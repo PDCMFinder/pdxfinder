@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+
+    <parent>
+        <groupId>org.pdxfinder</groupId>
+        <artifactId>dependencies</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../dependencies/pom.xml</relativePath>
+    </parent>
+
+    <name>parent</name>
+    <description>Parent module to aggregate maven submodules</description>
+
+    <url>http://www.pdxfinder.org</url>
+
+</project>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.pdxfinder</groupId>
+    <artifactId>dependencies</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <pdxfinder.version>${project.version}</pdxfinder.version>
+        <java.version>1.8</java.version>
+    </properties>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.4.3.RELEASE</version>
+        <relativePath/>
+        <!-- lookup parent from repository -->
+    </parent>
+
+    <name>dependencies</name>
+    <description>
+        Dependency management for the PdxFinder
+    </description>
+
+    <url>http://www.pdxfinder.org/</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-neo4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- version management for project internal dependencies -->
+            <dependency>
+                <groupId>org.pdxfinder</groupId>
+                <artifactId>web</artifactId>
+                <version>${pdxfinder.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.pdxfinder</groupId>
+                <artifactId>indexer</artifactId>
+                <version>${pdxfinder.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.pdxfinder</groupId>
+                <artifactId>data-model</artifactId>
+                <version>${pdxfinder.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+</project>
