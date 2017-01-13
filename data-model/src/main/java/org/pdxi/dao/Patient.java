@@ -3,7 +3,6 @@ package org.pdxi.dao;
 
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.util.Collections;
@@ -17,9 +16,6 @@ public class Patient {
 
     @GraphId
     private Long id;
-
-    @Property
-    private String NODE_TYPE = "PATIENT";
 
     private String externalId;
     private String sex;
@@ -40,7 +36,7 @@ public class Patient {
         this.ethnicity = ethnicity;
     }
 
-    @Relationship(type = "TUMOR", direction = Relationship.INCOMING)
+    @Relationship(type = "TUMOR-SOURCE", direction = Relationship.INCOMING)
     private Set<Tumor> tumors;
 
     public void hasTumor(Tumor tumor) {

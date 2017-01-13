@@ -2,10 +2,9 @@ package org.pdxi.dao;
 
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
 
 /**
- * Tissue
+ * Tissue represents a human tissue associated with a tumor
  */
 @NodeEntity
 public class Tissue {
@@ -13,9 +12,7 @@ public class Tissue {
     @GraphId
     private Long id;
 
-    @Property
-    private String NODE_TYPE = "TISSUE";
-
+    private String providedName;
     private String name;
 
     public String getName() {

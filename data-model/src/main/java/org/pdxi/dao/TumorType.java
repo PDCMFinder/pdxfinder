@@ -2,7 +2,6 @@ package org.pdxi.dao;
 
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
 
 /**
  * Tumor type represents the various types of tumors
@@ -12,8 +11,6 @@ public class TumorType {
 
     @GraphId
     private Long id;
-    @Property(name = "TUMOR_TYPE")
-    private String NODE_TYPE;
 
     private String name;
 

@@ -2,7 +2,6 @@ package org.pdxi.dao;
 
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 
 @NodeEntity
@@ -11,22 +10,21 @@ public class Tumor {
     @GraphId
     private Long id;
 
-    @Property
-    private String NODE_TYPE = "TUMOR";
-
     private String sourceTumorId;
     private String diagnosis;
     private Tissue originTissue;
+    private Tissue tumorSite;
     private String classification;
 
     @Relationship(type = "TYPE", direction = Relationship.INCOMING)
     private TumorType type;
 
-    public Tumor(String sourceTumorId, TumorType type, String diagnosis, Tissue originTissue, String classification) {
+    public Tumor(String sourceTumorId, TumorType type, String diagnosis, Tissue originTissue, Tissue tumorSite, String classification) {
         this.sourceTumorId = sourceTumorId;
         this.type = type;
         this.diagnosis = diagnosis;
         this.originTissue = originTissue;
+        this.tumorSite = tumorSite;
         this.classification = classification;
     }
 
@@ -68,5 +66,13 @@ public class Tumor {
 
     public void setClassification(String classification) {
         this.classification = classification;
+    }
+
+    public Tissue getTumorSite() {
+        return tumorSite;
+    }
+
+    public void setTumorSite(Tissue tumorSite) {
+        this.tumorSite = tumorSite;
     }
 }
