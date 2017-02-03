@@ -9,8 +9,8 @@
     <version>1.0.0</version>
 
     <packaging>pom</packaging>
-    <name>pdx-integrator</name>
-    <description>PDXIntegrator -- Find your PDX models</description>
+    <name>pdx-finder</name>
+    <description>PDXFinder -- Find PDX models</description>
 
     <url>http://www.mousephenotype.org</url>
 
