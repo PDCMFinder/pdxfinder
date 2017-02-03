@@ -1,22 +1,25 @@
-package org.pdxi.repositories;
+package org.pdxfinder.repositories;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.pdxi.TestConfig;
-import org.pdxi.dao.Patient;
+import org.pdxfinder.TestConfig;
+import org.pdxfinder.dao.ExternalDataSource;
+import org.pdxfinder.dao.Patient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
+import java.time.Instant;
+
 /**
- * Created by jmason on 09/01/2017.
+ * Tests for the Patient data repository
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -27,20 +30,34 @@ import org.springframework.transaction.annotation.Transactional;
 public class PatientRepositoryTest {
 
     private final static Logger log = LoggerFactory.getLogger(PatientRepositoryTest.class);
+    private String extDsName = "TEST_SOURCE";
 
     @Autowired
-    PatientRepository patientRepository;
+    private ExternalDataSourceRepository externalDataSourceRepository;
 
-    @Rollback(false)
-    @BeforeTransaction
-    public void cleanDb() {
+    @Autowired
+    private PatientRepository patientRepository;
+
+    @Before
+    public void setupDb() {
+
         patientRepository.deleteAll();
+        externalDataSourceRepository.deleteAll();
+
+        ExternalDataSource ds = externalDataSourceRepository.findByName(extDsName);
+        if (ds == null) {
+            log.info("External data source ", extDsName, "not found. Creating");
+            ds = new ExternalDataSource(extDsName, extDsName, extDsName, Date.from(Instant.now()));
+            externalDataSourceRepository.save(ds);
+        }
     }
 
     @Test
     public void persistedPatientShouldBeRetrievableFromGraphDb() throws Exception {
 
-        Patient femalePatient = new Patient("-9999", "F", "65", null, null);
+        ExternalDataSource externalDataSource = externalDataSourceRepository.findByAbbreviation(extDsName);
+
+        Patient femalePatient = new Patient("-9999", "F", "65", null, null, externalDataSource);
         patientRepository.save(femalePatient);
 
         Patient foundFemalePatient = patientRepository.findBySexAndAge("F", "65").iterator().next();
@@ -50,7 +67,9 @@ public class PatientRepositoryTest {
 
         log.info(foundFemalePatient.toString());
 
-//        patientRepository.delete(patientRepository.findByExternalId("-9999"));
+        patientRepository.delete(patientRepository.findByExternalId("-9999"));
+        Patient notFoundFemalePatient = patientRepository.findByExternalId("-9999");
+        assert (notFoundFemalePatient == null);
 
 
     }

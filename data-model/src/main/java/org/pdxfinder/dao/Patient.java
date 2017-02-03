@@ -1,5 +1,5 @@
 
-package org.pdxi.dao;
+package org.pdxfinder.dao;
 
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -22,18 +22,20 @@ public class Patient {
     private String age;
     private String race;
     private String ethnicity;
+    private String dataSource;
 
 
     private Patient() {
         // Empty constructor required as of Neo4j API 2.0.5
     }
 
-    public Patient(String externalId, String sex, String age, String race, String ethnicity) {
+    public Patient(String externalId, String sex, String age, String race, String ethnicity, ExternalDataSource externalDataSource) {
         this.externalId = externalId;
         this.sex = sex;
         this.age = age;
         this.race = race;
         this.ethnicity = ethnicity;
+        this.dataSource = externalDataSource.getAbbreviation();
     }
 
     @Relationship(type = "TUMOR-SOURCE", direction = Relationship.INCOMING)

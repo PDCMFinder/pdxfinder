@@ -1,13 +1,13 @@
-package org.pdxi.repositories;
+package org.pdxfinder.repositories;
 
-import org.pdxi.dao.Patient;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.pdxfinder.dao.Patient;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
 @Repository
-public interface PatientRepository extends GraphRepository<Patient> {
+public interface PatientRepository extends Neo4jRepository<Patient, Long> {
 
     Set<Patient> findBySex(String sex);
 
