@@ -1,4 +1,4 @@
-package org.pdxi;
+package org.pdxfinder;
 
 import org.neo4j.ogm.session.SessionFactory;
 import org.springframework.context.annotation.Bean;
@@ -9,12 +9,12 @@ import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * Created by jmason on 09/01/2017.
+ * Test configuration sets up the embedded Neo4J driver in memory mode
  */
 @Configuration
 @EnableTransactionManagement
-@ComponentScan(value = "org.pdxi")
-@EnableNeo4jRepositories("org.pdxi.repositories")
+@ComponentScan(value = "org.pdxfinder")
+@EnableNeo4jRepositories("org.pdxfinder.repositories")
 public class TestConfig {
 
     @Bean
@@ -27,16 +27,15 @@ public class TestConfig {
 //                .driverConfiguration()
 //                .setDriverClassName("org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver")
 //                .setURI("file://" + pathToDb);
-
-        System.out.println(config);
-
+//
+//        System.out.println(config);
 
         return config;
     }
 
     @Bean
     public SessionFactory sessionFactory() {
-        return new SessionFactory(getConfiguration(), "org.pdxi");
+        return new SessionFactory(getConfiguration(), "org.pdxfinder");
     }
 
     @Bean
