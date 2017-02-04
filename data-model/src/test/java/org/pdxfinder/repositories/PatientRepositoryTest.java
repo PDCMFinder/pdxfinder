@@ -2,18 +2,12 @@ package org.pdxfinder.repositories;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.pdxfinder.TestConfig;
+import org.pdxfinder.BaseTest;
 import org.pdxfinder.dao.ExternalDataSource;
 import org.pdxfinder.dao.Patient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.time.Instant;
@@ -22,12 +16,7 @@ import java.time.Instant;
  * Tests for the Patient data repository
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TestConfig.class})
-@TestPropertySource(locations = {"classpath:ogm.properties"})
-@Transactional
-@SpringBootTest
-public class PatientRepositoryTest {
+public class PatientRepositoryTest extends BaseTest {
 
     private final static Logger log = LoggerFactory.getLogger(PatientRepositoryTest.class);
     private String extDsName = "TEST_SOURCE";
@@ -46,7 +35,7 @@ public class PatientRepositoryTest {
 
         ExternalDataSource ds = externalDataSourceRepository.findByName(extDsName);
         if (ds == null) {
-            log.info("External data source ", extDsName, "not found. Creating");
+            log.debug("External data source {} not found. Creating", extDsName);
             ds = new ExternalDataSource(extDsName, extDsName, extDsName, Date.from(Instant.now()));
             externalDataSourceRepository.save(ds);
         }

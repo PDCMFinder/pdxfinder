@@ -2,17 +2,12 @@ package org.pdxfinder.integration;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.pdxfinder.TestConfig;
+import org.pdxfinder.BaseTest;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Date;
 import java.time.Instant;
@@ -20,11 +15,7 @@ import java.time.Instant;
 /**
  * Test the integration of tumor to patient
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TestConfig.class})
-@TestPropertySource(locations = {"classpath:ogm.properties"})
-@SpringBootTest
-public class PatientTumorIntegrationTest {
+public class PatientTumorIntegrationTest extends BaseTest {
 
     private final static Logger log = LoggerFactory.getLogger(PatientTumorIntegrationTest.class);
     private String tumorTypeName = "TEST_TUMORTYPE";
@@ -57,28 +48,28 @@ public class PatientTumorIntegrationTest {
 
         ExternalDataSource ds = externalDataSourceRepository.findByName(extDsName);
         if (ds == null) {
-            log.info("External data source ", extDsName, "not found. Creating");
+            log.debug("External data source {} not found. Creating", extDsName);
             ds = new ExternalDataSource(extDsName, extDsName, extDsName, Date.from(Instant.now()));
             externalDataSourceRepository.save(ds);
         }
 
         ExternalDataSource dsAlt = externalDataSourceRepository.findByName(extDsNameAlternate);
         if (dsAlt == null) {
-            log.info("External data source ", extDsNameAlternate, "not found. Creating");
+            log.debug("External data source {} not found. Creating", extDsNameAlternate);
             dsAlt = new ExternalDataSource(extDsNameAlternate, extDsNameAlternate, extDsNameAlternate, Date.from(Instant.now()));
             externalDataSourceRepository.save(dsAlt);
         }
 
         TumorType tumorType = tumorTypeRepository.findByName(tumorTypeName);
         if (tumorType == null) {
-            log.info("Tumor type ", tumorTypeName, "not found. Creating");
+            log.debug("Tumor type {} not found. Creating", tumorTypeName);
             tumorType = new TumorType(tumorTypeName);
             tumorTypeRepository.save(tumorType);
         }
 
         Tissue tissue = tissueRepository.findByName(tissueName);
         if (tissue == null) {
-            log.info("Tissue ", extDsName, "not found. Creating");
+            log.debug("Tissue {} not found. Creating", extDsName);
             tissue = new Tissue(tissueName);
             tissueRepository.save(tissue);
         }

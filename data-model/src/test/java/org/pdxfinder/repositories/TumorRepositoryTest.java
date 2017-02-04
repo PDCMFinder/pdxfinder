@@ -3,8 +3,7 @@ package org.pdxfinder.repositories;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.pdxfinder.TestConfig;
+import org.pdxfinder.BaseTest;
 import org.pdxfinder.dao.ExternalDataSource;
 import org.pdxfinder.dao.Tissue;
 import org.pdxfinder.dao.Tumor;
@@ -12,11 +11,6 @@ import org.pdxfinder.dao.TumorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.time.Instant;
@@ -24,12 +18,7 @@ import java.time.Instant;
 /**
  * Testing repository for managing tumor objects
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TestConfig.class})
-@TestPropertySource(locations = {"classpath:ogm.properties"})
-@SpringBootTest
-@Transactional
-public class TumorRepositoryTest {
+public class TumorRepositoryTest extends BaseTest {
 
     private final static Logger log = LoggerFactory.getLogger(TumorRepositoryTest.class);
     private String tumorTypeName = "TEST_TUMORTYPE";
@@ -61,21 +50,21 @@ public class TumorRepositoryTest {
 
         TumorType tumorType = tumorTypeRepository.findByName(tumorTypeName);
         if (tumorType == null) {
-            log.info("Tumor type ", tumorTypeName, "not found. Creating");
+            log.debug("Tumor type {} not found. Creating", tumorTypeName);
             tumorType = new TumorType(tumorTypeName);
             tumorTypeRepository.save(tumorType);
         }
 
         ExternalDataSource ds = externalDataSourceRepository.findByName(extDsName);
         if (ds == null) {
-            log.info("External data source ", extDsName, "not found. Creating");
+            log.debug("External data source {} not found. Creating", extDsName);
             ds = new ExternalDataSource(extDsName, extDsName, extDsName, Date.from(Instant.now()));
             externalDataSourceRepository.save(ds);
         }
 
         Tissue tissue = tissueRepository.findByName(tissueName);
         if (tissue == null) {
-            log.info("Tissue ", extDsName, "not found. Creating");
+            log.debug("Tissue {} not found. Creating", extDsName);
             tissue = new Tissue(tissueName);
             tissueRepository.save(tissue);
         }
