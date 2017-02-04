@@ -1,9 +1,9 @@
-package org.pdxi.repositories;
+package org.pdxfinder.repositories;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.pdxi.TestConfig;
-import org.pdxi.dao.TumorType;
+import org.pdxfinder.TestConfig;
+import org.pdxfinder.dao.TumorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by jmason on 09/01/2017.
+ * Tests for the Tumor Type repository
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -32,6 +32,7 @@ public class TumorTypeRepositoryTest {
     private final static Logger log = LoggerFactory.getLogger(TumorTypeRepositoryTest.class);
 
     @Autowired
+    private
     TumorTypeRepository tumorTypeRepository;
 
     @Rollback(false)
@@ -54,9 +55,8 @@ public class TumorTypeRepositoryTest {
             }
 
             foundType = tumorTypeRepository.findByName(type);
-            log.info("Found Tumor type ", type);
+            log.info("Found Tumor type {}", foundType.getName());
 
-            assert (foundType != null);
             assert (foundType.getName().equals(type));
 
         }
