@@ -30,7 +30,7 @@ import java.time.Instant;
 @Transactional
 public class ExternalDataSourceRepositoryTest {
 
-    private final static Logger log = LoggerFactory.getLogger(PatientRepositoryTest.class);
+    private final static Logger log = LoggerFactory.getLogger(ExternalDataSourceRepositoryTest.class);
     private String extDsName = "TEST_SOURCE";
 
     @Autowired
