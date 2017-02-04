@@ -23,6 +23,7 @@ public class Patient {
     private String race;
     private String ethnicity;
     private String dataSource;
+    private ExternalDataSource externalDataSource;
 
 
     private Patient() {
@@ -36,6 +37,7 @@ public class Patient {
         this.race = race;
         this.ethnicity = ethnicity;
         this.dataSource = externalDataSource.getAbbreviation();
+        this.externalDataSource = externalDataSource;
     }
 
     @Relationship(type = "TUMOR-SOURCE", direction = Relationship.INCOMING)
@@ -104,5 +106,20 @@ public class Patient {
         this.tumors = tumors;
     }
 
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public ExternalDataSource getExternalDataSource() {
+        return externalDataSource;
+    }
+
+    public void setExternalDataSource(ExternalDataSource externalDataSource) {
+        this.externalDataSource = externalDataSource;
+    }
 }
 
