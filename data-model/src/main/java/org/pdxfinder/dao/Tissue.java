@@ -1,4 +1,4 @@
-package org.pdxi.dao;
+package org.pdxfinder.dao;
 
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -12,8 +12,15 @@ public class Tissue {
     @GraphId
     private Long id;
 
-    private String providedName;
     private String name;
+
+    public Tissue() {
+        // Empty constructor required as of Neo4j API 2.0.5
+    }
+
+    public Tissue(String name) {
+        this.name = name;
+    }
 
     public String getName() {
         return name;
