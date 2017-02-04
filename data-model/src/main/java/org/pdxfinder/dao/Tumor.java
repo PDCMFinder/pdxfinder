@@ -1,4 +1,4 @@
-package org.pdxi.dao;
+package org.pdxfinder.dao;
 
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -15,17 +15,25 @@ public class Tumor {
     private Tissue originTissue;
     private Tissue tumorSite;
     private String classification;
+    private String dataSource;
+    private ExternalDataSource externalDataSource;
 
-    @Relationship(type = "TYPE", direction = Relationship.INCOMING)
+    @Relationship(type = "OF_TYPE", direction = Relationship.OUTGOING)
     private TumorType type;
 
-    public Tumor(String sourceTumorId, TumorType type, String diagnosis, Tissue originTissue, Tissue tumorSite, String classification) {
+    public Tumor() {
+        // Empty constructor required as of Neo4j API 2.0.5
+    }
+
+    public Tumor(String sourceTumorId, TumorType type, String diagnosis, Tissue originTissue, Tissue tumorSite, String classification, ExternalDataSource externalDataSource) {
         this.sourceTumorId = sourceTumorId;
         this.type = type;
         this.diagnosis = diagnosis;
         this.originTissue = originTissue;
         this.tumorSite = tumorSite;
         this.classification = classification;
+        this.dataSource = externalDataSource.getAbbreviation();
+        this.externalDataSource = externalDataSource;
     }
 
     public String getSourceTumorId() {
@@ -74,5 +82,21 @@ public class Tumor {
 
     public void setTumorSite(Tissue tumorSite) {
         this.tumorSite = tumorSite;
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public ExternalDataSource getExternalDataSource() {
+        return externalDataSource;
+    }
+
+    public void setExternalDataSource(ExternalDataSource externalDataSource) {
+        this.externalDataSource = externalDataSource;
     }
 }
