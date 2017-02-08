@@ -1,0 +1,77 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css"
+          th:href="@{/webjars/bootswatch-flatly/css/bootstrap.min.css}"
+          rel="stylesheet" media="screen"/>
+    <!--/*/ <th:block th:include="fragments/head-includes :: head-includes"></th:block> /*/-->
+    <style></style>
+</head>
+<body>
+
+<div class="container">
+    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+</div>
+
+<!-- Page Content -->
+<div class="container">
+
+    <!-- Heading Row -->
+    <div class="row">
+        <div class="col-md-4">
+            <img class="img-responsive img-rounded center-block" src="../static/images/pdx_logo.png"
+                 th:src="@{/images/pdx_logo.png}" alt=""/>
+        </div>
+        <!-- /.col-md-4 -->
+        <div class="col-md-8">
+            <h1>Welcome to the PDX integrator</h1>
+            <p>Patient-derived xenograft mouse models (PDX) have emerged as an important oncology research
+                platform to study tumor evolution, the mechanisms of drug response and resistance, and in the
+                personalization of chemotherapeutic approaches for patients. PDX finder aim is to make all PDX
+                models anywhere in the world findable and obtainable.
+            </p>
+            <a th:href="@{/search}" class="btn btn-success btn-block text-center" href="#">Search for PDX models</a>
+        </div>
+        <!-- /.col-md-8 -->
+    </div>
+    <!-- /.row -->
+
+    <hr/>
+
+    <!-- Call to Action Well -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="well text-center">
+            </div>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+
+    <!-- Content Row -->
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Data from JAX</h2>
+            <p>Information about the data from JAX.</p>
+            <a class="btn btn-default" href="#">More Info</a>
+        </div>
+        <!-- /.col-md-4 -->
+        <div class="col-md-4">
+            <h2>Data from PDM</h2>
+            <p>Patient derived models database information.</p>
+            <a class="btn btn-default" href="#">More Info</a>
+        </div>
+        <!-- /.col-md-4 -->
+        <div class="col-md-4">
+            <h2>Data from EUROPDX</h2>
+            <p>EUROPDX also has PDX information.</p>
+            <a class="btn btn-default" href="#">More Info</a>
+        </div>
+        <!-- /.col-md-4 -->
+    </div>
+    <!-- /.row -->
+
+</div>
+<!-- /.container -->
+
+</body>
+</html>

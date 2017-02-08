@@ -95,15 +95,15 @@ public class AllLookupNodeRepositoriesTest extends BaseTest {
     @Test
     public void createBackgroundStrain() {
 
-        BackgroundStrain bgStrain = backgroundStrainRepository.findByName(BACKGROUND_STRAIN);
+        BackgroundStrain bgStrain = backgroundStrainRepository.findBySymbol(BACKGROUND_STRAIN);
         if (bgStrain == null) {
             log.debug("Background strain {} not found. Creating", BACKGROUND_STRAIN);
             bgStrain = new BackgroundStrain(BACKGROUND_STRAIN);
             backgroundStrainRepository.save(bgStrain);
         }
 
-        Assert.notNull(backgroundStrainRepository.findByName(BACKGROUND_STRAIN));
-        log.info("  Found Background Strain {}", backgroundStrainRepository.findByName(BACKGROUND_STRAIN).getName());
+        Assert.notNull(backgroundStrainRepository.findBySymbol(BACKGROUND_STRAIN));
+        log.info("  Found Background Strain {}", backgroundStrainRepository.findBySymbol(BACKGROUND_STRAIN).getSymbol());
     }
 
     @Test

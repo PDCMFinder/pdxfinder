@@ -1,15 +1,16 @@
 package org.pdxfinder.repositories;
 
 import org.pdxfinder.dao.ExternalDataSource;
-import org.springframework.data.neo4j.repository.Neo4jRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 /**
  * Interface to the sources of data in PDX finder
  */
-public interface ExternalDataSourceRepository extends Neo4jRepository<ExternalDataSource, Long> {
+public interface ExternalDataSourceRepository extends PagingAndSortingRepository<ExternalDataSource, Long> {
 
-    ExternalDataSource findByName(String dataSourceName);
+    ExternalDataSource findByName(@Param("name") String dataSourceName);
 
-    ExternalDataSource findByAbbreviation(String dataSourceAbbr);
+    ExternalDataSource findByAbbreviation(@Param("abbr") String dataSourceAbbr);
 
 }

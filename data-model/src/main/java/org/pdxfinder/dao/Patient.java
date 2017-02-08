@@ -40,7 +40,7 @@ public class Patient {
         this.externalDataSource = externalDataSource;
     }
 
-    @Relationship(type = "TUMOR-SOURCE", direction = Relationship.INCOMING)
+    @Relationship(type = "EXTRACTED_FROM", direction = Relationship.INCOMING)
     private Set<Tumor> tumors;
 
     public void hasTumor(Tumor tumor) {
