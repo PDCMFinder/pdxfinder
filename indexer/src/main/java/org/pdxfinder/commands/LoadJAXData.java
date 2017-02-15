@@ -23,9 +23,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(value = Ordered.LOWEST_PRECEDENCE)
-public class LoadDataCommand implements CommandLineRunner {
+public class LoadJAXData implements CommandLineRunner {
 
-    private final static Logger log = LoggerFactory.getLogger(LoadDataCommand.class);
+    private final static Logger log = LoggerFactory.getLogger(LoadJAXData.class);
 
     private final static String DATASOURCE_ABBREVIATION = "UNITO-IRCC";
     private final static String DATASOURCE_NAME = "University of Torino, Candiolo Cancer Institute";
@@ -48,7 +48,7 @@ public class LoadDataCommand implements CommandLineRunner {
         log.info("Setting up LoadDataCommand option");
     }
 
-    public LoadDataCommand(TumorTypeRepository tumorTypeRepository, ExternalDataSourceRepository externalDataSourceRepository, Session session) {
+    public LoadJAXData(TumorTypeRepository tumorTypeRepository, ExternalDataSourceRepository externalDataSourceRepository, Session session) {
         Assert.notNull(tumorTypeRepository);
         Assert.notNull(externalDataSourceRepository);
         Assert.notNull(session);
