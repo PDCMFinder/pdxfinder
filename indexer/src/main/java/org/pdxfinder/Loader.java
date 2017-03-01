@@ -26,10 +26,11 @@ public class Loader {
 
             Option createOpt = Option.builder("create").desc("Purgess all data and re-creates the base graph database with the basic nodes pre loaded (standard tissues, implantation details, bacckground strains, etc.").build();
             Option loadOpt = Option.builder("load").desc("load command ").build();
-            Option jaxOpt = Option.builder("loadJAX").desc("load JAX PDX models ").build();
+            Option jaxOpt = Option.builder("loadJAX").desc("Load JAX PDX models from file.").build();
 
             options.addOption(createOpt);
             options.addOption(loadOpt);
+            options.addOption(jaxOpt);
 
             formatter.printHelp("Application", options);
         } else {
