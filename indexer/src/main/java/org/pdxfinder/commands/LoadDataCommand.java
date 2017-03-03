@@ -14,10 +14,15 @@ import org.springframework.util.Assert;
 import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.Date;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 /**
  * Load data from the UNITO-IRCC center.
  */
+@Component
+@Order(value = Ordered.LOWEST_PRECEDENCE)
 public class LoadDataCommand implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadDataCommand.class);
@@ -57,7 +62,7 @@ public class LoadDataCommand implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
 
-        if ("create".equals(args[0])) {
+        if ("load".equals(args[0])) {
 
             log.info("Loading data from UNITO-IRCC");
             try {
