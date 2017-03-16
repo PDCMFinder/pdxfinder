@@ -1,5 +1,22 @@
 package org.pdxfinder.commands;
 
+import org.apache.commons.cli.*;
+import org.neo4j.ogm.json.JSONArray;
+import org.neo4j.ogm.json.JSONObject;
+import org.neo4j.ogm.session.Session;
+import org.pdxfinder.dao.*;
+import org.pdxfinder.repositories.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -9,39 +26,6 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.stream.Stream;
-import org.apache.commons.cli.*;
-import org.neo4j.ogm.session.Session;
-import org.pdxfinder.dao.ExternalDataSource;
-import org.pdxfinder.repositories.ExternalDataSourceRepository;
-import org.pdxfinder.repositories.TumorTypeRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
-import javax.annotation.PostConstruct;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.dao.BackgroundStrain;
-import org.pdxfinder.dao.ImplantationSite;
-import org.pdxfinder.dao.ImplantationType;
-import org.pdxfinder.dao.Patient;
-import org.pdxfinder.dao.PdxStrain;
-import org.pdxfinder.dao.Tissue;
-import org.pdxfinder.dao.Tumor;
-import org.pdxfinder.dao.TumorType;
-import org.pdxfinder.repositories.BackgroundStrainRepository;
-import org.pdxfinder.repositories.ImplantationSiteRepository;
-import org.pdxfinder.repositories.ImplantationTypeRepository;
-import org.pdxfinder.repositories.PatientRepository;
-import org.pdxfinder.repositories.PdxStrainRepository;
-import org.pdxfinder.repositories.TissueRepository;
-import org.pdxfinder.repositories.TumorRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 /**
  * Load data from JAX.
@@ -75,7 +59,7 @@ public class LoadJAXData implements CommandLineRunner {
     private PatientRepository patientRepository;
     private PdxStrainRepository pdxStrainRepository;
     private TissueRepository tissueRepository;
-    private TumorRepository tumorRepository;
+    private SampleRepository sampleRepository;
     private Session session;
 
     @Value("${jaxpdx.file}")
@@ -92,12 +76,12 @@ public class LoadJAXData implements CommandLineRunner {
         log.info("Setting up LoadJAXDataCommand option");
     }
 
-    public LoadJAXData(TumorRepository tumorRepository, TissueRepository tissueRepository, PdxStrainRepository pdxStrainRepository, PatientRepository patientRepository, ExternalDataSourceRepository externalDataSourceRepository, TumorTypeRepository tumorTypeRepository, BackgroundStrainRepository backgroundStrainRepository, ImplantationSiteRepository implantationSiteRepository, ImplantationTypeRepository implantationTypeRepository, Session session) {
+    public LoadJAXData(SampleRepository sampleRepository, TissueRepository tissueRepository, PdxStrainRepository pdxStrainRepository, PatientRepository patientRepository, ExternalDataSourceRepository externalDataSourceRepository, TumorTypeRepository tumorTypeRepository, BackgroundStrainRepository backgroundStrainRepository, ImplantationSiteRepository implantationSiteRepository, ImplantationTypeRepository implantationTypeRepository, Session session) {
 
         Assert.notNull(patientRepository);
         Assert.notNull(pdxStrainRepository);
         Assert.notNull(tissueRepository);
-        Assert.notNull(tumorRepository);
+        Assert.notNull(sampleRepository);
         Assert.notNull(externalDataSourceRepository);
         Assert.notNull(tumorTypeRepository);
         Assert.notNull(backgroundStrainRepository);
@@ -108,7 +92,7 @@ public class LoadJAXData implements CommandLineRunner {
         this.patientRepository = patientRepository;
         this.pdxStrainRepository = pdxStrainRepository;
         this.tissueRepository = tissueRepository;
-        this.tumorRepository = tumorRepository;
+        this.sampleRepository = sampleRepository;
 
         this.externalDataSourceRepository = externalDataSourceRepository;
         this.tumorTypeRepository = tumorTypeRepository;
@@ -197,7 +181,7 @@ public class LoadJAXData implements CommandLineRunner {
     private void parseJSON(String json) {
 
         // {"Model ID","Gender","Age","Race","Ethnicity","Specimen Site","Primary Site","Initial Diagnosis","Clinical Diagnosis",
-        //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
+        //  "Sample Type","Grades","Sample Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
         try {
             JSONObject job = new JSONObject(json);
             JSONArray jarray = job.getJSONArray("pdxInfo");
@@ -208,12 +192,12 @@ public class LoadJAXData implements CommandLineRunner {
                 Patient p = createPatient("JAX " + i, j.getString("Gender"), j.getString("Age"), j.getString("Race"), j.getString("Ethnicity"));
                 Tissue originSite = createTissue(j.getString("Specimen Site"));
                 Tissue primarySite = createTissue(j.getString("Primary Site"));
-                TumorType tumorType = createTumorType(j.getString("Tumor Type"));
+                TumorType tumorType = createTumorType(j.getString("Sample Type"));
                 ImplantationSite is = createImplantationSite(j.getString("Engraftment Site"));
                 ImplantationType it = createImplantationType(j.getString("Sample Type"));
-                String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
+                String classification = j.getString("Sample Stage") + "/" + j.getString("Grades");
 
-                Tumor tumor = createTumor("JAX " + i, tumorType, j.getString("Clinical Diagnosis"), originSite, primarySite, classification, jaxDS);
+                Sample sample = createTumor("JAX " + i, tumorType, j.getString("Clinical Diagnosis"), originSite, primarySite, classification, jaxDS);
                 id = j.getString("Model ID");
                 
                 // models IDs that are numeric should start with 'TM' then the value padded to 5 digits with leading 0s
@@ -224,7 +208,7 @@ public class LoadJAXData implements CommandLineRunner {
                 }
 
                 // for JAX, passages are associated with samples, but i think valid modles are all passaged 3 times
-                createPDXStrain(id, is, it, tumor, this.nsgBS, "3");
+                createPDXStrain(id, is, it, sample, this.nsgBS, "3");
                
             }
 
@@ -233,28 +217,28 @@ public class LoadJAXData implements CommandLineRunner {
         }
     }
 
-    private PdxStrain createPDXStrain(String pdxId, ImplantationSite implantationSite, ImplantationType implantationType, Tumor tumor, BackgroundStrain backgroundStrain, String passage) {
+    private PdxStrain createPDXStrain(String pdxId, ImplantationSite implantationSite, ImplantationType implantationType, Sample sample, BackgroundStrain backgroundStrain, String passage) {
         
         PdxStrain pdxStrain = pdxStrainRepository.findBySourcePdxId(pdxId);
         if(pdxStrain != null){
             log.info("Deleting existing PdxStrain "+pdxId);
             pdxStrainRepository.delete(pdxStrain);
         }
-        pdxStrain = new PdxStrain(pdxId, implantationSite, implantationType, tumor, backgroundStrain, passage);
+        pdxStrain = new PdxStrain(pdxId, implantationSite, implantationType, sample, backgroundStrain, passage);
         pdxStrainRepository.save(pdxStrain);
         return pdxStrain;
     }
 
-    private Tumor createTumor(String id, TumorType tumorType, String diagnosis, Tissue originSite, Tissue primarySite, String classification, ExternalDataSource externalDataSource) {
+    private Sample createTumor(String id, TumorType tumorType, String diagnosis, Tissue originSite, Tissue primarySite, String classification, ExternalDataSource externalDataSource) {
 
-        Tumor tumor = tumorRepository.findBySourceTumorId(id);
-        if(tumor != null){
-            log.info("Deleting existing tumor "+id);
-            tumorRepository.delete(tumor);
+        Sample sample = sampleRepository.findBySourceSampleId(id);
+        if (sample != null) {
+            log.info("Deleting existing sample " + id);
+            sampleRepository.delete(sample);
         }
-        tumor = new Tumor(id, tumorType, diagnosis, originSite, primarySite, classification, externalDataSource);
-        tumorRepository.save(tumor);
-        return tumor;
+        sample = new Sample(id, tumorType, diagnosis, originSite, primarySite, classification, externalDataSource);
+        sampleRepository.save(sample);
+        return sample;
     }
 
     private ExternalDataSource createJAXDataSource() {

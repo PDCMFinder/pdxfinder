@@ -1,17 +1,18 @@
 package org.pdxfinder.repositories;
 
 import org.pdxfinder.dao.Patient;
+import org.pdxfinder.dao.PatientSnapshot;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
 @Repository
-public interface PatientRepository extends Neo4jRepository<Patient, Long> {
+public interface PatientSnapshotRepository extends Neo4jRepository<PatientSnapshot, Long> {
 
-    Set<Patient> findBySex(String sex);
+    Set<Patient> findByAge(String sex);
 
-    Set<Patient> findBySexAndPatientSnapshotAge(String sex, String age);
+    Set<Patient> findByPatientSex(String sex);
 
     Patient findByExternalId(String externalId);
 

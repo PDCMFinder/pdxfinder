@@ -8,15 +8,15 @@ import org.pdxfinder.repositories.TumorTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.Date;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 /**
  * Load data from the UNITO-IRCC center.
@@ -78,11 +78,11 @@ public class LoadDataCommand implements CommandLineRunner {
             if (eds != null) {
                 externalDataSourceRepository.delete(eds);
             }
-            log.info("Tumor type has {} entries now", tumorTypeRepository.count());
+            log.info("Sample type has {} entries now", tumorTypeRepository.count());
             log.info("  PURGING DATABASE");
             session.purgeDatabase();
             log.info("  DONE PURGING DATABASE");
-            log.info("Tumor type has {} entries now", tumorTypeRepository.count());
+            log.info("Sample type has {} entries now", tumorTypeRepository.count());
 
             // Create datasource node
             createDataSource();

@@ -11,20 +11,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Date;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * Test the integration of tumor to patient
  */
-public class PatientTumorIntegrationTest extends BaseTest {
+public class PatientSampleIntegrationTest extends BaseTest {
 
-    private final static Logger log = LoggerFactory.getLogger(PatientTumorIntegrationTest.class);
+    private final static Logger log = LoggerFactory.getLogger(PatientSampleIntegrationTest.class);
     private String tumorTypeName = "TEST_TUMORTYPE";
     private String extDsName = "TEST_SOURCE";
     private String extDsNameAlternate = "ALTERNATE_TEST_SOURCE";
     private String tissueName = "TEST_TISSUE";
 
     @Autowired
-    private TumorRepository tumorRepository;
+    private SampleRepository sampleRepository;
 
     @Autowired
     private TissueRepository tissueRepository;
@@ -36,12 +38,15 @@ public class PatientTumorIntegrationTest extends BaseTest {
     private PatientRepository patientRepository;
 
     @Autowired
+    private PatientSnapshotRepository patientsnapshotRepository;
+
+    @Autowired
     private ExternalDataSourceRepository externalDataSourceRepository;
 
     @Before
     public void setupDb() {
 
-        tumorRepository.deleteAll();
+        sampleRepository.deleteAll();
         patientRepository.deleteAll();
         externalDataSourceRepository.deleteAll();
         tissueRepository.deleteAll();
@@ -62,7 +67,7 @@ public class PatientTumorIntegrationTest extends BaseTest {
 
         TumorType tumorType = tumorTypeRepository.findByName(tumorTypeName);
         if (tumorType == null) {
-            log.debug("Tumor type {} not found. Creating", tumorTypeName);
+            log.debug("Sample type {} not found. Creating", tumorTypeName);
             tumorType = new TumorType(tumorTypeName);
             tumorTypeRepository.save(tumorType);
         }
@@ -87,11 +92,16 @@ public class PatientTumorIntegrationTest extends BaseTest {
             String sex = i % 2 == 0 ? "M" : "F";
             Long age = Math.round(Math.random() * 90);
 
-            Tumor tumor = new Tumor("tumor-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "TEST_CLASSIFICATION", externalDataSource);
-            tumorRepository.save(tumor);
+            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "TEST_CLASSIFICATION", externalDataSource);
+            sampleRepository.save(sample);
 
-            Patient patient = new Patient(Double.toString(Math.pow(i, age)), sex, age.toString(), null, null, externalDataSource);
-            patient.hasTumor(tumor);
+            Patient patient = new Patient(Double.toString(Math.pow(i, age)), sex, null, null, externalDataSource);
+            PatientSnapshot ps = new PatientSnapshot(patient, "67");
+            patient.hasSnapshot(ps);
+            Sample s = new Sample("test", tumorType, "adinocarcinoma", tissue, null, "F", externalDataSource);
+            s.normalTissue = Boolean.FALSE;
+            ps.setSamples(new HashSet<>(Arrays.asList(s)));
+
             patientRepository.save(patient);
 
         }
@@ -103,12 +113,12 @@ public class PatientTumorIntegrationTest extends BaseTest {
             String sex = i % 2 == 0 ? "M" : "F";
             Long age = Math.round(Math.random() * 80);
 
-            Tumor tumor = new Tumor("tumor-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "TEST_CLASSIFICATION", externalDataSourceAlternate);
-            tumorRepository.save(tumor);
+            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "TEST_CLASSIFICATION", externalDataSourceAlternate);
+            sampleRepository.save(sample);
 
-            Patient patient = new Patient(Double.toString(Math.pow(i, age)), sex, age.toString(), null, null, externalDataSourceAlternate);
-            patient.hasTumor(tumor);
-            patientRepository.save(patient);
+            PatientSnapshot ps = new PatientSnapshot(null, "67");
+            ps.setSamples(new HashSet<>(Arrays.asList(sample)));
+            patientsnapshotRepository.save(ps);
 
         }
 
