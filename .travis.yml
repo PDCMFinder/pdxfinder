@@ -1,0 +1,13 @@
+language: java
+
+sudo: false
+
+jdk:
+  - oraclejdk8
+
+script: mvn clean package
+
+env:
+  global:
+    - JAVA_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Xmn48M -Xmx512M"
+    - NUM_THREADS=2
