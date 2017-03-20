@@ -14,6 +14,6 @@ public interface PatientSnapshotRepository extends Neo4jRepository<PatientSnapsh
 
     Set<Patient> findByPatientSex(String sex);
 
-    Patient findByExternalId(String externalId);
+    Patient findByPatientExternalId(String externalId);
 
 }

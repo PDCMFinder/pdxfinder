@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 
 /**
@@ -24,6 +25,8 @@ public class PatientSampleIntegrationTest extends BaseTest {
     private String extDsName = "TEST_SOURCE";
     private String extDsNameAlternate = "ALTERNATE_TEST_SOURCE";
     private String tissueName = "TEST_TISSUE";
+    private String markerSymbol = "TEST_MARKER";
+    private String molCharTechnology = "TEST_MOLCHAR";
 
     @Autowired
     private SampleRepository sampleRepository;
@@ -43,6 +46,12 @@ public class PatientSampleIntegrationTest extends BaseTest {
     @Autowired
     private ExternalDataSourceRepository externalDataSourceRepository;
 
+    @Autowired
+    private MolecularCharacterizationRepository mcRepository;
+
+    @Autowired
+    private MarkerRepository markerRepository;
+
     @Before
     public void setupDb() {
 
@@ -50,6 +59,22 @@ public class PatientSampleIntegrationTest extends BaseTest {
         patientRepository.deleteAll();
         externalDataSourceRepository.deleteAll();
         tissueRepository.deleteAll();
+        mcRepository.deleteAll();
+        markerRepository.deleteAll();
+
+        MolecularCharacterization mc = mcRepository.findByTechnology(molCharTechnology);
+        if (mc == null) {
+            log.debug("Molecular characterization {} not found. Creating", molCharTechnology);
+            mc = new MolecularCharacterization(molCharTechnology);
+            mcRepository.save(mc);
+        }
+
+        Marker marker = markerRepository.findBySymbol(markerSymbol);
+        if (marker == null) {
+            log.debug("Marker {} not found. Creating", markerSymbol);
+            marker = new Marker(markerSymbol, markerSymbol);
+            markerRepository.save(marker);
+        }
 
         ExternalDataSource ds = externalDataSourceRepository.findByName(extDsName);
         if (ds == null) {
@@ -86,21 +111,28 @@ public class PatientSampleIntegrationTest extends BaseTest {
         TumorType tumorType = tumorTypeRepository.findByName(tumorTypeName);
         Tissue tissue = tissueRepository.findByName(tissueName);
         ExternalDataSource externalDataSource = externalDataSourceRepository.findByAbbreviation(extDsName);
+        MolecularCharacterization mc = mcRepository.findByTechnology(molCharTechnology);
+        Marker marker = markerRepository.findBySymbol(markerSymbol);
+
+        mc.setPositiveMarkers(new HashSet<>(Collections.singletonList(marker)));
+
 
         for (Integer i = 0; i < 20; i++) {
 
             String sex = i % 2 == 0 ? "M" : "F";
             Long age = Math.round(Math.random() * 90);
 
-            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "TEST_CLASSIFICATION", externalDataSource);
+            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "TEST_CLASSIFICATION", false, externalDataSource);
             sampleRepository.save(sample);
 
             Patient patient = new Patient(Double.toString(Math.pow(i, age)), sex, null, null, externalDataSource);
             PatientSnapshot ps = new PatientSnapshot(patient, "67");
             patient.hasSnapshot(ps);
-            Sample s = new Sample("test", tumorType, "adinocarcinoma", tissue, null, "F", externalDataSource);
+            Sample s = new Sample("test", tumorType, "adinocarcinoma", tissue, null, "F", false, externalDataSource);
             s.normalTissue = Boolean.FALSE;
-            ps.setSamples(new HashSet<>(Arrays.asList(s)));
+            s.setMolecularCharacterizations(new HashSet<>(Collections.singletonList(mc)));
+
+            ps.setSamples(new HashSet<>(Collections.singletonList(s)));
 
             patientRepository.save(patient);
 
@@ -113,7 +145,7 @@ public class PatientSampleIntegrationTest extends BaseTest {
             String sex = i % 2 == 0 ? "M" : "F";
             Long age = Math.round(Math.random() * 80);
 
-            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "TEST_CLASSIFICATION", externalDataSourceAlternate);
+            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "TEST_CLASSIFICATION", false, externalDataSourceAlternate);
             sampleRepository.save(sample);
 
             PatientSnapshot ps = new PatientSnapshot(null, "67");

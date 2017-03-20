@@ -140,7 +140,7 @@ public class SampleRepositoryTest extends BaseTest {
     }
 
     private void generateTumor(TumorType tumorType, Tissue tissue, ExternalDataSource externalDataSource, String TEST_TUMOR_ID) {
-        Sample sample = new Sample(TEST_TUMOR_ID, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "TEST_CLASSIFICATION", externalDataSource);
+        Sample sample = new Sample(TEST_TUMOR_ID, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "TEST_CLASSIFICATION", false, externalDataSource);
         sampleRepository.save(sample);
     }
 
