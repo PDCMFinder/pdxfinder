@@ -1,5 +1,6 @@
 package org.pdxfinder.dao;
 
+import java.util.HashSet;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -49,5 +50,12 @@ public class PatientSnapshot {
 
     public void setSamples(Set<Sample> samples) {
         this.samples = samples;
+    }
+    
+    public void addSample(Sample sample){
+        if(this.samples == null){
+            this.samples = new HashSet<Sample>();
+        }
+        this.samples.add(sample);
     }
 }

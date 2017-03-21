@@ -3,64 +3,109 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.pdxfinder.dao;
+package org.pdxfinder.commands;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Set;
+import org.pdxfinder.dao.BackgroundStrain;
+import org.pdxfinder.dao.ExternalDataSource;
+import org.pdxfinder.dao.ImplantationSite;
+import org.pdxfinder.dao.ImplantationType;
+import org.pdxfinder.dao.Marker;
+import org.pdxfinder.dao.MolecularCharacterization;
+import org.pdxfinder.dao.Patient;
+import org.pdxfinder.dao.PatientSnapshot;
+import org.pdxfinder.dao.PdxStrain;
+import org.pdxfinder.dao.Sample;
+import org.pdxfinder.dao.Tissue;
+import org.pdxfinder.dao.TumorType;
 import org.pdxfinder.repositories.ExternalDataSourceRepository;
 import org.pdxfinder.repositories.TumorTypeRepository;
 import org.pdxfinder.repositories.BackgroundStrainRepository;
 import org.pdxfinder.repositories.ImplantationSiteRepository;
 import org.pdxfinder.repositories.ImplantationTypeRepository;
+import org.pdxfinder.repositories.MarkerRepository;
+import org.pdxfinder.repositories.MolecularCharacterizationRepository;
 import org.pdxfinder.repositories.PatientRepository;
+import org.pdxfinder.repositories.PatientSnapshotRepository;
 import org.pdxfinder.repositories.PdxStrainRepository;
+import org.pdxfinder.repositories.SampleRepository;
 import org.pdxfinder.repositories.TissueRepository;
-import org.pdxfinder.repositories.TumorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 /**
- *  // these three types of thing happen a lot // there should be a naming
- * convention to indicate what we are doing
- *
- * // find or create a node // find, find a synonym, or create a node
- *
- * // delete and create (update) a node
+ *  The hope was to put a lot of reused repository actions into one place
+ *  ie find or create a node
+ *  or create a node with that requires a number of 'child' nodes that are terms
  *
  * @author sbn
  */
+@Component
 public class WrongPlaceWrongName {
 
-    @Autowired
+    
     private TumorTypeRepository tumorTypeRepository;
-
-    @Autowired
     private BackgroundStrainRepository backgroundStrainRepository;
-
-    @Autowired
     private ImplantationTypeRepository implantationTypeRepository;
-
-    @Autowired
     private ImplantationSiteRepository implantationSiteRepository;
-
-    @Autowired
     private ExternalDataSourceRepository externalDataSourceRepository;
-
-    @Autowired
     private PatientRepository patientRepository;
-
-    @Autowired
     private PdxStrainRepository pdxStrainRepository;
-
-    @Autowired
     private TissueRepository tissueRepository;
-
-    @Autowired
-    private TumorRepository tumorRepository;
+    private PatientSnapshotRepository patientSnapshotRepository;
+    private SampleRepository sampleRepository;
+    private MarkerRepository markerRepository;
+    private MolecularCharacterizationRepository molecularCharacterizationRepository; 
 
     private final static Logger log = LoggerFactory.getLogger(WrongPlaceWrongName.class);
 
+     public WrongPlaceWrongName(TumorTypeRepository tumorTypeRepository,
+                                BackgroundStrainRepository backgroundStrainRepository,
+                                ImplantationTypeRepository implantationTypeRepository,
+                                ImplantationSiteRepository implantationSiteRepository,
+                                ExternalDataSourceRepository externalDataSourceRepository,
+                                PatientRepository patientRepository,
+                                PdxStrainRepository pdxStrainRepository,
+                                TissueRepository tissueRepository,
+                                PatientSnapshotRepository patientSnapshotRepository,
+                                SampleRepository sampleRepository,
+                                MarkerRepository markerRepository,
+                                MolecularCharacterizationRepository molecularCharacterizationRepository) {
+         
+         
+        Assert.notNull(tumorTypeRepository);
+        Assert.notNull(backgroundStrainRepository);
+        Assert.notNull(implantationTypeRepository);
+        Assert.notNull(implantationSiteRepository);
+        Assert.notNull(externalDataSourceRepository);
+        Assert.notNull(patientRepository);
+        Assert.notNull(pdxStrainRepository);
+        Assert.notNull(tissueRepository);
+        Assert.notNull(patientSnapshotRepository);
+        Assert.notNull(sampleRepository);
+        Assert.notNull(markerRepository);
+        Assert.notNull(molecularCharacterizationRepository);
+
+        this.tumorTypeRepository = tumorTypeRepository;
+        this.backgroundStrainRepository = backgroundStrainRepository;
+        this.implantationTypeRepository = implantationTypeRepository;
+        this.implantationSiteRepository = implantationSiteRepository;
+        this.externalDataSourceRepository = externalDataSourceRepository;
+        this.patientRepository = patientRepository;
+        this.pdxStrainRepository = pdxStrainRepository;
+        this.tissueRepository = tissueRepository;
+        this.patientSnapshotRepository = patientSnapshotRepository;
+        this.sampleRepository = sampleRepository;
+        this.markerRepository = markerRepository;
+        this.molecularCharacterizationRepository = molecularCharacterizationRepository;
+        
+    }
+    
+    
     public ExternalDataSource getExternalDataSource(String abbr, String name, String description) {
         ExternalDataSource eDS = externalDataSourceRepository.findByAbbreviation(abbr);
         if (eDS == null) {
@@ -77,19 +122,20 @@ public class WrongPlaceWrongName {
 
     }
 
-    public PdxStrain createPDXStrain(String pdxId, ImplantationSite implantationSite, ImplantationType implantationType, Tumor tumor, BackgroundStrain backgroundStrain, String passage) {
+    public PdxStrain createPDXStrain(String pdxId, ImplantationSite implantationSite, ImplantationType implantationType, Sample sample, BackgroundStrain backgroundStrain) {
 
         PdxStrain pdxStrain = pdxStrainRepository.findBySourcePdxId(pdxId);
         if (pdxStrain != null) {
             log.info("Deleting existing PdxStrain " + pdxId);
             pdxStrainRepository.delete(pdxStrain);
         }
-        pdxStrain = new PdxStrain(pdxId, implantationSite, implantationType, tumor, backgroundStrain, passage);
+
+        pdxStrain = new PdxStrain(pdxId, implantationSite, implantationType, sample, backgroundStrain);
         pdxStrainRepository.save(pdxStrain);
         return pdxStrain;
     }
 
-    public PdxStrain createPDXStrain(String pdxId, String implantationSiteStr, String implantationTypeStr, Tumor tumor, BackgroundStrain backgroundStrain, String passage) {
+    public PdxStrain createPDXStrain(String pdxId, String implantationSiteStr, String implantationTypeStr, Sample sample, BackgroundStrain backgroundStrain) {
 
         ImplantationSite implantationSite = this.getImplantationSite(implantationSiteStr);
         ImplantationType implantationType = this.getImplantationType(implantationTypeStr);
@@ -98,49 +144,81 @@ public class WrongPlaceWrongName {
             log.info("Deleting existing PdxStrain " + pdxId);
             pdxStrainRepository.delete(pdxStrain);
         }
-        pdxStrain = new PdxStrain(pdxId, implantationSite, implantationType, tumor, backgroundStrain, passage);
+        pdxStrain = new PdxStrain(pdxId, implantationSite, implantationType, sample, backgroundStrain);
         pdxStrainRepository.save(pdxStrain);
         return pdxStrain;
     }
 
-    public Tumor getTumor(String id, TumorType tumorType, String diagnosis, Tissue originSite, Tissue primarySite, String classification, ExternalDataSource externalDataSource) {
+    public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, ExternalDataSource externalDataSource) {
 
-        Tumor tumor = tumorRepository.findBySourceTumorId(id);
-        if (tumor != null) {
-            log.info("Deleting existing tumor " + id);
-            tumorRepository.delete(tumor);
-        }
-        tumor = new Tumor(id, tumorType, diagnosis, originSite, primarySite, classification, externalDataSource);
-        tumorRepository.save(tumor);
-        return tumor;
-    }
-
-    public Tumor getTumor(String id, String tumorTypeStr, String diagnosis, String originSiteStr, String primarySiteStr, String classification, ExternalDataSource externalDataSource) {
-
-        TumorType tumorType = this.getTumorType(tumorTypeStr);
-        Tissue originSite = this.getTissue(originSiteStr);
-        Tissue primarySite = this.getTissue(primarySiteStr);
-
-        Tumor tumor = tumorRepository.findBySourceTumorId(id);
-        if (tumor != null) {
-            log.info("Deleting existing tumor " + id);
-            tumorRepository.delete(tumor);
-        }
-        tumor = new Tumor(id, tumorType, diagnosis, originSite, primarySite, classification, externalDataSource);
-        tumorRepository.save(tumor);
-        return tumor;
-    }
-
-    public Patient getPatient(String externalId, String sex, String age, String race, String ethnicity, ExternalDataSource externalDataSource) {
         Patient patient = patientRepository.findByExternalId(externalId);
+        PatientSnapshot patientSnapshot = null;
+
         if (patient == null) {
             log.info("Patient '{}' not found. Creating", externalId);
-            patient = new Patient(externalId, sex, age, race, ethnicity, externalDataSource);
+
+            patient = this.getPatient(externalId, sex, race, ethnicity, externalDataSource);
+
+            patientSnapshot = new PatientSnapshot(patient, age);
+            patientSnapshotRepository.save(patientSnapshot);
+
+        } else {
+            patientSnapshot = this.getPatientSnapshot(patient, age);
+        }
+        return patientSnapshot;
+    }
+
+    public PatientSnapshot getPatientSnapshot(Patient patient, String age) {
+
+        PatientSnapshot patientSnapshot = null;
+
+        Set<PatientSnapshot> pSnaps = patientSnapshotRepository.findByPatient(patient);
+        loop: for (PatientSnapshot ps : pSnaps) {
+            if (ps.getAge().equals(age)) {
+                patientSnapshot = ps;
+                break loop;
+            }
+        }
+        if(patientSnapshot == null){
+            log.info("PatientSnapshot for patient '{}' at aget '{}' not found. Creating", patient.getExternalId(), age);
+            patientSnapshot = new PatientSnapshot(patient, age);
+            patientSnapshotRepository.save(patientSnapshot);
+        }
+
+        return patientSnapshot;
+    }
+
+    public Patient getPatient(String externalId, String sex, String race, String ethnicity, ExternalDataSource externalDataSource) {
+
+        Patient patient = patientRepository.findByExternalId(externalId);
+
+        if (patient == null) {
+            log.info("Patient '{}' not found. Creating", externalId);
+
+            patient = new Patient(externalId, sex, race, ethnicity, externalDataSource);
+
             patientRepository.save(patient);
         }
 
         return patient;
     }
+
+    public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
+
+        TumorType type = this.getTumorType(typeStr);
+        Tissue origin = this.getTissue(originStr);
+        Tissue sampleSite = this.getTissue(sampleSiteStr);
+        Sample sample = sampleRepository.findBySourceSampleId(sourceSampleId);
+        if (sample == null) {
+            
+            sample = new Sample(sourceSampleId, type, diagnosis, origin, sampleSite, classification, normalTissue, externalDataSource);
+            sampleRepository.save(sample);
+        }
+
+        return sample;
+    }
+
+   
 
     public ImplantationSite getImplantationSite(String iSite) {
         ImplantationSite site = implantationSiteRepository.findByName(iSite);
@@ -189,10 +267,39 @@ public class WrongPlaceWrongName {
     public BackgroundStrain getBackgroundStrain(String symbol, String name, String description, String url) {
         BackgroundStrain bgStrain = backgroundStrainRepository.findByName(name);
         if (bgStrain == null) {
-            log.info("NSG Mouse '{}' not found. Creating", name);
+            log.info("Background Strain '{}' not found. Creating", name);
             bgStrain = new BackgroundStrain(symbol, name, description, url);
             backgroundStrainRepository.save(bgStrain);
         }
         return bgStrain;
+    }
+    
+    
+     public Marker getMarker(String symbol, String name) {
+        Marker marker = markerRepository.findByName(name);
+        if (marker == null) {
+            log.info("Marker '{}' not found. Creating", name);
+            marker = new Marker(symbol, name);
+            markerRepository.save(marker);
+        }
+        return marker;
+    }
+     
+     // is this bad? ... probably..
+     public Marker getMarker(String symbol) {
+        return this.getMarker(symbol, symbol);
+    }
+
+    // wow this is misleading it donsn't do anyting!
+    public void deleteAllByEDSName(String edsName) {
+
+    }
+    
+    public void savePatientSnapshot(PatientSnapshot ps){
+        patientSnapshotRepository.save(ps);
+    }
+    
+    public void saveMolecularCharacterization(MolecularCharacterization mc){
+        molecularCharacterizationRepository.save(mc);
     }
 }
