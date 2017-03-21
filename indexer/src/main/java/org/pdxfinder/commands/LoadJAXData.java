@@ -20,14 +20,11 @@ import java.util.stream.Stream;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.BackgroundStrain;
-<<<<<<< HEAD
 import org.pdxfinder.dao.ImplantationSite;
 import org.pdxfinder.dao.ImplantationType;
 import org.pdxfinder.dao.Patient;
 import org.pdxfinder.dao.PdxStrain;
 import org.pdxfinder.dao.Tissue;
-import org.pdxfinder.dao.Tumor;
-import org.pdxfinder.dao.TumorType;
 import org.pdxfinder.dao.WrongPlaceWrongName;
 import org.pdxfinder.repositories.BackgroundStrainRepository;
 import org.pdxfinder.repositories.ImplantationSiteRepository;
@@ -35,9 +32,7 @@ import org.pdxfinder.repositories.ImplantationTypeRepository;
 import org.pdxfinder.repositories.PatientRepository;
 import org.pdxfinder.repositories.PdxStrainRepository;
 import org.pdxfinder.repositories.TissueRepository;
-import org.pdxfinder.repositories.TumorRepository;
-=======
->>>>>>> data-model-v2
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -111,19 +106,9 @@ public class LoadJAXData implements CommandLineRunner {
                 System.exit(1);
             }
 
-<<<<<<< HEAD
-            // Delete all(?how?) data currently associated to this data source
-            ExternalDataSource jaxDS = externalDataSourceRepository.findByAbbreviation(JAX_DATASOURCE_ABBREVIATION);
-            if (jaxDS != null) {
-                externalDataSourceRepository.delete(jaxDS);
-                // delete all associated data....
-            }
-            
-=======
             // Delete all ?how? data currently associated to this data source
             // this wpwn method does noting!
             wpwn.deleteAllByEDSName(JAX_DATASOURCE_NAME);
->>>>>>> data-model-v2
 
             if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
@@ -173,10 +158,6 @@ public class LoadJAXData implements CommandLineRunner {
         return sb.toString();
     }
 
-<<<<<<< HEAD
-    
-=======
->>>>>>> data-model-v2
     //JSON Fields {"Model ID","Gender","Age","Race","Ethnicity","Specimen Site","Primary Site","Initial Diagnosis","Clinical Diagnosis",
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
@@ -185,35 +166,18 @@ public class LoadJAXData implements CommandLineRunner {
         jaxDS = wpwn.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
         nsgBS = wpwn.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
-<<<<<<< HEAD
-        
-=======
-        jaxDS = wpwn.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
-        nsgBS = wpwn.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
-
->>>>>>> data-model-v2
         try {
             JSONObject job = new JSONObject(json);
             JSONArray jarray = job.getJSONArray("pdxInfo");
             String id = "";
             for (int i = 0; i < jarray.length(); i++) {
                 JSONObject j = jarray.getJSONObject(i);
-<<<<<<< HEAD
-                
-                        
-                Patient p = wpwn.getPatient("JAX"+i, j.getString("Gender"),j.getString("Age"), j.getString("Race"), j.getString("Ethnicity"),jaxDS);
                 
                 String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
                 
-                Tumor tumor = wpwn.getTumor("JAX " + i, j.getString("Tumor Type"), j.getString("Clinical Diagnosis"), j.getString("Specimen Site"),
-                        j.getString("Primary Site"), classification, jaxDS);
-                
-=======
-
                 PatientSnapshot pSnap = wpwn.getPatientSnapshot("JAX" + i, j.getString("Gender"),
                         j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
 
-                String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
 
                 Sample sample = wpwn.getSample("JAX " + i, j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
                         j.getString("Specimen Site"), j.getString("Primary Site"), classification, NORMAL_TISSUE, jaxDS);
@@ -241,22 +205,16 @@ public class LoadJAXData implements CommandLineRunner {
 
                 pSnap.addSample(sample);
                 wpwn.savePatientSnapshot(pSnap);
->>>>>>> data-model-v2
                 // models IDs that are numeric should start with 'TM' then the value padded to 5 digits with leading 0s
                 try {
                     id = "TM" + String.format("%05d", new Integer(j.getString("Model ID")));
                 } catch (Exception e) {
                     // a J#### model
                 }
-<<<<<<< HEAD
-                
-                wpwn.createPDXStrain(id, j.getString("Engraftment Site"), j.getString("Sample Type"), tumor, nsgBS, "3");
-=======
 
 //                                                                        hope sample type is right value         
                 wpwn.createPDXStrain(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS);
 
->>>>>>> data-model-v2
             }
 
         } catch (Exception e) {
@@ -264,8 +222,4 @@ public class LoadJAXData implements CommandLineRunner {
         }
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> data-model-v2
 }
