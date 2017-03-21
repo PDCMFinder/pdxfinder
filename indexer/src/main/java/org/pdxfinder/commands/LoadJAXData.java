@@ -1,29 +1,26 @@
 package org.pdxfinder.commands;
 
+import org.apache.commons.cli.*;
+import org.neo4j.ogm.session.Session;
+import org.pdxfinder.dao.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.Instant;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.stream.Stream;
-import org.apache.commons.cli.*;
-import org.neo4j.ogm.session.Session;
-import org.pdxfinder.dao.ExternalDataSource;
-import org.pdxfinder.repositories.ExternalDataSourceRepository;
-import org.pdxfinder.repositories.TumorTypeRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
-import javax.annotation.PostConstruct;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.BackgroundStrain;
+<<<<<<< HEAD
 import org.pdxfinder.dao.ImplantationSite;
 import org.pdxfinder.dao.ImplantationType;
 import org.pdxfinder.dao.Patient;
@@ -39,6 +36,8 @@ import org.pdxfinder.repositories.PatientRepository;
 import org.pdxfinder.repositories.PdxStrainRepository;
 import org.pdxfinder.repositories.TissueRepository;
 import org.pdxfinder.repositories.TumorRepository;
+=======
+>>>>>>> data-model-v2
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -60,6 +59,12 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
 
+    // for now all samples are of tumor tissue
+    private final static Boolean NORMAL_TISSUE = false;
+
+    // hmm not sure about this
+    private final static String MC_TECH = "CTP or Whole Exome";
+
     private BackgroundStrain nsgBS;
     private ExternalDataSource jaxDS;
 
@@ -68,15 +73,7 @@ public class LoadJAXData implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private TumorTypeRepository tumorTypeRepository;
-    private BackgroundStrainRepository backgroundStrainRepository;
-    private ImplantationTypeRepository implantationTypeRepository;
-    private ImplantationSiteRepository implantationSiteRepository;
-    private ExternalDataSourceRepository externalDataSourceRepository;
-    private PatientRepository patientRepository;
-    private PdxStrainRepository pdxStrainRepository;
-    private TissueRepository tissueRepository;
-    private TumorRepository tumorRepository;
+    private WrongPlaceWrongName wpwn;
     private Session session;
 
     @Value("${jaxpdx.file}")
@@ -93,32 +90,8 @@ public class LoadJAXData implements CommandLineRunner {
         log.info("Setting up LoadJAXDataCommand option");
     }
 
-    public LoadJAXData(TumorRepository tumorRepository, TissueRepository tissueRepository, PdxStrainRepository pdxStrainRepository, PatientRepository patientRepository, ExternalDataSourceRepository externalDataSourceRepository, TumorTypeRepository tumorTypeRepository, BackgroundStrainRepository backgroundStrainRepository, ImplantationSiteRepository implantationSiteRepository, ImplantationTypeRepository implantationTypeRepository, Session session) {
-
-        Assert.notNull(patientRepository);
-        Assert.notNull(pdxStrainRepository);
-        Assert.notNull(tissueRepository);
-        Assert.notNull(tumorRepository);
-        Assert.notNull(externalDataSourceRepository);
-        Assert.notNull(tumorTypeRepository);
-        Assert.notNull(backgroundStrainRepository);
-        Assert.notNull(implantationSiteRepository);
-        Assert.notNull(implantationTypeRepository);
-        Assert.notNull(session);
-
-        this.patientRepository = patientRepository;
-        this.pdxStrainRepository = pdxStrainRepository;
-        this.tissueRepository = tissueRepository;
-        this.tumorRepository = tumorRepository;
-
-        this.externalDataSourceRepository = externalDataSourceRepository;
-        this.tumorTypeRepository = tumorTypeRepository;
-        this.backgroundStrainRepository = backgroundStrainRepository;
-        this.implantationSiteRepository = implantationSiteRepository;
-        this.implantationTypeRepository = implantationTypeRepository;
-
-        this.session = session;
-
+    public LoadJAXData(WrongPlaceWrongName wpwn) {
+        this.wpwn = wpwn;
     }
 
     @Override
@@ -138,6 +111,7 @@ public class LoadJAXData implements CommandLineRunner {
                 System.exit(1);
             }
 
+<<<<<<< HEAD
             // Delete all(?how?) data currently associated to this data source
             ExternalDataSource jaxDS = externalDataSourceRepository.findByAbbreviation(JAX_DATASOURCE_ABBREVIATION);
             if (jaxDS != null) {
@@ -145,6 +119,11 @@ public class LoadJAXData implements CommandLineRunner {
                 // delete all associated data....
             }
             
+=======
+            // Delete all ?how? data currently associated to this data source
+            // this wpwn method does noting!
+            wpwn.deleteAllByEDSName(JAX_DATASOURCE_NAME);
+>>>>>>> data-model-v2
 
             if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
@@ -194,7 +173,10 @@ public class LoadJAXData implements CommandLineRunner {
         return sb.toString();
     }
 
+<<<<<<< HEAD
     
+=======
+>>>>>>> data-model-v2
     //JSON Fields {"Model ID","Gender","Age","Race","Ethnicity","Specimen Site","Primary Site","Initial Diagnosis","Clinical Diagnosis",
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
@@ -203,13 +185,20 @@ public class LoadJAXData implements CommandLineRunner {
         jaxDS = wpwn.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
         nsgBS = wpwn.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
+<<<<<<< HEAD
         
+=======
+        jaxDS = wpwn.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
+        nsgBS = wpwn.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+
+>>>>>>> data-model-v2
         try {
             JSONObject job = new JSONObject(json);
             JSONArray jarray = job.getJSONArray("pdxInfo");
             String id = "";
             for (int i = 0; i < jarray.length(); i++) {
                 JSONObject j = jarray.getJSONObject(i);
+<<<<<<< HEAD
                 
                         
                 Patient p = wpwn.getPatient("JAX"+i, j.getString("Gender"),j.getString("Age"), j.getString("Race"), j.getString("Ethnicity"),jaxDS);
@@ -219,14 +208,55 @@ public class LoadJAXData implements CommandLineRunner {
                 Tumor tumor = wpwn.getTumor("JAX " + i, j.getString("Tumor Type"), j.getString("Clinical Diagnosis"), j.getString("Specimen Site"),
                         j.getString("Primary Site"), classification, jaxDS);
                 
+=======
+
+                PatientSnapshot pSnap = wpwn.getPatientSnapshot("JAX" + i, j.getString("Gender"),
+                        j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
+
+                String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
+
+                Sample sample = wpwn.getSample("JAX " + i, j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
+                        j.getString("Specimen Site"), j.getString("Primary Site"), classification, NORMAL_TISSUE, jaxDS);
+
+                String markerList = j.getString("Markers");
+                if (markerList != null && markerList.length() > 0) {
+                    HashSet<Marker> markerSet = new HashSet<>();
+                    String[] markers = markerList.split(",");
+                    for (String symbol : markers) {
+                        Marker m = wpwn.getMarker(symbol);
+                        markerSet.add(m);
+                    }
+
+                    MolecularCharacterization mc = new MolecularCharacterization(MC_TECH);
+
+                    // all positive, being positive about it.
+                    mc.setPositiveMarkers(markerSet);
+
+                    // save mc
+                    wpwn.saveMolecularCharacterization(mc);
+                    HashSet<MolecularCharacterization> mcs = new HashSet<>();
+                    mcs.add(mc);
+                    sample.setMolecularCharacterizations(mcs);
+                }
+
+                pSnap.addSample(sample);
+                wpwn.savePatientSnapshot(pSnap);
+>>>>>>> data-model-v2
                 // models IDs that are numeric should start with 'TM' then the value padded to 5 digits with leading 0s
                 try {
                     id = "TM" + String.format("%05d", new Integer(j.getString("Model ID")));
                 } catch (Exception e) {
                     // a J#### model
                 }
+<<<<<<< HEAD
                 
                 wpwn.createPDXStrain(id, j.getString("Engraftment Site"), j.getString("Sample Type"), tumor, nsgBS, "3");
+=======
+
+//                                                                        hope sample type is right value         
+                wpwn.createPDXStrain(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS);
+
+>>>>>>> data-model-v2
             }
 
         } catch (Exception e) {
@@ -234,5 +264,8 @@ public class LoadJAXData implements CommandLineRunner {
         }
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> data-model-v2
 }

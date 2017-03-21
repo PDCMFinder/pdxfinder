@@ -5,7 +5,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 
 /**
- * Interface for the Tumor Type repository
+ * Interface for the Sample Type repository
  */
 public interface TumorTypeRepository extends Neo4jRepository<TumorType, Long> {
 

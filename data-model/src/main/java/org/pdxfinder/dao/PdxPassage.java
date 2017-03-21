@@ -15,6 +15,9 @@ public class PdxPassage {
     @Relationship(type = "PASSAGED_FROM", direction = Relationship.OUTGOING)
     private PdxStrain pdxStrain;
 
+    @Relationship(type = "VALIDATED_BY", direction = Relationship.INCOMING)
+    private Validation validation;
+
 
     public PdxPassage(PdxStrain pdxStrain, Integer passage) {
         this.pdxStrain = pdxStrain;

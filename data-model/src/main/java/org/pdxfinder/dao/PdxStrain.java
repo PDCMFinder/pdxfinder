@@ -18,18 +18,16 @@ public class PdxStrain {
     private ImplantationSite implantationSite;
     private ImplantationType implantationType;
     private BackgroundStrain backgroundStrain;
-    private String passage;
 
     @Relationship(type = "IMPLANTED_IN", direction = Relationship.INCOMING)
-    private Tumor tumor;
+    private Sample sample;
 
-    public PdxStrain(String sourcePdxId, ImplantationSite implantationSite, ImplantationType implantationType, Tumor tumor, BackgroundStrain backgroundStrain, String passage) {
+    public PdxStrain(String sourcePdxId, ImplantationSite implantationSite, ImplantationType implantationType, Sample sample, BackgroundStrain backgroundStrain) {
         this.sourcePdxId = sourcePdxId;
         this.implantationSite = implantationSite;
         this.implantationType = implantationType;
-        this.tumor = tumor;
+        this.sample = sample;
         this.backgroundStrain = backgroundStrain;
-        this.passage = passage;
     }
 
     public PdxStrain() {
@@ -60,12 +58,12 @@ public class PdxStrain {
         this.implantationType = implantationType;
     }
 
-    public Tumor getTumor() {
-        return tumor;
+    public Sample getSample() {
+        return sample;
     }
 
-    public void setTumor(Tumor tumor) {
-        this.tumor = tumor;
+    public void setSample(Sample sample) {
+        this.sample = sample;
     }
 
     public BackgroundStrain getBackgroundStrain() {
@@ -76,11 +74,4 @@ public class PdxStrain {
         this.backgroundStrain = backgroundStrain;
     }
 
-    public String getPassage() {
-        return passage;
-    }
-
-    public void setPassage(String passage) {
-        this.passage = passage;
-    }
 }
