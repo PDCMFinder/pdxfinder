@@ -25,7 +25,6 @@ import org.pdxfinder.dao.ImplantationType;
 import org.pdxfinder.dao.Patient;
 import org.pdxfinder.dao.PdxStrain;
 import org.pdxfinder.dao.Tissue;
-import org.pdxfinder.dao.WrongPlaceWrongName;
 import org.pdxfinder.repositories.BackgroundStrainRepository;
 import org.pdxfinder.repositories.ImplantationSiteRepository;
 import org.pdxfinder.repositories.ImplantationTypeRepository;
@@ -162,7 +161,7 @@ public class LoadJAXData implements CommandLineRunner {
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
         
-        WrongPlaceWrongName wpwn = new WrongPlaceWrongName();
+       
         jaxDS = wpwn.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
         nsgBS = wpwn.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
