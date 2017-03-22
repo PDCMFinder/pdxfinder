@@ -1,5 +1,6 @@
 package org.pdxfinder.commands;
 
+import org.pdxfinder.utilities.LoaderUtils;
 import org.apache.commons.cli.*;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
@@ -67,7 +68,7 @@ public class LoadJAXData implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private WrongPlaceWrongName wpwn;
+    private LoaderUtils loaderUtils;
     private Session session;
 
     @Value("${jaxpdx.file}")
@@ -84,8 +85,8 @@ public class LoadJAXData implements CommandLineRunner {
         log.info("Setting up LoadJAXDataCommand option");
     }
 
-    public LoadJAXData(WrongPlaceWrongName wpwn) {
-        this.wpwn = wpwn;
+    public LoadJAXData(LoaderUtils loaderUtils) {
+        this.loaderUtils = loaderUtils;
     }
 
     @Override
@@ -106,8 +107,8 @@ public class LoadJAXData implements CommandLineRunner {
             }
 
             // Delete all ?how? data currently associated to this data source
-            // this wpwn method does noting!
-            wpwn.deleteAllByEDSName(JAX_DATASOURCE_NAME);
+            // this loaderUtils method does noting!
+            loaderUtils.deleteAllByEDSName(JAX_DATASOURCE_NAME);
 
             if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
@@ -162,8 +163,8 @@ public class LoadJAXData implements CommandLineRunner {
     private void parseJSON(String json) {
         
        
-        jaxDS = wpwn.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
-        nsgBS = wpwn.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
+        nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -174,36 +175,41 @@ public class LoadJAXData implements CommandLineRunner {
                 
                 String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
                 
-                PatientSnapshot pSnap = wpwn.getPatientSnapshot("JAX" + i, j.getString("Gender"),
+                PatientSnapshot pSnap = loaderUtils.getPatientSnapshot("JAX" + i, j.getString("Gender"),
                         j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
 
 
-                Sample sample = wpwn.getSample("JAX " + i, j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
+                Sample sample = loaderUtils.getSample("JAX " + i, j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
                         j.getString("Specimen Site"), j.getString("Primary Site"), classification, NORMAL_TISSUE, jaxDS);
 
                 String markerList = j.getString("Markers");
                 if (markerList != null && markerList.length() > 0) {
                     HashSet<Marker> markerSet = new HashSet<>();
+                    HashSet<Marker> negMarkerSet = new HashSet<>();
                     String[] markers = markerList.split(",");
                     for (String symbol : markers) {
-                        Marker m = wpwn.getMarker(symbol);
-                        markerSet.add(m);
+                        Marker m = loaderUtils.getMarker(symbol);
+                        if(symbol.contains("negative")){
+                            negMarkerSet.add(m);
+                        }else{
+                            markerSet.add(m);
+                        }
                     }
 
                     MolecularCharacterization mc = new MolecularCharacterization(MC_TECH);
 
-                    // all positive, being positive about it.
+                    // defalut is positive, being positive about it.
                     mc.setPositiveMarkers(markerSet);
-
+                    mc.setNegativeMarkers(negMarkerSet);
                     // save mc
-                    wpwn.saveMolecularCharacterization(mc);
+                    loaderUtils.saveMolecularCharacterization(mc);
                     HashSet<MolecularCharacterization> mcs = new HashSet<>();
                     mcs.add(mc);
                     sample.setMolecularCharacterizations(mcs);
                 }
 
                 pSnap.addSample(sample);
-                wpwn.savePatientSnapshot(pSnap);
+                loaderUtils.savePatientSnapshot(pSnap);
                 // models IDs that are numeric should start with 'TM' then the value padded to 5 digits with leading 0s
                 try {
                     id = "TM" + String.format("%05d", new Integer(j.getString("Model ID")));
@@ -212,7 +218,7 @@ public class LoadJAXData implements CommandLineRunner {
                 }
 
 //                                                                        hope sample type is right value         
-                wpwn.createPDXStrain(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS);
+                loaderUtils.createPDXStrain(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS);
 
             }
 

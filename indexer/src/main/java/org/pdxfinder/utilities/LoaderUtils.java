@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.pdxfinder.commands;
+package org.pdxfinder.utilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ import org.springframework.util.Assert;
  * @author sbn
  */
 @Component
-public class WrongPlaceWrongName {
+public class LoaderUtils {
 
     
     private TumorTypeRepository tumorTypeRepository;
@@ -61,9 +61,9 @@ public class WrongPlaceWrongName {
     private MarkerRepository markerRepository;
     private MolecularCharacterizationRepository molecularCharacterizationRepository; 
 
-    private final static Logger log = LoggerFactory.getLogger(WrongPlaceWrongName.class);
+    private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
 
-     public WrongPlaceWrongName(TumorTypeRepository tumorTypeRepository,
+     public LoaderUtils(TumorTypeRepository tumorTypeRepository,
                                 BackgroundStrainRepository backgroundStrainRepository,
                                 ImplantationTypeRepository implantationTypeRepository,
                                 ImplantationSiteRepository implantationSiteRepository,
