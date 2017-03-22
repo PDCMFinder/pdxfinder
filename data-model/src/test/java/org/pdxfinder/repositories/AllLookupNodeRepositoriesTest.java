@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Tests for the Tumor Type repository
+ * Tests for the Sample Type repository
  */
 public class AllLookupNodeRepositoriesTest extends BaseTest {
 
@@ -63,13 +63,13 @@ public class AllLookupNodeRepositoriesTest extends BaseTest {
         for (String type : types) {
             TumorType foundType = tumorTypeRepository.findByName(type);
             if (foundType == null) {
-                log.debug("Tumor type {} not found. Creating", type);
+                log.debug("Sample type {} not found. Creating", type);
                 foundType = new TumorType(type);
                 tumorTypeRepository.save(foundType);
             }
 
             foundType = tumorTypeRepository.findByName(type);
-            log.info("  Found Tumor type {}", foundType.getName());
+            log.info("  Found Sample type {}", foundType.getName());
 
             assert (foundType.getName().equals(type));
 

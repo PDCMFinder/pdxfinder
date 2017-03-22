@@ -1,26 +1,23 @@
 package org.pdxfinder.commands;
 
+import org.pdxfinder.utilities.LoaderUtils;
+import org.apache.commons.cli.*;
+import org.neo4j.ogm.session.Session;
+import org.pdxfinder.dao.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.Instant;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.stream.Stream;
-import org.apache.commons.cli.*;
-import org.neo4j.ogm.session.Session;
-import org.pdxfinder.dao.ExternalDataSource;
-import org.pdxfinder.repositories.ExternalDataSourceRepository;
-import org.pdxfinder.repositories.TumorTypeRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
-import javax.annotation.PostConstruct;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.BackgroundStrain;
@@ -29,15 +26,13 @@ import org.pdxfinder.dao.ImplantationType;
 import org.pdxfinder.dao.Patient;
 import org.pdxfinder.dao.PdxStrain;
 import org.pdxfinder.dao.Tissue;
-import org.pdxfinder.dao.Tumor;
-import org.pdxfinder.dao.TumorType;
 import org.pdxfinder.repositories.BackgroundStrainRepository;
 import org.pdxfinder.repositories.ImplantationSiteRepository;
 import org.pdxfinder.repositories.ImplantationTypeRepository;
 import org.pdxfinder.repositories.PatientRepository;
 import org.pdxfinder.repositories.PdxStrainRepository;
 import org.pdxfinder.repositories.TissueRepository;
-import org.pdxfinder.repositories.TumorRepository;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -59,6 +54,12 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
 
+    // for now all samples are of tumor tissue
+    private final static Boolean NORMAL_TISSUE = false;
+
+    // hmm not sure about this
+    private final static String MC_TECH = "CTP or Whole Exome";
+
     private BackgroundStrain nsgBS;
     private ExternalDataSource jaxDS;
 
@@ -67,15 +68,7 @@ public class LoadJAXData implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private TumorTypeRepository tumorTypeRepository;
-    private BackgroundStrainRepository backgroundStrainRepository;
-    private ImplantationTypeRepository implantationTypeRepository;
-    private ImplantationSiteRepository implantationSiteRepository;
-    private ExternalDataSourceRepository externalDataSourceRepository;
-    private PatientRepository patientRepository;
-    private PdxStrainRepository pdxStrainRepository;
-    private TissueRepository tissueRepository;
-    private TumorRepository tumorRepository;
+    private LoaderUtils loaderUtils;
     private Session session;
 
     @Value("${jaxpdx.file}")
@@ -92,32 +85,8 @@ public class LoadJAXData implements CommandLineRunner {
         log.info("Setting up LoadJAXDataCommand option");
     }
 
-    public LoadJAXData(TumorRepository tumorRepository, TissueRepository tissueRepository, PdxStrainRepository pdxStrainRepository, PatientRepository patientRepository, ExternalDataSourceRepository externalDataSourceRepository, TumorTypeRepository tumorTypeRepository, BackgroundStrainRepository backgroundStrainRepository, ImplantationSiteRepository implantationSiteRepository, ImplantationTypeRepository implantationTypeRepository, Session session) {
-
-        Assert.notNull(patientRepository);
-        Assert.notNull(pdxStrainRepository);
-        Assert.notNull(tissueRepository);
-        Assert.notNull(tumorRepository);
-        Assert.notNull(externalDataSourceRepository);
-        Assert.notNull(tumorTypeRepository);
-        Assert.notNull(backgroundStrainRepository);
-        Assert.notNull(implantationSiteRepository);
-        Assert.notNull(implantationTypeRepository);
-        Assert.notNull(session);
-
-        this.patientRepository = patientRepository;
-        this.pdxStrainRepository = pdxStrainRepository;
-        this.tissueRepository = tissueRepository;
-        this.tumorRepository = tumorRepository;
-
-        this.externalDataSourceRepository = externalDataSourceRepository;
-        this.tumorTypeRepository = tumorTypeRepository;
-        this.backgroundStrainRepository = backgroundStrainRepository;
-        this.implantationSiteRepository = implantationSiteRepository;
-        this.implantationTypeRepository = implantationTypeRepository;
-
-        this.session = session;
-
+    public LoadJAXData(LoaderUtils loaderUtils) {
+        this.loaderUtils = loaderUtils;
     }
 
     @Override
@@ -137,14 +106,9 @@ public class LoadJAXData implements CommandLineRunner {
                 System.exit(1);
             }
 
-            // Delete all(?how?) data currently associated to this data source
-            ExternalDataSource jaxDS = externalDataSourceRepository.findByAbbreviation(JAX_DATASOURCE_ABBREVIATION);
-            if (jaxDS != null) {
-                externalDataSourceRepository.delete(jaxDS);
-                // delete all associated data....
-            }
-            this.jaxDS = createJAXDataSource();
-            this.nsgBS = createNSGMouse();
+            // Delete all ?how? data currently associated to this data source
+            // this loaderUtils method does noting!
+            loaderUtils.deleteAllByEDSName(JAX_DATASOURCE_NAME);
 
             if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
@@ -194,28 +158,58 @@ public class LoadJAXData implements CommandLineRunner {
         return sb.toString();
     }
 
+    //JSON Fields {"Model ID","Gender","Age","Race","Ethnicity","Specimen Site","Primary Site","Initial Diagnosis","Clinical Diagnosis",
+    //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
+        
+       
+        jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
+        nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
-        // {"Model ID","Gender","Age","Race","Ethnicity","Specimen Site","Primary Site","Initial Diagnosis","Clinical Diagnosis",
-        //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
         try {
             JSONObject job = new JSONObject(json);
             JSONArray jarray = job.getJSONArray("pdxInfo");
             String id = "";
             for (int i = 0; i < jarray.length(); i++) {
                 JSONObject j = jarray.getJSONObject(i);
-
-                Patient p = createPatient("JAX " + i, j.getString("Gender"), j.getString("Age"), j.getString("Race"), j.getString("Ethnicity"));
-                Tissue originSite = createTissue(j.getString("Specimen Site"));
-                Tissue primarySite = createTissue(j.getString("Primary Site"));
-                TumorType tumorType = createTumorType(j.getString("Tumor Type"));
-                ImplantationSite is = createImplantationSite(j.getString("Engraftment Site"));
-                ImplantationType it = createImplantationType(j.getString("Sample Type"));
-                String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
-
-                Tumor tumor = createTumor("JAX " + i, tumorType, j.getString("Clinical Diagnosis"), originSite, primarySite, classification, jaxDS);
-                id = j.getString("Model ID");
                 
+                String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
+                
+                PatientSnapshot pSnap = loaderUtils.getPatientSnapshot("JAX" + i, j.getString("Gender"),
+                        j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
+
+
+                Sample sample = loaderUtils.getSample("JAX " + i, j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
+                        j.getString("Specimen Site"), j.getString("Primary Site"), classification, NORMAL_TISSUE, jaxDS);
+
+                String markerList = j.getString("Markers");
+                if (markerList != null && markerList.length() > 0) {
+                    HashSet<Marker> markerSet = new HashSet<>();
+                    HashSet<Marker> negMarkerSet = new HashSet<>();
+                    String[] markers = markerList.split(",");
+                    for (String symbol : markers) {
+                        Marker m = loaderUtils.getMarker(symbol);
+                        if(symbol.contains("negative")){
+                            negMarkerSet.add(m);
+                        }else{
+                            markerSet.add(m);
+                        }
+                    }
+
+                    MolecularCharacterization mc = new MolecularCharacterization(MC_TECH);
+
+                    // defalut is positive, being positive about it.
+                    mc.setPositiveMarkers(markerSet);
+                    mc.setNegativeMarkers(negMarkerSet);
+                    // save mc
+                    loaderUtils.saveMolecularCharacterization(mc);
+                    HashSet<MolecularCharacterization> mcs = new HashSet<>();
+                    mcs.add(mc);
+                    sample.setMolecularCharacterizations(mcs);
+                }
+
+                pSnap.addSample(sample);
+                loaderUtils.savePatientSnapshot(pSnap);
                 // models IDs that are numeric should start with 'TM' then the value padded to 5 digits with leading 0s
                 try {
                     id = "TM" + String.format("%05d", new Integer(j.getString("Model ID")));
@@ -223,119 +217,14 @@ public class LoadJAXData implements CommandLineRunner {
                     // a J#### model
                 }
 
-                // for JAX, passages are associated with samples, but i think valid modles are all passaged 3 times
-                createPDXStrain(id, is, it, tumor, this.nsgBS, "3");
-               
+//                                                                        hope sample type is right value         
+                loaderUtils.createPDXStrain(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS);
+
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private PdxStrain createPDXStrain(String pdxId, ImplantationSite implantationSite, ImplantationType implantationType, Tumor tumor, BackgroundStrain backgroundStrain, String passage) {
-        
-        PdxStrain pdxStrain = pdxStrainRepository.findBySourcePdxId(pdxId);
-        if(pdxStrain != null){
-            log.info("Deleting existing PdxStrain "+pdxId);
-            pdxStrainRepository.delete(pdxStrain);
-        }
-        pdxStrain = new PdxStrain(pdxId, implantationSite, implantationType, tumor, backgroundStrain, passage);
-        pdxStrainRepository.save(pdxStrain);
-        return pdxStrain;
-    }
-
-    private Tumor createTumor(String id, TumorType tumorType, String diagnosis, Tissue originSite, Tissue primarySite, String classification, ExternalDataSource externalDataSource) {
-
-        Tumor tumor = tumorRepository.findBySourceTumorId(id);
-        if(tumor != null){
-            log.info("Deleting existing tumor "+id);
-            tumorRepository.delete(tumor);
-        }
-        tumor = new Tumor(id, tumorType, diagnosis, originSite, primarySite, classification, externalDataSource);
-        tumorRepository.save(tumor);
-        return tumor;
-    }
-
-    private ExternalDataSource createJAXDataSource() {
-        ExternalDataSource jaxDS = externalDataSourceRepository.findByAbbreviation(JAX_DATASOURCE_ABBREVIATION);
-        if (jaxDS == null) {
-            log.info("External data source '{}' not found. Creating", JAX_DATASOURCE_ABBREVIATION);
-            jaxDS = new ExternalDataSource(
-                    JAX_DATASOURCE_NAME,
-                    JAX_DATASOURCE_ABBREVIATION,
-                    JAX_DATASOURCE_DESCRIPTION,
-                    Date.from(Instant.now()));
-            externalDataSourceRepository.save(jaxDS);
-        }
-
-        return jaxDS;
-
-    }
-
-    private BackgroundStrain createNSGMouse() {
-        BackgroundStrain nsgMouse = backgroundStrainRepository.findByName(NSG_BS_NAME);
-        if (nsgMouse == null) {
-            log.info("NSG Mouse '{}' not found. Creating", NSG_BS_NAME);
-            nsgMouse = new BackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
-            backgroundStrainRepository.save(nsgMouse);
-        }
-        return nsgMouse;
-    }
-
-    private Patient createPatient(String externalId, String sex, String age, String race, String ethnicity) {
-        Patient patient = patientRepository.findByExternalId(externalId);
-        if (patient == null) {
-            log.info("Patient '{}' not found. Creating", externalId);
-            patient = new Patient(externalId, sex, age, race, ethnicity, jaxDS);
-            patientRepository.save(patient);
-        }
-
-        return patient;
-    }
-
-    private ImplantationSite createImplantationSite(String iSite) {
-        ImplantationSite site = implantationSiteRepository.findByName(iSite);
-        if (site == null) {
-            log.info("Implantation Site '{}' not found. Creating.", iSite);
-            site = new ImplantationSite(iSite);
-            implantationSiteRepository.save(site);
-        }
-
-        return site;
-    }
-
-    private ImplantationType createImplantationType(String iType) {
-        ImplantationType type = implantationTypeRepository.findByName(iType);
-        if (type == null) {
-            log.info("Implantation Site '{}' not found. Creating.", iType);
-            type = new ImplantationType(iType);
-            implantationTypeRepository.save(type);
-        }
-
-        return type;
-    }
-
-    private Tissue createTissue(String t) {
-        Tissue tissue = tissueRepository.findByName(t);
-        if (tissue == null) {
-            log.info("Tissue '{}' not found. Creating.", t);
-            tissue = new Tissue(t);
-            tissueRepository.save(tissue);
-        }
-
-        return tissue;
-    }
-
-    private TumorType createTumorType(String name) {
-        TumorType tumorType = tumorTypeRepository.findByName(name);
-        if (tumorType == null) {
-            log.info("TumorType '{}' not found. Creating.", name);
-            tumorType = new TumorType(name);
-            tumorTypeRepository.save(tumorType);
-        }
-
-        return tumorType;
     }
 
 }

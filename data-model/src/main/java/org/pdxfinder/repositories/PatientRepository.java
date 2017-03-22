@@ -11,7 +11,7 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
 
     Set<Patient> findBySex(String sex);
 
-    Set<Patient> findBySexAndAge(String sex, String age);
+    Set<Patient> findBySexAndSnapshotsAge(String sex, String age);
 
     Patient findByExternalId(String externalId);
 

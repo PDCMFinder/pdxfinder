@@ -5,8 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.dao.ExternalDataSource;
+import org.pdxfinder.dao.Sample;
 import org.pdxfinder.dao.Tissue;
-import org.pdxfinder.dao.Tumor;
 import org.pdxfinder.dao.TumorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,15 +18,15 @@ import java.time.Instant;
 /**
  * Testing repository for managing tumor objects
  */
-public class TumorRepositoryTest extends BaseTest {
+public class SampleRepositoryTest extends BaseTest {
 
-    private final static Logger log = LoggerFactory.getLogger(TumorRepositoryTest.class);
+    private final static Logger log = LoggerFactory.getLogger(SampleRepositoryTest.class);
     private String tumorTypeName = "TEST_TUMORTYPE";
     private String extDsName = "TEST_SOURCE";
     private String tissueName = "TEST_TISSUE";
 
     @Autowired
-    private TumorRepository tumorRepository;
+    private SampleRepository sampleRepository;
 
     @Autowired
     private TissueRepository tissueRepository;
@@ -43,14 +43,14 @@ public class TumorRepositoryTest extends BaseTest {
     @Before
     public void cleanDb() {
 
-        tumorRepository.deleteAll();
+        sampleRepository.deleteAll();
         patientRepository.deleteAll();
         externalDataSourceRepository.deleteAll();
         tissueRepository.deleteAll();
 
         TumorType tumorType = tumorTypeRepository.findByName(tumorTypeName);
         if (tumorType == null) {
-            log.debug("Tumor type {} not found. Creating", tumorTypeName);
+            log.debug("Sample type {} not found. Creating", tumorTypeName);
             tumorType = new TumorType(tumorTypeName);
             tumorTypeRepository.save(tumorType);
         }
@@ -74,7 +74,7 @@ public class TumorRepositoryTest extends BaseTest {
     @Test
     public void createTumorInGraphDb() throws Exception {
 
-        // Tumor:
+        // Sample:
         //   String sourceTumorId
         //   TumorType type
         //   String diagnosis
@@ -90,8 +90,8 @@ public class TumorRepositoryTest extends BaseTest {
         String TEST_TUMOR_ID = "TESTID-1";
         generateTumor(tumorType, tissue, externalDataSource, TEST_TUMOR_ID);
 
-        Tumor foundTumor = tumorRepository.findBySourceTumorId(TEST_TUMOR_ID);
-        Assert.assertNotNull(foundTumor);
+        Sample foundSample = sampleRepository.findBySourceSampleId(TEST_TUMOR_ID);
+        Assert.assertNotNull(foundSample);
 
 
     }
@@ -106,12 +106,12 @@ public class TumorRepositoryTest extends BaseTest {
         String testTumorId = "DELETE_TESTID-1";
         generateTumor(tumorType, tissue, externalDataSource, testTumorId);
 
-        Tumor foundTumor = tumorRepository.findBySourceTumorId(testTumorId);
-        Assert.assertNotNull(foundTumor);
+        Sample foundSample = sampleRepository.findBySourceSampleId(testTumorId);
+        Assert.assertNotNull(foundSample);
 
-        tumorRepository.delete(foundTumor);
-        foundTumor = tumorRepository.findBySourceTumorId(testTumorId);
-        Assert.assertNull(foundTumor);
+        sampleRepository.delete(foundSample);
+        foundSample = sampleRepository.findBySourceSampleId(testTumorId);
+        Assert.assertNull(foundSample);
     }
 
 
@@ -127,21 +127,21 @@ public class TumorRepositoryTest extends BaseTest {
             generateTumor(tumorType, tissue, externalDataSource, testTumorId);
         }
 
-        Tumor foundTumor = tumorRepository.findBySourceTumorId("TESTID-12");
-        Assert.assertNotNull(foundTumor);
+        Sample foundSample = sampleRepository.findBySourceSampleId("TESTID-12");
+        Assert.assertNotNull(foundSample);
 
         // Added 20 tumors, count should be 20
-        Assert.assertEquals(20, tumorRepository.count());
+        Assert.assertEquals(20, sampleRepository.count());
 
         // Delete all tumors, count should be 0
-        tumorRepository.delete(tumorRepository.findByExternalDataSourceAbbreviation(externalDataSource.getAbbreviation()));
-        Assert.assertEquals(0, tumorRepository.count());
+        sampleRepository.delete(sampleRepository.findByExternalDataSourceAbbreviation(externalDataSource.getAbbreviation()));
+        Assert.assertEquals(0, sampleRepository.count());
 
     }
 
     private void generateTumor(TumorType tumorType, Tissue tissue, ExternalDataSource externalDataSource, String TEST_TUMOR_ID) {
-        Tumor tumor = new Tumor(TEST_TUMOR_ID, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "TEST_CLASSIFICATION", externalDataSource);
-        tumorRepository.save(tumor);
+        Sample sample = new Sample(TEST_TUMOR_ID, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "TEST_CLASSIFICATION", false, externalDataSource);
+        sampleRepository.save(sample);
     }
 
 

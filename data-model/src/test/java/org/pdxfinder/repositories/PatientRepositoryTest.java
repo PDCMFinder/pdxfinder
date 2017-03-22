@@ -46,13 +46,12 @@ public class PatientRepositoryTest extends BaseTest {
 
         ExternalDataSource externalDataSource = externalDataSourceRepository.findByAbbreviation(extDsName);
 
-        Patient femalePatient = new Patient("-9999", "F", "65", null, null, externalDataSource);
+        Patient femalePatient = new Patient("-9999", "F", null, null, externalDataSource);
         patientRepository.save(femalePatient);
 
-        Patient foundFemalePatient = patientRepository.findBySexAndAge("F", "65").iterator().next();
+        Patient foundFemalePatient = patientRepository.findBySex("F").iterator().next();
         assert (foundFemalePatient != null);
         assert (foundFemalePatient.getSex().equals("F"));
-        assert (foundFemalePatient.getAge().equals("65"));
 
         log.info(foundFemalePatient.toString());
 

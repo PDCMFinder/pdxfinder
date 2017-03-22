@@ -4,7 +4,7 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
- * Tumor type represents the various types of tumors
+ * Sample type represents the various types of tumors
  */
 @NodeEntity
 public class TumorType {

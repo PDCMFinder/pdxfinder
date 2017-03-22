@@ -26,7 +26,7 @@ import java.util.List;
 
 
 /**
- * Loads the required Tumor Type nodes into the database
+ * Loads the required Sample Type nodes into the database
  */
 @Component
 @Order(value = Ordered.LOWEST_PRECEDENCE)
@@ -86,11 +86,11 @@ public class CreateBaseCommand implements CommandLineRunner {
             System.out.println("Creating the base graph");
 
             // Delete whole graph
-            log.info("Tumor type has {} entries now", tumorTypeRepository.count());
+            log.info("Sample type has {} entries now", tumorTypeRepository.count());
             log.info("  PURGING DATABASE");
             session.purgeDatabase();
             log.info("  DONE PURGING DATABASE");
-            log.info("Tumor type has {} entries now", tumorTypeRepository.count());
+            log.info("Sample type has {} entries now", tumorTypeRepository.count());
 
             // Insert the tumor types
             createTumorTypes();
@@ -120,7 +120,7 @@ public class CreateBaseCommand implements CommandLineRunner {
         for (String type : types) {
             TumorType foundType = tumorTypeRepository.findByName(type);
             if (foundType == null) {
-                log.info("Tumor type '{}' not found. Creating", type);
+                log.info("Sample type '{}' not found. Creating", type);
                 foundType = new TumorType(type);
                 tumorTypeRepository.save(foundType);
             }
