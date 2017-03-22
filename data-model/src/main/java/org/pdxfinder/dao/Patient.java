@@ -5,11 +5,8 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @NodeEntity
 public class Patient {
@@ -19,43 +16,32 @@ public class Patient {
 
     private String externalId;
     private String sex;
-    private String age;
     private String race;
     private String ethnicity;
     private String dataSource;
     private ExternalDataSource externalDataSource;
 
-
     private Patient() {
         // Empty constructor required as of Neo4j API 2.0.5
     }
 
-    public Patient(String externalId, String sex, String age, String race, String ethnicity, ExternalDataSource externalDataSource) {
+    public Patient(String externalId, String sex, String race, String ethnicity, ExternalDataSource externalDataSource) {
         this.externalId = externalId;
         this.sex = sex;
-        this.age = age;
         this.race = race;
         this.ethnicity = ethnicity;
         this.dataSource = externalDataSource.getAbbreviation();
         this.externalDataSource = externalDataSource;
     }
 
-    @Relationship(type = "EXTRACTED_FROM", direction = Relationship.INCOMING)
-    private Set<Tumor> tumors;
+    @Relationship(type = "COLLECTION_EVENT", direction = Relationship.OUTGOING)
+    private Set<PatientSnapshot> snapshots;
 
-    public void hasTumor(Tumor tumor) {
-        if (tumors == null) {
-            tumors = new HashSet<>();
+    public void hasSnapshot(PatientSnapshot snapshot) {
+        if (snapshots == null) {
+            snapshots = new HashSet<>();
         }
-        tumors.add(tumor);
-    }
-
-    public String toString() {
-
-        return Optional.ofNullable(this.age).orElse("").concat(" y.o. ") + Optional.of(" " + this.sex).orElse("") + ", Tumors => "
-                + Optional.ofNullable(this.tumors).orElse(
-                Collections.emptySet()).stream().map(
-                Tumor::getType).collect(Collectors.toList());
+        snapshots.add(snapshot);
     }
 
     public String getExternalId() {
@@ -74,14 +60,6 @@ public class Patient {
         this.sex = sex;
     }
 
-    public String getAge() {
-        return age;
-    }
-
-    public void setAge(String age) {
-        this.age = age;
-    }
-
     public String getRace() {
         return race;
     }
@@ -98,12 +76,12 @@ public class Patient {
         this.ethnicity = ethnicity;
     }
 
-    public Set<Tumor> getTumors() {
-        return tumors;
+    public Set<PatientSnapshot> getSnapshots() {
+        return snapshots;
     }
 
-    public void setTumors(Set<Tumor> tumors) {
-        this.tumors = tumors;
+    public void setSnapshots(Set<PatientSnapshot> snapshots) {
+        this.snapshots = snapshots;
     }
 
     public String getDataSource() {
