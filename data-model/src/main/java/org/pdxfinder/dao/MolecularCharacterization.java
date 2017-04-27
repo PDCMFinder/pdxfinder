@@ -26,17 +26,24 @@ public class MolecularCharacterization {
     //                         -[NEGATIVE]-> Marker(PR)
     //           MolChar(MSS) -[STABILITY]-> Marker(MSI-L)
 
-    @Relationship(type = "POSITIVE", direction = Relationship.OUTGOING)
-    Set<Marker> positiveMarkers;
+    @Relationship(type = "ASSOCIATED_WITH", direction = Relationship.OUTGOING)
+    Set<MarkerAssociation> markerAssociations;
 
-    @Relationship(type = "NEGATIVE", direction = Relationship.OUTGOING)
-    Set<Marker> negativeMarkers;
 
     public MolecularCharacterization() {
     }
 
     public MolecularCharacterization(String technology) {
         this.technology = technology;
+    }
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTechnology() {
@@ -47,19 +54,11 @@ public class MolecularCharacterization {
         this.technology = technology;
     }
 
-    public Set<Marker> getPositiveMarkers() {
-        return positiveMarkers;
+    public Set<MarkerAssociation> getMarkerAssociations() {
+        return markerAssociations;
     }
 
-    public void setPositiveMarkers(Set<Marker> positiveMarkers) {
-        this.positiveMarkers = positiveMarkers;
-    }
-
-    public Set<Marker> getNegativeMarkers() {
-        return negativeMarkers;
-    }
-
-    public void setNegativeMarkers(Set<Marker> negativeMarkers) {
-        this.negativeMarkers = negativeMarkers;
+    public void setMarkerAssociations(Set<MarkerAssociation> markerAssociations) {
+        this.markerAssociations = markerAssociations;
     }
 }

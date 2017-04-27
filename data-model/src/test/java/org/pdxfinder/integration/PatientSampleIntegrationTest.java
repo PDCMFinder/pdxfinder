@@ -52,6 +52,9 @@ public class PatientSampleIntegrationTest extends BaseTest {
     @Autowired
     private MarkerRepository markerRepository;
 
+    @Autowired
+    private MarkerAssociationRepository markerAssociationRepository;
+
     @Before
     public void setupDb() {
 
@@ -61,6 +64,7 @@ public class PatientSampleIntegrationTest extends BaseTest {
         tissueRepository.deleteAll();
         mcRepository.deleteAll();
         markerRepository.deleteAll();
+        markerAssociationRepository.deleteAll();
 
         MolecularCharacterization mc = mcRepository.findByTechnology(molCharTechnology);
         if (mc == null) {
@@ -75,6 +79,9 @@ public class PatientSampleIntegrationTest extends BaseTest {
             marker = new Marker(markerSymbol, markerSymbol);
             markerRepository.save(marker);
         }
+
+
+
 
         ExternalDataSource ds = externalDataSourceRepository.findByName(extDsName);
         if (ds == null) {
@@ -114,8 +121,10 @@ public class PatientSampleIntegrationTest extends BaseTest {
         MolecularCharacterization mc = mcRepository.findByTechnology(molCharTechnology);
         Marker marker = markerRepository.findBySymbol(markerSymbol);
 
-        mc.setPositiveMarkers(new HashSet<>(Collections.singletonList(marker)));
 
+        MarkerAssociation ma = new MarkerAssociation();
+        ma.setMarker(marker);
+        mc.setMarkerAssociations(new HashSet<>(Collections.singletonList(ma)));
 
         for (Integer i = 0; i < 20; i++) {
 
