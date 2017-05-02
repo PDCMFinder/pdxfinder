@@ -15,23 +15,14 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.BackgroundStrain;
-import org.pdxfinder.dao.ImplantationSite;
-import org.pdxfinder.dao.ImplantationType;
-import org.pdxfinder.dao.Patient;
-import org.pdxfinder.dao.PdxStrain;
-import org.pdxfinder.dao.Tissue;
-import org.pdxfinder.repositories.BackgroundStrainRepository;
-import org.pdxfinder.repositories.ImplantationSiteRepository;
-import org.pdxfinder.repositories.ImplantationTypeRepository;
-import org.pdxfinder.repositories.PatientRepository;
-import org.pdxfinder.repositories.PdxStrainRepository;
-import org.pdxfinder.repositories.TissueRepository;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
@@ -108,8 +99,11 @@ public class LoadJAXData implements CommandLineRunner {
 
             // Delete all ?how? data currently associated to this data source
             // this loaderUtils method does noting!
+            try{
             loaderUtils.deleteAllByEDSName(JAX_DATASOURCE_NAME);
-
+            }catch(Exception e){
+                log.error("to be expected", e);
+            }
             if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
                 parseJSON(parseURL(urlStr));
@@ -182,34 +176,39 @@ public class LoadJAXData implements CommandLineRunner {
                 Sample sample = loaderUtils.getSample("JAX " + i, j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
                         j.getString("Specimen Site"), j.getString("Primary Site"), classification, NORMAL_TISSUE, jaxDS);
 
-                String markerList = j.getString("Markers");
-                if (markerList != null && markerList.length() > 0) {
-                    HashSet<Marker> markerSet = new HashSet<>();
-                    HashSet<Marker> negMarkerSet = new HashSet<>();
-                    String[] markers = markerList.split(",");
-                    for (String symbol : markers) {
-                        Marker m = loaderUtils.getMarker(symbol);
-                        if(symbol.contains("negative")){
-                            negMarkerSet.add(m);
-                        }else{
-                            markerSet.add(m);
-                        }
+                JSONArray markers = j.getJSONArray("Markers");
+                HashMap<String,Set<MarkerAssociation>> markerMap = new HashMap<>();
+                for(int mIndex = 0; mIndex < markers.length(); mIndex++){
+                    JSONObject marker = markers.getJSONObject(mIndex);
+                    String symbol = marker.getString("Symbol");
+                    String result = marker.getString("Result");
+                    String technology = marker.getString("Technology");
+                    
+                    MarkerAssociation ma = loaderUtils.getMarkerAssociation(result,symbol,symbol);
+                    // make a map of markerAssociationCollections keyed to technology
+                    if(markerMap.containsKey(technology)){
+                        markerMap.get(technology).add(ma);
+                    }else{
+                        HashSet<MarkerAssociation> set = new HashSet<>();
+                        set.add(ma);
+                        markerMap.put(technology,set);
                     }
-
-                    MolecularCharacterization mc = new MolecularCharacterization(MC_TECH);
-
-                    // defalut is positive, being positive about it.
-                    mc.setPositiveMarkers(markerSet);
-                    mc.setNegativeMarkers(negMarkerSet);
-                    // save mc
-                    loaderUtils.saveMolecularCharacterization(mc);
-                    HashSet<MolecularCharacterization> mcs = new HashSet<>();
-                    mcs.add(mc);
-                    sample.setMolecularCharacterizations(mcs);
                 }
-
+                HashSet<MolecularCharacterization> mcs = new HashSet<>();
+                for(String tech : markerMap.keySet()){
+                    MolecularCharacterization mc = new MolecularCharacterization();
+                    mc.setTechnology(tech);
+                    mc.setMarkerAssociations(markerMap.get(tech));
+                    
+                    loaderUtils.saveMolecularCharacterization(mc);
+                    mcs.add(mc);
+                    
+                }
+                sample.setMolecularCharacterizations(mcs);
+            
                 pSnap.addSample(sample);
                 loaderUtils.savePatientSnapshot(pSnap);
+                
                 // models IDs that are numeric should start with 'TM' then the value padded to 5 digits with leading 0s
                 try {
                     id = "TM" + String.format("%05d", new Integer(j.getString("Model ID")));
