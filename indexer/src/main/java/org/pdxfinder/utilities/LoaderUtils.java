@@ -15,6 +15,7 @@ import org.pdxfinder.dao.ExternalDataSource;
 import org.pdxfinder.dao.ImplantationSite;
 import org.pdxfinder.dao.ImplantationType;
 import org.pdxfinder.dao.Marker;
+import org.pdxfinder.dao.MarkerAssociation;
 import org.pdxfinder.dao.MolecularCharacterization;
 import org.pdxfinder.dao.Patient;
 import org.pdxfinder.dao.PatientSnapshot;
@@ -27,6 +28,7 @@ import org.pdxfinder.repositories.TumorTypeRepository;
 import org.pdxfinder.repositories.BackgroundStrainRepository;
 import org.pdxfinder.repositories.ImplantationSiteRepository;
 import org.pdxfinder.repositories.ImplantationTypeRepository;
+import org.pdxfinder.repositories.MarkerAssociationRepository;
 import org.pdxfinder.repositories.MarkerRepository;
 import org.pdxfinder.repositories.MolecularCharacterizationRepository;
 import org.pdxfinder.repositories.PatientRepository;
@@ -38,16 +40,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 /**
- *  The hope was to put a lot of reused repository actions into one place
- *  ie find or create a node
- *  or create a node with that requires a number of 'child' nodes that are terms
+ * The hope was to put a lot of reused repository actions into one place ie find
+ * or create a node or create a node with that requires a number of 'child'
+ * nodes that are terms
  *
  * @author sbn
  */
 @Component
 public class LoaderUtils {
 
-    
     private TumorTypeRepository tumorTypeRepository;
     private BackgroundStrainRepository backgroundStrainRepository;
     private ImplantationTypeRepository implantationTypeRepository;
@@ -59,24 +60,25 @@ public class LoaderUtils {
     private PatientSnapshotRepository patientSnapshotRepository;
     private SampleRepository sampleRepository;
     private MarkerRepository markerRepository;
-    private MolecularCharacterizationRepository molecularCharacterizationRepository; 
+    private MarkerAssociationRepository markerAssociationRepository;
+    private MolecularCharacterizationRepository molecularCharacterizationRepository;
 
     private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
 
-     public LoaderUtils(TumorTypeRepository tumorTypeRepository,
-                                BackgroundStrainRepository backgroundStrainRepository,
-                                ImplantationTypeRepository implantationTypeRepository,
-                                ImplantationSiteRepository implantationSiteRepository,
-                                ExternalDataSourceRepository externalDataSourceRepository,
-                                PatientRepository patientRepository,
-                                PdxStrainRepository pdxStrainRepository,
-                                TissueRepository tissueRepository,
-                                PatientSnapshotRepository patientSnapshotRepository,
-                                SampleRepository sampleRepository,
-                                MarkerRepository markerRepository,
-                                MolecularCharacterizationRepository molecularCharacterizationRepository) {
-         
-         
+    public LoaderUtils(TumorTypeRepository tumorTypeRepository,
+            BackgroundStrainRepository backgroundStrainRepository,
+            ImplantationTypeRepository implantationTypeRepository,
+            ImplantationSiteRepository implantationSiteRepository,
+            ExternalDataSourceRepository externalDataSourceRepository,
+            PatientRepository patientRepository,
+            PdxStrainRepository pdxStrainRepository,
+            TissueRepository tissueRepository,
+            PatientSnapshotRepository patientSnapshotRepository,
+            SampleRepository sampleRepository,
+            MarkerRepository markerRepository,
+            MarkerAssociationRepository markerAssociationRepository,
+            MolecularCharacterizationRepository molecularCharacterizationRepository) {
+
         Assert.notNull(tumorTypeRepository);
         Assert.notNull(backgroundStrainRepository);
         Assert.notNull(implantationTypeRepository);
@@ -88,6 +90,7 @@ public class LoaderUtils {
         Assert.notNull(patientSnapshotRepository);
         Assert.notNull(sampleRepository);
         Assert.notNull(markerRepository);
+        Assert.notNull(markerAssociationRepository);
         Assert.notNull(molecularCharacterizationRepository);
 
         this.tumorTypeRepository = tumorTypeRepository;
@@ -101,11 +104,11 @@ public class LoaderUtils {
         this.patientSnapshotRepository = patientSnapshotRepository;
         this.sampleRepository = sampleRepository;
         this.markerRepository = markerRepository;
+        this.markerAssociationRepository = markerAssociationRepository;
         this.molecularCharacterizationRepository = molecularCharacterizationRepository;
-        
+
     }
-    
-    
+
     public ExternalDataSource getExternalDataSource(String abbr, String name, String description) {
         ExternalDataSource eDS = externalDataSourceRepository.findByAbbreviation(abbr);
         if (eDS == null) {
@@ -173,13 +176,14 @@ public class LoaderUtils {
         PatientSnapshot patientSnapshot = null;
 
         Set<PatientSnapshot> pSnaps = patientSnapshotRepository.findByPatient(patient);
-        loop: for (PatientSnapshot ps : pSnaps) {
+        loop:
+        for (PatientSnapshot ps : pSnaps) {
             if (ps.getAge().equals(age)) {
                 patientSnapshot = ps;
                 break loop;
             }
         }
-        if(patientSnapshot == null){
+        if (patientSnapshot == null) {
             log.info("PatientSnapshot for patient '{}' at aget '{}' not found. Creating", patient.getExternalId(), age);
             patientSnapshot = new PatientSnapshot(patient, age);
             patientSnapshotRepository.save(patientSnapshot);
@@ -210,15 +214,13 @@ public class LoaderUtils {
         Tissue sampleSite = this.getTissue(sampleSiteStr);
         Sample sample = sampleRepository.findBySourceSampleId(sourceSampleId);
         if (sample == null) {
-            
+
             sample = new Sample(sourceSampleId, type, diagnosis, origin, sampleSite, classification, normalTissue, externalDataSource);
             sampleRepository.save(sample);
         }
 
         return sample;
     }
-
-   
 
     public ImplantationSite getImplantationSite(String iSite) {
         ImplantationSite site = implantationSiteRepository.findByName(iSite);
@@ -274,32 +276,51 @@ public class LoaderUtils {
         return bgStrain;
     }
     
-    
-     public Marker getMarker(String symbol, String name) {
-        Marker marker = markerRepository.findByName(name);
-        if (marker == null) {
-            log.info("Marker '{}' not found. Creating", name);
-            marker = new Marker(symbol, name);
-            markerRepository.save(marker);
-        }
-        return marker;
-    }
-     
-     // is this bad? ... probably..
-     public Marker getMarker(String symbol) {
+    // is this bad? ... probably..
+    public Marker getMarker(String symbol) {
         return this.getMarker(symbol, symbol);
     }
 
-    // wow this is misleading it donsn't do anyting!
-    public void deleteAllByEDSName(String edsName) {
+    public Marker getMarker(String symbol, String name) {
 
+        Marker marker = markerRepository.findByName(name);
+        if (marker == null && symbol != null) {
+            marker = markerRepository.findBySymbol(symbol);
+        }
+        if (marker == null) {
+            log.info("Marker '{}' not found. Creating", name);
+            marker = new Marker(symbol, name);
+            marker = markerRepository.save(marker);
+        }
+        return marker;
     }
-    
-    public void savePatientSnapshot(PatientSnapshot ps){
+
+    public MarkerAssociation getMarkerAssociation(String type, String markerSymbol, String markerName) {
+        Marker m = this.getMarker(markerSymbol, markerName);
+        MarkerAssociation ma = markerAssociationRepository.findByTypeAndMarkerName(type, m.getName());
+        
+        if(ma == null && m.getSymbol() != null){
+            ma = markerAssociationRepository.findByTypeAndMarkerSymbol(type, m.getSymbol());
+        }
+
+        if (ma == null) {
+            ma = new MarkerAssociation(type, m);
+            markerAssociationRepository.save(ma);
+        }
+
+        return ma;
+    }
+
+    // wow this is misleading it doesn't do anyting!
+    public void deleteAllByEDSName(String edsName) throws Exception {
+        throw new Exception("Nothing deleted. Method not implemented!");
+    }
+
+    public void savePatientSnapshot(PatientSnapshot ps) {
         patientSnapshotRepository.save(ps);
     }
-    
-    public void saveMolecularCharacterization(MolecularCharacterization mc){
+
+    public void saveMolecularCharacterization(MolecularCharacterization mc) {
         molecularCharacterizationRepository.save(mc);
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 /**
- * Interface for implantation site records
+ * Interface for Markers
  */
 public interface MarkerRepository extends PagingAndSortingRepository<Marker, Long> {
 

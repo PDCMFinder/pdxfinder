@@ -14,6 +14,9 @@ public interface MarkerAssociationRepository extends PagingAndSortingRepository<
 
     //TODO: Change cypher
     @Query("MATCH (t:MarkerAssociation) WHERE t.symbol = {symbol} RETURN t")
-    MarkerAssociation findByTypeAndMarker(@Param("type") String type, @Param("markerName") String markerName);
+    MarkerAssociation findByTypeAndMarkerSymbol(@Param("type") String type, @Param("symbol") String symbol);
+    
+    @Query("MATCH (t:MarkerAssociation) WHERE t.name = {name} RETURN t")
+    MarkerAssociation findByTypeAndMarkerName(@Param("type") String type, @Param("name") String name);
 
 }
