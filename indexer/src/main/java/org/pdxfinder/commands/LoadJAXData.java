@@ -98,7 +98,7 @@ public class LoadJAXData implements CommandLineRunner {
             }
 
             // Delete all ?how? data currently associated to this data source
-            // this loaderUtils method does noting!
+            // this loaderUtils method does nothing!
             try{
             loaderUtils.deleteAllByEDSName(JAX_DATASOURCE_NAME);
             }catch(Exception e){

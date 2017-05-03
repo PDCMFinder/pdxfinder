@@ -302,12 +302,12 @@ public class LoaderUtils {
         if(ma == null && m.getSymbol() != null){
             ma = markerAssociationRepository.findByTypeAndMarkerSymbol(type, m.getSymbol());
         }
-
+        
         if (ma == null) {
             ma = new MarkerAssociation(type, m);
             markerAssociationRepository.save(ma);
         }
-
+        
         return ma;
     }
 
