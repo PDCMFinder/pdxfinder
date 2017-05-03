@@ -13,10 +13,10 @@ import org.springframework.data.repository.query.Param;
 public interface MarkerAssociationRepository extends PagingAndSortingRepository<MarkerAssociation, Long>{
 
     //TODO: Change cypher
-    @Query("MATCH (t:MarkerAssociation) WHERE t.symbol = {symbol} RETURN t")
+    @Query("MATCH (n:MarkerAssociation)-[]-(m:Marker) where n.description = {type} and m.symbol={symbol} return n")
     MarkerAssociation findByTypeAndMarkerSymbol(@Param("type") String type, @Param("symbol") String symbol);
     
-    @Query("MATCH (t:MarkerAssociation) WHERE t.name = {name} RETURN t")
+    @Query("MATCH (n:MarkerAssociation)-[]-(m:Marker) where n.description = {type} and m.name={name} return n")
     MarkerAssociation findByTypeAndMarkerName(@Param("type") String type, @Param("name") String name);
 
 }
