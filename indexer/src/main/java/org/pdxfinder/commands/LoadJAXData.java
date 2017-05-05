@@ -93,7 +93,7 @@ public class LoadJAXData implements CommandLineRunner {
                 cmd = parser.parse(options, args);
 
             } catch (UnrecognizedOptionException | MissingArgumentException e) {
-                formatter.printHelp("load", options);
+                formatter.printHelp("loadJAX", options);
                 System.exit(1);
             }
 
@@ -102,7 +102,7 @@ public class LoadJAXData implements CommandLineRunner {
             try{
             loaderUtils.deleteAllByEDSName(JAX_DATASOURCE_NAME);
             }catch(Exception e){
-                log.error("to be expected", e);
+         //       log.error("to be expected", e);
             }
             if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
@@ -169,11 +169,11 @@ public class LoadJAXData implements CommandLineRunner {
                 
                 String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
                 
-                PatientSnapshot pSnap = loaderUtils.getPatientSnapshot("JAX" + i, j.getString("Gender"),
+                PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), j.getString("Gender"),
                         j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
 
 
-                Sample sample = loaderUtils.getSample("JAX " + i, j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
+                Sample sample = loaderUtils.getSample(j.getString("Patient ID"), j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
                         j.getString("Specimen Site"), j.getString("Primary Site"), classification, NORMAL_TISSUE, jaxDS);
 
                 JSONArray markers = j.getJSONArray("Markers");
