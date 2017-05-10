@@ -174,8 +174,9 @@ public class LoadJAXData implements CommandLineRunner {
 
 
                 Sample sample = loaderUtils.getSample(j.getString("Patient ID"), j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
-                        j.getString("Specimen Site"), j.getString("Primary Site"), classification, NORMAL_TISSUE, jaxDS);
-
+                        j.getString("Primary Site"), j.getString("Specimen Site"), classification, NORMAL_TISSUE, jaxDS);
+                
+              
                 JSONArray markers = j.getJSONArray("Markers");
                 HashMap<String,Set<MarkerAssociation>> markerMap = new HashMap<>();
                 for(int mIndex = 0; mIndex < markers.length(); mIndex++){
