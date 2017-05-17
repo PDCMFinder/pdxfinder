@@ -5,6 +5,9 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Interface for Markers
  */
@@ -15,5 +18,8 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
 
     @Query("MATCH (t:Marker) WHERE t.name = {name} RETURN t")
     Marker findByName(@Param("name") String name);
+
+    @Query("MATCH (m:Marker) RETURN m")
+    Collection<Marker> findAllMarkers();
 
 }

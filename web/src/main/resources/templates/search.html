@@ -2,31 +2,104 @@
 <head>
     <link th:remove="all" rel="stylesheet" media="screen"
           href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/chosen.css"/>
+    <script src="/js/jquery-3.2.1.js"></script>
+    <script src="/js/bootstrap.js"></script>
+    <script src="/js/chosen.jquery.js"></script>
+    <script src="/js/pdxFinder.js"></script>
     <!--/*/ <th:block th:include="fragments/head-includes :: head-includes"></th:block> /*/-->
 </head>
 <body>
-
+<div class="page-header text-center">
+<h1>Patient Derived Xenograft Finder</h1>
+</div>
 <div class="container">
     <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
 </div>
 
 <!-- Page Content -->
 <div class="container">
+<script type="text/javascript">
+    jQuery(document).ready(function(){
 
-    <!-- Heading Row -->
+        init();
+
+        jQuery("#searchField").bind("enterWasHit",function(e){
+            search();
+        });
+        jQuery("#searchField").keyup(function(e){
+            if(e.keyCode == 13)
+            {
+                jQuery(this).trigger("enterWasHit");
+            }
+        });
+
+        jQuery("#searchButton").on("click", function () {
+            search();
+        });
+
+
+
+
+
+    });
+
+
+</script>
+
     <div class="row">
-        <div class="col-md-12">
-            <h1>Search</h1>
-            <p>Search for PDX models
-            </p>
-        </div>
-        <!-- /.col-md-8 -->
-    </div>
-    <!-- /.row -->
+        <div class="col-md-6">
+            <h4>Diagnosis</h4>
 
+                <input id="searchField" class="chosen-search-input" autofocus="" data-modalfocus="" placeholder="" type="text" style="width:100%;"/>
+
+        </div>
+
+        <div class="col-md-6">
+            <h4>Choose marker(s)</h4>
+            <select id="markerSelect" class="chosen" multiple="true" data-placeholder="Select marker(s)...">
+        </select>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Source</h4>
+            <select id="sourceSelect" class="chosen" multiple="true" data-placeholder="Select source(s)...">
+                <option>IRCC</option>
+                <option>JAX</option>
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <h4>Origin tumor type</h4>
+            <select id="tumorTypeSelect" class="chosen" multiple="true" data-placeholder="Select tumor type(s)...">
+                <option>Metastatic</option>
+                <option>Primary</option>
+            </select>
+
+        </div>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="col-md-6"></div>
+        <div class="col-md-6">
+        <button id="searchButton" class="btn btn-default pull-right"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search</button>
+        </div>
+    </div>
+
+
+    <br/>
+
+    <div class="row">
+        <div id="resultsDiv" class="panel panel-primary hidden">
+        </div>
+    </div>
 
 </div>
 <!-- /.container -->
+
 
 </body>
 </html>
