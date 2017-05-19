@@ -1,5 +1,6 @@
 package org.pdxfinder.repositories;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.dao.ExternalDataSource;
@@ -8,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.transaction.BeforeTransaction;
-import org.springframework.util.Assert;
 
 import java.sql.Date;
 import java.time.Instant;
@@ -41,7 +41,7 @@ public class ExternalDataSourceRepositoryTest extends BaseTest {
             externalDataSourceRepository.save(ds);
         }
 
-        Assert.notNull(externalDataSourceRepository.findByName(extDsName));
+        Assert.assertNotNull(externalDataSourceRepository.findByName(extDsName));
     }
 
 }

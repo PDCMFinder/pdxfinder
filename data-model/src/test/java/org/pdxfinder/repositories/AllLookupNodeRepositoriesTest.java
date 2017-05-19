@@ -1,5 +1,6 @@
 package org.pdxfinder.repositories;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.pdxfinder.BaseTest;
@@ -9,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.transaction.BeforeTransaction;
-import org.springframework.util.Assert;
 
 import java.util.Arrays;
 import java.util.List;
@@ -87,7 +87,7 @@ public class AllLookupNodeRepositoriesTest extends BaseTest {
             tissueRepository.save(tissue);
         }
 
-        Assert.notNull(tissueRepository.findByName(TISSUE_NAME));
+        Assert.assertNotNull(tissueRepository.findByName(TISSUE_NAME));
         log.info("  Found Tissue {}", tissueRepository.findByName(TISSUE_NAME).getName());
 
     }
@@ -102,7 +102,7 @@ public class AllLookupNodeRepositoriesTest extends BaseTest {
             backgroundStrainRepository.save(bgStrain);
         }
 
-        Assert.notNull(backgroundStrainRepository.findBySymbol(BACKGROUND_STRAIN));
+        Assert.assertNotNull(backgroundStrainRepository.findBySymbol(BACKGROUND_STRAIN));
         log.info("  Found Background Strain {}", backgroundStrainRepository.findBySymbol(BACKGROUND_STRAIN).getSymbol());
     }
 
@@ -116,7 +116,7 @@ public class AllLookupNodeRepositoriesTest extends BaseTest {
             implantationSiteRepository.save(site);
         }
 
-        Assert.notNull(implantationSiteRepository.findByName(IMPLANTATION_SITE));
+        Assert.assertNotNull(implantationSiteRepository.findByName(IMPLANTATION_SITE));
         log.info("  Found Implantation Site {}", implantationSiteRepository.findByName(IMPLANTATION_SITE).getName());
     }
 
@@ -130,7 +130,7 @@ public class AllLookupNodeRepositoriesTest extends BaseTest {
             implantationTypeRepository.save(type);
         }
 
-        Assert.notNull(implantationTypeRepository.findByName(IMPLANTATION_TYPE));
+        Assert.assertNotNull(implantationTypeRepository.findByName(IMPLANTATION_TYPE));
         log.info("  Found Implantation Type {}", implantationTypeRepository.findByName(IMPLANTATION_TYPE).getName());
 
     }
