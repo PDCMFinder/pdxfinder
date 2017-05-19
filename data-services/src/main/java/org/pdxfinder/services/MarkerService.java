@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by csaba on 16/05/2017.
@@ -17,8 +18,13 @@ import java.util.List;
 @Service
 public class MarkerService {
 
+
+    private MarkerRepository markerRepository;
+
     @Autowired
-    MarkerRepository markerRepository;
+    public MarkerService(MarkerRepository markerRepository) {
+        this.markerRepository = markerRepository;
+    }
 
     public List<String> getAllMarkers(){
         Collection markers = markerRepository.findAllMarkers();
@@ -32,6 +38,14 @@ public class MarkerService {
         }
 
         return result;
+    }
+
+    public List<String> getAllMarkerNamesBySampleId(String sampleId){
+        Collection<Marker> markers = markerRepository.findAllBySampleId(sampleId);
+
+        return markers.stream().map(Marker::getName).collect(Collectors.toList());
+
+
     }
 
 }

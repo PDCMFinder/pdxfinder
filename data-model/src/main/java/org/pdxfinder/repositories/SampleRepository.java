@@ -22,7 +22,13 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
 
     Set<Sample> findByExternalDataSourceAbbreviation(String abbreviation);
 
-    @Query("MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) where s.diagnosis contains {diag} return s,o,t order by s.diagnosis limit 30")
+    @Query("MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) where toLower(s.diagnosis) contains toLower({diag}) return s,o,t order by s.diagnosis limit 30")
     Collection<Sample> findByDiagnosisContains(@Param("diag") String diag);
+
+    @Query("MATCH (s:Sample)--(:MolecularCharacterization)--(:MarkerAssociation)--(m:Marker) " +
+            "WHERE toLower(s.diagnosis) CONTAINS toLower({diag}) " +
+            "AND m.name IN {markers} return s")
+    Collection<Sample> findByDiagnosisContainsAndHaveMarkers(@Param("diag") String diag, @Param("markers") String[] markers);
+
 
 }
