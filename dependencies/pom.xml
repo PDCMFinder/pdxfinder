@@ -110,6 +110,12 @@
 
             <dependency>
                 <groupId>org.pdxfinder</groupId>
+                <artifactId>data-services</artifactId>
+                <version>${pdxfinder.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.pdxfinder</groupId>
                 <artifactId>indexer</artifactId>
                 <version>${pdxfinder.version}</version>
             </dependency>

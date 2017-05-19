@@ -1,14 +1,14 @@
 package org.pdxfinder.repositories;
 
-import org.pdxfinder.dao.MarkerAssociation;
+
 import org.pdxfinder.dao.Sample;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.Neo4jRepository;
+
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
-import java.util.List;
+
 import java.util.Set;
 
 /**
@@ -24,5 +24,11 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
 
     @Query("MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) where s.diagnosis contains {diag} return s,o,t order by s.diagnosis limit 30")
     Collection<Sample> findByDiagnosisContains(@Param("diag") String diag);
+
+    @Query("MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
+            "MATCH (s:Sample)--(:MolecularCharacterization)--(:MarkerAssociation)--(m:Marker) " +
+            "WHERE toLower(s.diagnosis) CONTAINS toLower({diag}) " +
+            "AND m.name IN {markers} return s.o,t")
+    Collection<Sample> findByDiagnosisContainsAndHaveMarkers(@Param("diag") String diag, @Param("markers") String[] markers);
 
 }
