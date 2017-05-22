@@ -86,7 +86,7 @@ public class SearchService {
         Sample sample = sampleRepository.findBySourceSampleId(sampleId);
         Patient patient = patientRepository.findBySampleId(sampleId);
         PatientSnapshot ps = patientSnapshotRepository.findBySampleId(sampleId);
-        PdxStrain pdx = pdxStrainRepository.findBySampleId(sampleId);
+        PdxStrain pdx = pdxStrainRepository.findBySampleSourceSampleId(sampleId);
 
         DetailsDTO dto = new DetailsDTO();
 

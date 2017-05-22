@@ -12,9 +12,7 @@ public interface PdxStrainRepository extends Neo4jRepository<PdxStrain, Long> {
 
     PdxStrain findBySourcePdxId(String sourcePdxId);
 
-    @Query("MATCH (s:Sample)--(pdx:PdxStrain) " +
-            "WHERE s.sourceSampleId = {sampleId} " +
-            "RETURN pdx")
-    PdxStrain findBySampleId(@Param("sampleId") String sampleId);
+
+    PdxStrain findBySampleSourceSampleId(@Param("sampleId") String sampleId);
 
 }
