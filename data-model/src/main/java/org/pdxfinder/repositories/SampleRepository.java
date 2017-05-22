@@ -28,7 +28,9 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
     @Query("MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
             "MATCH (s:Sample)--(:MolecularCharacterization)--(:MarkerAssociation)--(m:Marker) " +
             "WHERE toLower(s.diagnosis) CONTAINS toLower({diag}) " +
-            "AND m.name IN {markers} return s.o,t")
+            "AND m.name IN {markers} return s,o,t")
     Collection<Sample> findByDiagnosisContainsAndHaveMarkers(@Param("diag") String diag, @Param("markers") String[] markers);
+
+
 
 }

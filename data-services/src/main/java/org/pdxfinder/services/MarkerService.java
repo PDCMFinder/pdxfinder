@@ -34,4 +34,17 @@ public class MarkerService {
         return result;
     }
 
+    public List<String> getAllMarkerNamesBySampleId(String sampleId){
+        Collection<Marker> markers = this.markerRepository.findAllBySampleId(sampleId);
+        List<String> result = new ArrayList<>();
+
+        for(Marker marker:markers){
+            result.add(marker.getName());
+        }
+
+        return result;
+    }
+
+
+
 }
