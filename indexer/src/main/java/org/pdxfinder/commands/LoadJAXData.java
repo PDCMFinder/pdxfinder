@@ -228,8 +228,8 @@ public class LoadJAXData implements CommandLineRunner {
         }
     }
 
-   
-    //JSON fields: "model id","sample","gene symbol","platform","amino acid change"
+    HashMap<String, String> passageMap = null;
+    //JSON fields: "model id","sample","gene symbol","platform","amino acid change","passage num"
     // create validation with MC
     // attach validation to passage
     // attach passage to model
@@ -240,9 +240,12 @@ public class LoadJAXData implements CommandLineRunner {
         
         try {
             // marker assocations keyed to technology/platform
+            
+            passageMap = new HashMap<>();
 
             HashMap<String, HashMap<String, Set<MarkerAssociation>>> sampleMap = new HashMap<>();
             HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
+            
             
             JSONObject job = new JSONObject(parseURL(this.variationURL + strain.getSourcePdxId()));
             JSONArray jarray = job.getJSONArray("variation");
@@ -258,7 +261,8 @@ public class LoadJAXData implements CommandLineRunner {
                 symbol = j.getString("gene symbol");
                 variant = j.getString("amino acid change");
                 technology = j.getString("platform");
-
+                passageMap.put(sample,j.getString("passage num"));
+               
                 MarkerAssociation ma = loaderUtils.getMarkerAssociation("variant:" + variant, symbol, symbol);
 
                 markerMap = sampleMap.get(sample);
@@ -292,7 +296,7 @@ public class LoadJAXData implements CommandLineRunner {
                     mc.setTechnology(tech);
                     mc.setMarkerAssociations(markerMap.get(tech));
 
-                    loaderUtils.saveMolecularCharacterization(mc);
+          //          loaderUtils.saveMolecularCharacterization(mc);
                     mcs.add(mc);
 
                 }
@@ -301,7 +305,7 @@ public class LoadJAXData implements CommandLineRunner {
                 PdxPassage pdxPassage = new PdxPassage(strain, passage);
                 pdxPassage.setValidation(validation);
 
-                loaderUtils.saveValidation(validation);
+          //      loaderUtils.saveValidation(validation);
                 loaderUtils.savePdxPassage(pdxPassage);
                 System.out.println("saved passage "+passage+" for model "+strain.getSourcePdxId()+" from sample "+sampleKey);
             }
@@ -315,7 +319,7 @@ public class LoadJAXData implements CommandLineRunner {
     private Integer getPassage(String sample) {
         Integer p = 0;
         try{
-            p = new Integer(sample.substring(sample.lastIndexOf("P")+1, sample.lastIndexOf("_")));
+            p = new Integer(passageMap.get(sample).replaceAll("P", ""));
         }catch(Exception e){
             log.error("Unable to determine passage from sample name "+sample+". Assuming 0");
         }
