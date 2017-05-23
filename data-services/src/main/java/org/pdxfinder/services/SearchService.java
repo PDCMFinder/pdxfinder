@@ -35,7 +35,6 @@ public class SearchService {
 
     public List<SearchDTO> searchForSamplesWithFilters(String diag, String[] markers, String[] datasources, String[] origintumortypes){
 
-        //Collection<Sample> samples = sampleRepository.findByDiagnosisContainsAndHaveMarkers(diag, markers);
         Collection<Sample> samples = sampleRepository.findByMultipleFilters(diag, markers, datasources, origintumortypes);
 
         List<SearchDTO> results = new ArrayList<>();
@@ -184,19 +183,3 @@ public class SearchService {
 
 
 }
-/*
-
-Hello developers,
-
-Could someone please help me with this query?
-
-MATCH (f.Fragment)--(:Association)--(m:Marker)
-WHERE toLower(f.name) CONTAINS toLower('something')
-AND m.name IN ["alpha", "beta"]
-RETURN f
-
-This works fine as long as I pass a name for Fragment and a list for the Markers, but in some cases my list is empty.
-In those cases I would like to have all fragments regardless of its Markers names.
-
-Thanks in advance.
- */
