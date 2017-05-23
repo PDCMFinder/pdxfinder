@@ -2,10 +2,7 @@ package org.pdxfinder.services;
 
 
 
-import org.pdxfinder.dao.Patient;
-import org.pdxfinder.dao.PatientSnapshot;
-import org.pdxfinder.dao.PdxStrain;
-import org.pdxfinder.dao.Sample;
+import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.PatientRepository;
 import org.pdxfinder.repositories.PatientSnapshotRepository;
 import org.pdxfinder.repositories.PdxStrainRepository;
@@ -15,25 +12,22 @@ import org.pdxfinder.services.dto.SearchDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class SearchService {
 
 
     private SampleRepository sampleRepository;
-    private MarkerService markerService;
+
     private PatientRepository patientRepository;
     private PatientSnapshotRepository patientSnapshotRepository;
     private PdxStrainRepository pdxStrainRepository;
 
     @Autowired
-    public SearchService(SampleRepository sampleRepository, MarkerService markerService, PatientRepository patientRepository,
+    public SearchService(SampleRepository sampleRepository, PatientRepository patientRepository,
                          PatientSnapshotRepository patientSnapshotRepository, PdxStrainRepository pdxStrainRepository) {
         this.sampleRepository = sampleRepository;
-        this.markerService = markerService;
         this.patientRepository = patientRepository;
         this.patientSnapshotRepository = patientSnapshotRepository;
         this.pdxStrainRepository = pdxStrainRepository;
@@ -41,7 +35,9 @@ public class SearchService {
 
     public List<SearchDTO> searchForSamplesWithFilters(String diag, String[] markers, String[] datasources, String[] origintumortypes){
 
-        Collection<Sample> samples = sampleRepository.findByDiagnosisContainsAndHaveMarkers(diag, markers);
+        //Collection<Sample> samples = sampleRepository.findByDiagnosisContainsAndHaveMarkers(diag, markers);
+        Collection<Sample> samples = sampleRepository.findByMultipleFilters(diag, markers, datasources, origintumortypes);
+
         List<SearchDTO> results = new ArrayList<>();
 
         for (Sample sample : samples) {
@@ -71,7 +67,17 @@ public class SearchService {
             if(sample.getClassification() != null) {
                 sdto.setClassification(sample.getClassification());
             }
-            sdto.setCancerGenomics(markerService.getAllMarkerNamesBySampleId(sample.getSourceSampleId()));
+            if(sample.getMolecularCharacterizations() != null){
+                Set<String> markerSet = new HashSet<>();
+
+                for(MolecularCharacterization mc : sample.getMolecularCharacterizations()){
+                    for(MarkerAssociation ma : mc.getMarkerAssociations()){
+                        markerSet.add(ma.getMarker().getName());
+                    }
+                }
+                sdto.setCancerGenomics(new ArrayList<>(markerSet));
+
+            }
 
             results.add(sdto);
         }
@@ -178,3 +184,19 @@ public class SearchService {
 
 
 }
+/*
+
+Hello developers,
+
+Could someone please help me with this query?
+
+MATCH (f.Fragment)--(:Association)--(m:Marker)
+WHERE toLower(f.name) CONTAINS toLower('something')
+AND m.name IN ["alpha", "beta"]
+RETURN f
+
+This works fine as long as I pass a name for Fragment and a list for the Markers, but in some cases my list is empty.
+In those cases I would like to have all fragments regardless of its Markers names.
+
+Thanks in advance.
+ */
