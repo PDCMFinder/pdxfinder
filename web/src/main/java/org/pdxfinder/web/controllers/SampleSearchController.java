@@ -28,16 +28,6 @@ public class SampleSearchController {
         this.searchService = searchService;
     }
 
-    //This is broken, don't use it
-    @RequestMapping(method = RequestMethod.GET, value = "/searchsampleswrong")
-    public Map<String, Object> search(@RequestParam(value="diag", required = false) String diag,
-                                      @RequestParam(value="markers[]", required = false) String[] markers,
-                                      @RequestParam(value="datasources[]", required = false) String[] datasources,
-                                      @RequestParam(value="origintumortypes[]", required = false) String[] origintumortypes ) {
-
-        return sampleService.searchForSamples(diag);
-    }
-
 
 
     @RequestMapping(method = RequestMethod.GET, value = "/searchsamples")
