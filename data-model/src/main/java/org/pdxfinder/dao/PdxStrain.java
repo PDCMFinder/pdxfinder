@@ -15,8 +15,14 @@ public class PdxStrain {
     private Long id;
 
     private String sourcePdxId;
+
+    @Relationship(type = "IMPLANTATION_SITE")
     private ImplantationSite implantationSite;
+
+    @Relationship(type = "IMPLANTATION_TYPE")
     private ImplantationType implantationType;
+
+    @Relationship(type = "BACKGROUND_STRAIN")
     private BackgroundStrain backgroundStrain;
 
     @Relationship(type = "IMPLANTED_IN", direction = Relationship.INCOMING)

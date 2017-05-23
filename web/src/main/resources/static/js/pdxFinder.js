@@ -76,13 +76,13 @@ function displayResults(q,data){
     resTable.addClass("table table-striped no-footer");
 
     resTable.append('<thead><tr><th>Data source</th><th>Tumor ID</th><th>Diagnosis</th><th>Tissue of origin</th>' +
-        '<th>Classification</th></tr></thead>');
+        '<th>Classification</th><th>Cancer genomics</th></tr></thead>');
     var tbody = jQuery("<tbody/>");
 
     for (var i in data){
-        var tr = jQuery('<tr><td>'+data[i].dataSource+'</td><td><a href="/details/'+ data[i].sourceSampleId+
-            '">'+data[i].sourceSampleId+'</a></td><td>'+data[i].diagnosis+'</td><td>'+ data[i].originTissue.name+'</td><td>'
-            +data[i].classification+'</td></tr>');
+        var tr = jQuery('<tr><td>'+data[i].dataSource+'</td><td><a href="/details/'+ data[i].tumorId+
+            '">'+data[i].tumorId+'</a></td><td>'+data[i].diagnosis+'</td><td>'+ data[i].tissueOfOrigin+'</td><td>'
+            +data[i].classification+'</td><td>Features: '+data[i].cancerGenomics.toString()+'</td></tr>');
 
         tbody.append(tr);
     }
@@ -101,12 +101,12 @@ function getMarkers(){
 
         markers = data;
         markers.sort();
-        console.log("Markers:"+markers);
+
         var markerSelect = jQuery("#markerSelect");
 
         for(var i=0;i<markers.length;i++){
             markerSelect.append('<option>'+markers[i]+'</option>');
-            console.log("Adding "+markers[i]);
+
         }
 
         applyChosen();

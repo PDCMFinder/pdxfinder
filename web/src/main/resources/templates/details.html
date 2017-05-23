@@ -35,29 +35,15 @@
                     <div class="col-md-6">
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Diagnosis</h3>
+                                <h3 class="panel-title">Clinical / Patient</h3>
                             </div>
                             <div class="panel-body">
                                 <dl class="dl-horizontal">
-                                    <dt>Diagnosis</dt>
-                                    <dd>Some diagnosis
-                                        <small><table class="text-muted"><tbody><tr><th>Synonym / Category:</th></tr>
-
-                                        <tr><td>Data</td></tr>
-
-                                        <tr><td>More data</td></tr>
-
-                                        <tr><td>Something here, too</td></tr>
-
-                                        <tr><td>And here</td></tr>
-
-                                        </tbody></table></small>
-                                    </dd><dt>Tissue / Type</dt>
-                                    <dd>Blood / Primary Malignancy</dd>
-                                    <dt>Stage</dt>
-                                    <dd></dd>
-                                    <dt>Classification</dt>
-                                    <dd>None</dd>
+                                    <dt>Patient ID</dt><dd><span th:text="${patientId}"></span></dd>
+                                    <dt>Gender</dt><dd><span th:text="${gender}"></span></dd>
+                                    <dt>Age</dt><dd><span th:text="${age}"></span></dd>
+                                    <dt>Race</dt><dd><span th:text="${race}"></span></dd>
+                                    <dt>Ethnicity</dt><dd><span th:text="${ethnicity}"></span></dd>
                                 </dl>
                             </div>
                         </div>
@@ -66,60 +52,45 @@
                     <div class="col-md-6">
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Patient information</h3>
+                                <h3 class="panel-title">Clinical / Tumor</h3>
                             </div>
                             <div class="panel-body">
                                 <dl class="dl-horizontal">
-                                    <dt>Sex</dt>
-                                    <dd></dd>
-                                    <dt>Age</dt>
-                                    <dd></dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">PDX details</h3>
-                            </div>
-                            <div class="panel-body">
-                                <dl class="dl-horizontal">
-                                    <dt>Passage</dt>
-                                    <dd>No information</dd>
-                                    <dd></dd>
-                                    <dt>Implanation type</dt>
-                                    <dd></dd>
-                                    <dt>Implantation site</dt>
-                                    <dd></dd>
+                                    <dt>Diagnosis</dt><dd><span th:text="${diagnosis}"></span></dd>
+                                    <dt>Tumor type</dt><dd><span th:text="${tumorType}"></span></dd>
+                                    <dt>Classification</dt><dd><span th:text="${classification}"></span></dd>
+                                    <dt>Markers</dt><dd></dd>
                                 </dl>
                             </div>
                         </div>
                     </div>
 
                 </div>
-
-
                 <div class="row">
-
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Molecular Characterization</h3>
+                                <h3 class="panel-title">PDX model creation</h3>
                             </div>
                             <div class="panel-body">
-                                <ul>
-                                </ul>
+                                <dl class="dl-horizontal">
+                                    <dt>Sample type</dt><dd><span th:text="${sampleType}"></span></dd>
+                                    <dt>Strain</dt><dd><span th:text="${strain}"></span></dd>
+                                    <dt>Mouse sex</dt><dd><span th:text="${mouseSex}"></span></dd>
+                                    <dt>Engraftment site</dt><dd><span th:text="${engraftmentSite}"></span></dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
 
-
-                                <p>No validation information for human</p>
-
-
-
-                                <p>No validation information for pdx mouse</p>
-
-
+                    <div class="col-md-6">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">PDX model studies</h3>
+                            </div>
+                            <div class="panel-body">
+                                <p></p>
+                                <p></p>
                             </div>
                         </div>
                     </div>
