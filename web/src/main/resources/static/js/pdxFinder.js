@@ -69,7 +69,7 @@ function displayResults(q,data){
         div.removeClass("hidden");
     }
     div.empty();
-    div.append('<div class="panel-heading">You searched for "'+q+'" and the results are displayed below.</div>');
+    div.append('<div class="panel-heading">You searched for "'+q+'". Found '+data.length+' result(s).</div>');
     div.append('<div class="panel-body"></div>');
 
     var resTable = jQuery("<table/>");
@@ -89,7 +89,7 @@ function displayResults(q,data){
 
     resTable.append(tbody);
     div.append(resTable);
-
+    resTable.DataTable();
 }
 
 function getMarkers(){
