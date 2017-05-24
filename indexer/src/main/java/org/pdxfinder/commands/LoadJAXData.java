@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
+import org.neo4j.ogm.transaction.Transaction;
 import org.pdxfinder.dao.BackgroundStrain;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -82,12 +83,12 @@ public class LoadJAXData implements CommandLineRunner {
         log.info("Setting up LoadJAXDataCommand option");
     }
 
-    public LoadJAXData(LoaderUtils loaderUtils) {
+    public LoadJAXData(LoaderUtils loaderUtils, Session session) {
         this.loaderUtils = loaderUtils;
+        this.session = session;
     }
 
     @Override
-    @Transactional
     public void run(String... args) throws Exception {
 
         log.info(args[0]);
@@ -165,14 +166,28 @@ public class LoadJAXData implements CommandLineRunner {
         jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
         nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
+       
+        
         try {
             JSONObject job = new JSONObject(json);
             JSONArray jarray = job.getJSONArray("pdxInfo");
 
             for (int i = 0; i < jarray.length(); i++) {
+              
                 JSONObject j = jarray.getJSONObject(i);
 
-                String id = j.getString("Model ID");
+                createGraphObjects(j);
+            }
+
+        } catch (Exception e) {
+            log.error("", e);
+           
+        }
+    }
+
+    @Transactional
+    private void createGraphObjects(JSONObject j) throws Exception{
+        String id = j.getString("Model ID");
 
                 String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
 
@@ -219,14 +234,9 @@ public class LoadJAXData implements CommandLineRunner {
                 PdxStrain strain = loaderUtils.createPDXStrain(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS);
 
                 loadVariationData(strain);
-
+                
             }
-            
-
-        } catch (Exception e) {
-            log.error("", e);
-        }
-    }
+    
 
     HashMap<String, String> passageMap = null;
     //JSON fields: "model id","sample","gene symbol","platform","amino acid change","passage num"
@@ -251,9 +261,12 @@ public class LoadJAXData implements CommandLineRunner {
             JSONArray jarray = job.getJSONArray("variation");
             String sample, symbol, technology, variant;
             System.out.println(jarray.length()+" gene variants for model "+strain.getSourcePdxId());
-            int stop = maxVariations;
-            if(stop > jarray.length()){
-                stop = jarray.length();
+            
+            // configure the maximum variations to load in properties file
+            // loading them all will take a while (hour?)
+            int stop = jarray.length();
+            if(maxVariations > 0 && maxVariations < jarray.length()){
+                stop = maxVariations;
             }
             for (int i = 0; i < stop ; i++) {
                 JSONObject j = jarray.getJSONObject(i);
