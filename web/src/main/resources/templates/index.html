@@ -3,6 +3,7 @@
     <link th:remove="all" rel="stylesheet" media="screen"
           href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css"/>
     <!--/*/ <th:block th:include="fragments/head-includes :: head-includes"></th:block> /*/-->
+
 </head>
 <body>
 
@@ -21,12 +22,53 @@
         </div>
         <!-- /.col-md-4 -->
         <div class="col-md-8">
-            <h1>Welcome to the PDX integrator</h1>
-            <p>Patient-derived xenograft mouse models (PDX) have emerged as an important oncology research
-                platform to study sample evolution, the mechanisms of drug response and resistance, and in the
-                personalization of chemotherapeutic approaches for patients. PDX finder aim is to make all PDX
-                models anywhere in the world findable and obtainable.
+            <h1>Welcome to the PDX finder</h1>
+            <p>
+                Patient-derived tumor xenograft (PDX) mouse models are an important oncology research platform to study
+                tumor evolution, drug response and personalised medicine approaches. Global success of PDX models will
+                depend on their collective distribution and usage worldwide by academic and private sectors. In order to
+                facilitate PDX models discovery, <a href="http://www.ebi.ac.uk/about/people/terry-meehan">EMBL-EBI</a>
+                and
+                <a href="https://www.jax.org/research-and-faculty/research-labs/the-bult-lab">The Jackson Laboratory</a>
+                are
+                co-developing <strong>PDX finder</strong>.
             </p>
+            <p>
+                PDX finder is an open repository for the upload and storage of clinical,
+                genomic and functional PDX data which will provide a comprehensive global catalogue of PDX models
+                available for researchers across distributed repository databases. Using the newly developed
+                <a href="#" data-toggle="modal" data-target="#myModal" onclick="return false;">PDX-Minimum
+                    information standards</a>, PDX finder will integrate, standardize, analyze and
+                visualize the complex and diverse data associated with PDX mouse models for the cancer community.
+                Integrated views will be provided for histopathological image data, molecular classification of tumors,
+                host mouse strain metadata, tumor genomic data and metrics on tumor response to chemotherapeutics.
+
+            </p>
+
+            <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <img src="../static/images/pdx_mi_figure.png" th:src="@{/images/pdx_mi_figure.png}"
+                                 class="img-responsive"/>
+                            <p>
+                                Schematic of the process for PDX model creation, expansion, and drug dosing studies. A
+                                PDX model consists of an immunocompromised mouse into which human tumor material has
+                                been implanted. Once the implanted tumor reaches a target volume at the initial passage
+                                (P0), the tumor is excised, fractionated, and transplanted into the next cohort of mice
+                                to establish the next passage. P0 and P1 tumors are subjected to various quality control
+                                assays to ensure that the passaged tumors faithfully reflect the critical biological and
+                                genomic properties of the patient tumor. Cohorts of tumor bearing mice are used in
+                                experimental studies. Dosing studies are typically performed on low passage tumors
+                                (P1-P4).
+
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <a th:href="@{/search}" class="btn btn-success btn-block text-center" href="#">Search for PDX models</a>
         </div>
         <!-- /.col-md-8 -->
@@ -50,26 +92,39 @@
         <div class="col-md-4">
             <h2>Data from JAX</h2>
             <p>Information about the data from JAX.</p>
-            <a class="btn btn-default" href="#">More Info</a>
-        </div>
-        <!-- /.col-md-4 -->
-        <div class="col-md-4">
-            <h2>Data from PDM</h2>
-            <p>Patient derived models database information.</p>
-            <a class="btn btn-default" href="#">More Info</a>
+            <a class="btn btn-default" href="http://tumor.informatics.jax.org/mtbwi/pdxSearch.do" target="_blank">More
+                Info</a>
         </div>
         <!-- /.col-md-4 -->
         <div class="col-md-4">
             <h2>Data from EUROPDX</h2>
-            <p>EUROPDX also has PDX information.</p>
-            <a class="btn btn-default" href="#">More Info</a>
+            <p>Information about the data from EUROPDX.</p>
+            <a class="btn btn-default" href="https://www.ncbi.nlm.nih.gov/pubmed/?term=Enzo%20Medico%20EuroPDX"
+               target="_blank">More Info</a>
         </div>
         <!-- /.col-md-4 -->
+        <div class="col-md-4">
+        </div>
     </div>
     <!-- /.row -->
 
 </div>
 <!-- /.container -->
+
+<script>
+    function centerModal() {
+        $(this).css('display', 'block');
+        var $dialog = $(this).find(".modal-dialog");
+        var offset = ($(window).height() - $dialog.height()) / 2;
+        // Center modal vertically in window
+        $dialog.css("margin-top", offset);
+    }
+
+    $('.modal').on('show.bs.modal', centerModal);
+    $(window).on("resize", function () {
+        $('.modal:visible').each(centerModal);
+    });
+</script>
 
 </body>
 </html>

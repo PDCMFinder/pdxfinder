@@ -150,7 +150,11 @@ function displayResults(q,data){
     resTable.append(tbody);
     rpanel.append(resTable);
     div.append(rpanel);
-    jQuery("#resultsTable").DataTable();
+    jQuery("#resultsTable").DataTable({
+        language: {
+            sSearch: "Filter:"
+        }
+    });
 }
 
 function getMarkers(){
