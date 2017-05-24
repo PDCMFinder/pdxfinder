@@ -2,12 +2,43 @@
  * Created by csaba on 12/05/2017.
  */
 
+
+//GLOBAL for displaying tooltips
+
+var markerDefs = {};
+markerDefs['ALK-EML4']='Echinoderm microtubule-associated protein-like 4 (EML4) - Anaplastic lymphoma kinase (ALK) gene fusion';
+markerDefs['BRAF']='B-Raf proto-oncogene, serine/threonine kinase';
+markerDefs['BRAF V600E']='B-Raf proto-oncogene, serine/threonine kinase';
+markerDefs['BRCA1']='Breast Cancer 1, DNA repair associated';
+markerDefs['CD117 (c-Kit)']='KIT proto-oncogene receptor tyrosine kinase';
+markerDefs['EGFR']='Epidermal growth factor receptor gene';
+markerDefs['EGFR L858R']='Epidermal growth factor receptor gene';
+markerDefs['EGFR T790M']='Epidermal growth factor receptor gene';
+markerDefs['ER']='Estrogen receptor ';
+markerDefs['ERBB2 (HER2)']='Erb-b2 receptor tyrosine kinase 2';
+markerDefs['KRAS']='KRAS proto-oncogene, GTPase';
+markerDefs['MSI']='Microsatellite instability ';
+markerDefs['NRAS']='NRAS proto-oncogene, GTPase';
+markerDefs['PIK3CA']='Phosphatidylinositol-4,5-bisphosphate 3-kinase catalytic subunit alpha';
+markerDefs['PR']='Progesterone receptor ';
+markerDefs['ROS']='ROS proto-oncogene 1, receptor tyrosine kinase';
+
 function init(){
     getMarkers();
 }
 
 function applyChosen(){
     jQuery(".chosen").chosen({width: "100%"});
+}
+
+function insertSpinner(){
+    console.log('spinner');
+    var div = jQuery("#resultsDiv");
+    div.empty();
+    if(div.hasClass("hidden")){
+        div.removeClass("hidden");
+    }
+    div.append('<div class="row"><div class="col-md-2 col-md-offset-5"><div class="loader"></div>  Loading... </div></div></div>');
 }
 
 function search() {
@@ -46,6 +77,8 @@ function search() {
 
     if(q || markers.length>0 || dataSources.length>0 || originTumorTypes.length>0){
 
+        insertSpinner();
+
         var ajaxrequest = jQuery.ajax({
             url : "/searchsamples/",
             type : "get",
@@ -64,32 +97,60 @@ function search() {
 
 function displayResults(q,data){
     var div = jQuery("#resultsDiv");
+    var sources = [];
 
     if(div.hasClass("hidden")){
         div.removeClass("hidden");
     }
     div.empty();
-    div.append('<div class="panel-heading">You searched for "'+q+'". Found '+data.length+' result(s).</div>');
-    div.append('<div class="panel-body"></div>');
 
-    var resTable = jQuery("<table/>");
-    resTable.addClass("table table-striped no-footer");
+    var rpanel = jQuery("<div/>");
+    rpanel.addClass("panel panel-primary ");
 
-    resTable.append('<thead><tr><th>Data source</th><th>Tumor ID</th><th>Diagnosis</th><th>Tissue of origin</th>' +
-        '<th>Classification</th><th>Cancer genomics</th></tr></thead>');
     var tbody = jQuery("<tbody/>");
-
+    var markerString = '';
     for (var i in data){
-        var tr = jQuery('<tr><td>'+data[i].dataSource+'</td><td><a href="/details/'+ data[i].tumorId+
-            '">'+data[i].tumorId+'</a></td><td>'+data[i].diagnosis+'</td><td>'+ data[i].tissueOfOrigin+'</td><td>'
-            +data[i].classification+'</td><td>Features: '+data[i].cancerGenomics.toString()+'</td></tr>');
+
+        if(data[i].cancerGenomics.length>0){
+            var m = data[i].cancerGenomics;
+            markerString = '';
+
+            for(var j=0;j<m.length;j++){
+                markerString += '<a href="#" data-toggle="tooltip" data-placement="top" title="'+markerDefs[m[j]]+'">'+m[j]+'</a>';
+                if(j<m.length-1){
+                    markerString+=', ';
+                }
+            }
+        }
+
+        var tr = jQuery('<tr><td><a href="/details/'+ data[i].tumorId+
+            '">'+data[i].tumorId+'</a></td><td>'+data[i].diagnosis+'</td><td>'+ data[i].classification+'</td><td>'
+            +data[i].tumorType+'</td><td>'+markerString+'</td><td>'+data[i].dataSource+'</td></tr>');
+
+        if(sources.indexOf(data[i].dataSource) == -1){
+            sources.push(data[i].dataSource);
+        }
 
         tbody.append(tr);
+
+
     }
 
+    rpanel.append('<div class="panel-heading">You searched for "'+q+'". Found '+data.length+' result(s) in '+sources.length+' source(s).</div>');
+    rpanel.append('<div class="panel-body"></div>');
+
+    var resTable = jQuery("<table/>");
+    resTable.attr("id","resultsTable");
+    resTable.addClass("table table-striped no-footer");
+
+    resTable.append('<thead><tr><th>Model ID</th><th>Diagnosis</th>' +
+        '<th>Classification</th><th>Type</th><th>Marker</th><th>Data source</th></tr></thead>');
+
+
     resTable.append(tbody);
-    div.append(resTable);
-    resTable.DataTable();
+    rpanel.append(resTable);
+    div.append(rpanel);
+    jQuery("#resultsTable").DataTable();
 }
 
 function getMarkers(){
