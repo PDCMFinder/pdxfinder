@@ -19,10 +19,12 @@ import org.pdxfinder.dao.MarkerAssociation;
 import org.pdxfinder.dao.MolecularCharacterization;
 import org.pdxfinder.dao.Patient;
 import org.pdxfinder.dao.PatientSnapshot;
+import org.pdxfinder.dao.PdxPassage;
 import org.pdxfinder.dao.PdxStrain;
 import org.pdxfinder.dao.Sample;
 import org.pdxfinder.dao.Tissue;
 import org.pdxfinder.dao.TumorType;
+import org.pdxfinder.dao.Validation;
 import org.pdxfinder.repositories.ExternalDataSourceRepository;
 import org.pdxfinder.repositories.TumorTypeRepository;
 import org.pdxfinder.repositories.BackgroundStrainRepository;
@@ -33,9 +35,11 @@ import org.pdxfinder.repositories.MarkerRepository;
 import org.pdxfinder.repositories.MolecularCharacterizationRepository;
 import org.pdxfinder.repositories.PatientRepository;
 import org.pdxfinder.repositories.PatientSnapshotRepository;
+import org.pdxfinder.repositories.PdxPassageRepository;
 import org.pdxfinder.repositories.PdxStrainRepository;
 import org.pdxfinder.repositories.SampleRepository;
 import org.pdxfinder.repositories.TissueRepository;
+import org.pdxfinder.repositories.ValidationRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -62,6 +66,8 @@ public class LoaderUtils {
     private MarkerRepository markerRepository;
     private MarkerAssociationRepository markerAssociationRepository;
     private MolecularCharacterizationRepository molecularCharacterizationRepository;
+    private PdxPassageRepository pdxPassageRepository;
+    private ValidationRepository validationRepository;
 
     private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
 
@@ -77,7 +83,9 @@ public class LoaderUtils {
             SampleRepository sampleRepository,
             MarkerRepository markerRepository,
             MarkerAssociationRepository markerAssociationRepository,
-            MolecularCharacterizationRepository molecularCharacterizationRepository) {
+            MolecularCharacterizationRepository molecularCharacterizationRepository,
+            PdxPassageRepository pdxPassageRepository,
+            ValidationRepository validationRepository) {
 
         Assert.notNull(tumorTypeRepository);
         Assert.notNull(backgroundStrainRepository);
@@ -106,6 +114,8 @@ public class LoaderUtils {
         this.markerRepository = markerRepository;
         this.markerAssociationRepository = markerAssociationRepository;
         this.molecularCharacterizationRepository = molecularCharacterizationRepository;
+        this.pdxPassageRepository = pdxPassageRepository;
+        this.validationRepository = validationRepository;
 
     }
 
@@ -275,7 +285,7 @@ public class LoaderUtils {
         }
         return bgStrain;
     }
-    
+
     // is this bad? ... probably..
     public Marker getMarker(String symbol) {
         return this.getMarker(symbol, symbol);
@@ -298,16 +308,16 @@ public class LoaderUtils {
     public MarkerAssociation getMarkerAssociation(String type, String markerSymbol, String markerName) {
         Marker m = this.getMarker(markerSymbol, markerName);
         MarkerAssociation ma = markerAssociationRepository.findByTypeAndMarkerName(type, m.getName());
-        
-        if(ma == null && m.getSymbol() != null){
+
+        if (ma == null && m.getSymbol() != null) {
             ma = markerAssociationRepository.findByTypeAndMarkerSymbol(type, m.getSymbol());
         }
-        
+
         if (ma == null) {
             ma = new MarkerAssociation(type, m);
             markerAssociationRepository.save(ma);
         }
-        
+
         return ma;
     }
 
@@ -322,5 +332,13 @@ public class LoaderUtils {
 
     public void saveMolecularCharacterization(MolecularCharacterization mc) {
         molecularCharacterizationRepository.save(mc);
+    }
+    
+    public void saveValidation(Validation validation){
+        validationRepository.save(validation);
+    }
+    
+    public void savePdxPassage(PdxPassage pdxPassage){
+        pdxPassageRepository.save(pdxPassage);
     }
 }

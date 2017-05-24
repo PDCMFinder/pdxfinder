@@ -39,4 +39,8 @@ public class PdxPassage {
     public void setPassage(Integer passage) {
         this.passage = passage;
     }
+    
+     public void setValidation(Validation validation) {
+        this.validation = validation;
+    }
 }

@@ -46,10 +46,10 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
 
     // for now all samples are of tumor tissue
-    private final static Boolean NORMAL_TISSUE = false;
-
-    // hmm not sure about this
-    private final static String MC_TECH = "CTP or Whole Exome";
+    private final static Boolean NORMAL_TISSUE_FALSE = false;
+    
+    
+   
 
     private BackgroundStrain nsgBS;
     private ExternalDataSource jaxDS;
@@ -67,6 +67,12 @@ public class LoadJAXData implements CommandLineRunner {
 
     @Value("${jaxpdx.url}")
     private String urlStr;
+
+    @Value("${jaxpdx.variation.url}")
+    private String variationURL;
+    
+    @Value("${jaxpdx.variation.max}")
+    private int maxVariations;
 
     @PostConstruct
     public void init() {
@@ -99,10 +105,10 @@ public class LoadJAXData implements CommandLineRunner {
 
             // Delete all ?how? data currently associated to this data source
             // this loaderUtils method does nothing!
-            try{
-            loaderUtils.deleteAllByEDSName(JAX_DATASOURCE_NAME);
-            }catch(Exception e){
-         //       log.error("to be expected", e);
+            try {
+                loaderUtils.deleteAllByEDSName(JAX_DATASOURCE_NAME);
+            } catch (Exception e) {
+                //       log.error("to be expected", e);
             }
             if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
@@ -155,76 +161,170 @@ public class LoadJAXData implements CommandLineRunner {
     //JSON Fields {"Model ID","Gender","Age","Race","Ethnicity","Specimen Site","Primary Site","Initial Diagnosis","Clinical Diagnosis",
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
-        
-       
+
         jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
         nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
             JSONObject job = new JSONObject(json);
             JSONArray jarray = job.getJSONArray("pdxInfo");
-            String id = "";
+
             for (int i = 0; i < jarray.length(); i++) {
                 JSONObject j = jarray.getJSONObject(i);
-                
+
+                String id = j.getString("Model ID");
+
                 String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
-                
+
                 PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), j.getString("Gender"),
                         j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
 
-
                 Sample sample = loaderUtils.getSample(j.getString("Patient ID"), j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
-                        j.getString("Primary Site"), j.getString("Specimen Site"), classification, NORMAL_TISSUE, jaxDS);
-                
-              
+                        j.getString("Primary Site"), j.getString("Specimen Site"), classification, NORMAL_TISSUE_FALSE, jaxDS);
+
                 JSONArray markers = j.getJSONArray("Markers");
-                HashMap<String,Set<MarkerAssociation>> markerMap = new HashMap<>();
-                for(int mIndex = 0; mIndex < markers.length(); mIndex++){
+                HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
+                for (int mIndex = 0; mIndex < markers.length(); mIndex++) {
                     JSONObject marker = markers.getJSONObject(mIndex);
                     String symbol = marker.getString("Symbol");
                     String result = marker.getString("Result");
                     String technology = marker.getString("Technology");
-                    
-                    MarkerAssociation ma = loaderUtils.getMarkerAssociation(result,symbol,symbol);
+
+                    MarkerAssociation ma = loaderUtils.getMarkerAssociation(result, symbol, symbol);
                     // make a map of markerAssociationCollections keyed to technology
-                    if(markerMap.containsKey(technology)){
+                    if (markerMap.containsKey(technology)) {
                         markerMap.get(technology).add(ma);
-                    }else{
+                    } else {
                         HashSet<MarkerAssociation> set = new HashSet<>();
                         set.add(ma);
-                        markerMap.put(technology,set);
+                        markerMap.put(technology, set);
                     }
                 }
                 HashSet<MolecularCharacterization> mcs = new HashSet<>();
-                for(String tech : markerMap.keySet()){
+                for (String tech : markerMap.keySet()) {
                     MolecularCharacterization mc = new MolecularCharacterization();
                     mc.setTechnology(tech);
                     mc.setMarkerAssociations(markerMap.get(tech));
-                    
+
                     loaderUtils.saveMolecularCharacterization(mc);
                     mcs.add(mc);
-                    
+
                 }
                 sample.setMolecularCharacterizations(mcs);
-            
+
+                // this should only be for pt samples?
                 pSnap.addSample(sample);
                 loaderUtils.savePatientSnapshot(pSnap);
-                
-                // models IDs that are numeric should start with 'TM' then the value padded to 5 digits with leading 0s
-                try {
-                    id = "TM" + String.format("%05d", new Integer(j.getString("Model ID")));
-                } catch (Exception e) {
-                    // a J#### model
+
+                PdxStrain strain = loaderUtils.createPDXStrain(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS);
+
+                loadVariationData(strain);
+
+            }
+            
+
+        } catch (Exception e) {
+            log.error("", e);
+        }
+    }
+
+    HashMap<String, String> passageMap = null;
+    //JSON fields: "model id","sample","gene symbol","platform","amino acid change","passage num"
+    // create validation with MC
+    // attach validation to passage
+    // attach passage to model
+    // expliclty exclude patient samples for now
+    // for each set of variation data
+    // map <sample,map<tech,marker>>
+    private void loadVariationData(PdxStrain strain) {
+        
+        try {
+            // marker assocations keyed to technology/platform
+            
+            passageMap = new HashMap<>();
+
+            HashMap<String, HashMap<String, Set<MarkerAssociation>>> sampleMap = new HashMap<>();
+            HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
+            
+            
+            JSONObject job = new JSONObject(parseURL(this.variationURL + strain.getSourcePdxId()));
+            JSONArray jarray = job.getJSONArray("variation");
+            String sample, symbol, technology, variant;
+            System.out.println(jarray.length()+" gene variants for model "+strain.getSourcePdxId());
+            int stop = maxVariations;
+            if(stop > jarray.length()){
+                stop = jarray.length();
+            }
+            for (int i = 0; i < stop ; i++) {
+                JSONObject j = jarray.getJSONObject(i);
+                sample = j.getString("sample");
+                symbol = j.getString("gene symbol");
+                variant = j.getString("amino acid change");
+                technology = j.getString("platform");
+                passageMap.put(sample,j.getString("passage num"));
+               
+                MarkerAssociation ma = loaderUtils.getMarkerAssociation("variant:" + variant, symbol, symbol);
+
+                markerMap = sampleMap.get(sample);
+                if (markerMap == null) {
+                    markerMap = new HashMap<>();
                 }
 
-//                                                                        hope sample type is right value         
-                loaderUtils.createPDXStrain(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS);
+                // make a map of markerAssociationCollections keyed to technology
+                if (markerMap.containsKey(technology)) {
+                    markerMap.get(technology).add(ma);
+                } else {
+                    HashSet<MarkerAssociation> set = new HashSet<>();
+                    set.add(ma);
+                    markerMap.put(technology, set);
+                }
 
+                sampleMap.put(sample, markerMap);
+                if(i%20 == 0){
+                    System.out.println("loaded "+i+" markers");
+                }
+            }
+
+            for (String sampleKey : sampleMap.keySet()) {
+
+                Integer passage = getPassage(sampleKey);
+                markerMap = sampleMap.get(sampleKey);
+
+                HashSet<MolecularCharacterization> mcs = new HashSet<>();
+                for (String tech : markerMap.keySet()) {
+                    MolecularCharacterization mc = new MolecularCharacterization();
+                    mc.setTechnology(tech);
+                    mc.setMarkerAssociations(markerMap.get(tech));
+
+          //          loaderUtils.saveMolecularCharacterization(mc);
+                    mcs.add(mc);
+
+                }
+                Validation validation = new Validation();
+                validation.setMolecularCharacterizations(mcs);
+                PdxPassage pdxPassage = new PdxPassage(strain, passage);
+                pdxPassage.setValidation(validation);
+
+          //      loaderUtils.saveValidation(validation);
+                loaderUtils.savePdxPassage(pdxPassage);
+                System.out.println("saved passage "+passage+" for model "+strain.getSourcePdxId()+" from sample "+sampleKey);
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("",e);
         }
+        
+    }
+
+    private Integer getPassage(String sample) {
+        Integer p = 0;
+        try{
+            p = new Integer(passageMap.get(sample).replaceAll("P", ""));
+        }catch(Exception e){
+            log.error("Unable to determine passage from sample name "+sample+". Assuming 0");
+        }
+        return p;
+
     }
 
 }
