@@ -69,6 +69,8 @@ public class DetailsPageController {
         model.addAttribute("mouseSex", dto.getMouseSex());
         model.addAttribute("engraftmentSite", dto.getEngraftmentSite());
         model.addAttribute("markers", dto.getCancerGenomics());
+        model.addAttribute("url", dto.getExternalUrl());
+        model.addAttribute("urlText", dto.getExternalUrlText());
 
         //TODO: return error page if sampleId does not exist
         return "details";

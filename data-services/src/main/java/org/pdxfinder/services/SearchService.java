@@ -20,7 +20,10 @@ public class SearchService {
     private PatientRepository patientRepository;
     private PatientSnapshotRepository patientSnapshotRepository;
     private PdxStrainRepository pdxStrainRepository;
-
+    private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxSearch.do";
+    private final String JAX_URL_TEXT = "View data at JAX";
+    private final String IRCC_URL = "https://www.ncbi.nlm.nih.gov/pubmed/?term=Enzo%20Medico%20EuroPDX";
+    private final String IRCC_URL_TEXT = "Contact IRCC here";
 
     @Autowired
     public SearchService(SampleRepository sampleRepository, PatientRepository patientRepository,
@@ -186,7 +189,7 @@ public class SearchService {
                         markerList.add("None");
                     }
                     else{
-                        markerList.add(ma.getMarker().getName() +" "+ma.getDescription());
+                        markerList.add(ma.getMarker().getName() +" status: "+ma.getDescription());
                     }
 
                 }
@@ -195,6 +198,16 @@ public class SearchService {
             dto.setCancerGenomics(markerList);
 
         }
+
+        if(sample.getDataSource().equals("JAX")){
+            dto.setExternalUrl(JAX_URL);
+            dto.setExternalUrlText(JAX_URL_TEXT);
+        }
+        else if(sample.getDataSource().equals("IRCC")){
+            dto.setExternalUrl(IRCC_URL);
+            dto.setExternalUrlText(IRCC_URL_TEXT);
+        }
+
 
         return dto;
     }
