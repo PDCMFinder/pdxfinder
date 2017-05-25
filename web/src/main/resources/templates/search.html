@@ -102,16 +102,12 @@
             <!-- Graph Row, will get replaced by first query -->
             <div class="row">
                 <div class="col-md-4">
-                    <div id="cancer-tissue-chart"
+                    <div id="cancer-system-chart"
                          style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
                 </div>
                 <!-- /.col-md-4 -->
-                <div class="col-md-4">
-                    <div id="cancer-celltype-chart"></div>
-                </div>
-                <!-- /.col-md-4 -->
-                <div class="col-md-4">
-                    <div id="cancer-typte-distribution-chart"></div>
+                <div class="col-md-8">
+                    <div id="cancer-tissue-chart"></div>
                 </div>
             </div>
             <!-- /.row -->
@@ -127,7 +123,7 @@
 <script type="text/javascript" th:inline="javascript">
     /* <![CDATA[ */
     // Draw charts
-    Highcharts.chart('cancer-tissue-chart', {
+    Highcharts.chart('cancer-system-chart', {
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
@@ -153,39 +149,101 @@
         series: [{
             name: 'System',
             colorByPoint: true,
-            data: eval(/*[[ ${cancerByTissue} ]]*/)
+            data: eval(/*[[ ${cancerBySystem} ]]*/)
         }]
     });
 
-    //    Highcharts.chart('cancer-celltype-chart', {
-    //        chart: {
-    //            plotBackgroundColor: null,
-    //            plotBorderWidth: null,
-    //            plotShadow: false,
-    //            type: 'pie'
-    //        },
-    //        title: {
-    //            text: 'Cancers by Cell Type'
-    //        },
-    //        tooltip: {
-    //            pointFormat: '{series.name}: <b>{point.y}</b> (<b>{point.percentage:.1f}%</b>)'
-    //        },
-    //        plotOptions: {
-    //            pie: {
-    //                allowPointSelect: true,
-    //                cursor: 'pointer',
-    //                dataLabels: {
-    //                    enabled: false
-    //                },
-    //                showInLegend: true
-    //            }
-    //        },
-    //        series: [{
-    //            name: 'Cell types',
-    //            colorByPoint: true,
-    //            data: eval(/*[[ ${cancerByCellType} ]]*/)
-    //        }]
-    //    });
+
+    Highcharts.chart('cancer-tissue-chart', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Cancers by Tissue'
+        },
+        xAxis: {
+            type: 'category',
+            labels: {
+                rotation: -90,
+                style: {
+                    fontSize: '11px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
+        },
+        yAxis: {
+//            type: 'logarithmic',
+            title: {
+                text: 'Count of cancers'
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            pointFormat: 'Count: <b>{point.y:.1f}</b>'
+        },
+        series: [{
+            name: 'Tissue',
+            data: [
+                ['colon cancer', 496],
+                ['lung cancer', 77],
+                ['brain cancer', 34],
+                ['breast cancer', 31],
+                ['urinary bladder cancer', 28],
+                ['skin cancer', 20],
+                ['pancreatic cancer', 19],
+                ['muscle cancer', 17],
+                ['ovarian cancer', 13],
+                ['connective and soft tissue cancer', 13],
+                ['bone cancer', 12],
+                ['rectum cancer', 10],
+                ['kidney cancer', 10],
+                ['ampulla of vater cancer', 4],
+                ['bile duct cancer', 4],
+                ['head cancer', 4],
+                ['hematologic cancer', 3],
+                ['prostate cancer', 3],
+                ['cecum carcinoma', 3],
+                ['liver cancer', 2],
+                ['anus cancer', 2],
+                ['stomach cancer', 2],
+                ['appendix cancer', 2],
+                ['salivary gland cancer', 2],
+                ['tonsil cancer', 2],
+                ['duodenum cancer', 1],
+                ['b cell lymphoma', 1],
+                ['endometrial cancer', 1],
+                ['head and neck cancer', 1],
+                ['Hodgkins lymphoma', 1],
+                ['peripheral nervous system cancer', 1],
+                ['germ cell cancer', 1],
+                ['retroperitoneal cancer ', 1],
+                ['adrenal gland cancer', 1],
+                ['lipomatous cancer', 1],
+                ['kidney benign neoplasm', 1],
+                ['uterine cancer', 1],
+                ['esophageal cancer', 1],
+                ['neck cancer', 1],
+                ['bladder cancer', 1]
+            ],
+            dataLabels: {
+                crop: false,
+                overflow: 'none',
+                padding: 2,
+                enabled: true,
+                rotation: -90,
+                align: 'left',
+                format: '{point.y}',
+                y: -5,
+                style: {
+                    fontSize: '11px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
+        }]
+    });
+
     /* ]]> */
 
 

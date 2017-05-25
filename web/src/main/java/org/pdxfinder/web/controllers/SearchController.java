@@ -25,6 +25,29 @@ public class SearchController {
     @RequestMapping("/search")
     String index(Model model) throws JSONException {
 
+
+        //
+        // Cancers by system
+        //
+        JSONArray cancerBySystemDataSeriesArray = new JSONArray();
+
+        Map<String, Integer> cancerBySystem = graphService.getModelCountsBySystem();
+        for (String name : cancerBySystem.keySet()) {
+
+            JSONObject dataSeries = new JSONObject();
+            dataSeries.put("name", name);
+            dataSeries.put("y", cancerBySystem.get(name));
+
+            cancerBySystemDataSeriesArray.put(dataSeries);
+
+        }
+
+        model.addAttribute("cancerBySystem", cancerBySystemDataSeriesArray.toString());
+
+
+        //
+        // Cancers by tissue
+        //
         JSONArray cancerByTissueDataSeriesArray = new JSONArray();
 
         Map<String, Integer> cancerByTissue = graphService.getModelCountsByTissue();

@@ -49,9 +49,9 @@ public class GraphService {
      * Returns the counts of samples in the data base by top level tissue type
      */
     //TODO: Replace with dynamic query to top level when ontology associations are made
-    public Map<String, Integer> getModelCountsByTissue() {
+    public Map<String, Integer> getModelCountsBySystem() {
 
-        log.info("Entering getModelCountsByTissue");
+        log.info("Entering getModelCountsBySystem");
         Map<String, Integer> typesByTissue = new HashMap<>();
 
         typesByTissue.put("breast", 31);
@@ -104,4 +104,59 @@ public class GraphService {
 
         return modelsByCellType;
     }
+
+
+    /**
+     * Returns the counts of tumors in the data base by cell type
+     */
+    //TODO: Replace with dynamic query to top level when ontology associations are made
+    public Map<String, Integer> getModelCountsByTissue() {
+
+        log.info("Entering getModelCountsByCellType");
+        Map<String, Integer> cancerByTissue = new HashMap<>();
+
+
+        cancerByTissue.put("urinary bladder cancer", 28);
+        cancerByTissue.put("lung cancer", 77);
+        cancerByTissue.put("hematologic cancer", 3);
+        cancerByTissue.put("colon cancer", 496);
+        cancerByTissue.put("prostate cancer", 3);
+        cancerByTissue.put("rectum cancer", 10);
+        cancerByTissue.put("cecum carcinoma", 3);
+        cancerByTissue.put("ovarian cancer", 13);
+        cancerByTissue.put("liver cancer", 2);
+        cancerByTissue.put("duodenum cancer", 1);
+        cancerByTissue.put("anus cancer", 2);
+        cancerByTissue.put("pancreatic cancer", 19);
+        cancerByTissue.put("stomach cancer", 2);
+        cancerByTissue.put("ampulla of vater cancer", 4);
+        cancerByTissue.put("brain cancer", 34);
+        cancerByTissue.put("muscle cancer", 17);
+        cancerByTissue.put("appendix cancer", 2);
+        cancerByTissue.put("bone cancer", 12);
+        cancerByTissue.put("breast cancer", 31);
+        cancerByTissue.put("bile duct cancer", 4);
+        cancerByTissue.put("connective and soft tissue cancer", 13);
+        cancerByTissue.put("b cell lymphoma", 1);
+        cancerByTissue.put("endometrial cancer", 1);
+        cancerByTissue.put("head and neck cancer", 1);
+        cancerByTissue.put("Hodgkins lymphoma", 1);
+        cancerByTissue.put("kidney cancer", 10);
+        cancerByTissue.put("peripheral nervous system cancer", 1);
+        cancerByTissue.put("germ cell cancer", 1);
+        cancerByTissue.put("skin cancer", 20);
+        cancerByTissue.put("salivary gland cancer", 2);
+        cancerByTissue.put("retroperitoneal cancer ", 1);
+        cancerByTissue.put("adrenal gland cancer", 1);
+        cancerByTissue.put("lipomatous cancer", 1);
+        cancerByTissue.put("kidney benign neoplasm", 1);
+        cancerByTissue.put("uterine cancer", 1);
+        cancerByTissue.put("esophageal cancer", 1);
+        cancerByTissue.put("neck cancer", 1);
+        cancerByTissue.put("head cancer", 4);
+        cancerByTissue.put("tonsil cancer", 2);
+        cancerByTissue.put("bladder cancer", 1);
+        return cancerByTissue;
+    }
+
 }
