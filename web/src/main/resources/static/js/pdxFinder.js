@@ -6,7 +6,7 @@
 //GLOBAL for displaying tooltips
 
 var markerDefs = {};
-markerDefs['ALK-EML4']='Echinoderm microtubule-associated protein-like 4 (EML4) - Anaplastic lymphoma kinase (ALK) gene fusion';
+markerDefs['ALK-EML4']='Echinoderm microtubule-associated protein-like 4 (EML4) - Anaplastic lymphoma kinase (ALK) gene fusion';
 markerDefs['BRAF']='B-Raf proto-oncogene, serine/threonine kinase';
 markerDefs['BRAF V600E']='B-Raf proto-oncogene, serine/threonine kinase';
 markerDefs['BRCA1']='Breast Cancer 1, DNA repair associated';
@@ -14,13 +14,13 @@ markerDefs['CD117 (c-Kit)']='KIT proto-oncogene receptor tyrosine kinase';
 markerDefs['EGFR']='Epidermal growth factor receptor gene';
 markerDefs['EGFR L858R']='Epidermal growth factor receptor gene';
 markerDefs['EGFR T790M']='Epidermal growth factor receptor gene';
-markerDefs['ER']='Estrogen receptor ';
+markerDefs['ER']='Estrogen receptor ';
 markerDefs['ERBB2 (HER2)']='Erb-b2 receptor tyrosine kinase 2';
 markerDefs['KRAS']='KRAS proto-oncogene, GTPase';
-markerDefs['MSI']='Microsatellite instability ';
+markerDefs['MSI']='Microsatellite instability ';
 markerDefs['NRAS']='NRAS proto-oncogene, GTPase';
 markerDefs['PIK3CA']='Phosphatidylinositol-4,5-bisphosphate 3-kinase catalytic subunit alpha';
-markerDefs['PR']='Progesterone receptor ';
+markerDefs['PR']='Progesterone receptor ';
 markerDefs['ROS']='ROS proto-oncogene 1, receptor tyrosine kinase';
 
 function init(){
@@ -79,6 +79,7 @@ function search() {
         }).fail(function() {
             console.log("Error");
         });
+
 
 }
 
