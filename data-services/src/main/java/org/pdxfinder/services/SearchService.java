@@ -3,10 +3,7 @@ package org.pdxfinder.services;
 
 
 import org.pdxfinder.dao.*;
-import org.pdxfinder.repositories.PatientRepository;
-import org.pdxfinder.repositories.PatientSnapshotRepository;
-import org.pdxfinder.repositories.PdxStrainRepository;
-import org.pdxfinder.repositories.SampleRepository;
+import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +21,7 @@ public class SearchService {
     private PatientSnapshotRepository patientSnapshotRepository;
     private PdxStrainRepository pdxStrainRepository;
 
+
     @Autowired
     public SearchService(SampleRepository sampleRepository, PatientRepository patientRepository,
                          PatientSnapshotRepository patientSnapshotRepository, PdxStrainRepository pdxStrainRepository) {
@@ -31,6 +29,7 @@ public class SearchService {
         this.patientRepository = patientRepository;
         this.patientSnapshotRepository = patientSnapshotRepository;
         this.pdxStrainRepository = pdxStrainRepository;
+
     }
 
     public List<SearchDTO> searchForSamplesWithFilters(String diag, String[] markers, String[] datasources, String[] origintumortypes){
@@ -88,7 +87,7 @@ public class SearchService {
 
     public DetailsDTO searchForSample(String sampleId){
 
-        Sample sample = sampleRepository.findBySourceSampleId(sampleId);
+        Sample sample = sampleRepository.findBySampleSourceId(sampleId);
         Patient patient = patientRepository.findBySampleId(sampleId);
         PatientSnapshot ps = patientSnapshotRepository.findBySampleId(sampleId);
         PdxStrain pdx = pdxStrainRepository.findBySampleSourceSampleId(sampleId);
@@ -176,6 +175,25 @@ public class SearchService {
             dto.setEngraftmentSite(pdx.getImplantationSite().getName());
         }
 
+
+        if(sample.getMolecularCharacterizations() != null){
+            List<String> markerList = new ArrayList<>();
+
+            for(MolecularCharacterization mc : sample.getMolecularCharacterizations()){
+                for(MarkerAssociation ma : mc.getMarkerAssociations()){
+
+                    if(ma.getDescription().equals("None")){
+                        markerList.add("None");
+                    }
+                    else{
+                        markerList.add(ma.getMarker().getName() +" "+ma.getDescription());
+                    }
+
+                }
+            }
+            dto.setCancerGenomics(markerList);
+
+        }
 
         return dto;
     }
