@@ -135,7 +135,7 @@
             type: 'pie'
         },
         title: {
-            text: 'Cancers by Tissue'
+            text: 'Cancers by System'
         },
         tooltip: {
             pointFormat: '{series.name}: <b>{point.y}</b> (<b>{point.percentage:.1f}%</b>)'
@@ -151,7 +151,7 @@
             }
         },
         series: [{
-            name: 'Subtypes',
+            name: 'System',
             colorByPoint: true,
             data: eval(/*[[ ${cancerByTissue} ]]*/)
         }]
@@ -165,7 +165,7 @@
     //            type: 'pie'
     //        },
     //        title: {
-    //            text: 'Cancer by Cell Type'
+    //            text: 'Cancers by Cell Type'
     //        },
     //        tooltip: {
     //            pointFormat: '{series.name}: <b>{point.y}</b> (<b>{point.percentage:.1f}%</b>)'
@@ -188,13 +188,9 @@
     //    });
     /* ]]> */
 
+
 </script>
 
-<script language="text/javascript">
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
-</script>
 
 </body>
 </html>

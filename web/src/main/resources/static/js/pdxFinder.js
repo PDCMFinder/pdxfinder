@@ -106,7 +106,7 @@ function displayResults(q,data){
             markerString = '';
 
             for(var j=0;j<m.length;j++){
-                markerString += '<span data-toggle="tooltip" data-placement="top" title="' + markerDefs[m[j]] + '">' + m[j] + '</span>';
+                markerString += '<span class="marker-description" data-toggle="tooltip" data-placement="top" title="' + markerDefs[m[j]] + '">' + m[j] + '</span>';
                 if(j<m.length-1){
                     markerString+=', ';
                 }
@@ -145,6 +145,9 @@ function displayResults(q,data){
             sSearch: "Filter:"
         }
     });
+
+    $('[data-toggle="tooltip"]').tooltip();
+
 }
 
 function getMarkers(){
