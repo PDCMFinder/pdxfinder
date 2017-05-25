@@ -191,10 +191,10 @@ public class LoadJAXData implements CommandLineRunner {
 
                 String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
 
-                PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), j.getString("Gender"),
+                PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Model ID"), j.getString("Gender"),
                         j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
 
-                Sample sample = loaderUtils.getSample(j.getString("Patient ID"), j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
+                Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
                         j.getString("Primary Site"), j.getString("Specimen Site"), classification, NORMAL_TISSUE_FALSE, jaxDS);
 
                 JSONArray markers = j.getJSONArray("Markers");
@@ -247,6 +247,8 @@ public class LoadJAXData implements CommandLineRunner {
     // for each set of variation data
     // map <sample,map<tech,marker>>
     private void loadVariationData(PdxStrain strain) {
+        
+        if(maxVariations == 0)return;
         
         try {
             // marker assocations keyed to technology/platform
