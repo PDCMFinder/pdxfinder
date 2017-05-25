@@ -61,23 +61,13 @@ function search() {
     jQuery("#tumorTypeSelect_chosen ul li.search-choice").each(function( index, element ){
         originTumorTypes.push(jQuery(this).text());
     });
-    /*
-    filters+=markers.join(",");
-    filters+="/";
-    filters+=dataSources.join(",");
-    filters+="/";
-    filters+=originTumorTypes.join(",");
-    filters+="/";
-    */
 
     filters["diag"] = q;
     filters["markers"] = markers;
     filters["datasources"] = dataSources;
     filters["origintumortypes"] = originTumorTypes;
 
-    if(q || markers.length>0 || dataSources.length>0 || originTumorTypes.length>0){
-
-        insertSpinner();
+    insertSpinner();
 
         var ajaxrequest = jQuery.ajax({
             url : "/searchsamples/",
@@ -90,7 +80,6 @@ function search() {
             console.log("Error");
         });
 
-    }
 }
 
 
