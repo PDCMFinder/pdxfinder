@@ -102,11 +102,18 @@
             <!-- Graph Row, will get replaced by first query -->
             <div class="row">
                 <div class="col-md-4">
-                    <div id="cancer-system-chart"
-                         style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+                    <div id="cancer-system-chart"></div>
                 </div>
                 <!-- /.col-md-4 -->
                 <div class="col-md-8">
+                    <div id="cancer-histology-chart"></div>
+                </div>
+            </div>
+            <!-- /.row -->
+
+            <!-- Second Graph Row, will get replaced by first query -->
+            <div class="row">
+                <div class="col-md-12">
                     <div id="cancer-tissue-chart"></div>
                 </div>
             </div>
@@ -152,6 +159,97 @@
             data: eval(/*[[ ${cancerBySystem} ]]*/)
         }]
     });
+
+
+    // Create the chart
+    Highcharts.chart('cancer-histology-chart', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Cancers by cell types'
+        },
+        xAxis: {
+            type: 'category'
+        },
+        yAxis: {
+            type: 'logarithmic',
+            title: {
+                text: 'Count of cancers by cell type'
+            }
+
+        },
+        legend: {
+            enabled: false
+        },
+        plotOptions: {
+            series: {
+                borderWidth: 0,
+                dataLabels: {
+                    enabled: true,
+                    format: '{point.y}'
+                }
+            }
+        },
+
+        tooltip: {
+            headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+            pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b> of total<br/>'
+        },
+
+        series: [{
+            name: 'Cancers',
+            colorByPoint: true,
+            data: [{
+                name: 'Carcinoma', y: 713, drilldown: 'Carcinoma'
+            }, {
+                name: 'Sarcoma', y: 44, drilldown: 'Sarcoma'
+            }, {
+                name: 'malignant glioma', y: 34, drilldown: null
+            }, {
+                name: 'melanoma', y: 16, drilldown: null
+            }, {
+                name: 'leukemia', y: 3, drilldown: null
+            }, {
+                name: 'lymphoma', y: 2, drilldown: null
+            }, {
+                name: 'neuroblastoma', y: 2, drilldown: null
+            }, {
+                name: 'malignant mesothelioma', y: 1, drilldown: null
+            }, {
+                name: 'teratoma', y: 1, drilldown: null
+            }]
+        }], drilldown: {
+            series: [{
+                name: 'Carcinoma',
+                id: 'Carcinoma',
+                data: [
+                    ['adenocarcinoma', 532],
+                    ['carcinoma', 87],
+                    ['squamous cell carcinoma', 42],
+                    ['non small cell carcinoma', 38],
+                    ['small cell carcinoma', 5],
+                    ['papillary serous adenocarcinoma', 3],
+                    ['neuroendocrine carcinoma', 2],
+                    ['carcinosarcoma', 1],
+                    ['large cell carcinoma', 1],
+                    ['papillary carcinoma', 1],
+                    ['transitional cell carcinoma', 1],
+                ]
+            }, {
+                name: 'Sarcoma',
+                id: 'Sarcoma',
+                data: [
+                    ['sarcoma', 34],
+                    ['rhabdomyosarcoma', 6],
+                    ['osteosarcoma', 2],
+                    ['liposarcoma', 1],
+                    ['spindle cell sarcoma', 1],
+                ]
+            }]
+        }
+    });
+
 
 
     Highcharts.chart('cancer-tissue-chart', {
