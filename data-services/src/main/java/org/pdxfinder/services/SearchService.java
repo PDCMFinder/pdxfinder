@@ -191,6 +191,7 @@ public class SearchService {
 
                 }
             }
+            Collections.sort(markerList);
             dto.setCancerGenomics(markerList);
 
         }
