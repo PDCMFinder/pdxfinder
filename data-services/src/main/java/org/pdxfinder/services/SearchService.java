@@ -1,9 +1,11 @@
 package org.pdxfinder.services;
 
 
-
 import org.pdxfinder.dao.*;
-import org.pdxfinder.repositories.*;
+import org.pdxfinder.repositories.PatientRepository;
+import org.pdxfinder.repositories.PatientSnapshotRepository;
+import org.pdxfinder.repositories.PdxStrainRepository;
+import org.pdxfinder.repositories.SampleRepository;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,17 +181,16 @@ public class SearchService {
         }
 
 
-        if(sample.getMolecularCharacterizations() != null){
+        if (sample.getMolecularCharacterizations() != null) {
             List<String> markerList = new ArrayList<>();
 
-            for(MolecularCharacterization mc : sample.getMolecularCharacterizations()){
-                for(MarkerAssociation ma : mc.getMarkerAssociations()){
+            for (MolecularCharacterization mc : sample.getMolecularCharacterizations()) {
+                for (MarkerAssociation ma : mc.getMarkerAssociations()) {
 
-                    if(ma.getDescription().equals("None")){
+                    if (ma.getDescription().equals("None")) {
                         markerList.add("None");
-                    }
-                    else{
-                        markerList.add(ma.getMarker().getName() +" status: "+ma.getDescription());
+                    } else {
+                        markerList.add(ma.getMarker().getName() + " status: " + ma.getDescription());
                     }
 
                 }
@@ -199,11 +200,10 @@ public class SearchService {
 
         }
 
-        if(sample.getDataSource().equals("JAX")){
+        if (sample.getDataSource().equals("JAX")) {
             dto.setExternalUrl(JAX_URL);
             dto.setExternalUrlText(JAX_URL_TEXT);
-        }
-        else if(sample.getDataSource().equals("IRCC")){
+        } else if (sample.getDataSource().equals("IRCC")) {
             dto.setExternalUrl(IRCC_URL);
             dto.setExternalUrlText(IRCC_URL_TEXT);
         }
