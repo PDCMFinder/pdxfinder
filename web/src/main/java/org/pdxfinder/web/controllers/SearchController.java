@@ -1,14 +1,13 @@
 package org.pdxfinder.web.controllers;
 
-import org.pdxfinder.services.MarkerService;
-import org.pdxfinder.services.SearchService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.neo4j.ogm.json.JSONArray;
+import org.neo4j.ogm.json.JSONException;
+import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.services.GraphService;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,14 +16,64 @@ import java.util.Map;
 @Controller
 public class SearchController {
 
-    //@Autowired
-    //SearchService searchService;
-    @Autowired
-    MarkerService markerService;
+    private GraphService graphService;
+
+    public SearchController(GraphService graphService) {
+        this.graphService = graphService;
+    }
+
     @RequestMapping("/search")
-    String index() {
+    String index(Model model) throws JSONException {
+
+        JSONArray cancerByTissueDataSeriesArray = new JSONArray();
+
+        Map<String, Integer> cancerByTissue = graphService.getModelCountsByTissue();
+        for (String name : cancerByTissue.keySet()) {
+
+            JSONObject dataSeries = new JSONObject();
+            dataSeries.put("name", name);
+            dataSeries.put("y", cancerByTissue.get(name));
+
+            cancerByTissueDataSeriesArray.put(dataSeries);
+
+        }
+
+        model.addAttribute("cancerByTissue", cancerByTissueDataSeriesArray.toString());
+        System.out.println("+++ cancerByTissue" + cancerByTissueDataSeriesArray);
+
+
+//        JSONArray cancerByCellTypeDataSeriesArray = new JSONArray();
+//
+//        Map<String, Integer> cancerByCellType = graphService.getModelCountsByCellType();
+//        for (String name : cancerByCellType.keySet()) {
+//
+//            JSONObject dataSeries = new JSONObject();
+//            dataSeries.put("name", name);
+//            dataSeries.put("y", cancerByCellType.get(name));
+//
+//            cancerByCellTypeDataSeriesArray.put(dataSeries);
+//
+//        }
+//
+//        model.addAttribute("cancerByCellType", cancerByCellTypeDataSeriesArray.toString());
+//        System.out.println("+++ cancerByCellType" + cancerByCellTypeDataSeriesArray);
+
+
+        JSONObject dataByCellType = new JSONObject();
+
+
+
         return "search";
     }
 
+
+    // The data for producing a highcharts pie chart format
+    // [{
+    //        name: 'IE',
+    //                y: 56.33
+    //    }, {
+    //        name: 'Chrome',
+    //                y: 24.03
+    //    }]
 
 }

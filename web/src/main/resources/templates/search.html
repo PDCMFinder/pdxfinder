@@ -97,87 +97,103 @@
     <br/>
 
     <div class="row">
-        <div id="resultsDiv" class="hidden">
-        </div>
-    </div>
+        <div id="resultsDiv">
 
-    <!-- Graph Row -->
-    <div class="row">
-        <div class="col-md-4">
-            <h2>Cancer subtype</h2>
-            <div id="cancer-subtype-chart"></div>
-        </div>
-        <!-- /.col-md-4 -->
-        <div class="col-md-4">
-            <h2>Molecular characterization</h2>
-            <div id="molecular-characterization-chart"></div>
-        </div>
-        <!-- /.col-md-4 -->
-        <div class="col-md-4">
-            <h2>Cancer type distribution per center</h2>
-            <div id="cancer-typte-distribution-chart"></div>
+            <!-- Graph Row, will get replaced by first query -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div id="cancer-tissue-chart"
+                         style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+                </div>
+                <!-- /.col-md-4 -->
+                <div class="col-md-4">
+                    <div id="cancer-celltype-chart"></div>
+                </div>
+                <!-- /.col-md-4 -->
+                <div class="col-md-4">
+                    <div id="cancer-typte-distribution-chart"></div>
+                </div>
+            </div>
+            <!-- /.row -->
+
+
         </div>
     </div>
-    <!-- /.row -->
 
 
 </div>
 <!-- /.container -->
 
-<script type="text/javascript">
+<script type="text/javascript" th:inline="javascript">
     /* <![CDATA[ */
     // Draw charts
-    //    Highcharts.chart('cancer-subtype-chart', {
+    Highcharts.chart('cancer-tissue-chart', {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Cancers by Tissue'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.y}</b> (<b>{point.percentage:.1f}%</b>)'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: false
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            name: 'Subtypes',
+            colorByPoint: true,
+            data: eval(/*[[ ${cancerByTissue} ]]*/)
+        }]
+    });
+
+    //    Highcharts.chart('cancer-celltype-chart', {
     //        chart: {
-    //            plotBackgroundColor: 'white',
+    //            plotBackgroundColor: null,
     //            plotBorderWidth: null,
     //            plotShadow: false,
     //            type: 'pie'
     //        },
     //        title: {
-    //            text: 'Cancer subtypes'
+    //            text: 'Cancer by Cell Type'
     //        },
     //        tooltip: {
-    //            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    //            pointFormat: '{series.name}: <b>{point.y}</b> (<b>{point.percentage:.1f}%</b>)'
     //        },
     //        plotOptions: {
     //            pie: {
     //                allowPointSelect: true,
     //                cursor: 'pointer',
     //                dataLabels: {
-    //                    enabled: true,
-    //                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-    //                    style: {
-    //                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-    //                    }
-    //                }
+    //                    enabled: false
+    //                },
+    //                showInLegend: true
     //            }
     //        },
     //        series: [{
-    //            name: 'Brands',
+    //            name: 'Cell types',
     //            colorByPoint: true,
-    //            data: [{
-    //                name: 'Microsoft Internet Explorer',
-    //                y: 56.33
-    //            }, {
-    //                name: 'Chrome',
-    //                y: 24.03,
-    //            }, {
-    //                name: 'Firefox',
-    //                y: 10.38
-    //            }, {
-    //                name: 'Safari',
-    //                y: 4.77
-    //            }, {
-    //                name: 'Opera',
-    //                y: 0.91
-    //            }, {
-    //                name: 'Proprietary or Undetectable',
-    //                y: 0.2
-    //            }]
+    //            data: eval(/*[[ ${cancerByCellType} ]]*/)
     //        }]
     //    });
     /* ]]> */
+
+</script>
+
+<script language="text/javascript">
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
 </script>
 
 </body>

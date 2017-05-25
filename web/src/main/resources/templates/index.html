@@ -24,20 +24,21 @@
         <div class="col-md-8">
             <h1>Welcome to the PDX finder</h1>
             <p>
-                Patient-derived tumor xenograft (PDX) mouse models are an important oncology research platform to study
+                Patient-derived tumor xenograft <a href="#" data-toggle="modal" data-target="#pdx-modal"
+                                                   onclick="return false;">(PDX) mouse models</a>
+                are an important oncology research platform to study
                 tumor evolution, drug response and personalised medicine approaches. Global success of PDX models will
                 depend on their collective distribution and usage worldwide by academic and private sectors. In order to
                 facilitate PDX models discovery, <a href="http://www.ebi.ac.uk/about/people/terry-meehan">EMBL-EBI</a>
                 and
                 <a href="https://www.jax.org/research-and-faculty/research-labs/the-bult-lab">The Jackson Laboratory</a>
-                are
-                co-developing <strong>PDX finder</strong>.
+                are co-developing <strong>PDX finder</strong>.
             </p>
             <p>
                 PDX finder is an open repository for the upload and storage of clinical,
                 genomic and functional PDX data which will provide a comprehensive global catalogue of PDX models
                 available for researchers across distributed repository databases. Using the newly developed
-                <a href="#" data-toggle="modal" data-target="#myModal" onclick="return false;">PDX-Minimum
+                <a href="#" data-toggle="modal" data-target="#mi-modal" onclick="return false;">PDX-Minimum
                     information standards</a>, PDX finder will integrate, standardize, analyze and
                 visualize the complex and diverse data associated with PDX mouse models for the cancer community.
                 Integrated views will be provided for histopathological image data, molecular classification of tumors,
@@ -45,11 +46,16 @@
 
             </p>
 
-            <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+            <div id="pdx-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="PdxDescription"
                  aria-hidden="true">
                 <div class="modal-dialog">
-                    <div class="modal-content">
+                    <div class="modal-content panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">PDX mouse model creation</h3>
+                        </div>
+                        <div class="panel-body">
                         <div class="modal-body">
+
                             <img src="../static/images/pdx_mi_figure.png" th:src="@{/images/pdx_mi_figure.png}"
                                  class="img-responsive"/>
                             <p>
@@ -62,8 +68,39 @@
                                 genomic properties of the patient tumor. Cohorts of tumor bearing mice are used in
                                 experimental studies. Dosing studies are typically performed on low passage tumors
                                 (P1-P4).
-
                             </p>
+
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mi-modal" class="modal fade" tabindex="-2" role="dialog" aria-labelledby="myModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">PDX-Minimum
+                                information standards</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="modal-body">
+                                <img src="../static/images/pdx_mi_figure.png" th:src="@{/images/pdx_mi_figure.png}"
+                                     class="img-responsive"/>
+                                <p>
+                                    We identified critical attributes to accurately describe PDX production and usage
+                                    and
+                                    proposed the PDX-Minimum information (PDX-MI) standard, which defines the minimal
+                                    information for describing the clinical attributes of a patient’s tumor, the
+                                    processes
+                                    of implantation and passaging of tumors in a host mouse strain, quality assurance
+                                    methods, and the use PDX models in cancer research. PDX-MI standard is the result of
+                                    the
+                                    collaborative work from more than 50 worldwide experts over 30 worldwide
+                                    institutions.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -81,6 +118,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="well text-center">
+                <h3>PDX finder contains data from the following sources</h3>
             </div>
         </div>
         <!-- /.col-lg-12 -->
@@ -90,15 +128,15 @@
     <!-- Content Row -->
     <div class="row">
         <div class="col-md-4">
-            <h2>Data from JAX</h2>
-            <p>Information about the data from JAX.</p>
+            <h2>JAX Data</h2>
+            <p>Information about data from The Jackson Laboratory.</p>
             <a class="btn btn-default" href="http://tumor.informatics.jax.org/mtbwi/pdxSearch.do" target="_blank">More
                 Info</a>
         </div>
         <!-- /.col-md-4 -->
         <div class="col-md-4">
-            <h2>Data from EUROPDX</h2>
-            <p>Information about the data from EUROPDX.</p>
+            <h2>EurOPDX Data</h2>
+            <p>Information about data from The EurOPDX Consortium.</p>
             <a class="btn btn-default" href="https://www.ncbi.nlm.nih.gov/pubmed/?term=Enzo%20Medico%20EuroPDX"
                target="_blank">More Info</a>
         </div>

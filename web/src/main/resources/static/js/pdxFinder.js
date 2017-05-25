@@ -116,7 +116,7 @@ function displayResults(q,data){
             markerString = '';
 
             for(var j=0;j<m.length;j++){
-                markerString += '<a href="#" data-toggle="tooltip" data-placement="top" title="'+markerDefs[m[j]]+'">'+m[j]+'</a>';
+                markerString += '<span class="marker-description" data-toggle="tooltip" data-placement="top" title="' + markerDefs[m[j]] + '">' + m[j] + '</span>';
                 if(j<m.length-1){
                     markerString+=', ';
                 }
