@@ -27,6 +27,9 @@ public class DetailsDTO {
     private String mouseSex;
     private String engraftmentSite;
 
+    private String externalUrl;
+    private String externalUrlText;
+
     public DetailsDTO() {
         this.externalId = "";
         this.dataSource = "";
@@ -46,7 +49,8 @@ public class DetailsDTO {
         this.strain = "";
         this.mouseSex = "";
         this.engraftmentSite = "";
-
+        this.externalUrl = "";
+        this.externalUrlText = "";
     }
 
     public String getExternalId() {
@@ -183,5 +187,21 @@ public class DetailsDTO {
 
     public void setEngraftmentSite(String engraftmentSite) {
         this.engraftmentSite = engraftmentSite;
+    }
+
+    public String getExternalUrl() {
+        return externalUrl;
+    }
+
+    public void setExternalUrl(String externalUrl) {
+        this.externalUrl = externalUrl;
+    }
+
+    public String getExternalUrlText() {
+        return externalUrlText;
+    }
+
+    public void setExternalUrlText(String externalUrlText) {
+        this.externalUrlText = externalUrlText;
     }
 }

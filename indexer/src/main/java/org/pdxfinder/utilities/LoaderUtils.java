@@ -194,7 +194,7 @@ public class LoaderUtils {
             }
         }
         if (patientSnapshot == null) {
-            log.info("PatientSnapshot for patient '{}' at aget '{}' not found. Creating", patient.getExternalId(), age);
+            log.info("PatientSnapshot for patient '{}' at age '{}' not found. Creating", patient.getExternalId(), age);
             patientSnapshot = new PatientSnapshot(patient, age);
             patientSnapshotRepository.save(patientSnapshot);
         }

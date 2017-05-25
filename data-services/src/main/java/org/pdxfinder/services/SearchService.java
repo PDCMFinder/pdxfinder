@@ -3,10 +3,7 @@ package org.pdxfinder.services;
 
 
 import org.pdxfinder.dao.*;
-import org.pdxfinder.repositories.PatientRepository;
-import org.pdxfinder.repositories.PatientSnapshotRepository;
-import org.pdxfinder.repositories.PdxStrainRepository;
-import org.pdxfinder.repositories.SampleRepository;
+import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +20,10 @@ public class SearchService {
     private PatientRepository patientRepository;
     private PatientSnapshotRepository patientSnapshotRepository;
     private PdxStrainRepository pdxStrainRepository;
+    private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxSearch.do";
+    private final String JAX_URL_TEXT = "View data at JAX";
+    private final String IRCC_URL = "https://www.ncbi.nlm.nih.gov/pubmed/?term=Enzo%20Medico%20EuroPDX";
+    private final String IRCC_URL_TEXT = "Contact IRCC here";
 
     @Autowired
     public SearchService(SampleRepository sampleRepository, PatientRepository patientRepository,
@@ -31,6 +32,7 @@ public class SearchService {
         this.patientRepository = patientRepository;
         this.patientSnapshotRepository = patientSnapshotRepository;
         this.pdxStrainRepository = pdxStrainRepository;
+
     }
 
     public List<SearchDTO> searchForSamplesWithFilters(String diag, String[] markers, String[] datasources, String[] origintumortypes){
@@ -88,7 +90,7 @@ public class SearchService {
 
     public DetailsDTO searchForSample(String sampleId){
 
-        Sample sample = sampleRepository.findBySourceSampleId(sampleId);
+        Sample sample = sampleRepository.findBySampleSourceId(sampleId);
         Patient patient = patientRepository.findBySampleId(sampleId);
         PatientSnapshot ps = patientSnapshotRepository.findBySampleId(sampleId);
         PdxStrain pdx = pdxStrainRepository.findBySampleSourceSampleId(sampleId);
@@ -174,6 +176,36 @@ public class SearchService {
 
         if(pdx != null && pdx.getImplantationSite() != null){
             dto.setEngraftmentSite(pdx.getImplantationSite().getName());
+        }
+
+
+        if(sample.getMolecularCharacterizations() != null){
+            List<String> markerList = new ArrayList<>();
+
+            for(MolecularCharacterization mc : sample.getMolecularCharacterizations()){
+                for(MarkerAssociation ma : mc.getMarkerAssociations()){
+
+                    if(ma.getDescription().equals("None")){
+                        markerList.add("None");
+                    }
+                    else{
+                        markerList.add(ma.getMarker().getName() +" status: "+ma.getDescription());
+                    }
+
+                }
+            }
+            Collections.sort(markerList);
+            dto.setCancerGenomics(markerList);
+
+        }
+
+        if(sample.getDataSource().equals("JAX")){
+            dto.setExternalUrl(JAX_URL);
+            dto.setExternalUrlText(JAX_URL_TEXT);
+        }
+        else if(sample.getDataSource().equals("IRCC")){
+            dto.setExternalUrl(IRCC_URL);
+            dto.setExternalUrlText(IRCC_URL_TEXT);
         }
 
 

@@ -59,7 +59,7 @@
                                     <dt>Diagnosis</dt><dd><span th:text="${diagnosis}"></span></dd>
                                     <dt>Tumor type</dt><dd><span th:text="${tumorType}"></span></dd>
                                     <dt>Classification</dt><dd><span th:text="${classification}"></span></dd>
-                                    <dt>Markers</dt><dd></dd>
+                                    <dt>Markers</dt><dd><span th:each="marker, iterStat : ${markers}" th:text="!${iterStat.last} ? ${marker} + ', ': ${marker}"></span></dd>
                                 </dl>
                             </div>
                         </div>
@@ -98,10 +98,9 @@
                 </div>
 
 
-
-
-                <br></br>
-                <a class="btn btn-lg btn-success" href="http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=J000096854">View data at JAX  <i class="fa fa-external-link"></i></a>
+                <br/>
+                <a class="btn btn-lg btn-success" th:href="${url}" th:text="${urlText}">
+                    For more information please visit <i class="fa fa-external-link"></i></a>
 
             </div>
         </div>
