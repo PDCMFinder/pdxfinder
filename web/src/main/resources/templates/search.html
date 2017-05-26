@@ -203,7 +203,7 @@
             data: [{
                 name: 'Carcinoma', y: 713, drilldown: 'Carcinoma'
             }, {
-                name: 'Sarcoma', y: 44, drilldown: 'Sarcoma'
+                name: 'Sarcoma', y: 45, drilldown: 'Sarcoma'
             }, {
                 name: 'malignant glioma', y: 34, drilldown: null
             }, {
@@ -243,6 +243,7 @@
                     ['sarcoma', 34],
                     ['rhabdomyosarcoma', 6],
                     ['osteosarcoma', 2],
+                    ['carcinosarcoma', 1],
                     ['liposarcoma', 1],
                     ['spindle cell sarcoma', 1],
                 ]
@@ -270,7 +271,7 @@
             }
         },
         yAxis: {
-//            type: 'logarithmic',
+            type: 'logarithmic',
             title: {
                 text: 'Count of cancers'
             }
