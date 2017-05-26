@@ -114,7 +114,7 @@ function displayResults(q,data){
         }
 
         var tr = jQuery('<tr><td><a href="/details/'+ data[i].tumorId+
-            '">'+data[i].tumorId+'</a></td><td>'+data[i].diagnosis+'</td><td>'+ data[i].classification+'</td><td>'
+            '" target="_blank">'+data[i].tumorId+'</a></td><td>'+data[i].diagnosis+'</td><td>'+ data[i].classification+'</td><td>'
             +data[i].tumorType+'</td><td>'+markerString+'</td><td>'+data[i].dataSource+'</td></tr>');
 
         if(sources.indexOf(data[i].dataSource) == -1){
