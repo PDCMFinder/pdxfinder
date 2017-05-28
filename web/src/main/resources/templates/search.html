@@ -131,6 +131,7 @@
     /* <![CDATA[ */
     // Draw charts
     Highcharts.chart('cancer-system-chart', {
+        credits: false,
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
@@ -163,6 +164,7 @@
 
     // Create the chart
     Highcharts.chart('cancer-histology-chart', {
+        credits: false,
         chart: {
             type: 'column'
         },
@@ -254,6 +256,7 @@
 
 
     Highcharts.chart('cancer-tissue-chart', {
+        credits: false,
         chart: {
             type: 'column'
         },
@@ -280,7 +283,7 @@
             enabled: false
         },
         tooltip: {
-            pointFormat: 'Count: <b>{point.y:.1f}</b>'
+            pointFormat: 'Count: <b>{point.y}</b>'
         },
         series: [{
             name: 'Tissue',
