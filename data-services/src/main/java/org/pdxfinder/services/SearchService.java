@@ -2,9 +2,9 @@ package org.pdxfinder.services;
 
 
 import org.pdxfinder.dao.*;
+import org.pdxfinder.repositories.ModelCreationRepository;
 import org.pdxfinder.repositories.PatientRepository;
 import org.pdxfinder.repositories.PatientSnapshotRepository;
-import org.pdxfinder.repositories.PdxStrainRepository;
 import org.pdxfinder.repositories.SampleRepository;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.SearchDTO;
@@ -21,7 +21,7 @@ public class SearchService {
 
     private PatientRepository patientRepository;
     private PatientSnapshotRepository patientSnapshotRepository;
-    private PdxStrainRepository pdxStrainRepository;
+    private ModelCreationRepository modelCreationRepository;
     private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxSearch.do";
     private final String JAX_URL_TEXT = "View data at JAX";
     private final String IRCC_URL = "https://www.ncbi.nlm.nih.gov/pubmed/?term=Enzo%20Medico%20EuroPDX";
@@ -29,11 +29,11 @@ public class SearchService {
 
     @Autowired
     public SearchService(SampleRepository sampleRepository, PatientRepository patientRepository,
-                         PatientSnapshotRepository patientSnapshotRepository, PdxStrainRepository pdxStrainRepository) {
+                         PatientSnapshotRepository patientSnapshotRepository, ModelCreationRepository modelCreationRepository) {
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
         this.patientSnapshotRepository = patientSnapshotRepository;
-        this.pdxStrainRepository = pdxStrainRepository;
+        this.modelCreationRepository = modelCreationRepository;
 
     }
 
@@ -95,7 +95,7 @@ public class SearchService {
         Sample sample = sampleRepository.findBySampleSourceId(sampleId);
         Patient patient = patientRepository.findBySampleId(sampleId);
         PatientSnapshot ps = patientSnapshotRepository.findBySampleId(sampleId);
-        PdxStrain pdx = pdxStrainRepository.findBySampleSourceSampleId(sampleId);
+        ModelCreation pdx = modelCreationRepository.findBySampleSourceSampleId(sampleId);
 
         DetailsDTO dto = new DetailsDTO();
 

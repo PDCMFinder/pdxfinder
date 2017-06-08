@@ -1,8 +1,9 @@
 package org.pdxfinder.commands;
 
-import org.apache.commons.cli.*;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONObject;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.irccdatamodel.IRCCPatient;
@@ -231,7 +232,10 @@ public class LoadIRCCData implements CommandLineRunner {
                 pSnap.addSample(sample);
                 loaderUtils.savePatientSnapshot(pSnap);
 
-                loaderUtils.createPDXStrain(samples.get(i).getModelId(), samples.get(i).getImplantSite(), samples.get(i).getImplantType(), sample, nsgBS);
+                QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT);
+                loaderUtils.saveQualityAssurance(qa);
+
+                loaderUtils.createPdxModel(samples.get(i).getModelId(), samples.get(i).getImplantSite(), samples.get(i).getImplantType(), sample, nsgBS, qa);
 
 
             }

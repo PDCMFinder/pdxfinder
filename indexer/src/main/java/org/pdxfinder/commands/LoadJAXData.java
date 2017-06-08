@@ -1,12 +1,18 @@
 package org.pdxfinder.commands;
 
-import org.pdxfinder.utilities.LoaderUtils;
 import org.apache.commons.cli.*;
+import org.neo4j.ogm.json.JSONArray;
+import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
+import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -20,15 +26,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONObject;
-import org.neo4j.ogm.transaction.Transaction;
-import org.pdxfinder.dao.BackgroundStrain;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 /**
  * Load data from JAX.
@@ -48,9 +45,7 @@ public class LoadJAXData implements CommandLineRunner {
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
-    
-    
-   
+
 
     private BackgroundStrain nsgBS;
     private ExternalDataSource jaxDS;
@@ -71,7 +66,7 @@ public class LoadJAXData implements CommandLineRunner {
 
     @Value("${jaxpdx.variation.url}")
     private String variationURL;
-    
+
     @Value("${jaxpdx.variation.max}")
     private int maxVariations;
 
@@ -166,14 +161,13 @@ public class LoadJAXData implements CommandLineRunner {
         jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
         nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
-       
-        
+
         try {
             JSONObject job = new JSONObject(json);
             JSONArray jarray = job.getJSONArray("pdxInfo");
 
             for (int i = 0; i < jarray.length(); i++) {
-              
+
                 JSONObject j = jarray.getJSONObject(i);
 
                 createGraphObjects(j);
@@ -181,64 +175,70 @@ public class LoadJAXData implements CommandLineRunner {
 
         } catch (Exception e) {
             log.error("", e);
-           
+
         }
     }
 
     @Transactional
-    private void createGraphObjects(JSONObject j) throws Exception{
+    private void createGraphObjects(JSONObject j) throws Exception {
         String id = j.getString("Model ID");
 
-                String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
+        String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
 
-                PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Model ID"), j.getString("Gender"),
-                        j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
+        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Model ID"), j.getString("Gender"),
+                j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
 
-                Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
-                        j.getString("Primary Site"), j.getString("Specimen Site"), classification, NORMAL_TISSUE_FALSE, jaxDS);
+        Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
+                j.getString("Primary Site"), j.getString("Specimen Site"), classification, NORMAL_TISSUE_FALSE, jaxDS);
 
-                JSONArray markers = j.getJSONArray("Markers");
-                HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
-                for (int mIndex = 0; mIndex < markers.length(); mIndex++) {
-                    JSONObject marker = markers.getJSONObject(mIndex);
-                    String symbol = marker.getString("Symbol");
-                    String result = marker.getString("Result");
-                    String technology = marker.getString("Technology");
+        JSONArray markers = j.getJSONArray("Markers");
+        HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
+        for (int mIndex = 0; mIndex < markers.length(); mIndex++) {
+            JSONObject marker = markers.getJSONObject(mIndex);
+            String symbol = marker.getString("Symbol");
+            String result = marker.getString("Result");
+            String technology = marker.getString("Technology");
 
-                    MarkerAssociation ma = loaderUtils.getMarkerAssociation(result, symbol, symbol);
-                    // make a map of markerAssociationCollections keyed to technology
-                    if (markerMap.containsKey(technology)) {
-                        markerMap.get(technology).add(ma);
-                    } else {
-                        HashSet<MarkerAssociation> set = new HashSet<>();
-                        set.add(ma);
-                        markerMap.put(technology, set);
-                    }
-                }
-                HashSet<MolecularCharacterization> mcs = new HashSet<>();
-                for (String tech : markerMap.keySet()) {
-                    MolecularCharacterization mc = new MolecularCharacterization();
-                    mc.setTechnology(tech);
-                    mc.setMarkerAssociations(markerMap.get(tech));
-
-                    loaderUtils.saveMolecularCharacterization(mc);
-                    mcs.add(mc);
-
-                }
-                sample.setMolecularCharacterizations(mcs);
-
-                // this should only be for pt samples?
-                pSnap.addSample(sample);
-                loaderUtils.savePatientSnapshot(pSnap);
-
-                PdxStrain strain = loaderUtils.createPDXStrain(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS);
-
-                loadVariationData(strain);
-                
+            MarkerAssociation ma = loaderUtils.getMarkerAssociation(result, symbol, symbol);
+            // make a map of markerAssociationCollections keyed to technology
+            if (markerMap.containsKey(technology)) {
+                markerMap.get(technology).add(ma);
+            } else {
+                HashSet<MarkerAssociation> set = new HashSet<>();
+                set.add(ma);
+                markerMap.put(technology, set);
             }
-    
+        }
+        HashSet<MolecularCharacterization> mcs = new HashSet<>();
+        for (String tech : markerMap.keySet()) {
+            MolecularCharacterization mc = new MolecularCharacterization();
+            mc.setTechnology(tech);
+            mc.setMarkerAssociations(markerMap.get(tech));
+
+            loaderUtils.saveMolecularCharacterization(mc);
+            mcs.add(mc);
+
+        }
+        sample.setMolecularCharacterizations(mcs);
+
+        // this should only be for pt samples?
+        pSnap.addSample(sample);
+        loaderUtils.savePatientSnapshot(pSnap);
+
+        // For the moment, all JAX models are assumed to have been validated using Histological assessment by a pathologist
+        // TODO: verify this is the case
+        QualityAssurance qa = new QualityAssurance("Histology", "Pathologist assessment of patient tumor and pdx model tumor histology slides.", ValidationTechniques.VALIDATION);
+        loaderUtils.saveQualityAssurance(qa);
+
+        ModelCreation strain = loaderUtils.createPdxModel(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS, qa);
+
+        loadVariationData(strain);
+
+    }
+
 
     HashMap<String, String> passageMap = null;
+
     //JSON fields: "model id","sample","gene symbol","platform","amino acid change","passage num"
     // create validation with MC
     // attach validation to passage
@@ -246,38 +246,38 @@ public class LoadJAXData implements CommandLineRunner {
     // expliclty exclude patient samples for now
     // for each set of variation data
     // map <sample,map<tech,marker>>
-    private void loadVariationData(PdxStrain strain) {
-        
-        if(maxVariations == 0)return;
-        
+    private void loadVariationData(ModelCreation strain) {
+
+        if (maxVariations == 0) return;
+
         try {
             // marker assocations keyed to technology/platform
-            
+
             passageMap = new HashMap<>();
 
             HashMap<String, HashMap<String, Set<MarkerAssociation>>> sampleMap = new HashMap<>();
             HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
-            
-            
+
+
             JSONObject job = new JSONObject(parseURL(this.variationURL + strain.getSourcePdxId()));
             JSONArray jarray = job.getJSONArray("variation");
             String sample, symbol, technology, variant;
-            System.out.println(jarray.length()+" gene variants for model "+strain.getSourcePdxId());
-            
+            System.out.println(jarray.length() + " gene variants for model " + strain.getSourcePdxId());
+
             // configure the maximum variations to load in properties file
             // loading them all will take a while (hour?)
             int stop = jarray.length();
-            if(maxVariations > 0 && maxVariations < jarray.length()){
+            if (maxVariations > 0 && maxVariations < jarray.length()) {
                 stop = maxVariations;
             }
-            for (int i = 0; i < stop ; i++) {
+            for (int i = 0; i < stop; i++) {
                 JSONObject j = jarray.getJSONObject(i);
                 sample = j.getString("sample");
                 symbol = j.getString("gene symbol");
                 variant = j.getString("amino acid change");
                 technology = j.getString("platform");
-                passageMap.put(sample,j.getString("passage num"));
-               
+                passageMap.put(sample, j.getString("passage num"));
+
                 MarkerAssociation ma = loaderUtils.getMarkerAssociation("variant:" + variant, symbol, symbol);
 
                 markerMap = sampleMap.get(sample);
@@ -295,8 +295,8 @@ public class LoadJAXData implements CommandLineRunner {
                 }
 
                 sampleMap.put(sample, markerMap);
-                if(i%20 == 0){
-                    System.out.println("loaded "+i+" markers");
+                if (i % 20 == 0) {
+                    System.out.println("loaded " + i + " markers");
                 }
             }
 
@@ -311,32 +311,35 @@ public class LoadJAXData implements CommandLineRunner {
                     mc.setTechnology(tech);
                     mc.setMarkerAssociations(markerMap.get(tech));
 
-          //          loaderUtils.saveMolecularCharacterization(mc);
+                    //          loaderUtils.saveMolecularCharacterization(mc);
                     mcs.add(mc);
 
                 }
-                Validation validation = new Validation();
-                validation.setMolecularCharacterizations(mcs);
-                PdxPassage pdxPassage = new PdxPassage(strain, passage);
-                pdxPassage.setValidation(validation);
 
-          //      loaderUtils.saveValidation(validation);
+                // Needs to be updated to correspond to the updated data model where a passage
+                // links to a specimen which links to the MolChar
+//                Validation validation = new Validation();
+//                validation.setMolecularCharacterizations(mcs);
+                PdxPassage pdxPassage = new PdxPassage(strain, passage);
+//                pdxPassage.setValidation(validation);
+
+                //      loaderUtils.saveValidation(validation);
                 loaderUtils.savePdxPassage(pdxPassage);
-                System.out.println("saved passage "+passage+" for model "+strain.getSourcePdxId()+" from sample "+sampleKey);
+                System.out.println("saved passage " + passage + " for model " + strain.getSourcePdxId() + " from sample " + sampleKey);
             }
 
         } catch (Exception e) {
-            log.error("",e);
+            log.error("", e);
         }
-        
+
     }
 
     private Integer getPassage(String sample) {
         Integer p = 0;
-        try{
+        try {
             p = new Integer(passageMap.get(sample).replaceAll("P", ""));
-        }catch(Exception e){
-            log.error("Unable to determine passage from sample name "+sample+". Assuming 0");
+        } catch (Exception e) {
+            log.error("Unable to determine passage from sample name " + sample + ". Assuming 0");
         }
         return p;
 

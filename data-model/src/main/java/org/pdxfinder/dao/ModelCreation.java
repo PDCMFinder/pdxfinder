@@ -9,7 +9,7 @@ import org.neo4j.ogm.annotation.Relationship;
  * The model will have at least one PdxPassage to capture the model creation event
  */
 @NodeEntity
-public class PdxStrain {
+public class ModelCreation {
 
     @GraphId
     private Long id;
@@ -25,18 +25,22 @@ public class PdxStrain {
     @Relationship(type = "BACKGROUND_STRAIN")
     private BackgroundStrain backgroundStrain;
 
+    @Relationship(type = "QUALITY_ASSURED_BY")
+    private QualityAssurance qualityAssurance;
+
     @Relationship(type = "IMPLANTED_IN", direction = Relationship.INCOMING)
     private Sample sample;
 
-    public PdxStrain(String sourcePdxId, ImplantationSite implantationSite, ImplantationType implantationType, Sample sample, BackgroundStrain backgroundStrain) {
+    public ModelCreation(String sourcePdxId, ImplantationSite implantationSite, ImplantationType implantationType, Sample sample, BackgroundStrain backgroundStrain, QualityAssurance qualityAssurance) {
         this.sourcePdxId = sourcePdxId;
         this.implantationSite = implantationSite;
         this.implantationType = implantationType;
         this.sample = sample;
         this.backgroundStrain = backgroundStrain;
+        this.qualityAssurance = qualityAssurance;
     }
 
-    public PdxStrain() {
+    public ModelCreation() {
         // Empty constructor required as of Neo4j API 2.0.5
     }
 
@@ -80,4 +84,11 @@ public class PdxStrain {
         this.backgroundStrain = backgroundStrain;
     }
 
+    public QualityAssurance getQualityAssurance() {
+        return qualityAssurance;
+    }
+
+    public void setQualityAssurance(QualityAssurance qualityAssurance) {
+        this.qualityAssurance = qualityAssurance;
+    }
 }

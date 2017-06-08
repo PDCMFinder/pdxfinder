@@ -12,24 +12,31 @@ public class PdxPassage {
 
     Integer passage;
 
-    @Relationship(type = "PASSAGED_FROM", direction = Relationship.OUTGOING)
-    private PdxStrain pdxStrain;
+    @Relationship(type = "INSTANCE_OF")
+    private ModelCreation modelCreation;
 
-    @Relationship(type = "VALIDATED_BY", direction = Relationship.INCOMING)
-    private Validation validation;
+    @Relationship(type = "PASSAGED_FROM")
+    private PdxPassage pdxPassage;
 
-
-    public PdxPassage(PdxStrain pdxStrain, Integer passage) {
-        this.pdxStrain = pdxStrain;
+    // When linking to a model creation
+    public PdxPassage(ModelCreation modelCreation, Integer passage) {
+        this.modelCreation = modelCreation;
         this.passage = passage;
     }
 
-    public PdxStrain getPdxStrain() {
-        return pdxStrain;
+    // When linking to another passage
+    public PdxPassage(PdxPassage pdxPassage, Integer passage) {
+        this.pdxPassage = pdxPassage;
+        this.passage = passage;
     }
 
-    public void setPdxStrain(PdxStrain pdxStrain) {
-        this.pdxStrain = pdxStrain;
+
+    public ModelCreation getModelCreation() {
+        return modelCreation;
+    }
+
+    public void setModelCreation(ModelCreation modelCreation) {
+        this.modelCreation = modelCreation;
     }
 
     public Integer getPassage() {
@@ -39,8 +46,12 @@ public class PdxPassage {
     public void setPassage(Integer passage) {
         this.passage = passage;
     }
-    
-     public void setValidation(Validation validation) {
-        this.validation = validation;
+
+    public PdxPassage getPdxPassage() {
+        return pdxPassage;
+    }
+
+    public void setPdxPassage(PdxPassage pdxPassage) {
+        this.pdxPassage = pdxPassage;
     }
 }

@@ -5,43 +5,16 @@
  */
 package org.pdxfinder.utilities;
 
+import org.pdxfinder.dao.*;
+import org.pdxfinder.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+
 import java.time.Instant;
 import java.util.Date;
 import java.util.Set;
-import org.pdxfinder.dao.BackgroundStrain;
-import org.pdxfinder.dao.ExternalDataSource;
-import org.pdxfinder.dao.ImplantationSite;
-import org.pdxfinder.dao.ImplantationType;
-import org.pdxfinder.dao.Marker;
-import org.pdxfinder.dao.MarkerAssociation;
-import org.pdxfinder.dao.MolecularCharacterization;
-import org.pdxfinder.dao.Patient;
-import org.pdxfinder.dao.PatientSnapshot;
-import org.pdxfinder.dao.PdxPassage;
-import org.pdxfinder.dao.PdxStrain;
-import org.pdxfinder.dao.Sample;
-import org.pdxfinder.dao.Tissue;
-import org.pdxfinder.dao.TumorType;
-import org.pdxfinder.dao.Validation;
-import org.pdxfinder.repositories.ExternalDataSourceRepository;
-import org.pdxfinder.repositories.TumorTypeRepository;
-import org.pdxfinder.repositories.BackgroundStrainRepository;
-import org.pdxfinder.repositories.ImplantationSiteRepository;
-import org.pdxfinder.repositories.ImplantationTypeRepository;
-import org.pdxfinder.repositories.MarkerAssociationRepository;
-import org.pdxfinder.repositories.MarkerRepository;
-import org.pdxfinder.repositories.MolecularCharacterizationRepository;
-import org.pdxfinder.repositories.PatientRepository;
-import org.pdxfinder.repositories.PatientSnapshotRepository;
-import org.pdxfinder.repositories.PdxPassageRepository;
-import org.pdxfinder.repositories.PdxStrainRepository;
-import org.pdxfinder.repositories.SampleRepository;
-import org.pdxfinder.repositories.TissueRepository;
-import org.pdxfinder.repositories.ValidationRepository;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 /**
  * The hope was to put a lot of reused repository actions into one place ie find
@@ -59,7 +32,7 @@ public class LoaderUtils {
     private ImplantationSiteRepository implantationSiteRepository;
     private ExternalDataSourceRepository externalDataSourceRepository;
     private PatientRepository patientRepository;
-    private PdxStrainRepository pdxStrainRepository;
+    private ModelCreationRepository modelCreationRepository;
     private TissueRepository tissueRepository;
     private PatientSnapshotRepository patientSnapshotRepository;
     private SampleRepository sampleRepository;
@@ -67,25 +40,25 @@ public class LoaderUtils {
     private MarkerAssociationRepository markerAssociationRepository;
     private MolecularCharacterizationRepository molecularCharacterizationRepository;
     private PdxPassageRepository pdxPassageRepository;
-    private ValidationRepository validationRepository;
+    private QualityAssuranceRepository qualityAssuranceRepository;
 
     private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
 
     public LoaderUtils(TumorTypeRepository tumorTypeRepository,
-            BackgroundStrainRepository backgroundStrainRepository,
-            ImplantationTypeRepository implantationTypeRepository,
-            ImplantationSiteRepository implantationSiteRepository,
-            ExternalDataSourceRepository externalDataSourceRepository,
-            PatientRepository patientRepository,
-            PdxStrainRepository pdxStrainRepository,
-            TissueRepository tissueRepository,
-            PatientSnapshotRepository patientSnapshotRepository,
-            SampleRepository sampleRepository,
-            MarkerRepository markerRepository,
-            MarkerAssociationRepository markerAssociationRepository,
-            MolecularCharacterizationRepository molecularCharacterizationRepository,
-            PdxPassageRepository pdxPassageRepository,
-            ValidationRepository validationRepository) {
+                       BackgroundStrainRepository backgroundStrainRepository,
+                       ImplantationTypeRepository implantationTypeRepository,
+                       ImplantationSiteRepository implantationSiteRepository,
+                       ExternalDataSourceRepository externalDataSourceRepository,
+                       PatientRepository patientRepository,
+                       ModelCreationRepository modelCreationRepository,
+                       TissueRepository tissueRepository,
+                       PatientSnapshotRepository patientSnapshotRepository,
+                       SampleRepository sampleRepository,
+                       MarkerRepository markerRepository,
+                       MarkerAssociationRepository markerAssociationRepository,
+                       MolecularCharacterizationRepository molecularCharacterizationRepository,
+                       PdxPassageRepository pdxPassageRepository,
+                       QualityAssuranceRepository qualityAssuranceRepository) {
 
         Assert.notNull(tumorTypeRepository);
         Assert.notNull(backgroundStrainRepository);
@@ -93,7 +66,7 @@ public class LoaderUtils {
         Assert.notNull(implantationSiteRepository);
         Assert.notNull(externalDataSourceRepository);
         Assert.notNull(patientRepository);
-        Assert.notNull(pdxStrainRepository);
+        Assert.notNull(modelCreationRepository);
         Assert.notNull(tissueRepository);
         Assert.notNull(patientSnapshotRepository);
         Assert.notNull(sampleRepository);
@@ -107,7 +80,7 @@ public class LoaderUtils {
         this.implantationSiteRepository = implantationSiteRepository;
         this.externalDataSourceRepository = externalDataSourceRepository;
         this.patientRepository = patientRepository;
-        this.pdxStrainRepository = pdxStrainRepository;
+        this.modelCreationRepository = modelCreationRepository;
         this.tissueRepository = tissueRepository;
         this.patientSnapshotRepository = patientSnapshotRepository;
         this.sampleRepository = sampleRepository;
@@ -115,7 +88,7 @@ public class LoaderUtils {
         this.markerAssociationRepository = markerAssociationRepository;
         this.molecularCharacterizationRepository = molecularCharacterizationRepository;
         this.pdxPassageRepository = pdxPassageRepository;
-        this.validationRepository = validationRepository;
+        this.qualityAssuranceRepository = qualityAssuranceRepository;
 
     }
 
@@ -135,31 +108,31 @@ public class LoaderUtils {
 
     }
 
-    public PdxStrain createPDXStrain(String pdxId, ImplantationSite implantationSite, ImplantationType implantationType, Sample sample, BackgroundStrain backgroundStrain) {
+    public ModelCreation createPdxModel(String pdxId, ImplantationSite implantationSite, ImplantationType implantationType, Sample sample, BackgroundStrain backgroundStrain, QualityAssurance qa) {
 
-        PdxStrain pdxStrain = pdxStrainRepository.findBySourcePdxId(pdxId);
-        if (pdxStrain != null) {
-            log.info("Deleting existing PdxStrain " + pdxId);
-            pdxStrainRepository.delete(pdxStrain);
+        ModelCreation modelCreation = modelCreationRepository.findBySourcePdxId(pdxId);
+        if (modelCreation != null) {
+            log.info("Deleting existing ModelCreation " + pdxId);
+            modelCreationRepository.delete(modelCreation);
         }
 
-        pdxStrain = new PdxStrain(pdxId, implantationSite, implantationType, sample, backgroundStrain);
-        pdxStrainRepository.save(pdxStrain);
-        return pdxStrain;
+        modelCreation = new ModelCreation(pdxId, implantationSite, implantationType, sample, backgroundStrain, qa);
+        modelCreationRepository.save(modelCreation);
+        return modelCreation;
     }
 
-    public PdxStrain createPDXStrain(String pdxId, String implantationSiteStr, String implantationTypeStr, Sample sample, BackgroundStrain backgroundStrain) {
+    public ModelCreation createPdxModel(String pdxId, String implantationSiteStr, String implantationTypeStr, Sample sample, BackgroundStrain backgroundStrain, QualityAssurance qa) {
 
         ImplantationSite implantationSite = this.getImplantationSite(implantationSiteStr);
         ImplantationType implantationType = this.getImplantationType(implantationTypeStr);
-        PdxStrain pdxStrain = pdxStrainRepository.findBySourcePdxId(pdxId);
-        if (pdxStrain != null) {
-            log.info("Deleting existing PdxStrain " + pdxId);
-            pdxStrainRepository.delete(pdxStrain);
+        ModelCreation modelCreation = modelCreationRepository.findBySourcePdxId(pdxId);
+        if (modelCreation != null) {
+            log.info("Deleting existing ModelCreation " + pdxId);
+            modelCreationRepository.delete(modelCreation);
         }
-        pdxStrain = new PdxStrain(pdxId, implantationSite, implantationType, sample, backgroundStrain);
-        pdxStrainRepository.save(pdxStrain);
-        return pdxStrain;
+        modelCreation = new ModelCreation(pdxId, implantationSite, implantationType, sample, backgroundStrain, qa);
+        modelCreationRepository.save(modelCreation);
+        return modelCreation;
     }
 
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, ExternalDataSource externalDataSource) {
@@ -333,9 +306,13 @@ public class LoaderUtils {
     public void saveMolecularCharacterization(MolecularCharacterization mc) {
         molecularCharacterizationRepository.save(mc);
     }
-    
-    public void saveValidation(Validation validation){
-        validationRepository.save(validation);
+
+    public void saveQualityAssurance(QualityAssurance qa) {
+        if (qa != null) {
+            if (null == qualityAssuranceRepository.findFirstByTechnologyAndDescriptionAndValidationTechniques(qa.getTechnology(), qa.getDescription(), qa.getValidationTechniques())) {
+                qualityAssuranceRepository.save(qa);
+            }
+        }
     }
     
     public void savePdxPassage(PdxPassage pdxPassage){
