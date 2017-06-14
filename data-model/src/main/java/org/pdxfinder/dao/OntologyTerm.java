@@ -4,6 +4,7 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -28,6 +29,10 @@ public class OntologyTerm {
     public OntologyTerm() {
     }
 
+    public OntologyTerm(String url, String label) {
+        this.url = url;
+        this.label = label;
+    }
 
     public Long getId() {
         return id;
@@ -67,5 +72,12 @@ public class OntologyTerm {
 
     public void setMappedTo(Set<Sample> mappedTo) {
         this.mappedTo = mappedTo;
+    }
+
+    public void addSubclass(OntologyTerm ot){
+        if(this.subclassOf == null){
+            this.subclassOf = new HashSet<OntologyTerm>();
+        }
+        this.subclassOf.add(ot);
     }
 }
