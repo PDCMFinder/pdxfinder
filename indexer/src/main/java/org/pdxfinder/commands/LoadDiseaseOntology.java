@@ -69,11 +69,8 @@ public class LoadDiseaseOntology implements CommandLineRunner {
 
     private void loadDO(){
 
-
-        //Deleted 2002 nodes, deleted 2448 relationships, statement completed in 39 ms.
-
         Set<String> loadedTerms = new HashSet<>();
-        Set<OntologyTerm> notYetVisitedTerms = new HashSet<>();
+        Set<OntologyTerm> discoveredTerms = new HashSet<>();
 
         String cancerRootLabel = "cancer";
 
@@ -84,19 +81,17 @@ public class LoadDiseaseOntology implements CommandLineRunner {
         OntologyTerm ot = loaderUtils.getOntologyTerm(cancerBranchUrl,cancerRootLabel);
         System.out.println("Creating node: "+cancerRootLabel);
 
-        notYetVisitedTerms.add(ot);
+        discoveredTerms.add(ot);
 
-        while(notYetVisitedTerms.size()>0){
+        while(discoveredTerms.size()>0){
             //get term from notVisited
 
-            OntologyTerm notYetVisitedTerm = notYetVisitedTerms.iterator().next();
-            notYetVisitedTerms.remove(notYetVisitedTerm);
+            OntologyTerm notYetVisitedTerm = discoveredTerms.iterator().next();
+            discoveredTerms.remove(notYetVisitedTerm);
 
             if(loadedTerms.contains(notYetVisitedTerm.getUrl())) continue;
 
             loadedTerms.add(notYetVisitedTerm.getUrl());
-           // http://www.ebi.ac.uk/ols/api/ontologies/doid/terms/http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FDOID_162/hierarchicalDescendants
-           // http://www.ebi.ac.uk/ols/api/ontologies/doid/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FDOID_162/hierarchicalDescendants
 
             String parentUrlEncoded = "";
             try {
@@ -130,7 +125,7 @@ public class LoadDiseaseOntology implements CommandLineRunner {
                     System.out.println("TERM: "+term.getString("label"));
 
                     OntologyTerm newTerm = loaderUtils.getOntologyTerm(term.getString("iri"), term.getString("label"));
-                    notYetVisitedTerms.add(newTerm);
+                    discoveredTerms.add(newTerm);
 
                     OntologyTerm parentTerm = loaderUtils.getOntologyTerm(notYetVisitedTerm.getUrl());
                     newTerm.addSubclass(parentTerm);
@@ -144,19 +139,9 @@ public class LoadDiseaseOntology implements CommandLineRunner {
 
             }
 
-            //add current term to loadedTerms
-
-            //extract descendants
-
-            //create terms and connect to parent
-
-            //add terms to notYetVisitedTerms
-
             System.out.println("Requests made: " + requestCounter);
-            System.out.println("Terms loaded: " + termCounter);
 
         }
-        System.out.println("Loading finished.");
 
     }
 
