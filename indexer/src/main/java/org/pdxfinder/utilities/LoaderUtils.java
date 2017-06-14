@@ -41,6 +41,7 @@ public class LoaderUtils {
     private MolecularCharacterizationRepository molecularCharacterizationRepository;
     private PdxPassageRepository pdxPassageRepository;
     private QualityAssuranceRepository qualityAssuranceRepository;
+    private OntologyTermRepository ontologyTermRepository;
 
     private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
 
@@ -58,7 +59,8 @@ public class LoaderUtils {
                        MarkerAssociationRepository markerAssociationRepository,
                        MolecularCharacterizationRepository molecularCharacterizationRepository,
                        PdxPassageRepository pdxPassageRepository,
-                       QualityAssuranceRepository qualityAssuranceRepository) {
+                       QualityAssuranceRepository qualityAssuranceRepository,
+                       OntologyTermRepository ontologyTermRepository) {
 
         Assert.notNull(tumorTypeRepository);
         Assert.notNull(backgroundStrainRepository);
@@ -89,6 +91,7 @@ public class LoaderUtils {
         this.molecularCharacterizationRepository = molecularCharacterizationRepository;
         this.pdxPassageRepository = pdxPassageRepository;
         this.qualityAssuranceRepository = qualityAssuranceRepository;
+        this.ontologyTermRepository = ontologyTermRepository;
 
     }
 
@@ -318,4 +321,29 @@ public class LoaderUtils {
     public void savePdxPassage(PdxPassage pdxPassage){
         pdxPassageRepository.save(pdxPassage);
     }
+
+
+    public OntologyTerm getOntologyTerm(String url, String label){
+
+        OntologyTerm ot = ontologyTermRepository.findByUrl(url);
+
+        if(ot == null){
+            ot = new OntologyTerm(url, label);
+            ontologyTermRepository.save(ot);
+        }
+
+        return ot;
+    }
+
+    public OntologyTerm getOntologyTerm(String url){
+
+        OntologyTerm ot = ontologyTermRepository.findByUrl(url);
+
+        return ot;
+    }
+
+    public void saveOntologyTerm(OntologyTerm ot){
+        ontologyTermRepository.save(ot);
+    }
+
 }
