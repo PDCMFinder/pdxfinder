@@ -24,7 +24,7 @@ public class SearchService {
     private ModelCreationRepository modelCreationRepository;
     private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxSearch.do";
     private final String JAX_URL_TEXT = "View data at JAX";
-    private final String IRCC_URL = "mailto:andrea.bertotti@unito.it";
+    private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
     private final String IRCC_URL_TEXT = "Contact IRCC here";
 
     @Autowired
@@ -204,7 +204,7 @@ public class SearchService {
             dto.setExternalUrl(JAX_URL);
             dto.setExternalUrlText(JAX_URL_TEXT);
         } else if (sample.getDataSource().equals("IRCC")) {
-            dto.setExternalUrl(IRCC_URL);
+            dto.setExternalUrl(IRCC_URL+dto.getExternalId());
             dto.setExternalUrlText(IRCC_URL_TEXT);
         }
 
