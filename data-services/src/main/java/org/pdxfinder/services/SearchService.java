@@ -24,7 +24,7 @@ public class SearchService {
     private ModelCreationRepository modelCreationRepository;
     private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxSearch.do";
     private final String JAX_URL_TEXT = "View data at JAX";
-    private final String IRCC_URL = "https://www.ncbi.nlm.nih.gov/pubmed/?term=Enzo%20Medico%20EuroPDX";
+    private final String IRCC_URL = "mailto:andrea.bertotti@unito.it";
     private final String IRCC_URL_TEXT = "Contact IRCC here";
 
     @Autowired
