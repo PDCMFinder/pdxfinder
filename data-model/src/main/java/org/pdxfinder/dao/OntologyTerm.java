@@ -1,8 +1,6 @@
 package org.pdxfinder.dao;
 
-import org.neo4j.ogm.annotation.GraphId;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,8 +20,10 @@ public class OntologyTerm {
     @Relationship(type = "SUBCLASS_OF" ,direction = Relationship.OUTGOING)
     private Set<OntologyTerm> subclassOf;
 
-    @Relationship(type = "MAPPED_TO", direction = Relationship.INCOMING)
-    private Set<Sample> mappedTo;
+    //@Relationship(type = "MAPPED_TO", direction = Relationship.INCOMING)
+    //private Set<Sample> mappedTo;
+
+
 
 
     public OntologyTerm() {
@@ -66,13 +66,13 @@ public class OntologyTerm {
         this.subclassOf = subclassOf;
     }
 
-    public Set<Sample> getMappedTo() {
-        return mappedTo;
-    }
+    //public Set<Sample> getMappedTo() {
+    //    return mappedTo;
+    //}
 
-    public void setMappedTo(Set<Sample> mappedTo) {
-        this.mappedTo = mappedTo;
-    }
+    //public void setMappedTo(Set<Sample> mappedTo) {
+    //    this.mappedTo = mappedTo;
+    //}
 
     public void addSubclass(OntologyTerm ot){
         if(this.subclassOf == null){
