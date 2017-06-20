@@ -42,6 +42,7 @@ public class LoaderUtils {
     private PdxPassageRepository pdxPassageRepository;
     private QualityAssuranceRepository qualityAssuranceRepository;
     private OntologyTermRepository ontologyTermRepository;
+    private SpecimenRepository specimenRepository;
 
     private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
 
@@ -60,7 +61,8 @@ public class LoaderUtils {
                        MolecularCharacterizationRepository molecularCharacterizationRepository,
                        PdxPassageRepository pdxPassageRepository,
                        QualityAssuranceRepository qualityAssuranceRepository,
-                       OntologyTermRepository ontologyTermRepository) {
+                       OntologyTermRepository ontologyTermRepository,
+                       SpecimenRepository specimenRepository) {
 
         Assert.notNull(tumorTypeRepository);
         Assert.notNull(backgroundStrainRepository);
@@ -92,6 +94,7 @@ public class LoaderUtils {
         this.pdxPassageRepository = pdxPassageRepository;
         this.qualityAssuranceRepository = qualityAssuranceRepository;
         this.ontologyTermRepository = ontologyTermRepository;
+        this.specimenRepository = specimenRepository;
 
     }
 
@@ -111,7 +114,7 @@ public class LoaderUtils {
 
     }
 
-    public ModelCreation createPdxModel(String pdxId, ImplantationSite implantationSite, ImplantationType implantationType, Sample sample, BackgroundStrain backgroundStrain, QualityAssurance qa) {
+    public ModelCreation createModelCreation(String pdxId, ImplantationSite implantationSite, ImplantationType implantationType, Sample sample, BackgroundStrain backgroundStrain, QualityAssurance qa) {
 
         ModelCreation modelCreation = modelCreationRepository.findBySourcePdxId(pdxId);
         if (modelCreation != null) {
@@ -124,7 +127,7 @@ public class LoaderUtils {
         return modelCreation;
     }
 
-    public ModelCreation createPdxModel(String pdxId, String implantationSiteStr, String implantationTypeStr, Sample sample, BackgroundStrain backgroundStrain, QualityAssurance qa) {
+    public ModelCreation createModelCreation(String pdxId, String implantationSiteStr, String implantationTypeStr, Sample sample, BackgroundStrain backgroundStrain, QualityAssurance qa) {
 
         ImplantationSite implantationSite = this.getImplantationSite(implantationSiteStr);
         ImplantationType implantationType = this.getImplantationType(implantationTypeStr);
@@ -320,6 +323,22 @@ public class LoaderUtils {
     
     public void savePdxPassage(PdxPassage pdxPassage){
         pdxPassageRepository.save(pdxPassage);
+    }
+    
+    
+    
+    public Specimen getSpecimen(String id){
+        Specimen specimen = specimenRepository.findByExternalId(id);
+        if(specimen == null){
+            specimen = new Specimen();
+            specimen.setExternalId(id);
+        }
+             
+        return specimen;
+    }
+    
+    public void saveSpecimen(Specimen specimen){
+        specimenRepository.save(specimen);
     }
 
 

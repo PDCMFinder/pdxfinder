@@ -235,7 +235,7 @@ public class LoadIRCCData implements CommandLineRunner {
                 QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT);
                 loaderUtils.saveQualityAssurance(qa);
 
-                loaderUtils.createPdxModel(samples.get(i).getModelId(), samples.get(i).getImplantSite(), samples.get(i).getImplantType(), sample, nsgBS, qa);
+                loaderUtils.createModelCreation(samples.get(i).getModelId(), samples.get(i).getImplantSite(), samples.get(i).getImplantType(), sample, nsgBS, qa);
 
 
             }

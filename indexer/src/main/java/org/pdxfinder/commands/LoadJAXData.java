@@ -182,13 +182,20 @@ public class LoadJAXData implements CommandLineRunner {
     @Transactional
     private void createGraphObjects(JSONObject j) throws Exception {
         String id = j.getString("Model ID");
-
+        
+        // the preference is for clinical diagnosis but if not available use initial diagnosis
+        String diagnosis = j.getString("Clinical Diagnosis");
+        if(diagnosis.trim().length()==0 || "Not Specified".equals(diagnosis)){
+            diagnosis = j.getString("Initial Diagnosis");
+            
+        }
+        
         String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Model ID"), j.getString("Gender"),
                 j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
 
-        Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), j.getString("Clinical Diagnosis"),
+        Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"),diagnosis ,
                 j.getString("Primary Site"), j.getString("Specimen Site"), classification, NORMAL_TISSUE_FALSE, jaxDS);
 
         JSONArray markers = j.getJSONArray("Markers");
@@ -230,14 +237,16 @@ public class LoadJAXData implements CommandLineRunner {
         QualityAssurance qa = new QualityAssurance("Histology", "Pathologist assessment of patient tumor and pdx model tumor histology slides.", ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
 
-        ModelCreation strain = loaderUtils.createPdxModel(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS, qa);
+        ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS, qa);
 
-        loadVariationData(strain);
+        loadVariationData(mc);
 
     }
 
 
     HashMap<String, String> passageMap = null;
+    
+    
 
     //JSON fields: "model id","sample","gene symbol","platform","amino acid change","passage num"
     // create validation with MC
@@ -246,7 +255,7 @@ public class LoadJAXData implements CommandLineRunner {
     // expliclty exclude patient samples for now
     // for each set of variation data
     // map <sample,map<tech,marker>>
-    private void loadVariationData(ModelCreation strain) {
+    private void loadVariationData(ModelCreation modelCreation) {
 
         if (maxVariations == 0) return;
 
@@ -259,10 +268,10 @@ public class LoadJAXData implements CommandLineRunner {
             HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
 
 
-            JSONObject job = new JSONObject(parseURL(this.variationURL + strain.getSourcePdxId()));
+            JSONObject job = new JSONObject(parseURL(this.variationURL + modelCreation.getSourcePdxId()));
             JSONArray jarray = job.getJSONArray("variation");
-            String sample, symbol, technology, variant;
-            System.out.println(jarray.length() + " gene variants for model " + strain.getSourcePdxId());
+            String sample, symbol, technology, variant, chromosome,seqPosition,refAllele,consequence,aminoAcidChange,rsVariants,readDepth,alleleFrequency;
+            System.out.println(jarray.length() + " gene variants for model " + modelCreation.getSourcePdxId());
 
             // configure the maximum variations to load in properties file
             // loading them all will take a while (hour?)
@@ -270,13 +279,23 @@ public class LoadJAXData implements CommandLineRunner {
             if (maxVariations > 0 && maxVariations < jarray.length()) {
                 stop = maxVariations;
             }
-            for (int i = 0; i < stop; i++) {
+            for (int i = 0; i < stop;) {
                 JSONObject j = jarray.getJSONObject(i);
                 sample = j.getString("sample");
                 symbol = j.getString("gene symbol");
                 variant = j.getString("amino acid change");
                 technology = j.getString("platform");
                 passageMap.put(sample, j.getString("passage num"));
+                
+                // new fields
+                chromosome = j.getString("chromosome");
+                seqPosition = j.getString("seq position");
+                refAllele = j.getString("ref allele");
+                consequence = j.getString("consequence");
+                aminoAcidChange = j.getString("amino acid change");
+                rsVariants = j.getString("rs variants");
+                readDepth = j.getString("read depth");
+                alleleFrequency = j.getString("allele frequency");
 
                 MarkerAssociation ma = loaderUtils.getMarkerAssociation("variant:" + variant, symbol, symbol);
 
@@ -295,10 +314,12 @@ public class LoadJAXData implements CommandLineRunner {
                 }
 
                 sampleMap.put(sample, markerMap);
-                if (i % 20 == 0) {
+                i++;
+                if (i % 100 == 0) {
                     System.out.println("loaded " + i + " markers");
                 }
             }
+            System.out.println("loaded " + stop + " markers");
 
             for (String sampleKey : sampleMap.keySet()) {
 
@@ -310,22 +331,27 @@ public class LoadJAXData implements CommandLineRunner {
                     MolecularCharacterization mc = new MolecularCharacterization();
                     mc.setTechnology(tech);
                     mc.setMarkerAssociations(markerMap.get(tech));
-
-                    //          loaderUtils.saveMolecularCharacterization(mc);
                     mcs.add(mc);
 
                 }
 
-                // Needs to be updated to correspond to the updated data model where a passage
-                // links to a specimen which links to the MolChar
-//                Validation validation = new Validation();
-//                validation.setMolecularCharacterizations(mcs);
-                PdxPassage pdxPassage = new PdxPassage(strain, passage);
-//                pdxPassage.setValidation(validation);
-
-                //      loaderUtils.saveValidation(validation);
+                //  Needs to be updated to correspond to the updated data model where a passage
+                //  links to a specimen which links to the MolChar
+                
+                //  this stuff isn't getting saved
+                PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
+               
+                Specimen specimen = loaderUtils.getSpecimen(sampleKey);
+                specimen.setMolecularCharacterizations(mcs);
+                specimen.setPdxPassage(pdxPassage);
+                
+                
+                
+                pdxPassage.setModelCreation(modelCreation);
+                
                 loaderUtils.savePdxPassage(pdxPassage);
-                System.out.println("saved passage " + passage + " for model " + strain.getSourcePdxId() + " from sample " + sampleKey);
+                loaderUtils.saveSpecimen(specimen);
+                System.out.println("saved passage " + passage + " for model " + modelCreation.getSourcePdxId() + " from sample " + sampleKey);
             }
 
         } catch (Exception e) {
