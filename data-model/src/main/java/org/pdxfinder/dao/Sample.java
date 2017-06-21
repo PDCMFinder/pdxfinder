@@ -4,6 +4,7 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -26,6 +27,9 @@ public class Sample {
     private ExternalDataSource externalDataSource;
     public Boolean normalTissue;
 
+    @Relationship(type="MAPPED_TO")
+    private SampleToDiseaseOntologyRelationship sampleToDiseaseOntologyRelationship;
+
     @Relationship(type = "OF_TYPE", direction = Relationship.OUTGOING)
     private TumorType type;
 
@@ -46,6 +50,7 @@ public class Sample {
         this.dataSource = externalDataSource.getAbbreviation();
         this.externalDataSource = externalDataSource;
         this.normalTissue = normalTissue;
+
     }
 
     public String getSourceSampleId() {
@@ -126,5 +131,13 @@ public class Sample {
 
     public void setMolecularCharacterizations(Set<MolecularCharacterization> molecularCharacterizations) {
         this.molecularCharacterizations = molecularCharacterizations;
+    }
+
+    public SampleToDiseaseOntologyRelationship getSampleToDiseaseOntologyRelationship() {
+        return sampleToDiseaseOntologyRelationship;
+    }
+
+    public void setSampleToDiseaseOntologyRelationship(SampleToDiseaseOntologyRelationship sampleToDiseaseOntologyRelationship) {
+        this.sampleToDiseaseOntologyRelationship = sampleToDiseaseOntologyRelationship;
     }
 }
