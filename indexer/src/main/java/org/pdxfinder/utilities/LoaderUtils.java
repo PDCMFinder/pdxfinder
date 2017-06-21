@@ -208,6 +208,16 @@ public class LoaderUtils {
         return sample;
     }
 
+    public Sample getSampleBySourceSampleId(String sourceSampleId){
+
+        Sample sample = sampleRepository.findBySourceSampleId(sourceSampleId);
+        return sample;
+    }
+
+    public void saveSample(Sample sample){
+        sampleRepository.save(sample);
+    }
+
     public ImplantationSite getImplantationSite(String iSite) {
         ImplantationSite site = implantationSiteRepository.findByName(iSite);
         if (site == null) {
@@ -338,12 +348,20 @@ public class LoaderUtils {
     public OntologyTerm getOntologyTerm(String url){
 
         OntologyTerm ot = ontologyTermRepository.findByUrl(url);
+        return ot;
+    }
 
+    public OntologyTerm getOntologyTermByLabel(String label){
+
+        OntologyTerm ot = ontologyTermRepository.findByLabel(label);
         return ot;
     }
 
     public void saveOntologyTerm(OntologyTerm ot){
+
         ontologyTermRepository.save(ot);
     }
+
+
 
 }
