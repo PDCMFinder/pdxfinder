@@ -386,7 +386,7 @@ public class LoadJAXData implements CommandLineRunner {
         try {
             p = new Integer(passageMap.get(sample).replaceAll("P", ""));
         } catch (Exception e) {
-            log.error("Unable to determine passage from sample name " + sample + ". Assuming 0");
+            log.info("Unable to determine passage from sample name " + sample + ". Assuming 0");
         }
         return p;
 
@@ -411,7 +411,7 @@ public class LoadJAXData implements CommandLineRunner {
                                 String passage = new Integer(parts[0].replace("P", "")).toString();
                                 map.put(passage,url);
                             }catch(Exception e){
-                                log.error("Can't extract passage from description "+desc);
+                                log.info("Can't extract passage from description "+desc);
                             }
                         }
                     }
