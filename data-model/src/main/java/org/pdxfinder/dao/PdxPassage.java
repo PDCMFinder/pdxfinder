@@ -17,6 +17,10 @@ public class PdxPassage {
 
     @Relationship(type = "PASSAGED_FROM")
     private PdxPassage pdxPassage;
+    
+    public PdxPassage(){
+        
+    }
 
     // When linking to a model creation
     public PdxPassage(ModelCreation modelCreation, Integer passage) {
