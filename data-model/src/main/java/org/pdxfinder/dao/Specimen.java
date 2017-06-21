@@ -1,5 +1,6 @@
 package org.pdxfinder.dao;
 
+import java.util.HashSet;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -52,12 +53,21 @@ public class Specimen {
         this.molecularCharacterizations = molecularCharacterizations;
     }
 
-    public Set<Histology> getHistology() {
-        return histology;
-    }
-
-    public void setHistology(Set<Histology> histology) {
+    public void setHistology(Set<Histology> histology){
         this.histology = histology;
+    }
+    
+    public void addHistology(Histology histology){
+        if(this.histology == null){
+            this.histology = new HashSet<>();
+            this.histology.add(histology);
+        }else{
+            this.histology.add(histology);
+        }
+    }
+    
+    public Set<Histology> getHistology(){
+        return this.histology;
     }
 
     public PdxPassage getPdxPassage() {

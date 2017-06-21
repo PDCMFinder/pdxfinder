@@ -36,6 +36,9 @@ public class Sample {
     @Relationship(type = "CHARACTERIZED_BY", direction = Relationship.INCOMING)
     private Set<MolecularCharacterization> molecularCharacterizations;
 
+    @Relationship(type = "Histology", direction = Relationship.OUTGOING)
+    private Set<Histology> histology;
+    
     public Sample() {
         // Empty constructor required as of Neo4j API 2.0.5
     }
@@ -139,5 +142,22 @@ public class Sample {
 
     public void setSampleToDiseaseOntologyRelationship(SampleToDiseaseOntologyRelationship sampleToDiseaseOntologyRelationship) {
         this.sampleToDiseaseOntologyRelationship = sampleToDiseaseOntologyRelationship;
+    }
+    
+    public void setHistology(Set<Histology> histology){
+        this.histology = histology;
+    }
+    
+    public void addHistology(Histology histology){
+        if(this.histology == null){
+            this.histology = new HashSet<>();
+            this.histology.add(histology);
+        }else{
+            this.histology.add(histology);
+        }
+    }
+    
+    public Set<Histology> getHistology(){
+        return this.histology;
     }
 }

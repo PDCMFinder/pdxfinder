@@ -66,9 +66,15 @@ public class LoadJAXData implements CommandLineRunner {
 
     @Value("${jaxpdx.variation.url}")
     private String variationURL;
+    
+    @Value("${jaxpdx.histology.url}")
+    private String histologyURL;
 
     @Value("${jaxpdx.variation.max}")
     private int maxVariations;
+    
+    HashMap<String, String> passageMap = null;
+    HashMap<String, String> histologyMap = null;
 
     @PostConstruct
     public void init() {
@@ -183,6 +189,8 @@ public class LoadJAXData implements CommandLineRunner {
     private void createGraphObjects(JSONObject j) throws Exception {
         String id = j.getString("Model ID");
         
+        histologyMap = getHistologyImageMap(id);
+        
         // the preference is for clinical diagnosis but if not available use initial diagnosis
         String diagnosis = j.getString("Clinical Diagnosis");
         if(diagnosis.trim().length()==0 || "Not Specified".equals(diagnosis)){
@@ -197,7 +205,16 @@ public class LoadJAXData implements CommandLineRunner {
 
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"),diagnosis ,
                 j.getString("Primary Site"), j.getString("Specimen Site"), classification, NORMAL_TISSUE_FALSE, jaxDS);
+        
+        if(histologyMap.containsKey("Patient")){
+            Histology histology = new Histology();
+            Image image = new Image(histologyMap.get("Patient"));
+            histology.addImage(image);
+            sample.addHistology(histology);
+            
+        }
 
+        
         JSONArray markers = j.getJSONArray("Markers");
         HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
         for (int mIndex = 0; mIndex < markers.length(); mIndex++) {
@@ -244,7 +261,7 @@ public class LoadJAXData implements CommandLineRunner {
     }
 
 
-    HashMap<String, String> passageMap = null;
+ 
     
     
 
@@ -335,16 +352,20 @@ public class LoadJAXData implements CommandLineRunner {
 
                 }
 
-                //  Needs to be updated to correspond to the updated data model where a passage
-                //  links to a specimen which links to the MolChar
                 
-                //  this stuff isn't getting saved
                 PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
                
                 Specimen specimen = loaderUtils.getSpecimen(sampleKey);
                 specimen.setMolecularCharacterizations(mcs);
                 specimen.setPdxPassage(pdxPassage);
                 
+                if(histologyMap.containsKey(pdxPassage)){
+                    Histology histology = new Histology();
+                    Image image = new Image(histologyMap.get(pdxPassage));
+                    histology.addImage(image);
+                    specimen.addHistology(histology);
+
+                }
                 
                 
                 pdxPassage.setModelCreation(modelCreation);
@@ -369,6 +390,38 @@ public class LoadJAXData implements CommandLineRunner {
         }
         return p;
 
+    }
+    // we are loosing information here just getting PT or passage from description but for now its ok?
+    private HashMap<String,String> getHistologyImageMap(String id){
+        HashMap<String,String> map = new HashMap<>();
+        try{
+            JSONObject job = new JSONObject(parseURL(this.histologyURL + id));
+                JSONArray jarray = job.getJSONObject("pdxHistology").getJSONArray("Graphics");
+                
+                for(int i = 0; i < jarray.length(); i++){
+                    job = jarray.getJSONObject(i);
+                    String desc = job.getString("Description");
+                    String url = job.getString("URL");
+                    if(desc.startsWith("Patient") || desc.startsWith("Primary")){
+                        map.put("Patient",url);
+                    }else{
+                        String[] parts = desc.split(" ");
+                        if(parts[0].startsWith("P")){
+                            try{
+                                String passage = new Integer(parts[0].replace("P", "")).toString();
+                                map.put(passage,url);
+                            }catch(Exception e){
+                                log.error("Can't extract passage from description "+desc);
+                            }
+                        }
+                    }
+                }
+
+            }catch(Exception e){
+                log.error("Error getting histology for model "+id,e);
+            }
+
+        return map;
     }
 
 }

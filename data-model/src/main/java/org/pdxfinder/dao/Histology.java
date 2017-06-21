@@ -1,5 +1,6 @@
 package org.pdxfinder.dao;
 
+import java.util.HashSet;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -17,5 +18,19 @@ public class Histology {
 
     @Relationship(type = "HAS_IMAGE")
     private Set<Image> images;
+    
+    public void addImage(Image image){
+        if(images == null){
+            images = new HashSet<>();
+            images.add(image);
+            
+        }else{
+            images.add(image);
+        }
+    }
+    
+    public Set<Image> getImages(){
+        return this.images;
+    }
 
 }
