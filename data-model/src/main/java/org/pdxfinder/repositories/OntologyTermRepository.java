@@ -13,7 +13,7 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
 
     OntologyTerm findById();
 
-    OntologyTerm findByLabel();
+    OntologyTerm findByLabel(String label);
 
     OntologyTerm findByUrl(String url);
 
