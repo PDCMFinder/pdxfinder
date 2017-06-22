@@ -102,7 +102,7 @@ public class LoadDiseaseOntology implements CommandLineRunner {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            String url = ontologyUrl+parentUrlEncoded+"/hierarchicalChildren";
+            String url = ontologyUrl+parentUrlEncoded+"/hierarchicalChildren?size=100";
 
             System.out.println("Getting data from "+url);
 
