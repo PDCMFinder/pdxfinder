@@ -108,7 +108,8 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
 
                 }
 
-
+                System.out.println("Links created: "+mapCounter);
+                System.out.println("Mapping errors: "+errorCounter);
 
 
             }
