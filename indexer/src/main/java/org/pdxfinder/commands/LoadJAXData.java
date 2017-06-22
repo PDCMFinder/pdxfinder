@@ -287,7 +287,7 @@ public class LoadJAXData implements CommandLineRunner {
 
             JSONObject job = new JSONObject(parseURL(this.variationURL + modelCreation.getSourcePdxId()));
             JSONArray jarray = job.getJSONArray("variation");
-            String sample, symbol, technology, variant, chromosome,seqPosition,refAllele,consequence,aminoAcidChange,rsVariants,readDepth,alleleFrequency;
+            String sample, symbol, technology, aaChange, chromosome,seqPosition,refAllele,consequence,rsVariants,readDepth,alleleFrequency;
             System.out.println(jarray.length() + " gene variants for model " + modelCreation.getSourcePdxId());
 
             // configure the maximum variations to load in properties file
@@ -300,21 +300,30 @@ public class LoadJAXData implements CommandLineRunner {
                 JSONObject j = jarray.getJSONObject(i);
                 sample = j.getString("sample");
                 symbol = j.getString("gene symbol");
-                variant = j.getString("amino acid change");
+                aaChange = j.getString("amino acid change");
                 technology = j.getString("platform");
                 passageMap.put(sample, j.getString("passage num"));
                 
-                // new fields
                 chromosome = j.getString("chromosome");
                 seqPosition = j.getString("seq position");
                 refAllele = j.getString("ref allele");
                 consequence = j.getString("consequence");
-                aminoAcidChange = j.getString("amino acid change");
                 rsVariants = j.getString("rs variants");
                 readDepth = j.getString("read depth");
                 alleleFrequency = j.getString("allele frequency");
 
-                MarkerAssociation ma = loaderUtils.getMarkerAssociation("variant:" + variant, symbol, symbol);
+                MarkerAssociation ma = new MarkerAssociation();
+                Marker marker = loaderUtils.getMarker(symbol);
+                ma.setMarker(marker);
+                
+                ma.setAminoAcidChange(aaChange);
+                ma.setConsequence(consequence);
+                ma.setAlleleFrequency(alleleFrequency);
+                ma.setChromosome(chromosome);
+                ma.setReadDepth(readDepth);
+                ma.setRefAllele(refAllele);
+                ma.setRsVariants(rsVariants);
+                ma.setSeqPosition(seqPosition);
 
                 markerMap = sampleMap.get(sample);
                 if (markerMap == null) {

@@ -14,6 +14,7 @@ public class Marker {
 
     String symbol;
     String name;
+   
 
     public Marker() {
     }
@@ -39,4 +40,6 @@ public class Marker {
     public void setName(String name) {
         this.name = name;
     }
+
+   
 }
