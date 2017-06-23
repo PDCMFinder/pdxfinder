@@ -2,7 +2,9 @@ package org.pdxfinder.repositories;
 
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.dao.Sample;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -13,7 +15,8 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
 
     OntologyTerm findById();
 
-    OntologyTerm findByLabel(String label);
+    @Query("MATCH (o:OntologyTerm) WHERE toLower(o.label) = toLower({label}) return o")
+    OntologyTerm findByLabel(@Param("label") String label);
 
     OntologyTerm findByUrl(String url);
 
