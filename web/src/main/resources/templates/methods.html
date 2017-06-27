@@ -1,0 +1,101 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link th:remove="all" rel="stylesheet" media="screen"
+          href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/chosen.css"/>
+    <title>PDX Finder</title>
+    <!--/*/ <th:block th:include="fragments/head-includes :: head-includes"></th:block> /*/-->
+</head>
+<body>
+<div class="page-header text-center">
+    <h2 style="margin-top: 50px;"> <span class="paddedBorder">PDX Data Integration & Distribution </span> </h2>
+</div>
+<div class="container">
+    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+</div>
+
+<!-- Page Content -->
+<div class="container shiftUp100" >
+
+    <div class="row paddedBorder2">
+        <p class="fillUp">
+
+
+                Several academic and commercial sources of PDX models have emerged in recent years and the size of the resources and the processes for creating and characterizing
+                PDX models and their related data is variable (eg: custom database or individual files/tables collection). To account for this variability, multiple source data
+                deposition is achieved using bespoke automatic ingest pipelines. PDX data is stored in a secure Neo4J graph database which provides a powerful framework for
+                storage, querying and envisioning of biological data. Following data deposition, data standardization (adherence to PDX-Minimum information standard) and
+                harmonization is necessary to ensure cross-source data integration. More specifically, PDX model metadata includes clinical, chemical and experimental
+                factors that can be described in a number of ways. Most producers of PDX models adhere to an internal vocabulary partially based on community-developed
+                standards. For example, cancer diagnosis are represented at different resources with NCI-Thesaurus1, SNO-MED CT2, MeSH3, and the Disease Ontology4. Other
+                descriptors use free text or a mix of generic, commercial and chemical labels (e.g drugs).
+
+                <p>Expert knowledge is necessary to map between differing standards
+                in order to achieve data harmonization.  As this is a major issue across bioinformatics, ontology resources tools like ZOOMA5  have been developed to
+                semi-automate mapping of standards which produce unified indexes that facilitate data query and discovery. Following database deposition, multiple source
+                PDX data is standardized and harmonized in a two-step process:</p>
+                <ul>
+                    <li>Automated standardization and alignment of ontology terms using ZOOMA, and</li>
+                    <li>Manual curation of remaining anomalous events.  </li>
+                </ul>
+
+
+                <br>
+                <h4> PDX Finder Data Flow:  </h4><hr/>
+                <ul>
+                    <li>The automated standardization process will check data compliance with the PDX Minimal Information standard and skip/report records that do not conform. </li>
+                    <li>The standardized and harmonized records will then be integrated into a cohesive ontological data model which supports consistent searching across sources.</li>
+                    <li>Ontological annotation will assist users in their search providing representation of the data and its relationship. For example, searching for ‘Breast Cancer’
+                        related PDX models will allow users to uncover all subclasses of breast cancer models in a single query, without having to look for each subtype individually.</li>
+                    <li>Rather than impose a limited set of terms to describe a given minimal information attribute, we will accept a source’s internal standards and generate unified
+                        semantic indexes to describe the models.</li>
+                    <li>We will work with the PDX sources and local experts to will ensure the quality of the generated mappings and provide feedback to the developers of ontology tools.</li>
+                    <li>Finally, PDX data will be served through the PDX Finder interface (www.pdxfinder.org) allowing users query PDX models based on their research needs.</li>
+                </ul>
+
+
+                <br>
+                <h4> PDX Finder Facilitates User Flexibility: </h4><hr/>
+                <ul>
+                    <li>PDX Finder supports multiple search attributes thereby allowing various points of entry into the data (e.g: tumor type, diagnosis, molecular markers).  </li>
+                    <li>Search results are displayed in a table to allow easy visualization, further filtering and selection. </li>
+                    <li>Clickable links allow users to drill down in their selected PDX model data to discover additional patient, tumour, model attributes and associated studies
+                        (e.g dose response studies, ‘OMIC’ datasets e.t.c). </li>
+                    <li>Furthermore, links to the data sources the model originate from will be provided to allow user to contact the relevant institution for further collaboration
+                        and model acquisition. </li>
+                </ul>
+
+
+                <br>
+                <h4> Summary of PDx Data Flow: </h4><hr/>
+                <img style="width:100%;" th:src="@{/images/pdx1.jpg}" src="../../static/images/pdx1.jpg" >
+
+                <br><br>
+                The PDX finder data integration platform consists of bespoke data source ingest pipelines allowing data capture and deposition.<br><br>
+                <ul>
+                    <li>PDX data is stored in a secure Neo4J graph database.  </li>
+                    <li>Automated integration processes periodically consume data sources from the centers and ensure standardization/adherence to PDX-MI and across center data harmonization. </li>
+                    <li>Data is served through the PDX finder user interface allowing users to query PDX models based on their research needs and provides links back to the PDX source. </li>
+
+                </ul>
+
+
+
+
+
+
+        </p>
+
+    </div>
+
+
+
+
+</div>
+<!-- /.container  border:1px solid #efefef; -->
+
+
+
+
+</body>
+</html>
