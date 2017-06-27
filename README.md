@@ -2,7 +2,7 @@
 
 http://www.pdxfinder.org
 
-[![Build Status](https://travis-ci.org/PDXFinder/pdxfinder.svg?branch=master)](https://travis-ci.org/PDXFinder/pdxfinder)
+Travis CI: [![Build Status](https://travis-ci.org/PDXFinder/pdxfinder.svg?branch=master)](https://travis-ci.org/PDXFinder/pdxfinder)
 
 From wikipedia [https://en.wikipedia.org/wiki/Patient-derived_tumor_xenograft], 
 >Patient derived sample xenografts (PDTX) are created when cancerous tissue from a patient’s primary sample is implanted directly into an immunodeficient mouse. PDTX models are providing solutions to the challenges that researchers face in cancer drug research such as positive sample responses in mouse models but not translating over when the study is implemented in humans. As a result, PDTX cancer models are becoming popular models to use in cancer drug research.
