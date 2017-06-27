@@ -1,0 +1,38 @@
+
+.container-fluid {
+    padding-left: auto;
+    padding-right: auto;
+    width:65%;
+}
+
+.fillUp {
+    text-align: justify;
+}
+
+.shiftUp100 {
+    margin-top: -100px;
+}
+
+.paddedBorder{
+    border: 1px solid #ccc;
+    padding: 12px;
+}
+
+.paddedBorder2{
+    border: 1px solid #ccc;
+    padding: 24px;
+}
+
+.form-control{
+    height:37px;
+    padding:6px 15px;
+    font-size:12px;
+    border-radius:3px;
+}
+
+.btn{
+    height:37px;
+    padding:6px 15px;
+    font-size:12px;
+    border-radius:3px;
+}

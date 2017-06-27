@@ -1,7 +1,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link th:remove="all" rel="stylesheet" media="screen"
-          href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css"/>
+    <link th:remove="all" rel="stylesheet" media="screen" href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css"/>
     <!--/*/ <th:block th:include="fragments/head-includes :: head-includes"></th:block> /*/-->
     <title>PDX Finder</title>
 </head>
@@ -11,21 +10,22 @@
     <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
 </div>
 
+
+
+
 <!-- Page Content -->
 <div class="container">
 
     <!-- Heading Row -->
     <div class="row">
         <div class="col-md-4">
-            <img class="img-responsive img-rounded center-block" src="../static/images/pdx_logo.png"
-                 th:src="@{/images/pdx_logo.png}" alt=""/>
+            <img class="img-responsive img-rounded center-block" src="../static/images/pdx_logo.png" th:src="@{/images/pdx_logo.png}" alt=""/>
         </div>
         <!-- /.col-md-4 -->
         <div class="col-md-8">
             <h1>Welcome to the PDX finder</h1>
             <p>
-                Patient-derived tumor xenograft <a href="#" data-toggle="modal" data-target="#pdx-modal"
-                                                   onclick="return false;">(PDX) mouse models</a>
+                Patients-derived tumor xenograft <a href="#" data-toggle="modal" data-target="#pdx-modal" onclick="return false;">(PDX) mouse models</a>
                 are an important oncology research platform to study
                 tumor evolution, drug response and personalised medicine approaches. Global success of PDX models will
                 depend on their collective distribution and usage worldwide by academic and private sectors. In order to

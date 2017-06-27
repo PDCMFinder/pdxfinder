@@ -6,6 +6,7 @@
     <link th:href="@{/webjars/bootswatch-flatly/css/bootstrap.min.css}"
           href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" media="screen"/>
     <link th:href="@{/css/pdxfinder.css}" href="../../static/css/pdxfinder.css" rel="stylesheet" media="screen"/>
+    <link th:href="@{/css/customStyles.css}" href="../../static/css/customStyles.css" rel="stylesheet" media="screen"/>
     <title>PDX Finder</title>
 </head>
 <body>
@@ -21,8 +22,7 @@
                             data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                         <span class="sr-only">Toggle navigation</span>
                     </button>
-                    <a class="navbar-brand" href="#" th:href="@{/search}"><img th:src="@{/images/pdx_logo.png}"
-                                                                               width="20"/></a>
+                    <a class="navbar-brand" href="#" th:href="@{/search}"><img th:src="@{/images/pdx_logo.png}" width="20"/></a>
                 </div>
 
                 <!-- Collect the nav links, forms, and other content for toggling -->
@@ -31,14 +31,15 @@
                     <ul class="nav navbar-nav">
                         <li><a href="#" th:href="@{/search}">Search</a></li>
                         <li><a href="#" th:href="@{/contact}">Contact</a></li>
+                        <li><a href="#" th:href="@{/methods}">Methods</a></li>
                         <li><a href="#" th:href="@{/api}">API</a></li>
                     </ul>
+
                     <form class="navbar-form navbar-right" th:action="@{/search}">
-                        <div class="input-group">
+                        <div class="input-group" style="margin-top: 4px;}">
                             <input type="text" class="form-control" name="q" placeholder="Search"/>
                             <span class="input-group-btn">
-                                <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"
-                                                                                    aria-hidden="true"></span> Search</button>
+                                <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search</button>
                             </span>
                         </div>
                     </form>

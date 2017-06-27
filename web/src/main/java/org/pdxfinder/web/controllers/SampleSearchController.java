@@ -1,17 +1,16 @@
 package org.pdxfinder.web.controllers;
 
-import org.neo4j.ogm.json.JSONException;
-import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.dao.Sample;
 import org.pdxfinder.services.SampleService;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by csaba on 09/05/2017.
@@ -34,7 +33,7 @@ public class SampleSearchController {
     public List<SearchDTO> search2(@RequestParam(value="diag", required = false) String diag,
                                    @RequestParam(value="markers[]", required = false) String[] markers,
                                    @RequestParam(value="datasources[]", required = false) String[] datasources,
-                                   @RequestParam(value="origintumortypes[]", required = false) String[] origintumortypes ) {
+                                   @RequestParam(value="originttumortypes[]", required = false) String[] origintumortypes ) {
 
         if(diag == null) diag = "";
         if(markers == null) markers = new String[]{};

@@ -23,6 +23,7 @@ public class SearchController {
     }
 
     @RequestMapping("/search")
+
     String index(Model model) throws JSONException {
 
 
