@@ -13,6 +13,14 @@
     margin-top: -100px;
 }
 
+.topSpace50 {
+    margin-top: 50px;
+}
+
+.fullImg{
+    width:100%;
+}
+
 .paddedBorder{
     border: 1px solid #ccc;
     padding: 12px;
