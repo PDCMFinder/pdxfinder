@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.time.Instant;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
@@ -382,5 +384,13 @@ public class LoaderUtils {
     }
 
 
+    ////// TODO: Temporarily added these methods to fix load issue.
+    public void saveMarker(Marker marker) {
+        // Do nothing
+    }
+
+    public Collection<Marker> getAllMarkers() {
+        return Collections.EMPTY_LIST;
+    }
 
 }
