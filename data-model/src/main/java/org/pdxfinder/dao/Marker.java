@@ -14,7 +14,8 @@ public class Marker {
 
     String symbol;
     String name;
-   
+    String hugoId;
+    String ensemblId;
 
     public Marker() {
     }
@@ -41,5 +42,19 @@ public class Marker {
         this.name = name;
     }
 
-   
+    public String getHugoId() {
+        return hugoId;
+    }
+
+    public void setHugoId(String hugoId) {
+        this.hugoId = hugoId;
+    }
+
+    public String getEnsemblId() {
+        return ensemblId;
+    }
+
+    public void setEnsemblId(String ensemblId) {
+        this.ensemblId = ensemblId;
+    }
 }
