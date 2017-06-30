@@ -2,13 +2,15 @@
 <head>
     <link th:remove="all" rel="stylesheet" media="screen"
           href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css"/>
-    <link rel="stylesheet" href="/css/chosen.css"/>
+    <link rel="stylesheet" href="../static//css/chosen.css"/>
+    <link rel="stylesheet" href="../static/css/customStyles.css"/>
     <title>PDX Finder</title>
     <!--/*/ <th:block th:include="fragments/head-includes :: head-includes"></th:block> /*/-->
 </head>
 <body>
 <div class="page-header text-center">
-    <h2 class="topSpace50"> <span class="paddedBorder">PDX Data Integration & Distribution </span> </h2>
+    <h2 class="topSpace50"> <span >PDX Data Submission, Integration and Distribution
+ </span> </h2>
 </div>
 <div class="container">
     <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
@@ -17,74 +19,142 @@
 <!-- Page Content -->
 <div class="container shiftUp100" >
 
-    <div class="row paddedBorder2">
+    <div class="row">
+
+        <h5>A summary of the PDX Finder data flow is represented in the figure below. </h5>
         <p class="fillUp">
 
 
-                Several academic and commercial sources of PDX models have emerged in recent years and the size of the resources and the processes for creating and characterizing
-                PDX models and their related data is variable (eg: custom database or individual files/tables collection). To account for this variability, multiple source data
-                deposition is achieved using bespoke automatic ingest pipelines. PDX data is stored in a secure Neo4J graph database which provides a powerful framework for
-                storage, querying and envisioning of biological data. Following data deposition, data standardization (adherence to PDX-Minimum information standard) and
-                harmonization is necessary to ensure cross-source data integration. More specifically, PDX model metadata includes clinical, chemical and experimental
-                factors that can be described in a number of ways. Most producers of PDX models adhere to an internal vocabulary partially based on community-developed
-                standards. For example, cancer diagnosis are represented at different resources with NCI-Thesaurus1, SNO-MED CT2, MeSH3, and the Disease Ontology4. Other
-                descriptors use free text or a mix of generic, commercial and chemical labels (e.g drugs).
+            <div class="row pdxSummary">
 
-                <p>Expert knowledge is necessary to map between differing standards
-                in order to achieve data harmonization.  As this is a major issue across bioinformatics, ontology resources tools like ZOOMA5  have been developed to
-                semi-automate mapping of standards which produce unified indexes that facilitate data query and discovery. Following database deposition, multiple source
-                PDX data is standardized and harmonized in a two-step process:</p>
-                <ul>
-                    <li>Automated standardization and alignment of ontology terms using ZOOMA, and</li>
-                    <li>Manual curation of remaining anomalous events.  </li>
-                </ul>
+                    <div class="col-md-6">
+                        <img  style="border: 1px dashed #ccc; padding: 30px; margin-top: 25px;"  class="fullImg" th:src="@{/images/PDXDataFlow2.jpg}" src="../../static/images/PDXDataFlow2.jpg" >
+                    </div>
+
+                    <div class="col-md-6"  >
+                        <h5> (1) Submission </h5><hr/>
+                        <ul class="shiftUp20">
+                            <li>PDX data is submitted by PDX producers via data access end-points (APIs) or direct upload of files collection.  </li>
+                            <li>PDX producers can contact the PDX finder via email to submit data
+                                <a href="mailto:helpdesk@pdxfinder.org?cc=helpdesk2@pdxfinder.org&subject=PDX%20PRODUCER:%20DATA%20SUBMISSION%20REQUEST&body=Body-goes-here">(helpdesk@pdxfinder.org)</a></li>
+                        </ul>
 
 
-                <br>
-                <h4> PDX Finder Data Flow:  </h4><hr/>
-                <ul>
-                    <li>The automated standardization process will check data compliance with the PDX Minimal Information standard and skip/report records that do not conform. </li>
-                    <li>The standardized and harmonized records will then be integrated into a cohesive ontological data model which supports consistent searching across sources.</li>
-                    <li>Ontological annotation will assist users in their search providing representation of the data and its relationship. For example, searching for ‘Breast Cancer’
-                        related PDX models will allow users to uncover all subclasses of breast cancer models in a single query, without having to look for each subtype individually.</li>
-                    <li>Rather than impose a limited set of terms to describe a given minimal information attribute, we will accept a source’s internal standards and generate unified
-                        semantic indexes to describe the models.</li>
-                    <li>We will work with the PDX sources and local experts to will ensure the quality of the generated mappings and provide feedback to the developers of ontology tools.</li>
-                    <li>Finally, PDX data will be served through the PDX Finder interface (www.pdxfinder.org) allowing users query PDX models based on their research needs.</li>
-                </ul>
+                        <h5> (2) Neo4j database integration </h5><hr/>
+                        <ul class="shiftUp20">
+                            <li>	PDX data is stored in a secure Neo4j graph database.   </li>
+                        </ul>
 
 
-                <br>
-                <h4> PDX Finder Facilitates User Flexibility: </h4><hr/>
-                <ul>
-                    <li>PDX Finder supports multiple search attributes thereby allowing various points of entry into the data (e.g: tumor type, diagnosis, molecular markers).  </li>
-                    <li>Search results are displayed in a table to allow easy visualization, further filtering and selection. </li>
-                    <li>Clickable links allow users to drill down in their selected PDX model data to discover additional patient, tumour, model attributes and associated studies
-                        (e.g dose response studies, ‘OMIC’ datasets e.t.c). </li>
-                    <li>Furthermore, links to the data sources the model originate from will be provided to allow user to contact the relevant institution for further collaboration
-                        and model acquisition. </li>
-                </ul>
+                        <h5> (3) Standardization and harmonization </h5><hr/>
+                        <ul class="shiftUp20">
+                            <li>	Automated integration processes periodically consume data sources and ensure standardization/adherence to
+                                <a href="#" data-toggle="modal" data-target="#mi-modal" onclick="return false;">PDX-MI</a> and across center data harmonization. </li>
+                        </ul>
+
+                        <h5> (4) Data Distribution </h5><hr/>
+                        <ul class="shiftUp20">
+                            <li> PDX Finder supports multiple search attributes thereby allowing various points of entry into the data (e.g: tumor type, diagnosis, molecular markers). </li>
+                            <li> Search results are displayed in a table to allow easy visualization, further filtering and selection. </li>
+                            <li> Links allow users to drill down in selected PDX model data to discover additional patient, tumour, model attributes and associated studies (e.g dose response studies, 'OMIC' studies). </li>
+                            <li> Links to the data sources the model originate from are provided (5). </li>
+                        </ul>
+                    </div>
+
+             </div>
 
 
-                <br>
-                <h4> Summary of PDx Data Flow: </h4><hr/>
-                <img class="fullImg" th:src="@{/images/pdx1.jpg}" src="../../static/images/pdx1.jpg" >
-
-                <br><br>
-                The PDX finder data integration platform consists of bespoke data source ingest pipelines allowing data capture and deposition.<br><br>
-                <ul>
-                    <li>PDX data is stored in a secure Neo4J graph database.  </li>
-                    <li>Automated integration processes periodically consume data sources from the centers and ensure standardization/adherence to PDX-MI and across center data harmonization. </li>
-                    <li>Data is served through the PDX finder user interface allowing users to query PDX models based on their research needs and provides links back to the PDX source. </li>
-
-                </ul>
 
 
+            <div id="mi-modal" class="modal fade" tabindex="-2" role="dialog" aria-labelledby="myModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">PDX-Minimum
+                                information standards</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="modal-body">
+                                <p>
+                                    We identified critical attributes to accurately describe PDX production and usage
+                                    and
+                                    proposed the PDX-Minimum information (PDX-MI) standard, which defines the minimal
+                                    information for describing the clinical attributes of a patient’s tumor, the
+                                    processes
+                                    of implantation and passaging of tumors in a host mouse strain, quality assurance
+                                    methods, and the use PDX models in cancer research. PDX-MI standard is the result of
+                                    the
+                                    collaborative work from more than 50 worldwide experts over 30 worldwide
+                                    institutions.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+        <br>
+        <h4> More details about each process is presented below. </h4>
+
+        <br>
+        <h4> PDX data submission </h4><hr/>
+        <p class="fillUp">
+            Many academic and commercial sources of PDX models have emerged in recent years and the size of the resources and the processes for creating and characterizing PDX models and
+            their related data is variable (e.g: custom database or individual files/tables collection). To account for this variability, multiple source data submission is achieved using
+            bespoke automatic ingest pipelines.  PDX Data can be submitted by PDX producers via direct upload of files collection or via data access end-points (APIs). An interface for
+            submitting PDX model metadata, as well as experimental data will be implemented in the future. A PDX producers can contact the PDX Finder via email to submit their data into the
+            resource <a href="mailto:helpdesk@pdxfinder.org?cc=helpdesk2@pdxfinder.org&subject=PDX%20PRODUCER:%20DATA%20SUBMISSION%20REQUEST&body=Body-goes-here">(helpdesk@pdxfinder.org)</a>.
+
+        </p>
+
+        <br>
+        <h4> PDX data standardization and harmonization </h4><hr/>
+        <p class="fillUp">
+            PDX data is stored in a secure Neo4j graph database which provides a powerful framework for storage, querying and envisioning of biological data. Following data submission, data
+            standardization (adherence to PDX-Minimum information standard) and harmonization is necessary to ensure cross-source data integration. More specifically, PDX model metadata
+            includes clinical, chemical and experimental factors that can be described in a number of ways. Most producers of PDX models adhere to an internal vocabulary partially based on
+            community-developed standards. For example, cancer diagnosis are represented at different resources with <a href="https://ncit.nci.nih.gov/ncitbrowser" target="_blank"> NCI-Thesaurus </a>,
+            <a href="https://www.nlm.nih.gov/mesh/meshhome.html" target="_blank">MeSH</a>, and the <a href="http://disease-ontology.org" target="_blank">Disease Ontology</a> . Other descriptors use free text or
+            a mix of generic, commercial and chemical labels (e.g drugs). Expert knowledge is necessary to map between differing standards in order to achieve data harmonization.  As this is a major
+            issue across bioinformatics, ontology resources tools like <a href="http://www.ebi.ac.uk/spot/zooma" target="_blank">ZOOMA</a> have been developed to semi-automate mapping of standards
+            which produce unified indexes that facilitate data query and discovery. Following database deposition, multiple source PDX data is standardized and harmonized in a two-step process using
+            both Automated mappings of ontology terms with <a href="http://www.ebi.ac.uk/spot/zooma" target="_blank">ZOOMA</a> and manual curation of remaining anomalous events. The automated
+            standardization process will also check data compliance with the PDX Minimal Information standard and
+            skip/report records that do not conform. The standardized and harmonized records will be then integrated into a cohesive ontological data model which supports consistent searching
+            across sources. Ontological annotation will assist users in their search providing representation of the data and its relationship. For example, searching for 'Breast Cancer' related
+            PDX models will allow users to uncover all subclasses of breast cancer models in a single query, without having to look for each subtype individually. Rather than impose a limited
+            set of terms to describe a given minimal information attribute, we will accept a source's internal standards and generate unified semantic indexes to describe the models.  We will
+            work with the PDX sources and local experts to will ensure the quality of the generated mappings and provide feedback to the developers of ontology tools.
+
+
+        </p>
+
+
+
+        <br>
+        <h4> PDX data distribution </h4><hr/>
+        <p class="fillUp">
+            PDX data will be served through the PDX Finder interface allowing users query PDX models based on their research needs. To facilitate flexibility for users,
+            multiple search attributes will be supported allowing various points of entry into the data (e.g: tumor type, diagnosis, molecular markers). Search results will be displayed in a
+            table to allow easy visualization and further filtering and selection. Clickable links will allow users to drill down in their selected PDX model data to discover additional
+            patient/tumor/model attributes and associated studies (e.g dose response studies, 'OMIC' datasets). Furthermore, links to the data sources the model originate from will be
+            provided to allow users to contact the relevant institution for further collaboration/model acquisition.
+        </p>
 
 
 
 
         </p>
+
+
+
 
     </div>
 

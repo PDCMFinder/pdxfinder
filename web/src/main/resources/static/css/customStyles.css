@@ -12,6 +12,9 @@
 .shiftUp100 {
     margin-top: -100px;
 }
+.shiftUp20 {
+    margin-top: -20px;
+}
 
 .topSpace50 {
     margin-top: 50px;
@@ -19,6 +22,26 @@
 
 .fullImg{
     width:100%;
+    margin-top: 12px;
+/*    background-color: #fff;
+    border: 1px dashed #ddd; */
+}
+
+.pdxSummary{
+    background-color: #fff;
+    border-bottom: 1px dashed #ccc;
+    padding: 15px;
+    margin-top: -15px;
+}
+
+.pdxSummary hr {
+    margin-top: 4px;
+    background-color: #fff;
+    border-top: 1px dashed #ccc;
+}
+
+.pdxSummary ul li {
+    font-size: 13px;
 }
 
 .paddedBorder{
@@ -43,4 +66,20 @@
     padding:6px 15px;
     font-size:12px;
     border-radius:3px;
+}
+
+hr {
+    margin-top: 4px;
+    background-color: #fff;
+    border-top: 2px dashed #ccc;
+}
+
+h4{
+    font-weight: bold;
+    font-size: 16px;
+}
+
+h5{
+    font-weight: bold;
+    font-size: 14px;
 }

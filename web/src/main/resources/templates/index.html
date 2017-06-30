@@ -23,27 +23,30 @@
         </div>
         <!-- /.col-md-4 -->
         <div class="col-md-8">
-            <h1>Welcome to the PDX finder</h1>
-            <p>
-                Patients-derived tumor xenograft <a href="#" data-toggle="modal" data-target="#pdx-modal" onclick="return false;">(PDX) mouse models</a>
-                are an important oncology research platform to study
-                tumor evolution, drug response and personalised medicine approaches. Global success of PDX models will
-                depend on their collective distribution and usage worldwide by academic and private sectors. In order to
-                facilitate PDX models discovery, <a href="http://www.ebi.ac.uk/about/people/terry-meehan">EMBL-EBI</a>
-                and
-                <a href="https://www.jax.org/research-and-faculty/research-labs/the-bult-lab">The Jackson Laboratory</a>
-                are co-developing <strong>PDX finder</strong>.
+            <h1 style="margin-top:-30px;">Welcome to the PDX Finder</h1>
+            <p class="fillUp">
+                    <ul>
+                        <li> Patients-derived tumor xenograft <a href="#" data-toggle="modal" data-target="#pdx-modal" onclick="return false;">(PDX) mouse models</a>
+                            are an important oncology research platform to study tumor evolution, drug response and personalised medicine approaches. </li>
+                        <li> Global success of PDX models will depend on their collective distribution and usage worldwide by academic and private sectors. </li>
+                        <li> To facilitate PDX models discovery, <a href="http://www.ebi.ac.uk/about/people/terry-meehan" target="_blank">EMBL-EBI</a>
+                            and
+                            <a href="https://www.jax.org/research-and-faculty/research-labs/the-bult-lab" target="_blank">The Jackson Laboratory</a>
+                            are co-developing <strong>PDX Finder</strong>. </li>
+                    </ul>
             </p>
-            <p>
-                PDX finder is an open repository for the upload and storage of clinical,
-                genomic and functional PDX data which will provide a comprehensive global catalogue of PDX models
-                available for researchers across distributed repository databases. Using the newly developed
-                <a href="#" data-toggle="modal" data-target="#mi-modal" onclick="return false;">PDX-Minimum
-                    information standards</a>, PDX finder will integrate, standardize, analyze and
-                visualize the complex and diverse data associated with PDX mouse models for the cancer community.
-                Integrated views will be provided for histopathological image data, molecular classification of tumors,
-                host mouse strain metadata, tumor genomic data and metrics on tumor response to chemotherapeutics.
 
+
+
+            <p class="fillUp">
+                    <ul>
+                        <li> PDX Finder is an open repository for the upload and storage of clinical, genomic and functional PDX data which will provide a comprehensive global catalogue of PDX models
+                            available for researchers across distributed repository databases. </li>
+                        <li> Using the newly developed <a href="#" data-toggle="modal" data-target="#mi-modal" onclick="return false;">PDX-Minimum information standards</a>, PDX Finder will integrate, standardize, analyze and
+                            visualize the complex and diverse data associated with PDX mouse models for the cancer community. </li>
+                        <li> Integrated views will be provided for histopathological image data, molecular classification of tumors, host mouse strain metadata, tumor genomic data and metrics on tumor response to chemotherapeutics. </li>
+                        <li> More details about the PDX data submission, integration and distribution can be found <a href="#" th:href="@{/methods}"> here.</a> </li>
+                    </ul>
             </p>
             <p>
                 This work is supported by the National Institutes of Health U24 CA204781 01 and the National Cancer
@@ -58,23 +61,23 @@
                             <h3 class="panel-title">PDX mouse model creation</h3>
                         </div>
                         <div class="panel-body">
-                        <div class="modal-body">
+                            <div class="modal-body">
 
-                            <img src="../static/images/pdx_mi_figure.png" th:src="@{/images/pdx_mi_figure.png}"
-                                 class="img-responsive"/>
-                            <p>
-                                Schematic of the process for PDX model creation, expansion, and drug dosing studies. A
-                                PDX model consists of an immunocompromised mouse into which human tumor material has
-                                been implanted. Once the implanted tumor reaches a target volume at the initial passage
-                                (P0), the tumor is excised, fractionated, and transplanted into the next cohort of mice
-                                to establish the next passage. P0 and P1 tumors are subjected to various quality control
-                                assays to ensure that the passaged tumors faithfully reflect the critical biological and
-                                genomic properties of the patient tumor. Cohorts of tumor bearing mice are used in
-                                experimental studies. Dosing studies are typically performed on low passage tumors
-                                (P1-P4).
-                            </p>
+                                <img src="../static/images/pdx_mi_figure.png" th:src="@{/images/pdx_mi_figure.png}"
+                                     class="img-responsive"/>
+                                <p>
+                                    Schematic of the process for PDX model creation, expansion, and drug dosing studies. A
+                                    PDX model consists of an immunocompromised mouse into which human tumor material has
+                                    been implanted. Once the implanted tumor reaches a target volume at the initial passage
+                                    (P0), the tumor is excised, fractionated, and transplanted into the next cohort of mice
+                                    to establish the next passage. P0 and P1 tumors are subjected to various quality control
+                                    assays to ensure that the passaged tumors faithfully reflect the critical biological and
+                                    genomic properties of the patient tumor. Cohorts of tumor bearing mice are used in
+                                    experimental studies. Dosing studies are typically performed on low passage tumors
+                                    (P1-P4).
+                                </p>
 
-                        </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -108,37 +111,29 @@
                 </div>
             </div>
 
-            <a th:href="@{/search}" class="btn btn-success btn-block text-center" href="#">Search for PDX models</a>
         </div>
         <!-- /.col-md-8 -->
-    </div>
-    <!-- /.row -->
-
-    <hr/>
-
-    <!-- Call to Action Well -->
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="well text-center">
-                <h3>PDX finder contains data from the following sources</h3>
-            </div>
+        <div class="col-md-12">
+            <a th:href="@{/search}" class="btn btn-success btn-block text-center" href="#"> <span style="font-size: 20px; padding-bottom: 20px;"> Search PDX models </span> </a>
         </div>
-        <!-- /.col-lg-12 -->
     </div>
     <!-- /.row -->
+<br>
+
+
+        <h4> PDX Finder contains more than 800 PDX models from the following sources </h4><hr/>
 
     <!-- Content Row -->
     <div class="row">
-        <div class="col-md-4">
-            <h2>JAX Data</h2>
-            <p>Information about data from The Jackson Laboratory.</p>
-            <a class="btn btn-default" href="http://tumor.informatics.jax.org/mtbwi/pdxSearch.do" target="_blank">More
-                Info</a>
+        <div class="col-md-6">
+            <h4>JAX </h4>
+            <p>Information about data from The Jackson Laboratory </p>
+            <a class="btn btn-default" href="http://tumor.informatics.jax.org/mtbwi/pdxSearch.do" target="_blank">More Info</a>
         </div>
         <!-- /.col-md-4 -->
-        <div class="col-md-4">
-            <h2>EurOPDX Data</h2>
-            <p>Information about data from The EurOPDX Consortium.</p>
+        <div class="col-md-6">
+            <h4>EurOPDX </h4>
+            <p>Information about data from The EurOPDX Consortium</p>
             <a class="btn btn-default" href="https://www.ncbi.nlm.nih.gov/pubmed/?term=Enzo%20Medico%20EuroPDX"
                target="_blank">More Info</a>
         </div>
@@ -148,8 +143,278 @@
     </div>
     <!-- /.row -->
 
+
+
+    <div class="row" style="margin-top: 20px;">
+        <div id="resultsDiv">
+
+            <!-- Graph Row, will get replaced by first query -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div id="cancer-system-chart"></div>
+                </div>
+                <!-- /.col-md-4 -->
+                <div class="col-md-8">
+                    <div id="cancer-histology-chart"></div>
+                </div>
+            </div>
+            <!-- /.row -->
+
+            <!-- Second Graph Row, will get replaced by first query -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="cancer-tissue-chart"></div>
+                </div>
+            </div>
+            <!-- /.row -->
+
+
+        </div>
+    </div>
+
 </div>
 <!-- /.container -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" th:inline="javascript">
+    /* <![CDATA[ */
+    // Draw charts
+    Highcharts.chart('cancer-system-chart', {
+        credits: false,
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Cancers by system'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.y}</b> (<b>{point.percentage:.1f}%</b>)'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: false
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            name: 'System',
+            colorByPoint: true,
+            data: eval(/*[[ ${cancerBySystem} ]]*/)
+        }]
+    });
+
+
+
+    // Create the chart
+    Highcharts.chart('cancer-histology-chart', {
+        credits: false,
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Cancers by histology'
+        },
+        xAxis: {
+            type: 'category'
+        },
+        yAxis: {
+            type: 'logarithmic',
+            title: {
+                text: 'Count of cancers by histology'
+            }
+
+        },
+        legend: {
+            enabled: false
+        },
+        plotOptions: {
+            series: {
+                borderWidth: 0,
+                dataLabels: {
+                    enabled: true,
+                    format: '{point.y}'
+                }
+            }
+        },
+
+        tooltip: {
+            headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+            pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b> of total<br/>'
+        },
+
+        series: [{
+            name: 'Cancers',
+            colorByPoint: true,
+            data: [{
+                name: 'Carcinoma', y: 713, drilldown: 'Carcinoma'
+            }, {
+                name: 'Sarcoma', y: 45, drilldown: 'Sarcoma'
+            }, {
+                name: 'malignant glioma', y: 34, drilldown: null
+            }, {
+                name: 'melanoma', y: 16, drilldown: null
+            }, {
+                name: 'leukemia', y: 3, drilldown: null
+            }, {
+                name: 'lymphoma', y: 2, drilldown: null
+            }, {
+                name: 'neuroblastoma', y: 2, drilldown: null
+            }, {
+                name: 'malignant mesothelioma', y: 1, drilldown: null
+            }, {
+                name: 'teratoma', y: 1, drilldown: null
+            }]
+        }], drilldown: {
+            series: [{
+                name: 'Carcinoma',
+                id: 'Carcinoma',
+                data: [
+                    ['adenocarcinoma', 532],
+                    ['carcinoma', 87],
+                    ['squamous cell carcinoma', 42],
+                    ['non small cell carcinoma', 38],
+                    ['small cell carcinoma', 5],
+                    ['papillary serous adenocarcinoma', 3],
+                    ['neuroendocrine carcinoma', 2],
+                    ['carcinosarcoma', 1],
+                    ['large cell carcinoma', 1],
+                    ['papillary carcinoma', 1],
+                    ['transitional cell carcinoma', 1],
+                ]
+            }, {
+                name: 'Sarcoma',
+                id: 'Sarcoma',
+                data: [
+                    ['sarcoma', 34],
+                    ['rhabdomyosarcoma', 6],
+                    ['osteosarcoma', 2],
+                    ['carcinosarcoma', 1],
+                    ['liposarcoma', 1],
+                    ['spindle cell sarcoma', 1],
+                ]
+            }]
+        }
+    });
+
+
+
+    Highcharts.chart('cancer-tissue-chart', {
+        credits: false,
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Cancers by tissue'
+        },
+        xAxis: {
+            type: 'category',
+            labels: {
+                rotation: -90,
+                style: {
+                    fontSize: '11px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
+        },
+        yAxis: {
+            type: 'logarithmic',
+            title: {
+                text: 'Count of cancers'
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            pointFormat: 'Count: <b>{point.y}</b>'
+        },
+        series: [{
+            name: 'Tissue',
+            data: [
+                ['colon cancer', 496],
+                ['pancreatic cancer', 19],
+                ['rectum cancer', 10],
+                ['ampulla of vater cancer', 4],
+                ['bile duct cancer', 4],
+                ['cecum carcinoma', 3],
+                ['liver cancer', 2],
+                ['salivary gland cancer', 2],
+                ['tonsil cancer', 2],
+                ['anal cancer', 2],
+                ['stomach cancer', 2],
+                ['appendix cancer', 2],
+                ['esophageal cancer', 1],
+                ['duodenum cancer', 1],
+                ['lung cancer', 77],
+                ['brain cancer', 34],
+                ['peripheral nervous system cancer', 1],
+                ['retroperitoneal cancer ', 1],
+                ['adrenal gland cancer', 1],
+                ['breast cancer', 31],
+                ['urinary bladder cancer', 29],
+                ['kidney cancer', 10],
+                ['skin cancer', 20],
+                ['muscle cancer', 17],
+                ['bone cancer', 12],
+                ['lipomatous cancer', 1],
+                ['ovarian cancer', 13],
+                ['prostate cancer', 3],
+                ['uterine cancer', 1],
+                ['endometrial cancer', 1],
+                ['germ cell cancer', 1],
+                ['connective and soft tissue cancer', 13],
+                ['hematologic cancer', 5],
+                ['head cancer', 5],
+                ['neck cancer', 1]
+            ],
+            dataLabels: {
+                crop: false,
+                overflow: 'none',
+                padding: 2,
+                enabled: true,
+                rotation: -90,
+                align: 'left',
+                format: '{point.y}',
+                y: -5,
+                style: {
+                    fontSize: '11px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
+        }]
+    });
+
+    /* ]]> */
+
+
+</script>
+
+
+
 
 <script>
     function centerModal() {
@@ -159,7 +424,6 @@
         // Center modal vertically in window
         $dialog.css("margin-top", offset);
     }
-
     $('.modal').on('show.bs.modal', centerModal);
     $(window).on("resize", function () {
         $('.modal:visible').each(centerModal);
