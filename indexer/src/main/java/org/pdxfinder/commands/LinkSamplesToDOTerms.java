@@ -98,13 +98,15 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
                         loaderUtils.saveSample(sample);
                         loaderUtils.saveOntologyTerm(term);
                         mapCounter++;
+                        //System.out.println("DONE "+sampleId+" "+doLabel);
                     }
                     else{
                         errorCounter++;
+                        System.out.println("ERROR "+sampleId+" "+doLabel);
                     }
 
 
-                    System.out.println(sampleId+" "+doLabel+" "+type+" "+justification);
+
 
                 }
 
