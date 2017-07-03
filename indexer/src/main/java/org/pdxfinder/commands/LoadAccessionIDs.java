@@ -1,35 +1,35 @@
 package org.pdxfinder.commands;
 
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONException;
-import org.neo4j.ogm.json.JSONObject;
+
+import org.pdxfinder.accessionidtatamodel.AccessionData;
 import org.pdxfinder.dao.Marker;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
+
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
+
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashMap;
+
 
 /**
  * Created by csaba on 30/06/2017.
  */
 @Component
-@Order(value = Ordered.LOWEST_PRECEDENCE)
 public class LoadAccessionIDs implements CommandLineRunner {
 
     private static final String HGNC_URL = "http://rest.genenames.org/fetch/symbol/";
     private static final String ENSEMBL_URL = "http://rest.ensembl.org/xrefs/symbol/homo_sapiens/BRAF?content-type=application/json";
+    private static final String DATA_FILE_URL = "http://www.genenames.org/cgi-bin/download?col=gd_hgnc_id&col=gd_app_sym&col=gd_prev_sym&col=gd_aliases&col=gd_pub_ensembl_id&status=Approved&status_opt=2&where=&order_by=gd_app_sym_sort&format=text&limit=&hgnc_dbtag=on&submit=submit";
 
 
     private final static Logger log = LoggerFactory.getLogger(LoadAccessionIDs.class);
@@ -43,13 +43,14 @@ public class LoadAccessionIDs implements CommandLineRunner {
 
 
     @Override
+    @Transactional
     public void run(String... args) throws Exception {
 
         log.info(args[0]);
 
         if ("loadAccessionIds".equals(args[0]) || "-loadAccessionIds".equals(args[0])) {
 
-            log.info("Looking up HUGO ids for markers");
+
             long startTime = System.currentTimeMillis();
             loadAccessionIds();
             long endTime   = System.currentTimeMillis();
@@ -69,94 +70,117 @@ public class LoadAccessionIDs implements CommandLineRunner {
 
     private void loadAccessionIds(){
 
-        System.out.println("Loading all markers from Neo4j");
-        Collection<Marker> markers = loaderUtils.getAllMarkers();
+        String[] rowData;
+        String[] prevSymbols;
+        HashMap<String, AccessionData> hmap = new HashMap<>();
+        String symbol, hgncId, ensemblId = "";
 
-        String mUrl = "";
+        int rows = 0;
+        int symbolConflicts = 0;
+        String symbolConf = "";
 
-        for(Marker m:markers){
+        try{
 
-            if(m.getSymbol() != null && m.getSymbol() != ""){
-
-                mUrl =   HGNC_URL+m.getSymbol();
-                System.out.println("Fetching data from: "+mUrl);
-                try {
-                    String jString = "";
-                    jString = getJson(mUrl);
-                    JSONObject job = new JSONObject(jString);
-                    JSONObject response = job.getJSONObject("response");
-
-                    if(response.has("docs")){
-
-                        JSONArray docs = response.getJSONArray("docs");
-
-                        System.out.println(jString);
-                        if(docs.length() == 0) continue;
-                        JSONObject ids = docs.getJSONObject(0);
-
-
-                        if (ids.getString("hgnc_id") != null){
-                            m.setHugoId(ids.getString("hgnc_id"));
-                        }
-                        if (ids.getString("ensembl_gene_id") != null){
-                            m.setEnsemblId(ids.getString("ensembl_gene_id"));
-                        }
-                        System.out.println(ids.getString("hgnc_id"));
-
-                    }
-
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                loaderUtils.saveMarker(m);
-
-            }
-
-
-
-
-        }
-
-    }
-
-
-
-    private String getJson(String mUrl){
-
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            URL url = new URL(mUrl);
+            URL url = new URL(DATA_FILE_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            conn.addRequestProperty("Accept","application/json");
+            //conn.addRequestProperty("Enctype","application/x-www-form-urlencoded");
 
             if(conn.getResponseCode() != 200){
                 throw new RuntimeException("Failed : HTTP error code : "
                         + conn.getResponseCode());
             }
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
                     (conn.getInputStream())));
 
-            String inputLine;
-            while ((inputLine = br.readLine()) != null) {
-                sb.append(inputLine);
-            }
+            String line = reader.readLine();
+                while((line = reader.readLine()) != null){
+                    //HGNC_ID APPR_SYMBOL PREV_SYMBOLS SYNONYMS ENSEMBL_ID
 
-            conn.disconnect();
+                    rowData = line.split("\t");
+                    //rowData[1] = symbol, if it is not empty and if it is not a withdrawn symbol
+                    if(rowData[1] != null && !rowData[1].isEmpty() ){
+
+                        symbol = rowData[1];
+
+                        if(rowData[0] != null && !rowData[0].isEmpty()){
+                            hgncId = rowData[0];
+                        }
+                        else{
+                            hgncId = "";
+                        }
+
+                        if(rowData.length>4 && rowData[4] != null && !rowData[4].isEmpty()){
+                            ensemblId = rowData[4];
+                        }
+                        else{
+                            ensemblId = "";
+                        }
+
+                        //put it in the hashmap with all of its prev symbols
+
+                        AccessionData ad = new AccessionData(symbol, hgncId, ensemblId);
+                        System.out.println(symbol+" "+hgncId+" "+ ensemblId);
+                        hmap.put(symbol,ad);
+
+                        if(rowData.length>2 && !rowData[2].isEmpty()){
+                            prevSymbols = rowData[2].split(",");
+
+                                for(int i=0;i<prevSymbols.length;i++){
+                                    if(hmap.containsKey(prevSymbols[i].trim())){
+                                        symbolConflicts++;
+                                        symbolConf = prevSymbols[i];
+                                        //break;
+                                    }
+                                    else{
+                                        hmap.put(prevSymbols[i].trim(),ad);
+                                    }
+                                }
+                        }
+
+                    }
+                    rows++;
+                }
 
         }
-        catch(MalformedURLException e){
+        catch (Exception e){
             e.printStackTrace();
         }
-        catch(IOException e){
-            e.printStackTrace();
-        }
 
-        return sb.toString();
+        System.out.println("Symbol conflicts: "+symbolConflicts);
+        System.out.println("Last conflict:"+symbolConf);
+        System.out.println("Rows: "+rows);
+        System.out.println("Symbols incl. prev symbols: "+hmap.size());
+
+        updateMarkers(hmap);
     }
+
+private void updateMarkers(HashMap hmap){
+
+    int notUpdatedMarkers = 0;
+    System.out.println("Loading all markers from Neo4j...");
+    Collection<Marker> markers = loaderUtils.getAllMarkers();
+
+    for(Marker m:markers){
+
+        if(hmap.containsKey(m.getSymbol())){
+            AccessionData ad = (AccessionData) hmap.get(m.getSymbol());
+            m.setHugoId(ad.getHgncId());
+            m.setEnsemblId(ad.getEnsemblId());
+            System.out.println("Updating marker:"+m.getSymbol());
+            loaderUtils.saveMarker(m);
+        }
+        else{
+            notUpdatedMarkers++;
+        }
+
+    }
+
+    System.out.println("Not updated markers: "+notUpdatedMarkers);
+
+}
+
+
 
 }
