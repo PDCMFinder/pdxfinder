@@ -384,14 +384,12 @@ public class LoaderUtils {
     }
 
 
-    ////// TODO: Temporarily added these methods to fix load issue.
-    //modified savemarker behavior
     public void saveMarker(Marker marker) {
         markerRepository.save(marker);
     }
 
     public Collection<Marker> getAllMarkers() {
-        return Collections.EMPTY_LIST;
+        return markerRepository.findAllMarkers();
     }
 
 }
