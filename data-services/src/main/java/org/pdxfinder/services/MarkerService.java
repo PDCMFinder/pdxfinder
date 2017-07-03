@@ -23,13 +23,16 @@ public class MarkerService {
     }
 
     public List<String> getAllMarkers() {
-        Collection<Marker> markers = markerRepository.findAllMarkers();
-        List<String> result = new ArrayList<>();
 
+        //TODO: Temporary hack to fix search page
+
+        //Collection<Marker> markers = markerRepository.findAllMarkers();
+        List<String> result = new ArrayList<>();
+        /*
         for (Marker marker : markers) {
             result.add(marker.getName());
         }
-
+        */
         return result;
     }
 
