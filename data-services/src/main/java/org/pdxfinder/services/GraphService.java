@@ -33,10 +33,15 @@ public class GraphService
         public Set<String> searchResult(String searchParam)
         {
 
+                searchParam = searchParam+".*";
+                String searchParam2 = ".*"+searchParam+".*";
 
                 Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findByDiseaseOntologyTerm(searchParam);
+                Collection<OntologyTerm> ontologyTerms2 = ontologyTermRepositoryRepository.findByDiseaseOntologyTerm2(searchParam2,searchParam);
 
                 Set<String> dataReport = new HashSet<>();
+                Set<String> dataReport2 = new HashSet<>();
+
 
                 for (OntologyTerm ontologyTerm : ontologyTerms)
                 {
@@ -45,8 +50,35 @@ public class GraphService
                         dataReport.add(ontologyTerm.getLabel());
                     }
                 }
+                // Arrange the result alphabetically
+                Set<String> sortedData = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+                sortedData.addAll(dataReport);
 
-                return dataReport;
+
+
+                for (OntologyTerm ontologyTerm : ontologyTerms2)
+                {
+                    if(ontologyTerm.getLabel() != null)
+                    {
+                        dataReport2.add(ontologyTerm.getLabel());
+                    }
+                }
+                // Arrange the result alphabetically
+                Set<String> sortedData2 = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+                sortedData2.addAll(dataReport2);
+
+
+
+                if (sortedData.size() <= 1)
+                {
+                    sortedData.addAll(sortedData2);
+                    return sortedData;
+                }else{
+                    return sortedData;
+                }
+
+
+
         }
 
 
