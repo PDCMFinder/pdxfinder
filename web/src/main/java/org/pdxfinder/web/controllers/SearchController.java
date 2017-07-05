@@ -14,56 +14,70 @@ import java.util.Map;
  * Created by jmason on 16/03/2017.
  */
 @Controller
-public class SearchController {
+public class SearchController
+{
 
-    private GraphService graphService;
-
-    public SearchController(GraphService graphService) {
-        this.graphService = graphService;
-    }
-
-    @RequestMapping("/search")
-
-    String index(Model model) throws JSONException {
-
-
-        //
-        // Cancers by system
-        //
-        JSONArray cancerBySystemDataSeriesArray = new JSONArray();
-
-        Map<String, Integer> cancerBySystem = graphService.getModelCountsBySystem();
-        for (String name : cancerBySystem.keySet()) {
-
-            JSONObject dataSeries = new JSONObject();
-            dataSeries.put("name", name);
-            dataSeries.put("y", cancerBySystem.get(name));
-
-            cancerBySystemDataSeriesArray.put(dataSeries);
-
+        private GraphService graphService;
+        public SearchController(GraphService graphService) {
+            this.graphService = graphService;
         }
 
-        model.addAttribute("cancerBySystem", cancerBySystemDataSeriesArray.toString());
+        @RequestMapping("/search")
+        String index(Model model) throws JSONException
+        {
 
 
-        //
-        // Cancers by tissue
-        //
-        JSONArray cancerByTissueDataSeriesArray = new JSONArray();
+                    //Cancers by system
+                    JSONArray cancerBySystemDataSeriesArray = new JSONArray();
 
-        Map<String, Integer> cancerByTissue = graphService.getModelCountsByTissue();
-        for (String name : cancerByTissue.keySet()) {
+                    Map<String, Integer> cancerBySystem = graphService.getModelCountsBySystem();
+                    for (String name : cancerBySystem.keySet())
+                    {
 
-            JSONObject dataSeries = new JSONObject();
-            dataSeries.put("name", name);
-            dataSeries.put("y", cancerByTissue.get(name));
+                            JSONObject dataSeries = new JSONObject();
+                            dataSeries.put("name", name);
+                            dataSeries.put("y", cancerBySystem.get(name));
 
-            cancerByTissueDataSeriesArray.put(dataSeries);
+                            cancerBySystemDataSeriesArray.put(dataSeries);
 
+                    }
+                    model.addAttribute("cancerBySystem", cancerBySystemDataSeriesArray.toString());
+
+
+
+
+
+                    // Cancers by tissue
+                    JSONArray cancerByTissueDataSeriesArray = new JSONArray();
+
+                    Map<String, Integer> cancerByTissue = graphService.getModelCountsByTissue();
+                    for (String name : cancerByTissue.keySet())
+                    {
+
+                            JSONObject dataSeries = new JSONObject();
+                            dataSeries.put("name", name);
+                            dataSeries.put("y", cancerByTissue.get(name));
+
+                            cancerByTissueDataSeriesArray.put(dataSeries);
+
+                    }
+                    model.addAttribute("cancerByTissue", cancerByTissueDataSeriesArray.toString());
+                    System.out.println("+++ cancerByTissue" + cancerByTissueDataSeriesArray);
+
+
+
+                    JSONObject dataByCellType = new JSONObject();
+
+
+
+                return "search";
         }
 
-        model.addAttribute("cancerByTissue", cancerByTissueDataSeriesArray.toString());
-        System.out.println("+++ cancerByTissue" + cancerByTissueDataSeriesArray);
+
+}
+
+
+
 
 
 //        JSONArray cancerByCellTypeDataSeriesArray = new JSONArray();
@@ -83,21 +97,12 @@ public class SearchController {
 //        System.out.println("+++ cancerByCellType" + cancerByCellTypeDataSeriesArray);
 
 
-        JSONObject dataByCellType = new JSONObject();
 
-
-
-        return "search";
-    }
-
-
-    // The data for producing a highcharts pie chart format
-    // [{
-    //        name: 'IE',
-    //                y: 56.33
-    //    }, {
-    //        name: 'Chrome',
-    //                y: 24.03
-    //    }]
-
-}
+// The data for producing a highcharts pie chart format
+// [{
+//        name: 'IE',
+//                y: 56.33
+//    }, {
+//        name: 'Chrome',
+//                y: 24.03
+//    }]

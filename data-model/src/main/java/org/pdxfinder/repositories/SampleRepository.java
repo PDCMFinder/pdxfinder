@@ -2,14 +2,11 @@ package org.pdxfinder.repositories;
 
 
 import org.pdxfinder.dao.Sample;
-import org.springframework.data.neo4j.annotation.Depth;
 import org.springframework.data.neo4j.annotation.Query;
-
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
-
 import java.util.Set;
 
 /**

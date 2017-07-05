@@ -16,8 +16,16 @@
     margin-top: -20px;
 }
 
+.shiftUp60 {
+    margin-top: -60px;
+}
+
 .topSpace50 {
     margin-top: 50px;
+}
+
+.topSpace100 {
+    margin-top: 100px;
 }
 
 .fullImg{
@@ -29,7 +37,7 @@
 
 .pdxSummary{
     background-color: #fff;
-    border-bottom: 1px dashed #ccc;
+    border: 1px dashed #ccc;
     padding: 15px;
     margin-top: -15px;
 }
@@ -83,3 +91,30 @@ h5{
     font-weight: bold;
     font-size: 14px;
 }
+
+.materialF {
+    padding:8px;
+    padding-left: 0px;
+    display:block;
+    border:none;
+    border-bottom:1px solid #333;
+    width:100%
+}
+
+.w3-blue-grey,.w3-hover-blue-grey:hover,.w3-blue-gray,.w3-hover-blue-gray:hover
+{color:#fff!important;background-color:#607d8b!important}
+
+.w3-button:hover{color:#000!important;background-color:#ccc!important}
+
+.w3-button
+{border:none;display:inline-block;outline:0;padding:8px 16px;vertical-align:middle;overflow:hidden;text-decoration:none;color:inherit;background-color:inherit;text-align:center;cursor:pointer;white-space:nowrap}
+
+
+
+
+
+
+
+
+
+

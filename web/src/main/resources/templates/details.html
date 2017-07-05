@@ -27,7 +27,7 @@
 
         <div class="panel panel-primary">
             <!-- Default panel contents -->
-            <div class="panel-heading"><h2> <span th:text="${sampleId}"></span> </h2></div>
+            <div class="panel-heading"><h4> <span th:text="${sampleId}"></span> </h4></div>
             <div class="panel-body">
 
                 <div class="row">
@@ -39,7 +39,7 @@
                             </div>
                             <div class="panel-body">
                                 <dl class="dl-horizontal">
-                                    <dt>Patient ID</dt><dd><span th:text="${patientId}"></span></dd>
+                                    <dt>Patient ID</dt><dd><span th:text="${fullData.age}"></span></dd>
                                     <dt>Gender</dt><dd><span th:text="${gender}"></span></dd>
                                     <dt>Age</dt><dd><span th:text="${age}"></span></dd>
                                     <dt>Race</dt><dd><span th:text="${race}"></span></dd>
@@ -48,6 +48,7 @@
                             </div>
                         </div>
                     </div>
+
 
                     <div class="col-md-6">
                         <div class="panel panel-info">
@@ -66,6 +67,10 @@
                     </div>
 
                 </div>
+
+
+
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="panel panel-info">
@@ -96,6 +101,9 @@
                     </div>
 
                 </div>
+
+
+
 
 
                 <br/>

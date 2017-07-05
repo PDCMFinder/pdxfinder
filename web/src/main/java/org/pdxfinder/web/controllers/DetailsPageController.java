@@ -22,10 +22,13 @@ public class DetailsPageController {
     }
 
     @RequestMapping(value = "/details/{sampleId}")
-    public String details(@PathVariable String sampleId, Model model) {
+    public String details(@PathVariable String sampleId, Model model)
+    {
 
 
         DetailsDTO dto = searchService.searchForSample(sampleId);
+
+        model.addAttribute("fullData",dto);
 
         model.addAttribute("sampleId",sampleId);
         /*

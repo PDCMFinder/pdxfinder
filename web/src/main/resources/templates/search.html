@@ -1,347 +1,388 @@
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <link th:remove="all" rel="stylesheet" media="screen"
-          href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css"/>
-    <link rel="stylesheet" href="/css/chosen.css"/>
-    <title>PDX Finder</title>
-    <!--/*/ <th:block th:include="fragments/head-includes :: head-includes"></th:block> /*/-->
-</head>
-<body>
-<div class="page-header text-center">
-<h1>PDX Finder search</h1>
-</div>
-<div class="container">
-    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
-</div>
 
-<!-- Page Content -->
-<div class="container">
-<script type="text/javascript">
-    jQuery(document).ready(function(){
+    <head>
+        <link th:remove="all" rel="stylesheet" media="screen" href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css"/>
+        <link rel="stylesheet" href="/css/chosen.css"/>
+        <title>PDX Finder</title>
+        <!--/*/ <th:block th:include="fragments/head-includes :: head-includes"></th:block> /*/-->
+    </head>
 
-        init();
+    <body>
 
-        jQuery("#searchField").bind("enterWasHit",function(e){
-            search();
-        });
-        jQuery("#searchField").keyup(function(e){
-            if(e.keyCode == 13)
-            {
-                jQuery(this).trigger("enterWasHit");
-            }
-        });
-
-        jQuery("#searchButton").on("click", function () {
-            search();
-        });
-
-    });
-
-</script>
-
-    <p style="margin-top: -15px;">
-        To facilitate PDX models discovery, EMBL-EBI and the Jackson Laboratory are co-developing PDX Finder. PDX Finder
-        is an open repository for the upload and storage of clinical, genomic and functional PDX data which will provide
-        a comprehensive global catalogue of PDX models available for researchers and their associated data across
-        distributed repository databases.
-    </p>
-    <div class="row">
-        <div class="col-md-6">
-            <h4>Diagnosis</h4>
-
-                <input id="searchField" class="chosen-search-input" autofocus="" data-modalfocus="" placeholder="" type="text" style="width:100%;"/>
-
-        </div>
-
-        <div class="col-md-6">
-            <h4>Tested Marker(s)</h4>
-            <select id="markerSelect" class="chosen" multiple="true" data-placeholder="Select marker(s)...">
-        </select>
-
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <h4>Source</h4>
-            <select id="sourceSelect" class="chosen" multiple="true" data-placeholder="Select source(s)...">
-                <option>IRCC</option>
-                <option>JAX</option>
-            </select>
-        </div>
-
-        <div class="col-md-6">
-            <h4>Tumor type</h4>
-            <select id="tumorTypeSelect" class="chosen" multiple="true" data-placeholder="Select tumor type(s)...">
-                <option>Metastatic</option>
-                <option>Primary Malignancy</option>
-                <option>Recurrent/Relapse</option>
-            </select>
-
-        </div>
-    </div>
-    <br/>
-    <div class="row">
-        <div class="col-md-6"></div>
-        <div class="col-md-6">
-        <button id="searchButton" class="btn btn-default pull-right"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search</button>
-        </div>
-    </div>
-
-
-    <br/>
-
-    <div class="row">
-        <div id="resultsDiv">
-
-            <!-- Graph Row, will get replaced by first query -->
-            <div class="row">
-                <div class="col-md-4">
-                    <div id="cancer-system-chart"></div>
-                </div>
-                <!-- /.col-md-4 -->
-                <div class="col-md-8">
-                    <div id="cancer-histology-chart"></div>
-                </div>
+            <div class="page-header text-center">
+                    <h1>PDX Finder search</h1>
             </div>
-            <!-- /.row -->
 
-            <!-- Second Graph Row, will get replaced by first query -->
-            <div class="row">
-                <div class="col-md-12">
-                    <div id="cancer-tissue-chart"></div>
-                </div>
+
+            <div class="container">
+                <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
             </div>
-            <!-- /.row -->
-
-
-        </div>
-    </div>
-
-
-</div>
-<!-- /.container -->
-
-<script type="text/javascript" th:inline="javascript">
-    /* <![CDATA[ */
-    // Draw charts
-    Highcharts.chart('cancer-system-chart', {
-        credits: false,
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-        },
-        title: {
-            text: 'Cancers by system'
-        },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.y}</b> (<b>{point.percentage:.1f}%</b>)'
-        },
-        plotOptions: {
-            pie: {
-                allowPointSelect: true,
-                cursor: 'pointer',
-                dataLabels: {
-                    enabled: false
-                },
-                showInLegend: true
-            }
-        },
-        series: [{
-            name: 'System',
-            colorByPoint: true,
-            data: eval(/*[[ ${cancerBySystem} ]]*/)
-        }]
-    });
 
 
 
-    // Create the chart
-    Highcharts.chart('cancer-histology-chart', {
-        credits: false,
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: 'Cancers by histology'
-        },
-        xAxis: {
-            type: 'category'
-        },
-        yAxis: {
-            type: 'logarithmic',
-            title: {
-                text: 'Count of cancers by histology'
-            }
+            <!-- Page Content -->
+            <div class="container">
 
-        },
-        legend: {
-            enabled: false
-        },
-        plotOptions: {
-            series: {
-                borderWidth: 0,
-                dataLabels: {
-                    enabled: true,
-                    format: '{point.y}'
-                }
-            }
-        },
+                        <p class="shiftUp60">
+                            To facilitate PDX models discovery, EMBL-EBI and the Jackson Laboratory are co-developing PDX Finder. PDX Finder
+                            is an open repository for the upload and storage of clinical, genomic and functional PDX data which will provide
+                            a comprehensive global catalogue of PDX models available for researchers and their associated data across
+                            distributed repository databases.
+                        </p>
 
-        tooltip: {
-            headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-            pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b> of total<br/>'
-        },
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6" style="margin-top: 5px;">
+                                <h4>Diagnosis</h4>
 
-        series: [{
-            name: 'Cancers',
-            colorByPoint: true,
-            data: [{
-                name: 'Carcinoma', y: 713, drilldown: 'Carcinoma'
-            }, {
-                name: 'Sarcoma', y: 45, drilldown: 'Sarcoma'
-            }, {
-                name: 'malignant glioma', y: 34, drilldown: null
-            }, {
-                name: 'melanoma', y: 16, drilldown: null
-            }, {
-                name: 'leukemia', y: 3, drilldown: null
-            }, {
-                name: 'lymphoma', y: 2, drilldown: null
-            }, {
-                name: 'neuroblastoma', y: 2, drilldown: null
-            }, {
-                name: 'malignant mesothelioma', y: 1, drilldown: null
-            }, {
-                name: 'teratoma', y: 1, drilldown: null
-            }]
-        }], drilldown: {
-            series: [{
-                name: 'Carcinoma',
-                id: 'Carcinoma',
-                data: [
-                    ['adenocarcinoma', 532],
-                    ['carcinoma', 87],
-                    ['squamous cell carcinoma', 42],
-                    ['non small cell carcinoma', 38],
-                    ['small cell carcinoma', 5],
-                    ['papillary serous adenocarcinoma', 3],
-                    ['neuroendocrine carcinoma', 2],
-                    ['carcinosarcoma', 1],
-                    ['large cell carcinoma', 1],
-                    ['papillary carcinoma', 1],
-                    ['transitional cell carcinoma', 1],
-                ]
-            }, {
-                name: 'Sarcoma',
-                id: 'Sarcoma',
-                data: [
-                    ['sarcoma', 34],
-                    ['rhabdomyosarcoma', 6],
-                    ['osteosarcoma', 2],
-                    ['carcinosarcoma', 1],
-                    ['liposarcoma', 1],
-                    ['spindle cell sarcoma', 1],
-                ]
-            }]
-        }
-    });
+                                    <input id="diagnosisSuggest"  class="materialF" autofocus="" data-modalfocus="" placeholder="Diagnosis ..." type="text" style="width:100%;"/>
+
+                            </div>
 
 
+                            <div class="col-md-6">
+                                <h4>Tested Marker(s)</h4>
+                                <select  id="markerSelect"  class="chosen" multiple="true" placeholder="Select marker(s)...">
+                            </select>
 
-    Highcharts.chart('cancer-tissue-chart', {
-        credits: false,
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: 'Cancers by tissue'
-        },
-        xAxis: {
-            type: 'category',
-            labels: {
-                rotation: -90,
-                style: {
-                    fontSize: '11px',
-                    fontFamily: 'Verdana, sans-serif'
-                }
-            }
-        },
-        yAxis: {
-            type: 'logarithmic',
-            title: {
-                text: 'Count of cancers'
-            }
-        },
-        legend: {
-            enabled: false
-        },
-        tooltip: {
-            pointFormat: 'Count: <b>{point.y}</b>'
-        },
-        series: [{
-            name: 'Tissue',
-            data: [
-                ['colon cancer', 496],
-                ['pancreatic cancer', 19],
-                ['rectum cancer', 10],
-                ['ampulla of vater cancer', 4],
-                ['bile duct cancer', 4],
-                ['cecum carcinoma', 3],
-                ['liver cancer', 2],
-                ['salivary gland cancer', 2],
-                ['tonsil cancer', 2],
-                ['anal cancer', 2],
-                ['stomach cancer', 2],
-                ['appendix cancer', 2],
-                ['esophageal cancer', 1],
-                ['duodenum cancer', 1],
-                ['lung cancer', 77],
-                ['brain cancer', 34],
-                ['peripheral nervous system cancer', 1],
-                ['retroperitoneal cancer ', 1],
-                ['adrenal gland cancer', 1],
-                ['breast cancer', 31],
-                ['urinary bladder cancer', 29],
-                ['kidney cancer', 10],
-                ['skin cancer', 20],
-                ['muscle cancer', 17],
-                ['bone cancer', 12],
-                ['lipomatous cancer', 1],
-                ['ovarian cancer', 13],
-                ['prostate cancer', 3],
-                ['uterine cancer', 1],
-                ['endometrial cancer', 1],
-                ['germ cell cancer', 1],
-                ['connective and soft tissue cancer', 13],
-                ['hematologic cancer', 5],
-                ['head cancer', 5],
-                ['neck cancer', 1]
-            ],
-            dataLabels: {
-                crop: false,
-                overflow: 'none',
-                padding: 2,
-                enabled: true,
-                rotation: -90,
-                align: 'left',
-                format: '{point.y}',
-                y: -5,
-                style: {
-                    fontSize: '11px',
-                    fontFamily: 'Verdana, sans-serif'
-                }
-            }
-        }]
-    });
+                            </div>
+                        </div>
 
-    /* ]]> */
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>Source</h4>
+                                <select id="sourceSelect" class="chosen" multiple="true" placeholder="Select source(s)...">
+                                    <option>IRCC</option>
+                                    <option>JAX</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h4>Tumor type</h4>
+                                <select id="tumorTypeSelect" class="chosen" multiple="true" placeholder="Select tumor type(s)...">
+                                    <option>Metastatic</option>
+                                    <option>Primary Malignancy</option>
+                                    <option>Recurrent/Relapse</option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                            <button id="searchButton" class="w3-button w3-blue-grey pull-right"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> &nbsp;&nbsp; Search </button>
+
+                            </div>
+                        </div>
 
 
-</script>
+                        <br/>
+
+                        <div class="row topSpace50">
+                            <div id="resultsDiv">
+
+                                <!-- Second Graph Row, will get replaced by first query -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div id="cancer-tissue-chart" style="height: 550px;"></div>
+                                    </div>
+                                </div>
+                                <!-- /.row -->
 
 
-</body>
+                                <!-- Graph Row, will get replaced by first query -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div id="cancer-system-chart"></div>
+                                    </div>
+                                    <!-- /.col-md-4 -->
+                                    <div class="col-md-6">
+                                        <div id="cancer-histology-chart"></div>
+                                    </div>
+                                </div>
+                                <!-- /.row -->
+
+
+                            </div>
+                        </div>
+
+
+            </div>
+            <!-- /.container -->
+
+
+
+
+
+
+
+
+
+
+            <script type="text/javascript" th:inline="javascript">
+                /* <![CDATA[ */
+                // Draw charts
+                Highcharts.chart('cancer-system-chart', {
+                    credits: false,
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: 'Cancers by system'
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.y}</b> (<b>{point.percentage:.1f}%</b>)'
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: false
+                            },
+                            showInLegend: true
+                        }
+                    },
+                    series: [{
+                        name: 'System',
+                        colorByPoint: true,
+                        data: eval(/*[[ ${cancerBySystem} ]]*/)
+                    }]
+                });
+
+
+
+                // Create the chart
+                Highcharts.chart('cancer-histology-chart', {
+                    credits: false,
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: 'Cancers by histology'
+                    },
+                    xAxis: {
+                        type: 'category'
+                    },
+                    yAxis: {
+                        type: 'logarithmic',
+                        title: {
+                            text: 'Count of cancers by histology'
+                        }
+
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    plotOptions: {
+                        series: {
+                            borderWidth: 0,
+                            dataLabels: {
+                                enabled: true,
+                                format: '{point.y}'
+                            }
+                        }
+                    },
+
+                    tooltip: {
+                        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b> of total<br/>'
+                    },
+
+                    series: [{
+                        name: 'Cancers',
+                        colorByPoint: true,
+                        data: [{
+                            name: 'Carcinoma', y: 713, drilldown: 'Carcinoma'
+                        }, {
+                            name: 'Sarcoma', y: 45, drilldown: 'Sarcoma'
+                        }, {
+                            name: 'malignant glioma', y: 34, drilldown: null
+                        }, {
+                            name: 'melanoma', y: 16, drilldown: null
+                        }, {
+                            name: 'leukemia', y: 3, drilldown: null
+                        }, {
+                            name: 'lymphoma', y: 2, drilldown: null
+                        }, {
+                            name: 'neuroblastoma', y: 2, drilldown: null
+                        }, {
+                            name: 'malignant mesothelioma', y: 1, drilldown: null
+                        }, {
+                            name: 'teratoma', y: 1, drilldown: null
+                        }]
+                    }], drilldown: {
+                        series: [{
+                            name: 'Carcinoma',
+                            id: 'Carcinoma',
+                            data: [
+                                ['adenocarcinoma', 532],
+                                ['carcinoma', 87],
+                                ['squamous cell carcinoma', 42],
+                                ['non small cell carcinoma', 38],
+                                ['small cell carcinoma', 5],
+                                ['papillary serous adenocarcinoma', 3],
+                                ['neuroendocrine carcinoma', 2],
+                                ['carcinosarcoma', 1],
+                                ['large cell carcinoma', 1],
+                                ['papillary carcinoma', 1],
+                                ['transitional cell carcinoma', 1],
+                            ]
+                        }, {
+                            name: 'Sarcoma',
+                            id: 'Sarcoma',
+                            data: [
+                                ['sarcoma', 34],
+                                ['rhabdomyosarcoma', 6],
+                                ['osteosarcoma', 2],
+                                ['carcinosarcoma', 1],
+                                ['liposarcoma', 1],
+                                ['spindle cell sarcoma', 1],
+                            ]
+                        }]
+                    }
+                });
+
+
+
+                Highcharts.chart('cancer-tissue-chart', {
+                    credits: false,
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: 'Cancers by tissue'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        labels: {
+                            rotation: -90,
+                            style: {
+                                fontSize: '11px',
+                                fontFamily: 'Verdana, sans-serif'
+                            }
+                        }
+                    },
+                    yAxis: {
+                        type: 'logarithmic',
+                        title: {
+                            text: 'Count of cancers'
+                        }
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    tooltip: {
+                        pointFormat: 'Count: <b>{point.y}</b>'
+                    },
+                    series: [{
+                        name: 'Tissue',
+                        data: [
+                            ['colon cancer', 496],
+                            ['pancreatic cancer', 19],
+                            ['rectum cancer', 10],
+                            ['ampulla of vater cancer', 4],
+                            ['bile duct cancer', 4],
+                            ['cecum carcinoma', 3],
+                            ['liver cancer', 2],
+                            ['salivary gland cancer', 2],
+                            ['tonsil cancer', 2],
+                            ['anal cancer', 2],
+                            ['stomach cancer', 2],
+                            ['appendix cancer', 2],
+                            ['esophageal cancer', 1],
+                            ['duodenum cancer', 1],
+                            ['lung cancer', 77],
+                            ['brain cancer', 34],
+                            ['peripheral nervous system cancer', 1],
+                            ['retroperitoneal cancer ', 1],
+                            ['adrenal gland cancer', 1],
+                            ['breast cancer', 31],
+                            ['urinary bladder cancer', 29],
+                            ['kidney cancer', 10],
+                            ['skin cancer', 20],
+                            ['muscle cancer', 17],
+                            ['bone cancer', 12],
+                            ['lipomatous cancer', 1],
+                            ['ovarian cancer', 13],
+                            ['prostate cancer', 3],
+                            ['uterine cancer', 1],
+                            ['endometrial cancer', 1],
+                            ['germ cell cancer', 1],
+                            ['connective and soft tissue cancer', 13],
+                            ['hematologic cancer', 5],
+                            ['head cancer', 5],
+                            ['neck cancer', 1]
+                        ],
+                        dataLabels: {
+                            crop: false,
+                            overflow: 'none',
+                            padding: 2,
+                            enabled: true,
+                            rotation: -90,
+                            align: 'left',
+                            format: '{point.y}',
+                            y: -5,
+                            style: {
+                                fontSize: '11px',
+                                fontFamily: 'Verdana, sans-serif'
+                            }
+                        }
+                    }]
+                });
+
+                /* ]]> */
+            </script>
+            <!-- Auto Suggest JavaScript Code -->
+
+
+
+
+            <!-- Auto Suggest JavaScript Code -->
+            <script>
+                $( function() {
+                    $( "#diagnosisSuggest" ).autocomplete({
+                        source: "/DOAutoSuggest"
+                    });
+                } );
+            </script>
+            <!-- Auto Suggest JQuery Code End -->
+
+
+
+            <!-- Auto Search Field JavaScript Code Start -->
+            <script type="text/javascript">
+                jQuery(document).ready(function()
+                {
+
+                    init();
+                    jQuery("#searchField").bind("enterWasHit",function(e)
+                    {
+                        search();
+                    });
+                    jQuery("#searchField").keyup(function(e)
+                    {
+                        if(e.keyCode == 13)
+                        {
+                            jQuery(this).trigger("enterWasHit");
+                        }
+                    });
+
+                    jQuery("#searchButton").on("click", function ()
+                    {
+                        search();
+                    });
+
+                });
+            </script>
+            <!-- Auto Search Field JavaScript Code End -->
+
+
+            <link rel="stylesheet" th:href="@{/css/jquery-ui.css}" href="../static/css/jquery-ui.css">
+            <script src="/js/jquery-ui.js"></script>
+    </body>
 </html>
