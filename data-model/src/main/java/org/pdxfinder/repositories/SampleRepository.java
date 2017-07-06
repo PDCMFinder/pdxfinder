@@ -42,6 +42,13 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
                                              @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
 
 
+
+
+
+
+
+
+
     @Query("MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
             "MATCH (s:Sample)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
             "MATCH (s:Sample)-[ot:OF_TYPE]-(tt:TumorType) " +

@@ -2,10 +2,7 @@ package org.pdxfinder.services;
 
 
 import org.pdxfinder.dao.*;
-import org.pdxfinder.repositories.ModelCreationRepository;
-import org.pdxfinder.repositories.PatientRepository;
-import org.pdxfinder.repositories.PatientSnapshotRepository;
-import org.pdxfinder.repositories.SampleRepository;
+import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +20,7 @@ public class SearchService
             private PatientRepository patientRepository;
             private PatientSnapshotRepository patientSnapshotRepository;
             private ModelCreationRepository modelCreationRepository;
+            private OntologyTermRepository ontologyTermRepositoryRepository;
             private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxSearch.do";
             private final String JAX_URL_TEXT = "View data at JAX";
             private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
@@ -32,19 +30,75 @@ public class SearchService
 
             @Autowired
             public SearchService(SampleRepository sampleRepository, PatientRepository patientRepository,
-                                 PatientSnapshotRepository patientSnapshotRepository, ModelCreationRepository modelCreationRepository)
+                                 PatientSnapshotRepository patientSnapshotRepository, ModelCreationRepository modelCreationRepository,
+                                 OntologyTermRepository ontologyTermRepository)
             {
                 this.sampleRepository = sampleRepository;
                 this.patientRepository = patientRepository;
                 this.patientSnapshotRepository = patientSnapshotRepository;
                 this.modelCreationRepository = modelCreationRepository;
+                this.ontologyTermRepositoryRepository = ontologyTermRepository;
+
+            }
+
+
+
+            public List<SearchDTO> searchForSamplesWithFiltersHUB(String diag, String[] markers, String[] datasources, String[] origintumortypes)
+            {
+
+                        List<SearchDTO> aggregateReport = new ArrayList<>();
+
+                        // Do a direct Search With The diagnosis
+                        List<SearchDTO> searchEngine = searchForSamplesWithFilters(diag, markers, datasources, origintumortypes,"Initial Search");
+                        aggregateReport.addAll(searchEngine);
+
+
+                        // In case Nothing was found, Go on DepthOne DO Search
+                        if (searchEngine.size() == 0 )
+                        {
+                            // Retrieve Ontology terms for First Depth
+                            Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findDOTermDepthOne(diag);
+
+                            //Loop through the retrieved terms and search in the graph
+                            for (OntologyTerm ontologyTerm : ontologyTerms)
+                            {
+                                if(ontologyTerm.getLabel() != null) {
+                                    searchEngine = searchForSamplesWithFilters(ontologyTerm.getLabel(), markers, datasources, origintumortypes,"Depth One"); //Search Again
+                                }
+                                aggregateReport.addAll(searchEngine);  //Concantenate the SearchDTO Object
+                            }
+                        }
+
+
+
+                        // In case Nothing was found, Go on DepthTwo DO Search
+                        if (searchEngine.size() == 0 )
+                        {
+                            // Retrieve Ontology terms for Second Depth
+                            Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findDOTermDepthTwo(diag);
+
+                            //Loop through the retrieved terms and search in the graph
+                            for (OntologyTerm ontologyTerm : ontologyTerms)
+                            {
+                                if(ontologyTerm.getLabel() != null){
+                                    searchEngine = searchForSamplesWithFilters(ontologyTerm.getLabel(), markers, datasources, origintumortypes,"Depth Two"); //Search Again
+                                }
+                                aggregateReport.addAll(searchEngine); //Concantenate the SearchDTO Object
+                            }
+                        }
+
+                        return aggregateReport;
 
             }
 
 
 
 
-            public List<SearchDTO> searchForSamplesWithFilters(String diag, String[] markers, String[] datasources, String[] origintumortypes)
+
+
+
+
+            public List<SearchDTO> searchForSamplesWithFilters(String diag, String[] markers, String[] datasources, String[] origintumortypes, String searchDepth)
             {
 
                         Collection<Sample> samples = sampleRepository.findByMultipleFilters(diag, markers, datasources, origintumortypes);
@@ -54,6 +108,7 @@ public class SearchService
                         for (Sample sample : samples) {
 
                             SearchDTO sdto = new SearchDTO();
+
 
                             if(sample.getDataSource() != null){
                                 sdto.setDataSource(sample.getDataSource());
@@ -78,6 +133,10 @@ public class SearchService
                             if(sample.getClassification() != null) {
                                 sdto.setClassification(sample.getClassification());
                             }
+
+                            sdto.setSearchParameter(diag);
+                            sdto.setSearchDepth(searchDepth);
+
                             if(sample.getMolecularCharacterizations() != null){
                                 Set<String> markerSet = new HashSet<>();
 

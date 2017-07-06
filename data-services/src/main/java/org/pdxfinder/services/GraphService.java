@@ -43,8 +43,7 @@ public class GraphService
                 Set<String> dataReport2 = new HashSet<>();
 
 
-                for (OntologyTerm ontologyTerm : ontologyTerms)
-                {
+                for (OntologyTerm ontologyTerm : ontologyTerms){
                     if(ontologyTerm.getLabel() != null)
                     {
                         dataReport.add(ontologyTerm.getLabel());
@@ -55,9 +54,7 @@ public class GraphService
                 sortedData.addAll(dataReport);
 
 
-
-                for (OntologyTerm ontologyTerm : ontologyTerms2)
-                {
+                for (OntologyTerm ontologyTerm : ontologyTerms2){
                     if(ontologyTerm.getLabel() != null)
                     {
                         dataReport2.add(ontologyTerm.getLabel());
@@ -69,8 +66,7 @@ public class GraphService
 
 
 
-                if (sortedData.size() <= 1)
-                {
+                if (sortedData.size() <= 1){
                     sortedData.addAll(sortedData2);
                     return sortedData;
                 }else{
