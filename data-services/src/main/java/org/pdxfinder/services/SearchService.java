@@ -43,13 +43,14 @@ public class SearchService
 
 
 
+            // This serves as a Hub to the searchForSamplesWithFilters METHOD for integration DO in the search
             public List<SearchDTO> searchForSamplesWithFiltersHUB(String diag, String[] markers, String[] datasources, String[] origintumortypes)
             {
 
                         List<SearchDTO> aggregateReport = new ArrayList<>();
 
                         // Do a direct Search With The diagnosis
-                        List<SearchDTO> searchEngine = searchForSamplesWithFilters(diag, markers, datasources, origintumortypes,"Initial Search");
+                        List<SearchDTO> searchEngine = searchForSamplesWithFilters(diag, markers, datasources, origintumortypes,"Upper Level");
                         aggregateReport.addAll(searchEngine);
 
 
