@@ -27,6 +27,20 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
     Collection<OntologyTerm>  findByOntologyTermLabel(@Param("label") String label);
 
 
+    /*
+    @Query("MATCH (oTerm:OntologyTerm)<-[SUBCLASS_OF]-(subNodes) where oTerm.label CONTAINS trim(toLower({searchParam})) WITH COLLECT(subNodes) AS subNodes " +
+            "UNWIND subNodes AS subN " +
+            "MATCH (oTerm:OntologyTerm)<-[SUBCLASS_OF]-(subNodes2) where oTerm.label=subN.label return subN,subNodes2 ORDER BY subN.label limit 15")
+    Collection<OntologyTerm> findByDiseaseOntologyTerm(@Param("searchParam") String searchParam);
+
+    commented in order to sort when pulled together, it returns everything as a bunch */
+
+
+/*
+    @Query("MATCH (oTerm:OntologyTerm)<-[SUBCLASS_OF]-(subNodes) where oTerm.label CONTAINS trim(toLower({searchParam})) return subNodes ")
+    Collection<OntologyTerm> findByDiseaseOntologyTerm(@Param("searchParam") String searchParam);
+*/
+
     @Query("MATCH (oTerm:OntologyTerm) where oTerm.label  =~ trim(toLower({searchParam})) return oTerm limit 40 ")
     Collection<OntologyTerm> findByDiseaseOntologyTerm(@Param("searchParam") String searchParam);
 
