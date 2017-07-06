@@ -35,7 +35,7 @@
                             <div class="col-md-6" style="margin-top: 5px;">
                                 <h4>Diagnosis</h4>
 
-                                    <input id="diagnosisSuggest"  class="materialF" autofocus="" data-modalfocus="" placeholder="Diagnosis ..." type="text" style="width:100%;"/>
+                                    <input id="searchField"  class="materialF" autofocus="" data-modalfocus="" placeholder="Diagnosis ..." type="text" style="width:100%;"/>
 
                             </div>
 
@@ -345,7 +345,7 @@
             <!-- Auto Suggest JavaScript Code -->
             <script>
                 $( function() {
-                    $( "#diagnosisSuggest" ).autocomplete({
+                    $( "#searchField" ).autocomplete({
                         source: "/DOAutoSuggest"
                     });
                 } );
