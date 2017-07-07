@@ -17,6 +17,9 @@ public class SearchDTO {
     private String classification;
     private List<String> cancerGenomics;
 
+    private String searchParameter;
+    private String searchDepth;
+
 
     public SearchDTO() {
         this.dataSource = "";
@@ -26,6 +29,8 @@ public class SearchDTO {
         this.tissueOfOrigin = "";
         this.tumorType = "";
         this.classification = "";
+        this.searchParameter = "";
+        this.searchDepth = "";
     }
 
     public String getDataSource() {
@@ -83,6 +88,14 @@ public class SearchDTO {
     public void setClassification(String classification) {
         this.classification = classification;
     }
+
+    public String getSearchParameter() { return searchParameter; }
+
+    public void setSearchParameter(String searchParameter) { this.searchParameter = searchParameter; }
+
+    public String getSearchDepth() {  return searchDepth; }
+
+    public void setSearchDepth(String searchDepth) { this.searchDepth = searchDepth; }
 
     public List<String> getCancerGenomics() {
         return cancerGenomics;

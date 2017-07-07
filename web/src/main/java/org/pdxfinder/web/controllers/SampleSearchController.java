@@ -50,7 +50,7 @@ public class SampleSearchController
             System.out.println("Sources:"+Arrays.toString(datasources));
             System.out.println("Types:"+Arrays.toString(origintumortypes));
 
-            return searchService.searchForSamplesWithFilters(diag, markers, datasources, origintumortypes);
+            return searchService.searchForSamplesWithFiltersHUB(diag, markers, datasources, origintumortypes);
         }
 
 }
