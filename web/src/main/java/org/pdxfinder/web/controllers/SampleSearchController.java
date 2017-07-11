@@ -33,7 +33,7 @@ public class SampleSearchController
 
 
 
-        @RequestMapping(method = RequestMethod.GET, value = "/searchsamples")
+        @RequestMapping(method = RequestMethod.GET, value = "/searchmodels")
         public List<SearchDTO> search2(@RequestParam(value="diag", required = false) String diag,
                                        @RequestParam(value="markers[]", required = false) String[] markers,
                                        @RequestParam(value="datasources[]", required = false) String[] datasources,
@@ -50,7 +50,7 @@ public class SampleSearchController
             System.out.println("Sources:"+Arrays.toString(datasources));
             System.out.println("Types:"+Arrays.toString(origintumortypes));
 
-            return searchService.searchForSamplesWithFiltersHUB(diag, markers, datasources, origintumortypes);
+            return searchService.searchForModelsWithFiltersHUB(diag, markers, datasources, origintumortypes);
         }
 
 }
