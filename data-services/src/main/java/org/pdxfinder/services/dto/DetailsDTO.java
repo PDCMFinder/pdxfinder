@@ -7,6 +7,7 @@ import java.util.List;
  */
 public class DetailsDTO {
 
+    private String modelId;
     private String externalId;
     private String dataSource;
     private String patientId;
@@ -31,6 +32,7 @@ public class DetailsDTO {
     private String externalUrlText;
 
     public DetailsDTO() {
+        this.modelId = "";
         this.externalId = "";
         this.dataSource = "";
         this.patientId = "";
@@ -51,6 +53,14 @@ public class DetailsDTO {
         this.engraftmentSite = "";
         this.externalUrl = "";
         this.externalUrlText = "";
+    }
+
+    public String getModelId() {
+        return modelId;
+    }
+
+    public void setModelId(String modelId) {
+        this.modelId = modelId;
     }
 
     public String getExternalId() {
