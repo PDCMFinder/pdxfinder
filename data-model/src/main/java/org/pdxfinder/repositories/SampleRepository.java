@@ -41,19 +41,14 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
     Collection<Sample> findByMultipleFilters(@Param("diag") String diag, @Param("markers") String[] markers,
                                              @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
 
+    
 
-
-
-
-
-
-
-
-    @Query("MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
+    @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
+            "MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
             "MATCH (s:Sample)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
             "MATCH (s:Sample)-[ot:OF_TYPE]-(tt:TumorType) " +
-            "WHERE s.sourceSampleId = {sourceSampleId} " +
-            "RETURN s,o,t,ot, tt, mc, ma, m, mar, cb, aw")
-    Sample findBySampleSourceId(@Param("sourceSampleId") String sourceSampleId);
+            "WHERE mod.sourcePdxId = {sourcePdxId} " +
+            "RETURN mod,ii,s,o,t,ot, tt, mc, ma, m, mar, cb, aw")
+    Sample findBySourcePdxId(@Param("sourcePdxId") String sourcePdxId);
 
 }

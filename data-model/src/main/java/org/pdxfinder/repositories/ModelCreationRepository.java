@@ -9,9 +9,7 @@ import org.springframework.data.repository.query.Param;
  */
 public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, Long> {
 
-    ModelCreation findBySourcePdxId(String sourcePdxId);
 
-
-    ModelCreation findBySampleSourceSampleId(@Param("sampleId") String sampleId);
+    ModelCreation findBySourcePdxId(@Param("modelId") String modelId);
 
 }
