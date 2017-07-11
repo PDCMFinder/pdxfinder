@@ -72,6 +72,9 @@ public class LoadJAXData implements CommandLineRunner {
 
     @Value("${jaxpdx.variation.max}")
     private int maxVariations;
+    
+    @Value("${jaxpdx.ref.assembly}")
+    private String refAssembly;
 
     HashMap<String, String> passageMap = null;
     HashMap<String, String> histologyMap = null;
@@ -245,7 +248,7 @@ public class LoadJAXData implements CommandLineRunner {
 
             JSONObject job = new JSONObject(parseURL(this.variationURL + modelCreation.getSourcePdxId()));
             JSONArray jarray = job.getJSONArray("variation");
-            String sample, symbol, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency;
+            String sample, symbol, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency, altAllele;
             log.info(jarray.length() + " gene variants for model " + modelCreation.getSourcePdxId());
 
             // configure the maximum variations to load in properties file
@@ -268,10 +271,11 @@ public class LoadJAXData implements CommandLineRunner {
                 rsVariants = j.getString("rs variants");
                 readDepth = j.getString("read depth");
                 alleleFrequency = j.getString("allele frequency");
+                altAllele = j.getString("alt allele");
 
                 passageMap.put(sample, j.getString("passage num"));
 
-                // since there are 8 fields assume all MAs are unique
+                // since there are 8 fields assume (incorrectly?) all MAs are unique
                 // create a new one rather than look for exisitng one
                 MarkerAssociation ma = new MarkerAssociation();
 
@@ -281,6 +285,8 @@ public class LoadJAXData implements CommandLineRunner {
                 ma.setChromosome(chromosome);
                 ma.setReadDepth(readDepth);
                 ma.setRefAllele(refAllele);
+                ma.setAltAllele(altAllele);
+                ma.setRefAssembly(refAssembly);
                 ma.setRsVariants(rsVariants);
                 ma.setSeqPosition(seqPosition);
                 ma.setReadDepth(readDepth);
