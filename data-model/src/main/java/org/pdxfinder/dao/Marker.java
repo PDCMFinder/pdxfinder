@@ -3,6 +3,9 @@ package org.pdxfinder.dao;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by jmason on 17/03/2017.
  */
@@ -16,6 +19,8 @@ public class Marker {
     String name;
     String hugoId;
     String ensemblId;
+    Set<String> prevSymbols;
+    Set<String> synonyms;
 
     public Marker() {
     }
@@ -57,4 +62,29 @@ public class Marker {
     public void setEnsemblId(String ensemblId) {
         this.ensemblId = ensemblId;
     }
+
+    public Set<String> getPrevSymbols() {
+        return prevSymbols;
+    }
+
+    public Set<String> getSynonyms() {
+        return synonyms;
+    }
+
+    public void addPrevSymbol(String s){
+        if(this.prevSymbols == null){
+            this.prevSymbols = new HashSet<>();
+        }
+        this.prevSymbols.add(s);
+    }
+
+    public void addSynonym(String s){
+        if(this.synonyms == null){
+            this.synonyms = new HashSet<>();
+        }
+        this.synonyms.add(s);
+
+    }
+
+
 }
