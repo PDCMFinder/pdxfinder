@@ -18,11 +18,13 @@ public class MarkerAssociation {
     private String chromosome;
     private String seqPosition;
     private String refAllele;
+    private String altAllele;
     private String consequence;
     private String aminoAcidChange;
     private String rsVariants;
     private String readDepth;
     private String alleleFrequency;
+    private String refAssembly;
 
     public MarkerAssociation() {
     }
@@ -166,6 +168,34 @@ public class MarkerAssociation {
      */
     public void setAlleleFrequency(String alleleFrequency) {
         this.alleleFrequency = alleleFrequency;
+    }
+
+    /**
+     * @return the altAllele
+     */
+    public String getAltAllele() {
+        return altAllele;
+    }
+
+    /**
+     * @param altAllele the altAllele to set
+     */
+    public void setAltAllele(String altAllele) {
+        this.altAllele = altAllele;
+    }
+
+    /**
+     * @return the refAssembly
+     */
+    public String getRefAssembly() {
+        return refAssembly;
+    }
+
+    /**
+     * @param refAssembly the refAssembly to set
+     */
+    public void setRefAssembly(String refAssembly) {
+        this.refAssembly = refAssembly;
     }
 
 
