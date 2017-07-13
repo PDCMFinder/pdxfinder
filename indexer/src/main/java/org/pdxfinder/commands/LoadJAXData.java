@@ -293,7 +293,7 @@ public class LoadJAXData implements CommandLineRunner {
                 ma.setReadDepth(readDepth);
 
                 Marker marker = loaderUtils.getMarker(symbol);
-                marker.setEnsemblId(id);
+                marker.setEntrezId(id);
                 ma.setMarker(marker);
 
                 markerMap = sampleMap.get(sample);
