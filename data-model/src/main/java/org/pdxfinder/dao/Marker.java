@@ -19,6 +19,7 @@ public class Marker {
     String name;
     String hugoId;
     String ensemblId;
+    String entrezId;
     Set<String> prevSymbols;
     Set<String> synonyms;
 
@@ -61,6 +62,14 @@ public class Marker {
 
     public void setEnsemblId(String ensemblId) {
         this.ensemblId = ensemblId;
+    }
+
+    public String getEntrezId() {
+        return entrezId;
+    }
+
+    public void setEntrezId(String entrezId) {
+        this.entrezId = entrezId;
     }
 
     public Set<String> getPrevSymbols() {
