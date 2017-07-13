@@ -248,7 +248,7 @@ public class LoadJAXData implements CommandLineRunner {
 
             JSONObject job = new JSONObject(parseURL(this.variationURL + modelCreation.getSourcePdxId()));
             JSONArray jarray = job.getJSONArray("variation");
-            String sample, symbol, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency, altAllele;
+            String sample, symbol, id, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency, altAllele;
             log.info(jarray.length() + " gene variants for model " + modelCreation.getSourcePdxId());
 
             // configure the maximum variations to load in properties file
@@ -262,6 +262,7 @@ public class LoadJAXData implements CommandLineRunner {
 
                 sample = j.getString("sample");
                 symbol = j.getString("gene symbol");
+                id = j.getString("gene id");
                 aaChange = j.getString("amino acid change");
                 technology = j.getString("platform");
                 chromosome = j.getString("chromosome");
@@ -292,6 +293,7 @@ public class LoadJAXData implements CommandLineRunner {
                 ma.setReadDepth(readDepth);
 
                 Marker marker = loaderUtils.getMarker(symbol);
+                marker.setEnsemblId(id);
                 ma.setMarker(marker);
 
                 markerMap = sampleMap.get(sample);
