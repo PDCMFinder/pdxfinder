@@ -17,9 +17,10 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
 
     Patient findByExternalId(String externalId);
 
-    @Query("MATCH (s:Sample)--(ps:PatientSnapshot)--(p:Patient) " +
-            "WHERE s.sourceSampleId = {sampleId} " +
-            "RETURN s, ps, p")
-    Patient findBySampleId(@Param("sampleId") String sampleId);
+    @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
+            "MATCH (s:Sample)--(ps:PatientSnapshot)--(p:Patient) " +
+            "WHERE mod.sourcePdxId = {modelId} " +
+            "RETURN mod, ii, s, ps, p")
+    Patient findByModelId(@Param("modelId") String modelId);
 
 }

@@ -44,40 +44,36 @@ public class SearchService
 
 
             // This serves as a Hub to the searchForSamplesWithFilters METHOD for integration DO in the search
-            public List<SearchDTO> searchForSamplesWithFiltersHUB(String diag, String[] markers, String[] datasources, String[] origintumortypes)
+            public List<SearchDTO> searchForModelsWithFiltersHUB(String diag, String[] markers, String[] datasources, String[] origintumortypes)
             {
 
-                        List<SearchDTO> aggregateReport = new ArrayList<>();
+                    List<SearchDTO> aggregateReport = new ArrayList<>();
 
-                        // Do a direct Search With The diagnosis
-                        List<SearchDTO> searchEngine = searchForSamplesWithFilters(diag, markers, datasources, origintumortypes,"Upper Level");
-                        aggregateReport.addAll(searchEngine);
+                    // Do a direct Search With The diagnosis
+                    List<SearchDTO> searchEngine = searchForModelsWithFilters(diag, markers, datasources, origintumortypes,"Upper Level");
+                    aggregateReport.addAll(searchEngine);
 
 
-                        // In case Nothing was found, Go on DepthOne DO Search
-                        if (true)
+                        // Search with DO Matches
+                        Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findDOTermAll(diag);
+
+                        //Loop through the retrieved terms and search in the graph
+                        for (OntologyTerm ontologyTerm : ontologyTerms)
                         {
-                            // Retrieve Ontology terms for First Depth
-                            Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findDOTermAll(diag);
-
-                            //Loop through the retrieved terms and search in the graph
-                            for (OntologyTerm ontologyTerm : ontologyTerms)
-                            {
-                                if(ontologyTerm.getLabel() != null) {
-                                    searchEngine = searchForSamplesWithFilters(ontologyTerm.getLabel(), markers, datasources, origintumortypes,"Depth One"); //Search Again
-                                }
-                                aggregateReport.addAll(searchEngine);  //Concatenate the SearchDTO Object
+                            if(ontologyTerm.getLabel() != null) {
+                                searchEngine = searchForModelsWithFilters(ontologyTerm.getLabel(), markers, datasources, origintumortypes,"Depth One"); //Search Again
                             }
+                            aggregateReport.addAll(searchEngine);  //Concatenate the SearchDTO Object
                         }
 
 
-                        // add elements to al, including duplicates
-                        Set<SearchDTO> hs = new HashSet<>();
-                        hs.addAll(aggregateReport);
-                        aggregateReport.clear();
-                        aggregateReport.addAll(hs);
+                    // add elements to al, including duplicates
+                    Set<SearchDTO> hs = new HashSet<>();
+                    hs.addAll(aggregateReport);
+                    aggregateReport.clear();
+                    aggregateReport.addAll(hs);
 
-                        return aggregateReport;
+                    return aggregateReport;
 
             }
 
@@ -88,49 +84,51 @@ public class SearchService
 
 
 
-            public List<SearchDTO> searchForSamplesWithFilters(String diag, String[] markers, String[] datasources, String[] origintumortypes, String searchDepth)
-            {
+            public List<SearchDTO> searchForModelsWithFilters(String diag, String[] markers, String[] datasources, String[] origintumortypes, String searchDepth) {
 
-                        Collection<Sample> samples = sampleRepository.findByMultipleFilters(diag, markers, datasources, origintumortypes);
+                        Collection<ModelCreation> models = modelCreationRepository.findByMultipleFilters(diag, markers, datasources, origintumortypes);
 
                         List<SearchDTO> results = new ArrayList<>();
 
-                        for (Sample sample : samples) {
+                        for (ModelCreation model : models) {
 
                             SearchDTO sdto = new SearchDTO();
 
-
-                            if(sample.getDataSource() != null){
-                                sdto.setDataSource(sample.getDataSource());
+                            if(model.getSourcePdxId() != null){
+                                sdto.setModelId(model.getSourcePdxId());
                             }
 
-                            if(sample.getSourceSampleId() != null){
-                                sdto.setTumorId(sample.getSourceSampleId());
+                            if(model.getSample() != null && model.getSample().getDataSource() != null){
+                                sdto.setDataSource(model.getSample().getDataSource());
                             }
 
-                            if(sample.getDiagnosis() != null){
-                                sdto.setDiagnosis(sample.getDiagnosis());
+                            if(model.getSample() != null && model.getSample().getSourceSampleId() != null){
+                                sdto.setTumorId(model.getSample().getSourceSampleId());
                             }
 
-                            if(sample.getOriginTissue() != null){
-                                sdto.setTissueOfOrigin(sample.getOriginTissue().getName());
+                            if(model.getSample() != null && model.getSample().getDiagnosis() != null){
+                                sdto.setDiagnosis(model.getSample().getDiagnosis());
                             }
 
-                            if(sample.getType() != null){
-                                sdto.setTumorType(sample.getType().getName());
+                            if(model.getSample() != null && model.getSample().getOriginTissue() != null){
+                                sdto.setTissueOfOrigin(model.getSample().getOriginTissue().getName());
                             }
 
-                            if(sample.getClassification() != null) {
-                                sdto.setClassification(sample.getClassification());
+                            if(model.getSample() != null && model.getSample().getType() != null){
+                                sdto.setTumorType(model.getSample().getType().getName());
+                            }
+
+                            if(model.getSample() != null && model.getSample().getClassification() != null) {
+                                sdto.setClassification(model.getSample().getClassification());
                             }
 
                             sdto.setSearchParameter(diag);
                             sdto.setSearchDepth(searchDepth);
 
-                            if(sample.getMolecularCharacterizations() != null){
+                            if(model.getSample() != null && model.getSample().getMolecularCharacterizations() != null){
                                 Set<String> markerSet = new HashSet<>();
 
-                                for(MolecularCharacterization mc : sample.getMolecularCharacterizations()){
+                                for(MolecularCharacterization mc : model.getSample().getMolecularCharacterizations()){
                                     for(MarkerAssociation ma : mc.getMarkerAssociations()){
                                         markerSet.add(ma.getMarker().getName());
                                     }
@@ -140,6 +138,7 @@ public class SearchService
                             }
 
                             results.add(sdto);
+
                         }
 
                         return results;
@@ -153,19 +152,18 @@ public class SearchService
 
 
 
-            public DetailsDTO searchForSample(String sampleId)
-            {
+            public DetailsDTO searchForModel(String modelId){
 
 
-                        Sample sample = sampleRepository.findBySampleSourceId(sampleId);
-                        Patient patient = patientRepository.findBySampleId(sampleId);
-                        PatientSnapshot ps = patientSnapshotRepository.findBySampleId(sampleId);
-                        ModelCreation pdx = modelCreationRepository.findBySampleSourceSampleId(sampleId);
+                        Sample sample = sampleRepository.findBySourcePdxId(modelId);
+                        Patient patient = patientRepository.findByModelId(modelId);
+                        PatientSnapshot ps = patientSnapshotRepository.findByModelId(modelId);
+                        ModelCreation pdx = modelCreationRepository.findBySourcePdxId(modelId);
 
                         DetailsDTO dto = new DetailsDTO();
 
                         /*
-
+                        this.modelId = "";
                         this.externalId = "";
                         this.dataSource = "";
                         this.patientId = "";
@@ -245,6 +243,9 @@ public class SearchService
                             dto.setEngraftmentSite(pdx.getImplantationSite().getName());
                         }
 
+                        if(pdx != null && pdx.getSourcePdxId() != null){
+                            dto.setModelId(pdx.getSourcePdxId());
+                        }
 
                         if (sample.getMolecularCharacterizations() != null) {
                             List<String> markerList = new ArrayList<>();

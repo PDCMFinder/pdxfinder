@@ -26,7 +26,7 @@ public class DetailsPageController {
     {
 
 
-        DetailsDTO dto = searchService.searchForSample(sampleId);
+        DetailsDTO dto = searchService.searchForModel(sampleId);
 
         model.addAttribute("fullData",dto);
 

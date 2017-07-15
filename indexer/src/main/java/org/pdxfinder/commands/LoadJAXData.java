@@ -72,9 +72,12 @@ public class LoadJAXData implements CommandLineRunner {
 
     @Value("${jaxpdx.variation.max}")
     private int maxVariations;
+    
+    @Value("${jaxpdx.ref.assembly}")
+    private String refAssembly;
 
     HashMap<String, String> passageMap = null;
-    HashMap<String, String> histologyMap = null;
+    HashMap<String, Image> histologyMap = null;
 
     @PostConstruct
     public void init() {
@@ -173,7 +176,7 @@ public class LoadJAXData implements CommandLineRunner {
 
         if (histologyMap.containsKey("Patient")) {
             Histology histology = new Histology();
-            Image image = new Image(histologyMap.get("Patient"));
+            Image image = histologyMap.get("Patient");
             histology.addImage(image);
             sample.addHistology(histology);
 
@@ -245,7 +248,7 @@ public class LoadJAXData implements CommandLineRunner {
 
             JSONObject job = new JSONObject(parseURL(this.variationURL + modelCreation.getSourcePdxId()));
             JSONArray jarray = job.getJSONArray("variation");
-            String sample, symbol, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency;
+            String sample, symbol, id, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency, altAllele;
             log.info(jarray.length() + " gene variants for model " + modelCreation.getSourcePdxId());
 
             // configure the maximum variations to load in properties file
@@ -259,6 +262,7 @@ public class LoadJAXData implements CommandLineRunner {
 
                 sample = j.getString("sample");
                 symbol = j.getString("gene symbol");
+                id = j.getString("gene id");
                 aaChange = j.getString("amino acid change");
                 technology = j.getString("platform");
                 chromosome = j.getString("chromosome");
@@ -268,10 +272,11 @@ public class LoadJAXData implements CommandLineRunner {
                 rsVariants = j.getString("rs variants");
                 readDepth = j.getString("read depth");
                 alleleFrequency = j.getString("allele frequency");
+                altAllele = j.getString("alt allele");
 
                 passageMap.put(sample, j.getString("passage num"));
 
-                // since there are 8 fields assume all MAs are unique
+                // since there are 8 fields assume (incorrectly?) all MAs are unique
                 // create a new one rather than look for exisitng one
                 MarkerAssociation ma = new MarkerAssociation();
 
@@ -281,11 +286,14 @@ public class LoadJAXData implements CommandLineRunner {
                 ma.setChromosome(chromosome);
                 ma.setReadDepth(readDepth);
                 ma.setRefAllele(refAllele);
+                ma.setAltAllele(altAllele);
+                ma.setRefAssembly(refAssembly);
                 ma.setRsVariants(rsVariants);
                 ma.setSeqPosition(seqPosition);
                 ma.setReadDepth(readDepth);
 
                 Marker marker = loaderUtils.getMarker(symbol);
+                marker.setEntrezId(id);
                 ma.setMarker(marker);
 
                 markerMap = sampleMap.get(sample);
@@ -332,7 +340,7 @@ public class LoadJAXData implements CommandLineRunner {
 
                 if (histologyMap.containsKey(pdxPassage)) {
                     Histology histology = new Histology();
-                    Image image = new Image(histologyMap.get(pdxPassage));
+                    Image image = histologyMap.get(pdxPassage);
                     histology.addImage(image);
                     specimen.addHistology(histology);
 
@@ -365,24 +373,39 @@ public class LoadJAXData implements CommandLineRunner {
     /*
     For a given model return a map of passage # or "Patient" -> histology image URL
      */
-    private HashMap<String, String> getHistologyImageMap(String id) {
-        HashMap<String, String> map = new HashMap<>();
+    private HashMap<String, Image> getHistologyImageMap(String id) {
+        HashMap<String, Image> map = new HashMap<>();
         try {
             JSONObject job = new JSONObject(parseURL(this.histologyURL + id));
             JSONArray jarray = job.getJSONObject("pdxHistology").getJSONArray("Graphics");
+            String comment = job.getJSONObject("pdxHistology").getString("Comment");
 
             for (int i = 0; i < jarray.length(); i++) {
                 job = jarray.getJSONObject(i);
                 String desc = job.getString("Description");
+                
+                // comments apply to all of a models histology but histologies are passage specific
+                // so I guess attach the comment to all image descriptions
+                if(comment != null && comment.trim().length()>0){
+                    String sep = "";
+                    if(desc != null && desc.trim().length()>0){
+                        sep = " : ";
+                    }
+                    desc = comment + sep + desc;
+                }
+                
                 String url = job.getString("URL");
+                Image img = new Image();
+                img.setDescription(desc);
+                img.setUrl(url);
                 if (desc.startsWith("Patient") || desc.startsWith("Primary")) {
-                    map.put("Patient", url);
+                    map.put("Patient", img);
                 } else {
                     String[] parts = desc.split(" ");
                     if (parts[0].startsWith("P")) {
                         try {
                             String passage = new Integer(parts[0].replace("P", "")).toString();
-                            map.put(passage, url);
+                            map.put(passage, img);
                         } catch (Exception e) {
                             log.info("Can't extract passage from description " + desc);
                         }
@@ -432,5 +455,7 @@ public class LoadJAXData implements CommandLineRunner {
         }
         return sb.toString();
     }
+    
+    
 
 }

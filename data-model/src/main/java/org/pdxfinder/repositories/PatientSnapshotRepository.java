@@ -20,9 +20,9 @@ public interface PatientSnapshotRepository extends Neo4jRepository<PatientSnapsh
     
     Set<PatientSnapshot> findByPatient(Patient patient);
 
-    @Query("MATCH (s:Sample)--(ps:PatientSnapshot)" +
-            "WHERE s.sourceSampleId = {sampleId} " +
-            "RETURN ps")
-    PatientSnapshot findBySampleId(@Param("sampleId") String sampleId);
+    @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample)-[sf:SAMPLED_FROM]-(ps:PatientSnapshot)" +
+            "WHERE mod.sourcePdxId = {modelId} " +
+            "RETURN mod,ii,s,sf,ps")
+    PatientSnapshot findByModelId(@Param("modelId") String modelId);
 
 }
