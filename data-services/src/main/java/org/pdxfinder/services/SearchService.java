@@ -55,10 +55,10 @@ public class SearchService
 
 
                         // In case Nothing was found, Go on DepthOne DO Search
-                        if (searchEngine.size() == 0 )
+                        if (true)
                         {
                             // Retrieve Ontology terms for First Depth
-                            Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findDOTermDepthOne(diag);
+                            Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findDOTermAll(diag);
 
                             //Loop through the retrieved terms and search in the graph
                             for (OntologyTerm ontologyTerm : ontologyTerms)
@@ -66,27 +66,16 @@ public class SearchService
                                 if(ontologyTerm.getLabel() != null) {
                                     searchEngine = searchForSamplesWithFilters(ontologyTerm.getLabel(), markers, datasources, origintumortypes,"Depth One"); //Search Again
                                 }
-                                aggregateReport.addAll(searchEngine);  //Concantenate the SearchDTO Object
+                                aggregateReport.addAll(searchEngine);  //Concatenate the SearchDTO Object
                             }
                         }
 
 
-
-                        // In case Nothing was found, Go on DepthTwo DO Search
-                        if (searchEngine.size() == 0 )
-                        {
-                            // Retrieve Ontology terms for Second Depth
-                            Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findDOTermDepthTwo(diag);
-
-                            //Loop through the retrieved terms and search in the graph
-                            for (OntologyTerm ontologyTerm : ontologyTerms)
-                            {
-                                if(ontologyTerm.getLabel() != null){
-                                    searchEngine = searchForSamplesWithFilters(ontologyTerm.getLabel(), markers, datasources, origintumortypes,"Depth Two"); //Search Again
-                                }
-                                aggregateReport.addAll(searchEngine); //Concantenate the SearchDTO Object
-                            }
-                        }
+                        // add elements to al, including duplicates
+                        Set<SearchDTO> hs = new HashSet<>();
+                        hs.addAll(aggregateReport);
+                        aggregateReport.clear();
+                        aggregateReport.addAll(hs);
 
                         return aggregateReport;
 

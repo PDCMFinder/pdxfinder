@@ -30,18 +30,15 @@ public class GraphService
 
 
 
-        public Set<String> searchResult(String searchParam)
+        public Set<String> searchResult(String param)
         {
 
-                searchParam = searchParam+".*";
-                String searchParam2 = ".*"+searchParam+".*";
+                String param1 = param+".*";
+                String param2 = ".*"+param+".*";
 
-                Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findByDiseaseOntologyTerm(searchParam);
-                Collection<OntologyTerm> ontologyTerms2 = ontologyTermRepositoryRepository.findByDiseaseOntologyTerm2(searchParam2,searchParam);
-
+                // Suggest What the user may need to type next : param ...
+                Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findByDiseaseOntologyTerm(param1);
                 Set<String> dataReport = new HashSet<>();
-                Set<String> dataReport2 = new HashSet<>();
-
 
                 for (OntologyTerm ontologyTerm : ontologyTerms){
                     if(ontologyTerm.getLabel() != null)
@@ -53,6 +50,11 @@ public class GraphService
                 Set<String> sortedData = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
                 sortedData.addAll(dataReport);
 
+
+
+                //Suggest words that contain what the user is typing ... param ... , and suggest sub classes
+                Collection<OntologyTerm> ontologyTerms2 = ontologyTermRepositoryRepository.findByDiseaseOntologyTerm2(param2,param1,param);
+                Set<String> dataReport2 = new HashSet<>();
 
                 for (OntologyTerm ontologyTerm : ontologyTerms2){
                     if(ontologyTerm.getLabel() != null)
