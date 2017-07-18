@@ -1,7 +1,6 @@
 package org.pdxfinder.repositories;
 
 import org.pdxfinder.dao.ModelCreation;
-import org.pdxfinder.dao.Sample;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;

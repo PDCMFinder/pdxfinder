@@ -43,52 +43,37 @@ public class SearchService
 
 
 
-            // This serves as a Hub to the searchForModelsWithFilters METHOD for integration DO in the search
+            // This serves as a Hub to the searchForSamplesWithFilters METHOD for integration DO in the search
             public List<SearchDTO> searchForModelsWithFiltersHUB(String diag, String[] markers, String[] datasources, String[] origintumortypes)
             {
 
-                        List<SearchDTO> aggregateReport = new ArrayList<>();
+                    List<SearchDTO> aggregateReport = new ArrayList<>();
 
-                        // Do a direct Search With The diagnosis
-                        List<SearchDTO> searchEngine = searchForModelsWithFilters(diag, markers, datasources, origintumortypes,"Upper Level");
-                        aggregateReport.addAll(searchEngine);
+                    // Do a direct Search With The diagnosis
+                    List<SearchDTO> searchEngine = searchForModelsWithFilters(diag, markers, datasources, origintumortypes,"Upper Level");
+                    aggregateReport.addAll(searchEngine);
 
 
-                        // In case Nothing was found, Go on DepthOne DO Search
-                        if (searchEngine.size() == 0 )
+                        // Search with DO Matches
+                        Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findDOTermAll(diag);
+
+                        //Loop through the retrieved terms and search in the graph
+                        for (OntologyTerm ontologyTerm : ontologyTerms)
                         {
-                            // Retrieve Ontology terms for First Depth
-                            Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findDOTermDepthOne(diag);
-
-                            //Loop through the retrieved terms and search in the graph
-                            for (OntologyTerm ontologyTerm : ontologyTerms)
-                            {
-                                if(ontologyTerm.getLabel() != null) {
-                                    searchEngine = searchForModelsWithFilters(ontologyTerm.getLabel(), markers, datasources, origintumortypes,"Depth One"); //Search Again
-                                }
-                                aggregateReport.addAll(searchEngine);  //Concantenate the SearchDTO Object
+                            if(ontologyTerm.getLabel() != null) {
+                                searchEngine = searchForModelsWithFilters(ontologyTerm.getLabel(), markers, datasources, origintumortypes,"Depth One"); //Search Again
                             }
+                            aggregateReport.addAll(searchEngine);  //Concatenate the SearchDTO Object
                         }
 
 
+                    // add elements to al, including duplicates
+                    Set<SearchDTO> hs = new HashSet<>();
+                    hs.addAll(aggregateReport);
+                    aggregateReport.clear();
+                    aggregateReport.addAll(hs);
 
-                        // In case Nothing was found, Go on DepthTwo DO Search
-                        if (searchEngine.size() == 0 )
-                        {
-                            // Retrieve Ontology terms for Second Depth
-                            Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findDOTermDepthTwo(diag);
-
-                            //Loop through the retrieved terms and search in the graph
-                            for (OntologyTerm ontologyTerm : ontologyTerms)
-                            {
-                                if(ontologyTerm.getLabel() != null){
-                                    searchEngine = searchForModelsWithFilters(ontologyTerm.getLabel(), markers, datasources, origintumortypes,"Depth Two"); //Search Again
-                                }
-                                aggregateReport.addAll(searchEngine); //Concantenate the SearchDTO Object
-                            }
-                        }
-
-                        return aggregateReport;
+                    return aggregateReport;
 
             }
 
