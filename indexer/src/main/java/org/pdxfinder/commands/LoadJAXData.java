@@ -72,7 +72,7 @@ public class LoadJAXData implements CommandLineRunner {
 
     @Value("${jaxpdx.variation.max}")
     private int maxVariations;
-    
+
     @Value("${jaxpdx.ref.assembly}")
     private String refAssembly;
 
@@ -126,8 +126,6 @@ public class LoadJAXData implements CommandLineRunner {
             System.out.println("'" + args[0] + "' is not a recognized argument. Try 'loadJAX' to load JAX data.");
         }
     }
-
-    
 
     //JSON Fields {"Model ID","Gender","Age","Race","Ethnicity","Specimen Site","Primary Site","Initial Diagnosis","Clinical Diagnosis",
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
@@ -292,8 +290,16 @@ public class LoadJAXData implements CommandLineRunner {
                 ma.setSeqPosition(seqPosition);
                 ma.setReadDepth(readDepth);
 
-                Marker marker = loaderUtils.getMarker(symbol);
-                marker.setEntrezId(id);
+                Marker marker = null;
+
+                // for whatever reason some Truseq-Illumina use ensemblIDs as symbols
+                if ("Truseq-Illumina".equals(technology) && symbol.contains("ENSG")) {
+                    marker = loaderUtils.getMarkerByEnsemblId(symbol);
+                } else {
+                    marker = loaderUtils.getMarker(symbol);
+                    marker.setEntrezId(id);
+                }
+                
                 ma.setMarker(marker);
 
                 markerMap = sampleMap.get(sample);
@@ -383,17 +389,17 @@ public class LoadJAXData implements CommandLineRunner {
             for (int i = 0; i < jarray.length(); i++) {
                 job = jarray.getJSONObject(i);
                 String desc = job.getString("Description");
-                
+
                 // comments apply to all of a models histology but histologies are passage specific
                 // so I guess attach the comment to all image descriptions
-                if(comment != null && comment.trim().length()>0){
+                if (comment != null && comment.trim().length() > 0) {
                     String sep = "";
-                    if(desc != null && desc.trim().length()>0){
+                    if (desc != null && desc.trim().length() > 0) {
                         sep = " : ";
                     }
                     desc = comment + sep + desc;
                 }
-                
+
                 String url = job.getString("URL");
                 Image img = new Image();
                 img.setDescription(desc);
@@ -419,8 +425,7 @@ public class LoadJAXData implements CommandLineRunner {
 
         return map;
     }
-    
-    
+
     private String parseURL(String urlStr) {
         StringBuilder sb = new StringBuilder();
 
@@ -455,7 +460,5 @@ public class LoadJAXData implements CommandLineRunner {
         }
         return sb.toString();
     }
-    
-    
 
 }
