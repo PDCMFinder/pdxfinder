@@ -21,16 +21,18 @@ public class DetailsPageController {
         this.searchService = searchService;
     }
 
-    @RequestMapping(value = "/details/{sampleId}")
-    public String details(@PathVariable String sampleId, Model model)
+    @RequestMapping(value = "/details/{modelId}")
+    public String details(@PathVariable String modelId, Model model)
     {
 
 
-        DetailsDTO dto = searchService.searchForModel(sampleId);
+        DetailsDTO dto = searchService.searchForModel(modelId);
+
+        //if(dto.getModelId().equals("")) return "error";
 
         model.addAttribute("fullData",dto);
 
-        model.addAttribute("sampleId",sampleId);
+        model.addAttribute("modelId",modelId);
         /*
         this.externalId = "";
         this.dataSource = "";
