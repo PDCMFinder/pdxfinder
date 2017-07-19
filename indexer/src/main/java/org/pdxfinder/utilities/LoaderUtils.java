@@ -405,7 +405,7 @@ public class LoaderUtils {
     }
 
     public Collection<Marker> getAllHumanMarkers() {
-        return markerRepository.findAllMarkers();
+        return markerRepository.findAllHumanMarkers();
     }
 
 }
