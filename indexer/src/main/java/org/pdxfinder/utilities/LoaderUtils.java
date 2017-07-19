@@ -295,6 +295,18 @@ public class LoaderUtils {
         }
         return marker;
     }
+    
+    public Marker getMarkerByEnsemblId(String id){
+        Marker marker = markerRepository.findByEnsemblId(id);
+        
+        if (marker == null) {
+            log.info("Marker '{}' not found. Creating ensemble", id);
+            marker = new Marker();
+            marker.setEnsemblId(id);
+            marker = markerRepository.save(marker);
+        }
+        return marker;
+    }
 
     public MarkerAssociation getMarkerAssociation(String type, String markerSymbol, String markerName) {
         Marker m = this.getMarker(markerSymbol, markerName);
@@ -390,6 +402,10 @@ public class LoaderUtils {
 
     public Collection<Marker> getAllMarkers() {
         return markerRepository.findAllMarkers();
+    }
+
+    public Collection<Marker> getAllHumanMarkers() {
+        return markerRepository.findAllHumanMarkers();
     }
 
 }

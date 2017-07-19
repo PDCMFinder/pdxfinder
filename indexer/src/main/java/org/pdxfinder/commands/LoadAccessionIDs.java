@@ -17,8 +17,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -29,7 +31,7 @@ public class LoadAccessionIDs implements CommandLineRunner {
 
     private static final String HGNC_URL = "http://rest.genenames.org/fetch/symbol/";
     private static final String ENSEMBL_URL = "http://rest.ensembl.org/xrefs/symbol/homo_sapiens/BRAF?content-type=application/json";
-    private static final String DATA_FILE_URL = "http://www.genenames.org/cgi-bin/download?col=gd_hgnc_id&col=gd_app_sym&col=gd_prev_sym&col=gd_aliases&col=gd_pub_ensembl_id&status=Approved&status_opt=2&where=&order_by=gd_app_sym_sort&format=text&limit=&hgnc_dbtag=on&submit=submit";
+    private static final String DATA_FILE_URL = "http://www.genenames.org/cgi-bin/download?col=gd_hgnc_id&col=gd_app_sym&col=gd_prev_sym&col=gd_aliases&col=md_eg_id&col=md_ensembl_id&status=Approved&status_opt=2&where=&order_by=gd_app_sym_sort&format=text&limit=&hgnc_dbtag=on&submit=submit";
 
 
     private final static Logger log = LoggerFactory.getLogger(LoadAccessionIDs.class);
@@ -72,8 +74,9 @@ public class LoadAccessionIDs implements CommandLineRunner {
 
         String[] rowData;
         String[] prevSymbols;
+        String[] synonyms;
         HashMap<String, AccessionData> hmap = new HashMap<>();
-        String symbol, hgncId, ensemblId = "";
+        String symbol, hgncId, entrezId, ensemblId = "";
 
         int rows = 0;
         int symbolConflicts = 0;
@@ -96,7 +99,7 @@ public class LoadAccessionIDs implements CommandLineRunner {
 
             String line = reader.readLine();
                 while((line = reader.readLine()) != null){
-                    //HGNC_ID APPR_SYMBOL PREV_SYMBOLS SYNONYMS ENSEMBL_ID
+                    //HGNC_ID APPR_SYMBOL PREV_SYMBOLS SYNONYMS ENTREZ_ID ENSEMBL_ID
 
                     rowData = line.split("\t");
                     //rowData[1] = symbol, if it is not empty and if it is not a withdrawn symbol
@@ -111,8 +114,29 @@ public class LoadAccessionIDs implements CommandLineRunner {
                             hgncId = "";
                         }
 
+                        if(rowData.length>2 && rowData[2] != null && !rowData[2].isEmpty()){
+                            prevSymbols = rowData[2].split(", ");
+                        }
+                        else{
+                            prevSymbols= new String[0];
+                        }
+
+                        if(rowData.length>3 && rowData[3] != null && !rowData[3].isEmpty()){
+                            synonyms = rowData[3].split(", ");
+                        }
+                        else{
+                            synonyms = new String[0];
+                        }
+
                         if(rowData.length>4 && rowData[4] != null && !rowData[4].isEmpty()){
-                            ensemblId = rowData[4];
+                            entrezId = rowData[4];
+                        }
+                        else{
+                            entrezId = "";
+                        }
+
+                        if(rowData.length>5 && rowData[5] != null && !rowData[5].isEmpty()){
+                            ensemblId = rowData[5];
                         }
                         else{
                             ensemblId = "";
@@ -120,10 +144,21 @@ public class LoadAccessionIDs implements CommandLineRunner {
 
                         //put it in the hashmap with all of its prev symbols
 
-                        AccessionData ad = new AccessionData(symbol, hgncId, ensemblId);
-                        System.out.println(symbol+" "+hgncId+" "+ ensemblId);
-                        hmap.put(symbol,ad);
+                        AccessionData ad = new AccessionData(symbol, hgncId, entrezId, ensemblId);
 
+                        if(synonyms.length>0){
+                            for(int i=0;i<synonyms.length;i++)
+                            ad.addSynonym(synonyms[i]);
+                        }
+
+                        if(prevSymbols.length>0){
+                            for(int i=0;i<prevSymbols.length;i++)
+                                ad.addPrevSymbol(prevSymbols[i]);
+                        }
+
+                        System.out.println(symbol+" "+hgncId+" "+entrezId+" "+ ensemblId);
+                        hmap.put(symbol,ad);
+                        /*
                         if(rowData.length>2 && !rowData[2].isEmpty()){
                             prevSymbols = rowData[2].split(",");
 
@@ -138,6 +173,8 @@ public class LoadAccessionIDs implements CommandLineRunner {
                                     }
                                 }
                         }
+                        */
+
 
                     }
                     rows++;
@@ -158,26 +195,53 @@ public class LoadAccessionIDs implements CommandLineRunner {
 
 private void updateMarkers(HashMap hmap){
 
-    int notUpdatedMarkers = 0;
-    System.out.println("Loading all markers from Neo4j...");
-    Collection<Marker> markers = loaderUtils.getAllMarkers();
+    int updatedMarkers = 0;
+    List<String> notUpdatedMarkers = new ArrayList<>();
+    List<String> entrezIdMismatch = new ArrayList<>();
 
+    System.out.println("Loading all markers from Neo4j...");
+    Collection<Marker> markers = loaderUtils.getAllHumanMarkers();
+    System.out.println(markers.size()+" markers were loaded from Neo4j.");
     for(Marker m:markers){
 
         if(hmap.containsKey(m.getSymbol())){
             AccessionData ad = (AccessionData) hmap.get(m.getSymbol());
-            m.setHugoId(ad.getHgncId());
-            m.setEnsemblId(ad.getEnsemblId());
-            System.out.println("Updating marker:"+m.getSymbol());
-            loaderUtils.saveMarker(m);
+
+            if(m.getEntrezId().equals(ad.getEntrezId()) ){
+                m.setHugoId(ad.getHgncId());
+                m.setEnsemblId(ad.getEnsemblId());
+
+                if(ad.getPrevSymbols().size()>0){
+                    for(String ps:ad.getPrevSymbols()){
+                        m.addPrevSymbol(ps);
+                    }
+                }
+
+                if(ad.getSynonyms().size()>0){
+                    for(String s:ad.getSynonyms()){
+                        m.addSynonym(s);
+                    }
+                }
+                updatedMarkers++;
+                System.out.println("Updating marker:"+m.getSymbol());
+                loaderUtils.saveMarker(m);
+            }
+            else{
+                entrezIdMismatch.add(m.getSymbol());
+            }
+
+
+
         }
         else{
-            notUpdatedMarkers++;
+            notUpdatedMarkers.add(m.getSymbol());
         }
 
     }
-
+    System.out.println("Updated markers: "+updatedMarkers);
     System.out.println("Not updated markers: "+notUpdatedMarkers);
+    System.out.println("EntrezId mismatch: "+entrezIdMismatch);
+
 
 }
 
