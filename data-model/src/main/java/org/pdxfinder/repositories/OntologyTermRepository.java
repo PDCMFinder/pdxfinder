@@ -1,4 +1,3 @@
-
 package org.pdxfinder.repositories;
 
 import org.pdxfinder.dao.OntologyTerm;
