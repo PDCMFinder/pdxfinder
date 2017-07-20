@@ -19,12 +19,17 @@ public class MarkerAssociation {
     private String seqPosition;
     private String refAllele;
     private String altAllele;
-    private String consequence;
-    private String aminoAcidChange;
+    private String consequence; // variant_classification in ircc
+    private String aminoAcidChange; //use hgvsp short, remove p. in ircc
     private String rsVariants;
     private String readDepth;
     private String alleleFrequency;
-    private String refAssembly;
+    private String refAssembly; //NCBI_build in ircc
+
+    private String seqStartPosition;
+    private String seqEndPosition;
+    private String strand;
+
 
     public MarkerAssociation() {
     }
@@ -198,5 +203,27 @@ public class MarkerAssociation {
         this.refAssembly = refAssembly;
     }
 
+    public String getSeqStartPosition() {
+        return seqStartPosition;
+    }
 
+    public void setSeqStartPosition(String seqStartPosition) {
+        this.seqStartPosition = seqStartPosition;
+    }
+
+    public String getSeqEndPosition() {
+        return seqEndPosition;
+    }
+
+    public void setSeqEndPosition(String seqEndPosition) {
+        this.seqEndPosition = seqEndPosition;
+    }
+
+    public String getStrand() {
+        return strand;
+    }
+
+    public void setStrand(String strand) {
+        this.strand = strand;
+    }
 }
