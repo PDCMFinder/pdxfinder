@@ -43,48 +43,34 @@ public class SearchService
 
 
 
-            // This serves as a Hub to the searchForSamplesWithFilters METHOD for integration DO in the search
-            public List<SearchDTO> searchForModelsWithFiltersHUB(String diag, String[] markers, String[] datasources, String[] origintumortypes)
-            {
+            public Boolean isExistingOntologyTerm(String query){
 
-                    List<SearchDTO> aggregateReport = new ArrayList<>();
+                if(ontologyTermRepositoryRepository.findByLabel(query) != null) return true;
+                return false;
 
-                    // Do a direct Search With The diagnosis
-                    List<SearchDTO> searchEngine = searchForModelsWithFilters(diag, markers, datasources, origintumortypes,"Upper Level");
-                    aggregateReport.addAll(searchEngine);
+            }
 
-
-                        // Search with DO Matches
-                        Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findDOTermAll(diag);
-
-                        //Loop through the retrieved terms and search in the graph
-                        for (OntologyTerm ontologyTerm : ontologyTerms)
-                        {
-                            if(ontologyTerm.getLabel() != null) {
-                                searchEngine = searchForModelsWithFilters(ontologyTerm.getLabel(), markers, datasources, origintumortypes,"Depth One"); //Search Again
-                            }
-                            aggregateReport.addAll(searchEngine);  //Concatenate the SearchDTO Object
-                        }
+            //TODO:Return the proper result set
+            public List<SearchDTO> searchWithOntology(String query){
 
 
-                    // add elements to al, including duplicates
-                    Set<SearchDTO> hs = new HashSet<>();
-                    hs.addAll(aggregateReport);
-                    aggregateReport.clear();
-                    aggregateReport.addAll(hs);
 
-                    return aggregateReport;
+                List<SearchDTO> sdto = new ArrayList<>();
+                return sdto;
+            }
+
+            public List<SearchDTO> search(String query, String[] markers, String[] datasources, String[] origintumortypes){
+
+                if(isExistingOntologyTerm(query)) return searchWithOntology(query);
+
+                else return searchForModelsWithFilters(query, markers, datasources,origintumortypes);
 
             }
 
 
 
 
-
-
-
-
-            public List<SearchDTO> searchForModelsWithFilters(String diag, String[] markers, String[] datasources, String[] origintumortypes, String searchDepth) {
+            public List<SearchDTO> searchForModelsWithFilters(String diag, String[] markers, String[] datasources, String[] origintumortypes) {
 
                         Collection<ModelCreation> models = modelCreationRepository.findByMultipleFilters(diag, markers, datasources, origintumortypes);
 
@@ -123,7 +109,7 @@ public class SearchService
                             }
 
                             sdto.setSearchParameter(diag);
-                            sdto.setSearchDepth(searchDepth);
+
 
                             if(model.getSample() != null && model.getSample().getMolecularCharacterizations() != null){
                                 Set<String> markerSet = new HashSet<>();
