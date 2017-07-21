@@ -33,4 +33,11 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     Collection<ModelCreation> findByMultipleFilters(@Param("diag") String diag, @Param("markers") String[] markers,
                                              @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
 
+
+    @Query("MATCH (st:OntologyTerm)<-[*]-(ot:OntologyTerm) " +
+            "MATCH (ot)-[m:MAPPED_TO]-(s:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
+            "WHERE st.label = {query} " +
+            "RETURN s, i, mod")
+    Collection<ModelCreation> findByOntology(@Param("query") String query);
+
 }
