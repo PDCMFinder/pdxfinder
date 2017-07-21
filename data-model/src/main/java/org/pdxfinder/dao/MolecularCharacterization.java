@@ -15,20 +15,14 @@ public class MolecularCharacterization {
     @GraphId
     Long id;
 
-    String technology;
+    @Deprecated
+    private String technology;
 
-    // NOTE: These are not the only relationship types
-    //       How can we model different relationship types
-    //       between MolecularCharacterization and Marker
-    //       For instance:
-    //           MolChar(FISH) -[NEGATIVE]-> Marker(HER2)
-    //                         -[NEGATIVE]-> Marker(ER)
-    //                         -[NEGATIVE]-> Marker(PR)
-    //           MolChar(MSS) -[STABILITY]-> Marker(MSI-L)
+    @Relationship(type = "PLATFORM_USED")
+    Platform platform;
 
-    @Relationship(type = "ASSOCIATED_WITH", direction = Relationship.OUTGOING)
+    @Relationship(type = "ASSOCIATED_WITH")
     Set<MarkerAssociation> markerAssociations;
-
 
     public MolecularCharacterization() {
     }
@@ -37,6 +31,9 @@ public class MolecularCharacterization {
         this.technology = technology;
     }
 
+    public MolecularCharacterization(Platform platform) {
+        this.platform = platform;
+    }
 
     public Long getId() {
         return id;
@@ -52,6 +49,14 @@ public class MolecularCharacterization {
 
     public void setTechnology(String technology) {
         this.technology = technology;
+    }
+
+    public Platform getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(Platform platform) {
+        this.platform = platform;
     }
 
     public Set<MarkerAssociation> getMarkerAssociations() {
