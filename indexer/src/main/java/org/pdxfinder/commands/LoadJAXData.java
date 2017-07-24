@@ -180,39 +180,7 @@ public class LoadJAXData implements CommandLineRunner {
 
         }
 
-        JSONArray markers = j.getJSONArray("Markers");
-        HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
-        for (int mIndex = 0; mIndex < markers.length(); mIndex++) {
-            JSONObject marker = markers.getJSONObject(mIndex);
-            String symbol = marker.getString("Symbol");
-            String result = marker.getString("Result");
-            String technology = marker.getString("Technology");
-
-            MarkerAssociation ma = loaderUtils.getMarkerAssociation(result, symbol, symbol);
-            // make a map of markerAssociationCollections keyed to technology
-            if (markerMap.containsKey(technology)) {
-                markerMap.get(technology).add(ma);
-            } else {
-                HashSet<MarkerAssociation> set = new HashSet<>();
-                set.add(ma);
-                markerMap.put(technology, set);
-            }
-        }
-        HashSet<MolecularCharacterization> mcs = new HashSet<>();
-        for (String tech : markerMap.keySet()) {
-            MolecularCharacterization mc = new MolecularCharacterization();
-            mc.setTechnology(tech);
-            mc.setMarkerAssociations(markerMap.get(tech));
-
-            loaderUtils.saveMolecularCharacterization(mc);
-            mcs.add(mc);
-
-        }
-        sample.setMolecularCharacterizations(mcs);
-
-        // this should only be for pt samples?
-        pSnap.addSample(sample);
-        loaderUtils.savePatientSnapshot(pSnap);
+       
 
         // For the moment, all JAX models are assumed to have been validated using Histological assessment by a pathologist
         // TODO: verify this is the case
@@ -290,17 +258,19 @@ public class LoadJAXData implements CommandLineRunner {
                 ma.setSeqPosition(seqPosition);
                 ma.setReadDepth(readDepth);
 
-                Marker marker = null;
-
-                // for whatever reason some Truseq-Illumina use ensemblIDs as symbols
-                if ("Truseq-Illumina".equals(technology) && symbol.contains("ENSG")) {
-                    marker = loaderUtils.getMarkerByEnsemblId(symbol);
-                } else {
-                    marker = loaderUtils.getMarker(symbol);
-                    marker.setEntrezId(id);
-                }
+                Marker marker = loaderUtils.getMarker(symbol);
+                marker.setEntrezId(id);
                 
                 ma.setMarker(marker);
+                
+                Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
+                
+                // why would this happen?
+                if(platform.getExternalDataSource() == null){
+                    platform.setExternalDataSource(jaxDS);
+                }
+                loaderUtils.createPlatformAssociation(platform,marker);
+                
 
                 markerMap = sampleMap.get(sample);
                 if (markerMap == null) {
@@ -332,7 +302,7 @@ public class LoadJAXData implements CommandLineRunner {
                 HashSet<MolecularCharacterization> mcs = new HashSet<>();
                 for (String tech : markerMap.keySet()) {
                     MolecularCharacterization mc = new MolecularCharacterization();
-                    mc.setTechnology(tech);
+                    mc.setPlatform(loaderUtils.getPlatform(tech, this.jaxDS));
                     mc.setMarkerAssociations(markerMap.get(tech));
                     mcs.add(mc);
 
