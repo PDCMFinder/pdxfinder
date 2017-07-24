@@ -37,7 +37,7 @@ public class GraphService
                 String param2 = ".*"+param+".*";
 
                 // Suggest What the user may need to type next : param ...
-                Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findByDiseaseOntologyTerm(param1);
+                Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findAllWithMappings();
                 Set<String> dataReport = new HashSet<>();
 
                 for (OntologyTerm ontologyTerm : ontologyTerms){
