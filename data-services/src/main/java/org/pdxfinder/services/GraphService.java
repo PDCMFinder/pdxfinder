@@ -30,19 +30,15 @@ public class GraphService
 
 
 
-        public Set<String> searchResult(String param)
+        public Set<String> getMappedDOTerms()
         {
 
-                String param1 = param+".*";
-                String param2 = ".*"+param+".*";
-
-                // Suggest What the user may need to type next : param ...
                 Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findAllWithMappings();
                 Set<String> dataReport = new HashSet<>();
 
                 for (OntologyTerm ontologyTerm : ontologyTerms){
-                    if(ontologyTerm.getLabel() != null)
-                    {
+
+                    if(ontologyTerm.getLabel() != null) {
                         dataReport.add(ontologyTerm.getLabel());
                     }
                 }
@@ -50,32 +46,7 @@ public class GraphService
                 Set<String> sortedData = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
                 sortedData.addAll(dataReport);
 
-
-
-                //Suggest words that contain what the user is typing ... param ... , and suggest sub classes
-                Collection<OntologyTerm> ontologyTerms2 = ontologyTermRepositoryRepository.findByDiseaseOntologyTerm2(param2,param1,param);
-                Set<String> dataReport2 = new HashSet<>();
-
-                for (OntologyTerm ontologyTerm : ontologyTerms2){
-                    if(ontologyTerm.getLabel() != null)
-                    {
-                        dataReport2.add(ontologyTerm.getLabel());
-                    }
-                }
-                // Arrange the result alphabetically
-                Set<String> sortedData2 = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
-                sortedData2.addAll(dataReport2);
-
-
-
-                if (sortedData.size() <= 1){
-                    sortedData.addAll(sortedData2);
-                    return sortedData;
-                }else{
-                    return sortedData;
-                }
-
-
+                return sortedData;
 
         }
 

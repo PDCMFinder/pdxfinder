@@ -27,12 +27,11 @@ public class RestControllerGeneral
 
 
         @RequestMapping(method = RequestMethod.GET, value = "/DOAutoSuggest")
-        public Set<String> search3(@RequestParam(value="term", required = false) String term)
+        public Set<String> search3()
         {
 
-                if(term == null) term = "";
 
-                Set<String> autoSuggestList = graphService.searchResult(term);
+                Set<String> autoSuggestList = graphService.getMappedDOTerms();
                 return autoSuggestList;
         }
 }
