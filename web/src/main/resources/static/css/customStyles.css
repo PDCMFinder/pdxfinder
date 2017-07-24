@@ -9,15 +9,25 @@
     text-align: justify;
 }
 
-.shiftUp100 {
-    margin-top: -100px;
+.shiftUp5 {
+    margin-top: -5px;
 }
+
 .shiftUp20 {
     margin-top: -20px;
 }
 
 .shiftUp60 {
     margin-top: -60px;
+}
+
+.shiftUp100 {
+    margin-top: -100px;
+}
+
+
+.topSpace5 {
+    margin-top: 5px;
 }
 
 .topSpace50 {
@@ -31,8 +41,10 @@
 .fullImg{
     width:100%;
     margin-top: 12px;
-/*    background-color: #fff;
-    border: 1px dashed #ddd; */
+}
+
+.fullWidth{
+    width:100%;
 }
 
 .pdxSummary{

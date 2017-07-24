@@ -26,10 +26,8 @@ public class RestControllerGeneral
 
 
         @RequestMapping(method = RequestMethod.GET, value = "/DOAutoSuggest")
-        public Set<String> search3()
+        public Set<String> mappedDOTerm()
         {
-
-
                 Set<String> autoSuggestList = graphService.getMappedDOTerms();
                 return autoSuggestList;
         }
