@@ -20,7 +20,7 @@ public class RestControllerGeneral
         @Autowired
         public RestControllerGeneral( GraphService graphService)
         {
-                this.graphService = graphService;
+                 this.graphService = graphService;
         }
 
 
@@ -28,6 +28,7 @@ public class RestControllerGeneral
         @RequestMapping(method = RequestMethod.GET, value = "/DOAutoSuggest")
         public Set<String> search3()
         {
+
 
                 Set<String> autoSuggestList = graphService.getMappedDOTerms();
                 return autoSuggestList;
