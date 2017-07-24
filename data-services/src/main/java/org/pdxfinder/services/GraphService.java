@@ -18,17 +18,14 @@ import java.util.*;
 public class GraphService
 {
 
-
         private final static Logger log = LoggerFactory.getLogger(GraphService.class);
-
-    private SampleRepository sampleRepository;
-    private OntologyTermRepository ontologyTermRepositoryRepository;
+        private SampleRepository sampleRepository;
+        private OntologyTermRepository ontologyTermRepositoryRepository;
 
         public GraphService(SampleRepository sampleRepository,OntologyTermRepository ontologyTermRepository) {
             this.sampleRepository = sampleRepository;
             this.ontologyTermRepositoryRepository = ontologyTermRepository;
         }
-
 
 
         public Set<String> getMappedDOTerms()
