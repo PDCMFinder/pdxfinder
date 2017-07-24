@@ -22,16 +22,11 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
 
     OntologyTerm findByUrl(String url);
 
-    //AUTO-SUGGEST: Returns all OntologyTerms with mapped samples and all of their ancestors
+    //AUTO-SUGGEST: Returns all OntologyTerms with mapped samples and all their ancestors
     @Query("MATCH (st:OntologyTerm)<-[*]-(ot:OntologyTerm) " +
             "MATCH (ot)-[m:MAPPED_TO]-(s:Sample) " +
             "RETURN ot,st")
     Collection<OntologyTerm> findAllWithMappings();
-
-    @Query("MATCH (oTerm:OntologyTerm)<-[*]-(subnode:OntologyTerm) where oTerm.label = trim(toLower({diag})) return subnode as result  ")
-    Collection<OntologyTerm> findDOTermAll(@Param("diag") String diag);
-
-
 
 
 
