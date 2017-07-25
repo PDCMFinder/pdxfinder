@@ -584,7 +584,7 @@
                             c = title.charAt(spos);
                             h = hilite_hints.charAt(i);
                             if (h === '<') {
-                                highlighted += '<b>';
+                                highlighted += '<b class=\'adjust\'>';
                             } else if (h === '>') {
                                 highlighted += '</b>';
                             } else {
