@@ -151,7 +151,7 @@ h5{
     padding: 2px 0px 2px 0px;
 }
 .pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown > div.active{
-    background: #0097CF;
+    background: rgba(24,188,156,0.4); /*#18BC9C;*/
     color: #FFFFFF;
 }
 
