@@ -14,7 +14,6 @@ import org.springframework.util.Assert;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
@@ -45,6 +44,8 @@ public class LoaderUtils {
     private QualityAssuranceRepository qualityAssuranceRepository;
     private OntologyTermRepository ontologyTermRepository;
     private SpecimenRepository specimenRepository;
+    private PlatformRepository platformRepository;
+    private PlatformAssociationRepository platformAssociationRepository;
 
     private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
 
@@ -64,7 +65,9 @@ public class LoaderUtils {
                        PdxPassageRepository pdxPassageRepository,
                        QualityAssuranceRepository qualityAssuranceRepository,
                        OntologyTermRepository ontologyTermRepository,
-                       SpecimenRepository specimenRepository) {
+                       SpecimenRepository specimenRepository,
+                       PlatformRepository platformRepository,
+                       PlatformAssociationRepository platformAssociationRepository) {
 
         Assert.notNull(tumorTypeRepository);
         Assert.notNull(backgroundStrainRepository);
@@ -97,6 +100,8 @@ public class LoaderUtils {
         this.qualityAssuranceRepository = qualityAssuranceRepository;
         this.ontologyTermRepository = ontologyTermRepository;
         this.specimenRepository = specimenRepository;
+        this.platformRepository = platformRepository;
+        this.platformAssociationRepository = platformAssociationRepository;
 
     }
 
@@ -406,6 +411,43 @@ public class LoaderUtils {
 
     public Collection<Marker> getAllHumanMarkers() {
         return markerRepository.findAllHumanMarkers();
+    }
+    
+    public Platform getPlatform(String name, ExternalDataSource eds){
+        Platform p =  platformRepository.findByNameAndDataSource(name, eds.getName());
+        if(p == null){
+            p = new Platform();
+            p.setName(name);
+            p.setExternalDataSource(eds);
+            platformRepository.save(p);
+        }
+        
+        return p;
+    }
+    
+    public PlatformAssociation createPlatformAssociation(Platform p, Marker m){
+        if (platformAssociationRepository == null){
+            System.out.println("PAR is null");
+        }
+        if (p == null){
+            System.out.println("Platform is null");
+        }
+        if (p.getExternalDataSource() == null){
+            System.out.println("P.EDS is null");
+        }
+        if (m == null){
+            System.out.println("Marker is null");
+        }
+        PlatformAssociation pa = platformAssociationRepository.findByPlatformAndMarker(p.getName(),p.getExternalDataSource().getName(),m.getSymbol());
+        if(pa == null){
+            pa = new PlatformAssociation();
+            pa.setPlatform(p);
+            pa.setMarker(m);
+            platformAssociationRepository.save(pa);
+            
+        }
+        
+        return pa;
     }
 
 }
