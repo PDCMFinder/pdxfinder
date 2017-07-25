@@ -45,7 +45,6 @@ public class SearchController
                     model.addAttribute("cancerBySystem", cancerBySystemDataSeriesArray.toString());
 
 
-
                     /************************    Retrieve Mapped DO Terms Start   ************************/
 
                     Set<String> autoSuggestList = graphService.getMappedDOTerms();
