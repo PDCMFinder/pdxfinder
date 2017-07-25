@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by jmason on 16/03/2017.
@@ -34,7 +35,7 @@ public class SearchController
                     for (String name : cancerBySystem.keySet())
                     {
 
-                            JSONObject dataSeries = new JSONObject();
+                        JSONObject dataSeries = new JSONObject();
                             dataSeries.put("name", name);
                             dataSeries.put("y", cancerBySystem.get(name));
 
@@ -44,6 +45,13 @@ public class SearchController
                     model.addAttribute("cancerBySystem", cancerBySystemDataSeriesArray.toString());
 
 
+
+                    /************************    Retrieve Mapped DO Terms Start   ************************/
+
+                    Set<String> autoSuggestList = graphService.getMappedDOTerms();
+                    model.addAttribute("mappedDOTerm", autoSuggestList);
+
+                    /************************    Retrieve Mapped DO Terms End   ************************/
 
 
 

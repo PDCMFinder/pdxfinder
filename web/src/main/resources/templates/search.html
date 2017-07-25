@@ -5,6 +5,7 @@
         <link rel="stylesheet" href="/css/chosen.css"/>
         <title>PDX Finder</title>
         <!--/*/ <th:block th:include="fragments/head-includes :: head-includes"></th:block> /*/-->
+        <script src="/js/pdxFinder.autocomplete.js"></script>
     </head>
 
     <body>
@@ -23,19 +24,20 @@
             <!-- Page Content -->
             <div class="container">
 
-                        <p class="shiftUp60">
+                        <p class="shiftUp70">
                             To facilitate PDX models discovery, EMBL-EBI and the Jackson Laboratory are co-developing PDX Finder. PDX Finder
                             is an open repository for the upload and storage of clinical, genomic and functional PDX data which will provide
                             a comprehensive global catalogue of PDX models available for researchers and their associated data across
                             distributed repository databases.
                         </p>
 
-                        <br>
                         <div class="row">
+
+
                             <div class="col-md-6 topSpace5">
                                 <h4>Diagnosis</h4>
 
-                                    <input id="searchField"  class="materialF topSpace5" autofocus="" data-modalfocus="" placeholder="Diagnosis ..." type="text"/>
+                                    <input id="pdxFinder"  class="materialF topSpace5" placeholder="Enter Diagnosis ..." type="text"/>
 
                             </div>
 
@@ -336,20 +338,24 @@
 
                 /* ]]> */
             </script>
-            <!-- Auto Suggest JavaScript Code -->
-
-
-
 
             <!-- Auto Suggest JavaScript Code -->
-            <script>
-                $( function() {
-                    $( "#searchField" ).autocomplete({
-                        source: "/DOAutoSuggest"
+
+            <script type="text/javascript" th:inline="javascript">
+
+                    var states = [[ ${mappedDOTerm} ]];
+
+                    $('#pdxFinder').autocomplete({
+                    source:[states]
                     });
-                } );
+
             </script>
-            <!-- Auto Suggest JQuery Code End -->
+
+
+
+
+
+
 
 
 
@@ -381,7 +387,5 @@
             <!-- Auto Search Field JavaScript Code End -->
 
 
-            <link rel="stylesheet" th:href="@{/css/jquery-ui.css}" href="../static/css/jquery-ui.css">
-            <script src="/js/jquery-ui.js"></script>
     </body>
 </html>
