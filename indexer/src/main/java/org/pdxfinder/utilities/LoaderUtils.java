@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
+import org.apache.commons.cli.Option;
 
 /**
  * The hope was to put a lot of reused repository actions into one place ie find
@@ -27,6 +28,8 @@ import java.util.Set;
 @Component
 public class LoaderUtils {
 
+    public static Option loadAll = new Option("LoadAll",false,"Load all PDX Finder data");
+    
     private TumorTypeRepository tumorTypeRepository;
     private BackgroundStrainRepository backgroundStrainRepository;
     private ImplantationTypeRepository implantationTypeRepository;

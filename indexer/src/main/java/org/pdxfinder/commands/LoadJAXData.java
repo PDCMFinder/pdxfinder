@@ -85,6 +85,8 @@ public class LoadJAXData implements CommandLineRunner {
         parser = new DefaultParser();
         formatter = new HelpFormatter();
         log.info("Setting up LoadJAXDataCommand option");
+        options.addOption("loadJAX",false,"Load Jax PDX data");
+        options.addOption(LoaderUtils.loadAll);
     }
 
     public LoadJAXData(LoaderUtils loaderUtils, Session session) {
@@ -95,36 +97,30 @@ public class LoadJAXData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if ("loadJAX".equals(args[0]) || "-loadJAX".equals(args[0])) {
-
-            System.out.println("Loading JAX PDX data.");
             try {
                 cmd = parser.parse(options, args);
+                
 
             } catch (UnrecognizedOptionException | MissingArgumentException e) {
                 formatter.printHelp("loadJAX", options);
                 System.exit(1);
             }
-
-            // Delete all ?how? data currently associated to this data source
-            // this loaderUtils method does nothing!
-            try {
-                loaderUtils.deleteAllByEDSName(JAX_DATASOURCE_NAME);
-            } catch (Exception e) {
-                //       log.error("to be expected", e);
-            }
-            if (urlStr != null) {
-                log.info("Loading from URL " + urlStr);
-                parseJSON(parseURL(urlStr));
-            } else if (file != null) {
-                log.info("Loading from file " + file);
-                parseJSON(parseFile(file));
+            
+            if(cmd.hasOption("loadJAX") || cmd.hasOption(LoaderUtils.loadAll.getOpt())){
+                
+                System.out.println("Loading JAX PDX data.");
+                if (urlStr != null) {
+                    log.info("Loading from URL " + urlStr);
+                    parseJSON(parseURL(urlStr));
+                } else if (file != null) {
+                    log.info("Loading from file " + file);
+                    parseJSON(parseFile(file));
+                } else {
+                    log.error("No jaxpdx.file or jaxpdx.url provided in properties");
+                }
             } else {
-                log.error("No jaxpdx.file or jaxpdx.url provided in properties");
+                System.out.println("Not loading JAX. Use '-loadJAX' switch to load JAX data.");
             }
-        } else {
-            System.out.println("'" + args[0] + "' is not a recognized argument. Try 'loadJAX' to load JAX data.");
-        }
     }
 
     //JSON Fields {"Model ID","Gender","Age","Race","Ethnicity","Specimen Site","Primary Site","Initial Diagnosis","Clinical Diagnosis",
@@ -179,8 +175,6 @@ public class LoadJAXData implements CommandLineRunner {
             sample.addHistology(histology);
 
         }
-
-       
 
         // For the moment, all JAX models are assumed to have been validated using Histological assessment by a pathologist
         // TODO: verify this is the case
