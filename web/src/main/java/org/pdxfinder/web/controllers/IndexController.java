@@ -28,23 +28,22 @@ public class IndexController {
     String index(Model model)  throws JSONException
     {
 
-        //
-        // Cancers by system
-        //
-        JSONArray cancerBySystemDataSeriesArray = new JSONArray();
 
-        Map<String, Integer> cancerBySystem = graphService.getModelCountsBySystem();
-        for (String name : cancerBySystem.keySet()) {
+        JSONArray dCancerBySystemDataSeriesArray = new JSONArray();
 
-            JSONObject dataSeries = new JSONObject();
-            dataSeries.put("name", name);
-            dataSeries.put("y", cancerBySystem.get(name));
+        Map<String, Integer> cancerBySystemData = graphService.getModelCountsBySystem();
+        for (String name : cancerBySystemData.keySet())
+        {
 
-            cancerBySystemDataSeriesArray.put(dataSeries);
+            JSONObject indexData = new JSONObject();
+            indexData.put("name", name);
+            indexData.put("y", cancerBySystemData.get(name));
+
+            dCancerBySystemDataSeriesArray.put(indexData);
 
         }
 
-        model.addAttribute("cancerBySystem", cancerBySystemDataSeriesArray.toString());
+        model.addAttribute("cancerBySystem", dCancerBySystemDataSeriesArray.toString());
 
 
 

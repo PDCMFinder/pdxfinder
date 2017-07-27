@@ -43,7 +43,7 @@ function insertSpinner(){
 
 function search() {
 
-    var q = jQuery("#searchField").val();
+    var q = jQuery("#pdxFinder").val();
     var markers = [];
     var dataSources = [];
     var originTumorTypes = [];

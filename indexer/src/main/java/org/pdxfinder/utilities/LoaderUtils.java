@@ -174,7 +174,7 @@ public class LoaderUtils {
 
         PatientSnapshot patientSnapshot = null;
 
-        Set<PatientSnapshot> pSnaps = patientSnapshotRepository.findByPatient(patient);
+        Set<PatientSnapshot> pSnaps = patientSnapshotRepository.findByPatient(patient.getExternalId());
         loop:
         for (PatientSnapshot ps : pSnaps) {
             if (ps.getAge().equals(age)) {

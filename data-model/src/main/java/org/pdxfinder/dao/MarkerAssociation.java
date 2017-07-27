@@ -16,7 +16,7 @@ public class MarkerAssociation {
     Marker marker;
     
     private String chromosome;
-    private String seqPosition;
+    private String seqPosition; //in jax use seqStartPosition instead of this
     private String refAllele;
     private String altAllele;
     private String consequence; // variant_classification in ircc
