@@ -105,14 +105,11 @@ public class GraphService
         }
 
 
-
-
-
-
-
-
-
-        /**  Returns the counts of samples in the data base by top level tissue type */
+    /**
+     * Returns the counts of samples in the data base by top level tissue type
+     *
+     * @return Map of name to static count of tumors
+     */
         //TODO: Replace with dynamic query to top level when ontology associations are made
         public Map<String, Integer> getModelCountsBySystem()
         {
@@ -144,7 +141,10 @@ public class GraphService
 
 
 
-        /**  Returns the counts of tumors in the data base by cell type */
+        /**  Returns the counts of tumors in the data base by cell type
+         *
+         * @return Map of name to static count of tumors
+         */
         //TODO: Replace with dynamic query to top level when ontology associations are made
         public Map<String, Integer> getModelCountsByCellType()
         {
@@ -186,7 +186,9 @@ public class GraphService
 
 
 
-        /**  Returns the counts of tumors in the data base by cell type */
+        /**  Returns the counts of tumors in the data base by cell type
+         * @return Map of name to static count of tumors
+         */
         //TODO: Replace with dynamic query to top level when ontology associations are made
         public Map<String, Integer> getModelCountsByTissue()
         {
@@ -225,8 +227,8 @@ public class GraphService
                 cancerByTissue.put("germ cell cancer", 1);
                 cancerByTissue.put("skin cancer", 20);
                 cancerByTissue.put("salivary gland cancer", 2);
-                cancerByTissue.put("retroperitoneal cancer ", 1);
-                cancerByTissue.put("adrenal gland cancer", 1);
+            cancerByTissue.put("retroperitoneal cancer", 1);
+            cancerByTissue.put("adrenal gland cancer", 1);
                 cancerByTissue.put("lipomatous cancer", 1);
                 cancerByTissue.put("kidney benign neoplasm", 1);
                 cancerByTissue.put("uterine cancer", 1);
