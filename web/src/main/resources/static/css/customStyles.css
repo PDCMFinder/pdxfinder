@@ -222,4 +222,63 @@ h5{
 
 
 
+/********************************** PDXFinder Error Page Start ************************************************/
+
+.err_body{
+    font-family: 'pdxErrorStyle', cursive;
+    background:#eaeaea;
+}
+.err_wrap{
+    margin:0 auto;
+    width:100%;
+}
+.err_logo{
+    text-align:center;
+    margin-top:5%;
+}
+.err_logo img{
+    width:60%;
+    margin-top:-1%;
+}
+.err_logo p{
+    color:#272727;
+    font-size:35px;
+    margin-top:1px;
+}
+.err_logo p span{
+    color:lightgreen;
+}
+.err_sub a{
+    color:#fff;
+    background:#272727;
+    text-decoration:none;
+    padding:10px 70px;
+    font-size:13px;
+    font-family: arial, serif;
+    font-weight:bold;
+    -webkit-border-radius:.2em;
+    -moz-border-radius:.2em;
+    -border-radius:.2em;
+}
+@font-face {
+    font-family: 'pdxErrorStyle';
+    font-style: normal;
+    font-weight: 400;
+    src: local('pdxErrorStyle'), local('LoveYaLikeASister-Regular'), url(http://fonts.gstatic.com/s/loveyalikeasister/v7/LzkxWS-af0Br2Sk_YgSJYyDnSGr1Zea3iQKneaJ4t3mglnMp3_3A8V8Ai8YosRtX.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+.err_footer{
+    color:black;
+    position:absolute;
+    right:10px;
+    bottom: 10px;
+}
+.err_footer a{
+    color:rgb(114,173,38);
+}
+
+/********************************** PDXFinder Error Page Ends ************************************************/
+
+
+
 
