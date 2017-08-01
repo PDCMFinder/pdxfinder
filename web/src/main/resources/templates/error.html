@@ -4,14 +4,13 @@
     <title>PDX Finder</title>
     <!--/*/ <th:block th:include="fragments/head-includes :: head-includes"></th:block> /*/-->
 </head>
-<body>
 
 <body class='err_body'>
 
 <div class="err_wrap">
     <div class="err_logo">
         <p> OOPS! - I'm looking for your page ... I can't find it</p>
-        <img src="404-1.png">
+        <img th:src="@{/images/404.png}" src="../../static/images/404.png" >
 
         <div class="err_sub">
             <p><a href="#"> Return Home </a></p>
@@ -20,7 +19,7 @@
 </div>
 
 <div class="err_footer">
-    © 2017 <a href="#">PDX Finder</a>
+    &#x24B8; 2017 <a href="#">PDX Finder</a>
 </div>
 
 

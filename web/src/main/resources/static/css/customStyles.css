@@ -275,6 +275,7 @@ h5{
 }
 .err_footer a{
     color:rgb(114,173,38);
+    text-decoration: none;
 }
 
 /********************************** PDXFinder Error Page Ends ************************************************/
