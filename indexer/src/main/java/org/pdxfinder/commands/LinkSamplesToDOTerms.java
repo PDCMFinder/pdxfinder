@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * Created by csaba on 19/06/2017.
@@ -47,7 +49,8 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
 
             log.info("Mapping samples to DO terms.");
             long startTime = System.currentTimeMillis();
-            mapSamplesToTerms();
+            //mapSamplesToTerms();
+            updateIndirectMappingData();
             long endTime   = System.currentTimeMillis();
             long totalTime = endTime - startTime;
 
@@ -64,8 +67,6 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
 
 
     private void mapSamplesToTerms(){
-
-
 
         System.out.println("Getting data from "+spreadsheetServiceUrl);
 
@@ -95,6 +96,8 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
                         sample.setSampleToDiseaseOntologyRelationship(r);
                         term.setMappedTo(r);
 
+                        term.setDirectMappedSamplesNumber(term.getDirectMappedSamplesNumber() + 1);
+
                         loaderUtils.saveSample(sample);
                         loaderUtils.saveOntologyTerm(term);
                         mapCounter++;
@@ -105,18 +108,11 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
                         System.out.println("ERROR "+sampleId+" "+doLabel);
                     }
 
-
-
-
                 }
 
                 System.out.println("Links created: "+mapCounter);
                 System.out.println("Mapping errors: "+errorCounter);
-
-
             }
-
-
 
 
         } catch (JSONException e) {
@@ -125,6 +121,22 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
 
 
     }
+
+    private void updateIndirectMappingData(){
+
+        Collection<OntologyTerm> terms = loaderUtils.getAllOntologyTerms();
+
+        for(OntologyTerm ot:terms){
+            System.out.println("Updating "+ot.getLabel());
+            ot.setIndirectMappedSamplesNumber(loaderUtils.getDirectMappingNumber(ot.getLabel()));
+            loaderUtils.saveOntologyTerm(ot);
+
+        }
+
+
+
+    }
+
 
     private String parseURL(String urlStr) {
         StringBuilder sb = new StringBuilder();
