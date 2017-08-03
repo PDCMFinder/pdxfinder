@@ -398,6 +398,29 @@ public class LoaderUtils {
         return ot;
     }
 
+    public Collection<OntologyTerm> getAllOntologyTerms(){
+
+        Collection<OntologyTerm> ot = ontologyTermRepository.findAll();
+
+        return ot;
+    }
+
+    public int getIndirectMappingNumber(String label){
+
+        return ontologyTermRepository.getIndirectMappingNumber(label);
+    }
+
+    public int getDirectMappingNumber(String label){
+
+
+        Set<OntologyTerm> otset =  ontologyTermRepository.getDistinctSubTreeNodes(label);
+        int mapNum = 0;
+        for ( OntologyTerm ot:otset){
+            mapNum += ot.getDirectMappedSamplesNumber();
+        }
+        return mapNum;
+    }
+
     public void saveOntologyTerm(OntologyTerm ot){
 
         ontologyTermRepository.save(ot);
