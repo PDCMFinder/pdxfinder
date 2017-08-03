@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Created by csaba on 07/06/2017.
@@ -28,7 +29,18 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
             "RETURN ot,st")
     Collection<OntologyTerm> findAllWithMappings();
 
+    @Query("MATCH (ot:OntologyTerm) RETURN ot")
+    Collection<OntologyTerm> findAll();
 
+    @Query("MATCH (st:OntologyTerm)<-[*]-(term:OntologyTerm) " +
+            "WHERE st.label = {label} " +
+            "RETURN sum(term.indirectMappedSamplesNumber)")
+    int getIndirectMappingNumber(@Param("label") String label);
+
+    @Query("MATCH (st:OntologyTerm)<-[*]-(term:OntologyTerm) " +
+            "WHERE st.label = {label} " +
+            "RETURN term, st")
+    Set<OntologyTerm> getDistinctSubTreeNodes(@Param("label") String label);
 
 
 }
