@@ -37,7 +37,7 @@ public class GraphService
                 for (OntologyTerm ontologyTerm : ontologyTerms){
 
                     if(ontologyTerm.getLabel() != null) {
-                        dataReport.add(ontologyTerm.getLabel());
+                        dataReport.add(ontologyTerm.getLabel()+" ("+ontologyTerm.getIndirectMappedSamplesNumber()+")");
                     }
                 }
                 // Arrange the result alphabetically
