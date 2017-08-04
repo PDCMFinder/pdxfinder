@@ -206,7 +206,7 @@ public class LoaderUtils {
         return patient;
     }
 
-    public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
+    public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
 
         TumorType type = this.getTumorType(typeStr);
         Tissue origin = this.getTissue(originStr);
@@ -214,7 +214,7 @@ public class LoaderUtils {
         Sample sample = sampleRepository.findBySourceSampleId(sourceSampleId);
         if (sample == null) {
 
-            sample = new Sample(sourceSampleId, type, diagnosis, origin, sampleSite, classification, normalTissue, externalDataSource);
+            sample = new Sample(sourceSampleId, type, diagnosis, origin, sampleSite,extractionMethod, classification, normalTissue, externalDataSource);
             sampleRepository.save(sample);
         }
 

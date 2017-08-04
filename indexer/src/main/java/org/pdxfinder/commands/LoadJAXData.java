@@ -43,6 +43,7 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
     private final static String HISTOLOGY_NOTE = "Pathologist assessment of patient tumor and pdx model tumor histology slides.";
+    private final static String ENGRAFTMENT = "Engraftment";
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -166,7 +167,7 @@ public class LoadJAXData implements CommandLineRunner {
                 j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
 
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), j.getString("Specimen Site"), classification, NORMAL_TISSUE_FALSE, jaxDS);
+                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, jaxDS);
 
         if (histologyMap.containsKey("Patient")) {
             Histology histology = new Histology();
@@ -181,7 +182,7 @@ public class LoadJAXData implements CommandLineRunner {
         QualityAssurance qa = new QualityAssurance("Histology", HISTOLOGY_NOTE, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
 
-        ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS, qa);
+        ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), this.ENGRAFTMENT, sample, nsgBS, qa);
 
         loadVariationData(mc);
 
