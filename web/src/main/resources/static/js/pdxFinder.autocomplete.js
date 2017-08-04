@@ -5,7 +5,6 @@
 
 /**
  * @preserve jQuery Autocomplete plugin v1.2.6
- * @homepage http://pdxFinder.net/jqplugins/autocomplete/
  * @license MIT - MIT-LICENSE.txt
  * (c) 2014, Chupurnov Valeriy <chupurnov@gmail.com>
  */
@@ -587,12 +586,17 @@
                                 highlighted += '<b class=\'adjust\'>';
                             } else if (h === '>') {
                                 highlighted += '</b>';
-                            } else {
+                            }
+
+
+                            else {
                                 spos += 1;
                                 highlighted += c;
                             }
                         }
-                        title = highlighted;
+                        title = highlighted.replace("(","<i class=\'shft\'>&emsp;(").replace(")",")</i>");
+                        console.log(title);
+
                     }
                 }
 
@@ -802,7 +806,7 @@
                 $input
                     .trigger('timepick.pdxFinder',_value)
 
-                currentSelect = currentValue = $input.val();
+                currentSelect = currentValue = $input.val().split(" (")[0];  // editted here to remove brackets
 
                 $input
                     .trigger('close.pdxFinder');
