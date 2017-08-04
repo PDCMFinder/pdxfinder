@@ -149,6 +149,7 @@ h5{
     cursor: pointer;
     line-height: 1.5em;
     padding: 6px 0px 6px 0px;
+    width: 100%;
 }
 .pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown > div.active{
     background: rgba(24,188,156,1.0); /*#18BC9C;*/
@@ -157,6 +158,10 @@ h5{
 
 .adjust {
     color:#18BC9C; border-bottom:1px solid #18BC9C;
+}
+
+.pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown > div .shft::before {
+    content: " ";
 }
 
 .pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown  > div.active .adjust{
