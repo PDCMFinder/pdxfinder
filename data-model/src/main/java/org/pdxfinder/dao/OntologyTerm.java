@@ -16,6 +16,8 @@ public class OntologyTerm {
 
     private String url;
     private String label;
+    private int directMappedSamplesNumber;
+    private int indirectMappedSamplesNumber;
 
     @Relationship(type = "SUBCLASS_OF" ,direction = Relationship.OUTGOING)
     private Set<OntologyTerm> subclassOf;
@@ -81,5 +83,20 @@ public class OntologyTerm {
         this.subclassOf.add(ot);
     }
 
+    public int getDirectMappedSamplesNumber() {
+        return directMappedSamplesNumber;
+    }
 
+    public void setDirectMappedSamplesNumber(int directMappedSamplesNumber) {
+
+        this.directMappedSamplesNumber = directMappedSamplesNumber;
+    }
+
+    public int getIndirectMappedSamplesNumber() {
+        return indirectMappedSamplesNumber;
+    }
+
+    public void setIndirectMappedSamplesNumber(int indirectMappedSamplesNumber) {
+        this.indirectMappedSamplesNumber = indirectMappedSamplesNumber;
+    }
 }

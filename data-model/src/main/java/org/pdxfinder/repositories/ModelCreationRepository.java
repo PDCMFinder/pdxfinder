@@ -20,7 +20,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN mod")
     ModelCreation findBySampleId(@Param("sampleId") String sampleId);
 
-
+    //Simple search on sample diagnosis
     @Query("MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
             "MATCH (s:Sample)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
             "MATCH (s:Sample)-[ot:OF_TYPE]-(tt:TumorType) " +
@@ -33,11 +33,32 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     Collection<ModelCreation> findByMultipleFilters(@Param("diag") String diag, @Param("markers") String[] markers,
                                              @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
 
-
-    @Query("MATCH (st:OntologyTerm)<-[*]-(ot:OntologyTerm) " +
-            "MATCH (ot)-[m:MAPPED_TO]-(s:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
+    //Ontology powered search: molchar on samples
+    //TODO: Look up mol char and markers, deal with missing nodes
+    @Query("MATCH (st:OntologyTerm)<-[*]-(term:OntologyTerm)-[mapp:MAPPED_TO]-(s:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
+            "MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
+            "MATCH (s:Sample)-[ot:OF_TYPE]-(tt:TumorType) " +
             "WHERE st.label = {query} " +
-            "RETURN s, i, mod")
-    Collection<ModelCreation> findByOntology(@Param("query") String query);
+            "OR term.label = {query} " +
+            "AND (s.dataSource IN {dataSource} OR {dataSource}=[])  " +
+            "AND (tt.name IN {tumorType} OR {tumorType}=[])  " +
+            "RETURN mod, s,i,o,t,ot, tt")
+    Collection<ModelCreation> findByOntology(@Param("query") String query, @Param("markers") String[] markers,
+                                             @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
+
+    //Ontology powered search: molchar on specimen // BROKEN
+    @Query("MATCH (st:OntologyTerm)<-[*]-(term:OntologyTerm)-[mapp:MAPPED_TO]-(s:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
+            "MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
+            "MATCH (s:Sample)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
+            "MATCH (s:Sample)-[ot:OF_TYPE]-(tt:TumorType) " +
+            "WHERE st.label = {query} " +
+            "OR term.label = {query} " +
+            "AND (m.name IN {markers} OR {markers}=[])  " +
+            "AND (s.dataSource IN {dataSource} OR {dataSource}=[])  " +
+            "AND (tt.name IN {tumorType} OR {tumorType}=[])  " +
+            "RETURN mod, s,i,o,t,ot, tt, mc, ma, m, mar, cb, aw")
+    Collection<ModelCreation> findByOntology2(@Param("query") String query, @Param("markers") String[] markers,
+                                             @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
+
 
 }

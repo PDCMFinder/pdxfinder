@@ -4,7 +4,6 @@ import org.pdxfinder.services.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Set;
@@ -27,12 +26,9 @@ public class RestControllerGeneral
 
 
         @RequestMapping(method = RequestMethod.GET, value = "/DOAutoSuggest")
-        public Set<String> search3(@RequestParam(value="term", required = false) String term)
+        public Set<String> mappedDOTerm()
         {
-
-                if(term == null) term = "";
-
-                Set<String> autoSuggestList = graphService.searchResult(term);
+                Set<String> autoSuggestList = graphService.getMappedDOTerms();
                 return autoSuggestList;
         }
 }

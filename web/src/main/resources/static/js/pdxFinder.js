@@ -43,7 +43,7 @@ function insertSpinner(){
 
 function search() {
 
-    var q = jQuery("#searchField").val();
+    var q = jQuery("#pdxFinder").val();
     var markers = [];
     var dataSources = [];
     var originTumorTypes = [];
@@ -101,7 +101,7 @@ function displayResults(q,data){
     var markerString = '';
     for (var i in data){
 
-        if(data[i].cancerGenomics.length>0){
+        if(data[i].cancerGenomics != null && data[i].cancerGenomics.length>0){
             var m = data[i].cancerGenomics;
             markerString = '';
 

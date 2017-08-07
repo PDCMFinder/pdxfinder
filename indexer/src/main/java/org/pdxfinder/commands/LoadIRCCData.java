@@ -176,7 +176,7 @@ public class LoadIRCCData implements CommandLineRunner {
 
                 Sample sample = loaderUtils.getSample(samples.get(i).getSampleId(), samples.get(i).getTumorType(),
                         samples.get(i).getDiagnosis(), patientsMap.get(key).getPrimarySite(),
-                        samples.get(i).getSampleSite(), "", NORMAL_TISSUE, DS);
+                        samples.get(i).getSampleSite(),"Extraction Method", "", NORMAL_TISSUE, DS);
 
 
                 HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();

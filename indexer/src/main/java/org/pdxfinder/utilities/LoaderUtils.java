@@ -14,9 +14,9 @@ import org.springframework.util.Assert;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
+import org.apache.commons.cli.Option;
 
 /**
  * The hope was to put a lot of reused repository actions into one place ie find
@@ -28,6 +28,8 @@ import java.util.Set;
 @Component
 public class LoaderUtils {
 
+    public static Option loadAll = new Option("LoadAll",false,"Load all PDX Finder data");
+    
     private TumorTypeRepository tumorTypeRepository;
     private BackgroundStrainRepository backgroundStrainRepository;
     private ImplantationTypeRepository implantationTypeRepository;
@@ -45,6 +47,8 @@ public class LoaderUtils {
     private QualityAssuranceRepository qualityAssuranceRepository;
     private OntologyTermRepository ontologyTermRepository;
     private SpecimenRepository specimenRepository;
+    private PlatformRepository platformRepository;
+    private PlatformAssociationRepository platformAssociationRepository;
 
     private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
 
@@ -64,7 +68,9 @@ public class LoaderUtils {
                        PdxPassageRepository pdxPassageRepository,
                        QualityAssuranceRepository qualityAssuranceRepository,
                        OntologyTermRepository ontologyTermRepository,
-                       SpecimenRepository specimenRepository) {
+                       SpecimenRepository specimenRepository,
+                       PlatformRepository platformRepository,
+                       PlatformAssociationRepository platformAssociationRepository) {
 
         Assert.notNull(tumorTypeRepository);
         Assert.notNull(backgroundStrainRepository);
@@ -97,6 +103,8 @@ public class LoaderUtils {
         this.qualityAssuranceRepository = qualityAssuranceRepository;
         this.ontologyTermRepository = ontologyTermRepository;
         this.specimenRepository = specimenRepository;
+        this.platformRepository = platformRepository;
+        this.platformAssociationRepository = platformAssociationRepository;
 
     }
 
@@ -166,7 +174,7 @@ public class LoaderUtils {
 
         PatientSnapshot patientSnapshot = null;
 
-        Set<PatientSnapshot> pSnaps = patientSnapshotRepository.findByPatient(patient);
+        Set<PatientSnapshot> pSnaps = patientSnapshotRepository.findByPatient(patient.getExternalId());
         loop:
         for (PatientSnapshot ps : pSnaps) {
             if (ps.getAge().equals(age)) {
@@ -198,7 +206,7 @@ public class LoaderUtils {
         return patient;
     }
 
-    public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
+    public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
 
         TumorType type = this.getTumorType(typeStr);
         Tissue origin = this.getTissue(originStr);
@@ -206,7 +214,7 @@ public class LoaderUtils {
         Sample sample = sampleRepository.findBySourceSampleId(sourceSampleId);
         if (sample == null) {
 
-            sample = new Sample(sourceSampleId, type, diagnosis, origin, sampleSite, classification, normalTissue, externalDataSource);
+            sample = new Sample(sourceSampleId, type, diagnosis, origin, sampleSite,extractionMethod, classification, normalTissue, externalDataSource);
             sampleRepository.save(sample);
         }
 
@@ -390,6 +398,29 @@ public class LoaderUtils {
         return ot;
     }
 
+    public Collection<OntologyTerm> getAllOntologyTerms(){
+
+        Collection<OntologyTerm> ot = ontologyTermRepository.findAll();
+
+        return ot;
+    }
+
+    public int getIndirectMappingNumber(String label){
+
+        return ontologyTermRepository.getIndirectMappingNumber(label);
+    }
+
+    public int getDirectMappingNumber(String label){
+
+
+        Set<OntologyTerm> otset =  ontologyTermRepository.getDistinctSubTreeNodes(label);
+        int mapNum = 0;
+        for ( OntologyTerm ot:otset){
+            mapNum += ot.getDirectMappedSamplesNumber();
+        }
+        return mapNum;
+    }
+
     public void saveOntologyTerm(OntologyTerm ot){
 
         ontologyTermRepository.save(ot);
@@ -406,6 +437,43 @@ public class LoaderUtils {
 
     public Collection<Marker> getAllHumanMarkers() {
         return markerRepository.findAllHumanMarkers();
+    }
+    
+    public Platform getPlatform(String name, ExternalDataSource eds){
+        Platform p =  platformRepository.findByNameAndDataSource(name, eds.getName());
+        if(p == null){
+            p = new Platform();
+            p.setName(name);
+            p.setExternalDataSource(eds);
+            platformRepository.save(p);
+        }
+        
+        return p;
+    }
+    
+    public PlatformAssociation createPlatformAssociation(Platform p, Marker m){
+        if (platformAssociationRepository == null){
+            System.out.println("PAR is null");
+        }
+        if (p == null){
+            System.out.println("Platform is null");
+        }
+        if (p.getExternalDataSource() == null){
+            System.out.println("P.EDS is null");
+        }
+        if (m == null){
+            System.out.println("Marker is null");
+        }
+        PlatformAssociation pa = platformAssociationRepository.findByPlatformAndMarker(p.getName(),p.getExternalDataSource().getName(),m.getSymbol());
+        if(pa == null){
+            pa = new PlatformAssociation();
+            pa.setPlatform(p);
+            pa.setMarker(m);
+            platformAssociationRepository.save(pa);
+            
+        }
+        
+        return pa;
     }
 
 }

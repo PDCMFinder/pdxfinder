@@ -43,6 +43,7 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
     private final static String HISTOLOGY_NOTE = "Pathologist assessment of patient tumor and pdx model tumor histology slides.";
+    private final static String ENGRAFTMENT = "Engraftment";
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -85,6 +86,8 @@ public class LoadJAXData implements CommandLineRunner {
         parser = new DefaultParser();
         formatter = new HelpFormatter();
         log.info("Setting up LoadJAXDataCommand option");
+        options.addOption("loadJAX",false,"Load Jax PDX data");
+        options.addOption(LoaderUtils.loadAll);
     }
 
     public LoadJAXData(LoaderUtils loaderUtils, Session session) {
@@ -95,36 +98,30 @@ public class LoadJAXData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if ("loadJAX".equals(args[0]) || "-loadJAX".equals(args[0])) {
-
-            System.out.println("Loading JAX PDX data.");
             try {
                 cmd = parser.parse(options, args);
+                
 
             } catch (UnrecognizedOptionException | MissingArgumentException e) {
                 formatter.printHelp("loadJAX", options);
                 System.exit(1);
             }
-
-            // Delete all ?how? data currently associated to this data source
-            // this loaderUtils method does nothing!
-            try {
-                loaderUtils.deleteAllByEDSName(JAX_DATASOURCE_NAME);
-            } catch (Exception e) {
-                //       log.error("to be expected", e);
-            }
-            if (urlStr != null) {
-                log.info("Loading from URL " + urlStr);
-                parseJSON(parseURL(urlStr));
-            } else if (file != null) {
-                log.info("Loading from file " + file);
-                parseJSON(parseFile(file));
+            
+            if(cmd.hasOption("loadJAX") || cmd.hasOption(LoaderUtils.loadAll.getOpt())){
+                
+                System.out.println("Loading JAX PDX data.");
+                if (urlStr != null) {
+                    log.info("Loading from URL " + urlStr);
+                    parseJSON(parseURL(urlStr));
+                } else if (file != null) {
+                    log.info("Loading from file " + file);
+                    parseJSON(parseFile(file));
+                } else {
+                    log.error("No jaxpdx.file or jaxpdx.url provided in properties");
+                }
             } else {
-                log.error("No jaxpdx.file or jaxpdx.url provided in properties");
+                System.out.println("Not loading JAX. Use '-loadJAX' switch to load JAX data.");
             }
-        } else {
-            System.out.println("'" + args[0] + "' is not a recognized argument. Try 'loadJAX' to load JAX data.");
-        }
     }
 
     //JSON Fields {"Model ID","Gender","Age","Race","Ethnicity","Specimen Site","Primary Site","Initial Diagnosis","Clinical Diagnosis",
@@ -170,7 +167,7 @@ public class LoadJAXData implements CommandLineRunner {
                 j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
 
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), j.getString("Specimen Site"), classification, NORMAL_TISSUE_FALSE, jaxDS);
+                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, jaxDS);
 
         if (histologyMap.containsKey("Patient")) {
             Histology histology = new Histology();
@@ -180,46 +177,12 @@ public class LoadJAXData implements CommandLineRunner {
 
         }
 
-        JSONArray markers = j.getJSONArray("Markers");
-        HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
-        for (int mIndex = 0; mIndex < markers.length(); mIndex++) {
-            JSONObject marker = markers.getJSONObject(mIndex);
-            String symbol = marker.getString("Symbol");
-            String result = marker.getString("Result");
-            String technology = marker.getString("Technology");
-
-            MarkerAssociation ma = loaderUtils.getMarkerAssociation(result, symbol, symbol);
-            // make a map of markerAssociationCollections keyed to technology
-            if (markerMap.containsKey(technology)) {
-                markerMap.get(technology).add(ma);
-            } else {
-                HashSet<MarkerAssociation> set = new HashSet<>();
-                set.add(ma);
-                markerMap.put(technology, set);
-            }
-        }
-        HashSet<MolecularCharacterization> mcs = new HashSet<>();
-        for (String tech : markerMap.keySet()) {
-            MolecularCharacterization mc = new MolecularCharacterization();
-            mc.setTechnology(tech);
-            mc.setMarkerAssociations(markerMap.get(tech));
-
-            loaderUtils.saveMolecularCharacterization(mc);
-            mcs.add(mc);
-
-        }
-        sample.setMolecularCharacterizations(mcs);
-
-        // this should only be for pt samples?
-        pSnap.addSample(sample);
-        loaderUtils.savePatientSnapshot(pSnap);
-
         // For the moment, all JAX models are assumed to have been validated using Histological assessment by a pathologist
         // TODO: verify this is the case
         QualityAssurance qa = new QualityAssurance("Histology", HISTOLOGY_NOTE, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
 
-        ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS, qa);
+        ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), this.ENGRAFTMENT, sample, nsgBS, qa);
 
         loadVariationData(mc);
 
@@ -290,17 +253,19 @@ public class LoadJAXData implements CommandLineRunner {
                 ma.setSeqPosition(seqPosition);
                 ma.setReadDepth(readDepth);
 
-                Marker marker = null;
-
-                // for whatever reason some Truseq-Illumina use ensemblIDs as symbols
-                if ("Truseq-Illumina".equals(technology) && symbol.contains("ENSG")) {
-                    marker = loaderUtils.getMarkerByEnsemblId(symbol);
-                } else {
-                    marker = loaderUtils.getMarker(symbol);
-                    marker.setEntrezId(id);
-                }
+                Marker marker = loaderUtils.getMarker(symbol);
+                marker.setEntrezId(id);
                 
                 ma.setMarker(marker);
+                
+                Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
+                
+                // why would this happen?
+                if(platform.getExternalDataSource() == null){
+                    platform.setExternalDataSource(jaxDS);
+                }
+                loaderUtils.createPlatformAssociation(platform,marker);
+                
 
                 markerMap = sampleMap.get(sample);
                 if (markerMap == null) {
@@ -332,7 +297,7 @@ public class LoadJAXData implements CommandLineRunner {
                 HashSet<MolecularCharacterization> mcs = new HashSet<>();
                 for (String tech : markerMap.keySet()) {
                     MolecularCharacterization mc = new MolecularCharacterization();
-                    mc.setTechnology(tech);
+                    mc.setPlatform(loaderUtils.getPlatform(tech, this.jaxDS));
                     mc.setMarkerAssociations(markerMap.get(tech));
                     mcs.add(mc);
 
