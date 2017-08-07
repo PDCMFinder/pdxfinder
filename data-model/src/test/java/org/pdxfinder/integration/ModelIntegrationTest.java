@@ -148,6 +148,9 @@ public class ModelIntegrationTest extends BaseTest {
         Sample s = new Sample("test", tumorType, "adinocarcinoma", tissue, null, "F", false, externalDataSource);
         s.setMolecularCharacterizations(new HashSet<>(Collections.singletonList(mc)));
 
+        Sample specimenSample = new Sample("specimenSampleTest", tumorType, "adinocarcinoma", tissue, null, null, false, externalDataSource);
+        specimenSample.setMolecularCharacterizations(new HashSet<>(Collections.singletonList(mcPassage)));
+
         ps.setSamples(new HashSet<>(Collections.singletonList(s)));
 
         patientRepository.save(patient);
@@ -166,7 +169,7 @@ public class ModelIntegrationTest extends BaseTest {
         PdxPassage pdxPassage1 = new PdxPassage(pdxPassage, 1);
         pdxPassage1.setPdxPassage(pdxPassage);
 
-        Specimen specimen = new Specimen("TEST_SPECIMEN", new HashSet<>(Collections.singletonList(mcPassage)), null);
+        Specimen specimen = new Specimen("TEST_SPECIMEN", null, specimenSample);
         specimen.setPdxPassage(pdxPassage1);
 
 
