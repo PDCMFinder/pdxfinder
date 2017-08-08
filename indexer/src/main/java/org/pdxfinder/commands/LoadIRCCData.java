@@ -176,12 +176,12 @@ public class LoadIRCCData implements CommandLineRunner {
 
                 Sample sample = loaderUtils.getSample(samples.get(i).getSampleId(), samples.get(i).getTumorType(),
                         samples.get(i).getDiagnosis(), patientsMap.get(key).getPrimarySite(),
-                        samples.get(i).getSampleSite(),"Extraction Method", "", NORMAL_TISSUE, DS);
+                        samples.get(i).getSampleSite(), "Extraction Method", "", NORMAL_TISSUE, DS);
 
 
                 HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
 
-                if (samples.get(i).getMsiStatus() != "NA") {
+                if (!samples.get(i).getMsiStatus().equals("NA")) {
                     MarkerAssociation msia = loaderUtils.getMarkerAssociation(samples.get(i).getMsiStatus(), "MSI", "MSI");
                     // make a map of markerAssociationCollections keyed to technology
                     if (markerMap.containsKey(MC_TECH)) {
@@ -193,24 +193,24 @@ public class LoadIRCCData implements CommandLineRunner {
                     }
                 }
 
-                if (samples.get(i).getKrasStatus() != "NA") {
+                if (!samples.get(i).getKrasStatus().equals("NA")) {
                     MarkerAssociation krasa = loaderUtils.getMarkerAssociation(samples.get(i).getKrasStatus(), "KRAS", "KRAS");
                     // make a map of markerAssociationCollections keyed to technology
                     markerMap.get(MC_TECH).add(krasa);
                 }
 
-                if (samples.get(i).getBrafStatus() != "NA") {
+                if (!samples.get(i).getBrafStatus().equals("NA")) {
                     MarkerAssociation brafa = loaderUtils.getMarkerAssociation(samples.get(i).getBrafStatus(), "BRAF", "BRAF");
                     // make a map of markerAssociationCollections keyed to technology
                     markerMap.get(MC_TECH).add(brafa);
                 }
 
-                if (samples.get(i).getNrasStatus() != "NA") {
+                if (!samples.get(i).getNrasStatus().equals("NA")) {
                     MarkerAssociation nrasa = loaderUtils.getMarkerAssociation(samples.get(i).getNrasStatus(), "NRAS", "NRAS");
                     // make a map of markerAssociationCollections keyed to technology
                     markerMap.get(MC_TECH).add(nrasa);
                 }
-                if (samples.get(i).getPik3caStatus() != "NA") {
+                if (!samples.get(i).getPik3caStatus().equals("NA")) {
                     MarkerAssociation pik3caa = loaderUtils.getMarkerAssociation(samples.get(i).getPik3caStatus(), "PIK3CA", "PIK3CA");
                     // make a map of markerAssociationCollections keyed to technology
                     markerMap.get(MC_TECH).add(pik3caa);

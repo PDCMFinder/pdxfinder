@@ -86,13 +86,12 @@ public class LoadJAXData implements CommandLineRunner {
         parser = new DefaultParser();
         formatter = new HelpFormatter();
         log.info("Setting up LoadJAXDataCommand option");
-        options.addOption("loadJAX",false,"Load Jax PDX data");
+        options.addOption("loadJAX", false, "Load Jax PDX data");
         options.addOption(LoaderUtils.loadAll);
     }
 
-    public LoadJAXData(LoaderUtils loaderUtils, Session session) {
+    public LoadJAXData(LoaderUtils loaderUtils) {
         this.loaderUtils = loaderUtils;
-        this.session = session;
     }
 
     @Override
@@ -100,28 +99,28 @@ public class LoadJAXData implements CommandLineRunner {
 
             try {
                 cmd = parser.parse(options, args);
-                
+
 
             } catch (UnrecognizedOptionException | MissingArgumentException e) {
                 formatter.printHelp("loadJAX", options);
                 System.exit(1);
             }
-            
-            if(cmd.hasOption("loadJAX") || cmd.hasOption(LoaderUtils.loadAll.getOpt())){
-                
-                System.out.println("Loading JAX PDX data.");
-                if (urlStr != null) {
-                    log.info("Loading from URL " + urlStr);
-                    parseJSON(parseURL(urlStr));
-                } else if (file != null) {
-                    log.info("Loading from file " + file);
-                    parseJSON(parseFile(file));
-                } else {
-                    log.error("No jaxpdx.file or jaxpdx.url provided in properties");
-                }
+
+        if (cmd.hasOption("loadJAX") || cmd.hasOption(LoaderUtils.loadAll.getOpt())) {
+
+            System.out.println("Loading JAX PDX data.");
+            if (urlStr != null) {
+                log.info("Loading from URL " + urlStr);
+                parseJSON(parseURL(urlStr));
+            } else if (file != null) {
+                log.info("Loading from file " + file);
+                parseJSON(parseFile(file));
             } else {
-                System.out.println("Not loading JAX. Use '-loadJAX' switch to load JAX data.");
+                log.error("No jaxpdx.file or jaxpdx.url provided in properties");
             }
+        } else {
+            System.out.println("Not loading JAX. Use '-loadJAX' switch to load JAX data.");
+        }
     }
 
     //JSON Fields {"Model ID","Gender","Age","Race","Ethnicity","Specimen Site","Primary Site","Initial Diagnosis","Clinical Diagnosis",
@@ -149,7 +148,7 @@ public class LoadJAXData implements CommandLineRunner {
     }
 
     @Transactional
-    private void createGraphObjects(JSONObject j) throws Exception {
+    void createGraphObjects(JSONObject j) throws Exception {
         String id = j.getString("Model ID");
 
         histologyMap = getHistologyImageMap(id);
@@ -257,14 +256,14 @@ public class LoadJAXData implements CommandLineRunner {
                 marker.setEntrezId(id);
                 
                 ma.setMarker(marker);
-                
+
                 Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
-                
+
                 // why would this happen?
-                if(platform.getExternalDataSource() == null){
+                if (platform.getExternalDataSource() == null) {
                     platform.setExternalDataSource(jaxDS);
                 }
-                loaderUtils.createPlatformAssociation(platform,marker);
+                loaderUtils.createPlatformAssociation(platform, marker);
                 
 
                 markerMap = sampleMap.get(sample);
@@ -306,7 +305,7 @@ public class LoadJAXData implements CommandLineRunner {
                 PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
 
                 Specimen specimen = loaderUtils.getSpecimen(sampleKey);
-                specimen.setMolecularCharacterizations(mcs);
+//                specimen.setMolecularCharacterizations(mcs);
                 specimen.setPdxPassage(pdxPassage);
 
                 if (histologyMap.containsKey(pdxPassage)) {

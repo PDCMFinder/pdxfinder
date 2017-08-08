@@ -138,17 +138,17 @@ public class ModelIntegrationTest extends BaseTest {
         ma.setMarker(marker);
         mc.setMarkerAssociations(new HashSet<>(Collections.singletonList(ma)));
 
-        Sample sample = new Sample("sample-1", tumorType, "TEST_DIAGNOSIS", tissue, tissue,"Surgical Resection", "TEST_CLASSIFICATION", false, externalDataSource);
+        Sample sample = new Sample("sample-1", tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false, externalDataSource);
         sampleRepository.save(sample);
 
         Patient patient = new Patient("patient_id_1", "F", null, null, externalDataSource);
         PatientSnapshot ps = new PatientSnapshot(patient, "67");
         patient.hasSnapshot(ps);
 
-        Sample s = new Sample("test", tumorType, "adinocarcinoma", tissue, null,"Surgical Resection", "F", false, externalDataSource);
+        Sample s = new Sample("test", tumorType, "adinocarcinoma", tissue, null, "Surgical Resection", "F", false, externalDataSource);
         s.setMolecularCharacterizations(new HashSet<>(Collections.singletonList(mc)));
 
-        Sample specimenSample = new Sample("specimenSampleTest", tumorType, "adinocarcinoma", tissue, null, null, false, externalDataSource);
+        Sample specimenSample = new Sample("specimenSampleTest", tumorType, "adinocarcinoma", tissue, null, "", "", false, externalDataSource);
         specimenSample.setMolecularCharacterizations(new HashSet<>(Collections.singletonList(mcPassage)));
 
         ps.setSamples(new HashSet<>(Collections.singletonList(s)));

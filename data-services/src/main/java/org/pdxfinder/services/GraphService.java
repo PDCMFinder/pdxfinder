@@ -18,7 +18,7 @@ import java.util.*;
 public class GraphService {
 
 
-        private final static Logger log = LoggerFactory.getLogger(GraphService.class);
+    private final static Logger log = LoggerFactory.getLogger(GraphService.class);
 
     private SampleRepository sampleRepository;
     private OntologyTermRepository ontologyTermRepositoryRepository;
@@ -29,27 +29,25 @@ public class GraphService {
     }
 
 
-
-        public Set<String> getMappedDOTerms()
-        {
+    public Set<String> getMappedDOTerms() {
 
 
-                Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findAllWithMappings();
-                Set<String> dataReport = new HashSet<>();
+        Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findAllWithMappings();
+        Set<String> dataReport = new HashSet<>();
 
-                for (OntologyTerm ontologyTerm : ontologyTerms){
-                    if(ontologyTerm.getLabel() != null){
+        for (OntologyTerm ontologyTerm : ontologyTerms) {
+            if (ontologyTerm.getLabel() != null) {
 
-                        dataReport.add(ontologyTerm.getLabel()+" ("+ontologyTerm.getIndirectMappedSamplesNumber()+")");
-                    }
-                }
-                // Arrange the result alphabetically
-                Set<String> sortedData = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-                sortedData.addAll(dataReport);
-
-                return sortedData;
-
+                dataReport.add(ontologyTerm.getLabel() + " (" + ontologyTerm.getIndirectMappedSamplesNumber() + ")");
+            }
         }
+        // Arrange the result alphabetically
+        Set<String> sortedData = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        sortedData.addAll(dataReport);
+
+        return sortedData;
+
+    }
 
 
     public Map<String, Integer> getCancerSubtypeCounts() {
