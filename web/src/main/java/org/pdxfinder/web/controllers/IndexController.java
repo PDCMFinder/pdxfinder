@@ -32,8 +32,7 @@ public class IndexController {
         JSONArray dCancerBySystemDataSeriesArray = new JSONArray();
 
         Map<String, Integer> cancerBySystemData = graphService.getModelCountsBySystem();
-        for (String name : cancerBySystemData.keySet())
-        {
+        for (String name : cancerBySystemData.keySet()) {
 
             JSONObject indexData = new JSONObject();
             indexData.put("name", name);

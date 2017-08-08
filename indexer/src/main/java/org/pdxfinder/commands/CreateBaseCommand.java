@@ -13,7 +13,6 @@ import org.pdxfinder.repositories.TumorTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +28,7 @@ import java.util.List;
  * Loads the required Sample Type nodes into the database
  */
 @Component
-@Order(value = Ordered.LOWEST_PRECEDENCE)
+@Order
 public class CreateBaseCommand implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(CreateBaseCommand.class);
@@ -55,11 +54,11 @@ public class CreateBaseCommand implements CommandLineRunner {
     }
 
     public CreateBaseCommand(TumorTypeRepository tumorTypeRepository, BackgroundStrainRepository backgroundStrainRepository, ImplantationSiteRepository implantationSiteRepository, ImplantationTypeRepository implantationTypeRepository, Session session) {
-        Assert.notNull(tumorTypeRepository);
-        Assert.notNull(backgroundStrainRepository);
-        Assert.notNull(implantationSiteRepository);
-        Assert.notNull(implantationTypeRepository);
-        Assert.notNull(session);
+        Assert.notNull(tumorTypeRepository, "tumorTypeRepository is null");
+        Assert.notNull(backgroundStrainRepository, "backgroundStrainRepository is null");
+        Assert.notNull(implantationSiteRepository, "implantationSiteRepository is null");
+        Assert.notNull(implantationTypeRepository, "implantationTypeRepository is null");
+        Assert.notNull(session, "session is null");
 
         this.tumorTypeRepository = tumorTypeRepository;
         this.backgroundStrainRepository = backgroundStrainRepository;
@@ -131,12 +130,11 @@ public class CreateBaseCommand implements CommandLineRunner {
     private void createBackgroundStrains() {
 
         List<BackgroundStrain> strains = new ArrayList<>();
-        BackgroundStrain bg;
 
         // NOG strain
         strains.add(
                 new BackgroundStrain(
-                        "NOD/Shi-scid/IL-2Rγ<null>",
+                        "NOD/Shi-scid/IL-2R\u03BB<null>",
                         "NOD scid gamma")
         );
 
