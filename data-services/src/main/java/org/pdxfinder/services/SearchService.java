@@ -39,6 +39,14 @@ public class SearchService {
     }
 
 
+    public int modelCount() {
+
+        int pdxCount = modelCreationRepository.countAllModels();
+        return  pdxCount;
+
+    }
+
+
     public Boolean isExistingOntologyTerm(String query) {
 
         if (ontologyTermRepositoryRepository.findByLabel(query) != null) return true;

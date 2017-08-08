@@ -15,6 +15,11 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
 
     ModelCreation findBySourcePdxId(@Param("modelId") String modelId);
 
+
+    @Query("MATCH (model:ModelCreation) return count(model) ")
+    int countAllModels();
+
+
     @Query("MATCH (s:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
             "WHERE s.sourceSampleId = {sampleId} " +
             "RETURN mod")
