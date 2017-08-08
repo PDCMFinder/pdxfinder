@@ -49,7 +49,7 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
 
             log.info("Mapping samples to DO terms.");
             long startTime = System.currentTimeMillis();
-            //mapSamplesToTerms();
+            mapSamplesToTerms();
             updateIndirectMappingData();
             long endTime   = System.currentTimeMillis();
             long totalTime = endTime - startTime;
