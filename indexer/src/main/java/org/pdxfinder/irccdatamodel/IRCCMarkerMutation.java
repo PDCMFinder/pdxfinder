@@ -16,6 +16,7 @@ public class IRCCMarkerMutation {
     String startPosition;
     String endPosition;
     String strand;
+    String variantClassification;
     String hgvspShort;
     String proteinPosition;
     String swissprot;
@@ -25,7 +26,7 @@ public class IRCCMarkerMutation {
 
     public IRCCMarkerMutation(String modelId, String hugoSymbol, String entrezId, String ncbiBuild, String exon, String chromosome,
                               String start, String end, String startPosition, String endPosition, String strand,
-                              String hgvspShort, String proteinPosition, String swissprot, String xenoPassage, String platform) {
+                              String hgvspShort, String proteinPosition, String swissprot, String xenoPassage, String platform, String variantClassification) {
 
         this.modelId = modelId;
         this.hugoSymbol = hugoSymbol;
@@ -43,6 +44,7 @@ public class IRCCMarkerMutation {
         this.swissprot = swissprot;
         this.xenoPassage = xenoPassage;
         this.platform = platform;
+        this.variantClassification = variantClassification;
     }
 
     public String getHugoSymbol() {
@@ -107,5 +109,9 @@ public class IRCCMarkerMutation {
 
     public String getModelId() {
         return modelId;
+    }
+
+    public String getVariantClassification() {
+        return variantClassification;
     }
 }
