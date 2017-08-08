@@ -20,6 +20,9 @@ import java.util.Map;
 @Controller
 public class IndexController {
 
+
+    private Integer numModels = null;
+
     private GraphService graphService;
     private SearchService searchService;
 
@@ -46,22 +49,18 @@ public class IndexController {
             dCancerBySystemDataSeriesArray.put(indexData);
 
         }
-
         model.addAttribute("cancerBySystem", dCancerBySystemDataSeriesArray.toString());
 
 
-
-        String modelCount = "";
-        if (session.getAttribute("sessnPDXCount") == null)
+        synchronized (this)
         {
-            int pdxCount = searchService.modelCount();
-            pdxCount += 100 - (pdxCount % 100);
-            session.setAttribute("sessnPDXCount", pdxCount);
+            if (numModels == null) {
+                int pdxCount = searchService.modelCount();
+                pdxCount += 100 - (pdxCount % 100);
+                numModels = pdxCount;
+            }
         }
-
-        modelCount = session.getAttribute("sessnPDXCount")+"+";
-
-        model.addAttribute("modelCount", modelCount);
+        model.addAttribute("modelCount", numModels);
 
 
 
