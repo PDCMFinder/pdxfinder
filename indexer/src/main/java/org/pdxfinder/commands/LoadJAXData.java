@@ -43,6 +43,7 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
     private final static String HISTOLOGY_NOTE = "Pathologist assessment of patient tumor and pdx model tumor histology slides.";
+    private final static String ENGRAFTMENT = "Engraftment";
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -85,13 +86,12 @@ public class LoadJAXData implements CommandLineRunner {
         parser = new DefaultParser();
         formatter = new HelpFormatter();
         log.info("Setting up LoadJAXDataCommand option");
-        options.addOption("loadJAX",false,"Load Jax PDX data");
+        options.addOption("loadJAX", false, "Load Jax PDX data");
         options.addOption(LoaderUtils.loadAll);
     }
 
-    public LoadJAXData(LoaderUtils loaderUtils, Session session) {
+    public LoadJAXData(LoaderUtils loaderUtils) {
         this.loaderUtils = loaderUtils;
-        this.session = session;
     }
 
     @Override
@@ -99,28 +99,28 @@ public class LoadJAXData implements CommandLineRunner {
 
             try {
                 cmd = parser.parse(options, args);
-                
+
 
             } catch (UnrecognizedOptionException | MissingArgumentException e) {
                 formatter.printHelp("loadJAX", options);
                 System.exit(1);
             }
-            
-            if(cmd.hasOption("loadJAX") || cmd.hasOption(LoaderUtils.loadAll.getOpt())){
-                
-                System.out.println("Loading JAX PDX data.");
-                if (urlStr != null) {
-                    log.info("Loading from URL " + urlStr);
-                    parseJSON(parseURL(urlStr));
-                } else if (file != null) {
-                    log.info("Loading from file " + file);
-                    parseJSON(parseFile(file));
-                } else {
-                    log.error("No jaxpdx.file or jaxpdx.url provided in properties");
-                }
+
+        if (cmd.hasOption("loadJAX") || cmd.hasOption(LoaderUtils.loadAll.getOpt())) {
+
+            System.out.println("Loading JAX PDX data.");
+            if (urlStr != null) {
+                log.info("Loading from URL " + urlStr);
+                parseJSON(parseURL(urlStr));
+            } else if (file != null) {
+                log.info("Loading from file " + file);
+                parseJSON(parseFile(file));
             } else {
-                System.out.println("Not loading JAX. Use '-loadJAX' switch to load JAX data.");
+                log.error("No jaxpdx.file or jaxpdx.url provided in properties");
             }
+        } else {
+            System.out.println("Not loading JAX. Use '-loadJAX' switch to load JAX data.");
+        }
     }
 
     //JSON Fields {"Model ID","Gender","Age","Race","Ethnicity","Specimen Site","Primary Site","Initial Diagnosis","Clinical Diagnosis",
@@ -148,7 +148,7 @@ public class LoadJAXData implements CommandLineRunner {
     }
 
     @Transactional
-    private void createGraphObjects(JSONObject j) throws Exception {
+    void createGraphObjects(JSONObject j) throws Exception {
         String id = j.getString("Model ID");
 
         histologyMap = getHistologyImageMap(id);
@@ -166,7 +166,7 @@ public class LoadJAXData implements CommandLineRunner {
                 j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
 
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), j.getString("Specimen Site"), classification, NORMAL_TISSUE_FALSE, jaxDS);
+                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, jaxDS);
 
         if (histologyMap.containsKey("Patient")) {
             Histology histology = new Histology();
@@ -181,7 +181,7 @@ public class LoadJAXData implements CommandLineRunner {
         QualityAssurance qa = new QualityAssurance("Histology", HISTOLOGY_NOTE, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
 
-        ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS, qa);
+        ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), this.ENGRAFTMENT, sample, nsgBS, qa);
 
         loadVariationData(mc);
 
@@ -256,14 +256,14 @@ public class LoadJAXData implements CommandLineRunner {
                 marker.setEntrezId(id);
                 
                 ma.setMarker(marker);
-                
+
                 Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
-                
+
                 // why would this happen?
-                if(platform.getExternalDataSource() == null){
+                if (platform.getExternalDataSource() == null) {
                     platform.setExternalDataSource(jaxDS);
                 }
-                loaderUtils.createPlatformAssociation(platform,marker);
+                loaderUtils.createPlatformAssociation(platform, marker);
                 
 
                 markerMap = sampleMap.get(sample);
@@ -305,7 +305,7 @@ public class LoadJAXData implements CommandLineRunner {
                 PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
 
                 Specimen specimen = loaderUtils.getSpecimen(sampleKey);
-                specimen.setMolecularCharacterizations(mcs);
+//                specimen.setMolecularCharacterizations(mcs);
                 specimen.setPdxPassage(pdxPassage);
 
                 if (histologyMap.containsKey(pdxPassage)) {

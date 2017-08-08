@@ -63,7 +63,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "AND (tt.name IN {tumorType} OR {tumorType}=[])  " +
             "RETURN mod, s,i,o,t,ot, tt, mc, ma, m, mar, cb, aw")
     Collection<ModelCreation> findByOntology2(@Param("query") String query, @Param("markers") String[] markers,
-                                             @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
+                                              @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
 
 
 }

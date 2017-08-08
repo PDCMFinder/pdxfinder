@@ -11,13 +11,17 @@ public class SampleToDiseaseOntologyRelationship {
 
         @GraphId
         private Long relationshipId;
-        @Property
+
+    @Property
         private String type;
-        @Property
+
+    @Property
         private String justification;
-        @StartNode
+
+    @StartNode
         private Sample sample;
-        @EndNode
+
+    @EndNode
         private OntologyTerm ontologyTerm;
 
 

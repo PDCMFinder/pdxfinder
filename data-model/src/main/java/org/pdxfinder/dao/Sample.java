@@ -22,6 +22,7 @@ public class Sample {
     private String diagnosis;
     private Tissue originTissue;
     private Tissue sampleSite;
+    private String extractionMethod;
     private String classification;
     private String dataSource;
     private ExternalDataSource externalDataSource;
@@ -43,12 +44,13 @@ public class Sample {
         // Empty constructor required as of Neo4j API 2.0.5
     }
 
-    public Sample(String sourceSampleId, TumorType type, String diagnosis, Tissue originTissue, Tissue sampleSite, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
+    public Sample(String sourceSampleId, TumorType type, String diagnosis, Tissue originTissue, Tissue sampleSite, String extractionMethod, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
         this.sourceSampleId = sourceSampleId;
         this.type = type;
         this.diagnosis = diagnosis;
         this.originTissue = originTissue;
         this.sampleSite = sampleSite;
+        this.extractionMethod = extractionMethod;
         this.classification = classification;
         this.dataSource = externalDataSource.getAbbreviation();
         this.externalDataSource = externalDataSource;
@@ -159,5 +161,19 @@ public class Sample {
     
     public Set<Histology> getHistology(){
         return this.histology;
+    }
+
+    /**
+     * @return the extractionMethod
+     */
+    public String getExtractionMethod() {
+        return extractionMethod;
+    }
+
+    /**
+     * @param extractionMethod the extractionMethod to set
+     */
+    public void setExtractionMethod(String extractionMethod) {
+        this.extractionMethod = extractionMethod;
     }
 }

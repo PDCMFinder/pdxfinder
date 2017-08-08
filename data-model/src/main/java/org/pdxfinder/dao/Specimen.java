@@ -1,10 +1,10 @@
 package org.pdxfinder.dao;
 
-import java.util.HashSet;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -18,20 +18,25 @@ public class Specimen {
 
     private String externalId;
 
-    @Relationship(type = "CHARACTERIZED_BY", direction = Relationship.OUTGOING)
-    private Set<MolecularCharacterization> molecularCharacterizations;
-
-    @Relationship(type = "HISTOLOGY", direction = Relationship.OUTGOING)
+    @Relationship(type = "HISTOLOGY")
     private Set<Histology> histology;
 
     @Relationship(type = "PASSAGED_FROM", direction = Relationship.INCOMING)
     private PdxPassage pdxPassage;
 
+    @Relationship(type = "SAMPLED_FROM")
+    private Sample sample;
 
-    public Specimen(String externalId, Set<MolecularCharacterization> molecularCharacterizations, Set<Histology> histology) {
+
+    public Specimen(String externalId, Set<Histology> histology) {
         this.externalId = externalId;
-        this.molecularCharacterizations = molecularCharacterizations;
         this.histology = histology;
+    }
+
+    public Specimen(String externalId, Set<Histology> histology, Sample sample) {
+        this.externalId = externalId;
+        this.histology = histology;
+        this.sample = sample;
     }
 
     public Specimen() {
@@ -43,14 +48,6 @@ public class Specimen {
 
     public void setExternalId(String externalId) {
         this.externalId = externalId;
-    }
-
-    public Set<MolecularCharacterization> getMolecularCharacterizations() {
-        return molecularCharacterizations;
-    }
-
-    public void setMolecularCharacterizations(Set<MolecularCharacterization> molecularCharacterizations) {
-        this.molecularCharacterizations = molecularCharacterizations;
     }
 
     public void setHistology(Set<Histology> histology){
@@ -76,5 +73,13 @@ public class Specimen {
 
     public void setPdxPassage(PdxPassage pdxPassage) {
         this.pdxPassage = pdxPassage;
+    }
+
+    public Sample getSample() {
+        return sample;
+    }
+
+    public void setSample(Sample sample) {
+        this.sample = sample;
     }
 }
