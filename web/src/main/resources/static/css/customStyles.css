@@ -9,7 +9,6 @@
 
 .pdxSummary{
     background-color: #fff;
-    border: 1px dashed #ccc;
     padding: 15px;
     margin-top: -15px;
 }
@@ -17,7 +16,7 @@
 .pdxSummary hr {
     margin-top: 4px;
     background-color: #fff;
-    border-top: 1px dashed #ccc;
+    border-top: 1px solid #ccc;
 }
 
 .pdxSummary ul li {
@@ -42,7 +41,6 @@
 }
 
 .btn{
-    height:37px;
     padding:6px 15px;
     font-size:12px;
     border-radius:3px;
@@ -51,7 +49,7 @@
 hr {
     margin-top: 4px;
     background-color: #fff;
-    border-top: 2px dashed #ccc;
+    border-top: 1px solid #ccc;
 }
 
 h4{
@@ -292,4 +290,15 @@ h5{
 
 
 
+/**********************************  Overwrite bootstrap default notification starts ************************************************/
+.alert{padding:12px;margin-top:20px;border:1px solid transparent;border-radius:4px;}
+.alert .alert-link{font-weight:700}
+.alert-info, .alert-info a{text-align: center; color: #fff; background-color:#31708f;border-color:#31708f; }
+.alert-info hr{border-top-color:#a6e1ec}
+.alert-info .alert-link{color:#245269}
+.alert-dismissable,.alert-dismissible{padding-right:30px}
+.alert-dismissable .close, .alert-dismissible .close{position:relative;top:-2px;right:-21px;color:#fff;}
 
+
+
+/********************************** Overwrite bootstrap default notification Ends ************************************************/

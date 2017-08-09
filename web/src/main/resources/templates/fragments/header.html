@@ -5,8 +5,6 @@
 
     <link th:href="@{/webjars/bootswatch-flatly/css/bootstrap.min.css}"
           href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" media="screen"/>
-    <link th:href="@{/css/pdxfinder.css}" href="../static/css/pdxfinder.css" rel="stylesheet" media="screen"/>
-    <link th:href="@{/css/customStyles.css}" href="../static/css/customStyles.css" rel="stylesheet" media="screen"/>
     <title>PDX Finder</title>
 </head>
 <body>
@@ -48,6 +46,15 @@
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
         </nav>
+
+        <div class="alert alert-info alert-dismissable">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">X</a>
+            <a href="https://listserver.ebi.ac.uk/mailman/listinfo/pdxfinder-announce" target="_blank">
+                <strong>
+                PDX Finder is in active development, we are recruiting new datasets and working on the web interface - please register for our newsletter to follow updates !
+                </strong>
+            </a>
+        </div>
 
         <script th:if="${#arrays.contains(@environment.getActiveProfiles(),'live')}">
             (function (i, s, o, g, r, a, m) {

@@ -22,11 +22,11 @@
             <img class="img-responsive img-rounded center-block" src="../static/images/pdx_logo.png" th:src="@{/images/pdx_logo.png}" alt=""/>
         </div>
         <!-- /.col-md-4 -->
-        <div class="col-md-8">
-            <h1 style="margin-top:-30px;">Welcome to the PDX Finder</h1>
+        <div class="col-md-8" style="margin-top: -20px;">
+            <h2 style="margin-top:-30px;">Welcome to the PDX Finder</h2>
             <p class="fillUp">
                     <ul>
-                        <li> Patients-derived tumor xenograft <a href="#" data-toggle="modal" data-target="#pdx-modal" onclick="return false;">(PDX) mouse models</a>
+                        <li>  Patients-derived tumor xenograft <a href="#" data-toggle="modal" data-target="#pdx-modal" onclick="return false;">(PDX) mouse models</a>
                             are an important oncology research platform to study tumor evolution, drug response and personalised medicine approaches. </li>
                         <li> Global success of PDX models will depend on their collective distribution and usage worldwide by academic and private sectors. </li>
                         <li> To facilitate PDX models discovery, <a href="http://www.ebi.ac.uk/about/people/terry-meehan" target="_blank">EMBL-EBI</a>
@@ -114,15 +114,15 @@
         </div>
         <!-- /.col-md-8 -->
         <div class="col-md-12">
-            <a th:href="@{/search}" class="btn btn-success btn-block text-center" href="#"> <span
-                    style="font-size: 20px; margin-bottom: 20px;"> Search PDX models </span> </a>
+            <a th:href="@{/search}" class="btn btn-success  btn-block text-center" href="#"> <span style="font-size: 20px; margin-bottom: 20px;"> Search PDX models </span> </a>
         </div>
     </div>
     <!-- /.row -->
 <br>
 
 
-        <h4> PDX Finder contains more than 800 PDX models from the following sources </h4><hr/>
+    <h4 th:inline="text"> PDX Finder contains [[${modelCount}]] PDX models from the following sources </h4><hr/>
+
 
     <!-- Content Row -->
     <div class="row">
