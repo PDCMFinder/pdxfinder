@@ -48,6 +48,7 @@ public class IndexController {
             dCancerBySystemDataSeriesArray.put(indexData);
 
         }
+
         model.addAttribute("cancerBySystem", dCancerBySystemDataSeriesArray.toString());
 
 
