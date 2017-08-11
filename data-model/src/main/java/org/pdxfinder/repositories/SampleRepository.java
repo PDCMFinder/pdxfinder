@@ -45,9 +45,9 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
 
 
     @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
-            "WHERE mod.sourcePdxId = 'J000078336' " +
+            "WHERE mod.sourcePdxId = {sourcePdxId} " +
             "WITH s, mod, ii " +
-            "OPTIONAL MATCH (s)-[o:ORIGIN_TISSUE]-(t:Tissue)\n" +
+            "OPTIONAL MATCH (s)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
             "OPTIONAL MATCH (s)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
             "OPTIONAL MATCH (s)-[ot:OF_TYPE]-(tt:TumorType) " +
             "RETURN mod,ii,s,o,t,ot, tt, mc, ma, m, mar, cb, aw")

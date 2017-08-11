@@ -19,6 +19,20 @@ public class IRCCEGARow {
     String sampleOrigin;
     String sequencingPlatform;
 
+    //data from Neo4j
+    private String externalId;
+    private String sex;
+    private String race;
+    private String ethnicity;
+    private String dataSource;
+    private String age;
+    private String sourceSampleId;
+    private String diagnosis;
+    private String originTissue;
+    private String sampleSite;
+    private String classification;
+
+
 
     public IRCCEGARow(String egaId, String sameId, String internalId, String torinoId, String bamFileName, String md5Sum, String encrMd5) {
         this.egaId = egaId;
@@ -125,5 +139,93 @@ public class IRCCEGARow {
 
     public void setSequencingPlatform(String sequencingPlatform) {
         this.sequencingPlatform = sequencingPlatform;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public String getRace() {
+        return race;
+    }
+
+    public void setRace(String race) {
+        this.race = race;
+    }
+
+    public String getEthnicity() {
+        return ethnicity;
+    }
+
+    public void setEthnicity(String ethnicity) {
+        this.ethnicity = ethnicity;
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    public String getSourceSampleId() {
+        return sourceSampleId;
+    }
+
+    public void setSourceSampleId(String sourceSampleId) {
+        this.sourceSampleId = sourceSampleId;
+    }
+
+    public String getDiagnosis() {
+        return diagnosis;
+    }
+
+    public void setDiagnosis(String diagnosis) {
+        this.diagnosis = diagnosis;
+    }
+
+    public String getOriginTissue() {
+        return originTissue;
+    }
+
+    public void setOriginTissue(String originTissue) {
+        this.originTissue = originTissue;
+    }
+
+    public String getSampleSite() {
+        return sampleSite;
+    }
+
+    public void setSampleSite(String sampleSite) {
+        this.sampleSite = sampleSite;
+    }
+
+    public String getClassification() {
+        return classification;
+    }
+
+    public void setClassification(String classification) {
+        this.classification = classification;
     }
 }

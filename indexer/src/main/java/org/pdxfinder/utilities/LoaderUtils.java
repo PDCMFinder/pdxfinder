@@ -206,6 +206,16 @@ public class LoaderUtils {
         return patient;
     }
 
+    public Patient getPatientBySampleId(String sampleId){
+
+        return patientRepository.findBySampleId(sampleId);
+    }
+
+    public PatientSnapshot getPatientSnapshotByModelId(String modelId){
+
+        return patientSnapshotRepository.findByModelId(modelId);
+    }
+
     public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
 
         TumorType type = this.getTumorType(typeStr);
@@ -225,6 +235,10 @@ public class LoaderUtils {
 
         Sample sample = sampleRepository.findBySourceSampleId(sourceSampleId);
         return sample;
+    }
+
+    public Sample getSampleBySourcePdxId(String pdxId){
+        return sampleRepository.findBySourcePdxId(pdxId);
     }
 
     public void saveSample(Sample sample){
