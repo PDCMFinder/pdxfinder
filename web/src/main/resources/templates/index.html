@@ -22,11 +22,11 @@
             <img class="img-responsive img-rounded center-block" src="../static/images/pdx_logo.png" th:src="@{/images/pdx_logo.png}" alt=""/>
         </div>
         <!-- /.col-md-4 -->
-        <div class="col-md-8">
-            <h1 style="margin-top:-30px;">Welcome to the PDX Finder</h1>
+        <div class="col-md-8" style="margin-top: -20px;">
+            <h2 style="margin-top:-30px;">Welcome to the PDX Finder</h2>
             <p class="fillUp">
                     <ul>
-                        <li> Patients-derived tumor xenograft <a href="#" data-toggle="modal" data-target="#pdx-modal" onclick="return false;">(PDX) mouse models</a>
+                        <li>  Patients-derived tumor xenograft <a href="#" data-toggle="modal" data-target="#pdx-modal" onclick="return false;">(PDX) mouse models</a>
                             are an important oncology research platform to study tumor evolution, drug response and personalised medicine approaches. </li>
                         <li> Global success of PDX models will depend on their collective distribution and usage worldwide by academic and private sectors. </li>
                         <li> To facilitate PDX models discovery, <a href="http://www.ebi.ac.uk/about/people/terry-meehan" target="_blank">EMBL-EBI</a>
@@ -114,15 +114,47 @@
         </div>
         <!-- /.col-md-8 -->
         <div class="col-md-12">
-            <a th:href="@{/search}" class="btn btn-success btn-block text-center" href="#"> <span
-                    style="font-size: 20px; margin-bottom: 20px;"> Search PDX models </span> </a>
+            <a th:href="@{/search}" class="btn btn-success  btn-block text-center" href="#"> <span style="font-size: 20px; margin-bottom: 20px;"> Search PDX models </span> </a>
         </div>
     </div>
     <!-- /.row -->
 <br>
 
+    <h4 th:inline="text"> PDX Finder contains [[${modelCount}]]+ PDX models </h4><hr/>
 
-        <h4> PDX Finder contains more than 800 PDX models from the following sources </h4><hr/>
+
+    <div class="row" style="margin-top: 20px;">
+        <div id="resultsDiv">
+
+            <!-- Second Graph Row, will get replaced by first query -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="cancer-tissue-chart" style="height: 550px;"></div>
+                </div>
+            </div>
+            <!-- /.row -->
+
+            <!-- Graph Row, will get replaced by first query -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div id="cancer-system-chart"></div>
+                </div>
+                <!-- /.col-md-4 -->
+                <div class="col-md-6">
+                    <div id="cancer-histology-chart"></div>
+                </div>
+            </div>
+            <!-- /.row -->
+
+
+
+        </div>
+    </div>
+
+
+
+    <h4 th:inline="text"> PDX Finder contains data from the following sources: </h4><hr/>
+
 
     <!-- Content Row -->
     <div class="row">
@@ -143,35 +175,6 @@
         </div>
     </div>
     <!-- /.row -->
-
-
-
-    <div class="row" style="margin-top: 20px;">
-        <div id="resultsDiv">
-
-            <!-- Graph Row, will get replaced by first query -->
-            <div class="row">
-                <div class="col-md-4">
-                    <div id="cancer-system-chart"></div>
-                </div>
-                <!-- /.col-md-4 -->
-                <div class="col-md-8">
-                    <div id="cancer-histology-chart"></div>
-                </div>
-            </div>
-            <!-- /.row -->
-
-            <!-- Second Graph Row, will get replaced by first query -->
-            <div class="row">
-                <div class="col-md-12">
-                    <div id="cancer-tissue-chart"></div>
-                </div>
-            </div>
-            <!-- /.row -->
-
-
-        </div>
-    </div>
 
 </div>
 <!-- /.container -->
@@ -195,8 +198,25 @@
 
 
 <script type="text/javascript" th:inline="javascript">
-    /* <![CDATA[ */
-    // Draw charts
+
+
+    /* Start Compute the Sum of the JSON data for the Chart  */
+
+    var counta, dataSum = 0;
+    function sumAll(jsonData)
+    {
+        dataSum = 0;
+        for (counta = 0; counta < jsonData.length; counta++)
+        { dataSum += jsonData[counta].y;}
+
+        return dataSum;
+    }
+
+    /* End Compute the Sum of the JSON data for the Chart */
+
+
+    /* Begin Draw the Cancer By System Chart  */
+
     Highcharts.chart('cancer-system-chart', {
         credits: false,
         chart: {
@@ -228,9 +248,13 @@
         }]
     });
 
+    /* End Draw the Cancer By System Chart  */
 
 
-    // Create the chart
+
+
+    /* Begin Draw the Cancer By Histology Chart  */
+
     Highcharts.chart('cancer-histology-chart', {
         credits: false,
         chart: {
@@ -257,7 +281,11 @@
                 borderWidth: 0,
                 dataLabels: {
                     enabled: true,
-                    format: '{point.y}'
+                    formatter:function() {
+                        var pcnt = (this.y / sumAll(this.series.data) ) * 100; // compute sum and percentage
+                        return Highcharts.numberFormat(pcnt) + '% ';  // format to infuse percentage
+                    }
+                    //format: '{point.y/100}'
                 }
             }
         },
@@ -321,7 +349,13 @@
         }
     });
 
+    /* End Draw the Cancer By Histology Chart  */
 
+
+
+
+
+    /* Begin Draw the Cancer By Tissue Chart  */
 
     Highcharts.chart('cancer-tissue-chart', {
         credits: false,
@@ -399,7 +433,13 @@
                 enabled: true,
                 rotation: -90,
                 align: 'left',
-                format: '{point.y}',
+
+                formatter:function() {
+                    var pcnt = (this.y / sumAll(this.series.data) ) * 100; // compute sum and percentage
+                    return Highcharts.numberFormat(pcnt) + '% ';  // format to infuse percentage
+                },
+                //format: '{point.y}'
+
                 y: -5,
                 style: {
                     fontSize: '11px',
@@ -409,7 +449,8 @@
         }]
     });
 
-    /* ]]> */
+    /* End Draw the Cancer By Tissue Chart  */
+
 
 
 </script>

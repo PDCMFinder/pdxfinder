@@ -10,10 +10,6 @@
 
     <body>
 
-            <div class="page-header text-center">
-                    <h1>PDX Finder search</h1>
-            </div>
-
 
             <div class="container">
                 <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
@@ -21,10 +17,14 @@
 
 
 
+            <div class="page-header text-center shiftUp70">
+                <h1>PDX Finder search</h1>
+            </div>
+
             <!-- Page Content -->
             <div class="container">
 
-                <p class="shiftUp70">
+                        <p>
                             To facilitate PDX models discovery, EMBL-EBI and the Jackson Laboratory are co-developing PDX Finder. PDX Finder
                             is an open repository for the upload and storage of clinical, genomic and functional PDX data which will provide
                             a comprehensive global catalogue of PDX models available for researchers and their associated data across
@@ -37,8 +37,7 @@
                             <div class="col-md-6 topSpace5">
                                 <h4>Diagnosis</h4>
 
-                                <input id="pdxFinder" class="materialF topSpace5" placeholder="Enter Diagnosis ..."
-                                       type="text"/>
+                                    <input id="pdxFinder"  class="materialF topSpace5" placeholder="Enter Diagnosis ..." type="text"/>
 
                             </div>
 
@@ -82,7 +81,7 @@
 
                         <br/>
 
-                <div class="row topSpace5">
+                        <div class="row topSpace5">
                             <div id="resultsDiv">
 
                                 <!-- Second Graph Row, will get replaced by first query -->
@@ -339,13 +338,20 @@
 
             <script type="text/javascript" th:inline="javascript">
 
-                var states = [[${mappedDOTerm}]];
+                    var states = [[ ${mappedDOTerm} ]];
 
-                $('#pdxFinder').autocomplete({
-                    source: [states]
-                });
+                    $('#pdxFinder').autocomplete({
+                    source:[states]
+                    });
 
             </script>
+
+
+
+
+
+
+
 
 
             <!-- Auto Search Field JavaScript Code Start -->
@@ -354,11 +360,11 @@
                 {
 
                     init();
-                    jQuery("#pdxFinder").bind("enterWasHit", function (e)
+                    jQuery("#pdxFinder").bind("enterWasHit",function(e)
                     {
                         search();
                     });
-                    jQuery("#pdxFinder").keyup(function (e)
+                    jQuery("#pdxFinder").keyup(function(e)
                     {
                         if(e.keyCode == 13)
                         {
