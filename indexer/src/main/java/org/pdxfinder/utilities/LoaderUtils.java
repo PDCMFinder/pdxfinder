@@ -227,6 +227,10 @@ public class LoaderUtils {
         return sample;
     }
 
+    public Sample getSampleBySourcePdxId(String pdxId){
+        return sampleRepository.findBySourcePdxId(pdxId);
+    }
+
     public void saveSample(Sample sample){
         sampleRepository.save(sample);
     }
