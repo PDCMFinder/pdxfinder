@@ -21,12 +21,12 @@ public class DetailsPageController {
         this.searchService = searchService;
     }
 
-    @RequestMapping(value = "/details/{modelId}")
-    public String details(@PathVariable String modelId, Model model)
+    @RequestMapping(value = "/pdx/{dataSrc}/{modelId}")
+    public String details(@PathVariable String dataSrc,@PathVariable String modelId, Model model)
     {
 
 
-        DetailsDTO dto = searchService.searchForModel(modelId);
+        DetailsDTO dto = searchService.searchForModel(dataSrc,modelId);
 
         //if(dto.getModelId().equals("")) return "error";
 

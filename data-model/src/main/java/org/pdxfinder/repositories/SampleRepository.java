@@ -51,7 +51,7 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "OPTIONAL MATCH (s)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
             "OPTIONAL MATCH (s)-[ot:OF_TYPE]-(tt:TumorType) " +
             "RETURN mod,ii,s,o,t,ot, tt, mc, ma, m, mar, cb, aw")
-    Sample findBySourcePdxId(@Param("sourcePdxId") String sourcePdxId);
+    Sample findBySourcePdxId(@Param("dataCenter") String dataCenter,@Param("sourcePdxId") String sourcePdxId);
 
 
 }
