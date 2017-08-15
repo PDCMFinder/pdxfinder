@@ -28,6 +28,16 @@ public interface PatientSnapshotRepository extends Neo4jRepository<PatientSnapsh
             "OPTIONAL MATCH (s)-[ss:SAMPLE_SITE]-(t2:Tissue)\n" +
             "\n" +
             "RETURN mod,ii,s,sf,ps, p, pr, t1, t2, ot, ss")
-    PatientSnapshot findByModelId(@Param("dataCenter") String dataCenter,@Param("modelId") String modelId);
+    PatientSnapshot findByModelId(@Param("modelId") String modelId);
+
+    @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample)-[sf:SAMPLED_FROM]-(ps:PatientSnapshot)-[pr:PATIENT]-(p:Patient) \n" +
+            "WHERE mod.sourcePdxId = {modelId}\n" +
+            "AND toLower(s.dataSource) = toLower({dataSource}) "+
+            "WITH mod, ii, s, sf, ps, pr, p\n" +
+            "OPTIONAL MATCH (s)-[ot:ORIGIN_TISSUE]-(t1:Tissue)\n" +
+            "OPTIONAL MATCH (s)-[ss:SAMPLE_SITE]-(t2:Tissue)\n" +
+            "\n" +
+            "RETURN mod,ii,s,sf,ps, p, pr, t1, t2, ot, ss")
+    PatientSnapshot findByDataSourceAndModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
 }
