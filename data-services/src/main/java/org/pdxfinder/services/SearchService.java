@@ -140,12 +140,12 @@ public class SearchService {
     }
 
 
-    public DetailsDTO searchForModel(String dataCenter, String modelId) {
+    public DetailsDTO searchForModel(String dataSource, String modelId) {
 
 
-        Sample sample = sampleRepository.findBySourcePdxId(dataCenter,modelId);
-        Patient patient = patientRepository.findByModelId(dataCenter,modelId);
-        PatientSnapshot ps = patientSnapshotRepository.findByModelId(dataCenter,modelId);
+        Sample sample = sampleRepository.findByDataSourceAndPdxId(dataSource,modelId);
+        Patient patient = patientRepository.findByDataSourceAndModelId(dataSource,modelId);
+        PatientSnapshot ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
         ModelCreation pdx = modelCreationRepository.findBySourcePdxId(modelId);
 
         DetailsDTO dto = new DetailsDTO();
