@@ -134,6 +134,14 @@ public class CreateIRCCEGA implements CommandLineRunner {
                     row.setDataSource(ps.getPatient().getDataSource());
                     row.setExternalId(ps.getPatient().getExternalId());
                 }
+                if(ps.getSamples()!=null){
+                    //Sample sample = ps.getSamples().stream().findFirst().get().getDiagnosis();
+
+                    row.setDiagnosis(ps.getSamples().stream().findFirst().get().getDiagnosis());
+                    row.setOriginTissue(ps.getSamples().stream().findFirst().get().getOriginTissue().getName());
+                    row.setSampleSite(ps.getSamples().stream().findFirst().get().getSampleSite().getName());
+                    row.setSourceSampleId(ps.getSamples().stream().findFirst().get().getSourceSampleId());
+                }
 
 
 
@@ -171,10 +179,26 @@ public class CreateIRCCEGA implements CommandLineRunner {
             fileWriter.append(SEPARATOR);
             fileWriter.append("Source sample id");
             fileWriter.append(SEPARATOR);
+            fileWriter.append("Sample id");
+            fileWriter.append(SEPARATOR);
+            fileWriter.append("Specimen id");
+            fileWriter.append(SEPARATOR);
+
+            fileWriter.append("Diagnosis");
+            fileWriter.append(SEPARATOR);
+
+            fileWriter.append("Origin tissue");
+            fileWriter.append(SEPARATOR);
+            fileWriter.append("Sample site");
+            fileWriter.append(SEPARATOR);
+            fileWriter.append("Sample type");
+            fileWriter.append(SEPARATOR);
+            fileWriter.append("Sample origin");
+            fileWriter.append(SEPARATOR);
 
 
-
-
+            fileWriter.append("Sequencing platform");
+            fileWriter.append(SEPARATOR);
 
             fileWriter.append("Bam file name");
             fileWriter.append(SEPARATOR);
@@ -206,11 +230,58 @@ public class CreateIRCCEGA implements CommandLineRunner {
                 fileWriter.append(SEPARATOR);
                 fileWriter.append(row.getSourceSampleId());
                 fileWriter.append(SEPARATOR);
-
-
-
-                fileWriter.append(row.getEgaId());
+                fileWriter.append(row.getSampleId());
                 fileWriter.append(SEPARATOR);
+                fileWriter.append(row.getSpecimenId());
+                fileWriter.append(SEPARATOR);
+                fileWriter.append(row.getDiagnosis());
+                fileWriter.append(SEPARATOR);
+                fileWriter.append(row.getOriginTissue());
+                fileWriter.append(SEPARATOR);
+                fileWriter.append(row.getSampleSite());
+                fileWriter.append(SEPARATOR);
+
+                if(row.getSampleType().equals("n")){
+                    fileWriter.append("Normal");
+                }
+                else if(row.getSampleType().equals("t")){
+                    fileWriter.append("Tumor");
+                }
+                else{
+                    fileWriter.append("");
+                }
+                fileWriter.append(SEPARATOR);
+
+                if(row.getSampleOrigin().equals("T")){
+                    fileWriter.append("Pre-implanted tumor from liver metastasis");
+                }
+                else if(row.getSampleOrigin().equals("X")){
+                    fileWriter.append("Tumorgraft");
+                }
+                else{
+                    fileWriter.append("");
+                }
+                fileWriter.append(SEPARATOR);
+
+
+
+                if(row.getSequencingPlatform().equals("Ex")){
+                    fileWriter.append("Exome");
+                }
+                //else if(row.getSequencingPlatform().toLowerCase().equals("cpcr2")){}
+                else{
+                    fileWriter.append("Targeted");
+                }
+                fileWriter.append(SEPARATOR);
+
+
+
+
+                //fileWriter.append(row.getOriginTissue());
+                //fileWriter.append(SEPARATOR);
+
+
+
                 fileWriter.append(row.getBamFileName());
                 fileWriter.append(SEPARATOR);
                 fileWriter.append(row.getMd5Sum());
