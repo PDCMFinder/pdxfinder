@@ -9,7 +9,6 @@
 
 .pdxSummary{
     background-color: #fff;
-    border: 1px dashed #ccc;
     padding: 15px;
     margin-top: -15px;
 }
@@ -17,7 +16,7 @@
 .pdxSummary hr {
     margin-top: 4px;
     background-color: #fff;
-    border-top: 1px dashed #ccc;
+    border-top: 1px solid #ccc;
 }
 
 .pdxSummary ul li {
@@ -42,7 +41,6 @@
 }
 
 .btn{
-    height:37px;
     padding:6px 15px;
     font-size:12px;
     border-radius:3px;
@@ -51,7 +49,7 @@
 hr {
     margin-top: 4px;
     background-color: #fff;
-    border-top: 2px dashed #ccc;
+    border-top: 1px solid #ccc;
 }
 
 h4{
@@ -80,20 +78,18 @@ h5{
 .w3-button
 {border:none;display:inline-block;outline:0;padding:8px 16px;vertical-align:middle;overflow:hidden;text-decoration:none;color:inherit;background-color:inherit;text-align:center;cursor:pointer;white-space:nowrap}
 
-
-
 /********************************** PDXFinder Auto-Suggest Start ************************************************/
 
 .pdxFinder_autocomplete,
 .pdxFinder_autocomplete div,
-.pdxFinder_autocomplete span{
+.pdxFinder_autocomplete span {
     /*	-moz-box-sizing: border-box !important;
         box-sizing: border-box !important;*/
 }
 
-.pdxFinder_autocomplete{
-    display:inline;
-    position:relative;
+.pdxFinder_autocomplete {
+    display: inline;
+    position: relative;
     word-spacing: normal;
     text-transform: none;
     text-indent: 0px;
@@ -101,79 +97,80 @@ h5{
     text-align: start;
 }
 
-.pdxFinder_autocomplete .pdxFinder_input{
-    position:relative;
-    z-index:2;
-}
-.pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown{
-    position:absolute;
-    border: 1px solid #ccc;
-    border-top-color: #d9d9d9;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    cursor: default;
-    display:none;
-    z-index: 1001;
-    margin-top:-1px;
-    background-color:#fff;
-    min-width:100%;
-    overflow:auto;
-}
-.pdxFinder_autocomplete .pdxFinder_autocomplete_hint{
-    position:absolute;
-    z-index:1;
-    color:#ccc !important;
-    -webkit-text-fill-color:#ccc !important;
-    text-fill-color:#ccc  !important;
-    overflow:hidden !important;
-    white-space: pre  !important;
+.pdxFinder_autocomplete .pdxFinder_input {
+    position: relative;
+    z-index: 2;
 }
 
-.pdxFinder_autocomplete .pdxFinder_autocomplete_hint span{
-    color:transparent;
+.pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown {
+    position: absolute;
+    border: 1px solid #ccc;
+    border-top-color: #d9d9d9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: default;
+    display: none;
+    z-index: 1001;
+    margin-top: -1px;
+    background-color: #fff;
+    min-width: 100%;
+    overflow: auto;
+}
+
+.pdxFinder_autocomplete .pdxFinder_autocomplete_hint {
+    position: absolute;
+    z-index: 1;
+    color: #ccc !important;
+    -webkit-text-fill-color: #ccc !important;
+    text-fill-color: #ccc !important;
+    overflow: hidden !important;
+    white-space: pre !important;
+}
+
+.pdxFinder_autocomplete .pdxFinder_autocomplete_hint span {
+    color: transparent;
     opacity: 0.0;
 }
 
-.pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown > .pdxFinder_autocomplete_copyright{
-    color:#ddd;
-    font-size:10px;
-    text-decoration:none;
-    right:5px;
-    position:absolute;
-    margin-top:-15px;
-    z-index:1002;
+.pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown > .pdxFinder_autocomplete_copyright {
+    color: #ddd;
+    font-size: 10px;
+    text-decoration: none;
+    right: 5px;
+    position: absolute;
+    margin-top: -15px;
+    z-index: 1002;
 }
-.pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown > div{
-    background:#fff;
+
+.pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown > div {
+    background: #fff;
     white-space: nowrap;
     cursor: pointer;
     line-height: 1.5em;
     padding: 6px 0px 6px 0px;
     width: 100%;
 }
-.pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown > div.active{
-    background: rgba(24,188,156,1.0); /*#18BC9C;*/
+
+.pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown > div.active {
+    background: rgba(24, 188, 156, 1.0); /*#18BC9C;*/
     color: #FFFFFF;
 }
 
 .adjust {
-    color:#18BC9C; border-bottom:1px solid #18BC9C;
+    color: #18BC9C;
+    border-bottom: 1px solid #18BC9C;
 }
 
 .pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown > div .shft::before {
     content: " ";
 }
 
-.pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown  > div.active .adjust{
-    color:#000; border-bottom:1px solid #000;
+.pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown > div.active .adjust {
+    color: #000;
+    border-bottom: 1px solid #000;
 }
 
-
 /********************************** PDXFinder Auto-Suggest End ************************************************/
-
-
-
-
 
 /********************************** PDXFinder Spacing Start ************************************************/
 
@@ -201,7 +198,6 @@ h5{
     margin-top: -100px;
 }
 
-
 .topSpace5 {
     margin-top: 5px;
 }
@@ -214,57 +210,62 @@ h5{
     margin-top: 100px;
 }
 
-.fullImg{
-    width:100%;
+.fullImg {
+    width: 100%;
     margin-top: 12px;
 }
 
-.fullWidth{
-    width:100%;
+.fullWidth {
+    width: 100%;
 }
 
 /********************************** PDXFinder Spacing End ************************************************/
 
-
-
 /********************************** PDXFinder Error Page Start ************************************************/
 
-.err_body{
+.err_body {
     font-family: 'pdxErrorStyle', cursive;
-    background:#eaeaea;
+    background: #eaeaea;
 }
-.err_wrap{
-    margin:0 auto;
-    width:100%;
+
+.err_wrap {
+    margin: 0 auto;
+    width: 100%;
 }
-.err_logo{
-    text-align:center;
-    margin-top:5%;
+
+.err_logo {
+    text-align: center;
+    margin-top: 5%;
 }
-.err_logo img{
-    width:60%;
-    margin-top:-1%;
+
+.err_logo img {
+    width: 60%;
+    margin-top: -1%;
 }
-.err_logo p{
-    color:#272727;
-    font-size:35px;
-    margin-top:1px;
+
+.err_logo p {
+    color: #272727;
+    font-size: 35px;
+    margin-top: 1px;
 }
-.err_logo p span{
-    color:lightgreen;
+
+.err_logo p span {
+    color: lightgreen;
 }
-.err_sub a{
-    color:#fff;
-    background:#272727;
-    text-decoration:none;
-    padding:10px 70px;
-    font-size:13px;
+
+.err_sub a {
+    color: #fff;
+    background: #272727;
+    text-decoration: none;
+    padding: 10px 70px;
+    font-size: 13px;
     font-family: arial, serif;
-    font-weight:bold;
-    -webkit-border-radius:.2em;
-    -moz-border-radius:.2em;
-    -border-radius:.2em;
+    font-weight: bold;
+    -webkit-border-radius: .2em;
+    -moz-border-radius: .2em;
+    -border-radius: .2em;
 }
+
 @font-face {
     font-family: 'pdxErrorStyle';
     font-style: normal;
@@ -272,14 +273,16 @@ h5{
     src: local('pdxErrorStyle'), local('LoveYaLikeASister-Regular'), url(http://fonts.gstatic.com/s/loveyalikeasister/v7/LzkxWS-af0Br2Sk_YgSJYyDnSGr1Zea3iQKneaJ4t3mglnMp3_3A8V8Ai8YosRtX.woff2) format('woff2');
     unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
-.err_footer{
-    color:black;
-    position:absolute;
-    right:10px;
+
+.err_footer {
+    color: black;
+    position: absolute;
+    right: 10px;
     bottom: 10px;
 }
-.err_footer a{
-    color:rgb(114,173,38);
+
+.err_footer a {
+    color: rgb(114, 173, 38);
     text-decoration: none;
 }
 
@@ -287,4 +290,15 @@ h5{
 
 
 
+/**********************************  Overwrite bootstrap default notification starts ************************************************/
+.alert{padding:12px;margin-top:20px;border:1px solid transparent;border-radius:4px;}
+.alert .alert-link{font-weight:700}
+.alert-info, .alert-info a{text-align: center; color: #fff; background-color:#31708f;border-color:#31708f; }
+.alert-info hr{border-top-color:#a6e1ec}
+.alert-info .alert-link{color:#245269}
+.alert-dismissable,.alert-dismissible{padding-right:30px}
+.alert-dismissable .close, .alert-dismissible .close{position:relative;top:-2px;right:-21px;color:#fff;}
 
+
+
+/********************************** Overwrite bootstrap default notification Ends ************************************************/

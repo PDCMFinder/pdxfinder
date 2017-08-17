@@ -119,7 +119,7 @@ public class LoadIRCCData implements CommandLineRunner {
             e.printStackTrace();
         }
 
-
+        log.info("Patients were loaded.");
         //load samples file
         currentLineCounter = 1;
         try {
@@ -169,6 +169,7 @@ public class LoadIRCCData implements CommandLineRunner {
             List<IRCCSample> samples = entry.getValue();
 
             for (int i = 0; i < samples.size(); i++) {
+                log.info("Patient: "+key);
 
                 PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(key, patientsMap.get(key).getSex(),
                         "", "", samples.get(i).getAgeAtCollection(), DS);
@@ -176,58 +177,8 @@ public class LoadIRCCData implements CommandLineRunner {
 
                 Sample sample = loaderUtils.getSample(samples.get(i).getSampleId(), samples.get(i).getTumorType(),
                         samples.get(i).getDiagnosis(), patientsMap.get(key).getPrimarySite(),
-                        samples.get(i).getSampleSite(),"Extraction Method", "", NORMAL_TISSUE, DS);
+                        samples.get(i).getSampleSite(), "Extraction Method", "", NORMAL_TISSUE, DS);
 
-
-                HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
-
-                if (samples.get(i).getMsiStatus() != "NA") {
-                    MarkerAssociation msia = loaderUtils.getMarkerAssociation(samples.get(i).getMsiStatus(), "MSI", "MSI");
-                    // make a map of markerAssociationCollections keyed to technology
-                    if (markerMap.containsKey(MC_TECH)) {
-                        markerMap.get(MC_TECH).add(msia);
-                    } else {
-                        HashSet<MarkerAssociation> set = new HashSet<>();
-                        set.add(msia);
-                        markerMap.put(MC_TECH, set);
-                    }
-                }
-
-                if (samples.get(i).getKrasStatus() != "NA") {
-                    MarkerAssociation krasa = loaderUtils.getMarkerAssociation(samples.get(i).getKrasStatus(), "KRAS", "KRAS");
-                    // make a map of markerAssociationCollections keyed to technology
-                    markerMap.get(MC_TECH).add(krasa);
-                }
-
-                if (samples.get(i).getBrafStatus() != "NA") {
-                    MarkerAssociation brafa = loaderUtils.getMarkerAssociation(samples.get(i).getBrafStatus(), "BRAF", "BRAF");
-                    // make a map of markerAssociationCollections keyed to technology
-                    markerMap.get(MC_TECH).add(brafa);
-                }
-
-                if (samples.get(i).getNrasStatus() != "NA") {
-                    MarkerAssociation nrasa = loaderUtils.getMarkerAssociation(samples.get(i).getNrasStatus(), "NRAS", "NRAS");
-                    // make a map of markerAssociationCollections keyed to technology
-                    markerMap.get(MC_TECH).add(nrasa);
-                }
-                if (samples.get(i).getPik3caStatus() != "NA") {
-                    MarkerAssociation pik3caa = loaderUtils.getMarkerAssociation(samples.get(i).getPik3caStatus(), "PIK3CA", "PIK3CA");
-                    // make a map of markerAssociationCollections keyed to technology
-                    markerMap.get(MC_TECH).add(pik3caa);
-                }
-
-
-                HashSet<MolecularCharacterization> mcs = new HashSet<>();
-                for (String tech : markerMap.keySet()) {
-                    MolecularCharacterization mc = new MolecularCharacterization();
-                    mc.setTechnology(tech);
-                    mc.setMarkerAssociations(markerMap.get(tech));
-
-                    loaderUtils.saveMolecularCharacterization(mc);
-                    mcs.add(mc);
-
-                }
-                sample.setMolecularCharacterizations(mcs);
 
                 pSnap.addSample(sample);
                 loaderUtils.savePatientSnapshot(pSnap);
@@ -237,7 +188,7 @@ public class LoadIRCCData implements CommandLineRunner {
 
                 loaderUtils.createModelCreation(samples.get(i).getModelId(), samples.get(i).getImplantSite(), samples.get(i).getImplantType(), sample, nsgBS, qa);
 
-
+                //TODO: load molchar
             }
 
 

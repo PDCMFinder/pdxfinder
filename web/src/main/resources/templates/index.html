@@ -22,11 +22,11 @@
             <img class="img-responsive img-rounded center-block" src="../static/images/pdx_logo.png" th:src="@{/images/pdx_logo.png}" alt=""/>
         </div>
         <!-- /.col-md-4 -->
-        <div class="col-md-8">
-            <h1 style="margin-top:-30px;">Welcome to the PDX Finder</h1>
+        <div class="col-md-8" style="margin-top: -20px;">
+            <h2 style="margin-top:-30px;">Welcome to the PDX Finder</h2>
             <p class="fillUp">
                     <ul>
-                        <li> Patients-derived tumor xenograft <a href="#" data-toggle="modal" data-target="#pdx-modal" onclick="return false;">(PDX) mouse models</a>
+                        <li>  Patients-derived tumor xenograft <a href="#" data-toggle="modal" data-target="#pdx-modal" onclick="return false;">(PDX) mouse models</a>
                             are an important oncology research platform to study tumor evolution, drug response and personalised medicine approaches. </li>
                         <li> Global success of PDX models will depend on their collective distribution and usage worldwide by academic and private sectors. </li>
                         <li> To facilitate PDX models discovery, <a href="http://www.ebi.ac.uk/about/people/terry-meehan" target="_blank">EMBL-EBI</a>
@@ -114,14 +114,47 @@
         </div>
         <!-- /.col-md-8 -->
         <div class="col-md-12">
-            <a th:href="@{/search}" class="btn btn-success btn-block text-center" href="#"> <span style="font-size: 20px; margin-bottom: 20px;"> Search PDX models </span> </a>
+            <a th:href="@{/search}" class="btn btn-success  btn-block text-center" href="#"> <span style="font-size: 20px; margin-bottom: 20px;"> Search PDX models </span> </a>
         </div>
     </div>
     <!-- /.row -->
 <br>
 
+    <h4 th:inline="text"> PDX Finder contains [[${modelCount}]]+ PDX models </h4><hr/>
 
-        <h4> PDX Finder contains more than 800 PDX models from the following sources </h4><hr/>
+
+    <div class="row" style="margin-top: 20px;">
+        <div id="resultsDiv">
+
+            <!-- Second Graph Row, will get replaced by first query -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="cancer-tissue-chart" style="height: 550px;"></div>
+                </div>
+            </div>
+            <!-- /.row -->
+
+            <!-- Graph Row, will get replaced by first query -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div id="cancer-system-chart"></div>
+                </div>
+                <!-- /.col-md-4 -->
+                <div class="col-md-6">
+                    <div id="cancer-histology-chart"></div>
+                </div>
+            </div>
+            <!-- /.row -->
+
+
+
+        </div>
+    </div>
+
+
+
+    <h4 th:inline="text"> PDX Finder contains data from the following sources: </h4><hr/>
+
 
     <!-- Content Row -->
     <div class="row">
@@ -143,35 +176,6 @@
     </div>
     <!-- /.row -->
 
-
-
-    <div class="row" style="margin-top: 20px;">
-        <div id="resultsDiv">
-
-            <!-- Graph Row, will get replaced by first query -->
-            <div class="row">
-                <div class="col-md-4">
-                    <div id="cancer-system-chart"></div>
-                </div>
-                <!-- /.col-md-4 -->
-                <div class="col-md-8">
-                    <div id="cancer-histology-chart"></div>
-                </div>
-            </div>
-            <!-- /.row -->
-
-            <!-- Second Graph Row, will get replaced by first query -->
-            <div class="row">
-                <div class="col-md-12">
-                    <div id="cancer-tissue-chart"></div>
-                </div>
-            </div>
-            <!-- /.row -->
-
-
-        </div>
-    </div>
-
 </div>
 <!-- /.container -->
 
@@ -179,237 +183,11 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <script type="text/javascript" th:inline="javascript">
-    /* <![CDATA[ */
-    // Draw charts
-    Highcharts.chart('cancer-system-chart', {
-        credits: false,
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-        },
-        title: {
-            text: 'Cancers by system'
-        },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.y}</b> (<b>{point.percentage:.1f}%</b>)'
-        },
-        plotOptions: {
-            pie: {
-                allowPointSelect: true,
-                cursor: 'pointer',
-                dataLabels: {
-                    enabled: false
-                },
-                showInLegend: true
-            }
-        },
-        series: [{
-            name: 'System',
-            colorByPoint: true,
-            data: eval(/*[[ ${cancerBySystem} ]]*/)
-        }]
-    });
 
-
-
-    // Create the chart
-    Highcharts.chart('cancer-histology-chart', {
-        credits: false,
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: 'Cancers by histology'
-        },
-        xAxis: {
-            type: 'category'
-        },
-        yAxis: {
-            type: 'logarithmic',
-            title: {
-                text: 'Count of cancers by histology'
-            }
-
-        },
-        legend: {
-            enabled: false
-        },
-        plotOptions: {
-            series: {
-                borderWidth: 0,
-                dataLabels: {
-                    enabled: true,
-                    format: '{point.y}'
-                }
-            }
-        },
-
-        tooltip: {
-            headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-            pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b> of total<br/>'
-        },
-
-        series: [{
-            name: 'Cancers',
-            colorByPoint: true,
-            data: [{
-                name: 'Carcinoma', y: 713, drilldown: 'Carcinoma'
-            }, {
-                name: 'Sarcoma', y: 45, drilldown: 'Sarcoma'
-            }, {
-                name: 'malignant glioma', y: 34, drilldown: null
-            }, {
-                name: 'melanoma', y: 16, drilldown: null
-            }, {
-                name: 'leukemia', y: 3, drilldown: null
-            }, {
-                name: 'lymphoma', y: 2, drilldown: null
-            }, {
-                name: 'neuroblastoma', y: 2, drilldown: null
-            }, {
-                name: 'malignant mesothelioma', y: 1, drilldown: null
-            }, {
-                name: 'teratoma', y: 1, drilldown: null
-            }]
-        }], drilldown: {
-            series: [{
-                name: 'Carcinoma',
-                id: 'Carcinoma',
-                data: [
-                    ['adenocarcinoma', 532],
-                    ['carcinoma', 87],
-                    ['squamous cell carcinoma', 42],
-                    ['non small cell carcinoma', 38],
-                    ['small cell carcinoma', 5],
-                    ['papillary serous adenocarcinoma', 3],
-                    ['neuroendocrine carcinoma', 2],
-                    ['carcinosarcoma', 1],
-                    ['large cell carcinoma', 1],
-                    ['papillary carcinoma', 1],
-                    ['transitional cell carcinoma', 1],
-                ]
-            }, {
-                name: 'Sarcoma',
-                id: 'Sarcoma',
-                data: [
-                    ['sarcoma', 34],
-                    ['rhabdomyosarcoma', 6],
-                    ['osteosarcoma', 2],
-                    ['carcinosarcoma', 1],
-                    ['liposarcoma', 1],
-                    ['spindle cell sarcoma', 1],
-                ]
-            }]
-        }
-    });
-
-
-
-    Highcharts.chart('cancer-tissue-chart', {
-        credits: false,
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: 'Cancers by tissue'
-        },
-        xAxis: {
-            type: 'category',
-            labels: {
-                rotation: -90,
-                style: {
-                    fontSize: '11px',
-                    fontFamily: 'Verdana, sans-serif'
-                }
-            }
-        },
-        yAxis: {
-            type: 'logarithmic',
-            title: {
-                text: 'Count of cancers'
-            }
-        },
-        legend: {
-            enabled: false
-        },
-        tooltip: {
-            pointFormat: 'Count: <b>{point.y}</b>'
-        },
-        series: [{
-            name: 'Tissue',
-            data: [
-                ['colon cancer', 496],
-                ['pancreatic cancer', 19],
-                ['rectum cancer', 10],
-                ['ampulla of vater cancer', 4],
-                ['bile duct cancer', 4],
-                ['cecum carcinoma', 3],
-                ['liver cancer', 2],
-                ['salivary gland cancer', 2],
-                ['tonsil cancer', 2],
-                ['anal cancer', 2],
-                ['stomach cancer', 2],
-                ['appendix cancer', 2],
-                ['esophageal cancer', 1],
-                ['duodenum cancer', 1],
-                ['lung cancer', 77],
-                ['brain cancer', 34],
-                ['peripheral nervous system cancer', 1],
-                ['retroperitoneal cancer ', 1],
-                ['adrenal gland cancer', 1],
-                ['breast cancer', 31],
-                ['urinary bladder cancer', 29],
-                ['kidney cancer', 10],
-                ['skin cancer', 20],
-                ['muscle cancer', 17],
-                ['bone cancer', 12],
-                ['lipomatous cancer', 1],
-                ['ovarian cancer', 13],
-                ['prostate cancer', 3],
-                ['uterine cancer', 1],
-                ['endometrial cancer', 1],
-                ['germ cell cancer', 1],
-                ['connective and soft tissue cancer', 13],
-                ['hematologic cancer', 5],
-                ['head cancer', 5],
-                ['neck cancer', 1]
-            ],
-            dataLabels: {
-                crop: false,
-                overflow: 'none',
-                padding: 2,
-                enabled: true,
-                rotation: -90,
-                align: 'left',
-                format: '{point.y}',
-                y: -5,
-                style: {
-                    fontSize: '11px',
-                    fontFamily: 'Verdana, sans-serif'
-                }
-            }
-        }]
-    });
-
-    /* ]]> */
-
+    cancerBySystemChart(/*[[ ${cancerBySystem} ]]*/,"cancer-system-chart");
+    cancerByHistologyChart("","cancer-histology-chart");
+    cancerByTissueChart("","cancer-tissue-chart");
 
 </script>
 

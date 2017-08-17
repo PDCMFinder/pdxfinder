@@ -10,10 +10,6 @@
 
     <body>
 
-            <div class="page-header text-center">
-                    <h1>PDX Finder search</h1>
-            </div>
-
 
             <div class="container">
                 <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
@@ -21,10 +17,14 @@
 
 
 
+            <div class="page-header text-center shiftUp70">
+                <h1>PDX Finder search</h1>
+            </div>
+
             <!-- Page Content -->
             <div class="container">
 
-                        <p class="shiftUp70">
+                        <p>
                             To facilitate PDX models discovery, EMBL-EBI and the Jackson Laboratory are co-developing PDX Finder. PDX Finder
                             is an open repository for the upload and storage of clinical, genomic and functional PDX data which will provide
                             a comprehensive global catalogue of PDX models available for researchers and their associated data across
@@ -117,221 +117,11 @@
 
 
             <script type="text/javascript" th:inline="javascript">
-                /* <![CDATA[ */
-                // Draw charts
-                Highcharts.chart('cancer-system-chart', {
-                    credits: false,
-                    chart: {
-                        plotBackgroundColor: null,
-                        plotBorderWidth: null,
-                        plotShadow: false,
-                        type: 'pie'
-                    },
-                    title: {
-                        text: 'Cancers by system'
-                    },
-                    tooltip: {
-                        pointFormat: '{series.name}: <b>{point.y}</b> (<b>{point.percentage:.1f}%</b>)'
-                    },
-                    plotOptions: {
-                        pie: {
-                            allowPointSelect: true,
-                            cursor: 'pointer',
-                            dataLabels: {
-                                enabled: false
-                            },
-                            showInLegend: true
-                        }
-                    },
-                    series: [{
-                        name: 'System',
-                        colorByPoint: true,
-                        data: eval(/*[[ ${cancerBySystem} ]]*/)
-                    }]
-                });
 
+                cancerBySystemChart([[ ${cancerBySystem} ]],"cancer-system-chart");
+                cancerByHistologyChart("","cancer-histology-chart");
+                cancerByTissueChart("","cancer-tissue-chart");
 
-
-                // Create the chart
-                Highcharts.chart('cancer-histology-chart', {
-                    credits: false,
-                    chart: {
-                        type: 'column'
-                    },
-                    title: {
-                        text: 'Cancers by histology'
-                    },
-                    xAxis: {
-                        type: 'category'
-                    },
-                    yAxis: {
-                        type: 'logarithmic',
-                        title: {
-                            text: 'Count of cancers by histology'
-                        }
-
-                    },
-                    legend: {
-                        enabled: false
-                    },
-                    plotOptions: {
-                        series: {
-                            borderWidth: 0,
-                            dataLabels: {
-                                enabled: true,
-                                format: '{point.y}'
-                            }
-                        }
-                    },
-
-                    tooltip: {
-                        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b> of total<br/>'
-                    },
-
-                    series: [{
-                        name: 'Cancers',
-                        colorByPoint: true,
-                        data: [{
-                            name: 'Carcinoma', y: 713, drilldown: 'Carcinoma'
-                        }, {
-                            name: 'Sarcoma', y: 45, drilldown: 'Sarcoma'
-                        }, {
-                            name: 'malignant glioma', y: 34, drilldown: null
-                        }, {
-                            name: 'melanoma', y: 16, drilldown: null
-                        }, {
-                            name: 'leukemia', y: 3, drilldown: null
-                        }, {
-                            name: 'lymphoma', y: 2, drilldown: null
-                        }, {
-                            name: 'neuroblastoma', y: 2, drilldown: null
-                        }, {
-                            name: 'malignant mesothelioma', y: 1, drilldown: null
-                        }, {
-                            name: 'teratoma', y: 1, drilldown: null
-                        }]
-                    }], drilldown: {
-                        series: [{
-                            name: 'Carcinoma',
-                            id: 'Carcinoma',
-                            data: [
-                                ['adenocarcinoma', 532],
-                                ['carcinoma', 87],
-                                ['squamous cell carcinoma', 42],
-                                ['non small cell carcinoma', 38],
-                                ['small cell carcinoma', 5],
-                                ['papillary serous adenocarcinoma', 3],
-                                ['neuroendocrine carcinoma', 2],
-                                ['carcinosarcoma', 1],
-                                ['large cell carcinoma', 1],
-                                ['papillary carcinoma', 1],
-                                ['transitional cell carcinoma', 1],
-                            ]
-                        }, {
-                            name: 'Sarcoma',
-                            id: 'Sarcoma',
-                            data: [
-                                ['sarcoma', 34],
-                                ['rhabdomyosarcoma', 6],
-                                ['osteosarcoma', 2],
-                                ['carcinosarcoma', 1],
-                                ['liposarcoma', 1],
-                                ['spindle cell sarcoma', 1],
-                            ]
-                        }]
-                    }
-                });
-
-
-
-                Highcharts.chart('cancer-tissue-chart', {
-                    credits: false,
-                    chart: {
-                        type: 'column'
-                    },
-                    title: {
-                        text: 'Cancers by tissue'
-                    },
-                    xAxis: {
-                        type: 'category',
-                        labels: {
-                            rotation: -90,
-                            style: {
-                                fontSize: '11px',
-                                fontFamily: 'Verdana, sans-serif'
-                            }
-                        }
-                    },
-                    yAxis: {
-                        type: 'logarithmic',
-                        title: {
-                            text: 'Count of cancers'
-                        }
-                    },
-                    legend: {
-                        enabled: false
-                    },
-                    tooltip: {
-                        pointFormat: 'Count: <b>{point.y}</b>'
-                    },
-                    series: [{
-                        name: 'Tissue',
-                        data: [
-                            ['colon cancer', 496],
-                            ['pancreatic cancer', 19],
-                            ['rectum cancer', 10],
-                            ['ampulla of vater cancer', 4],
-                            ['bile duct cancer', 4],
-                            ['cecum carcinoma', 3],
-                            ['liver cancer', 2],
-                            ['salivary gland cancer', 2],
-                            ['tonsil cancer', 2],
-                            ['anal cancer', 2],
-                            ['stomach cancer', 2],
-                            ['appendix cancer', 2],
-                            ['esophageal cancer', 1],
-                            ['duodenum cancer', 1],
-                            ['lung cancer', 77],
-                            ['brain cancer', 34],
-                            ['peripheral nervous system cancer', 1],
-                            ['retroperitoneal cancer ', 1],
-                            ['adrenal gland cancer', 1],
-                            ['breast cancer', 31],
-                            ['urinary bladder cancer', 29],
-                            ['kidney cancer', 10],
-                            ['skin cancer', 20],
-                            ['muscle cancer', 17],
-                            ['bone cancer', 12],
-                            ['lipomatous cancer', 1],
-                            ['ovarian cancer', 13],
-                            ['prostate cancer', 3],
-                            ['uterine cancer', 1],
-                            ['endometrial cancer', 1],
-                            ['germ cell cancer', 1],
-                            ['connective and soft tissue cancer', 13],
-                            ['hematologic cancer', 5],
-                            ['head cancer', 5],
-                            ['neck cancer', 1]
-                        ],
-                        dataLabels: {
-                            crop: false,
-                            overflow: 'none',
-                            padding: 2,
-                            enabled: true,
-                            rotation: -90,
-                            align: 'left',
-                            format: '{point.y}',
-                            y: -5,
-                            style: {
-                                fontSize: '11px',
-                                fontFamily: 'Verdana, sans-serif'
-                            }
-                        }
-                    }]
-                });
-
-                /* ]]> */
             </script>
 
             <!-- Auto Suggest JavaScript Code -->

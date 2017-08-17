@@ -5,6 +5,7 @@
  */
 package org.pdxfinder.utilities;
 
+import org.apache.commons.cli.Option;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
 import org.slf4j.Logger;
@@ -16,7 +17,6 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
-import org.apache.commons.cli.Option;
 
 /**
  * The hope was to put a lot of reused repository actions into one place ie find
@@ -28,7 +28,7 @@ import org.apache.commons.cli.Option;
 @Component
 public class LoaderUtils {
 
-    public static Option loadAll = new Option("LoadAll",false,"Load all PDX Finder data");
+    public static Option loadAll = new Option("LoadAll", false, "Load all PDX Finder data");
     
     private TumorTypeRepository tumorTypeRepository;
     private BackgroundStrainRepository backgroundStrainRepository;
@@ -72,19 +72,19 @@ public class LoaderUtils {
                        PlatformRepository platformRepository,
                        PlatformAssociationRepository platformAssociationRepository) {
 
-        Assert.notNull(tumorTypeRepository);
-        Assert.notNull(backgroundStrainRepository);
-        Assert.notNull(implantationTypeRepository);
-        Assert.notNull(implantationSiteRepository);
-        Assert.notNull(externalDataSourceRepository);
-        Assert.notNull(patientRepository);
-        Assert.notNull(modelCreationRepository);
-        Assert.notNull(tissueRepository);
-        Assert.notNull(patientSnapshotRepository);
-        Assert.notNull(sampleRepository);
-        Assert.notNull(markerRepository);
-        Assert.notNull(markerAssociationRepository);
-        Assert.notNull(molecularCharacterizationRepository);
+        Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null");
+        Assert.notNull(backgroundStrainRepository, "backgroundStrainRepository cannot be null");
+        Assert.notNull(implantationTypeRepository, "implantationTypeRepository cannot be null");
+        Assert.notNull(implantationSiteRepository, "implantationSiteRepository cannot be null");
+        Assert.notNull(externalDataSourceRepository, "externalDataSourceRepository cannot be null");
+        Assert.notNull(patientRepository, "patientRepository cannot be null");
+        Assert.notNull(modelCreationRepository, "modelCreationRepository cannot be null");
+        Assert.notNull(tissueRepository, "tissueRepository cannot be null");
+        Assert.notNull(patientSnapshotRepository, "patientSnapshotRepository cannot be null");
+        Assert.notNull(sampleRepository, "sampleRepository cannot be null");
+        Assert.notNull(markerRepository, "markerRepository cannot be null");
+        Assert.notNull(markerAssociationRepository, "markerAssociationRepository cannot be null");
+        Assert.notNull(molecularCharacterizationRepository, "molecularCharacterizationRepository cannot be null");
 
         this.tumorTypeRepository = tumorTypeRepository;
         this.backgroundStrainRepository = backgroundStrainRepository;
@@ -206,6 +206,16 @@ public class LoaderUtils {
         return patient;
     }
 
+    public Patient getPatientBySampleId(String sampleId){
+
+        return patientRepository.findBySampleId(sampleId);
+    }
+
+    public PatientSnapshot getPatientSnapshotByModelId(String modelId){
+
+        return patientSnapshotRepository.findByModelId(modelId);
+    }
+
     public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
 
         TumorType type = this.getTumorType(typeStr);
@@ -214,7 +224,7 @@ public class LoaderUtils {
         Sample sample = sampleRepository.findBySourceSampleId(sourceSampleId);
         if (sample == null) {
 
-            sample = new Sample(sourceSampleId, type, diagnosis, origin, sampleSite,extractionMethod, classification, normalTissue, externalDataSource);
+            sample = new Sample(sourceSampleId, type, diagnosis, origin, sampleSite, extractionMethod, classification, normalTissue, externalDataSource);
             sampleRepository.save(sample);
         }
 
@@ -225,6 +235,10 @@ public class LoaderUtils {
 
         Sample sample = sampleRepository.findBySourceSampleId(sourceSampleId);
         return sample;
+    }
+
+    public Sample getSampleBySourcePdxId(String pdxId){
+        return sampleRepository.findBySourcePdxId(pdxId);
     }
 
     public void saveSample(Sample sample){
@@ -398,24 +412,24 @@ public class LoaderUtils {
         return ot;
     }
 
-    public Collection<OntologyTerm> getAllOntologyTerms(){
+    public Collection<OntologyTerm> getAllOntologyTerms() {
 
         Collection<OntologyTerm> ot = ontologyTermRepository.findAll();
 
         return ot;
     }
 
-    public int getIndirectMappingNumber(String label){
+    public int getIndirectMappingNumber(String label) {
 
         return ontologyTermRepository.getIndirectMappingNumber(label);
     }
 
-    public int getDirectMappingNumber(String label){
+    public int getDirectMappingNumber(String label) {
 
 
-        Set<OntologyTerm> otset =  ontologyTermRepository.getDistinctSubTreeNodes(label);
+        Set<OntologyTerm> otset = ontologyTermRepository.getDistinctSubTreeNodes(label);
         int mapNum = 0;
-        for ( OntologyTerm ot:otset){
+        for (OntologyTerm ot : otset) {
             mapNum += ot.getDirectMappedSamplesNumber();
         }
         return mapNum;
@@ -438,41 +452,41 @@ public class LoaderUtils {
     public Collection<Marker> getAllHumanMarkers() {
         return markerRepository.findAllHumanMarkers();
     }
-    
-    public Platform getPlatform(String name, ExternalDataSource eds){
-        Platform p =  platformRepository.findByNameAndDataSource(name, eds.getName());
-        if(p == null){
+
+    public Platform getPlatform(String name, ExternalDataSource eds) {
+        Platform p = platformRepository.findByNameAndDataSource(name, eds.getName());
+        if (p == null) {
             p = new Platform();
             p.setName(name);
             p.setExternalDataSource(eds);
             platformRepository.save(p);
         }
-        
+
         return p;
     }
-    
-    public PlatformAssociation createPlatformAssociation(Platform p, Marker m){
-        if (platformAssociationRepository == null){
+
+    public PlatformAssociation createPlatformAssociation(Platform p, Marker m) {
+        if (platformAssociationRepository == null) {
             System.out.println("PAR is null");
         }
-        if (p == null){
+        if (p == null) {
             System.out.println("Platform is null");
         }
-        if (p.getExternalDataSource() == null){
+        if (p.getExternalDataSource() == null) {
             System.out.println("P.EDS is null");
         }
-        if (m == null){
+        if (m == null) {
             System.out.println("Marker is null");
         }
-        PlatformAssociation pa = platformAssociationRepository.findByPlatformAndMarker(p.getName(),p.getExternalDataSource().getName(),m.getSymbol());
-        if(pa == null){
+        PlatformAssociation pa = platformAssociationRepository.findByPlatformAndMarker(p.getName(), p.getExternalDataSource().getName(), m.getSymbol());
+        if (pa == null) {
             pa = new PlatformAssociation();
             pa.setPlatform(p);
             pa.setMarker(m);
             platformAssociationRepository.save(pa);
-            
+
         }
-        
+
         return pa;
     }
 

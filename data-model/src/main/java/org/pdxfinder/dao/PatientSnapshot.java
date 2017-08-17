@@ -58,4 +58,12 @@ public class PatientSnapshot {
         }
         this.samples.add(sample);
     }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
 }

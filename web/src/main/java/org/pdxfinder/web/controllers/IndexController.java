@@ -4,10 +4,12 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.services.GraphService;
+import org.pdxfinder.services.SearchService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 /**
@@ -18,22 +20,26 @@ import java.util.Map;
 @Controller
 public class IndexController {
 
-    private GraphService graphService;
 
-    public IndexController(GraphService graphService) {
+    private Integer numModels = null;
+
+    private GraphService graphService;
+    private SearchService searchService;
+
+    public IndexController(GraphService graphService, SearchService searchService) {
         this.graphService = graphService;
+        this.searchService = searchService;
     }
 
     @RequestMapping("/")
-    String index(Model model)  throws JSONException
+    String index(Model model,HttpSession session)  throws JSONException
     {
 
 
         JSONArray dCancerBySystemDataSeriesArray = new JSONArray();
 
         Map<String, Integer> cancerBySystemData = graphService.getModelCountsBySystem();
-        for (String name : cancerBySystemData.keySet())
-        {
+        for (String name : cancerBySystemData.keySet()) {
 
             JSONObject indexData = new JSONObject();
             indexData.put("name", name);
@@ -44,6 +50,25 @@ public class IndexController {
         }
 
         model.addAttribute("cancerBySystem", dCancerBySystemDataSeriesArray.toString());
+
+
+        synchronized (this)
+        {
+            if (numModels == null) {
+                int pdxCount = searchService.modelCount();
+                pdxCount += 100 - (pdxCount % 100);
+                numModels = pdxCount;
+            }
+        }
+        model.addAttribute("modelCount", numModels);
+
+
+
+
+
+
+
+
 
 
 

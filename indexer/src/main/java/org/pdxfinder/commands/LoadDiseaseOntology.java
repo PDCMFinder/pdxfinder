@@ -1,7 +1,5 @@
 package org.pdxfinder.commands;
 
-import org.apache.commons.cli.MissingArgumentException;
-import org.apache.commons.cli.UnrecognizedOptionException;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
@@ -57,10 +55,10 @@ public class LoadDiseaseOntology implements CommandLineRunner {
             int seconds = (int) (totalTime / 1000) % 60 ;
             int minutes = (int) ((totalTime / (1000*60)) % 60);
 
-            System.out.println("Loading finished after "+minutes+" minute(s) and "+seconds+" second(s)");
+            log.info("Loading finished after " + minutes + " minute(s) and " + seconds + " second(s)");
         }
         else{
-            log.info("Missing command");
+            log.info("Not loading disease ontology");
         }
 
     }

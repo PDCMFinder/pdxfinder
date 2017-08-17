@@ -101,7 +101,7 @@ function displayResults(q,data){
     var markerString = '';
     for (var i in data){
 
-        if(data[i].cancerGenomics != null && data[i].cancerGenomics.length>0){
+        if (data[i].cancerGenomics != null && data[i].cancerGenomics.length > 0) {
             var m = data[i].cancerGenomics;
             markerString = '';
 
@@ -113,7 +113,7 @@ function displayResults(q,data){
             }
         }
 
-        var tr = jQuery('<tr><td><a href="/details/'+ data[i].modelId+
+        var tr = jQuery('<tr><td><a href="/pdx/'+ data[i].dataSource+'/'+ data[i].modelId+
             '" target="_blank">'+data[i].modelId+'</a></td><td>'+data[i].diagnosis+'</td><td>'+ data[i].classification+'</td><td>'
             +data[i].tumorType+'</td><td>'+markerString+'</td><td>'+data[i].dataSource+'</td></tr>');
 

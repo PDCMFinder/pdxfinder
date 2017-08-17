@@ -49,9 +49,9 @@ public class LoadDataCommand implements CommandLineRunner {
     }
 
     public LoadDataCommand(TumorTypeRepository tumorTypeRepository, ExternalDataSourceRepository externalDataSourceRepository, Session session) {
-        Assert.notNull(tumorTypeRepository);
-        Assert.notNull(externalDataSourceRepository);
-        Assert.notNull(session);
+        Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null ");
+        Assert.notNull(externalDataSourceRepository, "externalDataSourceRepository cannot be null ");
+        Assert.notNull(session, "session cannot be null ");
 
         this.tumorTypeRepository = tumorTypeRepository;
         this.externalDataSourceRepository = externalDataSourceRepository;

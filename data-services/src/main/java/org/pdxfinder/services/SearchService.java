@@ -20,7 +20,7 @@ public class SearchService {
     private PatientSnapshotRepository patientSnapshotRepository;
     private ModelCreationRepository modelCreationRepository;
     private OntologyTermRepository ontologyTermRepositoryRepository;
-    private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxSearch.do";
+    private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID="; // http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=J000078336
     private final String JAX_URL_TEXT = "View data at JAX";
     private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
     private final String IRCC_URL_TEXT = "Contact IRCC here";
@@ -35,6 +35,14 @@ public class SearchService {
         this.patientSnapshotRepository = patientSnapshotRepository;
         this.modelCreationRepository = modelCreationRepository;
         this.ontologyTermRepositoryRepository = ontologyTermRepository;
+
+    }
+
+
+    public int modelCount() {
+
+        int pdxCount = modelCreationRepository.countAllModels();
+        return  pdxCount;
 
     }
 
@@ -132,12 +140,12 @@ public class SearchService {
     }
 
 
-    public DetailsDTO searchForModel(String modelId) {
+    public DetailsDTO searchForModel(String dataSource, String modelId) {
 
 
-        Sample sample = sampleRepository.findBySourcePdxId(modelId);
-        Patient patient = patientRepository.findByModelId(modelId);
-        PatientSnapshot ps = patientSnapshotRepository.findByModelId(modelId);
+        Sample sample = sampleRepository.findByDataSourceAndPdxId(dataSource,modelId);
+        Patient patient = patientRepository.findByDataSourceAndModelId(dataSource,modelId);
+        PatientSnapshot ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
         ModelCreation pdx = modelCreationRepository.findBySourcePdxId(modelId);
 
         DetailsDTO dto = new DetailsDTO();
@@ -247,7 +255,7 @@ public class SearchService {
         }
 
         if (sample.getDataSource().equals("JAX")) {
-            dto.setExternalUrl(JAX_URL);
+            dto.setExternalUrl(JAX_URL+pdx.getSourcePdxId());
             dto.setExternalUrlText(JAX_URL_TEXT);
         } else if (sample.getDataSource().equals("IRCC")) {
             dto.setExternalUrl(IRCC_URL + dto.getExternalId());
