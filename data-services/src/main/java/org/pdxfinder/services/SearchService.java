@@ -20,7 +20,7 @@ public class SearchService {
     private PatientSnapshotRepository patientSnapshotRepository;
     private ModelCreationRepository modelCreationRepository;
     private OntologyTermRepository ontologyTermRepositoryRepository;
-    private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxSearch.do";
+    private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID="; // http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=J000078336
     private final String JAX_URL_TEXT = "View data at JAX";
     private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
     private final String IRCC_URL_TEXT = "Contact IRCC here";
@@ -255,7 +255,7 @@ public class SearchService {
         }
 
         if (sample.getDataSource().equals("JAX")) {
-            dto.setExternalUrl(JAX_URL);
+            dto.setExternalUrl(JAX_URL+pdx.getSourcePdxId());
             dto.setExternalUrlText(JAX_URL_TEXT);
         } else if (sample.getDataSource().equals("IRCC")) {
             dto.setExternalUrl(IRCC_URL + dto.getExternalId());
