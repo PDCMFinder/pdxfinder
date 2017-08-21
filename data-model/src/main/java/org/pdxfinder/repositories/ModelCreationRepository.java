@@ -65,5 +65,9 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     Collection<ModelCreation> findByOntology2(@Param("query") String query, @Param("markers") String[] markers,
                                               @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
 
+    @Query("MATCH (n:ModelCreation) RETURN n")
+    Collection<ModelCreation> getAllModels();
+
+
 
 }
