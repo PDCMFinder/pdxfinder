@@ -4,7 +4,6 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.accessionidtatamodel.AccessionData;
-import org.pdxfinder.dao.Marker;
 import org.pdxfinder.dao.ModelCreation;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
@@ -16,7 +15,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -40,7 +38,8 @@ public class ValidateGeneSymbols implements CommandLineRunner{
     private LoaderUtils loaderUtils;
     private Set<String> cnvSymbols;
     private Set<String> rnaseqSymbols;
-    private List<String> symbolsWithIssues;
+    private List<String> cnvSymbolsWithIssues;
+    private List<String> rnaseqSymbolsWithIssues;
 
     @Value("${jaxpdx.cnv.url}")
     private String cnvURL;
@@ -53,6 +52,8 @@ public class ValidateGeneSymbols implements CommandLineRunner{
         this.loaderUtils = loaderUtils;
         this.cnvSymbols = new HashSet<>();
         this.rnaseqSymbols = new HashSet<>();
+        this.cnvSymbolsWithIssues = new ArrayList<>();
+        this.rnaseqSymbolsWithIssues = new ArrayList<>();
     }
 
     @Override
@@ -229,14 +230,14 @@ public class ValidateGeneSymbols implements CommandLineRunner{
             JSONArray samples = pdxExpression.getJSONArray("samples");
 
             if(samples.length()>0){
-                JSONObject cnvObj = samples.getJSONObject(0);
-                JSONArray cnv = cnvObj.getJSONArray("Expression");
+                JSONObject rnaseqObj = samples.getJSONObject(0);
+                JSONArray rnaseq = rnaseqObj.getJSONArray("Expression");
 
-                for (int i = 0; i < cnv.length(); i++) {
+                for (int i = 0; i < rnaseq.length(); i++) {
 
-                    JSONObject geneObj = cnv.getJSONObject(i);
+                    JSONObject geneObj = rnaseq.getJSONObject(i);
                     String symbol = geneObj.getString("gene");
-                    this.cnvSymbols.add(symbol);
+                    this.rnaseqSymbols.add(symbol);
 
                 }
             }
@@ -248,9 +249,44 @@ public class ValidateGeneSymbols implements CommandLineRunner{
 
     }
 
-    private void createErrorList(){
+    private void compareSymbols(HashMap<String, AccessionData> hugoDB){
+
+        for(String cnvSymbol:this.cnvSymbols){
+
+            if(!hugoDB.containsKey(cnvSymbol)){
+                cnvSymbolsWithIssues.add(cnvSymbol);
+            }
+        }
+
+
+        for(String rnaseqSymbol:this.rnaseqSymbols){
+
+            if(!hugoDB.containsKey(rnaseqSymbol)){
+
+                rnaseqSymbolsWithIssues.add(rnaseqSymbol);
+            }
+        }
 
     }
+
+    private void printReport(){
+
+        System.out.println("CNV symbols loaded: "+this.cnvSymbols.size());
+        System.out.println("CNV symbol errors: "+this.cnvSymbolsWithIssues.size());
+
+        for (String error:this.cnvSymbolsWithIssues){
+            System.out.println(error);
+        }
+
+        System.out.println("RnaSeq symbols loaded: "+this.rnaseqSymbols.size());
+        System.out.println("RnaSeq symbol errors: "+this.rnaseqSymbolsWithIssues.size());
+
+        for (String error:this.rnaseqSymbolsWithIssues){
+            System.out.println(error);
+        }
+
+    }
+
 
     private void validateSymbols(){
 
@@ -264,7 +300,9 @@ public class ValidateGeneSymbols implements CommandLineRunner{
 
         }
 
-        createErrorList();
+        compareSymbols(hugoDB);
+        printReport();
+
         System.out.println("Done");
 
     }
