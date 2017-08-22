@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en"></head>
+<body>
+
+    <div th:fragment="footer">
+
+        <!-- Mainly scripts -->
+        <script th:src="@{/js/jquery-2.1.1.js}"></script>
+        <script th:src="@{/js/bootstrap.min.js}"></script>
+        <script th:src="@{/js/plugins/metisMenu/jquery.metisMenu.js}"></script>
+        <script th:src="@{/js/plugins/slimscroll/jquery.slimscroll.min.js}"></script>
+
+        <!-- Custom and plugin javascript -->
+        <script src="/js/pdxAdmin.js"></script>
+
+
+        <!-- Am Chart Dependencies Start -->
+        <link rel="stylesheet" href="/js/plugins/chart/export.css" type="text/css" media="all" />
+        <script th:src="@{/js/plugins/chart/amcharts.js}"></script>
+        <script th:src="@{/js/plugins/chart/serial.js}"></script>
+        <script th:src="@{/js/plugins/chart/export.min.js}"></script>
+        <script th:src="@{/js/plugins/chart/light.js}"></script>
+        <!-- Am Chart Dependencies Ends -->
+        <script type="application/javascript" th:src="@{/js/plugins/chart/3dbar.js}"></script>
+
+    </div>
+</body>
+</html>
