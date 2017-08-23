@@ -159,10 +159,7 @@ h5 {
 .nav.navbar-top-links .dropdown-alerts a {
   font-size: 12px;
 }
-.nav-header {
-  padding: 33px 25px;
-  background: url("patterns/header-profile.png") no-repeat;
-}
+
 .pace-done .nav-header {
   transition: all 0.4s;
 }
@@ -1037,7 +1034,7 @@ button.dim:active:before {
 .label {
   background-color: #d1dade;
   color: #5e5e5e;
-  font-family: 'Open Sans';
+  font-family: 'Open Sans', Gadget, sans-serif;
   font-size: 10px;
   font-weight: 600;
   padding: 3px 8px;
@@ -1046,7 +1043,7 @@ button.dim:active:before {
 .badge {
   background-color: #d1dade;
   color: #5e5e5e;
-  font-family: 'Open Sans';
+  font-family: 'Open Sans', Gadget, sans-serif;
   font-size: 11px;
   font-weight: 600;
   padding-bottom: 4px;
@@ -3317,8 +3314,9 @@ body.full-height-layout #page-wrapper {
   min-height: auto;
 }
 body.boxed-layout {
-  background: url('patterns/shattered.png');
+
 }
+/*background: url('patterns/shattered.png');*/
 body.boxed-layout #wrapper {
   background-color: #2f4050;
   max-width: 1200px;
