@@ -155,7 +155,7 @@ public class LoadJAXData implements CommandLineRunner {
 
         // the preference is for clinical diagnosis but if not available use initial diagnosis
         String diagnosis = j.getString("Clinical Diagnosis");
-        if (diagnosis.trim().length() == 0 || "Not Specified".equals(diagnosis)) {
+        if (diagnosis.trim().length() == 0 || "Not specified".equals(diagnosis)) {
             diagnosis = j.getString("Initial Diagnosis");
 
         }

@@ -151,6 +151,12 @@ public class LoaderUtils {
         return modelCreation;
     }
 
+    public Collection<ModelCreation> getAllModels(){
+
+        return this.modelCreationRepository.getAllModels();
+    }
+
+
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, ExternalDataSource externalDataSource) {
 
         Patient patient = patientRepository.findByExternalId(externalId);
