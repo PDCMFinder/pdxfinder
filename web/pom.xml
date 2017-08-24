@@ -40,6 +40,11 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+        </dependency>
+
         <!-- Swagger dependencies -->
         <dependency>
             <groupId>io.springfox</groupId>
@@ -59,6 +64,7 @@
             <version>2.7.0</version>
         </dependency>
 
+        <!-- WEBJARS -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>bootswatch-flatly</artifactId>
@@ -68,13 +74,31 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>highcharts</artifactId>
-            <version>5.0.1</version>
+            <version>5.0.14</version>
         </dependency>
 
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
             <version>3.2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>chosen</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>datatables</artifactId>
+            <version>1.10.15</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>3.3.7-1</version>
         </dependency>
 
         <dependency>
