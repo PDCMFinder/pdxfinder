@@ -30,7 +30,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
     private static final String spreadsheetServiceUrl = "http://gsx2json.com/api?id=16JhGWCEUimsOF8q8bYN7wEJqVtjbO259X1YGrbRQLdc";
 
-    private final static Logger log = LoggerFactory.getLogger(LinkSamplesToDOTerms.class);
+    private final static Logger log = LoggerFactory.getLogger(LinkSamplesToNCITTerms.class);
     private LoaderUtils loaderUtils;
 
     @Autowired
@@ -45,7 +45,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
         if ("linkSamplesToNCITTerms".equals(args[0]) || "-linkSamplesToNCITTerms".equals(args[0])) {
 
-            log.info("Mapping samples to DO terms.");
+            log.info("Mapping samples to NCIT terms.");
             long startTime = System.currentTimeMillis();
             mapSamplesToTerms();
             updateIndirectMappingData();
