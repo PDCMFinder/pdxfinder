@@ -1,10 +1,3 @@
-/*
- *
- *   PDX Curator - Responsive Admin Theme
- *   version 2.4
- *
- */
-
 
 $(document).ready(function () {
 
