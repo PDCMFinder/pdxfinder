@@ -99,7 +99,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                         loaderUtils.saveSample(sample);
                         loaderUtils.saveOntologyTerm(term);
                         mapCounter++;
-                        //System.out.println("DONE "+sampleId+" "+doLabel);
+                        System.out.println("DONE "+sampleId+" "+label);
                     }
                     else{
                         errorCounter++;
@@ -122,14 +122,30 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
     private void updateIndirectMappingData() {
 
-        Collection<OntologyTerm> terms = loaderUtils.getAllOntologyTerms();
+        log.info("Getting all terms to update indirect mapping numbers");
 
-        for (OntologyTerm ot : terms) {
-            System.out.println("Updating " + ot.getLabel());
-            ot.setIndirectMappedSamplesNumber(loaderUtils.getDirectMappingNumber(ot.getLabel()));
-            loaderUtils.saveOntologyTerm(ot);
+        int maxTermNumber = loaderUtils.getOntologyTermNumber();
+        int batchSize = 50;
+        int startNode = 0;
+
+        while(startNode<maxTermNumber){
+            int to = startNode+batchSize;
+            log.info("Loading terms from "+startNode+" to "+to);
+
+            Collection<OntologyTerm> terms = loaderUtils.getAllOntologyTermsFromTo(startNode,batchSize);
+
+            for (OntologyTerm ot : terms) {
+                System.out.println("Updating " + ot.getLabel());
+                ot.setIndirectMappedSamplesNumber(loaderUtils.getDirectMappingNumber(ot.getLabel()));
+                loaderUtils.saveOntologyTerm(ot);
+
+            }
+
+            startNode+=batchSize;
 
         }
+
+
 
 
     }

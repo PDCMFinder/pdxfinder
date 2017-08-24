@@ -14,7 +14,8 @@ import java.util.Set;
  */
 public interface SampleRepository extends PagingAndSortingRepository<Sample, Long> {
 
-    Sample findBySourceSampleId(String sourceSampleId);
+    @Query("MATCH (s:Sample) WHERE s.sourceSampleId = {sourceSampleId} return s")
+    Sample findBySourceSampleId(@Param("sourceSampleId") String sourceSampleId);
 
     Set<Sample> findByDataSource(String dataSource);
 
