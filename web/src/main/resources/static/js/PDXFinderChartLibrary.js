@@ -96,7 +96,7 @@ function cancerByHistologyChart(chartData, cssID){
             series: {
                 borderWidth: 0,
                 dataLabels: {
-                    enabled: true,
+                    enabled: false,
                     formatter:function() {
                         var pcnt = (this.y / sumAll(this.series.data) ) * 100; // compute sum and percentage
                         return Highcharts.numberFormat(pcnt) + '% ';  // format to infuse percentage
@@ -257,7 +257,7 @@ function cancerByTissueChart(chartData,cssID){
                 crop: false,
                 overflow: 'none',
                 padding: 2,
-                enabled: true,
+                enabled: false,
                 rotation: -90,
                 align: 'left',
 

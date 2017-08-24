@@ -56,7 +56,7 @@ public class IndexController {
         {
             if (numModels == null) {
                 int pdxCount = searchService.modelCount();
-                pdxCount += 100 - (pdxCount % 100);
+                pdxCount -= (pdxCount % 100);
                 numModels = pdxCount;
             }
         }

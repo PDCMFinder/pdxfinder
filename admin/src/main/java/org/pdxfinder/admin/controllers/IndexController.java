@@ -1,4 +1,4 @@
-package pdxfinder.admin.controllers;
+package org.pdxfinder.admin.controllers;
 
 import org.neo4j.ogm.json.JSONException;
 import org.slf4j.Logger;
@@ -15,11 +15,13 @@ public class IndexController {
 
     private final static Logger log = LoggerFactory.getLogger(IndexController.class);
 
+
     @RequestMapping("/")
     String index() throws JSONException {
         log.info("In the index method");
 
         return "index";
     }
+
 
 }
