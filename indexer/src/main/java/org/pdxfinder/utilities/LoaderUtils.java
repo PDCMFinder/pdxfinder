@@ -420,9 +420,8 @@ public class LoaderUtils {
 
     public Collection<OntologyTerm> getAllOntologyTerms() {
 
-        Collection<OntologyTerm> ot = ontologyTermRepository.findAll();
+        return ontologyTermRepository.findAll();
 
-        return ot;
     }
 
     public int getIndirectMappingNumber(String label) {
@@ -445,6 +444,13 @@ public class LoaderUtils {
 
         return ontologyTermRepository.getOntologyTermNumber();
     }
+
+    public Collection<OntologyTerm> getAllOntologyTermsFromTo(int from, int to) {
+
+        return ontologyTermRepository.findAllFromTo(from, to);
+
+    }
+
 
     public void saveOntologyTerm(OntologyTerm ot){
 

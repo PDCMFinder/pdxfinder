@@ -45,4 +45,7 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
     @Query("MATCH (o:OntologyTerm) RETURN count(o)")
     int getOntologyTermNumber();
 
+    @Query("match (o:OntologyTerm) RETURN o SKIP {from} LIMIT {to}")
+    Collection<OntologyTerm> findAllFromTo(@Param("from") int from, @Param("to") int to);
+
 }
