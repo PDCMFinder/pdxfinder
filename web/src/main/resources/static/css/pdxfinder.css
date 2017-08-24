@@ -72,3 +72,8 @@ code {
 span.marker-description {
     border-bottom: 1px dotted #000;
 }
+
+/* Override the highcharts height bug */
+.highcharts-container {
+    height: auto;
+}

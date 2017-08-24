@@ -5,26 +5,38 @@
 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title>PDX Finder</title>
+
+    <link th:href="@{/webjars/highcharts/css/highcharts.css}"
+          href="//cdn.jsdelivr.net/highcharts/5.0.1/highcharts.min.css" rel="stylesheet" media="screen"/>
     <link th:href="@{/webjars/bootswatch-flatly/css/bootstrap.min.css}" href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" media="screen"/>
+
+    <script th:src="@{/webjars/jquery/jquery.min.js}" src="//cdn.jsdelivr.net/jquery/3.2.1/jquery.min.js"></script>
+    <script th:src="@{/webjars/chosen/chosen.jquery.js}"
+            src="//cdn.jsdelivr.net/chosen/1.7.0/chosen.jquery.js"></script>
+
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"
+            src="//cdn.jsdelivr.net/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link th:href="@{/webjars/datatables/css/dataTables.bootstrap.min.css}"
+          href="//cdn.jsdelivr.net/bootstrap.datatables/0.1/css/datatables.css" rel="stylesheet" media="screen"/>
+    <script th:src="@{/webjars/datatables/js/jquery.dataTables.min.js}"
+            src="//cdn.jsdelivr.net/bootstrap.datatables/0.1/js/datatables.js"></script>
+    <script th:src="@{/webjars/datatables/js/dataTables.bootstrap.min.js}"
+            src="//cdn.jsdelivr.net/bootstrap.datatables/0.1/js/datatables.js"></script>
 
     <link th:href="@{/css/pdxfinder.css}" href="../../static/css/pdxfinder.css" rel="stylesheet" media="screen"/>
     <link th:href="@{/css/customStyles.css}" href="../../static/css/customStyles.css" rel="stylesheet" media="screen"/>
 
-    <script src="/js/jquery-3.2.1.js"></script>
-    <script src="/js/bootstrap.js"></script>
-    <script src="/js/chosen.jquery.js"></script>
-    <script src="/js/jquery.dataTables.js"></script>
-    <script src="/js/PDXFinderChartLibrary.js"></script>
-    <script src="//code.highcharts.com/highcharts.js"></script>
-    <script src="//code.highcharts.com/modules/exporting.js"></script>
-    <script src="//code.highcharts.com/modules/data.js"></script>
-    <script src="//code.highcharts.com/modules/drilldown.js"></script>
+    <script th:src="@{/webjars/highcharts/js/highcharts.js}" src="//code.highcharts.com/highcharts.js"></script>
+    <script th:src="@{/webjars/highcharts/js/modules/exporting.js}"
+            src="//code.highcharts.com/modules/exporting.js"></script>
+    <script th:src="@{/webjars/highcharts/js/modules/data.js}" src="//code.highcharts.com/modules/data.js"></script>
+    <script th:src="@{/webjars/highcharts/js/modules/drilldown.js}"
+            src="//code.highcharts.com/modules/drilldown.js"></script>
 
+    <script th:src="@{/js/PDXFinderChartLibrary.js}" src="../../static/js/PDXFinderChartLibrary.js"></script>
+    <script th:src="@{/js/pdxFinder.js}" src="../../static/js/pdxFinder.js"></script>
 
-    <script src="https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap4.min.css"/>
-
-    <script src="/js/pdxFinder.js"></script>
 
 </head>
 
