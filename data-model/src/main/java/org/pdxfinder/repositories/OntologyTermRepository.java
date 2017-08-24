@@ -42,5 +42,7 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
             "RETURN term, st")
     Set<OntologyTerm> getDistinctSubTreeNodes(@Param("label") String label);
 
+    @Query("MATCH (o:OntologyTerm) RETURN count(o)")
+    int getOntologyTermNumber();
 
 }

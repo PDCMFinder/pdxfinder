@@ -441,6 +441,11 @@ public class LoaderUtils {
         return mapNum;
     }
 
+    public int getOntologyTermNumber(){
+
+        return ontologyTermRepository.getOntologyTermNumber();
+    }
+
     public void saveOntologyTerm(OntologyTerm ot){
 
         ontologyTermRepository.save(ot);
