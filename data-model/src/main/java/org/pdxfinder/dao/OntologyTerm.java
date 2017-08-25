@@ -36,6 +36,8 @@ public class OntologyTerm {
     public OntologyTerm(String url, String label) {
         this.url = url;
         this.label = label;
+        this.directMappedSamplesNumber = 0;
+        this.indirectMappedSamplesNumber = 0;
     }
 
     public Long getId() {
