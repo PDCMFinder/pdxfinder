@@ -48,4 +48,13 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
     @Query("match (o:OntologyTerm) RETURN o SKIP {from} LIMIT {to}")
     Collection<OntologyTerm> findAllFromTo(@Param("from") int from, @Param("to") int to);
 
+    @Query("MATCH (parent:OntologyTerm)<-[:SUBCLASS_OF]-(child:OntologyTerm) " +
+            "WHERE child.url = {url} " +
+            "RETURN parent")
+    Collection<OntologyTerm> findAllDirectParents(@Param("url") String url);
+
+
+    @Query("MATCH (o:OntologyTerm) WHERE o.directMappedSamplesNumber > 0 RETURN o")
+    Collection<OntologyTerm> findAllWithNotZeroDirectMappingNumber();
+
 }

@@ -424,6 +424,16 @@ public class LoaderUtils {
 
     }
 
+    public Collection<OntologyTerm> getAllOntologyTermsWithNotZeroDirectMapping(){
+
+        return ontologyTermRepository.findAllWithNotZeroDirectMappingNumber();
+    }
+
+    public Collection<OntologyTerm> getAllDirectParents(String termUrl){
+
+        return ontologyTermRepository.findAllDirectParents(termUrl);
+    }
+
     public int getIndirectMappingNumber(String label) {
 
         return ontologyTermRepository.getIndirectMappingNumber(label);
