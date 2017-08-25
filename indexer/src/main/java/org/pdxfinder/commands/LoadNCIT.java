@@ -51,7 +51,7 @@ public class LoadNCIT implements CommandLineRunner {
 
             log.info("Loading cancer branch of Disease Ontology.");
             long startTime = System.currentTimeMillis();
-            loadDO();
+            loadNCIT();
             long endTime   = System.currentTimeMillis();
             long totalTime = endTime - startTime;
 
@@ -68,7 +68,7 @@ public class LoadNCIT implements CommandLineRunner {
 
 
 
-    private void loadDO(){
+    private void loadNCIT(){
 
         Set<String> loadedTerms = new HashSet<>();
         Set<OntologyTerm> discoveredTerms = new HashSet<>();
