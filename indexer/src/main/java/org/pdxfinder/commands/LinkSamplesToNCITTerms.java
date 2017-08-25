@@ -19,6 +19,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by csaba on 24/08/2017.
@@ -120,6 +122,56 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
     }
 
+    private void updateIndirectMappingData(){
+
+        Collection<OntologyTerm> termsWithDirectMappings = loaderUtils.getAllOntologyTermsWithNotZeroDirectMapping();
+        int remainingTermsToUpdate = termsWithDirectMappings.size();
+        log.info("Found "+remainingTermsToUpdate+" terms with direct number. Updating graph...");
+
+        for(OntologyTerm ot:termsWithDirectMappings){
+
+            Set<OntologyTerm> discoveredTerms = new HashSet<>();
+            Set<String> visitedTerms = new HashSet<>();
+            Collection<OntologyTerm> parents = loaderUtils.getAllDirectParents(ot.getUrl());
+
+            if(parents != null){
+
+                discoveredTerms.addAll(parents);
+            }
+
+            while(discoveredTerms.size()>0) {
+                OntologyTerm currentParentTerm = discoveredTerms.iterator().next();
+
+                if(visitedTerms.contains(currentParentTerm.getUrl())) {
+                    discoveredTerms.remove(currentParentTerm);
+                    continue;
+                }
+
+                visitedTerms.add(currentParentTerm.getUrl());
+                //update indirect number
+                currentParentTerm.setIndirectMappedSamplesNumber(currentParentTerm.getIndirectMappedSamplesNumber()+ot.getDirectMappedSamplesNumber());
+                loaderUtils.saveOntologyTerm(currentParentTerm);
+                //get parents
+                parents = loaderUtils.getAllDirectParents(currentParentTerm.getUrl());
+
+                if(parents != null){
+
+                    discoveredTerms.addAll(parents);
+                }
+
+                discoveredTerms.remove(currentParentTerm);
+
+            }
+            remainingTermsToUpdate--;
+            log.info("Updated subgraph for "+ot.getLabel()+", "+remainingTermsToUpdate+" term(s) remained");
+        }
+
+
+
+    }
+
+
+/*
     private void updateIndirectMappingData() {
 
         log.info("Getting all terms to update indirect mapping numbers");
@@ -144,11 +196,8 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
             startNode+=batchSize;
 
         }
-
-
-
-
     }
+*/
 
 
     private String parseURL(String urlStr) {
