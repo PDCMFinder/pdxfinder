@@ -162,7 +162,7 @@ public class LoadJAXData implements CommandLineRunner {
 
         String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
 
-        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Model ID"), j.getString("Gender"),
+        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), j.getString("Gender"),
                 j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
 
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), diagnosis,
@@ -180,6 +180,9 @@ public class LoadJAXData implements CommandLineRunner {
         // TODO: verify this is the case
         QualityAssurance qa = new QualityAssurance("Histology", HISTOLOGY_NOTE, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
+
+        pSnap.addSample(sample);
+        loaderUtils.savePatientSnapshot(pSnap);
 
         ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), this.ENGRAFTMENT, sample, nsgBS, qa);
 
