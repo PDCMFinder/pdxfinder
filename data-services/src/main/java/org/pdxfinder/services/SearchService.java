@@ -172,50 +172,50 @@ public class SearchService {
                          */
 
 
-        if (sample.getSourceSampleId() != null) {
+        if (sample != null && sample.getSourceSampleId() != null) {
             dto.setExternalId(sample.getSourceSampleId());
         }
 
-        if (sample.getDataSource() != null) {
+        if (sample != null && sample.getDataSource() != null) {
             dto.setDataSource(sample.getDataSource());
         }
 
-        if (patient.getExternalId() != null) {
+        if (patient != null && patient.getExternalId() != null) {
             dto.setPatientId(patient.getExternalId());
         }
 
-        if (patient.getSex() != null) {
+        if (patient != null && patient.getSex() != null) {
             dto.setGender(patient.getSex());
         }
 
-        if (ps.getAge() != null) {
+        if (ps != null && ps.getAge() != null) {
             dto.setAge(ps.getAge());
         }
 
-        if (patient.getRace() != null) {
+        if (patient != null && patient.getRace() != null) {
             dto.setRace(patient.getRace());
         }
 
-        if (patient.getEthnicity() != null) {
+        if (patient != null && patient.getEthnicity() != null) {
             dto.setEthnicity(patient.getEthnicity());
         }
 
-        if (sample.getDiagnosis() != null) {
+        if (sample != null && sample.getDiagnosis() != null) {
             dto.setDiagnosis(sample.getDiagnosis());
         }
 
-        if (sample.getType() != null) {
+        if (sample != null && sample.getType() != null) {
             dto.setTumorType(sample.getType().getName());
         }
 
-        if (sample.getClassification() != null) {
+        if (sample != null && sample.getClassification() != null) {
             dto.setClassification(sample.getClassification());
         }
 
-        if (sample.getOriginTissue() != null) {
+        if (sample != null && sample.getOriginTissue() != null) {
             dto.setOriginTissue(sample.getOriginTissue().getName());
         }
-        if (sample.getSampleSite() != null) {
+        if (sample != null && sample.getSampleSite() != null) {
             dto.setSampleSite(sample.getSampleSite().getName());
         }
 
@@ -235,7 +235,7 @@ public class SearchService {
             dto.setModelId(pdx.getSourcePdxId());
         }
 
-        if (sample.getMolecularCharacterizations() != null) {
+        if (sample != null && sample.getMolecularCharacterizations() != null) {
             List<String> markerList = new ArrayList<>();
 
             for (MolecularCharacterization mc : sample.getMolecularCharacterizations()) {
@@ -254,12 +254,16 @@ public class SearchService {
 
         }
 
-        if (sample.getDataSource().equals("JAX")) {
+        if (sample != null && sample.getDataSource().equals("JAX")) {
             dto.setExternalUrl(JAX_URL+pdx.getSourcePdxId());
             dto.setExternalUrlText(JAX_URL_TEXT);
-        } else if (sample.getDataSource().equals("IRCC")) {
+        } else if (sample != null && sample.getDataSource().equals("IRCC")) {
             dto.setExternalUrl(IRCC_URL + dto.getExternalId());
             dto.setExternalUrlText(IRCC_URL_TEXT);
+        }
+        else{
+            dto.setExternalUrl("#");
+            dto.setExternalUrlText("Unknown source");
         }
 
 
