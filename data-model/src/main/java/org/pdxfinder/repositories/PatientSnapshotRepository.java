@@ -40,7 +40,13 @@ public interface PatientSnapshotRepository extends Neo4jRepository<PatientSnapsh
             "RETURN mod,ii,s,sf,ps, p, pr, t1, t2, ot, ss")
     PatientSnapshot findByDataSourceAndModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
-    @Query("MATCH (p:Patient)--(ps:PatientSnapshot) WHERE p.externalId = {patientId} AND p.dataSource = {dataSource} AND ps.age = {age} RETURN ps")
-    PatientSnapshot findByPatientIdAndDataSourceAndAge(@Param("patientId") String patientId, @Param("dataSource") String dataSource, @Param("age") String age);
+    @Query("MATCH (p:Patient)--(ps:PatientSnapshot) " +
+            "WHERE p.externalId = {patientId} " +
+            "AND p.dataSource = {dataSource} " +
+            "AND ps.age = {age} " +
+            "RETURN ps")
+    PatientSnapshot findByPatientIdAndDataSourceAndAge(@Param("patientId") String patientId,
+                                                       @Param("dataSource") String dataSource,
+                                                       @Param("age") String age);
 
 }
