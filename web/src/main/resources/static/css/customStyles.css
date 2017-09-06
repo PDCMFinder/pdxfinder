@@ -194,6 +194,10 @@ h5{
     margin-top: -70px;
 }
 
+.shiftUp80 {
+    margin-top: -80px;
+}
+
 .shiftUp100 {
     margin-top: -100px;
 }
@@ -291,7 +295,7 @@ h5{
 
 
 /**********************************  Overwrite bootstrap default notification starts ************************************************/
-.alert{padding:12px;margin-top:20px;border:1px solid transparent;border-radius:4px;}
+.alert{padding:12px;margin-top:20px; margin-bottom:0px; border:1px solid transparent;border-radius:4px;}
 .alert .alert-link{font-weight:700}
 .alert-info, .alert-info a{text-align: center; color: #fff; background-color:#31708f;border-color:#31708f; }
 .alert-info hr{border-top-color:#a6e1ec}
@@ -300,5 +304,5 @@ h5{
 .alert-dismissable .close, .alert-dismissible .close{position:relative;top:-2px;right:-21px;color:#fff;}
 
 
-
+.panel-heading{padding:5px 15px; border-top-right-radius:3px; border-top-left-radius:3px}
 /********************************** Overwrite bootstrap default notification Ends ************************************************/

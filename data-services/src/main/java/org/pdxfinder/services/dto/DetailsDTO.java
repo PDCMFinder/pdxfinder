@@ -1,6 +1,9 @@
 package org.pdxfinder.services.dto;
 
+import org.pdxfinder.dao.MarkerAssociation;
+
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by csaba on 22/05/2017.
@@ -31,6 +34,12 @@ public class DetailsDTO {
     private String externalUrl;
     private String externalUrlText;
 
+
+
+    private String specimenId;
+    private String technology;
+    private Set<MarkerAssociation> markerAssociations;
+
     public DetailsDTO() {
         this.modelId = "";
         this.externalId = "";
@@ -53,7 +62,38 @@ public class DetailsDTO {
         this.engraftmentSite = "";
         this.externalUrl = "";
         this.externalUrlText = "";
+
+        this.specimenId = "";
+        this.technology = "";
     }
+
+
+    public String getSpecimenId() {
+        return specimenId;
+    }
+
+    public void setSpecimenId(String specimenId) {
+        this.specimenId = specimenId;
+    }
+
+    public String getTechnology() {
+        return technology;
+    }
+
+    public void setTechnology(String technology) {
+        this.technology = technology;
+    }
+
+    public Set<MarkerAssociation> getMarkerAssociations() {
+        return markerAssociations;
+    }
+
+    public void setMarkerAssociations(Set<MarkerAssociation> markerAssociations) {
+        this.markerAssociations = markerAssociations;
+    }
+
+
+
 
     public String getModelId() {
         return modelId;
