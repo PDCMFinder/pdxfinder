@@ -20,6 +20,8 @@ public class SearchService {
     private PatientSnapshotRepository patientSnapshotRepository;
     private ModelCreationRepository modelCreationRepository;
     private OntologyTermRepository ontologyTermRepositoryRepository;
+    private SpecimenRepository specimenRepository;
+    private MolecularCharacterizationRepository molecularCharacterizationRepository;
     private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
     private final String JAX_URL_TEXT = "View data at JAX";
     private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
@@ -29,12 +31,15 @@ public class SearchService {
     @Autowired
     public SearchService(SampleRepository sampleRepository, PatientRepository patientRepository,
                          PatientSnapshotRepository patientSnapshotRepository, ModelCreationRepository modelCreationRepository,
-                         OntologyTermRepository ontologyTermRepository) {
+                         OntologyTermRepository ontologyTermRepository,SpecimenRepository specimenRepository,
+                         MolecularCharacterizationRepository molecularCharacterizationRepository) {
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
         this.patientSnapshotRepository = patientSnapshotRepository;
         this.modelCreationRepository = modelCreationRepository;
         this.ontologyTermRepositoryRepository = ontologyTermRepository;
+        this.molecularCharacterizationRepository = molecularCharacterizationRepository;
+        this.specimenRepository = specimenRepository;
 
     }
 
@@ -145,9 +150,10 @@ public class SearchService {
 
         Sample sample = sampleRepository.findByDataSourceAndPdxId(dataSource,modelId);
         Patient patient = patientRepository.findByDataSourceAndModelId(dataSource,modelId);
-        PatientSnapshot ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
+        List<PatientSnapshot> ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
         ModelCreation pdx = modelCreationRepository.findBySourcePdxId(modelId);
-
+        List<Specimen> specimen = specimenRepository.findVariationDataBySourcePdxId(modelId);
+        List<MolecularCharacterization> molecularCharacterization = molecularCharacterizationRepository.findVariationDataBySourcePdxId(modelId);
         DetailsDTO dto = new DetailsDTO();
 
                         /*
@@ -171,6 +177,26 @@ public class SearchService {
                         this.engraftmentSite = "";
                          */
 
+        if (molecularCharacterization != null) {
+            for (MolecularCharacterization molChar : molecularCharacterization) {
+                try {
+                    dto.setTechnology(molChar.getTechnology());
+                }catch (Exception e){ }
+
+                try {
+                    dto.setMarkerAssociations(molChar.getMarkerAssociations());
+                }catch (Exception e){ }
+            }
+        }
+
+
+        if (specimen != null) {
+            for (Specimen dSpecimen : specimen) {
+                try {
+                    dto.setSpecimenId(dSpecimen.getExternalId());
+                }catch (Exception e){ }
+            }
+        }
 
         if (sample != null && sample.getSourceSampleId() != null) {
             dto.setExternalId(sample.getSourceSampleId());
@@ -188,8 +214,13 @@ public class SearchService {
             dto.setGender(patient.getSex());
         }
 
-        if (ps != null && ps.getAge() != null) {
-            dto.setAge(ps.getAge());
+        if (ps != null) {
+            for (PatientSnapshot patientSnapshots : ps) {
+                if (patientSnapshots != null && patientSnapshots.getAge() != null) {
+                    dto.setAge(patientSnapshots.getAge());
+                }
+            }
+
         }
 
         if (patient != null && patient.getRace() != null) {

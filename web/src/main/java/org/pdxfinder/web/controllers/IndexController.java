@@ -12,10 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
-/**
- * Created by abayomi on 27/06/2017.
- */
-
 
 @Controller
 public class IndexController {

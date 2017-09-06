@@ -9,11 +9,14 @@
     <!--/*/ <th:block th:include="fragments/head-includes :: head-includes"></th:block> /*/-->
 </head>
 <body>
-<div class="page-header text-center">
-    <h1>Patient Derived Xenograft Finder</h1>
-</div>
+
+
 <div class="container">
     <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+</div>
+
+<div class="page-header text-center shiftUp80">
+    <h2>Patient Derived Xenograft Finder</h2>
 </div>
 
 <!-- Page Content -->
@@ -27,7 +30,7 @@
 
         <div class="panel panel-primary">
             <!-- Default panel contents -->
-            <div class="panel-heading"><h4> <span th:text="${sampleId}"></span> </h4></div>
+            <div class="panel-heading"><h5> Model : <span th:text="${externalId}"></span> </h5></div>
             <div class="panel-body">
 
                 <div class="row">
@@ -72,7 +75,7 @@
 
 
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <div class="panel panel-info">
                             <div class="panel-heading">
                                 <h3 class="panel-title">PDX model creation</h3>
@@ -88,7 +91,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <div class="panel panel-info">
                             <div class="panel-heading">
                                 <h3 class="panel-title">PDX model studies</h3>

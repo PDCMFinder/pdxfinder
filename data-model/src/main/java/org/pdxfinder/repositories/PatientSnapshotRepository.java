@@ -7,6 +7,7 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -38,7 +39,7 @@ public interface PatientSnapshotRepository extends Neo4jRepository<PatientSnapsh
             "OPTIONAL MATCH (s)-[ss:SAMPLE_SITE]-(t2:Tissue)\n" +
             "\n" +
             "RETURN mod,ii,s,sf,ps, p, pr, t1, t2, ot, ss")
-    PatientSnapshot findByDataSourceAndModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
+    List<PatientSnapshot> findByDataSourceAndModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
     @Query("MATCH (p:Patient)--(ps:PatientSnapshot) " +
             "WHERE p.externalId = {patientId} " +
