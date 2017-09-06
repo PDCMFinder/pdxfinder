@@ -10,7 +10,11 @@ import org.springframework.stereotype.Repository;
 public interface PdxPassageRepository extends Neo4jRepository<PdxPassage, Long> {
 
 
-    @Query("MATCH (p:PdxPassage),(s:ModelCreation) WHERE (p)-[:PASSAGED_FROM]-(s) and p.passage={passage} and s.sourcePdxId = {modelId} RETURN p")
-    PdxPassage findByPassageAndModelId(@Param("passage") String passage, @Param("modelId")String modelId);
+    @Query("MATCH (s:Sample)--(mod:ModelCreation)--(p:PdxPassage) " +
+            "WHERE s.dataSource = {dataSource} " +
+            "AND p.passage = {passage} " +
+            "AND mod.sourcePdxId = {modelId} RETURN p")
+    PdxPassage findByPassageAndModelIdAndDataSource(@Param("passage") int passage, @Param("modelId")String modelId, @Param("dataSource") String dataSource);
+
 
 }
