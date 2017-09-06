@@ -21,18 +21,18 @@ public class GraphService {
     private final static Logger log = LoggerFactory.getLogger(GraphService.class);
 
     private SampleRepository sampleRepository;
-    private OntologyTermRepository ontologyTermRepositoryRepository;
+    private OntologyTermRepository ontologyTermRepository;
 
     public GraphService(SampleRepository sampleRepository, OntologyTermRepository ontologyTermRepository) {
         this.sampleRepository = sampleRepository;
-        this.ontologyTermRepositoryRepository = ontologyTermRepository;
+        this.ontologyTermRepository = ontologyTermRepository;
     }
 
 
     public Set<String> getMappedDOTerms() {
 
 
-        Collection<OntologyTerm> ontologyTerms = ontologyTermRepositoryRepository.findAllWithMappings();
+        Collection<OntologyTerm> ontologyTerms = ontologyTermRepository.findAllWithMappings();
         Set<String> dataReport = new HashSet<>();
 
         for (OntologyTerm ontologyTerm : ontologyTerms) {
