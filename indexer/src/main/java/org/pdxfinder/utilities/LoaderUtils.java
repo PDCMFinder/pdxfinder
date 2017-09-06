@@ -384,8 +384,20 @@ public class LoaderUtils {
     public void savePdxPassage(PdxPassage pdxPassage){
         pdxPassageRepository.save(pdxPassage);
     }
-    
-    
+
+
+    public PdxPassage getPassage(ModelCreation model, String dataSource, int passage){
+
+        PdxPassage pass = pdxPassageRepository.findByPassageAndModelIdAndDataSource(passage, model.getSourcePdxId(), dataSource);
+
+        if(pass == null){
+            pass = new PdxPassage(model, passage);
+            pdxPassageRepository.save(pass);
+
+        }
+
+        return pass;
+    }
     
     public Specimen getSpecimen(String id){
         Specimen specimen = specimenRepository.findByExternalId(id);
