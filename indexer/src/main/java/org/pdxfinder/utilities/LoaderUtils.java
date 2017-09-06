@@ -197,6 +197,14 @@ public class LoaderUtils {
         return patientSnapshot;
     }
 
+    public PatientSnapshot getPatientSnapshot(String patientId, String age, String dataSource){
+
+        PatientSnapshot ps = patientSnapshotRepository.findByPatientIdAndDataSourceAndAge(patientId, dataSource, age);
+
+        return ps;
+
+    }
+
     public Patient getPatient(String externalId, String sex, String race, String ethnicity, ExternalDataSource externalDataSource) {
 
         Patient patient = patientRepository.findByExternalId(externalId);

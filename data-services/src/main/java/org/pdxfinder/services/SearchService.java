@@ -20,8 +20,6 @@ public class SearchService {
     private PatientSnapshotRepository patientSnapshotRepository;
     private ModelCreationRepository modelCreationRepository;
     private OntologyTermRepository ontologyTermRepositoryRepository;
-    private SpecimenRepository specimenRepository;
-    private MolecularCharacterizationRepository molecularCharacterizationRepository;
     private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
     private final String JAX_URL_TEXT = "View data at JAX";
     private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
@@ -31,14 +29,12 @@ public class SearchService {
     @Autowired
     public SearchService(SampleRepository sampleRepository, PatientRepository patientRepository,
                          PatientSnapshotRepository patientSnapshotRepository, ModelCreationRepository modelCreationRepository,
-                         OntologyTermRepository ontologyTermRepository,SpecimenRepository specimenRepository,MolecularCharacterizationRepository molecularCharacterizationRepository) {
+                         OntologyTermRepository ontologyTermRepository) {
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
         this.patientSnapshotRepository = patientSnapshotRepository;
         this.modelCreationRepository = modelCreationRepository;
         this.ontologyTermRepositoryRepository = ontologyTermRepository;
-        this.molecularCharacterizationRepository = molecularCharacterizationRepository;
-        this.specimenRepository = specimenRepository;
 
     }
 
@@ -152,51 +148,28 @@ public class SearchService {
         PatientSnapshot ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
         ModelCreation pdx = modelCreationRepository.findBySourcePdxId(modelId);
 
-        Specimen specimen = specimenRepository.findVariationDataBySourcePdxId(modelId);
-        MolecularCharacterization molecularCharacterization = molecularCharacterizationRepository.findVariationDataBySourcePdxId(modelId);
-
         DetailsDTO dto = new DetailsDTO();
 
-                       /*
-                       this.modelId = "";
-                       this.externalId = "";
-                       this.dataSource = "";
-                       this.patientId = "";
-                       this.gender = "";
-                       this.age = "";
-                       this.race = "";
-                       this.ethnicity = "";
-                       this.diagnosis = "";
-                       this.tumorType = "";
-                       this.classification = "";
-                       this.originTissue = "";
-                       this.sampleSite = "";
+                        /*
+                        this.modelId = "";
+                        this.externalId = "";
+                        this.dataSource = "";
+                        this.patientId = "";
+                        this.gender = "";
+                        this.age = "";
+                        this.race = "";
+                        this.ethnicity = "";
+                        this.diagnosis = "";
+                        this.tumorType = "";
+                        this.classification = "";
+                        this.originTissue = "";
+                        this.sampleSite = "";
 
-                       this.sampleType = "";
-                       this.strain = "";
-                       this.mouseSex = "";
-                       this.engraftmentSite = "";
-                        */
-
-        /*if (specimen.getExternalId() != null) {
-            dto.setSpecimenId(specimen.getExternalId());
-        }*/
-
-
-        try
-        {
-            dto.setTechnology(molecularCharacterization.getTechnology());
-        }catch (Exception e){ }
-
-        try
-        {
-            dto.setMarkerAssociations(molecularCharacterization.getMarkerAssociations());
-        }catch (Exception e){ }
-
-        try
-        {
-            dto.setSpecimenId(specimen.getExternalId());
-        }catch (Exception e){ }
+                        this.sampleType = "";
+                        this.strain = "";
+                        this.mouseSex = "";
+                        this.engraftmentSite = "";
+                         */
 
 
         if (sample != null && sample.getSourceSampleId() != null) {
@@ -296,5 +269,6 @@ public class SearchService {
 
         return dto;
     }
+
 
 }
