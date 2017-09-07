@@ -24,11 +24,13 @@ public class IRCCSample {
     String drugData;
     String implantType;
 
+    String xenoMutationData;
+
 
     public IRCCSample(String sampleId, String collectionDate, String ageAtCollection, String diagnosis,
                       String tumorType, String sampleSite, String msiStatus, String krasStatus, String brafStatus,
                       String nrasStatus, String pik3caStatus, String modelId, String implantSite, String strain,
-                      String drugData, String implantType) {
+                      String drugData, String implantType, String xenoMutationData) {
         this.sampleId = sampleId;
         this.collectionDate = collectionDate;
 
@@ -52,6 +54,7 @@ public class IRCCSample {
         this.strain = strain;
         this.drugData = drugData;
         this.implantType = implantType;
+        this.xenoMutationData = xenoMutationData;
     }
 
     public String getSampleId() {
@@ -116,5 +119,13 @@ public class IRCCSample {
 
     public String getImplantType() {
         return implantType;
+    }
+
+    public String getXenoMutationData() {
+        return xenoMutationData;
+    }
+
+    public void setXenoMutationData(String xenoMutationData) {
+        this.xenoMutationData = xenoMutationData;
     }
 }
