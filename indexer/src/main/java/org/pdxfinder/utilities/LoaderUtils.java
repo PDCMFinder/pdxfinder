@@ -408,7 +408,18 @@ public class LoaderUtils {
              
         return specimen;
     }
-    
+
+    public Specimen getSpecimen(String id, String dataSource){
+
+        Specimen specimen = specimenRepository.findByExternalIdAndDataSource(id, dataSource);
+        if(specimen == null){
+            specimen = new Specimen();
+            specimen.setExternalId(id);
+        }
+
+        return specimen;
+
+    }
     public void saveSpecimen(Specimen specimen){
         specimenRepository.save(specimen);
     }
