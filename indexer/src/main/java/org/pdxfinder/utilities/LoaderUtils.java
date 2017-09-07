@@ -251,6 +251,25 @@ public class LoaderUtils {
         return sample;
     }
 
+
+    public Sample getMouseSample(ModelCreation model, String specimenId, String dataSource, int passage, String sampleId){
+
+        Specimen specimen = this.getSpecimen(model, specimenId, dataSource, passage);
+        Sample sample = null;
+
+        if(specimen.getSample() == null){
+            sample = new Sample();
+            sample.setSourceSampleId(sampleId);
+            sampleRepository.save(sample);
+        }
+        else{
+
+            sample = specimen.getSample();
+        }
+
+        return sample;
+    }
+
     public Sample getSampleBySourcePdxId(String pdxId){
         return sampleRepository.findBySourcePdxId(pdxId);
     }
@@ -369,6 +388,7 @@ public class LoaderUtils {
         patientSnapshotRepository.save(ps);
     }
 
+
     public void saveMolecularCharacterization(MolecularCharacterization mc) {
         molecularCharacterizationRepository.save(mc);
     }
@@ -415,10 +435,13 @@ public class LoaderUtils {
 
         PdxPassage pass = this.getPassage(model, dataSource, passage);
 
-        Specimen specimen = specimenRepository.findByModelIdAndDataSourceAndSpecimenIdAndPassage(model.getSourcePdxId(), dataSource, specimenId, passage);
+        Specimen specimen = specimenRepository.findByModelIdAndDataSourceAndSpecimenIdAndPassage(model.getSourcePdxId(), dataSource, specimenId, pass.getPassage());
+
         if(specimen == null){
             specimen = new Specimen();
             specimen.setExternalId(specimenId);
+            specimen.setPdxPassage(pass);
+            specimenRepository.save(specimen);
         }
 
         return specimen;
