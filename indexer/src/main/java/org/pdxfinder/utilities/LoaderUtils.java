@@ -409,17 +409,24 @@ public class LoaderUtils {
         return specimen;
     }
 
-    public Specimen getSpecimen(String id, String dataSource){
 
-        Specimen specimen = specimenRepository.findByExternalIdAndDataSource(id, dataSource);
+    public Specimen getSpecimen(ModelCreation model, String specimenId, String dataSource, int passage){
+
+
+        PdxPassage pass = this.getPassage(model, dataSource, passage);
+
+        Specimen specimen = specimenRepository.findByModelIdAndDataSourceAndSpecimenIdAndPassage(model.getSourcePdxId(), dataSource, specimenId, passage);
         if(specimen == null){
             specimen = new Specimen();
-            specimen.setExternalId(id);
+            specimen.setExternalId(specimenId);
         }
 
         return specimen;
 
     }
+
+
+
     public void saveSpecimen(Specimen specimen){
         specimenRepository.save(specimen);
     }
