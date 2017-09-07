@@ -152,7 +152,7 @@ public class ValidateIRCCData implements CommandLineRunner {
 
                     IRCCSample sample = new IRCCSample(rowData[1], rowData[4], rowData[5], "Colorectal Adenocarcinoma",
                             rowData[6], rowData[7], rowData[13], rowData[14], rowData[15],
-                            rowData[16], rowData[17], rowData[3], rowData[8], rowData[10], rowData[11], rowData[9]);
+                            rowData[16], rowData[17], rowData[3], rowData[8], rowData[10], rowData[11], rowData[9], rowData[27]);
 
                     if (samplesMap.containsKey(rowData[0])) {
                         samplesMap.get(rowData[0]).add(sample);
