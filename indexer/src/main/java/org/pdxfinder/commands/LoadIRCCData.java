@@ -155,7 +155,7 @@ public class LoadIRCCData implements CommandLineRunner {
 
                     IRCCSample sample = new IRCCSample(rowData[1], rowData[4], rowData[5], "Colorectal Adenocarcinoma",
                             rowData[6], rowData[7], rowData[13], rowData[14], rowData[15],
-                            rowData[16], rowData[17], rowData[3], rowData[8], rowData[10], rowData[11], rowData[9]);
+                            rowData[16], rowData[17], rowData[3], rowData[8], rowData[10], rowData[11], rowData[9], rowData[27]);
 
                     if (samplesMap.containsKey(rowData[0])) {
                         samplesMap.get(rowData[0]).add(sample);
@@ -335,7 +335,9 @@ public class LoadIRCCData implements CommandLineRunner {
 
                 Sample humanSample = null;
                 Sample mouseSample = null;
-                //If the markersMutationMap does not contain the sampleid => mouse sample
+                Boolean isHumanSample = false;
+
+                //If the markersMutationMap does not contain the sampleid => human sample
                 //If it contains but the passage is 0 => human sample
                 //If its all WT =>  human
                 //It's a mouse sample otherwise
@@ -352,10 +354,37 @@ public class LoadIRCCData implements CommandLineRunner {
                 QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT);
                 loaderUtils.saveQualityAssurance(qa);
 
-                loaderUtils.createModelCreation(modelId, s.getImplantSite(), s.getImplantType(), humanSample, nsgBS, qa);
+                ModelCreation modelCreation = loaderUtils.createModelCreation(modelId, s.getImplantSite(), s.getImplantType(), humanSample, nsgBS, qa);
 
                 //TODO: determine whether sample is from human or mouse
+                if(markersMutationMap.containsKey(sampleId)){
+
+                    List<IRCCMarkerMutation> mutations = markersMutationMap.get(sampleId);
+
+                    for(IRCCMarkerMutation mutation: mutations){
+
+                        Marker m = loaderUtils.getMarker(mutation.getHugoSymbol(), mutation.getHugoSymbol());
+
+                        MarkerAssociation ma = new MarkerAssociation();
+                        ma.setChromosome(mutation.getChromosome());
+                        ma.setSeqStartPosition(mutation.getStartPosition());
+                        ma.setSeqEndPosition(mutation.getEndPosition());
+                        ma.setMarker(m);
+
+                        //MolecularCharacterizatio
+
+
+                    }
+
+
+                }
+
                 //TODO: Add molchar to appropriate sample
+
+                if(!isHumanSample){
+                    PdxPassage pdxPassage = loaderUtils.getPassage(modelCreation, "IRCC", 0);
+                }
+
             }
 
 
