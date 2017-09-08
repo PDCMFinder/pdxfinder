@@ -355,7 +355,7 @@ public class LoadIRCCData implements CommandLineRunner {
 
                 ModelCreation modelCreation = loaderUtils.createModelCreation(modelId, s.getImplantSite(), s.getImplantType(), humanSample, nsgBS, qa);
 
-                //TODO: determine whether sample is from human or mouse
+                // determine whether sample is from human or mouse
                 if(markersMutationMap.containsKey(sampleId)){
 
                     List<IRCCMarkerMutation> mutations = markersMutationMap.get(sampleId);
@@ -384,7 +384,11 @@ public class LoadIRCCData implements CommandLineRunner {
                             if(humanSample.getMolecularCharacterizations() == null){
 
                                 mc = new MolecularCharacterization(mutation.getPlatform());
-
+                                mas.add(ma);
+                                mc.setMarkerAssociations(mas);
+                                Set<MolecularCharacterization> mcs = new HashSet<>();
+                                mcs.add(mc);
+                                humanSample.setMolecularCharacterizations(mcs);
                             }
                             else{
 
@@ -396,14 +400,18 @@ public class LoadIRCCData implements CommandLineRunner {
                                     }
                                 }
 
+                                if(mc == null){
+                                    mc = new MolecularCharacterization(mutation.getPlatform());
+                                }
+
+                                mc.getMarkerAssociations().add(ma);
+                                Set<MolecularCharacterization> mcs = new HashSet<>();
+                                mcs.add(mc);
+                                humanSample.setMolecularCharacterizations(mcs);
 
                             }
 
-                            mc.setMarkerAssociations(mas);
-                            Set<MolecularCharacterization> mcs = new HashSet<>();
-                            mcs.add(mc);
 
-                            humanSample.setMolecularCharacterizations(mcs);
                             loaderUtils.saveSample(humanSample);
 
                         }
@@ -416,7 +424,7 @@ public class LoadIRCCData implements CommandLineRunner {
                             if(specimen.getSample() == null){
 
                                 mouseSample = new Sample();
-                                mouseSample.setSourceSampleId(mutation.getModelId());
+                                mouseSample.setSourceSampleId(mutation.getSampleId());
 
                                 mc = new MolecularCharacterization(mutation.getPlatform());
 
