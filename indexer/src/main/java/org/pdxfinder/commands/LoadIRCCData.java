@@ -283,17 +283,17 @@ public class LoadIRCCData implements CommandLineRunner {
         Collections.sort(errors);
         Collections.sort(errors2);
 
-        for(Map.Entry<String, IRCCPatient> entry : this.patientsMap.entrySet()){
+        for (Map.Entry<String, IRCCPatient> entry : this.patientsMap.entrySet()) {
 
             String key = entry.getKey();
 
-            if(!this.samplesMap.containsKey(key)){
+            if (!this.samplesMap.containsKey(key)) {
                 patientsWithoutSamples.add(key);
             }
 
         }
 
-        System.out.println("Patients without samples: "+patientsWithoutSamples.size());
+        System.out.println("Patients without samples: " + patientsWithoutSamples.size());
         for (String err : patientsWithoutSamples) {
             System.out.println(err);
         }
@@ -310,7 +310,7 @@ public class LoadIRCCData implements CommandLineRunner {
 
     }
 
-    private void loadToNeo4j(){
+    private void loadToNeo4j() {
 
         DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION);
 
@@ -319,7 +319,6 @@ public class LoadIRCCData implements CommandLineRunner {
             String patientId = entry.getKey();
             System.out.println(patientId);
             List<IRCCSample> samples = entry.getValue();
-
 
 
             for (int i = 0; i < samples.size(); i++) {
@@ -356,14 +355,14 @@ public class LoadIRCCData implements CommandLineRunner {
                 ModelCreation modelCreation = loaderUtils.createModelCreation(modelId, s.getImplantSite(), s.getImplantType(), humanSample, nsgBS, qa);
 
                 // determine whether sample is from human or mouse
-                if(markersMutationMap.containsKey(sampleId)){
+                if (markersMutationMap.containsKey(sampleId)) {
 
                     List<IRCCMarkerMutation> mutations = markersMutationMap.get(sampleId);
 
-                    for(IRCCMarkerMutation mutation: mutations){
+                    for (IRCCMarkerMutation mutation : mutations) {
                         Boolean isHumanSample = false;
 
-                        if(mutation.getXenoPassage().equals("0")){
+                        if (mutation.getXenoPassage().equals("0")) {
                             isHumanSample = true;
                         }
 
@@ -375,93 +374,100 @@ public class LoadIRCCData implements CommandLineRunner {
                         ma.setSeqStartPosition(mutation.getStartPosition());
                         ma.setSeqEndPosition(mutation.getEndPosition());
                         ma.setMarker(m);
-                        Set<MarkerAssociation> mas = new HashSet<>();
-                        mas.add(ma);
+
+                        //Set<MarkerAssociation> mas = new HashSet<>();
+                        //mas.add(ma);
                         MolecularCharacterization mc = null;
 
-                        if(isHumanSample){
+                        if (isHumanSample) {
 
-                            if(humanSample.getMolecularCharacterizations() == null){
+                            if (humanSample.getMolecularCharacterizations() == null) {
 
                                 mc = new MolecularCharacterization(mutation.getPlatform());
+                                Set<MarkerAssociation> mas = new HashSet<>();
                                 mas.add(ma);
                                 mc.setMarkerAssociations(mas);
                                 Set<MolecularCharacterization> mcs = new HashSet<>();
                                 mcs.add(mc);
                                 humanSample.setMolecularCharacterizations(mcs);
-                            }
-                            else{
+                            } else {
 
-                                for(MolecularCharacterization mc2:humanSample.getMolecularCharacterizations()){
+                                for (MolecularCharacterization mc2 : humanSample.getMolecularCharacterizations()) {
 
-                                    if(mc2.getTechnology().equals(mutation.getPlatform())){
+                                    if (mc2.getTechnology().equals(mutation.getPlatform())) {
                                         mc = mc2;
                                         break;
                                     }
                                 }
 
-                                if(mc == null){
+                                if (mc == null) {
                                     mc = new MolecularCharacterization(mutation.getPlatform());
+                                    mc.setMarkerAssociations(new HashSet<>());
+                                    humanSample.getMolecularCharacterizations().add(mc);
                                 }
 
                                 mc.getMarkerAssociations().add(ma);
-                                Set<MolecularCharacterization> mcs = new HashSet<>();
-                                mcs.add(mc);
-                                humanSample.setMolecularCharacterizations(mcs);
 
                             }
 
-
                             loaderUtils.saveSample(humanSample);
 
-                        }
-                        else{
+                        } else {
                             //this is a mouse sample, link it to a specimen
 
                             Specimen specimen = loaderUtils.getSpecimen(modelCreation, modelCreation.getSourcePdxId(), DS.getAbbreviation(), Integer.valueOf(mutation.getXenoPassage()));
 
-
-                            if(specimen.getSample() == null){
+                            if (specimen.getSample() == null) {
 
                                 mouseSample = new Sample();
                                 mouseSample.setSourceSampleId(mutation.getSampleId());
 
                                 mc = new MolecularCharacterization(mutation.getPlatform());
+                                Set<MarkerAssociation> mas = new HashSet<>();
+                                mas.add(ma);
+                                mc.setMarkerAssociations(mas);
+                                Set<MolecularCharacterization> mcs = new HashSet<>();
+                                mcs.add(mc);
+                                mouseSample.setMolecularCharacterizations(mcs);
+                                specimen.setSample(mouseSample);
 
-                            }
-                            else{
+                            } else { // a sample is linked to the specimen already
 
-                                if(specimen.getSample().getMolecularCharacterizations() == null){
+                                mouseSample = specimen.getSample();
+                                if (mouseSample.getMolecularCharacterizations() == null) {
+                                    // no molchars on the mouse sample, create one
 
                                     mc = new MolecularCharacterization(mutation.getPlatform());
-                                }
-                                else{
+                                    Set<MarkerAssociation> mas = new HashSet<>();
+                                    mas.add(ma);
+                                    mc.setMarkerAssociations(mas);
+                                    Set<MolecularCharacterization> mcs = new HashSet<>();
+                                    mcs.add(mc);
+                                    mouseSample.setMolecularCharacterizations(mcs);
+                                } else { // the mouse sample already has molchar(s)
 
                                     Set<MolecularCharacterization> mcs = specimen.getSample().getMolecularCharacterizations();
+                                    // find the molchar with the same technology
+                                    for (MolecularCharacterization mc2 : mcs) {
 
-                                    for(MolecularCharacterization mc2 :mcs){
-
-                                        if(mc2.getTechnology().equals(mutation.getPlatform())){
+                                        if (mc2.getTechnology().equals(mutation.getPlatform())) {
 
                                             mc = mc2;
                                             break;
                                         }
-
                                     }
-
-                                    if(mc == null){
+                                    // if that technology wasn't used before, add it
+                                    if (mc == null) {
                                         mc = new MolecularCharacterization(mutation.getPlatform());
+                                        mc.setMarkerAssociations(new HashSet<>());
+                                        mouseSample.getMolecularCharacterizations().add(mc);
                                     }
+
+                                    mc.getMarkerAssociations().add(ma);
 
                                 }
-
-
                             }
-                            mc.setMarkerAssociations(mas);
-                            Set<MolecularCharacterization> mcs = new HashSet<>();
-                            mcs.add(mc);
-                            mouseSample.setMolecularCharacterizations(mcs);
-                            specimen.setSample(mouseSample);
+
                             loaderUtils.saveSample(mouseSample);
                             loaderUtils.saveSpecimen(specimen);
 
@@ -469,23 +475,13 @@ public class LoadIRCCData implements CommandLineRunner {
                         }
 
 
-
-                        System.out.println();
+                        //System.out.println();
                     }
 
 
                 }
 
-                //TODO: Add molchar to appropriate sample
-
-              //  if(!isHumanSample){
-              //      PdxPassage pdxPassage = loaderUtils.getPassage(modelCreation, "IRCC", 0);
-              //  }
-
             }
-
-
-
 
 
         }
