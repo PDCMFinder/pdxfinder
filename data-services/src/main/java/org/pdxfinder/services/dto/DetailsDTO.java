@@ -36,9 +36,11 @@ public class DetailsDTO {
 
 
 
+
     private String specimenId;
     private String technology;
     private Set<MarkerAssociation> markerAssociations;
+    private int totalPages;
 
     public DetailsDTO() {
         this.modelId = "";
@@ -65,6 +67,7 @@ public class DetailsDTO {
 
         this.specimenId = "";
         this.technology = "";
+        this.totalPages = 0;
     }
 
 
@@ -92,8 +95,13 @@ public class DetailsDTO {
         this.markerAssociations = markerAssociations;
     }
 
+    public int getTotalPages() {
+        return totalPages;
+    }
 
-
+    public void setTotalPages(int totalPages) {
+        this.totalPages = totalPages;
+    }
 
     public String getModelId() {
         return modelId;

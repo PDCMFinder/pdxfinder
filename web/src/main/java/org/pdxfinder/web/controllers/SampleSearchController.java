@@ -5,10 +5,7 @@ import org.pdxfinder.services.SampleService;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +13,7 @@ import java.util.List;
 /**
  * Created by csaba on 09/05/2017.
  */
+@CrossOrigin(origins = "http://localhost")
 @RestController
 public class SampleSearchController
 {
