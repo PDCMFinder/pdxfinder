@@ -16,7 +16,7 @@
 </div>
 
 <div class="page-header text-center shiftUp80">
-    <h3>PDX Model - <span th:text="${totalPages}"></span></h3>
+    <h3>PDX Model - <span th:text="${externalId}"></span></h3>
 </div>
 
 <!-- Page Content -->
@@ -80,7 +80,6 @@
                                     <tr><th>Tumor type</th>         <td th:text="${tumorType}"></td></tr>
                                     <tr><th>Classification</th>     <td th:text="${classification}"></td></tr>
                                     <tr><th>Markers</th>            <td><span th:each="marker, iterStat : ${markers}" th:text="!${iterStat.last} ? ${marker} + ', ': ${marker}"></span></td></tr>
-                                    <tr><th>&nbsp;</th>                 <td>&nbsp;</td></tr>
                                 </table>
                             </div>
                         </div>
@@ -143,6 +142,11 @@
                                         <ul class="pagination pagination-sm">
                                             <th:block th:unless="${totalPages<1}" th:each="num: ${#numbers.sequence(1,totalPages)}">
 
+                                                <li th:if="${num==1 && presentPage!=1}">
+                                                    <a th:href="@{'?page='+${presentPage-1}}"> << Previous </a>
+                                                </li>
+
+
                                                 <th:block th:if="${presentPage<5 && num<=5}">
                                                     <li th:class="( ${num} == ${presentPage} ) ? 'active' : '' ">
                                                         <a th:href="@{'?page='+${num}}" th:text="${num}"> Page Number </a>
@@ -175,6 +179,9 @@
                                                     </li>
                                                     <li th:class="( ${num} == ${presentPage} ) ? 'active' : '' ">
                                                         <a th:href="@{'?page='+${num}}" th:text="${num}"> Last Page </a>
+                                                    </li>
+                                                    <li>
+                                                        <a th:href="@{'?page='+${presentPage+1}}"> Next >> </a>
                                                     </li>
                                                 </th:block>
 
