@@ -377,3 +377,37 @@ h5{
 .table-hover > tbody > tr:hover > th {
     background-color: rgba(229, 230, 230, 0.25);
 }
+
+.pagination-sm>li>a,.pagination-sm>li>span
+{
+    position:relative;
+    float:left;
+    padding:6px 12px;
+    margin-left:-1px;
+    line-height:1.42857143;
+    color:#337ab7;
+    background-color:#fff;
+    border:1px solid #ddd
+}
+.pagination-sm>li>a,.pagination-sm>li>span
+{
+    padding:5px 10px;
+    font-size:12px;
+    line-height:1.5;
+}
+.pagination-sm>.active>a,.pagination-sm>.active>a:focus,.pagination-sm>.active>a:hover,.pagination-sm>.active>span,.pagination-sm>.active>span:focus,.pagination-sm>.active>span:hover
+{
+    z-index:3;
+    color:#fff;
+    cursor:default;
+    background-color:#337ab7;
+    border-color:#337ab7
+}
+.pagination-sm>li>a:focus,.pagination-sm>li>a:hover,.pagination-sm>li>span:focus,.pagination-sm>li>span:hover
+{
+    z-index:2;
+    color:#23527c;
+    background-color:#eee;
+    border-color:#ddd;
+}
+

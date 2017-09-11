@@ -80,6 +80,7 @@
                                     <tr><th>Tumor type</th>         <td th:text="${tumorType}"></td></tr>
                                     <tr><th>Classification</th>     <td th:text="${classification}"></td></tr>
                                     <tr><th>Markers</th>            <td><span th:each="marker, iterStat : ${markers}" th:text="!${iterStat.last} ? ${marker} + ', ': ${marker}"></span></td></tr>
+                                    <tr><th>&nbsp;</th>                 <td>&nbsp;</td></tr>
                                 </table>
                             </div>
                         </div>
@@ -136,19 +137,58 @@
                                     </table>
                                 </div>
 
+                                <div style="text-align: center;">
+                                    <div th:if="${not #lists.isEmpty(variationData)}">
+
+                                        <ul class="pagination pagination-sm">
+                                            <th:block th:unless="${totalPages<1}" th:each="num: ${#numbers.sequence(1,totalPages)}">
+
+                                                <th:block th:if="${presentPage<5 && num<=5}">
+                                                    <li th:class="( ${num} == ${presentPage} ) ? 'active' : '' ">
+                                                        <a th:href="@{'?page='+${num}}" th:text="${num}"> Page Number </a>
+                                                    </li>
+                                                </th:block>
+
+
+                                                <th:block th:if="${presentPage>=5 && num==1}">
+                                                    <li>
+                                                        <a th:href="@{'?page='+${num}}" th:text="${num}"> Page Number </a>
+                                                    </li>
+                                                    <li>
+                                                        <a disabled> . . . </a>
+                                                    </li>
+                                                    <li>
+                                                        <a th:href="@{'?page='+${presentPage-1}}" th:text="${presentPage-1}"> Page Number </a>
+                                                    </li>
+                                                    <li class="active">
+                                                        <a  th:href="@{'?page='+${presentPage}}" th:text="${presentPage}"> Page Number </a>
+                                                    </li>
+                                                    <li th:if="${presentPage<totalPages}">
+                                                        <a th:href="@{'?page='+${presentPage+1}}" th:text="${presentPage+1}"> Page Number </a>
+                                                    </li>
+                                                </th:block>
+
+
+                                                <th:block th:if="${num==totalPages && presentPage<totalPages-1}">
+                                                    <li  th:if="${presentPage<totalPages-2}" th:class="active">
+                                                        <a disabled> . . . </a>
+                                                    </li>
+                                                    <li th:class="( ${num} == ${presentPage} ) ? 'active' : '' ">
+                                                        <a th:href="@{'?page='+${num}}" th:text="${num}"> Last Page </a>
+                                                    </li>
+                                                </th:block>
+
+
+                                            </th:block>
+                                        </ul>
+
+                                    </div>
+                                </div>
+
 
                             </div>
                         </div>
                     </div>
-
-                </div>
-
-
-
-
-                <div class="row">
-
-
 
                 </div>
 

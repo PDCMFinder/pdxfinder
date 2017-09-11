@@ -59,7 +59,7 @@ public class DetailsPageController {
         model.addAttribute("specimenId", dto.getSpecimenId());
         model.addAttribute("technology", dto.getTechnology());
         model.addAttribute("totalPages", dto.getTotalPages());
-        model.addAttribute("disPage", viewPage+1);
+        model.addAttribute("presentPage", viewPage+1);
 
         model.addAttribute("variationData", dto.getMarkerAssociations());
 
