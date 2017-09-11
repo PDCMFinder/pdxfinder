@@ -5,7 +5,7 @@ package org.pdxfinder.irccdatamodel;
  */
 public class IRCCMarkerMutation {
 
-    String modelId;
+    String sampleId;
     String hugoSymbol;
     String entrezId;
     String ncbiBuild;
@@ -24,11 +24,11 @@ public class IRCCMarkerMutation {
     String platform;
 
 
-    public IRCCMarkerMutation(String modelId, String hugoSymbol, String entrezId, String ncbiBuild, String exon, String chromosome,
+    public IRCCMarkerMutation(String sampleId, String hugoSymbol, String entrezId, String ncbiBuild, String exon, String chromosome,
                               String start, String end, String startPosition, String endPosition, String strand,
                               String hgvspShort, String proteinPosition, String swissprot, String xenoPassage, String platform, String variantClassification) {
 
-        this.modelId = modelId;
+        this.sampleId = sampleId;
         this.hugoSymbol = hugoSymbol;
         this.entrezId = entrezId;
         this.ncbiBuild = ncbiBuild;
@@ -107,8 +107,8 @@ public class IRCCMarkerMutation {
         return platform;
     }
 
-    public String getModelId() {
-        return modelId;
+    public String getSampleId() {
+        return sampleId;
     }
 
     public String getVariantClassification() {
