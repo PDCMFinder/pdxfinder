@@ -34,9 +34,10 @@ public class RestControllerGeneral {
         }
 
 
-        @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
-        public DetailsDTO detail(@PathVariable String dataSrc, @PathVariable String modelId) {
-                DetailsDTO dto = searchService.searchForModel(dataSrc, modelId);
+        @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}/{page}")
+        public DetailsDTO detail(@PathVariable String dataSrc, @PathVariable String modelId, @PathVariable int page) {
+
+                DetailsDTO dto = searchService.searchForModel(dataSrc, modelId,page);
                 return dto;
         }
 

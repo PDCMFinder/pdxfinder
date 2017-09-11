@@ -5,6 +5,7 @@ import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.SearchService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +18,6 @@ import java.util.Map;
 public class IndexController {
 
 
-    private Integer numModels = null;
 
     private GraphService graphService;
     private SearchService searchService;
@@ -47,28 +47,21 @@ public class IndexController {
 
         model.addAttribute("cancerBySystem", dCancerBySystemDataSeriesArray.toString());
 
-
-        synchronized (this)
-        {
-            if (numModels == null) {
-                int pdxCount = searchService.modelCount();
-                pdxCount -= (pdxCount % 100);
-                numModels = pdxCount;
-            }
-        }
-        model.addAttribute("modelCount", numModels);
-
-
-
-
-
-
-
-
-
-
+        model.addAttribute("modelCount", getNumModels());
 
         return "index";
+    }
+
+
+    @Cacheable
+    private Integer getNumModels()
+    {
+
+        Integer numModels;
+        int pdxCount = searchService.modelCount();
+        pdxCount -= (pdxCount % 100);
+        numModels = pdxCount;
+        return numModels;
     }
 
 }

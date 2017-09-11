@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Created by csaba on 12/05/2017.
@@ -22,36 +23,17 @@ public class DetailsPageController {
     }
 
     @RequestMapping(value = "/pdx/{dataSrc}/{modelId}")
-    public String details(@PathVariable String dataSrc,@PathVariable String modelId, Model model)
-    {
+    public String details(@PathVariable String dataSrc,
+                          @PathVariable String modelId,
+                          @RequestParam(value="page", required = false) Integer page,Model model){
 
+        int viewPage = (page == null || page < 1) ? 0 : page-1;
 
-        DetailsDTO dto = searchService.searchForModel(dataSrc,modelId);
-
-        //if(dto.getModelId().equals("")) return "error";
+        DetailsDTO dto = searchService.searchForModel(dataSrc,modelId,viewPage);
 
         model.addAttribute("fullData",dto);
 
         model.addAttribute("modelId",modelId);
-        /*
-        this.externalId = "";
-        this.dataSource = "";
-        this.patientId = "";
-        this.gender = "";
-        this.age = "";
-        this.race = "";
-        this.ethnicity = "";
-        this.diagnosis = "";
-        this.tumorType = "";
-        this.classification = "";
-        this.originTissue = "";
-        this.sampleSite = "";
-
-        this.sampleType = "";
-        this.strain = "";
-        this.mouseSex = "";
-        this.engraftmentSite = "";
-        */
 
         model.addAttribute("externalId", dto.getExternalId());
         model.addAttribute("dataSource", dto.getDataSource());
@@ -74,7 +56,37 @@ public class DetailsPageController {
         model.addAttribute("url", dto.getExternalUrl());
         model.addAttribute("urlText", dto.getExternalUrlText());
 
+        model.addAttribute("specimenId", dto.getSpecimenId());
+        model.addAttribute("technology", dto.getTechnology());
+        model.addAttribute("totalPages", dto.getTotalPages());
+        model.addAttribute("presentPage", viewPage+1);
+
+        model.addAttribute("variationData", dto.getMarkerAssociations());
+
         //TODO: return error page if sampleId does not exist
         return "details";
     }
 }
+
+
+
+
+        /*
+        this.externalId = "";
+        this.dataSource = "";
+        this.patientId = "";
+        this.gender = "";
+        this.age = "";
+        this.race = "";
+        this.ethnicity = "";
+        this.diagnosis = "";
+        this.tumorType = "";
+        this.classification = "";
+        this.originTissue = "";
+        this.sampleSite = "";
+
+        this.sampleType = "";
+        this.strain = "";
+        this.mouseSex = "";
+        this.engraftmentSite = "";
+        */

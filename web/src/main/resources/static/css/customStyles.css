@@ -78,7 +78,10 @@ h5{
 .w3-button
 {border:none;display:inline-block;outline:0;padding:8px 16px;vertical-align:middle;overflow:hidden;text-decoration:none;color:inherit;background-color:inherit;text-align:center;cursor:pointer;white-space:nowrap}
 
-/********************************** PDXFinder Auto-Suggest Start ************************************************/
+
+/**
+ PDXFinder Auto-Suggest
+ */
 
 .pdxFinder_autocomplete,
 .pdxFinder_autocomplete div,
@@ -170,9 +173,11 @@ h5{
     border-bottom: 1px solid #000;
 }
 
-/********************************** PDXFinder Auto-Suggest End ************************************************/
 
-/********************************** PDXFinder Spacing Start ************************************************/
+
+/**
+ PDXFinder Spacing
+*/
 
 .fillUp {
     text-align: justify;
@@ -214,6 +219,10 @@ h5{
     margin-top: 100px;
 }
 
+.baseSpace2{
+    margin-bottom: 20px;
+}
+
 .fullImg {
     width: 100%;
     margin-top: 12px;
@@ -223,9 +232,17 @@ h5{
     width: 100%;
 }
 
-/********************************** PDXFinder Spacing End ************************************************/
 
-/********************************** PDXFinder Error Page Start ************************************************/
+@media (min-width:979px) {
+    .noPaddingLeft {
+        padding-left: 0px;
+    }
+}
+
+
+/**
+ PDXFinder Error Page
+*/
 
 .err_body {
     font-family: 'pdxErrorStyle', cursive;
@@ -290,11 +307,11 @@ h5{
     text-decoration: none;
 }
 
-/********************************** PDXFinder Error Page Ends ************************************************/
 
 
-
-/**********************************  Overwrite bootstrap default notification starts ************************************************/
+/**
+ Overwrite bootstrap default notification
+*/
 .alert{padding:12px;margin-top:20px; margin-bottom:0px; border:1px solid transparent;border-radius:4px;}
 .alert .alert-link{font-weight:700}
 .alert-info, .alert-info a{text-align: center; color: #fff; background-color:#31708f;border-color:#31708f; }
@@ -305,4 +322,92 @@ h5{
 
 
 .panel-heading{padding:5px 15px; border-top-right-radius:3px; border-top-left-radius:3px}
-/********************************** Overwrite bootstrap default notification Ends ************************************************/
+
+
+
+
+
+/**
+ Overwrite some bootstrap default table styles - table-bordered table-striped table-condensed, table-banded, table-hover
+*/
+
+.table{
+    font-size: 12px;
+}
+.table-borderedPdx {
+    /* border-color: rgba(163, 168, 168, 0.2); */
+    border: 1px solid #999;
+}
+
+.table-bordered > thead > tr > th,
+.table-bordered > thead > tr > td {
+    background-color: #F5F5F6;
+    border-bottom-width: 1px;
+    background:url(../images/tableBack.jpg) repeat-x;
+}
+
+.table-borderedPdx > thead > tr > th,
+.table-borderedPdx > tbody > tr > th,
+.table-borderedPdx > tfoot > tr > th,
+.table-borderedPdx > thead > tr > td,
+.table-borderedPdx > tbody > tr > td,
+.table-borderedPdx > tfoot > tr > td {
+    border: 1px solid #999;
+    white-space:nowrap;
+}
+
+.table-bordered > thead > tr > th,
+.table-bordered > tbody > tr > th,
+.table-bordered > tfoot > tr > th,
+.table-bordered > thead > tr > td,
+.table-bordered > tbody > tr > td,
+.table-bordered > tfoot > tr > td {
+    white-space:nowrap;
+}
+
+
+.table-borderedPdx > thead > tr > th,
+.table-borderedPdx > thead > tr > td {
+    background-color: #F5F5F6;
+    border-bottom-width: 1px;
+    background:url(../images/tableBack.jpg) repeat-x;
+}
+
+.table-hover > tbody > tr:hover > td,
+.table-hover > tbody > tr:hover > th {
+    background-color: rgba(229, 230, 230, 0.25);
+}
+
+.pagination-sm>li>a,.pagination-sm>li>span
+{
+    position:relative;
+    float:left;
+    padding:6px 12px;
+    margin-left:-1px;
+    line-height:1.42857143;
+    color:#337ab7;
+    background-color:#fff;
+    border:1px solid #ddd
+}
+.pagination-sm>li>a,.pagination-sm>li>span
+{
+    padding:5px 10px;
+    font-size:12px;
+    line-height:1.5;
+}
+.pagination-sm>.active>a,.pagination-sm>.active>a:focus,.pagination-sm>.active>a:hover,.pagination-sm>.active>span,.pagination-sm>.active>span:focus,.pagination-sm>.active>span:hover
+{
+    z-index:3;
+    color:#fff;
+    cursor:default;
+    background-color:#337ab7;
+    border-color:#337ab7
+}
+.pagination-sm>li>a:focus,.pagination-sm>li>a:hover,.pagination-sm>li>span:focus,.pagination-sm>li>span:hover
+{
+    z-index:2;
+    color:#23527c;
+    background-color:#eee;
+    border-color:#ddd;
+}
+

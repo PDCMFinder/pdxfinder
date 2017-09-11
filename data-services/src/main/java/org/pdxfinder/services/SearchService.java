@@ -6,6 +6,10 @@ import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -145,7 +149,7 @@ public class SearchService {
     }
 
 
-    public DetailsDTO searchForModel(String dataSource, String modelId) {
+    public DetailsDTO searchForModel(String dataSource, String modelId, int page) {
 
 
         Sample sample = sampleRepository.findByDataSourceAndPdxId(dataSource,modelId);
@@ -153,7 +157,12 @@ public class SearchService {
         List<PatientSnapshot> ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
         ModelCreation pdx = modelCreationRepository.findBySourcePdxId(modelId);
         List<Specimen> specimen = specimenRepository.findVariationDataBySourcePdxId(modelId);
-        List<MolecularCharacterization> molecularCharacterization = molecularCharacterizationRepository.findVariationDataBySourcePdxId(modelId);
+
+        Pageable pageCount = new PageRequest(page,10, Sort.Direction.ASC,"mAss.chromosome");
+        Page<MolecularCharacterization> moleChar = molecularCharacterizationRepository.findVariationDataBySourcePdxId(modelId,pageCount);
+
+        int pageSize = molecularCharacterizationRepository.countVariationDataByModelId(modelId);
+
         DetailsDTO dto = new DetailsDTO();
 
                         /*
@@ -169,7 +178,7 @@ public class SearchService {
                         this.tumorType = "";
                         this.classification = "";
                         this.originTissue = "";
-                        this.sampleSite = "";
+                        this.sampleSite = "";Å
 
                         this.sampleType = "";
                         this.strain = "";
@@ -177,14 +186,21 @@ public class SearchService {
                         this.engraftmentSite = "";
                          */
 
-        if (molecularCharacterization != null) {
-            for (MolecularCharacterization molChar : molecularCharacterization) {
+
+        if (moleChar != null) {
+
+
+            try {
+                dto.setTotalPages((int) Math.ceil(pageSize/10.0) );
+            }catch (Exception e){ }
+
+            for (MolecularCharacterization dMolChar : moleChar) {
                 try {
-                    dto.setTechnology(molChar.getTechnology());
+                    dto.setTechnology(dMolChar.getTechnology());
                 }catch (Exception e){ }
 
                 try {
-                    dto.setMarkerAssociations(molChar.getMarkerAssociations());
+                    dto.setMarkerAssociations(dMolChar.getMarkerAssociations());
                 }catch (Exception e){ }
             }
         }
