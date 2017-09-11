@@ -414,8 +414,10 @@ public class LoadIRCCData implements CommandLineRunner {
 
                         } else {
                             //this is a mouse sample, link it to a specimen
+                            int passage = Integer.valueOf(mutation.getXenoPassage());
+                            passage -= 1; // its an ircc thing, if the passage is 0, it is a human sample, otherwise passage = xenopassage -1;
 
-                            Specimen specimen = loaderUtils.getSpecimen(modelCreation, modelCreation.getSourcePdxId(), DS.getAbbreviation(), Integer.valueOf(mutation.getXenoPassage()));
+                            Specimen specimen = loaderUtils.getSpecimen(modelCreation, modelCreation.getSourcePdxId(), DS.getAbbreviation(), passage);
 
                             if (specimen.getSample() == null) {
 
