@@ -211,7 +211,8 @@ public class LoadJAXData implements CommandLineRunner {
 
             JSONObject job = new JSONObject(parseURL(this.variationURL + modelCreation.getSourcePdxId()));
             JSONArray jarray = job.getJSONArray("variation");
-            String sample, symbol, id, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency, altAllele;
+            String sample = null;
+            String symbol, id, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency, altAllele = null;
             log.info(jarray.length() + " gene variants for model " + modelCreation.getSourcePdxId());
 
             // configure the maximum variations to load in properties file
@@ -305,27 +306,28 @@ public class LoadJAXData implements CommandLineRunner {
 
                 }
 
-                PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
+                //PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
 
-     
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation, null, this.jaxDS.getName(), passage);
+                sample = (sample==null)?"":sample;
+                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sample, this.jaxDS.getName(), passage);
      
                 Sample specSample = new Sample();
+                specSample.setSourceSampleId(sample);
                 specimen.setSample(specSample);
                 specSample.setMolecularCharacterizations(mcs);
-                specimen.setPdxPassage(pdxPassage);
+                //specimen.setPdxPassage(pdxPassage);
 
                 if (histologyMap.containsKey(passage)) {
                     Histology histology = new Histology();
-                    Image image = histologyMap.get(pdxPassage);
+                    Image image = histologyMap.get(passage);
                     histology.addImage(image);
                     specSample.addHistology(histology);
 
                 }
 
-                pdxPassage.setModelCreation(modelCreation);
+                //pdxPassage.setModelCreation(modelCreation);
 
-                loaderUtils.savePdxPassage(pdxPassage);
+                //loaderUtils.savePdxPassage(pdxPassage);
                 loaderUtils.saveSpecimen(specimen);
                 System.out.println("saved passage " + passage + " for model " + modelCreation.getSourcePdxId() + " from sample " + sampleKey);
             }
