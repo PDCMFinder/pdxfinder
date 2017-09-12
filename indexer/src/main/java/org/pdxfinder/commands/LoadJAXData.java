@@ -307,15 +307,19 @@ public class LoadJAXData implements CommandLineRunner {
 
                 PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
 
-                Specimen specimen = loaderUtils.getSpecimen(sampleKey);
-//                specimen.setMolecularCharacterizations(mcs);
+     
+                Specimen specimen = loaderUtils.getSpecimen(modelCreation, null, this.jaxDS.getName(), passage);
+     
+                Sample specSample = new Sample();
+                specimen.setSample(specSample);
+                specSample.setMolecularCharacterizations(mcs);
                 specimen.setPdxPassage(pdxPassage);
 
-                if (histologyMap.containsKey(pdxPassage)) {
+                if (histologyMap.containsKey(passage)) {
                     Histology histology = new Histology();
                     Image image = histologyMap.get(pdxPassage);
                     histology.addImage(image);
-                    specimen.addHistology(histology);
+                    specSample.addHistology(histology);
 
                 }
 
