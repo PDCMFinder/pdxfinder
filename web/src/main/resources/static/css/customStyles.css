@@ -378,7 +378,7 @@ h5{
     background-color: rgba(229, 230, 230, 0.25);
 }
 
-.pagination-sm>li>a,.pagination-sm>li>span
+.pagination-pdxFinder>li>a,.pagination-pdxFinder>li>span
 {
     position:relative;
     float:left;
@@ -389,13 +389,13 @@ h5{
     background-color:#fff;
     border:1px solid #ddd
 }
-.pagination-sm>li>a,.pagination-sm>li>span
+.pagination-pdxFinder>li>a,.pagination-pdxFinder>li>span
 {
     padding:5px 10px;
     font-size:12px;
     line-height:1.5;
 }
-.pagination-sm>.active>a,.pagination-sm>.active>a:focus,.pagination-sm>.active>a:hover,.pagination-sm>.active>span,.pagination-sm>.active>span:focus,.pagination-sm>.active>span:hover
+.pagination-pdxFinder>.active>a,.pagination-pdxFinder>.active>a:focus,.pagination-pdxFinder>.active>a:hover,.pagination-pdxFinder>.active>span,.pagination-pdxFinder>.active>span:focus,.pagination-pdxFinder>.active>span:hover
 {
     z-index:3;
     color:#fff;
@@ -403,7 +403,7 @@ h5{
     background-color:#337ab7;
     border-color:#337ab7
 }
-.pagination-sm>li>a:focus,.pagination-sm>li>a:hover,.pagination-sm>li>span:focus,.pagination-sm>li>span:hover
+.pagination-pdxFinder>li>a:focus,.pagination-pdxFinder>li>a:hover,.pagination-pdxFinder>li>span:focus,.pagination-pdxFinder>li>span:hover
 {
     z-index:2;
     color:#23527c;

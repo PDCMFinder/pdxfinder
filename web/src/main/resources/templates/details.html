@@ -90,7 +90,7 @@
                     <div class="col-md-12">
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">PDX model studies</h3>
+                                <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
                             </div>
                             <div class="panel-body">
                                 <div class="table-responsive">
@@ -117,29 +117,35 @@
                                         <tr th:if="${#lists.isEmpty(variationData)}">
                                             <td></td>
                                         </tr>
-                                        <tr th:each="vData :${variationData}">
-                                            <td th:text="${specimenId}"> ... </td>
-                                            <td th:text="${technology}"> ... </td>
-                                            <td th:text="${vData.chromosome}"> ... </td>
-                                            <td th:text="${vData.seqPosition}"> ... </td>
-                                            <td th:text="${vData.refAllele}"> ... </td>
-                                            <td th:text="${vData.altAllele}"> ... </td>
-                                            <td th:text="${vData.consequence}"> ... </td>
-                                            <td th:text="${vData.marker.symbol}"> ... </td>
-                                            <td th:text="${vData.aminoAcidChange}"> ... </td>
-                                            <td th:text="${vData.readDepth}"> ... </td>
-                                            <td th:text="${vData.alleleFrequency}"> ... </td>
-                                            <td th:text="${diagnosis}"> ... </td>
-                                            <td th:text="${vData.rsVariants}"> ... </td>
-                                        </tr>
+                                        <th:block th:each="variationDataSet :${variationData}">
+
+                                            <tr th:each="vData :${variationDataSet}">
+                                                <td th:text="${specimenId}"> ... </td>
+                                                <td th:text="${technology}"> ... </td>
+                                                <td th:text="${vData.chromosome}"> ... </td>
+                                                <td th:text="${vData.seqPosition}"> ... </td>
+                                                <td th:text="${vData.refAllele}"> ... </td>
+                                                <td th:text="${vData.altAllele}"> ... </td>
+                                                <td th:text="${vData.consequence}"> ... </td>
+                                                <td th:text="${vData.marker.symbol}"> ... </td>
+                                                <td th:text="${vData.aminoAcidChange}"> ... </td>
+                                                <td th:text="${vData.readDepth}"> ... </td>
+                                                <td th:text="${vData.alleleFrequency}"> ... </td>
+                                                <td th:text="${diagnosis}"> ... </td>
+                                                <td th:text="${vData.rsVariants}"> ... </td>
+                                            </tr>
+
+                                        </th:block>
                                         </tbody>
                                     </table>
                                 </div>
 
+
+
                                 <div style="text-align: center;">
                                     <div th:if="${not #lists.isEmpty(variationData)}">
 
-                                        <ul class="pagination pagination-sm">
+                                        <ul class="pagination pagination-pdxFinder">
                                             <th:block th:unless="${totalPages<1}" th:each="num: ${#numbers.sequence(1,totalPages)}">
 
                                                 <li th:if="${num==1 && presentPage!=1}">
@@ -173,7 +179,7 @@
                                                 </th:block>
 
 
-                                                <th:block th:if="${num==totalPages && presentPage<totalPages-1}">
+                                                <th:block th:if="${presentPage<totalPages-1 && num==totalPages && totalPages > 4 }">
                                                     <li  th:if="${presentPage<totalPages-2}" th:class="active">
                                                         <a disabled> . . . </a>
                                                     </li>

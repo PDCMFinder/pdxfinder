@@ -158,10 +158,10 @@ public class SearchService {
         ModelCreation pdx = modelCreationRepository.findBySourcePdxId(modelId);
         List<Specimen> specimen = specimenRepository.findVariationDataBySourcePdxId(modelId);
 
-        Pageable pageCount = new PageRequest(page,10, Sort.Direction.ASC,"mAss.chromosome");
-        Page<MolecularCharacterization> moleChar = molecularCharacterizationRepository.findVariationDataBySourcePdxId(modelId,pageCount);
+        Pageable pageable = new PageRequest(page,20, Sort.Direction.ASC,"mAss.chromosome");
+        Page<MolecularCharacterization> moleChar = molecularCharacterizationRepository.findVariationDataBySourcePdxId(modelId,pageable);
 
-        int pageSize = molecularCharacterizationRepository.countVariationDataByModelId(modelId);
+        int totalRecords = molecularCharacterizationRepository.countVariationDataByModelId(modelId);
 
         DetailsDTO dto = new DetailsDTO();
 
@@ -186,23 +186,26 @@ public class SearchService {
                         this.engraftmentSite = "";
                          */
 
+        Set< Set<MarkerAssociation> > markerAssociatonSet = new HashSet<>();
 
         if (moleChar != null) {
 
-
             try {
-                dto.setTotalPages((int) Math.ceil(pageSize/10.0) );
+                dto.setTotalPages((int) Math.ceil(totalRecords/20.0) );
+                dto.setVariationDataCount(totalRecords);
             }catch (Exception e){ }
 
             for (MolecularCharacterization dMolChar : moleChar) {
                 try {
-                    dto.setTechnology(dMolChar.getTechnology());
+                    markerAssociatonSet.add(dMolChar.getMarkerAssociations());
                 }catch (Exception e){ }
 
                 try {
-                    dto.setMarkerAssociations(dMolChar.getMarkerAssociations());
+                    dto.setTechnology(dMolChar.getTechnology());
                 }catch (Exception e){ }
             }
+
+            dto.setMarkerAssociations(markerAssociatonSet);
         }
 
 

@@ -60,6 +60,7 @@ public class DetailsPageController {
         model.addAttribute("technology", dto.getTechnology());
         model.addAttribute("totalPages", dto.getTotalPages());
         model.addAttribute("presentPage", viewPage+1);
+        model.addAttribute("totalRecords", dto.getVariationDataCount());
 
         model.addAttribute("variationData", dto.getMarkerAssociations());
 

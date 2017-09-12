@@ -1,6 +1,7 @@
 package org.pdxfinder.services.dto;
 
 import org.pdxfinder.dao.MarkerAssociation;
+import org.pdxfinder.dao.MolecularCharacterization;
 
 import java.util.List;
 import java.util.Set;
@@ -39,8 +40,10 @@ public class DetailsDTO {
 
     private String specimenId;
     private String technology;
-    private Set<MarkerAssociation> markerAssociations;
+    private Set<MolecularCharacterization> molecularCharacterizations;
+    private Set< Set<MarkerAssociation> > markerAssociations;
     private int totalPages;
+    private int variationDataCount;
 
     public DetailsDTO() {
         this.modelId = "";
@@ -71,37 +74,6 @@ public class DetailsDTO {
     }
 
 
-    public String getSpecimenId() {
-        return specimenId;
-    }
-
-    public void setSpecimenId(String specimenId) {
-        this.specimenId = specimenId;
-    }
-
-    public String getTechnology() {
-        return technology;
-    }
-
-    public void setTechnology(String technology) {
-        this.technology = technology;
-    }
-
-    public Set<MarkerAssociation> getMarkerAssociations() {
-        return markerAssociations;
-    }
-
-    public void setMarkerAssociations(Set<MarkerAssociation> markerAssociations) {
-        this.markerAssociations = markerAssociations;
-    }
-
-    public int getTotalPages() {
-        return totalPages;
-    }
-
-    public void setTotalPages(int totalPages) {
-        this.totalPages = totalPages;
-    }
 
     public String getModelId() {
         return modelId;
@@ -261,5 +233,53 @@ public class DetailsDTO {
 
     public void setExternalUrlText(String externalUrlText) {
         this.externalUrlText = externalUrlText;
+    }
+
+    public String getSpecimenId() {
+        return specimenId;
+    }
+
+    public void setSpecimenId(String specimenId) {
+        this.specimenId = specimenId;
+    }
+
+    public String getTechnology() {
+        return technology;
+    }
+
+    public void setTechnology(String technology) {
+        this.technology = technology;
+    }
+
+    public Set< Set<MarkerAssociation> > getMarkerAssociations() {
+        return markerAssociations;
+    }
+
+    public void setMarkerAssociations(Set< Set<MarkerAssociation> > markerAssociations) {
+        this.markerAssociations = markerAssociations;
+    }
+
+    public Set<MolecularCharacterization> getMolecularCharacterizations() {
+        return molecularCharacterizations;
+    }
+
+    public void setMolecularCharacterizations(Set<MolecularCharacterization> molecularCharacterizations) {
+        this.molecularCharacterizations = molecularCharacterizations;
+    }
+
+    public int getTotalPages() {
+        return totalPages;
+    }
+
+    public void setTotalPages(int totalPages) {
+        this.totalPages = totalPages;
+    }
+
+    public int getVariationDataCount() {
+        return variationDataCount;
+    }
+
+    public void setVariationDataCount(int variationDataCount) {
+        this.variationDataCount = variationDataCount;
     }
 }
