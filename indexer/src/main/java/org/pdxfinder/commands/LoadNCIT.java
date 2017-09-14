@@ -126,6 +126,15 @@ public class LoadNCIT implements CommandLineRunner {
                     System.out.println("TERM: "+term.getString("label"));
 
                     OntologyTerm newTerm = loaderUtils.getOntologyTerm(term.getString("iri"), term.getString("label"));
+
+                    JSONArray synonyms = term.getJSONArray("synonyms");
+                    Set<String> synonymsSet = new HashSet<>();
+
+                    for(int j=0; j<synonyms.length();j++){
+                        synonymsSet.add(synonyms.getString(j));
+                    }
+
+                    newTerm.setSynonyms(synonymsSet);
                     discoveredTerms.add(newTerm);
 
                     OntologyTerm parentTerm = loaderUtils.getOntologyTerm(notYetVisitedTerm.getUrl());
