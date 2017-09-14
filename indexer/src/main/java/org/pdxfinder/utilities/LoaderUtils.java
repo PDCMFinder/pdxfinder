@@ -534,6 +534,10 @@ public class LoaderUtils {
         ontologyTermRepository.save(ot);
     }
 
+    public void deleteOntologyTermsWithoutMapping(){
+
+        ontologyTermRepository.deleteTermsWithZeroMappings();
+    }
 
     public void saveMarker(Marker marker) {
         markerRepository.save(marker);

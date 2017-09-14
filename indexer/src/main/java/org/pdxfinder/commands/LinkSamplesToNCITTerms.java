@@ -49,15 +49,35 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
             log.info("Mapping samples to NCIT terms.");
             long startTime = System.currentTimeMillis();
+
             mapSamplesToTerms();
             updateIndirectMappingData();
+
             long endTime   = System.currentTimeMillis();
             long totalTime = endTime - startTime;
 
             int seconds = (int) (totalTime / 1000) % 60 ;
             int minutes = (int) ((totalTime / (1000*60)) % 60);
 
-            System.out.println("Mapping finished after "+minutes+" minute(s) and "+seconds+" second(s)");
+            System.out.println("Jobfinished after "+minutes+" minute(s) and "+seconds+" second(s)");
+        }
+        else if("linkSamplesToNCITTermsWithCleanup".equals(args[0]) || "-linkSamplesToNCITTermsWithCleanup".equals(args[0])){
+
+            log.info("Mapping samples to NCIT terms.");
+            long startTime = System.currentTimeMillis();
+
+            mapSamplesToTerms();
+            updateIndirectMappingData();
+            deleteTermsWithoutMapping();
+
+            long endTime   = System.currentTimeMillis();
+            long totalTime = endTime - startTime;
+
+            int seconds = (int) (totalTime / 1000) % 60 ;
+            int minutes = (int) ((totalTime / (1000*60)) % 60);
+
+            System.out.println("Job finished after "+minutes+" minute(s) and "+seconds+" second(s)");
+
         }
         else{
             log.info("Not running linkSamplesToNCITTerms command");
@@ -171,6 +191,13 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
     }
 
+
+    private void deleteTermsWithoutMapping(){
+
+        log.info("Deleting terms and their relationships where direct and indirectMappedNumber is zero");
+
+        loaderUtils.deleteOntologyTermsWithoutMapping();
+    }
 
 /*
     private void updateIndirectMappingData() {
