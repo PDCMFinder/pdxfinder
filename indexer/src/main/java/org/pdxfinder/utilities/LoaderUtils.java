@@ -270,6 +270,12 @@ public class LoaderUtils {
         return sample;
     }
 
+    public Sample getHumanSample(String sampleId, String dataSource){
+
+
+        return sampleRepository.findHumanSampleBySampleIdAndDataSource(sampleId, dataSource);
+    }
+
     public Sample getSampleBySourcePdxId(String pdxId){
         return sampleRepository.findBySourcePdxId(pdxId);
     }
