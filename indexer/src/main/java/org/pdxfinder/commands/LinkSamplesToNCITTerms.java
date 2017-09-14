@@ -31,7 +31,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
 
     private static final String spreadsheetServiceUrl = "http://gsx2json.com/api?id=16JhGWCEUimsOF8q8bYN7wEJqVtjbO259X1YGrbRQLdc";
-
+    //https://docs.google.com/spreadsheets/d/16JhGWCEUimsOF8q8bYN7wEJqVtjbO259X1YGrbRQLdc/edit
     private final static Logger log = LoggerFactory.getLogger(LinkSamplesToNCITTerms.class);
     private LoaderUtils loaderUtils;
 
@@ -86,8 +86,9 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                     String label = row.getString("ncitlabel");
                     String type = row.getString("type");
                     String justification = row.getString("justification");
+                    String dataSource = row.getString("datasource");
 
-                    Sample sample = loaderUtils.getSampleBySourceSampleId(sampleId);
+                    Sample sample = loaderUtils.getHumanSample(sampleId, dataSource);
                     OntologyTerm term = loaderUtils.getOntologyTermByLabel(label.toLowerCase());
 
                     if(sample != null && term != null){
