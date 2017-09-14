@@ -57,4 +57,7 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
     @Query("MATCH (o:OntologyTerm) WHERE o.directMappedSamplesNumber > 0 RETURN o")
     Collection<OntologyTerm> findAllWithNotZeroDirectMappingNumber();
 
+    @Query("MATCH (ot:OntologyTerm) WHERE ot.directMappedSamplesNumber = 0 AND ot.indirectMappedSamplesNumber = 0 DETACH DELETE ot")
+    void deleteTermsWithZeroMappings();
+
 }
