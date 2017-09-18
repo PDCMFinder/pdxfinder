@@ -49,6 +49,37 @@ public class GraphService {
 
     }
 
+    public Set<String> getMappedNCITTerms() {
+
+
+        Collection<OntologyTerm> ontologyTerms = ontologyTermRepository.findAllWithMappings();
+        Set<String> dataReport = new HashSet<>();
+
+        for (OntologyTerm ontologyTerm : ontologyTerms) {
+            if (ontologyTerm.getLabel() != null) {
+                Set<String> synonyms = ontologyTerm.getSynonyms();
+
+                if(synonyms.isEmpty()){
+
+                    dataReport.add("["+ontologyTerm.getLabel() + "] (" + ontologyTerm.getIndirectMappedSamplesNumber() + ")");
+                }
+                else{
+
+                    for(String synonym:synonyms){
+
+                        dataReport.add(synonym + " ["+ontologyTerm.getLabel() + "] (" + ontologyTerm.getIndirectMappedSamplesNumber() + ")");
+                    }
+                }
+
+            }
+        }
+        // Arrange the result alphabetically
+        Set<String> sortedData = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        sortedData.addAll(dataReport);
+
+        return sortedData;
+
+    }
 
     public Map<String, Integer> getCancerSubtypeCounts() {
 
