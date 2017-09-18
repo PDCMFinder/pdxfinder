@@ -46,11 +46,11 @@ public class SearchController
 
 
             /**
-             * Retrieve Mapped DO Terms
+             * Retrieve Mapped NCIT Terms
              *
              */
 
-            Set<String> autoSuggestList = graphService.getMappedDOTerms();
+            Set<String> autoSuggestList = graphService.getMappedNCITTerms();
             model.addAttribute("mappedDOTerm", autoSuggestList);
 
 
