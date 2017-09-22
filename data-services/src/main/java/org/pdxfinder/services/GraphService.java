@@ -58,7 +58,7 @@ public class GraphService {
         for (OntologyTerm ontologyTerm : ontologyTerms) {
             if (ontologyTerm.getLabel() != null) {
                 Set<String> synonyms = ontologyTerm.getSynonyms();
-
+                /*
                 if(synonyms.isEmpty()){
 
                     dataReport.add("["+ontologyTerm.getLabel() + "] (" + ontologyTerm.getIndirectMappedSamplesNumber() + ")");
@@ -70,6 +70,10 @@ public class GraphService {
                         dataReport.add(synonym + " ["+ontologyTerm.getLabel() + "] (" + ontologyTerm.getIndirectMappedSamplesNumber() + ")");
                     }
                 }
+                */
+
+                dataReport.add(ontologyTerm.getLabel() + " (" + ontologyTerm.getIndirectMappedSamplesNumber() + ")");
+
 
             }
         }
