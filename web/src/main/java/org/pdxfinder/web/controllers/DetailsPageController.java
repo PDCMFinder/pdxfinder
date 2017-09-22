@@ -34,6 +34,7 @@ public class DetailsPageController {
         model.addAttribute("fullData",dto);
 
         model.addAttribute("modelId",modelId);
+        model.addAttribute("dataSrc",dataSrc);
 
         model.addAttribute("externalId", dto.getExternalId());
         model.addAttribute("dataSource", dto.getDataSource());
