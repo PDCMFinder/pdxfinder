@@ -270,6 +270,12 @@ public class LoaderUtils {
         return sample;
     }
 
+    public Sample getHumanSample(String sampleId, String dataSource){
+
+
+        return sampleRepository.findHumanSampleBySampleIdAndDataSource(sampleId, dataSource);
+    }
+
     public Sample getSampleBySourcePdxId(String pdxId){
         return sampleRepository.findBySourcePdxId(pdxId);
     }
@@ -528,6 +534,10 @@ public class LoaderUtils {
         ontologyTermRepository.save(ot);
     }
 
+    public void deleteOntologyTermsWithoutMapping(){
+
+        ontologyTermRepository.deleteTermsWithZeroMappings();
+    }
 
     public void saveMarker(Marker marker) {
         markerRepository.save(marker);

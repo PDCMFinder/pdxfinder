@@ -20,6 +20,7 @@ public class OntologyTerm {
     private String label;
     private int directMappedSamplesNumber;
     private int indirectMappedSamplesNumber;
+    private Set<String> synonyms;
 
     @Relationship(type = "SUBCLASS_OF" ,direction = Relationship.OUTGOING)
     private Set<OntologyTerm> subclassOf;
@@ -38,6 +39,7 @@ public class OntologyTerm {
         this.label = label;
         this.directMappedSamplesNumber = 0;
         this.indirectMappedSamplesNumber = 0;
+        this.synonyms = new HashSet<>();
     }
 
     public Long getId() {
@@ -102,5 +104,13 @@ public class OntologyTerm {
 
     public void setIndirectMappedSamplesNumber(int indirectMappedSamplesNumber) {
         this.indirectMappedSamplesNumber = indirectMappedSamplesNumber;
+    }
+
+    public Set<String> getSynonyms() {
+        return synonyms;
+    }
+
+    public void setSynonyms(Set<String> synonyms) {
+        this.synonyms = synonyms;
     }
 }
