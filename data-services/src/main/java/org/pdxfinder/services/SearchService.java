@@ -5,6 +5,7 @@ import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.SearchDTO;
+import org.pdxfinder.services.dto.VariationDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -161,7 +162,7 @@ public class SearchService {
         Pageable pageable = new PageRequest(page,20, Sort.Direction.ASC,"mAss.chromosome");
         Page<MolecularCharacterization> moleChar = molecularCharacterizationRepository.findVariationDataBySourcePdxId(modelId,pageable);
 
-        int totalRecords = molecularCharacterizationRepository.countVariationDataByModelId(modelId);
+        int totalRecords = molecularCharacterizationRepository.countBySearchParameter(modelId,"");
 
         DetailsDTO dto = new DetailsDTO();
 
@@ -319,6 +320,113 @@ public class SearchService {
 
         return dto;
     }
+
+
+
+
+
+
+    public VariationDataDTO getTable(String dataSource, String modelId,
+                                     String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
+        /**
+         * 1st count all the records and set Total Records & Initialize Filtered Record as Total record
+         */
+        int recordsTotal = molecularCharacterizationRepository.countBySearchParameter(modelId,"");
+        int recordsFiltered = recordsTotal;
+
+        List<Specimen> specimen = specimenRepository.findVariationDataBySourcePdxId(modelId);
+
+        /**
+         * If search Parameter is not empty: Count and Reset the value of filtered records based on search Parameter
+         */
+        if (!searchParam.isEmpty()) {
+            recordsFiltered = molecularCharacterizationRepository.countBySearchParameter(modelId,searchParam);
+        }
+
+        /**
+         * Retrieve the Records based on search parameter
+         */
+        List<MolecularCharacterization> molChars = molecularCharacterizationRepository.findBySearchParameter(modelId,searchParam,start,size);
+        VariationDataDTO variationDataDTO = buildUpDTO(specimen,molChars,draw,recordsTotal,recordsFiltered);
+        return variationDataDTO;
+
+
+    }
+
+
+
+
+    public VariationDataDTO buildUpDTO(List<Specimen> specimen,List<MolecularCharacterization> molChars,
+                                       int draw,int recordsTotal,int recordsFiltered){
+
+        VariationDataDTO variationDataDTO = new VariationDataDTO();
+        List<String[]> variationData = new ArrayList();
+        String sampleId = "";
+
+        if (specimen != null) {
+            for (Specimen dSpecimen : specimen) {
+                try {
+                    sampleId = dSpecimen.getExternalId();
+                }catch (Exception e){ }
+            }
+        }
+
+        /**
+         * Generate an equivalent 2-D array type of the Retrieved result Set, the Front end table must be a 2D JSON Array
+         */
+        if (molChars != null) {
+
+            for (MolecularCharacterization dMolChar : molChars) {
+
+                try {
+
+                    List<MarkerAssociation> markerAssociation = new ArrayList();// = dMolChar.getMarkerAssociations();
+                    markerAssociation.addAll(dMolChar.getMarkerAssociations());
+
+                    for (MarkerAssociation markerAssoc: markerAssociation) {
+
+                        String[] markerAssocArray = new String[12];
+                        markerAssocArray[0] = sampleId;
+                        markerAssocArray[1] = dMolChar.getTechnology();
+                        markerAssocArray[2] = markerAssoc.getChromosome();
+                        markerAssocArray[3] = markerAssoc.getSeqPosition();
+                        markerAssocArray[4] = markerAssoc.getRefAllele();
+                        markerAssocArray[5] = markerAssoc.getAltAllele();
+                        markerAssocArray[6] = markerAssoc.getConsequence();
+                        markerAssocArray[7] = markerAssoc.getMarker().getSymbol();
+                        markerAssocArray[8] = markerAssoc.getAminoAcidChange();
+                        markerAssocArray[9] = markerAssoc.getReadDepth();
+                        markerAssocArray[10] = markerAssoc.getAlleleFrequency();
+                        markerAssocArray[11] = markerAssoc.getRsVariants();
+
+                        variationData.add(markerAssocArray);
+                    }
+
+                }
+                catch (Exception e){ }
+
+
+
+            }
+
+        }
+
+
+        /**
+         * Transfer the data to the DTO
+         */
+        variationDataDTO.setDraw(draw);
+        variationDataDTO.setRecordsTotal(recordsTotal);
+        variationDataDTO.setRecordsFiltered(recordsFiltered);
+        variationDataDTO.setData(variationData);
+
+        return variationDataDTO;
+    }
+
+
+
+
+
 
 
 }
