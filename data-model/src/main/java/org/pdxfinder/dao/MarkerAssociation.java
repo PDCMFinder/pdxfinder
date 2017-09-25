@@ -14,7 +14,22 @@ public class MarkerAssociation {
 
     String description;
     Marker marker;
-    
+    /*
+    * IRCC NGS mapping (class attribute = file headers):
+    * chromosome = Chrom
+    * seqPosition = Pos
+    * refAllele = Ref
+    * altAllele = Alt
+    * consequence = Effect
+    * aminoAcidChange = Protein
+    * type = type
+    * alleleFrequency = TBD
+    * annotation = Drivers_v1.4 (0=NO, 1=YES)
+    *
+    *
+    * */
+
+
     private String chromosome;
     private String seqPosition; //in jax use seqStartPosition instead of this
     private String refAllele;
@@ -29,6 +44,10 @@ public class MarkerAssociation {
     private String seqStartPosition;
     private String seqEndPosition;
     private String strand;
+
+    private String cdsChange;
+    private String type; //Substitution
+    private String annotation;
 
 
     public MarkerAssociation() {
@@ -225,5 +244,29 @@ public class MarkerAssociation {
 
     public void setStrand(String strand) {
         this.strand = strand;
+    }
+
+    public String getCdsChange() {
+        return cdsChange;
+    }
+
+    public void setCdsChange(String cdsChange) {
+        this.cdsChange = cdsChange;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getAnnotation() {
+        return annotation;
+    }
+
+    public void setAnnotation(String annotation) {
+        this.annotation = annotation;
     }
 }
