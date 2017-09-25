@@ -15,7 +15,7 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
     Specimen findByExternalId(@Param("externalId") String externalId);
 
     @Query("MATCH (mod:ModelCreation) where mod.sourcePdxId = {modelId} with mod" +
-            "  optional match (mod)-[io:INSTANCE_OF]-(pdxPass:PdxPassage)-[passfrm:PASSAGED_FROM]-(spec:Specimen)-[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]-(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
+            "  optional match (mod)-[io:INSTANCE_OF]-(pdxPass:PdxPassage)-[passfrm:PASSAGED_FROM]-(spec:Specimen)-[sfr:SAMPLED_FROM]->(sample:Sample)<-[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]-(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
             "  return spec")
     List<Specimen> findVariationDataBySourcePdxId(@Param("modelId") String modelId);
 

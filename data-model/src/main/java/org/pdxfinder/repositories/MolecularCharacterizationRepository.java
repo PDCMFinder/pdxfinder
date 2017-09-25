@@ -17,13 +17,13 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
 
     MolecularCharacterization findByTechnology(@Param("technology") String technology);
 
-    @Query("Match (M:ModelCreation)<-[I:INSTANCE_OF]-(pdxPass:PdxPassage)-[passfrm:PASSAGED_FROM]->(spec:Specimen)-[char:CHARACTERIZED_BY]->(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker)" +
+    @Query("Match (M:ModelCreation)<-[I:INSTANCE_OF]-(pdxPass:PdxPassage)-[passfrm:PASSAGED_FROM]->(spec:Specimen)-[sfr:SAMPLED_FROM]->(sample:Sample)<-[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker)" +
             " where M.sourcePdxId={modelId} " +
             " return  M, I, pdxPass, passfrm, spec, char, molchar, assoc, mAss, aw, m")
     Page<MolecularCharacterization> findVariationDataBySourcePdxId(@Param("modelId") String modelId, Pageable pageable);
 
 
-    @Query("Match (mc:ModelCreation)<-[I:INSTANCE_OF]-(pdxPass:PdxPassage)-[passfrm:PASSAGED_FROM]->(spec:Specimen)-[char:CHARACTERIZED_BY]->(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker)" +
+    @Query("Match (mc:ModelCreation)<-[I:INSTANCE_OF]-(pdxPass:PdxPassage)-[passfrm:PASSAGED_FROM]->(spec:Specimen)-[sfr:SAMPLED_FROM]->(sample:Sample)<-[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker)" +
             " where mc.sourcePdxId={modelId} AND " +
             "( toLower(spec.externalId) CONTAINS toLower({search})" +
             " OR toLower(m.symbol) CONTAINS toLower({search})" +
@@ -34,7 +34,7 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
 
 
 
-    @Query("Match (mc:ModelCreation)<-[I:INSTANCE_OF]-(pdxPass:PdxPassage)-[passfrm:PASSAGED_FROM]->(spec:Specimen)-[char:CHARACTERIZED_BY]->(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker)" +
+    @Query("Match (mc:ModelCreation)<-[I:INSTANCE_OF]-(pdxPass:PdxPassage)-[passfrm:PASSAGED_FROM]->(spec:Specimen)-[sfr:SAMPLED_FROM]->(sample:Sample)<-[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker)" +
             " where mc.sourcePdxId={modelId} AND " +
             "( toLower(spec.externalId) CONTAINS toLower({search})" +
             " OR toLower(m.symbol) CONTAINS toLower({search})" +
