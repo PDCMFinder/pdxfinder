@@ -11279,7 +11279,7 @@
 			 *      } );
 			 *    } );
                  */
-                "sLoadingRecords": "<div style='margin: auto; width: 25%;'><img src='/images/loading.gif' style='width:100%; margin-top:-300px;'> </div>",
+                "sLoadingRecords": "<div style='margin: auto; width: 5%;'><img src='/images/loading2.gif' style='width:100%; margin-top:-300px;'> </div>",
 
 
                 /**
@@ -11300,7 +11300,7 @@
 			 *      } );
 			 *    } );
                  */
-                "sProcessing": "<img src='/images/loading.gif' width='60px' height='60px'>",
+                "sProcessing": "<img src='/images/loading2.gif' width='60px' height='60px'>",
 
 
                 /**
