@@ -29,7 +29,14 @@ public class IRCCVariantsRow {
         this.protein = protein;
         this.type = type;
         this.effect = effect;
-        this.annotation = annotation;
+
+        if(annotation.equals("1")){
+            this.annotation = "YES";
+        }
+        else{
+            this.annotation = "NO";
+        }
+
     }
 
 
