@@ -59,11 +59,13 @@ public class RestControllerGeneral {
         @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
         public DetailsDTO details(@PathVariable String dataSrc,
                                   @PathVariable String modelId,
-                                  @RequestParam(value="page", required = false) Integer page) {
+                                  @RequestParam(value="page", required = false) Integer page,
+                                  @RequestParam(value="size", required = false) Integer size) {
 
                 int viewPage = (page == null || page < 1) ? 0 : page - 1;
+                int viewSize = (size == null || size < 1) ? 20 : size;
 
-                DetailsDTO dto = searchService.searchForModel(dataSrc, modelId, viewPage);
+                DetailsDTO dto = searchService.searchForModel(dataSrc, modelId, viewPage,viewSize);
 
                 return  dto;
         }

@@ -146,7 +146,7 @@ public class SearchService {
     }
 
 
-    public DetailsDTO searchForModel(String dataSource, String modelId, int page) {
+    public DetailsDTO searchForModel(String dataSource, String modelId, int page, int size) {
 
 
         Sample sample = sampleRepository.findByDataSourceAndPdxId(dataSource,modelId);
@@ -158,7 +158,7 @@ public class SearchService {
 
 
 
-        int size = 20; int skip = page * size;
+        int skip = page * size;
         Set<Specimen> specimens = specimenRepository.findVariationDataBySourcePdxId(dataSource,modelId,"",skip,size);
 
         DetailsDTO dto = new DetailsDTO();

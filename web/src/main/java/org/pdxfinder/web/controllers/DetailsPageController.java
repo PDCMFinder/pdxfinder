@@ -26,11 +26,13 @@ public class DetailsPageController {
     @RequestMapping(value = "/pdx/{dataSrc}/{modelId}")
     public String details(@PathVariable String dataSrc,
                           @PathVariable String modelId,
-                          @RequestParam(value="page", required = false) Integer page,Model model){
+                          @RequestParam(value="page", required = false) Integer page,
+                          @RequestParam(value="size", required = false) Integer size,Model model){
 
         int viewPage = (page == null || page < 1) ? 0 : page-1;
+        int viewSize = (size == null || size < 1) ? 20 : size;
 
-        DetailsDTO dto = searchService.searchForModel(dataSrc,modelId,viewPage);
+        DetailsDTO dto = searchService.searchForModel(dataSrc,modelId,viewPage,viewSize);
 
         model.addAttribute("fullData",dto);
 
