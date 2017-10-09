@@ -51,7 +51,7 @@ public class RestControllerGeneral {
                 int size = Integer.parseInt(data.getFirst("length").toString());
 
                 sortColumn = getSortColumn(sortColumn);
-                VariationDataDTO variationDataDTO = searchService.getTable(dataSrc,modelId,searchText,draw,sortColumn,sortDir,start,size);
+                VariationDataDTO variationDataDTO = searchService.variationDataServerSideProcessor(dataSrc,modelId,searchText,draw,sortColumn,sortDir,start,size);
 
                 return variationDataDTO;
 

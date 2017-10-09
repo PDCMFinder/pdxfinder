@@ -337,16 +337,13 @@ public class SearchService {
 
 
 
-
-    public VariationDataDTO getTable(String dataSource, String modelId,
+    public VariationDataDTO variationDataServerSideProcessor(String dataSource, String modelId,
                                      String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
         /**
          * 1st count all the records and set Total Records & Initialize Filtered Record as Total record
          */
         int recordsTotal = molecularCharacterizationRepository.countBySearchParameter(modelId,"");
         int recordsFiltered = recordsTotal;
-
-        List<Specimen> specimen = specimenRepository.findVariationDataBySourcePdxId2(dataSource,modelId);
 
         /**
          * If search Parameter is not empty: Count and Reset the value of filtered records based on search Parameter
@@ -358,70 +355,60 @@ public class SearchService {
         /**
          * Retrieve the Records based on search parameter
          */
-        List<MolecularCharacterization> molChars = molecularCharacterizationRepository.findBySearchParameter(modelId,searchParam,start,size);
-        VariationDataDTO variationDataDTO = buildUpDTO(specimen,molChars,draw,recordsTotal,recordsFiltered);
+        Set<Specimen> specimen = specimenRepository.findVariationDataBySourcePdxId(dataSource,modelId,searchParam,start,size);
+        VariationDataDTO variationDataDTO = buildUpDTO(specimen,draw,recordsTotal,recordsFiltered);
         return variationDataDTO;
-
 
     }
 
 
 
 
-    public VariationDataDTO buildUpDTO(List<Specimen> specimen,List<MolecularCharacterization> molChars,
-                                       int draw,int recordsTotal,int recordsFiltered){
+    public VariationDataDTO buildUpDTO(Set<Specimen> specimens,int draw,int recordsTotal,int recordsFiltered){
 
         VariationDataDTO variationDataDTO = new VariationDataDTO();
         List<String[]> variationData = new ArrayList();
         String sampleId = "";
 
-        if (specimen != null) {
-            for (Specimen dSpecimen : specimen) {
-                try {
-                    sampleId = dSpecimen.getExternalId();
-                }catch (Exception e){ }
-            }
-        }
 
         /**
          * Generate an equivalent 2-D array type of the Retrieved result Set, the Front end table must be a 2D JSON Array
          */
-        if (molChars != null) {
-
-            for (MolecularCharacterization dMolChar : molChars) {
+        if (specimens != null) {
+            for (Specimen specimen : specimens) {
 
                 try {
 
-                    List<MarkerAssociation> markerAssociation = new ArrayList();// = dMolChar.getMarkerAssociations();
-                    markerAssociation.addAll(dMolChar.getMarkerAssociations());
+                        for (MolecularCharacterization dMolChar : specimen.getSample().getMolecularCharacterizations()) {
 
-                    for (MarkerAssociation markerAssoc: markerAssociation) {
+                            List<MarkerAssociation> markerAssociation = new ArrayList();// = dMolChar.getMarkerAssociations();
+                            markerAssociation.addAll(dMolChar.getMarkerAssociations());
 
-                        String[] markerAssocArray = new String[12];
-                        markerAssocArray[0] = sampleId;
-                        markerAssocArray[1] = dMolChar.getTechnology();
-                        markerAssocArray[2] = markerAssoc.getChromosome();
-                        markerAssocArray[3] = markerAssoc.getSeqPosition();
-                        markerAssocArray[4] = markerAssoc.getRefAllele();
-                        markerAssocArray[5] = markerAssoc.getAltAllele();
-                        markerAssocArray[6] = markerAssoc.getConsequence();
-                        markerAssocArray[7] = markerAssoc.getMarker().getSymbol();
-                        markerAssocArray[8] = markerAssoc.getAminoAcidChange();
-                        markerAssocArray[9] = markerAssoc.getReadDepth();
-                        markerAssocArray[10] = markerAssoc.getAlleleFrequency();
-                        markerAssocArray[11] = markerAssoc.getRsVariants();
+                            for (MarkerAssociation markerAssoc : markerAssociation) {
 
-                        variationData.add(markerAssocArray);
-                    }
+                                String[] markerAssocArray = new String[12];
+                                markerAssocArray[0] = specimen.getExternalId();
+                                markerAssocArray[1] = dMolChar.getPlatform().getName();
+                                markerAssocArray[2] = markerAssoc.getChromosome();
+                                markerAssocArray[3] = markerAssoc.getSeqPosition();
+                                markerAssocArray[4] = markerAssoc.getRefAllele();
+                                markerAssocArray[5] = markerAssoc.getAltAllele();
+                                markerAssocArray[6] = markerAssoc.getConsequence();
+                                markerAssocArray[7] = markerAssoc.getMarker().getSymbol();
+                                markerAssocArray[8] = markerAssoc.getAminoAcidChange();
+                                markerAssocArray[9] = markerAssoc.getReadDepth();
+                                markerAssocArray[10] = markerAssoc.getAlleleFrequency();
+                                markerAssocArray[11] = markerAssoc.getRsVariants();
 
-                }
-                catch (Exception e){ }
+                                variationData.add(markerAssocArray);
+                            }
 
+                        }
+                    }catch (Exception e) { }
 
+            }/* End of Specimens Set Loop */
 
-            }
-
-        }
+        } /* End of Specimens check */
 
 
         /**
