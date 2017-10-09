@@ -23,6 +23,7 @@ public class SearchService {
     private OntologyTermRepository ontologyTermRepositoryRepository;
     private SpecimenRepository specimenRepository;
     private MolecularCharacterizationRepository molecularCharacterizationRepository;
+    private PlatformRepository platformRepository;
     private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
     private final String JAX_URL_TEXT = "View data at JAX";
     private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
@@ -33,7 +34,7 @@ public class SearchService {
     public SearchService(SampleRepository sampleRepository, PatientRepository patientRepository,
                          PatientSnapshotRepository patientSnapshotRepository, ModelCreationRepository modelCreationRepository,
                          OntologyTermRepository ontologyTermRepository,SpecimenRepository specimenRepository,
-                         MolecularCharacterizationRepository molecularCharacterizationRepository) {
+                         MolecularCharacterizationRepository molecularCharacterizationRepository,PlatformRepository platformRepository) {
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
         this.patientSnapshotRepository = patientSnapshotRepository;
@@ -41,6 +42,7 @@ public class SearchService {
         this.ontologyTermRepositoryRepository = ontologyTermRepository;
         this.molecularCharacterizationRepository = molecularCharacterizationRepository;
         this.specimenRepository = specimenRepository;
+        this.platformRepository = platformRepository;
 
     }
 
@@ -146,6 +148,10 @@ public class SearchService {
     }
 
 
+    public List<Platform> findPlatfromByModelId(String dataSource, String modelId){
+        return platformRepository.findByModelId(dataSource,modelId);
+    }
+
     public DetailsDTO searchForModel(String dataSource, String modelId, int page, int size) {
 
 
@@ -192,7 +198,8 @@ public class SearchService {
         if (specimens != null) {
 
             try {
-                dto.setTotalPages((int) Math.ceil(totalRecords/size) );
+                double dSize = size;
+                dto.setTotalPages((int) Math.ceil(totalRecords/dSize) );
                 dto.setVariationDataCount(totalRecords);
             }catch (Exception e){ }
         }
@@ -323,6 +330,8 @@ public class SearchService {
 
         return dto;
     }
+
+
 
 
 

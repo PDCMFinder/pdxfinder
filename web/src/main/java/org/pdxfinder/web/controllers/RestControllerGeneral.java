@@ -1,5 +1,6 @@
 package org.pdxfinder.web.controllers;
 
+import org.pdxfinder.dao.Platform;
 import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.DetailsDTO;
@@ -10,6 +11,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,19 +58,26 @@ public class RestControllerGeneral {
         }
 
 
-        @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
-        public DetailsDTO details(@PathVariable String dataSrc,
-                                  @PathVariable String modelId,
-                                  @RequestParam(value="page", required = false) Integer page,
-                                  @RequestParam(value="size", required = false) Integer size) {
+    @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
+    public DetailsDTO details(@PathVariable String dataSrc,
+                              @PathVariable String modelId,
+                              @RequestParam(value="page", required = false) Integer page,
+                              @RequestParam(value="size", required = false) Integer size) {
 
-                int viewPage = (page == null || page < 1) ? 0 : page - 1;
-                int viewSize = (size == null || size < 1) ? 20 : size;
+        int viewPage = (page == null || page < 1) ? 0 : page - 1;
+        int viewSize = (size == null || size < 1) ? 20 : size;
 
-                DetailsDTO dto = searchService.searchForModel(dataSrc, modelId, viewPage,viewSize);
+        DetailsDTO dto = searchService.searchForModel(dataSrc, modelId, viewPage,viewSize);
 
-                return  dto;
-        }
+        return  dto;
+    }
+
+
+    @RequestMapping(value = "/modeltech/{dataSrc}/{modelId}")
+    public List<Platform> findTechnology(@PathVariable String dataSrc, @PathVariable String modelId) {
+
+        return  searchService.findPlatfromByModelId(dataSrc,modelId);
+    }
 
 
         public String getSortColumn(String sortolumn){
