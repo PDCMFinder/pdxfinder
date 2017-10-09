@@ -1,5 +1,6 @@
 package org.pdxfinder.web.controllers;
 
+import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +58,12 @@ public class DetailsPageController {
         model.addAttribute("url", dto.getExternalUrl());
         model.addAttribute("urlText", dto.getExternalUrlText());
 
-        model.addAttribute("specimenId", dto.getSpecimenId());
-        model.addAttribute("technology", dto.getTechnology());
+        //model.addAttribute("specimenId", dto.getSpecimenId());
+        for (Specimen specimen : dto.getSpecimens()) {
+            model.addAttribute("specimenId",specimen.getExternalId() );
+        }
+
+        model.addAttribute("technology", "");
         model.addAttribute("totalPages", dto.getTotalPages());
         model.addAttribute("presentPage", viewPage+1);
         model.addAttribute("totalRecords", dto.getVariationDataCount());
@@ -69,26 +74,3 @@ public class DetailsPageController {
         return "details";
     }
 }
-
-
-
-
-        /*
-        this.externalId = "";
-        this.dataSource = "";
-        this.patientId = "";
-        this.gender = "";
-        this.age = "";
-        this.race = "";
-        this.ethnicity = "";
-        this.diagnosis = "";
-        this.tumorType = "";
-        this.classification = "";
-        this.originTissue = "";
-        this.sampleSite = "";
-
-        this.sampleType = "";
-        this.strain = "";
-        this.mouseSex = "";
-        this.engraftmentSite = "";
-        */

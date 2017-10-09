@@ -7,10 +7,6 @@ import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -157,12 +153,13 @@ public class SearchService {
         Patient patient = patientRepository.findByDataSourceAndModelId(dataSource,modelId);
         List<PatientSnapshot> ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
         ModelCreation pdx = modelCreationRepository.findBySourcePdxId(modelId);
-        List<Specimen> specimen = specimenRepository.findVariationDataBySourcePdxId(modelId);
-
-        Pageable pageable = new PageRequest(page,20, Sort.Direction.ASC,"mAss.chromosome");
-        Page<MolecularCharacterization> moleChar = molecularCharacterizationRepository.findVariationDataBySourcePdxId(modelId,pageable);
 
         int totalRecords = molecularCharacterizationRepository.countBySearchParameter(modelId,"");
+
+
+
+        int size = 20; int skip = page * size;
+        Set<Specimen> specimens = specimenRepository.findVariationDataBySourcePdxId(dataSource,modelId,"",skip,size);
 
         DetailsDTO dto = new DetailsDTO();
 
@@ -188,35 +185,41 @@ public class SearchService {
                          */
 
         Set< Set<MarkerAssociation> > markerAssociatonSet = new HashSet<>();
+        List<Specimen> specimenList = new ArrayList<>();
+        Set<MolecularCharacterization>  molecularCharacterizations = new HashSet<>();
+        Set<Platform>  platforms = new HashSet<>();
 
-        if (moleChar != null) {
+        if (specimens != null) {
 
             try {
-                dto.setTotalPages((int) Math.ceil(totalRecords/20.0) );
+                dto.setTotalPages((int) Math.ceil(totalRecords/size) );
                 dto.setVariationDataCount(totalRecords);
             }catch (Exception e){ }
-
-            for (MolecularCharacterization dMolChar : moleChar) {
-                try {
-                    markerAssociatonSet.add(dMolChar.getMarkerAssociations());
-                }catch (Exception e){ }
-
-                try {
-                    dto.setTechnology(dMolChar.getTechnology());
-                }catch (Exception e){ }
-            }
-
-            dto.setMarkerAssociations(markerAssociatonSet);
         }
 
+        for (Specimen specimen : specimens) {
+            try
+            {
+                specimenList.add(specimen);
+                molecularCharacterizations.addAll(specimen.getSample().getMolecularCharacterizations());
 
-        if (specimen != null) {
-            for (Specimen dSpecimen : specimen) {
-                try {
-                    dto.setSpecimenId(dSpecimen.getExternalId());
-                }catch (Exception e){ }
-            }
+                for (MolecularCharacterization dMolkar : specimen.getSample().getMolecularCharacterizations()) {
+                    markerAssociatonSet.add(dMolkar.getMarkerAssociations());
+                    platforms.add(dMolkar.getPlatform());
+                }
+            }catch (Exception e){ }
         }
+
+        dto.setMarkerAssociations(markerAssociatonSet);
+        dto.setMolecularCharacterizations(molecularCharacterizations);
+        dto.setPlatforms(platforms);
+
+
+
+        try {
+            dto.setSpecimens(specimenList);
+        }catch (Exception e){ }
+
 
         if (sample != null && sample.getSourceSampleId() != null) {
             dto.setExternalId(sample.getSourceSampleId());
@@ -334,7 +337,7 @@ public class SearchService {
         int recordsTotal = molecularCharacterizationRepository.countBySearchParameter(modelId,"");
         int recordsFiltered = recordsTotal;
 
-        List<Specimen> specimen = specimenRepository.findVariationDataBySourcePdxId(modelId);
+        List<Specimen> specimen = specimenRepository.findVariationDataBySourcePdxId2(dataSource,modelId);
 
         /**
          * If search Parameter is not empty: Count and Reset the value of filtered records based on search Parameter
