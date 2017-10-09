@@ -36,14 +36,6 @@ public class RestControllerGeneral {
         }
 
 
-        @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}/{page}")
-        public DetailsDTO detail(@PathVariable String dataSrc, @PathVariable String modelId, @PathVariable int page) {
-
-                DetailsDTO dto = searchService.searchForModel(dataSrc, modelId,page);
-                return dto;
-        }
-
-
         @RequestMapping(value = "/datatable/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
         public VariationDataDTO getVariationTable(@PathVariable String dataSrc,
                                                   @PathVariable String modelId,
@@ -61,6 +53,19 @@ public class RestControllerGeneral {
 
                 return variationDataDTO;
 
+        }
+
+
+        @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
+        public DetailsDTO details(@PathVariable String dataSrc,
+                                  @PathVariable String modelId,
+                                  @RequestParam(value="page", required = false) Integer page) {
+
+                int viewPage = (page == null || page < 1) ? 0 : page - 1;
+
+                DetailsDTO dto = searchService.searchForModel(dataSrc, modelId, viewPage);
+
+                return  dto;
         }
 
 
