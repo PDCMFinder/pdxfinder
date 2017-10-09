@@ -43,7 +43,7 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
             "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) ) ) " +
 
             "            RETURN pdxPass, passfrm, spec, sfrm,msamp, char,molchar, assoc,mAss, aw,m,pl,tech SKIP {skip} LIMIT {lim} ")
-    Set<Specimen> findVariationDataBySourcePdxId(@Param("dataSource") String dataSource,
+    Set<Specimen> findSpecimenBySourcePdxId(@Param("dataSource") String dataSource,
                                                  @Param("modelId") String modelId,
                                                  @Param("search") String search,
                                                  @Param("skip") int skip,
@@ -51,7 +51,7 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
 
 
-    /*@Query("MATCH (psamp:Sample)--(mod:ModelCreation)-[io:INSTANCE_OF]-(pdxPass:PdxPassage)-[passfrm:PASSAGED_FROM]-(spec:Specimen)-[sfrm:SAMPLED_FROM]-(msamp:Sample) " +
+    @Query("MATCH (psamp:Sample)--(mod:ModelCreation)-[io:INSTANCE_OF]-(pdxPass:PdxPassage)-[passfrm:PASSAGED_FROM]-(spec:Specimen)-[sfrm:SAMPLED_FROM]-(msamp:Sample) " +
             "            -[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
             "            WITH psamp, mod, spec, passfrm,pdxPass, sfrm,msamp, char,molchar, assoc,mAss, aw,m " +
             "            MATCH (molchar)-[pl:PLATFORM_USED]-(tech:Platform) " +
@@ -66,9 +66,34 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
             "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) ) ) " +
 
             "            RETURN pdxPass, passfrm, spec, sfrm,msamp, char,molchar, assoc,mAss, aw,m,pl,tech SKIP {skip} LIMIT {lim} ")
-    Set<Specimen> findVariationDataBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource, @Param("modelId") String modelId,
-                                                            @Param("tech") String tech, @Param("search") String search,
-                                                            @Param("skip") int skip, @Param("lim") int lim);*/
+    Set<Specimen> findSpecimenBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
+                                                            @Param("modelId") String modelId,
+                                                            @Param("tech") String tech,
+                                                            @Param("search") String search,
+                                                            @Param("skip") int skip,
+                                                            @Param("lim") int lim);
+
+
+
+
+    @Query("MATCH (psamp:Sample)--(mod:ModelCreation)--(pdxPass:PdxPassage)--(spec:Specimen)--(msamp:Sample)--(molchar:MolecularCharacterization)-->(mAss:MarkerAssociation)--(m:Marker) " +
+            "            WITH psamp,mod,pdxPass,spec,msamp,molchar,mAss,m " +
+            "            MATCH (molchar)--(tech:Platform) " +
+
+            "            WHERE  psamp.dataSource = {dataSource}  " +
+            "            AND    mod.sourcePdxId = {modelId}  " +
+            "            AND    tech.name = {tech}  " +
+
+            "            AND ( toLower(spec.externalId) CONTAINS toLower({search})" +
+            "            OR toLower(m.symbol) CONTAINS toLower({search})" +
+            "            OR toLower(tech.name) CONTAINS toLower({search})" +
+            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) ) ) " +
+            "            RETURN count(*) ")
+    Integer countBySearchParameterAndPlatform(@Param("dataSource") String dataSource,
+                                                    @Param("modelId") String modelId,
+                                                    @Param("tech") String tech,
+                                                    @Param("search") String search);
+
 
 
 }

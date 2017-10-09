@@ -152,7 +152,8 @@ public class SearchService {
         return platformRepository.findByModelId(dataSource,modelId);
     }
 
-    public DetailsDTO searchForModel(String dataSource, String modelId, int page, int size) {
+
+    public DetailsDTO searchForModel(String dataSource, String modelId, int page, int size,String technology) {
 
 
         Sample sample = sampleRepository.findByDataSourceAndPdxId(dataSource,modelId);
@@ -160,12 +161,22 @@ public class SearchService {
         List<PatientSnapshot> ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
         ModelCreation pdx = modelCreationRepository.findBySourcePdxId(modelId);
 
-        int totalRecords = molecularCharacterizationRepository.countBySearchParameter(modelId,"");
-
-
-
         int skip = page * size;
-        Set<Specimen> specimens = specimenRepository.findVariationDataBySourcePdxId(dataSource,modelId,"",skip,size);
+        int totalRecords = 0;
+        Set<Specimen> specimens = new HashSet<>();
+
+
+        if (technology.equals("")){
+
+            totalRecords = molecularCharacterizationRepository.countBySearchParameter(modelId,"");
+            specimens = specimenRepository.findSpecimenBySourcePdxId(dataSource,modelId,"",skip,size);
+        }
+        else{
+
+            totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,"");
+            specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,"",skip,size);
+        }
+
 
         DetailsDTO dto = new DetailsDTO();
 
@@ -335,9 +346,35 @@ public class SearchService {
 
 
 
+    public VariationDataDTO variationDataByPlatform(String dataSource, String modelId, String technology,
+                                                             String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
+        /**
+         * 1st count all the records and set Total Records & Initialize Filtered Record as Total record
+         */
+        int recordsTotal = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,"");
+        int recordsFiltered = recordsTotal;
+
+        /**
+         * If search Parameter is not empty: Count and Reset the value of filtered records based on search Parameter
+         */
+        if (!searchParam.isEmpty()) {
+            recordsFiltered = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,searchParam);
+        }
+
+        /**
+         * Retrieve the Records based on search parameter
+         */
+        Set<Specimen> specimen = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,searchParam,start,size);
+        VariationDataDTO variationDataDTO = buildUpDTO(specimen,draw,recordsTotal,recordsFiltered);
+        return variationDataDTO;
+
+    }
 
 
-    public VariationDataDTO variationDataServerSideProcessor(String dataSource, String modelId,
+
+
+
+    public VariationDataDTO variationDataAll(String dataSource, String modelId,
                                      String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
         /**
          * 1st count all the records and set Total Records & Initialize Filtered Record as Total record
@@ -355,7 +392,7 @@ public class SearchService {
         /**
          * Retrieve the Records based on search parameter
          */
-        Set<Specimen> specimen = specimenRepository.findVariationDataBySourcePdxId(dataSource,modelId,searchParam,start,size);
+        Set<Specimen> specimen = specimenRepository.findSpecimenBySourcePdxId(dataSource,modelId,searchParam,start,size);
         VariationDataDTO variationDataDTO = buildUpDTO(specimen,draw,recordsTotal,recordsFiltered);
         return variationDataDTO;
 

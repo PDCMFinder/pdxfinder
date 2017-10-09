@@ -51,7 +51,7 @@ public class RestControllerGeneral {
                 int size = Integer.parseInt(data.getFirst("length").toString());
 
                 sortColumn = getSortColumn(sortColumn);
-                VariationDataDTO variationDataDTO = searchService.variationDataServerSideProcessor(dataSrc,modelId,searchText,draw,sortColumn,sortDir,start,size);
+                VariationDataDTO variationDataDTO = searchService.variationDataAll(dataSrc,modelId,searchText,draw,sortColumn,sortDir,start,size);
 
                 return variationDataDTO;
 
@@ -62,12 +62,14 @@ public class RestControllerGeneral {
     public DetailsDTO details(@PathVariable String dataSrc,
                               @PathVariable String modelId,
                               @RequestParam(value="page", required = false) Integer page,
-                              @RequestParam(value="size", required = false) Integer size) {
+                              @RequestParam(value="size", required = false) Integer size,
+                              @RequestParam(value="platform", required = false) String platform) {
 
         int viewPage = (page == null || page < 1) ? 0 : page - 1;
         int viewSize = (size == null || size < 1) ? 20 : size;
+        String viewPlatform = (platform == null) ? "" : platform;
 
-        DetailsDTO dto = searchService.searchForModel(dataSrc, modelId, viewPage,viewSize);
+        DetailsDTO dto = searchService.searchForModel(dataSrc, modelId, viewPage,viewSize,viewPlatform);
 
         return  dto;
     }

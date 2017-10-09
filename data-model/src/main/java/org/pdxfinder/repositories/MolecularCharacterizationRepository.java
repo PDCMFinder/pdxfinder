@@ -25,4 +25,6 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
 
 
 
+
+
 }
