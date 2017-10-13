@@ -308,11 +308,11 @@ public class LoadJAXData implements CommandLineRunner {
 
                 //PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
 
-                sample = (sample==null)?"":sample;
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sample, this.jaxDS.getName(), passage);
+                
+                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sampleKey, this.jaxDS.getName(), passage);
      
                 Sample specSample = new Sample();
-                specSample.setSourceSampleId(sample);
+                specSample.setSourceSampleId(sampleKey);
                 specimen.setSample(specSample);
                 specSample.setMolecularCharacterizations(mcs);
                 //specimen.setPdxPassage(pdxPassage);
@@ -335,6 +335,7 @@ public class LoadJAXData implements CommandLineRunner {
         } catch (Exception e) {
             log.error("", e);
         }
+        
 
     }
 
