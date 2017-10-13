@@ -148,8 +148,56 @@ public class SearchService {
     }
 
 
-    public List<Platform> findPlatfromByModelId(String dataSource, String modelId){
-        return platformRepository.findByModelId(dataSource,modelId);
+    public Map findPlatformAndPassagesByModelId(String dataSource, String modelId){
+
+        /**
+         * Used to store a technology String with their respective List of PDX Passages
+         */
+        Map<String, Set<String>> platformMap = new HashMap<>();
+
+        /**
+         * Retrieve all the technologies for that mouse model
+         */
+        List<Platform> platforms = platformRepository.findByModelId(dataSource,modelId);
+        int totalRecords = molecularCharacterizationRepository.countBySearchParameter(modelId,"");
+
+        /**
+         * For each of the technologies retrieve the list PDX passages using the specimen repository
+         */
+        for (Platform platform : platforms) {
+
+            Set<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,platform.getName(),"",0,totalRecords);
+
+            Set<String> passagesList = new HashSet<>();
+            for (Specimen specimen : specimens)
+            {
+                for (MolecularCharacterization dMolkar : specimen.getSample().getMolecularCharacterizations())
+                {
+                    passagesList.add(specimen.getPdxPassage().getPassage()+"");
+                }
+            }
+
+            platformMap.put(platform.getName(), passagesList);
+        }
+
+
+
+        Set<Set<String>> mySet = new HashSet<>();
+
+        for (Iterator itr = platformMap.entrySet().iterator(); itr.hasNext();)
+        {
+            Map.Entry<String, Set<String>> entrySet = (Map.Entry) itr.next();
+
+            Set<String> value = entrySet.getValue();
+
+            if (!mySet.add(value))
+            {
+                itr.remove();
+            }
+        }
+
+        return platformMap;
+
     }
 
 

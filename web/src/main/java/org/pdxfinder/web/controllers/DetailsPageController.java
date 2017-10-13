@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Map;
+
 /**
  * Created by csaba on 12/05/2017.
  */
@@ -71,6 +73,10 @@ public class DetailsPageController {
         model.addAttribute("totalRecords", dto.getVariationDataCount());
 
         model.addAttribute("variationData", dto.getMarkerAssociations());
+
+        Map techAndPassages = searchService.findPlatformAndPassagesByModelId(dataSrc,modelId);
+
+        model.addAttribute("modelInfo", techAndPassages);
 
         //TODO: return error page if sampleId does not exist
         return "details";

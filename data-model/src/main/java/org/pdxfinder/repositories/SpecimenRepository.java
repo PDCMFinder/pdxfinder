@@ -76,6 +76,8 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
 
 
+
+
     @Query("MATCH (psamp:Sample)--(mod:ModelCreation)--(pdxPass:PdxPassage)--(spec:Specimen)--(msamp:Sample)--(molchar:MolecularCharacterization)-->(mAss:MarkerAssociation)--(m:Marker) " +
             "            WITH psamp,mod,pdxPass,spec,msamp,molchar,mAss,m " +
             "            MATCH (molchar)--(tech:Platform) " +

@@ -91,7 +91,7 @@
 
 
                     <style> table *{ -webkit-box-sizing:content-box; -moz-box-sizing:content-box; box-sizing:content-box;}</style>
-                    <div class="col-md-12 javaScriptBrowser">
+                    <!--<div class="col-md-12 javaScriptBrowser">
                         <div class="panel panel-info">
                             <div class="panel-heading">
                                 <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
@@ -120,7 +120,86 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
+
+
+
+
+                    <div class="col-md-12">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
+                            </div>
+                        </div>
+                            <div class="tab" role="tabpanel">
+                                <!-- Nav tabs -->
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li th:each="technology,iter : ${modelInfo}"
+                                        th:class="( ${iter.index} == 0 ) ? 'active' : '' "
+                                        role="presentation">
+
+                                        <a th:href="@{'#'+${technology.key}}"
+                                           th:text="${technology.key}+' Platform'" role="tab" data-toggle="tab" onclick="showTabs()"> TAB TITLES </a>
+
+                                    </li>
+                                </ul>
+
+
+                                <!-- Tab panes -->
+                                <div class="tab-content">
+                                    <div th:each="technology,iter : ${modelInfo}"
+                                         th:id="${technology.key}"
+                                         class="tab-pane active"  role="tabpanel">
+
+                                        <span th:unless="${technology.value.size()<1}" th:each="num: ${#numbers.sequence(1,technology.value.size())}"> <!--/* Unable to capture index for inner loop so, this was used for innerloop : <tr th:each="passageList : ${technolog[y.value]}"> */-->
+
+
+                                                <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'showContent' : 'hideContent' ">
+
+
+                                                    <h4 class="bLine" th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
+                                                        <span class="hdc">Tumour Type: </span>            <i>Xenographic Tumor</i>                  &nbsp; &nbsp;
+                                                        <span class="hdc">Diagnosis:</span> <i th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
+                                                        <span class="hdc">Passage: </span>  <i th:text="${technology.value[num-1]}"></i>
+                                                    </h4>
+
+                                                    <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
+                                                           class="table table-condensed table-striped table-borderedPdx table-hover">
+
+
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Sample </th>
+                                                            <th>Platform(s)</th>
+                                                            <th>Chromosome</th>
+                                                            <th>Seq. Position</th>
+                                                            <th>Ref. Allele</th>
+                                                            <th>Alt. Allele</th>
+                                                            <th>Consequence</th>
+                                                            <th>Gene</th>
+                                                            <th>Amino Acid Change</th>
+                                                            <th>Read Depth</th>
+                                                            <th>Allele Freq.</th>
+                                                            <th>RS Variants</th>
+                                                        </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+
+                                        </span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+
+
+
+
+
 
 
 
@@ -185,7 +264,9 @@
                                         </table>
                                     </div>
 
-
+                                    <!--/*<p th:each="i: ${#numbers.sequence(0, (list.size() / 4) - 1)}">
+                                        <span th:each="j: ${#numbers.sequence(i * 4, i * 4 + 3)}" th:if="${list.size() gt j}" th:text="${list.get(j)} + ', '"></span>
+                                    </p>*/-->
 
                                     <div style="text-align: center;">
                                         <div th:if="${not #lists.isEmpty(variationData)}">
@@ -278,26 +359,58 @@
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
-    document.getElementsByClassName("javaScriptBrowser")[0].style.display = "block";
-
+   // document.getElementsByClassName("javaScriptBrowser")[0].style.display = "block";
     var modelId = [[${externalId}]];
     var dataSrc = [[${dataSrc}]];
-    var apiURL = "/datatable/"+dataSrc+"/"+modelId;
+
 
     $(document).ready(function() {
-        var dataTable =  $('#pdxFinder-grid').DataTable( {
+
+        var modelInfo = [[${modelInfo}]];
+
+        var apiURL = "/vdata/"+dataSrc+"/"+modelId;
+
+        for (var tech in modelInfo){
+
+            console.log(tech); var counter=1;
+            for (var passage in modelInfo[tech]){
+
+                console.log(passage);
+
+                var dTech = tech.replace(" ", "-");
+                console.log(dTech);
+
+                apiURL = "/vdata/"+dataSrc+"/"+modelId+"/"+tech+"?passage="+passage;
+                var tableId = "pdxFinder-grid"+dTech+counter;
+                drawTable(tableId,apiURL);
+
+                console.log(tableId);
+                console.log(apiURL);
+                counter++;
+            }
+        }
+
+
+    } );
+
+
+
+    // We define the function
+    function drawTable(tableId,apiURL){
+
+        var dataTable =  $('#'+tableId).DataTable( {
             serverSide: true,
             ajax:{
                 url :apiURL, // json datasource
                 type: "post",  // method  , by default get
                 error: function(){  // error handling
                     $(".pdxFinder-grid-error").html("");
-                    $("#pdxFinder-grid").append('<tbody class="pdxFinder-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    $("#"+tableId).append('<tbody class="pdxFinder-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
                     $("#pdxFinder-grid_processing").css("display","none");
                 }
             },
             dom: "frtiS",
-            scrollY: 500,
+            scrollY: 300,
             scrollX: true,
             deferRender: true,
             responsive: true,
@@ -307,7 +420,16 @@
                 loadingIndicator: true
             }
         } );
-    } );
+    }
+
+    function showTabs() {
+
+        for (var i=0; i<5; i++) {
+            document.getElementsByClassName("hideContent")[i].style.position = "static";
+        }
+    }
+
+
 </script>
 </body>
 </html>

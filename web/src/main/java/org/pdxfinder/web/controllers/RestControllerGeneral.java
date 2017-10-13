@@ -1,6 +1,5 @@
 package org.pdxfinder.web.controllers;
 
-import org.pdxfinder.dao.Platform;
 import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.DetailsDTO;
@@ -11,7 +10,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,24 +36,46 @@ public class RestControllerGeneral {
         }
 
 
-        @RequestMapping(value = "/datatable/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-        public VariationDataDTO getVariationTable(@PathVariable String dataSrc,
-                                                  @PathVariable String modelId,
-                                                  @RequestBody MultiValueMap data) {
+    @RequestMapping(value = "/datatable/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public VariationDataDTO getVariationTable(@PathVariable String dataSrc,
+                                              @PathVariable String modelId,
+                                              @RequestBody MultiValueMap data) {
 
-                int draw = Integer.parseInt(data.getFirst("draw").toString());
-                String searchText = data.getFirst("search[value]").toString();
-                String sortColumn = data.getFirst("order[0][column]").toString();
-                String sortDir = data.getFirst("order[0][dir]").toString();
-                int start = Integer.parseInt(data.getFirst("start").toString());
-                int size = Integer.parseInt(data.getFirst("length").toString());
+        int draw = Integer.parseInt(data.getFirst("draw").toString());
+        String searchText = data.getFirst("search[value]").toString();
+        String sortColumn = data.getFirst("order[0][column]").toString();
+        String sortDir = data.getFirst("order[0][dir]").toString();
+        int start = Integer.parseInt(data.getFirst("start").toString());
+        int size = Integer.parseInt(data.getFirst("length").toString());
 
-                sortColumn = getSortColumn(sortColumn);
-                VariationDataDTO variationDataDTO = searchService.variationDataAll(dataSrc,modelId,searchText,draw,sortColumn,sortDir,start,size);
+        sortColumn = getSortColumn(sortColumn);
+        VariationDataDTO variationDataDTO = searchService.variationDataAll(dataSrc,modelId,searchText,draw,sortColumn,sortDir,start,size);
 
-                return variationDataDTO;
+        return variationDataDTO;
 
-        }
+    }
+
+
+    @RequestMapping(value = "/vdata/{dataSrc}/{modelId}/{platform}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public VariationDataDTO getVariationDataByPlatform(@PathVariable String dataSrc,
+                                                       @PathVariable String modelId,
+                                                       @PathVariable String platform,
+                                                       @RequestParam(value="passage", required = false) String passage,
+                                                       @RequestBody MultiValueMap data) {
+
+        int draw = Integer.parseInt(data.getFirst("draw").toString());
+        String searchText = data.getFirst("search[value]").toString();
+        String sortColumn = data.getFirst("order[0][column]").toString();
+        String sortDir = data.getFirst("order[0][dir]").toString();
+        int start = Integer.parseInt(data.getFirst("start").toString());
+        int size = Integer.parseInt(data.getFirst("length").toString());
+
+        sortColumn = getSortColumn(sortColumn);
+        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,platform,searchText,draw,sortColumn,sortDir,start,size);
+
+        return variationDataDTO;
+
+    }
 
 
     @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
@@ -76,9 +96,9 @@ public class RestControllerGeneral {
 
 
     @RequestMapping(value = "/modeltech/{dataSrc}/{modelId}")
-    public List<Platform> findTechnology(@PathVariable String dataSrc, @PathVariable String modelId) {
+    public Map findTechnology(@PathVariable String dataSrc, @PathVariable String modelId) {
 
-        return  searchService.findPlatfromByModelId(dataSrc,modelId);
+        return  searchService.findPlatformAndPassagesByModelId(dataSrc,modelId);
     }
 
 
