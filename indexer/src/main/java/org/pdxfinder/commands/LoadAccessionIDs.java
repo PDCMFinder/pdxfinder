@@ -1,6 +1,8 @@
 package org.pdxfinder.commands;
 
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.pdxfinder.accessionidtatamodel.AccessionData;
 import org.pdxfinder.dao.Marker;
 import org.pdxfinder.utilities.LoaderUtils;
@@ -8,14 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +28,7 @@ import java.util.List;
  * Created by csaba on 30/06/2017.
  */
 @Component
+@Order(value = 100)
 public class LoadAccessionIDs implements CommandLineRunner {
 
     private static final String HGNC_URL = "http://rest.genenames.org/fetch/symbol/";
@@ -48,24 +50,25 @@ public class LoadAccessionIDs implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
 
-        log.info(args[0]);
+        OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
+        parser.accepts("loadAccessionIds", "Load Accession IDs");
+        parser.accepts("loadALL", "Load all, including Accession IDs");
+        OptionSet options = parser.parse(args);
 
-        if ("loadAccessionIds".equals(args[0]) || "-loadAccessionIds".equals(args[0])) {
+        long startTime = System.currentTimeMillis();
 
-
-            long startTime = System.currentTimeMillis();
+        if (options.has("loadAccessionIds") || options.has("loadALL")) {
             loadAccessionIds();
-            long endTime   = System.currentTimeMillis();
-            long totalTime = endTime - startTime;
-
-            int seconds = (int) (totalTime / 1000) % 60 ;
-            int minutes = (int) ((totalTime / (1000*60)) % 60);
-
-            System.out.println("Loading finished after "+minutes+" minute(s) and "+seconds+" second(s)");
         }
-        else{
-            log.info("Missing command");
-        }
+
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+
+        int seconds = (int) (totalTime / 1000) % 60;
+        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
+
+        log.info(this.getClass().getSimpleName() + " finished after " + minutes + " minute(s) and " + seconds + " second(s)");
 
     }
 

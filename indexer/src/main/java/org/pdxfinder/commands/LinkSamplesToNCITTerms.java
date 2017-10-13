@@ -1,5 +1,7 @@
 package org.pdxfinder.commands;
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
@@ -11,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,7 @@ import java.util.Set;
  * Created by csaba on 24/08/2017.
  */
 @Component
-@Order(value = Ordered.LOWEST_PRECEDENCE)
+@Order(value = 100)
 public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
 
@@ -43,45 +44,42 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
     @Override
     public void run(String... args) throws Exception {
 
-        log.info(args[0]);
+        OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
+        parser.accepts("loadAccessionIds", "Link samples to NCIT terms");
+        parser.accepts("loadALL", "Load all, including linking samples to NCIT terms");
+        OptionSet options = parser.parse(args);
 
-        if ("linkSamplesToNCITTerms".equals(args[0]) || "-linkSamplesToNCITTerms".equals(args[0])) {
+        long startTime = System.currentTimeMillis();
 
-            log.info("Mapping samples to NCIT terms.");
-            long startTime = System.currentTimeMillis();
+        if (options.has("linkSamplesToNCITTerms") && options.has("linkSamplesToNCITTermsWithCleanup")) {
+            log.warn("Select one or the other of: -linkSamplesToNCITTerms, -linkSamplesToNCITTermsWithCleanup");
+            log.warn("Not loading ", this.getClass().getName());
 
-            mapSamplesToTerms();
-            updateIndirectMappingData();
-
-            long endTime   = System.currentTimeMillis();
-            long totalTime = endTime - startTime;
-
-            int seconds = (int) (totalTime / 1000) % 60 ;
-            int minutes = (int) ((totalTime / (1000*60)) % 60);
-
-            System.out.println("Jobfinished after "+minutes+" minute(s) and "+seconds+" second(s)");
-        }
-        else if("linkSamplesToNCITTermsWithCleanup".equals(args[0]) || "-linkSamplesToNCITTermsWithCleanup".equals(args[0])){
+        } else if (options.has("linkSamplesToNCITTermsWithCleanup") || options.has("loadALL")) {
 
             log.info("Mapping samples to NCIT terms.");
-            long startTime = System.currentTimeMillis();
 
             mapSamplesToTerms();
             updateIndirectMappingData();
             deleteTermsWithoutMapping();
 
-            long endTime   = System.currentTimeMillis();
-            long totalTime = endTime - startTime;
+        } else if (options.has("linkSamplesToNCITTerms")) {
 
-            int seconds = (int) (totalTime / 1000) % 60 ;
-            int minutes = (int) ((totalTime / (1000*60)) % 60);
+            log.info("Mapping samples to NCIT terms.");
 
-            System.out.println("Job finished after "+minutes+" minute(s) and "+seconds+" second(s)");
+            mapSamplesToTerms();
+            updateIndirectMappingData();
 
         }
-        else{
-            log.info("Not running linkSamplesToNCITTerms command");
-        }
+
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+
+        int seconds = (int) (totalTime / 1000) % 60;
+        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
+
+        log.info(this.getClass().getSimpleName() + " finished after " + minutes + " minute(s) and " + seconds + " second(s)");
 
     }
 
