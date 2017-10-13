@@ -74,7 +74,7 @@ public class DetailsPageController {
 
         model.addAttribute("variationData", dto.getMarkerAssociations());
 
-        Map techAndPassages = searchService.findPlatformAndPassagesByModelId(dataSrc,modelId);
+        Map techAndPassages = searchService.findPlatformAndPassagesByModelId(dataSrc,modelId,"");
 
         model.addAttribute("modelInfo", techAndPassages);
 

@@ -56,10 +56,10 @@ public class RestControllerGeneral {
     }
 
 
-    @RequestMapping(value = "/vdata/{dataSrc}/{modelId}/{platform}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @RequestMapping(value = "/vdata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public VariationDataDTO getVariationDataByPlatform(@PathVariable String dataSrc,
                                                        @PathVariable String modelId,
-                                                       @PathVariable String platform,
+                                                       @RequestParam(value="platform", required = false) String platform,
                                                        @RequestParam(value="passage", required = false) String passage,
                                                        @RequestBody MultiValueMap data) {
 
@@ -71,7 +71,10 @@ public class RestControllerGeneral {
         int size = Integer.parseInt(data.getFirst("length").toString());
 
         sortColumn = getSortColumn(sortColumn);
-        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,platform,searchText,draw,sortColumn,sortDir,start,size);
+
+        String dplatform = (platform == null) ? "" : platform;
+        String dPassage = (passage == null) ? "" : passage;
+        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dplatform,dPassage,searchText,draw,sortColumn,sortDir,start,size);
 
         return variationDataDTO;
 
@@ -96,9 +99,11 @@ public class RestControllerGeneral {
 
 
     @RequestMapping(value = "/modeltech/{dataSrc}/{modelId}")
-    public Map findTechnology(@PathVariable String dataSrc, @PathVariable String modelId) {
+    public Map findTechnology(@PathVariable String dataSrc, @PathVariable String modelId,
+                              @RequestParam(value="passage", required = false) String passage) {
 
-        return  searchService.findPlatformAndPassagesByModelId(dataSrc,modelId);
+        String dPassage = (passage == null) ? "" : passage;
+        return  searchService.findPlatformAndPassagesByModelId(dataSrc,modelId,dPassage);
     }
 
 

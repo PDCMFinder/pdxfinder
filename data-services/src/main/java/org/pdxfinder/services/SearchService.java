@@ -148,7 +148,7 @@ public class SearchService {
     }
 
 
-    public Map findPlatformAndPassagesByModelId(String dataSource, String modelId){
+    public Map findPlatformAndPassagesByModelId(String dataSource, String modelId,String passage){
 
         /**
          * Used to store a technology String with their respective List of PDX Passages
@@ -166,7 +166,7 @@ public class SearchService {
          */
         for (Platform platform : platforms) {
 
-            Set<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,platform.getName(),"",0,totalRecords);
+            Set<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,platform.getName(),passage,"",0,totalRecords);
 
             Set<String> passagesList = new HashSet<>();
             for (Specimen specimen : specimens)
@@ -181,7 +181,9 @@ public class SearchService {
         }
 
 
-
+        /**
+         *  This removes duplicate passages by removing duplicates in the platformMap
+         */
         Set<Set<String>> mySet = new HashSet<>();
 
         for (Iterator itr = platformMap.entrySet().iterator(); itr.hasNext();)
@@ -217,12 +219,12 @@ public class SearchService {
         if (technology.equals("")){
 
             totalRecords = molecularCharacterizationRepository.countBySearchParameter(modelId,"");
-            specimens = specimenRepository.findSpecimenBySourcePdxId(dataSource,modelId,"",skip,size);
+            specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,"","",skip,size);
         }
         else{
 
-            totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,"");
-            specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,"",skip,size);
+            totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,"","");
+            specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,"","",skip,size);
         }
 
 
@@ -394,25 +396,25 @@ public class SearchService {
 
 
 
-    public VariationDataDTO variationDataByPlatform(String dataSource, String modelId, String technology,
+    public VariationDataDTO variationDataByPlatform(String dataSource, String modelId, String technology,String passage,
                                                              String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
         /**
          * 1st count all the records and set Total Records & Initialize Filtered Record as Total record
          */
-        int recordsTotal = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,"");
+        int recordsTotal = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,passage,"");
         int recordsFiltered = recordsTotal;
 
         /**
          * If search Parameter is not empty: Count and Reset the value of filtered records based on search Parameter
          */
         if (!searchParam.isEmpty()) {
-            recordsFiltered = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,searchParam);
+            recordsFiltered = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,passage,searchParam);
         }
 
         /**
          * Retrieve the Records based on search parameter
          */
-        Set<Specimen> specimen = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,searchParam,start,size);
+        Set<Specimen> specimen = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchParam,start,size);
         VariationDataDTO variationDataDTO = buildUpDTO(specimen,draw,recordsTotal,recordsFiltered);
         return variationDataDTO;
 
@@ -440,7 +442,7 @@ public class SearchService {
         /**
          * Retrieve the Records based on search parameter
          */
-        Set<Specimen> specimen = specimenRepository.findSpecimenBySourcePdxId(dataSource,modelId,searchParam,start,size);
+        Set<Specimen> specimen = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,"","","",start,size);
         VariationDataDTO variationDataDTO = buildUpDTO(specimen,draw,recordsTotal,recordsFiltered);
         return variationDataDTO;
 

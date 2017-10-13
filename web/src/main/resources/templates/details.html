@@ -125,7 +125,7 @@
 
 
 
-                    <div class="col-md-12">
+                    <div class="col-md-12 javaScriptBrowser">
                         <div class="panel panel-info">
                             <div class="panel-heading">
                                 <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
@@ -359,28 +359,30 @@
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
-   // document.getElementsByClassName("javaScriptBrowser")[0].style.display = "block";
+    document.getElementsByClassName("javaScriptBrowser")[0].style.display = "block";
     var modelId = [[${externalId}]];
     var dataSrc = [[${dataSrc}]];
+
 
 
     $(document).ready(function() {
 
         var modelInfo = [[${modelInfo}]];
 
-        var apiURL = "/vdata/"+dataSrc+"/"+modelId;
+        //var apiURL = "/datatable/"+dataSrc+"/"+modelId;
+        //drawTable("pdxFinder-grid",apiURL);
 
         for (var tech in modelInfo){
 
             console.log(tech); var counter=1;
             for (var passage in modelInfo[tech]){
 
-                console.log(passage);
+                console.log(modelInfo[tech][passage]);
 
                 var dTech = tech.replace(" ", "-");
                 console.log(dTech);
 
-                apiURL = "/vdata/"+dataSrc+"/"+modelId+"/"+tech+"?passage="+passage;
+                apiURL = "/vdata/"+dataSrc+"/"+modelId+"?platform="+tech+"&passage="+modelInfo[tech][passage];           // e.g modelInfo[tech][passage] = CTP[0]
                 var tableId = "pdxFinder-grid"+dTech+counter;
                 drawTable(tableId,apiURL);
 

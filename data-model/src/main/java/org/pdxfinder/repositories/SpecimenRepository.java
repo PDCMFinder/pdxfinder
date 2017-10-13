@@ -29,27 +29,6 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
 
 
-    @Query("MATCH (psamp:Sample)--(mod:ModelCreation)-[io:INSTANCE_OF]-(pdxPass:PdxPassage)-[passfrm:PASSAGED_FROM]-(spec:Specimen)-[sfrm:SAMPLED_FROM]-(msamp:Sample) " +
-            "            -[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
-            "            WITH psamp, mod, spec, passfrm,pdxPass, sfrm,msamp, char,molchar, assoc,mAss, aw,m " +
-            "            MATCH (molchar)-[pl:PLATFORM_USED]-(tech:Platform) " +
-
-            "            WHERE  psamp.dataSource = {dataSource}  " +
-            "            AND    mod.sourcePdxId = {modelId}  " +
-
-            "            AND ( toLower(spec.externalId) CONTAINS toLower({search})" +
-            "            OR toLower(m.symbol) CONTAINS toLower({search})" +
-            "            OR toLower(tech.name) CONTAINS toLower({search})" +
-            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) ) ) " +
-
-            "            RETURN pdxPass, passfrm, spec, sfrm,msamp, char,molchar, assoc,mAss, aw,m,pl,tech SKIP {skip} LIMIT {lim} ")
-    Set<Specimen> findSpecimenBySourcePdxId(@Param("dataSource") String dataSource,
-                                                 @Param("modelId") String modelId,
-                                                 @Param("search") String search,
-                                                 @Param("skip") int skip,
-                                                 @Param("lim") int lim);
-
-
 
     @Query("MATCH (psamp:Sample)--(mod:ModelCreation)-[io:INSTANCE_OF]-(pdxPass:PdxPassage)-[passfrm:PASSAGED_FROM]-(spec:Specimen)-[sfrm:SAMPLED_FROM]-(msamp:Sample) " +
             "            -[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
@@ -58,7 +37,8 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
             "            WHERE  psamp.dataSource = {dataSource}  " +
             "            AND    mod.sourcePdxId = {modelId}  " +
-            "            AND    tech.name = {tech}  " +
+            "            AND    tech.name = {tech}  OR {tech} = ''  " +
+            "            AND    (pdxPass.passage = toInteger({passage}) OR {passage} = '' )" +
 
             "            AND ( toLower(spec.externalId) CONTAINS toLower({search})" +
             "            OR toLower(m.symbol) CONTAINS toLower({search})" +
@@ -67,14 +47,12 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
             "            RETURN pdxPass, passfrm, spec, sfrm,msamp, char,molchar, assoc,mAss, aw,m,pl,tech SKIP {skip} LIMIT {lim} ")
     Set<Specimen> findSpecimenBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
-                                                            @Param("modelId") String modelId,
-                                                            @Param("tech") String tech,
-                                                            @Param("search") String search,
-                                                            @Param("skip") int skip,
-                                                            @Param("lim") int lim);
-
-
-
+                                                       @Param("modelId") String modelId,
+                                                       @Param("tech") String tech,
+                                                       @Param("passage") String passage,
+                                                       @Param("search") String search,
+                                                       @Param("skip") int skip,
+                                                       @Param("lim") int lim);
 
 
 
@@ -85,6 +63,7 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
             "            WHERE  psamp.dataSource = {dataSource}  " +
             "            AND    mod.sourcePdxId = {modelId}  " +
             "            AND    tech.name = {tech}  " +
+            "            AND    (pdxPass.passage = toInteger({passage}) OR {passage} = '' )" +
 
             "            AND ( toLower(spec.externalId) CONTAINS toLower({search})" +
             "            OR toLower(m.symbol) CONTAINS toLower({search})" +
@@ -92,10 +71,10 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
             "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) ) ) " +
             "            RETURN count(*) ")
     Integer countBySearchParameterAndPlatform(@Param("dataSource") String dataSource,
-                                                    @Param("modelId") String modelId,
-                                                    @Param("tech") String tech,
-                                                    @Param("search") String search);
-
+                                              @Param("modelId") String modelId,
+                                              @Param("tech") String tech,
+                                              @Param("passage") String passage,
+                                              @Param("search") String search);
 
 
 }
