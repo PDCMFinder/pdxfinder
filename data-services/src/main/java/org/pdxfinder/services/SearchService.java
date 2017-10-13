@@ -218,7 +218,7 @@ public class SearchService {
 
         if (technology.equals("")){
 
-            totalRecords = molecularCharacterizationRepository.countBySearchParameter(modelId,"");
+            totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,"","","");
             specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,"","",skip,size);
         }
         else{
@@ -429,14 +429,14 @@ public class SearchService {
         /**
          * 1st count all the records and set Total Records & Initialize Filtered Record as Total record
          */
-        int recordsTotal = molecularCharacterizationRepository.countBySearchParameter(modelId,"");
+        int recordsTotal = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,"","","");
         int recordsFiltered = recordsTotal;
 
         /**
          * If search Parameter is not empty: Count and Reset the value of filtered records based on search Parameter
          */
         if (!searchParam.isEmpty()) {
-            recordsFiltered = molecularCharacterizationRepository.countBySearchParameter(modelId,searchParam);
+            recordsFiltered = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,"","",searchParam);
         }
 
         /**
