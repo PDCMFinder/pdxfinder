@@ -37,7 +37,7 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
             "            WHERE  psamp.dataSource = {dataSource}  " +
             "            AND    mod.sourcePdxId = {modelId}  " +
-            "            AND    tech.name = {tech}  OR {tech} = ''  " +
+            "            AND    (tech.name = {tech}  OR {tech} = '' ) " +
             "            AND    (pdxPass.passage = toInteger({passage}) OR {passage} = '' )" +
 
             "            AND ( toLower(spec.externalId) CONTAINS toLower({search})" +
@@ -62,7 +62,7 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
             "            WHERE  psamp.dataSource = {dataSource}  " +
             "            AND    mod.sourcePdxId = {modelId}  " +
-            "            AND    tech.name = {tech}  " +
+            "            AND    (tech.name = {tech}  OR {tech} = '' ) " +
             "            AND    (pdxPass.passage = toInteger({passage}) OR {passage} = '' )" +
 
             "            AND ( toLower(spec.externalId) CONTAINS toLower({search})" +
