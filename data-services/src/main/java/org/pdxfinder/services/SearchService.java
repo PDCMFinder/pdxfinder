@@ -159,7 +159,7 @@ public class SearchService {
          * Retrieve all the technologies for that mouse model
          */
         List<Platform> platforms = platformRepository.findByModelId(dataSource,modelId);
-        int totalRecords = molecularCharacterizationRepository.countBySearchParameter(modelId,"");
+        int totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,"","","");
 
         /**
          * For each of the technologies retrieve the list PDX passages using the specimen repository
@@ -184,7 +184,7 @@ public class SearchService {
         /**
          *  This removes duplicate passages by removing duplicates in the platformMap
          */
-        Set<Set<String>> mySet = new HashSet<>();
+        /*Set<Set<String>> mySet = new HashSet<>();
 
         for (Iterator itr = platformMap.entrySet().iterator(); itr.hasNext();)
         {
@@ -196,7 +196,7 @@ public class SearchService {
             {
                 itr.remove();
             }
-        }
+        }*/
 
         return platformMap;
 
