@@ -1,6 +1,9 @@
 package org.pdxfinder.commands;
 
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
@@ -15,7 +18,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -80,16 +82,6 @@ public class LoadJAXData implements CommandLineRunner {
     HashMap<String, String> passageMap = null;
     HashMap<String, Image> histologyMap = null;
 
-    @PostConstruct
-    public void init() {
-        options = new Options();
-        parser = new DefaultParser();
-        formatter = new HelpFormatter();
-        log.info("Setting up LoadJAXDataCommand option");
-        options.addOption("loadJAX", false, "Load Jax PDX data");
-        options.addOption(LoaderUtils.loadAll);
-    }
-
     public LoadJAXData(LoaderUtils loaderUtils) {
         this.loaderUtils = loaderUtils;
     }
@@ -97,18 +89,10 @@ public class LoadJAXData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-            try {
-                cmd = parser.parse(options, args);
+        if ("loadJAX".equals(args[0]) || "-loadJAX".equals(args[0])) {
 
+            log.info("Loading JAX PDX data.");
 
-            } catch (UnrecognizedOptionException | MissingArgumentException e) {
-                formatter.printHelp("loadJAX", options);
-                System.exit(1);
-            }
-
-        if (cmd.hasOption("loadJAX") || cmd.hasOption(LoaderUtils.loadAll.getOpt())) {
-
-            System.out.println("Loading JAX PDX data.");
             if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
                 parseJSON(parseURL(urlStr));
@@ -119,7 +103,7 @@ public class LoadJAXData implements CommandLineRunner {
                 log.error("No jaxpdx.file or jaxpdx.url provided in properties");
             }
         } else {
-            System.out.println("Not loading JAX. Use '-loadJAX' switch to load JAX data.");
+            log.debug("Not loading JAX. Use '-loadJAX' switch to load JAX data.");
         }
     }
 
@@ -308,11 +292,11 @@ public class LoadJAXData implements CommandLineRunner {
 
                 //PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
 
-                sample = (sample==null)?"":sample;
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sample, this.jaxDS.getName(), passage);
+                
+                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sampleKey, this.jaxDS.getName(), passage);
      
                 Sample specSample = new Sample();
-                specSample.setSourceSampleId(sample);
+                specSample.setSourceSampleId(sampleKey);
                 specimen.setSample(specSample);
                 specSample.setMolecularCharacterizations(mcs);
                 //specimen.setPdxPassage(pdxPassage);
@@ -335,6 +319,7 @@ public class LoadJAXData implements CommandLineRunner {
         } catch (Exception e) {
             log.error("", e);
         }
+        
 
     }
 
