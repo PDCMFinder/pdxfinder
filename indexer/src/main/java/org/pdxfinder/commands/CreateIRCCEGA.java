@@ -56,10 +56,9 @@ public class CreateIRCCEGA implements CommandLineRunner {
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("createIRCCEGA", "Create IRCC EGA links");
-        parser.accepts("loadALL", "Load all, including creating IRCC EGA links");
         OptionSet options = parser.parse(args);
 
-        if (options.has("createIRCCEGA") || options.has("loadALL")) {
+        if (options.has("createIRCCEGA")) {
 
             log.info("Creating IRCC EGA file");
 
