@@ -90,48 +90,83 @@
 
 
 
+
                     <style> table *{ -webkit-box-sizing:content-box; -moz-box-sizing:content-box; box-sizing:content-box;}</style>
-                    <!--<div class="col-md-12 javaScriptBrowser">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
-                            </div>
-                            <div class="panel-body">
-                                <div class="table-responsive">
-                                    <table id="pdxFinder-grid" class="table table-condensed table-striped table-borderedPdx table-hover" >
-
-                                        <thead>
-                                        <tr>
-                                            <th>Sample </th>
-                                            <th>Platform(s)</th>
-                                            <th>Chromosome</th>
-                                            <th>Seq. Position</th>
-                                            <th>Ref. Allele</th>
-                                            <th>Alt. Allele</th>
-                                            <th>Consequence</th>
-                                            <th>Gene</th>
-                                            <th>Amino Acid Change</th>
-                                            <th>Read Depth</th>
-                                            <th>Allele Freq.</th>
-                                            <th>RS Variants</th>
-                                        </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>-->
-
-
-
-
                     <div class="col-md-12 javaScriptBrowser">
                         <div class="panel panel-info">
                             <div class="panel-heading">
                                 <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
                             </div>
                         </div>
-                            <div class="tab" role="tabpanel">
+
+                            <div class="tab" role="tabpanel" th:if="${patientInfo.size() > 0}" >
+                                <!-- Nav tabs -->
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li th:each="technology,iter : ${patientInfo}"
+                                        th:class="( ${iter.index} == 0 ) ? 'active' : '' "
+                                        role="presentation">
+
+                                        <a th:href="@{'#'+${technology.key}}"
+                                           th:text="${technology.key}+' Platform'" role="tab" data-toggle="tab" onclick="showTabs()"> TAB TITLES </a>
+
+                                    </li>
+                                </ul>
+
+                                <!-- Tab panes -->
+                                <div class="tab-content">
+                                    <div th:each="technology,iter : ${patientInfo}"
+                                         th:id="${technology.key}"
+                                         class="tab-pane active"  role="tabpanel">
+
+                                            <span>
+                                                    <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'showContent' : 'hideContent' ">
+
+                                                        <h4 class="bLine">
+                                                            <span class="hdc">Tumour Type: </span>            <i>Patient Tumor</i>                  &nbsp; &nbsp;
+                                                            <span class="hdc">Diagnosis:</span> <i th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
+                                                            <span class="hdc">Grade: </span>  <i></i>
+                                                        </h4>
+
+                                                        <table id="pdxFinder-grid"
+                                                               class="table table-condensed table-striped table-borderedPdx table-hover">
+
+                                                            <thead>
+                                                            <tr>
+                                                                <th>Sample </th>
+                                                                <th>Platform(s)</th>
+                                                                <th>Chromosome</th>
+                                                                <th>Seq. Position</th>
+                                                                <th>Ref. Allele</th>
+                                                                <th>Alt. Allele</th>
+                                                                <th>Consequence</th>
+                                                                <th>Gene</th>
+                                                                <th>Amino Acid Change</th>
+                                                                <th>Read Depth</th>
+                                                                <th>Allele Freq.</th>
+                                                                <th>RS Variants</th>
+                                                            </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+
+                                            </span>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+
+
+
+
+                            <div class="tab" role="tabpanel" th:if="${modelInfo.size() > 0}">
                                 <!-- Nav tabs -->
                                 <ul class="nav nav-tabs" role="tablist">
                                     <li th:each="technology,iter : ${modelInfo}"
@@ -153,9 +188,7 @@
 
                                         <span th:unless="${technology.value.size()<1}" th:each="num: ${#numbers.sequence(1,technology.value.size())}"> <!--/* Unable to capture index for inner loop so, this was used for innerloop : <tr th:each="passageList : ${technolog[y.value]}"> */-->
 
-
                                                 <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'showContent' : 'hideContent' ">
-
 
                                                     <h4 class="bLine" th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
                                                         <span class="hdc">Tumour Type: </span>            <i>Xenographt Tumor</i>                  &nbsp; &nbsp;
@@ -360,6 +393,7 @@
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
     document.getElementsByClassName("javaScriptBrowser")[0].style.display = "block";
+    //document.getElementsByClassName("javaScriptBrowser")[1].style.display = "block";
     var modelId = [[${externalId}]];
     var dataSrc = [[${dataSrc}]];
 
@@ -369,8 +403,8 @@
 
         var modelInfo = [[${modelInfo}]];
 
-        //var apiURL = "/datatable/"+dataSrc+"/"+modelId;
-        //drawTable("pdxFinder-grid",apiURL);
+        var apiURL = "/patientdata/"+dataSrc+"/"+modelId;
+        drawTable("pdxFinder-grid",apiURL);
 
         for (var tech in modelInfo){
 
@@ -382,7 +416,7 @@
                 var dTech = tech.replace(" ", "-");
                 console.log(dTech);
 
-                apiURL = "/vdata/"+dataSrc+"/"+modelId+"?platform="+tech+"&passage="+modelInfo[tech][passage];           // e.g modelInfo[tech][passage] = CTP[0]
+                apiURL = "/modeldata/"+dataSrc+"/"+modelId+"?platform="+tech+"&passage="+modelInfo[tech][passage];
                 var tableId = "pdxFinder-grid"+dTech+counter;
                 drawTable(tableId,apiURL);
 
