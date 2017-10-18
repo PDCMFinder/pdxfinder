@@ -4,17 +4,17 @@ package org.pdxfinder.commands;
  * Created by csaba on 22/08/2017.
  */
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
-import org.pdxfinder.irccdatamodel.IRCCPatient;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -24,10 +24,13 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Component
-@Order(value = Ordered.LOWEST_PRECEDENCE)
+@Order(value = -100)
 public class LoadNCIT implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadDiseaseOntology.class);
@@ -48,40 +51,43 @@ public class LoadNCIT implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        log.info(args[0]);
 
         //http://www.ebi.ac.uk/ols/api/ontologies/ncit/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FNCIT_C7057/hierarchicalChildren
         //http://www.ebi.ac.uk/ols/api/ontologies/doid/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FNCIT_C7057/hierarchicalChildren
-        if ("loadNCIT".equals(args[0]) || "-loadNCIT".equals(args[0])) {
+
+        OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
+        parser.accepts("loadNCIT", "Load NCIT all ontology");
+        parser.accepts("loadNCITPreDef", "Load predefined NCIT ontology");
+        parser.accepts("loadALL", "Load all, including NCiT ontology");
+        OptionSet options = parser.parse(args);
+
+        long startTime = System.currentTimeMillis();
+
+        if (options.has("loadNCIT") && options.has("loadNCITPreDef")) {
+
+            log.warn("Select one or the other of: -loadNCIT, -loadNCITPreDef");
+            log.warn("Not loading ", this.getClass().getName());
+
+        } else if (options.has("loadNCIT") || options.has("loadALL")) {
 
             log.info("Loading all Disease, Disorder or Finding subnodes.");
-            long startTime = System.currentTimeMillis();
             loadNCIT();
-            long endTime   = System.currentTimeMillis();
-            long totalTime = endTime - startTime;
 
-            int seconds = (int) (totalTime / 1000) % 60 ;
-            int minutes = (int) ((totalTime / (1000*60)) % 60);
-
-            log.info("Loading finished after " + minutes + " minute(s) and " + seconds + " second(s)");
-        }
-        else if("loadNCITPreDef".equals(args[0]) || "-loadNCITPreDef".equals(args[0])){
+        } else if (options.has("loadNCITPreDef")) {
 
             log.info("Loading predefined nodes from NCIT.");
-            long startTime = System.currentTimeMillis();
             loadNCITPreDef();
-            long endTime   = System.currentTimeMillis();
-            long totalTime = endTime - startTime;
-
-            int seconds = (int) (totalTime / 1000) % 60 ;
-            int minutes = (int) ((totalTime / (1000*60)) % 60);
-
-            log.info("Loading finished after " + minutes + " minute(s) and " + seconds + " second(s)");
 
         }
-        else{
-            log.info("Not loading disease ontology");
-        }
+
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+
+        int seconds = (int) (totalTime / 1000) % 60;
+        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
+
+        log.info(this.getClass().getSimpleName() + " finished after " + minutes + " minute(s) and " + seconds + " second(s)");
 
     }
 

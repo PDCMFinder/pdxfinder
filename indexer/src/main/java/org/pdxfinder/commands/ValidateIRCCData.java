@@ -1,5 +1,7 @@
 package org.pdxfinder.commands;
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -14,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ import java.util.*;
  * Created by csaba on 18/04/2017.
  */
 @Component
+@Order(value = 200)
 public class ValidateIRCCData implements CommandLineRunner {
 
 
@@ -72,9 +76,13 @@ public class ValidateIRCCData implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
 
-        log.info(args[0]);
+        OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
+        parser.accepts("validateIRCC", "Validate IRCC data");
+        parser.accepts("loadALL", "Load all, including validating IRCC data");
+        OptionSet options = parser.parse(args);
 
-        if ("validateIRCC".equals(args[0]) || "-validateIRCC".equals(args[0])) {
+        if (options.has("validateIRCC") || options.has("loadALL")) {
 
             log.info("Loading IRCC PDX data.");
 

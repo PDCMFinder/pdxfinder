@@ -1,5 +1,7 @@
 package org.pdxfinder.commands;
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -13,11 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -33,7 +35,7 @@ import java.util.stream.Stream;
  * Load data from JAX.
  */
 @Component
-@Order(value = Ordered.LOWEST_PRECEDENCE)
+@Order(value = 0)
 public class LoadJAXData implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadJAXData.class);
@@ -82,6 +84,11 @@ public class LoadJAXData implements CommandLineRunner {
     HashMap<String, String> passageMap = null;
     HashMap<String, Image> histologyMap = null;
 
+    @PostConstruct
+    public void init() {
+        formatter = new HelpFormatter();
+    }
+
     public LoadJAXData(LoaderUtils loaderUtils) {
         this.loaderUtils = loaderUtils;
     }
@@ -89,7 +96,13 @@ public class LoadJAXData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if ("loadJAX".equals(args[0]) || "-loadJAX".equals(args[0])) {
+        OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
+        parser.accepts("loadJAX", "Load JAX PDX data");
+        parser.accepts("loadALL", "Load all, including JAX PDX data");
+        OptionSet options = parser.parse(args);
+
+        if (options.has("loadJAX") || options.has("loadALL")) {
 
             log.info("Loading JAX PDX data.");
 
@@ -102,8 +115,6 @@ public class LoadJAXData implements CommandLineRunner {
             } else {
                 log.error("No jaxpdx.file or jaxpdx.url provided in properties");
             }
-        } else {
-            log.debug("Not loading JAX. Use '-loadJAX' switch to load JAX data.");
         }
     }
 
