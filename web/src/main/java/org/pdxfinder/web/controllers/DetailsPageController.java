@@ -74,9 +74,11 @@ public class DetailsPageController {
 
         model.addAttribute("variationData", dto.getMarkerAssociations());
 
-        Map techAndPassages = searchService.findPlatformAndPassagesByModelId(dataSrc,modelId,"");
+        Map modelTechAndPassages = searchService.findModelPlatformAndPassages(dataSrc,modelId,"");
+        Map patientTech = searchService.findPatientPlatforms(dataSrc,modelId);
 
-        model.addAttribute("modelInfo", techAndPassages);
+        model.addAttribute("modelInfo", modelTechAndPassages);
+        model.addAttribute("patientInfo", patientTech);
 
         //TODO: return error page if sampleId does not exist
         return "details";

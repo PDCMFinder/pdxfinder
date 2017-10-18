@@ -148,61 +148,6 @@ public class SearchService {
     }
 
 
-    public Map findPlatformAndPassagesByModelId(String dataSource, String modelId,String passage){
-
-        /**
-         * Used to store a technology String with their respective List of PDX Passages
-         */
-        Map<String, Set<String>> platformMap = new HashMap<>();
-
-        /**
-         * Retrieve all the technologies for that mouse model
-         */
-        List<Platform> platforms = platformRepository.findByModelId(dataSource,modelId);
-        int totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,"","","");
-
-        /**
-         * For each of the technologies retrieve the list PDX passages using the specimen repository
-         */
-        for (Platform platform : platforms) {
-
-            Set<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,platform.getName(),passage,"",0,totalRecords);
-
-            Set<String> passagesList = new HashSet<>();
-            for (Specimen specimen : specimens)
-            {
-                for (MolecularCharacterization dMolkar : specimen.getSample().getMolecularCharacterizations())
-                {
-                    passagesList.add(specimen.getPdxPassage().getPassage()+"");
-                }
-            }
-
-            platformMap.put(platform.getName(), passagesList);
-        }
-
-
-        /**
-         *  This removes duplicate passages by removing duplicates in the platformMap
-         */
-        /*Set<Set<String>> mySet = new HashSet<>();
-
-        for (Iterator itr = platformMap.entrySet().iterator(); itr.hasNext();)
-        {
-            Map.Entry<String, Set<String>> entrySet = (Map.Entry) itr.next();
-
-            Set<String> value = entrySet.getValue();
-
-            if (!mySet.add(value))
-            {
-                itr.remove();
-            }
-        }*/
-
-        return platformMap;
-
-    }
-
-
     public DetailsDTO searchForModel(String dataSource, String modelId, int page, int size,String technology) {
 
 
@@ -363,11 +308,11 @@ public class SearchService {
             for (MolecularCharacterization mc : sample.getMolecularCharacterizations()) {
                 for (MarkerAssociation ma : mc.getMarkerAssociations()) {
 
-                    if (ma.getDescription().equals("None")) {
+                   /* if (ma.getDescription().equals("None")) {
                         markerList.add("None");
                     } else {
                         markerList.add(ma.getMarker().getName() + " status: " + ma.getDescription());
-                    }
+                    }*/
 
                 }
             }
@@ -394,6 +339,90 @@ public class SearchService {
 
 
 
+    public Map findModelPlatformAndPassages(String dataSource, String modelId,String passage){
+
+        /**
+         * Used to store a technology String with their respective List of PDX Passages
+         */
+        Map<String, Set<String>> platformMap = new HashMap<>();
+
+        /**
+         * Retrieve all the technologies for that mouse model
+         */
+        List<Platform> platforms = platformRepository.findModelPlatformByModelId(dataSource,modelId);
+        int totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,"","","");
+
+        /**
+         * For each of the technologies retrieve the list of PDX passages using the specimen repository
+         */
+        for (Platform platform : platforms) {
+
+            Set<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,platform.getName(),passage,"",0,totalRecords);
+
+            Set<String> passagesList = new HashSet<>();
+            for (Specimen specimen : specimens)
+            {
+                passagesList.add(specimen.getPdxPassage().getPassage()+"");
+            }
+
+            platformMap.put(platform.getName(), passagesList);
+        }
+
+        return platformMap;
+    }
+
+
+    public Map findPatientPlatforms(String dataSource, String modelId){
+
+        Map<String, String> platformMap = new HashMap<>();
+
+        List<MolecularCharacterization> molecularCharacterizations = molecularCharacterizationRepository.findPatientPlatformByModelId(dataSource,modelId);
+
+        for (MolecularCharacterization molecularCharacterization : molecularCharacterizations) {
+            platformMap.put(molecularCharacterization.getTechnology(), molecularCharacterization.getTechnology());
+        }
+
+        return platformMap;
+    }
+
+
+    public VariationDataDTO patientVariationDataByPlatform(String dataSource, String modelId, String technology,
+                                                    String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
+
+        int recordsTotal = patientRepository.countByBySourcePdxIdAndPlatform(dataSource,modelId,technology,"");
+        int recordsFiltered = recordsTotal;
+
+        if (!searchParam.isEmpty()) {
+            recordsFiltered = patientRepository.countByBySourcePdxIdAndPlatform(dataSource,modelId,technology,searchParam);
+        }
+
+        /**
+         * Retrieve the Records based on search parameter
+         */
+        Set<Patient> patients = patientRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,searchParam,start,size);
+        VariationDataDTO variationDataDTO = new VariationDataDTO();
+        List<String[]> variationData = new ArrayList();
+
+        if (patients != null) {
+            for (Patient patient : patients) {
+
+                for (PatientSnapshot patientSnapshot : patient.getSnapshots()) {
+
+                    for (Sample sample : patientSnapshot.getSamples()) {
+                        variationData.addAll( buildUpDTO(sample,draw,recordsTotal,recordsFiltered) );
+                    }
+                }
+            }
+        }
+
+        variationDataDTO.setDraw(draw);
+        variationDataDTO.setRecordsTotal(recordsTotal);
+        variationDataDTO.setRecordsFiltered(recordsFiltered);
+        variationDataDTO.setData(variationData);
+
+        return variationDataDTO;
+
+    }
 
 
     public VariationDataDTO variationDataByPlatform(String dataSource, String modelId, String technology,String passage,
@@ -414,67 +443,46 @@ public class SearchService {
         /**
          * Retrieve the Records based on search parameter
          */
-        Set<Specimen> specimen = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchParam,start,size);
-        VariationDataDTO variationDataDTO = buildUpDTO(specimen,draw,recordsTotal,recordsFiltered);
-        return variationDataDTO;
-
-    }
-
-
-
-
-
-    public VariationDataDTO variationDataAll(String dataSource, String modelId,
-                                     String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
-        /**
-         * 1st count all the records and set Total Records & Initialize Filtered Record as Total record
-         */
-        int recordsTotal = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,"","","");
-        int recordsFiltered = recordsTotal;
-
-        /**
-         * If search Parameter is not empty: Count and Reset the value of filtered records based on search Parameter
-         */
-        if (!searchParam.isEmpty()) {
-            recordsFiltered = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,"","",searchParam);
-        }
-
-        /**
-         * Retrieve the Records based on search parameter
-         */
-        Set<Specimen> specimen = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,"","","",start,size);
-        VariationDataDTO variationDataDTO = buildUpDTO(specimen,draw,recordsTotal,recordsFiltered);
-        return variationDataDTO;
-
-    }
-
-
-
-
-    public VariationDataDTO buildUpDTO(Set<Specimen> specimens,int draw,int recordsTotal,int recordsFiltered){
-
+        Set<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchParam,start,size);
         VariationDataDTO variationDataDTO = new VariationDataDTO();
         List<String[]> variationData = new ArrayList();
-        String sampleId = "";
 
+        if (specimens != null) {
+            for (Specimen specimen : specimens) {
+                variationData.addAll( buildUpDTO(specimen.getSample(),draw,recordsTotal,recordsFiltered) );
+            }
+        }
+
+        variationDataDTO.setDraw(draw);
+        variationDataDTO.setRecordsTotal(recordsTotal);
+        variationDataDTO.setRecordsFiltered(recordsFiltered);
+        variationDataDTO.setData(variationData);
+
+        return variationDataDTO;
+
+    }
+
+
+
+
+    public List<String[]> buildUpDTO(Sample sample,int draw,int recordsTotal,int recordsFiltered){
+
+        List<String[]> variationData = new ArrayList();
 
         /**
          * Generate an equivalent 2-D array type of the Retrieved result Set, the Front end table must be a 2D JSON Array
          */
-        if (specimens != null) {
-            for (Specimen specimen : specimens) {
+          try {
 
-                try {
+                  for (MolecularCharacterization dMolChar : sample.getMolecularCharacterizations()) {
 
-                        for (MolecularCharacterization dMolChar : specimen.getSample().getMolecularCharacterizations()) {
+                       List<MarkerAssociation> markerAssociation = new ArrayList();// = dMolChar.getMarkerAssociations();
+                       markerAssociation.addAll(dMolChar.getMarkerAssociations());
 
-                            List<MarkerAssociation> markerAssociation = new ArrayList();// = dMolChar.getMarkerAssociations();
-                            markerAssociation.addAll(dMolChar.getMarkerAssociations());
-
-                            for (MarkerAssociation markerAssoc : markerAssociation) {
+                       for (MarkerAssociation markerAssoc : markerAssociation) {
 
                                 String[] markerAssocArray = new String[12];
-                                markerAssocArray[0] = specimen.getExternalId();
+                                markerAssocArray[0] = sample.getSourceSampleId();
                                 markerAssocArray[1] = dMolChar.getPlatform().getName();
                                 markerAssocArray[2] = markerAssoc.getChromosome();
                                 markerAssocArray[3] = markerAssoc.getSeqPosition();
@@ -488,25 +496,11 @@ public class SearchService {
                                 markerAssocArray[11] = markerAssoc.getRsVariants();
 
                                 variationData.add(markerAssocArray);
-                            }
+                       }
+                 }
+          }catch (Exception e) { }
 
-                        }
-                    }catch (Exception e) { }
-
-            }/* End of Specimens Set Loop */
-
-        } /* End of Specimens check */
-
-
-        /**
-         * Transfer the data to the DTO
-         */
-        variationDataDTO.setDraw(draw);
-        variationDataDTO.setRecordsTotal(recordsTotal);
-        variationDataDTO.setRecordsFiltered(recordsFiltered);
-        variationDataDTO.setData(variationData);
-
-        return variationDataDTO;
+        return variationData;
     }
 
 

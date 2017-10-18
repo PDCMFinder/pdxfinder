@@ -36,27 +36,8 @@ public class RestControllerGeneral {
         }
 
 
-    @RequestMapping(value = "/datatable/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public VariationDataDTO getVariationTable(@PathVariable String dataSrc,
-                                              @PathVariable String modelId,
-                                              @RequestBody MultiValueMap data) {
 
-        int draw = Integer.parseInt(data.getFirst("draw").toString());
-        String searchText = data.getFirst("search[value]").toString();
-        String sortColumn = data.getFirst("order[0][column]").toString();
-        String sortDir = data.getFirst("order[0][dir]").toString();
-        int start = Integer.parseInt(data.getFirst("start").toString());
-        int size = Integer.parseInt(data.getFirst("length").toString());
-
-        sortColumn = getSortColumn(sortColumn);
-        VariationDataDTO variationDataDTO = searchService.variationDataAll(dataSrc,modelId,searchText,draw,sortColumn,sortDir,start,size);
-
-        return variationDataDTO;
-
-    }
-
-
-    @RequestMapping(value = "/vdata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @RequestMapping(value = "/modeldata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public VariationDataDTO getVariationDataByPlatform(@PathVariable String dataSrc,
                                                        @PathVariable String modelId,
                                                        @RequestParam(value="platform", required = false) String platform,
@@ -72,9 +53,32 @@ public class RestControllerGeneral {
 
         sortColumn = getSortColumn(sortColumn);
 
-        String dplatform = (platform == null) ? "" : platform;
+        String dPlatform = (platform == null) ? "" : platform;
         String dPassage = (passage == null) ? "" : passage;
-        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dplatform,dPassage,searchText,draw,sortColumn,sortDir,start,size);
+        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,searchText,draw,sortColumn,sortDir,start,size);
+
+        return variationDataDTO;
+
+    }
+
+
+    @RequestMapping(value = "/patientdata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public VariationDataDTO getPatientVariationData(@PathVariable String dataSrc,
+                                                    @PathVariable String modelId,
+                                                    @RequestParam(value="platform", required = false) String platform,
+                                                    @RequestBody MultiValueMap data) {
+
+        int draw = Integer.parseInt(data.getFirst("draw").toString());
+        String searchText = data.getFirst("search[value]").toString();
+        String sortColumn = data.getFirst("order[0][column]").toString();
+        String sortDir = data.getFirst("order[0][dir]").toString();
+        int start = Integer.parseInt(data.getFirst("start").toString());
+        int size = Integer.parseInt(data.getFirst("length").toString());
+
+        sortColumn = getSortColumn(sortColumn);
+
+        String dPlatform = (platform == null) ? "" : platform;
+        VariationDataDTO variationDataDTO = searchService.patientVariationDataByPlatform(dataSrc,modelId,dPlatform,searchText,draw,sortColumn,sortDir,start,size);
 
         return variationDataDTO;
 
@@ -99,11 +103,18 @@ public class RestControllerGeneral {
 
 
     @RequestMapping(value = "/modeltech/{dataSrc}/{modelId}")
-    public Map findTechnology(@PathVariable String dataSrc, @PathVariable String modelId,
+    public Map findModelTechnology(@PathVariable String dataSrc, @PathVariable String modelId,
                               @RequestParam(value="passage", required = false) String passage) {
 
         String dPassage = (passage == null) ? "" : passage;
-        return  searchService.findPlatformAndPassagesByModelId(dataSrc,modelId,dPassage);
+        return  searchService.findModelPlatformAndPassages(dataSrc,modelId,dPassage);
+    }
+
+
+    @RequestMapping(value = "/patienttech/{dataSrc}/{modelId}")
+    public Map findPatientTechnology(@PathVariable String dataSrc, @PathVariable String modelId) {
+
+        return  searchService.findPatientPlatforms(dataSrc,modelId);
     }
 
 
