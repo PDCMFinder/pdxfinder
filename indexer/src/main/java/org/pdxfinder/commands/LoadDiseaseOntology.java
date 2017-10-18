@@ -46,12 +46,11 @@ public class LoadDiseaseOntology implements CommandLineRunner {
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadDO", "Load Disease ontology");
-        parser.accepts("loadALL", "Load all, including Disease ontology");
         OptionSet options = parser.parse(args);
 
         long startTime = System.currentTimeMillis();
 
-        if (options.has("loadDO") || options.has("loadALL")) {
+        if (options.has("loadDO")) {
 
             log.info("Loading cancer branch of Disease Ontology.");
             loadDO();

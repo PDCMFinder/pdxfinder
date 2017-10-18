@@ -46,12 +46,11 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("linkSamplesToDOTerms", "Link samples to DO terms");
-        parser.accepts("loadALL", "Load all, including linking samples to DO terms");
         OptionSet options = parser.parse(args);
 
         long startTime = System.currentTimeMillis();
 
-        if (options.has("linkSamplesToDOTerms") || options.has("loadALL")) {
+        if (options.has("linkSamplesToDOTerms")) {
 
             log.info("Mapping samples to DO terms.");
             mapSamplesToTerms();
