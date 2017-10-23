@@ -15,7 +15,7 @@ public class Treatment {
 
     private String therapy;
 
-    //TODO: Add therapy details
+    private TreatmentProtocol treatmentProtocol;
 
     @Relationship(type = "TREATED_WITH")
     private PatientSnapshot snapshot;
@@ -62,5 +62,13 @@ public class Treatment {
 
     public void setSpecimen(Specimen specimen) {
         this.specimen = specimen;
+    }
+
+    public TreatmentProtocol getTreatmentProtocol() {
+        return treatmentProtocol;
+    }
+
+    public void setTreatmentProtocol(TreatmentProtocol treatmentProtocol) {
+        this.treatmentProtocol = treatmentProtocol;
     }
 }
