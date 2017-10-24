@@ -156,6 +156,9 @@ public class LoaderUtils {
         return this.modelCreationRepository.getAllModels();
     }
 
+    public void saveModelCreation(ModelCreation modelCreation){
+        this.modelCreationRepository.save(modelCreation);
+    }
 
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, ExternalDataSource externalDataSource) {
 
