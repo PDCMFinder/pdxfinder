@@ -19,11 +19,9 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-/**
+/*
  * Created by csaba on 24/08/2017.
  */
 @Component
@@ -36,6 +34,9 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
     private final static Logger log = LoggerFactory.getLogger(LinkSamplesToNCITTerms.class);
     private LoaderUtils loaderUtils;
 
+    private List<String> missingSamples;
+    private Set<String> missingTerms;
+
     @Autowired
     public LinkSamplesToNCITTerms(LoaderUtils loaderUtils) {
         this.loaderUtils = loaderUtils;
@@ -46,7 +47,8 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("loadAccessionIds", "Link samples to NCIT terms");
+        parser.accepts("linkSamplesToNCITTerms", "Link samples to NCIT terms");
+        parser.accepts("linkSamplesToNCITTermsWithCleanup", "Link samples to NCIT terms, then cleanup.");
         parser.accepts("loadALL", "Load all, including linking samples to NCIT terms");
         OptionSet options = parser.parse(args);
 
@@ -58,7 +60,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
         } else if (options.has("linkSamplesToNCITTermsWithCleanup") || options.has("loadALL")) {
 
-            log.info("Mapping samples to NCIT terms.");
+            log.info("Mapping samples to NCIT terms with cleanup.");
 
             mapSamplesToTerms();
             updateIndirectMappingData();
@@ -86,17 +88,22 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
     private void mapSamplesToTerms(){
 
+
+        int mapCounter = 0;
+
         System.out.println("Getting data from "+spreadsheetServiceUrl);
 
         String json = parseURL(spreadsheetServiceUrl);
+
+        this.missingSamples = new ArrayList<>();
+        this.missingTerms = new HashSet<>();
 
         try {
             JSONObject job = new JSONObject(json);
             if (job.has("rows")){
                 JSONArray rows = job.getJSONArray("rows");
 
-                int errorCounter = 0;
-                int mapCounter = 0;
+
 
                 for(int i=0;i<rows.length();i++){
                     JSONObject row = rows.getJSONObject(i);
@@ -107,8 +114,9 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                     String dataSource = row.getString("datasource");
 
                     Sample sample = loaderUtils.getHumanSample(sampleId, dataSource);
-                    OntologyTerm term = loaderUtils.getOntologyTermByLabel(label.toLowerCase());
+                    OntologyTerm term = loaderUtils.getOntologyTermByLabel(label);
 
+                    System.out.println("Updating  "+dataSource+" "+sampleId+" "+label);
                     if(sample != null && term != null){
 
                         SampleToDiseaseOntologyRelationship r = new SampleToDiseaseOntologyRelationship(sample, term, type, justification);
@@ -120,17 +128,37 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                         loaderUtils.saveSample(sample);
                         loaderUtils.saveOntologyTerm(term);
                         mapCounter++;
-                        System.out.println("DONE "+sampleId+" "+label);
                     }
-                    else{
-                        errorCounter++;
-                        System.out.println("ERROR "+sampleId+" "+label);
+                    else if(sample == null){
+
+                        this.missingSamples.add(dataSource+" "+sampleId+" "+label);
+                    }
+                    else if(term == null){
+                        this.missingTerms.add(label);
                     }
 
                 }
-
+                System.out.println();
                 System.out.println("Links created: "+mapCounter);
-                System.out.println("Mapping errors: "+errorCounter);
+                System.out.println("Missing samples: "+missingSamples.size());
+                System.out.println("Missing terms: "+missingTerms.size());
+
+                if(missingSamples.size()>0){
+
+                    System.out.println("List of missing samples:");
+                    for(String error:this.missingSamples){
+                        System.out.println(error);
+                    }
+                }
+
+                if(missingTerms.size()>0){
+
+                    System.out.println("List of missing terms:");
+                    for(String error:this.missingTerms){
+                        System.out.println(error);
+                    }
+                }
+
             }
 
 
