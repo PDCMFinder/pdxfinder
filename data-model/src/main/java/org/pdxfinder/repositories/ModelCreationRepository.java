@@ -55,30 +55,44 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
 
     //Ontology powered search: molchar on samples
     //TODO: Look up mol char and markers, deal with missing nodes
-    @Query("MATCH (st:OntologyTerm)<-[*]-(term:OntologyTerm)-[mapp:MAPPED_TO]-(s:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
-            "MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
-            "MATCH (s:Sample)-[ot:OF_TYPE]-(tt:TumorType) " +
-            "WHERE st.label = {query} " +
-            "OR term.label = {query} " +
-            "AND (s.dataSource IN {dataSource} OR {dataSource}=[])  " +
-            "AND (tt.name IN {tumorType} OR {tumorType}=[])  " +
-            "RETURN mod, s,i,o,t,ot, tt")
+    @Query("MATCH (term:OntologyTerm)-[mapp:MAPPED_TO]-(humSample:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
+            "WHERE term.label = {query} " +
+            "AND (humSample.dataSource IN {dataSource} OR {dataSource}=[])  " +
+            "WITH humSample,i,mod " +
+
+            "OPTIONAL MATCH (humSample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
+            "OPTIONAL MATCH (humSample)-[ot:OF_TYPE]-(tt:TumorType) " +
+            "WHERE (tt.name IN {tumorType} OR {tumorType}=[])  " +
+            "WITH humSample, i, mod, o, t, ot, tt"+
+
+            "MATCH (humSample)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) "+
+            "WHERE (m.name IN {markers} OR {markers}=[])  " +
+            "RETURN humSample, cb, mc, aw, ma, mar, m, mod, i,o,t, ot, tt "+
+            "UNION "+
+            "MATCH (mod)-[io:INSTANCE_OF]-(p:Passage)-(pf:PASSAGED_FROM)-(sp:Specimen)-[sf:SAMPLED_FROM]-(mouseSample:Sample) " +
+            "-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) "+
+            "WHERE (m.name IN {markers} OR {markers}=[])  " +
+            "RETURN mod, humSample,i,o,t,ot, tt, m")
     Collection<ModelCreation> findByOntology(@Param("query") String query, @Param("markers") String[] markers,
                                              @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
 
-    //Ontology powered search: molchar on specimen // BROKEN
-    @Query("MATCH (st:OntologyTerm)<-[*]-(term:OntologyTerm)-[mapp:MAPPED_TO]-(s:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
-            "MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
-            "MATCH (s:Sample)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
-            "MATCH (s:Sample)-[ot:OF_TYPE]-(tt:TumorType) " +
-            "WHERE st.label = {query} " +
-            "OR term.label = {query} " +
-            "AND (m.name IN {markers} OR {markers}=[])  " +
-            "AND (s.dataSource IN {dataSource} OR {dataSource}=[])  " +
-            "AND (tt.name IN {tumorType} OR {tumorType}=[])  " +
-            "RETURN mod, s,i,o,t,ot, tt, mc, ma, m, mar, cb, aw")
+    //Ontology powered search: returns less data to improve performance
+    @Query("MATCH (term:OntologyTerm)-[mapp:MAPPED_TO]-(humSample:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation)\n" +
+            "        WHERE term.label = {query} " +
+            "        AND (humSample.dataSource IN {dataSource} OR []=[]) " +
+            "        WITH humSample,i,mod " +
+
+            "        OPTIONAL MATCH (humSample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
+            "        OPTIONAL MATCH (humSample)-[ot:OF_TYPE]-(tt:TumorType) " +
+            "        WHERE (tt.name IN {tumorType} OR []=[])  " +
+            "        WITH humSample, i, mod, o, t, ot, tt " +
+
+            "        MATCH (mod)—[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
+            "        WHERE (m.name IN {markers} OR []=[])  " +
+            "        RETURN mod, humSample, t, tt")
     Collection<ModelCreation> findByOntology2(@Param("query") String query, @Param("markers") String[] markers,
                                               @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
+
 
     @Query("MATCH (n:ModelCreation) RETURN n")
     Collection<ModelCreation> getAllModels();
