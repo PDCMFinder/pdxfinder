@@ -78,7 +78,7 @@
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-striped table-bordered table-condensed table-hover" style="margin-bottom: 2px;">
-                                    <tr><th>Diagnosis</th>          <td th:text="${diagnosis}"></td></tr>
+                                    <tr><th>Histology</th>          <td th:text="${diagnosis}"></td></tr>
                                     <tr><th>Tumor type</th>         <td th:text="${tumorType}"></td></tr>
                                     <tr><th>Classification</th>     <td th:text="${classification}"></td></tr>
                                     <tr><th>Markers</th>            <td><span th:each="marker, iterStat : ${markers}" th:text="!${iterStat.last} ? ${marker} + ', ': ${marker}"></span></td></tr>
@@ -191,8 +191,8 @@
                                                 <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'showContent' : 'hideContent' ">
 
                                                     <h4 class="bLine" th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
-                                                        <span class="hdc">Tumour Type: </span>            <i>Xenographt Tumor</i>                  &nbsp; &nbsp;
-                                                        <span class="hdc">Diagnosis:</span> <i th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
+                                                        <span class="hdc">Tumour Type: </span>            <i>Xenograft Tumor</i>                  &nbsp; &nbsp;
+                                                        <span class="hdc">Histology:</span> <i th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
                                                         <span class="hdc">Passage: </span>  <i th:text="${technology.value[num-1]}"></i>
                                                     </h4>
 
