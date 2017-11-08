@@ -148,7 +148,7 @@ public class SearchService {
     }
 
 
-    public DetailsDTO searchForModel(String dataSource, String modelId, int page, int size,String technology) {
+    public DetailsDTO searchForModel(String dataSource, String modelId, int page, int size,String technology,String passage,String searchFilter) {
 
 
         Sample sample = sampleRepository.findByDataSourceAndPdxId(dataSource,modelId);
@@ -161,16 +161,10 @@ public class SearchService {
         Set<Specimen> specimens = new HashSet<>();
 
 
-        if (technology.equals("")){
+         totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,passage,searchFilter);
 
-            totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,"","","");
-            specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,"","",skip,size);
-        }
-        else{
+         specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchFilter,skip,size);
 
-            totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,"","");
-            specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,"","",skip,size);
-        }
 
 
         DetailsDTO dto = new DetailsDTO();

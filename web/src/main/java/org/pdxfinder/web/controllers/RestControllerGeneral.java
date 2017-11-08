@@ -38,7 +38,7 @@ public class RestControllerGeneral {
 
 
     @RequestMapping(value = "/modeldata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public VariationDataDTO getVariationDataByPlatform(@PathVariable String dataSrc,
+    public VariationDataDTO postVariationDataByPlatform(@PathVariable String dataSrc,
                                                        @PathVariable String modelId,
                                                        @RequestParam(value="platform", required = false) String platform,
                                                        @RequestParam(value="passage", required = false) String passage,
@@ -63,7 +63,7 @@ public class RestControllerGeneral {
 
 
     @RequestMapping(value = "/patientdata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public VariationDataDTO getPatientVariationData(@PathVariable String dataSrc,
+    public VariationDataDTO postPatientVariationData(@PathVariable String dataSrc,
                                                     @PathVariable String modelId,
                                                     @RequestParam(value="platform", required = false) String platform,
                                                     @RequestBody MultiValueMap data) {
@@ -85,6 +85,34 @@ public class RestControllerGeneral {
     }
 
 
+
+
+    @RequestMapping(value = "/getxdata/{dataSrc}/{modelId}")
+    public VariationDataDTO getXenoVariationData(@PathVariable String dataSrc,
+                                                       @PathVariable String modelId,
+                                                       @RequestParam(value="page", required = false) Integer page,
+                                                       @RequestParam(value="size", required = false) Integer pageSize,
+                                                       @RequestParam(value="passage", required = false) String passage,
+                                                       @RequestParam(value="platform", required = false) String platform) {
+
+        int start = (page == null || page < 1) ? 0 : page - 1;
+        int size = (pageSize == null || pageSize < 1) ? 20 : pageSize;
+
+        /*
+        TM00231?platform=CTP&page=0&size=20
+        modeldata/JAX/TM00231?platform=CTP&passage=0
+         */
+
+        String dPlatform = (platform == null) ? "" : platform;
+        String dPassage = (passage == null) ? "" : passage;
+        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,"",1,"","",start,size);
+
+
+        return variationDataDTO;
+
+    }
+
+
     @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
     public DetailsDTO details(@PathVariable String dataSrc,
                               @PathVariable String modelId,
@@ -96,7 +124,7 @@ public class RestControllerGeneral {
         int viewSize = (size == null || size < 1) ? 20 : size;
         String viewPlatform = (platform == null) ? "" : platform;
 
-        DetailsDTO dto = searchService.searchForModel(dataSrc, modelId, viewPage,viewSize,viewPlatform);
+        DetailsDTO dto = searchService.searchForModel(dataSrc, modelId, viewPage,viewSize,viewPlatform,"","");
 
         return  dto;
     }

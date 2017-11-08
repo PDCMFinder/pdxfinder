@@ -40,7 +40,6 @@ public class SearchController
                             dataSeries.put("y", cancerBySystem.get(name));
 
                             cancerBySystemDataSeriesArray.put(dataSeries);
-
                     }
                     model.addAttribute("cancerBySystem", cancerBySystemDataSeriesArray.toString());
 
@@ -63,8 +62,8 @@ public class SearchController
                     {
 
                             JSONObject dataSeries = new JSONObject();
-                            dataSeries.put("name", name);
                             dataSeries.put("y", cancerByTissue.get(name));
+                            dataSeries.put("name", name);
 
                             cancerByTissueDataSeriesArray.put(dataSeries);
 

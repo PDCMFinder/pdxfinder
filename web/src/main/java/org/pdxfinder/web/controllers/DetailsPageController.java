@@ -34,7 +34,7 @@ public class DetailsPageController {
         int viewPage = (page == null || page < 1) ? 0 : page-1;
         int viewSize = (size == null || size < 1) ? 20 : size;
 
-        DetailsDTO dto = searchService.searchForModel(dataSrc,modelId,viewPage,viewSize,"");
+        DetailsDTO dto = searchService.searchForModel(dataSrc,modelId,viewPage,viewSize,"","","");
 
         model.addAttribute("fullData",dto);
 
@@ -79,6 +79,14 @@ public class DetailsPageController {
 
         model.addAttribute("modelInfo", modelTechAndPassages);
         model.addAttribute("patientInfo", patientTech);
+
+
+        //List<VariationDataDTO> variationDataDTOList = new ArrayList<>();
+        //VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,"CTP","0","",1,"","",viewPage,3);
+        //variationDataDTOList.add(variationDataDTO);
+
+        //model.addAttribute("nonjsVariationdata", variationDataDTO);
+
 
         //TODO: return error page if sampleId does not exist
         return "details";
