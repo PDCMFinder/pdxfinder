@@ -61,8 +61,7 @@ public class LoadMDAnderson implements CommandLineRunner {
     @Value("${mdapdx.url}")
     private String urlStr;
 
-    HashMap<String, String> passageMap = null;
-    HashMap<String, Image> histologyMap = null;
+   
 
     @PostConstruct
     public void init() {
@@ -120,11 +119,17 @@ public class LoadMDAnderson implements CommandLineRunner {
     @Transactional
     void createGraphObjects(JSONObject j) throws Exception {
         String id = j.getString("Model ID");
-        
-        log.warn("creating model "+id);
 
-        // the preference is for clinical diagnosis but if not available use initial diagnosis
+        // the preference is for histology
         String diagnosis = j.getString("Clinical Diagnosis");
+        String histology = j.getString("Histology");
+        if(histology.trim().length()>0){
+            if("ACA".equals(histology)){
+                diagnosis= "Adenocarcinoma";
+            }else{
+                diagnosis = histology;
+            }
+        }
 
         String classification = j.getString("Classification") + "/" + j.getString("Grades");
 
@@ -132,7 +137,7 @@ public class LoadMDAnderson implements CommandLineRunner {
                 j.getString("Gender"),"", j.getString("Ethnicity"), j.getString("Age"), mdaDS);
 
         // asssume specimen site is primary site?
-        Sample sample = loaderUtils.getSample(id, j.getString("PMR"), diagnosis,
+        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), j.getString("Primary Site"), 
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
         
@@ -153,9 +158,6 @@ public class LoadMDAnderson implements CommandLineRunner {
         }
         
         String markerStr = j.getString("Markers");
-
-        log.warn("Markers: "+markerStr);
-        log.warn("Platform: "+markerPlatform);
         
         String[] markers = markerStr.split(";");
         if(markerStr.trim().length()>0){
