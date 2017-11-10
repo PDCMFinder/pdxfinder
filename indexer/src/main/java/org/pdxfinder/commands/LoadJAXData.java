@@ -180,7 +180,7 @@ public class LoadJAXData implements CommandLineRunner {
         loaderUtils.savePatientSnapshot(pSnap);
 
         ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), this.ENGRAFTMENT, sample, nsgBS, qa);
-
+        mc.addRelatedSample(sample);
         loadVariationData(mc);
 
     }
@@ -324,6 +324,10 @@ public class LoadJAXData implements CommandLineRunner {
 
                 //loaderUtils.savePdxPassage(pdxPassage);
                 loaderUtils.saveSpecimen(specimen);
+
+                modelCreation.addRelatedSample(specSample);
+                loaderUtils.saveModelCreation(modelCreation);
+
                 System.out.println("saved passage " + passage + " for model " + modelCreation.getSourcePdxId() + " from sample " + sampleKey);
             }
 

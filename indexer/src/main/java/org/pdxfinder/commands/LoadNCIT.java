@@ -36,7 +36,7 @@ public class LoadNCIT implements CommandLineRunner {
     private final static Logger log = LoggerFactory.getLogger(LoadDiseaseOntology.class);
 
     private static final String diseasesBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C7057";
-    private static final String ontologyUrl = "http://www.ebi.ac.uk/ols/api/ontologies/ncit/terms/";
+    private static final String ontologyUrl = "https://www.ebi.ac.uk/ols/api/ontologies/ncit/terms/";
 
     @Value("${ncitpredef.file}")
     private String ncitFile;

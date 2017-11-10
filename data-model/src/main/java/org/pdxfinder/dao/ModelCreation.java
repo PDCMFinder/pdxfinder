@@ -4,6 +4,9 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Represent the PDX model
  * The model will have at least one PdxPassage to capture the model creation event
@@ -30,6 +33,9 @@ public class ModelCreation {
 
     @Relationship(type = "IMPLANTED_IN", direction = Relationship.INCOMING)
     private Sample sample;
+
+    @Relationship(type= "MODEL_SAMPLE_RELATION", direction = Relationship.INCOMING)
+    private Set<Sample> relatedSamples;
 
     public ModelCreation(String sourcePdxId, ImplantationSite implantationSite, ImplantationType implantationType, Sample sample, BackgroundStrain backgroundStrain, QualityAssurance qualityAssurance) {
         this.sourcePdxId = sourcePdxId;
@@ -90,5 +96,22 @@ public class ModelCreation {
 
     public void setQualityAssurance(QualityAssurance qualityAssurance) {
         this.qualityAssurance = qualityAssurance;
+    }
+
+    public Set<Sample> getRelatedSamples() {
+        return relatedSamples;
+    }
+
+    public void setRelatedSamples(Set<Sample> relatedSamples) {
+        this.relatedSamples = relatedSamples;
+    }
+
+    public void addRelatedSample(Sample sample){
+
+        if(this.relatedSamples == null){
+            this.relatedSamples = new HashSet<>();
+        }
+
+        this.relatedSamples.add(sample);
     }
 }
