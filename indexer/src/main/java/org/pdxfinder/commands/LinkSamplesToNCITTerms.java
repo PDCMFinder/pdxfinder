@@ -91,7 +91,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
         int mapCounter = 0;
 
-        System.out.println("Getting data from "+spreadsheetServiceUrl);
+        log.debug("Getting data from "+spreadsheetServiceUrl);
 
         String json = parseURL(spreadsheetServiceUrl);
 
@@ -116,7 +116,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                     Sample sample = loaderUtils.getHumanSample(sampleId, dataSource);
                     OntologyTerm term = loaderUtils.getOntologyTermByLabel(label);
 
-                    System.out.println("Updating  "+dataSource+" "+sampleId+" "+label);
+                    log.info("Updating  "+dataSource+" "+sampleId+" "+label);
                     if(sample != null && term != null){
 
                         SampleToDiseaseOntologyRelationship r = new SampleToDiseaseOntologyRelationship(sample, term, type, justification);
@@ -138,24 +138,24 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                     }
 
                 }
-                System.out.println();
-                System.out.println("Links created: "+mapCounter);
-                System.out.println("Missing samples: "+missingSamples.size());
-                System.out.println("Missing terms: "+missingTerms.size());
+
+                log.info("Links created: "+mapCounter);
+                log.info("Missing samples: "+missingSamples.size());
+                log.info("Missing terms: "+missingTerms.size());
 
                 if(missingSamples.size()>0){
 
-                    System.out.println("List of missing samples:");
+                    log.error("List of missing samples:");
                     for(String error:this.missingSamples){
-                        System.out.println(error);
+                        log.error(error);
                     }
                 }
 
                 if(missingTerms.size()>0){
 
-                    System.out.println("List of missing terms:");
+                    log.error("List of missing terms:");
                     for(String error:this.missingTerms){
-                        System.out.println(error);
+                        log.error(error);
                     }
                 }
 

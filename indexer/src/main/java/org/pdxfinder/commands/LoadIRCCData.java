@@ -324,7 +324,7 @@ public class LoadIRCCData implements CommandLineRunner {
         for (Map.Entry<String, List<IRCCSample>> entry : this.samplesMap.entrySet()) {
 
             String patientId = entry.getKey();
-            System.out.println(patientId);
+            log.debug("Loading data for patient "+patientId);
             List<IRCCSample> samples = entry.getValue();
 
 

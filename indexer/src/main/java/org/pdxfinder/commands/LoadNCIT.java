@@ -105,7 +105,7 @@ public class LoadNCIT implements CommandLineRunner {
 
         //create cancer root term
         OntologyTerm ot = loaderUtils.getOntologyTerm(diseasesBranchUrl,diseaseRootLabel);
-        System.out.println("Creating node: "+diseaseRootLabel);
+        log.debug("Creating node: "+diseaseRootLabel);
 
         discoveredTerms.add(ot);
 
@@ -130,7 +130,7 @@ public class LoadNCIT implements CommandLineRunner {
             }
             String url = ontologyUrl+parentUrlEncoded+"/hierarchicalChildren?size=100";
 
-            System.out.println("Getting data from "+url);
+            log.debug("Getting data from "+url);
 
             String json = parseURL(url);
             requestCounter++;
@@ -148,7 +148,7 @@ public class LoadNCIT implements CommandLineRunner {
                 for (int i = 0; i < terms.length(); i++) {
 
                     JSONObject term = terms.getJSONObject(i);
-                    System.out.println("TERM: "+term.getString("label"));
+                    log.debug("TERM: "+term.getString("label"));
 
                     OntologyTerm newTerm = loaderUtils.getOntologyTerm(term.getString("iri"), term.getString("label"));
 
@@ -174,7 +174,7 @@ public class LoadNCIT implements CommandLineRunner {
 
             }
 
-            System.out.println("Requests made: " + requestCounter);
+            log.info("Requests made: " + requestCounter);
 
         }
 
@@ -235,7 +235,7 @@ public class LoadNCIT implements CommandLineRunner {
             }
             String url = ontologyUrl+parentUrlEncoded+"/hierarchicalChildren?size=100";
 
-            System.out.println("Getting data from "+url);
+            log.debug("Getting data from "+url);
 
             String json = parseURL(url);
 
