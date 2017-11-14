@@ -51,7 +51,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "        WHERE (tt.name IN {tumorType} OR []=[])  " +
             "        WITH humSample, i, mod, o, t, ot, tt " +
 
-            "        OPTIONAL MATCH (mod)—[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
+            "        MATCH (mod)—[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
             "        WHERE (m.name IN {markers} OR []=[])  " +
             "        RETURN mod, humSample, t, tt, i, ot")
     Collection<ModelCreation> findByOntology(@Param("query") String query, @Param("markers") String[] markers,
