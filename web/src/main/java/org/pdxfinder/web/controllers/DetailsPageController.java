@@ -3,6 +3,7 @@ package org.pdxfinder.web.controllers;
 import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.DetailsDTO;
+import org.pdxfinder.services.dto.VariationDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +11,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by csaba on 12/05/2017.
@@ -32,9 +36,23 @@ public class DetailsPageController {
                           @RequestParam(value="size", required = false) Integer size,Model model){
 
         int viewPage = (page == null || page < 1) ? 0 : page-1;
-        int viewSize = (size == null || size < 1) ? 20 : size;
+        int viewSize = (size == null || size < 1) ? 10 : size;
+
+        Map<String, String> patientTech = searchService.findPatientPlatforms(dataSrc,modelId);
+        Map<String, Set<String>> modelTechAndPassages = searchService.findModelPlatformAndPassages(dataSrc,modelId,"");
 
         DetailsDTO dto = searchService.searchForModel(dataSrc,modelId,viewPage,viewSize,"","","");
+
+        List<VariationDataDTO> variationDataDTOList = new ArrayList<>();
+        for (String tech : modelTechAndPassages.keySet()) {
+            VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,"",viewPage,viewSize,"",1,"","");
+            variationDataDTOList.add(variationDataDTO);
+        }
+
+        // dto.setTotalPages((int) Math.ceil(totalRecords/dSize) );
+
+
+        model.addAttribute("nonjsVariationdata", variationDataDTOList);
 
         model.addAttribute("fullData",dto);
 
@@ -67,25 +85,14 @@ public class DetailsPageController {
             model.addAttribute("specimenId",specimen.getExternalId() );
         }
 
-        model.addAttribute("technology", "");
         model.addAttribute("totalPages", dto.getTotalPages());
         model.addAttribute("presentPage", viewPage+1);
         model.addAttribute("totalRecords", dto.getVariationDataCount());
 
         model.addAttribute("variationData", dto.getMarkerAssociations());
 
-        Map modelTechAndPassages = searchService.findModelPlatformAndPassages(dataSrc,modelId,"");
-        Map patientTech = searchService.findPatientPlatforms(dataSrc,modelId);
-
         model.addAttribute("modelInfo", modelTechAndPassages);
         model.addAttribute("patientInfo", patientTech);
-
-
-        //List<VariationDataDTO> variationDataDTOList = new ArrayList<>();
-        //VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,"CTP","0","",1,"","",viewPage,3);
-        //variationDataDTOList.add(variationDataDTO);
-
-        //model.addAttribute("nonjsVariationdata", variationDataDTO);
 
 
         //TODO: return error page if sampleId does not exist

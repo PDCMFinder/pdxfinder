@@ -19,30 +19,30 @@ import java.util.Set;
 @RestController
 public class RestControllerGeneral {
 
-        GraphService graphService;
-        SearchService searchService;
+    GraphService graphService;
+    SearchService searchService;
 
-        @Autowired
-        public RestControllerGeneral(GraphService graphService, SearchService searchService) {
-                this.graphService = graphService;
-                this.searchService = searchService;
-        }
+    @Autowired
+    public RestControllerGeneral(GraphService graphService, SearchService searchService) {
+        this.graphService = graphService;
+        this.searchService = searchService;
+    }
 
 
-        @RequestMapping(method = RequestMethod.GET, value = "/DOAutoSuggest")
-        public Set<String> mappedDOTerm() {
-                Set<String> autoSuggestList = graphService.getMappedDOTerms();
-                return autoSuggestList;
-        }
+    @RequestMapping(method = RequestMethod.GET, value = "/DOAutoSuggest")
+    public Set<String> mappedDOTerm() {
+        Set<String> autoSuggestList = graphService.getMappedDOTerms();
+        return autoSuggestList;
+    }
 
 
 
     @RequestMapping(value = "/modeldata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public VariationDataDTO postVariationDataByPlatform(@PathVariable String dataSrc,
-                                                       @PathVariable String modelId,
-                                                       @RequestParam(value="platform", required = false) String platform,
-                                                       @RequestParam(value="passage", required = false) String passage,
-                                                       @RequestBody MultiValueMap data) {
+                                                        @PathVariable String modelId,
+                                                        @RequestParam(value="platform", required = false) String platform,
+                                                        @RequestParam(value="passage", required = false) String passage,
+                                                        @RequestBody MultiValueMap data) {
 
         int draw = Integer.parseInt(data.getFirst("draw").toString());
         String searchText = data.getFirst("search[value]").toString();
@@ -55,7 +55,7 @@ public class RestControllerGeneral {
 
         String dPlatform = (platform == null) ? "" : platform;
         String dPassage = (passage == null) ? "" : passage;
-        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,searchText,draw,sortColumn,sortDir,start,size);
+        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,searchText,draw,sortColumn,sortDir);
 
         return variationDataDTO;
 
@@ -64,9 +64,9 @@ public class RestControllerGeneral {
 
     @RequestMapping(value = "/patientdata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public VariationDataDTO postPatientVariationData(@PathVariable String dataSrc,
-                                                    @PathVariable String modelId,
-                                                    @RequestParam(value="platform", required = false) String platform,
-                                                    @RequestBody MultiValueMap data) {
+                                                     @PathVariable String modelId,
+                                                     @RequestParam(value="platform", required = false) String platform,
+                                                     @RequestBody MultiValueMap data) {
 
         int draw = Integer.parseInt(data.getFirst("draw").toString());
         String searchText = data.getFirst("search[value]").toString();
@@ -89,11 +89,11 @@ public class RestControllerGeneral {
 
     @RequestMapping(value = "/getxdata/{dataSrc}/{modelId}")
     public VariationDataDTO getXenoVariationData(@PathVariable String dataSrc,
-                                                       @PathVariable String modelId,
-                                                       @RequestParam(value="page", required = false) Integer page,
-                                                       @RequestParam(value="size", required = false) Integer pageSize,
-                                                       @RequestParam(value="passage", required = false) String passage,
-                                                       @RequestParam(value="platform", required = false) String platform) {
+                                                 @PathVariable String modelId,
+                                                 @RequestParam(value="page", required = false) Integer page,
+                                                 @RequestParam(value="size", required = false) Integer pageSize,
+                                                 @RequestParam(value="passage", required = false) String passage,
+                                                 @RequestParam(value="platform", required = false) String platform) {
 
         int start = (page == null || page < 1) ? 0 : page - 1;
         int size = (pageSize == null || pageSize < 1) ? 20 : pageSize;
@@ -105,8 +105,7 @@ public class RestControllerGeneral {
 
         String dPlatform = (platform == null) ? "" : platform;
         String dPassage = (passage == null) ? "" : passage;
-        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,"",1,"","",start,size);
-
+        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,"",1,"","");
 
         return variationDataDTO;
 
@@ -132,7 +131,7 @@ public class RestControllerGeneral {
 
     @RequestMapping(value = "/modeltech/{dataSrc}/{modelId}")
     public Map findModelTechnology(@PathVariable String dataSrc, @PathVariable String modelId,
-                              @RequestParam(value="passage", required = false) String passage) {
+                                   @RequestParam(value="passage", required = false) String passage) {
 
         String dPassage = (passage == null) ? "" : passage;
         return  searchService.findModelPlatformAndPassages(dataSrc,modelId,dPassage);
@@ -146,14 +145,14 @@ public class RestControllerGeneral {
     }
 
 
-        public String getSortColumn(String sortolumn){
+    public String getSortColumn(String sortolumn){
 
-                Map<String, String> tableColumns = new HashMap<>();
-                tableColumns.put("0","mAss.technology");
-                tableColumns.put("1","mAss.technology");
-                tableColumns.put("2","mAss.technology");
+        Map<String, String> tableColumns = new HashMap<>();
+        tableColumns.put("0","mAss.technology");
+        tableColumns.put("1","mAss.technology");
+        tableColumns.put("2","mAss.technology");
 
-                return tableColumns.get(sortolumn);
-        }
+        return tableColumns.get(sortolumn);
+    }
 
 }

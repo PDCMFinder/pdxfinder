@@ -231,18 +231,26 @@
 
                         <div class="col-md-12">
 
+
+
                             <div class="panel panel-info" style="height:850px;">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
                                 </div>
 
 
-                                <div class="nonjs-tab" th:if="${modelInfo.size() > 0}" style="margin-top: 15px">
+                                <div class="nonjs-tab" th:if="${not #lists.isEmpty(nonjsVariationdata)}" style="margin-top: 15px">
 
-                                    <th:block th:each="technology,iter : ${modelInfo}">
 
-                                        <input type="radio" name="tab" th:id="'tab'+${iter.index}" th:checked="${iter.index == 0} ? 'checked' "/>
-                                        <label th:for="'tab'+${iter.index}" th:text="${technology.key}+' Platform'"> TAB TITLES </label>
+                                    <th:block th:each="variationDataSet,iter : ${nonjsVariationdata}">
+
+                                        <input type="radio" name="tab"
+                                               th:id="'tab'+${iter.index}"
+                                               th:checked="${iter.index == 0} ? 'checked' "/>
+
+                                        <label th:for="'tab'+${iter.index}"
+                                               th:text="${variationDataSet.data[0][1]}+' Platform'"> TAB TITLES </label>
+
 
                                         <div class='tab-body'>
 
@@ -253,7 +261,6 @@
                                                         <thead>
                                                         <tr>
                                                             <th>Sample</th>
-                                                            <th>Platform(s)</th>
                                                             <th>Chromosome</th>
                                                             <th>Seq. Position</th>
                                                             <th>Ref. Allele</th>
@@ -263,12 +270,31 @@
                                                             <th>Amino Acid Change</th>
                                                             <th>Read Depth</th>
                                                             <th>Allele Freq.</th>
-                                                            <th>Disease</th>
                                                             <th>RS Variants</th>
                                                         </tr>
                                                         </thead>
 
                                                         <tbody>
+
+                                                        <tr th:each="vData :${variationDataSet.data}">
+                                                            <td th:text="${vData[0]}"> ... </td>
+                                                            <td th:text="${vData[2]}"> ... </td>
+                                                            <td th:text="${vData[3]}"> ... </td>
+                                                            <td th:text="${vData[4]}"> ... </td>
+                                                            <td th:text="${vData[5]}"> ... </td>
+                                                            <td th:text="${vData[6]}"> ... </td>
+                                                            <td th:text="${vData[7]}"> ... </td>
+                                                            <td th:text="${vData[8]}"> ... </td>
+                                                            <td th:text="${vData[9]}"> ... </td>
+                                                            <td th:text="${vData[10]}"> ... </td>
+                                                            <td th:text="${vData[11]}"> ... </td>
+                                                        </tr>
+
+                                                        </tbody>
+
+
+
+                                                        <!--<tbody>
                                                         <tr th:if="${#lists.isEmpty(variationData)}">
                                                             <td></td>
                                                         </tr>
@@ -291,7 +317,7 @@
                                                             </tr>
 
                                                         </th:block>
-                                                        </tbody>
+                                                        </tbody>-->
 
                                                     </table>
                                                 </div>
@@ -370,6 +396,164 @@
 
 
                             </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            <!--<div class="panel panel-info" style="height:850px;">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
+                                </div>
+
+
+                                <div class="nonjs-tab" th:if="${modelInfo.size() > 0}" style="margin-top: 15px">
+
+                                    <th:block th:each="technology,iter : ${modelInfo}">
+
+                                        <input type="radio" name="tab" th:id="'tab'+${iter.index}" th:checked="${iter.index == 0} ? 'checked' "/>
+                                        <label th:for="'tab'+${iter.index}" th:text="${technology.key}+' Platform'"> TAB TITLES </label>
+
+                                        <div class='tab-body'>
+
+                                            <div class="panel-body" style="margin-top:-6px; ">
+                                                <div class="table-responsive">
+                                                    <table class="table table-condensed table-striped table-borderedPdx table-hover" >
+
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Sample</th>
+                                                            <th>Platform(s)</th>
+                                                            <th>Chromosome</th>
+                                                            <th>Seq. Position</th>
+                                                            <th>Ref. Allele</th>
+                                                            <th>Alt. Allele</th>
+                                                            <th>Consequence</th>
+                                                            <th>Gene</th>
+                                                            <th>Amino Acid Change</th>
+                                                            <th>Read Depth</th>
+                                                            <th>Allele Freq.</th>
+                                                            <th>Disease</th>
+                                                            <th>RS Variants</th>
+                                                        </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                        <tr th:if="${#lists.isEmpty(variationData)}">
+                                                            <td></td>
+                                                        </tr>
+                                                        <th:block th:each="variationDataSet :${variationData}">
+
+                                                            <tr th:each="vData :${variationDataSet}">
+                                                                <td th:text="${specimenId}"> ... </td>
+                                                                <td th:text="${technology}"> ... </td>
+                                                                <td th:text="${vData.chromosome}"> ... </td>
+                                                                <td th:text="${vData.seqPosition}"> ... </td>
+                                                                <td th:text="${vData.refAllele}"> ... </td>
+                                                                <td th:text="${vData.altAllele}"> ... </td>
+                                                                <td th:text="${vData.consequence}"> ... </td>
+                                                                <td th:text="${vData.marker.symbol}"> ... </td>
+                                                                <td th:text="${vData.aminoAcidChange}"> ... </td>
+                                                                <td th:text="${vData.readDepth}"> ... </td>
+                                                                <td th:text="${vData.alleleFrequency}"> ... </td>
+                                                                <td th:text="${diagnosis}"> ... </td>
+                                                                <td th:text="${vData.rsVariants}"> ... </td>
+                                                            </tr>
+
+                                                        </th:block>
+                                                        </tbody>
+
+                                                    </table>
+                                                </div>
+
+
+                                                <div style="text-align: center;">
+                                                    <div th:if="${not #lists.isEmpty(variationData)}">
+
+                                                        <ul class="pagination pagination-pdxFinder">
+                                                            <th:block th:unless="${totalPages<1}" th:each="num: ${#numbers.sequence(1,totalPages)}">
+
+                                                                <li th:if="${num==1 && presentPage!=1}">
+                                                                    <a th:href="@{'?page='+${presentPage-1}}"> << Previous </a>
+                                                                </li>
+
+
+                                                                <th:block th:if="${presentPage<5 && num<=5}">
+                                                                    <li th:class="( ${num} == ${presentPage} ) ? 'active' : '' ">
+                                                                        <a th:href="@{'?page='+${num}}" th:text="${num}"> Page Number </a>
+                                                                    </li>
+                                                                </th:block>
+
+
+                                                                <th:block th:if="${presentPage>=5 && num==1}">
+                                                                    <li>
+                                                                        <a th:href="@{'?page='+${num}}" th:text="${num}"> Page Number </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a disabled> . . . </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a th:href="@{'?page='+${presentPage-1}}" th:text="${presentPage-1}"> Page Number </a>
+                                                                    </li>
+                                                                    <li class="active">
+                                                                        <a  th:href="@{'?page='+${presentPage}}" th:text="${presentPage}"> Page Number </a>
+                                                                    </li>
+                                                                    <li th:if="${presentPage<totalPages}">
+                                                                        <a th:href="@{'?page='+${presentPage+1}}" th:text="${presentPage+1}"> Page Number </a>
+                                                                    </li>
+                                                                </th:block>
+
+
+                                                                <th:block th:if="${presentPage<totalPages-1 && num==totalPages && totalPages > 4 }">
+                                                                    <li  th:if="${presentPage<totalPages-2}" th:class="active">
+                                                                        <a disabled> . . . </a>
+                                                                    </li>
+                                                                    <li th:class="( ${num} == ${presentPage} ) ? 'active' : '' ">
+                                                                        <a th:href="@{'?page='+${num}}" th:text="${num}"> Last Page </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a th:href="@{'?page='+${presentPage+1}}"> Next >> </a>
+                                                                    </li>
+                                                                </th:block>
+
+
+                                                            </th:block>
+                                                        </ul>
+
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+
+
+                                        </div>
+
+                                    </th:block>
+
+
+
+                                </div>
+
+
+                            </div>-->
+
+
                         </div>
                     </noscript>
 
@@ -405,6 +589,10 @@
 
 
 </div>
+
+
+
+
 
 
 <script type="text/javascript" language="javascript" th:inline="javascript">

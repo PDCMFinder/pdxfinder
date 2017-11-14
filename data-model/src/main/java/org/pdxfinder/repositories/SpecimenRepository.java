@@ -5,6 +5,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -53,6 +54,23 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
                                                        @Param("search") String search,
                                                        @Param("skip") int skip,
                                                        @Param("lim") int lim);
+
+
+
+
+    @Query("MATCH (psamp:Sample)--(mod:ModelCreation)-[io:INSTANCE_OF]-(pdxPass:PdxPassage)-[passfrm:PASSAGED_FROM]-(spec:Specimen)-[sfrm:SAMPLED_FROM]-(msamp:Sample) " +
+            "            -[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization) " +
+            "            WITH psamp, mod, spec, passfrm,pdxPass, sfrm,msamp, char,molchar " +
+            "            MATCH (molchar)-[pl:PLATFORM_USED]-(tech:Platform) " +
+
+            "            WHERE  psamp.dataSource = {dataSource}  " +
+            "            AND    mod.sourcePdxId = {modelId}  " +
+            "            AND    (tech.name = {tech}  OR {tech} = '' ) " +
+
+            "            RETURN pdxPass, passfrm, spec, sfrm,msamp, char,molchar,pl,tech ")
+    List<Specimen> findSpecimenBySourcePdxIdAndPlatform2(@Param("dataSource") String dataSource,
+                                                         @Param("modelId") String modelId,
+                                                         @Param("tech") String tech);
 
 
 

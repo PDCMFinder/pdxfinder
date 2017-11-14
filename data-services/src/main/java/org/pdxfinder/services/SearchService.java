@@ -161,10 +161,9 @@ public class SearchService {
         Set<Specimen> specimens = new HashSet<>();
 
 
-         totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,passage,searchFilter);
+        totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,passage,searchFilter);
 
-         specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchFilter,skip,size);
-
+        specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchFilter,skip,size);
 
 
         DetailsDTO dto = new DetailsDTO();
@@ -333,7 +332,7 @@ public class SearchService {
 
 
 
-    public Map findModelPlatformAndPassages(String dataSource, String modelId,String passage){
+    public Map<String, Set<String>> findModelPlatformAndPassages(String dataSource, String modelId,String passage){
 
         /**
          * Used to store a technology String with their respective List of PDX Passages
@@ -344,14 +343,13 @@ public class SearchService {
          * Retrieve all the technologies for that mouse model
          */
         List<Platform> platforms = platformRepository.findModelPlatformByModelId(dataSource,modelId);
-        int totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,"","","");
 
         /**
          * For each of the technologies retrieve the list of PDX passages using the specimen repository
          */
         for (Platform platform : platforms) {
 
-            Set<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,platform.getName(),passage,"",0,totalRecords);
+            List<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform2(dataSource,modelId,platform.getName());
 
             Set<String> passagesList = new HashSet<>();
             for (Specimen specimen : specimens)
@@ -364,6 +362,7 @@ public class SearchService {
 
         return platformMap;
     }
+
 
 
     public Map findPatientPlatforms(String dataSource, String modelId){
@@ -381,7 +380,7 @@ public class SearchService {
 
 
     public VariationDataDTO patientVariationDataByPlatform(String dataSource, String modelId, String technology,
-                                                    String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
+                                                           String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
 
         int recordsTotal = patientRepository.countByBySourcePdxIdAndPlatform(dataSource,modelId,technology,"");
         int recordsFiltered = recordsTotal;
@@ -419,8 +418,8 @@ public class SearchService {
     }
 
 
-    public VariationDataDTO variationDataByPlatform(String dataSource, String modelId, String technology,String passage,
-                                                             String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
+    public VariationDataDTO variationDataByPlatform(String dataSource, String modelId, String technology,String passage, int start, int size,
+                                                    String searchParam, int draw, String sortColumn, String sortDir) {
         /**
          * 1st count all the records and set Total Records & Initialize Filtered Record as Total record
          */
@@ -466,33 +465,33 @@ public class SearchService {
         /**
          * Generate an equivalent 2-D array type of the Retrieved result Set, the Front end table must be a 2D JSON Array
          */
-          try {
+        try {
 
-                  for (MolecularCharacterization dMolChar : sample.getMolecularCharacterizations()) {
+            for (MolecularCharacterization dMolChar : sample.getMolecularCharacterizations()) {
 
-                       List<MarkerAssociation> markerAssociation = new ArrayList();// = dMolChar.getMarkerAssociations();
-                       markerAssociation.addAll(dMolChar.getMarkerAssociations());
+                List<MarkerAssociation> markerAssociation = new ArrayList();// = dMolChar.getMarkerAssociations();
+                markerAssociation.addAll(dMolChar.getMarkerAssociations());
 
-                       for (MarkerAssociation markerAssoc : markerAssociation) {
+                for (MarkerAssociation markerAssoc : markerAssociation) {
 
-                                String[] markerAssocArray = new String[12];
-                                markerAssocArray[0] = sample.getSourceSampleId();
-                                markerAssocArray[1] = dMolChar.getPlatform().getName();
-                                markerAssocArray[2] = markerAssoc.getChromosome();
-                                markerAssocArray[3] = markerAssoc.getSeqPosition();
-                                markerAssocArray[4] = markerAssoc.getRefAllele();
-                                markerAssocArray[5] = markerAssoc.getAltAllele();
-                                markerAssocArray[6] = markerAssoc.getConsequence();
-                                markerAssocArray[7] = markerAssoc.getMarker().getSymbol();
-                                markerAssocArray[8] = markerAssoc.getAminoAcidChange();
-                                markerAssocArray[9] = markerAssoc.getReadDepth();
-                                markerAssocArray[10] = markerAssoc.getAlleleFrequency();
-                                markerAssocArray[11] = markerAssoc.getRsVariants();
+                    String[] markerAssocArray = new String[12];
+                    markerAssocArray[0] = sample.getSourceSampleId();
+                    markerAssocArray[1] = dMolChar.getPlatform().getName();
+                    markerAssocArray[2] = markerAssoc.getChromosome();
+                    markerAssocArray[3] = markerAssoc.getSeqPosition();
+                    markerAssocArray[4] = markerAssoc.getRefAllele();
+                    markerAssocArray[5] = markerAssoc.getAltAllele();
+                    markerAssocArray[6] = markerAssoc.getConsequence();
+                    markerAssocArray[7] = markerAssoc.getMarker().getSymbol();
+                    markerAssocArray[8] = markerAssoc.getAminoAcidChange();
+                    markerAssocArray[9] = markerAssoc.getReadDepth();
+                    markerAssocArray[10] = markerAssoc.getAlleleFrequency();
+                    markerAssocArray[11] = markerAssoc.getRsVariants();
 
-                                variationData.add(markerAssocArray);
-                       }
-                 }
-          }catch (Exception e) { }
+                    variationData.add(markerAssocArray);
+                }
+            }
+        }catch (Exception e) { }
 
         return variationData;
     }
