@@ -44,7 +44,7 @@
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-striped table-bordered table-condensed table-hover" style="margin-bottom: 2px;">
-                                    <tr><th>Patient ID</th> <td th:text="${fullData.age}"></td></tr>
+                                    <tr><th>Patient ID</th> <td th:text="${patientId}"></td></tr>
                                     <tr><th>Gender</th>     <td th:text="${gender}"></td></tr>
                                     <tr><th>Age</th>        <td th:text="${age}"></td></tr>
                                     <tr><th>Race</th>       <td th:text="${race}"></td></tr>
@@ -125,7 +125,7 @@
 
                                                             <h4 class="bLine">
                                                                 <span class="hdc">Tumour Type: </span>            <i>Patient Tumor</i>                  &nbsp; &nbsp;
-                                                                <span class="hdc">Diagnosis:</span> <i th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
+                                                                <span class="hdc">Histology:</span> <i th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
                                                                 <span class="hdc">Grade: </span>  <i></i>
                                                             </h4>
 
