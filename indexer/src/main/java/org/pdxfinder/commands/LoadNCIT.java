@@ -35,7 +35,7 @@ public class LoadNCIT implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadDiseaseOntology.class);
 
-    private static final String diseasesBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C7057";
+    private static final String diseasesBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C3262";
     private static final String ontologyUrl = "https://www.ebi.ac.uk/ols/api/ontologies/ncit/terms/";
 
     @Value("${ncitpredef.file}")
@@ -71,7 +71,7 @@ public class LoadNCIT implements CommandLineRunner {
 
         } else if (options.has("loadNCIT") || options.has("loadALL")) {
 
-            log.info("Loading all Disease, Disorder or Finding subnodes.");
+            log.info("Loading all Neoplasm subnodes.");
             loadNCIT();
 
         } else if (options.has("loadNCITPreDef")) {
@@ -98,7 +98,7 @@ public class LoadNCIT implements CommandLineRunner {
         Set<String> loadedTerms = new HashSet<>();
         Set<OntologyTerm> discoveredTerms = new HashSet<>();
 
-        String diseaseRootLabel = "Disease, Disorder or Finding";
+        String diseaseRootLabel = "Cancer"; // Neoplasm
 
         int termCounter = 1;
         int requestCounter = 0;
@@ -134,6 +134,11 @@ public class LoadNCIT implements CommandLineRunner {
 
             String json = parseURL(url);
             requestCounter++;
+
+            if(requestCounter%200 == 0){
+                log.info("Terms loaded: " + requestCounter);
+            }
+
             try {
                 JSONObject job = new JSONObject(json);
                 if (!job.has("_embedded")) continue;
@@ -167,6 +172,8 @@ public class LoadNCIT implements CommandLineRunner {
                     loaderUtils.saveOntologyTerm(newTerm);
 
                     termCounter++;
+
+
                 }
 
             } catch (Exception e) {
@@ -174,8 +181,10 @@ public class LoadNCIT implements CommandLineRunner {
 
             }
 
-            log.info("Requests made: " + requestCounter);
+        }
 
+        if(requestCounter%200 != 0){
+            log.info("Terms loaded: " + requestCounter);
         }
 
     }
