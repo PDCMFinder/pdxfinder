@@ -279,6 +279,16 @@ public class LoaderUtils {
         return sampleRepository.findHumanSampleBySampleIdAndDataSource(sampleId, dataSource);
     }
 
+    public int getHumanSamplesNumber(){
+
+        return sampleRepository.findHumanSamplesNumber();
+    }
+
+    public Collection<Sample> getHumanSamplesFromTo(int from, int to){
+
+        return sampleRepository.findHumanSamplesFromTo(from, to);
+    }
+
     public Sample getSampleBySourcePdxId(String pdxId){
         return sampleRepository.findBySourcePdxId(pdxId);
     }

@@ -78,4 +78,14 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
 
     @Query("MATCH (sp:Specimen)--(s:Sample) WHERE s.sourceSampleId = {sampleId} AND s.dataSource = {dataSource} RETURN s")
     Sample findMouseSampleBySampleIdAndDataSource(@Param("sampleId") String sampleId, @Param("dataSource") String dataSource);
+
+    @Query("MATCH (ps:PatientSnapshot)--(s:Sample) RETURN count(s)")
+    int findHumanSamplesNumber();
+
+    @Query("MATCH (ps:PatientSnapshot)--(s:Sample) " +
+            "WITH s " +
+            "OPTIONAL MATCH (s)-[ot:ORIGIN_TISSUE]-(t:Tissue) " +
+            "OPTIONAL MATCH (s)-[oft:OF_TYPE]-(tt:TumorType) " +
+            "RETURN s, ot,t, oft, tt SKIP {from} LIMIT {to}")
+    Collection<Sample> findHumanSamplesFromTo(@Param("from") int from, @Param("to") int to);
 }
