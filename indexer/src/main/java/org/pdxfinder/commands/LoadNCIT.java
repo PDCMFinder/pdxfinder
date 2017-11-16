@@ -153,9 +153,14 @@ public class LoadNCIT implements CommandLineRunner {
                 for (int i = 0; i < terms.length(); i++) {
 
                     JSONObject term = terms.getJSONObject(i);
-                    log.debug("TERM: "+term.getString("label"));
+                    String termLabel = term.getString("label");
 
-                    OntologyTerm newTerm = loaderUtils.getOntologyTerm(term.getString("iri"), term.getString("label"));
+                    //do not load this branch
+                    if(termLabel.equals("Neoplasm by Special Category")) continue;
+
+                    log.debug("TERM: "+termLabel);
+
+                    OntologyTerm newTerm = loaderUtils.getOntologyTerm(term.getString("iri"), termLabel);
 
                     JSONArray synonyms = term.getJSONArray("synonyms");
                     Set<String> synonymsSet = new HashSet<>();
