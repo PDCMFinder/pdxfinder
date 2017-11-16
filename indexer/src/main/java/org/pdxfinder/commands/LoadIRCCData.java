@@ -34,7 +34,7 @@ public class LoadIRCCData implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadJAXData.class);
 
-    private final static String DATASOURCE_ABBREVIATION = "IRCC";
+    private final static String DATASOURCE_ABBREVIATION = "ircc";
     private final static String DATASOURCE_NAME = "IRCC data";
     private final static String DATASOURCE_DESCRIPTION = "IRCC PDX mouse models.";
     //private final static String NSG_BS_NAME = "NSG (NOD scid gamma)"; //background strain

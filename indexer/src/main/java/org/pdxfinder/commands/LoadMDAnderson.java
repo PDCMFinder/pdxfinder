@@ -36,7 +36,7 @@ public class LoadMDAnderson implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadMDAnderson.class);
 
-    private final static String MDA_DATASOURCE_ABBREVIATION = "UT MDAnderson (PDXNet)";
+    private final static String MDA_DATASOURCE_ABBREVIATION = "ut-md-anderson";
     private final static String MDA_DATASOURCE_NAME = "UT MD Anderson (PDXNet)";
     private final static String MDA_DATASOURCE_DESCRIPTION = "University Texas MD Anderson PDX mouse models for PDXNet.";
 
