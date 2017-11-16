@@ -40,7 +40,7 @@ public class LoadJAXData implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadJAXData.class);
 
-    private final static String JAX_DATASOURCE_ABBREVIATION = "jax";
+    private final static String JAX_DATASOURCE_ABBREVIATION = "JAX";
     private final static String JAX_DATASOURCE_NAME = "The Jackson Laboratory";
     private final static String JAX_DATASOURCE_DESCRIPTION = "The Jackson Laboratory PDX mouse models.";
     private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";

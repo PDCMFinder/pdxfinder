@@ -36,7 +36,7 @@ public class LoadHCI implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadHCI.class);
 
-    private final static String HCI_DATASOURCE_ABBREVIATION = "hci";
+    private final static String HCI_DATASOURCE_ABBREVIATION = "HCI";
     private final static String HCI_DATASOURCE_NAME = "Huntsman Cancer Institute (PDXNet)";
     private final static String HCI_DATASOURCE_DESCRIPTION = "Huntsman Cancer Institute PDX mouse models for PDXNet.";
 
