@@ -7,7 +7,7 @@ import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.dao.Sample;
-import org.pdxfinder.dao.SampleToDiseaseOntologyRelationship;
+import org.pdxfinder.dao.SampleToOntologyRelationShip;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,8 +94,8 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
 
                     if(sample != null && term != null){
 
-                        SampleToDiseaseOntologyRelationship r = new SampleToDiseaseOntologyRelationship(sample, term, type, justification);
-                        sample.setSampleToDiseaseOntologyRelationship(r);
+                        SampleToOntologyRelationShip r = new SampleToOntologyRelationShip(type, justification, sample, term);
+                        sample.setSampleToOntologyRelationShip(r);
                         term.setMappedTo(r);
 
                         term.setDirectMappedSamplesNumber(term.getDirectMappedSamplesNumber() + 1);

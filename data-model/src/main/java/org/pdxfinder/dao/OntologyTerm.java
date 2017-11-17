@@ -26,7 +26,7 @@ public class OntologyTerm {
     private Set<OntologyTerm> subclassOf;
 
     @Relationship(type = "MAPPED_TO", direction = Relationship.INCOMING)
-    private SampleToDiseaseOntologyRelationship mappedTo;
+    private SampleToOntologyRelationShip mappedTo;
 
 
 
@@ -74,11 +74,11 @@ public class OntologyTerm {
         this.subclassOf = subclassOf;
     }
 
-    public SampleToDiseaseOntologyRelationship getMappedTo() {
+    public SampleToOntologyRelationShip getMappedTo() {
         return mappedTo;
     }
 
-    public void setMappedTo(SampleToDiseaseOntologyRelationship mappedTo) {
+    public void setMappedTo(SampleToOntologyRelationShip mappedTo) {
         this.mappedTo = mappedTo;
     }
 
