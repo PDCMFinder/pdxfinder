@@ -33,7 +33,7 @@ import java.util.Set;
 @Order(value = -100)
 public class LoadNCIT implements CommandLineRunner {
 
-    private final static Logger log = LoggerFactory.getLogger(LoadDiseaseOntology.class);
+    private final static Logger log = LoggerFactory.getLogger(LoadNCIT.class);
 
     private static final String diseasesBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C3262";
     private static final String ontologyUrl = "https://www.ebi.ac.uk/ols/api/ontologies/ncit/terms/";
