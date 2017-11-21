@@ -123,6 +123,9 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                     if(ontologyTerm.equals("") || ontologyTerm == null) continue;
                     if(sampleDiagnosis.equals("") || sampleDiagnosis == null) continue;
 
+                    if(originTissue == null) originTissue = "";
+                    if(tumorType == null) tumorType = "";
+
                     //if it is a direct mapping, add it to the rules, key = diagnosis
 
                     if(mapType.equals("direct")){
@@ -164,6 +167,8 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
         //0. if diagnosis is empty return empty object
         if(diagnosis.equals("") || diagnosis == null) return mr;
 
+        if(originTissue == null) originTissue = "";
+        if (tumorType == null) tumorType = "";
 
         // 1. check whether the diagnosis exists in the keys = direct map type
         if(this.mappingRules.containsKey(diagnosis.toLowerCase())){
