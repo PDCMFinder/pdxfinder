@@ -123,8 +123,9 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                     if(ontologyTerm.equals("") || ontologyTerm == null) continue;
                     if(sampleDiagnosis.equals("") || sampleDiagnosis == null) continue;
 
-                    if(originTissue == null) originTissue = "";
-                    if(tumorType == null) tumorType = "";
+                    //DO not ask, I know it looks horrible...
+                    if(originTissue == null || originTissue.equals("null")) originTissue = "";
+                    if(tumorType == null || tumorType.equals("null")) tumorType = "";
 
                     //if it is a direct mapping, add it to the rules, key = diagnosis
 
@@ -256,14 +257,12 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                     }
                 }
 
-
-
             }
 
             startNode+=batchSize;
         }
 
-        printMissingMappings();
+        if(this.missingMappings.size()>0) printMissingMappings();
     }
 
     private void insertMissingMapping(String id, MissingMapping mm){
