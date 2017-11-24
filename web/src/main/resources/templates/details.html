@@ -49,6 +49,7 @@
                                     <tr><th>Age</th>        <td th:text="${age}"></td></tr>
                                     <tr><th>Race</th>       <td th:text="${race}"></td></tr>
                                     <tr><th>Ethnicity</th>  <td th:text="${ethnicity}"></td></tr>
+                                    <tr><th>&nbsp;</th>                 <td>&nbsp;</td></tr>
                                 </table>
                             </div>
                         </div>
@@ -57,15 +58,16 @@
                     <div class="col-md-6 noPaddingLeft">
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">PDX model creation</h3>
+                                <h3 class="panel-title">Clinical / Tumor</h3>
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-striped table-bordered table-condensed table-hover" style="margin-bottom: 2px;">
-                                    <tr><th>Sample type</th>            <td th:text="${sampleType}"></td></tr>
-                                    <tr><th>Strain</th>                 <td th:text="${strain}"></td></tr>
-                                    <tr><th>Mouse sex</th>              <td th:text="${mouseSex}"></td></tr>
-                                    <tr><th>Engraftment site</th>       <td th:text="${engraftmentSite}"></td></tr>
-                                    <tr><th>&nbsp;</th>                 <td>&nbsp;</td></tr>
+                                    <tr><th>Histology</th>                  <td th:text="${diagnosis}"></td></tr>
+                                    <tr><th>Ontology Mapping</th>           <td th:text="..."></td></tr>
+                                    <tr><th>Primary Tissue</th>             <td th:text="..."></td></tr>
+                                    <tr><th>Collection Tissue</th>          <td th:text="..."></td></tr>
+                                    <tr><th>Tumor type</th>                 <td th:text="${tumorType}"></td></tr>
+                                    <tr><th>Classification</th>             <td th:text="${classification}"></td></tr>
                                 </table>
                             </div>
                         </div>
@@ -74,18 +76,18 @@
                     <div class="col-md-12">
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Clinical / Tumor</h3>
+                                <h3 class="panel-title">PDX model creation</h3>
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-striped table-bordered table-condensed table-hover" style="margin-bottom: 2px;">
-                                    <tr><th>Histology</th>          <td th:text="${diagnosis}"></td></tr>
-                                    <tr><th>Tumor type</th>         <td th:text="${tumorType}"></td></tr>
-                                    <tr><th>Classification</th>     <td th:text="${classification}"></td></tr>
-                                    <tr><th>Markers</th>            <td><span th:each="marker, iterStat : ${markers}" th:text="!${iterStat.last} ? ${marker} + ', ': ${marker}"></span></td></tr>
+                                    <tr><th>Sample type</th>            <td th:text="${sampleType}"></td></tr>
+                                    <tr><th>Strain</th>                 <td th:text="${strain}"></td></tr>
+                                    <tr><th>Engraftment site</th>       <td th:text="${engraftmentSite}"></td></tr>
                                 </table>
                             </div>
                         </div>
                     </div>
+
 
 
 
