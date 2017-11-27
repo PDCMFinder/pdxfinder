@@ -279,6 +279,10 @@ public class SearchService {
             dto.setSampleSite(sample.getSampleSite().getName());
         }
 
+        if (sample != null && sample.getSampleToOntologyRelationShip() != null) {
+            dto.setMappedOntology(sample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
+        }
+
         if (pdx != null && pdx.getImplantationType() != null) {
             dto.setSampleType(pdx.getImplantationType().getName());
         }

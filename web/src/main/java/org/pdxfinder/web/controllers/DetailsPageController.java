@@ -79,6 +79,7 @@ public class DetailsPageController {
         model.addAttribute("markers", dto.getCancerGenomics());
         model.addAttribute("url", dto.getExternalUrl());
         model.addAttribute("urlText", dto.getExternalUrlText());
+        model.addAttribute("mappedOntology", dto.getMappedOntology());
 
         //model.addAttribute("specimenId", dto.getSpecimenId());
         for (Specimen specimen : dto.getSpecimens()) {

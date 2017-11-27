@@ -36,6 +36,7 @@ public class DetailsDTO {
 
     private String externalUrl;
     private String externalUrlText;
+    private String mappedOntology;
 
 
 
@@ -69,6 +70,7 @@ public class DetailsDTO {
         this.engraftmentSite = "";
         this.externalUrl = "";
         this.externalUrlText = "";
+        this.mappedOntology = "";
 
         this.totalPages = 0;
     }
@@ -237,6 +239,14 @@ public class DetailsDTO {
 
     public List<Specimen> getSpecimens() {
         return specimens;
+    }
+
+    public void setMappedOntology(String mappedOntology) {
+        this.mappedOntology = mappedOntology;
+    }
+
+    public String getMappedOntology() {
+        return mappedOntology;
     }
 
     public void setSpecimens(List<Specimen> specimens) {
