@@ -19,6 +19,7 @@ public class SearchDTO {
 
     private String searchParameter;
     private String searchDepth;
+    private String mappedOntology;
 
 
     public SearchDTO() {
@@ -31,6 +32,7 @@ public class SearchDTO {
         this.classification = "";
         this.searchParameter = "";
         this.searchDepth = "";
+        this.mappedOntology = "";
     }
 
     public String getDataSource() {
@@ -103,5 +105,13 @@ public class SearchDTO {
 
     public void setCancerGenomics(List<String> cancerGenomics) {
         this.cancerGenomics = cancerGenomics;
+    }
+
+    public String getMappedOntology() {
+        return mappedOntology;
+    }
+
+    public void setMappedOntology(String mappedOntology) {
+        this.mappedOntology = mappedOntology;
     }
 }

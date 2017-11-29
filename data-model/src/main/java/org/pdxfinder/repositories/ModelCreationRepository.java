@@ -54,8 +54,9 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
 
             "MATCH (humSample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
             "MATCH (humSample)-[ot:OF_TYPE]-(tt:TumorType) " +
+            "OPTIONAL MATCH (humSample)-[mto:MAPPED_TO]-(oterm:OntologyTerm) " +
             "WHERE (tt.name IN {tumorType} OR {tumorType}=[])  " +
-            "RETURN humSample, i, mod, o, t, ot, tt ")
+            "RETURN humSample, i, mod, o, t, ot, tt, mto, oterm ")
     Collection<ModelCreation> findByMultipleFilters(@Param("diag") String diag, @Param("markers") String[] markers,
                                                     @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
 
@@ -82,40 +83,15 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
 
 
     //Ontology powered search: returns less data to improve performance
-
-    @Query("MATCH (term:OntologyTerm)<-[mapp:MAPPED_TO]-(humSample:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
-            "        WHERE term.label = {query} " +
-            "        AND (humSample.dataSource IN {dataSource} OR {dataSource}=[]) " +
-            "        WITH humSample,i,mod " +
-
-            "        MATCH (humSample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
-            "        MATCH (humSample)-[ot:OF_TYPE]-(tt:TumorType) " +
-            "        WHERE (tt.name IN {tumorType} OR {tumorType}=[])  " +
-            "        return humSample, i, mod, o, t, ot, tt ")
-    Collection<ModelCreation> findByOntologyDirectMapped(@Param("query") String query, @Param("markers") String[] markers,
-                                             @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
-
     @Query("MATCH (term:OntologyTerm)<-[*]-(child:OntologyTerm)-[mapp:MAPPED_TO]-(humSample:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
             "        WHERE term.label = {query} " +
             "        AND (humSample.dataSource IN {dataSource} OR {dataSource}=[]) " +
-            "        WITH humSample,i,mod " +
+            "        WITH humSample,i,mod,mapp,child " +
 
             "        MATCH (humSample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
             "        MATCH (humSample)-[ot:OF_TYPE]-(tt:TumorType) " +
             "        WHERE (tt.name IN {tumorType} OR {tumorType}=[])  " +
-            "        return humSample, i, mod, o, t, ot, tt ")
-    Collection<ModelCreation> findByOntologyIndirectMapped(@Param("query") String query, @Param("markers") String[] markers,
-                                             @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
-
-    @Query("MATCH (term:OntologyTerm)<-[*]-(child:OntologyTerm)-[mapp:MAPPED_TO]-(humSample:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
-            "        WHERE term.label = {query} " +
-            "        AND (humSample.dataSource IN {dataSource} OR {dataSource}=[]) " +
-            "        WITH humSample,i,mod " +
-
-            "        MATCH (humSample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
-            "        MATCH (humSample)-[ot:OF_TYPE]-(tt:TumorType) " +
-            "        WHERE (tt.name IN {tumorType} OR {tumorType}=[])  " +
-            "        return humSample, i, mod, o, t, ot, tt ")
+            "        return humSample, i, mod, o, t, ot, tt,mapp,child ")
     Collection<ModelCreation> findByOntology(@Param("query") String query, @Param("markers") String[] markers,
                                              @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
 

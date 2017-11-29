@@ -69,16 +69,16 @@ function search() {
 
     insertSpinner();
 
-        var ajaxrequest = jQuery.ajax({
-            url : "/searchmodels/",
-            type : "get",
-            datatype: 'json',
-            data: filters
-        }).done(function(data) {
-            displayResults(q,data);
-        }).fail(function() {
-            console.log("Error");
-        });
+    var ajaxrequest = jQuery.ajax({
+        url : "/searchmodels/",
+        type : "get",
+        datatype: 'json',
+        data: filters
+    }).done(function(data) {
+        displayResults(q,data);
+    }).fail(function() {
+        console.log("Error");
+    });
 
 
 }
@@ -98,24 +98,24 @@ function displayResults(q,data){
     rpanel.addClass("panel panel-primary ");
 
     var tbody = jQuery("<tbody/>");
-    var markerString = '';
+    //var markerString = '';
     for (var i in data){
 
         if (data[i].cancerGenomics != null && data[i].cancerGenomics.length > 0) {
             var m = data[i].cancerGenomics;
-            markerString = '';
+            /*markerString = '';
 
             for(var j=0;j<m.length;j++){
                 markerString += '<span class="marker-description" data-toggle="tooltip" data-placement="top" title="' + markerDefs[m[j]] + '">' + m[j] + '</span>';
                 if(j<m.length-1){
                     markerString+=', ';
                 }
-            }
+            }*/
         }
 
         var tr = jQuery('<tr><td><a href="/pdx/'+ data[i].dataSource+'/'+ data[i].modelId+
-            '" target="_blank">'+data[i].modelId+'</a></td><td>'+data[i].diagnosis+'</td><td>'+ data[i].classification+'</td><td>'
-            +data[i].tumorType+'</td><td>'+markerString+'</td><td>'+data[i].dataSource+'</td></tr>');
+            '" target="_blank">'+data[i].modelId+'</a></td><td>'+data[i].diagnosis+'</td><td>'+ data[i].mappedOntology+'</td><td>'
+            +data[i].tissueOfOrigin+'</td><td>'+data[i].dataSource+'</td></tr>');
 
         if(sources.indexOf(data[i].dataSource) == -1){
             sources.push(data[i].dataSource);
@@ -133,8 +133,8 @@ function displayResults(q,data){
     resTable.attr("id","resultsTable");
     resTable.addClass("table table-striped no-footer");
 
-    resTable.append('<thead><tr><th>Model ID</th><th>Diagnosis</th>' +
-        '<th>Classification</th><th>Type</th><th>Marker</th><th>Data source</th></tr></thead>');
+    resTable.append('<thead><tr><th>Model ID</th><th>Histology</th>' +
+        '<th>Ontology Mapping</th><th>Primary Tissue</th><th>Data source</th></tr></thead>');
 
 
     resTable.append(tbody);

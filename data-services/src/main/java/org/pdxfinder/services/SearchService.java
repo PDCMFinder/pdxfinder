@@ -65,10 +65,9 @@ public class SearchService {
 
     public List<SearchDTO> searchWithOntology(String query, String[] markers, String[] datasources, String[] origintumortypes) {
 
-        Collection<ModelCreation> directMappedModels = modelCreationRepository.findByOntologyDirectMapped(query, markers, datasources, origintumortypes);
-        Collection<ModelCreation> indirectMappedModels = modelCreationRepository.findByOntologyIndirectMapped(query, markers, datasources, origintumortypes);
+        Collection<ModelCreation> models = modelCreationRepository.findByOntology(query, markers, datasources, origintumortypes);
 
-        return createSearchResult(directMappedModels, indirectMappedModels, query);
+        return createSearchResult(models, query);
 
     }
 
@@ -76,7 +75,7 @@ public class SearchService {
 
         Collection<ModelCreation> models = modelCreationRepository.findByMultipleFilters(diag, markers, datasources, origintumortypes);
 
-        return createSearchResult(models, null, diag);
+        return createSearchResult(models, diag);
     }
 
     public List<SearchDTO> search(String query, String[] markers, String[] datasources, String[] origintumortypes) {
@@ -88,12 +87,11 @@ public class SearchService {
     }
 
 
-    public List<SearchDTO> createSearchResult(Collection<ModelCreation> directModels, Collection<ModelCreation> indirectModels, String query) {
+    public List<SearchDTO> createSearchResult(Collection<ModelCreation> models, String query) {
 
         List<SearchDTO> results = new ArrayList<>();
 
-
-        for (ModelCreation model : directModels) {
+        for (ModelCreation model : models) {
 
             SearchDTO sdto = new SearchDTO();
 
@@ -125,6 +123,10 @@ public class SearchService {
                 sdto.setClassification(model.getSample().getClassification());
             }
 
+            if (model.getSample() != null && model.getSample().getSampleToOntologyRelationShip() != null) {
+                sdto.setMappedOntology(model.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
+            }
+
             sdto.setSearchParameter(query);
 
 
@@ -143,63 +145,6 @@ public class SearchService {
             results.add(sdto);
 
         }
-
-
-        if(indirectModels != null){
-
-            for (ModelCreation model : indirectModels) {
-
-                SearchDTO sdto = new SearchDTO();
-
-                if (model.getSourcePdxId() != null) {
-                    sdto.setModelId(model.getSourcePdxId());
-                }
-
-                if (model.getSample() != null && model.getSample().getDataSource() != null) {
-                    sdto.setDataSource(model.getSample().getDataSource());
-                }
-
-                if (model.getSample() != null && model.getSample().getSourceSampleId() != null) {
-                    sdto.setTumorId(model.getSample().getSourceSampleId());
-                }
-
-                if (model.getSample() != null && model.getSample().getDiagnosis() != null) {
-                    sdto.setDiagnosis(model.getSample().getDiagnosis());
-                }
-
-                if (model.getSample() != null && model.getSample().getOriginTissue() != null) {
-                    sdto.setTissueOfOrigin(model.getSample().getOriginTissue().getName());
-                }
-
-                if (model.getSample() != null && model.getSample().getType() != null) {
-                    sdto.setTumorType(model.getSample().getType().getName());
-                }
-
-                if (model.getSample() != null && model.getSample().getClassification() != null) {
-                    sdto.setClassification(model.getSample().getClassification());
-                }
-
-                sdto.setSearchParameter(query);
-
-
-                if (model.getSample() != null && model.getSample().getMolecularCharacterizations() != null) {
-                    Set<String> markerSet = new HashSet<>();
-
-                    for (MolecularCharacterization mc : model.getSample().getMolecularCharacterizations()) {
-                        for (MarkerAssociation ma : mc.getMarkerAssociations()) {
-                            markerSet.add(ma.getMarker().getName());
-                        }
-                    }
-                    sdto.setCancerGenomics(new ArrayList<>(markerSet));
-
-                }
-
-                results.add(sdto);
-
-            }
-
-        }
-
 
         return results;
 
