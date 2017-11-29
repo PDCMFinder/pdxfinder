@@ -47,7 +47,7 @@ public class LoadMDAnderson implements CommandLineRunner {
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
-    private BackgroundStrain nsgBS;
+    //   private BackgroundStrain nsgBS;
     private ExternalDataSource mdaDS;
 
     private Options options;
@@ -58,11 +58,8 @@ public class LoadMDAnderson implements CommandLineRunner {
     private LoaderUtils loaderUtils;
     private Session session;
 
-    @Value("${mdapdx.url}")
-    private String urlStr;
-
-   
-
+    //   @Value("${mdapdx.url}")
+    //   private String urlStr;
     @PostConstruct
     public void init() {
         formatter = new HelpFormatter();
@@ -75,6 +72,7 @@ public class LoadMDAnderson implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
+        String[] urls = {"http://tumor.informatics.jax.org/PDXInfo/MBMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/CRCMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/MinnaMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/FangMDAnderson.json"};
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadMDA", "Load MDAnderson PDX data");
@@ -85,23 +83,24 @@ public class LoadMDAnderson implements CommandLineRunner {
 
             log.info("Loading MDAnderson PDX data.");
 
-            if (urlStr != null) {
+            for (String urlStr : urls) {
+
                 log.info("Loading from URL " + urlStr);
                 parseJSON(parseURL(urlStr));
-            } else {
-                log.error("No mdapdx.url provided in properties");
+
             }
         }
+
     }
 
     private void parseJSON(String json) {
 
         mdaDS = loaderUtils.getExternalDataSource(MDA_DATASOURCE_ABBREVIATION, MDA_DATASOURCE_NAME, MDA_DATASOURCE_DESCRIPTION);
-        nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        //      nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
             JSONObject job = new JSONObject(json);
-            JSONArray jarray = job.getJSONArray("MDAnderson");
+            JSONArray jarray = job.getJSONArray("MDA");
 
             for (int i = 0; i < jarray.length(); i++) {
 
@@ -123,48 +122,90 @@ public class LoadMDAnderson implements CommandLineRunner {
         // the preference is for histology
         String diagnosis = j.getString("Clinical Diagnosis");
         String histology = j.getString("Histology");
-        if(histology.trim().length()>0){
-            if("ACA".equals(histology)){
-                diagnosis= "Adenocarcinoma";
-            }else{
+        if (histology.trim().length() > 0) {
+            if ("ACA".equals(histology)) {
+                diagnosis = "Adenocarcinoma";
+            } else {
                 diagnosis = histology;
             }
         }
 
-        String classification = j.getString("Classification") + "/" + j.getString("Grades");
+        String classification = j.getString("Stage") + "/" + j.getString("Grades");
+        
+        String race = "Not specified";
+        try{
+            if(j.getString("Race").trim().length()>0){
+                race = j.getString("Race");
+            }
+        }catch(Exception e){}
+        
+        try{
+            if(j.getString("Ethnicity").trim().length()>0){
+                race = j.getString("Ethnicity");
+            }
+        }catch(Exception e){}
+
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
-                j.getString("Gender"),"", j.getString("Ethnicity"), j.getString("Age"), mdaDS);
+                j.getString("Gender"), "", race, j.getString("Age"), mdaDS);
 
-        // asssume specimen site is primary site?
-        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), j.getString("Primary Site"), 
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
         
+        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
+                j.getString("Primary Site"), j.getString("Primary Site"),
+                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
+
         pSnap.addSample(sample);
 
-        QualityAssurance qa = new QualityAssurance(j.getString("QA") + "on passage " + j.getString("QA Passage"),
+        String qaType = "Not Supplied";
+        try{
+            qaType = j.getString("QA") + "on passage " + j.getString("QA Passage");
+        }catch(Exception e){
+            // not all groups supplied QA
+        }
+        QualityAssurance qa = new QualityAssurance(qaType,
                 "HISTOLOGY_NOTE?", ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
-
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"),
-                "Tumor Prep", sample, nsgBS, qa);
-        modelCreation.addRelatedSample(sample);
-
-        String markerPlatform = j.getString("Marker Platform");
-        boolean human = false;
-        if ("CMS50".equals(markerPlatform) || "CMS400".equals(markerPlatform)) {
-            human = true;
+        String strain = j.getString("Strain");
+        BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
+        
+        String engraftmentSite = "Not Supplied";
+        try{
+            engraftmentSite = j.getString("Engraftment Site");
+        }catch(Exception e){
+            // uggh
         }
         
-        String markerStr = j.getString("Markers");
+        String tumorPrep = "Not Supplied";
         
+        try{
+            tumorPrep = j.getString("Tumor Prep");
+        }catch(Exception e){
+            // uggh again
+        }
+
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, engraftmentSite,
+                tumorPrep, sample, bs, qa);
+        modelCreation.addRelatedSample(sample);
+
+        boolean human = false;
+        String markerPlatform = "Not Specified";
+        try {
+            markerPlatform = j.getString("Marker Platform");
+            if ("CMS50".equals(markerPlatform) || "CMS400".equals(markerPlatform)) {
+                human = true;
+            }
+        } catch (Exception e) {
+            // this is for the FANG data and we don't really care about markers at this point anyway
+        }
+
+        String markerStr = j.getString("Markers");
+
         String[] markers = markerStr.split(";");
-        if(markerStr.trim().length()>0){
-            
+        if (markerStr.trim().length() > 0) {
+
             MolecularCharacterization molC = new MolecularCharacterization(markerPlatform);
             Set<MarkerAssociation> markerAssocs = new HashSet();
-            
+
             for (int i = 0; i < markers.length; i++) {
                 Marker m = loaderUtils.getMarker(markers[i], markers[i]);
                 MarkerAssociation ma = new MarkerAssociation();
@@ -184,10 +225,10 @@ public class LoadMDAnderson implements CommandLineRunner {
                 int passage = 0;
                 try {
                     passage = new Integer(j.getString("QA Passage").replaceAll("P", "")).intValue();
-                } catch (NumberFormatException e) {
+                } catch (Exception e) {
                     // default is 0
-                     }
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation, 
+                }
+                Specimen specimen = loaderUtils.getSpecimen(modelCreation,
                         modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
                 specimen.setSample(sample);
 
@@ -195,7 +236,7 @@ public class LoadMDAnderson implements CommandLineRunner {
 
             }
         }
-        
+
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
     }
