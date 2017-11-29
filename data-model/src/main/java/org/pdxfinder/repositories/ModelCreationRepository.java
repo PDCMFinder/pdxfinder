@@ -82,6 +82,31 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
 
 
     //Ontology powered search: returns less data to improve performance
+
+    @Query("MATCH (term:OntologyTerm)<-[mapp:MAPPED_TO]-(humSample:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
+            "        WHERE term.label = {query} " +
+            "        AND (humSample.dataSource IN {dataSource} OR {dataSource}=[]) " +
+            "        WITH humSample,i,mod " +
+
+            "        MATCH (humSample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
+            "        MATCH (humSample)-[ot:OF_TYPE]-(tt:TumorType) " +
+            "        WHERE (tt.name IN {tumorType} OR {tumorType}=[])  " +
+            "        return humSample, i, mod, o, t, ot, tt ")
+    Collection<ModelCreation> findByOntologyDirectMapped(@Param("query") String query, @Param("markers") String[] markers,
+                                             @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
+
+    @Query("MATCH (term:OntologyTerm)<-[*]-(child:OntologyTerm)-[mapp:MAPPED_TO]-(humSample:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
+            "        WHERE term.label = {query} " +
+            "        AND (humSample.dataSource IN {dataSource} OR {dataSource}=[]) " +
+            "        WITH humSample,i,mod " +
+
+            "        MATCH (humSample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
+            "        MATCH (humSample)-[ot:OF_TYPE]-(tt:TumorType) " +
+            "        WHERE (tt.name IN {tumorType} OR {tumorType}=[])  " +
+            "        return humSample, i, mod, o, t, ot, tt ")
+    Collection<ModelCreation> findByOntologyIndirectMapped(@Param("query") String query, @Param("markers") String[] markers,
+                                             @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
+
     @Query("MATCH (term:OntologyTerm)<-[*]-(child:OntologyTerm)-[mapp:MAPPED_TO]-(humSample:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
             "        WHERE term.label = {query} " +
             "        AND (humSample.dataSource IN {dataSource} OR {dataSource}=[]) " +
