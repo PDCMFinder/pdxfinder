@@ -37,8 +37,8 @@ public class GraphService {
 
         for (OntologyTerm ontologyTerm : ontologyTerms) {
             if (ontologyTerm.getLabel() != null) {
-
-                dataReport.add(ontologyTerm.getLabel() + " (" + ontologyTerm.getIndirectMappedSamplesNumber() + ")");
+                int mappedNumber = ontologyTerm.getDirectMappedSamplesNumber() + ontologyTerm.getIndirectMappedSamplesNumber();
+                dataReport.add(ontologyTerm.getLabel() + " (" + mappedNumber + ")");
             }
         }
         // Arrange the result alphabetically
@@ -57,22 +57,9 @@ public class GraphService {
 
         for (OntologyTerm ontologyTerm : ontologyTerms) {
             if (ontologyTerm.getLabel() != null) {
-                Set<String> synonyms = ontologyTerm.getSynonyms();
-                /*
-                if(synonyms.isEmpty()){
 
-                    dataReport.add("["+ontologyTerm.getLabel() + "] (" + ontologyTerm.getIndirectMappedSamplesNumber() + ")");
-                }
-                else{
-
-                    for(String synonym:synonyms){
-
-                        dataReport.add(synonym + " ["+ontologyTerm.getLabel() + "] (" + ontologyTerm.getIndirectMappedSamplesNumber() + ")");
-                    }
-                }
-                */
-
-                dataReport.add(ontologyTerm.getLabel() + " (" + ontologyTerm.getIndirectMappedSamplesNumber() + ")");
+                int mappedNumber = ontologyTerm.getDirectMappedSamplesNumber() + ontologyTerm.getIndirectMappedSamplesNumber();
+                dataReport.add(ontologyTerm.getLabel() + " (" + mappedNumber + ")");
 
 
             }
