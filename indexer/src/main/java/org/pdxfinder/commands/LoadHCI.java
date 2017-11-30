@@ -37,13 +37,12 @@ public class LoadHCI implements CommandLineRunner {
     private final static Logger log = LoggerFactory.getLogger(LoadHCI.class);
 
     private final static String HCI_DATASOURCE_ABBREVIATION = "HCI-BCM(PDXNet)";
-    private final static String HCI_DATASOURCE_NAME = "Huntsman Cancer Institute (PDXNet)";
-    private final static String HCI_DATASOURCE_DESCRIPTION = "Huntsman Cancer Institute PDX mouse models for PDXNet.";
+    private final static String HCI_DATASOURCE_NAME = "HCI-BCM(PDXNet)";
+    private final static String HCI_DATASOURCE_DESCRIPTION = "HCI-BCM PDX mouse models for PDXNet.";
 
     private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
-
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 

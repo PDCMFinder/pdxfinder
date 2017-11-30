@@ -36,9 +36,9 @@ public class LoadWISTAR implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadWISTAR.class);
 
-    private final static String WISTAR_DATASOURCE_ABBREVIATION = "WISTAR-MDAnderson-Penn(PDXNet)";
-    private final static String WISTAR_DATASOURCE_NAME = "WISTAR(PDXNet)";
-    private final static String WISTAR_DATASOURCE_DESCRIPTION = "WISTAR PDX mouse models for PDXNet.";
+    private final static String WISTAR_DATASOURCE_ABBREVIATION = "Wistar-MDAnderson-Penn(PDXNet)";
+    private final static String WISTAR_DATASOURCE_NAME = "Wistar-MDAnderson-Penn(PDXNet)";
+    private final static String WISTAR_DATASOURCE_DESCRIPTION = "Wistar-MDAnderson-Penn PDX mouse models for PDXNet.";
 
     private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
