@@ -28,17 +28,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Load data from University of Texas MD Anderson PDXNet.
+ * Load models from WISTAR
  */
 @Component
 @Order(value = 0)
-public class LoadMDAnderson implements CommandLineRunner {
+public class LoadWISTAR implements CommandLineRunner {
 
-    private final static Logger log = LoggerFactory.getLogger(LoadMDAnderson.class);
+    private final static Logger log = LoggerFactory.getLogger(LoadWISTAR.class);
 
-    private final static String MDA_DATASOURCE_ABBREVIATION = "MDAnderson(PDXNet)";
-    private final static String MDA_DATASOURCE_NAME = "MDAnderson(PDXNet)";
-    private final static String MDA_DATASOURCE_DESCRIPTION = "University Texas MD Anderson PDX mouse models for PDXNet.";
+    private final static String WISTAR_DATASOURCE_ABBREVIATION = "WISTAR (PDXNet)";
+    private final static String WISTAR_DATASOURCE_NAME = "WISTAR (PDXNet)";
+    private final static String WISTAR_DATASOURCE_DESCRIPTION = "WISTAR PDX mouse models for PDXNet.";
 
     private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
@@ -48,7 +48,7 @@ public class LoadMDAnderson implements CommandLineRunner {
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
     //   private BackgroundStrain nsgBS;
-    private ExternalDataSource mdaDS;
+    private ExternalDataSource wistarDS;
 
     private Options options;
     private CommandLineParser parser;
@@ -58,49 +58,46 @@ public class LoadMDAnderson implements CommandLineRunner {
     private LoaderUtils loaderUtils;
     private Session session;
 
-    //   @Value("${mdapdx.url}")
-    //   private String urlStr;
+    @Value("${wistarpdx.url}")
+    private String urlStr;
+    
+    
     @PostConstruct
     public void init() {
         formatter = new HelpFormatter();
     }
 
-    public LoadMDAnderson(LoaderUtils loaderUtils) {
+    public LoadWISTAR(LoaderUtils loaderUtils) {
         this.loaderUtils = loaderUtils;
     }
 
     @Override
     public void run(String... args) throws Exception {
 
-        String[] urls = {"http://tumor.informatics.jax.org/PDXInfo/MBMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/CRCMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/MinnaMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/FangMDAnderson.json"};
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("loadMDA", "Load MDAnderson PDX data");
-        parser.accepts("loadALL", "Load all, including MDA PDX data");
+        parser.accepts("loadWISTAR", "Load WISTAR PDX data");
+        parser.accepts("loadALL", "Load all, including WISTAR PDX data");
         OptionSet options = parser.parse(args);
 
-        if (options.has("loadMDA") || options.has("loadALL")) {
+        if (options.has("loadWISTAR") || options.has("loadALL")) {
 
-            log.info("Loading MDAnderson PDX data.");
+            log.info("Loading WISTAR PDX data from URL " + urlStr);
+            parseJSON(parseURL(urlStr));
 
-            for (String urlStr : urls) {
 
-                log.info("Loading from URL " + urlStr);
-                parseJSON(parseURL(urlStr));
-
-            }
         }
 
     }
 
     private void parseJSON(String json) {
 
-        mdaDS = loaderUtils.getExternalDataSource(MDA_DATASOURCE_ABBREVIATION, MDA_DATASOURCE_NAME, MDA_DATASOURCE_DESCRIPTION);
+        wistarDS = loaderUtils.getExternalDataSource(WISTAR_DATASOURCE_ABBREVIATION, WISTAR_DATASOURCE_NAME, WISTAR_DATASOURCE_DESCRIPTION);
         //      nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
             JSONObject job = new JSONObject(json);
-            JSONArray jarray = job.getJSONArray("MDA");
+            JSONArray jarray = job.getJSONArray("WISTAR");
 
             for (int i = 0; i < jarray.length(); i++) {
 
@@ -110,7 +107,7 @@ public class LoadMDAnderson implements CommandLineRunner {
             }
 
         } catch (Exception e) {
-            log.error("Error getting MDA PDX models", e);
+            log.error("Error getting WISTAR PDX models", e);
 
         }
     }
@@ -123,12 +120,9 @@ public class LoadMDAnderson implements CommandLineRunner {
         String diagnosis = j.getString("Clinical Diagnosis");
         String histology = j.getString("Histology");
         if (histology.trim().length() > 0) {
-            if ("ACA".equals(histology)) {
-                diagnosis = "Adenocarcinoma";
-            } else {
                 diagnosis = histology;
             }
-        }
+        
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
         
@@ -147,12 +141,12 @@ public class LoadMDAnderson implements CommandLineRunner {
 
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
-                j.getString("Gender"), "", race, j.getString("Age"), mdaDS);
+                j.getString("Gender"), "", race, j.getString("Age"), wistarDS);
 
         
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), j.getString("Primary Site"),
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
+                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS);
 
         pSnap.addSample(sample);
 
@@ -187,58 +181,11 @@ public class LoadMDAnderson implements CommandLineRunner {
                 tumorPrep, sample, bs, qa);
         modelCreation.addRelatedSample(sample);
 
-        boolean human = false;
-        String markerPlatform = "Not Specified";
-        try {
-            markerPlatform = j.getString("Marker Platform");
-            if ("CMS50".equals(markerPlatform) || "CMS400".equals(markerPlatform)) {
-                human = true;
-            }
-        } catch (Exception e) {
-            // this is for the FANG data and we don't really care about markers at this point anyway
-        }
+        
+        
+        
 
-        String markerStr = j.getString("Markers");
-
-        String[] markers = markerStr.split(";");
-        if (markerStr.trim().length() > 0) {
-
-            MolecularCharacterization molC = new MolecularCharacterization(markerPlatform);
-            Set<MarkerAssociation> markerAssocs = new HashSet();
-
-            for (int i = 0; i < markers.length; i++) {
-                Marker m = loaderUtils.getMarker(markers[i], markers[i]);
-                MarkerAssociation ma = new MarkerAssociation();
-                ma.setMarker(m);
-                markerAssocs.add(ma);
-            }
-            molC.setMarkerAssociations(markerAssocs);
-            Set<MolecularCharacterization> mcs = new HashSet<>();
-            mcs.add(molC);
-            sample.setMolecularCharacterizations(mcs);
-
-            if (human) {
-                pSnap.addSample(sample);
-
-            } else {
-
-                int passage = 0;
-                try {
-                    passage = new Integer(j.getString("QA Passage").replaceAll("P", "")).intValue();
-                } catch (Exception e) {
-                    // default is 0
-                }
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation,
-                        modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
-                specimen.setSample(sample);
-
-                loaderUtils.saveSpecimen(specimen);
-
-            }
-        }
-
-        loaderUtils.saveSample(sample);
-        loaderUtils.savePatientSnapshot(pSnap);
+        
     }
 
     private String parseURL(String urlStr) {
