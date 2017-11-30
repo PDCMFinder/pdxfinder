@@ -91,4 +91,11 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "OPTIONAL MATCH (s)-[oft:OF_TYPE]-(tt:TumorType) " +
             "RETURN s, ot,t, oft, tt SKIP {from} LIMIT {to}")
     Collection<Sample> findHumanSamplesFromTo(@Param("from") int from, @Param("to") int to);
+
+    @Query("MATCH (ps:PatientSnapshot)-[sf:SAMPLED_FROM]-(s:Sample) WHERE NOT (s)-[:MAPPED_TO]-() " +
+            "WITH s " +
+            "OPTIONAL MATCH (s)-[ot:ORIGIN_TISSUE]-(ti:Tissue) " +
+            "OPTIONAL MATCH  (s)-[oft:OF_TYPE]-(t:TumorType) " +
+            "RETURN DISTINCT  s, ti, t, ot, oft")
+    Collection<Sample> findSamplesWithoutOntologyMapping();
 }
