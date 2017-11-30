@@ -95,7 +95,7 @@ function displayResults(q,data){
     div.empty();
 
     var rpanel = jQuery("<div/>");
-    rpanel.addClass("panel panel-primary ");
+    rpanel.addClass("panel panel-primary lilPadding");
 
     var tbody = jQuery("<tbody/>");
     //var markerString = '';
@@ -114,8 +114,7 @@ function displayResults(q,data){
         }
 
         var tr = jQuery('<tr><td><a href="/pdx/'+ data[i].dataSource+'/'+ data[i].modelId+
-            '" target="_blank">'+data[i].modelId+'</a></td><td>'+data[i].diagnosis+'</td><td>'+ data[i].mappedOntology+'</td><td>'
-            +data[i].tissueOfOrigin+'</td><td>'+data[i].dataSource+'</td></tr>');
+            '" target="_blank" class="pdxfinder-link" style="text-decoration:none">'+data[i].modelId+'</a></td><td>'+data[i].diagnosis+'</td><td>'+data[i].tissueOfOrigin+'</td><td>'+ data[i].mappedOntology+'</td><td>'+data[i].dataSource+'</td></tr>');
 
         if(sources.indexOf(data[i].dataSource) == -1){
             sources.push(data[i].dataSource);
@@ -126,15 +125,15 @@ function displayResults(q,data){
 
     }
 
-    rpanel.append('<div class="panel-heading">You searched for "'+q+'". Found '+data.length+' result(s) in '+sources.length+' source(s).</div>');
+
+    rpanel.append('<div class="panel-heading"><h5> You searched for "'+q+'". Found '+data.length+' result(s) in '+sources.length+' source(s). </h5></div>');
     rpanel.append('<div class="panel-body"></div>');
 
     var resTable = jQuery("<table/>");
     resTable.attr("id","resultsTable");
-    resTable.addClass("table table-striped no-footer");
+    resTable.addClass("table table-striped table-borderedPdx table-hover");
 
-    resTable.append('<thead><tr><th>Model ID</th><th>Histology</th>' +
-        '<th>Ontology Mapping</th><th>Primary Tissue</th><th>Data source</th></tr></thead>');
+    resTable.append('<thead><tr><th>Model ID</th><th>Histology</th><th>Primary Tissue</th><th>Ontology Mapping</th><th>Data source</th></tr></thead>');
 
 
     resTable.append(tbody);
