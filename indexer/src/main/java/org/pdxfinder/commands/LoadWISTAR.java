@@ -36,7 +36,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadWISTAR.class);
 
-    private final static String WISTAR_DATASOURCE_ABBREVIATION = "WISTAR(PDXNet)";
+    private final static String WISTAR_DATASOURCE_ABBREVIATION = "WISTAR-MDAnderson-Penn(PDXNet)";
     private final static String WISTAR_DATASOURCE_NAME = "WISTAR(PDXNet)";
     private final static String WISTAR_DATASOURCE_DESCRIPTION = "WISTAR PDX mouse models for PDXNet.";
 

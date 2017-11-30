@@ -75,7 +75,8 @@ public class LoadMDAnderson implements CommandLineRunner {
         String[] urls = {"http://tumor.informatics.jax.org/PDXInfo/MBMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/CRCMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/MinnaMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/FangMDAnderson.json"};
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("loadMDA", "Load MDAnderson PDX data");
+        parser.accepts("loadMDA", "Load MDAnderson PDX data");git status
+                
         parser.accepts("loadALL", "Load all, including MDA PDX data");
         OptionSet options = parser.parse(args);
 
