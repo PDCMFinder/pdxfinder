@@ -349,8 +349,11 @@ public class LoadIRCCData implements CommandLineRunner {
                 //It's a mouse sample otherwise and the passage is xeno_passage - 1
 
                 //create a human sample
+                //getSample(String sourceSampleId, String typeStr, String diagnosis,
+                // String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
+
                 humanSample = loaderUtils.getSample(sampleId, s.getTumorType(), s.getDiagnosis(),
-                        s.getSampleSite(), patientsMap.get(patientId).getPrimarySite(), "Extraction Method", "", NORMAL_TISSUE, DS);
+                        patientsMap.get(patientId).getPrimarySite(), s.getSampleSite(), "Extraction Method", "", NORMAL_TISSUE, DS);
 
 
                 pSnap.addSample(humanSample);
