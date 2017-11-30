@@ -83,7 +83,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
 
 
     //Ontology powered search: returns less data to improve performance
-    @Query("MATCH (term:OntologyTerm)<-[*]-(child:OntologyTerm)-[mapp:MAPPED_TO]-(humSample:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
+    @Query("MATCH (term:OntologyTerm)<-[*0..]-(child:OntologyTerm)-[mapp:MAPPED_TO]-(humSample:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
             "        WHERE term.label = {query} " +
             "        AND (humSample.dataSource IN {dataSource} OR {dataSource}=[]) " +
             "        WITH humSample,i,mod,mapp,child " +
