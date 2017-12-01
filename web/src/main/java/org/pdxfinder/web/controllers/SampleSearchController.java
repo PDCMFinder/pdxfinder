@@ -35,7 +35,7 @@ public class SampleSearchController
         public List<SearchDTO> search2(@RequestParam(value="diag", required = false) String diag,
                                        @RequestParam(value="markers[]", required = false) String[] markers,
                                        @RequestParam(value="datasources[]", required = false) String[] datasources,
-                                       @RequestParam(value="originttumortypes[]", required = false) String[] origintumortypes ) {
+                                       @RequestParam(value="origintumortypes[]", required = false) String[] origintumortypes ) {
 
             if(diag == null) diag = "";
             if(markers == null) markers = new String[]{};

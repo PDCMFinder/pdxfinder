@@ -1,5 +1,7 @@
 package org.pdxfinder.commands;
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
@@ -11,15 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-
 import java.net.URL;
 import java.util.*;
 
@@ -27,7 +26,7 @@ import java.util.*;
  * Created by csaba on 21/08/2017.
  */
 @Component
-@Order(value = Ordered.LOWEST_PRECEDENCE)
+@Order(value = 200)
 public class ValidateGeneSymbols implements CommandLineRunner{
 
 
@@ -59,24 +58,27 @@ public class ValidateGeneSymbols implements CommandLineRunner{
     @Override
     public void run(String... args) throws Exception {
 
-        log.info(args[0]);
+        OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
+        parser.accepts("validateGeneSymbols", "Validate gene symbols");
+        parser.accepts("loadALL", "Load all, including validating gene symbols");
+        OptionSet options = parser.parse(args);
 
-        if ("validateGeneSymbols".equals(args[0]) || "-validateGeneSymbols".equals(args[0])) {
+        long startTime = System.currentTimeMillis();
 
+        if (options.has("validateGeneSymbols") || options.has("loadALL")) {
 
-            long startTime = System.currentTimeMillis();
             validateSymbols();
-            long endTime   = System.currentTimeMillis();
-            long totalTime = endTime - startTime;
 
-            int seconds = (int) (totalTime / 1000) % 60 ;
-            int minutes = (int) ((totalTime / (1000*60)) % 60);
+        }
 
-            System.out.println("Loading finished after "+minutes+" minute(s) and "+seconds+" second(s)");
-        }
-        else{
-            log.info("Missing command");
-        }
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+
+        int seconds = (int) (totalTime / 1000) % 60;
+        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
+
+        log.info(this.getClass().getSimpleName() + " finished after " + minutes + " minute(s) and " + seconds + " second(s)");
 
     }
 

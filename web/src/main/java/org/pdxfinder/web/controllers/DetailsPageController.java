@@ -1,13 +1,20 @@
 package org.pdxfinder.web.controllers;
 
+import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.DetailsDTO;
+import org.pdxfinder.services.dto.VariationDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by csaba on 12/05/2017.
@@ -25,11 +32,27 @@ public class DetailsPageController {
     @RequestMapping(value = "/pdx/{dataSrc}/{modelId}")
     public String details(@PathVariable String dataSrc,
                           @PathVariable String modelId,
-                          @RequestParam(value="page", required = false) Integer page,Model model){
+                          @RequestParam(value="page", required = false) Integer page,
+                          @RequestParam(value="size", required = false) Integer size,Model model){
 
         int viewPage = (page == null || page < 1) ? 0 : page-1;
+        int viewSize = (size == null || size < 1) ? 10 : size;
 
-        DetailsDTO dto = searchService.searchForModel(dataSrc,modelId,viewPage);
+        Map<String, String> patientTech = searchService.findPatientPlatforms(dataSrc,modelId);
+        Map<String, Set<String>> modelTechAndPassages = searchService.findModelPlatformAndPassages(dataSrc,modelId,"");
+
+        DetailsDTO dto = searchService.searchForModel(dataSrc,modelId,viewPage,viewSize,"","","");
+
+        List<VariationDataDTO> variationDataDTOList = new ArrayList<>();
+        for (String tech : modelTechAndPassages.keySet()) {
+            VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,"",viewPage,viewSize,"",1,"","");
+            variationDataDTOList.add(variationDataDTO);
+        }
+
+        // dto.setTotalPages((int) Math.ceil(totalRecords/dSize) );
+
+
+        model.addAttribute("nonjsVariationdata", variationDataDTOList);
 
         model.addAttribute("fullData",dto);
 
@@ -56,39 +79,24 @@ public class DetailsPageController {
         model.addAttribute("markers", dto.getCancerGenomics());
         model.addAttribute("url", dto.getExternalUrl());
         model.addAttribute("urlText", dto.getExternalUrlText());
+        model.addAttribute("mappedOntology", dto.getMappedOntology());
 
-        model.addAttribute("specimenId", dto.getSpecimenId());
-        model.addAttribute("technology", dto.getTechnology());
+        //model.addAttribute("specimenId", dto.getSpecimenId());
+        for (Specimen specimen : dto.getSpecimens()) {
+            model.addAttribute("specimenId",specimen.getExternalId() );
+        }
+
         model.addAttribute("totalPages", dto.getTotalPages());
         model.addAttribute("presentPage", viewPage+1);
         model.addAttribute("totalRecords", dto.getVariationDataCount());
 
         model.addAttribute("variationData", dto.getMarkerAssociations());
 
+        model.addAttribute("modelInfo", modelTechAndPassages);
+        model.addAttribute("patientInfo", patientTech);
+
+
         //TODO: return error page if sampleId does not exist
         return "details";
     }
 }
-
-
-
-
-        /*
-        this.externalId = "";
-        this.dataSource = "";
-        this.patientId = "";
-        this.gender = "";
-        this.age = "";
-        this.race = "";
-        this.ethnicity = "";
-        this.diagnosis = "";
-        this.tumorType = "";
-        this.classification = "";
-        this.originTissue = "";
-        this.sampleSite = "";
-
-        this.sampleType = "";
-        this.strain = "";
-        this.mouseSex = "";
-        this.engraftmentSite = "";
-        */

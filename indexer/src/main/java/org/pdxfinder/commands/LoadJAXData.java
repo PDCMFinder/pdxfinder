@@ -1,6 +1,11 @@
 package org.pdxfinder.commands;
 
-import org.apache.commons.cli.*;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
@@ -10,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +35,7 @@ import java.util.stream.Stream;
  * Load data from JAX.
  */
 @Component
-@Order(value = Ordered.LOWEST_PRECEDENCE)
+@Order(value = 0)
 public class LoadJAXData implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadJAXData.class);
@@ -82,12 +86,7 @@ public class LoadJAXData implements CommandLineRunner {
 
     @PostConstruct
     public void init() {
-        options = new Options();
-        parser = new DefaultParser();
         formatter = new HelpFormatter();
-        log.info("Setting up LoadJAXDataCommand option");
-        options.addOption("loadJAX", false, "Load Jax PDX data");
-        options.addOption(LoaderUtils.loadAll);
     }
 
     public LoadJAXData(LoaderUtils loaderUtils) {
@@ -97,18 +96,16 @@ public class LoadJAXData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-            try {
-                cmd = parser.parse(options, args);
+        OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
+        parser.accepts("loadJAX", "Load JAX PDX data");
+        parser.accepts("loadALL", "Load all, including JAX PDX data");
+        OptionSet options = parser.parse(args);
 
+        if (options.has("loadJAX") || options.has("loadALL")) {
 
-            } catch (UnrecognizedOptionException | MissingArgumentException e) {
-                formatter.printHelp("loadJAX", options);
-                System.exit(1);
-            }
+            log.info("Loading JAX PDX data.");
 
-        if (cmd.hasOption("loadJAX") || cmd.hasOption(LoaderUtils.loadAll.getOpt())) {
-
-            System.out.println("Loading JAX PDX data.");
             if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
                 parseJSON(parseURL(urlStr));
@@ -118,8 +115,6 @@ public class LoadJAXData implements CommandLineRunner {
             } else {
                 log.error("No jaxpdx.file or jaxpdx.url provided in properties");
             }
-        } else {
-            System.out.println("Not loading JAX. Use '-loadJAX' switch to load JAX data.");
         }
     }
 
@@ -185,7 +180,7 @@ public class LoadJAXData implements CommandLineRunner {
         loaderUtils.savePatientSnapshot(pSnap);
 
         ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), this.ENGRAFTMENT, sample, nsgBS, qa);
-
+        mc.addRelatedSample(sample);
         loadVariationData(mc);
 
     }
@@ -308,11 +303,11 @@ public class LoadJAXData implements CommandLineRunner {
 
                 //PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
 
-                sample = (sample==null)?"":sample;
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sample, this.jaxDS.getName(), passage);
+                
+                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sampleKey, this.jaxDS.getName(), passage);
      
                 Sample specSample = new Sample();
-                specSample.setSourceSampleId(sample);
+                specSample.setSourceSampleId(sampleKey);
                 specimen.setSample(specSample);
                 specSample.setMolecularCharacterizations(mcs);
                 //specimen.setPdxPassage(pdxPassage);
@@ -329,12 +324,17 @@ public class LoadJAXData implements CommandLineRunner {
 
                 //loaderUtils.savePdxPassage(pdxPassage);
                 loaderUtils.saveSpecimen(specimen);
+
+                modelCreation.addRelatedSample(specSample);
+                loaderUtils.saveModelCreation(modelCreation);
+
                 System.out.println("saved passage " + passage + " for model " + modelCreation.getSourcePdxId() + " from sample " + sampleKey);
             }
 
         } catch (Exception e) {
             log.error("", e);
         }
+        
 
     }
 

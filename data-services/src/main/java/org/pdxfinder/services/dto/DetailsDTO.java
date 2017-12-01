@@ -2,6 +2,8 @@ package org.pdxfinder.services.dto;
 
 import org.pdxfinder.dao.MarkerAssociation;
 import org.pdxfinder.dao.MolecularCharacterization;
+import org.pdxfinder.dao.Platform;
+import org.pdxfinder.dao.Specimen;
 
 import java.util.List;
 import java.util.Set;
@@ -34,13 +36,14 @@ public class DetailsDTO {
 
     private String externalUrl;
     private String externalUrlText;
+    private String mappedOntology;
 
 
 
 
-    private String specimenId;
-    private String technology;
-    private Set<MolecularCharacterization> molecularCharacterizations;
+    private List<Specimen> specimens;
+    private Set<Platform> platforms;
+    private Set<MolecularCharacterization>  molecularCharacterizations;
     private Set< Set<MarkerAssociation> > markerAssociations;
     private int totalPages;
     private int variationDataCount;
@@ -67,9 +70,8 @@ public class DetailsDTO {
         this.engraftmentSite = "";
         this.externalUrl = "";
         this.externalUrlText = "";
+        this.mappedOntology = "";
 
-        this.specimenId = "";
-        this.technology = "";
         this.totalPages = 0;
     }
 
@@ -235,20 +237,28 @@ public class DetailsDTO {
         this.externalUrlText = externalUrlText;
     }
 
-    public String getSpecimenId() {
-        return specimenId;
+    public List<Specimen> getSpecimens() {
+        return specimens;
     }
 
-    public void setSpecimenId(String specimenId) {
-        this.specimenId = specimenId;
+    public void setMappedOntology(String mappedOntology) {
+        this.mappedOntology = mappedOntology;
     }
 
-    public String getTechnology() {
-        return technology;
+    public String getMappedOntology() {
+        return mappedOntology;
     }
 
-    public void setTechnology(String technology) {
-        this.technology = technology;
+    public void setSpecimens(List<Specimen> specimens) {
+        this.specimens = specimens;
+    }
+
+    public Set<Platform> getPlatforms() {
+        return platforms;
+    }
+
+    public void setPlatforms(Set<Platform> platforms) {
+        this.platforms = platforms;
     }
 
     public Set< Set<MarkerAssociation> > getMarkerAssociations() {
@@ -259,7 +269,8 @@ public class DetailsDTO {
         this.markerAssociations = markerAssociations;
     }
 
-    public Set<MolecularCharacterization> getMolecularCharacterizations() {
+    public Set<MolecularCharacterization>  getMolecularCharacterizations() {
+
         return molecularCharacterizations;
     }
 

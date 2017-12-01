@@ -1,5 +1,7 @@
 package org.pdxfinder.commands;
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
@@ -8,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +25,7 @@ import java.util.Set;
  * Created by csaba on 12/06/2017.
  */
 @Component
-@Order(value = Ordered.LOWEST_PRECEDENCE)
+@Order(value = -100)
 public class LoadDiseaseOntology implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadDiseaseOntology.class);
@@ -42,24 +43,26 @@ public class LoadDiseaseOntology implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        log.info(args[0]);
+        OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
+        parser.accepts("loadDO", "Load Disease ontology");
+        OptionSet options = parser.parse(args);
 
-        if ("loadDO".equals(args[0]) || "-loadDO".equals(args[0])) {
+        long startTime = System.currentTimeMillis();
+
+        if (options.has("loadDO")) {
 
             log.info("Loading cancer branch of Disease Ontology.");
-            long startTime = System.currentTimeMillis();
             loadDO();
-            long endTime   = System.currentTimeMillis();
-            long totalTime = endTime - startTime;
-
-            int seconds = (int) (totalTime / 1000) % 60 ;
-            int minutes = (int) ((totalTime / (1000*60)) % 60);
-
-            log.info("Loading finished after " + minutes + " minute(s) and " + seconds + " second(s)");
         }
-        else{
-            log.info("Not loading disease ontology");
-        }
+
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+
+        int seconds = (int) (totalTime / 1000) % 60;
+        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
+
+        log.info(this.getClass().getSimpleName() + " finished after " + minutes + " minute(s) and " + seconds + " second(s)");
 
     }
 

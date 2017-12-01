@@ -5,6 +5,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -18,6 +19,11 @@ public interface PlatformRepository extends PagingAndSortingRepository<Platform,
 
     @Query("MATCH (p:Platform)-[]-(d:ExternalDataSource) where p.name = {name} and d.name={dataSource} return p")
     Platform findByNameAndDataSource(@Param("name") String name, @Param("dataSource") String dataSource);
-    
+
+    @Query("MATCH (s:Sample)--(mod:ModelCreation)--(pass:PdxPassage)--(spec:Specimen)--(msamp:Sample)--(molchar:MolecularCharacterization)-->(plat:Platform) " +
+            "WHERE s.dataSource = {dataSource} AND mod.sourcePdxId={modelId} " +
+            "RETURN distinct plat")
+    List<Platform> findModelPlatformByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
+
 
 }

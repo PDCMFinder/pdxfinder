@@ -1,5 +1,7 @@
 package org.pdxfinder.commands;
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -9,12 +11,12 @@ import org.pdxfinder.dao.*;
 import org.pdxfinder.irccdatamodel.IRCCMarkerMutation;
 import org.pdxfinder.irccdatamodel.IRCCPatient;
 import org.pdxfinder.irccdatamodel.IRCCSample;
-import org.pdxfinder.irccdatamodel.IRCCVariantsRow;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ import java.util.*;
  * Created by csaba on 18/04/2017.
  */
 @Component
+@Order(value = 0)
 public class LoadIRCCData implements CommandLineRunner {
 
 
@@ -59,7 +62,6 @@ public class LoadIRCCData implements CommandLineRunner {
     Map<String, IRCCPatient> patientsMap;
     Map<String, List<IRCCSample>> samplesMap;
     Map<String, List<IRCCMarkerMutation>> markersMutationMap;
-    Map<String, List<IRCCVariantsRow>> variantsMap;
 
     @Value("${irccpatients.file}")
     private String patientsFile;
@@ -70,25 +72,25 @@ public class LoadIRCCData implements CommandLineRunner {
     @Value("${irccmarkermutation.file}")
     private String markerMutationsFile;
 
-    @Value("${irccvariations.file}")
-    private String variationsFile;
 
     @Override
     @Transactional
     public void run(String... args) throws Exception {
 
-        log.info(args[0]);
+        OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
+        parser.accepts("loadIRCC", "Load IRCC PDX data");
+        parser.accepts("loadALL", "Load all, including JAX PDX data");
+        OptionSet options = parser.parse(args);
 
-        if ("loadIRCC".equals(args[0]) || "-loadIRCC".equals(args[0])) {
+        if (options.has("loadIRCC") || options.has("loadALL")) {
 
             log.info("Loading IRCC PDX data.");
-
 
             loadDataFromFiles();
             //validateData();
             loadToNeo4j();
 
-            log.info("Finished loading IRCC PDX data.");
 
         }
     }
@@ -103,7 +105,6 @@ public class LoadIRCCData implements CommandLineRunner {
         this.patientsMap = new HashMap<>();
         this.samplesMap = new HashMap<>();
         this.markersMutationMap = new HashMap<>();
-        this.variantsMap = new HashMap<>();
 
 
         String currentLine;
@@ -226,51 +227,6 @@ public class LoadIRCCData implements CommandLineRunner {
             e.printStackTrace();
         }
 
-
-
-        //load variations file
-        currentLineCounter = 1;
-        try {
-            BufferedReader buf = new BufferedReader(new FileReader(variationsFile));
-            currentLine = null;
-
-            while (true) {
-                currentLine = buf.readLine();
-                if (currentLine == null) {
-                    break;
-                } else if (currentLineCounter < 2) {
-                    currentLineCounter++;
-                    continue;
-
-                } else {
-                    rowData = currentLine.split("\t");
-                    //String sampleId, String chrom, String pos, String ref, String alt, String gene,
-                    // String cds, String protein, String type, String effect, String annotation
-                    IRCCVariantsRow v = new IRCCVariantsRow(rowData[1], rowData[4], rowData[5], rowData[6], rowData[7], rowData[10],
-                            rowData[13], rowData[14], rowData[16], rowData[17],rowData[112]);
-
-                    if(this.variantsMap.containsKey(rowData[1])){
-
-                        this.variantsMap.get(rowData[1]).add(v);
-                    }
-                    else{
-                        List<IRCCVariantsRow> vl = new ArrayList<>();
-                        vl.add(v);
-
-                        this.variantsMap.put(rowData[1], vl);
-                    }
-
-
-                }
-                currentLineCounter++;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        //List<IRCCVariantsRow> test = variantsMap.get("PD25720a2");
-        log.info("Variants loaded.");
     }
 
 
@@ -368,7 +324,7 @@ public class LoadIRCCData implements CommandLineRunner {
         for (Map.Entry<String, List<IRCCSample>> entry : this.samplesMap.entrySet()) {
 
             String patientId = entry.getKey();
-            System.out.println(patientId);
+            log.debug("Loading data for patient "+patientId);
             List<IRCCSample> samples = entry.getValue();
 
 
@@ -393,8 +349,11 @@ public class LoadIRCCData implements CommandLineRunner {
                 //It's a mouse sample otherwise and the passage is xeno_passage - 1
 
                 //create a human sample
+                //getSample(String sourceSampleId, String typeStr, String diagnosis,
+                // String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
+
                 humanSample = loaderUtils.getSample(sampleId, s.getTumorType(), s.getDiagnosis(),
-                        s.getSampleSite(), patientsMap.get(patientId).getPrimarySite(), "Extraction Method", "", NORMAL_TISSUE, DS);
+                        patientsMap.get(patientId).getPrimarySite(), s.getSampleSite(), "Extraction Method", "", NORMAL_TISSUE, DS);
 
 
                 pSnap.addSample(humanSample);

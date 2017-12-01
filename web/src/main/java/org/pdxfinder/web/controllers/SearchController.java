@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,77 +16,75 @@ import java.util.Set;
  * Created by jmason on 16/03/2017.
  */
 @Controller
-public class SearchController
-{
+public class SearchController {
 
-        private GraphService graphService;
-        public SearchController(GraphService graphService) {
-            this.graphService = graphService;
+    private GraphService graphService;
+
+    public SearchController(GraphService graphService) {
+        this.graphService = graphService;
+    }
+
+    @RequestMapping("/search")
+    String index(Model model) throws JSONException {
+
+
+        //Cancers by system
+        JSONArray cancerBySystemDataSeriesArray = new JSONArray();
+
+        Map<String, Integer> cancerBySystem = graphService.getModelCountsBySystem();
+        for (String name : cancerBySystem.keySet()) {
+
+            JSONObject dataSeries = new JSONObject();
+            dataSeries.put("name", name);
+            dataSeries.put("y", cancerBySystem.get(name));
+
+            cancerBySystemDataSeriesArray.put(dataSeries);
         }
-
-        @RequestMapping("/search")
-        String index(Model model) throws JSONException
-        {
+        model.addAttribute("cancerBySystem", cancerBySystemDataSeriesArray.toString());
 
 
-                    //Cancers by system
-                    JSONArray cancerBySystemDataSeriesArray = new JSONArray();
+        /**
+         * Retrieve Mapped NCIT Terms
+         *
+         */
 
-                    Map<String, Integer> cancerBySystem = graphService.getModelCountsBySystem();
-                    for (String name : cancerBySystem.keySet())
-                    {
-
-                        JSONObject dataSeries = new JSONObject();
-                            dataSeries.put("name", name);
-                            dataSeries.put("y", cancerBySystem.get(name));
-
-                            cancerBySystemDataSeriesArray.put(dataSeries);
-
-                    }
-                    model.addAttribute("cancerBySystem", cancerBySystemDataSeriesArray.toString());
+        Set<String> autoSuggestList = graphService.getMappedNCITTerms();
+        model.addAttribute("mappedDOTerm", autoSuggestList);
 
 
-            /**
-             * Retrieve Mapped NCIT Terms
-             *
-             */
+        // Cancers by tissue
+        JSONArray cancerByTissueDataSeriesArray = new JSONArray();
 
-            Set<String> autoSuggestList = graphService.getMappedNCITTerms();
-            model.addAttribute("mappedDOTerm", autoSuggestList);
+        Map<String, Integer> cancerByTissue = graphService.getModelCountsByTissue();
+        for (String name : cancerByTissue.keySet()) {
 
+            JSONObject dataSeries = new JSONObject();
+            dataSeries.put("y", cancerByTissue.get(name));
+            dataSeries.put("name", name);
 
+            cancerByTissueDataSeriesArray.put(dataSeries);
 
-                    // Cancers by tissue
-                    JSONArray cancerByTissueDataSeriesArray = new JSONArray();
-
-                    Map<String, Integer> cancerByTissue = graphService.getModelCountsByTissue();
-                    for (String name : cancerByTissue.keySet())
-                    {
-
-                            JSONObject dataSeries = new JSONObject();
-                            dataSeries.put("name", name);
-                            dataSeries.put("y", cancerByTissue.get(name));
-
-                            cancerByTissueDataSeriesArray.put(dataSeries);
-
-                    }
-                    model.addAttribute("cancerByTissue", cancerByTissueDataSeriesArray.toString());
-                    System.out.println("+++ cancerByTissue" + cancerByTissueDataSeriesArray);
-
-
-
-                    JSONObject dataByCellType = new JSONObject();
-
-
-
-                return "search";
         }
+        model.addAttribute("cancerByTissue", cancerByTissueDataSeriesArray.toString());
+        System.out.println("+++ cancerByTissue" + cancerByTissueDataSeriesArray);
+
+
+        JSONObject dataByCellType = new JSONObject();
+
+
+             /*
+             Get datasource abbreviations dynamically
+              */
+
+        List<String> dataSources = graphService.getDataSourceAbbreviations();
+        model.addAttribute("dataSources", dataSources);
+
+
+        return "search";
+    }
 
 
 }
-
-
-
 
 
 //        JSONArray cancerByCellTypeDataSeriesArray = new JSONArray();
@@ -103,7 +102,6 @@ public class SearchController
 //
 //        model.addAttribute("cancerByCellType", cancerByCellTypeDataSeriesArray.toString());
 //        System.out.println("+++ cancerByCellType" + cancerByCellTypeDataSeriesArray);
-
 
 
 // The data for producing a highcharts pie chart format

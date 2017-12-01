@@ -1,20 +1,19 @@
 package org.pdxfinder.commands;
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.neo4j.ogm.session.Session;
-import org.pdxfinder.dao.*;
+import org.pdxfinder.dao.PatientSnapshot;
 import org.pdxfinder.irccdatamodel.IRCCEGARow;
-import org.pdxfinder.irccdatamodel.IRCCMarkerMutation;
-import org.pdxfinder.irccdatamodel.IRCCPatient;
-import org.pdxfinder.irccdatamodel.IRCCSample;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +21,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by csaba on 08/08/2017.
  */
 @Component
+@Order(value = 100)
 public class CreateIRCCEGA implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(CreateIRCCEGA.class);
@@ -52,16 +53,18 @@ public class CreateIRCCEGA implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
 
-        log.info(args[0]);
+        OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
+        parser.accepts("createIRCCEGA", "Create IRCC EGA links");
+        OptionSet options = parser.parse(args);
 
-        if ("createIRCCEGA".equals(args[0]) || "-createIRCCEGA".equals(args[0])) {
+        if (options.has("createIRCCEGA")) {
 
             log.info("Creating IRCC EGA file");
 
             loadDataFromFile();
             insertDataFromDB();
             createAndSave();
-
 
         }
     }

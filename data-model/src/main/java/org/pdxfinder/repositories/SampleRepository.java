@@ -54,6 +54,7 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "RETURN mod,ii,s,o,t,ot, tt, mc, ma, m, mar, cb, aw")
     Sample findBySourcePdxId(@Param("sourcePdxId") String sourcePdxId);
 
+
     @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
             "WHERE mod.sourcePdxId = {sourcePdxId} " +
             "AND toLower(s.dataSource) = toLower({dataSource}) " +
@@ -61,8 +62,10 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "OPTIONAL MATCH (s)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
             "OPTIONAL MATCH (s)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
             "OPTIONAL MATCH (s)-[ot:OF_TYPE]-(tt:TumorType) " +
-            "RETURN mod,ii,s,o,t,ot, tt, mc, ma, m, mar, cb, aw")
+            "OPTIONAL MATCH (s)-[mapped:MAPPED_TO]-(oterm:OntologyTerm) " +
+            "RETURN mod,ii,s,o,t,ot, tt, mc, ma, m, mar, cb, aw, mapped, oterm")
     Sample findByDataSourceAndPdxId(@Param("dataSource") String dataSource, @Param("sourcePdxId") String sourcePdxId);
+
 
     @Query("MATCH (p:Patient--(ps:PatientSnapshot)--(s:Sample) " +
             "WHERE p.externalId = {patientId} " +
@@ -78,4 +81,21 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
 
     @Query("MATCH (sp:Specimen)--(s:Sample) WHERE s.sourceSampleId = {sampleId} AND s.dataSource = {dataSource} RETURN s")
     Sample findMouseSampleBySampleIdAndDataSource(@Param("sampleId") String sampleId, @Param("dataSource") String dataSource);
+
+    @Query("MATCH (ps:PatientSnapshot)--(s:Sample) RETURN count(s)")
+    int findHumanSamplesNumber();
+
+    @Query("MATCH (ps:PatientSnapshot)--(s:Sample) " +
+            "WITH s " +
+            "OPTIONAL MATCH (s)-[ot:ORIGIN_TISSUE]-(t:Tissue) " +
+            "OPTIONAL MATCH (s)-[oft:OF_TYPE]-(tt:TumorType) " +
+            "RETURN s, ot,t, oft, tt SKIP {from} LIMIT {to}")
+    Collection<Sample> findHumanSamplesFromTo(@Param("from") int from, @Param("to") int to);
+
+    @Query("MATCH (ps:PatientSnapshot)-[sf:SAMPLED_FROM]-(s:Sample) WHERE NOT (s)-[:MAPPED_TO]-() " +
+            "WITH s " +
+            "OPTIONAL MATCH (s)-[ot:ORIGIN_TISSUE]-(ti:Tissue) " +
+            "OPTIONAL MATCH  (s)-[oft:OF_TYPE]-(t:TumorType) " +
+            "RETURN DISTINCT  s, ti, t, ot, oft")
+    Collection<Sample> findSamplesWithoutOntologyMapping();
 }

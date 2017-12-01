@@ -156,6 +156,9 @@ public class LoaderUtils {
         return this.modelCreationRepository.getAllModels();
     }
 
+    public void saveModelCreation(ModelCreation modelCreation){
+        this.modelCreationRepository.save(modelCreation);
+    }
 
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, ExternalDataSource externalDataSource) {
 
@@ -274,6 +277,16 @@ public class LoaderUtils {
 
 
         return sampleRepository.findHumanSampleBySampleIdAndDataSource(sampleId, dataSource);
+    }
+
+    public int getHumanSamplesNumber(){
+
+        return sampleRepository.findHumanSamplesNumber();
+    }
+
+    public Collection<Sample> getHumanSamplesFromTo(int from, int to){
+
+        return sampleRepository.findHumanSamplesFromTo(from, to);
     }
 
     public Sample getSampleBySourcePdxId(String pdxId){

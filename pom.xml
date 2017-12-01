@@ -19,6 +19,7 @@
         <module>dependencies</module>
         <module>data-model</module>
         <module>indexer</module>
+        <module>data-transformer</module>
         <module>web</module>
         <module>data-services</module>
         <module>admin</module>

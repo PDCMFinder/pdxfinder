@@ -29,7 +29,7 @@ public class Sample {
     public Boolean normalTissue;
 
     @Relationship(type="MAPPED_TO")
-    private SampleToDiseaseOntologyRelationship sampleToDiseaseOntologyRelationship;
+    private SampleToOntologyRelationShip sampleToOntologyRelationShip;
 
     @Relationship(type = "OF_TYPE", direction = Relationship.OUTGOING)
     private TumorType type;
@@ -138,14 +138,14 @@ public class Sample {
         this.molecularCharacterizations = molecularCharacterizations;
     }
 
-    public SampleToDiseaseOntologyRelationship getSampleToDiseaseOntologyRelationship() {
-        return sampleToDiseaseOntologyRelationship;
+    public SampleToOntologyRelationShip getSampleToOntologyRelationShip() {
+        return sampleToOntologyRelationShip;
     }
 
-    public void setSampleToDiseaseOntologyRelationship(SampleToDiseaseOntologyRelationship sampleToDiseaseOntologyRelationship) {
-        this.sampleToDiseaseOntologyRelationship = sampleToDiseaseOntologyRelationship;
+    public void setSampleToOntologyRelationShip(SampleToOntologyRelationShip sampleToOntologyRelationShip) {
+        this.sampleToOntologyRelationShip = sampleToOntologyRelationShip;
     }
-    
+
     public void setHistology(Set<Histology> histology){
         this.histology = histology;
     }

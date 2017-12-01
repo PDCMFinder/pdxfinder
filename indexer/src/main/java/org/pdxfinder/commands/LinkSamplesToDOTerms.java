@@ -1,17 +1,18 @@
 package org.pdxfinder.commands;
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.dao.Sample;
-import org.pdxfinder.dao.SampleToDiseaseOntologyRelationship;
+import org.pdxfinder.dao.SampleToOntologyRelationShip;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +25,7 @@ import java.util.Collection;
  * Created by csaba on 19/06/2017.
  */
 @Component
-@Order(value = Ordered.LOWEST_PRECEDENCE)
+@Order(value = 100)
 public class LinkSamplesToDOTerms implements CommandLineRunner{
 
 
@@ -42,25 +43,27 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
     @Override
     public void run(String... args) throws Exception {
 
-        log.info(args[0]);
+        OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
+        parser.accepts("linkSamplesToDOTerms", "Link samples to DO terms");
+        OptionSet options = parser.parse(args);
 
-        if ("linkSamplesToDOTerms".equals(args[0]) || "-linkSamplesToDOTerms".equals(args[0])) {
+        long startTime = System.currentTimeMillis();
+
+        if (options.has("linkSamplesToDOTerms")) {
 
             log.info("Mapping samples to DO terms.");
-            long startTime = System.currentTimeMillis();
             mapSamplesToTerms();
             updateIndirectMappingData();
-            long endTime   = System.currentTimeMillis();
-            long totalTime = endTime - startTime;
-
-            int seconds = (int) (totalTime / 1000) % 60 ;
-            int minutes = (int) ((totalTime / (1000*60)) % 60);
-
-            System.out.println("Mapping finished after "+minutes+" minute(s) and "+seconds+" second(s)");
         }
-        else{
-            log.info("Not running linkSamplesToDOTerms command");
-        }
+
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+
+        int seconds = (int) (totalTime / 1000) % 60;
+        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
+
+        log.info(this.getClass().getSimpleName() + " finished after " + minutes + " minute(s) and " + seconds + " second(s)");
 
     }
 
@@ -91,8 +94,8 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
 
                     if(sample != null && term != null){
 
-                        SampleToDiseaseOntologyRelationship r = new SampleToDiseaseOntologyRelationship(sample, term, type, justification);
-                        sample.setSampleToDiseaseOntologyRelationship(r);
+                        SampleToOntologyRelationShip r = new SampleToOntologyRelationShip(type, justification, sample, term);
+                        sample.setSampleToOntologyRelationShip(r);
                         term.setMappedTo(r);
 
                         term.setDirectMappedSamplesNumber(term.getDirectMappedSamplesNumber() + 1);

@@ -27,6 +27,8 @@ public class Specimen {
     @Relationship(type = "SAMPLED_FROM")
     private Sample sample;
 
+    @Relationship(type = "TREATED_WITH", direction = Relationship.INCOMING)
+    private Treatment treatment;
 
     public Specimen(String externalId, Set<Histology> histology) {
         this.externalId = externalId;
