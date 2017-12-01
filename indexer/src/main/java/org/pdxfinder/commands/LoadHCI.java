@@ -36,15 +36,18 @@ public class LoadHCI implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadHCI.class);
 
-    private final static String HCI_DATASOURCE_ABBREVIATION = "HCI-BCM(PDXNet)";
-    private final static String HCI_DATASOURCE_NAME = "HCI-BCM(PDXNet)";
-    private final static String HCI_DATASOURCE_DESCRIPTION = "HCI-BCM PDX mouse models for PDXNet.";
+    private final static String HCI_DATASOURCE_ABBREVIATION = "PDXNet-HCI-BCM";
+    private final static String HCI_DATASOURCE_NAME = "HCI BCM";
+    private final static String HCI_DATASOURCE_DESCRIPTION = "HCI BCM PDX mouse models for PDXNet.";
 
     private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
+    
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
+    
+    private final static String NOT_SPECIFIED = "Not Specified";
 
     private BackgroundStrain nsgBS;
     private ExternalDataSource hciDS;
@@ -88,7 +91,7 @@ public class LoadHCI implements CommandLineRunner {
                 log.info("Loading from URL " + urlStr);
                 parseJSON(parseURL(urlStr));
             } else {
-                log.error("No HCIpdx.url provided in properties");
+                log.error("No hcipdx.url provided in properties");
             }
         }
     }
@@ -139,7 +142,7 @@ public class LoadHCI implements CommandLineRunner {
         pSnap.addSample(sample);
 
         QualityAssurance qa = new QualityAssurance(j.getString("QA"),
-                "HISTOLOGY_NOTE?", ValidationTechniques.VALIDATION);
+                NOT_SPECIFIED, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
 
         ModelCreation modelCreation = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"),

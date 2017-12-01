@@ -28,19 +28,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Load data from University of Texas MD Anderson PDXNet.
+ * Load data from WUSTL PDXNet.
  */
 @Component
 @Order(value = 0)
-public class LoadMDAnderson implements CommandLineRunner {
+public class LoadWUSTL implements CommandLineRunner {
 
-    private final static Logger log = LoggerFactory.getLogger(LoadMDAnderson.class);
+    private final static Logger log = LoggerFactory.getLogger(LoadWUSTL.class);
 
-    private final static String MDA_DATASOURCE_ABBREVIATION = "PDXNet-MDAnderson";
-    private final static String MDA_DATASOURCE_NAME = "M D Anderson";
-    private final static String MDA_DATASOURCE_DESCRIPTION = "University Texas MD Anderson PDX mouse models for PDXNet.";
+    private final static String WUSTL_DATASOURCE_ABBREVIATION = "PDXNet-WUSTL";
+    private final static String WUSTL_DATASOURCE_NAME = "Washington University St. Louis";
+    private final static String WUSTL_DATASOURCE_DESCRIPTION = "Washington University St. Louis PDX mouse models for PDXNet.";
 
     private final static String NOT_SPECIFIED = "Not Specified";
+   
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -63,24 +64,24 @@ public class LoadMDAnderson implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadMDAnderson(LoaderUtils loaderUtils) {
+    public LoadWUSTL(LoaderUtils loaderUtils) {
         this.loaderUtils = loaderUtils;
     }
 
     @Override
     public void run(String... args) throws Exception {
 
-        String[] urls = {"http://tumor.informatics.jax.org/PDXInfo/MBMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/CRCMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/MinnaMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/FangMDAnderson.json"};
+        String[] urls = {"http://tumor.informatics.jax.org/PDXInfo/WUSTLBreast.json", "http://tumor.informatics.jax.org/PDXInfo/WUSTLSarcoma.json", "http://tumor.informatics.jax.org/PDXInfo/WUSTLPCM.json"};
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("loadMDA", "Load MDAnderson PDX data");
+        parser.accepts("loadWUSTL", "Load WUSTL PDX data");
                 
-        parser.accepts("loadALL", "Load all, including MDA PDX data");
+        parser.accepts("loadALL", "Load all, including WUSTL PDX data");
         OptionSet options = parser.parse(args);
 
-        if (options.has("loadMDA") || options.has("loadALL")) {
+        if (options.has("loadWUSTL") || options.has("loadALL")) {
 
-            log.info("Loading MDAnderson PDX data.");
+            log.info("Loading WUSTL PDX data.");
 
             for (String urlStr : urls) {
 
@@ -94,12 +95,12 @@ public class LoadMDAnderson implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        mdaDS = loaderUtils.getExternalDataSource(MDA_DATASOURCE_ABBREVIATION, MDA_DATASOURCE_NAME, MDA_DATASOURCE_DESCRIPTION);
+        mdaDS = loaderUtils.getExternalDataSource(WUSTL_DATASOURCE_ABBREVIATION, WUSTL_DATASOURCE_NAME, WUSTL_DATASOURCE_DESCRIPTION);
         //      nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
             JSONObject job = new JSONObject(json);
-            JSONArray jarray = job.getJSONArray("MDA");
+            JSONArray jarray = job.getJSONArray("WUSTL");
 
             for (int i = 0; i < jarray.length(); i++) {
 
@@ -109,7 +110,7 @@ public class LoadMDAnderson implements CommandLineRunner {
             }
 
         } catch (Exception e) {
-            log.error("Error getting MDA PDX models", e);
+            log.error("Error getting WUSTL PDX models", e);
 
         }
     }
@@ -122,16 +123,13 @@ public class LoadMDAnderson implements CommandLineRunner {
         String diagnosis = j.getString("Clinical Diagnosis");
         String histology = j.getString("Histology");
         if (histology.trim().length() > 0) {
-            if ("ACA".equals(histology)) {
-                diagnosis = "Adenocarcinoma";
-            } else {
                 diagnosis = histology;
-            }
+            
         }
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
         
-        String race = NOT_SPECIFIED;
+        String race = NOT_SPECIFIED;;
         try{
             if(j.getString("Race").trim().length()>0){
                 race = j.getString("Race");
@@ -167,14 +165,14 @@ public class LoadMDAnderson implements CommandLineRunner {
         String strain = j.getString("Strain");
         BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
         
-        String engraftmentSite = NOT_SPECIFIED;
+        String engraftmentSite = NOT_SPECIFIED;;
         try{
             engraftmentSite = j.getString("Engraftment Site");
         }catch(Exception e){
             // uggh
         }
         
-        String tumorPrep = NOT_SPECIFIED;
+        String tumorPrep = NOT_SPECIFIED;;
         
         try{
             tumorPrep = j.getString("Tumor Prep");
@@ -187,7 +185,7 @@ public class LoadMDAnderson implements CommandLineRunner {
         modelCreation.addRelatedSample(sample);
 
         boolean human = false;
-        String markerPlatform = NOT_SPECIFIED;
+        String markerPlatform = NOT_SPECIFIED;;
         try {
             markerPlatform = j.getString("Marker Platform");
             if ("CMS50".equals(markerPlatform) || "CMS400".equals(markerPlatform)) {
@@ -253,7 +251,7 @@ public class LoadMDAnderson implements CommandLineRunner {
             }
             in.close();
         } catch (Exception e) {
-            log.error("Unable to read from MD Anderson JSON URL " + urlStr, e);
+            log.error("Unable to read from WUSTL JSON URL " + urlStr, e);
         }
         return sb.toString();
     }
