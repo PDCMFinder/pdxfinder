@@ -54,12 +54,14 @@
                             <div class="col-md-6">
                                 <h4>Source</h4>
                                 <select id="sourceSelect" class="chosen" multiple="true" placeholder="Select source(s)...">
-                                    <option>HCI-BCM(PDXNet)</option>
+                                    <option th:each="ds:${dataSources}" th:text="${ds}"></option>
+<!--                                    <option>HCI-BCM(PDXNet)</option>
                                     <option>IRCC</option>
                                     <option>JAX</option>
                                     <option>MDAnderson(PDXNet)</option>
                                     <option>Wistar-MDAnderson-Penn(PDXNet)</option>
-                                    <option>WUSTL(PDXNet)</option>
+                                    <option>WUSTL(PDXNet)</option>-->
+
                                 </select>
                             </div>
 

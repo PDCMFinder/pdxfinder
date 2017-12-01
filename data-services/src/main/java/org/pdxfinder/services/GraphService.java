@@ -1,7 +1,9 @@
 package org.pdxfinder.services;
 
+import org.pdxfinder.dao.ExternalDataSource;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.dao.Sample;
+import org.pdxfinder.repositories.ExternalDataSourceRepository;
 import org.pdxfinder.repositories.OntologyTermRepository;
 import org.pdxfinder.repositories.SampleRepository;
 import org.slf4j.Logger;
@@ -22,12 +24,13 @@ public class GraphService {
 
     private SampleRepository sampleRepository;
     private OntologyTermRepository ontologyTermRepository;
+    private ExternalDataSourceRepository externalDataSourceRepository;
 
-    public GraphService(SampleRepository sampleRepository, OntologyTermRepository ontologyTermRepository) {
+    public GraphService(SampleRepository sampleRepository, OntologyTermRepository ontologyTermRepository, ExternalDataSourceRepository externalDataSourceRepository) {
         this.sampleRepository = sampleRepository;
         this.ontologyTermRepository = ontologyTermRepository;
+        this.externalDataSourceRepository = externalDataSourceRepository;
     }
-
 
     public Set<String> getMappedDOTerms() {
 
@@ -213,6 +216,12 @@ public class GraphService {
         cancerByTissue.put("tonsil cancer", 2);
         cancerByTissue.put("bladder cancer", 1);
         return cancerByTissue;
+    }
+
+
+    public List<String> getDataSourceAbbreviations(){
+
+        return externalDataSourceRepository.findAllAbbreviations();
     }
 
 
