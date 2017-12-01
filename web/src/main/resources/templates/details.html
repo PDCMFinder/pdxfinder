@@ -95,7 +95,7 @@
                     <style> table *{ -webkit-box-sizing:content-box; -moz-box-sizing:content-box; box-sizing:content-box;}</style>
                     <div class="col-md-12 javaScriptBrowser">
 
-                        <div class="panel panel-info">
+                        <div class="panel panel-info" th:if="${totalRecords > 0}" >
                             <div class="panel-heading">
                                 <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
                             </div>
