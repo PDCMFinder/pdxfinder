@@ -13,7 +13,6 @@ import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,6 @@ import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -74,7 +72,7 @@ public class LoadMDAnderson implements CommandLineRunner {
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadMDA", "Load MDAnderson PDX data");
-                
+
         parser.accepts("loadALL", "Load all, including MDA PDX data");
         OptionSet options = parser.parse(args);
 
@@ -130,25 +128,25 @@ public class LoadMDAnderson implements CommandLineRunner {
         }
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
-        
+
         String race = NOT_SPECIFIED;
-        try{
-            if(j.getString("Race").trim().length()>0){
+        try {
+            if (j.getString("Race").trim().length() > 0) {
                 race = j.getString("Race");
             }
-        }catch(Exception e){}
-        
-        try{
-            if(j.getString("Ethnicity").trim().length()>0){
+        } catch (Exception e) {
+        }
+
+        try {
+            if (j.getString("Ethnicity").trim().length() > 0) {
                 race = j.getString("Ethnicity");
             }
-        }catch(Exception e){}
-
+        } catch (Exception e) {
+        }
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
                 j.getString("Gender"), "", race, j.getString("Age"), mdaDS);
 
-        
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), j.getString("Primary Site"),
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
@@ -156,9 +154,9 @@ public class LoadMDAnderson implements CommandLineRunner {
         pSnap.addSample(sample);
 
         String qaType = NOT_SPECIFIED;
-        try{
+        try {
             qaType = j.getString("QA") + "on passage " + j.getString("QA Passage");
-        }catch(Exception e){
+        } catch (Exception e) {
             // not all groups supplied QA
         }
         QualityAssurance qa = new QualityAssurance(qaType,
@@ -166,19 +164,19 @@ public class LoadMDAnderson implements CommandLineRunner {
         loaderUtils.saveQualityAssurance(qa);
         String strain = j.getString("Strain");
         BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
-        
+
         String engraftmentSite = NOT_SPECIFIED;
-        try{
+        try {
             engraftmentSite = j.getString("Engraftment Site");
-        }catch(Exception e){
+        } catch (Exception e) {
             // uggh
         }
-        
+
         String tumorPrep = NOT_SPECIFIED;
-        
-        try{
+
+        try {
             tumorPrep = j.getString("Tumor Prep");
-        }catch(Exception e){
+        } catch (Exception e) {
             // uggh again
         }
 
