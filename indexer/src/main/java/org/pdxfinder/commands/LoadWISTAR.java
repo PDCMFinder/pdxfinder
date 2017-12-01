@@ -150,6 +150,9 @@ public class LoadWISTAR implements CommandLineRunner {
 
         pSnap.addSample(sample);
 
+        loaderUtils.saveSample(sample);
+        loaderUtils.savePatientSnapshot(pSnap);
+        
         String qaType = "Not Supplied";
         try{
             qaType = j.getString("QA") + "on passage " + j.getString("QA Passage");
@@ -159,6 +162,7 @@ public class LoadWISTAR implements CommandLineRunner {
         QualityAssurance qa = new QualityAssurance(qaType,
                 "HISTOLOGY_NOTE?", ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
+        
         String strain = j.getString("Strain");
         BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
         
@@ -183,7 +187,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
         
         
-        
+        loaderUtils.saveModelCreation(modelCreation);
 
         
     }
