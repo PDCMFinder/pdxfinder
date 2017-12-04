@@ -13,7 +13,6 @@ import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,6 @@ import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -148,7 +146,7 @@ public class LoadWUSTL implements CommandLineRunner {
 
         
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), j.getString("Primary Site"),
+                j.getString("Primary Site"), NOT_SPECIFIED,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
 
         pSnap.addSample(sample);

@@ -146,9 +146,11 @@ public class LoadMDAnderson implements CommandLineRunner {
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
                 j.getString("Gender"), "", race, j.getString("Age"), mdaDS);
+        
+        
 
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), j.getString("Primary Site"),
+                j.getString("Primary Site"), NOT_SPECIFIED,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
 
         pSnap.addSample(sample);
