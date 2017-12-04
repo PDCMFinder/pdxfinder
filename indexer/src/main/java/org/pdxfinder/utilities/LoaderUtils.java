@@ -255,6 +255,11 @@ public class LoaderUtils {
     }
 
 
+    public Collection<Sample> getSamplesWithoutOntologyMapping(){
+
+        return sampleRepository.findSamplesWithoutOntologyMapping();
+    }
+
     public Sample getMouseSample(ModelCreation model, String specimenId, String dataSource, int passage, String sampleId){
 
         Specimen specimen = this.getSpecimen(model, specimenId, dataSource, passage);
