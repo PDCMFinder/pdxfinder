@@ -54,8 +54,8 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
 
             "MATCH (humSample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
             "MATCH (humSample)-[ot:OF_TYPE]-(tt:TumorType) " +
-            "OPTIONAL MATCH (humSample)-[mto:MAPPED_TO]-(oterm:OntologyTerm) " +
             "WHERE (tt.name IN {tumorType} OR {tumorType}=[])  " +
+            "OPTIONAL MATCH (humSample)-[mto:MAPPED_TO]-(oterm:OntologyTerm) " +
             "RETURN humSample, i, mod, o, t, ot, tt, mto, oterm ")
     Collection<ModelCreation> findByMultipleFilters(@Param("diag") String diag, @Param("markers") String[] markers,
                                                     @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);

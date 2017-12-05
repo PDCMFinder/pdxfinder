@@ -23,9 +23,6 @@ import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Load models from WISTAR
@@ -36,16 +33,16 @@ public class LoadWISTAR implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadWISTAR.class);
 
-    private final static String WISTAR_DATASOURCE_ABBREVIATION = "Wistar-MDAnderson-Penn(PDXNet)";
-    private final static String WISTAR_DATASOURCE_NAME = "Wistar-MDAnderson-Penn(PDXNet)";
+    private final static String WISTAR_DATASOURCE_ABBREVIATION = "PDXNet-Wistar-MDAnderson-Penn";
+    private final static String WISTAR_DATASOURCE_NAME = "Wistar-MDAnderson-Penn";
     private final static String WISTAR_DATASOURCE_DESCRIPTION = "Wistar-MDAnderson-Penn PDX mouse models for PDXNet.";
 
-    private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
-    private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
-    private final static String NSG_BS_URL = "http://jax.org/strain/005557";
+  
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
+    
+     private final static String NOT_SPECIFIED = "Not Specified";
 
     //   private BackgroundStrain nsgBS;
     private ExternalDataSource wistarDS;
@@ -126,7 +123,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
         
-        String race = "Not specified";
+        String race =  NOT_SPECIFIED;
         try{
             if(j.getString("Race").trim().length()>0){
                 race = j.getString("Race");
@@ -145,7 +142,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
         
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), j.getString("Primary Site"),
+                j.getString("Primary Site"), j.getString("Specimen Site"),
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS);
 
         pSnap.addSample(sample);
@@ -153,27 +150,27 @@ public class LoadWISTAR implements CommandLineRunner {
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
         
-        String qaType = "Not Supplied";
+        String qaType = NOT_SPECIFIED;
         try{
             qaType = j.getString("QA") + "on passage " + j.getString("QA Passage");
         }catch(Exception e){
             // not all groups supplied QA
         }
         QualityAssurance qa = new QualityAssurance(qaType,
-                "HISTOLOGY_NOTE?", ValidationTechniques.VALIDATION);
+                NOT_SPECIFIED, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
         
         String strain = j.getString("Strain");
         BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
         
-        String engraftmentSite = "Not Supplied";
+        String engraftmentSite = NOT_SPECIFIED;
         try{
             engraftmentSite = j.getString("Engraftment Site");
         }catch(Exception e){
             // uggh
         }
         
-        String tumorPrep = "Not Supplied";
+        String tumorPrep = NOT_SPECIFIED;
         
         try{
             tumorPrep = j.getString("Tumor Prep");
