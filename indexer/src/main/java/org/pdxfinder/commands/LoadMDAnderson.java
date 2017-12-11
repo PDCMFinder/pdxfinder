@@ -148,9 +148,13 @@ public class LoadMDAnderson implements CommandLineRunner {
                 j.getString("Gender"), "", race, j.getString("Age"), mdaDS);
         
         
-
+        String sampleSite = NOT_SPECIFIED;
+        try{
+            sampleSite = j.getString("Sample Site");
+        }catch(Exception e){}
+       
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), NOT_SPECIFIED,
+                j.getString("Primary Site"), sampleSite,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
 
         pSnap.addSample(sample);

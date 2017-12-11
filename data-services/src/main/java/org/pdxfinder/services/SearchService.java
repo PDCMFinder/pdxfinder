@@ -28,6 +28,16 @@ public class SearchService {
     private final String JAX_URL_TEXT = "View data at JAX";
     private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
     private final String IRCC_URL_TEXT = "Contact IRCC here";
+    
+    // for PDXNet
+    private final String HCI_URL = "https://www.pdxnetwork.org/hcibcm/";
+    private final String HCI_DS = "PDXNet-HCI-BCM";
+    private final String WISTAR_URL = "https://www.pdxnetwork.org/the-wistarmd-andersonpenn/";
+    private final String WISTAR_DS = "PDXNet-Wistar-MDAnderson-Penn";
+    private final String MDA_URL = "https://www.pdxnetwork.org/md-anderson/";
+    private final String MDA_DS = "PDXNet-MDAnderson";
+    private final String WUSTL_URL = "https://www.pdxnetwork.org/wustl/";
+    private final String WUSTL_DS = "PDXNet-WUSTL";
 
 
     @Autowired
@@ -328,6 +338,18 @@ public class SearchService {
         } else if (sample != null && sample.getDataSource().equals("IRCC")) {
             dto.setExternalUrl(IRCC_URL + dto.getExternalId());
             dto.setExternalUrlText(IRCC_URL_TEXT);
+        } else if(sample != null && sample.getDataSource().equals(HCI_DS)) {
+            dto.setExternalUrl(HCI_URL);
+            dto.setExternalUrlText(HCI_DS);
+        } else if(sample != null && sample.getDataSource().equals(MDA_DS)) {
+            dto.setExternalUrl(MDA_URL);
+            dto.setExternalUrlText(MDA_DS);
+        } else if(sample != null && sample.getDataSource().equals(WUSTL_DS)) {
+            dto.setExternalUrl(WUSTL_URL);
+            dto.setExternalUrlText(WUSTL_DS);
+        } else if(sample != null && sample.getDataSource().equals(WISTAR_DS)) {
+            dto.setExternalUrl(WISTAR_URL);
+            dto.setExternalUrlText(WISTAR_DS);
         }
         else{
             dto.setExternalUrl("#");

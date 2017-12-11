@@ -127,7 +127,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                     if(originTissue == null || originTissue.equals("null")) originTissue = "";
                     if(tumorType == null || tumorType.equals("null")) tumorType = "";
 
-                    //if it is a direct mapping, add it to the rules, key = diagnosis
+                    //if it is a direct mapping, add it to the rules, key = DS+diagnosis
 
                     if(mapType.equals("direct")){
 
@@ -136,7 +136,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                         rule.setOntologyTerm(ontologyTerm);
                         rule.setMapType(mapType);
 
-                        this.mappingRules.put(sampleDiagnosis, rule);
+                        this.mappingRules.put(dataSource+sampleDiagnosis, rule);
 
                     }
                     //if it is an inferred mapping, key = dataSource+sampleDiagnosis+originTissue+tumorType
@@ -172,19 +172,19 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
         if (tumorType == null) tumorType = "";
 
         // 1. check whether the diagnosis exists in the keys = direct map type
-        if(this.mappingRules.containsKey(diagnosis.toLowerCase())){
+        if(this.mappingRules.containsKey(dataSource+diagnosis.toLowerCase())){
 
-            mr =  this.mappingRules.get(diagnosis.toLowerCase());
+            return this.mappingRules.get(dataSource+diagnosis.toLowerCase());
         }
         // 2. else check whether a general inferred rule exists, key = ANY+sampleDiagnosis+originTissue+tumorType
         if(this.mappingRules.containsKey("ANY"+diagnosis.toLowerCase()+originTissue+tumorType)){
 
-            mr =  this.mappingRules.get("ANY"+diagnosis.toLowerCase()+originTissue+tumorType);
+            return this.mappingRules.get("ANY"+diagnosis.toLowerCase()+originTissue+tumorType);
         }
         //3. else check whether a dataSource specific inferred rule exists, key = dataSource+sampleDiagnosis+originTissue+tumorType
         if(this.mappingRules.containsKey(dataSource+diagnosis.toLowerCase()+originTissue+tumorType)){
 
-            mr = this.mappingRules.get(dataSource+diagnosis.toLowerCase()+originTissue+tumorType);
+            return this.mappingRules.get(dataSource+diagnosis.toLowerCase()+originTissue+tumorType);
         }
         //4. if no mapping rule was found, return empty object
 
@@ -229,7 +229,6 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                 MappingRule mappingRule = getMappingForSample(dataSource, diagnosis, originTissue, tumorType);
 
                 //deal with empty mapping rules here!
-
                 if(mappingRule.getOntologyTerm() == null || mappingRule.getOntologyTerm().equals("")){
 
                     MissingMapping mm = new MissingMapping(dataSource, diagnosis, originTissue, tumorType);
