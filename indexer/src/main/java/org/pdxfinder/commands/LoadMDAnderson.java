@@ -13,7 +13,6 @@ import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,6 @@ import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,13 +34,11 @@ public class LoadMDAnderson implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadMDAnderson.class);
 
-    private final static String MDA_DATASOURCE_ABBREVIATION = "MDAnderson(PDXNet)";
-    private final static String MDA_DATASOURCE_NAME = "MDAnderson(PDXNet)";
+    private final static String MDA_DATASOURCE_ABBREVIATION = "PDXNet-MDAnderson";
+    private final static String MDA_DATASOURCE_NAME = "M D Anderson";
     private final static String MDA_DATASOURCE_DESCRIPTION = "University Texas MD Anderson PDX mouse models for PDXNet.";
 
-    private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
-    private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
-    private final static String NSG_BS_URL = "http://jax.org/strain/005557";
+    private final static String NOT_SPECIFIED = "Not Specified";
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -76,7 +72,7 @@ public class LoadMDAnderson implements CommandLineRunner {
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadMDA", "Load MDAnderson PDX data");
-                
+
         parser.accepts("loadALL", "Load all, including MDA PDX data");
         OptionSet options = parser.parse(args);
 
@@ -132,55 +128,61 @@ public class LoadMDAnderson implements CommandLineRunner {
         }
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
-        
-        String race = "Not specified";
-        try{
-            if(j.getString("Race").trim().length()>0){
+
+        String race = NOT_SPECIFIED;
+        try {
+            if (j.getString("Race").trim().length() > 0) {
                 race = j.getString("Race");
             }
-        }catch(Exception e){}
-        
-        try{
-            if(j.getString("Ethnicity").trim().length()>0){
+        } catch (Exception e) {
+        }
+
+        try {
+            if (j.getString("Ethnicity").trim().length() > 0) {
                 race = j.getString("Ethnicity");
             }
-        }catch(Exception e){}
-
+        } catch (Exception e) {
+        }
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
                 j.getString("Gender"), "", race, j.getString("Age"), mdaDS);
-
         
+        
+        String sampleSite = NOT_SPECIFIED;
+        try{
+            sampleSite = j.getString("Sample Site");
+        }catch(Exception e){}
+       
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), j.getString("Primary Site"),
+                j.getString("Primary Site"), sampleSite,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
 
         pSnap.addSample(sample);
 
-        String qaType = "Not Supplied";
-        try{
+        String qaType = NOT_SPECIFIED;
+        try {
             qaType = j.getString("QA") + "on passage " + j.getString("QA Passage");
-        }catch(Exception e){
+        } catch (Exception e) {
             // not all groups supplied QA
         }
         QualityAssurance qa = new QualityAssurance(qaType,
-                "HISTOLOGY_NOTE?", ValidationTechniques.VALIDATION);
+                NOT_SPECIFIED, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
         String strain = j.getString("Strain");
         BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
-        
-        String engraftmentSite = "Not Supplied";
-        try{
+
+        String engraftmentSite = NOT_SPECIFIED;
+        try {
             engraftmentSite = j.getString("Engraftment Site");
-        }catch(Exception e){
+        } catch (Exception e) {
             // uggh
         }
-        
-        String tumorPrep = "Not Supplied";
-        
-        try{
+
+        String tumorPrep = NOT_SPECIFIED;
+
+        try {
             tumorPrep = j.getString("Tumor Prep");
-        }catch(Exception e){
+        } catch (Exception e) {
             // uggh again
         }
 
@@ -189,7 +191,7 @@ public class LoadMDAnderson implements CommandLineRunner {
         modelCreation.addRelatedSample(sample);
 
         boolean human = false;
-        String markerPlatform = "Not Specified";
+        String markerPlatform = NOT_SPECIFIED;
         try {
             markerPlatform = j.getString("Marker Platform");
             if ("CMS50".equals(markerPlatform) || "CMS400".equals(markerPlatform)) {

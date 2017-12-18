@@ -13,7 +13,6 @@ import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -27,29 +26,26 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Load data from University of Texas MD Anderson PDXNet.
+ * Load data from WUSTL PDXNet.
  */
 @Component
 @Order(value = 0)
-public class LoadHCI implements CommandLineRunner {
+public class LoadWUSTL implements CommandLineRunner {
 
-    private final static Logger log = LoggerFactory.getLogger(LoadHCI.class);
+    private final static Logger log = LoggerFactory.getLogger(LoadWUSTL.class);
 
-    private final static String HCI_DATASOURCE_ABBREVIATION = "PDXNet-HCI-BCM";
-    private final static String HCI_DATASOURCE_NAME = "HCI BCM";
-    private final static String HCI_DATASOURCE_DESCRIPTION = "HCI BCM PDX mouse models for PDXNet.";
+    private final static String WUSTL_DATASOURCE_ABBREVIATION = "PDXNet-WUSTL";
+    private final static String WUSTL_DATASOURCE_NAME = "Washington University St. Louis";
+    private final static String WUSTL_DATASOURCE_DESCRIPTION = "Washington University St. Louis PDX mouse models for PDXNet.";
 
-    private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
-    private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
-    private final static String NSG_BS_URL = "http://jax.org/strain/005557";
-    
+    private final static String NOT_SPECIFIED = "Not Specified";
+   
+
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
-    
-    private final static String NOT_SPECIFIED = "Not Specified";
 
-    private BackgroundStrain nsgBS;
-    private ExternalDataSource hciDS;
+    //   private BackgroundStrain nsgBS;
+    private ExternalDataSource mdaDS;
 
     private Options options;
     private CommandLineParser parser;
@@ -59,50 +55,50 @@ public class LoadHCI implements CommandLineRunner {
     private LoaderUtils loaderUtils;
     private Session session;
 
-    @Value("${hcipdx.url}")
-    private String urlStr;
-
-   
-
+    //   @Value("${mdapdx.url}")
+    //   private String urlStr;
     @PostConstruct
     public void init() {
         formatter = new HelpFormatter();
     }
 
-    public LoadHCI(LoaderUtils loaderUtils) {
+    public LoadWUSTL(LoaderUtils loaderUtils) {
         this.loaderUtils = loaderUtils;
     }
 
     @Override
     public void run(String... args) throws Exception {
 
+        String[] urls = {"http://tumor.informatics.jax.org/PDXInfo/WUSTLBreast.json", "http://tumor.informatics.jax.org/PDXInfo/WUSTLSarcoma.json", "http://tumor.informatics.jax.org/PDXInfo/WUSTLPCM.json"};
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("loadHCI", "Load HCI PDX data");
-        parser.accepts("loadALL", "Load all, including HCI PDX data");
+        parser.accepts("loadWUSTL", "Load WUSTL PDX data");
+                
+        parser.accepts("loadALL", "Load all, including WUSTL PDX data");
         OptionSet options = parser.parse(args);
 
-        if (options.has("loadHCI") || options.has("loadALL")) {
+        if (options.has("loadWUSTL") || options.has("loadALL")) {
 
-            log.info("Loading Huntsman PDX data.");
+            log.info("Loading WUSTL PDX data.");
 
-            if (urlStr != null) {
+            for (String urlStr : urls) {
+
                 log.info("Loading from URL " + urlStr);
                 parseJSON(parseURL(urlStr));
-            } else {
-                log.error("No hcipdx.url provided in properties");
+
             }
         }
+
     }
 
     private void parseJSON(String json) {
 
-        hciDS = loaderUtils.getExternalDataSource(HCI_DATASOURCE_ABBREVIATION, HCI_DATASOURCE_NAME, HCI_DATASOURCE_DESCRIPTION);
-        nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        mdaDS = loaderUtils.getExternalDataSource(WUSTL_DATASOURCE_ABBREVIATION, WUSTL_DATASOURCE_NAME, WUSTL_DATASOURCE_DESCRIPTION);
+        //      nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
             JSONObject job = new JSONObject(json);
-            JSONArray jarray = job.getJSONArray("HCI");
+            JSONArray jarray = job.getJSONArray("WUSTL");
 
             for (int i = 0; i < jarray.length(); i++) {
 
@@ -112,7 +108,7 @@ public class LoadHCI implements CommandLineRunner {
             }
 
         } catch (Exception e) {
-            log.error("Error getting HCI PDX models", e);
+            log.error("Error getting WUSTL PDX models", e);
 
         }
     }
@@ -124,40 +120,87 @@ public class LoadHCI implements CommandLineRunner {
         // the preference is for histology
         String diagnosis = j.getString("Clinical Diagnosis");
         String histology = j.getString("Histology");
-        if(histology.trim().length()>0){
-            diagnosis = histology;
+        if (histology.trim().length() > 0) {
+                diagnosis = histology;
+            
         }
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
+        
+        String race = NOT_SPECIFIED;;
+        try{
+            if(j.getString("Race").trim().length()>0){
+                race = j.getString("Race");
+            }
+        }catch(Exception e){}
+        
+        try{
+            if(j.getString("Ethnicity").trim().length()>0){
+                race = j.getString("Ethnicity");
+            }
+        }catch(Exception e){}
+
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
-                j.getString("Gender"),"", j.getString("Ethnicity"), j.getString("Age"), hciDS);
+                j.getString("Gender"), "", race, j.getString("Age"), mdaDS);
 
-        // asssume specimen site is primary site?
-        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), NOT_SPECIFIED, 
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, hciDS);
         
+        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
+                j.getString("Primary Site"), NOT_SPECIFIED,
+                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
+
         pSnap.addSample(sample);
 
-        QualityAssurance qa = new QualityAssurance(j.getString("QA"),
+        String qaType = NOT_SPECIFIED;
+        try{
+            qaType = j.getString("QA") + "on passage " + j.getString("QA Passage");
+        }catch(Exception e){
+            // not all groups supplied QA
+        }
+        QualityAssurance qa = new QualityAssurance(qaType,
                 NOT_SPECIFIED, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
+        String strain = j.getString("Strain");
+        BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
+        
+        String engraftmentSite = NOT_SPECIFIED;;
+        try{
+            engraftmentSite = j.getString("Engraftment Site");
+        }catch(Exception e){
+            // uggh
+        }
+        
+        String tumorPrep = NOT_SPECIFIED;;
+        
+        try{
+            tumorPrep = j.getString("Tumor Prep");
+        }catch(Exception e){
+            // uggh again
+        }
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"),
-                j.getString("Tumor Prep"), sample, nsgBS, qa);
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, engraftmentSite,
+                tumorPrep, sample, bs, qa);
         modelCreation.addRelatedSample(sample);
 
-       
-        
+        boolean human = false;
+        String markerPlatform = NOT_SPECIFIED;;
+        try {
+            markerPlatform = j.getString("Marker Platform");
+            if ("CMS50".equals(markerPlatform) || "CMS400".equals(markerPlatform)) {
+                human = true;
+            }
+        } catch (Exception e) {
+            // this is for the FANG data and we don't really care about markers at this point anyway
+        }
+
         String markerStr = j.getString("Markers");
-        
+
         String[] markers = markerStr.split(";");
-        if(markerStr.trim().length()>0){
-            
-            MolecularCharacterization molC = new MolecularCharacterization(j.getString("Platform"));
+        if (markerStr.trim().length() > 0) {
+
+            MolecularCharacterization molC = new MolecularCharacterization(markerPlatform);
             Set<MarkerAssociation> markerAssocs = new HashSet();
-            
+
             for (int i = 0; i < markers.length; i++) {
                 Marker m = loaderUtils.getMarker(markers[i], markers[i]);
                 MarkerAssociation ma = new MarkerAssociation();
@@ -169,28 +212,26 @@ public class LoadHCI implements CommandLineRunner {
             mcs.add(molC);
             sample.setMolecularCharacterizations(mcs);
 
-            // this is not the case AFAIK
-            if (true) {
+            if (human) {
                 pSnap.addSample(sample);
 
             } else {
 
                 int passage = 0;
                 try {
-                    // this appears to be "multiple" for most values not sure how to handle default will be 0
                     passage = new Integer(j.getString("QA Passage").replaceAll("P", "")).intValue();
-                } catch (NumberFormatException e) {
+                } catch (Exception e) {
                     // default is 0
-                     }
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation, 
-                        modelCreation.getSourcePdxId(), hciDS.getAbbreviation(), passage);
+                }
+                Specimen specimen = loaderUtils.getSpecimen(modelCreation,
+                        modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
                 specimen.setSample(sample);
 
                 loaderUtils.saveSpecimen(specimen);
 
             }
         }
-        
+
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
     }
@@ -208,7 +249,7 @@ public class LoadHCI implements CommandLineRunner {
             }
             in.close();
         } catch (Exception e) {
-            log.error("Unable to read from MD Anderson JSON URL " + urlStr, e);
+            log.error("Unable to read from WUSTL JSON URL " + urlStr, e);
         }
         return sb.toString();
     }
