@@ -2,11 +2,13 @@ package org.pdxfinder.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pdxfinder.transcommands.DataTransformerService;
+import org.pdxfinder.transdatamodel.PdxInfo;
 import org.pdxfinder.transdatamodel.PdmrPdxInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,6 +16,7 @@ import java.util.List;
 
 
 @RestController
+@RequestMapping("/transformer")
 public class TransController {
 
 
@@ -36,12 +39,15 @@ public class TransController {
     }
 
 
-    @GetMapping("/")
-    public List<PdmrPdxInfo> getAllPdmr()
+    @GetMapping("/view-data")
+    public PdxInfo getAllPdmr()
     {
         List<PdmrPdxInfo> pdmrPdxInfos = dataTransformerService.getAllPdmr();
 
-        return pdmrPdxInfos;
+        PdxInfo pdxInfo = new PdxInfo();
+        pdxInfo.setPdxInfo(pdmrPdxInfos);
+
+        return pdxInfo;
     }
 
 

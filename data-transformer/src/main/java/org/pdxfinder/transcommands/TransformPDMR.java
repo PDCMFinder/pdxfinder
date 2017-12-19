@@ -56,7 +56,7 @@ public class TransformPDMR implements CommandLineRunner {
             }
         }
         else{
-            log.info("No data Loading or transformation at the moment, the tomcat server is running for browser based access");
+            log.info("No data Loading or transformation at the moment, the tomcat server is running for browser based access, to Load data use program argument: -transformPDMR");
         }
     }
 
