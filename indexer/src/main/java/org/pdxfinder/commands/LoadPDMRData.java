@@ -38,7 +38,7 @@ import java.util.stream.Stream;
 @Order(value = 0)
 public class LoadPDMRData implements CommandLineRunner {
 
-    private final static Logger log = LoggerFactory.getLogger(LoadJAXData.class);
+    private final static Logger log = LoggerFactory.getLogger(LoadPDMRData.class);
 
     private final static String DATASOURCE_ABBREVIATION = "PDMR";
     private final static String DATASOURCE_NAME = "National Cancer Institute";
