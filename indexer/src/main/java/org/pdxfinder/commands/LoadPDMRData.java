@@ -109,10 +109,10 @@ public class LoadPDMRData implements CommandLineRunner {
             if (file != null) {
                 log.info("Loading from file " + file);
                 parseJSON(parseFile(file));
-            } else if (urlStr != null) {
+            } /* else if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
                 parseJSON(parseURL(urlStr));
-            } else {
+            } */else {
                 log.error("No pdmrpdx.file or pdmrpdx.url provided in properties");
             }
         }
@@ -147,7 +147,7 @@ public class LoadPDMRData implements CommandLineRunner {
     void createGraphObjects(JSONObject j) throws Exception {
         String id = j.getString("Model ID");
 
-        histologyMap = getHistologyImageMap(id);
+        //histologyMap = getHistologyImageMap(id);
 
         // the preference is for clinical diagnosis but if not available use initial diagnosis
         String diagnosis = j.getString("Clinical Diagnosis");
@@ -164,6 +164,7 @@ public class LoadPDMRData implements CommandLineRunner {
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, jaxDS);
 
+        /*
         if (histologyMap.containsKey("Patient")) {
             Histology histology = new Histology();
             Image image = histologyMap.get("Patient");
@@ -171,7 +172,7 @@ public class LoadPDMRData implements CommandLineRunner {
             sample.addHistology(histology);
 
         }
-
+        */
         // For the moment, all JAX models are assumed to have been validated using Histological assessment by a pathologist
         // TODO: verify this is the case
         QualityAssurance qa = new QualityAssurance("Histology", HISTOLOGY_NOTE, ValidationTechniques.VALIDATION);
@@ -182,7 +183,7 @@ public class LoadPDMRData implements CommandLineRunner {
 
         ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), this.ENGRAFTMENT, sample, nsgBS, qa);
         mc.addRelatedSample(sample);
-        loadVariationData(mc);
+        //loadVariationData(mc);
 
     }
 
