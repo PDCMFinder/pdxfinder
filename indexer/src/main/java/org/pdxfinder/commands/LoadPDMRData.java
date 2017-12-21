@@ -43,8 +43,8 @@ public class LoadPDMRData implements CommandLineRunner {
     private final static String DATASOURCE_ABBREVIATION = "PDMR";
     private final static String DATASOURCE_NAME = "National Cancer Institute";
     private final static String DATASOURCE_DESCRIPTION = "The NCI Patient-Derived Models Repository ";
-    private final static String NSG_BS_NAME = "";
-    private final static String NSG_BS_SYMBOL = "";
+    private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
+    private final static String NSG_BS_SYMBOL = "NOD.Cg-PrkdcscidIl2rgtm1Wjl/SzJ";
     private final static String NSG_BS_URL = "";
     private final static String HISTOLOGY_NOTE = "";
     private final static String ENGRAFTMENT = "Engraftment";
@@ -181,7 +181,7 @@ public class LoadPDMRData implements CommandLineRunner {
         pSnap.addSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
 
-        ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), this.ENGRAFTMENT, sample, nsgBS, qa);
+        ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS, qa);
         mc.addRelatedSample(sample);
         //loadVariationData(mc);
 
