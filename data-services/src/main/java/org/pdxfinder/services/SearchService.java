@@ -28,6 +28,8 @@ public class SearchService {
     private final String JAX_URL_TEXT = "View data at JAX";
     private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
     private final String IRCC_URL_TEXT = "Contact IRCC here";
+    private final String PDMR_URL = "https://pdmdb.cancer.gov/pls/apex/f?p=101:41";
+    private final String PDMR_URL_TEXT = "Access PDMR here";
     
     // for PDXNet
     private final String HCI_URL = "https://www.pdxnetwork.org/hcibcm/";
@@ -350,6 +352,10 @@ public class SearchService {
         } else if(sample != null && sample.getDataSource().equals(WISTAR_DS)) {
             dto.setExternalUrl(WISTAR_URL);
             dto.setExternalUrlText(WISTAR_DS);
+        }
+        else if(sample != null && sample.getDataSource().equals("PDMR")) {
+            dto.setExternalUrl(PDMR_URL);
+            dto.setExternalUrlText(PDMR_URL_TEXT);
         }
         else{
             dto.setExternalUrl("#");

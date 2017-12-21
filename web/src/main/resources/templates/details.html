@@ -575,8 +575,9 @@
 
 
             <br/>
-            <a class="btn btn-lg btn-success" th:href="${url}" th:text="${urlText}">
-                For more information please visit <i class="fa fa-external-link"></i></a>
+            <th:block th:if="${urlText != 'Unknown source'}"  >
+            <a class="btn btn-lg btn-success" th:href="${url}" th:text="${urlText}"> For more information please visit <i class="fa fa-external-link"></i></a>
+            </th:block>
 
         </div>
     </div>
