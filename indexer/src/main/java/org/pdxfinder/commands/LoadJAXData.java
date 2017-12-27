@@ -154,6 +154,13 @@ public class LoadJAXData implements CommandLineRunner {
             diagnosis = j.getString("Initial Diagnosis");
 
         }
+        
+        // if the diagnosis is still unknown don't load it
+        if(diagnosis.toLowerCase().contains("unknown") ||
+           diagnosis.toLowerCase().contains("not specified")){
+            System.out.println("Skipping model "+id+" with diagnosis:"+diagnosis);
+            return;
+        }
 
         String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
 

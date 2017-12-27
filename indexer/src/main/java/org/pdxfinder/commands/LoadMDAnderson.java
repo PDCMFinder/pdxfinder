@@ -129,13 +129,7 @@ public class LoadMDAnderson implements CommandLineRunner {
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
 
-        String race = NOT_SPECIFIED;
-        try {
-            if (j.getString("Race").trim().length() > 0) {
-                race = j.getString("Race");
-            }
-        } catch (Exception e) {
-        }
+        String race = getValue("Race",j);
 
         try {
             if (j.getString("Ethnicity").trim().length() > 0) {
@@ -148,10 +142,8 @@ public class LoadMDAnderson implements CommandLineRunner {
                 j.getString("Gender"), "", race, j.getString("Age"), mdaDS);
         
         
-        String sampleSite = NOT_SPECIFIED;
-        try{
-            sampleSite = j.getString("Sample Site");
-        }catch(Exception e){}
+        String sampleSite = getValue("Sample Site",j);
+        
        
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), sampleSite,
@@ -165,32 +157,23 @@ public class LoadMDAnderson implements CommandLineRunner {
         } catch (Exception e) {
             // not all groups supplied QA
         }
+        
         QualityAssurance qa = new QualityAssurance(qaType,
                 NOT_SPECIFIED, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
         String strain = j.getString("Strain");
         BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
 
-        String engraftmentSite = NOT_SPECIFIED;
-        try {
-            engraftmentSite = j.getString("Engraftment Site");
-        } catch (Exception e) {
-            // uggh
-        }
-
-        String tumorPrep = NOT_SPECIFIED;
-
-        try {
-            tumorPrep = j.getString("Tumor Prep");
-        } catch (Exception e) {
-            // uggh again
-        }
+        String engraftmentSite = getValue("Engraftment Site",j);
+        
+        String tumorPrep = getValue("Tumor Prep",j);
 
         ModelCreation modelCreation = loaderUtils.createModelCreation(id, engraftmentSite,
                 tumorPrep, sample, bs, qa);
         modelCreation.addRelatedSample(sample);
 
         boolean human = false;
+        
         String markerPlatform = NOT_SPECIFIED;
         try {
             markerPlatform = j.getString("Marker Platform");
@@ -242,6 +225,17 @@ public class LoadMDAnderson implements CommandLineRunner {
 
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
+    }
+    
+     private String getValue(String name, JSONObject j){
+        String value = NOT_SPECIFIED;
+        try{
+            value = j.getString(name);
+            if(value.trim().length()==0){
+                value = NOT_SPECIFIED;
+            }
+        }catch(Exception e){}
+        return value;
     }
 
     private String parseURL(String urlStr) {

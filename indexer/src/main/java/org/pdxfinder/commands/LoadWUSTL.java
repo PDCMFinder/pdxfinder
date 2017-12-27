@@ -1,3 +1,4 @@
+
 package org.pdxfinder.commands;
 
 import joptsimple.OptionParser;
@@ -120,19 +121,14 @@ public class LoadWUSTL implements CommandLineRunner {
         // the preference is for histology
         String diagnosis = j.getString("Clinical Diagnosis");
         String histology = j.getString("Histology");
+        
         if (histology.trim().length() > 0) {
-                diagnosis = histology;
-            
+                diagnosis = histology;    
         }
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
         
-        String race = NOT_SPECIFIED;;
-        try{
-            if(j.getString("Race").trim().length()>0){
-                race = j.getString("Race");
-            }
-        }catch(Exception e){}
+        String race = getValue("Race",j);
         
         try{
             if(j.getString("Ethnicity").trim().length()>0){
@@ -163,20 +159,12 @@ public class LoadWUSTL implements CommandLineRunner {
         String strain = j.getString("Strain");
         BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
         
-        String engraftmentSite = NOT_SPECIFIED;;
-        try{
-            engraftmentSite = j.getString("Engraftment Site");
-        }catch(Exception e){
-            // uggh
-        }
         
-        String tumorPrep = NOT_SPECIFIED;;
+        String engraftmentSite = getValue("Engraftment Site",j);
         
-        try{
-            tumorPrep = j.getString("Tumor Prep");
-        }catch(Exception e){
-            // uggh again
-        }
+        
+        String tumorPrep = getValue("Tumor Prep", j);
+       
 
         ModelCreation modelCreation = loaderUtils.createModelCreation(id, engraftmentSite,
                 tumorPrep, sample, bs, qa);
@@ -234,6 +222,17 @@ public class LoadWUSTL implements CommandLineRunner {
 
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
+    }
+    
+     private String getValue(String name, JSONObject j){
+        String value = NOT_SPECIFIED;
+        try{
+            value = j.getString(name);
+            if(value.trim().length()==0){
+                value = NOT_SPECIFIED;
+            }
+        }catch(Exception e){}
+        return value;
     }
 
     private String parseURL(String urlStr) {
