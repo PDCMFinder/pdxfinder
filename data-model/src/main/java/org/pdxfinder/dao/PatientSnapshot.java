@@ -15,16 +15,17 @@ import java.util.Set;
 public class PatientSnapshot {
 
     @GraphId
-    Long id;
+    private Long id;
 
-    Patient patient;
-    String age;
+    private Patient patient;
+    private String age;
+    private String dateAtCollection;
 
-    @Relationship(type = "SAMPLED_FROM", direction = Relationship.OUTGOING)
-    Set<Sample> samples;
+    @Relationship(type = "SAMPLED_FROM")
+    private Set<Sample> samples;
 
     @Relationship(type = "TREATED_WITH", direction = Relationship.INCOMING)
-    Set<Treatment> treatments;
+    private Set<Treatment> treatments;
 
     public PatientSnapshot() {
     }
@@ -65,7 +66,7 @@ public class PatientSnapshot {
     
     public void addSample(Sample sample){
         if(this.samples == null){
-            this.samples = new HashSet<Sample>();
+            this.samples = new HashSet<>();
         }
         this.samples.add(sample);
     }
@@ -84,5 +85,13 @@ public class PatientSnapshot {
 
     public void setTreatments(Set<Treatment> treatments) {
         this.treatments = treatments;
+    }
+
+    public String getDateAtCollection() {
+        return dateAtCollection;
+    }
+
+    public void setDateAtCollection(String dateAtCollection) {
+        this.dateAtCollection = dateAtCollection;
     }
 }
