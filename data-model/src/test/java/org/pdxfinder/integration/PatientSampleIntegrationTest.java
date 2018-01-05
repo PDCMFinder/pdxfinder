@@ -131,13 +131,13 @@ public class PatientSampleIntegrationTest extends BaseTest {
             String sex = i % 2 == 0 ? "M" : "F";
             Long age = Math.round(Math.random() * 90);
 
-            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false, externalDataSource);
+            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false ,externalDataSource.getAbbreviation());
             sampleRepository.save(sample);
 
             Patient patient = new Patient(Double.toString(Math.pow(i, age)), sex, null, null, externalDataSource);
             PatientSnapshot ps = new PatientSnapshot(patient, "67");
             patient.hasSnapshot(ps);
-            Sample s = new Sample("test", tumorType, "adinocarcinoma", tissue, null, "Surgical Resection", "F", false, externalDataSource);
+            Sample s = new Sample("test", tumorType, "adinocarcinoma", tissue, null, "Surgical Resection", "F", false,externalDataSource.getAbbreviation());
             s.normalTissue = Boolean.FALSE;
             s.setMolecularCharacterizations(new HashSet<>(Collections.singletonList(mc)));
 
@@ -154,7 +154,7 @@ public class PatientSampleIntegrationTest extends BaseTest {
             String sex = i % 2 == 0 ? "M" : "F";
             Long age = Math.round(Math.random() * 80);
 
-            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false, externalDataSourceAlternate);
+            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false,externalDataSource.getAbbreviation());
             sampleRepository.save(sample);
 
             PatientSnapshot ps = new PatientSnapshot(null, "67");

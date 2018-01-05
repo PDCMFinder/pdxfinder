@@ -29,7 +29,7 @@ import java.util.*;
  */
 @Component
 @Order(value = 100)
-public class LinkSamplesToNCITTerms implements CommandLineRunner{
+public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
 
     private static final String spreadsheetServiceUrl = "http://gsx2json.com/api?id=17LixNQL_BoL_-yev1s_VJt9FDZAJQcl5kyMhHkSF7Xk";
@@ -40,7 +40,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
     private final static Logger log = LoggerFactory.getLogger(LinkSamplesToNCITTerms.class);
     private LoaderUtils loaderUtils;
 
-    private Map<String,Set<MissingMapping>> missingMappings;
+    private Map<String, Set<MissingMapping>> missingMappings;
     private Set<String> missingTerms;
 
     private Map<String, MappingRule> mappingRules;
@@ -95,21 +95,20 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
     }
 
 
-    private void loadMappingRules(){
+    private void loadMappingRules() {
 
         String json = parseURL(spreadsheetServiceUrl);
-        log.info("Fetching mapping rules from "+spreadsheetServiceUrl);
+        log.info("Fetching mapping rules from " + spreadsheetServiceUrl);
 
         this.mappingRules = new HashMap<>();
 
         try {
             JSONObject job = new JSONObject(json);
-            if (job.has("rows")){
+            if (job.has("rows")) {
                 JSONArray rows = job.getJSONArray("rows");
 
 
-
-                for(int i=0;i<rows.length();i++){
+                for (int i = 0; i < rows.length(); i++) {
                     JSONObject row = rows.getJSONObject(i);
 
                     String dataSource = row.getString("datasource");
@@ -120,38 +119,45 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                     String mapType = row.getString("maptype");
                     String justification = row.getString("justification");
 
-                    if(ontologyTerm.equals("") || ontologyTerm == null) continue;
-                    if(sampleDiagnosis.equals("") || sampleDiagnosis == null) continue;
+                    if (ontologyTerm.equals("") || ontologyTerm == null) continue;
+                    if (sampleDiagnosis.equals("") || sampleDiagnosis == null) continue;
 
                     //DO not ask, I know it looks horrible...
-                    if(originTissue == null || originTissue.equals("null")) originTissue = "";
-                    if(tumorType == null || tumorType.equals("null")) tumorType = "";
+                    if (originTissue == null || originTissue.equals("null")) originTissue = "";
+                    if (tumorType == null || tumorType.equals("null")) tumorType = "";
+                    if (justification == null || justification.equals("null")) justification = "";
 
-                    //if it is a direct mapping, add it to the rules, key = diagnosis
+                    //make everything lowercase
+                    if (dataSource != null) dataSource = dataSource.toLowerCase();
+                    if (originTissue != null) originTissue = originTissue.toLowerCase();
+                    if (tumorType != null) tumorType = tumorType.toLowerCase();
+                    sampleDiagnosis = sampleDiagnosis.toLowerCase();
 
-                    if(mapType.equals("direct")){
+                    /*
+                    DATASOURCE SPECIFIC:
+                    Center first
+                    1) PDMR-ad-lung-met ->  lung-met-adeno
 
-                        MappingRule rule = new MappingRule();
+                    2) PDMR-ad-lung -> lung-adeno
 
-                        rule.setOntologyTerm(ontologyTerm);
-                        rule.setMapType(mapType);
+                    3) PDMR-ad ->adeno
 
-                        this.mappingRules.put(sampleDiagnosis, rule);
+                    GENERAL:
+                    Maximum information to least specific information
+                    4) ad-lung-met ->  lung-met-adeno
 
-                    }
-                    //if it is an inferred mapping, key = dataSource+sampleDiagnosis+originTissue+tumorType
-                    else{
+                    5) ad-lung ->  lung-adeno
 
-                        MappingRule rule = new MappingRule();
+                    6) ad -> adenocarcinoma
 
-                        rule.setOntologyTerm(ontologyTerm);
-                        rule.setMapType(mapType);
-                        rule.setJustification(justification);
+                     */
 
-                        this.mappingRules.put(dataSource+sampleDiagnosis+originTissue+tumorType, rule);
+                    MappingRule rule = new MappingRule();
+                    rule.setOntologyTerm(ontologyTerm);
+                    rule.setMapType(mapType);
+                    rule.setJustification(justification);
 
-                    }
-
+                    this.mappingRules.put(dataSource + sampleDiagnosis + originTissue + tumorType, rule);
                 }
             }
 
@@ -162,36 +168,46 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
     }
 
 
-    private MappingRule getMappingForSample(String dataSource, String diagnosis, String originTissue, String tumorType){
+    private MappingRule getMappingForSample(String dataSource, String diagnosis, String originTissue, String tumorType) {
 
         MappingRule mr = new MappingRule();
+
         //0. if diagnosis is empty return empty object
-        if(diagnosis.equals("") || diagnosis == null) return mr;
+        if (diagnosis.equals("") || diagnosis == null) return mr;
 
-        if(originTissue == null) originTissue = "";
+        if (dataSource == null) dataSource = "";
+        if (originTissue == null) originTissue = "";
         if (tumorType == null) tumorType = "";
+        /*
+        DATASOURCE SPECIFIC:
+        Center first
+        1) PDMR-ad-lung-met ->  lung-met-adeno
 
-        // 1. check whether the diagnosis exists in the keys = direct map type
-        if(this.mappingRules.containsKey(diagnosis.toLowerCase())){
+        2) PDMR-ad-lung -> lung-adeno
 
-            mr =  this.mappingRules.get(diagnosis.toLowerCase());
+        3) PDMR-ad ->adeno
+
+        GENERAL:
+        Maximum information to least specific information
+        4) ad-lung-met ->  lung-met-adeno
+
+        5) ad-lung ->  lung-adeno
+
+        6) ad -> adenocarcinoma
+
+        */
+
+        if (this.mappingRules.containsKey(dataSource.toLowerCase() + diagnosis.toLowerCase() + originTissue.toLowerCase() + tumorType.toLowerCase())) {
+
+            return this.mappingRules.get(dataSource.toLowerCase() + diagnosis.toLowerCase() + originTissue.toLowerCase() + tumorType.toLowerCase());
         }
-        // 2. else check whether a general inferred rule exists, key = ANY+sampleDiagnosis+originTissue+tumorType
-        if(this.mappingRules.containsKey("ANY"+diagnosis.toLowerCase()+originTissue+tumorType)){
 
-            mr =  this.mappingRules.get("ANY"+diagnosis.toLowerCase()+originTissue+tumorType);
-        }
-        //3. else check whether a dataSource specific inferred rule exists, key = dataSource+sampleDiagnosis+originTissue+tumorType
-        if(this.mappingRules.containsKey(dataSource+diagnosis.toLowerCase()+originTissue+tumorType)){
-
-            mr = this.mappingRules.get(dataSource+diagnosis.toLowerCase()+originTissue+tumorType);
-        }
-        //4. if no mapping rule was found, return empty object
-
+        //else return empty object
+        //log.warn("No mapping for "+dataSource.toLowerCase() + diagnosis.toLowerCase() + originTissue.toLowerCase() + tumorType.toLowerCase());
         return mr;
     }
 
-    private void mapSamplesToTerms(){
+    private void mapSamplesToTerms() {
 
         int batchSize = 50;
         int startNode = 0;
@@ -201,13 +217,12 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
         this.missingTerms = new HashSet<>();
 
 
+        while (startNode < maxSamplesNumber) {
 
-        while(startNode<maxSamplesNumber){
-
-            log.info("Mapping "+batchSize+" samples from "+startNode);
+            log.info("Mapping " + batchSize + " samples from " + startNode);
             Collection<Sample> samples = loaderUtils.getHumanSamplesFromTo(startNode, batchSize);
 
-            for(Sample sample:samples){
+            for (Sample sample : samples) {
 
                 String dataSource = "";
                 String diagnosis = "";
@@ -217,11 +232,11 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                 dataSource = sample.getDataSource();
                 diagnosis = sample.getDiagnosis();
 
-                if(sample.getOriginTissue() != null){
+                if (sample.getOriginTissue() != null) {
                     originTissue = sample.getOriginTissue().getName();
                 }
 
-                if(sample.getType() != null){
+                if (sample.getType() != null) {
                     tumorType = sample.getType().getName();
                 }
 
@@ -229,26 +244,23 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
                 MappingRule mappingRule = getMappingForSample(dataSource, diagnosis, originTissue, tumorType);
 
                 //deal with empty mapping rules here!
-
-                if(mappingRule.getOntologyTerm() == null || mappingRule.getOntologyTerm().equals("")){
+                if (mappingRule.getOntologyTerm() == null || mappingRule.getOntologyTerm().equals("")) {
 
                     MissingMapping mm = new MissingMapping(dataSource, diagnosis, originTissue, tumorType);
                     insertMissingMapping(diagnosis, mm);
 
-                }
-                else{
+                } else {
 
                     OntologyTerm ot = loaderUtils.getOntologyTermByLabel(mappingRule.getOntologyTerm());
 
 
-                    if(ot == null){
+                    if (ot == null) {
 
-                        log.warn("Missing ontology term: "+mappingRule.getOntologyTerm());
+                        log.warn("Missing ontology term: " + mappingRule.getOntologyTerm());
                         this.missingTerms.add(mappingRule.getOntologyTerm());
-                    }
-                    else{
+                    } else {
                         ot.setDirectMappedSamplesNumber(ot.getDirectMappedSamplesNumber() + 1);
-                        SampleToOntologyRelationShip r = new SampleToOntologyRelationShip( mappingRule.getMapType(), mappingRule.getJustification(), sample, ot);
+                        SampleToOntologyRelationShip r = new SampleToOntologyRelationShip(mappingRule.getMapType(), mappingRule.getJustification(), sample, ot);
                         sample.setSampleToOntologyRelationShip(r);
                         ot.setMappedTo(r);
                         loaderUtils.saveSample(sample);
@@ -259,72 +271,71 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
             }
 
-            startNode+=batchSize;
+            startNode += batchSize;
         }
 
-        if(this.missingMappings.size()>0) printMissingMappings();
+        if (this.missingMappings.size() > 0) printMissingMappings();
     }
 
-    private void insertMissingMapping(String id, MissingMapping mm){
+    private void insertMissingMapping(String id, MissingMapping mm) {
 
-        if(!this.missingMappings.containsKey(id)){
+        if (!this.missingMappings.containsKey(id)) {
             //log.info("No mapping found for "+id);
             Set<MissingMapping> lmm = new HashSet<>();
             lmm.add(mm);
             this.missingMappings.put(id, lmm);
-        }
-        else{
+        } else {
 
             this.missingMappings.get(id).add(mm);
         }
     }
 
 
-    private void printMissingMappings(){
+    private void printMissingMappings() {
 
-        log.warn("Couldn't map samples with the following details("+this.missingMappings.size()+"): ");
-        for(Set<MissingMapping> mms:this.missingMappings.values()){
+        log.warn("Couldn't map samples with the following details(" + this.missingMappings.size() + "): ");
+        for (Set<MissingMapping> mms : this.missingMappings.values()) {
 
-            for(MissingMapping mm:mms){
-                log.warn(mm.getDataSource()+ " "+mm.getDiagnosis()+" "+mm.getOriginTissue()+" "+mm.getTumorType());
+            for (MissingMapping mm : mms) {
+                log.warn(mm.getDataSource() + " " + mm.getDiagnosis() + " " + mm.getOriginTissue() + " " + mm.getTumorType());
 
             }
         }
     }
 
-    private void updateIndirectMappingData(){
+    private void updateIndirectMappingData() {
 
         Collection<OntologyTerm> termsWithDirectMappings = loaderUtils.getAllOntologyTermsWithNotZeroDirectMapping();
         int remainingTermsToUpdate = termsWithDirectMappings.size();
-        log.info("Found "+remainingTermsToUpdate+" terms with direct number. Updating graph...");
+        log.info("Found " + remainingTermsToUpdate + " terms with direct number. Updating graph...");
 
-        for(OntologyTerm ot:termsWithDirectMappings){
+        for (OntologyTerm ot : termsWithDirectMappings) {
 
             Set<OntologyTerm> discoveredTerms = new HashSet<>();
             Set<String> visitedTerms = new HashSet<>();
             Collection<OntologyTerm> parents = loaderUtils.getAllDirectParents(ot.getUrl());
 
-            if(parents != null){
+            if (parents != null) {
 
                 discoveredTerms.addAll(parents);
             }
 
-            while(discoveredTerms.size()>0) {
+            while (discoveredTerms.size() > 0) {
                 OntologyTerm currentParentTerm = discoveredTerms.iterator().next();
 
-                if(visitedTerms.contains(currentParentTerm.getUrl())) {
+                if (visitedTerms.contains(currentParentTerm.getUrl())) {
                     discoveredTerms.remove(currentParentTerm);
                     continue;
                 }
 
                 visitedTerms.add(currentParentTerm.getUrl());
                 //update indirect number
-                currentParentTerm.setIndirectMappedSamplesNumber(currentParentTerm.getIndirectMappedSamplesNumber()+ot.getDirectMappedSamplesNumber());
+                currentParentTerm.setIndirectMappedSamplesNumber(currentParentTerm.getIndirectMappedSamplesNumber() + ot.getDirectMappedSamplesNumber());
                 loaderUtils.saveOntologyTerm(currentParentTerm);
                 //get parents
                 parents = loaderUtils.getAllDirectParents(currentParentTerm.getUrl());
 
-                if(parents != null){
+                if (parents != null) {
 
                     discoveredTerms.addAll(parents);
                 }
@@ -333,18 +344,17 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner{
 
             }
             remainingTermsToUpdate--;
-            log.info("Updated subgraph for "+ot.getLabel()+", "+remainingTermsToUpdate+" term(s) remained");
+            log.info("Updated subgraph for " + ot.getLabel() + ", " + remainingTermsToUpdate + " term(s) remained");
         }
     }
 
 
-    private void deleteTermsWithoutMapping(){
+    private void deleteTermsWithoutMapping() {
 
         log.info("Deleting terms and their relationships where direct and indirectMappedNumber is zero");
 
         loaderUtils.deleteOntologyTermsWithoutMapping();
     }
-
 
 
     private String parseURL(String urlStr) {

@@ -116,10 +116,15 @@ public class LoadWISTAR implements CommandLineRunner {
         // the preference is for histology
         String diagnosis = j.getString("Clinical Diagnosis");
         String histology = j.getString("Histology");
+       
         if (histology.trim().length() > 0) {
                 diagnosis = histology;
             }
         
+        if(diagnosis.trim().length()==0){
+            // no histology no diagnosis -> no model
+            return;
+        }
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
         
@@ -143,7 +148,7 @@ public class LoadWISTAR implements CommandLineRunner {
         
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"),
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS);
+                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS.getAbbreviation());
 
         pSnap.addSample(sample);
 
@@ -156,6 +161,7 @@ public class LoadWISTAR implements CommandLineRunner {
         }catch(Exception e){
             // not all groups supplied QA
         }
+        
         QualityAssurance qa = new QualityAssurance(qaType,
                 NOT_SPECIFIED, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
@@ -163,23 +169,11 @@ public class LoadWISTAR implements CommandLineRunner {
         String strain = j.getString("Strain");
         BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
         
-        String engraftmentSite = NOT_SPECIFIED;
-        try{
-            engraftmentSite = j.getString("Engraftment Site");
-        }catch(Exception e){
-            // uggh
-        }
+        String engraftmentSite = getValue("Engraftment Site",j);
         
-        String tumorPrep = NOT_SPECIFIED;
-        
-        try{
-            tumorPrep = j.getString("Tumor Prep");
-        }catch(Exception e){
-            // uggh again
-        }
+        String tumorPrep = getValue("Tumor Prep",j);
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, engraftmentSite,
-                tumorPrep, sample, bs, qa);
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, wistarDS.getAbbreviation(), sample,  qa);
         modelCreation.addRelatedSample(sample);
 
         
@@ -187,6 +181,17 @@ public class LoadWISTAR implements CommandLineRunner {
         loaderUtils.saveModelCreation(modelCreation);
 
         
+    }
+    
+    private String getValue(String name, JSONObject j){
+        String value = NOT_SPECIFIED;
+        try{
+            value = j.getString(name);
+            if(value.trim().length()==0){
+                value = NOT_SPECIFIED;
+            }
+        }catch(Exception e){}
+        return value;
     }
 
     private String parseURL(String urlStr) {

@@ -332,7 +332,7 @@ public class ValidateIRCCData implements CommandLineRunner {
 
                 Sample sample = loaderUtils.getSample(samples.get(i).getSampleId(), samples.get(i).getTumorType(),
                         samples.get(i).getDiagnosis(), patientsMap.get(key).getPrimarySite(),
-                        samples.get(i).getSampleSite(), "", "", NORMAL_TISSUE, DS);
+                        samples.get(i).getSampleSite(), "", "", NORMAL_TISSUE, DS.getAbbreviation());
 
 
                 pSnap.addSample(sample);
@@ -341,7 +341,7 @@ public class ValidateIRCCData implements CommandLineRunner {
                 QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT);
                 loaderUtils.saveQualityAssurance(qa);
 
-                ModelCreation mc = loaderUtils.createModelCreation(samples.get(i).getModelId(), samples.get(i).getImplantSite(), samples.get(i).getImplantType(), sample, nsgBS, qa);
+                ModelCreation mc = loaderUtils.createModelCreation(samples.get(i).getModelId(),DS.getAbbreviation(), sample, qa);
 
                 loadVariationData(mc, samples.get(i));
 

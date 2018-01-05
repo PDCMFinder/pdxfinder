@@ -125,8 +125,12 @@ function displayResults(q,data){
 
     }
 
-
-    rpanel.append('<div class="panel-heading"><h5> You searched for "'+q+'". Found '+data.length+' result(s) in '+sources.length+' source(s). </h5></div>');
+    var searchedFor = "";
+    if(q){
+        searchedFor = "You searched for '"+q+"'. ";
+    }
+    
+    rpanel.append('<div class="panel-heading"><h5>'+searchedFor+'Found '+data.length+' result(s) in '+sources.length+' source(s). </h5></div>');
     rpanel.append('<div class="panel-body"></div>');
 
     var resTable = jQuery("<table/>");

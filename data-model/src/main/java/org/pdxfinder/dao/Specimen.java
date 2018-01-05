@@ -18,28 +18,24 @@ public class Specimen {
 
     private String externalId;
 
-    @Relationship(type = "HISTOLOGY")
-    private Set<Histology> histology;
+    private String passage;
 
-    @Relationship(type = "PASSAGED_FROM", direction = Relationship.INCOMING)
-    private PdxPassage pdxPassage;
 
     @Relationship(type = "SAMPLED_FROM")
     private Sample sample;
 
-    @Relationship(type = "TREATED_WITH", direction = Relationship.INCOMING)
+    @Relationship(type = "TREATED_WITH")
     private Treatment treatment;
 
-    public Specimen(String externalId, Set<Histology> histology) {
-        this.externalId = externalId;
-        this.histology = histology;
-    }
+    @Relationship(type = "IMPLANTATION_SITE")
+    private ImplantationSite implantationSite;
 
-    public Specimen(String externalId, Set<Histology> histology, Sample sample) {
-        this.externalId = externalId;
-        this.histology = histology;
-        this.sample = sample;
-    }
+    @Relationship(type = "IMPLANTATION_TYPE")
+    private ImplantationType implantationType;
+
+    @Relationship(type = "BACKGROUND_STRAIN")
+    private BackgroundStrain backgroundStrain;
+
 
     public Specimen() {
     }
@@ -52,29 +48,13 @@ public class Specimen {
         this.externalId = externalId;
     }
 
-    public void setHistology(Set<Histology> histology){
-        this.histology = histology;
-    }
-    
-    public void addHistology(Histology histology){
-        if(this.histology == null){
-            this.histology = new HashSet<>();
-            this.histology.add(histology);
-        }else{
-            this.histology.add(histology);
-        }
-    }
-    
-    public Set<Histology> getHistology(){
-        return this.histology;
+
+    public String getPassage() {
+        return passage;
     }
 
-    public PdxPassage getPdxPassage() {
-        return pdxPassage;
-    }
-
-    public void setPdxPassage(PdxPassage pdxPassage) {
-        this.pdxPassage = pdxPassage;
+    public void setPassage(String passage) {
+        this.passage = passage;
     }
 
     public Sample getSample() {
@@ -83,5 +63,37 @@ public class Specimen {
 
     public void setSample(Sample sample) {
         this.sample = sample;
+    }
+
+    public Treatment getTreatment() {
+        return treatment;
+    }
+
+    public void setTreatment(Treatment treatment) {
+        this.treatment = treatment;
+    }
+
+    public ImplantationSite getImplantationSite() {
+        return implantationSite;
+    }
+
+    public void setImplantationSite(ImplantationSite implantationSite) {
+        this.implantationSite = implantationSite;
+    }
+
+    public ImplantationType getImplantationType() {
+        return implantationType;
+    }
+
+    public void setImplantationType(ImplantationType implantationType) {
+        this.implantationType = implantationType;
+    }
+
+    public BackgroundStrain getBackgroundStrain() {
+        return backgroundStrain;
+    }
+
+    public void setBackgroundStrain(BackgroundStrain backgroundStrain) {
+        this.backgroundStrain = backgroundStrain;
     }
 }

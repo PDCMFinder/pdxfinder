@@ -90,7 +90,7 @@ public class SampleRepositoryTest extends BaseTest {
         String TEST_TUMOR_ID = "TESTID-1";
         generateTumor(tumorType, tissue, externalDataSource, TEST_TUMOR_ID);
 
-        Sample foundSample = sampleRepository.findBySourceSampleId(TEST_TUMOR_ID);
+        Sample foundSample = sampleRepository.findBySourceSampleIdAndDataSource(TEST_TUMOR_ID, externalDataSource.getAbbreviation());
         Assert.assertNotNull(foundSample);
 
 
@@ -106,11 +106,11 @@ public class SampleRepositoryTest extends BaseTest {
         String testTumorId = "DELETE_TESTID-1";
         generateTumor(tumorType, tissue, externalDataSource, testTumorId);
 
-        Sample foundSample = sampleRepository.findBySourceSampleId(testTumorId);
+        Sample foundSample = sampleRepository.findBySourceSampleIdAndDataSource(testTumorId, externalDataSource.getAbbreviation());
         Assert.assertNotNull(foundSample);
 
         sampleRepository.delete(foundSample);
-        foundSample = sampleRepository.findBySourceSampleId(testTumorId);
+        foundSample = sampleRepository.findBySourceSampleIdAndDataSource(testTumorId, externalDataSource.getAbbreviation());
         Assert.assertNull(foundSample);
     }
 
@@ -127,20 +127,17 @@ public class SampleRepositoryTest extends BaseTest {
             generateTumor(tumorType, tissue, externalDataSource, testTumorId);
         }
 
-        Sample foundSample = sampleRepository.findBySourceSampleId("TESTID-12");
+        Sample foundSample = sampleRepository.findBySourceSampleIdAndDataSource("TESTID-12", externalDataSource.getAbbreviation());
         Assert.assertNotNull(foundSample);
 
         // Added 20 tumors, count should be 20
         Assert.assertEquals(20, sampleRepository.count());
 
-        // Delete all tumors, count should be 0
-        sampleRepository.delete(sampleRepository.findByExternalDataSourceAbbreviation(externalDataSource.getAbbreviation()));
-        Assert.assertEquals(0, sampleRepository.count());
 
     }
-
+//String sourceSampleId, TumorType type, String diagnosis, Tissue originTissue, Tissue sampleSite, String extractionMethod, String classification, Boolean normalTissue
     private void generateTumor(TumorType tumorType, Tissue tissue, ExternalDataSource externalDataSource, String TEST_TUMOR_ID) {
-        Sample sample = new Sample(TEST_TUMOR_ID, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false, externalDataSource);
+        Sample sample = new Sample(TEST_TUMOR_ID, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false, externalDataSource.getAbbreviation());
         sampleRepository.save(sample);
     }
 
