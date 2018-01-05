@@ -81,7 +81,7 @@ public class LoadJAXData implements CommandLineRunner {
     @Value("${jaxpdx.ref.assembly}")
     private String refAssembly;
 
-    HashMap<String, JSONObject> pdxMap = new HashMap<>();
+
     HashMap<String, String> passageMap = null;
     HashMap<String, Image> histologyMap = null;
 
@@ -133,8 +133,7 @@ public class LoadJAXData implements CommandLineRunner {
             for (int i = 0; i < jarray.length(); i++) {
 
                 JSONObject j = jarray.getJSONObject(i);
-                String id = j.getString("Model ID");
-                this.pdxMap.put(id, j);
+
                 createGraphObjects(j);
             }
 
@@ -191,7 +190,12 @@ public class LoadJAXData implements CommandLineRunner {
         ModelCreation mc = loaderUtils.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa);
         mc.addRelatedSample(sample);
 
-        loadVariationData(mc);
+        String backgroundStrain = j.getString("Strain");
+        // JAX feed does not supply implantation type
+        String implantationType = "Subcutaneous";
+        String implantationSite = j.getString("Engraftment Site");
+
+        loadVariationData(mc, backgroundStrain, implantationSite, implantationType);
 
     }
 
@@ -201,7 +205,7 @@ public class LoadJAXData implements CommandLineRunner {
     This is a set of makers with marker association details
     Since we are creating samples here attach any histology images to the sample based on passage #
      */
-    private void loadVariationData(ModelCreation modelCreation) {
+    private void loadVariationData(ModelCreation modelCreation,String backgroundStrain,String implantationSite,String implantationType) {
 
         if (maxVariations == 0) {
             return;
@@ -330,9 +334,22 @@ public class LoadJAXData implements CommandLineRunner {
 
                 }
 
-                //pdxPassage.setModelCreation(modelCreation);
 
-                //loaderUtils.savePdxPassage(pdxPassage);
+                if(backgroundStrain != null){
+                    BackgroundStrain bs = new BackgroundStrain(backgroundStrain);
+                    specimen.setBackgroundStrain(bs);
+                }
+
+                if(implantationSite != null){
+                    ImplantationSite is = new ImplantationSite(implantationSite);
+                    specimen.setImplantationSite(is);
+                }
+
+                if(implantationType != null){
+                    ImplantationType it = new ImplantationType(implantationType);
+                    specimen.setImplantationType(it);
+                }
+
                 loaderUtils.saveSpecimen(specimen);
 
                 modelCreation.addSpecimen(specimen);
