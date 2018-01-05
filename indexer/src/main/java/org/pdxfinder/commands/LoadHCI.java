@@ -136,7 +136,7 @@ public class LoadHCI implements CommandLineRunner {
         // asssume specimen site is primary site?
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), NOT_SPECIFIED, 
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, hciDS);
+                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, hciDS.getAbbreviation());
         
         pSnap.addSample(sample);
 
@@ -144,8 +144,7 @@ public class LoadHCI implements CommandLineRunner {
                 NOT_SPECIFIED, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"),
-                j.getString("Tumor Prep"), sample, nsgBS, qa);
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, this.hciDS.getAbbreviation(), sample, qa);
         modelCreation.addRelatedSample(sample);
 
        
@@ -175,10 +174,10 @@ public class LoadHCI implements CommandLineRunner {
 
             } else {
 
-                int passage = 0;
+                String passage = "0";
                 try {
                     // this appears to be "multiple" for most values not sure how to handle default will be 0
-                    passage = new Integer(j.getString("QA Passage").replaceAll("P", "")).intValue();
+                    passage = j.getString("QA Passage").replaceAll("P", "");
                 } catch (NumberFormatException e) {
                     // default is 0
                      }

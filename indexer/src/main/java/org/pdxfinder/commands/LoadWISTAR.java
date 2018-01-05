@@ -148,7 +148,7 @@ public class LoadWISTAR implements CommandLineRunner {
         
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"),
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS);
+                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS.getAbbreviation());
 
         pSnap.addSample(sample);
 
@@ -173,8 +173,7 @@ public class LoadWISTAR implements CommandLineRunner {
         
         String tumorPrep = getValue("Tumor Prep",j);
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, engraftmentSite,
-                tumorPrep, sample, bs, qa);
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, wistarDS.getAbbreviation(), sample,  qa);
         modelCreation.addRelatedSample(sample);
 
         

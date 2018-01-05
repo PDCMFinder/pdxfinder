@@ -143,7 +143,7 @@ public class LoadWUSTL implements CommandLineRunner {
         
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), NOT_SPECIFIED,
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
+                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
 
         pSnap.addSample(sample);
 
@@ -166,8 +166,7 @@ public class LoadWUSTL implements CommandLineRunner {
         String tumorPrep = getValue("Tumor Prep", j);
        
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, engraftmentSite,
-                tumorPrep, sample, bs, qa);
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, mdaDS.getAbbreviation(), sample, qa);
         modelCreation.addRelatedSample(sample);
 
         boolean human = false;
@@ -205,9 +204,9 @@ public class LoadWUSTL implements CommandLineRunner {
 
             } else {
 
-                int passage = 0;
+                String passage = "0";
                 try {
-                    passage = new Integer(j.getString("QA Passage").replaceAll("P", "")).intValue();
+                    passage = j.getString("QA Passage").replaceAll("P", "");
                 } catch (Exception e) {
                     // default is 0
                 }

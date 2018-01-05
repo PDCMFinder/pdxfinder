@@ -81,6 +81,7 @@ public class LoadJAXData implements CommandLineRunner {
     @Value("${jaxpdx.ref.assembly}")
     private String refAssembly;
 
+    HashMap<String, JSONObject> pdxMap = new HashMap<>();
     HashMap<String, String> passageMap = null;
     HashMap<String, Image> histologyMap = null;
 
@@ -132,7 +133,8 @@ public class LoadJAXData implements CommandLineRunner {
             for (int i = 0; i < jarray.length(); i++) {
 
                 JSONObject j = jarray.getJSONObject(i);
-
+                String id = j.getString("Model ID");
+                this.pdxMap.put(id, j);
                 createGraphObjects(j);
             }
 
@@ -168,7 +170,7 @@ public class LoadJAXData implements CommandLineRunner {
                 j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
 
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, jaxDS);
+                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, JAX_DATASOURCE_ABBREVIATION);
 
         if (histologyMap.containsKey("Patient")) {
             Histology histology = new Histology();
@@ -186,8 +188,9 @@ public class LoadJAXData implements CommandLineRunner {
         pSnap.addSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
 
-        ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS, qa);
+        ModelCreation mc = loaderUtils.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa);
         mc.addRelatedSample(sample);
+
         loadVariationData(mc);
 
     }
@@ -296,7 +299,7 @@ public class LoadJAXData implements CommandLineRunner {
 
             for (String sampleKey : sampleMap.keySet()) {
 
-                Integer passage = getPassage(sampleKey);
+                String passage = getPassage(sampleKey);
                 markerMap = sampleMap.get(sampleKey);
 
                 HashSet<MolecularCharacterization> mcs = new HashSet<>();
@@ -311,7 +314,7 @@ public class LoadJAXData implements CommandLineRunner {
                 //PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
 
                 
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sampleKey, this.jaxDS.getName(), passage);
+                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sampleKey, this.jaxDS.getAbbreviation(), passage);
      
                 Sample specSample = new Sample();
                 specSample.setSourceSampleId(sampleKey);
@@ -332,6 +335,7 @@ public class LoadJAXData implements CommandLineRunner {
                 //loaderUtils.savePdxPassage(pdxPassage);
                 loaderUtils.saveSpecimen(specimen);
 
+                modelCreation.addSpecimen(specimen);
                 modelCreation.addRelatedSample(specSample);
                 loaderUtils.saveModelCreation(modelCreation);
 
@@ -345,10 +349,10 @@ public class LoadJAXData implements CommandLineRunner {
 
     }
 
-    private Integer getPassage(String sample) {
-        Integer p = 0;
+    private String getPassage(String sample) {
+        String p = "0";
         try {
-            p = new Integer(passageMap.get(sample).replaceAll("P", ""));
+            p = passageMap.get(sample).replaceAll("P", "");
         } catch (Exception e) {
             log.info("Unable to determine passage from sample name " + sample + ". Assuming 0");
         }

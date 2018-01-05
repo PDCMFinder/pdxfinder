@@ -353,7 +353,7 @@ public class LoadIRCCData implements CommandLineRunner {
                 // String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
 
                 humanSample = loaderUtils.getSample(sampleId, s.getTumorType(), s.getDiagnosis(),
-                        patientsMap.get(patientId).getPrimarySite(), s.getSampleSite(), "Extraction Method", "", NORMAL_TISSUE, DS);
+                        patientsMap.get(patientId).getPrimarySite(), s.getSampleSite(), "Extraction Method", "", NORMAL_TISSUE, DS.getAbbreviation());
 
 
                 pSnap.addSample(humanSample);
@@ -362,7 +362,7 @@ public class LoadIRCCData implements CommandLineRunner {
                 QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT);
                 loaderUtils.saveQualityAssurance(qa);
 
-                ModelCreation modelCreation = loaderUtils.createModelCreation(modelId, s.getImplantSite(), s.getImplantType(), humanSample, nsgBS, qa);
+                ModelCreation modelCreation = loaderUtils.createModelCreation(modelId, DS.getAbbreviation(), humanSample, qa);
 
                 // determine whether sample is from human or mouse
                 if (markersMutationMap.containsKey(sampleId)) {
@@ -426,8 +426,8 @@ public class LoadIRCCData implements CommandLineRunner {
                             //this is a mouse sample, link it to a specimen
                             int passage = Integer.valueOf(mutation.getXenoPassage());
                             passage -= 1; // its an ircc thing, if the passage is 0, it is a human sample, otherwise passage = xenopassage -1;
-
-                            Specimen specimen = loaderUtils.getSpecimen(modelCreation, modelCreation.getSourcePdxId(), DS.getAbbreviation(), passage);
+                            String pass = String.valueOf(passage);
+                            Specimen specimen = loaderUtils.getSpecimen(modelCreation, modelCreation.getSourcePdxId(), DS.getAbbreviation(), pass);
 
                             if (specimen.getSample() == null) {
 
