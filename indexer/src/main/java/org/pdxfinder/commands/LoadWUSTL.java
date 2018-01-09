@@ -1,4 +1,3 @@
-
 package org.pdxfinder.commands;
 
 import joptsimple.OptionParser;
@@ -40,7 +39,6 @@ public class LoadWUSTL implements CommandLineRunner {
     private final static String WUSTL_DATASOURCE_DESCRIPTION = "Washington University St. Louis PDX mouse models for PDXNet.";
 
     private final static String NOT_SPECIFIED = "Not Specified";
-   
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -74,7 +72,7 @@ public class LoadWUSTL implements CommandLineRunner {
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadWUSTL", "Load WUSTL PDX data");
-                
+
         parser.accepts("loadALL", "Load all, including WUSTL PDX data");
         OptionSet options = parser.parse(args);
 
@@ -121,26 +119,25 @@ public class LoadWUSTL implements CommandLineRunner {
         // the preference is for histology
         String diagnosis = j.getString("Clinical Diagnosis");
         String histology = j.getString("Histology");
-        
+
         if (histology.trim().length() > 0) {
-                diagnosis = histology;    
+            diagnosis = histology;
         }
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
-        
-        String race = getValue("Race",j);
-        
-        try{
-            if(j.getString("Ethnicity").trim().length()>0){
+
+        String race = getValue("Race", j);
+
+        try {
+            if (j.getString("Ethnicity").trim().length() > 0) {
                 race = j.getString("Ethnicity");
             }
-        }catch(Exception e){}
-
+        } catch (Exception e) {
+        }
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
                 j.getString("Gender"), "", race, j.getString("Age"), mdaDS);
 
-        
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), NOT_SPECIFIED,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
@@ -148,9 +145,9 @@ public class LoadWUSTL implements CommandLineRunner {
         pSnap.addSample(sample);
 
         String qaType = NOT_SPECIFIED;
-        try{
+        try {
             qaType = j.getString("QA") + "on passage " + j.getString("QA Passage");
-        }catch(Exception e){
+        } catch (Exception e) {
             // not all groups supplied QA
         }
         QualityAssurance qa = new QualityAssurance(qaType,
@@ -158,13 +155,10 @@ public class LoadWUSTL implements CommandLineRunner {
         loaderUtils.saveQualityAssurance(qa);
         String strain = j.getString("Strain");
         BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
-        
-        
-        String engraftmentSite = getValue("Engraftment Site",j);
-        
-        
+
+        String engraftmentSite = getValue("Engraftment Site", j);
+
         String tumorPrep = getValue("Tumor Prep", j);
-       
 
         ModelCreation modelCreation = loaderUtils.createModelCreation(id, mdaDS.getAbbreviation(), sample, qa);
         modelCreation.addRelatedSample(sample);
@@ -214,6 +208,16 @@ public class LoadWUSTL implements CommandLineRunner {
                         modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
                 specimen.setSample(sample);
 
+                specimen.setBackgroundStrain(bs);
+
+                ImplantationSite is = new ImplantationSite(engraftmentSite);
+                specimen.setImplantationSite(is);
+
+                ImplantationType it = new ImplantationType(tumorPrep);
+                specimen.setImplantationType(it);
+
+                specimen.setSample(sample);
+
                 loaderUtils.saveSpecimen(specimen);
 
             }
@@ -222,15 +226,16 @@ public class LoadWUSTL implements CommandLineRunner {
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
     }
-    
-     private String getValue(String name, JSONObject j){
+
+    private String getValue(String name, JSONObject j) {
         String value = NOT_SPECIFIED;
-        try{
+        try {
             value = j.getString(name);
-            if(value.trim().length()==0){
+            if (value.trim().length() == 0) {
                 value = NOT_SPECIFIED;
             }
-        }catch(Exception e){}
+        } catch (Exception e) {
+        }
         return value;
     }
 

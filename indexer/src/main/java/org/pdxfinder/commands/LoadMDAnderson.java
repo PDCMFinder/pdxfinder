@@ -10,6 +10,7 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
+import org.pdxfinder.dao.ImplantationSite;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -215,6 +216,15 @@ public class LoadMDAnderson implements CommandLineRunner {
                 }
                 Specimen specimen = loaderUtils.getSpecimen(modelCreation,
                         modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
+                
+                specimen.setBackgroundStrain(bs);
+                
+                ImplantationSite is = new ImplantationSite(engraftmentSite);
+                specimen.setImplantationSite(is);
+                
+                ImplantationType it = new ImplantationType(tumorPrep);
+                specimen.setImplantationType(it);
+                  
                 specimen.setSample(sample);
 
                 loaderUtils.saveSpecimen(specimen);

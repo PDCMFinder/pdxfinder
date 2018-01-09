@@ -42,10 +42,10 @@ public class LoadHCI implements CommandLineRunner {
     private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
-    
+
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
-    
+
     private final static String NOT_SPECIFIED = "Not Specified";
 
     private BackgroundStrain nsgBS;
@@ -61,8 +61,6 @@ public class LoadHCI implements CommandLineRunner {
 
     @Value("${hcipdx.url}")
     private String urlStr;
-
-   
 
     @PostConstruct
     public void init() {
@@ -124,39 +122,41 @@ public class LoadHCI implements CommandLineRunner {
         // the preference is for histology
         String diagnosis = j.getString("Clinical Diagnosis");
         String histology = j.getString("Histology");
-        if(histology.trim().length()>0){
+        if (histology.trim().length() > 0) {
             diagnosis = histology;
         }
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
-                j.getString("Gender"),"", j.getString("Ethnicity"), j.getString("Age"), hciDS);
+                j.getString("Gender"), "", j.getString("Ethnicity"), j.getString("Age"), hciDS);
 
         // asssume specimen site is primary site?
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), NOT_SPECIFIED, 
+                j.getString("Primary Site"), NOT_SPECIFIED,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, hciDS.getAbbreviation());
-        
+
         pSnap.addSample(sample);
 
         QualityAssurance qa = new QualityAssurance(j.getString("QA"),
                 NOT_SPECIFIED, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
+        
+         String engraftmentSite = getValue("Engraftment Site",j);
+        
+        String tumorPrep = getValue("Tumor Prep",j);
 
         ModelCreation modelCreation = loaderUtils.createModelCreation(id, this.hciDS.getAbbreviation(), sample, qa);
         modelCreation.addRelatedSample(sample);
 
-       
-        
         String markerStr = j.getString("Markers");
-        
+
         String[] markers = markerStr.split(";");
-        if(markerStr.trim().length()>0){
-            
+        if (markerStr.trim().length() > 0) {
+
             MolecularCharacterization molC = new MolecularCharacterization(j.getString("Platform"));
             Set<MarkerAssociation> markerAssocs = new HashSet();
-            
+
             for (int i = 0; i < markers.length; i++) {
                 Marker m = loaderUtils.getMarker(markers[i], markers[i]);
                 MarkerAssociation ma = new MarkerAssociation();
@@ -180,19 +180,42 @@ public class LoadHCI implements CommandLineRunner {
                     passage = j.getString("QA Passage").replaceAll("P", "");
                 } catch (NumberFormatException e) {
                     // default is 0
-                     }
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation, 
+                }
+                Specimen specimen = loaderUtils.getSpecimen(modelCreation,
                         modelCreation.getSourcePdxId(), hciDS.getAbbreviation(), passage);
+                specimen.setSample(sample);
+
+                specimen.setBackgroundStrain(this.nsgBS);
+
+                ImplantationSite is = new ImplantationSite(engraftmentSite);
+                specimen.setImplantationSite(is);
+
+                ImplantationType it = new ImplantationType(tumorPrep);
+                specimen.setImplantationType(it);
+
                 specimen.setSample(sample);
 
                 loaderUtils.saveSpecimen(specimen);
 
             }
         }
-        
+
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
     }
+    
+    
+     private String getValue(String name, JSONObject j){
+        String value = NOT_SPECIFIED;
+        try{
+            value = j.getString(name);
+            if(value.trim().length()==0){
+                value = NOT_SPECIFIED;
+            }
+        }catch(Exception e){}
+        return value;
+    }
+
 
     private String parseURL(String urlStr) {
         StringBuilder sb = new StringBuilder();
