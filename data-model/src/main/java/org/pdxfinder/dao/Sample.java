@@ -24,27 +24,26 @@ public class Sample {
     private Tissue sampleSite;
     private String extractionMethod;
     private String classification;
-    private String dataSource;
-    private ExternalDataSource externalDataSource;
     public Boolean normalTissue;
+    private String dataSource;
 
     @Relationship(type="MAPPED_TO")
     private SampleToOntologyRelationShip sampleToOntologyRelationShip;
 
-    @Relationship(type = "OF_TYPE", direction = Relationship.OUTGOING)
+    @Relationship(type = "OF_TYPE")
     private TumorType type;
 
     @Relationship(type = "CHARACTERIZED_BY", direction = Relationship.INCOMING)
     private Set<MolecularCharacterization> molecularCharacterizations;
 
-    @Relationship(type = "Histology", direction = Relationship.OUTGOING)
+    @Relationship(type = "Histology")
     private Set<Histology> histology;
     
     public Sample() {
         // Empty constructor required as of Neo4j API 2.0.5
     }
 
-    public Sample(String sourceSampleId, TumorType type, String diagnosis, Tissue originTissue, Tissue sampleSite, String extractionMethod, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
+    public Sample(String sourceSampleId, TumorType type, String diagnosis, Tissue originTissue, Tissue sampleSite, String extractionMethod, String classification, Boolean normalTissue, String dataSource) {
         this.sourceSampleId = sourceSampleId;
         this.type = type;
         this.diagnosis = diagnosis;
@@ -52,9 +51,8 @@ public class Sample {
         this.sampleSite = sampleSite;
         this.extractionMethod = extractionMethod;
         this.classification = classification;
-        this.dataSource = externalDataSource.getAbbreviation();
-        this.externalDataSource = externalDataSource;
         this.normalTissue = normalTissue;
+        this.dataSource = dataSource;
 
     }
 
@@ -96,22 +94,6 @@ public class Sample {
 
     public void setClassification(String classification) {
         this.classification = classification;
-    }
-
-    public String getDataSource() {
-        return dataSource;
-    }
-
-    public void setDataSource(String dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public ExternalDataSource getExternalDataSource() {
-        return externalDataSource;
-    }
-
-    public void setExternalDataSource(ExternalDataSource externalDataSource) {
-        this.externalDataSource = externalDataSource;
     }
 
     public Boolean getNormalTissue() {
@@ -175,5 +157,13 @@ public class Sample {
      */
     public void setExtractionMethod(String extractionMethod) {
         this.extractionMethod = extractionMethod;
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
     }
 }

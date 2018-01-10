@@ -37,12 +37,10 @@ public class LoadWISTAR implements CommandLineRunner {
     private final static String WISTAR_DATASOURCE_NAME = "Wistar-MDAnderson-Penn";
     private final static String WISTAR_DATASOURCE_DESCRIPTION = "Wistar-MDAnderson-Penn PDX mouse models for PDXNet.";
 
-  
-
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
-    
-     private final static String NOT_SPECIFIED = "Not Specified";
+
+    private final static String NOT_SPECIFIED = "Not Specified";
 
     //   private BackgroundStrain nsgBS;
     private ExternalDataSource wistarDS;
@@ -57,8 +55,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
     @Value("${wistarpdx.url}")
     private String urlStr;
-    
-    
+
     @PostConstruct
     public void init() {
         formatter = new HelpFormatter();
@@ -81,7 +78,6 @@ public class LoadWISTAR implements CommandLineRunner {
 
             log.info("Loading WISTAR PDX data from URL " + urlStr);
             parseJSON(parseURL(urlStr));
-
 
         }
 
@@ -116,82 +112,94 @@ public class LoadWISTAR implements CommandLineRunner {
         // the preference is for histology
         String diagnosis = j.getString("Clinical Diagnosis");
         String histology = j.getString("Histology");
-       
+
         if (histology.trim().length() > 0) {
-                diagnosis = histology;
-            }
-        
-        if(diagnosis.trim().length()==0){
+            diagnosis = histology;
+        }
+
+        if (diagnosis.trim().length() == 0) {
             // no histology no diagnosis -> no model
             return;
         }
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
-        
-        String race =  NOT_SPECIFIED;
-        try{
-            if(j.getString("Race").trim().length()>0){
+
+        String race = NOT_SPECIFIED;
+        try {
+            if (j.getString("Race").trim().length() > 0) {
                 race = j.getString("Race");
             }
-        }catch(Exception e){}
-        
-        try{
-            if(j.getString("Ethnicity").trim().length()>0){
+        } catch (Exception e) {
+        }
+
+        try {
+            if (j.getString("Ethnicity").trim().length() > 0) {
                 race = j.getString("Ethnicity");
             }
-        }catch(Exception e){}
-
+        } catch (Exception e) {
+        }
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
                 j.getString("Gender"), "", race, j.getString("Age"), wistarDS);
 
-        
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"),
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS);
+                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS.getAbbreviation());
 
         pSnap.addSample(sample);
 
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
-        
+
         String qaType = NOT_SPECIFIED;
-        try{
+        try {
             qaType = j.getString("QA") + "on passage " + j.getString("QA Passage");
-        }catch(Exception e){
+        } catch (Exception e) {
             // not all groups supplied QA
         }
-        
+
         QualityAssurance qa = new QualityAssurance(qaType,
                 NOT_SPECIFIED, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
-        
+
         String strain = j.getString("Strain");
         BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
-        
-        String engraftmentSite = getValue("Engraftment Site",j);
-        
-        String tumorPrep = getValue("Tumor Prep",j);
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, engraftmentSite,
-                tumorPrep, sample, bs, qa);
+        String engraftmentSite = getValue("Engraftment Site", j);
+
+        String tumorPrep = getValue("Tumor Prep", j);
+
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, wistarDS.getAbbreviation(), sample, qa);
         modelCreation.addRelatedSample(sample);
 
-        
-        
+        Specimen specimen = loaderUtils.getSpecimen(modelCreation,
+                modelCreation.getSourcePdxId(), wistarDS.getAbbreviation(), NOT_SPECIFIED);
+
+        specimen.setBackgroundStrain(bs);
+
+        ImplantationSite is = new ImplantationSite(engraftmentSite);
+        specimen.setImplantationSite(is);
+
+        ImplantationType it = new ImplantationType(tumorPrep);
+        specimen.setImplantationType(it);
+
+        specimen.setSample(sample);
+
+        loaderUtils.saveSpecimen(specimen);
+
         loaderUtils.saveModelCreation(modelCreation);
 
-        
     }
-    
-    private String getValue(String name, JSONObject j){
+
+    private String getValue(String name, JSONObject j) {
         String value = NOT_SPECIFIED;
-        try{
+        try {
             value = j.getString(name);
-            if(value.trim().length()==0){
+            if (value.trim().length() == 0) {
                 value = NOT_SPECIFIED;
             }
-        }catch(Exception e){}
+        } catch (Exception e) {
+        }
         return value;
     }
 

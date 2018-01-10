@@ -10,6 +10,7 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
+import org.pdxfinder.dao.ImplantationSite;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +148,7 @@ public class LoadMDAnderson implements CommandLineRunner {
        
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), sampleSite,
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
+                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
 
         pSnap.addSample(sample);
 
@@ -168,8 +169,7 @@ public class LoadMDAnderson implements CommandLineRunner {
         
         String tumorPrep = getValue("Tumor Prep",j);
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, engraftmentSite,
-                tumorPrep, sample, bs, qa);
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, mdaDS.getAbbreviation(), sample, qa);
         modelCreation.addRelatedSample(sample);
 
         boolean human = false;
@@ -208,14 +208,23 @@ public class LoadMDAnderson implements CommandLineRunner {
 
             } else {
 
-                int passage = 0;
+                String passage = "0";
                 try {
-                    passage = new Integer(j.getString("QA Passage").replaceAll("P", "")).intValue();
+                    passage = j.getString("QA Passage").replaceAll("P", "");
                 } catch (Exception e) {
                     // default is 0
                 }
                 Specimen specimen = loaderUtils.getSpecimen(modelCreation,
                         modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
+                
+                specimen.setBackgroundStrain(bs);
+                
+                ImplantationSite is = new ImplantationSite(engraftmentSite);
+                specimen.setImplantationSite(is);
+                
+                ImplantationType it = new ImplantationType(tumorPrep);
+                specimen.setImplantationType(it);
+                  
                 specimen.setSample(sample);
 
                 loaderUtils.saveSpecimen(specimen);

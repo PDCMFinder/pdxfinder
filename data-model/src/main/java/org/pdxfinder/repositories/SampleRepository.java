@@ -14,12 +14,10 @@ import java.util.Set;
  */
 public interface SampleRepository extends PagingAndSortingRepository<Sample, Long> {
 
-    @Query("MATCH (s:Sample) WHERE s.sourceSampleId = {sourceSampleId} return s")
-    Sample findBySourceSampleId(@Param("sourceSampleId") String sourceSampleId);
+    @Query("MATCH (s:Sample) WHERE s.sourceSampleId = {sourceSampleId} AND s.dataSource = {dataSource} return s")
+    Sample findBySourceSampleIdAndDataSource(@Param("sourceSampleId") String sourceSampleId, @Param("dataSource") String dataSource) ;
 
     Set<Sample> findByDataSource(String dataSource);
-
-    Set<Sample> findByExternalDataSourceAbbreviation(String abbreviation);
 
     @Query("MATCH (s:Sample)-[o:ORIGIN_TISSUE]-(t:Tissue) where s.diagnosis contains {diag} return s,o,t order by s.diagnosis limit 30")
     Collection<Sample> findByDiagnosisContains(@Param("diag") String diag);

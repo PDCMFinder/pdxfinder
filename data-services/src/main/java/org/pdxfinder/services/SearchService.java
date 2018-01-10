@@ -299,6 +299,7 @@ public class SearchService {
             dto.setMappedOntology(sample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
         }
 
+        /*
         if (pdx != null && pdx.getImplantationType() != null) {
             dto.setSampleType(pdx.getImplantationType().getName());
         }
@@ -310,7 +311,7 @@ public class SearchService {
         if (pdx != null && pdx.getImplantationSite() != null) {
             dto.setEngraftmentSite(pdx.getImplantationSite().getName());
         }
-
+        */
         if (pdx != null && pdx.getSourcePdxId() != null) {
             dto.setModelId(pdx.getSourcePdxId());
         }
@@ -390,7 +391,7 @@ public class SearchService {
             Set<String> passagesList = new HashSet<>();
             for (Specimen specimen : specimens)
             {
-                passagesList.add(specimen.getPdxPassage().getPassage()+"");
+                passagesList.add(specimen.getPassage()+"");
             }
 
             platformMap.put(platform.getName(), passagesList);

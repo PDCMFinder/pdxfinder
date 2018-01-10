@@ -124,29 +124,16 @@ public class LoaderUtils {
 
     }
 
-    public ModelCreation createModelCreation(String pdxId, ImplantationSite implantationSite, ImplantationType implantationType, Sample sample, BackgroundStrain backgroundStrain, QualityAssurance qa) {
 
-        ModelCreation modelCreation = modelCreationRepository.findBySourcePdxId(pdxId);
+    public ModelCreation createModelCreation(String pdxId, String dataSource,  Sample sample, QualityAssurance qa) {
+
+        ModelCreation modelCreation = modelCreationRepository.findBySourcePdxIdAndDataSource(pdxId, dataSource);
+
         if (modelCreation != null) {
             log.info("Deleting existing ModelCreation " + pdxId);
             modelCreationRepository.delete(modelCreation);
         }
-
-        modelCreation = new ModelCreation(pdxId, implantationSite, implantationType, sample, backgroundStrain, qa);
-        modelCreationRepository.save(modelCreation);
-        return modelCreation;
-    }
-
-    public ModelCreation createModelCreation(String pdxId, String implantationSiteStr, String implantationTypeStr, Sample sample, BackgroundStrain backgroundStrain, QualityAssurance qa) {
-
-        ImplantationSite implantationSite = this.getImplantationSite(implantationSiteStr);
-        ImplantationType implantationType = this.getImplantationType(implantationTypeStr);
-        ModelCreation modelCreation = modelCreationRepository.findBySourcePdxId(pdxId);
-        if (modelCreation != null) {
-            log.info("Deleting existing ModelCreation " + pdxId);
-            modelCreationRepository.delete(modelCreation);
-        }
-        modelCreation = new ModelCreation(pdxId, implantationSite, implantationType, sample, backgroundStrain, qa);
+        modelCreation = new ModelCreation(pdxId, dataSource, sample, qa);
         modelCreationRepository.save(modelCreation);
         return modelCreation;
     }
@@ -163,7 +150,7 @@ public class LoaderUtils {
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, ExternalDataSource externalDataSource) {
 
         Patient patient = patientRepository.findByExternalId(externalId);
-        PatientSnapshot patientSnapshot = null;
+        PatientSnapshot patientSnapshot;
 
         if (patient == null) {
             log.info("Patient '{}' not found. Creating", externalId);
@@ -233,24 +220,18 @@ public class LoaderUtils {
         return patientSnapshotRepository.findByModelId(modelId);
     }
 
-    public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
+    public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, String dataSource) {
 
         TumorType type = this.getTumorType(typeStr);
         Tissue origin = this.getTissue(originStr);
         Tissue sampleSite = this.getTissue(sampleSiteStr);
-        Sample sample = sampleRepository.findBySourceSampleId(sourceSampleId);
+        Sample sample = sampleRepository.findBySourceSampleIdAndDataSource(sourceSampleId, dataSource);
         if (sample == null) {
 
-            sample = new Sample(sourceSampleId, type, diagnosis, origin, sampleSite, extractionMethod, classification, normalTissue, externalDataSource);
+            sample = new Sample(sourceSampleId, type, diagnosis, origin, sampleSite, extractionMethod, classification, normalTissue, dataSource);
             sampleRepository.save(sample);
         }
 
-        return sample;
-    }
-
-    public Sample getSampleBySourceSampleId(String sourceSampleId){
-
-        Sample sample = sampleRepository.findBySourceSampleId(sourceSampleId);
         return sample;
     }
 
@@ -260,7 +241,7 @@ public class LoaderUtils {
         return sampleRepository.findSamplesWithoutOntologyMapping();
     }
 
-    public Sample getMouseSample(ModelCreation model, String specimenId, String dataSource, int passage, String sampleId){
+    public Sample getMouseSample(ModelCreation model, String specimenId, String dataSource, String passage, String sampleId){
 
         Specimen specimen = this.getSpecimen(model, specimenId, dataSource, passage);
         Sample sample = null;
@@ -454,17 +435,14 @@ public class LoaderUtils {
     }
 
 
-    public Specimen getSpecimen(ModelCreation model, String specimenId, String dataSource, int passage){
+    public Specimen getSpecimen(ModelCreation model, String specimenId, String dataSource, String passage){
 
-
-        PdxPassage pass = this.getPassage(model, dataSource, passage);
-
-        Specimen specimen = specimenRepository.findByModelIdAndDataSourceAndSpecimenIdAndPassage(model.getSourcePdxId(), dataSource, specimenId, pass.getPassage());
+        Specimen specimen = specimenRepository.findByModelIdAndDataSourceAndSpecimenIdAndPassage(model.getSourcePdxId(), dataSource, specimenId, passage);
 
         if(specimen == null){
             specimen = new Specimen();
             specimen.setExternalId(specimenId);
-            specimen.setPdxPassage(pass);
+            specimen.setPassage(passage);
             specimenRepository.save(specimen);
         }
 
