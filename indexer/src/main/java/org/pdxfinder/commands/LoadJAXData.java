@@ -326,10 +326,12 @@ public class LoadJAXData implements CommandLineRunner {
                 loaderUtils.saveSpecimen(specimen);
 
                 modelCreation.addRelatedSample(specSample);
-                loaderUtils.saveModelCreation(modelCreation);
+
 
                 System.out.println("saved passage " + passage + " for model " + modelCreation.getSourcePdxId() + " from sample " + sampleKey);
             }
+
+            loaderUtils.saveModelCreation(modelCreation);
 
         } catch (Exception e) {
             log.error("", e);
