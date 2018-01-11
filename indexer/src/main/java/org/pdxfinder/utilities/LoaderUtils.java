@@ -553,7 +553,7 @@ public class LoaderUtils {
             p = new Platform();
             p.setName(name);
             p.setExternalDataSource(eds);
-            platformRepository.save(p);
+            //platformRepository.save(p);
         }
 
         return p;
@@ -577,7 +577,7 @@ public class LoaderUtils {
             pa = new PlatformAssociation();
             pa.setPlatform(p);
             pa.setMarker(m);
-            platformAssociationRepository.save(pa);
+            //platformAssociationRepository.save(pa);
 
         }
 
