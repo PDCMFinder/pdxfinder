@@ -20,6 +20,7 @@ public class PatientSnapshot {
     private Patient patient;
     private String age;
     private String dateAtCollection;
+    private Boolean treatmentNaive;
 
     @Relationship(type = "SAMPLED_FROM")
     private Set<Sample> samples;
@@ -93,5 +94,13 @@ public class PatientSnapshot {
 
     public void setDateAtCollection(String dateAtCollection) {
         this.dateAtCollection = dateAtCollection;
+    }
+
+    public Boolean getTreatmentNaive() {
+        return treatmentNaive;
+    }
+
+    public void setTreatmentNaive(Boolean treatmentNaive) {
+        this.treatmentNaive = treatmentNaive;
     }
 }
