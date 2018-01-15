@@ -1,184 +1,454 @@
-<html xmlns:th="http://www.thymeleaf.org">
 
-    <head>
-        <link th:remove="all" rel="stylesheet" media="screen" href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css"/>
-        <link rel="stylesheet" href="/css/chosen.css"/>
-        <title>PDX Finder</title>
-        <!--/*/ <th:block th:include="fragments/head-includes :: bootstrap"></th:block> /*/-->
-        <!--/*/ <th:block th:include="fragments/head-includes :: datatables"></th:block> /*/-->
-        <!--/*/ <th:block th:include="fragments/head-includes :: chart"></th:block> /*/-->
-        <!--/*/ <th:block th:include="fragments/head-includes :: general"></th:block> /*/-->
-        <script src="/js/pdxFinder.autocomplete.js"></script>
-    </head>
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title>PDX Finder - Search</title>
+    <meta name="description" content="PDX Finder" /><!-- Describe what this page is about -->
+    <meta name="keywords" content="Framework, Life Sciences" /><!-- A few keywords that relate to the content of THIS PAGE (not the whole project) -->
+    <meta name="author" content="PDX Finder" />
+    <meta name="HandheldFriendly" content="true" />
+    <meta name="MobileOptimized" content="width" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <body>
+    <link rel="apple-touch-icon" sizes="180x180" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/apple-touch-icon.png?v=1">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon-32x32.png?v=1">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon-16x16.png?v=1">
+    <link rel="manifest" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/manifest.json?v=1">
+    <link rel="mask-icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/safari-pinned-tab.svg?v=1" color="#0032a0">
+    <link rel="shortcut icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon.ico?v=1">
+    <meta name="apple-mobile-web-app-title" content="PDX Finder">
+    <meta name="application-name" content="PDX Finder">
+    <meta name="msapplication-config" content="https://ebiwd.github.io/pdx-visual-framework/images/favicons/browserconfig.xml?v=1">
+    <meta name="theme-color" content="#0032a0">
+    <!-- Add information on the life cycle of this page -->
+    <meta name="ebi:owner" content="PDX" /> <!-- Who should be contacted about changes -->
+    <meta name="ebi:review-cycle" content="60" /> <!-- In days, how often should the content be reviewed -->
+    <meta name="ebi:last-review" content="2017-11-14" /> <!-- The last time the content was reviewed -->
+    <meta name="ebi:expiry" content="2018-01-20" /> <!-- When this content is no longer relevant -->
+
+    <!-- If you link to any other sites frequently, consider optimising performance with a DNS prefetch -->
+    <!-- <link rel="dns-prefetch" href="//www.ebi.ac.uk" /> -->
+
+    <!-- CSS: implied media=all -->
+    <!-- CSS concatenated and minified via ant build script-->
+
+    <!-- <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/ebi-global.css" type="text/css" media="all" /> -->
+    <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css" type="text/css" media="all" />
+    <!-- Import Choice Library stylesheet-->
+    <link rel="stylesheet" href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/styles/css/choices.min.css">
+    <!-- Use this CSS file for any custom styling -->
+    <link rel="stylesheet" href="/css/app.css" type="text/css" media="all" />
+
+    <!-- If you have a custom header image or colour -->
+    <!--
+    <meta name="ebi:masthead-color" content="#000" />
+    <meta name="ebi:masthead-image" content="//www.ebi.ac.uk/web_guidelines/EBI-Framework/images/backgrounds/embl-ebi-background.jpg" />
+    -->
+
+    <!-- you can replace this with theme-[projectname].css. See http://www.ebi.ac.uk/web/style/colour for details of how to do this -->
+    <!-- also inform ES so we can host your colour palette file -->
+    <!-- <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/theme-embl-petrol.css" type="text/css" media="all" /> -->
+    <!-- end CSS-->
+</head>
+
+<body class="level2"><!-- add any of your classes or IDs -->
 
 
-            <div class="container">
-                <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
-            </div>
+<div class="expand-menu show-for-small-only">
+    <div class="columns small-2 full-height close-wrapper text-center padding-vertical-15">
+        <a><i class="icon icon-functional" data-icon="x" data-responsive-toggle="expand-menu"></i></a>
+    </div>
 
+    <div class="columns small-10 background-color-primary full-height">
+        <ul class="vertical menu pdx-mobile-menu" data-responsive-menu="drilldown small-accordion">
+            <li>
+                <a href="#">Pages</a>
+                <ul class="menu">
+                    <li><a href="page1.html">Page 1</a></li>
+                    <li class="active"><a href="page2.html">Page 2</a></li>
+                    <li><a href="page3.html">Page 3</a></li>
+                </ul>
+            </li>
+            <li class="active"><a href="#">Models</a></li>
+            <li><a href="#">PDX Standard</a></li>
+            <li><a href="#">Contacts</a></li>
+            <li><a href="#">Join us</a></li>
+        </ul>
+    </div>
+</div>
 
-            <div class="page-header text-center shiftUp80">
-                <h2>PDX Finder search</h2>
-            </div>
+<div content="content-wrapper">
+    <div id="skip-to">
+        <a href="#content">Skip to main content</a>
+    </div>
 
-            <!-- Page Content -->
-            <div class="container">
+    <div id="content">
+        <div data-sticky-container>
+            <header id="masthead" class="masthead" data-sticky data-options="marginTop: 0">
+                <div class="masthead-inner row">
+                    <div class="columns medium-2 small-4 log-column" id="local-title">
+                        <h1><a href="index.html" title="Back to [service-name] homepage"><img src="images/logo.png" class="padding-15"/></a></h1>
+                    </div>
+                    <!-- Desktop Menu-->
+                    <div class="columns medium-10 menu-column padding-vertical-30 hide-for-small-only" id="local-nav">
+                        <nav>
+                            <ul id="local-nav" class="dropdown menu main-menu float-right" data-dropdown-menu data-description="navigational">
+                                <li>
+                                    <a href="#">Pages</a>
+                                    <ul class="menu">
+                                        <li><a href="page1.html">Page 1</a></li>
+                                        <li class="active"><a href="page2.html">Page 2</a></li>
+                                        <li><a href="page3.html">Page 3</a></li>
+                                    </ul>
+                                </li>
+                                <li class="active"><a href="#">Models</a></li>
+                                <li><a href="#">PDX Standard</a></li>
+                                <li><a href="#">Contacts</a></li>
+                                <li><a href="#">Join us</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <!-- Mobile Menu -->
+                    <div class="columns small-4 show-for-small-only padding-vertical-15 text-right">
+                        <a class="menu-toggle"><i class="icon icon-functional" data-icon="M" data-toggle data-responsive-toggle="expand-menu"></i></a>
+                    </div>
+                </div>
+            </header>
+        </div>
 
-                        <p>
-                            To facilitate PDX models discovery, EMBL-EBI and the Jackson Laboratory are co-developing PDX Finder. PDX Finder
-                            is an open repository for the upload and storage of clinical, genomic and functional PDX data which will provide
-                            a comprehensive global catalogue of PDX models available for researchers and their associated data across
-                            distributed repository databases.
-                        </p>
+        <!-- Suggested layout containers -->
+        <section id="main-content-area" role="main">
+            <!-- Your menu structure should make a breadcrumb redundant, but if a breadcrump is needed uncomment the below -->
+            <nav aria-label="You are here:" role="navigation">
+                <ul class="breadcrumbs columns">
+                    <li><a href="#">Home</a></li>
+                    <li>
+                        <span class="show-for-sr">Current: </span> Blank boilerplate
+                    </li>
+                </ul>
+            </nav>
 
-                        <div class="row">
+            <!-- Search FORM Section -->
+            <section>
+                <form class="main-search">
+                    <div class="row">
+                        <fieldset>
+                            <div class="margin-bottom-none small-collapse">
+                                <!-- Large screen -->
+                                <div class="columns small-2 small-push-2 margin-bottom-small padding-top-large hide-for-small-only">
+                                    Enter your search here
+                                </div>
+                                <!-- Small screen-->
+                                <div class="columns small-7 medium-push-2 small-push-3  margin-bottom-none search-text-wrapper show-for-small-only">
+                                    Enter your search here
+                                </div>
 
-
-                            <div class="col-md-12 topSpace5">
-                                <h4>Diagnosis</h4>
-
-                                    <input id="pdxFinder"  class="materialF topSpace5" placeholder="Enter Diagnosis ..." type="text"/>
-
+                                <div class="columns small-7 medium-push-2 small-push-3  margin-bottom-none search-text-wrapper">
+                                    <input id="query" class="margin-bottom-none" title="EBI Search" tabindex="2" type="text" name="query" value="" size="35" maxlength="2048" placeholder="E.G. Breast cancer" required="">
+                                    <span class="form-error margin-top-small">
+                        You need to enter a search query.
+                    </span>
+                                </div>
+                                <div class="columns small-1 medium-push-2 small-push-3 margin-bottom-none ">
+                                    <input id="search_submit" class="button icon icon-functional margin-bottom-none" tabindex="3" type="submit" name="submit1" value="1" style="line-height:.9">
+                                </div>
+                                <!-- <input id="allebi" type="hidden" name="db" value="allebi" checked="checked" /> -->
+                                <input type="hidden" name="requestFrom" value="ebi_index">
                             </div>
+                        </fieldset>
+                        <fieldset>
+                            <div class="medium-push-4 small-push-3 small-8 small padding-top-medium">
+                                <a href="" id="main-search-advanced-link" class="font-color-dark-gray font-style-underline ">Advanced Search</a>
+                            </div>
+                        </fieldset>
+                    </div>
+                </form>
+            </section>
 
+            <!-- Search Result Message & Export Section -->
+            <section class="row padding-vertical-30">
+                <div class="columns medium-8 small-6 padding-vertical-15">
+                    Your Search for `Whatever` returned 1782 results.
+                </div>
 
-                            <!--<div class="col-md-6">
-                                <h4>Tested Marker(s)</h4>
-                                <select  id="markerSelect"  class="chosen" multiple="true" placeholder="Select marker(s)..."></select>
-                            </div>-->
-                        </div><br/>
+                <div class="columns medium-4 small-6 text-right">
+                    <a href="#" class="button more outline secondary large">Export Results</a>
+                </div>
+            </section>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h4>Source</h4>
-                                <select id="sourceSelect" class="chosen" multiple="true" placeholder="Select source(s)...">
-                                    <option th:each="ds:${dataSources}" th:text="${ds}"></option>
-<!--                                    <option>HCI-BCM(PDXNet)</option>
-                                    <option>IRCC</option>
-                                    <option>JAX</option>
-                                    <option>MDAnderson(PDXNet)</option>
-                                    <option>Wistar-MDAnderson-Penn(PDXNet)</option>
-                                    <option>WUSTL(PDXNet)</option>-->
+            <!-- Search Result and Filter Section -->
+            <section class="row">
+                <div class="columns medium-3">
+                    <h4 class="block-title clearfix"><span class="float-left">Filter By:</span></h4>
 
+                    <ul class="accordion pdx-accordion-1" data-accordion data-multi-expand="true">
+                        <li class="accordion-item is-active" data-accordion-item>
+                            <!-- Accordion tab title -->
+                            <a href="#" class="accordion-title">Title 1</a>
+
+                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
+                            <div class="accordion-content" data-tab-content>
+                                <select name="topic" required id="topic" class="form-control choices" multiple>
+                                    <option value="color">Color</option>
+                                    <option value="metastatic">Metastatic</option>
                                 </select>
                             </div>
+                        </li>
 
-                            <div class="col-md-6">
-                                <h4>Tumor type</h4>
-                                <select id="tumorTypeSelect" class="chosen" multiple="true" placeholder="Select tumor type(s)...">
-                                    <option>Metastatic</option>
-                                    <option>Primary Malignancy</option>
-                                    <option>Recurrent/Relapse</option>
-                                    <option>Refractory</option>
-                                    <option>Not Specified</option>
+                        <li class="accordion-item is-active" data-accordion-item>
+                            <!-- Accordion tab title -->
+                            <a href="#" class="accordion-title">Title 2</a>
+
+                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
+                            <div class="accordion-content" data-tab-content>
+                                <select name="topic" required id="topic" class="form-control choices">
+                                    <option value="color">Color</option>
+                                    <option value="metastatic">Metastatic</option>
                                 </select>
 
-                            </div>
-                        </div>
-                        <br/>
-                        <div class="row">
-                            <div class="col-md-6"></div>
-                            <div class="col-md-6">
-                            <button id="searchButton" class="w3-button w3-blue-grey pull-right"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> &nbsp; Search </button>
+                                <div class="large-form">
+                                    <div class="checkbox-item">
+                                        <input id="box1" type="checkbox" /><label for="box1">Checkbox 1</label>
+                                    </div>
 
-                            </div>
-                        </div>
+                                    <div class="checkbox-item">
+                                        <input id="box2" type="checkbox" /><label for="box2">Checkbox 2</label>
+                                    </div>
 
-
-                        <br/>
-
-                        <div class="row topSpace5">
-                            <div id="resultsDiv">
-
-                                <!-- Second Graph Row, will get replaced by first query -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div id="cancer-tissue-chart" style="height: 550px;"></div>
+                                    <div class="checkbox-item">
+                                        <input id="box3" type="checkbox" /><label for="box3">Checkbox 3</label>
                                     </div>
                                 </div>
-                                <!-- /.row -->
+                            </div>
+                        </li>
 
-                                <!-- Graph Row, will get replaced by first query -->
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div id="cancer-system-chart"></div>
+                        <li class="accordion-item is-active" data-accordion-item>
+                            <!-- Accordion tab title -->
+                            <a href="#" class="accordion-title">Title 3</a>
+
+                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
+                            <div class="accordion-content" data-tab-content>
+                                <div class="large-form">
+                                    <div class="checkbox-item">
+                                        <input id="box4" type="checkbox" /><label for="box4">Checkbox 4</label>
                                     </div>
-                                    <!-- /.col-md-4 -->
-                                    <div class="col-md-6">
-                                        <div id="cancer-histology-chart"></div>
+
+                                    <div class="checkbox-item">
+                                        <input id="box5" type="checkbox" /><label for="box5">Checkbox 5</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input id="box6" type="checkbox" /><label for="box6">Checkbox 6</label>
                                     </div>
                                 </div>
-                                <!-- /.row -->
 
+                                <select name="topic" required id="topic" class="form-control choices">
+                                    <option value="color">Color</option>
+                                    <option value="metastatic">Metastatic</option>
+                                </select>
+
+                                <div class="large-form">
+                                    <div class="checkbox-item">
+                                        <input id="box7" type="checkbox" /><label for="box7">Checkbox 7</label>
+                                    </div>
+
+                                    <div class="checkbox-item">
+                                        <input id="box8" type="checkbox" /><label for="box8">Checkbox 8</label>
+                                    </div>
+                                </div>
 
                             </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="columns medium-9">
+                    <div class="responsive-table">
+                        <table class="unstriped pdx-table">
+                            <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Type</th>
+                                <th>Histology</th>
+                                <th>Stage</th>
+                                <th>Status</th>
+                                <th>Strain</th>
+                                <th>Data</th>
+                                <th>Provider</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
+                                <td>Colon.</td>
+                                <td>Colon something</td>
+                                <td>IV</td>
+                                <td>Metastatic</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
+                                <td>JAX</td>
+                            </tr>
+                            <tr>
+                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
+                                <td>Colon.</td>
+                                <td>Colon something</td>
+                                <td>IV</td>
+                                <td>Metastatic</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
+                                <td>JAX</td>
+                            </tr>
+                            <tr>
+                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
+                                <td>Colon.</td>
+                                <td>Colon something</td>
+                                <td>IV</td>
+                                <td>Metastatic</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
+                                <td>JAX</td>
+                            </tr>
+                            <tr>
+                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
+                                <td>Colon.</td>
+                                <td>Colon something</td>
+                                <td>IV</td>
+                                <td>Metastatic</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
+                                <td>JAX</td>
+                            </tr>
+                            <tr>
+                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
+                                <td>Colon.</td>
+                                <td>Colon something</td>
+                                <td>IV</td>
+                                <td>Metastatic</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
+                                <td>JAX</td>
+                            </tr>
+                            <tr>
+                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
+                                <td>Colon.</td>
+                                <td>Colon something</td>
+                                <td>IV</td>
+                                <td>Metastatic</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
+                                <td>JAX</td>
+                            </tr>
+                            <tr>
+                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
+                                <td>Colon.</td>
+                                <td>Colon something</td>
+                                <td>IV</td>
+                                <td>Metastatic</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
+                                <td>JAX</td>
+                            </tr>
+                            <tr>
+                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
+                                <td>Colon.</td>
+                                <td>Colon something</td>
+                                <td>IV</td>
+                                <td>Metastatic</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
+                                <td>JAX</td>
+                            </tr>
+                            <tr>
+                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
+                                <td>Colon.</td>
+                                <td>Colon something</td>
+                                <td>IV</td>
+                                <td>Metastatic</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
+                                <td>JAX</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="row">
+                        <div class="columns medium-8 small-6 padding-vertical-10">
+                            <ul class="pagination pdx-pagination" role="navigation" aria-label="Pagination">
+                                <li class="pagination-previous disabled">Previous <span class="show-for-sr">page</span></li>
+                                <li class="current"><span class="show-for-sr">You're on page</span> 1</li>
+                                <li><a href="#" aria-label="Page 2">2</a></li>
+                                <li><a href="#" aria-label="Page 3">3</a></li>
+                                <li><a href="#" aria-label="Page 4">4</a></li>
+                                <li class="ellipsis" aria-hidden="true"></li>
+                                <li><a href="#" aria-label="Page 12">12</a></li>
+                                <li><a href="#" aria-label="Page 13">13</a></li>
+                                <li class="pagination-next"><a href="#" aria-label="Next page">Next <span class="show-for-sr">page</span></a></li>
+                            </ul>
                         </div>
 
+                        <div class="columns medium-4 small-6 text-right">
+                            <a href="#" class="button more outline secondary large">Export Results</a>
+                        </div>
+                    </div>
 
+
+                </div>
+            </section>
+
+        </section>
+        <!-- Optional local footer (insert citation / project-specific copyright / etc here -->
+        <!--
+        <footer id="local-footer" class="local-footer" role="local-footer">
+          <div class="row">
+            <span class="reference">How to reference this page: ...</span>
+          </div>
+        </footer>
+        -->
+        <!-- End optional local footer -->
+    </div>
+    <!-- End suggested layout containers / #content -->
+
+    <footer>
+        <div id="global-footer" class="global-footer row">
+            <div class="columns medium-4">
+                <h3 class="highlight green">Quick links</h3>
+                <ul class="no-bullet">
+                    <li>Unorderred list</li>
+                    <li>Unorderred list</li>
+                    <li>Unorderred list</li>
+                </ul>
             </div>
-            <!-- /.container -->
+
+            <div class="columns medium-4">
+                <h3 class="highlight green">Contacts</h3>
+                <ul class="no-bullet">
+                    <li><a href="#">Link</a></li>
+                    <li>Unorderred list</li>
+                    <li>Unorderred list</li>
+                </ul>
+            </div>
+
+            <div class="columns medium-4">
+                <h3 class="highlight">&nbsp;</h3>
+                A joint procet
+            </div>
+        </div>
+    </footer>
+</div>
+<!-- JavaScript -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
+<script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/scripts/dist/choices.min.js"></script>
+<script src="/js/script.js"></script>
 
 
+<!-- <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/js/foundationExtendEBI.js"></script> -->
+<!-- <script type="text/JavaScript">$(document).foundationExtendEBI();</script> -->
 
-
-
-            <script type="text/javascript" th:inline="javascript">
-
-                cancerBySystemChart([[ ${cancerBySystem} ]],"cancer-system-chart");
-                cancerByHistologyChart("","cancer-histology-chart");
-                cancerByTissueChart("","cancer-tissue-chart");
-
-            </script>
-
-            <!-- Auto Suggest JavaScript Code -->
-
-            <script type="text/javascript" th:inline="javascript">
-
-                    var states = [[ ${mappedDOTerm} ]];
-
-                    $('#pdxFinder').autocomplete({
-                    source:[states]
-                    });
-
-            </script>
-
-
-
-
-
-
-
-
-
-            <!-- Auto Search Field JavaScript Code Start -->
-            <script type="text/javascript">
-                jQuery(document).ready(function()
-                {
-
-                    init();
-                    jQuery("#pdxFinder").bind("enterWasHit",function(e)
-                    {
-                        search();
-                    });
-                    jQuery("#pdxFinder").keyup(function(e)
-                    {
-                        if(e.keyCode == 13)
-                        {
-                            jQuery(this).trigger("enterWasHit");
-                        }
-                    });
-
-                    jQuery("#searchButton").on("click", function ()
-                    {
-                        search();
-                    });
-
-                });
-            </script>
-            <!-- Auto Search Field JavaScript Code End -->
-
-
-    </body>
+<!-- Google Analytics details... -->
+<!-- Change UA-XXXXX-X to be your site's ID -->
+<!-- <script type="text/javascript">!function(e,a,n,t,i,o,c){e.GoogleAnalyticsObject=i,e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},e[i].l=1*new Date,o=a.createElement(n),c=a.getElementsByTagName(n)[0],o.async=1,o.src="//www.google-analytics.com/analytics.js",c.parentNode.insertBefore(o,c)}(window,document,"script",0,"ga"),ga("create","UA-629242-1",{cookieDomain:"auto"}),ga("require","linkid","linkid.js"),ga("set","anonymizeIp",!0),ga("send","pageview");</script> -->
+</body>
 </html>
