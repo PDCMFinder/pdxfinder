@@ -32,9 +32,10 @@
     <!-- Import Choice Library stylesheet-->
     <link rel="stylesheet" href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/styles/css/choices.min.css">
     <!-- Use this CSS file for any custom styling -->
-    <link rel="stylesheet" href="https://raw.githubusercontent.com/ebiwd/pdx-visual-framework/master/css/app.min.css" type="text/css" media="all" />
+    <!--    <link rel="stylesheet" href="https://raw.githubusercontent.com/ebiwd/pdx-visual-framework/master/css/app.min.css" type="text/css" media="all" /> -->
+     <link rel="stylesheet" href="/css/app.min.css" type="text/css" media="all" />
 
-    <!-- If you have a custom header image or colour -->
+     <!-- If you have a custom header image or colour -->
     <!--
     <meta name="ebi:masthead-color" content="#000" />
     <meta name="ebi:masthead-image" content="//www.ebi.ac.uk/web_guidelines/EBI-Framework/images/backgrounds/embl-ebi-background.jpg" />
@@ -170,12 +171,12 @@
                     <div class="columns medium-4 small-12 margin-top-30">
                         <h4 class="block-title clearfix"><span class="float-left border-color-black" th:text="${externalId}"></span></h4>
                         <ul class="cols-2 margin-top-large">
-                            <li>Overian: High grade serious</li>
-                            <li>Caucasion</li>
-                            <li>Tumbour: Primary</li>
-                            <li>Therapy: No</li>
-                            <li>Grade: IV</li>
-                            <li>Female: 65</li>
+                            <li>Patient ID: <span th:text="${patientId}"></span></li>
+                            <li>Gender: <span th:text="${gender}"></span></li>
+                            <li>Age: <span th:text="${age}"></span></li>
+                            <li>Race: <span th:text="${race}"></span></li>
+                            <li>Ethnicity: <span th:text="${ethnicity}"></span></li>
+
                         </ul>
                     </div>
 
@@ -201,7 +202,9 @@
 
                 <div class="tabs-content style-2" data-tabs-content="example2-tabs">
                     <div class="tabs-panel is-active" id="model">
-                        <p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.</p>
+
+                        <p>Display model related data</p>
+
                     </div>
                     <div class="tabs-panel" id="drug">
                         <p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.</p>
@@ -256,7 +259,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
 <script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/scripts/dist/choices.min.js"></script>
-<script src="https://raw.githubusercontent.com/ebiwd/pdx-visual-framework/master/js/script.js"></script>
+<script src="/js/script.js"></script>
 
 <!-- <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/js/foundationExtendEBI.js"></script> -->
 <!-- <script type="text/JavaScript">$(document).foundationExtendEBI();</script> -->
