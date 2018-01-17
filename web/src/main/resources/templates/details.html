@@ -195,19 +195,100 @@
             <!-- Tabs Section -->
             <section class="row">
                 <ul class="tabs style-2" data-tabs id="example2-tabs">
-                    <li class="tabs-title is-active"><a href="#model" data-tabs-target="model" aria-selected="true">Model</a></li>
-                    <li class="tabs-title"><a href="#drug" data-tabs-target="drug">Drug Response</a></li>
+                    <li class="tabs-title is-active"><a href="#summary" data-tabs-target="summary" aria-selected="true">Summary</a></li>
+                    <li class="tabs-title"><a href="#plots" data-tabs-target="plots">Plots SOC</a></li>
                     <li class="tabs-title"><a href="#variation" data-tabs-target="variation" id="variation_data_link">Variation</a></li>
                 </ul>
 
                 <div class="tabs-content style-2" data-tabs-content="example2-tabs">
-                    <div class="tabs-panel is-active" id="model">
+                    <div class="tabs-panel is-active" id="summary">
 
-                        <p>Display model related data</p>
+                        <p>
 
+                            <!-- Summary first row -->
+                        <div class="row">
+
+                        <div class="columns medium-6 small-12 margin-top-30">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">Clinical / Patient</h4>
+                                </div>
+                                <div class="responsive-table">
+                                    <table class="pdx-table">
+                                        <tr><th>Patient ID</th> <td th:text="${patientId}"></td></tr>
+                                        <tr><th>Gender</th>     <td th:text="${gender}"></td></tr>
+                                        <tr><th>Age</th>        <td th:text="${age}"></td></tr>
+                                        <tr><th>Race</th>       <td th:text="${race}"></td></tr>
+                                        <tr><th>Ethnicity</th>  <td th:text="${ethnicity}"></td></tr>
+                                        <tr><th>&nbsp;</th>                 <td>&nbsp;</td></tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="columns medium-6 small-12 margin-top-30">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">Clinical / Tumor</h4>
+                                </div>
+                                <div class="responsive-table">
+                                    <table class="pdx-table">
+                                        <tr><th>Histology</th>                  <td><span th:text="${diagnosis}"></span> <i class="hdc" th:text="${' (mapped to: '+mappedOntology+')'}"></i> </td></tr>
+                                        <tr><th>Ontology Mapping</th>           <td th:text="${mappedOntology}"></td></tr>
+                                        <tr><th>Primary Tissue</th>             <td th:text="${originTissue}"></td></tr>
+                                        <tr><th>Collection Tissue</th>          <td th:text="${sampleSite}"></td></tr>
+                                        <tr><th>Tumor type</th>                 <td th:text="${tumorType}"></td></tr>
+                                        <tr><th>Classification</th>             <td th:text="${classification}"></td></tr>
+                                        <tr><th>Sample type</th>                <td th:text="${sampleType}"></td></tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        </div> <!-- Summary first row ends-->
+
+                        <div class="row"><!-- Summary second row -->
+
+                            <div class="columns medium-6 small-12 margin-top-30">
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">PDX model</h4>
+                                    </div>
+                                    <div class="responsive-table">
+                                        <table class="pdx-table">
+                                            <tr><th>Strain</th>                 <td th:text="${strain}"></td></tr>
+                                            <tr><th>Engraftment site</th>       <td th:text="${engraftmentSite}"></td></tr>
+                                            <tr><th>Implantation type</th>      <td></td></tr>
+                                            <tr><th>&nbsp;</th>                 <td>&nbsp;</td></tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="columns medium-6 small-12 margin-top-30">
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">Quality control</h4>
+                                    </div>
+                                    <div class="responsive-table">
+                                        <table class="pdx-table">
+                                            <tr><th>Technology</th>                 <td> </td></tr>
+                                            <tr><th>Description</th>                <td></td></tr>
+                                            <tr><th>Passages</th>                   <td></td></tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+
+                        </p>
 
                     </div>
-                    <div class="tabs-panel" id="drug">
+                    <div class="tabs-panel" id="plots">
                         <p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.</p>
                     </div>
                     <div class="tabs-panel" id="variation">
