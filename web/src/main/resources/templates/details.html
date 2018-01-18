@@ -182,8 +182,7 @@
                 <ul class="tabs style-2" data-tabs id="example2-tabs">
                     <li class="tabs-title is-active"><a href="#summary" data-tabs-target="summary" aria-selected="true">Summary</a></li>
                     <li class="tabs-title"><a href="#variation" data-tabs-target="variation" id="variation_data_link">Variation</a></li>
-                    <li class="tabs-title"><a href="#plots" data-tabs-target="plots">Drug dosing</a></li>
-
+                    <li class="tabs-title"><a href="#plots" data-tabs-target="plots">Dosing studies</a></li>
                 </ul>
 
                 <div class="tabs-content style-2" data-tabs-content="example2-tabs">
@@ -201,7 +200,6 @@
                                 </div>
                                 <div class="responsive-table">
                                     <table class="pdx-table">
-                                        <tr><th>Patient ID</th> <td th:text="${patientId}"></td></tr>
                                         <tr><th>Gender</th>     <td th:text="${gender}"></td></tr>
                                         <tr><th>Age</th>        <td th:text="${age}"></td></tr>
                                         <tr><th>Race / Ethnicity</th>      <td><span th:text="${race}"></span> / <span th:text="${ethnicity}"></span> </td></tr>
@@ -314,7 +312,7 @@
                                                         <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'showContent' : 'hideContent' ">
 
                                                             <h4 class="bLine">
-                                                                <span class="hdc">Tumour Type: </span>            <i>Patient Tumor</i>                  &nbsp; &nbsp;
+                                                                <span class="hdc">Tumor Type: </span>            <i>Patient Tumor</i>                  &nbsp; &nbsp;
                                                                 <span class="hdc">Histology:</span> <i th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
                                                                 <span class="hdc">Grade: </span>  <i></i>
                                                             </h4>
@@ -374,7 +372,7 @@
                                                             <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'showContent' : 'hideContent' ">
 
                                                                 <h4 class="bLine" th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
-                                                                    <span class="hdc">Tumour Type: </span>            <i>Xenograft Tumor</i>                  &nbsp; &nbsp;
+                                                                    <span class="hdc">Tumor Type: </span>            <i>Xenograft Tumor</i>                  &nbsp; &nbsp;
                                                                     <span class="hdc">Histology:</span> <i th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
                                                                     <span class="hdc">Passage: </span>  <i th:text="${technology.value[num-1]}"></i>
                                                                 </h4>
