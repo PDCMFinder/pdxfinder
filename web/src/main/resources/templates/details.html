@@ -60,7 +60,7 @@
             <li><a href="#">Home</a></li>
             <li><a href="#">Search</a></li>
             <li><a href="#">PDX Standards</a></li>
-            <li><a href="#">Methodology</a></li>
+            <li><a href="#">Methods</a></li>
             <li><a href="#">Contact</a></li>
         </ul>
     </div>
@@ -85,7 +85,7 @@
                                 <li><a href="#">Home</a></li>
                                 <li><a href="/search">Search</a></li>
                                 <li><a href="#">PDX Standards</a></li>
-                                <li><a href="#">Methodology</a></li>
+                                <li><a href="#">Methods</a></li>
                                 <li><a href="#">Contact</a></li>
                             </ul>
                         </nav>
@@ -150,40 +150,40 @@
             <!-- Three Grids Section -->
             <section>
                 <div class="row">
-                    <div class="columns medium-4 small-12 margin-top-30">
-                        <img src="/images/image-1.png" />
-                    </div>
 
                     <div class="columns medium-4 small-12 margin-top-30">
                         <h4 class="block-title clearfix"><span class="float-left border-color-black" th:text="${externalId}"></span></h4>
+
+                    </div>
+
+                    <div class="columns medium-4 small-12 margin-top-30">
                         <ul class="cols-2 margin-top-large">
-                            <li>Patient ID: <span th:text="${patientId}"></span></li>
-                            <li>Gender: <span th:text="${gender}"></span></li>
-                            <li>Age: <span th:text="${age}"></span></li>
-                            <li>Race: <span th:text="${race}"></span></li>
-                            <li>Ethnicity: <span th:text="${ethnicity}"></span></li>
+                            <li><span th:text="${mappedOntology}"></span> </li>
+
 
                         </ul>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-30">
+                        <!--
                         <p><span class="badge"><i class="icon icon-functional" data-icon="L"></i></span> <a href="#" class="font-style-underline">Show similar</a></p>
                         <p><span class="badge"><i class="icon icon-functional" data-icon="+"></i></span> <a href="#" class="font-style-underline">Add to my list</a></p>
                         <p><span class="badge"><i class="icon icon-functional" data-icon="="></i></span> <a href="#" class="font-style-underline">Download report</a></p>
-
+                         -->
                         <p><a href="#" class="button more uppercase margin-top-large">Contact Provider</a></p>
                     </div>
                 </div>
             </section>
 
-            <hr class="margin-vertical-30">
+              <hr class="margin-vertical-30">
 
-            <!-- Tabs Section -->
+              <!-- Tabs Section -->
             <section class="row">
                 <ul class="tabs style-2" data-tabs id="example2-tabs">
                     <li class="tabs-title is-active"><a href="#summary" data-tabs-target="summary" aria-selected="true">Summary</a></li>
-                    <li class="tabs-title"><a href="#plots" data-tabs-target="plots">Plots SOC</a></li>
                     <li class="tabs-title"><a href="#variation" data-tabs-target="variation" id="variation_data_link">Variation</a></li>
+                    <li class="tabs-title"><a href="#plots" data-tabs-target="plots">Drug dosing</a></li>
+
                 </ul>
 
                 <div class="tabs-content style-2" data-tabs-content="example2-tabs">
@@ -204,8 +204,7 @@
                                         <tr><th>Patient ID</th> <td th:text="${patientId}"></td></tr>
                                         <tr><th>Gender</th>     <td th:text="${gender}"></td></tr>
                                         <tr><th>Age</th>        <td th:text="${age}"></td></tr>
-                                        <tr><th>Race</th>       <td th:text="${race}"></td></tr>
-                                        <tr><th>Ethnicity</th>  <td th:text="${ethnicity}"></td></tr>
+                                        <tr><th>Race / Ethnicity</th>      <td><span th:text="${race}"></span> / <span th:text="${ethnicity}"></span> </td></tr>
                                         <tr><th>&nbsp;</th>                 <td>&nbsp;</td></tr>
                                     </table>
                                 </div>
@@ -255,7 +254,7 @@
                             <div class="columns medium-6 small-12 margin-top-30">
                                 <div class="panel panel-info">
                                     <div class="panel-heading">
-                                        <h4 class="panel-title">Quality control</h4>
+                                        <h4 class="panel-title">Model quality control</h4>
                                     </div>
                                     <div class="responsive-table">
                                         <table class="pdx-table">
@@ -274,9 +273,8 @@
                         </p>
 
                     </div>
-                    <div class="tabs-panel" id="plots">
-                        <p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.</p>
-                    </div>
+
+
                     <div class="tabs-panel" id="variation">
                         <p>
 
@@ -286,11 +284,11 @@
                             <style> table *{ -webkit-box-sizing:content-box; -moz-box-sizing:content-box; box-sizing:content-box;}</style>
                         <div class="col-md-12 javaScriptBrowser">
 
-                            <div class="panel panel-info" th:if="${totalRecords > 0}" >
+                            <!-- <div class="panel panel-info" th:if="${totalRecords > 0}" >
                                 <div class="panel-heading">
                                     <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
                                 </div>
-                            </div>
+                            </div> -->
 
 
                             <div class="tab" role="tabpanel" th:if="${patientInfo.size() > 0}" >
@@ -421,6 +419,12 @@
 
                         </p>
                     </div>
+
+
+                    <div class="tabs-panel" id="plots">
+                        <p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.</p>
+                    </div>
+
                 </div>
             </section>
 
