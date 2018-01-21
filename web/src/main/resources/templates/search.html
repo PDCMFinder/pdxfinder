@@ -171,13 +171,14 @@
                     <ul class="accordion pdx-accordion-1" data-accordion data-multi-expand="true">
                         <li class="accordion-item is-active" data-accordion-item>
                             <!-- Accordion tab title -->
-                            <a href="#" class="accordion-title">Title 1</a>
+                            <a href="#" class="accordion-title">Patient Age</a>
 
                             <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
                             <div class="accordion-content" data-tab-content>
                                 <select name="topic" required id="topic" class="form-control choices" multiple>
-                                    <option value="color">Color</option>
-                                    <option value="metastatic">Metastatic</option>
+                                    <span th:each="instance : ${patient_age_options}">
+                                        <option th:text="${instance.name}">keyvalue</option>
+                                    </span>
                                 </select>
                             </div>
                         </li>
@@ -193,18 +194,13 @@
                                     <option value="metastatic">Metastatic</option>
                                 </select>
 
-                                <div class="large-form">
+                                <div class="large-form" th:each="instance,iterStat : ${patient_age_options}">
                                     <div class="checkbox-item">
-                                        <input id="box1" type="checkbox" /><label for="box1">Checkbox 1</label>
+                                        <input th:id="${iterStat.index}" type="checkbox"/><label
+                                            th:for="${iterStat.index}" th:text="${instance.name}">Checkbox 1</label>
+                                        <span th:text="${instance.count}" }>(count)</span>
                                     </div>
 
-                                    <div class="checkbox-item">
-                                        <input id="box2" type="checkbox" /><label for="box2">Checkbox 2</label>
-                                    </div>
-
-                                    <div class="checkbox-item">
-                                        <input id="box3" type="checkbox" /><label for="box3">Checkbox 3</label>
-                                    </div>
                                 </div>
                             </div>
                         </li>

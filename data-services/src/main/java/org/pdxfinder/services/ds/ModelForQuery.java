@@ -53,6 +53,8 @@ public class ModelForQuery {
 
     private Long modelId;
 
+    private String datasource;
+
     private String patientAge;
     private String patientTreatmentStatus;
     private String patientGender;
@@ -164,5 +166,13 @@ public class ModelForQuery {
 
     public void setModelBackgroundStrain(String modelBackgroundStrain) {
         this.modelBackgroundStrain = modelBackgroundStrain;
+    }
+
+    public String getDatasource() {
+        return datasource;
+    }
+
+    public void setDatasource(String datasource) {
+        this.datasource = datasource;
     }
 }

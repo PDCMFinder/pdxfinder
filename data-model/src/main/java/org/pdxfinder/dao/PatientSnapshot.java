@@ -1,11 +1,10 @@
 package org.pdxfinder.dao;
 
-import java.util.HashSet;
-
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -34,6 +33,44 @@ public class PatientSnapshot {
     public PatientSnapshot(Patient patient, String age) {
         this.patient = patient;
         this.age = age;
+    }
+
+    public String getAgeBin() {
+        String ageBin;
+
+        try {
+            Integer ageInteger = Integer.parseInt(this.age);
+
+            if (ageInteger < 11) {
+                ageBin = "Child";
+            } else if (ageInteger < 21) {
+                ageBin = "11-20";
+            } else if (ageInteger < 31) {
+                ageBin = "21-30";
+            } else if (ageInteger < 41) {
+                ageBin = "31-40";
+            } else if (ageInteger < 51) {
+                ageBin = "41-50";
+            } else if (ageInteger < 61) {
+                ageBin = "51-60";
+            } else if (ageInteger < 71) {
+                ageBin = "61-70";
+            } else if (ageInteger < 81) {
+                ageBin = "71-80";
+            } else if (ageInteger < 91) {
+                ageBin = "81-90";
+            } else if (ageInteger < 101) {
+                ageBin = "91-100";
+            } else {
+                ageBin = "> 101";
+            }
+
+        } catch (Exception e) {
+            // probably a parse exception
+            ageBin = this.age;
+        }
+
+        return ageBin;
     }
 
     public PatientSnapshot(Patient patient, String age, Set<Sample> samples) {

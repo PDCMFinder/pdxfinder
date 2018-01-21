@@ -36,6 +36,10 @@ public class Sample {
     @Relationship(type = "CHARACTERIZED_BY", direction = Relationship.INCOMING)
     private Set<MolecularCharacterization> molecularCharacterizations;
 
+    //
+    @Relationship(type = "SAMPLED_FROM", direction = Relationship.INCOMING)
+    private PatientSnapshot patientSnapshot;
+
     @Relationship(type = "Histology")
     private Set<Histology> histology;
     
@@ -165,5 +169,13 @@ public class Sample {
 
     public void setDataSource(String dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public PatientSnapshot getPatientSnapshot() {
+        return patientSnapshot;
+    }
+
+    public void setPatientSnapshot(PatientSnapshot patientSnapshot) {
+        this.patientSnapshot = patientSnapshot;
     }
 }

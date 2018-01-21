@@ -6,7 +6,6 @@ import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -24,6 +23,7 @@ public class SearchService {
     private SpecimenRepository specimenRepository;
     private MolecularCharacterizationRepository molecularCharacterizationRepository;
     private PlatformRepository platformRepository;
+
     private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
     private final String JAX_URL_TEXT = "View data at JAX";
     private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
@@ -42,11 +42,14 @@ public class SearchService {
     private final String WUSTL_DS = "PDXNet-WUSTL";
 
 
-    @Autowired
-    public SearchService(SampleRepository sampleRepository, PatientRepository patientRepository,
-                         PatientSnapshotRepository patientSnapshotRepository, ModelCreationRepository modelCreationRepository,
-                         OntologyTermRepository ontologyTermRepository,SpecimenRepository specimenRepository,
-                         MolecularCharacterizationRepository molecularCharacterizationRepository,PlatformRepository platformRepository) {
+    public SearchService(SampleRepository sampleRepository,
+                         PatientRepository patientRepository,
+                         PatientSnapshotRepository patientSnapshotRepository,
+                         ModelCreationRepository modelCreationRepository,
+                         OntologyTermRepository ontologyTermRepository,
+                         SpecimenRepository specimenRepository,
+                         MolecularCharacterizationRepository molecularCharacterizationRepository,
+                         PlatformRepository platformRepository) {
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
         this.patientSnapshotRepository = patientSnapshotRepository;
@@ -55,7 +58,6 @@ public class SearchService {
         this.molecularCharacterizationRepository = molecularCharacterizationRepository;
         this.specimenRepository = specimenRepository;
         this.platformRepository = platformRepository;
-
     }
 
 

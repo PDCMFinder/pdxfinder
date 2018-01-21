@@ -46,6 +46,10 @@ public class ModelCreation {
     }
 
 
+    public Long getId() {
+        return id;
+    }
+
     public String getSourcePdxId() {
         return sourcePdxId;
     }
