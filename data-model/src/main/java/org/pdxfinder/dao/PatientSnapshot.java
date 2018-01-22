@@ -41,28 +41,27 @@ public class PatientSnapshot {
         try {
             Integer ageInteger = Integer.parseInt(this.age);
 
-            if (ageInteger < 11) {
-                ageBin = "Child";
-            } else if (ageInteger < 21) {
-                ageBin = "11-20";
-            } else if (ageInteger < 31) {
-                ageBin = "21-30";
-            } else if (ageInteger < 41) {
-                ageBin = "31-40";
-            } else if (ageInteger < 51) {
-                ageBin = "41-50";
-            } else if (ageInteger < 61) {
-                ageBin = "51-60";
-            } else if (ageInteger < 71) {
-                ageBin = "61-70";
-            } else if (ageInteger < 81) {
-                ageBin = "71-80";
-            } else if (ageInteger < 91) {
-                ageBin = "81-90";
-            } else if (ageInteger < 101) {
-                ageBin = "91-100";
-            } else {
-                ageBin = "> 101";
+            if (ageInteger < 10) {
+                ageBin = "0-9";
+            } else if (ageInteger < 20) {
+                ageBin = "10-19";
+            } else if (ageInteger < 30) {
+                ageBin = "20-29";
+            } else if (ageInteger < 40) {
+                ageBin = "30-39";
+            } else if (ageInteger < 50) {
+                ageBin = "40-49";
+            } else if (ageInteger < 60) {
+                ageBin = "50-59";
+            } else if (ageInteger < 70) {
+                ageBin = "60-69";
+            } else if (ageInteger < 80) {
+                ageBin = "70-79";
+            } else if (ageInteger < 90) {
+                ageBin = "80-89";
+            }
+            else {
+                ageBin = "90+";
             }
 
         } catch (Exception e) {
