@@ -143,6 +143,18 @@ public class SearchDS {
                     //TODO: Add this section
                     break;
 
+                case system:
+                    //TODO
+                    break;
+
+                case organ:
+                    //TODO
+                    break;
+
+                case cell_type:
+                    //TODO
+                    break;
+
                 default:
                     // default case is an unexpected filter option
                     // Do not filter anything

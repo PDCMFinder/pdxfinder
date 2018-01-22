@@ -12,6 +12,9 @@ public enum SearchFacetName {
     sample_tumor_type,
     model_implantation_site,
     model_implantation_type,
-    model_background_strain;
+    model_background_strain,
+    organ,
+    system,
+    cell_type;
 
 }
