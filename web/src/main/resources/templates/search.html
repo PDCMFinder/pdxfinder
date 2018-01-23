@@ -215,7 +215,7 @@
 
                                                 <div class="checkbox-item" th:each="instance, iter:${patient_age_options}">
                                                     <input th:id="'age_' + ${iter.index}" type="checkbox" />
-                                                    <label><span th:text="${instance.name}"></span></label>
+                                                    <label th:attr="for='age_'+${iter.index}"><span th:text="${instance.name}"></span></label>
                                                 </div>
 
                                             </div>
@@ -276,13 +276,15 @@
                             <thead>
                             <tr>
                                 <th>Model</th>
-                                <th>Type</th>
                                 <th>Histology</th>
-                                <th>Stage</th>
-                                <th>Status</th>
-                                <th>Strain</th>
-                                <th>Data</th>
-                                <th>Provider</th>
+                                <th>Primary site</th>
+                                <th>Collection site</th>
+                                <th>Type</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Treatment history</th>
+                                <th>Study</th>
+                                <th>Center</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -292,6 +294,8 @@
                                 <td>Colon something</td>
                                 <td>IV</td>
                                 <td>Metastatic</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
                                 <td>NODSCID</td>
                                 <td>Exome Expression</td>
                                 <td>JAX <a href="https://www.google.co.uk/search?q=jax" target="_blank" data-tooltip
@@ -306,6 +310,8 @@
                                 <td>IV</td>
                                 <td>Metastatic</td>
                                 <td>NODSCID</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
                                 <td>Exome Expression</td>
                                 <td>JAX</td>
                             </tr>
@@ -316,6 +322,8 @@
                                 <td>IV</td>
                                 <td>Metastatic</td>
                                 <td>NODSCID</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
                                 <td>Exome Expression</td>
                                 <td>JAX</td>
                             </tr>
@@ -326,6 +334,8 @@
                                 <td>IV</td>
                                 <td>Metastatic</td>
                                 <td>NODSCID</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
                                 <td>Exome Expression</td>
                                 <td>JAX</td>
                             </tr>
@@ -336,6 +346,8 @@
                                 <td>IV</td>
                                 <td>Metastatic</td>
                                 <td>NODSCID</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
                                 <td>Exome Expression</td>
                                 <td>JAX</td>
                             </tr>
@@ -346,6 +358,8 @@
                                 <td>IV</td>
                                 <td>Metastatic</td>
                                 <td>NODSCID</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
                                 <td>Exome Expression</td>
                                 <td>JAX</td>
                             </tr>
@@ -356,6 +370,8 @@
                                 <td>IV</td>
                                 <td>Metastatic</td>
                                 <td>NODSCID</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
                                 <td>Exome Expression</td>
                                 <td>JAX</td>
                             </tr>
@@ -366,6 +382,8 @@
                                 <td>IV</td>
                                 <td>Metastatic</td>
                                 <td>NODSCID</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
                                 <td>Exome Expression</td>
                                 <td>JAX</td>
                             </tr>
@@ -376,6 +394,8 @@
                                 <td>IV</td>
                                 <td>Metastatic</td>
                                 <td>NODSCID</td>
+                                <td>NODSCID</td>
+                                <td>Exome Expression</td>
                                 <td>Exome Expression</td>
                                 <td>JAX</td>
                             </tr>
