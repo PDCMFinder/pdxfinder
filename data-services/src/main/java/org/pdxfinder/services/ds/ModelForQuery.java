@@ -73,6 +73,8 @@ public class ModelForQuery {
     private String cancerOrgan;
     private String cancerCellType;
 
+    private String diagnosis;
+
     public ModelForQuery() {
     }
 
@@ -252,5 +254,13 @@ public class ModelForQuery {
 
     public void setCancerCellType(String cancerCellType) {
         this.cancerCellType = cancerCellType;
+    }
+
+    public String getDiagnosis() {
+        return diagnosis;
+    }
+
+    public void setDiagnosis(String diagnosis) {
+        this.diagnosis = diagnosis;
     }
 }

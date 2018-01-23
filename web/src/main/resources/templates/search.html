@@ -288,17 +288,18 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td><a>PDX123</a></td>
-                                <td>Colon.</td>
-                                <td>Colon something</td>
-                                <td>IV</td>
-                                <td>Metastatic</td>
-                                <td>NODSCID</td>
-                                <td>Exome Expression</td>
-                                <td>NODSCID</td>
-                                <td>Exome Expression</td>
-                                <td>JAX <a href="https://www.google.co.uk/search?q=jax" target="_blank" data-tooltip
+                            <tr th:each="model, iter : ${results}">
+                                <td th:text="${iter.index}"><a th:text="${model.id}"></a></td>
+                                <td th:text="${model.diagnosis}">${model.diagnosis}</td>
+                                <td th:text="${model.sampleOriginTissue}">origin tissue</td>
+                                <td th:text="${model.sampleSampleSite}">sample site</td>
+                                <td th:text="${model.sampleTumorType}">Metastatic</td>
+                                <td th:text="${model.patientAge}">NODSCID</td>
+                                <td th:text="${model.patientGender}">NODSCID</td>
+                                <td th:text="${model.sampleSampleSite}">Exome Expression</td>
+                                <td th:text="${model.sampleSampleSite}">study</td>
+                                <td th:text="${model.datasource}">JAX <a href="https://www.google.co.uk/search?q=jax"
+                                                                         target="_blank" data-tooltip
                                            aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1"
                                            title="Some text about JAX"><i class="icon icon-generic"
                                                                           data-icon="i"></i></a></td>

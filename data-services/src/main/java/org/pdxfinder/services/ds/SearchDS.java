@@ -42,6 +42,7 @@ public class SearchDS {
             // Patient information
             mfq.setPatientAge(mc.getSample().getPatientSnapshot().getAgeBin());
             mfq.setPatientGender(mc.getSample().getPatientSnapshot().getPatient().getSex());
+            mfq.setDiagnosis(mc.getSample().getDiagnosis());
 
             if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
                 mfq.setPatientTreatmentStatus(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());
