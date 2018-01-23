@@ -98,50 +98,32 @@ public class SearchDS {
 
                 case datasource:
 
-                    preds.clear();
-                    for (String filter : filters.get(SearchFacetName.datasource)) {
-                        Predicate<ModelForQuery> p = s -> s.getDatasource().equals(filter);
-                        preds.add(p);
-                    }
-                    predicate = preds.stream().reduce(Predicate::or).orElse(x -> false);
-
-                    result = result.stream().filter(predicate::test).collect(Collectors.toSet());
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.datasource));
+                    result = result.stream().filter(x -> predicate.test(x.getDatasource())).collect(Collectors.toSet());
                     break;
 
                 case patient_age:
 
-                    preds.clear();
-                    for (String filter : filters.get(SearchFacetName.patient_age)) {
-                        Predicate<ModelForQuery> p = s -> s.getPatientAge().equals(filter);
-                        preds.add(p);
-                    }
-                    predicate = preds.stream().reduce(Predicate::or).orElse(x -> false);
-
-                    result = result.stream().filter(predicate::test).collect(Collectors.toSet());
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.patient_age));
+                    result = result.stream().filter(x -> predicate.test(x.getPatientAge())).collect(Collectors.toSet());
                     break;
 
                 case patient_treatment_status:
 
                     predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.patient_treatment_status));
-                    result = result.stream().filter(predicate::test).collect(Collectors.toSet());
+                    result = result.stream().filter(x -> predicate.test(x.getPatientTreatmentStatus())).collect(Collectors.toSet());
                     break;
 
                 case patient_gender:
 
                     predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.patient_gender));
-                    result = result.stream().filter(predicate::test).collect(Collectors.toSet());
+                    result = result.stream().filter(x -> predicate.test(x.getPatientGender())).collect(Collectors.toSet());
                     break;
 
                 case sample_origin_tissue:
 
-                    preds.clear();
-                    for (String filter : filters.get(SearchFacetName.sample_origin_tissue)) {
-                        Predicate<ModelForQuery> p = s -> s.getSampleOriginTissue().equals(filter);
-                        preds.add(p);
-                    }
-                    predicate = preds.stream().reduce(Predicate::or).orElse(x -> false);
-
-                    result = result.stream().filter(predicate::test).collect(Collectors.toSet());
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.sample_origin_tissue));
+                    result = result.stream().filter(x -> predicate.test(x.getSampleOriginTissue())).collect(Collectors.toSet());
                     break;
 
                 case sample_sample_site:
@@ -204,14 +186,14 @@ public class SearchDS {
      * @param filters the set of strings to match against
      * @return a composed predicate case insensitive matching the supplied filters using disjunction (OR)
      */
-    Predicate<ModelForQuery> getExactMatchDisjunctionPredicate(List<String> filters) {
-        List<Predicate<ModelForQuery>> preds = new ArrayList<>();
+    Predicate<String> getExactMatchDisjunctionPredicate(List<String> filters) {
+        List<Predicate<String>> preds = new ArrayList<>();
 
         // Iterate through the filter options passed in for this facet
         for (String filter : filters) {
 
             // Create a filter predicate for each option
-            Predicate<ModelForQuery> pred = s -> s.getDatasource().equals(filter);
+            Predicate<String> pred = s -> s.equals(filter);
 
             // Store all filter options in a list
             preds.add(pred);
