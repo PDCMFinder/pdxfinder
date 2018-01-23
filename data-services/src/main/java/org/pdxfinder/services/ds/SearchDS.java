@@ -22,9 +22,10 @@ public class SearchDS {
     private final static Logger log = LoggerFactory.getLogger(SearchDS.class);
 
     private Set<ModelForQuery> models;
-    private ModelCreationRepository modelCreationRepository;
 
-
+    /**
+     * Populate the complete set of models for searching when this object is instantiated
+     */
     public SearchDS(ModelCreationRepository modelCreationRepository) {
         Assert.notNull(modelCreationRepository, "Model repository cannot be null");
         this.models = new HashSet<>();
@@ -85,24 +86,44 @@ public class SearchDS {
 
         Set<ModelForQuery> result = new HashSet<>(models);
 
+        // If no filters have been specified, return the complete set
+        if (filters == null) {
+            return result;
+        }
+
         for (SearchFacetName facet : filters.keySet()) {
+            List<Predicate<ModelForQuery>> preds = new ArrayList<>();
             Predicate predicate;
             switch (facet) {
 
                 case datasource:
 
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.datasource));
+                    preds.clear();
+                    for (String filter : filters.get(SearchFacetName.datasource)) {
+                        Predicate<ModelForQuery> p = s -> s.getDatasource().equals(filter);
+                        preds.add(p);
+                    }
+                    predicate = preds.stream().reduce(Predicate::or).orElse(x -> false);
+
                     result = result.stream().filter(predicate::test).collect(Collectors.toSet());
                     break;
 
                 case patient_age:
 
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.patient_age));
+                    preds.clear();
+                    for (String filter : filters.get(SearchFacetName.patient_age)) {
+                        Predicate<ModelForQuery> p = s -> s.getPatientAge().equals(filter);
+                        preds.add(p);
+                    }
+                    predicate = preds.stream().reduce(Predicate::or).orElse(x -> false);
+
                     result = result.stream().filter(predicate::test).collect(Collectors.toSet());
                     break;
 
                 case patient_treatment_status:
-                    //TODO: Add this section
+
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.patient_treatment_status));
+                    result = result.stream().filter(predicate::test).collect(Collectors.toSet());
                     break;
 
                 case patient_gender:
@@ -112,7 +133,15 @@ public class SearchDS {
                     break;
 
                 case sample_origin_tissue:
-                    //TODO: Add this section
+
+                    preds.clear();
+                    for (String filter : filters.get(SearchFacetName.sample_origin_tissue)) {
+                        Predicate<ModelForQuery> p = s -> s.getSampleOriginTissue().equals(filter);
+                        preds.add(p);
+                    }
+                    predicate = preds.stream().reduce(Predicate::or).orElse(x -> false);
+
+                    result = result.stream().filter(predicate::test).collect(Collectors.toSet());
                     break;
 
                 case sample_sample_site:
@@ -163,14 +192,14 @@ public class SearchDS {
      * @param filters the set of strings to match against
      * @return a composed predicate case insensitive matching the supplied filters using disjunction (OR)
      */
-    Predicate getExactMatchDisjunctionPredicate(List<String> filters) {
-        List<Predicate<String>> preds = new ArrayList<>();
+    Predicate<ModelForQuery> getExactMatchDisjunctionPredicate(List<String> filters) {
+        List<Predicate<ModelForQuery>> preds = new ArrayList<>();
 
         // Iterate through the filter options passed in for this facet
         for (String filter : filters) {
 
             // Create a filter predicate for each option
-            Predicate<String> pred = s -> s.equals(filter);
+            Predicate<ModelForQuery> pred = s -> s.getDatasource().equals(filter);
 
             // Store all filter options in a list
             preds.add(pred);
