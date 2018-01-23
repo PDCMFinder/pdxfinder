@@ -30,9 +30,23 @@ public class SearchController {
 
     @RequestMapping("/search")
     String search(Model model,
-                  @RequestParam("facets") String facets) {
+                  @RequestParam("datasource") Optional<List<String>> datasource,
+                  @RequestParam("patient_age") Optional<List<String>> patient_age,
+                  @RequestParam("patient_treatment_status") Optional<List<String>> patient_treatment_status,
+                  @RequestParam("patient_gender") Optional<List<String>> patient_gender,
+                  @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue
+    ) {
 
-        Map<SearchFacetName, List<String>> configuredFacets = new HashMap<>();
+//        Map<SearchFacetName, List<String>> configuredFacets = null; //getFacetsFromString(facets);
+        Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
+                datasource,
+                patient_age,
+                patient_treatment_status,
+                patient_gender,
+                sample_origin_tissue
+        );
+
+        System.out.println(datasource);
 
 
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
@@ -42,6 +56,67 @@ public class SearchController {
         model.addAttribute("patient_age_options", patientAgeOptions);
 
         return "search";
+    }
+
+    private Map<SearchFacetName, List<String>> getFacetMap(
+            Optional<List<String>> datasource,
+            Optional<List<String>> patientAge,
+            Optional<List<String>> patientTreatmentStatus,
+            Optional<List<String>> patientGender,
+            Optional<List<String>> sampleOriginTissue
+    ) {
+        Map<SearchFacetName, List<String>> configuredFacets = new HashMap<>();
+
+        if (datasource.isPresent() && !datasource.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.datasource, new ArrayList<>());
+            for (String s : datasource.get()) {
+                configuredFacets.get(SearchFacetName.datasource).add(s);
+            }
+        }
+
+        if (patientAge.isPresent() && !patientAge.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.patient_age, new ArrayList<>());
+            for (String s : patientAge.get()) {
+                configuredFacets.get(SearchFacetName.patient_age).add(s);
+            }
+        }
+
+        if (patientTreatmentStatus.isPresent() && !patientTreatmentStatus.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.patient_treatment_status, new ArrayList<>());
+            for (String s : patientTreatmentStatus.get()) {
+                configuredFacets.get(SearchFacetName.patient_treatment_status).add(s);
+            }
+        }
+
+        if (patientGender.isPresent() && !patientGender.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.patient_gender, new ArrayList<>());
+            for (String s : patientGender.get()) {
+                configuredFacets.get(SearchFacetName.patient_gender).add(s);
+            }
+        }
+
+        if (sampleOriginTissue.isPresent() && !sampleOriginTissue.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.sample_origin_tissue, new ArrayList<>());
+            for (String s : sampleOriginTissue.get()) {
+                configuredFacets.get(SearchFacetName.sample_origin_tissue).add(s);
+            }
+        }
+
+        return configuredFacets;
+    }
+
+
+    private Map<SearchFacetName, List<String>> getFacetsFromString(Optional<String> facets) {
+        Map<SearchFacetName, List<String>> configuredFacets = new HashMap<>();
+
+
+        if (facets.isPresent() && !facets.get().isEmpty()) {
+            // parse the facets string into map of lists of facet options selected
+
+
+        }
+
+        return configuredFacets;
     }
 
     private List<FacetOption> getPatientAgeOptions(Set<ModelForQuery> results) {
