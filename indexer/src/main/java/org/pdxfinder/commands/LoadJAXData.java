@@ -272,10 +272,7 @@ public class LoadJAXData implements CommandLineRunner {
 
                 Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
 
-                // why would this happen?
-                if (platform.getExternalDataSource() == null) {
-                    platform.setExternalDataSource(jaxDS);
-                }
+                
                 loaderUtils.createPlatformAssociation(platform, marker);
                 
 
