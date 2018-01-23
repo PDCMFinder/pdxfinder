@@ -146,7 +146,7 @@ public class LoadWUSTL implements CommandLineRunner {
 
         
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), NOT_SPECIFIED,
+                NOT_SPECIFIED, NOT_SPECIFIED,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
 
         pSnap.addSample(sample);
