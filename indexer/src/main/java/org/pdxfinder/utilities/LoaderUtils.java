@@ -553,10 +553,14 @@ public class LoaderUtils {
             p = new Platform();
             p.setName(name);
             p.setExternalDataSource(eds);
-            //platformRepository.save(p);
+      //      platformRepository.save(p);
         }
 
         return p;
+    }
+    
+    public void savePlatform(Platform p){
+        platformRepository.save(p);
     }
 
     public PlatformAssociation createPlatformAssociation(Platform p, Marker m) {
