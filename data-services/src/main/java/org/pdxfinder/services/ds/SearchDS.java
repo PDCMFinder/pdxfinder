@@ -1,6 +1,7 @@
 package org.pdxfinder.services.ds;
 
 import org.pdxfinder.dao.ModelCreation;
+import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.repositories.ModelCreationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,10 +47,25 @@ public class SearchDS {
                 mfq.setPatientTreatmentStatus(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());
             }
 
+            // Sample information
             mfq.setSampleExtractionMethod(mc.getSample().getExtractionMethod());
             mfq.setSampleOriginTissue(mc.getSample().getOriginTissue().getName());
             mfq.setSampleClassification(mc.getSample().getClassification());
-            // etc.
+
+            if (mc.getSample().getType() != null) {
+                mfq.setSampleTumorType(mc.getSample().getType().getName());
+            }
+            // Model information
+            Set<Specimen> specimens = mc.getSpecimens();
+            if (specimens != null && specimens.size() > 0) {
+
+                Specimen s = specimens.iterator().next();
+                mfq.setModelBackgroundStrain(s.getBackgroundStrain().getSymbol());
+                mfq.setModelImplantationSite(s.getImplantationSite().getName());
+                mfq.setModelImplantationType(s.getImplantationType().getName());
+            }
+
+            // TODO : complete the options etc.
 
             models.add(mfq);
         }
@@ -126,44 +142,52 @@ public class SearchDS {
                     result = result.stream().filter(x -> predicate.test(x.getSampleOriginTissue())).collect(Collectors.toSet());
                     break;
 
-                case sample_sample_site:
-                    //TODO: Add this section
-                    break;
-
-                case sample_extraction_method:
-                    //TODO: Add this section
-                    break;
-
                 case sample_classification:
-                    //TODO: Add this section
+
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.sample_classification));
+                    result = result.stream().filter(x -> predicate.test(x.getSampleClassification())).collect(Collectors.toSet());
                     break;
 
                 case sample_tumor_type:
-                    //TODO: Add this section
+
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.sample_tumor_type));
+                    result = result.stream().filter(x -> predicate.test(x.getSampleTumorType())).collect(Collectors.toSet());
                     break;
 
                 case model_implantation_site:
-                    //TODO: Add this section
+
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.model_implantation_site));
+                    result = result.stream().filter(x -> predicate.test(x.getModelImplantationSite())).collect(Collectors.toSet());
                     break;
 
                 case model_implantation_type:
-                    //TODO: Add this section
+
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.model_implantation_type));
+                    result = result.stream().filter(x -> predicate.test(x.getModelImplantationType())).collect(Collectors.toSet());
                     break;
 
                 case model_background_strain:
-                    //TODO: Add this section
+
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.model_background_strain));
+                    result = result.stream().filter(x -> predicate.test(x.getModelBackgroundStrain())).collect(Collectors.toSet());
                     break;
 
                 case system:
-                    //TODO
+
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.system));
+                    result = result.stream().filter(x -> predicate.test(x.getCancerSystem())).collect(Collectors.toSet());
                     break;
 
                 case organ:
-                    //TODO
+
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.organ));
+                    result = result.stream().filter(x -> predicate.test(x.getCancerOrgan())).collect(Collectors.toSet());
                     break;
 
                 case cell_type:
-                    //TODO
+
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.cell_type));
+                    result = result.stream().filter(x -> predicate.test(x.getCancerCellType())).collect(Collectors.toSet());
                     break;
 
                 default:

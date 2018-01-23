@@ -37,7 +37,6 @@ public class SearchController {
                   @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue
     ) {
 
-//        Map<SearchFacetName, List<String>> configuredFacets = null; //getFacetsFromString(facets);
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
                 datasource,
                 patient_age,
@@ -46,14 +45,15 @@ public class SearchController {
                 sample_origin_tissue
         );
 
-        System.out.println(datasource);
-
 
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
 
-        List<FacetOption> patientAgeOptions = getPatientAgeOptions(results);
+        List<FacetOption> patientAgeOptions = getFacetOptions(SearchFacetName.patient_age, results, patient_age.orElse(null));
+        List<FacetOption> patientGenderOptions = getFacetOptions(SearchFacetName.patient_gender, results, patient_gender.orElse(null));
 
         model.addAttribute("patient_age_options", patientAgeOptions);
+        model.addAttribute("patient_gender_options", patientGenderOptions);
+        model.addAttribute("results", results);
 
         return "search";
     }
@@ -106,25 +106,20 @@ public class SearchController {
     }
 
 
-    private Map<SearchFacetName, List<String>> getFacetsFromString(Optional<String> facets) {
-        Map<SearchFacetName, List<String>> configuredFacets = new HashMap<>();
-
-
-        if (facets.isPresent() && !facets.get().isEmpty()) {
-            // parse the facets string into map of lists of facet options selected
-
-
-        }
-
-        return configuredFacets;
-    }
-
-    private List<FacetOption> getPatientAgeOptions(Set<ModelForQuery> results) {
+    /**
+     * Get the facet lists for a passed in facet argument
+     *
+     * @param facet
+     * @param results
+     * @param selected
+     * @return
+     */
+    private List<FacetOption> getFacetOptions(SearchFacetName facet, Set<ModelForQuery> results, List<String> selected) {
 
         List<FacetOption> map = new ArrayList<>();
 
         for (ModelForQuery mfq : results) {
-            String s = mfq.getPatientAge();
+            String s = mfq.getBy(facet);
 
             // Initialise on the first time we see this facet name
             if (map.stream().noneMatch(x -> x.getName().equals(s))) {
@@ -138,10 +133,21 @@ public class SearchController {
                 }
             });
         }
+
+        // Set selected attribute on all options that the user has chosen
+        if (selected != null) {
+            map.forEach(x -> {
+                if (selected.contains(x.getName())) {
+                    x.setSelected(Boolean.TRUE);
+                }
+            });
+        }
+
         Collections.sort(map);
 
         return map;
     }
+
 
     @RequestMapping("/search2")
     String index(Model model) throws JSONException {

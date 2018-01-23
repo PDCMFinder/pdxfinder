@@ -6,6 +6,7 @@ public class FacetOption implements Comparable {
 
     String name;
     Integer count;
+    Boolean selected;
 
     public FacetOption(String name, Integer count) {
         this.name = name;
@@ -32,6 +33,14 @@ public class FacetOption implements Comparable {
         this.count = count;
     }
 
+    public Boolean getSelected() {
+        return selected;
+    }
+
+    public void setSelected(Boolean selected) {
+        this.selected = selected;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -42,13 +51,11 @@ public class FacetOption implements Comparable {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(name);
     }
 
     @Override
     public int compareTo(Object o) {
-        // TODO: Sort "Child" to top of list
         return this.name.compareTo(((FacetOption) o).getName());
     }
 }

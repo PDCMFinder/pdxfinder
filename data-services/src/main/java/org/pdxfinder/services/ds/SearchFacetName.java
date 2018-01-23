@@ -6,8 +6,6 @@ public enum SearchFacetName {
     patient_treatment_status,
     patient_gender,
     sample_origin_tissue,
-    sample_sample_site,
-    sample_extraction_method,
     sample_classification,
     sample_tumor_type,
     model_implantation_site,

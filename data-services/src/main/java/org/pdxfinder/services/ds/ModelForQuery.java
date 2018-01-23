@@ -69,7 +69,61 @@ public class ModelForQuery {
     private String modelImplantationType;
     private String modelBackgroundStrain;
 
+    private String cancerSystem;
+    private String cancerOrgan;
+    private String cancerCellType;
+
     public ModelForQuery() {
+    }
+
+
+    public String getBy(SearchFacetName facet) {
+        String s;
+        switch (facet) {
+            case datasource:
+                s = datasource;
+                break;
+            case patient_age:
+                s = patientAge;
+                break;
+            case patient_treatment_status:
+                s = patientTreatmentStatus;
+                break;
+            case patient_gender:
+                s = patientGender;
+                break;
+            case sample_origin_tissue:
+                s = sampleOriginTissue;
+                break;
+            case sample_classification:
+                s = sampleClassification;
+                break;
+            case sample_tumor_type:
+                s = sampleTumorType;
+                break;
+            case model_implantation_site:
+                s = modelImplantationSite;
+                break;
+            case model_implantation_type:
+                s = modelImplantationType;
+                break;
+            case model_background_strain:
+                s = modelBackgroundStrain;
+                break;
+            case organ:
+                s = cancerOrgan;
+                break;
+            case system:
+                s = cancerSystem;
+                break;
+            case cell_type:
+                s = cancerCellType;
+                break;
+            default:
+                s = null;
+                break;
+        }
+        return s;
     }
 
     public Long getModelId() {
@@ -174,5 +228,29 @@ public class ModelForQuery {
 
     public void setDatasource(String datasource) {
         this.datasource = datasource;
+    }
+
+    public String getCancerSystem() {
+        return cancerSystem;
+    }
+
+    public void setCancerSystem(String cancerSystem) {
+        this.cancerSystem = cancerSystem;
+    }
+
+    public String getCancerOrgan() {
+        return cancerOrgan;
+    }
+
+    public void setCancerOrgan(String cancerOrgan) {
+        this.cancerOrgan = cancerOrgan;
+    }
+
+    public String getCancerCellType() {
+        return cancerCellType;
+    }
+
+    public void setCancerCellType(String cancerCellType) {
+        this.cancerCellType = cancerCellType;
     }
 }
