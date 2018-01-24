@@ -128,8 +128,15 @@ public class LoadHCI implements CommandLineRunner {
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
 
+        String age = NOT_SPECIFIED;
+        try{
+            age = new Integer(j.getString("Age")).toString();
+        }catch(NumberFormatException nfe){
+            log.error("Cant convert "+j.getString("Age")+" to a numeric age using "+NOT_SPECIFIED);
+        }
+        
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
-                j.getString("Gender"), "", j.getString("Ethnicity"), j.getString("Age"), hciDS);
+                j.getString("Gender"), "", j.getString("Ethnicity"), age, hciDS);
 
         // asssume specimen site is primary site?
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,

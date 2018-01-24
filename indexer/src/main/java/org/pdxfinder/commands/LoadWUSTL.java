@@ -134,9 +134,16 @@ public class LoadWUSTL implements CommandLineRunner {
             }
         } catch (Exception e) {
         }
+        
+          String age = NOT_SPECIFIED;
+        try{
+            age = new Integer(j.getString("Age")).toString();
+        }catch(NumberFormatException nfe){
+            log.error("Cant convert "+j.getString("Age")+" to a numeric age. Using "+NOT_SPECIFIED);
+        }
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
-                j.getString("Gender"), "", race, j.getString("Age"), mdaDS);
+                j.getString("Gender"), "", race, age, mdaDS);
 
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 NOT_SPECIFIED, NOT_SPECIFIED,

@@ -47,7 +47,8 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
     private final static String HISTOLOGY_NOTE = "Pathologist assessment of patient tumor and pdx model tumor histology slides.";
-    private final static String ENGRAFTMENT = "Subcutaneous";
+    
+    private final static String NOT_SPECIFIED = "Not Specified";
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -164,9 +165,16 @@ public class LoadJAXData implements CommandLineRunner {
         }
 
         String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
+        
+        String age = NOT_SPECIFIED;
+        try{
+            age = new Integer(j.getString("Age")).toString();
+        }catch(NumberFormatException nfe){
+            log.error("Cant convert "+j.getString("Age")+" to a numeric age. Using "+NOT_SPECIFIED);
+        }
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), j.getString("Gender"),
-                j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
+                j.getString("Race"), j.getString("Ethnicity"), age, jaxDS);
 
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, JAX_DATASOURCE_ABBREVIATION);
