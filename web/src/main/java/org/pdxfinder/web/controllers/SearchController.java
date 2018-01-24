@@ -51,9 +51,12 @@ public class SearchController {
                 "PDXNet-Wistar-MDAnderson-Penn"
         );
 
+        List<String> cancerBySystemOptions = SearchDS.CANCERS_BY_SYSTEM;
 
-        facets.put("patient_age_options", patientAgeOptions);
+
         facets.put("datasource_options", datasourceOptions);
+        facets.put("patient_age_options", patientAgeOptions);
+        facets.put("cancer_system_options", cancerBySystemOptions);
 
     }
 
@@ -63,7 +66,8 @@ public class SearchController {
                   @RequestParam("patient_age") Optional<List<String>> patient_age,
                   @RequestParam("patient_treatment_status") Optional<List<String>> patient_treatment_status,
                   @RequestParam("patient_gender") Optional<List<String>> patient_gender,
-                  @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue
+                  @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
+                  @RequestParam("cancer_system") Optional<List<String>> cancer_system
     ) {
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
@@ -71,7 +75,8 @@ public class SearchController {
                 patient_age,
                 patient_treatment_status,
                 patient_gender,
-                sample_origin_tissue
+                sample_origin_tissue,
+                cancer_system
         );
 
 
@@ -96,7 +101,8 @@ public class SearchController {
             Optional<List<String>> patientAge,
             Optional<List<String>> patientTreatmentStatus,
             Optional<List<String>> patientGender,
-            Optional<List<String>> sampleOriginTissue
+            Optional<List<String>> sampleOriginTissue,
+            Optional<List<String>> cancerSystem
     ) {
         Map<SearchFacetName, List<String>> configuredFacets = new HashMap<>();
 
@@ -135,6 +141,13 @@ public class SearchController {
             }
         }
 
+        if (cancerSystem.isPresent() && !cancerSystem.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.system, new ArrayList<>());
+            for (String s : cancerSystem.get()) {
+                configuredFacets.get(SearchFacetName.system).add(s);
+            }
+        }
+
         return configuredFacets;
     }
 
@@ -154,17 +167,39 @@ public class SearchController {
         for (ModelForQuery mfq : results) {
             String s = mfq.getBy(facet);
 
-            // Initialise on the first time we see this facet name
-            if (map.stream().noneMatch(x -> x.getName().equals(s))) {
-                map.add(new FacetOption(s, 0));
-            }
 
-            // There should be only one element per facet name
-            map.forEach(x -> {
-                if (x.getName().equals(s)) {
-                    x.increment();
+            // List of ontology terms may come from the service.  These will by separated by "::" delimiter
+            if (s.contains("::")) {
+
+                for (String ss : s.split("::")) {
+
+                    // Initialise on the first time we see this facet name
+                    if (map.stream().noneMatch(x -> x.getName().equals(ss))) {
+                        map.add(new FacetOption(ss, 0));
+                    }
+
+                    // There should be only one element per facet name
+                    map.forEach(x -> {
+                        if (x.getName().equals(ss)) {
+                            x.increment();
+                        }
+                    });
                 }
-            });
+
+            } else {
+
+                // Initialise on the first time we see this facet name
+                if (map.stream().noneMatch(x -> x.getName().equals(s))) {
+                    map.add(new FacetOption(s, 0));
+                }
+
+                // There should be only one element per facet name
+                map.forEach(x -> {
+                    if (x.getName().equals(s)) {
+                        x.increment();
+                    }
+                });
+            }
         }
 
         // Set selected attribute on all options that the user has chosen

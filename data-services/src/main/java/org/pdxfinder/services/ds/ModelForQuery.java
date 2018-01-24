@@ -49,6 +49,9 @@ modelBackgroundStrain
 */
 
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class ModelForQuery {
 
     private Long modelId;
@@ -69,7 +72,7 @@ public class ModelForQuery {
     private String modelImplantationType;
     private String modelBackgroundStrain;
 
-    private String cancerSystem;
+    private List<String> cancerSystem;
     private String cancerOrgan;
     private String cancerCellType;
 
@@ -116,7 +119,8 @@ public class ModelForQuery {
                 s = cancerOrgan;
                 break;
             case system:
-                s = cancerSystem;
+                // Pass back the list of top level ontology systems delimited by "::"
+                s = cancerSystem.stream().collect(Collectors.joining("::"));
                 break;
             case cell_type:
                 s = cancerCellType;
@@ -232,11 +236,11 @@ public class ModelForQuery {
         this.datasource = datasource;
     }
 
-    public String getCancerSystem() {
+    public List<String> getCancerSystem() {
         return cancerSystem;
     }
 
-    public void setCancerSystem(String cancerSystem) {
+    public void setCancerSystem(List<String> cancerSystem) {
         this.cancerSystem = cancerSystem;
     }
 

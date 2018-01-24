@@ -102,8 +102,8 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
 
     @Query("MATCH (mc:ModelCreation)<-[ir:IMPLANTED_IN]-(s:Sample)-[sfr:SAMPLED_FROM]-(ps:PatientSnapshot)-[pr:PATIENT]-(p:Patient) " +
             "WITH mc, ir, s, sfr, ps, pr, p " +
-            "MATCH (t:Tissue)-[tr:ORIGIN_TISSUE]-(s:Sample) " +
-            "RETURN mc, ir, s, sfr, ps, pr, p, tr, t ")
+            "MATCH (t:Tissue)-[tr:ORIGIN_TISSUE]-(s)-[otm:MAPPED_TO]-(ot:OntologyTerm)-[ottm:SUBCLASS_OF *1..]->(term:OntologyTerm) " +
+            "RETURN mc, ir, s, sfr, ps, pr, p, tr, t, otm, ot, ottm, term ")
     Collection<ModelCreation> getModelsWithPatientData();
 
 

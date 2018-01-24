@@ -1,6 +1,7 @@
 package org.pdxfinder.services.ds;
 
 import org.pdxfinder.dao.ModelCreation;
+import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.repositories.ModelCreationRepository;
 import org.slf4j.Logger;
@@ -23,6 +24,26 @@ public class SearchDS {
     private final static Logger log = LoggerFactory.getLogger(SearchDS.class);
 
     private Set<ModelForQuery> models;
+    private Map<String, String> cancerSystemMap = new HashMap<>();
+
+    public static List<String> CANCERS_BY_SYSTEM = Arrays.asList(
+            "Breast cancer",
+            "Cardiovascular Cancer",
+            "Connective and Soft Tissue cancer",
+            "Digestive System Cancer",
+            "Endocrine Cancer",
+            "Eye Cancer",
+            "Head and Neck Cancer",
+            "Hematopoietic and Lymphoid System Cancer",
+            "Nervous System Cancer",
+            "Peritoneal and Retroperitoneal Cancer",
+            "Malignant Reproductive System Cancer",
+            "Respiratory Tract Cancer",
+            "Thoracic cancer",
+            "Skin cancer",
+            "Urinary System Cancer",
+            "Unclassified"
+    );
 
     /**
      * Populate the complete set of models for searching when this object is instantiated
@@ -30,6 +51,27 @@ public class SearchDS {
     public SearchDS(ModelCreationRepository modelCreationRepository) {
         Assert.notNull(modelCreationRepository, "Model repository cannot be null");
         this.models = new HashSet<>();
+
+        // Mapping NCIT ontology term labels to display labels
+        this.cancerSystemMap.put("Malignant Breast Neoplasm", "Breast cancer");
+        this.cancerSystemMap.put("Malignant Cardiovascular Neoplasm", "Cardiovascular Cancer");
+        this.cancerSystemMap.put("Connective and Soft Tissue Neoplasm", "Connective and Soft Tissue cancer");
+        this.cancerSystemMap.put("Malignant Digestive System Neoplasm", "Digestive System Cancer");
+        this.cancerSystemMap.put("Malignant Endocrine Neoplasm", "Endocrine Cancer");
+        this.cancerSystemMap.put("Malignant Eye Neoplasm", "Eye Cancer");
+        this.cancerSystemMap.put("Malignant Head and Neck Neoplasm", "Head and Neck Cancer");
+        this.cancerSystemMap.put("Hematopoietic and Lymphoid System Neoplasm", "Hematopoietic and Lymphoid System Cancer");
+        this.cancerSystemMap.put("Malignant Nervous System Neoplasm", "Nervous System Cancer");
+        this.cancerSystemMap.put("Peritoneal and Retroperitoneal Neoplasms", "Peritoneal and Retroperitoneal Cancer");
+        this.cancerSystemMap.put("Malignant Reproductive System Neoplasm", "Malignant Reproductive System Cancer");
+        this.cancerSystemMap.put("Malignant Respiratory Tract Neoplasm", "Respiratory Tract Cancer");
+        this.cancerSystemMap.put("Thoracic Disorder", "Thoracic cancer");
+        this.cancerSystemMap.put("Malignant Skin Neoplasm", "Skin cancer");
+        this.cancerSystemMap.put("Malignant Urinary System Neoplasm", "Urinary System Cancer");
+        this.cancerSystemMap.put("Unclassified", "Unclassified");
+
+
+
 
         // When this class is instantiated, populate and cache the models set
 
@@ -66,12 +108,69 @@ public class SearchDS {
                 mfq.setModelImplantationType(s.getImplantationType().getName());
             }
 
-            // TODO : complete the options etc.
+            // Get all ancestor ontology terms into a set specific for this model
+            Set<OntologyTerm> allOntologyTerms = new HashSet<>();
+            for (OntologyTerm t : mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getSubclassOf()) {
+                allOntologyTerms.addAll(getAllAncestors(t));
+            }
+
+            // Add all top level systems (translated) to the Model
+            for (String s : allOntologyTerms.stream().map(OntologyTerm::getLabel).collect(Collectors.toSet())) {
+
+                if (this.cancerSystemMap.keySet().contains(s)) {
+
+                    if (mfq.getCancerSystem() == null) {
+                        mfq.setCancerSystem(new ArrayList<>());
+                    }
+
+                    mfq.getCancerSystem().add(this.cancerSystemMap.get(s));
+
+                }
+            }
+
+            // Ensure that ALL models have a system -- even if it's not in the ontology nodes specified
+            if (mfq.getCancerSystem() == null || mfq.getCancerSystem().size() == 0) {
+                if (mfq.getCancerSystem() == null) {
+                    mfq.setCancerSystem(new ArrayList<>());
+                }
+
+                mfq.getCancerSystem().add(this.cancerSystemMap.get("Unclassified"));
+
+            }
+
+            // TODO: Complete the organ options
+            // TODO: Complete the cell type options
+            // TODO: Complete the patient treatment options
+
 
             models.add(mfq);
         }
     }
 
+    /**
+     * Recursively get all ancestors starting from the supplied ontology term
+     *
+     * @param t the starting term in the ontology
+     * @return a set of ontology terms corresponding to the ancestors of the term supplied
+     */
+    public Set<OntologyTerm> getAllAncestors(OntologyTerm t) {
+
+        Set<OntologyTerm> retSet = new HashSet<>();
+
+        if (t.getSubclassOf() == null || t.getSubclassOf().size() == 0) {
+            return null;
+        }
+
+
+        for (OntologyTerm st : t.getSubclassOf()) {
+
+            retSet.add(st);
+            Set<OntologyTerm> intSet = getAllAncestors(st);
+            if (intSet != null) retSet.addAll(intSet);
+        }
+
+        return retSet;
+    }
 
     public Set<ModelForQuery> getModels() {
         return models;
@@ -175,8 +274,20 @@ public class SearchDS {
 
                 case system:
 
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.system));
-                    result = result.stream().filter(x -> predicate.test(x.getCancerSystem())).collect(Collectors.toSet());
+                    Set<ModelForQuery> toRemove = new HashSet<>();
+                    for (ModelForQuery res : result) {
+                        Boolean keep = Boolean.FALSE;
+                        for (String s : filters.get(SearchFacetName.system)) {
+                            if (res.getCancerSystem().contains(s)) {
+                                keep = Boolean.TRUE;
+                            }
+                        }
+                        if (!keep) {
+                            toRemove.add(res);
+                        }
+                    }
+
+                    result.removeAll(toRemove);
                     break;
 
                 case organ:
@@ -201,6 +312,7 @@ public class SearchDS {
 
         return result;
     }
+
 
     /**
      * getExactMatchDisjunctionPredicate returns a composed predicate with all the supplied filters "OR"ed together
