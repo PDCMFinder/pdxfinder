@@ -186,7 +186,7 @@
                     <ul class="accordion pdx-accordion-1" data-accordion data-multi-expand="true">
                         <li class="accordion-item is-active" data-accordion-item>
                             <!-- Accordion tab title -->
-                            <a href="#" class="accordion-title">Varient</a>
+                            <a href="#" class="accordion-title">Variant</a>
 
                             <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
                             <div class="accordion-content" data-tab-content>
@@ -205,7 +205,7 @@
 
                                 <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
                                     data-allow-all-closed="true">
-                                    <li class="accordion-item is-active" data-accordion-item>
+                                    <li class="accordion-item" data-accordion-item id="age_filter">
                                         <a href="#" class="accordion-title">Age</a>
 
 
@@ -287,7 +287,7 @@
 
                                     </li>
 
-                                    <li class="accordion-item" data-accordion-item>
+                                    <li class="accordion-item" data-accordion-item id="datasource_filter">
                                         <a href="#" class="accordion-title">Datasource</a>
 
                                         <div class="accordion-content" data-tab-content>
@@ -465,12 +465,13 @@
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
     var ageFilters = [[${patient_age_selected}]];
+    var dsFilters = [[${datasource_selected}]];
     console.log("before updating");
 
 
     jQuery(document).ready(function() {
 
-        updateFilters(ageFilters);
+        updateFilters(ageFilters, dsFilters);
         console.log("updated");
 
 
