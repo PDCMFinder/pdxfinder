@@ -22,10 +22,39 @@ public class SearchController {
 
     private GraphService graphService;
     private SearchDS searchDS;
+    private Map<String, List<String>> facets = new HashMap<>();
 
     public SearchController(GraphService graphService, SearchDS searchDS) {
         this.graphService = graphService;
         this.searchDS = searchDS;
+
+        List<String> patientAgeOptions = Arrays.asList(
+                "0-9",
+                "10-19",
+                "20-29",
+                "30-39",
+                "40-49",
+                "50-59",
+                "60-69",
+                "70-79",
+                "80-89",
+                "90+",
+                "NA"
+        );
+        List<String> datasourceOptions = Arrays.asList(
+                "JAX",
+                "IRCC",
+                "PDMR",
+                "PDXNet-HCI-BCM",
+                "PDXNet-MDAnderson",
+                "PDXNet-WUSTL",
+                "PDXNet-Wistar-MDAnderson-Penn"
+        );
+
+
+        facets.put("patient_age_options", patientAgeOptions);
+        facets.put("datasource_options", datasourceOptions);
+
     }
 
     @RequestMapping("/search")
@@ -48,11 +77,15 @@ public class SearchController {
 
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
 
-        List<FacetOption> patientAgeOptions = getFacetOptions(SearchFacetName.patient_age, results, patient_age.orElse(null));
-        List<FacetOption> patientGenderOptions = getFacetOptions(SearchFacetName.patient_gender, results, patient_gender.orElse(null));
+        List<FacetOption> patientAgeSelected = getFacetOptions(SearchFacetName.patient_age, results, patient_age.orElse(null));
+        List<FacetOption> patientGenderSelected = getFacetOptions(SearchFacetName.patient_gender, results, patient_gender.orElse(null));
+        List<FacetOption> datasourceSelected = getFacetOptions(SearchFacetName.datasource, results, datasource.orElse(null));
 
-        model.addAttribute("patient_age_options", patientAgeOptions);
-        model.addAttribute("patient_gender_options", patientGenderOptions);
+        model.addAttribute("patient_age_selected", patientAgeSelected);
+        model.addAttribute("patient_gender_selected", patientGenderSelected);
+        model.addAttribute("datasource_selected", datasourceSelected);
+
+        model.addAttribute("facet_options", facets);
         model.addAttribute("results", results);
 
         return "search";
