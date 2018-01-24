@@ -85,10 +85,12 @@ public class SearchController {
         List<FacetOption> patientAgeSelected = getFacetOptions(SearchFacetName.patient_age, results, patient_age.orElse(null));
         List<FacetOption> patientGenderSelected = getFacetOptions(SearchFacetName.patient_gender, results, patient_gender.orElse(null));
         List<FacetOption> datasourceSelected = getFacetOptions(SearchFacetName.datasource, results, datasource.orElse(null));
+        List<FacetOption> cancerSystemSelected = getFacetOptions(SearchFacetName.system, results, cancer_system.orElse(null));
 
         model.addAttribute("patient_age_selected", patientAgeSelected);
         model.addAttribute("patient_gender_selected", patientGenderSelected);
         model.addAttribute("datasource_selected", datasourceSelected);
+        model.addAttribute("cancer_system_selected", cancerSystemSelected);
 
         model.addAttribute("facet_options", facets);
         model.addAttribute("results", results);
