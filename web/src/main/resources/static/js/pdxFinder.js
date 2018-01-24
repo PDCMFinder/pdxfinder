@@ -9,10 +9,11 @@ function updateFilters(ages, datasources){
 
     console.log("updating filters!");
     //characters we want to see as values
-    var reg = /[^A-Za-z0-9_-]/;
+    var reg = /[^A-Za-z0-9 _-]/;
 
     var openAgeFacet = false;
     var openDatasourceFacet = false;
+    var openCancerBySystem = false;
 
     //check selected age bins
     if(ages.length>0){
@@ -42,9 +43,8 @@ function updateFilters(ages, datasources){
             var ageFilterField = jQuery("li#age_filter > a.accordion-title");
             ageFilterField.click();
         }
-
-
     }
+
 
     //check selected datasources
     if(datasources.length>0) {

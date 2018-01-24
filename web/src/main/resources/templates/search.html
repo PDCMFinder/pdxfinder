@@ -184,21 +184,11 @@
                     <h4 class="block-title clearfix"><span class="float-left">Filter By:</span></h4>
 
                     <ul class="accordion pdx-accordion-1" data-accordion data-multi-expand="true">
-                        <li class="accordion-item is-active" data-accordion-item>
-                            <!-- Accordion tab title -->
-                            <a href="#" class="accordion-title">Variant</a>
 
-                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
-                            <div class="accordion-content" data-tab-content>
-                                <select name="varient" required id="varient" class="form-control choices" multiple>
-
-                                </select>
-                            </div>
-                        </li>
 
                         <li class="accordion-item is-active" data-accordion-item>
                             <!-- Accordion tab title -->
-                            <a href="#" class="accordion-title">Patient</a>
+                            <a href="#" class="accordion-title">Patient / Tumor</a>
 
                             <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
                             <div class="accordion-content" data-tab-content>
@@ -212,140 +202,101 @@
                                         <div class="accordion-content" data-tab-content>
 
                                             <div class="large-form">
-<!--
-                                                <div class="checkbox-item" th:each="instance, iter:${patient_age_options}">
-                                                    <input th:id="'age_' + ${iter.index}" type="checkbox" />
-                                                    <label th:attr="for='age_'+${iter.index}"><span th:text="${instance.name}"></span></label>
-                                                </div>
--->
 
-
-
-                                                <div class="checkbox-item">
-                                                    <input id="patient_age__0-9" type="checkbox" class="age filter"/>
-                                                    <label for="patient_age__0-9">0-9</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="patient_age__10-19" type="checkbox" class="age filter"/>
-                                                    <label for="patient_age__10-19">10-19</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="patient_age__20-29" type="checkbox" class="age filter"/>
-                                                    <label for="patient_age__20-29">20-29</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="patient_age__30-39" type="checkbox" class="age filter"/>
-                                                    <label for="patient_age__30-39">30-39</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="patient_age__40-49" type="checkbox" class="age filter"/>
-                                                    <label for="patient_age__40-49">40-49</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="patient_age__50-59" type="checkbox" class="age filter"/>
-                                                    <label for="patient_age__50-59">50-59</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="patient_age__60-69" type="checkbox" class="age filter"/>
-                                                    <label for="patient_age__60-69">60-69</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="patient_age__70-79" type="checkbox" class="age filter"/>
-                                                    <label for="patient_age__70-79">70-79</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="patient_age__80-89" type="checkbox" class="age filter"/>
-                                                    <label for="patient_age__80-89">80-89</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="patient_age__90p" type="checkbox" class="age filter"/>
-                                                    <label for="patient_age__90p">90+</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="patient_age__NA" type="checkbox" class="age filter"/>
-                                                    <label for="patient_age__NA">NA</label>
+                                                <div class="checkbox-item" th:each="instance:${facet_options['patient_age_options']}">
+                                                    <input th:id="'patient_age__' + ${instance}" type="checkbox" class="age filter"/>
+                                                    <label th:attr="for='patient_age__'+${instance}"><span th:text="${instance}"></span></label>
                                                 </div>
 
 
-
-
-
-
-                                            </div>
-                                        </div>
-
-
-                                    </li>
-
-                                    <li class="accordion-item" data-accordion-item id="datasource_filter">
-                                        <a href="#" class="accordion-title">Datasource</a>
-
-                                        <div class="accordion-content" data-tab-content>
-                                            <div class="large-form">
-
-                                                <div class="checkbox-item">
-                                                    <input id="datasource__IRCC" type="checkbox" class="datasource filter"/><label for="datasource__IRCC">IRCC</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="datasource__JAX" type="checkbox" class="datasource filter"/><label for="datasource__JAX">JAX</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="datasource__PDMR" type="checkbox" class="datasource filter"/><label for="datasource__PDMR">PDMR</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="datasource__PDXNet-HCI-BCM" type="checkbox" class="datasource filter"/><label for="datasource__PDXNet-HCI-BCM">PDXNet-HCI-BCM</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="datasource__PDXNet-MDAnderson" type="checkbox" class="datasource filter"/><label for="datasource__PDXNet-MDAnderson">PDXNet-MDAnderson</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="datasource__PDXNet-WUSTL" type="checkbox" class="datasource filter"/><label for="datasource__PDXNet-WUSTL">PDXNet-WUSTL</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="datasource__PDXNet-Wistar-MDAnderson-Penn" type="checkbox" class="datasource filter"/><label for="datasource__PDXNet-Wistar-MDAnderson-Penn">PDXNet-Wistar-MDAnderson-Penn</label>
-                                                </div>
-
-
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li class="accordion-item" data-accordion-item>
-                                        <a href="#" class="accordion-title">Size</a>
-
-                                        <div class="accordion-content" data-tab-content>
-                                            <div class="large-form">
-                                                <div class="checkbox-item">
-                                                    <input id="box7" type="checkbox"/><label for="box7">Checkbox
-                                                    7</label>
-                                                </div>
-
-                                                <div class="checkbox-item">
-                                                    <input id="box8" type="checkbox"/><label for="box8">Checkbox
-                                                    8</label>
-                                                </div>
                                             </div>
                                         </div>
                                     </li>
                                 </ul>
+
+
+
+                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
+                                    data-allow-all-closed="true">
+                                    <li class="accordion-item" data-accordion-item id="cancer_system_filter">
+                                        <a href="#" class="accordion-title">Cancer by system</a>
+
+
+                                        <div class="accordion-content" data-tab-content>
+
+                                            <div class="large-form">
+
+                                                <div class="checkbox-item" th:each="instance:${facet_options['cancer_system_options']}">
+                                                    <input th:id="'cancer_system__' + ${instance}" type="checkbox" class="cancer_system filter"/>
+                                                    <label th:attr="for='cancer_system__'+${instance}"><span th:text="${instance}"></span></label>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+
+
+
+
+
+
                             </div>
                         </li>
+
+
+
+                                                                        <li class="accordion-item is-active" data-accordion-item>
+                                                                            <!-- Accordion tab title -->
+                            <a href="#" class="accordion-title">PDX model</a>
+
+                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
+                            <div class="accordion-content" data-tab-content>
+                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
+                                    data-allow-all-closed="true">
+
+                            <li class="accordion-item" data-accordion-item id="datasource_filter">
+                                 <a href="#" class="accordion-title">Datasource</a>
+
+                            <div class="accordion-content" data-tab-content>
+                                <div class="large-form">
+
+
+                                    <div class="checkbox-item" th:each="instance:${facet_options['datasource_options']}">
+                                        <input th:id="'datasource__' + ${instance}" type="checkbox" class="datasource filter"/>
+                                        <label th:attr="for='datasource__'+${instance}"><span th:text="${instance}"></span></label>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                        </li>
+
+
+
+
+
+
+                                </ul>
+                            </div>
+                        </li>
+
+
+                        <li class="accordion-item is-active" data-accordion-item>
+                            <!-- Accordion tab title -->
+                            <a href="#" class="accordion-title">Molecular characterization</a>
+
+                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
+                            <div class="accordion-content" data-tab-content>
+                                <select name="molchar" required id="molchar" class="form-control choices" multiple>
+
+                                </select>
+                            </div>
+                        </li>
+
+
                     </ul>
                 </div>
 
@@ -466,6 +417,8 @@
 
     var ageFilters = [[${patient_age_selected}]];
     var dsFilters = [[${datasource_selected}]];
+
+
     console.log("before updating");
 
 
