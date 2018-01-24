@@ -212,11 +212,74 @@
                                         <div class="accordion-content" data-tab-content>
 
                                             <div class="large-form">
-
+<!--
                                                 <div class="checkbox-item" th:each="instance, iter:${patient_age_options}">
                                                     <input th:id="'age_' + ${iter.index}" type="checkbox" />
                                                     <label th:attr="for='age_'+${iter.index}"><span th:text="${instance.name}"></span></label>
                                                 </div>
+-->
+
+
+
+                                                <div class="checkbox-item">
+                                                    <input id="patient_age__0-9" type="checkbox" class="age filter"/>
+                                                    <label for="patient_age__0-9">0-9</label>
+                                                </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="patient_age__10-19" type="checkbox" class="age filter"/>
+                                                    <label for="patient_age__10-19">10-19</label>
+                                                </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="patient_age__20-29" type="checkbox" class="age filter"/>
+                                                    <label for="patient_age__20-29">20-29</label>
+                                                </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="patient_age__30-39" type="checkbox" class="age filter"/>
+                                                    <label for="patient_age__30-39">30-39</label>
+                                                </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="patient_age__40-49" type="checkbox" class="age filter"/>
+                                                    <label for="patient_age__40-49">40-49</label>
+                                                </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="patient_age__50-59" type="checkbox" class="age filter"/>
+                                                    <label for="patient_age__50-59">50-59</label>
+                                                </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="patient_age__60-69" type="checkbox" class="age filter"/>
+                                                    <label for="patient_age__60-69">60-69</label>
+                                                </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="patient_age__70-79" type="checkbox" class="age filter"/>
+                                                    <label for="patient_age__70-79">70-79</label>
+                                                </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="patient_age__80-89" type="checkbox" class="age filter"/>
+                                                    <label for="patient_age__80-89">80-89</label>
+                                                </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="patient_age__90p" type="checkbox" class="age filter"/>
+                                                    <label for="patient_age__90p">90+</label>
+                                                </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="patient_age__NA" type="checkbox" class="age filter"/>
+                                                    <label for="patient_age__NA">NA</label>
+                                                </div>
+
+
+
+
+
 
                                             </div>
                                         </div>
@@ -224,25 +287,41 @@
 
                                     </li>
 
-                                    <li class="accordion-item is-active" data-accordion-item>
-                                        <a href="#" class="accordion-title">Color</a>
+                                    <li class="accordion-item" data-accordion-item>
+                                        <a href="#" class="accordion-title">Datasource</a>
 
                                         <div class="accordion-content" data-tab-content>
                                             <div class="large-form">
+
                                                 <div class="checkbox-item">
-                                                    <input id="box4" type="checkbox"/><label for="box4">Checkbox
-                                                    4</label>
+                                                    <input id="datasource__IRCC" type="checkbox" class="datasource filter"/><label for="datasource__IRCC">IRCC</label>
                                                 </div>
 
                                                 <div class="checkbox-item">
-                                                    <input id="box5" type="checkbox"/><label for="box5">Checkbox
-                                                    5</label>
+                                                    <input id="datasource__JAX" type="checkbox" class="datasource filter"/><label for="datasource__JAX">JAX</label>
                                                 </div>
 
                                                 <div class="checkbox-item">
-                                                    <input id="box6" type="checkbox"/><label for="box6">Checkbox
-                                                    6</label>
+                                                    <input id="datasource__PDMR" type="checkbox" class="datasource filter"/><label for="datasource__PDMR">PDMR</label>
                                                 </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="datasource__PDXNet-HCI-BCM" type="checkbox" class="datasource filter"/><label for="datasource__PDXNet-HCI-BCM">PDXNet-HCI-BCM</label>
+                                                </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="datasource__PDXNet-MDAnderson" type="checkbox" class="datasource filter"/><label for="datasource__PDXNet-MDAnderson">PDXNet-MDAnderson</label>
+                                                </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="datasource__PDXNet-WUSTL" type="checkbox" class="datasource filter"/><label for="datasource__PDXNet-WUSTL">PDXNet-WUSTL</label>
+                                                </div>
+
+                                                <div class="checkbox-item">
+                                                    <input id="datasource__PDXNet-Wistar-MDAnderson-Penn" type="checkbox" class="datasource filter"/><label for="datasource__PDXNet-Wistar-MDAnderson-Penn">PDXNet-Wistar-MDAnderson-Penn</label>
+                                                </div>
+
+
                                             </div>
                                         </div>
                                     </li>
@@ -304,102 +383,7 @@
                                            title="Some text about JAX"><i class="icon icon-generic"
                                                                           data-icon="i"></i></a></td>
                             </tr>
-                            <tr>
-                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
-                                <td>Colon.</td>
-                                <td>Colon something</td>
-                                <td>IV</td>
-                                <td>Metastatic</td>
-                                <td>NODSCID</td>
-                                <td>NODSCID</td>
-                                <td>Exome Expression</td>
-                                <td>Exome Expression</td>
-                                <td>JAX</td>
-                            </tr>
-                            <tr>
-                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
-                                <td>Colon.</td>
-                                <td>Colon something</td>
-                                <td>IV</td>
-                                <td>Metastatic</td>
-                                <td>NODSCID</td>
-                                <td>NODSCID</td>
-                                <td>Exome Expression</td>
-                                <td>Exome Expression</td>
-                                <td>JAX</td>
-                            </tr>
-                            <tr>
-                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
-                                <td>Colon.</td>
-                                <td>Colon something</td>
-                                <td>IV</td>
-                                <td>Metastatic</td>
-                                <td>NODSCID</td>
-                                <td>NODSCID</td>
-                                <td>Exome Expression</td>
-                                <td>Exome Expression</td>
-                                <td>JAX</td>
-                            </tr>
-                            <tr>
-                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
-                                <td>Colon.</td>
-                                <td>Colon something</td>
-                                <td>IV</td>
-                                <td>Metastatic</td>
-                                <td>NODSCID</td>
-                                <td>NODSCID</td>
-                                <td>Exome Expression</td>
-                                <td>Exome Expression</td>
-                                <td>JAX</td>
-                            </tr>
-                            <tr>
-                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
-                                <td>Colon.</td>
-                                <td>Colon something</td>
-                                <td>IV</td>
-                                <td>Metastatic</td>
-                                <td>NODSCID</td>
-                                <td>NODSCID</td>
-                                <td>Exome Expression</td>
-                                <td>Exome Expression</td>
-                                <td>JAX</td>
-                            </tr>
-                            <tr>
-                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
-                                <td>Colon.</td>
-                                <td>Colon something</td>
-                                <td>IV</td>
-                                <td>Metastatic</td>
-                                <td>NODSCID</td>
-                                <td>NODSCID</td>
-                                <td>Exome Expression</td>
-                                <td>Exome Expression</td>
-                                <td>JAX</td>
-                            </tr>
-                            <tr>
-                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
-                                <td>Colon.</td>
-                                <td>Colon something</td>
-                                <td>IV</td>
-                                <td>Metastatic</td>
-                                <td>NODSCID</td>
-                                <td>NODSCID</td>
-                                <td>Exome Expression</td>
-                                <td>Exome Expression</td>
-                                <td>JAX</td>
-                            </tr>
-                            <tr>
-                                <td><a><i class="icon icon-generic" data-icon="i"></i> PDX123</a></td>
-                                <td>Colon.</td>
-                                <td>Colon something</td>
-                                <td>IV</td>
-                                <td>Metastatic</td>
-                                <td>NODSCID</td>
-                                <td>NODSCID</td>
-                                <td>Exome Expression</td>
-                                <td>Exome Expression</td>
-                                <td>JAX</td>
-                            </tr>
+
                             </tbody>
                         </table>
                     </div>
@@ -475,6 +459,30 @@
 <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
 <script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/scripts/dist/choices.min.js"></script>
 <script src="/js/script.js"></script>
+<script src="/js/jquery.dataTables.js"></script>
+<script src="/js/pdxFinder.js"></script>
+
+<script type="text/javascript" language="javascript" th:inline="javascript">
+
+    var ageFilters = [[${patient_age_options}]];
+    console.log("before updating");
+
+
+    jQuery(document).ready(function() {
+
+        updateFilters(ageFilters);
+        console.log("updated");
+
+
+        jQuery('.filter').change( function(){
+
+            redirectPage();
+        });
+
+
+    });
+
+</script>
 
 <!-- <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/js/foundationExtendEBI.js"></script> -->
 <!-- <script type="text/JavaScript">$(document).foundationExtendEBI();</script> -->

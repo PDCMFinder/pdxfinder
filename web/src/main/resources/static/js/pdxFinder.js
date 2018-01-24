@@ -3,6 +3,87 @@
  */
 
 
+
+
+function updateFilters(ages){
+
+    console.log("updating filters!");
+    //characters we want to see as values
+    var reg = /[^A-Za-z0-9_-]/;
+
+    var toggleAge = false;
+    if(ages.length>0){
+
+        jQuery.each(ages, function(key, value){
+
+            var id = value.name;
+            var selected = value.selected;
+
+            //testing id for invalid characters
+            if( reg.test(id)){
+                console.log("skipping id: "+id);
+                return;
+            }
+
+            if(selected){
+                jQuery("#patient_age__"+id).prop('checked', true);
+                toggleAge = true;
+            }
+
+            var count = " ("+value.counter+")";
+            jQuery("#patient_age__"+id).closest("label").append(count);
+
+        });
+
+        if(toggleAge){
+            var ageFilterField = jQuery("li#age_filter > a.accordion-title");
+            ageFilterField.click();
+        }
+
+
+    }
+
+}
+
+
+function redirectPage(){
+
+    var no_parameters = true;
+    var url = "?"
+    //get all filters with values
+    jQuery(".filter").each(function(){
+        var id = jQuery(this).attr("id");
+
+        //characters we want to see as values
+        var reg = /[^A-Za-z0-9_-]/;
+
+        if (jQuery(this).is(':checked')){
+
+
+            var res = id.split("__");
+
+            if(!no_parameters){
+                url = url+"&";
+            }
+
+            if( ! reg.test(res[1])){
+                url = url+res[0]+"="+res[1];
+                no_parameters = false;
+
+            }
+        }
+        else if(jQuery(this).is("input:text")){
+            return;
+        }
+
+
+    });
+    console.log(url);
+
+    window.location.replace(url);
+}
+
+
 //GLOBAL for displaying tooltips
 
 var markerDefs = {};
