@@ -5,13 +5,16 @@
 
 
 
-function updateFilters(ages){
+function updateFilters(ages, datasources){
 
     console.log("updating filters!");
     //characters we want to see as values
     var reg = /[^A-Za-z0-9_-]/;
 
-    var toggleAge = false;
+    var openAgeFacet = false;
+    var openDatasourceFacet = false;
+
+    //check selected age bins
     if(ages.length>0){
 
         jQuery.each(ages, function(key, value){
@@ -27,7 +30,7 @@ function updateFilters(ages){
 
             if(selected){
                 jQuery("#patient_age__"+id).prop('checked', true);
-                toggleAge = true;
+                openAgeFacet = true;
             }
 
             var count = " ("+value.counter+")";
@@ -35,7 +38,7 @@ function updateFilters(ages){
 
         });
 
-        if(toggleAge){
+        if(openAgeFacet){
             var ageFilterField = jQuery("li#age_filter > a.accordion-title");
             ageFilterField.click();
         }
@@ -43,6 +46,37 @@ function updateFilters(ages){
 
     }
 
+    //check selected datasources
+    if(datasources.length>0) {
+
+        jQuery.each(datasources, function (key, value) {
+
+            var id = value.name;
+            var selected = value.selected;
+
+            //testing id for invalid characters
+            if (reg.test(id)) {
+                console.log("skipping id: " + id);
+                return;
+            }
+
+            if (selected) {
+                jQuery("#datasource__" + id).prop('checked', true);
+                openDatasourceFacet = true;
+            }
+
+            var count = " (" + value.counter + ")";
+            jQuery("#datasource__" + id).closest("label").append(count);
+
+        });
+
+        if (openDatasourceFacet) {
+            var dsFilterField = jQuery("li#datasource_filter > a.accordion-title");
+            dsFilterField.click();
+        }
+
+
+    }
 }
 
 
