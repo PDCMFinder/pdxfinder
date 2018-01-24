@@ -227,8 +227,8 @@
                                             <div class="large-form">
 
                                                 <div class="checkbox-item" th:each="instance:${facet_options['cancer_system_options']}">
-                                                    <input th:id="'cancer_system__' + ${instance}" type="checkbox" class="cancer_system filter"/>
-                                                    <label th:attr="for='cancer_system__'+${instance}"><span th:text="${instance}"></span></label>
+                                                    <input th:id="'cancer_system__' + ${#strings.replace(instance, ' ', '_')}" type="checkbox" class="cancer_system filter"/>
+                                                    <label th:attr="for='cancer_system__'+${#strings.replace(instance, ' ', '_')}"><span th:text="${instance}"></span></label>
                                                 </div>
 
 
@@ -417,14 +417,14 @@
 
     var ageFilters = [[${patient_age_selected}]];
     var dsFilters = [[${datasource_selected}]];
-
+    var cancerSystemFilters = [[${cancer_system_selected}]];
 
     console.log("before updating");
 
 
     jQuery(document).ready(function() {
 
-        updateFilters(ageFilters, dsFilters);
+        updateFilters(ageFilters, cancerSystemFilters, dsFilters);
         console.log("updated");
 
 

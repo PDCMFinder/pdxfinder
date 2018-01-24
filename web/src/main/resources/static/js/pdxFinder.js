@@ -5,7 +5,7 @@
 
 
 
-function updateFilters(ages, datasources){
+function updateFilters(ages, cancersystem, datasources){
 
     console.log("updating filters!");
     //characters we want to see as values
@@ -42,6 +42,38 @@ function updateFilters(ages, datasources){
         if(openAgeFacet){
             var ageFilterField = jQuery("li#age_filter > a.accordion-title");
             ageFilterField.click();
+        }
+    }
+
+
+    //check selected cancer systems
+    if(cancersystem.length>0){
+
+        jQuery.each(cancersystem, function(key, value){
+
+            var id = value.name;
+            id = id.replace(" ","_");
+            var selected = value.selected;
+
+            //testing id for invalid characters
+            if( reg.test(id)){
+                console.log("skipping id: "+id);
+                return;
+            }
+
+            if(selected){
+                jQuery("#cancer_system__"+id).prop('checked', true);
+                openCancerBySystem = true;
+            }
+
+            var count = " ("+value.counter+")";
+            jQuery("#cancer_system__"+id).closest("label").append(count);
+
+        });
+
+        if(openCancerBySystem){
+            var cancerSystemFilterField = jQuery("li#cancer_system_filter > a.accordion-title");
+            cancerSystemFilterField.click();
         }
     }
 
@@ -89,7 +121,7 @@ function redirectPage(){
         var id = jQuery(this).attr("id");
 
         //characters we want to see as values
-        var reg = /[^A-Za-z0-9_-]/;
+        var reg = /[^A-Za-z0-9 _-]/;
 
         if (jQuery(this).is(':checked')){
 
@@ -101,7 +133,7 @@ function redirectPage(){
             }
 
             if( ! reg.test(res[1])){
-                url = url+res[0]+"="+res[1];
+                url = url+res[0]+"="+encodeURIComponent(res[1].replace("_"," "));
                 no_parameters = false;
 
             }
