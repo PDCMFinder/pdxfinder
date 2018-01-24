@@ -123,9 +123,16 @@ public class LoadIRCC implements CommandLineRunner {
         String diagnosis = job.getString("Clinical Diagnosis");
 
         String classification = job.getString("Stage");
+        
+        String age = NOT_SPECIFIED;
+        try{
+            age = new Integer(job.getString("Age")).toString();
+        }catch(NumberFormatException nfe){
+            log.error("Cant convert "+job.getString("Age")+" to a numeric age. Using "+NOT_SPECIFIED);
+        }
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(job.getString("Patient ID"),
-                job.getString("Gender"), "", NOT_SPECIFIED, job.getString("Age"), irccDS);
+                job.getString("Gender"), "", NOT_SPECIFIED, age, irccDS);
 
       
         Sample ptSample = loaderUtils.getSample(id, job.getString("Tumor Type"), diagnosis,
