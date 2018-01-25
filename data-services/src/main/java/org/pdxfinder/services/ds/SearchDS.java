@@ -26,6 +26,7 @@ public class SearchDS {
     private Set<ModelForQuery> models;
     private Map<String, String> cancerSystemMap = new HashMap<>();
 
+    public static List<String> PATIENT_GENDERS = new ArrayList<>();
     public static List<String> CANCERS_BY_SYSTEM = Arrays.asList(
             "Breast cancer",
             "Cardiovascular Cancer",
@@ -86,6 +87,7 @@ public class SearchDS {
             mfq.setPatientAge(mc.getSample().getPatientSnapshot().getAgeBin());
             mfq.setPatientGender(mc.getSample().getPatientSnapshot().getPatient().getSex());
             mfq.setDiagnosis(mc.getSample().getDiagnosis());
+            mfq.setMappedOntologyTerm(mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
 
             if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
                 mfq.setPatientTreatmentStatus(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());
@@ -153,6 +155,7 @@ public class SearchDS {
 //            log.warn("Cannot serialize models to file, startup times will be slow", e);
 //        }
 
+        PATIENT_GENDERS = models.stream().map(ModelForQuery::getPatientGender).collect(Collectors.toList());
     }
 
     /**

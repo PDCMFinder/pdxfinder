@@ -320,7 +320,7 @@
                             <tbody>
                             <tr th:each="model, iter : ${results}">
                                 <td><a th:text="${model.externalId}" th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}}"></a></td>
-                                <td th:text="${model.diagnosis}">${model.diagnosis}</td>
+                                <td th:text="${model.mappedOntologyTerm}">${model.diagnosis}</td>
                                 <td th:text="${model.sampleOriginTissue}">origin tissue</td>
                                 <td th:text="${model.sampleSampleSite}">sample site</td>
                                 <td th:text="${model.sampleTumorType}">Metastatic</td>

@@ -13,6 +13,13 @@ public class FacetOption implements Comparable {
         this.count = count;
     }
 
+    public FacetOption(String name, Integer count, Boolean selected) {
+        this.name = name;
+        this.count = count;
+        this.selected = selected;
+    }
+
+
     public void increment() {
         this.count += 1;
     }
