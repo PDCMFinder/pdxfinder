@@ -79,6 +79,8 @@ public class ModelForQuery {
 
     private String diagnosis;
     private String mappedOntologyTerm;
+    private String treatmentHistory;
+    private String dataAvailable;
 
     public ModelForQuery() {
     }
@@ -284,5 +286,21 @@ public class ModelForQuery {
 
     public void setMappedOntologyTerm(String mappedOntologyTerm) {
         this.mappedOntologyTerm = mappedOntologyTerm;
+    }
+
+    public String getTreatmentHistory() {
+        return treatmentHistory;
+    }
+
+    public void setTreatmentHistory(String treatmentHistory) {
+        this.treatmentHistory = treatmentHistory;
+    }
+
+    public String getDataAvailable() {
+        return dataAvailable;
+    }
+
+    public void setDataAvailable(String dataAvailable) {
+        this.dataAvailable = dataAvailable;
     }
 }

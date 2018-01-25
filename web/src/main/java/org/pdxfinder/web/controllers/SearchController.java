@@ -24,29 +24,8 @@ public class SearchController {
     private SearchDS searchDS;
     private Map<String, List<String>> facets = new HashMap<>();
 
-    private List<String> patientAgeOptions = Arrays.asList(
-            "0-9",
-            "10-19",
-            "20-29",
-            "30-39",
-            "40-49",
-            "50-59",
-            "60-69",
-            "70-79",
-            "80-89",
-            "90+",
-            "NA"
-    );
-    List<String> datasourceOptions = Arrays.asList(
-            "JAX",
-            "IRCC",
-            "PDMR",
-            "PDXNet-HCI-BCM",
-            "PDXNet-MDAnderson",
-            "PDXNet-WUSTL",
-            "PDXNet-Wistar-MDAnderson-Penn"
-    );
-
+    List<String> patientAgeOptions = SearchDS.PATIENT_AGE_OPTIONS;
+    List<String> datasourceOptions = SearchDS.DATASOURCE_OPTIONS;
     List<String> cancerBySystemOptions = SearchDS.CANCERS_BY_SYSTEM;
     List<String> patientGenderOptions = SearchDS.PATIENT_GENDERS;
 
