@@ -67,8 +67,8 @@ function updateFilters(ages, cancersystem, datasources){
                 openCancerBySystem = true;
             }
 
-            var count = " ("+value.counter+")";
-            jQuery("#cancer_system__"+id).closest("label").append(count);
+            var count = " ("+value.count+")";
+            jQuery("#cancer_system__"+id).siblings("label").find("span").append(count);
 
         });
 
@@ -98,8 +98,8 @@ function updateFilters(ages, cancersystem, datasources){
                 openDatasourceFacet = true;
             }
 
-            var count = " (" + value.counter + ")";
-            jQuery("#datasource__" + id).closest("label").append(count);
+            var count = " (" + value.count + ")";
+            jQuery("#datasource__" + id).siblings("label").find("span").append(count);
 
         });
 
@@ -117,6 +117,15 @@ function redirectPage(){
 
     var no_parameters = true;
     var url = "?"
+
+    var searchField = jQuery("#query");
+
+    if(searchField.val() != ""){
+        url+="query="+searchField.val();
+        no_parameters = false;
+    }
+
+
     //get all filters with values
     jQuery(".filter").each(function(){
         var id = jQuery(this).attr("id");
