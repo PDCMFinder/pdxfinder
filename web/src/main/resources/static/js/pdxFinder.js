@@ -117,6 +117,15 @@ function redirectPage(){
 
     var no_parameters = true;
     var url = "?"
+
+    var searchField = jQuery("#query");
+
+    if(searchField.val() != ""){
+        url+="query="+searchField.val();
+        no_parameters = false;
+    }
+
+
     //get all filters with values
     jQuery(".filter").each(function(){
         var id = jQuery(this).attr("id");

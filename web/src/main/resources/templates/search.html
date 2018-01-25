@@ -427,8 +427,14 @@
         updateFilters(ageFilters, cancerSystemFilters, dsFilters);
         console.log("updated");
 
-
+        //Add eventlistener to fields with filter class
         jQuery('.filter').change( function(){
+
+            redirectPage();
+        });
+
+        //Add eventlistener to search field's button
+        jQuery('#search_submit').click( function(){
 
             redirectPage();
         });
