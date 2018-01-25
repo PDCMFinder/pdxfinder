@@ -9,9 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -82,6 +79,7 @@ public class SearchDS {
 
             ModelForQuery mfq = new ModelForQuery();
             mfq.setModelId(mc.getId());
+            mfq.setExternalId(mc.getSourcePdxId());
             mfq.setDatasource(mc.getDataSource());
 
             // Patient information
@@ -149,11 +147,11 @@ public class SearchDS {
             models.add(mfq);
         }
 
-        try (FileOutputStream fout = new FileOutputStream("classpath:/resources/models.ser"); ObjectOutputStream oos = new ObjectOutputStream(fout)) {
-            oos.writeObject(models);
-        } catch (IOException e) {
-            log.warn("Cannot serialize models to file, startup times will be slow", e);
-        }
+//        try (FileOutputStream fout = new FileOutputStream("/models.ser"); ObjectOutputStream oos = new ObjectOutputStream(fout)) {
+//            oos.writeObject(models);
+//        } catch (IOException e) {
+//            log.warn("Cannot serialize models to file, startup times will be slow", e);
+//        }
 
     }
 

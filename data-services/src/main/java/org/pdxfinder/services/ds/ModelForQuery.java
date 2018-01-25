@@ -55,6 +55,7 @@ import java.util.stream.Collectors;
 public class ModelForQuery {
 
     private Long modelId;
+    private String externalId;
 
     private String datasource;
 
@@ -138,6 +139,14 @@ public class ModelForQuery {
 
     public void setModelId(Long modelId) {
         this.modelId = modelId;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 
     public String getPatientAge() {
