@@ -78,6 +78,7 @@ public class ModelForQuery {
     private String cancerCellType;
 
     private String diagnosis;
+    private String mappedOntologyTerm;
 
     public ModelForQuery() {
     }
@@ -275,5 +276,13 @@ public class ModelForQuery {
 
     public void setDiagnosis(String diagnosis) {
         this.diagnosis = diagnosis;
+    }
+
+    public String getMappedOntologyTerm() {
+        return mappedOntologyTerm;
+    }
+
+    public void setMappedOntologyTerm(String mappedOntologyTerm) {
+        this.mappedOntologyTerm = mappedOntologyTerm;
     }
 }

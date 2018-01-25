@@ -24,34 +24,36 @@ public class SearchController {
     private SearchDS searchDS;
     private Map<String, List<String>> facets = new HashMap<>();
 
+    private List<String> patientAgeOptions = Arrays.asList(
+            "0-9",
+            "10-19",
+            "20-29",
+            "30-39",
+            "40-49",
+            "50-59",
+            "60-69",
+            "70-79",
+            "80-89",
+            "90+",
+            "NA"
+    );
+    List<String> datasourceOptions = Arrays.asList(
+            "JAX",
+            "IRCC",
+            "PDMR",
+            "PDXNet-HCI-BCM",
+            "PDXNet-MDAnderson",
+            "PDXNet-WUSTL",
+            "PDXNet-Wistar-MDAnderson-Penn"
+    );
+
+    List<String> cancerBySystemOptions = SearchDS.CANCERS_BY_SYSTEM;
+    List<String> patientGenderOptions = SearchDS.PATIENT_GENDERS;
+
     public SearchController(GraphService graphService, SearchDS searchDS) {
         this.graphService = graphService;
         this.searchDS = searchDS;
 
-        List<String> patientAgeOptions = Arrays.asList(
-                "0-9",
-                "10-19",
-                "20-29",
-                "30-39",
-                "40-49",
-                "50-59",
-                "60-69",
-                "70-79",
-                "80-89",
-                "90+",
-                "NA"
-        );
-        List<String> datasourceOptions = Arrays.asList(
-                "JAX",
-                "IRCC",
-                "PDMR",
-                "PDXNet-HCI-BCM",
-                "PDXNet-MDAnderson",
-                "PDXNet-WUSTL",
-                "PDXNet-Wistar-MDAnderson-Penn"
-        );
-
-        List<String> cancerBySystemOptions = SearchDS.CANCERS_BY_SYSTEM;
 
 
         facets.put("datasource_options", datasourceOptions);
@@ -62,6 +64,7 @@ public class SearchController {
 
     @RequestMapping("/search")
     String search(Model model,
+                  @RequestParam("query") Optional<String> query,
                   @RequestParam("datasource") Optional<List<String>> datasource,
                   @RequestParam("patient_age") Optional<List<String>> patient_age,
                   @RequestParam("patient_treatment_status") Optional<List<String>> patient_treatment_status,
@@ -71,6 +74,7 @@ public class SearchController {
     ) {
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
+                query,
                 datasource,
                 patient_age,
                 patient_treatment_status,
@@ -82,15 +86,16 @@ public class SearchController {
 
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
 
-        List<FacetOption> patientAgeSelected = getFacetOptions(SearchFacetName.patient_age, results, patient_age.orElse(null));
-        List<FacetOption> patientGenderSelected = getFacetOptions(SearchFacetName.patient_gender, results, patient_gender.orElse(null));
-        List<FacetOption> datasourceSelected = getFacetOptions(SearchFacetName.datasource, results, datasource.orElse(null));
-        List<FacetOption> cancerSystemSelected = getFacetOptions(SearchFacetName.system, results, cancer_system.orElse(null));
+        List<FacetOption> patientAgeSelected = getFacetOptions(SearchFacetName.patient_age, patientAgeOptions, results, patient_age.orElse(null));
+        List<FacetOption> patientGenderSelected = getFacetOptions(SearchFacetName.patient_gender, patientGenderOptions, results, patient_gender.orElse(null));
+        List<FacetOption> datasourceSelected = getFacetOptions(SearchFacetName.datasource, datasourceOptions, results, datasource.orElse(null));
+        List<FacetOption> cancerSystemSelected = getFacetOptions(SearchFacetName.system, cancerBySystemOptions, results, cancer_system.orElse(null));
 
         model.addAttribute("patient_age_selected", patientAgeSelected);
         model.addAttribute("patient_gender_selected", patientGenderSelected);
         model.addAttribute("datasource_selected", datasourceSelected);
         model.addAttribute("cancer_system_selected", cancerSystemSelected);
+        model.addAttribute("query", query);
 
         model.addAttribute("facet_options", facets);
         model.addAttribute("results", results);
@@ -99,6 +104,7 @@ public class SearchController {
     }
 
     private Map<SearchFacetName, List<String>> getFacetMap(
+            Optional<String> query,
             Optional<List<String>> datasource,
             Optional<List<String>> patientAge,
             Optional<List<String>> patientTreatmentStatus,
@@ -106,7 +112,13 @@ public class SearchController {
             Optional<List<String>> sampleOriginTissue,
             Optional<List<String>> cancerSystem
     ) {
+
         Map<SearchFacetName, List<String>> configuredFacets = new HashMap<>();
+
+        if (query.isPresent() && !query.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.query, new ArrayList<>());
+            configuredFacets.get(SearchFacetName.query).add(query.get());
+        }
 
         if (datasource.isPresent() && !datasource.get().isEmpty()) {
             configuredFacets.put(SearchFacetName.datasource, new ArrayList<>());
@@ -162,23 +174,24 @@ public class SearchController {
      * @param selected
      * @return
      */
-    private List<FacetOption> getFacetOptions(SearchFacetName facet, Set<ModelForQuery> results, List<String> selected) {
+    private List<FacetOption> getFacetOptions(SearchFacetName facet, List<String> options, Set<ModelForQuery> results, List<String> selected) {
 
         List<FacetOption> map = new ArrayList<>();
 
-        for (ModelForQuery mfq : results) {
-            String s = mfq.getBy(facet);
+        // Initialise all facet option counts to 0 and set selected attribute on all options that the user has chosen
+        for (String option : options) {
+            map.add(new FacetOption(option, 0, selected != null && selected.contains(option) ? Boolean.TRUE : Boolean.FALSE));
+        }
 
+        // Iterate through results adding count to the appropriate option
+        for (ModelForQuery mfq : results) {
+
+            String s = mfq.getBy(facet);
 
             // List of ontology terms may come from the service.  These will by separated by "::" delimiter
             if (s.contains("::")) {
 
                 for (String ss : s.split("::")) {
-
-                    // Initialise on the first time we see this facet name
-                    if (map.stream().noneMatch(x -> x.getName().equals(ss))) {
-                        map.add(new FacetOption(ss, 0));
-                    }
 
                     // There should be only one element per facet name
                     map.forEach(x -> {
@@ -204,16 +217,8 @@ public class SearchController {
             }
         }
 
-        // Set selected attribute on all options that the user has chosen
-        if (selected != null) {
-            map.forEach(x -> {
-                if (selected.contains(x.getName())) {
-                    x.setSelected(Boolean.TRUE);
-                }
-            });
-        }
 
-        Collections.sort(map);
+//        Collections.sort(map);
 
         return map;
     }

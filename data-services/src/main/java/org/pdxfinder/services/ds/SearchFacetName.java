@@ -1,6 +1,7 @@
 package org.pdxfinder.services.ds;
 
 public enum SearchFacetName {
+    query,
     datasource,
     patient_age,
     patient_treatment_status,
