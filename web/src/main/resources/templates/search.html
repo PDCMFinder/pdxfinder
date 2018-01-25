@@ -319,7 +319,7 @@
                             </thead>
                             <tbody>
                             <tr th:each="model, iter : ${results}">
-                                <td th:text="${iter.index}"><a th:text="${model.id}"></a></td>
+                                <td><a th:text="${model.externalId}" th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}}"></a></td>
                                 <td th:text="${model.diagnosis}">${model.diagnosis}</td>
                                 <td th:text="${model.sampleOriginTissue}">origin tissue</td>
                                 <td th:text="${model.sampleSampleSite}">sample site</td>

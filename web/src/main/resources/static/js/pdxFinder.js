@@ -34,8 +34,9 @@ function updateFilters(ages, cancersystem, datasources){
                 openAgeFacet = true;
             }
 
-            var count = " ("+value.counter+")";
-            jQuery("#patient_age__"+id).closest("label").append(count);
+            var count = " ("+value.count+")";
+            jQuery("#patient_age__"+id).siblings("label").find("span").append(count);
+            console.log(id+" "+count);
 
         });
 
