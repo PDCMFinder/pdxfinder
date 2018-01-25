@@ -26,6 +26,28 @@ public class SearchDS {
     private Set<ModelForQuery> models;
     private Map<String, String> cancerSystemMap = new HashMap<>();
 
+    public static List<String> PATIENT_AGE_OPTIONS = Arrays.asList(
+            "0-9",
+            "10-19",
+            "20-29",
+            "30-39",
+            "40-49",
+            "50-59",
+            "60-69",
+            "70-79",
+            "80-89",
+            "90+",
+            "NA"
+    );
+    public static List<String> DATASOURCE_OPTIONS = Arrays.asList(
+            "JAX",
+            "IRCC",
+            "PDMR",
+            "PDXNet-HCI-BCM",
+            "PDXNet-MDAnderson",
+            "PDXNet-WUSTL",
+            "PDXNet-Wistar-MDAnderson-Penn"
+    );
     public static List<String> PATIENT_GENDERS = new ArrayList<>();
     public static List<String> CANCERS_BY_SYSTEM = Arrays.asList(
             "Breast cancer",
@@ -82,6 +104,30 @@ public class SearchDS {
             mfq.setModelId(mc.getId());
             mfq.setExternalId(mc.getSourcePdxId());
             mfq.setDatasource(mc.getDataSource());
+
+            if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
+                mfq.setTreatmentHistory(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());
+            } else {
+                mfq.setTreatmentHistory("Not Specified");
+            }
+
+            if (mc.getSample().getSampleSite() != null) {
+                mfq.setSampleSampleSite(mc.getSample().getSampleSite().getName());
+            } else {
+                mfq.setSampleSampleSite("Not Specified");
+            }
+
+            if (mc.getSample().getType() != null) {
+                mfq.setSampleTumorType(mc.getSample().getType().getName());
+            } else {
+                mfq.setSampleTumorType("Not Specified");
+            }
+
+            if (mc.getSample().getSampleSite() != null) {
+                mfq.setSampleSampleSite(mc.getSample().getSampleSite().getName());
+            } else {
+                mfq.setSampleSampleSite("Not Specified");
+            }
 
             // Patient information
             mfq.setPatientAge(mc.getSample().getPatientSnapshot().getAgeBin());
