@@ -16,4 +16,7 @@ public enum SearchFacetName {
     system,
     cell_type;
 
+    public String getName() {
+        return name();
+    }
 }

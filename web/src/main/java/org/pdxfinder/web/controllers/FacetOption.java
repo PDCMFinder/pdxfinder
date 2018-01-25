@@ -1,5 +1,7 @@
 package org.pdxfinder.web.controllers;
 
+import org.pdxfinder.services.ds.SearchFacetName;
+
 import java.util.Objects;
 
 public class FacetOption implements Comparable {
@@ -7,6 +9,7 @@ public class FacetOption implements Comparable {
     String name;
     Integer count;
     Boolean selected;
+    SearchFacetName facetType;
 
     public FacetOption(String name, Integer count) {
         this.name = name;
@@ -17,6 +20,13 @@ public class FacetOption implements Comparable {
         this.name = name;
         this.count = count;
         this.selected = selected;
+    }
+
+    public FacetOption(String name, Integer count, Boolean selected, SearchFacetName facetType) {
+        this.name = name;
+        this.count = count;
+        this.selected = selected;
+        this.facetType = facetType;
     }
 
 
@@ -48,17 +58,27 @@ public class FacetOption implements Comparable {
         this.selected = selected;
     }
 
+    public SearchFacetName getFacetType() {
+        return facetType;
+    }
+
+    public void setFacetType(SearchFacetName facetType) {
+        this.facetType = facetType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FacetOption that = (FacetOption) o;
-        return Objects.equals(name, that.name);
+        return Objects.equals(name, that.name) &&
+                facetType == that.facetType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+
+        return Objects.hash(name, facetType);
     }
 
     @Override

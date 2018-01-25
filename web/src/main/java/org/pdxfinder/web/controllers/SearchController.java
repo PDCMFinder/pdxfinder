@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by jmason on 16/03/2017.
@@ -49,7 +50,9 @@ public class SearchController {
                   @RequestParam("patient_treatment_status") Optional<List<String>> patient_treatment_status,
                   @RequestParam("patient_gender") Optional<List<String>> patient_gender,
                   @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
-                  @RequestParam("cancer_system") Optional<List<String>> cancer_system
+                  @RequestParam("cancer_system") Optional<List<String>> cancer_system,
+                  @RequestParam(value = "page", defaultValue = "1") Integer page,
+                  @RequestParam(value = "size", defaultValue = "10") Integer size
     ) {
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
@@ -63,6 +66,7 @@ public class SearchController {
         );
 
 
+
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
 
         List<FacetOption> patientAgeSelected = getFacetOptions(SearchFacetName.patient_age, patientAgeOptions, results, patient_age.orElse(null));
@@ -70,16 +74,52 @@ public class SearchController {
         List<FacetOption> datasourceSelected = getFacetOptions(SearchFacetName.datasource, datasourceOptions, results, datasource.orElse(null));
         List<FacetOption> cancerSystemSelected = getFacetOptions(SearchFacetName.system, cancerBySystemOptions, results, cancer_system.orElse(null));
 
+        Set<List<FacetOption>> allSelectedFacetOptions = new HashSet<>(Arrays.asList(patientAgeSelected, patientGenderSelected, datasourceSelected, cancerSystemSelected));
+        String facetString = getFacetString(allSelectedFacetOptions);
+
+        // Num pages is converted to an int using this formula int n = a / b + (a % b == 0) ? 0 : 1;
+        int numPages = results.size() / size + (results.size() % size == 0 ? 0 : 1);
+        int current = page;
+        int begin = Math.max(1, current - 4);
+        int end = Math.min(begin + 8, numPages);
+
+        model.addAttribute("numPages", numPages);
+        model.addAttribute("beginIndex", begin);
+        model.addAttribute("endIndex", end);
+        model.addAttribute("currentIndex", current);
+        model.addAttribute("totalResults", results.size());
+        model.addAttribute("page", page);
+        model.addAttribute("size", size);
+        model.addAttribute("facets_string", facetString);
+
         model.addAttribute("patient_age_selected", patientAgeSelected);
         model.addAttribute("patient_gender_selected", patientGenderSelected);
         model.addAttribute("datasource_selected", datasourceSelected);
         model.addAttribute("cancer_system_selected", cancerSystemSelected);
-        model.addAttribute("query", query);
+        model.addAttribute("query", query.orElse(""));
 
         model.addAttribute("facet_options", facets);
-        model.addAttribute("results", results);
+        model.addAttribute("results", new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size())));
 
         return "search";
+    }
+
+    /**
+     * Get a string representation of all the configured facets
+     *
+     * @param allSelectedFacetOptions
+     * @return
+     */
+    private String getFacetString(Set<List<FacetOption>> allSelectedFacetOptions) {
+        List<String> pieces = new ArrayList<>();
+        for (List<FacetOption> facetOptions : allSelectedFacetOptions) {
+            pieces.add(facetOptions.stream()
+                    .filter(x -> x.getSelected() != null)
+                    .filter(FacetOption::getSelected)
+                    .map(x -> x.getFacetType() + "=" + x.getName())
+                    .collect(Collectors.joining("&")));
+        }
+        return pieces.stream().filter(x -> !x.isEmpty()).collect(Collectors.joining("&"));
     }
 
     private Map<SearchFacetName, List<String>> getFacetMap(
@@ -159,7 +199,7 @@ public class SearchController {
 
         // Initialise all facet option counts to 0 and set selected attribute on all options that the user has chosen
         for (String option : options) {
-            map.add(new FacetOption(option, 0, selected != null && selected.contains(option) ? Boolean.TRUE : Boolean.FALSE));
+            map.add(new FacetOption(option, 0, selected != null && selected.contains(option) ? Boolean.TRUE : Boolean.FALSE, facet));
         }
 
         // Iterate through results adding count to the appropriate option

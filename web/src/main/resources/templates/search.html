@@ -170,7 +170,11 @@
             <!-- Search Result Message & Export Section -->
             <section class="row padding-vertical-30">
                 <div class="columns medium-8 small-6 padding-vertical-15">
-                    Your Search for `Whatever` returned 1782 results.
+                    <span th:if="${#strings.isEmpty(query)}">Your Search for '<span th:text="${query}">Whatever</span>' returned <span
+                            th:text="${totalResults}">a number of</span> results.</span>
+                    <span th:unless="${#strings.isEmpty(query)}">Viewing <span
+                            th:text="${totalResults}">a number of</span> results.</span>
+
                 </div>
 
                 <div class="columns medium-4 small-6 text-right">
@@ -340,19 +344,44 @@
                     </div>
 
                     <div class="row">
+
                         <div class="columns medium-8 small-6 padding-vertical-10">
                             <ul class="pagination pdx-pagination" role="navigation" aria-label="Pagination">
-                                <li class="pagination-previous disabled">Previous <span class="show-for-sr">page</span>
+                                <li class="pagination-previous"
+                                    th:classappend="${#strings.equals(page, '1')} ? 'disabled'">
+                                    <span th:if="${#strings.equals(page, '1')}" aria-label="Previous page">First </span>
+                                    <a th:unless="${#strings.equals(page, '1')}"
+                                       th:href="'?' + ${facets_string} + '&page=1'" aria-label="First page">First </a>
                                 </li>
-                                <li class="current"><span class="show-for-sr">You're on page</span> 1</li>
-                                <li><a href="#" aria-label="Page 2">2</a></li>
-                                <li><a href="#" aria-label="Page 3">3</a></li>
-                                <li><a href="#" aria-label="Page 4">4</a></li>
-                                <li class="ellipsis" aria-hidden="true"></li>
-                                <li><a href="#" aria-label="Page 12">12</a></li>
-                                <li><a href="#" aria-label="Page 13">13</a></li>
-                                <li class="pagination-next"><a href="#" aria-label="Next page">Next <span
-                                        class="show-for-sr">page</span></a></li>
+                                <li class="pagination-previous"
+                                    th:classappend="${#strings.equals(page, '1')} ? 'disabled'">
+                                    <span th:if="${#strings.equals(page, '1')}"
+                                          aria-label="Previous page">Previous </span>
+                                    <a th:unless="${#strings.equals(page, '1')}"
+                                       th:href="'?' + ${facets_string} + '&page=' + ${page - 1}"
+                                       aria-label="Previous page">Previous </a>
+                                </li>
+
+                                <li th:each="i: ${#numbers.sequence(beginIndex, endIndex)}"
+                                    th:classappend="${i == page} ? 'current'">
+                                    <a th:href="'?' + ${facets_string} + '&page=' + ${i}" th:aria-label="'Page ' + ${i}"
+                                       th:text="${i}">1</a>
+                                </li>
+
+                                <li class="pagination-next"
+                                    th:classappend="${#strings.equals(page, #strings.toString(numPages))} ? 'disabled' ">
+                                    <span th:if="${#strings.equals(page, #strings.toString(numPages))}"
+                                          aria-label="Next page">Next </span>
+                                    <a th:unless="${#strings.equals(page, #strings.toString(numPages))}"
+                                       th:href="'?' + ${facets_string} + '&page=' + ${page + 1}" aria-label="Next page">Next </a>
+                                </li>
+                                <li class="pagination-next"
+                                    th:classappend="${#strings.equals(page, #strings.toString(numPages))} ? 'disabled' ">
+                                    <span th:if="${#strings.equals(page, #strings.toString(numPages))}"
+                                          aria-label="Last page">Last </span>
+                                    <a th:unless="${#strings.equals(page, #strings.toString(numPages))}"
+                                       th:href="'?' + ${facets_string} + '&page=' + ${numPages}" aria-label="Last page">Last </a>
+                                </li>
                             </ul>
                         </div>
 
