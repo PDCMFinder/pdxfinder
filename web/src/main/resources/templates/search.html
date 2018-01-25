@@ -95,7 +95,7 @@
                     <!-- Desktop Menu-->
                     <div class="columns medium-10 menu-column padding-vertical-30 hide-for-small-only" id="local-nav">
                         <nav>
-                            <ul id="local-nav" class="dropdown menu main-menu float-right" data-dropdown-menu
+                            <ul id="local-nav2" class="dropdown menu main-menu float-right" data-dropdown-menu
                                 data-description="navigational">
                                 <li><a href="#">Home</a></li>
                                 <li class="active"><a href="/search">Search</a></li>
@@ -144,14 +144,14 @@
                                 <div class="columns small-7 medium-push-2 small-push-3  margin-bottom-none search-text-wrapper">
                                     <input id="query" class="margin-bottom-none" title="EBI Search" tabindex="2"
                                            type="text" name="query" value="" size="35" maxlength="2048"
-                                           placeholder="E.G. Breast cancer" required="">
+                                           placeholder="E.G. Breast cancer" required="" th:value="${query}">
                                     <span class="form-error margin-top-small">
                         You need to enter a search query.
                     </span>
                                 </div>
                                 <div class="columns small-1 medium-push-2 small-push-3 margin-bottom-none ">
                                     <input id="search_submit" class="button icon icon-functional margin-bottom-none"
-                                           tabindex="3" type="submit" name="submit1" value="1" style="line-height:.9">
+                                           tabindex="3" name="submit1" type="submit" value="1" style="line-height:.9">
                                 </div>
                                 <!-- <input id="allebi" type="hidden" name="db" value="allebi" checked="checked" /> -->
                                 <input type="hidden" name="requestFrom" value="ebi_index">
@@ -468,11 +468,23 @@
             redirectPage();
         });
 
-
     });
 
 </script>
 
+<script>
+/*
+    const choices = new Choices('#query', {
+        silent: false,
+        items: ["Alpha", "Bravo", "Charlie"],
+        choices: [],
+        loadingText: 'Loading...',
+        noResultsText: 'No results found'
+
+
+    });
+*/
+</script>
 <!-- <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/js/foundationExtendEBI.js"></script> -->
 <!-- <script type="text/JavaScript">$(document).foundationExtendEBI();</script> -->
 
