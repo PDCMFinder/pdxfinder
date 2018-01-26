@@ -219,6 +219,29 @@
                                 </ul>
 
 
+                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
+                                    data-allow-all-closed="true">
+                                    <li class="accordion-item" data-accordion-item id="tumor_type_filter">
+                                        <a href="#" class="accordion-title">Tumor type</a>
+
+
+                                        <div class="accordion-content" data-tab-content>
+
+                                            <div class="large-form">
+
+                                                <div class="checkbox-item" th:each="instance:${facet_options['sample_tumor_type_options']}">
+                                                    <input th:id="'sample_tumor_type__' + ${instance}" type="checkbox" class="tumor_type filter"/>
+                                                    <label th:attr="for='sample_tumor_type__'+${instance}"><span th:text="${instance}"></span></label>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+
+
+
 
                                 <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
                                     data-allow-all-closed="true">
@@ -250,8 +273,7 @@
                         </li>
 
 
-
-                                                                        <li class="accordion-item is-active" data-accordion-item>
+                        <li class="accordion-item is-active" data-accordion-item>
                                                                             <!-- Accordion tab title -->
                             <a href="#" class="accordion-title">PDX model</a>
 
@@ -442,18 +464,23 @@
 <script src="/js/jquery.dataTables.js"></script>
 <script src="/js/pdxFinder.js"></script>
 
+
 <script type="text/javascript" language="javascript" th:inline="javascript">
+
+    var states = [[ ${mappedTerm} ]];
 
     var ageFilters = [[${patient_age_selected}]];
     var dsFilters = [[${datasource_selected}]];
     var cancerSystemFilters = [[${cancer_system_selected}]];
+    var sampleTumorTypeFilters = [[${sample_tumor_type_selected}]];
+
 
     console.log("before updating");
 
 
     jQuery(document).ready(function() {
 
-        updateFilters(ageFilters, cancerSystemFilters, dsFilters);
+        updateFilters(ageFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters);
         console.log("updated");
 
         //Add eventlistener to fields with filter class
@@ -467,6 +494,13 @@
 
             redirectPage();
         });
+
+
+        var options = {
+            data: states
+        };
+
+        $("#query").easyAutocomplete(options);
 
     });
 
