@@ -107,6 +107,7 @@ public class SearchController {
         model.addAttribute("patient_gender_selected", patientGenderSelected);
         model.addAttribute("datasource_selected", datasourceSelected);
         model.addAttribute("cancer_system_selected", cancerSystemSelected);
+        model.addAttribute("sample_tumor_type",sampleTumorTypeSelected);
         model.addAttribute("query", query.orElse(""));
 
         model.addAttribute("facet_options", facets);
