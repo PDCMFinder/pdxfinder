@@ -142,9 +142,17 @@
                                 </div>
 
                                 <div class="columns small-7 medium-push-2 small-push-3  margin-bottom-none search-text-wrapper">
+
+                                    <select class="form-control" id="query" name="query" type="text" tabindex="2" placeholder="E.G. Breast cancer" multiple>
+
+                                    <option th:if="${query != null && query != ''}" th:attr="selected='selected'" th:text="${query}"/>
+
+                                    </select>
+                                    <!--
                                     <input id="query" class="margin-bottom-none" title="EBI Search" tabindex="2"
                                            type="text" name="query" value="" size="35" maxlength="2048"
                                            placeholder="E.G. Breast cancer" required="" th:value="${query}">
+                                    -->
                                     <span class="form-error margin-top-small">
                         You need to enter a search query.
                     </span>
@@ -467,13 +475,67 @@
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
-    var states = [[ ${mappedTerm} ]];
+    var searchStates = [[ ${mappedTerm} ]];
 
     var ageFilters = [[${patient_age_selected}]];
     var dsFilters = [[${datasource_selected}]];
     var cancerSystemFilters = [[${cancer_system_selected}]];
     var sampleTumorTypeFilters = [[${sample_tumor_type_selected}]];
 
+    function constructSearchOptions(data) {
+        var newOptions = [];
+        for (var i = 0; i < data.length; i++) {
+            newOptions.push({'value':data[i],'label':data[i],selected: false,disabled: false})
+        }
+        return newOptions;
+    }
+    // Test choices integration
+    const mainSearch = new Choices('#query', {
+        choices: constructSearchOptions(searchStates),
+        removeItemButton: true,
+        // placeholder: false,
+        // placeholderValue: 'This is a placeholder',
+        maxItemCount: 1,
+        searchFloor: 0,
+        searchResultLimit: 10,
+        noResultsText: 'No results found',
+        fuseOptions: {
+            threshold: 0.1,
+            // includeScore: true,
+            // includeMatches: true, //doesn't do anything as it's not integrated :(
+            tokenize: true,
+            distance: 1000
+        }
+    });
+    function conditionallyShowDropdown(str) {
+        if (str.length < 1) {
+            mainSearch.hideDropdown();
+        } else {
+            // mainSearch.showDropdown();
+        }
+    }
+    function regexEscape(str) {
+        return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+    }
+    mainSearch.passedElement.addEventListener('showDropdown', function(event) {
+        conditionallyShowDropdown(mainSearch.currentValue);
+    }, false);
+    mainSearch.passedElement.addEventListener('search', function(event) {
+        var currentSearch = mainSearch.currentValue;
+        // highlight match, docs:
+        // https://github.com/jbr/jQuery.highlightRegex
+        $('.choices__list--dropdown').highlightRegex(); //clear
+        $('.choices__list--dropdown').highlightRegex(new RegExp(regexEscape(currentSearch),'ig'), {
+            tagType:   'span',
+            className: 'search-highlight'
+        });
+        conditionallyShowDropdown(currentSearch);
+    }, false);
+    /*
+    mainSearch.passedElement.addEventListener('choice', function(event) {
+        $('form.main-search').submit();
+    }, false);
+    */
 
     console.log("before updating");
 
@@ -494,13 +556,6 @@
 
             redirectPage();
         });
-
-
-        var options = {
-            data: states
-        };
-
-        $("#query").easyAutocomplete(options);
 
     });
 
