@@ -29,6 +29,7 @@ public class SearchController {
     List<String> datasourceOptions = SearchDS.DATASOURCE_OPTIONS;
     List<String> cancerBySystemOptions = SearchDS.CANCERS_BY_SYSTEM;
     List<String> patientGenderOptions = SearchDS.PATIENT_GENDERS;
+    List<String> sampleTumorTypeOptions = SearchDS.SAMPLE_TUMOR_TYPE_OPTIONS;
 
     public SearchController(GraphService graphService, SearchDS searchDS) {
         this.graphService = graphService;
@@ -39,6 +40,7 @@ public class SearchController {
         facets.put("datasource_options", datasourceOptions);
         facets.put("patient_age_options", patientAgeOptions);
         facets.put("cancer_system_options", cancerBySystemOptions);
+        facets.put("sample_tumor_type_options", sampleTumorTypeOptions);
 
     }
 
@@ -51,6 +53,8 @@ public class SearchController {
                   @RequestParam("patient_gender") Optional<List<String>> patient_gender,
                   @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
                   @RequestParam("cancer_system") Optional<List<String>> cancer_system,
+                  @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type,
+
                   @RequestParam(value = "page", defaultValue = "1") Integer page,
                   @RequestParam(value = "size", defaultValue = "10") Integer size
     ) {
@@ -62,7 +66,8 @@ public class SearchController {
                 patient_treatment_status,
                 patient_gender,
                 sample_origin_tissue,
-                cancer_system
+                cancer_system,
+                sample_tumor_type
         );
 
 
@@ -73,6 +78,8 @@ public class SearchController {
         List<FacetOption> patientGenderSelected = getFacetOptions(SearchFacetName.patient_gender, patientGenderOptions, results, patient_gender.orElse(null));
         List<FacetOption> datasourceSelected = getFacetOptions(SearchFacetName.datasource, datasourceOptions, results, datasource.orElse(null));
         List<FacetOption> cancerSystemSelected = getFacetOptions(SearchFacetName.system, cancerBySystemOptions, results, cancer_system.orElse(null));
+        List<FacetOption> sampleTumorTypeSelected = getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
+
 
         Set<List<FacetOption>> allSelectedFacetOptions = new HashSet<>(Arrays.asList(patientAgeSelected, patientGenderSelected, datasourceSelected, cancerSystemSelected));
         String facetString = getFacetString(allSelectedFacetOptions);
@@ -133,7 +140,9 @@ public class SearchController {
             Optional<List<String>> patientTreatmentStatus,
             Optional<List<String>> patientGender,
             Optional<List<String>> sampleOriginTissue,
-            Optional<List<String>> cancerSystem
+            Optional<List<String>> cancerSystem,
+            Optional<List<String>> sampleTumorType
+
     ) {
 
         Map<SearchFacetName, List<String>> configuredFacets = new HashMap<>();
@@ -182,6 +191,13 @@ public class SearchController {
             configuredFacets.put(SearchFacetName.system, new ArrayList<>());
             for (String s : cancerSystem.get()) {
                 configuredFacets.get(SearchFacetName.system).add(s);
+            }
+        }
+
+        if (sampleTumorType.isPresent() && !sampleTumorType.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.sample_tumor_type, new ArrayList<>());
+            for (String s : sampleTumorType.get()) {
+                configuredFacets.get(SearchFacetName.sample_tumor_type).add(s);
             }
         }
 

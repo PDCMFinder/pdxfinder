@@ -68,6 +68,14 @@ public class SearchDS {
             "Unclassified"
     );
 
+    public static List<String> SAMPLE_TUMOR_TYPE_OPTIONS = Arrays.asList(
+            "Primary",
+            "Metastatic",
+            "Recurrent/Relapse",
+            "Refractory",
+            "Not Specified"
+            );
+
     /**
      * Populate the complete set of models for searching when this object is instantiated
      */
@@ -92,8 +100,6 @@ public class SearchDS {
         this.cancerSystemMap.put("Malignant Skin Neoplasm", "Skin cancer");
         this.cancerSystemMap.put("Malignant Urinary System Neoplasm", "Urinary System Cancer");
         this.cancerSystemMap.put("Unclassified", "Unclassified");
-
-
 
 
         // When this class is instantiated, populate and cache the models set
