@@ -24,7 +24,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Set;
+import org.pdxfinder.utilities.Standardizer;
 
 /**
  * Load data from IRCC.
@@ -46,7 +46,7 @@ public class LoadIRCC implements CommandLineRunner {
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
-    private final static String NOT_SPECIFIED = "Not Specified";
+    private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
     private BackgroundStrain nsgBS;
     private ExternalDataSource irccDS;
@@ -124,15 +124,11 @@ public class LoadIRCC implements CommandLineRunner {
 
         String classification = job.getString("Stage");
         
-        String age = NOT_SPECIFIED;
-        try{
-            age = new Integer(job.getString("Age")).toString();
-        }catch(NumberFormatException nfe){
-            log.error("Cant convert "+job.getString("Age")+" to a numeric age. Using "+NOT_SPECIFIED);
-        }
+        String age = Standardizer.getAge(job.getString("Age"));
+        String gender = Standardizer.getGender(job.getString("Age"));
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(job.getString("Patient ID"),
-                job.getString("Gender"), "", NOT_SPECIFIED, age, irccDS);
+                gender, "", NOT_SPECIFIED, age, irccDS);
 
       
         Sample ptSample = loaderUtils.getSample(id, job.getString("Tumor Type"), diagnosis,
@@ -189,17 +185,7 @@ public class LoadIRCC implements CommandLineRunner {
 
     }
 
-    private String getValue(String name, JSONObject j) {
-        String value = NOT_SPECIFIED;
-        try {
-            value = j.getString(name);
-            if (value.trim().length() == 0) {
-                value = NOT_SPECIFIED;
-            }
-        } catch (Exception e) {
-        }
-        return value;
-    }
+   
 
     private String parseURL(String urlStr) {
         StringBuilder sb = new StringBuilder();
