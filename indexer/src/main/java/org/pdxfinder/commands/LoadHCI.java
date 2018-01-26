@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
+import org.pdxfinder.utilities.Standardizer;
 
 /**
  * Load data from University of Texas MD Anderson PDXNet.
@@ -46,7 +47,7 @@ public class LoadHCI implements CommandLineRunner {
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
-    private final static String NOT_SPECIFIED = "Not Specified";
+    private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
     private BackgroundStrain nsgBS;
     private ExternalDataSource hciDS;
@@ -128,15 +129,11 @@ public class LoadHCI implements CommandLineRunner {
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
 
-        String age = NOT_SPECIFIED;
-        try{
-            age = new Integer(j.getString("Age")).toString();
-        }catch(NumberFormatException nfe){
-            log.error("Cant convert "+j.getString("Age")+" to a numeric age using "+NOT_SPECIFIED);
-        }
+        String age = Standardizer.getAge(j.getString("Age"));
+        String gender = Standardizer.getGender(j.getString("Gender"));
         
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
-                j.getString("Gender"), "", j.getString("Ethnicity"), age, hciDS);
+                gender, "", j.getString("Ethnicity"), age, hciDS);
 
         // asssume specimen site is primary site?
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
@@ -149,9 +146,9 @@ public class LoadHCI implements CommandLineRunner {
                 NOT_SPECIFIED, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
         
-         String engraftmentSite = getValue("Engraftment Site",j);
+        String engraftmentSite = Standardizer.getValue("Engraftment Site",j);
         
-        String tumorPrep = getValue("Tumor Prep",j);
+        String tumorPrep = Standardizer.getValue("Tumor Prep",j);
 
         ModelCreation modelCreation = loaderUtils.createModelCreation(id, this.hciDS.getAbbreviation(), sample, qa);
         modelCreation.addRelatedSample(sample);
@@ -211,17 +208,6 @@ public class LoadHCI implements CommandLineRunner {
         loaderUtils.savePatientSnapshot(pSnap);
     }
     
-    
-     private String getValue(String name, JSONObject j){
-        String value = NOT_SPECIFIED;
-        try{
-            value = j.getString(name);
-            if(value.trim().length()==0){
-                value = NOT_SPECIFIED;
-            }
-        }catch(Exception e){}
-        return value;
-    }
 
 
     private String parseURL(String urlStr) {
