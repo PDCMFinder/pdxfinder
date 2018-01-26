@@ -83,6 +83,10 @@ public class SearchController {
         int begin = Math.max(1, current - 4);
         int end = Math.min(begin + 8, numPages);
 
+        //auto suggestions for the search field
+        Set<String> autoSuggestList = graphService.getMappedNCITTerms();
+        model.addAttribute("mappedTerm", autoSuggestList);
+
         model.addAttribute("numPages", numPages);
         model.addAttribute("beginIndex", begin);
         model.addAttribute("endIndex", end);
