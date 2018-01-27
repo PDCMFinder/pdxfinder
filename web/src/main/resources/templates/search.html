@@ -170,11 +170,12 @@
             <!-- Search Result Message & Export Section -->
             <section class="row padding-vertical-30">
                 <div class="columns medium-8 small-6 padding-vertical-15">
-                    <span th:if="${#strings.isEmpty(query)}">Your Search for '<span th:text="${query}">Whatever</span>' returned <span
-                            th:text="${totalResults}">a number of</span> results.</span>
-                    <span th:unless="${#strings.isEmpty(query)}">Viewing <span
-                            th:text="${totalResults}">a number of</span> results.</span>
-
+                    <span th:if="${#strings.isEmpty(query)}">Viewing <span th:remove="tag" th:text="${totalResults}">a number of</span> result<span
+                            th:if="${totalResults ne 1}">s</span>.</span>
+                    <span th:unless="${#strings.isEmpty(query)}">Your Search for '<span th:remove="tag"
+                                                                                        th:text="${query}">Whatever</span>' returned <span
+                            th:text="${totalResults}">a number of</span> result<span
+                            th:if="${totalResults ne 1}">s</span>.</span>
                 </div>
 
                 <div class="columns medium-4 small-6 text-right">
@@ -317,22 +318,22 @@
                                 <th>Age</th>
                                 <th>Gender</th>
                                 <th>Treatment history</th>
-                                <th>Study</th>
+                                <th>Available data</th>
                                 <th>Center</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr th:each="model, iter : ${results}">
                                 <td><a th:text="${model.externalId}" th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}}"></a></td>
-                                <td th:text="${model.mappedOntologyTerm}">${model.diagnosis}</td>
+                                <td th:text="${model.mappedOntologyTerm}">ontology term</td>
                                 <td th:text="${model.sampleOriginTissue}">origin tissue</td>
                                 <td th:text="${model.sampleSampleSite}">sample site</td>
                                 <td th:text="${model.sampleTumorType}">Metastatic</td>
-                                <td th:text="${model.patientAge}">NODSCID</td>
-                                <td th:text="${model.patientGender}">NODSCID</td>
-                                <td th:text="${model.treatmentHistory}">collection site</td>
-                                <td th:text="${model.dataAvailable}"></td>
-                                <td th:text="${model.datasource}">JAX <a href="https://www.google.co.uk/search?q=jax"
+                                <td th:text="${model.patientAge}">Age</td>
+                                <td th:text="${model.patientGender}">Gender</td>
+                                <td th:text="${model.treatmentHistory}">history</td>
+                                <td th:text="${model.dataAvailable}">data</td>
+                                <td th:text="${model.datasource}">Center <a href="https://www.google.co.uk/search?q=jax"
                                                                          target="_blank" data-tooltip
                                            aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1"
                                            title="Some text about JAX"><i class="icon icon-generic"

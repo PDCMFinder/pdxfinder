@@ -1,5 +1,6 @@
 package org.pdxfinder.web.controllers;
 
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
@@ -84,11 +85,22 @@ public class SearchController {
         Set<List<FacetOption>> allSelectedFacetOptions = new HashSet<>(Arrays.asList(patientAgeSelected, patientGenderSelected, datasourceSelected, cancerSystemSelected));
         String facetString = getFacetString(allSelectedFacetOptions);
 
+        // If there is a query, append the query parameter to any configured facet string
+        if (query.isPresent() && !query.get().isEmpty()) {
+            facetString = StringUtils.join(Arrays.asList("query=" + query.get(), facetString), "&");
+        }
+
         // Num pages is converted to an int using this formula int n = a / b + (a % b == 0) ? 0 : 1;
         int numPages = results.size() / size + (results.size() % size == 0 ? 0 : 1);
+
+        // If there are no results, default to 1 page (instead of 0 pages)
+        if (numPages < 1) {
+            numPages = 1;
+        }
+
         int current = page;
         int begin = Math.max(1, current - 4);
-        int end = Math.min(begin + 8, numPages);
+        int end = Math.min(begin + 7, numPages);
 
         //auto suggestions for the search field
         Set<String> autoSuggestList = graphService.getMappedNCITTerms();
