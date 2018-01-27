@@ -5,7 +5,7 @@
 
 
 
-function updateFilters(ages, cancersystem, datasources){
+function updateFilters(ages, cancersystem, datasources, tumortype){
 
     console.log("updating filters!");
     //characters we want to see as values
@@ -14,9 +14,10 @@ function updateFilters(ages, cancersystem, datasources){
     var openAgeFacet = false;
     var openDatasourceFacet = false;
     var openCancerBySystem = false;
+    var openTumorTypeFacet = false;
 
     //check selected age bins
-    if(ages.length>0){
+    if(ages != null && ages.length>0){
 
         jQuery.each(ages, function(key, value){
 
@@ -48,7 +49,7 @@ function updateFilters(ages, cancersystem, datasources){
 
 
     //check selected cancer systems
-    if(cancersystem.length>0){
+    if(cancersystem != null && cancersystem.length>0){
 
         jQuery.each(cancersystem, function(key, value){
 
@@ -80,7 +81,7 @@ function updateFilters(ages, cancersystem, datasources){
 
 
     //check selected datasources
-    if(datasources.length>0) {
+    if(datasources != null && datasources.length>0) {
 
         jQuery.each(datasources, function (key, value) {
 
@@ -110,6 +111,45 @@ function updateFilters(ages, cancersystem, datasources){
 
 
     }
+
+    //check selected tumorTypes
+    if(tumortype != null && tumortype.length>0) {
+
+        jQuery.each(tumortype, function (key, value) {
+
+            var id = value.name;
+            var selected = value.selected;
+
+            //testing id for invalid characters
+            if (reg.test(id)) {
+                console.log("skipping id: " + id);
+                return;
+            }
+
+            if (selected) {
+                jQuery("#sample_tumor_type__" + id).prop('checked', true);
+                openTumorTypeFacet = true;
+            }
+
+            var count = " (" + value.count + ")";
+            jQuery("#sample_tumor_type__" + id).siblings("label").find("span").append(count);
+
+        });
+
+        if (openTumorTypeFacet) {
+            var ttFilterField = jQuery("li#tumor_type_filter > a.accordion-title");
+            ttFilterField.click();
+        }
+
+
+    }
+
+
+
+
+
+
+
 }
 
 

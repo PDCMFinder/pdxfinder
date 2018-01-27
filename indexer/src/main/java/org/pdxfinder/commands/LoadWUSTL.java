@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
+import org.pdxfinder.utilities.Standardizer;
 
 /**
  * Load data from WUSTL PDXNet.
@@ -38,7 +39,7 @@ public class LoadWUSTL implements CommandLineRunner {
     private final static String WUSTL_DATASOURCE_NAME = "Washington University St. Louis";
     private final static String WUSTL_DATASOURCE_DESCRIPTION = "Washington University St. Louis PDX mouse models for PDXNet.";
 
-    private final static String NOT_SPECIFIED = "Not Specified";
+    private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -126,7 +127,7 @@ public class LoadWUSTL implements CommandLineRunner {
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
 
-        String race = getValue("Race", j);
+        String race = Standardizer.getValue("Race", j);
 
         try {
             if (j.getString("Ethnicity").trim().length() > 0) {
@@ -134,9 +135,12 @@ public class LoadWUSTL implements CommandLineRunner {
             }
         } catch (Exception e) {
         }
+        
+          String age = Standardizer.getAge(j.getString("Age"));
+          String gender = Standardizer.getGender(j.getString("Gender"));
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
-                j.getString("Gender"), "", race, j.getString("Age"), mdaDS);
+                gender, "", race, age, mdaDS);
 
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 NOT_SPECIFIED, NOT_SPECIFIED,
@@ -156,9 +160,9 @@ public class LoadWUSTL implements CommandLineRunner {
         String strain = j.getString("Strain");
         BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
 
-        String engraftmentSite = getValue("Engraftment Site", j);
+        String engraftmentSite = Standardizer.getValue("Engraftment Site", j);
 
-        String tumorPrep = getValue("Tumor Prep", j);
+        String tumorPrep = Standardizer.getValue("Tumor Prep", j);
 
         ModelCreation modelCreation = loaderUtils.createModelCreation(id, mdaDS.getAbbreviation(), sample, qa);
         modelCreation.addRelatedSample(sample);
@@ -227,17 +231,7 @@ public class LoadWUSTL implements CommandLineRunner {
         loaderUtils.savePatientSnapshot(pSnap);
     }
 
-    private String getValue(String name, JSONObject j) {
-        String value = NOT_SPECIFIED;
-        try {
-            value = j.getString(name);
-            if (value.trim().length() == 0) {
-                value = NOT_SPECIFIED;
-            }
-        } catch (Exception e) {
-        }
-        return value;
-    }
+   
 
     private String parseURL(String urlStr) {
         StringBuilder sb = new StringBuilder();

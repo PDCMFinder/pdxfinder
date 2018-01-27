@@ -79,17 +79,17 @@ public class LoadIRCCData implements CommandLineRunner {
 
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("loadIRCC", "Load IRCC PDX data");
-        parser.accepts("loadALL", "Load all, including JAX PDX data");
+        parser.accepts("loadIRCCOLD", "Load IRCC PDX data");
+        parser.accepts("loadALLOLD", "Load all, including JAX PDX data");
         OptionSet options = parser.parse(args);
 
-        if (options.has("loadIRCC") || options.has("loadALL")) {
+        if (options.has("loadOLDIRCC")) {
 
-            log.info("Loading IRCC PDX data.");
+            log.info("NOT Loading OLD! IRCC PDX data.");
 
-            loadDataFromFiles();
+         //   loadDataFromFiles();
             //validateData();
-            loadToNeo4j();
+         //   loadToNeo4j();
 
 
         }
