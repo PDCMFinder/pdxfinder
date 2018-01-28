@@ -160,7 +160,7 @@ function redirectPage(){
 
     var searchField = jQuery("#query");
 
-    if(searchField.val() != ""){
+    if (searchField.val() != null && searchField.val() != "") {
         url+="query="+searchField.val();
         no_parameters = false;
     }

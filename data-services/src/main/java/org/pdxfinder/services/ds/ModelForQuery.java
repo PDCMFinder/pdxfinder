@@ -49,38 +49,110 @@ modelBackgroundStrain
 */
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonPropertyOrder({
+        "modelId",
+        "datasource",
+        "externalId",
+        "patientAge",
+        "patientGender",
+        "patientTreatmentStatus",
+        "treatmentHistory",
+        "diagnosis",
+        "mappedOntologyTerm",
+        "sampleOriginTissue",
+        "sampleSampleSite",
+        "sampleExtractionMethod",
+        "sampleClassification",
+        "sampleTumorType",
+        "modelImplantationSite",
+        "modelImplantationType",
+        "modelBackgroundStrain",
+        "cancerSystem",
+        "cancerOrgan",
+        "cancerCellType",
+        "dataAvailable"
+})
 public class ModelForQuery {
 
+    @JsonProperty("PDXFinder Id")
     private Long modelId;
-    private String externalId;
 
+    @JsonProperty("Datasource")
     private String datasource;
 
+    @JsonProperty("Source Id")
+    private String externalId;
+
+    @JsonProperty("Patient Age")
     private String patientAge;
+
+    @JsonProperty("Patient Treatment Status")
     private String patientTreatmentStatus;
+
+    @JsonProperty("Patient Gender")
     private String patientGender;
 
+    @JsonProperty("Origin Tissue")
     private String sampleOriginTissue;
+
+    @JsonProperty("Sample Site")
     private String sampleSampleSite;
+
+    @JsonProperty("Origin Sample Extraction Method")
     private String sampleExtractionMethod;
+
+    @JsonProperty("Classification")
     private String sampleClassification;
+
+    @JsonProperty("Tumor Type")
     private String sampleTumorType;
 
+    @JsonProperty("Model Implantation Site")
     private String modelImplantationSite;
+
+    @JsonProperty("Model Implantation Type")
     private String modelImplantationType;
+
+    @JsonProperty("Model Background Strain")
     private String modelBackgroundStrain;
 
+    @JsonProperty("Cancer Systems")
     private List<String> cancerSystem;
+
+    @JsonProperty("Cancer Organ")
     private String cancerOrgan;
+
+    @JsonProperty("Cancer Histology")
     private String cancerCellType;
 
+    @JsonProperty("Patient Original Diagnosis")
     private String diagnosis;
+
+    @JsonProperty("NCIT Mapped Ontology Term")
     private String mappedOntologyTerm;
+
+    @JsonProperty("Patient Treatment History")
     private String treatmentHistory;
+
+    @JsonProperty("Other Available Data")
     private String dataAvailable;
+
+    @JsonIgnore
+    private Set<String> allOntologyTermAncestors;
+
+    @JsonIgnore
+    private Set<String> queryMatch;
+
 
     public ModelForQuery() {
     }
@@ -303,4 +375,51 @@ public class ModelForQuery {
     public void setDataAvailable(String dataAvailable) {
         this.dataAvailable = dataAvailable;
     }
+
+    public Set<String> getAllOntologyTermAncestors() {
+        return allOntologyTermAncestors;
+    }
+
+    public void setAllOntologyTermAncestors(Set<String> allOntologyTermAncestors) {
+        this.allOntologyTermAncestors = allOntologyTermAncestors;
+    }
+
+    public Set<String> getQueryMatch() {
+        return queryMatch;
+    }
+
+    public void setQueryMatch(Set<String> queryMatch) {
+        this.queryMatch = queryMatch;
+    }
+
+    public String getFormattedQueryMatch(String query) {
+
+        // Return nothing if there is no query
+        if (query == null || query.length() < 1) {
+            return null;
+        }
+
+        // Replace URL encoded spaces in the query string
+        String normQuery = query.replaceAll("%20", " ").replaceAll("\\+", " ");
+
+        // Return nothing if the query (case insensitively) matches the ontology term directly
+        if (this.mappedOntologyTerm.toLowerCase().contains(normQuery.toLowerCase())) {
+            return null;
+        }
+
+        // Return a string indicating which ontology term ancestors matches and highlight the match for the tooltip
+        if (this.queryMatch != null && this.queryMatch.size() > 0) {
+            List<String> s = new ArrayList<>(this.queryMatch);
+            List<String> replaced = new ArrayList<>();
+            for (String r : s) {
+                // Find the case insensitive matched part of the term searched,
+                // replace with original string surrounded with bold tags,
+                // and do not allow wrapping at spaces
+                replaced.add(r.replaceAll("(?i)(" + normQuery + ")", "<b>$1</b>").replaceAll(" ", "&nbsp;"));
+            }
+            return "Matches:<hr />" + StringUtils.join(replaced, "<br />");
+        }
+        return null;
+    }
+
 }

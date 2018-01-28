@@ -1,5 +1,8 @@
 package org.pdxfinder.web.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
@@ -8,11 +11,15 @@ import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.ds.ModelForQuery;
 import org.pdxfinder.services.ds.SearchDS;
 import org.pdxfinder.services.ds.SearchFacetName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,6 +28,8 @@ import java.util.stream.Collectors;
  */
 @Controller
 public class SearchController {
+
+    private final static Logger logger = LoggerFactory.getLogger(SearchController.class);
 
     private GraphService graphService;
     private SearchDS searchDS;
@@ -44,6 +53,49 @@ public class SearchController {
         facets.put("sample_tumor_type_options", sampleTumorTypeOptions);
 
     }
+
+    @RequestMapping("/search/export")
+    @ResponseBody
+    String export(HttpServletResponse response,
+                  @RequestParam("query") Optional<String> query,
+                  @RequestParam("datasource") Optional<List<String>> datasource,
+                  @RequestParam("patient_age") Optional<List<String>> patient_age,
+                  @RequestParam("patient_treatment_status") Optional<List<String>> patient_treatment_status,
+                  @RequestParam("patient_gender") Optional<List<String>> patient_gender,
+                  @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
+                  @RequestParam("cancer_system") Optional<List<String>> cancer_system,
+                  @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type
+    ) {
+
+        Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
+                query,
+                datasource,
+                patient_age,
+                patient_treatment_status,
+                patient_gender,
+                sample_origin_tissue,
+                cancer_system,
+                sample_tumor_type
+        );
+
+        Set<ModelForQuery> results = searchDS.search(configuredFacets);
+
+        CsvMapper mapper = new CsvMapper();
+        CsvSchema schema = mapper.schemaFor(ModelForQuery.class).withHeader();
+        String output = "CSV output for configured values " + configuredFacets.toString();
+        try {
+            output = mapper.writer(schema).writeValueAsString(results);
+        } catch (JsonProcessingException e) {
+            logger.error("Could not convert result set to CSV file. Facetes: {}", configuredFacets.toString(), e);
+        }
+
+        response.setContentType("text/csv;charset=utf-8");
+        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder_search_export.csv");
+
+        return output;
+
+    }
+
 
     @RequestMapping("/search")
     String search(Model model,
@@ -82,8 +134,18 @@ public class SearchController {
         List<FacetOption> sampleTumorTypeSelected = getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
 
 
-        Set<List<FacetOption>> allSelectedFacetOptions = new HashSet<>(Arrays.asList(patientAgeSelected, patientGenderSelected, datasourceSelected, cancerSystemSelected));
-        String facetString = getFacetString(allSelectedFacetOptions);
+        // Ensure to add the facet options to this list so the URL encoding retains the configured options
+        String facetString = getFacetString(
+                new HashSet<>(
+                        Arrays.asList(
+                                patientAgeSelected,
+                                patientGenderSelected,
+                                datasourceSelected,
+                                cancerSystemSelected,
+                                sampleTumorTypeSelected
+                        )
+                )
+        );
 
         // If there is a query, append the query parameter to any configured facet string
         if (query.isPresent() && !query.get().isEmpty()) {

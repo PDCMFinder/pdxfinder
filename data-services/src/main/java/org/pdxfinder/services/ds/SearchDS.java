@@ -177,6 +177,8 @@ public class SearchDS {
                 allOntologyTerms.addAll(getAllAncestors(t));
             }
 
+            mfq.setAllOntologyTermAncestors(allOntologyTerms.stream().map(OntologyTerm::getLabel).collect(Collectors.toSet()));
+
             // Add all top level systems (translated) to the Model
             for (String s : allOntologyTerms.stream().map(OntologyTerm::getLabel).collect(Collectors.toSet())) {
 
@@ -290,7 +292,19 @@ public class SearchDS {
                 case query:
 
                     predicate = getContainsMatchDisjunctionPredicate(filters.get(SearchFacetName.query));
-                    result = result.stream().filter(x -> predicate.test(x.getMappedOntologyTerm())).collect(Collectors.toSet());
+
+                    Set<ModelForQuery> accumulate = new HashSet<>();
+                    for (ModelForQuery r : result) {
+
+                        Set<String> i = r.getAllOntologyTermAncestors().stream().filter(x -> predicate.test(x)).collect(Collectors.toSet());
+                        if (i != null && i.size() > 0) {
+                            r.setQueryMatch(i);
+                            accumulate.add(r);
+                        }
+
+                    }
+
+                    result = accumulate;
                     break;
 
                 case datasource:
