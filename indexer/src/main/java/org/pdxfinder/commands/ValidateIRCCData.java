@@ -82,7 +82,7 @@ public class ValidateIRCCData implements CommandLineRunner {
         parser.accepts("loadALL", "Load all, including validating IRCC data");
         OptionSet options = parser.parse(args);
 
-        if (options.has("validateIRCC") || options.has("loadALL")) {
+        if (options.has("validateIRCC")) {
 
             log.info("Loading IRCC PDX data.");
 
