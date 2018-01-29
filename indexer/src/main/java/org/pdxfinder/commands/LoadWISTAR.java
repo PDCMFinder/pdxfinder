@@ -23,6 +23,7 @@ import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import org.pdxfinder.utilities.Standardizer;
 
 /**
  * Load models from WISTAR
@@ -40,7 +41,7 @@ public class LoadWISTAR implements CommandLineRunner {
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
-    private final static String NOT_SPECIFIED = "Not Specified";
+    private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
     //   private BackgroundStrain nsgBS;
     private ExternalDataSource wistarDS;
@@ -138,9 +139,14 @@ public class LoadWISTAR implements CommandLineRunner {
             }
         } catch (Exception e) {
         }
+        
+        String age = Standardizer.getAge(j.getString("Age"));
+        
+        String gender = Standardizer.getGender(j.getString("Gender"));
+        
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
-                j.getString("Gender"), "", race, j.getString("Age"), wistarDS);
+                gender, "", race, age, wistarDS);
 
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 NOT_SPECIFIED, NOT_SPECIFIED,
@@ -165,9 +171,9 @@ public class LoadWISTAR implements CommandLineRunner {
         String strain = j.getString("Strain");
         BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
 
-        String engraftmentSite = getValue("Engraftment Site", j);
+        String engraftmentSite = Standardizer.getValue("Engraftment Site", j);
 
-        String tumorPrep = getValue("Tumor Prep", j);
+        String tumorPrep = Standardizer.getValue("Tumor Prep", j);
 
         ModelCreation modelCreation = loaderUtils.createModelCreation(id, wistarDS.getAbbreviation(), sample, qa);
         modelCreation.addRelatedSample(sample);
@@ -191,17 +197,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
     }
 
-    private String getValue(String name, JSONObject j) {
-        String value = NOT_SPECIFIED;
-        try {
-            value = j.getString(name);
-            if (value.trim().length() == 0) {
-                value = NOT_SPECIFIED;
-            }
-        } catch (Exception e) {
-        }
-        return value;
-    }
+  
 
     private String parseURL(String urlStr) {
         StringBuilder sb = new StringBuilder();

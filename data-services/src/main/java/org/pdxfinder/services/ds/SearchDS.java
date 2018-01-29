@@ -108,7 +108,10 @@ public class SearchDS {
         this.cancerSystemMap.put("Unclassified", "Unclassified");
 
 
-        // When this class is instantiated, populate and cache the models set
+        //
+        // When this class is instantiated,
+        //   populate and cache the models set
+        //
 
         for (ModelCreation mc : modelCreationRepository.getModelsWithPatientData()) {
 
@@ -169,11 +172,18 @@ public class SearchDS {
                 mfq.setModelImplantationType(s.getImplantationType().getName());
             }
 
-            // Get all ancestor ontology terms into a set specific for this model
+            // Get all ancestor ontology terms (including self) into a set specific for this model
             Set<OntologyTerm> allOntologyTerms = new HashSet<>();
+
+            // Add direct mapped term
+            allOntologyTerms.add(mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm());
+
+            // Add all ancestors of direct mapped term
             for (OntologyTerm t : mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getSubclassOf()) {
                 allOntologyTerms.addAll(getAllAncestors(t));
             }
+
+            mfq.setAllOntologyTermAncestors(allOntologyTerms.stream().map(OntologyTerm::getLabel).collect(Collectors.toSet()));
 
             // Add all top level systems (translated) to the Model
             for (String s : allOntologyTerms.stream().map(OntologyTerm::getLabel).collect(Collectors.toSet())) {
@@ -226,18 +236,21 @@ public class SearchDS {
 
         Set<OntologyTerm> retSet = new HashSet<>();
 
-        if (t.getSubclassOf() == null || t.getSubclassOf().size() == 0) {
-            return null;
+        // Store this ontology term in the set
+        retSet.add(t);
+
+        // If this term has parent terms
+        if (t.getSubclassOf() != null && t.getSubclassOf().size() > 0) {
+
+            // For each parent term
+            for (OntologyTerm st : t.getSubclassOf()) {
+
+                // Recurse and add all ancestor terms to the set
+                retSet.addAll(getAllAncestors(st));
+            }
         }
 
-
-        for (OntologyTerm st : t.getSubclassOf()) {
-
-            retSet.add(st);
-            Set<OntologyTerm> intSet = getAllAncestors(st);
-            if (intSet != null) retSet.addAll(intSet);
-        }
-
+        // Return the full set
         return retSet;
     }
 
@@ -277,9 +290,28 @@ public class SearchDS {
         }
 
         for (SearchFacetName facet : filters.keySet()) {
-            List<Predicate<ModelForQuery>> preds = new ArrayList<>();
+
             Predicate predicate;
+
             switch (facet) {
+
+                case query:
+
+                    predicate = getContainsMatchDisjunctionPredicate(filters.get(SearchFacetName.query));
+
+                    Set<ModelForQuery> accumulate = new HashSet<>();
+                    for (ModelForQuery r : result) {
+
+                        Set<String> i = r.getAllOntologyTermAncestors().stream().filter(x -> predicate.test(x)).collect(Collectors.toSet());
+                        if (i != null && i.size() > 0) {
+                            r.setQueryMatch(i);
+                            accumulate.add(r);
+                        }
+
+                    }
+
+                    result = accumulate;
+                    break;
 
                 case datasource:
 

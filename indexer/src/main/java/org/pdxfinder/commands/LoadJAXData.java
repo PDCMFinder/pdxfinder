@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Stream;
+import org.pdxfinder.utilities.Standardizer;
 
 /**
  * Load data from JAX.
@@ -47,7 +48,8 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
     private final static String HISTOLOGY_NOTE = "Pathologist assessment of patient tumor and pdx model tumor histology slides.";
-    private final static String ENGRAFTMENT = "Subcutaneous";
+    
+    private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -164,9 +166,12 @@ public class LoadJAXData implements CommandLineRunner {
         }
 
         String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
+        
+        String age = Standardizer.getAge(j.getString("Age"));
+        String gender = Standardizer.getGender(j.getString("Gender"));
 
-        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), j.getString("Gender"),
-                j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
+        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), gender,
+                j.getString("Race"), j.getString("Ethnicity"), age, jaxDS);
 
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, JAX_DATASOURCE_ABBREVIATION);
@@ -179,8 +184,7 @@ public class LoadJAXData implements CommandLineRunner {
 
         }
 
-        // For the moment, all JAX models are assumed to have been validated using Histological assessment by a pathologist
-        // TODO: verify this is the case
+       
         QualityAssurance qa = new QualityAssurance("Histology", HISTOLOGY_NOTE, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
 
@@ -272,10 +276,7 @@ public class LoadJAXData implements CommandLineRunner {
 
                 Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
 
-                // why would this happen?
-                if (platform.getExternalDataSource() == null) {
-                    platform.setExternalDataSource(jaxDS);
-                }
+                
                 loaderUtils.createPlatformAssociation(platform, marker);
                 
 

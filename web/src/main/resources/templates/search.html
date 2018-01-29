@@ -57,6 +57,11 @@
     <!-- also inform ES so we can host your colour palette file -->
     <!-- <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/theme-embl-petrol.css" type="text/css" media="all" /> -->
     <!-- end CSS-->
+    <style>
+        .tooltip {
+            max-width: none;
+        }
+    </style>
 </head>
 
 <body class="level2"><!-- add any of your classes or IDs -->
@@ -178,15 +183,17 @@
             <!-- Search Result Message & Export Section -->
             <section class="row padding-vertical-30">
                 <div class="columns medium-8 small-6 padding-vertical-15">
-                    <span th:if="${#strings.isEmpty(query)}">Your Search for '<span th:text="${query}">Whatever</span>' returned <span
-                            th:text="${totalResults}">a number of</span> results.</span>
-                    <span th:unless="${#strings.isEmpty(query)}">Viewing <span
-                            th:text="${totalResults}">a number of</span> results.</span>
-
+                    <span th:if="${#strings.isEmpty(query)}">Viewing <span th:text="${totalResults}">a number of</span> result<span
+                            th:if="${totalResults ne 1}">s</span>.</span>
+                    <span th:unless="${#strings.isEmpty(query)}">Your Search for '<span
+                                                                                        th:text="${query}">Whatever</span>' returned <span
+                            th:text="${totalResults}">a number of</span> result<span
+                            th:if="${totalResults ne 1}">s</span>.</span>
                 </div>
 
                 <div class="columns medium-4 small-6 text-right">
-                    <a href="#" class="button more outline secondary large">Export Results</a>
+                    <a th:href="@{'/search/export' + '?' + ${facets_string}}"
+                       class="button more outline secondary large">Export Results</a>
                 </div>
             </section>
 
@@ -368,22 +375,28 @@
                                 <th>Age</th>
                                 <th>Gender</th>
                                 <th>Treatment history</th>
-                                <th>Study</th>
+                                <th>Available data</th>
                                 <th>Center</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr th:each="model, iter : ${results}">
                                 <td><a th:text="${model.externalId}" th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}}"></a></td>
-                                <td th:text="${model.mappedOntologyTerm}">${model.diagnosis}</td>
+                                <td><span th:text="${model.mappedOntologyTerm}">ontology term</span>
+                                    <span th:unless="${#strings.isEmpty(model.getFormattedQueryMatch(query))}"
+                                          data-tooltip data-allow-html="true" aria-haspopup="true" class="has-tip"
+                                          data-disable-hover="false" th:tabindex="${iter}}"
+                                          th:title="${model.getFormattedQueryMatch(query)}"><i class="icon icon-generic"
+                                                                                               data-icon="i"></i></span>
+                                </td>
                                 <td th:text="${model.sampleOriginTissue}">origin tissue</td>
                                 <td th:text="${model.sampleSampleSite}">sample site</td>
                                 <td th:text="${model.sampleTumorType}">Metastatic</td>
-                                <td th:text="${model.patientAge}">NODSCID</td>
-                                <td th:text="${model.patientGender}">NODSCID</td>
-                                <td th:text="${model.treatmentHistory}">collection site</td>
-                                <td th:text="${model.dataAvailable}"></td>
-                                <td th:text="${model.datasource}">JAX <a href="https://www.google.co.uk/search?q=jax"
+                                <td th:text="${model.patientAge}">Age</td>
+                                <td th:text="${model.patientGender}">Gender</td>
+                                <td th:text="${model.treatmentHistory}">history</td>
+                                <td th:text="${model.dataAvailable}">data</td>
+                                <td th:text="${model.datasource}">Center <a href="https://www.google.co.uk/search?q=jax"
                                                                          target="_blank" data-tooltip
                                            aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1"
                                            title="Some text about JAX"><i class="icon icon-generic"
@@ -437,7 +450,8 @@
                         </div>
 
                         <div class="columns medium-4 small-6 text-right">
-                            <a href="#" class="button more outline secondary large">Export Results</a>
+                            <a th:href="@{'/search/export' + '?' + ${facets_string}}"
+                               class="button more outline secondary large">Export Results</a>
                         </div>
                     </div>
 
