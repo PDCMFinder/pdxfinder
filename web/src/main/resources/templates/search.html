@@ -223,8 +223,8 @@
                                             <div class="large-form">
 
                                                 <div class="checkbox-item" th:each="instance:${facet_options['patient_age_options']}">
-                                                    <input th:id="'patient_age__' + ${instance}" type="checkbox" class="age filter"/>
-                                                    <label th:attr="for='patient_age__'+${instance}"><span th:text="${instance}"></span></label>
+                                                    <input th:id="'patient_age__' + ${#strings.replace(instance, ' ', '_')}" type="checkbox" class="age filter"/>
+                                                    <label th:attr="for='patient_age__'+${#strings.replace(instance, ' ', '_')}"><span th:text="${instance}"></span></label>
                                                 </div>
 
                                             </div>
@@ -244,8 +244,8 @@
                                             <div class="large-form">
 
                                                 <div class="checkbox-item" th:each="instance:${facet_options['patient_gender_options']}">
-                                                    <input th:id="'patient_gender__' + ${instance}" type="checkbox" class="gender filter"/>
-                                                    <label th:attr="for='patient_gender__'+${instance}"><span th:text="${instance}"></span></label>
+                                                    <input th:id="'patient_gender__' + ${#strings.replace(instance, ' ', '_')}" type="checkbox" class="gender filter"/>
+                                                    <label th:attr="for='patient_gender__'+${#strings.replace(instance, ' ', '_')}"><span th:text="${instance}"></span></label>
                                                 </div>
 
                                             </div>
