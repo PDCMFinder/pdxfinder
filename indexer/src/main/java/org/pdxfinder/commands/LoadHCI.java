@@ -136,9 +136,12 @@ public class LoadHCI implements CommandLineRunner {
                 gender, "", j.getString("Ethnicity"), age, hciDS);
 
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
-        // asssume specimen site is primary site?
+        
+        String sampleSite = Standardizer.getValue("Sample Site",j);
+        System.out.println("Sample Site="+sampleSite);
+        
         Sample sample = loaderUtils.getSample(id, tumorType, diagnosis,
-                j.getString("Primary Site"), NOT_SPECIFIED,
+                j.getString("Primary Site"), sampleSite,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, hciDS.getAbbreviation());
 
         pSnap.addSample(sample);
