@@ -130,8 +130,9 @@ public class LoadIRCC implements CommandLineRunner {
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(job.getString("Patient ID"),
                 gender, "", NOT_SPECIFIED, age, irccDS);
 
-      
-        Sample ptSample = loaderUtils.getSample(id, job.getString("Tumor Type"), diagnosis,
+        String tumorType = Standardizer.getTumorType(job.getString("Tumor Type"));
+        
+        Sample ptSample = loaderUtils.getSample(id, tumorType, diagnosis,
                 job.getString("Primary Site"), job.getString("Sample Site"),
                 NOT_SPECIFIED, classification, NORMAL_TISSUE_FALSE, irccDS.getAbbreviation());
 

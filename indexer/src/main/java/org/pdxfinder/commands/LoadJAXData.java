@@ -173,7 +173,8 @@ public class LoadJAXData implements CommandLineRunner {
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), gender,
                 j.getString("Race"), j.getString("Ethnicity"), age, jaxDS);
 
-        Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), diagnosis,
+        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
+        Sample sample = loaderUtils.getSample(j.getString("Model ID"), tumorType, diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, JAX_DATASOURCE_ABBREVIATION);
 
         if (histologyMap.containsKey("Patient")) {

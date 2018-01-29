@@ -149,8 +149,9 @@ public class LoadMDAnderson implements CommandLineRunner {
         
         String sampleSite = Standardizer.getValue("Sample Site",j);
         
+         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
        
-        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
+        Sample sample = loaderUtils.getSample(id, tumorType, diagnosis,
                 j.getString("Primary Site"), sampleSite,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
 

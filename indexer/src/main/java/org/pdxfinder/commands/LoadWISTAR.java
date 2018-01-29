@@ -147,8 +147,10 @@ public class LoadWISTAR implements CommandLineRunner {
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
                 gender, "", race, age, wistarDS);
+        
+         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
 
-        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
+        Sample sample = loaderUtils.getSample(id, tumorType, diagnosis,
                 NOT_SPECIFIED, NOT_SPECIFIED,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS.getAbbreviation());
 
