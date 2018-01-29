@@ -37,7 +37,7 @@ public class SearchDS {
             "70-79",
             "80-89",
             "90+",
-            "NA"
+            "Not Specified"
     );
     public static List<String> DATASOURCE_OPTIONS = Arrays.asList(
             "JAX",
@@ -51,7 +51,7 @@ public class SearchDS {
     public static List<String> PATIENT_GENDERS = Arrays.asList(
             "Male",
             "Female",
-            "Not specified"
+            "Not Specified"
     );
 
 
