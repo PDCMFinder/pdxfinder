@@ -23,6 +23,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
         jQuery.each(ages, function(key, value){
 
             var id = value.name;
+            id = id.replace(" ","_");
             var selected = value.selected;
 
             //testing id for invalid characters
@@ -57,6 +58,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
         jQuery.each(genders, function(key, value){
 
             var id = value.name;
+            id = id.replace(" ","_");
             var selected = value.selected;
 
             //testing id for invalid characters
@@ -121,6 +123,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
         jQuery.each(datasources, function (key, value) {
 
             var id = value.name;
+            id = id.replace(" ","_");
             var selected = value.selected;
 
             //testing id for invalid characters
@@ -153,6 +156,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
         jQuery.each(tumortype, function (key, value) {
 
             var id = value.name;
+            id = id.replace(" ","_");
             var selected = value.selected;
 
             //testing id for invalid characters
