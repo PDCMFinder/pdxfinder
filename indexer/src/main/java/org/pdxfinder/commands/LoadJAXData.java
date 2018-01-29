@@ -276,7 +276,12 @@ public class LoadJAXData implements CommandLineRunner {
                 ma.setMarker(marker);
 
                 Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
-
+               
+                
+                
+                platform.setExternalDataSource(jaxDS);
+                loaderUtils.savePlatform(platform);
+               
                 
                 loaderUtils.createPlatformAssociation(platform, marker);
                 
