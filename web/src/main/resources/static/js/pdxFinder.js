@@ -5,13 +5,14 @@
 
 
 
-function updateFilters(ages, cancersystem, datasources, tumortype){
+function updateFilters(ages, genders, cancersystem, datasources, tumortype){
 
     console.log("updating filters!");
     //characters we want to see as values
     var reg = /[^A-Za-z0-9 _-]/;
 
     var openAgeFacet = false;
+    var openGenderFacet = false;
     var openDatasourceFacet = false;
     var openCancerBySystem = false;
     var openTumorTypeFacet = false;
@@ -44,6 +45,40 @@ function updateFilters(ages, cancersystem, datasources, tumortype){
         if(openAgeFacet){
             var ageFilterField = jQuery("li#age_filter > a.accordion-title");
             ageFilterField.click();
+        }
+    }
+
+
+
+
+    //check selected gender options
+    if(genders != null && genders.length>0){
+
+        jQuery.each(genders, function(key, value){
+
+            var id = value.name;
+            var selected = value.selected;
+
+            //testing id for invalid characters
+            if( reg.test(id)){
+                console.log("skipping id: "+id);
+                return;
+            }
+
+            if(selected){
+                jQuery("#patient_gender__"+id).prop('checked', true);
+                openGenderFacet = true;
+            }
+
+            var count = " ("+value.count+")";
+            jQuery("#patient_gender__"+id).siblings("label").find("span").append(count);
+            console.log(id+" "+count);
+
+        });
+
+        if(openGenderFacet){
+            var genderFilterField = jQuery("li#gender_filter > a.accordion-title");
+            genderFilterField.click();
         }
     }
 

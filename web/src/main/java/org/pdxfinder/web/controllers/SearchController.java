@@ -39,6 +39,7 @@ public class SearchController {
 
         facets.put("datasource_options", datasourceOptions);
         facets.put("patient_age_options", patientAgeOptions);
+        facets.put("patient_gender_options", patientGenderOptions);
         facets.put("cancer_system_options", cancerBySystemOptions);
         facets.put("sample_tumor_type_options", sampleTumorTypeOptions);
 

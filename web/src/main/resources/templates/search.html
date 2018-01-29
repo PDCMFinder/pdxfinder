@@ -220,11 +220,32 @@
                                                     <label th:attr="for='patient_age__'+${instance}"><span th:text="${instance}"></span></label>
                                                 </div>
 
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+
+
+                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
+                                    data-allow-all-closed="true">
+                                    <li class="accordion-item" data-accordion-item id="gender_filter">
+                                        <a href="#" class="accordion-title">Gender</a>
+
+
+                                        <div class="accordion-content" data-tab-content>
+
+                                            <div class="large-form">
+
+                                                <div class="checkbox-item" th:each="instance:${facet_options['patient_gender_options']}">
+                                                    <input th:id="'patient_gender__' + ${instance}" type="checkbox" class="gender filter"/>
+                                                    <label th:attr="for='patient_gender__'+${instance}"><span th:text="${instance}"></span></label>
+                                                </div>
 
                                             </div>
                                         </div>
                                     </li>
                                 </ul>
+
 
 
                                 <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
@@ -481,6 +502,7 @@
     var dsFilters = [[${datasource_selected}]];
     var cancerSystemFilters = [[${cancer_system_selected}]];
     var sampleTumorTypeFilters = [[${sample_tumor_type_selected}]];
+    var genderFilters = [[${patient_gender_selected}]];
 
     function constructSearchOptions(data) {
         var newOptions = [];
@@ -542,7 +564,7 @@
 
     jQuery(document).ready(function() {
 
-        updateFilters(ageFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters);
+        updateFilters(ageFilters, genderFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters);
         console.log("updated");
 
         //Add eventlistener to fields with filter class

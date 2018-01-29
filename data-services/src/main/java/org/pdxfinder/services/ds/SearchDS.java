@@ -48,7 +48,13 @@ public class SearchDS {
             "PDXNet-WUSTL",
             "PDXNet-Wistar-MDAnderson-Penn"
     );
-    public static List<String> PATIENT_GENDERS = new ArrayList<>();
+    public static List<String> PATIENT_GENDERS = Arrays.asList(
+            "Male",
+            "Female",
+            "Not specified"
+    );
+
+
     public static List<String> CANCERS_BY_SYSTEM = Arrays.asList(
             "Breast cancer",
             "Cardiovascular Cancer",
