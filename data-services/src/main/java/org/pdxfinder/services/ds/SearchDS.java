@@ -223,7 +223,7 @@ public class SearchDS {
 //            log.warn("Cannot serialize models to file, startup times will be slow", e);
 //        }
 
-        PATIENT_GENDERS = models.stream().map(ModelForQuery::getPatientGender).distinct().collect(Collectors.toList());
+        //PATIENT_GENDERS = models.stream().map(ModelForQuery::getPatientGender).distinct().collect(Collectors.toList());
     }
 
     /**
