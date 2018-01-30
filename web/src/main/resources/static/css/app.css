@@ -4751,8 +4751,7 @@ table.width-auto {
 /* some images should be stretched, such as sparkline-style gifs */
 table.data-table img,
 img.stretch {
-  height: inherit;
-  max-width: none; }
+  height: inherit; }
 
 /* align table cell text to top */
 table.data-table th,
@@ -5074,12 +5073,24 @@ ul.main-menu.menu.dropdown.menu > li.is-dropdown-submenu-parent > a::after {
 form.main-search {
   background: url("../images/icon-find.png") no-repeat 5% center #e6e7e8;
   padding: 50px 0 20px 0; }
+  form.main-search .choices[data-type='select-multiple'] .choices__item[aria-selected='true'] {
+    background: #fff;
+    border-color: #fff; }
+  form.main-search .choices {
+    margin-bottom: 0; }
+    form.main-search .choices button.choices__button {
+      display: none; }
+    form.main-search .choices .choices__inner {
+      background: #fefefe;
+      padding-bottom: 4px; }
+    form.main-search .choices .search-highlight {
+      border-bottom: 2px solid #00b2d5; }
   form.main-search.icon-2 {
     background: url("../images/icon-find-mobile.png") no-repeat 5% center #e6e7e8; }
-  form.main-search input[type='text'],
+  form.main-search input[type='text']:not(.choices__input),
   form.main-search input[type='submit'] {
     height: 60px; }
-  form.main-search input[type='text'] {
+  form.main-search input[type='text']:not(.choices__input) {
     box-shadow: none;
     border: 2px solid #c1c1c1;
     border-right: none; }
