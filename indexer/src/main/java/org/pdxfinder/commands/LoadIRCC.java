@@ -125,7 +125,7 @@ public class LoadIRCC implements CommandLineRunner {
         String classification = job.getString("Stage");
         
         String age = Standardizer.getAge(job.getString("Age"));
-        String gender = Standardizer.getGender(job.getString("Age"));
+        String gender = Standardizer.getGender(job.getString("Gender"));
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(job.getString("Patient ID"),
                 gender, "", NOT_SPECIFIED, age, irccDS);
