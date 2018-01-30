@@ -126,7 +126,7 @@
                                 </div>
 
                                 <div class="columns small-7 medium-push-2 small-push-3  margin-bottom-none search-text-wrapper">
-                                    <input id="query" class="margin-bottom-none" title="EBI Search" tabindex="2" type="text" name="query" value="" size="35" maxlength="2048" placeholder="E.G. Breast cancer" required="">
+                                    <select class="form-control" id="query" name="query" type="text" tabindex="2" placeholder="E.G. Breast cancer" multiple></select>
                                     <span class="form-error margin-top-small">
                         You need to enter a search query.
                     </span>
@@ -481,11 +481,96 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
 <script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/scripts/dist/choices.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.highlightRegex/0.1.2/highlightRegex.min.js"></script>
 <script src="/js/script.js"></script>
 <script src="/js/jquery.dataTables.js"></script>
 <script src="/js/scroller.js"></script>
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
+
+    var searchStates = [[ ${mappedTerm} ]];
+
+
+    function constructSearchOptions(data) {
+        var newOptions = [];
+        for (var i = 0; i < data.length; i++) {
+            newOptions.push({'value':data[i],'label':data[i],selected: false,disabled: false})
+        }
+        return newOptions;
+    }
+    // Test choices integration
+    const mainSearch = new Choices('#query', {
+        choices: constructSearchOptions(searchStates),
+        removeItemButton: true,
+        // placeholder: false,
+        // placeholderValue: 'This is a placeholder',
+        maxItemCount: 1,
+        searchFloor: 0,
+        searchResultLimit: 10,
+        noResultsText: 'No results found',
+        fuseOptions: {
+            threshold: 0.1,
+            // includeScore: true,
+            // includeMatches: true, //doesn't do anything as it's not integrated :(
+            tokenize: true,
+            distance: 1000
+        }
+    });
+    function conditionallyShowDropdown(str) {
+        if (str.length < 1) {
+            mainSearch.hideDropdown();
+        } else {
+            mainSearch.showDropdown();
+        }
+    }
+    function regexEscape(str) {
+        return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+    }
+    mainSearch.passedElement.addEventListener('showDropdown', function(event) {
+        if (mainSearch.currentState.items.length) {
+            if (mainSearch.currentState.items[mainSearch.currentState.items.length-1].active) {
+                // only show dropdown if something hasn't been selected
+                mainSearch.hideDropdown();
+                // hide placeholder text
+                $('.main-search .choices__input').attr("placeholder","  ");
+                // $('.choices__input').hide();
+            }
+        } else {
+            // show placeholder text
+            $('.main-search .choices__input').attr("placeholder","E.G. Breast cancer");
+            // show dropdown if nothing selected and a long enough string entered
+            conditionallyShowDropdown(mainSearch.currentValue);
+        }
+    }, false);
+    mainSearch.passedElement.addEventListener('search', function(event) {
+        var currentSearch = mainSearch.currentValue;
+        // highlight match, docs:
+        // https://github.com/jbr/jQuery.highlightRegex
+        $('.main-search .choices__list--dropdown').highlightRegex(); //clear
+        $('.main-search .choices__list--dropdown').highlightRegex(new RegExp(regexEscape(currentSearch),'ig'), {
+            tagType:   'span',
+            className: 'search-highlight'
+        });
+        conditionallyShowDropdown(currentSearch);
+    }, false);
+    mainSearch.passedElement.addEventListener('choice', function(event) {
+        // Hide form after selecting an option
+        mainSearch.hideDropdown();
+        // hide placeholder text
+        $('.main-search .choices__input').attr("placeholder","  ");
+        // drop the parenthetical
+        $('.main-search .choices__list .choices__item').text('test')
+        // To autosubmit on select
+        // $('form.main-search').submit();
+    }, false);
+    mainSearch.passedElement.addEventListener('removeItem', function(event) {
+        // show placeholder text
+        $('.main-search .choices__input').attr("placeholder","E.G. Breast cancer");
+    }, false);
+
+
+
+
     document.getElementsByClassName("javaScriptBrowser")[0].style.display = "block";
     //document.getElementsByClassName("javaScriptBrowser")[1].style.display = "block";
     var modelId = [[${externalId}]];
