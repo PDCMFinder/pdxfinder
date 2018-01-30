@@ -547,31 +547,54 @@
         if (str.length < 1) {
             mainSearch.hideDropdown();
         } else {
-            // mainSearch.showDropdown();
+            mainSearch.showDropdown();
         }
     }
     function regexEscape(str) {
         return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
     }
     mainSearch.passedElement.addEventListener('showDropdown', function(event) {
-        conditionallyShowDropdown(mainSearch.currentValue);
+        if (mainSearch.currentState.items.length) {
+            if (mainSearch.currentState.items[mainSearch.currentState.items.length-1].active) {
+                // only show dropdown if something hasn't been selected
+                mainSearch.hideDropdown();
+                // hide placeholder text
+                $('.main-search .choices__input').attr("placeholder","  ");
+                // $('.choices__input').hide();
+            }
+        } else {
+            // show placeholder text
+            $('.main-search .choices__input').attr("placeholder","E.G. Breast cancer");
+            // show dropdown if nothing selected and a long enough string entered
+            conditionallyShowDropdown(mainSearch.currentValue);
+        }
     }, false);
     mainSearch.passedElement.addEventListener('search', function(event) {
         var currentSearch = mainSearch.currentValue;
         // highlight match, docs:
         // https://github.com/jbr/jQuery.highlightRegex
-        $('.choices__list--dropdown').highlightRegex(); //clear
-        $('.choices__list--dropdown').highlightRegex(new RegExp(regexEscape(currentSearch),'ig'), {
+        $('.main-search .choices__list--dropdown').highlightRegex(); //clear
+        $('.main-search .choices__list--dropdown').highlightRegex(new RegExp(regexEscape(currentSearch),'ig'), {
             tagType:   'span',
             className: 'search-highlight'
         });
         conditionallyShowDropdown(currentSearch);
     }, false);
-    /*
     mainSearch.passedElement.addEventListener('choice', function(event) {
-        $('form.main-search').submit();
+        // Hide form after selecting an option
+        mainSearch.hideDropdown();
+        // hide placeholder text
+        $('.main-search .choices__input').attr("placeholder","  ");
+        // drop the parenthetical
+        $('.main-search .choices__list .choices__item').text('test')
+        // To autosubmit on select
+        // $('form.main-search').submit();
     }, false);
-    */
+    mainSearch.passedElement.addEventListener('removeItem', function(event) {
+        // show placeholder text
+        $('.main-search .choices__input').attr("placeholder","E.G. Breast cancer");
+    }, false);
+
 
     console.log("before updating");
 
