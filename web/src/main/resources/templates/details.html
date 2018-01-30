@@ -17,6 +17,7 @@
     <link rel="manifest" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/manifest.json?v=1">
     <link rel="mask-icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/safari-pinned-tab.svg?v=1" color="#0032a0">
     <link rel="shortcut icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon.ico?v=1">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
     <meta name="apple-mobile-web-app-title" content="PDX Finder">
     <meta name="application-name" content="PDX Finder">
     <meta name="msapplication-config" content="https://ebiwd.github.io/pdx-visual-framework/images/favicons/browserconfig.xml?v=1">
@@ -327,8 +328,8 @@
                                                                 <span class="hdc">Grade: </span>  <i></i>
                                                             </h4>
 
-                                                            <table id="pdxFinder-grid" th:height="50"
-                                                                   class="table  table-striped table-borderedPdx table-hover">
+                                                            <table id="pdxFinder-grid"
+                                                                   class="datatable-pdx display" cellspacing="0" width="100%">
 
                                                                 <thead>
                                                                 <tr>
@@ -388,7 +389,7 @@
                                                                 </h4>
 
                                                                 <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
-                                                                       class="table  table-striped table-borderedPdx table-hover" th:height="50"> <!-- table-condensed -->
+                                                                       class="datatable-pdx" th:height="50"> <!-- table-condensed -->
 
 
                                                                     <thead>
