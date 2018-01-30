@@ -61,8 +61,8 @@ public class GraphService {
         for (OntologyTerm ontologyTerm : ontologyTerms) {
             if (ontologyTerm.getLabel() != null) {
 
-                int mappedNumber = ontologyTerm.getDirectMappedSamplesNumber() + ontologyTerm.getIndirectMappedSamplesNumber();
-                dataReport.add(ontologyTerm.getLabel() + " (" + mappedNumber + ")");
+                //int mappedNumber = ontologyTerm.getDirectMappedSamplesNumber() + ontologyTerm.getIndirectMappedSamplesNumber();
+                dataReport.add(ontologyTerm.getLabel());
 
 
             }
