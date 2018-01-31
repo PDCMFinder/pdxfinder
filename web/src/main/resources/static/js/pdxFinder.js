@@ -96,9 +96,10 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
         jQuery.each(cancersystem, function(key, value){
 
             var id = value.name;
-            id = id.replace(" ","_");
+            id = id.replace(/ /g,"_");
             var selected = value.selected;
 
+            console.log("system id:"+id);
             //testing id for invalid characters
             if( reg.test(id)){
                 console.log("skipping id: "+id);
