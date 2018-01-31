@@ -20,9 +20,9 @@ public class Standardizer {
     
     // tumor types
     public static final String PRIMARY ="Primary";
-    public static final String RECURRANT = "Recurrant";
+    public static final String RECURRENT = "Recurrent";
     public static final String METASTATIC = "Metastatic";
-    public static final String REFACTORY = "Refactory";
+    public static final String REFRACTORY = "Refractory";
     
     
     private final static Logger log = LoggerFactory.getLogger(Standardizer.class);
@@ -50,9 +50,9 @@ public class Standardizer {
         }else if(tumorType.toUpperCase().startsWith("MET")){
             tumorType = METASTATIC;
         }else if(tumorType.toUpperCase().startsWith("REF")){
-            tumorType = REFACTORY;
+            tumorType = REFRACTORY;
         }else if(tumorType.toUpperCase().startsWith("REC")){
-            tumorType = RECURRANT;
+            tumorType = RECURRENT;
         }else{
             tumorType = NOT_SPECIFIED;
         }
