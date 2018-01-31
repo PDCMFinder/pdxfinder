@@ -37,9 +37,14 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
                 openAgeFacet = true;
             }
 
+            //Add a plus to patient age 90
+            if(id == '90') {
+                jQuery("#patient_age__"+id).siblings("label").find("span").append("+");
+            }
+
             var count = " ("+value.count+")";
             jQuery("#patient_age__"+id).siblings("label").find("span").append(count);
-            console.log(id+" "+count);
+
 
         });
 
