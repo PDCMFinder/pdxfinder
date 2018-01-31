@@ -11,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.utilities.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -158,10 +159,15 @@ public class LoadPDMRData implements CommandLineRunner {
 
         String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
 
-        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), j.getString("Gender"),
-                j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), DS);
+        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
+        String age = Standardizer.getAge(j.getString("Age"));
+        String gender = Standardizer.getGender(j.getString("Gender"));
 
-        Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), diagnosis,
+
+        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), gender,
+                j.getString("Race"), j.getString("Ethnicity"), age, DS);
+
+        Sample sample = loaderUtils.getSample(j.getString("Model ID"), tumorType, diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, DS.getAbbreviation());
 
         /*
