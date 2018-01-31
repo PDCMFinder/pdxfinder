@@ -77,7 +77,7 @@ public class SearchDS {
     public static List<String> SAMPLE_TUMOR_TYPE_OPTIONS = Arrays.asList(
             "Primary",
             "Metastatic",
-            "Recurrent or Relapse",
+            "Recurrent",
             "Refractory",
             "Not Specified"
             );
