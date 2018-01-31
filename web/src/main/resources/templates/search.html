@@ -93,16 +93,16 @@
             <header id="masthead" class="masthead" data-sticky data-options="marginTop: 0">
                 <div class="masthead-inner row">
                     <div class="columns medium-2 small-4 log-column" id="local-title">
-                        <h1><a th:href="@{/}" title="Back to PDXFinder homepage"><img src="images/logo.png"
-                                                                                      class="padding-15"/></a></h1>
+                        <h1><a th:href="/" title="Back to PDXFinder homepage"><img th:src="@{/images/logo.png}"
+                                                                                   class="padding-15"/></a></h1>
                     </div>
                     <!-- Desktop Menu-->
                     <div class="columns medium-10 menu-column padding-vertical-30 hide-for-small-only" id="local-nav">
                         <nav>
                             <ul id="local-nav2" class="dropdown menu main-menu float-right" data-dropdown-menu
                                 data-description="navigational">
-                                <li><a href="#">Home</a></li>
-                                <li class="active"><a href="/search">Search</a></li>
+                                <li><a href="/">Home</a></li>
+                                <li class="active"><a th:href="@{/search}">Search</a></li>
                                 <li><a href="#">PDX Standards</a></li>
                                 <li><a href="#">Methods</a></li>
                                 <li><a href="#">Contact</a></li>
@@ -120,12 +120,11 @@
 
         <!-- Suggested layout containers -->
         <section id="main-content-area" role="main">
-            <!-- Your menu structure should make a breadcrumb redundant, but if a breadcrump is needed uncomment the below -->
             <nav aria-label="You are here:" role="navigation">
                 <ul class="breadcrumbs row">
-                    <li><a th:href="@{/}">Home</a></li>
+                    <li><a href="/">Home</a></li>
                     <li>
-                        <span class="show-for-sr">Current: </span> Blank boilerplate
+                        <span class="show-for-sr">Current: </span> Search
                     </li>
                 </ul>
             </nav>
