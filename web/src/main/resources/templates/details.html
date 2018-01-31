@@ -34,7 +34,7 @@
     <link rel="stylesheet" href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/styles/css/choices.min.css">
     <!-- Use this CSS file for any custom styling -->
     <!--    <link rel="stylesheet" href="https://raw.githubusercontent.com/ebiwd/pdx-visual-framework/master/css/app.min.css" type="text/css" media="all" /> -->
-    <link rel="stylesheet" href="/css/app.min.css" type="text/css" media="all" />
+    <link rel="stylesheet" th:href="@{/css/app.min.css}" type="text/css" media="all"/>
 
     <!-- If you have a custom header image or colour -->
     <!--
@@ -48,8 +48,7 @@
     <!-- end CSS-->
 </head>
 
-<body class="level2"><!-- add any of your classes or IDs -->
-
+<body class="level2">
 
 <div class="expand-menu show-for-small-only">
     <div class="columns small-2 full-height close-wrapper text-center padding-vertical-15">
@@ -77,14 +76,15 @@
             <header id="masthead" class="masthead" data-sticky data-options="marginTop: 0">
                 <div class="masthead-inner row">
                     <div class="columns medium-2 small-4 log-column" id="local-title">
-                        <h1><a href="index.html" title="Back to [service-name] homepage"><img src="/images/logo.png" class="padding-15"/></a></h1>
+                        <h1><a th:href="@{/}" title="Back to PDXFinder homepage"><img th:src="@{/images/logo.png}"
+                                                                                      class="padding-15"/></a></h1>
                     </div>
                     <!-- Desktop Menu-->
                     <div class="columns medium-10 menu-column padding-vertical-30 hide-for-small-only" id="local-nav">
                         <nav>
                             <ul id="local-nav" class="dropdown menu main-menu float-right" data-dropdown-menu data-description="navigational">
-                                <li><a href="#">Home</a></li>
-                                <li><a href="/search">Search</a></li>
+                                <li><a th:href="@{/}">Home</a></li>
+                                <li><a th:href="@{/search}">Search</a></li>
                                 <li><a href="#">PDX Standards</a></li>
                                 <li><a href="#">Methods</a></li>
                                 <li><a href="#">Contact</a></li>
@@ -112,7 +112,7 @@
 
             <!-- Search FORM Section -->
             <section>
-                <form class="main-search" action="/search">
+                <form class="main-search" th:action="@{/search}">
                     <div class="row">
                         <fieldset>
                             <div class="margin-bottom-none small-collapse">
@@ -482,9 +482,9 @@
 <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
 <script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/scripts/dist/choices.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.highlightRegex/0.1.2/highlightRegex.min.js"></script>
-<script src="/js/script.js"></script>
-<script src="/js/jquery.dataTables.js"></script>
-<script src="/js/scroller.js"></script>
+<script th:src="@{/js/script.js}"></script>
+<script th:src="@{/js/jquery.dataTables.js}"></script>
+<script th:src="@{/js/scroller.js}"></script>
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
