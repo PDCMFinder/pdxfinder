@@ -74,8 +74,8 @@
 
     <div class="columns small-10 background-color-primary full-height">
         <ul class="vertical menu pdx-mobile-menu" data-responsive-menu="drilldown small-accordion">
-            <li><a href="#">Home</a></li>
-            <li class="active"><a href="/search">Search</a></li>
+            <li><a href="/">Home</a></li>
+            <li class="active"><a th:href="@{/search}">Search</a></li>
             <li><a href="#">PDX Standards</a></li>
             <li><a href="#">Methods</a></li>
             <li><a href="#">Contact</a></li>
@@ -93,8 +93,8 @@
             <header id="masthead" class="masthead" data-sticky data-options="marginTop: 0">
                 <div class="masthead-inner row">
                     <div class="columns medium-2 small-4 log-column" id="local-title">
-                        <h1><a th:href="/" title="Back to PDXFinder homepage"><img th:src="@{/images/logo.png}"
-                                                                                   class="padding-15"/></a></h1>
+                        <h1><a href="/" title="Back to PDXFinder homepage"><img th:src="@{/images/logo.png}"
+                                                                                class="padding-15"/></a></h1>
                     </div>
                     <!-- Desktop Menu-->
                     <div class="columns medium-10 menu-column padding-vertical-30 hide-for-small-only" id="local-nav">
