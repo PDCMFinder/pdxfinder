@@ -1,6 +1,8 @@
 $(document).foundation();
 
 $(document).ready(function () {
+
+  /*
   // Datatable Initialize. 
   $('#example-datatable').DataTable({
     columnDefs: [ {
@@ -14,7 +16,7 @@ $(document).ready(function () {
         orderData: [ 4, 0 ]
     } ]
   });
-
+*/
   $("[data-responsive-toggle]").click(function () {
     var targetMenuClass =  $(this).attr("data-responsive-toggle");
 
@@ -22,7 +24,7 @@ $(document).ready(function () {
     $("[class*='" + targetMenuClass + "']").toggleClass("open");
   });
 
-
+/*
   if($("select#varient").length > 0) {
     // Ajax Request for Varient Choices Select
     var varientRequest = function (callback) {
@@ -45,6 +47,7 @@ $(document).ready(function () {
     selectVarientChoices.ajax(varientRequest);
   }
 
+
   // Initialize Choices.
   if($(".choices").length > 0) {
     var multiSelectChoices = new Choices('.choices[multiple]', {
@@ -65,5 +68,5 @@ $(document).ready(function () {
     $(this).hide();
   });
 
-
+*/
 });
