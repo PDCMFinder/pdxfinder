@@ -575,25 +575,25 @@
     //document.getElementsByClassName("javaScriptBrowser")[1].style.display = "block";
     var modelId = [[${externalId}]];
     var dataSrc = [[${dataSrc}]];
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
         console.log("ready");
         var modelInfo = [[${modelInfo}]];
-        var apiURL = "/patientdata/"+dataSrc+"/"+modelId;
+        var apiURL = "/data/patientdata/"+dataSrc+"/"+modelId;
 
 
         drawTable("pdxFinder-grid",apiURL);
         for (var tech in modelInfo){
-            console.log(tech);
+            //console.log(tech);
 
             var counter=1;
             for (var passage in modelInfo[tech]){
-                console.log(modelInfo[tech][passage]);
+                //console.log(modelInfo[tech][passage]);
                 var dTech = tech.replace(" ", "-");
-                console.log(dTech);
-                apiURL = "/modeldata/"+dataSrc+"/"+modelId+"?platform="+tech+"&passage="+modelInfo[tech][passage];
+                //console.log(dTech);
+                apiURL = "/data/modeldata/"+dataSrc+"/"+modelId+"?platform="+tech+"&passage="+modelInfo[tech][passage];
                 var tableId = "pdxFinder-grid"+dTech+counter;
                 drawTable(tableId,apiURL);
-                console.log(tableId);
+                //console.log(tableId);
                 console.log(apiURL);
                 counter++;
             }
