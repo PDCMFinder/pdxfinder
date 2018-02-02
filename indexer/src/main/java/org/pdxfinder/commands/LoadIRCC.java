@@ -142,6 +142,11 @@ public class LoadIRCC implements CommandLineRunner {
         loaderUtils.savePatientSnapshot(pSnap);
 
         QualityAssurance qa = new QualityAssurance();
+        
+        if("TRUE".equals(job.getString("Fingerprinting").toUpperCase())){
+            qa.setValidationTechniques(ValidationTechniques.FINGERPRINT);
+            
+        }
 
         ModelCreation modelCreation = loaderUtils.createModelCreation(id, this.irccDS.getAbbreviation(), ptSample, qa);
 
@@ -181,6 +186,8 @@ public class LoadIRCC implements CommandLineRunner {
             modelCreation.addRelatedSample(specSample);
 
         }
+        
+        // fingerprinting fingerpainting fingerpointing
 
         loaderUtils.saveModelCreation(modelCreation);
 
