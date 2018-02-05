@@ -1,7 +1,6 @@
 package org.pdxfinder.web.controllers;
 
 import org.pdxfinder.services.AutoCompleteService;
-import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.ds.AutoSuggestOption;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
