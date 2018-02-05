@@ -1,6 +1,8 @@
 package org.pdxfinder.web.controllers;
 
+import org.pdxfinder.services.AutoCompleteService;
 import org.pdxfinder.services.GraphService;
+import org.pdxfinder.services.ds.AutoSuggestOption;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,25 +16,17 @@ import java.util.Set;
 @RestController
 public class AutoSuggestController {
 
-    private GraphService graphService;
+    private AutoCompleteService autoCompleteService;
 
-    public AutoSuggestController(GraphService graphService) {
-        this.graphService = graphService;
+    public AutoSuggestController(AutoCompleteService autoCompleteService) {
+        this.autoCompleteService = autoCompleteService;
     }
-
-
 
     @RequestMapping(value = "/autosuggests")
     List<AutoSuggestOption> getAutoSuggestList(){
-        List<AutoSuggestOption> autoSuggestList = new ArrayList<>();
 
-        Set<String> ncitTerms = graphService.getMappedNCITTerms();
 
-        for(String term:ncitTerms){
-            autoSuggestList.add(new AutoSuggestOption(term, "OntologyTerm"));
-        }
-
-        return autoSuggestList;
+        return autoCompleteService.getAutoSuggestions();
 
     }
 
