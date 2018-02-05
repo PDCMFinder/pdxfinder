@@ -5082,7 +5082,7 @@ form.main-search {
       display: none; }
     form.main-search .choices .choices__inner {
       background: #fefefe;
-      padding-bottom: 4px; }
+      padding: 8px .5rem 9px; }
     form.main-search .choices .search-highlight {
       border-bottom: 2px solid #00b2d5; }
   form.main-search.icon-2 {
@@ -5261,8 +5261,10 @@ ul.pagination.pdx-pagination li {
   background: #58636b;
   color: #fefefe;
   float: left;
-  padding: 10px 15px;
-  margin-right: 5px; }
+  height: 45px;
+  min-width: 40px;
+  margin-right: 5px;
+  line-height: 40px; }
   ul.pagination.pdx-pagination li.pagination-previous, ul.pagination.pdx-pagination li.pagination-next {
     background: #73cfaf; }
   ul.pagination.pdx-pagination li.current {
@@ -5272,8 +5274,7 @@ ul.pagination.pdx-pagination li {
   ul.pagination.pdx-pagination li.ellipsis::after {
     color: #fefefe; }
   ul.pagination.pdx-pagination li a {
-    color: #fefefe;
-    padding: 0; }
+    color: #fefefe; }
     ul.pagination.pdx-pagination li a:hover {
       background: transparent; }
 
@@ -5326,7 +5327,8 @@ ul.pdx-accordion-2 a.accordion-title {
   position: relative;
   padding: 10px !important;
   overflow: hidden;
-  margin-top: 0; }
+  margin-top: 0;
+  font-size: 1rem; }
   ul.pdx-accordion-2 a.accordion-title:after {
     position: absolute;
     right: -1px;
