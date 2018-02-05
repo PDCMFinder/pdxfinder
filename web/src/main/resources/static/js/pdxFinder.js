@@ -228,7 +228,7 @@ function redirectPage(){
             }
 
             if( ! reg.test(res[1])){
-                url = url+res[0]+"="+encodeURIComponent(res[1].replace("_"," "));
+                url = url+res[0]+"="+encodeURIComponent(res[1].replace(/_/g, ' '));
                 no_parameters = false;
 
             }
