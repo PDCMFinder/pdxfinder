@@ -509,7 +509,12 @@
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
-    var searchStates = [[ ${mappedTerm} ]];
+    var searchOptions = [[ ${autoCompleteList} ]];
+    var searchStates = [];
+
+    for(var i=0; i<searchOptions.length;i++){
+        searchStates.push(searchOptions[i].value);
+    }
 
     var ageFilters = [[${patient_age_selected}]];
     var dsFilters = [[${datasource_selected}]];
