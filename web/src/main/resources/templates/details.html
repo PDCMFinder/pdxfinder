@@ -58,8 +58,9 @@
     <div class="columns small-10 background-color-primary full-height">
         <ul class="vertical menu pdx-mobile-menu" data-responsive-menu="drilldown small-accordion">
             <li><a href="/">Home</a></li>
+            <li><a href="/about/">About</a></li>
             <li><a th:href="@{/search}">Search</a></li>
-            <li><a href="/pdx-standards/">PDX Standards</a></li>
+            <li><a href="/pdx-standard/">PDX Standards</a></li>
             <li><a href="/pdx-data-submission-integration-and-distribution/">Methods</a></li>
             <li><a href="/get-in-touch-with-us/">Contact</a></li>
         </ul>
@@ -85,7 +86,8 @@
                             <ul id="local-nav3" class="dropdown menu main-menu float-right" data-dropdown-menu data-description="navigational">
                                 <li><a href="/">Home</a></li>
                                 <li><a th:href="@{/search}">Search</a></li>
-                                <li><a href="/pdx-standards/">PDX Standards</a></li>
+                                <li><a href="/about/">About</a></li>
+                                <li><a href="/pdx-standard/">PDX Standards</a></li>
                                 <li><a href="/pdx-data-submission-integration-and-distribution/">Methods</a></li>
                                 <li><a href="/get-in-touch-with-us/">Contact</a></li>
                             </ul>
@@ -121,15 +123,16 @@
                             <div class="margin-bottom-none small-collapse">
                                 <!-- Large screen -->
                                 <div class="columns small-2 small-push-2 margin-bottom-small padding-top-large hide-for-small-only">
-                                    Enter your search here
+                                    <!-- Enter your search here -->
                                 </div>
                                 <!-- Small screen-->
                                 <div class="columns small-7 medium-push-2 small-push-3  margin-bottom-none search-text-wrapper show-for-small-only">
-                                    Enter your search here
+                                    <!-- Enter your search here -->
                                 </div>
 
                                 <div class="columns small-7 medium-push-2 small-push-3  margin-bottom-none search-text-wrapper">
-                                    <select class="form-control" id="query" name="query" type="text" tabindex="2" placeholder="E.G. Breast cancer" multiple></select>
+                                    <select class="form-control" id="query" name="query" type="text" tabindex="2"
+                                            placeholder="Search (e.g. Melanoma)" multiple></select>
                                     <span class="form-error margin-top-small">
                         You need to enter a search query.
                     </span>
