@@ -543,7 +543,7 @@
             }
         } else {
             // show placeholder text
-            $('.main-search .choices__input').attr("placeholder","E.G. Breast cancer");
+            $('.main-search .choices__input').attr("placeholder","Search (e.g. Melanoma)");
             // show dropdown if nothing selected and a long enough string entered
             conditionallyShowDropdown(mainSearch.currentValue);
         }
@@ -571,7 +571,7 @@
     }, false);
     mainSearch.passedElement.addEventListener('removeItem', function(event) {
         // show placeholder text
-        $('.main-search .choices__input').attr("placeholder","E.G. Breast cancer");
+        $('.main-search .choices__input').attr("placeholder","Search (e.g. Melanoma)");
     }, false);
 
 

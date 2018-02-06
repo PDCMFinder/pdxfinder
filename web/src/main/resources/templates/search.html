@@ -148,12 +148,14 @@
 
                                 <div class="columns small-7 medium-push-2 small-push-3  margin-bottom-none search-text-wrapper">
 
-                                    <select class="form-control" id="query" name="query" type="text" tabindex="2"
-                                            placeholder="Search (e.g. Melanoma)" multiple>
+                                    <select class="form-control" id="query" name="query" type="text" tabindex="2"  th:if="${query == null || query == ''}" placeholder="Search (e.g. Melanoma)" multiple></select>
 
-                                    <option th:if="${query != null && query != ''}" th:attr="selected='selected'" th:text="${query}"/>
+                                    <select class="form-control" id="query" name="query" type="text" tabindex="2"  th:if="${query != null && query != ''}" multiple>
+
+                                        <option th:if="${query != null && query != ''}" th:attr="selected='selected'" th:text="${query}"/>
 
                                     </select>
+
                                     <!--
                                     <input id="query" class="margin-bottom-none" title="EBI Search" tabindex="2"
                                            type="text" name="query" value="" size="35" maxlength="2048"
@@ -571,7 +573,7 @@
             }
         } else {
             // show placeholder text
-            $('.main-search .choices__input').attr("placeholder","E.G. Breast cancer");
+            $('.main-search .choices__input').attr("placeholder","Search (e.g. Melanoma)");
             // show dropdown if nothing selected and a long enough string entered
             conditionallyShowDropdown(mainSearch.currentValue);
         }
@@ -599,7 +601,7 @@
     }, false);
     mainSearch.passedElement.addEventListener('removeItem', function(event) {
         // show placeholder text
-        $('.main-search .choices__input').attr("placeholder","E.G. Breast cancer");
+        $('.main-search .choices__input').attr("placeholder","Search (e.g. Melanoma)");
     }, false);
 
 
