@@ -1,9 +1,10 @@
-package org.pdxfinder.web.controllers;
+package org.pdxfinder.services.ds;
 
 /*
- * Created by csaba on 02/02/2018.
+ * Created by csaba on 05/02/2018.
  */
 public class AutoSuggestOption {
+
 
     private String value;
     private String context;

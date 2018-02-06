@@ -7,7 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.services.AutoCompleteService;
 import org.pdxfinder.services.GraphService;
+import org.pdxfinder.services.ds.AutoSuggestOption;
 import org.pdxfinder.services.ds.ModelForQuery;
 import org.pdxfinder.services.ds.SearchDS;
 import org.pdxfinder.services.ds.SearchFacetName;
@@ -32,6 +34,7 @@ public class SearchController {
     private final static Logger logger = LoggerFactory.getLogger(SearchController.class);
 
     private GraphService graphService;
+    private AutoCompleteService autoCompleteService;
     private SearchDS searchDS;
     private Map<String, List<String>> facets = new HashMap<>();
 
@@ -41,9 +44,10 @@ public class SearchController {
     List<String> patientGenderOptions = SearchDS.PATIENT_GENDERS;
     List<String> sampleTumorTypeOptions = SearchDS.SAMPLE_TUMOR_TYPE_OPTIONS;
 
-    public SearchController(GraphService graphService, SearchDS searchDS) {
+    public SearchController(GraphService graphService, SearchDS searchDS, AutoCompleteService autoCompleteService) {
         this.graphService = graphService;
         this.searchDS = searchDS;
+        this.autoCompleteService = autoCompleteService;
 
 
 
@@ -166,8 +170,8 @@ public class SearchController {
         int end = Math.min(begin + 7, numPages);
 
         //auto suggestions for the search field
-        Set<String> autoSuggestList = graphService.getMappedNCITTerms();
-        model.addAttribute("mappedTerm", autoSuggestList);
+        List<AutoSuggestOption> autoSuggestList = autoCompleteService.getAutoSuggestions();
+        model.addAttribute("autoCompleteList", autoSuggestList);
 
         model.addAttribute("numPages", numPages);
         model.addAttribute("beginIndex", begin);
