@@ -25,8 +25,8 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
 
     //AUTO-SUGGEST: Returns all OntologyTerms that have indirect/direct samples mapped to
     @Query("MATCH (st:OntologyTerm) " +
-            "WHERE st.indirectMappedSamplesNumber > 0 " +
-            "RETURN st")
+            "WHERE st.indirectMappedSamplesNumber > 0 OR st.directMappedSamplesNumber > 0 " +
+            "RETURN distinct st")
     Collection<OntologyTerm> findAllWithMappings();
 
     @Query("MATCH (ot:OntologyTerm) RETURN ot")
