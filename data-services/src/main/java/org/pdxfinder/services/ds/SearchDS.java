@@ -164,12 +164,17 @@ public class SearchDS {
             }
             // Model information
             Set<Specimen> specimens = mc.getSpecimens();
+            Set<String> hoststrains = new HashSet<>();
             if (specimens != null && specimens.size() > 0) {
 
-                Specimen s = specimens.iterator().next();
-                mfq.setModelBackgroundStrain(s.getBackgroundStrain().getSymbol());
-                mfq.setModelImplantationSite(s.getImplantationSite().getName());
-                mfq.setModelImplantationType(s.getImplantationType().getName());
+                for (Specimen s: specimens){
+                    hoststrains.add(s.getHostStrain().getName());
+
+                    mfq.setModelImplantationSite(s.getImplantationSite().getName());
+                    mfq.setModelImplantationType(s.getImplantationType().getName());
+                }
+                //Specimen s = specimens.iterator().next();
+                mfq.setModelHostStrain(hoststrains);
             }
 
             // Get all ancestor ontology terms (including self) into a set specific for this model
@@ -367,10 +372,10 @@ public class SearchDS {
                     result = result.stream().filter(x -> predicate.test(x.getModelImplantationType())).collect(Collectors.toSet());
                     break;
 
-                case model_background_strain:
+                case model_host_strain:
 
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.model_background_strain));
-                    result = result.stream().filter(x -> predicate.test(x.getModelBackgroundStrain())).collect(Collectors.toSet());
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.model_host_strain));
+                    result = result.stream().filter(x -> predicate.test(x.getModelHostStrain())).collect(Collectors.toSet());
                     break;
 
                 case system:

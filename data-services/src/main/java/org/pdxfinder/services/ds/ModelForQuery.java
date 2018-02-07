@@ -44,7 +44,7 @@ sampleTumorType
 
 modelImplantationSite
 modelImplantationType
-modelBackgroundStrain
+modelHostStrain
 
 */
 
@@ -56,6 +56,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,7 @@ import java.util.stream.Collectors;
         "sampleTumorType",
         "modelImplantationSite",
         "modelImplantationType",
-        "modelBackgroundStrain",
+        "modelHostStrain",
         "cancerSystem",
         "cancerOrgan",
         "cancerCellType",
@@ -123,8 +124,8 @@ public class ModelForQuery {
     @JsonProperty("Model Implantation Type")
     private String modelImplantationType;
 
-    @JsonProperty("Model Background Strain")
-    private String modelBackgroundStrain;
+    @JsonProperty("Model Host Strain")
+    private Set<String> modelHostStrain;
 
     @JsonProperty("Cancer Systems")
     private List<String> cancerSystem;
@@ -188,8 +189,8 @@ public class ModelForQuery {
             case model_implantation_type:
                 s = modelImplantationType;
                 break;
-            case model_background_strain:
-                s = modelBackgroundStrain;
+            case model_host_strain:
+                s = modelHostStrain.stream().collect(Collectors.joining("::"));;
                 break;
             case organ:
                 s = cancerOrgan;
@@ -304,12 +305,12 @@ public class ModelForQuery {
         this.modelImplantationType = modelImplantationType;
     }
 
-    public String getModelBackgroundStrain() {
-        return modelBackgroundStrain;
+    public Set<String> getModelHostStrain() {
+        return modelHostStrain;
     }
 
-    public void setModelBackgroundStrain(String modelBackgroundStrain) {
-        this.modelBackgroundStrain = modelBackgroundStrain;
+    public void setModelHostStrain(Set<String> modelHostStrain) {
+        this.modelHostStrain = modelHostStrain;
     }
 
     public String getDatasource() {

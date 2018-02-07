@@ -306,8 +306,8 @@ public class SearchService {
             dto.setSampleType(pdx.getImplantationType().getName());
         }
 
-        if (pdx != null && pdx.getBackgroundStrain() != null) {
-            dto.setStrain(pdx.getBackgroundStrain().getName());
+        if (pdx != null && pdx.getHostStrain() != null) {
+            dto.setStrain(pdx.getHostStrain().getName());
         }
 
         if (pdx != null && pdx.getImplantationSite() != null) {
