@@ -39,7 +39,7 @@ public class LoadIRCC implements CommandLineRunner {
     private final static String IRCC_DATASOURCE_NAME = "IRCC";
     private final static String IRCC_DATASOURCE_DESCRIPTION = "IRCC";
 
-    private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
+    private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
 
@@ -48,7 +48,7 @@ public class LoadIRCC implements CommandLineRunner {
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
-    private BackgroundStrain nsgBS;
+    private HostStrain nsgBS;
     private ExternalDataSource irccDS;
 
     private Options options;
@@ -96,7 +96,7 @@ public class LoadIRCC implements CommandLineRunner {
     private void parseJSON(String json) {
 
         irccDS = loaderUtils.getExternalDataSource(IRCC_DATASOURCE_ABBREVIATION, IRCC_DATASOURCE_NAME, IRCC_DATASOURCE_DESCRIPTION);
-        nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -157,7 +157,7 @@ public class LoadIRCC implements CommandLineRunner {
             Specimen specimen = loaderUtils.getSpecimen(modelCreation,
                     modelCreation.getSourcePdxId(), irccDS.getAbbreviation(), specimenJSON.getString("Passage"));
 
-            specimen.setBackgroundStrain(this.nsgBS);
+            specimen.setHostStrain(this.nsgBS);
 
             ImplantationSite is = new ImplantationSite(specimenJSON.getString("Engraftment Site"));
             specimen.setImplantationSite(is);

@@ -31,7 +31,7 @@ public class LoaderUtils {
     public static Option loadAll = new Option("LoadAll", false, "Load all PDX Finder data");
     
     private TumorTypeRepository tumorTypeRepository;
-    private BackgroundStrainRepository backgroundStrainRepository;
+    private HostStrainRepository hostStrainRepository;
     private ImplantationTypeRepository implantationTypeRepository;
     private ImplantationSiteRepository implantationSiteRepository;
     private ExternalDataSourceRepository externalDataSourceRepository;
@@ -53,7 +53,7 @@ public class LoaderUtils {
     private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
 
     public LoaderUtils(TumorTypeRepository tumorTypeRepository,
-                       BackgroundStrainRepository backgroundStrainRepository,
+                       HostStrainRepository hostStrainRepository,
                        ImplantationTypeRepository implantationTypeRepository,
                        ImplantationSiteRepository implantationSiteRepository,
                        ExternalDataSourceRepository externalDataSourceRepository,
@@ -73,7 +73,7 @@ public class LoaderUtils {
                        PlatformAssociationRepository platformAssociationRepository) {
 
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null");
-        Assert.notNull(backgroundStrainRepository, "backgroundStrainRepository cannot be null");
+        Assert.notNull(hostStrainRepository, "hostStrainRepository cannot be null");
         Assert.notNull(implantationTypeRepository, "implantationTypeRepository cannot be null");
         Assert.notNull(implantationSiteRepository, "implantationSiteRepository cannot be null");
         Assert.notNull(externalDataSourceRepository, "externalDataSourceRepository cannot be null");
@@ -87,7 +87,7 @@ public class LoaderUtils {
         Assert.notNull(molecularCharacterizationRepository, "molecularCharacterizationRepository cannot be null");
 
         this.tumorTypeRepository = tumorTypeRepository;
-        this.backgroundStrainRepository = backgroundStrainRepository;
+        this.hostStrainRepository = hostStrainRepository;
         this.implantationTypeRepository = implantationTypeRepository;
         this.implantationSiteRepository = implantationSiteRepository;
         this.externalDataSourceRepository = externalDataSourceRepository;
@@ -327,14 +327,16 @@ public class LoaderUtils {
         return tumorType;
     }
 
-    public BackgroundStrain getBackgroundStrain(String symbol, String name, String description, String url) {
-        BackgroundStrain bgStrain = backgroundStrainRepository.findByName(name);
-        if (bgStrain == null) {
+    public HostStrain getHostStrain(String name, String symbol, String url, String description) {
+
+        HostStrain hostStrain = hostStrainRepository.findBySymbol(symbol);
+
+        if (hostStrain == null) {
             log.info("Background Strain '{}' not found. Creating", name);
-            bgStrain = new BackgroundStrain(symbol, name, description, url);
-            backgroundStrainRepository.save(bgStrain);
+            hostStrain = new HostStrain(name, symbol, description, url);
+            hostStrainRepository.save(hostStrain);
         }
-        return bgStrain;
+        return hostStrain;
     }
 
     // is this bad? ... probably..

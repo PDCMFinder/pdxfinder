@@ -44,9 +44,12 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String JAX_DATASOURCE_ABBREVIATION = "JAX";
     private final static String JAX_DATASOURCE_NAME = "The Jackson Laboratory";
     private final static String JAX_DATASOURCE_DESCRIPTION = "The Jackson Laboratory PDX mouse models.";
-    private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
-    private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
+
+    private final static String NSG_BS_NAME = "NOD scid gamma";
+    private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<scid> Il2rg<tm1Wjl>/SzJ";
+    private final static String NSG_BS_DESC = "";
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
+
     private final static String HISTOLOGY_NOTE = "Pathologist assessment of patient tumor and pdx model tumor histology slides.";
     
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
@@ -54,7 +57,7 @@ public class LoadJAXData implements CommandLineRunner {
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
-    private BackgroundStrain nsgBS;
+    private HostStrain nsgBS;
     private ExternalDataSource jaxDS;
 
     private Options options;
@@ -126,7 +129,8 @@ public class LoadJAXData implements CommandLineRunner {
     private void parseJSON(String json) {
 
         jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
-        nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+
+        nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -343,8 +347,8 @@ public class LoadJAXData implements CommandLineRunner {
 
 
                 if(backgroundStrain != null){
-                    BackgroundStrain bs = new BackgroundStrain(backgroundStrain);
-                    specimen.setBackgroundStrain(bs);
+                    HostStrain bs = new HostStrain(backgroundStrain);
+                    specimen.setHostStrain(bs);
                 }
 
                 if(implantationSite != null){

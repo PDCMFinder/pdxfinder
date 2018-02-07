@@ -2,11 +2,11 @@ package org.pdxfinder.commands;
 
 import org.apache.commons.cli.*;
 import org.neo4j.ogm.session.Session;
-import org.pdxfinder.dao.BackgroundStrain;
+import org.pdxfinder.dao.HostStrain;
 import org.pdxfinder.dao.ImplantationSite;
 import org.pdxfinder.dao.ImplantationType;
 import org.pdxfinder.dao.TumorType;
-import org.pdxfinder.repositories.BackgroundStrainRepository;
+import org.pdxfinder.repositories.HostStrainRepository;
 import org.pdxfinder.repositories.ImplantationSiteRepository;
 import org.pdxfinder.repositories.ImplantationTypeRepository;
 import org.pdxfinder.repositories.TumorTypeRepository;
@@ -39,7 +39,7 @@ public class CreateBaseCommand implements CommandLineRunner {
     private HelpFormatter formatter;
 
     private TumorTypeRepository tumorTypeRepository;
-    private BackgroundStrainRepository backgroundStrainRepository;
+    private HostStrainRepository hostStrainRepository;
     private ImplantationTypeRepository implantationTypeRepository;
     private ImplantationSiteRepository implantationSiteRepository;
 
@@ -53,15 +53,15 @@ public class CreateBaseCommand implements CommandLineRunner {
         log.info("Setting up CreateBaseCommand option");
     }
 
-    public CreateBaseCommand(TumorTypeRepository tumorTypeRepository, BackgroundStrainRepository backgroundStrainRepository, ImplantationSiteRepository implantationSiteRepository, ImplantationTypeRepository implantationTypeRepository, Session session) {
+    public CreateBaseCommand(TumorTypeRepository tumorTypeRepository, HostStrainRepository hostStrainRepository, ImplantationSiteRepository implantationSiteRepository, ImplantationTypeRepository implantationTypeRepository, Session session) {
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository is null");
-        Assert.notNull(backgroundStrainRepository, "backgroundStrainRepository is null");
+        Assert.notNull(hostStrainRepository, "hostStrainRepository is null");
         Assert.notNull(implantationSiteRepository, "implantationSiteRepository is null");
         Assert.notNull(implantationTypeRepository, "implantationTypeRepository is null");
         Assert.notNull(session, "session is null");
 
         this.tumorTypeRepository = tumorTypeRepository;
-        this.backgroundStrainRepository = backgroundStrainRepository;
+        this.hostStrainRepository = hostStrainRepository;
         this.implantationSiteRepository = implantationSiteRepository;
         this.implantationTypeRepository = implantationTypeRepository;
         this.session = session;
@@ -129,35 +129,35 @@ public class CreateBaseCommand implements CommandLineRunner {
 
     private void createBackgroundStrains() {
 
-        List<BackgroundStrain> strains = new ArrayList<>();
+        List<HostStrain> strains = new ArrayList<>();
 
         // NOG strain
         strains.add(
-                new BackgroundStrain(
+                new HostStrain(
                         "NOD/Shi-scid/IL-2R\u03BB<null>",
                         "NOD scid gamma")
         );
 
         // NOD scid gamma strain
         strains.add(
-                new BackgroundStrain(
+                new HostStrain(
                         "NOD.Cg-Prkdc<scid> Il2rg<tm1Wjl>/SzJ",
                         "NOD scid gamma")
         );
 
         // NOD scid strain
         strains.add(
-                new BackgroundStrain(
+                new HostStrain(
                         "NOD.CB17-Prkdc<scid>/J",
                         "NOD scid")
         );
 
 
         // Save all background strains if they do not exist already
-        for (BackgroundStrain strain : strains) {
-            if (backgroundStrainRepository.findBySymbol(strain.getSymbol()) == null) {
+        for (HostStrain strain : strains) {
+            if (hostStrainRepository.findBySymbol(strain.getSymbol()) == null) {
                 log.info("  Creating background strain {} ({})", strain.getName(), strain.getSymbol());
-                backgroundStrainRepository.save(strain);
+                hostStrainRepository.save(strain);
             }
         }
     }

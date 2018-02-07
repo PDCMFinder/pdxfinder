@@ -47,7 +47,7 @@ public class LoadIRCCData implements CommandLineRunner {
     // hmm not sure about this
     private final static String MC_TECH = "Gene Panel";
 
-    private BackgroundStrain nsgBS;
+    private HostStrain nsgBS;
     private ExternalDataSource DS;
 
     private Options options;

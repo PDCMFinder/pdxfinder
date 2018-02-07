@@ -44,7 +44,8 @@ public class LoadPDMRData implements CommandLineRunner {
     private final static String DATASOURCE_ABBREVIATION = "PDMR";
     private final static String DATASOURCE_NAME = "National Cancer Institute";
     private final static String DATASOURCE_DESCRIPTION = "The NCI Patient-Derived Models Repository ";
-    private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
+
+    private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-PrkdcscidIl2rgtm1Wjl/SzJ";
     private final static String NSG_BS_URL = "";
     private final static String HISTOLOGY_NOTE = "";
@@ -53,7 +54,7 @@ public class LoadPDMRData implements CommandLineRunner {
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
-    private BackgroundStrain nsgBS;
+    private HostStrain nsgBS;
     private ExternalDataSource DS;
 
     private Options options;
@@ -124,7 +125,7 @@ public class LoadPDMRData implements CommandLineRunner {
     private void parseJSON(String json) {
 
         DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION);
-        nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         try {
             JSONObject job = new JSONObject(json);
