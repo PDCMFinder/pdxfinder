@@ -1,6 +1,6 @@
 package org.pdxfinder;
 
-import org.pdxfinder.dao.BackgroundStrain;
+import org.pdxfinder.dao.HostStrain;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,7 +13,7 @@ import java.util.List;
 @Configuration
 public class CuratedBackgroundStrains {
 
-    private List<BackgroundStrain> backgroundStrains;
+    private List<HostStrain> hostStrains;
 
 
 }

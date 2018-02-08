@@ -11,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.utilities.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +44,8 @@ public class LoadPDMRData implements CommandLineRunner {
     private final static String DATASOURCE_ABBREVIATION = "PDMR";
     private final static String DATASOURCE_NAME = "National Cancer Institute";
     private final static String DATASOURCE_DESCRIPTION = "The NCI Patient-Derived Models Repository ";
-    private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
+
+    private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-PrkdcscidIl2rgtm1Wjl/SzJ";
     private final static String NSG_BS_URL = "";
     private final static String HISTOLOGY_NOTE = "";
@@ -52,7 +54,7 @@ public class LoadPDMRData implements CommandLineRunner {
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
-    private BackgroundStrain nsgBS;
+    private HostStrain nsgBS;
     private ExternalDataSource DS;
 
     private Options options;
@@ -123,7 +125,7 @@ public class LoadPDMRData implements CommandLineRunner {
     private void parseJSON(String json) {
 
         DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION);
-        nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -158,10 +160,15 @@ public class LoadPDMRData implements CommandLineRunner {
 
         String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
 
-        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), j.getString("Gender"),
-                j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), DS);
+        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
+        String age = Standardizer.getAge(j.getString("Age"));
+        String gender = Standardizer.getGender(j.getString("Gender"));
 
-        Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), diagnosis,
+
+        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), gender,
+                j.getString("Race"), j.getString("Ethnicity"), age, DS);
+
+        Sample sample = loaderUtils.getSample(j.getString("Model ID"), tumorType, diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, DS.getAbbreviation());
 
         /*

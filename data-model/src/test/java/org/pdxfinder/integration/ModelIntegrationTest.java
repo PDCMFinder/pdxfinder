@@ -164,7 +164,7 @@ public class ModelIntegrationTest extends BaseTest {
                 new ImplantationSite(tissueName),
                 new ImplantationType("subcutis"),
                 sample,
-                new BackgroundStrain("TEST_STRAIN"),
+                new HostStrain("TEST_STRAIN"),
                 new QualityAssurance("test", "Test description", ValidationTechniques.VALIDATION));
 
         PdxPassage pdxPassage = new PdxPassage(modelCreation, 0);

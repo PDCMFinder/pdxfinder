@@ -3,6 +3,248 @@
  */
 
 
+
+
+function updateFilters(ages, genders, cancersystem, datasources, tumortype){
+
+    console.log("updating filters!");
+    //characters we want to see as values
+    var reg = /[^A-Za-z0-9 _-]/;
+
+    var openAgeFacet = false;
+    var openGenderFacet = false;
+    var openDatasourceFacet = false;
+    var openCancerBySystem = false;
+    var openTumorTypeFacet = false;
+
+    //check selected age bins
+    if(ages != null && ages.length>0){
+
+        jQuery.each(ages, function(key, value){
+
+            var id = value.name;
+            id = id.replace(" ","_");
+            var selected = value.selected;
+
+            //testing id for invalid characters
+            if( reg.test(id)){
+                console.log("skipping id: "+id);
+                return;
+            }
+
+            if(selected){
+                jQuery("#patient_age__"+id).prop('checked', true);
+                openAgeFacet = true;
+            }
+
+            //Add a plus to patient age 90
+            if(id == '90') {
+                jQuery("#patient_age__"+id).siblings("label").find("span").append("+");
+            }
+
+            var count = " ("+value.count+")";
+            jQuery("#patient_age__"+id).siblings("label").find("span").append(count);
+
+
+        });
+
+        if(openAgeFacet){
+            var ageFilterField = jQuery("li#age_filter > a.accordion-title");
+            ageFilterField.click();
+        }
+    }
+
+
+
+
+    //check selected gender options
+    if(genders != null && genders.length>0){
+
+        jQuery.each(genders, function(key, value){
+
+            var id = value.name;
+            id = id.replace(" ","_");
+            var selected = value.selected;
+
+            //testing id for invalid characters
+            if( reg.test(id)){
+                console.log("skipping id: "+id);
+                return;
+            }
+
+            if(selected){
+                jQuery("#patient_gender__"+id).prop('checked', true);
+                openGenderFacet = true;
+            }
+
+            var count = " ("+value.count+")";
+            jQuery("#patient_gender__"+id).siblings("label").find("span").append(count);
+            console.log(id+" "+count);
+
+        });
+
+        if(openGenderFacet){
+            var genderFilterField = jQuery("li#gender_filter > a.accordion-title");
+            genderFilterField.click();
+        }
+    }
+
+
+    //check selected cancer systems
+    if(cancersystem != null && cancersystem.length>0){
+
+        jQuery.each(cancersystem, function(key, value){
+
+            var id = value.name;
+            id = id.replace(/ /g,"_");
+            var selected = value.selected;
+
+            console.log("system id:"+id);
+            //testing id for invalid characters
+            if( reg.test(id)){
+                console.log("skipping id: "+id);
+                return;
+            }
+
+            if(selected){
+                jQuery("#cancer_system__"+id).prop('checked', true);
+                openCancerBySystem = true;
+            }
+
+            var count = " ("+value.count+")";
+            jQuery("#cancer_system__"+id).siblings("label").find("span").append(count);
+
+        });
+
+        if(openCancerBySystem){
+            var cancerSystemFilterField = jQuery("li#cancer_system_filter > a.accordion-title");
+            cancerSystemFilterField.click();
+        }
+    }
+
+
+    //check selected datasources
+    if(datasources != null && datasources.length>0) {
+
+        jQuery.each(datasources, function (key, value) {
+
+            var id = value.name;
+            id = id.replace(" ","_");
+            var selected = value.selected;
+
+            //testing id for invalid characters
+            if (reg.test(id)) {
+                console.log("skipping id: " + id);
+                return;
+            }
+
+            if (selected) {
+                jQuery("#datasource__" + id).prop('checked', true);
+                openDatasourceFacet = true;
+            }
+
+            var count = " (" + value.count + ")";
+            jQuery("#datasource__" + id).siblings("label").find("span").append(count);
+
+        });
+
+        if (openDatasourceFacet) {
+            var dsFilterField = jQuery("li#datasource_filter > a.accordion-title");
+            dsFilterField.click();
+        }
+
+
+    }
+
+    //check selected tumorTypes
+    if(tumortype != null && tumortype.length>0) {
+
+        jQuery.each(tumortype, function (key, value) {
+
+            var id = value.name;
+            id = id.replace(" ","_");
+            var selected = value.selected;
+
+            //testing id for invalid characters
+            if (reg.test(id)) {
+                console.log("skipping id: " + id);
+                return;
+            }
+
+            if (selected) {
+                jQuery("#sample_tumor_type__" + id).prop('checked', true);
+                openTumorTypeFacet = true;
+            }
+
+            var count = " (" + value.count + ")";
+            jQuery("#sample_tumor_type__" + id).siblings("label").find("span").append(count);
+
+        });
+
+        if (openTumorTypeFacet) {
+            var ttFilterField = jQuery("li#tumor_type_filter > a.accordion-title");
+            ttFilterField.click();
+        }
+
+
+    }
+
+
+
+
+
+
+
+}
+
+
+function redirectPage(){
+
+    var no_parameters = true;
+    var url = "?"
+
+    var searchField = jQuery("#query");
+
+    if (searchField.val() != null && searchField.val() != "") {
+        url+="query="+searchField.val();
+        no_parameters = false;
+    }
+
+
+    //get all filters with values
+    jQuery(".filter").each(function(){
+        var id = jQuery(this).attr("id");
+
+        //characters we want to see as values
+        var reg = /[^A-Za-z0-9 _-]/;
+
+        if (jQuery(this).is(':checked')){
+
+
+            var res = id.split("__");
+
+            if(!no_parameters){
+                url = url+"&";
+            }
+
+            if( ! reg.test(res[1])){
+                url = url+res[0]+"="+encodeURIComponent(res[1].replace(/_/g, ' '));
+                no_parameters = false;
+
+            }
+        }
+        else if(jQuery(this).is("input:text")){
+            return;
+        }
+
+
+    });
+    console.log(url);
+
+    window.location.replace(url);
+}
+
+
 //GLOBAL for displaying tooltips
 
 var markerDefs = {};

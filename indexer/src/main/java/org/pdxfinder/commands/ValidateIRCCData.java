@@ -47,7 +47,7 @@ public class ValidateIRCCData implements CommandLineRunner {
     // hmm not sure about this
     private final static String MC_TECH = "Gene Panel";
 
-    private BackgroundStrain nsgBS;
+    private HostStrain nsgBS;
     private ExternalDataSource DS;
 
     private Options options;
@@ -82,7 +82,7 @@ public class ValidateIRCCData implements CommandLineRunner {
         parser.accepts("loadALL", "Load all, including validating IRCC data");
         OptionSet options = parser.parse(args);
 
-        if (options.has("validateIRCC") || options.has("loadALL")) {
+        if (options.has("validateIRCC")) {
 
             log.info("Loading IRCC PDX data.");
 
@@ -311,7 +311,7 @@ public class ValidateIRCCData implements CommandLineRunner {
 
         //Loading data to Neo4j
         DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION);
-        //nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        //nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         int counter = 0;
         for (Map.Entry<String, List<IRCCSample>> entry : this.samplesMap.entrySet()) {

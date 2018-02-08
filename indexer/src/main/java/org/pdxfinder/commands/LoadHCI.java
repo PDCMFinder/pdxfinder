@@ -40,7 +40,7 @@ public class LoadHCI implements CommandLineRunner {
     private final static String HCI_DATASOURCE_NAME = "HCI BCM";
     private final static String HCI_DATASOURCE_DESCRIPTION = "HCI BCM PDX mouse models for PDXNet.";
 
-    private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
+    private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
 
@@ -49,7 +49,7 @@ public class LoadHCI implements CommandLineRunner {
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
-    private BackgroundStrain nsgBS;
+    private HostStrain nsgBS;
     private ExternalDataSource hciDS;
 
     private Options options;
@@ -97,7 +97,7 @@ public class LoadHCI implements CommandLineRunner {
     private void parseJSON(String json) {
 
         hciDS = loaderUtils.getExternalDataSource(HCI_DATASOURCE_ABBREVIATION, HCI_DATASOURCE_NAME, HCI_DATASOURCE_DESCRIPTION);
-        nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -135,9 +135,13 @@ public class LoadHCI implements CommandLineRunner {
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
                 gender, "", j.getString("Ethnicity"), age, hciDS);
 
-        // asssume specimen site is primary site?
-        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), NOT_SPECIFIED,
+        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
+        
+        String sampleSite = Standardizer.getValue("Sample Site",j);
+        System.out.println("Sample Site="+sampleSite);
+        
+        Sample sample = loaderUtils.getSample(id, tumorType, diagnosis,
+                j.getString("Primary Site"), sampleSite,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, hciDS.getAbbreviation());
 
         pSnap.addSample(sample);
@@ -189,7 +193,7 @@ public class LoadHCI implements CommandLineRunner {
                         modelCreation.getSourcePdxId(), hciDS.getAbbreviation(), passage);
                 specimen.setSample(sample);
 
-                specimen.setBackgroundStrain(this.nsgBS);
+                specimen.setHostStrain(this.nsgBS);
 
                 ImplantationSite is = new ImplantationSite(engraftmentSite);
                 specimen.setImplantationSite(is);

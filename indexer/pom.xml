@@ -38,7 +38,11 @@
             <artifactId>jopt-simple</artifactId>
             <version>4.8</version>
         </dependency>
-             
+        <dependency>
+            <groupId>org.pdxfinder</groupId>
+            <artifactId>data-services</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -45,7 +45,7 @@ public class LoadMDAnderson implements CommandLineRunner {
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
-    //   private BackgroundStrain nsgBS;
+    //   private HostStrain nsgBS;
     private ExternalDataSource mdaDS;
 
     private Options options;
@@ -95,7 +95,7 @@ public class LoadMDAnderson implements CommandLineRunner {
     private void parseJSON(String json) {
 
         mdaDS = loaderUtils.getExternalDataSource(MDA_DATASOURCE_ABBREVIATION, MDA_DATASOURCE_NAME, MDA_DATASOURCE_DESCRIPTION);
-        //      nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -149,8 +149,9 @@ public class LoadMDAnderson implements CommandLineRunner {
         
         String sampleSite = Standardizer.getValue("Sample Site",j);
         
+        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
        
-        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
+        Sample sample = loaderUtils.getSample(id, tumorType, diagnosis,
                 j.getString("Primary Site"), sampleSite,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
 
@@ -167,7 +168,7 @@ public class LoadMDAnderson implements CommandLineRunner {
                 NOT_SPECIFIED, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
         String strain = j.getString("Strain");
-        BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
+        HostStrain bs = loaderUtils.getHostStrain(strain, strain, "", "");
 
         String engraftmentSite = Standardizer.getValue("Engraftment Site",j);
         
@@ -221,7 +222,7 @@ public class LoadMDAnderson implements CommandLineRunner {
                 Specimen specimen = loaderUtils.getSpecimen(modelCreation,
                         modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
                 
-                specimen.setBackgroundStrain(bs);
+                specimen.setHostStrain(bs);
                 
                 ImplantationSite is = new ImplantationSite(engraftmentSite);
                 specimen.setImplantationSite(is);

@@ -44,7 +44,7 @@ public class LoadWUSTL implements CommandLineRunner {
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
-    //   private BackgroundStrain nsgBS;
+    //   private HostStrain nsgBS;
     private ExternalDataSource mdaDS;
 
     private Options options;
@@ -94,7 +94,7 @@ public class LoadWUSTL implements CommandLineRunner {
     private void parseJSON(String json) {
 
         mdaDS = loaderUtils.getExternalDataSource(WUSTL_DATASOURCE_ABBREVIATION, WUSTL_DATASOURCE_NAME, WUSTL_DATASOURCE_DESCRIPTION);
-        //      nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -142,8 +142,15 @@ public class LoadWUSTL implements CommandLineRunner {
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
                 gender, "", race, age, mdaDS);
 
-        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), NOT_SPECIFIED,
+        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
+        String primarySite = j.getString("Primary Site");
+
+        if(primarySite.length() <= 2){
+            primarySite = NOT_SPECIFIED;
+        }
+
+        Sample sample = loaderUtils.getSample(id, tumorType, diagnosis,
+                primarySite, NOT_SPECIFIED,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
 
         pSnap.addSample(sample);
@@ -158,7 +165,7 @@ public class LoadWUSTL implements CommandLineRunner {
                 NOT_SPECIFIED, ValidationTechniques.VALIDATION);
         loaderUtils.saveQualityAssurance(qa);
         String strain = j.getString("Strain");
-        BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
+        HostStrain bs = loaderUtils.getHostStrain(strain, strain, "", "");
 
         String engraftmentSite = Standardizer.getValue("Engraftment Site", j);
 
@@ -212,7 +219,7 @@ public class LoadWUSTL implements CommandLineRunner {
                         modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
                 specimen.setSample(sample);
 
-                specimen.setBackgroundStrain(bs);
+                specimen.setHostStrain(bs);
 
                 ImplantationSite is = new ImplantationSite(engraftmentSite);
                 specimen.setImplantationSite(is);

@@ -43,7 +43,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
-    //   private BackgroundStrain nsgBS;
+    //   private HostStrain nsgBS;
     private ExternalDataSource wistarDS;
 
     private Options options;
@@ -87,7 +87,7 @@ public class LoadWISTAR implements CommandLineRunner {
     private void parseJSON(String json) {
 
         wistarDS = loaderUtils.getExternalDataSource(WISTAR_DATASOURCE_ABBREVIATION, WISTAR_DATASOURCE_NAME, WISTAR_DATASOURCE_DESCRIPTION);
-        //      nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -147,8 +147,9 @@ public class LoadWISTAR implements CommandLineRunner {
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
                 gender, "", race, age, wistarDS);
+         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
 
-        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
+        Sample sample = loaderUtils.getSample(id, tumorType, diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"),
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS.getAbbreviation());
 
@@ -169,7 +170,7 @@ public class LoadWISTAR implements CommandLineRunner {
         loaderUtils.saveQualityAssurance(qa);
 
         String strain = j.getString("Strain");
-        BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
+        HostStrain bs = loaderUtils.getHostStrain(strain, strain, "", "");
 
         String engraftmentSite = Standardizer.getValue("Engraftment Site", j);
 
@@ -181,7 +182,7 @@ public class LoadWISTAR implements CommandLineRunner {
         Specimen specimen = loaderUtils.getSpecimen(modelCreation,
                 modelCreation.getSourcePdxId(), wistarDS.getAbbreviation(), NOT_SPECIFIED);
 
-        specimen.setBackgroundStrain(bs);
+        specimen.setHostStrain(bs);
 
         ImplantationSite is = new ImplantationSite(engraftmentSite);
         specimen.setImplantationSite(is);

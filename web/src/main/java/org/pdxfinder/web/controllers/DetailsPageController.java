@@ -1,6 +1,7 @@
 package org.pdxfinder.web.controllers;
 
 import org.pdxfinder.dao.Specimen;
+import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
@@ -23,10 +24,13 @@ import java.util.Set;
 public class DetailsPageController {
 
     private SearchService searchService;
+    private GraphService graphService;
+
 
     @Autowired
-    public DetailsPageController(SearchService searchService) {
+    public DetailsPageController(SearchService searchService, GraphService graphService) {
         this.searchService = searchService;
+        this.graphService = graphService;
     }
 
     @RequestMapping(value = "/pdx/{dataSrc}/{modelId}")
@@ -50,6 +54,10 @@ public class DetailsPageController {
         }
 
         // dto.setTotalPages((int) Math.ceil(totalRecords/dSize) );
+
+        //auto suggestions for the search field
+        Set<String> autoSuggestList = graphService.getMappedNCITTerms();
+        model.addAttribute("mappedTerm", autoSuggestList);
 
 
         model.addAttribute("nonjsVariationdata", variationDataDTOList);

@@ -4,9 +4,6 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Created by jmason on 06/06/2017.
  */
@@ -33,8 +30,8 @@ public class Specimen {
     @Relationship(type = "IMPLANTATION_TYPE")
     private ImplantationType implantationType;
 
-    @Relationship(type = "BACKGROUND_STRAIN")
-    private BackgroundStrain backgroundStrain;
+    @Relationship(type = "HOST_STRAIN")
+    private HostStrain hostStrain;
 
 
     public Specimen() {
@@ -89,11 +86,11 @@ public class Specimen {
         this.implantationType = implantationType;
     }
 
-    public BackgroundStrain getBackgroundStrain() {
-        return backgroundStrain;
+    public HostStrain getHostStrain() {
+        return hostStrain;
     }
 
-    public void setBackgroundStrain(BackgroundStrain backgroundStrain) {
-        this.backgroundStrain = backgroundStrain;
+    public void setHostStrain(HostStrain hostStrain) {
+        this.hostStrain = hostStrain;
     }
 }

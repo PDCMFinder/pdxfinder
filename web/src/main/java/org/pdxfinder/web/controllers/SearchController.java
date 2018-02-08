@@ -1,16 +1,29 @@
 package org.pdxfinder.web.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.services.AutoCompleteService;
 import org.pdxfinder.services.GraphService;
+import org.pdxfinder.services.ds.AutoSuggestOption;
+import org.pdxfinder.services.ds.ModelForQuery;
+import org.pdxfinder.services.ds.SearchDS;
+import org.pdxfinder.services.ds.SearchFacetName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by jmason on 16/03/2017.
@@ -18,13 +31,319 @@ import java.util.Set;
 @Controller
 public class SearchController {
 
-    private GraphService graphService;
+    private final static Logger logger = LoggerFactory.getLogger(SearchController.class);
 
-    public SearchController(GraphService graphService) {
+    private GraphService graphService;
+    private AutoCompleteService autoCompleteService;
+    private SearchDS searchDS;
+    private Map<String, List<String>> facets = new HashMap<>();
+
+    List<String> patientAgeOptions = SearchDS.PATIENT_AGE_OPTIONS;
+    List<String> datasourceOptions = SearchDS.DATASOURCE_OPTIONS;
+    List<String> cancerBySystemOptions = SearchDS.CANCERS_BY_SYSTEM;
+    List<String> patientGenderOptions = SearchDS.PATIENT_GENDERS;
+    List<String> sampleTumorTypeOptions = SearchDS.SAMPLE_TUMOR_TYPE_OPTIONS;
+
+    public SearchController(GraphService graphService, SearchDS searchDS, AutoCompleteService autoCompleteService) {
         this.graphService = graphService;
+        this.searchDS = searchDS;
+        this.autoCompleteService = autoCompleteService;
+
+
+
+        facets.put("datasource_options", datasourceOptions);
+        facets.put("patient_age_options", patientAgeOptions);
+        facets.put("patient_gender_options", patientGenderOptions);
+        facets.put("cancer_system_options", cancerBySystemOptions);
+        facets.put("sample_tumor_type_options", sampleTumorTypeOptions);
+
     }
 
+    @RequestMapping("/search/export")
+    @ResponseBody
+    String export(HttpServletResponse response,
+                  @RequestParam("query") Optional<String> query,
+                  @RequestParam("datasource") Optional<List<String>> datasource,
+                  @RequestParam("patient_age") Optional<List<String>> patient_age,
+                  @RequestParam("patient_treatment_status") Optional<List<String>> patient_treatment_status,
+                  @RequestParam("patient_gender") Optional<List<String>> patient_gender,
+                  @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
+                  @RequestParam("cancer_system") Optional<List<String>> cancer_system,
+                  @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type
+    ) {
+
+        Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
+                query,
+                datasource,
+                patient_age,
+                patient_treatment_status,
+                patient_gender,
+                sample_origin_tissue,
+                cancer_system,
+                sample_tumor_type
+        );
+
+        Set<ModelForQuery> results = searchDS.search(configuredFacets);
+
+        CsvMapper mapper = new CsvMapper();
+        CsvSchema schema = mapper.schemaFor(ModelForQuery.class).withHeader();
+        String output = "CSV output for configured values " + configuredFacets.toString();
+        try {
+            output = mapper.writer(schema).writeValueAsString(results);
+        } catch (JsonProcessingException e) {
+            logger.error("Could not convert result set to CSV file. Facetes: {}", configuredFacets.toString(), e);
+        }
+
+        response.setContentType("text/csv;charset=utf-8");
+        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder_search_export.csv");
+
+        return output;
+
+    }
+
+
     @RequestMapping("/search")
+    String search(Model model,
+                  @RequestParam("query") Optional<String> query,
+                  @RequestParam("datasource") Optional<List<String>> datasource,
+                  @RequestParam("patient_age") Optional<List<String>> patient_age,
+                  @RequestParam("patient_treatment_status") Optional<List<String>> patient_treatment_status,
+                  @RequestParam("patient_gender") Optional<List<String>> patient_gender,
+                  @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
+                  @RequestParam("cancer_system") Optional<List<String>> cancer_system,
+                  @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type,
+
+                  @RequestParam(value = "page", defaultValue = "1") Integer page,
+                  @RequestParam(value = "size", defaultValue = "10") Integer size
+    ) {
+
+        Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
+                query,
+                datasource,
+                patient_age,
+                patient_treatment_status,
+                patient_gender,
+                sample_origin_tissue,
+                cancer_system,
+                sample_tumor_type
+        );
+
+
+
+        Set<ModelForQuery> results = searchDS.search(configuredFacets);
+
+        List<FacetOption> patientAgeSelected = getFacetOptions(SearchFacetName.patient_age, patientAgeOptions, results, patient_age.orElse(null));
+        List<FacetOption> patientGenderSelected = getFacetOptions(SearchFacetName.patient_gender, patientGenderOptions, results, patient_gender.orElse(null));
+        List<FacetOption> datasourceSelected = getFacetOptions(SearchFacetName.datasource, datasourceOptions, results, datasource.orElse(null));
+        List<FacetOption> cancerSystemSelected = getFacetOptions(SearchFacetName.system, cancerBySystemOptions, results, cancer_system.orElse(null));
+        List<FacetOption> sampleTumorTypeSelected = getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
+
+
+        // Ensure to add the facet options to this list so the URL encoding retains the configured options
+        String facetString = getFacetString(
+                new HashSet<>(
+                        Arrays.asList(
+                                patientAgeSelected,
+                                patientGenderSelected,
+                                datasourceSelected,
+                                cancerSystemSelected,
+                                sampleTumorTypeSelected
+                        )
+                )
+        );
+
+        // If there is a query, append the query parameter to any configured facet string
+        if (query.isPresent() && !query.get().isEmpty()) {
+            facetString = StringUtils.join(Arrays.asList("query=" + query.get(), facetString), "&");
+        }
+
+        // Num pages is converted to an int using this formula int n = a / b + (a % b == 0) ? 0 : 1;
+        int numPages = results.size() / size + (results.size() % size == 0 ? 0 : 1);
+
+        // If there are no results, default to 1 page (instead of 0 pages)
+        if (numPages < 1) {
+            numPages = 1;
+        }
+
+        int current = page;
+        int begin = Math.max(1, current - 4);
+        int end = Math.min(begin + 7, numPages);
+
+        //auto suggestions for the search field
+        List<AutoSuggestOption> autoSuggestList = autoCompleteService.getAutoSuggestions();
+        model.addAttribute("autoCompleteList", autoSuggestList);
+
+        model.addAttribute("numPages", numPages);
+        model.addAttribute("beginIndex", begin);
+        model.addAttribute("endIndex", end);
+        model.addAttribute("currentIndex", current);
+        model.addAttribute("totalResults", results.size());
+        model.addAttribute("page", page);
+        model.addAttribute("size", size);
+        model.addAttribute("facets_string", facetString);
+
+        model.addAttribute("patient_age_selected", patientAgeSelected);
+        model.addAttribute("patient_gender_selected", patientGenderSelected);
+        model.addAttribute("datasource_selected", datasourceSelected);
+        model.addAttribute("cancer_system_selected", cancerSystemSelected);
+        model.addAttribute("sample_tumor_type_selected",sampleTumorTypeSelected);
+        model.addAttribute("query", query.orElse(""));
+
+        model.addAttribute("facet_options", facets);
+        model.addAttribute("results", new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size())));
+
+        return "search";
+    }
+
+    /**
+     * Get a string representation of all the configured facets
+     *
+     * @param allSelectedFacetOptions
+     * @return
+     */
+    private String getFacetString(Set<List<FacetOption>> allSelectedFacetOptions) {
+        List<String> pieces = new ArrayList<>();
+        for (List<FacetOption> facetOptions : allSelectedFacetOptions) {
+            pieces.add(facetOptions.stream()
+                    .filter(x -> x.getSelected() != null)
+                    .filter(FacetOption::getSelected)
+                    .map(x -> x.getFacetType() + "=" + x.getName())
+                    .collect(Collectors.joining("&")));
+        }
+        return pieces.stream().filter(x -> !x.isEmpty()).collect(Collectors.joining("&"));
+    }
+
+    private Map<SearchFacetName, List<String>> getFacetMap(
+            Optional<String> query,
+            Optional<List<String>> datasource,
+            Optional<List<String>> patientAge,
+            Optional<List<String>> patientTreatmentStatus,
+            Optional<List<String>> patientGender,
+            Optional<List<String>> sampleOriginTissue,
+            Optional<List<String>> cancerSystem,
+            Optional<List<String>> sampleTumorType
+
+    ) {
+
+        Map<SearchFacetName, List<String>> configuredFacets = new HashMap<>();
+
+        if (query.isPresent() && !query.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.query, new ArrayList<>());
+            configuredFacets.get(SearchFacetName.query).add(query.get());
+        }
+
+        if (datasource.isPresent() && !datasource.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.datasource, new ArrayList<>());
+            for (String s : datasource.get()) {
+                configuredFacets.get(SearchFacetName.datasource).add(s);
+            }
+        }
+
+        if (patientAge.isPresent() && !patientAge.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.patient_age, new ArrayList<>());
+            for (String s : patientAge.get()) {
+                configuredFacets.get(SearchFacetName.patient_age).add(s);
+            }
+        }
+
+        if (patientTreatmentStatus.isPresent() && !patientTreatmentStatus.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.patient_treatment_status, new ArrayList<>());
+            for (String s : patientTreatmentStatus.get()) {
+                configuredFacets.get(SearchFacetName.patient_treatment_status).add(s);
+            }
+        }
+
+        if (patientGender.isPresent() && !patientGender.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.patient_gender, new ArrayList<>());
+            for (String s : patientGender.get()) {
+                configuredFacets.get(SearchFacetName.patient_gender).add(s);
+            }
+        }
+
+        if (sampleOriginTissue.isPresent() && !sampleOriginTissue.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.sample_origin_tissue, new ArrayList<>());
+            for (String s : sampleOriginTissue.get()) {
+                configuredFacets.get(SearchFacetName.sample_origin_tissue).add(s);
+            }
+        }
+
+        if (cancerSystem.isPresent() && !cancerSystem.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.system, new ArrayList<>());
+            for (String s : cancerSystem.get()) {
+                configuredFacets.get(SearchFacetName.system).add(s);
+            }
+        }
+
+        if (sampleTumorType.isPresent() && !sampleTumorType.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.sample_tumor_type, new ArrayList<>());
+            for (String s : sampleTumorType.get()) {
+                configuredFacets.get(SearchFacetName.sample_tumor_type).add(s);
+            }
+        }
+
+        return configuredFacets;
+    }
+
+
+    /**
+     * Get the facet lists for a passed in facet argument
+     *
+     * @param facet
+     * @param results
+     * @param selected
+     * @return
+     */
+    private List<FacetOption> getFacetOptions(SearchFacetName facet, List<String> options, Set<ModelForQuery> results, List<String> selected) {
+
+        List<FacetOption> map = new ArrayList<>();
+
+        // Initialise all facet option counts to 0 and set selected attribute on all options that the user has chosen
+        for (String option : options) {
+            map.add(new FacetOption(option, 0, selected != null && selected.contains(option) ? Boolean.TRUE : Boolean.FALSE, facet));
+        }
+
+        // Iterate through results adding count to the appropriate option
+        for (ModelForQuery mfq : results) {
+
+            String s = mfq.getBy(facet);
+
+            // List of ontology terms may come from the service.  These will by separated by "::" delimiter
+            if (s.contains("::")) {
+
+                for (String ss : s.split("::")) {
+
+                    // There should be only one element per facet name
+                    map.forEach(x -> {
+                        if (x.getName().equals(ss)) {
+                            x.increment();
+                        }
+                    });
+                }
+
+            } else {
+
+                // Initialise on the first time we see this facet name
+                if (map.stream().noneMatch(x -> x.getName().equals(s))) {
+                    map.add(new FacetOption(s, 0));
+                }
+
+                // There should be only one element per facet name
+                map.forEach(x -> {
+                    if (x.getName().equals(s)) {
+                        x.increment();
+                    }
+                });
+            }
+        }
+
+
+//        Collections.sort(map);
+
+        return map;
+    }
+
+
+    @RequestMapping("/search2")
     String index(Model model) throws JSONException {
 
 

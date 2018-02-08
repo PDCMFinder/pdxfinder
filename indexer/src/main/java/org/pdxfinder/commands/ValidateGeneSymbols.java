@@ -66,7 +66,7 @@ public class ValidateGeneSymbols implements CommandLineRunner{
 
         long startTime = System.currentTimeMillis();
 
-        if (options.has("validateGeneSymbols") || options.has("loadALL")) {
+        if (options.has("validateGeneSymbols")) {
 
             validateSymbols();
 
