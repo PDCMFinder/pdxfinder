@@ -24,7 +24,6 @@ public class Standardizer {
     public static final String METASTATIC = "Metastatic";
     public static final String REFRACTORY = "Refractory";
     
-    
     private final static Logger log = LoggerFactory.getLogger(Standardizer.class);
     
     public static String getGender(String gender){

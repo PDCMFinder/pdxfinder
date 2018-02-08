@@ -186,9 +186,8 @@ public class LoadIRCC implements CommandLineRunner {
             modelCreation.addRelatedSample(specSample);
 
         }
-        
+      
         // fingerprinting fingerpainting fingerpointing
-
         loaderUtils.saveModelCreation(modelCreation);
 
     }
