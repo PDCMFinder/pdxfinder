@@ -50,109 +50,32 @@
 
 <body class="level2">
 
-<div class="expand-menu show-for-small-only">
-    <div class="columns small-2 full-height close-wrapper text-center padding-vertical-15">
-        <a><i class="icon icon-functional" data-icon="x" data-responsive-toggle="expand-menu"></i></a>
-    </div>
-
-    <div class="columns small-10 background-color-primary full-height">
-        <ul class="vertical menu pdx-mobile-menu" data-responsive-menu="drilldown small-accordion">
-            <li><a href="/">Home</a></li>
-            <li><a href="/about/">About</a></li>
-            <li><a th:href="@{/search}">Search</a></li>
-            <li><a href="/pdx-standard/">PDX Standards</a></li>
-            <li><a href="/pdx-data-submission-integration-and-distribution/">Methods</a></li>
-            <li><a href="/get-in-touch-with-us/">Contact</a></li>
-        </ul>
-    </div>
-</div>
-
 <div content="content-wrapper">
     <div id="skip-to">
         <a href="#content">Skip to main content</a>
     </div>
 
     <div id="content">
-        <div data-sticky-container>
-            <header id="masthead" class="masthead" data-sticky data-options="marginTop: 0">
-                <div class="masthead-inner row">
-                    <div class="columns medium-2 small-4 log-column" id="local-title">
-                        <h1><a href="/" title="Back to PDXFinder homepage"><img th:src="@{/images/logo.png}"
-                                                                                class="padding-15"/></a></h1>
-                    </div>
-                    <!-- Desktop Menu-->
-                    <div class="columns medium-10 menu-column padding-vertical-30 hide-for-small-only" id="local-nav">
-                        <nav>
-                            <ul id="local-nav3" class="dropdown menu main-menu float-right" data-dropdown-menu data-description="navigational">
-                                <li><a href="/">Home</a></li>
-                                <li><a th:href="@{/search}">Search</a></li>
-                                <li><a href="/about/">About</a></li>
-                                <li><a href="/pdx-standard/">PDX Standards</a></li>
-                                <li><a href="/pdx-data-submission-integration-and-distribution/">Methods</a></li>
-                                <li><a href="/get-in-touch-with-us/">Contact</a></li>
-                            </ul>
-                        </nav>
-                    </div>
-                    <!-- Mobile Menu -->
-                    <div class="columns small-4 show-for-small-only padding-vertical-15 text-right">
-                        <a class="menu-toggle"><i class="icon icon-functional" data-icon="M" data-toggle data-responsive-toggle="expand-menu"></i></a>
-                    </div>
-                </div>
-            </header>
-        </div>
+
+
+        <!--/*/ <th:block th:include="fragments/shared :: menu"></th:block> /*/-->
+
         <!-- Suggested layout containers -->
         <section id="main-content-area" role="main">
-            <!-- Your menu structure should make a breadcrumb redundant, but if a breadcrump is needed uncomment the below -->
-            <nav aria-label="You are here:" role="navigation">
-                <ul class="breadcrumbs columns">
-                    <li><a href="#">Home</a></li>
-                    <li>
-                        Details
-                    </li>
-                    <li>
-                        <span class="show-for-sr">Current: </span> <span th:text="${externalId}">Model ID</span>
-                    </li>
-                </ul>
-            </nav>
 
-            <!-- Search FORM Section -->
-            <section>
-                <form class="main-search" th:action="@{/search}">
-                    <div class="row">
-                        <fieldset>
-                            <div class="margin-bottom-none small-collapse">
-                                <!-- Large screen -->
-                                <div class="columns small-2 small-push-2 margin-bottom-small padding-top-large hide-for-small-only">
-                                    <!-- Enter your search here -->
-                                </div>
-                                <!-- Small screen-->
-                                <div class="columns small-7 medium-push-2 small-push-3  margin-bottom-none search-text-wrapper show-for-small-only">
-                                    <!-- Enter your search here -->
-                                </div>
-
-                                <div class="columns small-7 medium-push-2 small-push-3  margin-bottom-none search-text-wrapper">
-                                    <select class="form-control" id="query" name="query" type="text" tabindex="2"
-                                            placeholder="Search (e.g. Melanoma)" multiple></select>
-                                    <span class="form-error margin-top-small">
-                        You need to enter a search query.
-                    </span>
-                                </div>
-                                <div class="columns small-1 medium-push-2 small-push-3 margin-bottom-none ">
-                                    <input id="search_submit" class="button icon icon-functional margin-bottom-none" tabindex="3" type="submit" name="submit1" value="1" style="line-height:.9">
-                                </div>
-                                <!-- <input id="allebi" type="hidden" name="db" value="allebi" checked="checked" /> -->
-                                <input type="hidden" name="requestFrom" value="ebi_index">
-                            </div>
-                        </fieldset>
-                        <fieldset>
-                            <div class="medium-push-4 small-push-3 small-8 small padding-top-medium">
-                                <a href="" id="main-search-advanced-link" class="font-color-dark-gray font-style-underline ">Advanced Search</a>
-                            </div>
-                        </fieldset>
-                    </div>
-                </form>
-            </section>
-
+            <div class="row">
+                <nav aria-label="You are here:" role="navigation">
+                    <ul class="breadcrumbs columns">
+                        <li><a href="#">Home</a></li>
+                        <li>
+                            Details
+                        </li>
+                        <li>
+                            <span class="show-for-sr">Current: </span> <span th:text="${externalId}">Model ID</span>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
 
             <!-- Three Grids Section -->
             <section>
@@ -456,32 +379,10 @@
     </div>
     <!-- End suggested layout containers / #content -->
 
-    <footer>
-        <div id="global-footer" class="global-footer row">
-            <div class="columns medium-4">
-                <h3 class="highlight green">Quick links</h3>
-                <ul class="no-bullet">
-                    <li>Unorderred list</li>
-                    <li>Unorderred list</li>
-                    <li>Unorderred list</li>
-                </ul>
-            </div>
 
-            <div class="columns medium-4">
-                <h3 class="highlight green">Contacts</h3>
-                <ul class="no-bullet">
-                    <li><a href="#">Link</a></li>
-                    <li>Unorderred list</li>
-                    <li>Unorderred list</li>
-                </ul>
-            </div>
+    <!--/*/ <th:block th:include="fragments/shared :: footer"></th:block> /*/-->
 
-            <div class="columns medium-4">
-                <h3 class="highlight">&nbsp;</h3>
-                A joint procet
-            </div>
-        </div>
-    </footer>
+
 </div>
 <!-- JavaScript -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
