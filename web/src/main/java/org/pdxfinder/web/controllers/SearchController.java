@@ -135,7 +135,7 @@ public class SearchController {
         List<FacetOption> patientAgeSelected = getFacetOptions(SearchFacetName.patient_age, patientAgeOptions, results, patient_age.orElse(null));
         List<FacetOption> patientGenderSelected = getFacetOptions(SearchFacetName.patient_gender, patientGenderOptions, results, patient_gender.orElse(null));
         List<FacetOption> datasourceSelected = getFacetOptions(SearchFacetName.datasource, datasourceOptions, results, datasource.orElse(null));
-        List<FacetOption> cancerSystemSelected = getFacetOptions(SearchFacetName.system, cancerBySystemOptions, results, cancer_system.orElse(null));
+        List<FacetOption> cancerSystemSelected = getFacetOptions(SearchFacetName.cancer_system, cancerBySystemOptions, results, cancer_system.orElse(null));
         List<FacetOption> sampleTumorTypeSelected = getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
 
 
@@ -268,9 +268,9 @@ public class SearchController {
         }
 
         if (cancerSystem.isPresent() && !cancerSystem.get().isEmpty()) {
-            configuredFacets.put(SearchFacetName.system, new ArrayList<>());
+            configuredFacets.put(SearchFacetName.cancer_system, new ArrayList<>());
             for (String s : cancerSystem.get()) {
-                configuredFacets.get(SearchFacetName.system).add(s);
+                configuredFacets.get(SearchFacetName.cancer_system).add(s);
             }
         }
 

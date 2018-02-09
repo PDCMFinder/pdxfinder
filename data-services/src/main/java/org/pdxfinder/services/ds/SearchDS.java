@@ -378,12 +378,12 @@ public class SearchDS {
                     result = result.stream().filter(x -> predicate.test(x.getModelHostStrain())).collect(Collectors.toSet());
                     break;
 
-                case system:
+                case cancer_system:
 
                     Set<ModelForQuery> toRemove = new HashSet<>();
                     for (ModelForQuery res : result) {
                         Boolean keep = Boolean.FALSE;
-                        for (String s : filters.get(SearchFacetName.system)) {
+                        for (String s : filters.get(SearchFacetName.cancer_system)) {
                             if (res.getCancerSystem().contains(s)) {
                                 keep = Boolean.TRUE;
                             }
