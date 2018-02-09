@@ -56,9 +56,9 @@ public class SearchDS {
 
 
     public static List<String> CANCERS_BY_SYSTEM = Arrays.asList(
-            "Breast cancer",
+            "Breast Cancer",
             "Cardiovascular Cancer",
-            "Connective and Soft Tissue cancer",
+            "Connective and Soft Tissue Cancer",
             "Digestive System Cancer",
             "Endocrine Cancer",
             "Eye Cancer",
@@ -66,10 +66,10 @@ public class SearchDS {
             "Hematopoietic and Lymphoid System Cancer",
             "Nervous System Cancer",
             "Peritoneal and Retroperitoneal Cancer",
-            "Malignant Reproductive System Cancer",
+            "Reproductive System Cancer",
             "Respiratory Tract Cancer",
-            "Thoracic cancer",
-            "Skin cancer",
+            "Thoracic Cancer",
+            "Skin Cancer",
             "Urinary System Cancer",
             "Unclassified"
     );
@@ -90,21 +90,21 @@ public class SearchDS {
         this.models = new HashSet<>();
 
         // Mapping NCIT ontology term labels to display labels
-        this.cancerSystemMap.put("Malignant Breast Neoplasm", "Breast cancer");
-        this.cancerSystemMap.put("Malignant Cardiovascular Neoplasm", "Cardiovascular Cancer");
-        this.cancerSystemMap.put("Connective and Soft Tissue Neoplasm", "Connective and Soft Tissue cancer");
-        this.cancerSystemMap.put("Malignant Digestive System Neoplasm", "Digestive System Cancer");
-        this.cancerSystemMap.put("Malignant Endocrine Neoplasm", "Endocrine Cancer");
-        this.cancerSystemMap.put("Malignant Eye Neoplasm", "Eye Cancer");
-        this.cancerSystemMap.put("Malignant Head and Neck Neoplasm", "Head and Neck Cancer");
+        this.cancerSystemMap.put("Breast Cancer", "Breast Cancer");
+        this.cancerSystemMap.put("Cardiovascular Cancer", "Cardiovascular Cancer");
+        this.cancerSystemMap.put("Connective and Soft Tissue Neoplasm", "Connective and Soft Tissue Cancer");
+        this.cancerSystemMap.put("Digestive System Cancer", "Digestive System Cancer");
+        this.cancerSystemMap.put("Endocrine Cancer", "Endocrine Cancer");
+        this.cancerSystemMap.put("Eye Cancer", "Eye Cancer");
+        this.cancerSystemMap.put("Head and Neck Cancer", "Head and Neck Cancer");
         this.cancerSystemMap.put("Hematopoietic and Lymphoid System Neoplasm", "Hematopoietic and Lymphoid System Cancer");
-        this.cancerSystemMap.put("Malignant Nervous System Neoplasm", "Nervous System Cancer");
+        this.cancerSystemMap.put("Nervous System Cancer", "Nervous System Cancer");
         this.cancerSystemMap.put("Peritoneal and Retroperitoneal Neoplasms", "Peritoneal and Retroperitoneal Cancer");
-        this.cancerSystemMap.put("Malignant Reproductive System Neoplasm", "Malignant Reproductive System Cancer");
-        this.cancerSystemMap.put("Malignant Respiratory Tract Neoplasm", "Respiratory Tract Cancer");
-        this.cancerSystemMap.put("Thoracic Disorder", "Thoracic cancer");
-        this.cancerSystemMap.put("Malignant Skin Neoplasm", "Skin cancer");
-        this.cancerSystemMap.put("Malignant Urinary System Neoplasm", "Urinary System Cancer");
+        this.cancerSystemMap.put("Reproductive System Neoplasm", "Reproductive System Cancer");
+        this.cancerSystemMap.put("Respiratory Tract Cancer", "Respiratory Tract Cancer");
+        this.cancerSystemMap.put("Thoracic Neoplasm", "Thoracic Cancer");
+        this.cancerSystemMap.put("Skin Cancer", "Skin Cancer");
+        this.cancerSystemMap.put("Urinary System Cancer", "Urinary System Cancer");
         this.cancerSystemMap.put("Unclassified", "Unclassified");
 
 
