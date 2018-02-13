@@ -23,6 +23,7 @@ import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.HashSet;
 import org.pdxfinder.utilities.Standardizer;
 
@@ -59,8 +60,18 @@ public class LoadIRCC implements CommandLineRunner {
     private LoaderUtils loaderUtils;
     private Session session;
 
+    // samples -> markerAsssociations
+    private HashMap<String, HashSet<MarkerAssociation>> markerAssociations = new HashMap();
+    private HashMap<String, HashMap<String, String>> modelSamples = new HashMap();
+
     @Value("${irccpdx.url}")
     private String urlStr;
+
+    @Value("${irccpdx.variation.url}")
+    private String variationURLStr;
+
+    @Value("${irccpdx.variation.max}")
+    private int variationMax;
 
     @PostConstruct
     public void init() {
@@ -84,16 +95,19 @@ public class LoadIRCC implements CommandLineRunner {
 
             log.info("Loading IRCC PDX data.");
 
+            if (variationURLStr != null && variationMax != 0) {
+                loadVariants();
+            }
             if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
-                parseJSON(parseURL(urlStr));
+                parseModels(parseURL(urlStr));
             } else {
                 log.error("No irccpdx.url provided in properties");
             }
         }
     }
 
-    private void parseJSON(String json) {
+    private void parseModels(String json) {
 
         irccDS = loaderUtils.getExternalDataSource(IRCC_DATASOURCE_ABBREVIATION, IRCC_DATASOURCE_NAME, IRCC_DATASOURCE_DESCRIPTION);
         nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
@@ -113,6 +127,9 @@ public class LoadIRCC implements CommandLineRunner {
             log.error("Error getting IRCC PDX models", e);
 
         }
+        System.out.println(markerAssociations.size()+" un matched samples");
+        System.out.println(modelSamples.size()+" un matched models");
+        for(String model :modelSamples.keySet())System.out.println(model);
     }
 
     @Transactional
@@ -123,7 +140,7 @@ public class LoadIRCC implements CommandLineRunner {
         String diagnosis = job.getString("Clinical Diagnosis");
 
         String classification = job.getString("Stage");
-        
+
         String age = Standardizer.getAge(job.getString("Age"));
         String gender = Standardizer.getGender(job.getString("Gender"));
 
@@ -131,7 +148,7 @@ public class LoadIRCC implements CommandLineRunner {
                 gender, "", NOT_SPECIFIED, age, irccDS);
 
         String tumorType = Standardizer.getTumorType(job.getString("Tumor Type"));
-        
+
         Sample ptSample = loaderUtils.getSample(id, tumorType, diagnosis,
                 job.getString("Primary Site"), job.getString("Sample Site"),
                 NOT_SPECIFIED, classification, NORMAL_TISSUE_FALSE, irccDS.getAbbreviation());
@@ -142,10 +159,10 @@ public class LoadIRCC implements CommandLineRunner {
         loaderUtils.savePatientSnapshot(pSnap);
 
         QualityAssurance qa = new QualityAssurance();
-        
-        if("TRUE".equals(job.getString("Fingerprinting").toUpperCase())){
+
+        if ("TRUE".equals(job.getString("Fingerprinting").toUpperCase())) {
             qa.setValidationTechniques(ValidationTechniques.FINGERPRINT);
-            
+
         }
 
         ModelCreation modelCreation = loaderUtils.createModelCreation(id, this.irccDS.getAbbreviation(), ptSample, qa);
@@ -167,13 +184,14 @@ public class LoadIRCC implements CommandLineRunner {
 
             JSONArray platforms = specimenJSON.getJSONArray("Platforms");
             HashSet<MolecularCharacterization> mcs = new HashSet();
-            for(int j = 0; j < platforms.length(); j++){
+            for (int j = 0; j < platforms.length(); j++) {
                 JSONObject platform = platforms.getJSONObject(j);
                 MolecularCharacterization mc = new MolecularCharacterization();
                 Platform p = loaderUtils.getPlatform(platform.getString("Platform"), this.irccDS);
                 loaderUtils.savePlatform(p);
-                
+
                 mc.setPlatform(p);
+
                 mcs.add(mc);
             }
             Sample specSample = new Sample();
@@ -186,13 +204,95 @@ public class LoadIRCC implements CommandLineRunner {
             modelCreation.addRelatedSample(specSample);
 
         }
-      
-        // fingerprinting fingerpainting fingerpointing
+        
+        if (modelSamples.containsKey(id)) {
+            for (String sampleID : modelSamples.get(id).keySet()) {
+                Sample variationSample = new Sample();
+                variationSample.setSourceSampleId(sampleID);
+                MolecularCharacterization mc = new MolecularCharacterization();
+
+                mc.setMarkerAssociations(markerAssociations.get(sampleID));
+                markerAssociations.remove(sampleID);
+               
+                HashSet<MolecularCharacterization> mcs = new HashSet();
+                mcs.add(mc); // assumes all are same platform
+                variationSample.setMolecularCharacterizations(mcs);
+                modelCreation.addRelatedSample(variationSample);
+                System.out.println("adding "+sampleID+ " to model "+id);
+                addedSamples++;
+            }
+            modelSamples.remove(id);
+        }
+
         loaderUtils.saveModelCreation(modelCreation);
-
+        
     }
+    int addedSamples = 0;
 
-   
+    @Transactional
+    private void loadVariants() {
+
+        try {
+            JSONObject job = new JSONObject(parseURL(variationURLStr));
+            JSONArray jarray = job.getJSONArray("IRCC");
+            
+            for (int i = 0; i < jarray.length(); i++) {
+                if (i == variationMax) {
+                    System.out.println("qutting after loading "+i+" variants");
+                    break;
+                }
+
+                JSONObject variation = jarray.getJSONObject(i);
+
+                String sample = variation.getString("Sample ID");
+                String model = variation.getString("Model ID");
+                
+                if(modelSamples.containsKey(model)){
+                    modelSamples.get(model).put(sample, sample);
+                }else{
+                    HashMap<String,String> samples = new HashMap();
+                    samples.put(sample,sample);
+                    modelSamples.put(model,samples);
+                }
+                        
+                        
+               
+                
+                String gene = variation.getString("Gene");
+                String type = variation.getString("Type");
+                
+                Marker marker = loaderUtils.getMarker(gene,gene);
+                
+                MarkerAssociation ma = new MarkerAssociation();
+                
+                ma.setMarker(marker);
+                ma.setType(type);
+                ma.setCdsChange(variation.getString("CDS"));
+                ma.setChromosome(variation.getString("Chrom"));
+                ma.setConsequence(variation.getString("Effect"));
+                ma.setSeqPosition(variation.getString("Pos"));
+                ma.setRefAllele(variation.getString("Ref"));
+                ma.setAltAllele(variation.getString("Alt"));
+                ma.setAminoAcidChange(variation.getString("Protein"));
+                ma.setAlleleFrequency(variation.getString("VAF"));
+                ma.setRsVariants(variation.getString("avsnp147"));
+
+            
+                if (markerAssociations.containsKey(sample)) {
+                    markerAssociations.get(sample).add(ma);
+                } else {
+                    HashSet<MarkerAssociation> mas = new HashSet();
+                    mas.add(ma);
+                    markerAssociations.put(sample, mas);
+                }
+
+            }
+
+        } catch (Exception e) {
+            log.error("Unable to load variants" + e);
+        }
+       
+    }
 
     private String parseURL(String urlStr) {
         StringBuilder sb = new StringBuilder();
