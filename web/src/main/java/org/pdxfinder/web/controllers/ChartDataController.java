@@ -1,15 +1,13 @@
 package org.pdxfinder.web.controllers;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.pdxfinder.services.ds.ModelForQuery;
 import org.pdxfinder.services.ds.SearchDS;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -24,31 +22,26 @@ public class ChartDataController {
     }
 
     @RequestMapping("/graphdata")
-    @ResponseBody
-    public String graphdata(Model model) {
-
-        JSONObject data = getData();
-        return data.toString();
+    public Map<String, Collection<DataHolder>> graphdata(Model model) {
+        return getData();
     }
 
 
-    @Cacheable
-    public JSONObject getData() {
+    @Cacheable("graph_data")
+    public Map<String, Collection<DataHolder>> getData() {
+
         final Set<ModelForQuery> models = searchDS.getModels();
 
-        JSONObject data = new JSONObject();
-        JSONArray cancerbyType = new JSONArray();
-        JSONArray providersCollection = new JSONArray();
+        Map<String, Collection<DataHolder>> data = new HashMap<>();
+        Map<String, DataHolder> cancers = new HashMap<>();
 
         int ids = 1;
-
-        Map<String, DataHolder> cancers = new HashMap<>();
 
         for (ModelForQuery m : models) {
 
             if (!cancers.containsKey(m.getMappedOntologyTerm())) {
                 cancers.put(m.getMappedOntologyTerm(), new DataHolder(m.getMappedOntologyTerm()));
-                cancers.get(m.getMappedOntologyTerm()).id = ids++;
+                cancers.get(m.getMappedOntologyTerm()).setId(ids++);
             }
 
             DataHolder dh = cancers.get(m.getMappedOntologyTerm());
@@ -56,33 +49,50 @@ public class ChartDataController {
 
         }
 
-        for (DataHolder h : cancers.values()) {
-            cancerbyType.put(h.toJson());
-        }
+        data.put("cancer_by_type", cancers.values());
 
-        data.put("cancer_by_type", cancerbyType);
-
-        Map<String, DataHolder> providers = new HashMap<>();
+        Map<String, DataHolder> dataHolderMap = new HashMap<>();
 
         for (ModelForQuery m : models) {
 
-            if (!providers.containsKey(m.getDatasource())) {
-                providers.put(m.getDatasource(), new DataHolder(m.getDatasource()));
-                providers.get(m.getDatasource()).id = ids++;
+            if (!dataHolderMap.containsKey(m.getDatasource())) {
+                dataHolderMap.put(m.getDatasource(), new DataHolder(m.getDatasource()));
+                dataHolderMap.get(m.getDatasource()).id = ids++;
             }
 
-            DataHolder dh = providers.get(m.getDatasource());
+            DataHolder dh = dataHolderMap.get(m.getDatasource());
             dh.increment();
 
         }
 
-        for (DataHolder h : providers.values()) {
-            providersCollection.put(h.toJson());
+        data.put("providers", dataHolderMap.values());
+
+        /*
+        Return counts of models by top level by center
+         */
+        cancers = new HashMap<>();
+        for (ModelForQuery m : models) {
+
+            for (String system : m.getCancerSystem()) {
+
+                String key = system + m.getDatasource();
+
+                if (!cancers.containsKey(key)) {
+
+                    CenterSpecificDataHolder c = new CenterSpecificDataHolder(system);
+                    c.setDatasource(m.getDatasource());
+                    c.setId(ids++);
+
+                    cancers.put(key, c);
+                }
+
+                DataHolder dh = cancers.get(key);
+                dh.increment();
+            }
+
         }
 
-
-        data.put("providers", providersCollection);
-
+        data.put("cancer_by_top_level", cancers.values());
         return data;
     }
 
@@ -92,7 +102,9 @@ public class ChartDataController {
         private Integer id;
         private String name;
         private Integer number = 0;
-        private String description;
+
+        public DataHolder() {
+        }
 
         public DataHolder(String name) {
             this.name = name;
@@ -100,15 +112,6 @@ public class ChartDataController {
 
         public void increment() {
             number += 1;
-        }
-
-        public JSONObject toJson() {
-            JSONObject n = new JSONObject();
-            n.put("id", id);
-            n.put("name", name);
-            n.put("number", number);
-            n.put("description", description);
-            return n;
         }
 
         public Integer getId() {
@@ -135,6 +138,17 @@ public class ChartDataController {
             this.number = number;
         }
 
+    }
+
+    private class CenterSpecificDataHolder extends DataHolder {
+
+        private String description;
+        private String datasource;
+
+        public CenterSpecificDataHolder(String name) {
+            setName(name);
+        }
+
         public String getDescription() {
             return description;
         }
@@ -142,6 +156,13 @@ public class ChartDataController {
         public void setDescription(String description) {
             this.description = description;
         }
-    }
 
+        public String getDatasource() {
+            return datasource;
+        }
+
+        public void setDatasource(String datasource) {
+            this.datasource = datasource;
+        }
+    }
 }
