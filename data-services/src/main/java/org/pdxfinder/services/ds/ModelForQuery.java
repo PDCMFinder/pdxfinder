@@ -195,7 +195,7 @@ public class ModelForQuery {
             case organ:
                 s = cancerOrgan;
                 break;
-            case system:
+            case cancer_system:
                 // Pass back the list of top level ontology systems delimited by "::"
                 s = cancerSystem.stream().collect(Collectors.joining("::"));
                 break;

@@ -13,7 +13,7 @@ public enum SearchFacetName {
     model_implantation_type,
     model_host_strain,
     organ,
-    system,
+    cancer_system,
     cell_type;
 
     public String getName() {
