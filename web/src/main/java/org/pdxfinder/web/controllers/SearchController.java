@@ -182,6 +182,8 @@ public class SearchController {
         int begin = Math.max(1, current - 4);
         int end = Math.min(begin + 7, numPages);
 
+        String textSearchDescription = getTextualDescription(facetString, results);
+
         //auto suggestions for the search field
         List<AutoSuggestOption> autoSuggestList = autoCompleteService.getAutoSuggestions();
         model.addAttribute("autoCompleteList", autoSuggestList);
@@ -194,6 +196,7 @@ public class SearchController {
         model.addAttribute("page", page);
         model.addAttribute("size", size);
         model.addAttribute("facets_string", facetString);
+        model.addAttribute("text_search_desc", textSearchDescription);
 
         model.addAttribute("patient_age_selected", patientAgeSelected);
         model.addAttribute("patient_gender_selected", patientGenderSelected);
@@ -225,6 +228,40 @@ public class SearchController {
                     .collect(Collectors.joining("&")));
         }
         return pieces.stream().filter(x -> !x.isEmpty()).collect(Collectors.joining("&"));
+    }
+
+    public String getTextualDescription(String facetString, Set<ModelForQuery> results) {
+
+        if (StringUtils.isEmpty(facetString)) {
+            return null;
+        }
+
+        String textDescription = "Your filter for ";
+        Map<String, Set<String>> filters = new HashMap<>();
+
+        for (String urlParams : facetString.split("&")) {
+            List<String> pieces = Arrays.asList(urlParams.split("="));
+            String key = pieces.get(0);
+            String value = pieces.get(1);
+
+            if (!filters.containsKey(key)) {
+                filters.put(key, new TreeSet<>());
+            }
+
+            filters.get(key).add(value);
+        }
+
+        textDescription += StringUtils
+                .join(filters.keySet()
+                        .stream()
+                        .map(x -> "<b>" + x + ":</b> (" + StringUtils.join(filters.get(x), ", ").replaceAll("\\[", "").replaceAll("\\]", "") + ")")
+                        .collect(Collectors.toList()), ", ");
+
+        textDescription += " returned " + results.size() + " result";
+        textDescription += results.size() == 1 ? "" : "s";
+
+        return textDescription;
+
     }
 
     private Map<SearchFacetName, List<String>> getFacetMap(
