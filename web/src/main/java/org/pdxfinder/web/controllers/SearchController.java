@@ -135,6 +135,7 @@ public class SearchController {
 
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
 
+
         List<FacetOption> patientAgeSelected = getFacetOptions(SearchFacetName.patient_age, patientAgeOptions, results, patient_age.orElse(null));
         List<FacetOption> patientGenderSelected = getFacetOptions(SearchFacetName.patient_gender, patientGenderOptions, results, patient_gender.orElse(null));
         List<FacetOption> datasourceSelected = getFacetOptions(SearchFacetName.datasource, datasourceOptions, results, datasource.orElse(null));
@@ -354,12 +355,15 @@ public class SearchController {
      */
     private List<FacetOption> getFacetOptions(SearchFacetName facet, List<String> options, Set<ModelForQuery> results, List<String> selected) {
 
+        Set<ModelForQuery> allResults = searchDS.getModels();
+
         List<FacetOption> map = new ArrayList<>();
 
         // Initialise all facet option counts to 0 and set selected attribute on all options that the user has chosen
         if (options != null) {
             for (String option : options) {
-                map.add(new FacetOption(option, 0, selected != null && selected.contains(option) ? Boolean.TRUE : Boolean.FALSE, facet));
+                Long count = allResults.stream().filter(x -> x.getBy(facet).equals(option)).count();
+                map.add(new FacetOption(option, count.intValue(), selected != null && selected.contains(option) ? Boolean.TRUE : Boolean.FALSE, facet));
             }
         }
 
