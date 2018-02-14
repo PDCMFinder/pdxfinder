@@ -211,6 +211,30 @@ function redirectPage(){
     }
 
 
+    // Add all diagnosis filters to the URL
+    jQuery(".diagnosis").each(function () {
+        var id = jQuery(this).attr("id");
+
+        //characters we want to see as values
+        var reg = /[^A-Za-z0-9 _-]/;
+
+        var res = id.split("__");
+
+        if (!no_parameters) {
+            url = url + "&";
+        }
+
+        if (!reg.test(res[1])) {
+            url = url + res[0] + "=" + encodeURIComponent(res[1].replace(/_/g, ' '));
+            no_parameters = false;
+
+        }
+
+
+    });
+
+
+
     //get all filters with values
     jQuery(".filter").each(function(){
         var id = jQuery(this).attr("id");

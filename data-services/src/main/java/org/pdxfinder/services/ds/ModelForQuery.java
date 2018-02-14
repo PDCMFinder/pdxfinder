@@ -56,7 +56,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -162,6 +161,9 @@ public class ModelForQuery {
     public String getBy(SearchFacetName facet) {
         String s;
         switch (facet) {
+            case diagnosis:
+                s = mappedOntologyTerm;
+                break;
             case datasource:
                 s = datasource;
                 break;

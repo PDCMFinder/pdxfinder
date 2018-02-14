@@ -81,6 +81,7 @@ public class SearchDS {
             "Refractory",
             "Not Specified"
             );
+    public static List<String> DIAGNOSIS_OPTIONS = new ArrayList<>();
 
     /**
      * Populate the complete set of models for searching when this object is instantiated
@@ -229,6 +230,9 @@ public class SearchDS {
 //        }
 
         //PATIENT_GENDERS = models.stream().map(ModelForQuery::getPatientGender).distinct().collect(Collectors.toList());
+
+        // Populate the list of possible diagnoses
+        DIAGNOSIS_OPTIONS = models.stream().map(ModelForQuery::getDiagnosis).distinct().collect(Collectors.toList());
     }
 
     /**
@@ -322,6 +326,12 @@ public class SearchDS {
 
                     predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.datasource));
                     result = result.stream().filter(x -> predicate.test(x.getDatasource())).collect(Collectors.toSet());
+                    break;
+
+                case diagnosis:
+
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.diagnosis));
+                    result = result.stream().filter(x -> predicate.test(x.getMappedOntologyTerm())).collect(Collectors.toSet());
                     break;
 
                 case patient_age:

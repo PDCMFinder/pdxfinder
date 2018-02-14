@@ -129,8 +129,7 @@
                         </fieldset>
                         <fieldset>
                             <div class="medium-push-4 small-push-3 small-8 small padding-top-medium">
-                                <a href="" id="main-search-advanced-link"
-                                   class="font-color-dark-gray font-style-underline ">Advanced Search</a>
+                                &nbsp;
                             </div>
                         </fieldset>
                     </div>
@@ -257,9 +256,9 @@
 
 
 
-
                             </div>
                         </li>
+
 
 
                         <li class="accordion-item is-active" data-accordion-item>
@@ -313,6 +312,13 @@
 
 
                     </ul>
+
+                    <span th:each="instance:${diagnosis_selected}">
+                        <input th:id="'diagnosis__' + ${#strings.replace(instance.name, ' ', '_')}" type="hidden"
+                               class="diagnosis filter"/>
+                    </span>
+
+
                 </div>
 
                 <div class="columns medium-9">
