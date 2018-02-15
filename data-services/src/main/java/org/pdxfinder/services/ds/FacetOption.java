@@ -1,6 +1,4 @@
-package org.pdxfinder.web.controllers;
-
-import org.pdxfinder.services.ds.SearchFacetName;
+package org.pdxfinder.services.ds;
 
 import java.util.Objects;
 

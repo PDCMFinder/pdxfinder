@@ -6,12 +6,14 @@ import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.repositories.ModelCreationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /*
@@ -55,7 +57,7 @@ public class SearchDS {
     );
 
 
-    public static List<String> CANCERS_BY_SYSTEM = Arrays.asList(
+    public static List<String> CANCERS_BY_SYSTEM_OPTIONS = Arrays.asList(
             "Breast Cancer",
             "Cardiovascular Cancer",
             "Connective and Soft Tissue Cancer",
@@ -223,16 +225,69 @@ public class SearchDS {
             models.add(mfq);
         }
 
-//        try (FileOutputStream fout = new FileOutputStream("/models.ser"); ObjectOutputStream oos = new ObjectOutputStream(fout)) {
-//            oos.writeObject(models);
-//        } catch (IOException e) {
-//            log.warn("Cannot serialize models to file, startup times will be slow", e);
-//        }
-
-        //PATIENT_GENDERS = models.stream().map(ModelForQuery::getPatientGender).distinct().collect(Collectors.toList());
 
         // Populate the list of possible diagnoses
         DIAGNOSIS_OPTIONS = models.stream().map(ModelForQuery::getDiagnosis).distinct().collect(Collectors.toList());
+
+
+        //
+        // Filter out all options that have no models for that option
+        //
+        PATIENT_AGE_OPTIONS = PATIENT_AGE_OPTIONS
+                .stream()
+                .filter(x -> models
+                        .stream()
+                        .map(ModelForQuery::getPatientAge)
+                        .collect(Collectors.toSet())
+                        .contains(x))
+                .collect(Collectors.toList());
+
+        DATASOURCE_OPTIONS = DATASOURCE_OPTIONS
+                .stream()
+                .filter(x -> models
+                        .stream()
+                        .map(ModelForQuery::getDatasource)
+                        .collect(Collectors.toSet())
+                        .contains(x))
+                .collect(Collectors.toList());
+
+        CANCERS_BY_SYSTEM_OPTIONS = CANCERS_BY_SYSTEM_OPTIONS
+                .stream()
+                .filter(x -> models
+                        .stream()
+                        .map(ModelForQuery::getCancerSystem)
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toSet())
+                        .contains(x))
+                .collect(Collectors.toList());
+
+        PATIENT_GENDERS = PATIENT_GENDERS
+                .stream()
+                .filter(x -> models
+                        .stream()
+                        .map(ModelForQuery::getPatientGender)
+                        .collect(Collectors.toSet())
+                        .contains(x))
+                .collect(Collectors.toList());
+
+        SAMPLE_TUMOR_TYPE_OPTIONS = SAMPLE_TUMOR_TYPE_OPTIONS
+                .stream()
+                .filter(x -> models
+                        .stream()
+                        .map(ModelForQuery::getSampleTumorType)
+                        .collect(Collectors.toSet())
+                        .contains(x))
+                .collect(Collectors.toList());
+
+        DIAGNOSIS_OPTIONS = DIAGNOSIS_OPTIONS
+                .stream()
+                .filter(x -> models
+                        .stream()
+                        .map(ModelForQuery::getDiagnosis)
+                        .collect(Collectors.toSet())
+                        .contains(x))
+                .collect(Collectors.toList());
+
     }
 
     /**
@@ -480,6 +535,83 @@ public class SearchDS {
 
         // Create a "combination" predicate containing sub-predicates "OR"ed together
         return preds.stream().reduce(Predicate::or).orElse(x -> false);
+    }
+
+
+    /**
+     * Get the count of models for a supplied facet.
+     * <p>
+     * This method will return counts of facet options for the supplied facet
+     *
+     * @param facet    the facet to count
+     * @param results  set of models already filtered
+     * @param selected what facets have been filtered already
+     * @return a list of {@link FacetOption} indicating counts and selected state
+     */
+    @Cacheable("facet_counts")
+    public List<FacetOption> getFacetOptions(SearchFacetName facet, List<String> options, Set<ModelForQuery> results, List<String> selected) {
+
+        Set<ModelForQuery> allResults = models;
+
+        List<FacetOption> map = new ArrayList<>();
+
+        // Initialise all facet option counts to 0 and set selected attribute on all options that the user has chosen
+        if (options != null) {
+            for (String option : options) {
+                Long count = allResults
+                        .stream()
+                        .filter(x ->
+                                Stream.of(x.getBy(facet).split("::"))
+                                        .collect(Collectors.toSet())
+                                        .contains(option))
+                        .count();
+                map.add(new FacetOption(option, count.intValue(), selected != null && selected.contains(option) ? Boolean.TRUE : Boolean.FALSE, facet));
+            }
+        }
+
+//        // Iterate through results adding count to the appropriate option
+//        for (ModelForQuery mfq : results) {
+//
+//            String s = mfq.getBy(facet);
+//
+//            // Skip empty facets
+//            if (s == null || s.equals("")) {
+//                continue;
+//            }
+//
+//            // List of ontology terms may come from the service.  These will by separated by "::" delimiter
+//            if (s.contains("::")) {
+//
+//                for (String ss : s.split("::")) {
+//
+//                    // There should be only one element per facet name
+//                    map.forEach(x -> {
+//                        if (x.getName().equals(ss)) {
+//                            x.increment();
+//                        }
+//                    });
+//                }
+//
+//            } else {
+//
+//                // Initialise on the first time we see this facet name
+//                if (map.stream().noneMatch(x -> x.getName().equals(s))) {
+//                    map.add(new FacetOption(s, 0, selected != null && selected.contains(s) ? Boolean.TRUE : Boolean.FALSE, facet));
+//                }
+//
+//                // There should be only one element per facet name
+//                map.forEach(x -> {
+//                    if (x.getName().equals(s)) {
+//                        x.increment();
+//                    }
+//                });
+//            }
+//        }
+//
+
+//        Collections.sort(map);
+
+        return map;
     }
 
 
