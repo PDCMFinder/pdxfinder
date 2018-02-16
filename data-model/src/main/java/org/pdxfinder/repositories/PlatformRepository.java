@@ -27,12 +27,14 @@ public interface PlatformRepository extends PagingAndSortingRepository<Platform,
     List<Platform> findModelPlatformByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
 
-    @Query("MATCH (plat:Platform)--(src:ExternalDataSource) WHERE src.abbreviation={dataSource} " +
+    @Query("MATCH (plat:Platform)--(src:ExternalDataSource) " +
+            "WHERE toLower(src.abbreviation)=toLower({dataSource}) " +
             "RETURN plat ")
     List<Platform> findPlatformByExternalDataSource(@Param("dataSource") String dataSource);
 
 
-    @Query("MATCH (plat:Platform)--(mc:MolecularCharacterization) where plat.name = {platform} " +
+    @Query("MATCH (plat:Platform)--(mc:MolecularCharacterization) " +
+            "WHERE toLower(plat.name) = toLower({platform}) " +
             "RETURN count (mc)")
     int findPlatformCount(@Param("platform") String platform, @Param("dataSource") String dataSource);
 
