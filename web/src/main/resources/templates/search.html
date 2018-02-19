@@ -369,12 +369,6 @@
                                        th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}}"></a><br/><span
                                         class="small" th:text="${model.datasource}">center</span></td>
                                 <td><span th:remove="tag" th:text="${model.mappedOntologyTerm}">ontology term</span>
-                                    <span th:remove="tag"
-                                          th:unless="${#strings.isEmpty(model.getFormattedQueryMatch(query))}"
-                                          data-tooltip data-allow-html="true" aria-haspopup="true" class="has-tip"
-                                          data-disable-hover="false" th:tabindex="${iter}"
-                                          th:title="${model.getFormattedQueryMatch(query)}"><i class="icon icon-generic"
-                                                                                               data-icon="i"></i></span>
                                 </td>
                                 <td th:text="${model.sampleOriginTissue}">origin tissue</td>
                                 <td th:text="${model.sampleSampleSite}">sample site</td>
