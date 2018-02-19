@@ -8,7 +8,6 @@ import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.dao.Sample;
 import org.pdxfinder.dao.SampleToOntologyRelationShip;
-import org.pdxfinder.dao.SampleToOntologyRelationShip;
 import org.pdxfinder.ontologymapping.MappingRule;
 import org.pdxfinder.ontologymapping.MissingMapping;
 import org.pdxfinder.utilities.LoaderUtils;
@@ -231,6 +230,13 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
                 dataSource = sample.getDataSource();
                 diagnosis = sample.getDiagnosis();
+
+                // Per Nat 20180219, remove commas from the ontology terms
+                // to fix issues with term "Invasive Ductal Carcinoma, Not Otherwise Specified"
+                // URL parsing has trouble with commas
+                // Decided solution is to remove commas from ontology labels
+                // https://www.ebi.ac.uk/panda/jira/browse/PDXI-258
+                diagnosis = diagnosis.replaceAll(",", "");
 
                 if (sample.getOriginTissue() != null) {
                     originTissue = sample.getOriginTissue().getName();
