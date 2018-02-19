@@ -34,6 +34,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
 
             if(selected){
                 jQuery("#patient_age__"+id).prop('checked', true);
+                jQuery("#patient_age__" + id).siblings("label").find("span").addClass("selected");
                 openAgeFacet = true;
             }
 
@@ -42,8 +43,8 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
                 jQuery("#patient_age__"+id).siblings("label").find("span").append("+");
             }
 
-            var count = " ("+value.count+")";
-            jQuery("#patient_age__"+id).siblings("label").find("span").append(count);
+            var count = " (" + value.count + " of " + value.totalCount + ")";
+            // jQuery("#patient_age__"+id).siblings("label").find("span").append(count);
 
 
         });
@@ -74,12 +75,12 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
 
             if(selected){
                 jQuery("#patient_gender__"+id).prop('checked', true);
+                jQuery("#patient_gender__" + id).siblings("label").find("span").addClass("selected");
                 openGenderFacet = true;
             }
 
-            var count = " ("+value.count+")";
-            jQuery("#patient_gender__"+id).siblings("label").find("span").append(count);
-            console.log(id+" "+count);
+            var count = " (" + value.count + " of " + value.totalCount + ")";
+            // jQuery("#patient_gender__"+id).siblings("label").find("span").append(count);
 
         });
 
@@ -108,11 +109,12 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
 
             if(selected){
                 jQuery("#cancer_system__"+id).prop('checked', true);
+                jQuery("#cancer_system__" + id).siblings("label").find("span").addClass("selected");
                 openCancerBySystem = true;
             }
 
-            var count = " ("+value.count+")";
-            jQuery("#cancer_system__"+id).siblings("label").find("span").append(count);
+            var count = " (" + value.count + " of " + value.totalCount + ")";
+            // jQuery("#cancer_system__"+id).siblings("label").find("span").append(count);
 
         });
 
@@ -140,11 +142,12 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
 
             if (selected) {
                 jQuery("#datasource__" + id).prop('checked', true);
+                jQuery("#datasource__" + id).siblings("label").find("span").addClass("selected");
                 openDatasourceFacet = true;
             }
 
-            var count = " (" + value.count + ")";
-            jQuery("#datasource__" + id).siblings("label").find("span").append(count);
+            var count = " (" + value.count + " of " + value.totalCount + ")";
+            // jQuery("#datasource__" + id).siblings("label").find("span").append(count);
 
         });
 
@@ -173,11 +176,12 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
 
             if (selected) {
                 jQuery("#sample_tumor_type__" + id).prop('checked', true);
+                jQuery("#sample_tumor_type__" + id).siblings("label").find("span").addClass("selected");
                 openTumorTypeFacet = true;
             }
 
-            var count = " (" + value.count + ")";
-            jQuery("#sample_tumor_type__" + id).siblings("label").find("span").append(count);
+            var count = " (" + value.count + " of " + value.totalCount + ")";
+            // jQuery("#sample_tumor_type__" + id).siblings("label").find("span").append(count);
 
         });
 

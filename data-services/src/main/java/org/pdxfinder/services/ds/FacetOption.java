@@ -6,6 +6,7 @@ public class FacetOption implements Comparable {
 
     String name;
     Integer count;
+    Integer totalCount;
     Boolean selected;
     SearchFacetName facetType;
 
@@ -20,9 +21,10 @@ public class FacetOption implements Comparable {
         this.selected = selected;
     }
 
-    public FacetOption(String name, Integer count, Boolean selected, SearchFacetName facetType) {
+    public FacetOption(String name, Integer count, Integer totalCount, Boolean selected, SearchFacetName facetType) {
         this.name = name;
         this.count = count;
+        this.totalCount = totalCount;
         this.selected = selected;
         this.facetType = facetType;
     }
@@ -62,6 +64,14 @@ public class FacetOption implements Comparable {
 
     public void setFacetType(SearchFacetName facetType) {
         this.facetType = facetType;
+    }
+
+    public Integer getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(Integer totalCount) {
+        this.totalCount = totalCount;
     }
 
     @Override

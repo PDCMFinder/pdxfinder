@@ -565,49 +565,62 @@ public class SearchDS {
                                         .collect(Collectors.toSet())
                                         .contains(option))
                         .count();
-                map.add(new FacetOption(option, count.intValue(), selected != null && selected.contains(option) ? Boolean.TRUE : Boolean.FALSE, facet));
+                map.add(new FacetOption(option, selected != null ? 0 : count.intValue(), count.intValue(), selected != null && selected.contains(option) ? Boolean.TRUE : Boolean.FALSE, facet));
             }
         }
 
-//        // Iterate through results adding count to the appropriate option
-//        for (ModelForQuery mfq : results) {
-//
-//            String s = mfq.getBy(facet);
-//
-//            // Skip empty facets
-//            if (s == null || s.equals("")) {
-//                continue;
-//            }
-//
-//            // List of ontology terms may come from the service.  These will by separated by "::" delimiter
-//            if (s.contains("::")) {
-//
-//                for (String ss : s.split("::")) {
-//
-//                    // There should be only one element per facet name
-//                    map.forEach(x -> {
-//                        if (x.getName().equals(ss)) {
-//                            x.increment();
-//                        }
-//                    });
-//                }
-//
-//            } else {
-//
-//                // Initialise on the first time we see this facet name
-//                if (map.stream().noneMatch(x -> x.getName().equals(s))) {
-//                    map.add(new FacetOption(s, 0, selected != null && selected.contains(s) ? Boolean.TRUE : Boolean.FALSE, facet));
-//                }
-//
-//                // There should be only one element per facet name
-//                map.forEach(x -> {
-//                    if (x.getName().equals(s)) {
-//                        x.increment();
-//                    }
-//                });
-//            }
-//        }
-//
+        // We want the counts on the facets to look something like:
+        // Gender
+        //   [ ] Male (1005 of 1005)
+        //   [ ] Female (840 of 840)
+        //   [ ] Not specified (31 of 31)
+        // Then when a facet is clicked:
+        // Gender
+        //   [X] Male (1005 of (1005)
+        //   [ ] Female (0 of 840)
+        //   [ ] Not specified (2 of 31)
+        //
+
+
+        // Iterate through results adding count to the appropriate option
+        for (ModelForQuery mfq : results) {
+
+            String s = mfq.getBy(facet);
+
+            // Skip empty facets
+            if (s == null || s.equals("")) {
+                continue;
+            }
+
+            // List of ontology terms may come from the service.  These will by separated by "::" delimiter
+            if (s.contains("::")) {
+
+                for (String ss : s.split("::")) {
+
+                    // There should be only one element per facet name
+                    map.forEach(x -> {
+                        if (x.getName().equals(ss)) {
+                            x.increment();
+                        }
+                    });
+                }
+
+            } else {
+
+                // Initialise on the first time we see this facet name
+                if (map.stream().noneMatch(x -> x.getName().equals(s))) {
+                    map.add(new FacetOption(s, 0, 0, selected != null && selected.contains(s) ? Boolean.TRUE : Boolean.FALSE, facet));
+                }
+
+                // There should be only one element per facet name
+                map.forEach(x -> {
+                    if (x.getName().equals(s)) {
+                        x.increment();
+                    }
+                });
+            }
+        }
+
 
 //        Collections.sort(map);
 
