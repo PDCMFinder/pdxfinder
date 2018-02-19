@@ -169,8 +169,6 @@ public class LoadNCIT implements CommandLineRunner {
                         log.info("Replacing term label '{}' with '{}'", termLabel, updatedTermlabel);
                     }
 
-                    termLabel = termLabel.replaceAll(",", "");
-
                     OntologyTerm newTerm = loaderUtils.getOntologyTerm(term.getString("iri"), updatedTermlabel != null ? updatedTermlabel : termLabel);
 
                     JSONArray synonyms = term.getJSONArray("synonyms");
