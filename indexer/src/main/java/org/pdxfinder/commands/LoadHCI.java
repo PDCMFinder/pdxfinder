@@ -11,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.utilities.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +26,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
-import org.pdxfinder.utilities.Standardizer;
 
 /**
  * Load data from University of Texas MD Anderson PDXNet.
@@ -146,8 +146,9 @@ public class LoadHCI implements CommandLineRunner {
 
         pSnap.addSample(sample);
 
+        String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
         QualityAssurance qa = new QualityAssurance(j.getString("QA"),
-                NOT_SPECIFIED, ValidationTechniques.VALIDATION);
+                NOT_SPECIFIED, ValidationTechniques.VALIDATION, qaPassage);
         loaderUtils.saveQualityAssurance(qa);
         
         String engraftmentSite = Standardizer.getValue("Engraftment Site",j);

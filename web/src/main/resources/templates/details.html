@@ -198,9 +198,18 @@
                                         </thead>
                                         <tbody>
 
-                                        <tr><th class="text-left">Technology</th><td> </td></tr>
-                                        <tr><th class="text-left">Description</th><td> </td></tr>
-                                        <tr><th class="text-left">Passages</th><td> </td></tr>
+                                        <tr>
+                                            <th class="text-left">Technology</th>
+                                            <td th:text="${fullData.technology}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left">Description</th>
+                                            <td th:text="${fullData.description}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left">Passages</th>
+                                            <td th:text="${fullData.passages}"></td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>

@@ -171,18 +171,10 @@ public class LoadPDMRData implements CommandLineRunner {
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), tumorType, diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, DS.getAbbreviation());
 
-        /*
-        if (histologyMap.containsKey("Patient")) {
-            Histology histology = new Histology();
-            Image image = histologyMap.get("Patient");
-            histology.addImage(image);
-            sample.addHistology(histology);
+        // TODO: Update with actual QA data when available
+        String qaPassage = null;
 
-        }
-        */
-        // For the moment, all JAX models are assumed to have been validated using Histological assessment by a pathologist
-        // TODO: verify this is the case
-        QualityAssurance qa = new QualityAssurance("Histology", HISTOLOGY_NOTE, ValidationTechniques.VALIDATION);
+        QualityAssurance qa = new QualityAssurance("", "", ValidationTechniques.NOT_SPECIFIED, qaPassage);
         loaderUtils.saveQualityAssurance(qa);
 
         pSnap.addSample(sample);

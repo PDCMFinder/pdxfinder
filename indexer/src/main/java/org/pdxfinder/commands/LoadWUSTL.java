@@ -11,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.utilities.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -24,7 +25,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
-import org.pdxfinder.utilities.Standardizer;
 
 /**
  * Load data from WUSTL PDXNet.
@@ -161,8 +161,10 @@ public class LoadWUSTL implements CommandLineRunner {
         } catch (Exception e) {
             // not all groups supplied QA
         }
+        String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
+
         QualityAssurance qa = new QualityAssurance(qaType,
-                NOT_SPECIFIED, ValidationTechniques.VALIDATION);
+                NOT_SPECIFIED, ValidationTechniques.VALIDATION, qaPassage);
         loaderUtils.saveQualityAssurance(qa);
         String strain = j.getString("Strain");
         HostStrain bs = loaderUtils.getHostStrain(strain, strain, "", "");

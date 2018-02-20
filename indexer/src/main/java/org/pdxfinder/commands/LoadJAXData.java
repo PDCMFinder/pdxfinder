@@ -11,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.utilities.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +31,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.pdxfinder.utilities.Standardizer;
 
 /**
  * Load data from JAX.
@@ -189,8 +189,10 @@ public class LoadJAXData implements CommandLineRunner {
 
         }
 
-       
-        QualityAssurance qa = new QualityAssurance("Histology", HISTOLOGY_NOTE, ValidationTechniques.VALIDATION);
+        // TODO: When the QA information is available, replace this with actual data from the feed
+        String qaPassages = null;
+
+        QualityAssurance qa = new QualityAssurance("Histology", HISTOLOGY_NOTE, ValidationTechniques.VALIDATION, qaPassages);
         loaderUtils.saveQualityAssurance(qa);
 
         pSnap.addSample(sample);

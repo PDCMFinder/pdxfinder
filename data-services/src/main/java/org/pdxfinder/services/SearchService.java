@@ -174,6 +174,8 @@ public class SearchService {
         List<PatientSnapshot> ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
         ModelCreation pdx = modelCreationRepository.findBySourcePdxId(modelId);
 
+        QualityAssurance qa = pdx.getQualityAssurance();
+
         int skip = page * size;
         int totalRecords = 0;
         Set<Specimen> specimens = new HashSet<>();
@@ -211,6 +213,13 @@ public class SearchService {
         List<Specimen> specimenList = new ArrayList<>();
         Set<MolecularCharacterization>  molecularCharacterizations = new HashSet<>();
         Set<Platform>  platforms = new HashSet<>();
+
+        if (qa != null && qa.getValidationTechniques() != null) {
+            dto.setTechnology(qa.getValidationTechniques().getTechnique());
+        }
+
+        if (qa != null && qa.getDescription() != null) dto.setDescription(qa.getDescription());
+        if (qa != null && qa.getPassages() != null) dto.setPassages(qa.getPassages());
 
         if (specimens != null) {
 

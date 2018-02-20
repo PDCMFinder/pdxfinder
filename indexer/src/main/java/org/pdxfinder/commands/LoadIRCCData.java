@@ -359,7 +359,7 @@ public class LoadIRCCData implements CommandLineRunner {
                 pSnap.addSample(humanSample);
                 loaderUtils.savePatientSnapshot(pSnap);
 
-                QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT);
+                QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT, "");
                 loaderUtils.saveQualityAssurance(qa);
 
                 ModelCreation modelCreation = loaderUtils.createModelCreation(modelId, DS.getAbbreviation(), humanSample, qa);
