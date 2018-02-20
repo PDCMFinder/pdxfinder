@@ -6,11 +6,13 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.utilities.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +25,12 @@ import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import org.pdxfinder.utilities.Standardizer;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Load data from IRCC.
@@ -48,6 +53,7 @@ public class LoadIRCC implements CommandLineRunner {
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
+    public static final String FINGERPRINT_DESCRIPTION = "Model validated against patient germline.";
 
     private HostStrain nsgBS;
     private ExternalDataSource irccDS;
@@ -162,6 +168,27 @@ public class LoadIRCC implements CommandLineRunner {
 
         if ("TRUE".equals(job.getString("Fingerprinting").toUpperCase())) {
             qa.setValidationTechniques(ValidationTechniques.FINGERPRINT);
+            qa.setDescription(FINGERPRINT_DESCRIPTION);
+
+            // If the model includes which passages have had QA performed, set the passages on the QA node
+            if (job.has("QA Passage") && !job.getString("QA Passage").isEmpty()) {
+
+                List<String> passages = Stream.of(job.getString("QA Passage").split(","))
+                        .map(String::trim)
+                        .distinct()
+                        .collect(Collectors.toList());
+                List<Integer> passageInts = new ArrayList<>();
+
+                // NOTE:  IRCC uses passage 0 to mean Patient Tumor, so we need to harmonize according to the other
+                // sources.  Subtract 1 from every passage.
+                for (String p : passages) {
+                    Integer intPassage = Integer.parseInt(p);
+                    passageInts.add(intPassage - 1);
+                }
+
+                qa.setPassages(StringUtils.join(passages, ", "));
+
+            }
 
         }
 
