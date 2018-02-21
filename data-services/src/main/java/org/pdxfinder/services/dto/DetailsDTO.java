@@ -29,10 +29,10 @@ public class DetailsDTO {
     private String classification;
     private List<String> cancerGenomics;
 
-    private String sampleType;
+    private String sampleType; //Implantation Type
     private String strain;
     private String mouseSex;
-    private String engraftmentSite;
+    private String engraftmentSite; // Implantation Site
 
     private String externalUrl;
     private String externalUrlText;

@@ -159,7 +159,6 @@
                                     <tr><th class="text-left">Collection Tissue</th>          <td th:text="${sampleSite}"></td></tr>
                                     <tr><th class="text-left">Tumor type</th>                 <td th:text="${tumorType}"></td></tr>
                                     <tr><th class="text-left">Classification</th>             <td th:text="${classification}"></td></tr>
-                                    <tr><th class="text-left">Sample type</th>                <td th:text="${sampleType}"></td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -183,7 +182,7 @@
 
                                         <tr><th class="text-left">Strain</th><td th:text="${strain}"></td></tr>
                                         <tr><th class="text-left">Engraftment site</th><td th:text="${engraftmentSite}"></td></tr>
-                                        <tr><th class="text-left">Implantation type</th><td></td></tr>
+                                        <tr><th class="text-left">Implantation type</th><td th:text="${sampleType}"></td></tr>
                                         </tbody>
                                     </table>
                                 </div>

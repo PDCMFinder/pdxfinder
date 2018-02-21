@@ -172,7 +172,7 @@ public class SearchService {
         Sample sample = sampleRepository.findByDataSourceAndPdxId(dataSource,modelId);
         Patient patient = patientRepository.findByDataSourceAndModelId(dataSource,modelId);
         List<PatientSnapshot> ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
-        ModelCreation pdx = modelCreationRepository.findBySourcePdxId(modelId);
+        ModelCreation pdx = modelCreationRepository.findByDataSourceAndSourcePdxId(dataSource, modelId);
 
         QualityAssurance qa = pdx.getQualityAssurance();
 
@@ -230,9 +230,11 @@ public class SearchService {
             }catch (Exception e){ }
         }
 
+        // "NOD SCID GAMA"=>"P1, P2"
+        Map<String, String> hostStrainMap = new HashMap<>();
+
         for (Specimen specimen : specimens) {
-            try
-            {
+            try {
                 specimenList.add(specimen);
                 molecularCharacterizations.addAll(specimen.getSample().getMolecularCharacterizations());
 
@@ -240,6 +242,7 @@ public class SearchService {
                     markerAssociatonSet.add(dMolkar.getMarkerAssociations());
                     platforms.add(dMolkar.getPlatform());
                 }
+
             }catch (Exception e){ }
         }
 
@@ -326,6 +329,78 @@ public class SearchService {
         if (pdx != null && pdx.getSourcePdxId() != null) {
             dto.setModelId(pdx.getSourcePdxId());
         }
+
+        if(pdx!= null && pdx.getSpecimens() != null){
+
+            Set<Specimen> sp = pdx.getSpecimens();
+
+            for(Specimen s:sp){
+
+                if(s.getHostStrain() != null && s.getPassage() != null){
+
+                    String hostStrain = s.getHostStrain().getName();
+                    String p = s.getPassage();
+
+                    if(hostStrainMap.containsKey(hostStrain)){
+                        String composedPassage = hostStrainMap.get(hostStrain);
+                        composedPassage+=", P"+p;
+                        hostStrainMap.put(hostStrain, composedPassage);
+
+                    }
+                    else{
+                        hostStrainMap.put(hostStrain, "P"+p);
+                    }
+
+
+                    //Set implantation site and type
+                    if(s.getImplantationSite() != null){
+                        dto.setEngraftmentSite(s.getImplantationSite().getName());
+                    }
+                    else{
+
+                        dto.setEngraftmentSite("Not Specified");
+                    }
+
+                    if(s.getImplantationType() != null){
+                        dto.setSampleType(s.getImplantationType().getName());
+                    }
+                    else{
+
+                        dto.setSampleType("Not Specified");
+                    }
+
+
+
+                }
+
+            }
+
+
+        }
+
+        String composedStrain = "";
+
+        if(hostStrainMap.size() > 1){
+
+            for (Map.Entry<String, String> entry : hostStrainMap.entrySet()) {
+                String strain = entry.getKey();
+                String passages = entry.getValue();
+
+                composedStrain += strain+" ("+passages+" ); ";
+            }
+        }
+        else if(hostStrainMap.size() == 1){
+
+            for(String key:hostStrainMap.keySet()){
+                composedStrain = key;
+            }
+        }
+        else{
+            composedStrain = "Not Specified";
+        }
+
+        dto.setStrain(composedStrain);
+
 
         if (sample != null && sample.getMolecularCharacterizations() != null) {
             List<String> markerList = new ArrayList<>();
