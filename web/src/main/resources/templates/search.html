@@ -131,11 +131,11 @@
 
                                 <div class="columns small-7 medium-push-2 small-push-3  margin-bottom-none search-text-wrapper">
 
-                                    <select class="form-control" id="query" name="query" type="text" tabindex="2"
+                                    <select class="form-control" id="query" name="diagnosis" type="text" tabindex="2"
                                             th:if="${query == null || query == ''}"
                                             placeholder="Search (e.g., Melanoma)" multiple></select>
 
-                                    <select class="form-control" id="query" name="query" type="text" tabindex="2"  th:if="${query != null && query != ''}" multiple>
+                                    <select class="form-control" id="query" name="diagnosis" type="text" tabindex="2"  th:if="${query != null && query != ''}" multiple>
 
                                         <option th:if="${query != null && query != ''}" th:attr="selected='selected'" th:text="${query}"/>
 
@@ -166,8 +166,7 @@
             <section class="row padding-vertical-30">
                 <div class="columns medium-12">
                     <span th:if="${#strings.isEmpty(text_search_desc)}">
-                        Viewing <span th:text="${totalResults}">a number of</span> result<span
-                            th:if="${totalResults ne 1}">s</span>.
+                        Viewing <span th:text="${totalResults}">a number of</span> result<span th:if="${totalResults ne 1}">s</span>.
                     </span>
                     <span th:unless="${#strings.isEmpty(text_search_desc)}">
                         <span th:remove="tag" th:utext="${text_search_desc}">Viewing results</span>
