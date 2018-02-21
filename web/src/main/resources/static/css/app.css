@@ -5377,6 +5377,7 @@ ul.pdx-accordion-2 div.accordion-content {
     box-shadow: none;
     padding: 0;
     width: 10%;
+    min-width: 180px;
     margin: 0; }
   .choices[data-type*='select-one'] .choices__input {
     box-shadow: none; }
