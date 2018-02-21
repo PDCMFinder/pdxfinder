@@ -226,9 +226,22 @@ public class LoaderUtils {
         Tissue origin = this.getTissue(originStr);
         Tissue sampleSite = this.getTissue(sampleSiteStr);
         Sample sample = sampleRepository.findBySourceSampleIdAndDataSource(sourceSampleId, dataSource);
+
+        String updatedDiagnosis = diagnosis;
+
+        // Changes Malignant * Neoplasm to * Cancer
+        String pattern = "(.*)Malignant(.*)Neoplasm(.*)";
+
+        if (diagnosis.matches(pattern)) {
+            updatedDiagnosis = (diagnosis.replaceAll(pattern, "\t$1$2Cancer$3")).trim();
+            log.info("Replacing diagnosis '{}' with '{}'", diagnosis, updatedDiagnosis);
+        }
+
+        updatedDiagnosis = updatedDiagnosis.replaceAll(",", "");
+
         if (sample == null) {
 
-            sample = new Sample(sourceSampleId, type, diagnosis, origin, sampleSite, extractionMethod, classification, normalTissue, dataSource);
+            sample = new Sample(sourceSampleId, type, updatedDiagnosis, origin, sampleSite, extractionMethod, classification, normalTissue, dataSource);
             sampleRepository.save(sample);
         }
 

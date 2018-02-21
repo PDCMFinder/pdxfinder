@@ -338,7 +338,7 @@ public class ValidateIRCCData implements CommandLineRunner {
                 pSnap.addSample(sample);
                 loaderUtils.savePatientSnapshot(pSnap);
 
-                QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT);
+                QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT, null);
                 loaderUtils.saveQualityAssurance(qa);
 
                 ModelCreation mc = loaderUtils.createModelCreation(samples.get(i).getModelId(),DS.getAbbreviation(), sample, qa);
