@@ -108,7 +108,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
     @Transactional
     void createGraphObjects(JSONObject j) throws Exception {
-        String id = j.getString("Model ID");
+        String id = j.getString("Model ID").trim();
 
         // the preference is for histology
         String diagnosis = j.getString("Clinical Diagnosis");
