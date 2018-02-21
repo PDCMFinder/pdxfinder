@@ -165,7 +165,9 @@ public class SearchController {
 
         // If there is a diagnosis, append the diagnosis parameters to any configured facet string
         if (diagnosis.isPresent() && !diagnosis.get().isEmpty()) {
-            facetString = StringUtils.join(Arrays.asList("diagnosis=" + diagnosis.get(), facetString), "&");
+            for (String diag : diagnosis.get()) {
+                facetString = StringUtils.join(Arrays.asList("diagnosis=" + diag, facetString), "&");
+            }
         }
 
         // Num pages is converted to an int using this formula int n = a / b + (a % b == 0) ? 0 : 1;
