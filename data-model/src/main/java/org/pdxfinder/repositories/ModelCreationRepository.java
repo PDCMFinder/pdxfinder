@@ -80,6 +80,12 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt, tr, t, otm, ot, ottm, term ")
     Collection<ModelCreation> getModelsWithPatientData();
 
+    @Query("MATCH " +
+            "(mc:ModelCreation)-[msr:MODEL_SAMPLE_RELATION]-(s:Sample)" +
+            "-[cbr:CHARACTERIZED_BY]-(molChar:MolecularCharacterization)" +
+            "-[pur:PLATFORM_USED]-(p:Platform) " +
+            "RETURN mc, msr, s, cbr, molChar, pur, p")
+    Collection<ModelCreation> getAllModelsPlatforms();
 
 
 

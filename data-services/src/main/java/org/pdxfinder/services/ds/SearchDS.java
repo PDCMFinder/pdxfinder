@@ -2,6 +2,7 @@ package org.pdxfinder.services.ds;
 
 import org.pdxfinder.dao.ModelCreation;
 import org.pdxfinder.dao.OntologyTerm;
+import org.pdxfinder.dao.Sample;
 import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.repositories.ModelCreationRepository;
 import org.slf4j.Logger;
@@ -92,6 +93,30 @@ public class SearchDS {
         Assert.notNull(modelCreationRepository, "Model repository cannot be null");
         this.models = new HashSet<>();
 
+        // Get out all platforms for all models and populate a map with the results
+        Map<Long, List<String>> platformsByModel = new HashMap<>();
+        Collection<ModelCreation> allModelsPlatforms = modelCreationRepository.getAllModelsPlatforms();
+        for (ModelCreation mc : allModelsPlatforms) {
+
+            if (!platformsByModel.containsKey(mc.getId())) {
+                platformsByModel.put(mc.getId(), new ArrayList<>());
+            }
+
+            // Are ther any molecular characterizations asspcoated to this model?
+            if (mc.getRelatedSamples().stream().map(Sample::getMolecularCharacterizations).mapToLong(Collection::size).sum() > 0) {
+
+                // Get all molecular characterizations platforms into a list
+                platformsByModel.get(mc.getId()).addAll(
+                        mc.getRelatedSamples().stream()
+                                .map(Sample::getMolecularCharacterizations)
+                                .flatMap(Collection::stream)
+                                .map(x -> x.getPlatform().getName())
+                                .distinct()
+                                .collect(Collectors.toList()));
+            }
+        }
+
+
         // Mapping NCIT ontology term labels to display labels
         this.cancerSystemMap.put("Breast Cancer", "Breast Cancer");
         this.cancerSystemMap.put("Cardiovascular Cancer", "Cardiovascular Cancer");
@@ -122,6 +147,8 @@ public class SearchDS {
             mfq.setModelId(mc.getId());
             mfq.setExternalId(mc.getSourcePdxId());
             mfq.setDatasource(mc.getDataSource());
+
+            mfq.setDataAvailable(platformsByModel.get(mc.getId()));
 
             if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
                 mfq.setTreatmentHistory(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());

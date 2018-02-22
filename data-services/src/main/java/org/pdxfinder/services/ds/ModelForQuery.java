@@ -145,7 +145,7 @@ public class ModelForQuery {
     private String treatmentHistory;
 
     @JsonProperty("Other Available Data")
-    private String dataAvailable;
+    private List<String> dataAvailable;
 
     @JsonIgnore
     private Set<String> allOntologyTermAncestors;
@@ -371,11 +371,11 @@ public class ModelForQuery {
         this.treatmentHistory = treatmentHistory;
     }
 
-    public String getDataAvailable() {
+    public List<String> getDataAvailable() {
         return dataAvailable;
     }
 
-    public void setDataAvailable(String dataAvailable) {
+    public void setDataAvailable(List<String> dataAvailable) {
         this.dataAvailable = dataAvailable;
     }
 

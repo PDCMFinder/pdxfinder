@@ -364,7 +364,7 @@
                                 <th>Type</th>
                                 <th>Age</th>
                                 <th>Sex</th>
-                                <th>Treatment history</th>
+                                <th>Data Available</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -379,7 +379,11 @@
                                 <td th:text="${model.sampleTumorType}">Metastatic</td>
                                 <td th:text="${model.patientAge}">Age</td>
                                 <td th:text="${model.patientGender}">Gender</td>
-                                <td th:text="${model.treatmentHistory}">history</td>
+                                <td>
+                                    <th:block th:each="platform : ${model.dataAvailable}">
+                                        <th:block th:utext="${platform} + '<br />'">platform</th:block>
+                                    </th:block>
+                                </td>
                             </tr>
 
                             </tbody>
