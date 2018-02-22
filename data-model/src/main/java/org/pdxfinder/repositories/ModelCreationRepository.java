@@ -81,4 +81,41 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     Collection<ModelCreation> getModelsWithPatientData();
 
 
+
+
+    @Query("MATCH (mc:ModelCreation)--(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
+
+            "            WHERE  psamp.dataSource = {dataSource}  " +
+            "            AND    mc.sourcePdxId = {modelId}  " +
+            "            AND    (mc.technology = {tech}  OR {tech} = '' ) " +
+
+            "            OR toLower(m.symbol) CONTAINS toLower({search}) " +
+            "            OR toLower(mc.technology) CONTAINS toLower({search}) " +
+            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
+            "            RETURN count(*) ")
+    Integer variationCountByDataSourceAndPdxIdAndPlatform(@Param("dataSource") String dataSource,
+                                            @Param("modelId") String modelId,
+                                            @Param("tech") String tech,
+                                            @Param("search") String search);
+
+
+    @Query("MATCH(pat:Patient)-[patRel:PATIENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
+            "WITH pat,patRel,ps,sfrm,psamp,char,molch,mAss,m " +
+            "Match (psamp)-[imp:IMPLANTED_IN]-(mc:ModelCreation) " +
+            "            WHERE  psamp.dataSource = {dataSource}  " +
+            "            AND    mc.sourcePdxId = {modelId}  " +
+            "            AND    (mc.technology = {tech}  OR {tech} = '' ) " +
+
+
+            "            OR toLower(m.symbol) CONTAINS toLower({search})" +
+            "            OR toLower(mc.technology) CONTAINS toLower({search})" +
+            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
+
+            "            RETURN pat,patRel,ps,sfrm,psamp,char,molch,mAss,m SKIP {skip} LIMIT {lim} ")
+    ModelCreation findVariationBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
+                                                      @Param("modelId") String modelId,
+                                                      @Param("tech") String tech,
+                                                      @Param("search") String search,
+                                                      @Param("skip") int skip,
+                                                      @Param("lim") int lim);
 }
