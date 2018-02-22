@@ -40,18 +40,18 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
 
 
     @Query("MATCH(pat:Patient)-[patRel:PATIENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
-            "WITH pat,patRel,ps,sfrm,samp,char,molch,mAss,m" +
-            "Match (samp)-[imp:IMPLANTED_IN]-(mc:ModelCreation) " +
+            "WITH pat,patRel,ps,sfrm,psamp,char,molch,mAss,m " +
+            "Match (psamp)-[imp:IMPLANTED_IN]-(mc:ModelCreation) " +
             "            WHERE  psamp.dataSource = {dataSource}  " +
             "            AND    mc.sourcePdxId = {modelId}  " +
             "            AND    (mc.technology = {tech}  OR {tech} = '' ) " +
 
-            "            AND ( toLower(spec.externalId) CONTAINS toLower({search})" +
+
             "            OR toLower(m.symbol) CONTAINS toLower({search})" +
             "            OR toLower(mc.technology) CONTAINS toLower({search})" +
-            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) ) ) " +
+            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
 
-            "            RETURN pat,patRel,ps,sfrm,samp,char,molch,mAss,m SKIP {skip} LIMIT {lim} ")
+            "            RETURN pat,patRel,ps,sfrm,psamp,char,molch,mAss,m SKIP {skip} LIMIT {lim} ")
     Set<Patient> findSpecimenBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
                                                        @Param("modelId") String modelId,
                                                        @Param("tech") String tech,
@@ -64,16 +64,15 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
 
 
     @Query("MATCH(pat:Patient)-[patRel:PATIENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
-            "WITH pat,patRel,ps,sfrm,samp,char,molch,mAss,m" +
-            "Match (samp)-[imp:IMPLANTED_IN]-(mc:ModelCreation) " +
+            "WITH pat,patRel,ps,sfrm,psamp,char,molch,mAss,m " +
+            "Match (psamp)-[imp:IMPLANTED_IN]-(mc:ModelCreation) " +
             "            WHERE  psamp.dataSource = {dataSource}  " +
             "            AND    mc.sourcePdxId = {modelId}  " +
             "            AND    (mc.technology = {tech}  OR {tech} = '' ) " +
 
-            "            AND ( toLower(spec.externalId) CONTAINS toLower({search})" +
-            "            OR toLower(m.symbol) CONTAINS toLower({search})" +
-            "            OR toLower(mc.technology) CONTAINS toLower({search})" +
-            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) ) ) " +
+            "            OR toLower(m.symbol) CONTAINS toLower({search}) " +
+            "            OR toLower(mc.technology) CONTAINS toLower({search}) " +
+            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
             "            RETURN count(*) ")
     Integer countByBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
                                                       @Param("modelId") String modelId,

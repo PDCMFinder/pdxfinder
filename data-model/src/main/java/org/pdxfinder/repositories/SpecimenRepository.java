@@ -31,8 +31,8 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
 
 
-    @Query("MATCH (mod:ModelCreation)-[sp:SPECIMENS]-(spec:Specimen)-[sfrm:SAMPLED_FROM]-(msamp:Sample) " +
-            "            -[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
+    @Query("MATCH (mod:ModelCreation)-[sp:SPECIMENS]-(spec:Specimen)-[sfrm:SAMPLED_FROM]-(msamp:Sample)" +
+            "-[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
             "            WITH mod, sp, spec, sfrm,msamp, char,molchar, assoc,mAss, aw,m " +
             "            MATCH (molchar)-[pl:PLATFORM_USED]-(tech:Platform) " +
 
@@ -94,5 +94,21 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
                                               @Param("passage") String passage,
                                               @Param("search") String search);
 
+
+
+    @Query("MATCH (mod:ModelCreation)--(spec:Specimen)--(msamp:Sample)--(molchar:MolecularCharacterization)-->(mAss:MarkerAssociation)--(m:Marker) " +
+            "            WITH mod,spec,msamp,molchar,mAss,m " +
+            "            MATCH (molchar)--(tech:Platform) " +
+
+            "            WHERE  mod.dataSource = {dataSource}  " +
+            "            AND    mod.sourcePdxId = {modelId}  " +
+            "            AND    (tech.name = {tech}  OR {tech} = '' ) " +
+            "            AND    (spec.passage = {passage} OR {passage} = '' )" +
+
+            "            RETURN count(*) ")
+    Integer countByPlatform(@Param("dataSource") String dataSource,
+                                              @Param("modelId") String modelId,
+                                              @Param("tech") String tech,
+                                              @Param("passage") String passage);
 
 }

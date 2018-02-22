@@ -494,8 +494,12 @@ public class SearchService {
 
         List<MolecularCharacterization> molecularCharacterizations = molecularCharacterizationRepository.findPatientPlatformByModelId(dataSource,modelId);
 
-        for (MolecularCharacterization molecularCharacterization : molecularCharacterizations) {
-            platformMap.put(molecularCharacterization.getTechnology(), molecularCharacterization.getTechnology());
+        for (MolecularCharacterization mc : molecularCharacterizations) {
+
+            if(mc.getPlatform() != null){
+                platformMap.put(mc.getPlatform().getName(), mc.getPlatform().getName());
+            }
+
         }
 
         return platformMap;
@@ -505,30 +509,26 @@ public class SearchService {
     public VariationDataDTO patientVariationDataByPlatform(String dataSource, String modelId, String technology,
                                                            String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
 
-        int recordsTotal = patientRepository.countByBySourcePdxIdAndPlatform(dataSource,modelId,technology,"");
+        //int recordsTotal = patientRepository.countByBySourcePdxIdAndPlatform(dataSource,modelId,technology,"");
+
+        int recordsTotal = modelCreationRepository.variationCountByDataSourceAndPdxIdAndPlatform(dataSource,modelId,technology,"");
+
         int recordsFiltered = recordsTotal;
 
         if (!searchParam.isEmpty()) {
-            recordsFiltered = patientRepository.countByBySourcePdxIdAndPlatform(dataSource,modelId,technology,searchParam);
+            recordsFiltered = modelCreationRepository.variationCountByDataSourceAndPdxIdAndPlatform(dataSource,modelId,technology,searchParam);
         }
 
         /**
          * Retrieve the Records based on search parameter
          */
-        Set<Patient> patients = patientRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,searchParam,start,size);
+        ModelCreation model = modelCreationRepository.findVariationBySourcePdxIdAndPlatform(dataSource,modelId,technology,searchParam,start,size);
         VariationDataDTO variationDataDTO = new VariationDataDTO();
         List<String[]> variationData = new ArrayList();
 
-        if (patients != null) {
-            for (Patient patient : patients) {
+        if (model != null && model.getSample() != null ) {
 
-                for (PatientSnapshot patientSnapshot : patient.getSnapshots()) {
-
-                    for (Sample sample : patientSnapshot.getSamples()) {
-                        variationData.addAll( buildUpDTO(sample,draw,recordsTotal,recordsFiltered) );
-                    }
-                }
-            }
+            variationData.addAll(buildUpDTO(model.getSample(),draw,recordsTotal,recordsFiltered));
         }
 
         variationDataDTO.setDraw(draw);
@@ -546,7 +546,9 @@ public class SearchService {
         /**
          * 1st count all the records and set Total Records & Initialize Filtered Record as Total record
          */
-        int recordsTotal = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,passage,"");
+        //int recordsTotal = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,passage,"");
+        int recordsTotal = specimenRepository.countByPlatform(dataSource,modelId,technology,passage);
+
         int recordsFiltered = recordsTotal;
 
         /**
