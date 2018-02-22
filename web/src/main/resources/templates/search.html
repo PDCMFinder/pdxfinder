@@ -381,7 +381,7 @@
                                 <td th:text="${model.patientGender}">Gender</td>
                                 <td>
                                     <th:block th:each="platform : ${model.dataAvailable}">
-                                        <th:block th:utext="${platform} + '<br />'">platform</th:block>
+                                        <span style="font-size: 12px;" th:utext="${platform} + '<br />'">platform</span>
                                     </th:block>
                                 </td>
                             </tr>
