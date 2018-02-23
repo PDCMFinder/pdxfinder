@@ -102,7 +102,9 @@ public class SearchDS {
                 platformsByModel.put(mc.getId(), new ArrayList<>());
             }
 
-            // Are ther any molecular characterizations asspcoated to this model?
+            int allMarkerAssoc = modelCreationRepository.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId());
+
+            // Are there any molecular characterizations associated to this model?
             if (mc.getRelatedSamples().stream().map(Sample::getMolecularCharacterizations).mapToLong(Collection::size).sum() > 0) {
 
                 // Get all molecular characterizations platforms into a list
@@ -110,7 +112,13 @@ public class SearchDS {
                         mc.getRelatedSamples().stream()
                                 .map(Sample::getMolecularCharacterizations)
                                 .flatMap(Collection::stream)
-                                .map(x -> x.getPlatform().getName())
+                                .map(x ->  {
+                                    if (allMarkerAssoc != 0){
+                                        return x.getPlatform().getName();
+                                    }else{
+                                        return "";
+                                    }
+                                })
                                 .distinct()
                                 .collect(Collectors.toList()));
             }
@@ -141,6 +149,8 @@ public class SearchDS {
         //   populate and cache the models set
         //
 
+        List<String> padding = new ArrayList<>();
+        padding.add("NO DATA");
         for (ModelCreation mc : modelCreationRepository.getModelsWithPatientData()) {
 
             ModelForQuery mfq = new ModelForQuery();
