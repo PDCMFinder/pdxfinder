@@ -163,7 +163,10 @@ public class LoadHCI implements CommandLineRunner {
         String[] markers = markerStr.split(";");
         if (markerStr.trim().length() > 0) {
 
-            MolecularCharacterization molC = new MolecularCharacterization(j.getString("Platform"));
+            Platform pl = loaderUtils.getPlatform(j.getString("Platform"), hciDS);
+            MolecularCharacterization molC = new MolecularCharacterization();
+            molC.setPlatform(pl);
+
             Set<MarkerAssociation> markerAssocs = new HashSet();
 
             for (int i = 0; i < markers.length; i++) {

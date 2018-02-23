@@ -192,7 +192,10 @@ public class LoadWUSTL implements CommandLineRunner {
         String[] markers = markerStr.split(";");
         if (markerStr.trim().length() > 0) {
 
+            Platform pl = loaderUtils.getPlatform(markerPlatform, mdaDS);
             MolecularCharacterization molC = new MolecularCharacterization(markerPlatform);
+            molC.setPlatform(pl);
+
             Set<MarkerAssociation> markerAssocs = new HashSet();
 
             for (int i = 0; i < markers.length; i++) {
