@@ -15,10 +15,12 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
 
     MolecularCharacterization findByTechnology(@Param("technology") String technology);
 
-    @Query("MATCH(pat:Patient)--(ps:PatientSnapshot)--(samp:Sample)--(molch:MolecularCharacterization) with pat,ps,samp,molch " +
-            "Match (samp)-[imp:IMPLANTED_IN]-(mc:ModelCreation) " +
-            "WHERE samp.dataSource = {dataSource} AND mc.sourcePdxId = {modelId} " +
-            "RETURN distinct molch")
+    @Query("MATCH (ps:PatientSnapshot)--(samp:Sample)--(mod:ModelCreation)  " +
+            "WHERE mod.sourcePdxId = {modelId} " +
+            "AND mod.dataSource = {dataSource} " +
+            "WITH samp " +
+            "MATCH (samp)--(molch:MolecularCharacterization)--(pl:Platform) " +
+            "RETURN distinct molch  ")
     List<MolecularCharacterization> findPatientPlatformByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
 }

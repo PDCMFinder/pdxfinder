@@ -47,6 +47,8 @@ public class DetailsPageController {
 
         DetailsDTO dto = searchService.searchForModel(dataSrc,modelId,viewPage,viewSize,"","","");
 
+        List<String> relatedModels = searchService.getModelsOriginatedFromSamePatient(dataSrc, modelId);
+
         List<VariationDataDTO> variationDataDTOList = new ArrayList<>();
         for (String tech : modelTechAndPassages.keySet()) {
             VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,"",viewPage,viewSize,"",1,"","");
@@ -103,8 +105,20 @@ public class DetailsPageController {
         model.addAttribute("modelInfo", modelTechAndPassages);
         model.addAttribute("patientInfo", patientTech);
 
+        model.addAttribute("relatedModels", relatedModels);
+        /*
+        if(relatedModels.size()>0){
+            String rm = "";
+            for (String mod:relatedModels){
+                rm+="<a href=\"/data/pdx/"+dto.getDataSource()+"/"+mod+"\">"+mod+"</a>";
+            }
+            model.addAttribute("relatedModels", rm);
+        }
+        else{
+            model.addAttribute("relatedModels", "-");
+        }
+        */
 
-        //TODO: return error page if sampleId does not exist
         return "details";
     }
 }
