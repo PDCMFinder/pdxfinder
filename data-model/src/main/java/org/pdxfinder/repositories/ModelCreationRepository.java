@@ -87,4 +87,52 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN mc, msr, s, cbr, molChar, pur, p")
     Collection<ModelCreation> getAllModelsPlatforms();
 
+
+
+    @Query("MATCH (mc:ModelCreation)--(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
+            "            WHERE  mc.dataSource = {dataSource}  " +
+            "            AND    mc.sourcePdxId = {modelId}  " +
+            "WITH mc, psamp, char, molch, assoc, mAss, aw, m " +
+            "MATCH (molch)-[pu:PLATFORM_USED]-(pl:Platform) " +
+
+            "            WHERE (pl.name = {tech}  OR {tech} = '' ) " +
+
+            "            OR toLower(m.symbol) CONTAINS toLower({search}) " +
+            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
+            "            RETURN count(*) ")
+    Integer variationCountByDataSourceAndPdxIdAndPlatform(@Param("dataSource") String dataSource,
+                                                          @Param("modelId") String modelId,
+                                                          @Param("tech") String tech,
+                                                          @Param("search") String search);
+
+
+    @Query("MATCH (mc:ModelCreation)--(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
+
+            "            WHERE  mc.dataSource = {dataSource}  " +
+            "            AND    mc.sourcePdxId = {modelId}  " +
+            "WITH mc, psamp, char, molch, assoc, mAss, aw, m " +
+            "MATCH (molch)-[pu:PLATFORM_USED]-(pl:Platform) " +
+
+            "            WHERE (pl.name = {tech}  OR {tech} = '' ) " +
+
+
+            "            OR toLower(m.symbol) CONTAINS toLower({search})" +
+            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
+
+            "            RETURN mc,psamp,char,molch,mAss,m, pu, pl SKIP {skip} LIMIT {lim} ")
+    ModelCreation findVariationBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
+                                                        @Param("modelId") String modelId,
+                                                        @Param("tech") String tech,
+                                                        @Param("search") String search,
+                                                        @Param("skip") int skip,
+                                                        @Param("lim") int lim);
+
+    @Query("MATCH (mc:ModelCreation)-[msr:MODEL_SAMPLE_RELATION]-(s:Sample)" +
+            "-[cbr:CHARACTERIZED_BY]-(molChar:MolecularCharacterization)" +
+            "-[assW:ASSOCIATED_WITH]-(mAss:MarkerAssociation) where mc.sourcePdxId={sourcePdxId} " +
+            "RETURN count(mAss) ")
+    Integer countMarkerAssociationBySourcePdxId(@Param("sourcePdxId") String sourcePdxId);
+
+
+
 }
