@@ -6,6 +6,7 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -78,4 +79,17 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
                                                       @Param("modelId") String modelId,
                                                       @Param("tech") String tech,
                                                       @Param("search") String search);
+
+
+
+    @Query("MATCH (p:Patient)--(ps:PatientSnapshot)--(s:Sample)--(mod:ModelCreation) " +
+            "WHERE mod.dataSource = {dataSource} " +
+            "AND mod.sourcePdxId = {modelId} " +
+            "WITH p " +
+            "MATCH (p:Patient)--(ps:PatientSnapshot)--(s:Sample)--(mod:ModelCreation) " +
+            "WHERE mod.sourcePdxId <> {modelId} " +
+            "RETURN mod.sourcePdxId")
+    List<String> getModelsOriginatedFromSamePatientByDataSourceAndModelId(@Param("dataSource") String dataSource,
+                                                                          @Param("modelId") String modelId);
+
 }

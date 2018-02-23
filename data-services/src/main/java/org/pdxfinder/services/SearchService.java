@@ -581,6 +581,10 @@ public class SearchService {
     }
 
 
+    public List<String> getModelsOriginatedFromSamePatient(String dataSource, String modelId){
+
+        return patientRepository.getModelsOriginatedFromSamePatientByDataSourceAndModelId(dataSource, modelId);
+    }
 
 
     public List<String[]> buildUpDTO(Sample sample,int draw,int recordsTotal,int recordsFiltered){
