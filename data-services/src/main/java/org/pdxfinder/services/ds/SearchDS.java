@@ -102,8 +102,6 @@ public class SearchDS {
                 platformsByModel.put(mc.getId(), new ArrayList<>());
             }
 
-            int allMarkerAssoc = modelCreationRepository.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId());
-
             // Are there any molecular characterizations associated to this model?
             if (mc.getRelatedSamples().stream().map(Sample::getMolecularCharacterizations).mapToLong(Collection::size).sum() > 0) {
 
@@ -113,11 +111,11 @@ public class SearchDS {
                                 .map(Sample::getMolecularCharacterizations)
                                 .flatMap(Collection::stream)
                                 .map(x ->  {
-                                    if (allMarkerAssoc != 0){
-                                        return x.getPlatform().getName();
-                                    }else{
-                                        return "";
-                                    }
+                                        if (modelCreationRepository.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), x.getPlatform().getName()) != 0) {
+                                            return x.getPlatform().getName();
+                                        } else {
+                                            return " ";
+                                        }
                                 })
                                 .distinct()
                                 .collect(Collectors.toList()));
