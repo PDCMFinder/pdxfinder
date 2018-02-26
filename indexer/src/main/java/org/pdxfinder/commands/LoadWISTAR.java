@@ -152,7 +152,7 @@ public class LoadWISTAR implements CommandLineRunner {
         
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 NOT_SPECIFIED, NOT_SPECIFIED,
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS);
+                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS.getAbbreviation());
 
         pSnap.addSample(sample);
 
