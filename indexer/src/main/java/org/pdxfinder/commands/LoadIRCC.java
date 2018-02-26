@@ -48,6 +48,8 @@ public class LoadIRCC implements CommandLineRunner {
     private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
+    
+    private final static String TECH = "MUT targeted NGS";
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -68,6 +70,7 @@ public class LoadIRCC implements CommandLineRunner {
 
     // samples -> markerAsssociations
     private HashMap<String, HashSet<MarkerAssociation>> markerAssociations = new HashMap();
+    private HashMap<String, HashMap<String, String>> specimenSamples = new HashMap();
     private HashMap<String, HashMap<String, String>> modelSamples = new HashMap();
 
     @Value("${irccpdx.url}")
@@ -96,13 +99,16 @@ public class LoadIRCC implements CommandLineRunner {
         parser.accepts("loadIRCC", "Load IRCC PDX data");
         parser.accepts("loadALL", "Load all, including IRCC PDX data");
         OptionSet options = parser.parse(args);
+        
+        irccDS = loaderUtils.getExternalDataSource(IRCC_DATASOURCE_ABBREVIATION, IRCC_DATASOURCE_NAME, IRCC_DATASOURCE_DESCRIPTION);
+        nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         if (options.has("loadIRCC") || options.has("loadALL")) {
 
             log.info("Loading IRCC PDX data.");
 
             if (variationURLStr != null && variationMax != 0) {
-                loadVariants();
+                loadVariantsBySpecimen();
             }
             if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
@@ -115,8 +121,7 @@ public class LoadIRCC implements CommandLineRunner {
 
     private void parseModels(String json) {
 
-        irccDS = loaderUtils.getExternalDataSource(IRCC_DATASOURCE_ABBREVIATION, IRCC_DATASOURCE_NAME, IRCC_DATASOURCE_DESCRIPTION);
-        nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
+       
 
         try {
             JSONObject job = new JSONObject(json);
@@ -133,9 +138,7 @@ public class LoadIRCC implements CommandLineRunner {
             log.error("Error getting IRCC PDX models", e);
 
         }
-        System.out.println(markerAssociations.size()+" un matched samples");
-        System.out.println(modelSamples.size()+" un matched models");
-        for(String model :modelSamples.keySet())System.out.println(model);
+       
     }
 
     @Transactional
@@ -198,6 +201,8 @@ public class LoadIRCC implements CommandLineRunner {
         for (int i = 0; i < specimens.length(); i++) {
             JSONObject specimenJSON = specimens.getJSONObject(i);
 
+            String specimenId = specimenJSON.getString("Specimen ID");
+            
             Specimen specimen = loaderUtils.getSpecimen(modelCreation,
                     modelCreation.getSourcePdxId(), irccDS.getAbbreviation(), specimenJSON.getString("Passage"));
 
@@ -209,6 +214,8 @@ public class LoadIRCC implements CommandLineRunner {
             ImplantationType it = new ImplantationType(specimenJSON.getString("Engraftment Type"));
             specimen.setImplantationType(it);
 
+            
+            
             JSONArray platforms = specimenJSON.getJSONArray("Platforms");
             HashSet<MolecularCharacterization> mcs = new HashSet();
             for (int j = 0; j < platforms.length(); j++) {
@@ -222,7 +229,10 @@ public class LoadIRCC implements CommandLineRunner {
                 mcs.add(mc);
             }
             Sample specSample = new Sample();
-            specSample.setSourceSampleId(specimenJSON.getString("Specimen ID"));
+            
+            
+            
+            specSample.setSourceSampleId(specimenId);
             specSample.setMolecularCharacterizations(mcs);
             specimen.setSample(specSample);
 
@@ -230,39 +240,46 @@ public class LoadIRCC implements CommandLineRunner {
             modelCreation.addSpecimen(specimen);
             modelCreation.addRelatedSample(specSample);
 
-        }
-        
-        if (modelSamples.containsKey(id)) {
-            for (String sampleID : modelSamples.get(id).keySet()) {
+          //  System.out.println("checking for samples for specimen "+specimenId);
+            if (specimenSamples.containsKey(specimenId)) {
+            for (String sampleID : specimenSamples.get(specimenId).keySet()) {
+          //      System.out.println("samples found for specimen");
                 Sample variationSample = new Sample();
                 variationSample.setSourceSampleId(sampleID);
                 MolecularCharacterization mc = new MolecularCharacterization();
 
                 mc.setMarkerAssociations(markerAssociations.get(sampleID));
-                markerAssociations.remove(sampleID);
+                Platform platform = loaderUtils.getPlatform(TECH, this.irccDS);
+                mc.setPlatform(platform);
                
-                HashSet<MolecularCharacterization> mcs = new HashSet();
-                mcs.add(mc); // assumes all are same platform
+                mcs = new HashSet();
+                mcs.add(mc); 
                 variationSample.setMolecularCharacterizations(mcs);
                 modelCreation.addRelatedSample(variationSample);
-                System.out.println("adding "+sampleID+ " to model "+id);
-                addedSamples++;
+                System.out.println("adding "+sampleID+ " to model "+id+ " for specimen "+specimenId);
+                
+                
             }
-            modelSamples.remove(id);
+           
         }
-
+        }
+        
+        
+        
         loaderUtils.saveModelCreation(modelCreation);
         
     }
-    int addedSamples = 0;
+    
 
-    @Transactional
-    private void loadVariants() {
+    
+    
+     @Transactional
+    private void loadVariantsBySpecimen() {
 
         try {
             JSONObject job = new JSONObject(parseURL(variationURLStr));
-            JSONArray jarray = job.getJSONArray("IRCC");
-            
+            JSONArray jarray = job.getJSONArray("IRCCVariation");
+         //   System.out.println("loading "+jarray.length()+" variant records");
             for (int i = 0; i < jarray.length(); i++) {
                 if (i == variationMax) {
                     System.out.println("qutting after loading "+i+" variants");
@@ -272,14 +289,16 @@ public class LoadIRCC implements CommandLineRunner {
                 JSONObject variation = jarray.getJSONObject(i);
 
                 String sample = variation.getString("Sample ID");
-                String model = variation.getString("Model ID");
+                String specimen = variation.getString("Specimen ID");
                 
-                if(modelSamples.containsKey(model)){
-                    modelSamples.get(model).put(sample, sample);
+               // System.out.println("specimen "+specimen+" has sample "+sample);
+                
+                if(specimenSamples.containsKey(specimen)){
+                    specimenSamples.get(specimen).put(sample, sample);
                 }else{
                     HashMap<String,String> samples = new HashMap();
                     samples.put(sample,sample);
-                    modelSamples.put(model,samples);
+                    specimenSamples.put(specimen,samples);
                 }
                         
                         
@@ -303,6 +322,13 @@ public class LoadIRCC implements CommandLineRunner {
                 ma.setAminoAcidChange(variation.getString("Protein"));
                 ma.setAlleleFrequency(variation.getString("VAF"));
                 ma.setRsVariants(variation.getString("avsnp147"));
+                
+                
+                Platform platform = loaderUtils.getPlatform(TECH, this.irccDS);
+                platform.setExternalDataSource(irccDS);
+                loaderUtils.savePlatform(platform);
+                PlatformAssociation pa = loaderUtils.createPlatformAssociation(platform, marker);
+                loaderUtils.savePlatformAssociation(pa);
 
             
                 if (markerAssociations.containsKey(sample)) {
@@ -316,7 +342,8 @@ public class LoadIRCC implements CommandLineRunner {
             }
 
         } catch (Exception e) {
-            log.error("Unable to load variants" + e);
+            log.error("Unable to load variants");
+            e.printStackTrace();
         }
        
     }
