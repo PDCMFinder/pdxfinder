@@ -40,7 +40,7 @@ public class ChartDataController {
         for (ModelForQuery m : models) {
 
             if (!cancers.containsKey(m.getMappedOntologyTerm())) {
-                cancers.put(m.getMappedOntologyTerm(), new DataHolder(m.getMappedOntologyTerm()));
+                cancers.put(m.getMappedOntologyTerm(), new DataHolder(m.getMappedOntologyTerm(),""));
                 cancers.get(m.getMappedOntologyTerm()).setId(ids++);
             }
 
@@ -53,10 +53,20 @@ public class ChartDataController {
 
         Map<String, DataHolder> dataHolderMap = new HashMap<>();
 
+        Map<String, String> dataHolderDetails = new HashMap<>();
+        dataHolderDetails.put("JAX","The Jackson Laboratory");
+        dataHolderDetails.put("PDXNet-HCI-BCM","HCI-Baylor College of Medicine");
+        dataHolderDetails.put("PDXNet-Wistar-MDAnderson-Penn","Melanoma PDX established by the Wistar/MD Anderson/Penn");
+        dataHolderDetails.put("PDXNet-WUSTL","Washington University in St. Louis");
+        dataHolderDetails.put("PDXNet-MDAnderson","University of Texas MD Anderson Cancer Center");
+        dataHolderDetails.put("PPDMR","NCI Patient-Derived Models Repository");
+        dataHolderDetails.put("IRCC","Candiolo Cancer Institute");
+
+
         for (ModelForQuery m : models) {
 
             if (!dataHolderMap.containsKey(m.getDatasource())) {
-                dataHolderMap.put(m.getDatasource(), new DataHolder(m.getDatasource()));
+                dataHolderMap.put(m.getDatasource(), new DataHolder(m.getDatasource(), dataHolderDetails.get(m.getDatasource())));
                 dataHolderMap.get(m.getDatasource()).id = ids++;
             }
 
@@ -101,13 +111,15 @@ public class ChartDataController {
 
         private Integer id;
         private String name;
+        private String details;
         private Integer number = 0;
 
         public DataHolder() {
         }
 
-        public DataHolder(String name) {
+        public DataHolder(String name,String details) {
             this.name = name;
+            this.details = details;
         }
 
         public void increment() {
@@ -128,6 +140,14 @@ public class ChartDataController {
 
         public void setName(String name) {
             this.name = name;
+        }
+
+        public String getDetails() {
+            return details;
+        }
+
+        public void setDetails(String details) {
+            this.details = details;
         }
 
         public Integer getNumber() {
