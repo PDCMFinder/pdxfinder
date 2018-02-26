@@ -59,7 +59,7 @@ public class ChartDataController {
         dataHolderDetails.put("PDXNet-Wistar-MDAnderson-Penn","Melanoma PDX established by the Wistar/MD Anderson/Penn");
         dataHolderDetails.put("PDXNet-WUSTL","Washington University in St. Louis");
         dataHolderDetails.put("PDXNet-MDAnderson","University of Texas MD Anderson Cancer Center");
-        dataHolderDetails.put("PPDMR","NCI Patient-Derived Models Repository");
+        dataHolderDetails.put("PDMR","NCI Patient-Derived Models Repository");
         dataHolderDetails.put("IRCC","Candiolo Cancer Institute");
 
 
@@ -70,6 +70,7 @@ public class ChartDataController {
 
                 CenterSpecificDataHolder c = new CenterSpecificDataHolder(m.getDatasource());
                 c.setDescription(dataHolderDetails.get(m.getDatasource()));
+                c.setDatasource(m.getDatasource());
                 dataHolderMap.put(m.getDatasource(), c);
 
                 dataHolderMap.get(m.getDatasource()).id = ids++;
