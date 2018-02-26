@@ -69,7 +69,7 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
 
 
     private void mapSamplesToTerms(){
-
+/*
         System.out.println("Getting data from "+spreadsheetServiceUrl);
 
         String json = parseURL(spreadsheetServiceUrl);
@@ -89,7 +89,7 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
                     String type = row.getString("type");
                     String justification = row.getString("justification");
 
-                    Sample sample = loaderUtils.getSampleBySourceSampleId(sampleId);
+                    //Sample sample = loaderUtils.getSampleBySourceSampleId(sampleId);
                     OntologyTerm term = loaderUtils.getOntologyTermByLabel(doLabel.toLowerCase());
 
                     if(sample != null && term != null){
@@ -121,7 +121,7 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
             e.printStackTrace();
         }
 
-
+*/
     }
 
     private void updateIndirectMappingData() {

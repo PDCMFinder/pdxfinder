@@ -17,6 +17,17 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
 
     ModelCreation findBySourcePdxId(@Param("modelId") String modelId);
 
+    @Query("MATCH (model:ModelCreation) WHERE model.dataSource = {dataSource} AND model.sourcePdxId = {modelId} " +
+            "WITH model " +
+            "OPTIONAL MATCH (model)-[spr:SPECIMENS]-(sp:Specimen)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
+            "WITH model, spr, sp, hsr, hs " +
+            "OPTIONAL MATCH (sp)-[itr:IMPLANTATION_TYPE]-(it:ImplantationType) "+
+            "OPTIONAL MATCH (sp)-[isr:IMPLANTATION_SITE]-(is:ImplantationSite) "+
+            "RETURN model, spr, sp, hsr, hs, itr, isr, it, is")
+    ModelCreation findByDataSourceAndSourcePdxId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
+
+    @Query("MATCH (model:ModelCreation) WHERE model.sourcePdxId = {modelId} AND model.dataSource = {dataSource} RETURN model ")
+    ModelCreation findBySourcePdxIdAndDataSource(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
 
     @Query("MATCH (model:ModelCreation) return count(model) ")
     int countAllModels();
@@ -27,25 +38,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN mod")
     ModelCreation findBySampleId(@Param("sampleId") String sampleId);
 
-    /*
-    //This query is being used when a user does not select an existing ontology term from autosuggest, ie: Football cancer
-    @Query("MATCH (humSample:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation)" +
-            "WHERE (toLower(humSample.diagnosis) CONTAINS toLower({diag}) OR {diag}='') " +
-            "AND (humSample.dataSource IN {dataSource} OR {dataSource}=[] )"+
-            "WITH mod, humSample, i " +
 
-            "MATCH (humSample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
-            "MATCH (humSample)-[ot:OF_TYPE]-(tt:TumorType) " +
-            "WHERE (tt.name IN {tumorType} OR {tumorType}=[])  " +
-            "WITH humSample, i, mod, o, t, ot, tt " +
-
-            "MATCH (mod)—[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
-            "WHERE (m.name IN {markers} OR {markers}=[])  " +
-            "RETURN distinct mod, humSample, s, t, tt, i, ot")
-    Collection<ModelCreation> findByMultipleFilters(@Param("diag") String diag, @Param("markers") String[] markers,
-                                                    @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
-
-    */
     //disable filtering on markers
     @Query("MATCH (humSample:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation)" +
             "WHERE (toLower(humSample.diagnosis) CONTAINS toLower({diag}) OR {diag}='') " +
@@ -61,25 +54,6 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
                                                     @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
 
 
-    /*
-    //Ontology powered search: returns less data to improve performance
-    @Query("MATCH (term:OntologyTerm)<-[*]-(child:OntologyTerm)-[mapp:MAPPED_TO]-(humSample:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
-            "        WHERE term.label = {query} " +
-            "        AND (humSample.dataSource IN {dataSource} OR {dataSource}=[]) " +
-            "        WITH humSample,i,mod " +
-
-            "        MATCH (humSample)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
-            "        MATCH (humSample)-[ot:OF_TYPE]-(tt:TumorType) " +
-            "        WHERE (tt.name IN {tumorType} OR {tumorType}=[])  " +
-            "        WITH humSample, i, mod, o, t, ot, tt " +
-
-            "        MATCH (mod)—[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
-            "        WHERE (m.name IN {markers} OR []=[])  " +
-            "        RETURN distinct mod, humSample, t, tt, i, ot")
-    Collection<ModelCreation> findByOntology(@Param("query") String query, @Param("markers") String[] markers,
-                                              @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
-
-*/
 
 
     //Ontology powered search: returns less data to improve performance
@@ -98,6 +72,68 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     @Query("MATCH (n:ModelCreation) RETURN n")
     Collection<ModelCreation> getAllModels();
 
+    @Query("MATCH (mc:ModelCreation)<-[ir:IMPLANTED_IN]-(s:Sample)-[sfr:SAMPLED_FROM]-(ps:PatientSnapshot)-[pr:PATIENT]-(p:Patient) " +
+            "WITH mc, ir, s, sfr, ps, pr, p " +
+            "MATCH (c:Tissue)-[cr:SAMPLE_SITE]-(s)-[ttr:OF_TYPE]-(tt:TumorType) " +
+            "WITH mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt " +
+            "MATCH (t:Tissue)-[tr:ORIGIN_TISSUE]-(s)-[otm:MAPPED_TO]-(ot:OntologyTerm)-[ottm:SUBCLASS_OF *1..]->(term:OntologyTerm) " +
+            "RETURN mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt, tr, t, otm, ot, ottm, term ")
+    Collection<ModelCreation> getModelsWithPatientData();
 
+    @Query("MATCH " +
+            "(mc:ModelCreation)-[msr:MODEL_SAMPLE_RELATION]-(s:Sample)" +
+            "-[cbr:CHARACTERIZED_BY]-(molChar:MolecularCharacterization)" +
+            "-[pur:PLATFORM_USED]-(p:Platform) " +
+            "RETURN mc, msr, s, cbr, molChar, pur, p")
+    Collection<ModelCreation> getAllModelsPlatforms();
+
+
+
+    @Query("MATCH (mc:ModelCreation)--(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
+            "            WHERE  mc.dataSource = {dataSource}  " +
+            "            AND    mc.sourcePdxId = {modelId}  " +
+            "WITH mc, psamp, char, molch, assoc, mAss, aw, m " +
+            "MATCH (molch)-[pu:PLATFORM_USED]-(pl:Platform) " +
+
+            "            WHERE (pl.name = {tech}  OR {tech} = '' ) " +
+
+            "            OR toLower(m.symbol) CONTAINS toLower({search}) " +
+            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
+            "            RETURN count(*) ")
+    Integer variationCountByDataSourceAndPdxIdAndPlatform(@Param("dataSource") String dataSource,
+                                                          @Param("modelId") String modelId,
+                                                          @Param("tech") String tech,
+                                                          @Param("search") String search);
+
+
+    @Query("MATCH (mc:ModelCreation)--(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
+
+            "            WHERE  mc.dataSource = {dataSource}  " +
+            "            AND    mc.sourcePdxId = {modelId}  " +
+            "WITH mc, psamp, char, molch, assoc, mAss, aw, m " +
+            "MATCH (molch)-[pu:PLATFORM_USED]-(pl:Platform) " +
+
+            "            WHERE (pl.name = {tech}  OR {tech} = '' ) " +
+
+
+            "            OR toLower(m.symbol) CONTAINS toLower({search})" +
+            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
+
+            "            RETURN mc,psamp,char,molch,mAss,m, pu, pl SKIP {skip} LIMIT {lim} ")
+    ModelCreation findVariationBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
+                                                        @Param("modelId") String modelId,
+                                                        @Param("tech") String tech,
+                                                        @Param("search") String search,
+                                                        @Param("skip") int skip,
+                                                        @Param("lim") int lim);
+
+    @Query("MATCH (mc)-[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(molChar:MolecularCharacterization)-[pur:PLATFORM_USED]-(p:Platform) " +
+            "WHERE mc.sourcePdxId={sourcePdxId}  AND p.name={platform} " +
+            "WITH mc, msr, s, cbr, molChar, pur, p " +
+
+            "OPTIONAL MATCH (molChar)-[assW:ASSOCIATED_WITH]-(mAss:MarkerAssociation) " +
+            "RETURN count(mAss) ")
+    Integer countMarkerAssociationBySourcePdxId(@Param("sourcePdxId") String sourcePdxId,
+                                                @Param("platform") String platform);
 
 }

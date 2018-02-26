@@ -47,7 +47,7 @@ public class ValidateIRCCData implements CommandLineRunner {
     // hmm not sure about this
     private final static String MC_TECH = "Gene Panel";
 
-    private BackgroundStrain nsgBS;
+    private HostStrain nsgBS;
     private ExternalDataSource DS;
 
     private Options options;
@@ -82,7 +82,7 @@ public class ValidateIRCCData implements CommandLineRunner {
         parser.accepts("loadALL", "Load all, including validating IRCC data");
         OptionSet options = parser.parse(args);
 
-        if (options.has("validateIRCC") || options.has("loadALL")) {
+        if (options.has("validateIRCC")) {
 
             log.info("Loading IRCC PDX data.");
 
@@ -311,7 +311,7 @@ public class ValidateIRCCData implements CommandLineRunner {
 
         //Loading data to Neo4j
         DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION);
-        //nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        //nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         int counter = 0;
         for (Map.Entry<String, List<IRCCSample>> entry : this.samplesMap.entrySet()) {
@@ -332,16 +332,16 @@ public class ValidateIRCCData implements CommandLineRunner {
 
                 Sample sample = loaderUtils.getSample(samples.get(i).getSampleId(), samples.get(i).getTumorType(),
                         samples.get(i).getDiagnosis(), patientsMap.get(key).getPrimarySite(),
-                        samples.get(i).getSampleSite(), "", "", NORMAL_TISSUE, DS);
+                        samples.get(i).getSampleSite(), "", "", NORMAL_TISSUE, DS.getAbbreviation());
 
 
                 pSnap.addSample(sample);
                 loaderUtils.savePatientSnapshot(pSnap);
 
-                QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT);
+                QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT, null);
                 loaderUtils.saveQualityAssurance(qa);
 
-                ModelCreation mc = loaderUtils.createModelCreation(samples.get(i).getModelId(), samples.get(i).getImplantSite(), samples.get(i).getImplantType(), sample, nsgBS, qa);
+                ModelCreation mc = loaderUtils.createModelCreation(samples.get(i).getModelId(),DS.getAbbreviation(), sample, qa);
 
                 loadVariationData(mc, samples.get(i));
 

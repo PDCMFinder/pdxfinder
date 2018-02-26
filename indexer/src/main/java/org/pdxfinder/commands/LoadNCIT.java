@@ -160,7 +160,18 @@ public class LoadNCIT implements CommandLineRunner {
 
                     log.debug("TERM: "+termLabel);
 
-                    OntologyTerm newTerm = loaderUtils.getOntologyTerm(term.getString("iri"), termLabel);
+                    // Changes Malignant * Neoplasm to * Cancer
+                    String pattern = "(.*)Malignant(.*)Neoplasm(.*)";
+                    String updatedTermlabel = null;
+
+                    if (termLabel.matches(pattern)) {
+                        updatedTermlabel = (termLabel.replaceAll(pattern, "\t$1$2Cancer$3")).trim();
+                        log.info("Replacing term label '{}' with '{}'", termLabel, updatedTermlabel);
+                    }
+
+                    termLabel = termLabel.replaceAll(",", "");
+
+                    OntologyTerm newTerm = loaderUtils.getOntologyTerm(term.getString("iri"), updatedTermlabel != null ? updatedTermlabel : termLabel);
 
                     JSONArray synonyms = term.getJSONArray("synonyms");
                     Set<String> synonymsSet = new HashSet<>();

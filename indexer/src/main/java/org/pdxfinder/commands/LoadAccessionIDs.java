@@ -53,7 +53,7 @@ public class LoadAccessionIDs implements CommandLineRunner {
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadAccessionIds", "Load Accession IDs");
-        parser.accepts("loadALL", "Load all, including Accession IDs");
+        //parser.accepts("loadALL", "Load all, including Accession IDs");
         OptionSet options = parser.parse(args);
 
         long startTime = System.currentTimeMillis();

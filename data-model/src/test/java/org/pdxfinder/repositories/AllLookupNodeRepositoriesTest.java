@@ -34,7 +34,7 @@ public class AllLookupNodeRepositoriesTest extends BaseTest {
     private TissueRepository tissueRepository;
 
     @Autowired
-    private BackgroundStrainRepository backgroundStrainRepository;
+    private HostStrainRepository hostStrainRepository;
 
     @Autowired
     private ImplantationSiteRepository implantationSiteRepository;
@@ -95,15 +95,15 @@ public class AllLookupNodeRepositoriesTest extends BaseTest {
     @Test
     public void createBackgroundStrain() {
 
-        BackgroundStrain bgStrain = backgroundStrainRepository.findBySymbol(BACKGROUND_STRAIN);
+        HostStrain bgStrain = hostStrainRepository.findBySymbol(BACKGROUND_STRAIN);
         if (bgStrain == null) {
             log.debug("Background strain {} not found. Creating", BACKGROUND_STRAIN);
-            bgStrain = new BackgroundStrain(BACKGROUND_STRAIN);
-            backgroundStrainRepository.save(bgStrain);
+            bgStrain = new HostStrain(BACKGROUND_STRAIN);
+            hostStrainRepository.save(bgStrain);
         }
 
-        Assert.assertNotNull(backgroundStrainRepository.findBySymbol(BACKGROUND_STRAIN));
-        log.info("  Found Background Strain {}", backgroundStrainRepository.findBySymbol(BACKGROUND_STRAIN).getSymbol());
+        Assert.assertNotNull(hostStrainRepository.findBySymbol(BACKGROUND_STRAIN));
+        log.info("  Found Background Strain {}", hostStrainRepository.findBySymbol(BACKGROUND_STRAIN).getSymbol());
     }
 
     @Test

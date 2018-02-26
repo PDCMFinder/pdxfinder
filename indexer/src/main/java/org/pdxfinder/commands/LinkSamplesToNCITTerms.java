@@ -8,7 +8,6 @@ import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.dao.Sample;
 import org.pdxfinder.dao.SampleToOntologyRelationShip;
-import org.pdxfinder.dao.SampleToOntologyRelationShip;
 import org.pdxfinder.ontologymapping.MappingRule;
 import org.pdxfinder.ontologymapping.MissingMapping;
 import org.pdxfinder.utilities.LoaderUtils;
@@ -122,6 +121,17 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                     if (ontologyTerm.equals("") || ontologyTerm == null) continue;
                     if (sampleDiagnosis.equals("") || sampleDiagnosis == null) continue;
 
+                    String updatedDiagnosis = sampleDiagnosis;
+                    String pattern = "(.*)Malignant(.*)Neoplasm(.*)";
+
+                    if (sampleDiagnosis.matches(pattern)) {
+                        updatedDiagnosis = (sampleDiagnosis.replaceAll(pattern, "\t$1$2Cancer$3")).trim();
+                        log.info("Updating label from mapping service of diagnosis '{}' with '{}'", sampleDiagnosis, updatedDiagnosis);
+                    }
+
+                    // Remove commas from diagnosis
+                    sampleDiagnosis = updatedDiagnosis.replaceAll(",", "");
+
                     //DO not ask, I know it looks horrible...
                     if (originTissue == null || originTissue.equals("null")) originTissue = "";
                     if (tumorType == null || tumorType.equals("null")) tumorType = "";
@@ -232,6 +242,22 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                 dataSource = sample.getDataSource();
                 diagnosis = sample.getDiagnosis();
 
+                // Per Nat 20180219, remove commas from the ontology terms
+                // to fix issues with term "Invasive Ductal Carcinoma, Not Otherwise Specified"
+                // URL parsing has trouble with commas
+                // Decided solution is to remove commas from ontology labels
+                // https://www.ebi.ac.uk/panda/jira/browse/PDXI-258
+                // Changes Malignant * Neoplasm to * Cancer
+                String updatedDiagnosis = diagnosis;
+                String pattern = "(.*)Malignant(.*)Neoplasm(.*)";
+
+                if (diagnosis.matches(pattern)) {
+                    updatedDiagnosis = (diagnosis.replaceAll(pattern, "\t$1$2Cancer$3")).trim();
+                    log.info("Updating ontology linking of diagnosis '{}' with '{}'", diagnosis, updatedDiagnosis);
+                }
+
+                updatedDiagnosis = updatedDiagnosis.replaceAll(",", "");
+
                 if (sample.getOriginTissue() != null) {
                     originTissue = sample.getOriginTissue().getName();
                 }
@@ -241,13 +267,13 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                 }
 
 
-                MappingRule mappingRule = getMappingForSample(dataSource, diagnosis, originTissue, tumorType);
+                MappingRule mappingRule = getMappingForSample(dataSource, updatedDiagnosis, originTissue, tumorType);
 
                 //deal with empty mapping rules here!
                 if (mappingRule.getOntologyTerm() == null || mappingRule.getOntologyTerm().equals("")) {
 
-                    MissingMapping mm = new MissingMapping(dataSource, diagnosis, originTissue, tumorType);
-                    insertMissingMapping(diagnosis, mm);
+                    MissingMapping mm = new MissingMapping(dataSource, updatedDiagnosis, originTissue, tumorType);
+                    insertMissingMapping(updatedDiagnosis, mm);
 
                 } else {
 
@@ -297,7 +323,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
         for (Set<MissingMapping> mms : this.missingMappings.values()) {
 
             for (MissingMapping mm : mms) {
-                log.warn(mm.getDataSource() + " " + mm.getDiagnosis() + " " + mm.getOriginTissue() + " " + mm.getTumorType());
+                log.warn("Datasource: " + mm.getDataSource() + ", Diagnosis: " + mm.getDiagnosis() + ", Origin Tissue: " + mm.getOriginTissue() + ", Tumor Type: " + mm.getTumorType());
 
             }
         }

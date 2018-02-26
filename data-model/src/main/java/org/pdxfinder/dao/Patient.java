@@ -22,7 +22,12 @@ public class Patient {
     private String race;
     private String ethnicity;
     private String dataSource;
+
+    @Relationship(type = "EXTERNAL_DATASOURCE", direction = Relationship.INCOMING)
     private ExternalDataSource externalDataSource;
+
+    @Relationship(type = "COLLECTION_EVENT")
+    private Set<PatientSnapshot> snapshots;
 
     /**
      * Empty constructor required as of Neo4j API 2.0.5
@@ -48,9 +53,6 @@ public class Patient {
         this.externalDataSource = externalDataSource;
     }
 
-
-    @Relationship(type = "COLLECTION_EVENT", direction = Relationship.OUTGOING)
-    private Set<PatientSnapshot> snapshots;
 
     public void hasSnapshot(PatientSnapshot snapshot) {
         if (snapshots == null) {

@@ -6,7 +6,6 @@ import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -24,6 +23,7 @@ public class SearchService {
     private SpecimenRepository specimenRepository;
     private MolecularCharacterizationRepository molecularCharacterizationRepository;
     private PlatformRepository platformRepository;
+
     private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
     private final String JAX_URL_TEXT = "View data at JAX";
     private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
@@ -42,11 +42,14 @@ public class SearchService {
     private final String WUSTL_DS = "PDXNet-WUSTL";
 
 
-    @Autowired
-    public SearchService(SampleRepository sampleRepository, PatientRepository patientRepository,
-                         PatientSnapshotRepository patientSnapshotRepository, ModelCreationRepository modelCreationRepository,
-                         OntologyTermRepository ontologyTermRepository,SpecimenRepository specimenRepository,
-                         MolecularCharacterizationRepository molecularCharacterizationRepository,PlatformRepository platformRepository) {
+    public SearchService(SampleRepository sampleRepository,
+                         PatientRepository patientRepository,
+                         PatientSnapshotRepository patientSnapshotRepository,
+                         ModelCreationRepository modelCreationRepository,
+                         OntologyTermRepository ontologyTermRepository,
+                         SpecimenRepository specimenRepository,
+                         MolecularCharacterizationRepository molecularCharacterizationRepository,
+                         PlatformRepository platformRepository) {
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
         this.patientSnapshotRepository = patientSnapshotRepository;
@@ -55,7 +58,6 @@ public class SearchService {
         this.molecularCharacterizationRepository = molecularCharacterizationRepository;
         this.specimenRepository = specimenRepository;
         this.platformRepository = platformRepository;
-
     }
 
 
@@ -170,7 +172,9 @@ public class SearchService {
         Sample sample = sampleRepository.findByDataSourceAndPdxId(dataSource,modelId);
         Patient patient = patientRepository.findByDataSourceAndModelId(dataSource,modelId);
         List<PatientSnapshot> ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
-        ModelCreation pdx = modelCreationRepository.findBySourcePdxId(modelId);
+        ModelCreation pdx = modelCreationRepository.findByDataSourceAndSourcePdxId(dataSource, modelId);
+
+        QualityAssurance qa = pdx.getQualityAssurance();
 
         int skip = page * size;
         int totalRecords = 0;
@@ -210,6 +214,13 @@ public class SearchService {
         Set<MolecularCharacterization>  molecularCharacterizations = new HashSet<>();
         Set<Platform>  platforms = new HashSet<>();
 
+        if (qa != null && qa.getValidationTechniques() != null) {
+            dto.setTechnology(qa.getValidationTechniques().getTechnique());
+        }
+
+        if (qa != null && qa.getDescription() != null) dto.setDescription(qa.getDescription());
+        if (qa != null && qa.getPassages() != null) dto.setPassages(qa.getPassages());
+
         if (specimens != null) {
 
             try {
@@ -219,9 +230,11 @@ public class SearchService {
             }catch (Exception e){ }
         }
 
+        // "NOD SCID GAMA"=>"P1, P2"
+        Map<String, String> hostStrainMap = new HashMap<>();
+
         for (Specimen specimen : specimens) {
-            try
-            {
+            try {
                 specimenList.add(specimen);
                 molecularCharacterizations.addAll(specimen.getSample().getMolecularCharacterizations());
 
@@ -229,6 +242,7 @@ public class SearchService {
                     markerAssociatonSet.add(dMolkar.getMarkerAssociations());
                     platforms.add(dMolkar.getPlatform());
                 }
+
             }catch (Exception e){ }
         }
 
@@ -299,21 +313,94 @@ public class SearchService {
             dto.setMappedOntology(sample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
         }
 
+        /*
         if (pdx != null && pdx.getImplantationType() != null) {
             dto.setSampleType(pdx.getImplantationType().getName());
         }
 
-        if (pdx != null && pdx.getBackgroundStrain() != null) {
-            dto.setStrain(pdx.getBackgroundStrain().getName());
+        if (pdx != null && pdx.getHostStrain() != null) {
+            dto.setStrain(pdx.getHostStrain().getName());
         }
 
         if (pdx != null && pdx.getImplantationSite() != null) {
             dto.setEngraftmentSite(pdx.getImplantationSite().getName());
         }
-
+        */
         if (pdx != null && pdx.getSourcePdxId() != null) {
             dto.setModelId(pdx.getSourcePdxId());
         }
+
+        if(pdx!= null && pdx.getSpecimens() != null){
+
+            Set<Specimen> sp = pdx.getSpecimens();
+
+            for(Specimen s:sp){
+
+                if(s.getHostStrain() != null && s.getPassage() != null){
+
+                    String hostStrain = s.getHostStrain().getName();
+                    String p = s.getPassage();
+
+                    if(hostStrainMap.containsKey(hostStrain)){
+                        String composedPassage = hostStrainMap.get(hostStrain);
+                        composedPassage+=", P"+p;
+                        hostStrainMap.put(hostStrain, composedPassage);
+
+                    }
+                    else{
+                        hostStrainMap.put(hostStrain, "P"+p);
+                    }
+
+
+                    //Set implantation site and type
+                    if(s.getImplantationSite() != null){
+                        dto.setEngraftmentSite(s.getImplantationSite().getName());
+                    }
+                    else{
+
+                        dto.setEngraftmentSite("Not Specified");
+                    }
+
+                    if(s.getImplantationType() != null){
+                        dto.setSampleType(s.getImplantationType().getName());
+                    }
+                    else{
+
+                        dto.setSampleType("Not Specified");
+                    }
+
+
+
+                }
+
+            }
+
+
+        }
+
+        String composedStrain = "";
+
+        if(hostStrainMap.size() > 1){
+
+            for (Map.Entry<String, String> entry : hostStrainMap.entrySet()) {
+                String strain = entry.getKey();
+                String passages = entry.getValue();
+
+                composedStrain += strain+" ("+passages+" ); ";
+            }
+        }
+        else if(hostStrainMap.size() == 1){
+
+            for(String key:hostStrainMap.keySet()){
+                composedStrain = key;
+            }
+        }
+        else{
+            composedStrain = "Not Specified";
+        }
+
+        dto.setStrain(composedStrain);
+
 
         if (sample != null && sample.getMolecularCharacterizations() != null) {
             List<String> markerList = new ArrayList<>();
@@ -390,7 +477,7 @@ public class SearchService {
             Set<String> passagesList = new HashSet<>();
             for (Specimen specimen : specimens)
             {
-                passagesList.add(specimen.getPdxPassage().getPassage()+"");
+                passagesList.add(specimen.getPassage()+"");
             }
 
             platformMap.put(platform.getName(), passagesList);
@@ -407,8 +494,12 @@ public class SearchService {
 
         List<MolecularCharacterization> molecularCharacterizations = molecularCharacterizationRepository.findPatientPlatformByModelId(dataSource,modelId);
 
-        for (MolecularCharacterization molecularCharacterization : molecularCharacterizations) {
-            platformMap.put(molecularCharacterization.getTechnology(), molecularCharacterization.getTechnology());
+        for (MolecularCharacterization mc : molecularCharacterizations) {
+
+            if(mc.getPlatform() != null){
+                platformMap.put(mc.getPlatform().getName(), mc.getPlatform().getName());
+            }
+
         }
 
         return platformMap;
@@ -418,30 +509,26 @@ public class SearchService {
     public VariationDataDTO patientVariationDataByPlatform(String dataSource, String modelId, String technology,
                                                            String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
 
-        int recordsTotal = patientRepository.countByBySourcePdxIdAndPlatform(dataSource,modelId,technology,"");
+        //int recordsTotal = patientRepository.countByBySourcePdxIdAndPlatform(dataSource,modelId,technology,"");
+
+        int recordsTotal = modelCreationRepository.variationCountByDataSourceAndPdxIdAndPlatform(dataSource,modelId,technology,"");
+
         int recordsFiltered = recordsTotal;
 
         if (!searchParam.isEmpty()) {
-            recordsFiltered = patientRepository.countByBySourcePdxIdAndPlatform(dataSource,modelId,technology,searchParam);
+            recordsFiltered = modelCreationRepository.variationCountByDataSourceAndPdxIdAndPlatform(dataSource,modelId,technology,searchParam);
         }
 
         /**
          * Retrieve the Records based on search parameter
          */
-        Set<Patient> patients = patientRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,searchParam,start,size);
+        ModelCreation model = modelCreationRepository.findVariationBySourcePdxIdAndPlatform(dataSource,modelId,technology,searchParam,start,size);
         VariationDataDTO variationDataDTO = new VariationDataDTO();
         List<String[]> variationData = new ArrayList();
 
-        if (patients != null) {
-            for (Patient patient : patients) {
+        if (model != null && model.getSample() != null ) {
 
-                for (PatientSnapshot patientSnapshot : patient.getSnapshots()) {
-
-                    for (Sample sample : patientSnapshot.getSamples()) {
-                        variationData.addAll( buildUpDTO(sample,draw,recordsTotal,recordsFiltered) );
-                    }
-                }
-            }
+            variationData.addAll(buildUpDTO(model.getSample(),draw,recordsTotal,recordsFiltered));
         }
 
         variationDataDTO.setDraw(draw);
@@ -459,7 +546,9 @@ public class SearchService {
         /**
          * 1st count all the records and set Total Records & Initialize Filtered Record as Total record
          */
-        int recordsTotal = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,passage,"");
+        //int recordsTotal = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,passage,"");
+        int recordsTotal = specimenRepository.countByPlatform(dataSource,modelId,technology,passage);
+
         int recordsFiltered = recordsTotal;
 
         /**
@@ -492,6 +581,10 @@ public class SearchService {
     }
 
 
+    public List<String> getModelsOriginatedFromSamePatient(String dataSource, String modelId){
+
+        return patientRepository.getModelsOriginatedFromSamePatientByDataSourceAndModelId(dataSource, modelId);
+    }
 
 
     public List<String[]> buildUpDTO(Sample sample,int draw,int recordsTotal,int recordsFiltered){

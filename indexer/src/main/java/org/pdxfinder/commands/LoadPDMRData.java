@@ -11,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.utilities.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,8 +43,9 @@ public class LoadPDMRData implements CommandLineRunner {
 
     private final static String DATASOURCE_ABBREVIATION = "PDMR";
     private final static String DATASOURCE_NAME = "National Cancer Institute";
-    private final static String DATASOURCE_DESCRIPTION = "The NCI Patient-Derived Models Repository ";
-    private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
+    private final static String DATASOURCE_DESCRIPTION = "NCI Patient-Derived Models Repository ";
+
+    private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-PrkdcscidIl2rgtm1Wjl/SzJ";
     private final static String NSG_BS_URL = "";
     private final static String HISTOLOGY_NOTE = "";
@@ -52,8 +54,8 @@ public class LoadPDMRData implements CommandLineRunner {
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
-    private BackgroundStrain nsgBS;
-    private ExternalDataSource jaxDS;
+    private HostStrain nsgBS;
+    private ExternalDataSource DS;
 
     private Options options;
     private CommandLineParser parser;
@@ -122,8 +124,8 @@ public class LoadPDMRData implements CommandLineRunner {
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
 
-        jaxDS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION);
-        nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION);
+        nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -158,30 +160,27 @@ public class LoadPDMRData implements CommandLineRunner {
 
         String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
 
-        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), j.getString("Gender"),
-                j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
+        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
+        String age = Standardizer.getAge(j.getString("Age"));
+        String gender = Standardizer.getGender(j.getString("Gender"));
 
-        Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, jaxDS);
 
-        /*
-        if (histologyMap.containsKey("Patient")) {
-            Histology histology = new Histology();
-            Image image = histologyMap.get("Patient");
-            histology.addImage(image);
-            sample.addHistology(histology);
+        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), gender,
+                j.getString("Race"), j.getString("Ethnicity"), age, DS);
 
-        }
-        */
-        // For the moment, all JAX models are assumed to have been validated using Histological assessment by a pathologist
-        // TODO: verify this is the case
-        QualityAssurance qa = new QualityAssurance("Histology", HISTOLOGY_NOTE, ValidationTechniques.VALIDATION);
+        Sample sample = loaderUtils.getSample(j.getString("Model ID"), tumorType, diagnosis,
+                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, DS.getAbbreviation());
+
+        // TODO: Update with actual QA data when available
+        String qaPassage = null;
+
+        QualityAssurance qa = new QualityAssurance("", "", ValidationTechniques.NOT_SPECIFIED, qaPassage);
         loaderUtils.saveQualityAssurance(qa);
 
         pSnap.addSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
 
-        ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS, qa);
+        ModelCreation mc = loaderUtils.createModelCreation(id, this.DS.getAbbreviation(), sample, qa);
         mc.addRelatedSample(sample);
         //loadVariationData(mc);
 
@@ -258,11 +257,11 @@ public class LoadPDMRData implements CommandLineRunner {
 
                 ma.setMarker(marker);
 
-                Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
+                Platform platform = loaderUtils.getPlatform(technology, this.DS);
 
                 // why would this happen?
                 if (platform.getExternalDataSource() == null) {
-                    platform.setExternalDataSource(jaxDS);
+                    platform.setExternalDataSource(DS);
                 }
                 loaderUtils.createPlatformAssociation(platform, marker);
 
@@ -291,13 +290,13 @@ public class LoadPDMRData implements CommandLineRunner {
 
             for (String sampleKey : sampleMap.keySet()) {
 
-                Integer passage = getPassage(sampleKey);
+                String passage = getPassage(sampleKey);
                 markerMap = sampleMap.get(sampleKey);
 
                 HashSet<MolecularCharacterization> mcs = new HashSet<>();
                 for (String tech : markerMap.keySet()) {
                     MolecularCharacterization mc = new MolecularCharacterization();
-                    mc.setPlatform(loaderUtils.getPlatform(tech, this.jaxDS));
+                    mc.setPlatform(loaderUtils.getPlatform(tech, this.DS));
                     mc.setMarkerAssociations(markerMap.get(tech));
                     mcs.add(mc);
 
@@ -306,7 +305,7 @@ public class LoadPDMRData implements CommandLineRunner {
                 //PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
 
 
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sampleKey, this.jaxDS.getName(), passage);
+                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sampleKey, this.DS.getName(), passage);
 
                 Sample specSample = new Sample();
                 specSample.setSourceSampleId(sampleKey);
@@ -340,10 +339,10 @@ public class LoadPDMRData implements CommandLineRunner {
 
     }
 
-    private Integer getPassage(String sample) {
-        Integer p = 0;
+    private String getPassage(String sample) {
+        String p = "0";
         try {
-            p = new Integer(passageMap.get(sample).replaceAll("P", ""));
+            p = passageMap.get(sample).replaceAll("P", "");
         } catch (Exception e) {
             log.info("Unable to determine passage from sample name " + sample + ". Assuming 0");
         }

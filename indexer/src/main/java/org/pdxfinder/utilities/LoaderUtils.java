@@ -31,7 +31,7 @@ public class LoaderUtils {
     public static Option loadAll = new Option("LoadAll", false, "Load all PDX Finder data");
     
     private TumorTypeRepository tumorTypeRepository;
-    private BackgroundStrainRepository backgroundStrainRepository;
+    private HostStrainRepository hostStrainRepository;
     private ImplantationTypeRepository implantationTypeRepository;
     private ImplantationSiteRepository implantationSiteRepository;
     private ExternalDataSourceRepository externalDataSourceRepository;
@@ -53,7 +53,7 @@ public class LoaderUtils {
     private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
 
     public LoaderUtils(TumorTypeRepository tumorTypeRepository,
-                       BackgroundStrainRepository backgroundStrainRepository,
+                       HostStrainRepository hostStrainRepository,
                        ImplantationTypeRepository implantationTypeRepository,
                        ImplantationSiteRepository implantationSiteRepository,
                        ExternalDataSourceRepository externalDataSourceRepository,
@@ -73,7 +73,7 @@ public class LoaderUtils {
                        PlatformAssociationRepository platformAssociationRepository) {
 
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null");
-        Assert.notNull(backgroundStrainRepository, "backgroundStrainRepository cannot be null");
+        Assert.notNull(hostStrainRepository, "hostStrainRepository cannot be null");
         Assert.notNull(implantationTypeRepository, "implantationTypeRepository cannot be null");
         Assert.notNull(implantationSiteRepository, "implantationSiteRepository cannot be null");
         Assert.notNull(externalDataSourceRepository, "externalDataSourceRepository cannot be null");
@@ -87,7 +87,7 @@ public class LoaderUtils {
         Assert.notNull(molecularCharacterizationRepository, "molecularCharacterizationRepository cannot be null");
 
         this.tumorTypeRepository = tumorTypeRepository;
-        this.backgroundStrainRepository = backgroundStrainRepository;
+        this.hostStrainRepository = hostStrainRepository;
         this.implantationTypeRepository = implantationTypeRepository;
         this.implantationSiteRepository = implantationSiteRepository;
         this.externalDataSourceRepository = externalDataSourceRepository;
@@ -124,29 +124,16 @@ public class LoaderUtils {
 
     }
 
-    public ModelCreation createModelCreation(String pdxId, ImplantationSite implantationSite, ImplantationType implantationType, Sample sample, BackgroundStrain backgroundStrain, QualityAssurance qa) {
 
-        ModelCreation modelCreation = modelCreationRepository.findBySourcePdxId(pdxId);
+    public ModelCreation createModelCreation(String pdxId, String dataSource,  Sample sample, QualityAssurance qa) {
+
+        ModelCreation modelCreation = modelCreationRepository.findBySourcePdxIdAndDataSource(pdxId, dataSource);
+
         if (modelCreation != null) {
             log.info("Deleting existing ModelCreation " + pdxId);
             modelCreationRepository.delete(modelCreation);
         }
-
-        modelCreation = new ModelCreation(pdxId, implantationSite, implantationType, sample, backgroundStrain, qa);
-        modelCreationRepository.save(modelCreation);
-        return modelCreation;
-    }
-
-    public ModelCreation createModelCreation(String pdxId, String implantationSiteStr, String implantationTypeStr, Sample sample, BackgroundStrain backgroundStrain, QualityAssurance qa) {
-
-        ImplantationSite implantationSite = this.getImplantationSite(implantationSiteStr);
-        ImplantationType implantationType = this.getImplantationType(implantationTypeStr);
-        ModelCreation modelCreation = modelCreationRepository.findBySourcePdxId(pdxId);
-        if (modelCreation != null) {
-            log.info("Deleting existing ModelCreation " + pdxId);
-            modelCreationRepository.delete(modelCreation);
-        }
-        modelCreation = new ModelCreation(pdxId, implantationSite, implantationType, sample, backgroundStrain, qa);
+        modelCreation = new ModelCreation(pdxId, dataSource, sample, qa);
         modelCreationRepository.save(modelCreation);
         return modelCreation;
     }
@@ -163,7 +150,7 @@ public class LoaderUtils {
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, ExternalDataSource externalDataSource) {
 
         Patient patient = patientRepository.findByExternalId(externalId);
-        PatientSnapshot patientSnapshot = null;
+        PatientSnapshot patientSnapshot;
 
         if (patient == null) {
             log.info("Patient '{}' not found. Creating", externalId);
@@ -233,24 +220,31 @@ public class LoaderUtils {
         return patientSnapshotRepository.findByModelId(modelId);
     }
 
-    public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
+    public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, String dataSource) {
 
         TumorType type = this.getTumorType(typeStr);
         Tissue origin = this.getTissue(originStr);
         Tissue sampleSite = this.getTissue(sampleSiteStr);
-        Sample sample = sampleRepository.findBySourceSampleId(sourceSampleId);
+        Sample sample = sampleRepository.findBySourceSampleIdAndDataSource(sourceSampleId, dataSource);
+
+        String updatedDiagnosis = diagnosis;
+
+        // Changes Malignant * Neoplasm to * Cancer
+        String pattern = "(.*)Malignant(.*)Neoplasm(.*)";
+
+        if (diagnosis.matches(pattern)) {
+            updatedDiagnosis = (diagnosis.replaceAll(pattern, "\t$1$2Cancer$3")).trim();
+            log.info("Replacing diagnosis '{}' with '{}'", diagnosis, updatedDiagnosis);
+        }
+
+        updatedDiagnosis = updatedDiagnosis.replaceAll(",", "");
+
         if (sample == null) {
 
-            sample = new Sample(sourceSampleId, type, diagnosis, origin, sampleSite, extractionMethod, classification, normalTissue, externalDataSource);
+            sample = new Sample(sourceSampleId, type, updatedDiagnosis, origin, sampleSite, extractionMethod, classification, normalTissue, dataSource);
             sampleRepository.save(sample);
         }
 
-        return sample;
-    }
-
-    public Sample getSampleBySourceSampleId(String sourceSampleId){
-
-        Sample sample = sampleRepository.findBySourceSampleId(sourceSampleId);
         return sample;
     }
 
@@ -260,7 +254,7 @@ public class LoaderUtils {
         return sampleRepository.findSamplesWithoutOntologyMapping();
     }
 
-    public Sample getMouseSample(ModelCreation model, String specimenId, String dataSource, int passage, String sampleId){
+    public Sample getMouseSample(ModelCreation model, String specimenId, String dataSource, String passage, String sampleId){
 
         Specimen specimen = this.getSpecimen(model, specimenId, dataSource, passage);
         Sample sample = null;
@@ -346,14 +340,16 @@ public class LoaderUtils {
         return tumorType;
     }
 
-    public BackgroundStrain getBackgroundStrain(String symbol, String name, String description, String url) {
-        BackgroundStrain bgStrain = backgroundStrainRepository.findByName(name);
-        if (bgStrain == null) {
+    public HostStrain getHostStrain(String name, String symbol, String url, String description) {
+
+        HostStrain hostStrain = hostStrainRepository.findBySymbol(symbol);
+
+        if (hostStrain == null) {
             log.info("Background Strain '{}' not found. Creating", name);
-            bgStrain = new BackgroundStrain(symbol, name, description, url);
-            backgroundStrainRepository.save(bgStrain);
+            hostStrain = new HostStrain(name, symbol, description, url);
+            hostStrainRepository.save(hostStrain);
         }
-        return bgStrain;
+        return hostStrain;
     }
 
     // is this bad? ... probably..
@@ -454,17 +450,14 @@ public class LoaderUtils {
     }
 
 
-    public Specimen getSpecimen(ModelCreation model, String specimenId, String dataSource, int passage){
+    public Specimen getSpecimen(ModelCreation model, String specimenId, String dataSource, String passage){
 
-
-        PdxPassage pass = this.getPassage(model, dataSource, passage);
-
-        Specimen specimen = specimenRepository.findByModelIdAndDataSourceAndSpecimenIdAndPassage(model.getSourcePdxId(), dataSource, specimenId, pass.getPassage());
+        Specimen specimen = specimenRepository.findByModelIdAndDataSourceAndSpecimenIdAndPassage(model.getSourcePdxId(), dataSource, specimenId, passage);
 
         if(specimen == null){
             specimen = new Specimen();
             specimen.setExternalId(specimenId);
-            specimen.setPdxPassage(pass);
+            specimen.setPassage(passage);
             specimenRepository.save(specimen);
         }
 
@@ -575,10 +568,14 @@ public class LoaderUtils {
             p = new Platform();
             p.setName(name);
             p.setExternalDataSource(eds);
-            //platformRepository.save(p);
+      //      platformRepository.save(p);
         }
 
         return p;
+    }
+    
+    public void savePlatform(Platform p){
+        platformRepository.save(p);
     }
 
     public PlatformAssociation createPlatformAssociation(Platform p, Marker m) {

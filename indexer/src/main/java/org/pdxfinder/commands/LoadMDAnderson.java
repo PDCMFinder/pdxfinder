@@ -11,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.utilities.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -35,15 +36,15 @@ public class LoadMDAnderson implements CommandLineRunner {
     private final static Logger log = LoggerFactory.getLogger(LoadMDAnderson.class);
 
     private final static String MDA_DATASOURCE_ABBREVIATION = "PDXNet-MDAnderson";
-    private final static String MDA_DATASOURCE_NAME = "M D Anderson";
+    private final static String MDA_DATASOURCE_NAME = "University of Texas MD Anderson Cancer Center";
     private final static String MDA_DATASOURCE_DESCRIPTION = "University Texas MD Anderson PDX mouse models for PDXNet.";
 
-    private final static String NOT_SPECIFIED = "Not Specified";
+    private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
-    //   private BackgroundStrain nsgBS;
+    //   private HostStrain nsgBS;
     private ExternalDataSource mdaDS;
 
     private Options options;
@@ -93,7 +94,7 @@ public class LoadMDAnderson implements CommandLineRunner {
     private void parseJSON(String json) {
 
         mdaDS = loaderUtils.getExternalDataSource(MDA_DATASOURCE_ABBREVIATION, MDA_DATASOURCE_NAME, MDA_DATASOURCE_DESCRIPTION);
-        //      nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -129,13 +130,7 @@ public class LoadMDAnderson implements CommandLineRunner {
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
 
-        String race = NOT_SPECIFIED;
-        try {
-            if (j.getString("Race").trim().length() > 0) {
-                race = j.getString("Race");
-            }
-        } catch (Exception e) {
-        }
+        String race = Standardizer.getValue("Race",j);
 
         try {
             if (j.getString("Ethnicity").trim().length() > 0) {
@@ -143,19 +138,21 @@ public class LoadMDAnderson implements CommandLineRunner {
             }
         } catch (Exception e) {
         }
+        
+          String age = Standardizer.getAge(j.getString("Age"));
+          String gender = Standardizer.getGender(j.getString("Gender"));
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
-                j.getString("Gender"), "", race, j.getString("Age"), mdaDS);
+                gender, "", race, age, mdaDS);
         
         
-        String sampleSite = NOT_SPECIFIED;
-        try{
-            sampleSite = j.getString("Sample Site");
-        }catch(Exception e){}
+        String sampleSite = Standardizer.getValue("Sample Site",j);
+        
+        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
        
-        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
+        Sample sample = loaderUtils.getSample(id, tumorType, diagnosis,
                 j.getString("Primary Site"), sampleSite,
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS);
+                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
 
         pSnap.addSample(sample);
 
@@ -165,32 +162,24 @@ public class LoadMDAnderson implements CommandLineRunner {
         } catch (Exception e) {
             // not all groups supplied QA
         }
+
+        String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
+        
         QualityAssurance qa = new QualityAssurance(qaType,
-                NOT_SPECIFIED, ValidationTechniques.VALIDATION);
+                NOT_SPECIFIED, ValidationTechniques.VALIDATION, qaPassage);
         loaderUtils.saveQualityAssurance(qa);
         String strain = j.getString("Strain");
-        BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
+        HostStrain bs = loaderUtils.getHostStrain(strain, strain, "", "");
 
-        String engraftmentSite = NOT_SPECIFIED;
-        try {
-            engraftmentSite = j.getString("Engraftment Site");
-        } catch (Exception e) {
-            // uggh
-        }
+        String engraftmentSite = Standardizer.getValue("Engraftment Site",j);
+        
+        String tumorPrep = Standardizer.getValue("Tumor Prep",j);
 
-        String tumorPrep = NOT_SPECIFIED;
-
-        try {
-            tumorPrep = j.getString("Tumor Prep");
-        } catch (Exception e) {
-            // uggh again
-        }
-
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, engraftmentSite,
-                tumorPrep, sample, bs, qa);
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, mdaDS.getAbbreviation(), sample, qa);
         modelCreation.addRelatedSample(sample);
 
         boolean human = false;
+        
         String markerPlatform = NOT_SPECIFIED;
         try {
             markerPlatform = j.getString("Marker Platform");
@@ -205,8 +194,9 @@ public class LoadMDAnderson implements CommandLineRunner {
 
         String[] markers = markerStr.split(";");
         if (markerStr.trim().length() > 0) {
-
-            MolecularCharacterization molC = new MolecularCharacterization(markerPlatform);
+            Platform pl = loaderUtils.getPlatform(markerPlatform, mdaDS);
+            MolecularCharacterization molC = new MolecularCharacterization();
+            molC.setPlatform(pl);
             Set<MarkerAssociation> markerAssocs = new HashSet();
 
             for (int i = 0; i < markers.length; i++) {
@@ -225,14 +215,23 @@ public class LoadMDAnderson implements CommandLineRunner {
 
             } else {
 
-                int passage = 0;
+                String passage = "0";
                 try {
-                    passage = new Integer(j.getString("QA Passage").replaceAll("P", "")).intValue();
+                    passage = j.getString("QA Passage").replaceAll("P", "");
                 } catch (Exception e) {
                     // default is 0
                 }
                 Specimen specimen = loaderUtils.getSpecimen(modelCreation,
                         modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
+                
+                specimen.setHostStrain(bs);
+                
+                ImplantationSite is = new ImplantationSite(engraftmentSite);
+                specimen.setImplantationSite(is);
+                
+                ImplantationType it = new ImplantationType(tumorPrep);
+                specimen.setImplantationType(it);
+                  
                 specimen.setSample(sample);
 
                 loaderUtils.saveSpecimen(specimen);
@@ -243,6 +242,8 @@ public class LoadMDAnderson implements CommandLineRunner {
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
     }
+    
+     
 
     private String parseURL(String urlStr) {
         StringBuilder sb = new StringBuilder();

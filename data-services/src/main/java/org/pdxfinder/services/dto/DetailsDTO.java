@@ -29,16 +29,19 @@ public class DetailsDTO {
     private String classification;
     private List<String> cancerGenomics;
 
-    private String sampleType;
+    private String sampleType; //Implantation Type
     private String strain;
     private String mouseSex;
-    private String engraftmentSite;
+    private String engraftmentSite; // Implantation Site
 
     private String externalUrl;
     private String externalUrlText;
     private String mappedOntology;
 
-
+    // Quality control information
+    private String technology;
+    private String description;
+    private String passages;
 
 
     private List<Specimen> specimens;
@@ -71,6 +74,10 @@ public class DetailsDTO {
         this.externalUrl = "";
         this.externalUrlText = "";
         this.mappedOntology = "";
+
+        this.technology = "";
+        this.description = "";
+        this.passages = "";
 
         this.totalPages = 0;
     }
@@ -292,5 +299,29 @@ public class DetailsDTO {
 
     public void setVariationDataCount(int variationDataCount) {
         this.variationDataCount = variationDataCount;
+    }
+
+    public String getTechnology() {
+        return technology;
+    }
+
+    public void setTechnology(String technology) {
+        this.technology = technology;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getPassages() {
+        return passages;
+    }
+
+    public void setPassages(String passages) {
+        this.passages = passages;
     }
 }

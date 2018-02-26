@@ -17,10 +17,10 @@ public class Treatment {
 
     private TreatmentProtocol treatmentProtocol;
 
-    @Relationship(type = "TREATED_WITH")
+    @Relationship(type = "TREATED_WITH", direction = Relationship.INCOMING)
     private PatientSnapshot snapshot;
 
-    @Relationship(type = "TREATED_WITH")
+    @Relationship(type = "TREATED_WITH", direction = Relationship.INCOMING)
     private Specimen specimen;
 
     @Relationship(type = "RESPONSE")

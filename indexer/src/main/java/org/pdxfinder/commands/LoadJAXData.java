@@ -11,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.utilities.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,16 +44,20 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String JAX_DATASOURCE_ABBREVIATION = "JAX";
     private final static String JAX_DATASOURCE_NAME = "The Jackson Laboratory";
     private final static String JAX_DATASOURCE_DESCRIPTION = "The Jackson Laboratory PDX mouse models.";
-    private final static String NSG_BS_NAME = "NSG (NOD scid gamma)";
-    private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
+
+    private final static String NSG_BS_NAME = "NOD scid gamma";
+    private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<scid> Il2rg<tm1Wjl>/SzJ";
+    private final static String NSG_BS_DESC = "";
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
+
     private final static String HISTOLOGY_NOTE = "Pathologist assessment of patient tumor and pdx model tumor histology slides.";
-    private final static String ENGRAFTMENT = "Engraftment";
+    
+    private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
-    private BackgroundStrain nsgBS;
+    private HostStrain nsgBS;
     private ExternalDataSource jaxDS;
 
     private Options options;
@@ -80,6 +85,7 @@ public class LoadJAXData implements CommandLineRunner {
 
     @Value("${jaxpdx.ref.assembly}")
     private String refAssembly;
+
 
     HashMap<String, String> passageMap = null;
     HashMap<String, Image> histologyMap = null;
@@ -123,7 +129,8 @@ public class LoadJAXData implements CommandLineRunner {
     private void parseJSON(String json) {
 
         jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
-        nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+
+        nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -154,14 +161,25 @@ public class LoadJAXData implements CommandLineRunner {
             diagnosis = j.getString("Initial Diagnosis");
 
         }
+        
+        // if the diagnosis is still unknown don't load it
+        if(diagnosis.toLowerCase().contains("unknown") ||
+           diagnosis.toLowerCase().contains("not specified")){
+            System.out.println("Skipping model "+id+" with diagnosis:"+diagnosis);
+            return;
+        }
 
         String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
+        
+        String age = Standardizer.getAge(j.getString("Age"));
+        String gender = Standardizer.getGender(j.getString("Gender"));
 
-        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), j.getString("Gender"),
-                j.getString("Race"), j.getString("Ethnicity"), j.getString("Age"), jaxDS);
+        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), gender,
+                j.getString("Race"), j.getString("Ethnicity"), age, jaxDS);
 
-        Sample sample = loaderUtils.getSample(j.getString("Model ID"), j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, jaxDS);
+        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
+        Sample sample = loaderUtils.getSample(j.getString("Model ID"), tumorType, diagnosis,
+                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, JAX_DATASOURCE_ABBREVIATION);
 
         if (histologyMap.containsKey("Patient")) {
             Histology histology = new Histology();
@@ -171,17 +189,24 @@ public class LoadJAXData implements CommandLineRunner {
 
         }
 
-        // For the moment, all JAX models are assumed to have been validated using Histological assessment by a pathologist
-        // TODO: verify this is the case
-        QualityAssurance qa = new QualityAssurance("Histology", HISTOLOGY_NOTE, ValidationTechniques.VALIDATION);
+        // TODO: When the QA information is available, replace this with actual data from the feed
+        String qaPassages = null;
+
+        QualityAssurance qa = new QualityAssurance("Histology", HISTOLOGY_NOTE, ValidationTechniques.VALIDATION, qaPassages);
         loaderUtils.saveQualityAssurance(qa);
 
         pSnap.addSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
 
-        ModelCreation mc = loaderUtils.createModelCreation(id, j.getString("Engraftment Site"), j.getString("Sample Type"), sample, nsgBS, qa);
+        ModelCreation mc = loaderUtils.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa);
         mc.addRelatedSample(sample);
-        loadVariationData(mc);
+
+        String backgroundStrain = j.getString("Strain");
+        // JAX feed does not supply implantation type
+        String implantationType = "Subcutaneous";
+        String implantationSite = j.getString("Engraftment Site");
+
+        loadVariationData(mc, backgroundStrain, implantationSite, implantationType);
 
     }
 
@@ -191,7 +216,7 @@ public class LoadJAXData implements CommandLineRunner {
     This is a set of makers with marker association details
     Since we are creating samples here attach any histology images to the sample based on passage #
      */
-    private void loadVariationData(ModelCreation modelCreation) {
+    private void loadVariationData(ModelCreation modelCreation,String backgroundStrain,String implantationSite,String implantationType) {
 
         if (maxVariations == 0) {
             return;
@@ -257,11 +282,8 @@ public class LoadJAXData implements CommandLineRunner {
                 ma.setMarker(marker);
 
                 Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
-
-                // why would this happen?
-                if (platform.getExternalDataSource() == null) {
-                    platform.setExternalDataSource(jaxDS);
-                }
+                platform.setExternalDataSource(jaxDS);
+                loaderUtils.savePlatform(platform);
                 loaderUtils.createPlatformAssociation(platform, marker);
                 
 
@@ -289,7 +311,7 @@ public class LoadJAXData implements CommandLineRunner {
 
             for (String sampleKey : sampleMap.keySet()) {
 
-                Integer passage = getPassage(sampleKey);
+                String passage = getPassage(sampleKey);
                 markerMap = sampleMap.get(sampleKey);
 
                 HashSet<MolecularCharacterization> mcs = new HashSet<>();
@@ -304,7 +326,7 @@ public class LoadJAXData implements CommandLineRunner {
                 //PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
 
                 
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sampleKey, this.jaxDS.getName(), passage);
+                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sampleKey, this.jaxDS.getAbbreviation(), passage);
      
                 Sample specSample = new Sample();
                 specSample.setSourceSampleId(sampleKey);
@@ -320,11 +342,25 @@ public class LoadJAXData implements CommandLineRunner {
 
                 }
 
-                //pdxPassage.setModelCreation(modelCreation);
 
-                //loaderUtils.savePdxPassage(pdxPassage);
+                if(backgroundStrain != null){
+                    HostStrain bs = new HostStrain(backgroundStrain);
+                    specimen.setHostStrain(bs);
+                }
+
+                if(implantationSite != null){
+                    ImplantationSite is = new ImplantationSite(implantationSite);
+                    specimen.setImplantationSite(is);
+                }
+
+                if(implantationType != null){
+                    ImplantationType it = new ImplantationType(implantationType);
+                    specimen.setImplantationType(it);
+                }
+
                 loaderUtils.saveSpecimen(specimen);
 
+                modelCreation.addSpecimen(specimen);
                 modelCreation.addRelatedSample(specSample);
 
 
@@ -340,10 +376,10 @@ public class LoadJAXData implements CommandLineRunner {
 
     }
 
-    private Integer getPassage(String sample) {
-        Integer p = 0;
+    private String getPassage(String sample) {
+        String p = "0";
         try {
-            p = new Integer(passageMap.get(sample).replaceAll("P", ""));
+            p = passageMap.get(sample).replaceAll("P", "");
         } catch (Exception e) {
             log.info("Unable to determine passage from sample name " + sample + ". Assuming 0");
         }

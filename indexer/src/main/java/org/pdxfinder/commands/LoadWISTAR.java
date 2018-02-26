@@ -11,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.utilities.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,17 +35,15 @@ public class LoadWISTAR implements CommandLineRunner {
     private final static Logger log = LoggerFactory.getLogger(LoadWISTAR.class);
 
     private final static String WISTAR_DATASOURCE_ABBREVIATION = "PDXNet-Wistar-MDAnderson-Penn";
-    private final static String WISTAR_DATASOURCE_NAME = "Wistar-MDAnderson-Penn";
+    private final static String WISTAR_DATASOURCE_NAME = "Melanoma PDX established by the Wistar/MD Anderson/Penn";
     private final static String WISTAR_DATASOURCE_DESCRIPTION = "Wistar-MDAnderson-Penn PDX mouse models for PDXNet.";
-
-  
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
-    
-     private final static String NOT_SPECIFIED = "Not Specified";
 
-    //   private BackgroundStrain nsgBS;
+    private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
+
+    //   private HostStrain nsgBS;
     private ExternalDataSource wistarDS;
 
     private Options options;
@@ -57,8 +56,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
     @Value("${wistarpdx.url}")
     private String urlStr;
-    
-    
+
     @PostConstruct
     public void init() {
         formatter = new HelpFormatter();
@@ -82,7 +80,6 @@ public class LoadWISTAR implements CommandLineRunner {
             log.info("Loading WISTAR PDX data from URL " + urlStr);
             parseJSON(parseURL(urlStr));
 
-
         }
 
     }
@@ -90,7 +87,7 @@ public class LoadWISTAR implements CommandLineRunner {
     private void parseJSON(String json) {
 
         wistarDS = loaderUtils.getExternalDataSource(WISTAR_DATASOURCE_ABBREVIATION, WISTAR_DATASOURCE_NAME, WISTAR_DATASOURCE_DESCRIPTION);
-        //      nsgBS = loaderUtils.getBackgroundStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -111,34 +108,46 @@ public class LoadWISTAR implements CommandLineRunner {
 
     @Transactional
     void createGraphObjects(JSONObject j) throws Exception {
-        String id = j.getString("Model ID");
+        String id = j.getString("Model ID").trim();
 
         // the preference is for histology
         String diagnosis = j.getString("Clinical Diagnosis");
         String histology = j.getString("Histology");
+
         if (histology.trim().length() > 0) {
-                diagnosis = histology;
-            }
-        
+            diagnosis = histology;
+        }
+
+        if (diagnosis.trim().length() == 0) {
+            // no histology no diagnosis -> no model
+            return;
+        }
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
-        
-        String race =  NOT_SPECIFIED;
-        try{
-            if(j.getString("Race").trim().length()>0){
+
+        String race = NOT_SPECIFIED;
+        try {
+            if (j.getString("Race").trim().length() > 0) {
                 race = j.getString("Race");
             }
-        }catch(Exception e){}
-        
-        try{
-            if(j.getString("Ethnicity").trim().length()>0){
+        } catch (Exception e) {
+        }
+
+        try {
+            if (j.getString("Ethnicity").trim().length() > 0) {
                 race = j.getString("Ethnicity");
             }
-        }catch(Exception e){}
+        } catch (Exception e) {
+        }
+
+        String age = Standardizer.getAge(j.getString("Age"));
+
+        String gender = Standardizer.getGender(j.getString("Gender"));
 
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
-                j.getString("Gender"), "", race, j.getString("Age"), wistarDS);
+                gender, "", race, age, wistarDS);
+         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
 
         
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
@@ -149,45 +158,49 @@ public class LoadWISTAR implements CommandLineRunner {
 
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
-        
+
         String qaType = NOT_SPECIFIED;
-        try{
+        try {
             qaType = j.getString("QA") + "on passage " + j.getString("QA Passage");
-        }catch(Exception e){
+        } catch (Exception e) {
             // not all groups supplied QA
         }
-        QualityAssurance qa = new QualityAssurance(qaType,
-                NOT_SPECIFIED, ValidationTechniques.VALIDATION);
-        loaderUtils.saveQualityAssurance(qa);
-        
-        String strain = j.getString("Strain");
-        BackgroundStrain bs = loaderUtils.getBackgroundStrain(strain, strain, "", "");
-        
-        String engraftmentSite = NOT_SPECIFIED;
-        try{
-            engraftmentSite = j.getString("Engraftment Site");
-        }catch(Exception e){
-            // uggh
-        }
-        
-        String tumorPrep = NOT_SPECIFIED;
-        
-        try{
-            tumorPrep = j.getString("Tumor Prep");
-        }catch(Exception e){
-            // uggh again
-        }
+        String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, engraftmentSite,
-                tumorPrep, sample, bs, qa);
+        QualityAssurance qa = new QualityAssurance(qaType,
+                NOT_SPECIFIED, ValidationTechniques.VALIDATION, qaPassage);
+        loaderUtils.saveQualityAssurance(qa);
+
+        String strain = j.getString("Strain");
+        HostStrain bs = loaderUtils.getHostStrain(strain, strain, "", "");
+
+        String engraftmentSite = Standardizer.getValue("Engraftment Site", j);
+
+        String tumorPrep = Standardizer.getValue("Tumor Prep", j);
+
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, wistarDS.getAbbreviation(), sample, qa);
         modelCreation.addRelatedSample(sample);
 
-        
-        
+        Specimen specimen = loaderUtils.getSpecimen(modelCreation,
+                modelCreation.getSourcePdxId(), wistarDS.getAbbreviation(), NOT_SPECIFIED);
+
+        specimen.setHostStrain(bs);
+
+        ImplantationSite is = new ImplantationSite(engraftmentSite);
+        specimen.setImplantationSite(is);
+
+        ImplantationType it = new ImplantationType(tumorPrep);
+        specimen.setImplantationType(it);
+
+        specimen.setSample(sample);
+
+        loaderUtils.saveSpecimen(specimen);
+
         loaderUtils.saveModelCreation(modelCreation);
 
-        
     }
+
+
 
     private String parseURL(String urlStr) {
         StringBuilder sb = new StringBuilder();
