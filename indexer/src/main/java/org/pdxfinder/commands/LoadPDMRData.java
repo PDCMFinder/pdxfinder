@@ -43,7 +43,7 @@ public class LoadPDMRData implements CommandLineRunner {
 
     private final static String DATASOURCE_ABBREVIATION = "PDMR";
     private final static String DATASOURCE_NAME = "National Cancer Institute";
-    private final static String DATASOURCE_DESCRIPTION = "The NCI Patient-Derived Models Repository ";
+    private final static String DATASOURCE_DESCRIPTION = "NCI Patient-Derived Models Repository ";
 
     private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-PrkdcscidIl2rgtm1Wjl/SzJ";

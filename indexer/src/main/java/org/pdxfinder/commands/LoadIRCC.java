@@ -42,7 +42,7 @@ public class LoadIRCC implements CommandLineRunner {
     private final static Logger log = LoggerFactory.getLogger(LoadIRCC.class);
 
     private final static String IRCC_DATASOURCE_ABBREVIATION = "IRCC";
-    private final static String IRCC_DATASOURCE_NAME = "IRCC";
+    private final static String IRCC_DATASOURCE_NAME = "Candiolo Cancer Institute";
     private final static String IRCC_DATASOURCE_DESCRIPTION = "IRCC";
 
     private final static String NSG_BS_NAME = "NOD scid gamma";

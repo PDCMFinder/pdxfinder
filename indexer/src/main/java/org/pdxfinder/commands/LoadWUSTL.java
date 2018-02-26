@@ -36,7 +36,7 @@ public class LoadWUSTL implements CommandLineRunner {
     private final static Logger log = LoggerFactory.getLogger(LoadWUSTL.class);
 
     private final static String WUSTL_DATASOURCE_ABBREVIATION = "PDXNet-WUSTL";
-    private final static String WUSTL_DATASOURCE_NAME = "Washington University St. Louis";
+    private final static String WUSTL_DATASOURCE_NAME = "Washington University in St. Louis";
     private final static String WUSTL_DATASOURCE_DESCRIPTION = "Washington University St. Louis PDX mouse models for PDXNet.";
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
