@@ -36,7 +36,7 @@ public class LoadMDAnderson implements CommandLineRunner {
     private final static Logger log = LoggerFactory.getLogger(LoadMDAnderson.class);
 
     private final static String MDA_DATASOURCE_ABBREVIATION = "PDXNet-MDAnderson";
-    private final static String MDA_DATASOURCE_NAME = "M D Anderson";
+    private final static String MDA_DATASOURCE_NAME = "University of Texas MD Anderson Cancer Center";
     private final static String MDA_DATASOURCE_DESCRIPTION = "University Texas MD Anderson PDX mouse models for PDXNet.";
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
@@ -194,8 +194,9 @@ public class LoadMDAnderson implements CommandLineRunner {
 
         String[] markers = markerStr.split(";");
         if (markerStr.trim().length() > 0) {
-
-            MolecularCharacterization molC = new MolecularCharacterization(markerPlatform);
+            Platform pl = loaderUtils.getPlatform(markerPlatform, mdaDS);
+            MolecularCharacterization molC = new MolecularCharacterization();
+            molC.setPlatform(pl);
             Set<MarkerAssociation> markerAssocs = new HashSet();
 
             for (int i = 0; i < markers.length; i++) {

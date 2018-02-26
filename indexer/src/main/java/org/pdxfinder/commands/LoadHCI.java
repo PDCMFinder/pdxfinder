@@ -37,7 +37,7 @@ public class LoadHCI implements CommandLineRunner {
     private final static Logger log = LoggerFactory.getLogger(LoadHCI.class);
 
     private final static String HCI_DATASOURCE_ABBREVIATION = "PDXNet-HCI-BCM";
-    private final static String HCI_DATASOURCE_NAME = "HCI BCM";
+    private final static String HCI_DATASOURCE_NAME = "HCI-Baylor College of Medicine";
     private final static String HCI_DATASOURCE_DESCRIPTION = "HCI BCM PDX mouse models for PDXNet.";
 
     private final static String NSG_BS_NAME = "NOD scid gamma";
@@ -163,7 +163,10 @@ public class LoadHCI implements CommandLineRunner {
         String[] markers = markerStr.split(";");
         if (markerStr.trim().length() > 0) {
 
-            MolecularCharacterization molC = new MolecularCharacterization(j.getString("Platform"));
+            Platform pl = loaderUtils.getPlatform(j.getString("Platform"), hciDS);
+            MolecularCharacterization molC = new MolecularCharacterization();
+            molC.setPlatform(pl);
+
             Set<MarkerAssociation> markerAssocs = new HashSet();
 
             for (int i = 0; i < markers.length; i++) {
