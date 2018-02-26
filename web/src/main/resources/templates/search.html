@@ -131,11 +131,11 @@
 
                                 <div class="columns small-7 medium-push-2 small-push-3  margin-bottom-none search-text-wrapper">
 
-                                    <select class="form-control" id="query" name="diagnosis" type="text" tabindex="2"
+                                    <select class="form-control" id="query" name="query" type="text" tabindex="2"
                                             th:if="${query == null || query == ''}"
                                             placeholder="Search (e.g., Melanoma)" multiple></select>
 
-                                    <select class="form-control" id="query" name="diagnosis" type="text" tabindex="2"  th:if="${query != null && query != ''}" multiple>
+                                    <select class="form-control" id="query" name="query" type="text" tabindex="2"  th:if="${query != null && query != ''}" multiple>
 
                                         <option th:if="${query != null && query != ''}" th:attr="selected='selected'" th:text="${query}"/>
 
