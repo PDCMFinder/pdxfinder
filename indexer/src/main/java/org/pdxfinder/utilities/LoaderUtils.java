@@ -602,5 +602,9 @@ public class LoaderUtils {
 
         return pa;
     }
+    
+    public void savePlatformAssociation(PlatformAssociation pa){
+            platformAssociationRepository.save(pa);
+    }
 
 }
