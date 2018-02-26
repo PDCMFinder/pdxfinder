@@ -40,7 +40,7 @@ public class ChartDataController {
         for (ModelForQuery m : models) {
 
             if (!cancers.containsKey(m.getMappedOntologyTerm())) {
-                cancers.put(m.getMappedOntologyTerm(), new DataHolder(m.getMappedOntologyTerm(),""));
+                cancers.put(m.getMappedOntologyTerm(), new DataHolder(m.getMappedOntologyTerm()));
                 cancers.get(m.getMappedOntologyTerm()).setId(ids++);
             }
 
@@ -66,7 +66,12 @@ public class ChartDataController {
         for (ModelForQuery m : models) {
 
             if (!dataHolderMap.containsKey(m.getDatasource())) {
-                dataHolderMap.put(m.getDatasource(), new DataHolder(m.getDatasource(), dataHolderDetails.get(m.getDatasource())));
+                dataHolderMap.put(m.getDatasource(), new DataHolder(m.getDatasource()));
+
+                CenterSpecificDataHolder c = new CenterSpecificDataHolder(m.getDatasource());
+                c.setDescription(dataHolderDetails.get(m.getDatasource()));
+                dataHolderMap.put(m.getDatasource(), c);
+
                 dataHolderMap.get(m.getDatasource()).id = ids++;
             }
 
@@ -75,7 +80,10 @@ public class ChartDataController {
 
         }
 
+
         data.put("providers", dataHolderMap.values());
+
+
 
         /*
         Return counts of models by top level by center
@@ -111,15 +119,13 @@ public class ChartDataController {
 
         private Integer id;
         private String name;
-        private String details;
         private Integer number = 0;
 
         public DataHolder() {
         }
 
-        public DataHolder(String name,String details) {
+        public DataHolder(String name) {
             this.name = name;
-            this.details = details;
         }
 
         public void increment() {
@@ -140,14 +146,6 @@ public class ChartDataController {
 
         public void setName(String name) {
             this.name = name;
-        }
-
-        public String getDetails() {
-            return details;
-        }
-
-        public void setDetails(String details) {
-            this.details = details;
         }
 
         public Integer getNumber() {
