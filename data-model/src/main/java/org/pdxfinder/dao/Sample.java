@@ -124,6 +124,14 @@ public class Sample {
         this.molecularCharacterizations = molecularCharacterizations;
     }
 
+    public void addMolecularCharacterization(MolecularCharacterization mc){
+
+        if(this.molecularCharacterizations == null){
+            this.molecularCharacterizations = new HashSet<>();
+        }
+        this.molecularCharacterizations.add(mc);
+    }
+
     public SampleToOntologyRelationShip getSampleToOntologyRelationShip() {
         return sampleToOntologyRelationShip;
     }
