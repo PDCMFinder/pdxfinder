@@ -70,6 +70,8 @@ public class LoadIRCC implements CommandLineRunner {
     private HashMap<String, HashMap<String, String>> specimenSamples = new HashMap();
     private HashMap<String, HashMap<String, String>> modelSamples = new HashMap();
 
+    private HashSet<Integer> loadedModelHashes = new HashSet<>();
+
 
     @Value("${irccpdx.url}")
     private String urlStr;
@@ -143,6 +145,10 @@ public class LoadIRCC implements CommandLineRunner {
 
     @Transactional
     void createGraphObjects(JSONObject job) throws Exception {
+
+        if(loadedModelHashes.contains(job.toString().hashCode())) return;
+        loadedModelHashes.add(job.toString().hashCode());
+
         String id = job.getString("Model ID");
 
         // the preference is for histology
@@ -204,7 +210,7 @@ public class LoadIRCC implements CommandLineRunner {
             String specimenId = specimenJSON.getString("Specimen ID");
             
             Specimen specimen = loaderUtils.getSpecimen(modelCreation,
-                    modelCreation.getSourcePdxId(), irccDS.getAbbreviation(), specimenJSON.getString("Passage"));
+                    specimenId, irccDS.getAbbreviation(), specimenJSON.getString("Passage"));
 
             specimen.setHostStrain(this.nsgBS);
 
@@ -306,8 +312,8 @@ public class LoadIRCC implements CommandLineRunner {
 
             for(String m:markers){
                 Marker marker = loaderUtils.getMarker(m, m);
-                PlatformAssociation pa = loaderUtils.createPlatformAssociation(platform, marker);
-                loaderUtils.savePlatformAssociation(pa);
+                //PlatformAssociation pa = loaderUtils.createPlatformAssociation(platform, marker);
+                //loaderUtils.savePlatformAssociation(pa);
 
             }
             log.info("Saved "+markers.size()+" to the DB.");
