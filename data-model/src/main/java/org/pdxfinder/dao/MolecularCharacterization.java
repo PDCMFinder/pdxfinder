@@ -4,6 +4,7 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -65,5 +66,15 @@ public class MolecularCharacterization {
 
     public void setMarkerAssociations(Set<MarkerAssociation> markerAssociations) {
         this.markerAssociations = markerAssociations;
+    }
+
+
+    public void addMarkerAssociation(MarkerAssociation ma){
+
+        if(this.markerAssociations == null){
+            this.markerAssociations = new HashSet<>();
+        }
+        this.markerAssociations.add(ma);
+
     }
 }

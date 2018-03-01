@@ -5075,7 +5075,8 @@ form.main-search {
   padding: 50px 0 20px 0; }
   form.main-search .choices[data-type='select-multiple'] .choices__item[aria-selected='true'] {
     background: #fff;
-    border-color: #fff; }
+    border-color: #fff;
+      font-size: 18px;}
   form.main-search .choices {
     margin-bottom: 0; }
     form.main-search .choices button.choices__button {
@@ -5377,7 +5378,8 @@ ul.pdx-accordion-2 div.accordion-content {
     box-shadow: none;
     padding: 0;
     width: 10%;
-    min-width: 180px;
+    min-width: 250px;
+    font-size: 19px;
     margin: 0; }
   .choices[data-type*='select-one'] .choices__input {
     box-shadow: none; }

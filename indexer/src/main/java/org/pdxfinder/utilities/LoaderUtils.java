@@ -248,6 +248,10 @@ public class LoaderUtils {
         return sample;
     }
 
+    public Sample getSampleByDataSourceAndSourceSampleId(String dataSource, String sampleId){
+
+        return sampleRepository.findBySourceSampleIdAndDataSource(sampleId, dataSource);
+    }
 
     public Collection<Sample> getSamplesWithoutOntologyMapping(){
 

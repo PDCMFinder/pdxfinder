@@ -33,12 +33,13 @@ public interface PlatformRepository extends PagingAndSortingRepository<Platform,
     List<Platform> findPlatformByExternalDataSource(@Param("dataSource") String dataSource);
 
 
-    @Query("MATCH (plat:Platform)--(mc:MolecularCharacterization) " +
-            "WHERE toLower(plat.name) = toLower({platform}) " +
-            "RETURN count (mc)")
-    int findPlatformCount(@Param("platform") String platform, @Param("dataSource") String dataSource);
+    @Query("MATCH (molChar:MolecularCharacterization)-[pus:PLATFORM_USED]-(p:Platform)-[assW:ASSOCIATED_WITH]-(eds:ExternalDataSource) " +
+            "WHERE p.name={platform} AND toLower(eds.abbreviation)=toLower({dataSource}) " +
 
-
+            "WITH molChar, pus, p " +
+            "OPTIONAL MATCH (molChar)-[assW:ASSOCIATED_WITH]-(mAss:MarkerAssociation) " +
+            "RETURN count(mAss)")
+    int countMarkerAssocByPlatformAndExternalDataSource(@Param("platform") String platform, @Param("dataSource") String dataSource);
 
 
 }
