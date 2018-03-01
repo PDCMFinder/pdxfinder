@@ -251,6 +251,11 @@ public class SearchController {
             filters.get(key).add(value);
         }
 
+        Set<String> dataSourceCounter = new HashSet<>();
+        for(ModelForQuery mfq :results){
+            dataSourceCounter.add(mfq.getDatasource());
+        }
+
         textDescription += StringUtils
                 .join(filters.keySet()
                         .stream()
@@ -259,6 +264,10 @@ public class SearchController {
 
         textDescription += " returned " + results.size() + " result";
         textDescription += results.size() == 1 ? "" : "s";
+        textDescription += " in "+dataSourceCounter.size()+" source";
+        textDescription += dataSourceCounter.size() == 1 ? "" : "s";
+
+        if(dataSourceCounter.size() != 0) textDescription += " "+dataSourceCounter.toString();
 
         return textDescription;
 
