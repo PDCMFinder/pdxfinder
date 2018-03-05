@@ -57,6 +57,8 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
         parser.accepts("linkSamplesToNCITTerms", "Link samples to NCIT terms");
         parser.accepts("linkSamplesToNCITTermsWithCleanup", "Link samples to NCIT terms, then cleanup.");
         parser.accepts("loadALL", "Load all, including linking samples to NCIT terms");
+        parser.accepts("loadSlim", "Load slim, then link samples to NCIT terms");
+
         OptionSet options = parser.parse(args);
 
         long startTime = System.currentTimeMillis();
@@ -65,7 +67,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
             log.warn("Select one or the other of: -linkSamplesToNCITTerms, -linkSamplesToNCITTermsWithCleanup");
             log.warn("Not loading ", this.getClass().getName());
 
-        } else if (options.has("linkSamplesToNCITTermsWithCleanup") || options.has("loadALL")) {
+        } else if (options.has("linkSamplesToNCITTermsWithCleanup") || options.has("loadALL")  || options.has("loadSlim")) {
 
             log.info("Mapping samples to NCIT terms with cleanup.");
 

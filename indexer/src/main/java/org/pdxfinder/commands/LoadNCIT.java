@@ -60,6 +60,7 @@ public class LoadNCIT implements CommandLineRunner {
         parser.accepts("loadNCIT", "Load NCIT all ontology");
         parser.accepts("loadNCITPreDef", "Load predefined NCIT ontology");
         parser.accepts("loadALL", "Load all, including NCiT ontology");
+        parser.accepts("loadSlim", "Load slim, then link samples to NCIT terms");
         OptionSet options = parser.parse(args);
 
         long startTime = System.currentTimeMillis();
@@ -69,7 +70,7 @@ public class LoadNCIT implements CommandLineRunner {
             log.warn("Select one or the other of: -loadNCIT, -loadNCITPreDef");
             log.warn("Not loading ", this.getClass().getName());
 
-        } else if (options.has("loadNCIT") || options.has("loadALL")) {
+        } else if (options.has("loadNCIT") || options.has("loadALL")  || options.has("loadSlim")) {
 
             log.info("Loading all Neoplasm subnodes.");
             loadNCIT();
