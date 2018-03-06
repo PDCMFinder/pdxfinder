@@ -106,9 +106,10 @@ public class LoadJAXData implements CommandLineRunner {
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadJAX", "Load JAX PDX data");
         parser.accepts("loadALL", "Load all, including JAX PDX data");
+        parser.accepts("loadSlim", "Load slim, then link samples to NCIT terms");
         OptionSet options = parser.parse(args);
 
-        if (options.has("loadJAX") || options.has("loadALL")) {
+        if (options.has("loadJAX") || options.has("loadALL")  || options.has("loadSlim")) {
 
             log.info("Loading JAX PDX data.");
 
@@ -284,7 +285,7 @@ public class LoadJAXData implements CommandLineRunner {
                 Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
                 platform.setExternalDataSource(jaxDS);
                 //loaderUtils.savePlatform(platform);
-                loaderUtils.createPlatformAssociation(platform, marker);
+                //loaderUtils.createPlatformAssociation(platform, marker);
                 
 
                 markerMap = sampleMap.get(sample);
