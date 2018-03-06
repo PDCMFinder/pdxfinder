@@ -65,6 +65,9 @@ h5{
 .hdc{
     color: rgb(52,152,219);
 }
+.black{
+    color: #000000;
+}
 
 .pdxfinder-link{
     color: #337ab7;
@@ -390,7 +393,6 @@ th,td {
 .table-borderedPdx > thead > tr > td {
     background-color: #F5F5F6;
     border-bottom-width: 1px;
-    background:url(../images/tableBack.jpg) repeat-x;
 }
 
 .table-hover > tbody > tr:hover > td,
@@ -524,6 +526,18 @@ table.dataTable {
     padding: 0 !important;
 }
 
+/* Move the Datatable Search Box anywhere with these 2 ... */
+.dataTables_filter {
+    white-space:nowrap;
+    margin-top: 20px;
+    margin-right: 55px;
+}
+.dataTables_filter label, .dataTables_filter input {
+    display: inline-block;
+    padding: 2px;
+    font-weight: bold;
+}
+
 
 
 /**
@@ -583,7 +597,7 @@ table.dataTable {
     line-height: 25px;
     padding:20px 25px;
     margin-top: 15px;
-    border: 1px solid rgb(52,152,219);
+    border: 1px solid #73cfaf;
 }
 @media only screen and (max-width: 480px){
     .tab .nav-tabs li{
@@ -607,7 +621,7 @@ table.dataTable {
 
 
 .bLine{
-    border-bottom: 1px solid #ccc; padding-bottom: 13px;
+    border-bottom: 1px solid #000; padding-bottom: 13px; margin-top:20px;
 }
 
 
@@ -678,6 +692,46 @@ table.dataTable {
 
 .nonjs-tab label:hover {color: #999; cursor: pointer; border:1px solid #000;}
 
+
+
+
+
+
+
+.table100.ver3 tbody tr {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.table100.ver3 th {
+    font-family: Montserrat-Medium;
+    font-size: 12px;
+    color: #fff;
+    line-height: 1.4;
+    text-transform: uppercase;
+
+    background-color: #0a0a0a;
+}
+
+.table100.ver3 .row100:hover td {
+    background-color: #fcebf5;
+}
+
+.table100.ver3 .hov-column-ver3 {
+    background-color: #fcebf5;
+}
+
+.table100.ver3 .hov-column-head-ver3 {
+    background-color: #0a0a0a !important;
+}
+
+.table100.ver3 .row100 td:hover {
+    background-color: rgba(0,178,213,0.6);  /*#06369d; #00b2d5;*/
+    color: #fff;
+}
+
+.pull-left{
+    float: left !important;
+}
 
 
 

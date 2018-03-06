@@ -36,7 +36,7 @@
     <!--    <link rel="stylesheet" href="https://raw.githubusercontent.com/ebiwd/pdx-visual-framework/master/css/app.min.css" type="text/css" media="all" /> -->
     <link rel="stylesheet" th:href="@{/css/app.min.css}" type="text/css" media="all"/>
 
-    <!--<link rel="stylesheet" th:href="@{/css/customStyles.css}" type="text/css" media="all"/>-->
+    <link rel="stylesheet" th:href="@{/css/customStyles.css}" type="text/css" media="all"/>
 
     <!-- If you have a custom header image or colour -->
     <!--
@@ -48,6 +48,43 @@
     <!-- also inform ES so we can host your colour palette file -->
     <!-- <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/theme-embl-petrol.css" type="text/css" media="all" /> -->
     <!-- end CSS-->
+
+    <style>
+        .tooltip {
+            max-width: none;
+        }
+
+        table.datatable-pdx thead th {
+            font-size: 1.0rem;
+        }
+
+        table.datatable-pdx td {
+            font-size: 0.9rem;
+        }
+
+        h4 {
+            font-size: 1.0rem;
+        }
+
+        ul.pdx-accordion-1 a.accordion-title {
+            font-size: 1.0rem;
+        }
+
+        ul.pdx-accordion-2 a.accordion-title {
+            font-size: 0.95rem;
+        }
+
+        span.selected {
+            color: #06369d;
+            font-weight: bold;
+        }
+
+
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script th:src="@{/js/jquery.dataTables.js}"></script>
+    <script th:src="@{/js/scroller.js}"></script>
 </head>
 
 <body class="level2">
@@ -112,13 +149,13 @@
               <!-- Tabs Section -->
             <section class="row">
                 <ul class="tabs style-2" data-tabs id="example2-tabs">
-                    <li class="tabs-title is-active"><a href="#summary" data-tabs-target="summary" aria-selected="true">Summary</a></li>
-                    <li class="tabs-title"><a href="#variation" data-tabs-target="variation" id="variation_data_link">Variation</a></li>
+                    <li class="tabs-title"><a href="#summary" data-tabs-target="summary">Summary</a></li>
+                    <li class="tabs-title is-active"><a href="#variation" data-tabs-target="variation" id="variation_data_link" aria-selected="true">Variation</a></li>
                     <li class="tabs-title"><a href="#plots" data-tabs-target="plots">Dosing studies</a></li>
                 </ul>
 
                 <div class="tabs-content style-2" data-tabs-content="example2-tabs">
-                    <div class="tabs-panel is-active" id="summary">
+                    <div class="tabs-panel" id="summary">
 
 
                             <!-- Summary first row -->
@@ -224,12 +261,9 @@
                     </div>
 
 
-                    <div class="tabs-panel" id="variation">
+                    <div class="tabs-panel is-active" id="variation">
+
                         <p>
-
-
-
-
                             <style> table *{ -webkit-box-sizing:content-box; -moz-box-sizing:content-box; box-sizing:content-box;}</style>
                         <div class="col-md-12 javaScriptBrowser">
 
@@ -238,8 +272,9 @@
                                     <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
                                 </div>
                             </div> -->
+                </div>
 
-
+                <!-- Start of Patient variation data -->
                             <div class="tab" role="tabpanel" th:if="${patientInfo.size() > 0}" >
                                 <!-- Nav tabs -->
                                 <ul class="nav nav-tabs" role="tablist">
@@ -252,6 +287,7 @@
 
                                     </li>
                                 </ul>
+
 
                                 <!-- Tab panes -->
                                 <div class="tab-content">
@@ -269,7 +305,7 @@
                                                             </h4>
 
                                                             <table id="pdxFinder-grid"
-                                                                   class="datatable-pdx display" cellspacing="0" width="100%">
+                                                                    class="unstriped pdx-table"> <!-- table-striped table-borderedPdx table-hover -->
 
                                                                 <thead>
                                                                 <tr>
@@ -294,43 +330,51 @@
 
                                     </div>
                                 </div>
+
                             </div>
+                <!-- End of Patient Variation Data -->
 
 
+
+
+
+                <!-- Start of Xenograft Variation data-->
 
                             <div class="tab" role="tabpanel" th:if="${modelInfo.size() > 0}">
-                                <!-- Nav tabs -->
-                                <ul class="nav nav-tabs" role="tablist">
+
+                                <ul class="tabs" data-tabs id="example-tabs" >
+
                                     <li th:each="technology,iter : ${modelInfo}"
-                                        th:class="( ${iter.index} == 0 ) ? 'active' : '' "
-                                        role="presentation">
+                                        class="tabs-title" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
 
                                         <a th:href="@{'#'+${technology.key}}"
-                                           th:text="${technology.key}+' Platform'" role="tab" data-toggle="tab" onclick="showTabs()"> TAB TITLES </a>
+                                           data-th-attr="data-tabs-target=${technology.key},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
+                                           th:text="${technology.key}+' Platform'" > TAB TITLES </a>
 
                                     </li>
+
                                 </ul>
 
 
                                 <!-- Tab panes -->
-                                <div class="tab-content">
+                                <div class="tabs-content"  data-tabs-content="example-tabs">
                                     <div th:each="technology,iter : ${modelInfo}"
                                          th:id="${technology.key}"
-                                         class="tab-pane active"  role="tabpanel">
+                                         class="tabs-panel"  th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
 
                                                     <span th:unless="${technology.value.size()<1}" th:each="num: ${#numbers.sequence(1,technology.value.size())}"> <!--/* Unable to capture index for inner loop so, this was used for innerloop : <tr th:each="passageList : ${technolog[y.value]}"> */-->
 
-                                                            <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'showContent' : 'hideContent' ">
+                                                            <div class="table-responsive">
 
                                                                 <h4 class="bLine" th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
-                                                                    <span class="hdc">Tumor Type: </span>            <i>Xenograft Tumor</i>                  &nbsp; &nbsp;
-                                                                    <span class="hdc">Histology:</span> <i th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
-                                                                    <span class="hdc">Passage: </span>  <i th:text="${technology.value[num-1]}"></i>
+                                                                    <span class="hdc">Tumor Type: </span>            <i class="black">Xenograft Tumor</i>                  &nbsp; &nbsp;
+                                                                    <span class="hdc">Histology:</span> <i class="black" th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
+                                                                    <span class="hdc">Passage: </span>  <i class="black" th:text="${technology.value[num-1]}"></i>
                                                                 </h4>
 
                                                                 <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
-                                                                       class="datatable-pdx" th:height="50"> <!-- table-condensed -->
-
+                                                                       id="example-datatable"
+                                                                       class="table display datatable-pdx table-borderedPdx" th:height="50"> <!-- class=" "   table-condensed style="border:1px solid #000; padding:10px;"-->
 
                                                                     <thead>
                                                                     <tr>
@@ -357,14 +401,10 @@
                                 </div>
 
                             </div>
+                        <!-- End of Xenograft Variation data -->
 
 
                         </div>
-
-
-
-
-
 
                         </p>
                     </div>
@@ -396,13 +436,14 @@
 
 </div>
 <!-- JavaScript -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
+
 <script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/scripts/dist/choices.min.js"></script>
+<script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.highlightRegex/0.1.2/highlightRegex.min.js"></script>
 <script th:src="@{/js/script.js}"></script>
-<script th:src="@{/js/jquery.dataTables.js}"></script>
-<script th:src="@{/js/scroller.js}"></script>
+<!--<script th:src="@{/js/main.js}"></script>-->
+
+
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
@@ -555,7 +596,14 @@
             }
 
         });
+
+        $(window).bind('resize', function () {
+            dataTable.fnAdjustColumnSizing();
+        } );
     }
+
+
+
 
     function showTabs() {
         for (var i=0; i<5; i++) {

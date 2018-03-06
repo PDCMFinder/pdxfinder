@@ -12,7 +12,8 @@ import java.util.Map;
  * Created by abayomi on 16/02/2018.
  */
 @Service
-public class PlatformService {
+public class PlatformService
+{
 
 
     private PlatformRepository platformRepository;

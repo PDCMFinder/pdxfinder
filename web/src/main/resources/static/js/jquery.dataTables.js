@@ -1,5 +1,5 @@
 /*! DataTables 1.10.4
- * ©2008-2014 SpryMedia Ltd - datatables.net/license
+ * Â©2008-2014 SpryMedia Ltd - datatables.net/license
  */
 
 /**
@@ -113,7 +113,7 @@
 
         // U+2009 is thin space and U+202F is narrow no-break space, both used in many
         // standards as thousands separators
-        var _re_formatted_numeric = /[',$£€¥%\u2009\u202F]/g;
+        var _re_formatted_numeric = /[',$Â£â‚¬Â¥%\u2009\u202F]/g;
 
 
         var _empty = function ( d ) {
@@ -674,8 +674,8 @@
                 return typeof src === 'string' && src.indexOf('@') !== -1;
             };
             oCol._bAttrSrc = $.isPlainObject( mDataSrc ) && (
-                    attrTest(mDataSrc.sort) || attrTest(mDataSrc.type) || attrTest(mDataSrc.filter)
-                );
+                attrTest(mDataSrc.sort) || attrTest(mDataSrc.type) || attrTest(mDataSrc.filter)
+            );
 
             oCol.fnGetData = function (rowData, type, meta) {
                 var innerData = mData( rowData, type, undefined, meta );
@@ -1199,7 +1199,7 @@
                 };
             }
             else if ( typeof mSource === 'string' && (mSource.indexOf('.') !== -1 ||
-                mSource.indexOf('[') !== -1 || mSource.indexOf('(') !== -1) )
+                    mSource.indexOf('[') !== -1 || mSource.indexOf('(') !== -1) )
             {
                 /* If there is a . in the source string then the data source is in a
                  * nested object so we loop over the data for each level to get the next
@@ -1312,7 +1312,7 @@
                 };
             }
             else if ( typeof mSource === 'string' && (mSource.indexOf('.') !== -1 ||
-                mSource.indexOf('[') !== -1 || mSource.indexOf('(') !== -1) )
+                    mSource.indexOf('[') !== -1 || mSource.indexOf('(') !== -1) )
             {
                 /* Like the get, we need to get data from a nested object */
                 var setData = function (data, val, src) {
@@ -3844,7 +3844,7 @@
                 // - which is shouldn't. When there is a scrollbar we need to take this
                 // into account.
                 if ( ie67 && (table.find('tbody').height() > divBodyEl.offsetHeight ||
-                    divBody.css('overflow-y') == "scroll")
+                        divBody.css('overflow-y') == "scroll")
                 ) {
                     tableStyle.width = _fnStringToCss( table.outerWidth() - barWidth);
                 }
@@ -3938,13 +3938,13 @@
             {
                 // The min width depends upon if we have a vertical scrollbar visible or not */
                 correction = ((divBodyEl.scrollHeight > divBodyEl.offsetHeight ||
-                divBody.css('overflow-y') == "scroll")) ?
+                    divBody.css('overflow-y') == "scroll")) ?
                     sanityWidth+barWidth :
                     sanityWidth;
 
                 // IE6/7 are a law unto themselves...
                 if ( ie67 && (divBodyEl.scrollHeight >
-                    divBodyEl.offsetHeight || divBody.css('overflow-y') == "scroll")
+                        divBodyEl.offsetHeight || divBody.css('overflow-y') == "scroll")
                 ) {
                     tableStyle.width = _fnStringToCss( correction-barWidth );
                 }
@@ -4667,9 +4667,9 @@
                     }
 
                     label = sTitle + ( nextSort === "asc" ?
-                                oAria.sSortAscending :
-                                oAria.sSortDescending
-                        );
+                            oAria.sSortAscending :
+                            oAria.sSortDescending
+                    );
                 }
                 else {
                     label = sTitle;
@@ -11279,7 +11279,7 @@
 			 *      } );
 			 *    } );
                  */
-                "sLoadingRecords": "<div style='margin: auto; width: 5%;'><img src='/images/loading2.gif' style='width:100%; margin-top:-300px;'> </div>",
+                "sLoadingRecords": "<div style='margin: auto; width: 5%;'><img src='/data/images/loading2.gif' style='width:100%; margin-top:-300px;'> </div>",
 
 
                 /**
@@ -14132,25 +14132,25 @@
                                     case 'first':
                                         btnDisplay = lang.sFirst;
                                         btnClass = button + (page > 0 ?
-                                                '' : ' '+classes.sPageButtonDisabled);
+                                            '' : ' '+classes.sPageButtonDisabled);
                                         break;
 
                                     case 'previous':
                                         btnDisplay = lang.sPrevious;
                                         btnClass = button + (page > 0 ?
-                                                '' : ' '+classes.sPageButtonDisabled);
+                                            '' : ' '+classes.sPageButtonDisabled);
                                         break;
 
                                     case 'next':
                                         btnDisplay = lang.sNext;
                                         btnClass = button + (page < pages-1 ?
-                                                '' : ' '+classes.sPageButtonDisabled);
+                                            '' : ' '+classes.sPageButtonDisabled);
                                         break;
 
                                     case 'last':
                                         btnDisplay = lang.sLast;
                                         btnClass = button + (page < pages-1 ?
-                                                '' : ' '+classes.sPageButtonDisabled);
+                                            '' : ' '+classes.sPageButtonDisabled);
                                         break;
 
                                     default:
