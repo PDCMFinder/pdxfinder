@@ -166,6 +166,7 @@ public class LoadHCI implements CommandLineRunner {
             Platform pl = loaderUtils.getPlatform(j.getString("Platform"), hciDS);
             MolecularCharacterization molC = new MolecularCharacterization();
             molC.setPlatform(pl);
+            molC.setType("mutation");
 
             Set<MarkerAssociation> markerAssocs = new HashSet();
 

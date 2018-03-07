@@ -194,6 +194,7 @@ public class LoadWUSTL implements CommandLineRunner {
 
             Platform pl = loaderUtils.getPlatform(markerPlatform, mdaDS);
             MolecularCharacterization molC = new MolecularCharacterization(markerPlatform);
+            molC.setType("mutation");
             molC.setPlatform(pl);
 
             Set<MarkerAssociation> markerAssocs = new HashSet();

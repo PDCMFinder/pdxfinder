@@ -196,6 +196,7 @@ public class LoadMDAnderson implements CommandLineRunner {
         if (markerStr.trim().length() > 0) {
             Platform pl = loaderUtils.getPlatform(markerPlatform, mdaDS);
             MolecularCharacterization molC = new MolecularCharacterization();
+            molC.setType("mutation");
             molC.setPlatform(pl);
             Set<MarkerAssociation> markerAssocs = new HashSet();
 

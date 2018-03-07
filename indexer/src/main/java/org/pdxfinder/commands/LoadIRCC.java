@@ -113,7 +113,7 @@ public class LoadIRCC implements CommandLineRunner {
                 parseModels(parseURL(urlStr));
             }
             if (variationURLStr != null && variationMax != 0) {
-                loadVariants(variationURLStr, "TargetedNGS_MUT");
+                loadVariants(variationURLStr, "TargetedNGS_MUT", "mutation");
             }
             else {
                 log.error("No irccpdx.url provided in properties");
@@ -288,7 +288,7 @@ public class LoadIRCC implements CommandLineRunner {
     }
 
     @Transactional
-    public void loadVariants(String variationURLStr, String platformName){
+    public void loadVariants(String variationURLStr, String platformName, String molcharType){
 
         log.info("Loading variation for platform "+platformName);
         //STEP 1: Save the platform
@@ -365,7 +365,9 @@ public class LoadIRCC implements CommandLineRunner {
                 else{
                     MolecularCharacterization mcNew = new MolecularCharacterization();
                     mcNew.setPlatform(platform);
+                    mcNew.setType(molcharType);
                     mcNew.addMarkerAssociation(ma);
+
 
                     sampleMolCharMap.put(sampleId,mcNew);
 
