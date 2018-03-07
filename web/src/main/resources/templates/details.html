@@ -166,7 +166,7 @@
                                 <table class="unstriped pdx-table head-left">
                                     <thead>
                                         <tr>
-                                            <th colspan="2">Clinical / Patient</th>
+                                            <th colspan="2"> Patient</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -186,7 +186,7 @@
                                 <table class="unstriped pdx-table head-left">
                                     <thead>
                                     <tr>
-                                        <th colspan="2">Clinical / Tumor</th>
+                                        <th colspan="2"> Patient Tumor</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -194,9 +194,9 @@
                                     <tr><th class="text-left">Histology</th>                  <td><span th:text="${diagnosis}"></span> <i class="hdc" th:text="${' (mapped to: '+mappedOntology+')'}"></i> </td></tr>
                                     <tr><th class="text-left">Ontology Mapping</th>           <td th:text="${mappedOntology}"></td></tr>
                                     <tr><th class="text-left">Primary Tissue</th>             <td th:text="${originTissue}"></td></tr>
-                                    <tr><th class="text-left">Collection Tissue</th>          <td th:text="${sampleSite}"></td></tr>
-                                    <tr><th class="text-left">Tumor type</th>                 <td th:text="${tumorType}"></td></tr>
-                                    <tr><th class="text-left">Classification</th>             <td th:text="${classification}"></td></tr>
+                                    <tr><th class="text-left">Collection Site</th>          <td th:text="${sampleSite}"></td></tr>
+                                    <tr><th class="text-left">Tumor Type</th>                 <td th:text="${tumorType}"></td></tr>
+                                    <tr><th class="text-left">Stage / Grade</th>             <td th:text="${classification}"></td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -219,8 +219,8 @@
                                         <tbody>
 
                                         <tr><th class="text-left">Strain</th><td th:text="${strain}"></td></tr>
-                                        <tr><th class="text-left">Engraftment site</th><td th:text="${engraftmentSite}"></td></tr>
-                                        <tr><th class="text-left">Implantation type</th><td th:text="${sampleType}"></td></tr>
+                                        <tr><th class="text-left">Engraftment Site</th><td th:text="${engraftmentSite}"></td></tr>
+                                        <tr><th class="text-left">Implantation Type</th><td th:text="${sampleType}"></td></tr>
                                         </tbody>
                                     </table>
                                 </div>
