@@ -17,17 +17,19 @@ public class ExternalDataSource {
     private String name;
     private String abbreviation;
     private String description;
+    private String contact;
     private Date dateLastUpdated;
 
     public ExternalDataSource() {
         // Empty constructor required as of Neo4j API 2.0.5
     }
 
-    public ExternalDataSource(String name, String abbreviation, String description, Date dateLastUpdated) {
+    public ExternalDataSource(String name, String abbreviation, String description,String contact, Date dateLastUpdated) {
         this.name = name;
         this.abbreviation = abbreviation;
         this.description = description;
         this.dateLastUpdated = dateLastUpdated;
+        this.contact = contact;
     }
 
     public String getName() {
@@ -52,6 +54,14 @@ public class ExternalDataSource {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 
     public Date getDateLastUpdated() {

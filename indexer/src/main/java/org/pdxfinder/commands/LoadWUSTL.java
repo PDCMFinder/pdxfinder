@@ -38,6 +38,7 @@ public class LoadWUSTL implements CommandLineRunner {
     private final static String WUSTL_DATASOURCE_ABBREVIATION = "PDXNet-WUSTL";
     private final static String WUSTL_DATASOURCE_NAME = "Washington University in St. Louis";
     private final static String WUSTL_DATASOURCE_DESCRIPTION = "Washington University St. Louis PDX mouse models for PDXNet.";
+    private final static String DATASOURCE_CONTACT = "bvantine@wustl.edu,rcfields@wustl.edu,jmudd@wustl.edu,sqli@wustl.edu,tprimeau@wustl.edu";
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
@@ -93,7 +94,7 @@ public class LoadWUSTL implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        mdaDS = loaderUtils.getExternalDataSource(WUSTL_DATASOURCE_ABBREVIATION, WUSTL_DATASOURCE_NAME, WUSTL_DATASOURCE_DESCRIPTION);
+        mdaDS = loaderUtils.getExternalDataSource(WUSTL_DATASOURCE_ABBREVIATION, WUSTL_DATASOURCE_NAME, WUSTL_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {

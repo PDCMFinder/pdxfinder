@@ -44,6 +44,7 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String JAX_DATASOURCE_ABBREVIATION = "JAX";
     private final static String JAX_DATASOURCE_NAME = "The Jackson Laboratory";
     private final static String JAX_DATASOURCE_DESCRIPTION = "The Jackson Laboratory PDX mouse models.";
+    private final static String DATASOURCE_CONTACT = "http://tumor.informatics.jax.org/mtbwi/pdxRequest.do?mice=";
 
     private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<scid> Il2rg<tm1Wjl>/SzJ";
@@ -129,7 +130,7 @@ public class LoadJAXData implements CommandLineRunner {
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
 
-        jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
+        jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
 
         nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
 

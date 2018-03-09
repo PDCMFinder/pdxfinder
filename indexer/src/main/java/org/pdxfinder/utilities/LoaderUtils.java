@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import javax.xml.crypto.Data;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
@@ -112,7 +111,7 @@ public class LoaderUtils {
 
     }
 
-    public ExternalDataSource getExternalDataSource(String abbr, String name, String description) {
+    public ExternalDataSource getExternalDataSource(String abbr, String name, String description, String contact) {
         ExternalDataSource eDS = externalDataSourceRepository.findByAbbreviation(abbr);
         if (eDS == null) {
             log.info("External data source '{}' not found. Creating", abbr);
@@ -120,6 +119,7 @@ public class LoaderUtils {
                     name,
                     abbr,
                     description,
+                    contact,
                     Date.from(Instant.now()));
             externalDataSourceRepository.save(eDS);
         }

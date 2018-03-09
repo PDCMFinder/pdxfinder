@@ -39,6 +39,7 @@ public class LoadHCI implements CommandLineRunner {
     private final static String HCI_DATASOURCE_ABBREVIATION = "PDXNet-HCI-BCM";
     private final static String HCI_DATASOURCE_NAME = "HCI-Baylor College of Medicine";
     private final static String HCI_DATASOURCE_DESCRIPTION = "HCI BCM PDX mouse models for PDXNet.";
+    private final static String DATASOURCE_CONTACT = "Alana.Welm@hci.utah.edu";
 
     private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
@@ -96,7 +97,7 @@ public class LoadHCI implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        hciDS = loaderUtils.getExternalDataSource(HCI_DATASOURCE_ABBREVIATION, HCI_DATASOURCE_NAME, HCI_DATASOURCE_DESCRIPTION);
+        hciDS = loaderUtils.getExternalDataSource(HCI_DATASOURCE_ABBREVIATION, HCI_DATASOURCE_NAME, HCI_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
         nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         try {

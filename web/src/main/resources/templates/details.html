@@ -138,7 +138,7 @@
 
 
               <!-- Tabs Section -->
-            <section class="row large-10 medium-12 expanded" id="detailsData">
+            <section class="row" id="detailsData">
 
                 <div class="row large-12 medium-12 expanded">
                     <ul class="tabs style-2" data-tabs id="example2-tabs">
@@ -185,7 +185,7 @@
                                     </thead>
                                     <tbody>
 
-                                    <tr><th class="text-left">Histology</th>                  <td> <span th:text="${mappedOntology}"></span> </td></tr>
+                                    <tr><th class="text-left">Histology</th>                  <td> <span class="hdc" th:text="${mappedOntology}"></span> </td></tr>
                                     <tr><th class="text-left">Primary Tissue</th>             <td th:text="${originTissue}"></td></tr>
                                     <tr><th class="text-left">Collection Site</th>          <td th:text="${sampleSite}"></td></tr>
                                     <tr><th class="text-left">Tumor Type</th>                 <td th:text="${tumorType}"></td></tr>
@@ -338,7 +338,8 @@
                             <div class="tab" role="tabpanel" th:if="${modelInfo.size() > 0}">
 
                                 <div id="sizeSwitch" >
-                                    <a class="button outline"> Export Results <i class="fi-page-export-csv lpad10"></i> </a>
+                                    <a onclick="expandTable('open')" class="button outline showOnLargeOnly"> Expand table <i class="fi-arrows-expand lpad10"></i> </a>
+
                                 </div>
 
 
@@ -617,8 +618,7 @@
         }
     }
 
-
-    /*function expandTable(action) {
+    function expandTable(action) {
 
 
         var expandButton = "<a onclick=\"expandTable('open')\" class='button outline'> Expand table <i class='fi-arrows-expand lpad10'></i> </a>";
@@ -628,7 +628,7 @@
         {
             //open it and activate compress button
             document.getElementById("variationTableData").className = "row large-12 medium-12 expanded";
-            document.getElementById("detailsData").className = "row large-10 medium-12 expanded";
+            document.getElementById("detailsData").className = "row large-12 medium-12 expanded";
             document.getElementById("sizeSwitch").innerHTML=compressButton;
         }
         else
@@ -639,7 +639,7 @@
             document.getElementById("sizeSwitch").innerHTML=expandButton;
         }
 
-    }*/
+    }
 
 
 </script>

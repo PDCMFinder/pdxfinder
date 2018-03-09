@@ -38,6 +38,7 @@ public class LoadMDAnderson implements CommandLineRunner {
     private final static String MDA_DATASOURCE_ABBREVIATION = "PDXNet-MDAnderson";
     private final static String MDA_DATASOURCE_NAME = "University of Texas MD Anderson Cancer Center";
     private final static String MDA_DATASOURCE_DESCRIPTION = "University Texas MD Anderson PDX mouse models for PDXNet.";
+    private final static String DATASOURCE_CONTACT = "bfang@mdanderson.org";
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
@@ -93,7 +94,7 @@ public class LoadMDAnderson implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        mdaDS = loaderUtils.getExternalDataSource(MDA_DATASOURCE_ABBREVIATION, MDA_DATASOURCE_NAME, MDA_DATASOURCE_DESCRIPTION);
+        mdaDS = loaderUtils.getExternalDataSource(MDA_DATASOURCE_ABBREVIATION, MDA_DATASOURCE_NAME, MDA_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
