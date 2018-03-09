@@ -14,6 +14,7 @@ public class Image {
 
     private String url;
     private String description;
+    private String type;
     
 
     public Image(String url) {
@@ -44,5 +45,13 @@ public class Image {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

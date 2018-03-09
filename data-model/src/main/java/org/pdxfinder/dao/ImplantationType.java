@@ -4,7 +4,7 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
- * Represents the type of implantation. e.g. Orthotopic, Subcutaneous, etc.
+ * Represents the type of implantation. e.g. Orthotopic, Heterotopic
  */
 @NodeEntity
 public class ImplantationType {

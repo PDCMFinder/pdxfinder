@@ -5,14 +5,17 @@ package org.pdxfinder.services;
  */
 
 import org.neo4j.cypher.internal.frontend.v2_3.ast.functions.Str;
+import org.pdxfinder.dao.DataProjection;
+import org.pdxfinder.dao.Marker;
+import org.pdxfinder.dao.MarkerAssociation;
 import org.pdxfinder.dao.MolecularCharacterization;
+import org.pdxfinder.repositories.DataProjectionRepository;
+import org.pdxfinder.repositories.MarkerAssociationRepository;
+import org.pdxfinder.repositories.MarkerRepository;
 import org.pdxfinder.repositories.MolecularCharacterizationRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  *
@@ -22,26 +25,32 @@ import java.util.Set;
 public class MolCharService {
 
     private MolecularCharacterizationRepository molecularCharacterizationRepository;
+    private MarkerAssociationRepository markerAssociationRepository;
+    private MarkerRepository markerRepository;
+    private DataProjectionRepository dataProjectionRepository;
 
-    public MolCharService(MolecularCharacterizationRepository molecularCharacterizationRepository) {
+
+    public MolCharService(MolecularCharacterizationRepository molecularCharacterizationRepository, MarkerAssociationRepository markerAssociationRepository,
+                          MarkerRepository markerRepository, DataProjectionRepository dataProjectionRepository) {
+
         this.molecularCharacterizationRepository = molecularCharacterizationRepository;
+        this.markerAssociationRepository = markerAssociationRepository;
+        this.markerRepository = markerRepository;
+        this.dataProjectionRepository = dataProjectionRepository;
     }
 
+    public String getMutatedMarkersAndVariants(){
 
-    public Map<String, Set<String>> getMutatedMarkersAndVariants(){
+        DataProjection dp = dataProjectionRepository.findByLabel("MarkerVariant");
 
+        if(dp != null){
 
-        // "KRAS"=>("V600","V600E","V612")
-        Map<String, Set<String>> result = new HashMap<>();
-
-        Collection<MolecularCharacterization> mutatedMolchars = molecularCharacterizationRepository.getAllDistinctByType("MUTATED");
-
-        for(MolecularCharacterization mc:mutatedMolchars){
-
-            //TODO: add variants and markers to results
+            if(dp.getValue() != null){
+                return dp.getValue();
+            }
         }
 
-        return result;
+        return "";
     }
 
 

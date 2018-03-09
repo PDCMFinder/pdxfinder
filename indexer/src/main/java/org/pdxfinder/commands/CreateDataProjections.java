@@ -13,10 +13,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 /*
@@ -32,8 +28,11 @@ public class CreateDataProjections implements CommandLineRunner{
     @Value("${user.home}")
     String homeDir;
 
-    //"platform"=>"marker"=>"variation"=>"set of model ids"
-    private Map<String, Map<String, Map<String, Set<String>>>> mutatedMarkersDataProjection = new HashMap<>();
+    //"platform"=>"marker"=>"variant"=>"set of model ids"
+    private Map<String, Map<String, Map<String, Set<String>>>> mutatedPlatformMarkerVariantModelDP = new HashMap<>();
+
+    //"marker"=>"set of variants"
+    private Map<String, Set<String>> mutatedMarkerVariantDP = new HashMap<>();
 
     //"platform"=>"marker"=>"set of model ids"
     private Map<String, Map<String, Set<String>>> wtMarkersDataProjection = new HashMap<>();
@@ -117,9 +116,8 @@ public class CreateDataProjections implements CommandLineRunner{
                         if(variantName != null && !variantName.isEmpty() && markerName != null && !markerName.isEmpty()){
 
 
-                            addToMutationProjection(platformName, markerName, variantName, modelId);
-
-
+                            addToMutatedPlatformMarkerVariantModelDP(platformName, markerName, variantName, modelId);
+                            addToMutatedMarkerVariantDP(markerName, variantName);
 
                         }
 
@@ -137,17 +135,41 @@ public class CreateDataProjections implements CommandLineRunner{
 
         log.info("Saving DataProjection");
 
-        DataProjection dp = loaderUtils.getDataProjectionByLabel("mutations");
+        DataProjection pmvmDP = loaderUtils.getDataProjectionByLabel("PlatformMarkerVariantModel");
 
-        if (dp == null){
+        if (pmvmDP == null){
 
-            dp = new DataProjection();
-            dp.setLabel("mutations");
+            pmvmDP = new DataProjection();
+            pmvmDP.setLabel("PlatformMarkerVariantModel");
         }
 
-        dp.setValue(createJsonString());
+        DataProjection mvDP = loaderUtils.getDataProjectionByLabel("MarkerVariant");
 
-        loaderUtils.saveDataProjection(dp);
+        if(mvDP == null){
+
+            mvDP = new DataProjection();
+            mvDP.setLabel("MarkerVariant");
+        }
+
+        JSONObject j1 ,j2;
+
+        try{
+
+            j1 = new JSONObject(this.mutatedPlatformMarkerVariantModelDP.toString());
+            j2 = new JSONObject(this.mutatedMarkerVariantDP.toString());
+
+            pmvmDP.setValue(j1.toString());
+            mvDP.setValue(j2.toString());
+
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
+
+
+        loaderUtils.saveDataProjection(pmvmDP);
+        loaderUtils.saveDataProjection(mvDP);
 
         /*
         try {
@@ -170,22 +192,22 @@ public class CreateDataProjections implements CommandLineRunner{
      * @param variantName
      * @param modelId
      */
-    private void addToMutationProjection(String platformName, String markerName, String variantName, String modelId){
+    private void addToMutatedPlatformMarkerVariantModelDP(String platformName, String markerName, String variantName, String modelId){
 
-        if(this.mutatedMarkersDataProjection.containsKey(platformName)){
+        if(this.mutatedPlatformMarkerVariantModelDP.containsKey(platformName)){
 
-            if(this.mutatedMarkersDataProjection.get(platformName).containsKey(markerName)){
+            if(this.mutatedPlatformMarkerVariantModelDP.get(platformName).containsKey(markerName)){
 
-                if(this.mutatedMarkersDataProjection.get(platformName).get(markerName).containsKey(variantName)){
+                if(this.mutatedPlatformMarkerVariantModelDP.get(platformName).get(markerName).containsKey(variantName)){
 
-                    this.mutatedMarkersDataProjection.get(platformName).get(markerName).get(variantName).add(modelId);
+                    this.mutatedPlatformMarkerVariantModelDP.get(platformName).get(markerName).get(variantName).add(modelId);
                 }
                 //platform and marker is there, variant is missing
                 else{
 
                     Set<String> models = new HashSet<>(Arrays.asList(modelId));
 
-                    this.mutatedMarkersDataProjection.get(platformName).get(markerName).put(variantName, models);
+                    this.mutatedPlatformMarkerVariantModelDP.get(platformName).get(markerName).put(variantName, models);
                 }
             }
             //platform is there, marker is missing
@@ -196,7 +218,7 @@ public class CreateDataProjections implements CommandLineRunner{
                 Map<String, Set<String>> variants = new HashMap<>();
                 variants.put(variantName, models);
 
-                this.mutatedMarkersDataProjection.get(platformName).put(markerName, variants);
+                this.mutatedPlatformMarkerVariantModelDP.get(platformName).put(markerName, variants);
             }
         }
         //if the platform is missing, combine all keys
@@ -210,17 +232,49 @@ public class CreateDataProjections implements CommandLineRunner{
             Map<String, Map<String, Set<String>>> markers = new HashMap<>();
             markers.put(markerName, variants);
 
-            this.mutatedMarkersDataProjection.put(platformName, markers);
+            this.mutatedPlatformMarkerVariantModelDP.put(platformName, markers);
         }
 
     }
 
 
-    private String createJsonString(){
+    /**
+     * Inserts a variant for a marker
+     *
+     * @param markerName
+     * @param variantName
+     */
+    private void addToMutatedMarkerVariantDP(String markerName, String variantName){
 
-        JSONObject json = new JSONObject(this.mutatedMarkersDataProjection);
+        if(this.mutatedMarkerVariantDP.containsKey(markerName)){
 
-        return json.toString();
+            this.mutatedMarkerVariantDP.get(markerName).add(variantName);
+        }
+        else{
+
+            Set s = new HashSet();
+            s.add(variantName);
+
+            this.mutatedMarkerVariantDP.put(markerName, s);
+        }
+
+    }
+
+
+
+    private String createJsonString(Object jstring){
+
+        try{
+
+            JSONObject json = new JSONObject(jstring);
+            return json.toString();
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
 

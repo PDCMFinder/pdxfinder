@@ -1,14 +1,22 @@
 package org.pdxfinder.web.controllers;
 
+
+
+
+import org.json.JSONObject;
 import org.pdxfinder.services.GraphService;
+import org.pdxfinder.services.MolCharService;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -21,11 +29,13 @@ public class RestControllerGeneral {
 
     GraphService graphService;
     SearchService searchService;
+    MolCharService molCharService;
 
     @Autowired
-    public RestControllerGeneral(GraphService graphService, SearchService searchService) {
+    public RestControllerGeneral(GraphService graphService, SearchService searchService, MolCharService molCharService) {
         this.graphService = graphService;
         this.searchService = searchService;
+        this.molCharService = molCharService;
     }
 
 
@@ -154,5 +164,22 @@ public class RestControllerGeneral {
 
         return tableColumns.get(sortolumn);
     }
+
+
+    @RequestMapping(value = "/getmutatedmarkerswithvariants")
+    public ResponseEntity getMutatedMarkersWithVariants(){
+        JSONObject j = new JSONObject();
+
+        try {
+            j = new JSONObject(molCharService.getMutatedMarkersAndVariants());
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        //TODO: Look for possible formatting, it looks bad
+        return new ResponseEntity(molCharService.getMutatedMarkersAndVariants(), HttpStatus.OK);
+    }
+
+
 
 }
