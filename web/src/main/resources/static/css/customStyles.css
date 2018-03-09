@@ -62,8 +62,19 @@ h5{
     font-size: 14px;
 }
 
+.pdxBig{
+    font-size: 22px;
+}
+.margin-top-10{
+    margin-top:10px;
+}
+
 .hdc{
-    color: rgb(52,152,219);
+    color: #06369d;
+}
+
+.bold{
+    font-weight: 600;
 }
 .black{
     color: #000000;
@@ -257,6 +268,10 @@ h5{
     padding: 8px;
 }
 
+.lpad10 {
+    padding-left: 10px;
+}
+
 
 @media (min-width:979px) {
     .noPaddingLeft {
@@ -361,7 +376,7 @@ h5{
 }
 .table-borderedPdx {
     /* border-color: rgba(163, 168, 168, 0.2); */
-    border: 1px solid #999;
+    border: 1px solid rgba(153,153,153,0.3);
 }
 
 .table-bordered > thead > tr > th,
@@ -377,8 +392,8 @@ h5{
 .table-borderedPdx > thead > tr > td,
 .table-borderedPdx > tbody > tr > td,
 .table-borderedPdx > tfoot > tr > td {
-    border-top: 1px solid #999;
-    border-right: 1px solid #999;
+    border-top: 1px solid rgba(153,153,153,0.3);
+    border-right: 1px solid rgba(153,153,153,0.3);
     white-space:nowrap;
 }
 
@@ -621,7 +636,7 @@ table.dataTable {
 
 
 .bLine{
-    border-bottom: 1px solid #000; padding-bottom: 13px; margin-top:20px;
+    border-bottom: 1px solid  rgba(153,153,153,0.4); padding-bottom: 13px; margin-top:20px;
 }
 
 
@@ -693,8 +708,26 @@ table.dataTable {
 .nonjs-tab label:hover {color: #999; cursor: pointer; border:1px solid #000;}
 
 
+/* Some Media Query to adjust visibility */
+@media (max-width:767px){
+    .hideOnVSmall{display:none!important}
+}
+@media (min-width:768px) and (max-width:991px){
+    .hideOnSmall{display:none!important}
+}
+@media (min-width:992px) and (max-width:1199px){
+    .hideOnMedium{display:none!important}
+}
+@media (min-width:1200px) and (max-width:1699px){
+    .hideOn15Inch{display:none!important}
+}
+@media (min-width:1700px){
+    .hideOnLarge{display:none!important}
+}
 
-
+@media (min-width:10px) and (max-width:1699px){
+    .showOnLargeOnly{display:none!important}
+}
 
 
 
