@@ -27,7 +27,7 @@ import java.util.*;
  * Created by csaba on 24/08/2017.
  */
 @Component
-@Order(value = 100)
+@Order(value = 95)
 public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
 
