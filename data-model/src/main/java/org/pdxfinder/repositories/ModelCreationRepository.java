@@ -1,6 +1,7 @@
 package org.pdxfinder.repositories;
 
 import org.pdxfinder.dao.ModelCreation;
+import org.pdxfinder.dao.MolecularCharacterization;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
@@ -136,5 +137,11 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN count(mAss) ")
     Integer countMarkerAssociationBySourcePdxId(@Param("sourcePdxId") String sourcePdxId,
                                                 @Param("platform") String platform);
+
+
+    @Query("MATCH (model:ModelCreation)--(s:Sample)--(molch:MolecularCharacterization) " +
+            "WHERE id(molch) = {mc} " +
+            "RETURN model")
+    ModelCreation findByMolChar(@Param("mc") MolecularCharacterization mc);
 
 }

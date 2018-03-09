@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import javax.xml.crypto.Data;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
@@ -49,6 +50,7 @@ public class LoaderUtils {
     private SpecimenRepository specimenRepository;
     private PlatformRepository platformRepository;
     private PlatformAssociationRepository platformAssociationRepository;
+    private DataProjectionRepository dataProjectionRepository;
 
     private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
 
@@ -70,7 +72,8 @@ public class LoaderUtils {
                        OntologyTermRepository ontologyTermRepository,
                        SpecimenRepository specimenRepository,
                        PlatformRepository platformRepository,
-                       PlatformAssociationRepository platformAssociationRepository) {
+                       PlatformAssociationRepository platformAssociationRepository,
+                       DataProjectionRepository dataProjectionRepository) {
 
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null");
         Assert.notNull(hostStrainRepository, "hostStrainRepository cannot be null");
@@ -105,6 +108,7 @@ public class LoaderUtils {
         this.specimenRepository = specimenRepository;
         this.platformRepository = platformRepository;
         this.platformAssociationRepository = platformAssociationRepository;
+        this.dataProjectionRepository = dataProjectionRepository;
 
     }
 
@@ -145,6 +149,11 @@ public class LoaderUtils {
 
     public void saveModelCreation(ModelCreation modelCreation){
         this.modelCreationRepository.save(modelCreation);
+    }
+
+    public ModelCreation getModelByMolChar(MolecularCharacterization mc){
+
+        return modelCreationRepository.findByMolChar(mc);
     }
 
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, ExternalDataSource externalDataSource) {
@@ -403,6 +412,12 @@ public class LoaderUtils {
         return ma;
     }
 
+
+    public Set<MarkerAssociation> getMarkerAssocsByMolChar(MolecularCharacterization mc){
+
+        return markerAssociationRepository.findByMolChar(mc);
+    }
+
     // wow this is misleading it doesn't do anyting!
     public void deleteAllByEDSName(String edsName) throws Exception {
         throw new Exception("Nothing deleted. Method not implemented!");
@@ -423,6 +438,11 @@ public class LoaderUtils {
                 qualityAssuranceRepository.save(qa);
             }
         }
+    }
+
+    public Collection<MolecularCharacterization> getMolCharsByType(String type){
+
+        return molecularCharacterizationRepository.getAllByType(type);
     }
     
     public void savePdxPassage(PdxPassage pdxPassage){
@@ -609,6 +629,16 @@ public class LoaderUtils {
     
     public void savePlatformAssociation(PlatformAssociation pa){
             platformAssociationRepository.save(pa);
+    }
+
+    public void saveDataProjection(DataProjection dp){
+
+        dataProjectionRepository.save(dp);
+    }
+
+    public DataProjection getDataProjectionByLabel(String label){
+
+        return dataProjectionRepository.findByLabel(label);
     }
 
 }

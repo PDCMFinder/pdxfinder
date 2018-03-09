@@ -1,6 +1,7 @@
 package org.pdxfinder.repositories;
 
 import org.pdxfinder.dao.Marker;
+import org.pdxfinder.dao.MarkerAssociation;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -30,5 +31,8 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
 
     @Query("MATCH (s:Sample)--(:MolecularCharacterization)--(:MarkerAssociation)--(m:Marker) WHERE s.sourceSampleId = {sampleId}  return m")
     Collection<Marker> findAllBySampleId(@Param("sampleId") String sampleId);
+
+    @Query("MATCH (ma:MarkerAssociation)--(m:Marker) WHERE id(ma) = {ma} RETURN m")
+    Marker findByMarkerAssociation(@Param("ma") MarkerAssociation ma);
 
 }

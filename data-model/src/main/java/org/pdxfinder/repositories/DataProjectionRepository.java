@@ -10,4 +10,5 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 public interface DataProjectionRepository extends Neo4jRepository<DataProjection, Long> {
 
 
+    DataProjection findByLabel(String label);
 }
