@@ -139,18 +139,19 @@ public class LoadWISTAR implements CommandLineRunner {
             }
         } catch (Exception e) {
         }
-        
+
         String age = Standardizer.getAge(j.getString("Age"));
-        
+
         String gender = Standardizer.getGender(j.getString("Gender"));
-        
+
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
                 gender, "", race, age, wistarDS);
          String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
 
-        Sample sample = loaderUtils.getSample(id, tumorType, diagnosis,
-                j.getString("Primary Site"), j.getString("Specimen Site"),
+        
+        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
+                NOT_SPECIFIED, NOT_SPECIFIED,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS.getAbbreviation());
 
         pSnap.addSample(sample);
@@ -199,7 +200,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
     }
 
-  
+
 
     private String parseURL(String urlStr) {
         StringBuilder sb = new StringBuilder();

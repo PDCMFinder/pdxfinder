@@ -135,22 +135,16 @@ public class LoadWUSTL implements CommandLineRunner {
             }
         } catch (Exception e) {
         }
-        
+
           String age = Standardizer.getAge(j.getString("Age"));
           String gender = Standardizer.getGender(j.getString("Gender"));
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
                 gender, "", race, age, mdaDS);
 
-        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
-        String primarySite = j.getString("Primary Site");
 
-        if(primarySite.length() <= 2){
-            primarySite = NOT_SPECIFIED;
-        }
-
-        Sample sample = loaderUtils.getSample(id, tumorType, diagnosis,
-                primarySite, NOT_SPECIFIED,
+        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
+                NOT_SPECIFIED, NOT_SPECIFIED,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
 
         pSnap.addSample(sample);
@@ -244,7 +238,7 @@ public class LoadWUSTL implements CommandLineRunner {
         loaderUtils.savePatientSnapshot(pSnap);
     }
 
-   
+
 
     private String parseURL(String urlStr) {
         StringBuilder sb = new StringBuilder();
