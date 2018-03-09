@@ -296,6 +296,7 @@ public class LoadPDMRData implements CommandLineRunner {
                 HashSet<MolecularCharacterization> mcs = new HashSet<>();
                 for (String tech : markerMap.keySet()) {
                     MolecularCharacterization mc = new MolecularCharacterization();
+                    mc.setType("mutation");
                     mc.setPlatform(loaderUtils.getPlatform(tech, this.DS));
                     mc.setMarkerAssociations(markerMap.get(tech));
                     mcs.add(mc);

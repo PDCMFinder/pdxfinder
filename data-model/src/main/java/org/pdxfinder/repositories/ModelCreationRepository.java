@@ -1,6 +1,7 @@
 package org.pdxfinder.repositories;
 
 import org.pdxfinder.dao.ModelCreation;
+import org.pdxfinder.dao.MolecularCharacterization;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
@@ -78,7 +79,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "MATCH (c:Tissue)-[cr:SAMPLE_SITE]-(s)-[ttr:OF_TYPE]-(tt:TumorType) " +
             "WITH mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt " +
             "MATCH (t:Tissue)-[tr:ORIGIN_TISSUE]-(s)-[otm:MAPPED_TO]-(ot:OntologyTerm)-[ottm:SUBCLASS_OF *1..]->(term:OntologyTerm) " +
-            "RETURN mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt, tr, t, otm, ot, ottm, term ")
+            "RETURN mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt, tr, t, otm, ot, ottm, term")
     Collection<ModelCreation> getModelsWithPatientData();
 
     @Query("MATCH " +
@@ -136,5 +137,11 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN count(mAss) ")
     Integer countMarkerAssociationBySourcePdxId(@Param("sourcePdxId") String sourcePdxId,
                                                 @Param("platform") String platform);
+
+
+    @Query("MATCH (model:ModelCreation)--(s:Sample)--(molch:MolecularCharacterization) " +
+            "WHERE id(molch) = {mc} " +
+            "RETURN model")
+    ModelCreation findByMolChar(@Param("mc") MolecularCharacterization mc);
 
 }

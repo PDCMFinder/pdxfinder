@@ -36,7 +36,8 @@
     <!--    <link rel="stylesheet" href="https://raw.githubusercontent.com/ebiwd/pdx-visual-framework/master/css/app.min.css" type="text/css" media="all" /> -->
     <link rel="stylesheet" th:href="@{/css/app.min.css}" type="text/css" media="all"/>
 
-    <!--<link rel="stylesheet" th:href="@{/css/customStyles.css}" type="text/css" media="all"/>-->
+    <link rel="stylesheet" th:href="@{/css/customStyles.css}" type="text/css" media="all"/>
+    <link rel="stylesheet" th:href="@{/icons/foundation-icons.css}" type="text/css" media="all"/>
 
     <!-- If you have a custom header image or colour -->
     <!--
@@ -48,6 +49,39 @@
     <!-- also inform ES so we can host your colour palette file -->
     <!-- <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/theme-embl-petrol.css" type="text/css" media="all" /> -->
     <!-- end CSS-->
+
+    <style>
+        .tooltip {
+            max-width: none;
+        }
+
+        table.datatable-pdx thead th {
+            font-size: 1.0rem;
+        }
+
+        table.datatable-pdx td {
+            font-size: 0.9rem;
+        }
+
+        ul.pdx-accordion-1 a.accordion-title {
+            font-size: 1.0rem;
+        }
+
+        ul.pdx-accordion-2 a.accordion-title {
+            font-size: 0.95rem;
+        }
+
+        span.selected {
+            color: #06369d;
+            font-weight: bold;
+        }
+
+
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script th:src="@{/js/jquery.dataTables.js}"></script>
+    <script th:src="@{/js/scroller.js}"></script>
 </head>
 
 <body class="level2">
@@ -79,57 +113,54 @@
                 </nav>
             </div>
 
-            <!-- Three Grids Section -->
+            <style>
+                hr{box-sizing:content-box;overflow:visible;clear:both;max-width:75rem;height:0;margin:1.25rem auto;border-top:0;border-right:0;border-bottom:2px solid #06369d;border-left:0}
+            </style>
+
+            <!-- Three Grids Section-->
             <section>
                 <div class="row">
 
                     <div class="columns medium-4 small-12 margin-top-30">
-                        <h4 class="block-title clearfix"><span class="float-left border-color-black" th:text="${externalId}"></span></h4>
-
+                        <h4 class="pdxBig"><span class="float-left border-color-black" th:text="${externalId+': '+mappedOntology}"></span></h4>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-30">
-                        <ul class="cols-2 margin-top-large">
-                            <li><span th:text="${mappedOntology}"></span> </li>
-
-
-                        </ul>
+                            <h4 class="pdxBig black"><span class="float-left"> The Jackson Laboratory </span></h4>
                     </div>
 
-                    <div class="columns medium-4 small-12 margin-top-30">
-                        <!--
-                        <p><span class="badge"><i class="icon icon-functional" data-icon="L"></i></span> <a href="#" class="font-style-underline">Show similar</a></p>
-                        <p><span class="badge"><i class="icon icon-functional" data-icon="+"></i></span> <a href="#" class="font-style-underline">Add to my list</a></p>
-                        <p><span class="badge"><i class="icon icon-functional" data-icon="="></i></span> <a href="#" class="font-style-underline">Download report</a></p>
-                         -->
-                        <p><a href="#" class="button more uppercase margin-top-large" disabled="disabled">Contact Provider</a></p>
+                    <div class="columns medium-4 small-12 margin-top-10">
+                        <a href="#"> <h4 class="button more uppercase margin-top-large">Contact Provider</h4> </a>
                     </div>
                 </div>
             </section>
+            <hr class="margin-vertical-30">
 
-              <hr class="margin-vertical-30">
 
               <!-- Tabs Section -->
-            <section class="row">
-                <ul class="tabs style-2" data-tabs id="example2-tabs">
-                    <li class="tabs-title is-active"><a href="#summary" data-tabs-target="summary" aria-selected="true">Summary</a></li>
-                    <li class="tabs-title"><a href="#variation" data-tabs-target="variation" id="variation_data_link">Variation</a></li>
-                    <li class="tabs-title"><a href="#plots" data-tabs-target="plots">Dosing studies</a></li>
-                </ul>
+            <section class="row large-10 medium-12 expanded" id="detailsData">
+
+                <div class="row large-12 medium-12 expanded">
+                    <ul class="tabs style-2" data-tabs id="example2-tabs">
+                        <li class="tabs-title"><a href="#summary" data-tabs-target="summary">Summary</a></li>
+                        <li class="tabs-title is-active"><a href="#variation" data-tabs-target="variation" id="variation_data_link" aria-selected="true"> Genomic Data (<span th:text="${totalRecords}"></span>) </a></li>
+                        <li class="tabs-title"><a href="#plots" data-tabs-target="plots">Dosing studies</a></li>
+                    </ul>
+                </div>
 
                 <div class="tabs-content style-2" data-tabs-content="example2-tabs">
-                    <div class="tabs-panel is-active" id="summary">
+                    <div class="tabs-panel" id="summary">
 
 
                             <!-- Summary first row -->
-                        <div class="row">
+                        <div class="row large-12 medium-12 expanded">
 
                         <div class="columns medium-6 small-12 margin-top-30">
                             <div class="responsive-table">
-                                <table class="unstriped pdx-table head-left">
+                                <table class=" pdx-table head-left">
                                     <thead>
                                         <tr>
-                                            <th colspan="2">Clinical / Patient</th>
+                                            <th colspan="2"> Patient</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -149,17 +180,16 @@
                                 <table class="unstriped pdx-table head-left">
                                     <thead>
                                     <tr>
-                                        <th colspan="2">Clinical / Tumor</th>
+                                        <th colspan="2"> Patient Tumor</th>
                                     </tr>
                                     </thead>
                                     <tbody>
 
-                                    <tr><th class="text-left">Histology</th>                  <td><span th:text="${diagnosis}"></span> <i class="hdc" th:text="${' (mapped to: '+mappedOntology+')'}"></i> </td></tr>
-                                    <tr><th class="text-left">Ontology Mapping</th>           <td th:text="${mappedOntology}"></td></tr>
+                                    <tr><th class="text-left">Histology</th>                  <td> <span th:text="${mappedOntology}"></span> </td></tr>
                                     <tr><th class="text-left">Primary Tissue</th>             <td th:text="${originTissue}"></td></tr>
-                                    <tr><th class="text-left">Collection Tissue</th>          <td th:text="${sampleSite}"></td></tr>
-                                    <tr><th class="text-left">Tumor type</th>                 <td th:text="${tumorType}"></td></tr>
-                                    <tr><th class="text-left">Classification</th>             <td th:text="${classification}"></td></tr>
+                                    <tr><th class="text-left">Collection Site</th>          <td th:text="${sampleSite}"></td></tr>
+                                    <tr><th class="text-left">Tumor Type</th>                 <td th:text="${tumorType}"></td></tr>
+                                    <tr><th class="text-left">Stage / Grade</th>             <td th:text="${classification}"></td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -169,7 +199,7 @@
 
                         </div> <!-- Summary first row ends-->
 
-                        <div class="row"><!-- Summary second row -->
+                        <div class="row large-12 medium-12 expanded"><!-- Summary second row -->
 
                             <div class="columns medium-6 small-12 margin-top-30">
                                 <div class="responsive-table">
@@ -182,8 +212,8 @@
                                         <tbody>
 
                                         <tr><th class="text-left">Strain</th><td th:text="${strain}"></td></tr>
-                                        <tr><th class="text-left">Engraftment site</th><td th:text="${engraftmentSite}"></td></tr>
-                                        <tr><th class="text-left">Implantation type</th><td th:text="${sampleType}"></td></tr>
+                                        <tr><th class="text-left">Engraftment Site</th><td th:text="${engraftmentSite}"></td></tr>
+                                        <tr><th class="text-left">Implantation Type</th><td th:text="${sampleType}"></td></tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -224,22 +254,22 @@
                     </div>
 
 
-                    <div class="tabs-panel" id="variation">
+                    <div class="tabs-panel is-active" id="variation">
+
                         <p>
-
-
-
+                        <div class="row large-12 medium-12 expanded" id="variationTableData">
 
                             <style> table *{ -webkit-box-sizing:content-box; -moz-box-sizing:content-box; box-sizing:content-box;}</style>
-                        <div class="col-md-12 javaScriptBrowser">
+                            <div class="col-md-12 javaScriptBrowser">
 
-                            <!-- <div class="panel panel-info" th:if="${totalRecords > 0}" >
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
-                                </div>
-                            </div> -->
+                                <!-- <div class="panel panel-info" th:if="${totalRecords > 0}" >
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
+                                    </div>
+                                </div> -->
+                            </div>
 
-
+                <!-- Start of Patient variation data -->
                             <div class="tab" role="tabpanel" th:if="${patientInfo.size() > 0}" >
                                 <!-- Nav tabs -->
                                 <ul class="nav nav-tabs" role="tablist">
@@ -253,6 +283,7 @@
                                     </li>
                                 </ul>
 
+
                                 <!-- Tab panes -->
                                 <div class="tab-content">
                                     <div th:each="technology,iter : ${patientInfo}"
@@ -262,14 +293,14 @@
                                                 <span>
                                                         <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'showContent' : 'hideContent' ">
 
-                                                            <h4 class="bLine">
+                                                            <b class="bLine">
                                                                 <span class="hdc">Tumor Type: </span>            <i>Patient Tumor</i>                  &nbsp; &nbsp;
                                                                 <span class="hdc">Histology:</span> <i th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
                                                                 <span class="hdc">Grade: </span>  <i></i>
-                                                            </h4>
+                                                            </b>
 
                                                             <table id="pdxFinder-grid"
-                                                                   class="datatable-pdx display" cellspacing="0" width="100%">
+                                                                    class="unstriped pdx-table"> <!-- table-striped table-borderedPdx table-hover -->
 
                                                                 <thead>
                                                                 <tr>
@@ -294,43 +325,59 @@
 
                                     </div>
                                 </div>
+
                             </div>
+                <!-- End of Patient Variation Data -->
 
 
+
+
+
+                <!-- Start of Xenograft Variation data-->
 
                             <div class="tab" role="tabpanel" th:if="${modelInfo.size() > 0}">
-                                <!-- Nav tabs -->
-                                <ul class="nav nav-tabs" role="tablist">
+
+                                <div id="sizeSwitch" >
+                                    <a class="button outline"> Export Results <i class="fi-page-export-csv lpad10"></i> </a>
+                                </div>
+
+
+
+                                <ul class="tabs" data-tabs id="example-tabs">
+
                                     <li th:each="technology,iter : ${modelInfo}"
-                                        th:class="( ${iter.index} == 0 ) ? 'active' : '' "
-                                        role="presentation">
+                                        class="tabs-title" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
 
                                         <a th:href="@{'#'+${technology.key}}"
-                                           th:text="${technology.key}+' Platform'" role="tab" data-toggle="tab" onclick="showTabs()"> TAB TITLES </a>
+                                           data-th-attr="data-tabs-target=${technology.key},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
+                                           th:text="${technology.key}+' Platform'" > TAB TITLES </a>
 
                                     </li>
+
                                 </ul>
 
 
                                 <!-- Tab panes -->
-                                <div class="tab-content">
+                                <div class="tabs-content"  data-tabs-content="example-tabs">
+
+
                                     <div th:each="technology,iter : ${modelInfo}"
                                          th:id="${technology.key}"
-                                         class="tab-pane active"  role="tabpanel">
+                                         class="tabs-panel"  th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
 
                                                     <span th:unless="${technology.value.size()<1}" th:each="num: ${#numbers.sequence(1,technology.value.size())}"> <!--/* Unable to capture index for inner loop so, this was used for innerloop : <tr th:each="passageList : ${technolog[y.value]}"> */-->
 
-                                                            <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'showContent' : 'hideContent' ">
+                                                            <div class="table-responsive">
 
-                                                                <h4 class="bLine" th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
-                                                                    <span class="hdc">Tumor Type: </span>            <i>Xenograft Tumor</i>                  &nbsp; &nbsp;
-                                                                    <span class="hdc">Histology:</span> <i th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
-                                                                    <span class="hdc">Passage: </span>  <i th:text="${technology.value[num-1]}"></i>
-                                                                </h4>
+                                                                <b class="bLine" th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
+                                                                    <span class="hdc">Tumor Type: </span>            <i class="black">Xenograft Tumor</i>                  &nbsp; &nbsp;
+                                                                    <span class="hdc">Histology:</span> <i class="black" th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
+                                                                    <span class="hdc">Passage: </span>  <i class="black" th:text="${technology.value[num-1]}"></i>
+                                                                </b>
 
                                                                 <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
-                                                                       class="datatable-pdx" th:height="50"> <!-- table-condensed -->
-
+                                                                       id="example-datatable"
+                                                                       class="table display datatable-pdx table-borderedPdx" th:height="50" width="100%"> <!-- class=" "   table-condensed style="border:1px solid #000; padding:10px;"-->
 
                                                                     <thead>
                                                                     <tr>
@@ -357,25 +404,24 @@
                                 </div>
 
                             </div>
+                        <!-- End of Xenograft Variation data -->
 
 
                         </div>
-
-
-
-
-
-
                         </p>
+
+                    </div>
+
                     </div>
 
 
                     <div class="tabs-panel" id="plots">
                         <p></p>
                     </div>
-
-                </div>
             </section>
+
+
+
 
         </section>
         <!-- Optional local footer (insert citation / project-specific copyright / etc here -->
@@ -396,13 +442,14 @@
 
 </div>
 <!-- JavaScript -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
+
 <script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/scripts/dist/choices.min.js"></script>
+<script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.highlightRegex/0.1.2/highlightRegex.min.js"></script>
 <script th:src="@{/js/script.js}"></script>
-<script th:src="@{/js/jquery.dataTables.js}"></script>
-<script th:src="@{/js/scroller.js}"></script>
+<!--<script th:src="@{/js/main.js}"></script>-->
+
+
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
@@ -543,7 +590,7 @@
             },
 
             dom: "frtiS",
-            scrollY: 300,
+            scrollY: 350,
             scrollX: true,
             deferRender: true,
             responsive: true,
@@ -555,13 +602,46 @@
             }
 
         });
+
+        $(window).bind('resize', function () {
+            dataTable.fnAdjustColumnSizing();
+        } );
     }
+
+
+
 
     function showTabs() {
         for (var i=0; i<5; i++) {
             document.getElementsByClassName("hideContent")[i].style.position = "static";
         }
     }
+
+
+    /*function expandTable(action) {
+
+
+        var expandButton = "<a onclick=\"expandTable('open')\" class='button outline'> Expand table <i class='fi-arrows-expand lpad10'></i> </a>";
+        var compressButton = "<a onclick=\"expandTable('close')\" class='button outline'> Compress Table <i class='fi-arrows-compress lpad10'></i> </a>";
+
+        if (action == 'open')
+        {
+            //open it and activate compress button
+            document.getElementById("variationTableData").className = "row large-12 medium-12 expanded";
+            document.getElementById("detailsData").className = "row large-10 medium-12 expanded";
+            document.getElementById("sizeSwitch").innerHTML=compressButton;
+        }
+        else
+        {
+            // Close it and activate expand button
+            document.getElementById("variationTableData").className = "row";
+            document.getElementById("detailsData").className = "row";
+            document.getElementById("sizeSwitch").innerHTML=expandButton;
+        }
+
+    }*/
+
+
 </script>
 
 <!-- <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/js/foundationExtendEBI.js"></script> -->

@@ -6,6 +6,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -23,4 +24,20 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
             "RETURN distinct molch  ")
     List<MolecularCharacterization> findPatientPlatformByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
+
+    @Query("MATCH (molch:MolecularCharacterization) " +
+            "WHERE molch.type = {type} " +
+            "WITH molch " +
+            "MATCH (molch)-[awr:ASSOCIATED_WITH]-(mAss:MarkerAssociation) " +
+            "WHERE exists(mAss.aminoAcidChange) " +
+            "WITH molch, awr, mAss " +
+            "MATCH (mAss)-[mr:MARKER]-(m:Marker) " +
+            "RETURN distinct molch, awr, mAss, mr, m")
+    Collection<MolecularCharacterization> getAllDistinctByType(@Param("type") String type);
+
+    @Query("MATCH (molch:MolecularCharacterization) " +
+            "WHERE molch.type = {type} " +
+            "OPTIONAL MATCH (molch)-[plr:PLATFORM_USED]-(pl:Platform) " +
+            "RETURN molch, plr, pl")
+    Collection<MolecularCharacterization> getAllByType(@Param("type") String type);
 }

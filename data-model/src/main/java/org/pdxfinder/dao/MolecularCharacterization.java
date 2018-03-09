@@ -19,6 +19,8 @@ public class MolecularCharacterization {
     @Deprecated
     private String technology;
 
+    private String type;
+
     @Relationship(type = "PLATFORM_USED")
     Platform platform;
 
@@ -68,6 +70,13 @@ public class MolecularCharacterization {
         this.markerAssociations = markerAssociations;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public void addMarkerAssociation(MarkerAssociation ma){
 
