@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -126,7 +125,7 @@
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-30">
-                            <h4 class="pdxBig black"><span class="float-left"> The Jackson Laboratory </span></h4>
+                        <h4 class="pdxBig black"><span class="float-left"> The Jackson Laboratory </span></h4>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-10">
@@ -137,64 +136,64 @@
             <hr class="margin-vertical-30">
 
 
-              <!-- Tabs Section -->
-            <section class="row" id="detailsData">
+            <!-- Tabs Section -->
+            <section class="row large-10 medium-12 expanded" id="detailsData">
 
                 <div class="row large-12 medium-12 expanded">
                     <ul class="tabs style-2" data-tabs id="example2-tabs">
-                        <li class="tabs-title"><a href="#summary" data-tabs-target="summary">Summary</a></li>
-                        <li class="tabs-title is-active"><a href="#variation" data-tabs-target="variation" id="variation_data_link" aria-selected="true"> Genomic Data (<span th:text="${totalRecords}"></span>) </a></li>
+                        <li class="tabs-title is-active"><a href="#summary" data-tabs-target="summary" aria-selected="true">Summary</a></li>
+                        <li class="tabs-title"><a href="#variation" data-tabs-target="variation" id="variation_data_link"> Genomic Data (<span th:text="${totalRecords}"></span>) </a></li>
                         <li class="tabs-title"><a href="#plots" data-tabs-target="plots">Dosing studies</a></li>
                     </ul>
                 </div>
 
                 <div class="tabs-content style-2" data-tabs-content="example2-tabs">
-                    <div class="tabs-panel" id="summary">
+                    <div class="tabs-panel is-active" id="summary">
 
 
-                            <!-- Summary first row -->
+                        <!-- Summary first row -->
                         <div class="row large-12 medium-12 expanded">
 
-                        <div class="columns medium-6 small-12 margin-top-30">
-                            <div class="responsive-table">
-                                <table class=" pdx-table head-left">
-                                    <thead>
+                            <div class="columns medium-6 small-12 margin-top-30">
+                                <div class="responsive-table">
+                                    <table class=" pdx-table head-left">
+                                        <thead>
                                         <tr>
                                             <th colspan="2"> Patient</th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
+                                        </thead>
+                                        <tbody>
 
-                                    <tr><th class="text-left">Gender</th>     <td th:text="${gender}"></td></tr>
-                                    <tr><th class="text-left">Age</th>        <td th:text="${age}"></td></tr>
-                                    <tr><th class="text-left">Race / Ethnicity</th>      <td><span th:text="${race}"></span> / <span th:text="${ethnicity}"></span> </td></tr>
-                                    <tr th:if="${not #lists.isEmpty(relatedModels)}"><th class="text-left">Related models</th>        <td><span th:each="relMod:${relatedModels}"><a th:text="${relMod}" th:href="@{'/pdx/'+${dataSrc}+'/'+${relMod}}"></a> </span></td></tr>
-                                    </tbody>
-                                </table>
+                                        <tr><th class="text-left">Gender</th>     <td th:text="${gender}"></td></tr>
+                                        <tr><th class="text-left">Age</th>        <td th:text="${age}"></td></tr>
+                                        <tr><th class="text-left">Race / Ethnicity</th>      <td><span th:text="${race}"></span> / <span th:text="${ethnicity}"></span> </td></tr>
+                                        <tr th:if="${not #lists.isEmpty(relatedModels)}"><th class="text-left">Related models</th>        <td><span th:each="relMod:${relatedModels}"><a th:text="${relMod}" th:href="@{'/pdx/'+${dataSrc}+'/'+${relMod}}"></a> </span></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
                             </div>
 
-                        </div>
+                            <div class="columns medium-6 small-12 margin-top-30">
+                                <div class="responsive-table">
+                                    <table class="unstriped pdx-table head-left">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="2"> Patient Tumor</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
 
-                        <div class="columns medium-6 small-12 margin-top-30">
-                            <div class="responsive-table">
-                                <table class="unstriped pdx-table head-left">
-                                    <thead>
-                                    <tr>
-                                        <th colspan="2"> Patient Tumor</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
+                                        <tr><th class="text-left">Histology</th>                  <td> <span th:text="${mappedOntology}"></span> </td></tr>
+                                        <tr><th class="text-left">Primary Tissue</th>             <td th:text="${originTissue}"></td></tr>
+                                        <tr><th class="text-left">Collection Site</th>          <td th:text="${sampleSite}"></td></tr>
+                                        <tr><th class="text-left">Tumor Type</th>                 <td th:text="${tumorType}"></td></tr>
+                                        <tr><th class="text-left">Stage / Grade</th>             <td th:text="${classification}"></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                                    <tr><th class="text-left">Histology</th>                  <td> <span class="hdc" th:text="${mappedOntology}"></span> </td></tr>
-                                    <tr><th class="text-left">Primary Tissue</th>             <td th:text="${originTissue}"></td></tr>
-                                    <tr><th class="text-left">Collection Site</th>          <td th:text="${sampleSite}"></td></tr>
-                                    <tr><th class="text-left">Tumor Type</th>                 <td th:text="${tumorType}"></td></tr>
-                                    <tr><th class="text-left">Stage / Grade</th>             <td th:text="${classification}"></td></tr>
-                                    </tbody>
-                                </table>
                             </div>
-
-                        </div>
 
 
                         </div> <!-- Summary first row ends-->
@@ -254,7 +253,7 @@
                     </div>
 
 
-                    <div class="tabs-panel is-active" id="variation">
+                    <div class="tabs-panel" id="variation">
 
                         <p>
                         <div class="row large-12 medium-12 expanded" id="variationTableData">
@@ -269,7 +268,7 @@
                                 </div> -->
                             </div>
 
-                <!-- Start of Patient variation data -->
+                            <!-- Start of Patient variation data -->
                             <div class="tab" role="tabpanel" th:if="${patientInfo.size() > 0}" >
                                 <!-- Nav tabs -->
                                 <ul class="nav nav-tabs" role="tablist">
@@ -300,7 +299,7 @@
                                                             </b>
 
                                                             <table id="pdxFinder-grid"
-                                                                    class="unstriped pdx-table"> <!-- table-striped table-borderedPdx table-hover -->
+                                                                   class="unstriped pdx-table"> <!-- table-striped table-borderedPdx table-hover -->
 
                                                                 <thead>
                                                                 <tr>
@@ -327,19 +326,18 @@
                                 </div>
 
                             </div>
-                <!-- End of Patient Variation Data -->
+                            <!-- End of Patient Variation Data -->
 
 
 
 
 
-                <!-- Start of Xenograft Variation data-->
+                            <!-- Start of Xenograft Variation data-->
 
                             <div class="tab" role="tabpanel" th:if="${modelInfo.size() > 0}">
 
                                 <div id="sizeSwitch" >
-                                    <a onclick="expandTable('open')" class="button outline showOnLargeOnly"> Expand table <i class="fi-arrows-expand lpad10"></i> </a>
-
+                                    <a class="button outline"> Export Results <i class="fi-page-export-csv lpad10"></i> </a>
                                 </div>
 
 
@@ -405,7 +403,7 @@
                                 </div>
 
                             </div>
-                        <!-- End of Xenograft Variation data -->
+                            <!-- End of Xenograft Variation data -->
 
 
                         </div>
@@ -413,12 +411,12 @@
 
                     </div>
 
-                    </div>
+                </div>
 
 
-                    <div class="tabs-panel" id="plots">
-                        <p></p>
-                    </div>
+                <div class="tabs-panel" id="plots">
+                    <p></p>
+                </div>
             </section>
 
 
@@ -618,7 +616,8 @@
         }
     }
 
-    function expandTable(action) {
+
+    /*function expandTable(action) {
 
 
         var expandButton = "<a onclick=\"expandTable('open')\" class='button outline'> Expand table <i class='fi-arrows-expand lpad10'></i> </a>";
@@ -628,7 +627,7 @@
         {
             //open it and activate compress button
             document.getElementById("variationTableData").className = "row large-12 medium-12 expanded";
-            document.getElementById("detailsData").className = "row large-12 medium-12 expanded";
+            document.getElementById("detailsData").className = "row large-10 medium-12 expanded";
             document.getElementById("sizeSwitch").innerHTML=compressButton;
         }
         else
@@ -639,7 +638,7 @@
             document.getElementById("sizeSwitch").innerHTML=expandButton;
         }
 
-    }
+    }*/
 
 
 </script>
