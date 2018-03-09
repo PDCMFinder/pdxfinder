@@ -4,7 +4,7 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
- * Represents the type of implantation performed
+ * Represents the site or organ where implantation was performed
  */
 @NodeEntity
 public class ImplantationSite {
