@@ -142,6 +142,21 @@ public class LoaderUtils {
         return modelCreation;
     }
 
+    public Collection<ModelCreation> getAllModelsPlatforms(){
+
+        return modelCreationRepository.getAllModelsPlatforms();
+    }
+
+    public int countMarkerAssociationBySourcePdxId(String modelId, String platformName){
+
+        return modelCreationRepository.countMarkerAssociationBySourcePdxId(modelId,platformName);
+    }
+
+    public Collection<ModelCreation> getModelsWithPatientData(){
+
+        return modelCreationRepository.getModelsWithPatientData();
+    }
+
     public Collection<ModelCreation> getAllModels(){
 
         return this.modelCreationRepository.getAllModels();
