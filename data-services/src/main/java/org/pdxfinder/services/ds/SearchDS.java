@@ -100,7 +100,7 @@ public class SearchDS {
         this.models = new HashSet<>();
 
         //this method loads the ModelForQuery Data Projection object and
-        initializeModels(dataProjectionRepository);
+        //initializeModels(dataProjectionRepository);
 
 
         //
