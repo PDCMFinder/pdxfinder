@@ -31,7 +31,7 @@ public class PlatformService
             List<Platform> platforms = platformRepository.findPlatformByExternalDataSource(dataSource);
 
             for (Platform platform : platforms) {
-                platformMap.put(platform.getName(), platformRepository.countMarkerAssocByPlatformAndExternalDataSource(platform.getName(),dataSource));
+                platformMap.put(platform.getName(), platformRepository.countModelsByPlatformAndExternalDataSource(platform.getName(),dataSource));
             }
 
             return platformMap;

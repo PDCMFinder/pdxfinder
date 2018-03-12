@@ -41,5 +41,10 @@ public interface PlatformRepository extends PagingAndSortingRepository<Platform,
             "RETURN count(mAss)")
     int countMarkerAssocByPlatformAndExternalDataSource(@Param("platform") String platform, @Param("dataSource") String dataSource);
 
+    @Query("MATCH (mod:ModelCreation)--(s:Sample)--(molChar:MolecularCharacterization)-[pus:PLATFORM_USED]-(p:Platform) " +
+            "WHERE p.name={platform} AND toLower(mod.dataSource)=toLower({dataSource}) " +
+            "RETURN count(distinct mod)")
+    int countModelsByPlatformAndExternalDataSource(@Param("platform") String platform, @Param("dataSource") String dataSource);
+
 
 }
