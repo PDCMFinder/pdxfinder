@@ -96,7 +96,7 @@ public class SearchDS {
      * Populate the complete set of models for searching when this object is instantiated
      */
     public SearchDS(DataProjectionRepository dataProjectionRepository) {
-        Assert.notNull(dataProjectionRepository, "Data projection repository cannot be null");
+        //Assert.notNull(dataProjectionRepository, "Data projection repository cannot be null");
         this.models = new HashSet<>();
 
         //this method loads the ModelForQuery Data Projection object and
