@@ -18,6 +18,8 @@ public class SearchDSTest extends BaseTest {
 
     private final static Logger log = LoggerFactory.getLogger(SearchDSTest.class);
 
+    /*
+
     @Autowired
     SearchDS searchDS;
 
@@ -99,4 +101,5 @@ public class SearchDSTest extends BaseTest {
 
     }
 
+*/
 }
