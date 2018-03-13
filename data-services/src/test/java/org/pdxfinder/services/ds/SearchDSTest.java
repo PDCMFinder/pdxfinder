@@ -58,7 +58,12 @@ public class SearchDSTest extends BaseTest {
         dp.setLabel("ModelForQuery");
         dp.setValue("[{\"modelId\":164005,\"datasource\":\"PDXNet-WUSTL\",\"externalId\":\"WUSTL 911-06\",\"patientAge\":\"30-39\",\"patientGender\":\"Female\",\"sampleOriginTissue\":\"Not Specified\",\"sampleSampleSite\":\"Not Specified\",\"sampleExtractionMethod\":\"surgical sample\",\"sampleClassification\":\"ypT3/N1b/M1a/G1/G2\",\"sampleTumorType\":\"Primary\",\"cancerSystem\":[\"Unclassified\"],\"diagnosis\":\"Adenocarcinoma\",\"mappedOntologyTerm\":\"Adenocarcinoma\",\"treatmentHistory\":\"Not Specified\",\"allOntologyTermAncestors\":[\"Adenocarcinoma\",\"Carcinoma\",\"Epithelial Neoplasm\",\"Cancer\",\"Glandular Cell Neoplasm\",\"Neoplasm by Morphology\"]}]");
 
+        DataProjection mutDP = new DataProjection();
+        mutDP.setLabel("PlatformMarkerVariantModel");
+        mutDP.setValue("{\"TargetedNGS_MUT\":{\"RB1\":{\"N123D\":[10411],\"Q383E\":[10940],\"E323Q\":[16519],\"G38S\":[12539]}}}");
+
         dataProjectionRepository.save(dp);
+        dataProjectionRepository.save(mutDP);
 
         assertThat(models.size(), is(4));
 
