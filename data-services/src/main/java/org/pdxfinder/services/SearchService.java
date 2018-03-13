@@ -42,6 +42,7 @@ public class SearchService {
     private final String WUSTL_DS = "PDXNet-WUSTL";
 
 
+
     public SearchService(SampleRepository sampleRepository,
                          PatientRepository patientRepository,
                          PatientSnapshotRepository patientSnapshotRepository,

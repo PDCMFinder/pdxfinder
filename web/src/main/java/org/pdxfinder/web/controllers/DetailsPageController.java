@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by csaba on 12/05/2017.
@@ -106,6 +103,20 @@ public class DetailsPageController {
         model.addAttribute("patientInfo", patientTech);
 
         model.addAttribute("relatedModels", relatedModels);
+
+
+        Map<String, String> sorceDesc = new HashMap<>();
+        sorceDesc.put("JAX","The Jackson Laboratory");
+        sorceDesc.put("PDXNet-HCI-BCM","HCI-Baylor College of Medicine");
+        sorceDesc.put("PDXNet-Wistar-MDAnderson-Penn","Melanoma PDX established by the Wistar/MD Anderson/Penn");
+        sorceDesc.put("PDXNet-WUSTL","Washington University in St. Louis");
+        sorceDesc.put("PDXNet-MDAnderson","University of Texas MD Anderson Cancer Center");
+        sorceDesc.put("PDMR","NCI Patient-Derived Models Repository");
+        sorceDesc.put("IRCC","Candiolo Cancer Institute");
+
+
+        model.addAttribute("sourceDescription", sorceDesc.get(dto.getDataSource()));
+
         /*
         if(relatedModels.size()>0){
             String rm = "";
