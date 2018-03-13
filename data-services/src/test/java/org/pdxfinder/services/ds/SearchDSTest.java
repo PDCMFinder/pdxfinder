@@ -3,10 +3,13 @@ package org.pdxfinder.services.ds;
 import org.junit.Before;
 import org.junit.Test;
 import org.pdxfinder.BaseTest;
+import org.pdxfinder.dao.DataProjection;
+import org.pdxfinder.repositories.DataProjectionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.xml.crypto.Data;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -18,12 +21,11 @@ public class SearchDSTest extends BaseTest {
 
     private final static Logger log = LoggerFactory.getLogger(SearchDSTest.class);
 
-
+    SearchDS searchDS;
+    private Set<ModelForQuery> models = new HashSet<>();
 
     @Autowired
-    SearchDS searchDS;
-
-    private Set<ModelForQuery> models = new HashSet<>();
+    DataProjectionRepository dataProjectionRepository;
 
     @Before
     public void setUp() {
@@ -52,7 +54,17 @@ public class SearchDSTest extends BaseTest {
         m.setPatientGender("Male");
         models.add(m);
 
+        DataProjection dp = new DataProjection();
+        dp.setLabel("ModelForQuery");
+        dp.setValue("[{\"modelId\":164005,\"datasource\":\"PDXNet-WUSTL\",\"externalId\":\"WUSTL 911-06\",\"patientAge\":\"30-39\",\"patientGender\":\"Female\",\"sampleOriginTissue\":\"Not Specified\",\"sampleSampleSite\":\"Not Specified\",\"sampleExtractionMethod\":\"surgical sample\",\"sampleClassification\":\"ypT3/N1b/M1a/G1/G2\",\"sampleTumorType\":\"Primary\",\"cancerSystem\":[\"Unclassified\"],\"diagnosis\":\"Adenocarcinoma\",\"mappedOntologyTerm\":\"Adenocarcinoma\",\"treatmentHistory\":\"Not Specified\",\"allOntologyTermAncestors\":[\"Adenocarcinoma\",\"Carcinoma\",\"Epithelial Neoplasm\",\"Cancer\",\"Glandular Cell Neoplasm\",\"Neoplasm by Morphology\"]}]");
+
+        dataProjectionRepository.save(dp);
+
         assertThat(models.size(), is(4));
+
+        this.searchDS = new SearchDS(dataProjectionRepository);
+        searchDS.initialize();
+
     }
 
     @Test

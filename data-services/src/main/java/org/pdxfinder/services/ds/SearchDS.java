@@ -3,10 +3,7 @@ package org.pdxfinder.services.ds;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.dao.ModelCreation;
-import org.pdxfinder.dao.OntologyTerm;
-import org.pdxfinder.dao.Sample;
-import org.pdxfinder.dao.Specimen;
+import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.DataProjectionRepository;
 import org.pdxfinder.repositories.ModelCreationRepository;
 import org.slf4j.Logger;
@@ -15,6 +12,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -34,6 +32,8 @@ public class SearchDS {
 
     private Set<ModelForQuery> models;
     private Map<String, String> cancerSystemMap = new HashMap<>();
+
+    private DataProjectionRepository dataProjectionRepository;
 
     public static List<String> PATIENT_AGE_OPTIONS = Arrays.asList(
             "0-9",
@@ -97,10 +97,17 @@ public class SearchDS {
      */
     public SearchDS(DataProjectionRepository dataProjectionRepository) {
         Assert.notNull(dataProjectionRepository, "Data projection repository cannot be null");
+
+        this.dataProjectionRepository = dataProjectionRepository;
         this.models = new HashSet<>();
+    }
+
+    @PostConstruct
+    void initialize() {
+
 
         //this method loads the ModelForQuery Data Projection object and
-        initializeModels(dataProjectionRepository);
+        initializeModels();
 
 
         //
@@ -216,12 +223,20 @@ public class SearchDS {
     /**
      *
      * This method loads the ModelForQuery Data Projection object and initializes the models
-     * @param dataProjectionRepository
+     *
      */
-    private void initializeModels(DataProjectionRepository dataProjectionRepository) {
+    void initializeModels() {
 
-        String modelJson = dataProjectionRepository.findByLabel("ModelForQuery").getValue();
-
+//        try {
+            String modelJson = dataProjectionRepository.findByLabel("ModelForQuery").getValue();
+//        }
+//        catch(NullPointerException npe){
+//
+//            DataProjection dp = new DataProjection();
+//            dp.setLabel("ModelForQuery");
+//            dp.setValue();
+//
+//        }
         try {
             JSONArray jarray = new JSONArray(modelJson);
 
