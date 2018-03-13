@@ -221,26 +221,17 @@ public class SearchDS {
 
 
     /**
-     *
      * This method loads the ModelForQuery Data Projection object and initializes the models
-     *
      */
     void initializeModels() {
 
-//        try {
-            String modelJson = dataProjectionRepository.findByLabel("ModelForQuery").getValue();
-//        }
-//        catch(NullPointerException npe){
-//
-//            DataProjection dp = new DataProjection();
-//            dp.setLabel("ModelForQuery");
-//            dp.setValue();
-//
-//        }
+
+        String modelJson = dataProjectionRepository.findByLabel("ModelForQuery").getValue();
+
         try {
             JSONArray jarray = new JSONArray(modelJson);
 
-            for(int i=0;i<jarray.length();i++){
+            for (int i = 0; i < jarray.length(); i++) {
 
                 JSONObject j = jarray.getJSONObject(i);
 
@@ -263,7 +254,7 @@ public class SearchDS {
 
                 JSONArray ja = j.getJSONArray("cancerSystem");
                 List<String> cancerSystem = new ArrayList<>();
-                for(int k = 0; k<ja.length(); k++){
+                for (int k = 0; k < ja.length(); k++) {
 
                     cancerSystem.add(ja.getString(k));
                 }
@@ -273,7 +264,7 @@ public class SearchDS {
                 ja = j.getJSONArray("allOntologyTermAncestors");
                 Set<String> ancestors = new HashSet<>();
 
-                for(int k = 0; k<ja.length(); k++){
+                for (int k = 0; k < ja.length(); k++) {
 
                     ancestors.add(ja.getString(k));
                 }
@@ -283,10 +274,6 @@ public class SearchDS {
 
                 this.models.add(mfq);
             }
-
-
-
-
 
 
         } catch (JSONException e) {
