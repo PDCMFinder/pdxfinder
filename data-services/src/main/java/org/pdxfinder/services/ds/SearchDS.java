@@ -1,9 +1,10 @@
 package org.pdxfinder.services.ds;
 
-import org.pdxfinder.dao.ModelCreation;
-import org.pdxfinder.dao.OntologyTerm;
-import org.pdxfinder.dao.Sample;
-import org.pdxfinder.dao.Specimen;
+import org.neo4j.ogm.json.JSONArray;
+import org.neo4j.ogm.json.JSONException;
+import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.dao.*;
+import org.pdxfinder.repositories.DataProjectionRepository;
 import org.pdxfinder.repositories.ModelCreationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,10 +12,13 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.lang.Long.parseLong;
 
 
 /*
@@ -28,6 +32,8 @@ public class SearchDS {
 
     private Set<ModelForQuery> models;
     private Map<String, String> cancerSystemMap = new HashMap<>();
+
+    private DataProjectionRepository dataProjectionRepository;
 
     public static List<String> PATIENT_AGE_OPTIONS = Arrays.asList(
             "0-9",
@@ -83,63 +89,25 @@ public class SearchDS {
             "Recurrent",
             "Refractory",
             "Not Specified"
-            );
+    );
     public static List<String> DIAGNOSIS_OPTIONS = new ArrayList<>();
 
     /**
      * Populate the complete set of models for searching when this object is instantiated
      */
-    public SearchDS(ModelCreationRepository modelCreationRepository) {
-        Assert.notNull(modelCreationRepository, "Model repository cannot be null");
+    public SearchDS(DataProjectionRepository dataProjectionRepository) {
+        Assert.notNull(dataProjectionRepository, "Data projection repository cannot be null");
+
+        this.dataProjectionRepository = dataProjectionRepository;
         this.models = new HashSet<>();
+    }
 
-        // Get out all platforms for all models and populate a map with the results
-        Map<Long, List<String>> platformsByModel = new HashMap<>();
-        Collection<ModelCreation> allModelsPlatforms = modelCreationRepository.getAllModelsPlatforms();
-        for (ModelCreation mc : allModelsPlatforms) {
-
-            if (!platformsByModel.containsKey(mc.getId())) {
-                platformsByModel.put(mc.getId(), new ArrayList<>());
-            }
-
-            // Are there any molecular characterizations associated to this model?
-            if (mc.getRelatedSamples().stream().map(Sample::getMolecularCharacterizations).mapToLong(Collection::size).sum() > 0) {
-
-                // Get all molecular characterizations platforms into a list
-                platformsByModel.get(mc.getId()).addAll(
-                        mc.getRelatedSamples().stream()
-                                .map(Sample::getMolecularCharacterizations)
-                                .flatMap(Collection::stream)
-                                .map(x ->  {
-                                        if (modelCreationRepository.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), x.getPlatform().getName()) != 0) {
-                                            return x.getPlatform().getName();
-                                        } else {
-                                            return " ";
-                                        }
-                                })
-                                .distinct()
-                                .collect(Collectors.toList()));
-            }
-        }
+    @PostConstruct
+    void initialize() {
 
 
-        // Mapping NCIT ontology term labels to display labels
-        this.cancerSystemMap.put("Breast Cancer", "Breast Cancer");
-        this.cancerSystemMap.put("Cardiovascular Cancer", "Cardiovascular Cancer");
-        this.cancerSystemMap.put("Connective and Soft Tissue Neoplasm", "Connective and Soft Tissue Cancer");
-        this.cancerSystemMap.put("Digestive System Cancer", "Digestive System Cancer");
-        this.cancerSystemMap.put("Endocrine Cancer", "Endocrine Cancer");
-        this.cancerSystemMap.put("Eye Cancer", "Eye Cancer");
-        this.cancerSystemMap.put("Head and Neck Cancer", "Head and Neck Cancer");
-        this.cancerSystemMap.put("Hematopoietic and Lymphoid System Neoplasm", "Hematopoietic and Lymphoid System Cancer");
-        this.cancerSystemMap.put("Nervous System Cancer", "Nervous System Cancer");
-        this.cancerSystemMap.put("Peritoneal and Retroperitoneal Neoplasms", "Peritoneal and Retroperitoneal Cancer");
-        this.cancerSystemMap.put("Reproductive System Neoplasm", "Reproductive System Cancer");
-        this.cancerSystemMap.put("Respiratory Tract Cancer", "Respiratory Tract Cancer");
-        this.cancerSystemMap.put("Thoracic Neoplasm", "Thoracic Cancer");
-        this.cancerSystemMap.put("Skin Cancer", "Skin Cancer");
-        this.cancerSystemMap.put("Urinary System Cancer", "Urinary System Cancer");
-        this.cancerSystemMap.put("Unclassified", "Unclassified");
+        //this method loads the ModelForQuery Data Projection object and
+        initializeModels();
 
 
         //
@@ -149,116 +117,6 @@ public class SearchDS {
 
         List<String> padding = new ArrayList<>();
         padding.add("NO DATA");
-        for (ModelCreation mc : modelCreationRepository.getModelsWithPatientData()) {
-
-            ModelForQuery mfq = new ModelForQuery();
-            mfq.setModelId(mc.getId());
-            mfq.setExternalId(mc.getSourcePdxId());
-            mfq.setDatasource(mc.getDataSource());
-
-            mfq.setDataAvailable(platformsByModel.get(mc.getId()));
-
-            if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
-                mfq.setTreatmentHistory(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());
-            } else {
-                mfq.setTreatmentHistory("Not Specified");
-            }
-
-            if (mc.getSample().getSampleSite() != null) {
-                mfq.setSampleSampleSite(mc.getSample().getSampleSite().getName());
-            } else {
-                mfq.setSampleSampleSite("Not Specified");
-            }
-
-            if (mc.getSample().getType() != null) {
-                mfq.setSampleTumorType(mc.getSample().getType().getName());
-            } else {
-                mfq.setSampleTumorType("Not Specified");
-            }
-
-            if (mc.getSample().getSampleSite() != null) {
-                mfq.setSampleSampleSite(mc.getSample().getSampleSite().getName());
-            } else {
-                mfq.setSampleSampleSite("Not Specified");
-            }
-
-            // Patient information
-            mfq.setPatientAge(mc.getSample().getPatientSnapshot().getAgeBin());
-            mfq.setPatientGender(mc.getSample().getPatientSnapshot().getPatient().getSex());
-            mfq.setDiagnosis(mc.getSample().getDiagnosis());
-            mfq.setMappedOntologyTerm(mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
-
-            if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
-                mfq.setPatientTreatmentStatus(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());
-            }
-
-            // Sample information
-            mfq.setSampleExtractionMethod(mc.getSample().getExtractionMethod());
-            mfq.setSampleOriginTissue(mc.getSample().getOriginTissue().getName());
-            mfq.setSampleClassification(mc.getSample().getClassification());
-
-            if (mc.getSample().getType() != null) {
-                mfq.setSampleTumorType(mc.getSample().getType().getName());
-            }
-            // Model information
-            Set<Specimen> specimens = mc.getSpecimens();
-            Set<String> hoststrains = new HashSet<>();
-            if (specimens != null && specimens.size() > 0) {
-
-                for (Specimen s: specimens){
-                    hoststrains.add(s.getHostStrain().getName());
-
-                    mfq.setModelImplantationSite(s.getImplantationSite().getName());
-                    mfq.setModelImplantationType(s.getImplantationType().getName());
-                }
-                //Specimen s = specimens.iterator().next();
-                mfq.setModelHostStrain(hoststrains);
-            }
-
-            // Get all ancestor ontology terms (including self) into a set specific for this model
-            Set<OntologyTerm> allOntologyTerms = new HashSet<>();
-
-            // Add direct mapped term
-            allOntologyTerms.add(mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm());
-
-            // Add all ancestors of direct mapped term
-            for (OntologyTerm t : mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getSubclassOf()) {
-                allOntologyTerms.addAll(getAllAncestors(t));
-            }
-
-            mfq.setAllOntologyTermAncestors(allOntologyTerms.stream().map(OntologyTerm::getLabel).collect(Collectors.toSet()));
-
-            // Add all top level systems (translated) to the Model
-            for (String s : allOntologyTerms.stream().map(OntologyTerm::getLabel).collect(Collectors.toSet())) {
-
-                if (this.cancerSystemMap.keySet().contains(s)) {
-
-                    if (mfq.getCancerSystem() == null) {
-                        mfq.setCancerSystem(new ArrayList<>());
-                    }
-
-                    mfq.getCancerSystem().add(this.cancerSystemMap.get(s));
-
-                }
-            }
-
-            // Ensure that ALL models have a system -- even if it's not in the ontology nodes specified
-            if (mfq.getCancerSystem() == null || mfq.getCancerSystem().size() == 0) {
-                if (mfq.getCancerSystem() == null) {
-                    mfq.setCancerSystem(new ArrayList<>());
-                }
-
-                mfq.getCancerSystem().add(this.cancerSystemMap.get("Unclassified"));
-
-            }
-
-            // TODO: Complete the organ options
-            // TODO: Complete the cell type options
-            // TODO: Complete the patient treatment options
-
-
-            models.add(mfq);
-        }
 
 
         // Populate the list of possible diagnoses
@@ -359,6 +217,69 @@ public class SearchDS {
 
     public void setModels(Set<ModelForQuery> models) {
         this.models = models;
+    }
+
+
+    /**
+     * This method loads the ModelForQuery Data Projection object and initializes the models
+     */
+    void initializeModels() {
+
+
+        String modelJson = dataProjectionRepository.findByLabel("ModelForQuery").getValue();
+
+        try {
+            JSONArray jarray = new JSONArray(modelJson);
+
+            for (int i = 0; i < jarray.length(); i++) {
+
+                JSONObject j = jarray.getJSONObject(i);
+
+                ModelForQuery mfq = new ModelForQuery();
+
+                mfq.setModelId(parseLong(j.getString("modelId")));
+                mfq.setDatasource(j.getString("datasource"));
+                mfq.setExternalId(j.getString("externalId"));
+                mfq.setPatientAge(j.getString("patientAge"));
+                mfq.setPatientGender(j.getString("patientGender"));
+                mfq.setSampleOriginTissue(j.getString("sampleOriginTissue"));
+                mfq.setSampleSampleSite(j.getString("sampleSampleSite"));
+                mfq.setSampleExtractionMethod(j.getString("sampleExtractionMethod"));
+                mfq.setSampleClassification(j.getString("sampleClassification"));
+                mfq.setSampleTumorType(j.getString("sampleTumorType"));
+                mfq.setDiagnosis(j.getString("diagnosis"));
+                mfq.setMappedOntologyTerm(j.getString("mappedOntologyTerm"));
+                mfq.setTreatmentHistory(j.getString("treatmentHistory"));
+
+
+                JSONArray ja = j.getJSONArray("cancerSystem");
+                List<String> cancerSystem = new ArrayList<>();
+                for (int k = 0; k < ja.length(); k++) {
+
+                    cancerSystem.add(ja.getString(k));
+                }
+
+                mfq.setCancerSystem(cancerSystem);
+
+                ja = j.getJSONArray("allOntologyTermAncestors");
+                Set<String> ancestors = new HashSet<>();
+
+                for (int k = 0; k < ja.length(); k++) {
+
+                    ancestors.add(ja.getString(k));
+                }
+
+                mfq.setAllOntologyTermAncestors(ancestors);
+
+
+                this.models.add(mfq);
+            }
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
