@@ -1,11 +1,12 @@
 package org.pdxfinder.services.ds;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.DataProjectionRepository;
-import org.pdxfinder.repositories.ModelCreationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,6 +33,10 @@ public class SearchDS {
 
     private Set<ModelForQuery> models;
     private Map<String, String> cancerSystemMap = new HashMap<>();
+
+    //marker=> {variant=>set of model ids}
+    private Map<String, Map<String, Set<Long>>> mutations = new HashMap<String, Map<String, Set<Long>>>();
+
 
     private DataProjectionRepository dataProjectionRepository;
 
@@ -109,11 +114,9 @@ public class SearchDS {
         //this method loads the ModelForQuery Data Projection object and
         initializeModels();
 
+        //loads the mutation map from Data Projection
+        initializeMutations();
 
-        //
-        // When this class is instantiated,
-        //   populate and cache the models set
-        //
 
         List<String> padding = new ArrayList<>();
         padding.add("NO DATA");
@@ -295,6 +298,104 @@ public class SearchDS {
     }
 
 
+    void initializeMutations(){
+
+        log.info("Initializing mutations");
+
+        String mut = dataProjectionRepository.findByLabel("PlatformMarkerVariantModel").getValue();
+
+        JSONObject j;
+        JSONArray ja;
+        try{
+            j = new JSONObject(mut);
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            Map<String, Map<String, Map<String, Set<String>>>> map = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<String>>>>>(){});
+
+            log.info("Lookup: "+map.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
+
+            for(Map.Entry<String, Map<String, Map<String, Set<String>>>> platformEntry: map.entrySet()){
+
+                for(Map.Entry<String, Map<String,Set<String>>> markerEntry: platformEntry.getValue().entrySet()){
+
+                    for(Map.Entry<String, Set<String>> variationEntry: markerEntry.getValue().entrySet()){
+
+                        String marker = markerEntry.getKey();
+                        String variant = variationEntry.getKey();
+                        Set models = variationEntry.getValue();
+
+                        addModelsToMutations(marker, variant, models);
+
+                    }
+                }
+            }
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private void addModelsToMutations(String marker, String variant, Set<String> models){
+
+        if(mutations.containsKey(marker)){
+
+            if(mutations.get(marker).containsKey(variant)){
+
+                for(String model: models){
+
+                    mutations.get(marker).get(variant).add(Long.parseLong(model));
+                }
+
+            }
+            //marker found, new variant
+            else{
+                Set<Long> newModelSet = new HashSet<>();
+
+                for(String model: models){
+
+                    newModelSet.add(Long.parseLong(model));
+                }
+
+                mutations.get(marker).put(variant, newModelSet);
+            }
+        }
+        //new marker
+        else{
+
+            Set<Long> newModelSet = new HashSet<>();
+
+            for(String model: models){
+
+                newModelSet.add(Long.parseLong(model));
+            }
+
+            Map<String, Set<Long>> newVariant = new HashMap();
+
+            newVariant.put(variant, newModelSet);
+
+            mutations.put(marker, newVariant);
+        }
+    }
+
+
+    private Set<Long> getModelsByMutatedMarkerAndVariant(String marker, String variant){
+
+        if(mutations.containsKey(marker)){
+
+            if(mutations.get(marker).containsKey(variant)){
+
+                return mutations.get(marker).get(variant);
+            }
+        }
+
+        return null;
+    }
+
+
     /**
      * Search function accespts a Map of key value pairs
      * key = what facet to search
@@ -440,6 +541,29 @@ public class SearchDS {
                     predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.cell_type));
                     result = result.stream().filter(x -> predicate.test(x.getCancerCellType())).collect(Collectors.toSet());
                     break;
+
+                case mutation:
+                    // mutation=KRAS___MUT___V600E, mutation=NRAS___WT
+                    // if the String has ___ (three underscores) twice, it is mutated, if it has only one, it is WT
+
+                    Set<Long> modelsWithMutatedMarkerAndVariant = new HashSet<>();
+
+                    for(String mutation: filters.get(SearchFacetName.mutation)){
+
+                        if(mutation.split("___").length == 3){
+
+                            String[] mut = mutation.split("___");
+                            String marker = mut[0];
+                            String variant = mut[2];
+                            modelsWithMutatedMarkerAndVariant.addAll(getModelsByMutatedMarkerAndVariant(marker, variant));
+
+                        }
+                    }
+
+                    result = result.stream().filter(x -> modelsWithMutatedMarkerAndVariant.contains(x.getModelId())).collect(Collectors.toSet());
+
+
+
 
                 default:
                     // default case is an unexpected filter option
