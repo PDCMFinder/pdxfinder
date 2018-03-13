@@ -129,7 +129,15 @@
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-10">
-                        <a href="#"> <h4 class="button more uppercase margin-top-large">Contact Provider</h4> </a>
+
+                        <a th:href="@{'mailto:'+${contacts}}" th:if="${#strings.contains(contacts,'@')}">
+                            <h4 class="button more uppercase margin-top-large">Contact Provider</h4>
+                        </a>
+
+                        <a th:href="@{${contacts+externalId}}" th:target="_blank" th:if="${not #strings.contains(contacts,'@')}">
+                            <h4 class="button more uppercase margin-top-large">Contact Provider</h4>
+                        </a>
+
                     </div>
                 </div>
             </section>
@@ -166,7 +174,13 @@
 
                                         <tr><th class="text-left">Gender</th>     <td th:text="${gender}"></td></tr>
                                         <tr><th class="text-left">Age</th>        <td th:text="${age}"></td></tr>
-                                        <tr><th class="text-left">Race / Ethnicity</th>      <td><span th:text="${race}"></span> / <span th:text="${ethnicity}"></span> </td></tr>
+                                        <tr><th class="text-left">Race / Ethnicity</th>
+                                            <td>
+                                                <span th:text="${race}"></span>
+                                                <span th:if="${not ( #strings.isEmpty(race) || #strings.isEmpty(ethnicity) ) }"> / </span>
+                                                <span th:text="${ethnicity}"></span>
+                                            </td>
+                                        </tr>
                                         <tr th:if="${not #lists.isEmpty(relatedModels)}"><th class="text-left">Related models</th>        <td><span th:each="relMod:${relatedModels}"><a th:text="${relMod}" th:href="@{'/pdx/'+${dataSrc}+'/'+${relMod}}"></a> </span></td></tr>
                                         </tbody>
                                     </table>

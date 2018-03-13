@@ -32,10 +32,10 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
 
 
     @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
-            "MATCH (s:Sample)-[sf:SAMPLED_FROM]-(ps:PatientSnapshot)-[pt:PATIENT]-(p:Patient) " +
+            "MATCH (s:Sample)-[sf:SAMPLED_FROM]-(ps:PatientSnapshot)-[pt:PATIENT]-(p:Patient)-[ext:EXTERNAL_DATASOURCE]-(extdsos:ExternalDataSource) " +
             "WHERE mod.sourcePdxId = {modelId} " +
             "AND toLower(s.dataSource) = toLower({dataSource}) "+
-            "RETURN mod, ii, s, ps, p, sf, pt")
+            "RETURN mod, ii, s, ps, p, sf, pt, ext, extdsos")
     Patient findByDataSourceAndModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
 

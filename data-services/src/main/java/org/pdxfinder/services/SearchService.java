@@ -274,6 +274,11 @@ public class SearchService {
             dto.setGender(patient.getSex());
         }
 
+        if (patient != null && patient.getExternalDataSource() != null) {
+            dto.setContacts(patient.getExternalDataSource().getContact());
+            dto.setExternalDataSourceDesc(patient.getExternalDataSource().getDescription());
+        }
+
         if (ps != null) {
             for (PatientSnapshot patientSnapshots : ps) {
                 if (patientSnapshots != null && patientSnapshots.getAge() != null) {

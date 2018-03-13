@@ -116,6 +116,7 @@ public class DetailsPageController {
 
 
         model.addAttribute("sourceDescription", sorceDesc.get(dto.getDataSource()));
+        model.addAttribute("contacts",dto.getContacts());
 
         /*
         if(relatedModels.size()>0){
