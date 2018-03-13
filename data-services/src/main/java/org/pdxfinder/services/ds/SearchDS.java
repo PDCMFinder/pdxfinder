@@ -271,6 +271,18 @@ public class SearchDS {
 
                 mfq.setAllOntologyTermAncestors(ancestors);
 
+                if(j.has("dataAvailable")){
+                    ja = j.getJSONArray("dataAvailable");
+                    List<String> dataAvailable = new ArrayList<>();
+
+                    for(int k=0; k<ja.length(); k++){
+
+                        dataAvailable.add(ja.getString(k));
+                    }
+
+                    mfq.setDataAvailable(dataAvailable);
+                }
+
 
                 this.models.add(mfq);
             }
