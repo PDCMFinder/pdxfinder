@@ -388,11 +388,13 @@
 
                                                             <div class="table-responsive">
 
-                                                                <b class="bLine" th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
+                                                                <h4 class="bLine" th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
+                                                                    <span class="hdc">Sample ID: </span>            <i class="black">Xenograft Tumor</i>                  &nbsp; &nbsp;
                                                                     <span class="hdc">Tumor Type: </span>            <i class="black">Xenograft Tumor</i>                  &nbsp; &nbsp;
                                                                     <span class="hdc">Histology:</span> <i class="black" th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
-                                                                    <span class="hdc">Passage: </span>  <i class="black" th:text="${technology.value[num-1]}"></i>
-                                                                </b>
+                                                                    <span class="hdc">Passage: </span>  <i class="black" th:text="${technology.value[num-1]}"></i>     &nbsp; &nbsp;
+                                                                    <a href="" target="_blank"><span class="hdc">Description: </span>  <i class="black" th:text="${technology.key+' Technology'}"></i></a>
+                                                                </h4>
 
                                                                 <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
                                                                        id="example-datatable"
