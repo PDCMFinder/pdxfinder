@@ -66,7 +66,8 @@ public class SearchController {
                   @RequestParam("patient_gender") Optional<List<String>> patient_gender,
                   @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
                   @RequestParam("cancer_system") Optional<List<String>> cancer_system,
-                  @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type
+                  @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type,
+                  @RequestParam("sample_tumor_type") Optional<List<String>> mutation
     ) {
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
@@ -78,7 +79,8 @@ public class SearchController {
                 patient_gender,
                 sample_origin_tissue,
                 cancer_system,
-                sample_tumor_type
+                sample_tumor_type,
+                mutation
         );
 
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
@@ -111,6 +113,7 @@ public class SearchController {
                   @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
                   @RequestParam("cancer_system") Optional<List<String>> cancer_system,
                   @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type,
+                  @RequestParam("mutation") Optional<List<String>> mutation,
 
                   @RequestParam(value = "page", defaultValue = "1") Integer page,
                   @RequestParam(value = "size", defaultValue = "10") Integer size
@@ -125,7 +128,8 @@ public class SearchController {
                 patient_gender,
                 sample_origin_tissue,
                 cancer_system,
-                sample_tumor_type
+                sample_tumor_type,
+                mutation
         );
 
 
@@ -138,6 +142,8 @@ public class SearchController {
         List<FacetOption> datasourceSelected = searchDS.getFacetOptions(SearchFacetName.datasource, datasourceOptions, results, datasource.orElse(null));
         List<FacetOption> cancerSystemSelected = searchDS.getFacetOptions(SearchFacetName.cancer_system, cancerBySystemOptions, results, cancer_system.orElse(null));
         List<FacetOption> sampleTumorTypeSelected = searchDS.getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
+        List<FacetOption> mutationSelected = searchDS.getFacetOptions(SearchFacetName.mutation, null, results, mutation.orElse(null));
+
 
         // Only add diagnosisSelected if diagnosis has actually been specified
         List<FacetOption> diagnosisSelected = null;
@@ -282,9 +288,11 @@ public class SearchController {
             Optional<List<String>> patientGender,
             Optional<List<String>> sampleOriginTissue,
             Optional<List<String>> cancerSystem,
-            Optional<List<String>> sampleTumorType
+            Optional<List<String>> sampleTumorType,
+            Optional<List<String>> mutation
 
-    ) {
+
+            ) {
 
         Map<SearchFacetName, List<String>> configuredFacets = new HashMap<>();
 
@@ -348,6 +356,14 @@ public class SearchController {
                 configuredFacets.get(SearchFacetName.sample_tumor_type).add(s);
             }
         }
+
+        if (mutation.isPresent() && !mutation.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.mutation, new ArrayList<>());
+            for (String s : mutation.get()) {
+                configuredFacets.get(SearchFacetName.mutation).add(s);
+            }
+        }
+
 
         return configuredFacets;
     }

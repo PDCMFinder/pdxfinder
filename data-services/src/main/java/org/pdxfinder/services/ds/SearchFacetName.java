@@ -15,7 +15,8 @@ public enum SearchFacetName {
     model_host_strain,
     organ,
     cancer_system,
-    cell_type;
+    cell_type,
+    mutation;
 
     public String getName() {
         return name();
