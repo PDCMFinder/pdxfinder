@@ -121,7 +121,9 @@
                 <div class="row">
 
                     <div class="columns medium-4 small-12 margin-top-30">
-                        <h4 class="pdxBig"><span class="float-left border-color-black" th:text="${externalId+': '+mappedOntology}"></span></h4>
+                        <a th:href="@{${url}}" th:target="_blank">
+                            <h4 class="pdxBig"><span class="float-left border-color-black" th:text="${externalId+': '+mappedOntology}"></span></h4>
+                        </a>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-30">
@@ -202,7 +204,11 @@
                                         <tr><th class="text-left">Primary Tissue</th>             <td th:text="${originTissue}"></td></tr>
                                         <tr><th class="text-left">Collection Site</th>          <td th:text="${sampleSite}"></td></tr>
                                         <tr><th class="text-left">Tumor Type</th>                 <td th:text="${tumorType}"></td></tr>
-                                        <tr><th class="text-left">Stage / Grade</th>             <td th:text="${classification}"></td></tr>
+                                        <tr><th class="text-left">Stage / Grade</th>
+                                            <td th:if="${#strings.equals(class, '/')}" th:text="${'Not Available'}"></td>
+                                            <td th:text="${#strings.endsWith(class,'/')} ? ${ #strings.substringBefore(class,'/') } : ${class} "></td>
+
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -245,15 +251,15 @@
 
                                         <tr>
                                             <th class="text-left">Technology</th>
-                                            <td th:text="${fullData.technology}"></td>
+                                            <td th:text="${technology}"></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left">Description</th>
-                                            <td th:text="${fullData.description}"></td>
+                                            <td th:text="${description}"></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left">Passages</th>
-                                            <td th:text="${fullData.passages}"></td>
+                                            <td th:text="${passages}"></td>
                                         </tr>
                                         </tbody>
                                     </table>

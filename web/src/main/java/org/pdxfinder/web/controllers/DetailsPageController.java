@@ -75,14 +75,14 @@ public class DetailsPageController {
         model.addAttribute("ethnicity", dto.getEthnicity());
         model.addAttribute("diagnosis", dto.getDiagnosis());
         model.addAttribute("tumorType", dto.getTumorType());
-        model.addAttribute("classification", dto.getClassification());
+        model.addAttribute("class", dto.getClassification());
         model.addAttribute("originTissue", dto.getOriginTissue());
         model.addAttribute("sampleSite", dto.getSampleSite());
 
-        model.addAttribute("sampleType", dto.getSampleType());
-        model.addAttribute("strain", dto.getStrain());
+        model.addAttribute("sampleType", notEmpty(dto.getSampleType()));
+        model.addAttribute("strain", notEmpty(dto.getStrain()));
         model.addAttribute("mouseSex", dto.getMouseSex());
-        model.addAttribute("engraftmentSite", dto.getEngraftmentSite());
+        model.addAttribute("engraftmentSite", notEmpty(dto.getEngraftmentSite()));
         model.addAttribute("markers", dto.getCancerGenomics());
         model.addAttribute("url", dto.getExternalUrl());
         model.addAttribute("urlText", dto.getExternalUrlText());
@@ -103,6 +103,9 @@ public class DetailsPageController {
         model.addAttribute("patientInfo", patientTech);
 
         model.addAttribute("relatedModels", relatedModels);
+        model.addAttribute("technology", notEmpty(dto.getTechnology()));
+        model.addAttribute("description", notEmpty(dto.getDescription()));
+        model.addAttribute("passages", notEmpty(dto.getPassages()));
 
 
         Map<String, String> sorceDesc = new HashMap<>();
@@ -133,4 +136,14 @@ public class DetailsPageController {
 
         return "details";
     }
+
+
+    public String notEmpty(String incoming){
+
+        String result = (incoming == null) ? "Not Available" : incoming;
+        result = (result.length() == 0 ? "Not Available" : result );
+
+        return result;
+    }
+
 }
