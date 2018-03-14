@@ -311,15 +311,15 @@ public class SearchDS {
 
             ObjectMapper mapper = new ObjectMapper();
 
-            Map<String, Map<String, Map<String, Set<String>>>> map = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<String>>>>>(){});
+            Map<String, Map<String, Map<String, Set<Long>>>> map = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<Long>>>>>(){});
 
             log.info("Lookup: "+map.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
 
-            for(Map.Entry<String, Map<String, Map<String, Set<String>>>> platformEntry: map.entrySet()){
+            for(Map.Entry<String, Map<String, Map<String, Set<Long>>>> platformEntry: map.entrySet()){
 
-                for(Map.Entry<String, Map<String,Set<String>>> markerEntry: platformEntry.getValue().entrySet()){
+                for(Map.Entry<String, Map<String,Set<Long>>> markerEntry: platformEntry.getValue().entrySet()){
 
-                    for(Map.Entry<String, Set<String>> variationEntry: markerEntry.getValue().entrySet()){
+                    for(Map.Entry<String, Set<Long>> variationEntry: markerEntry.getValue().entrySet()){
 
                         String marker = markerEntry.getKey();
                         String variant = variationEntry.getKey();
@@ -339,15 +339,15 @@ public class SearchDS {
     }
 
 
-    private void addModelsToMutations(String marker, String variant, Set<String> models){
+    private void addModelsToMutations(String marker, String variant, Set<Long> models){
 
         if(mutations.containsKey(marker)){
 
             if(mutations.get(marker).containsKey(variant)){
 
-                for(String model: models){
+                for(Long model: models){
 
-                    mutations.get(marker).get(variant).add(Long.parseLong(model));
+                    mutations.get(marker).get(variant).add(model);
                 }
 
             }
@@ -355,9 +355,9 @@ public class SearchDS {
             else{
                 Set<Long> newModelSet = new HashSet<>();
 
-                for(String model: models){
+                for(Long model: models){
 
-                    newModelSet.add(Long.parseLong(model));
+                    newModelSet.add(model);
                 }
 
                 mutations.get(marker).put(variant, newModelSet);
@@ -368,9 +368,9 @@ public class SearchDS {
 
             Set<Long> newModelSet = new HashSet<>();
 
-            for(String model: models){
+            for(Long model: models){
 
-                newModelSet.add(Long.parseLong(model));
+                newModelSet.add(model);
             }
 
             Map<String, Set<Long>> newVariant = new HashMap();

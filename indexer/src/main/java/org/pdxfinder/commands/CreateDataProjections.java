@@ -31,7 +31,7 @@ public class CreateDataProjections implements CommandLineRunner{
     String homeDir;
 
     //"platform"=>"marker"=>"variant"=>"set of model ids"
-    private Map<String, Map<String, Map<String, Set<String>>>> mutatedPlatformMarkerVariantModelDP = new HashMap<>();
+    private Map<String, Map<String, Map<String, Set<Long>>>> mutatedPlatformMarkerVariantModelDP = new HashMap<>();
 
     //"marker"=>"set of variants"
     private Map<String, Set<String>> mutatedMarkerVariantDP = new HashMap<>();
@@ -39,7 +39,7 @@ public class CreateDataProjections implements CommandLineRunner{
     private List<ModelForQuery> modelForQueryDP = new ArrayList<>();
 
     //"platform"=>"marker"=>"set of model ids"
-    private Map<String, Map<String, Set<String>>> wtMarkersDataProjection = new HashMap<>();
+    private Map<String, Map<String, Set<Long>>> wtMarkersDataProjection = new HashMap<>();
 
 
     @Autowired
@@ -95,7 +95,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
             ModelCreation model = loaderUtils.getModelByMolChar(mc);
 
-            String modelId = model.getId().toString();
+            Long modelId = model.getId();
 
             String platformName = "Not Specified";
 
@@ -198,7 +198,7 @@ public class CreateDataProjections implements CommandLineRunner{
      * @param variantName
      * @param modelId
      */
-    private void addToMutatedPlatformMarkerVariantModelDP(String platformName, String markerName, String variantName, String modelId){
+    private void addToMutatedPlatformMarkerVariantModelDP(String platformName, String markerName, String variantName, Long modelId){
 
         if(this.mutatedPlatformMarkerVariantModelDP.containsKey(platformName)){
 
@@ -211,7 +211,7 @@ public class CreateDataProjections implements CommandLineRunner{
                 //platform and marker is there, variant is missing
                 else{
 
-                    Set<String> models = new HashSet<>(Arrays.asList(modelId));
+                    Set<Long> models = new HashSet<>(Arrays.asList(modelId));
 
                     this.mutatedPlatformMarkerVariantModelDP.get(platformName).get(markerName).put(variantName, models);
                 }
@@ -219,9 +219,9 @@ public class CreateDataProjections implements CommandLineRunner{
             //platform is there, marker is missing
             else{
 
-                Set<String> models = new HashSet<>(Arrays.asList(modelId));
+                Set<Long> models = new HashSet<>(Arrays.asList(modelId));
 
-                Map<String, Set<String>> variants = new HashMap<>();
+                Map<String, Set<Long>> variants = new HashMap<>();
                 variants.put(variantName, models);
 
                 this.mutatedPlatformMarkerVariantModelDP.get(platformName).put(markerName, variants);
@@ -230,12 +230,12 @@ public class CreateDataProjections implements CommandLineRunner{
         //if the platform is missing, combine all keys
         else{
 
-            Set<String> models = new HashSet<>(Arrays.asList(modelId));
+            Set<Long> models = new HashSet<>(Arrays.asList(modelId));
 
-            Map<String, Set<String>> variants = new HashMap<>();
+            Map<String, Set<Long>> variants = new HashMap<>();
             variants.put(variantName, models);
 
-            Map<String, Map<String, Set<String>>> markers = new HashMap<>();
+            Map<String, Map<String, Set<Long>>> markers = new HashMap<>();
             markers.put(markerName, variants);
 
             this.mutatedPlatformMarkerVariantModelDP.put(platformName, markers);
