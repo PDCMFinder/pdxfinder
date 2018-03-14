@@ -176,6 +176,7 @@ public class SearchController {
             }
         }
 
+
         // Num pages is converted to an int using this formula int n = a / b + (a % b == 0) ? 0 : 1;
         int numPages = results.size() / size + (results.size() % size == 0 ? 0 : 1);
 
@@ -189,6 +190,12 @@ public class SearchController {
         int end = Math.min(begin + 7, numPages);
 
         String textSearchDescription = getTextualDescription(facetString, results);
+
+        boolean mutSelected = false;
+
+        if(mutation.isPresent() && !mutation.get().isEmpty()){
+            mutSelected = true;
+        }
 
         //auto suggestions for the search field
         List<AutoSuggestOption> autoSuggestList = autoCompleteService.getAutoSuggestions();
@@ -210,6 +217,7 @@ public class SearchController {
         model.addAttribute("cancer_system_selected", cancerSystemSelected);
         model.addAttribute("sample_tumor_type_selected",sampleTumorTypeSelected);
         model.addAttribute("diagnosis_selected", diagnosisSelected);
+        model.addAttribute("isMutationSelected", mutSelected);
         model.addAttribute("query", query.orElse(""));
 
         model.addAttribute("facet_options", facets);
