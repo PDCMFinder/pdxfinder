@@ -1,5 +1,8 @@
 package org.pdxfinder.web.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.SearchService;
@@ -8,10 +11,9 @@ import org.pdxfinder.services.dto.VariationDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
@@ -52,7 +54,7 @@ public class DetailsPageController {
             variationDataDTOList.add(variationDataDTO);
         }
 
-        // dto.setTotalPages((int) Math.ceil(totalRecords/dSize) );
+        //dto.setTotalPages((int) Math.ceil(totalRecords/dSize) );
 
         //auto suggestions for the search field
         Set<String> autoSuggestList = graphService.getMappedNCITTerms();
@@ -136,6 +138,58 @@ public class DetailsPageController {
 
         return "details";
     }
+
+
+
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/pdx/{dataSrc}/{modelId}/export")
+    @ResponseBody
+    public String download(HttpServletResponse response,
+                                   @PathVariable String dataSrc,
+                                   @PathVariable String modelId){
+
+        Map<String, Set<String>> modelTechAndPassages = searchService.findModelPlatformAndPassages(dataSrc,modelId,"");
+
+        List<List<String[]>> variationDataDTOList = new ArrayList<>();
+
+        for (String tech : modelTechAndPassages.keySet()) {
+            VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,"",0,50000,"",1,"","");
+            variationDataDTOList.add(variationDataDTO.getData());
+        }
+
+        List<String[]> variationData = variationDataDTOList.get(0);
+
+        CsvMapper mapper = new CsvMapper();
+
+        CsvSchema schema = CsvSchema.builder()
+                .addColumn("Sample ID")
+                .addColumn("Platform")
+                .addColumn("Chromosome")
+                .addColumn("Seq. Position")
+                .addColumn("Ref Allele")
+                .addColumn("Alt Allele")
+                .addColumn("Consequence")
+                .addColumn("Gene")
+                .addColumn("Amino Acid Change")
+                .addColumn("Read Depth")
+                .addColumn("Allele Freq")
+                .addColumn("RS Variant")
+                .build().withHeader();
+
+
+        String output = "CSV output";
+        try {
+            output = mapper.writer(schema).writeValueAsString(variationData);
+        } catch (JsonProcessingException e) {}
+
+        response.setContentType("text/csv;charset=utf-8");
+        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder.org_variation"+dataSrc+"_"+modelId+".csv");
+
+        return output;
+
+    }
+
 
 
     public String notEmpty(String incoming){

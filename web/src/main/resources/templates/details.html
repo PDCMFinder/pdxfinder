@@ -357,7 +357,7 @@
                             <div class="tab" role="tabpanel" th:if="${modelInfo.size() > 0}">
 
                                 <div id="sizeSwitch" >
-                                    <a class="button outline"> Export Results <i class="fi-page-export-csv lpad10"></i> </a>
+                                    <a th:href="@{'/pdx/'+${dataSrc}+'/'+${modelId}+'/export'}" class="button outline"> Export Results <i class="fi-page-export-csv lpad10"></i> </a>
                                 </div>
 
 
