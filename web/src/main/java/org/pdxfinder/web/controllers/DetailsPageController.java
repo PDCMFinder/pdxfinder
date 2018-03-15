@@ -192,8 +192,6 @@ public class DetailsPageController {
             variationDataDTOList.add(variationDataDTO.getData());
         }
 
-        List<String[]> variationData = variationDataDTOList.get(0);
-
         CsvMapper mapper = new CsvMapper();
 
         CsvSchema schema = CsvSchema.builder()
@@ -213,7 +211,7 @@ public class DetailsPageController {
 
         String output = "CSV output";
         try {
-            output = mapper.writer(schema).writeValueAsString(variationData);
+            output = mapper.writer(schema).writeValueAsString(variationDataDTOList);
         } catch (JsonProcessingException e) {}
 
         response.setContentType("text/csv;charset=utf-8");
