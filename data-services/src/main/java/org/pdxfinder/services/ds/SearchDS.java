@@ -34,8 +34,8 @@ public class SearchDS {
     private Set<ModelForQuery> models;
     private Map<String, String> cancerSystemMap = new HashMap<>();
 
-    //marker=> {variant=>set of model ids}
-    private Map<String, Map<String, Set<Long>>> mutations = new HashMap<String, Map<String, Set<Long>>>();
+    //platform=> marker=> variant=>{set of model ids}
+    Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<String, Map<String, Map<String, Set<Long>>>>();
 
 
     private DataProjectionRepository dataProjectionRepository;
@@ -304,32 +304,14 @@ public class SearchDS {
 
         String mut = dataProjectionRepository.findByLabel("PlatformMarkerVariantModel").getValue();
 
-        JSONObject j;
-        JSONArray ja;
         try{
-            j = new JSONObject(mut);
 
             ObjectMapper mapper = new ObjectMapper();
 
-            Map<String, Map<String, Map<String, Set<String>>>> map = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<String>>>>>(){});
+            mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<Long>>>>>(){});
 
-            log.info("Lookup: "+map.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
+            log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
 
-            for(Map.Entry<String, Map<String, Map<String, Set<String>>>> platformEntry: map.entrySet()){
-
-                for(Map.Entry<String, Map<String,Set<String>>> markerEntry: platformEntry.getValue().entrySet()){
-
-                    for(Map.Entry<String, Set<String>> variationEntry: markerEntry.getValue().entrySet()){
-
-                        String marker = markerEntry.getKey();
-                        String variant = variationEntry.getKey();
-                        Set models = variationEntry.getValue();
-
-                        addModelsToMutations(marker, variant, models);
-
-                    }
-                }
-            }
         }
         catch(Exception e){
 
@@ -339,60 +321,50 @@ public class SearchDS {
     }
 
 
-    private void addModelsToMutations(String marker, String variant, Set<String> models){
+    /**
+     * Takes a marker and a variant. Looks up these variants in mutation.
+     * Then creates a hashmap with modelids as keys and platform+marker+mutation as values
+     *
+     *
+     * @param marker
+     * @param variant
+     * @return
+     */
+    private void getModelsByMutatedMarkerAndVariant(String marker, String variant, Map<Long, Set<String>> previouslyFoundModels){
 
-        if(mutations.containsKey(marker)){
+        //Map<Long, Set<String>> modelPlatformMarkerVariant = new HashMap<>();
 
-            if(mutations.get(marker).containsKey(variant)){
+        for(Map.Entry<String, Map<String, Map<String, Set<Long>>>> platformEntry : mutations.entrySet()){
 
-                for(String model: models){
+            String platformName = platformEntry.getKey();
 
-                    mutations.get(marker).get(variant).add(Long.parseLong(model));
+            if(platformEntry.getValue().containsKey(marker)){
+
+                if(platformEntry.getValue().get(marker).containsKey(variant)){
+
+                    Set<Long> foundModels = platformEntry.getValue().get(marker).get(variant);
+
+                    for(Long modelId : foundModels){
+
+                        if(previouslyFoundModels.containsKey(modelId)){
+
+                            previouslyFoundModels.get(modelId).add(platformName+" "+marker+" "+variant);
+                        }
+                        else{
+
+                            Set<String>  newSet = new HashSet<>();
+                            newSet.add(platformName+" "+marker+" "+variant);
+                            previouslyFoundModels.put(modelId, newSet);
+                        }
+
+                    }
+
                 }
-
-            }
-            //marker found, new variant
-            else{
-                Set<Long> newModelSet = new HashSet<>();
-
-                for(String model: models){
-
-                    newModelSet.add(Long.parseLong(model));
-                }
-
-                mutations.get(marker).put(variant, newModelSet);
-            }
-        }
-        //new marker
-        else{
-
-            Set<Long> newModelSet = new HashSet<>();
-
-            for(String model: models){
-
-                newModelSet.add(Long.parseLong(model));
             }
 
-            Map<String, Set<Long>> newVariant = new HashMap();
-
-            newVariant.put(variant, newModelSet);
-
-            mutations.put(marker, newVariant);
-        }
-    }
-
-
-    private Set<Long> getModelsByMutatedMarkerAndVariant(String marker, String variant){
-
-        if(mutations.containsKey(marker)){
-
-            if(mutations.get(marker).containsKey(variant)){
-
-                return mutations.get(marker).get(variant);
-            }
         }
 
-        return null;
+
     }
 
 
@@ -546,7 +518,7 @@ public class SearchDS {
                     // mutation=KRAS___MUT___V600E, mutation=NRAS___WT
                     // if the String has ___ (three underscores) twice, it is mutated, if it has only one, it is WT
 
-                    Set<Long> modelsWithMutatedMarkerAndVariant = new HashSet<>();
+                    Map<Long, Set<String>> modelsWithMutatedMarkerAndVariant = new HashMap<>();
 
                     for(String mutation: filters.get(SearchFacetName.mutation)){
 
@@ -555,13 +527,20 @@ public class SearchDS {
                             String[] mut = mutation.split("___");
                             String marker = mut[0];
                             String variant = mut[2];
-                            modelsWithMutatedMarkerAndVariant.addAll(getModelsByMutatedMarkerAndVariant(marker, variant));
+                            getModelsByMutatedMarkerAndVariant(marker, variant, modelsWithMutatedMarkerAndVariant);
+
+                        }
+                        else if(mutation.split("___").length == 2){
+
+                            //TODO: add wt lookup when we have data
 
                         }
                     }
-
-                    result = result.stream().filter(x -> modelsWithMutatedMarkerAndVariant.contains(x.getModelId())).collect(Collectors.toSet());
-
+                    // applies the mutation filters
+                    result = result.stream().filter(x -> modelsWithMutatedMarkerAndVariant.containsKey(x.getModelId())).collect(Collectors.toSet());
+                    // updates the remaining modelforquery objects with platform+marker+variant info
+                    result.forEach(x -> x.setMutatedVariants(new ArrayList<>(modelsWithMutatedMarkerAndVariant.get(x.getModelId()))));
+                    break;
 
 
 
