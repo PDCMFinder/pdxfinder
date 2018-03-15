@@ -203,7 +203,7 @@ public class LoadJAXData implements CommandLineRunner {
          // Pending or Complete
         String qc = j.getString("QC");
         
-        QualityAssurance qa = new QualityAssurance("", "QA is "+qc, ValidationTechniques.FINGERPRINT, qaPassages);
+        QualityAssurance qa = new QualityAssurance("", "QC is "+qc, ValidationTechniques.FINGERPRINT, qaPassages);
         loaderUtils.saveQualityAssurance(qa);
 
         ModelCreation mc = loaderUtils.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa);

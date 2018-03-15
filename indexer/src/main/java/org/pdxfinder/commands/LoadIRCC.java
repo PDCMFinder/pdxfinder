@@ -215,10 +215,10 @@ public class LoadIRCC implements CommandLineRunner {
 
             specimen.setHostStrain(this.nsgBS);
 
-            ImplantationSite is = new ImplantationSite(specimenJSON.getString("Engraftment Site"));
+            ImplantationSite is = loaderUtils.getImplantationSite(specimenJSON.getString("Engraftment Site"));
             specimen.setImplantationSite(is);
 
-            ImplantationType it = new ImplantationType(specimenJSON.getString("Engraftment Type"));
+            ImplantationType it = loaderUtils.getImplantationType(specimenJSON.getString("Engraftment Type"));
             specimen.setImplantationType(it);
 
             /*

@@ -201,10 +201,10 @@ public class LoadHCI implements CommandLineRunner {
 
                 specimen.setHostStrain(this.nsgBS);
 
-                ImplantationSite is = new ImplantationSite(engraftmentSite);
+                ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
                 specimen.setImplantationSite(is);
 
-                ImplantationType it = new ImplantationType(tumorPrep);
+                ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
                 specimen.setImplantationType(it);
 
                 specimen.setSample(sample);
