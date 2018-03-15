@@ -5175,7 +5175,7 @@ table.datatable-pdx {
 table.pdx-table thead {
   background: transparent;
   border: none;
-  border-bottom: 2px solid #73cfaf;
+  border-bottom: 1px solid #73cfaf;
   text-transform: uppercase; }
   table.pdx-table thead th {
     font-size: 1.3rem; }

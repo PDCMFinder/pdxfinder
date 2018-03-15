@@ -121,9 +121,7 @@
                 <div class="row">
 
                     <div class="columns medium-4 small-12 margin-top-30">
-                        <a th:href="@{${url}}" th:target="_blank">
                             <h4 class="pdxBig"><span class="float-left border-color-black" th:text="${externalId+': '+mappedOntology}"></span></h4>
-                        </a>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-30">
@@ -132,18 +130,21 @@
 
                     <div class="columns medium-4 small-12 margin-top-10">
 
-                        <a th:href="@{'mailto:'+${contacts}}" th:if="${#strings.contains(contacts,'@')}">
-                            <h4 class="button more uppercase margin-top-large">Contact Provider</h4>
+                        <a th:href="@{'mailto:'+${contacts+'?subject='+externalId}}" th:if="${#strings.contains(contacts,'@')}">
+                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
+                        </a>
+                        <a th:href="@{${contacts+externalId}}" th:target="_blank" th:if="${not #strings.contains(contacts,'@')}">
+                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
                         </a>
 
-                        <a th:href="@{${contacts+externalId}}" th:target="_blank" th:if="${not #strings.contains(contacts,'@')}">
-                            <h4 class="button more uppercase margin-top-large">Contact Provider</h4>
+                        <a th:href="@{${url}}" th:target="_blank" th:if="${#strings.contains(url,'http')}">
+                            <h4 class="button more uppercase margin-top-large minwidth300" style='margin-top:-10px;' th:text="${urlText}">View at Provider</h4>
                         </a>
 
                     </div>
                 </div>
             </section>
-            <hr class="margin-vertical-30">
+            <hr class="margin-vertical-20">
 
 
             <!-- Tabs Section -->
@@ -164,9 +165,9 @@
                         <!-- Summary first row -->
                         <div class="row large-12 medium-12 expanded">
 
-                            <div class="columns medium-6 small-12 margin-top-30">
+                            <div class="columns medium-12 small-12 margin-top-30">
                                 <div class="responsive-table">
-                                    <table class=" pdx-table head-left">
+                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
                                         <thead>
                                         <tr>
                                             <th colspan="2"> Patient</th>
@@ -174,9 +175,9 @@
                                         </thead>
                                         <tbody>
 
-                                        <tr><th class="text-left">Gender</th>     <td th:text="${gender}"></td></tr>
-                                        <tr><th class="text-left">Age</th>        <td th:text="${age}"></td></tr>
-                                        <tr><th class="text-left">Race / Ethnicity</th>
+                                        <tr><th class="text-left medium-4">Gender</th>     <td th:text="${gender}"></td></tr>
+                                        <tr><th class="text-left medium-4">Age</th>        <td th:text="${age}"></td></tr>
+                                        <tr><th class="text-left medium-4">Race / Ethnicity</th>
                                             <td>
                                                 <span th:text="${race}"></span>
                                                 <span th:if="${not ( #strings.isEmpty(race) || #strings.isEmpty(ethnicity) ) }"> / </span>
@@ -190,9 +191,9 @@
 
                             </div>
 
-                            <div class="columns medium-6 small-12 margin-top-30">
+                            <div class="columns medium-12 small-12 margin-top-medium">
                                 <div class="responsive-table">
-                                    <table class="unstriped pdx-table head-left">
+                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
                                         <thead>
                                         <tr>
                                             <th colspan="2"> Patient Tumor</th>
@@ -200,11 +201,11 @@
                                         </thead>
                                         <tbody>
 
-                                        <tr><th class="text-left">Histology</th>                  <td> <span th:text="${mappedOntology}"></span> </td></tr>
-                                        <tr><th class="text-left">Primary Tissue</th>             <td th:text="${originTissue}"></td></tr>
-                                        <tr><th class="text-left">Collection Site</th>          <td th:text="${sampleSite}"></td></tr>
-                                        <tr><th class="text-left">Tumor Type</th>                 <td th:text="${tumorType}"></td></tr>
-                                        <tr><th class="text-left">Stage / Grade</th>
+                                        <tr><th class="text-left medium-4">Histology</th>                  <td class="text-left"> <span th:text="${mappedOntology}"></span> </td></tr>
+                                        <tr><th class="text-left medium-4">Primary Tissue</th>             <td class="text-left" th:text="${originTissue}"></td></tr>
+                                        <tr><th class="text-left medium-4">Collection Site</th>          <td class="text-left" th:text="${sampleSite}"></td></tr>
+                                        <tr><th class="text-left medium-4">Tumor Type</th>                 <td class="text-left" th:text="${tumorType}"></td></tr>
+                                        <tr><th class="text-left medium-4">Stage / Grade</th>
                                             <td th:if="${#strings.equals(class, '/')}" th:text="${'Not Available'}"></td>
                                             <td th:text="${#strings.endsWith(class,'/')} ? ${ #strings.substringBefore(class,'/') } : ${class} "></td>
 
@@ -216,13 +217,9 @@
                             </div>
 
 
-                        </div> <!-- Summary first row ends-->
-
-                        <div class="row large-12 medium-12 expanded"><!-- Summary second row -->
-
-                            <div class="columns medium-6 small-12 margin-top-30">
+                            <div class="columns medium-12 small-12 margin-top-medium">
                                 <div class="responsive-table">
-                                    <table class="unstriped pdx-table head-left">
+                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
                                         <thead>
                                         <tr>
                                             <th colspan="2">PDX model</th>
@@ -230,18 +227,18 @@
                                         </thead>
                                         <tbody>
 
-                                        <tr><th class="text-left">Strain</th><td th:text="${strain}"></td></tr>
-                                        <tr><th class="text-left">Engraftment Site</th><td th:text="${engraftmentSite}"></td></tr>
-                                        <tr><th class="text-left">Implantation Type</th><td th:text="${sampleType}"></td></tr>
+                                        <tr><th class="text-left medium-4">Strain</th><td class="text-left" th:text="${strain}"></td></tr>
+                                        <tr><th class="text-left medium-4">Engraftment Site</th><td th:text="${engraftmentSite}"></td></tr>
+                                        <tr><th class="text-left medium-4">Implantation Type</th><td th:text="${sampleType}"></td></tr>
                                         </tbody>
                                     </table>
                                 </div>
 
                             </div>
 
-                            <div class="columns medium-6 small-12 margin-top-30">
+                            <div class="columns medium-12 small-12 margin-top-medium">
                                 <div class="responsive-table">
-                                    <table class="unstriped pdx-table head-left">
+                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
                                         <thead>
                                         <tr>
                                             <th colspan="2">Model quality control</th>
@@ -250,15 +247,15 @@
                                         <tbody>
 
                                         <tr>
-                                            <th class="text-left">Technology</th>
+                                            <th class="text-left medium-4">Technology</th>
                                             <td th:text="${technology}"></td>
                                         </tr>
                                         <tr>
-                                            <th class="text-left">Description</th>
+                                            <th class="text-left medium-4">Description</th>
                                             <td th:text="${description}"></td>
                                         </tr>
                                         <tr>
-                                            <th class="text-left">Passages</th>
+                                            <th class="text-left medium-4">Passages</th>
                                             <td th:text="${passages}"></td>
                                         </tr>
                                         </tbody>
@@ -376,7 +373,7 @@
                                 </ul>
 
 
-                                <!-- Tab panes -->
+                                <!-- Tab panes --><strong ></strong>
                                 <div class="tabs-content"  data-tabs-content="example-tabs">
 
 
@@ -389,11 +386,15 @@
                                                             <div class="table-responsive">
 
                                                                 <h4 class="bLine" th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
-                                                                    <span class="hdc">Sample ID: </span>            <i class="black">Xenograft Tumor</i>                  &nbsp; &nbsp;
-                                                                    <span class="hdc">Tumor Type: </span>            <i class="black">Xenograft Tumor</i>                  &nbsp; &nbsp;
-                                                                    <span class="hdc">Histology:</span> <i class="black" th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
-                                                                    <span class="hdc">Passage: </span>  <i class="black" th:text="${technology.value[num-1]}"></i>     &nbsp; &nbsp;
-                                                                    <a href="" target="_blank"><span class="hdc">Description: </span>  <i class="black" th:text="${technology.key+' Technology'}"></i></a>
+
+                                                                    <span class="hdc">Sample ID: </span>
+
+                                                                    <b class="black" th:text="${sampleIdMap['__${technology.key}__'+'__${technology.value[num-1]}__']}"></b>    &nbsp; &nbsp;
+
+                                                                    <span class="hdc">Tumor Type: </span>            <b class="black">Xenograft Tumor</b>                  &nbsp; &nbsp;
+                                                                    <span class="hdc">Histology:</span> <b class="black" th:text="${#strings.capitalize(diagnosis)}"></b>     &nbsp; &nbsp;
+                                                                    <span class="hdc">Passage: </span>  <b class="black" th:text="${technology.value[num-1]}"></b>     &nbsp; &nbsp;
+                                                                    <a href="" target="_blank"><span class="hdc">Description: </span>  <b class="black" th:text="${technology.key+' Technology'}"></b></a>
                                                                 </h4>
 
                                                                 <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
@@ -403,7 +404,6 @@
                                                                     <thead>
                                                                     <tr>
                                                                         <th>Sample </th>
-                                                                        <th>Platform(s)</th>
                                                                         <th>Chromosome</th>
                                                                         <th>Seq. Position</th>
                                                                         <th>Ref. Allele</th>

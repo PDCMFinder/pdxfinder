@@ -3,6 +3,7 @@ package org.pdxfinder.web.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.SearchService;
@@ -39,7 +40,7 @@ public class DetailsPageController {
                           @RequestParam(value="size", required = false) Integer size,Model model){
 
         int viewPage = (page == null || page < 1) ? 0 : page-1;
-        int viewSize = (size == null || size < 1) ? 10 : size;
+        int viewSize = (size == null || size < 1) ? 15000 : size;
 
         Map<String, String> patientTech = searchService.findPatientPlatforms(dataSrc,modelId);
         Map<String, Set<String>> modelTechAndPassages = searchService.findModelPlatformAndPassages(dataSrc,modelId,"");
@@ -48,10 +49,42 @@ public class DetailsPageController {
 
         List<String> relatedModels = searchService.getModelsOriginatedFromSamePatient(dataSrc, modelId);
 
+
+
         List<VariationDataDTO> variationDataDTOList = new ArrayList<>();
+
+        Map<String, String> techNPassToSampleId = new HashMap<>();
+
         for (String tech : modelTechAndPassages.keySet()) {
-            VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,"",viewPage,viewSize,"",1,"","");
-            variationDataDTOList.add(variationDataDTO);
+
+            //Retrieve the passages:
+            Set<String> passages = modelTechAndPassages.get(tech);
+
+            // Retrieve variation data by technology and passage
+            for (String passage : passages){
+                VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,passage,viewPage,viewSize,"",1,"","");
+                variationDataDTOList.add(variationDataDTO);
+
+                // Aggregate sampleIds for this Technology and passage in a Set<String>, to remove duplicates
+                Set<String> sampleIDSet = new HashSet<>();
+                for (String[] data : variationDataDTO.getData()){
+                    sampleIDSet.add(data[0]);
+                }
+
+                // Turn the Set<String> to a comma seperated String
+                String sampleIDs = "";
+                for (String sampleID : sampleIDSet){
+                    sampleIDs += sampleID+",";
+                }
+
+                // Create a Key Value map of (Technology+Passage , sampleIDs) and Pass to Thymeleaf front end
+                techNPassToSampleId.put(tech+passage,StringUtils.stripEnd(sampleIDs, ","));
+            }
+
+
+
+
+
         }
 
         //dto.setTotalPages((int) Math.ceil(totalRecords/dSize) );
@@ -108,6 +141,7 @@ public class DetailsPageController {
         model.addAttribute("technology", notEmpty(dto.getTechnology()));
         model.addAttribute("description", notEmpty(dto.getDescription()));
         model.addAttribute("passages", notEmpty(dto.getPassages()));
+        model.addAttribute("sampleIdMap",techNPassToSampleId);
 
 
         Map<String, String> sorceDesc = new HashMap<>();
@@ -164,7 +198,6 @@ public class DetailsPageController {
 
         CsvSchema schema = CsvSchema.builder()
                 .addColumn("Sample ID")
-                .addColumn("Platform")
                 .addColumn("Chromosome")
                 .addColumn("Seq. Position")
                 .addColumn("Ref Allele")
