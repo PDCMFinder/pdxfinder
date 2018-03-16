@@ -160,6 +160,7 @@ public class SearchController {
                                 datasourceSelected,
                                 cancerSystemSelected,
                                 sampleTumorTypeSelected
+
                         )
                 )
         );
@@ -173,6 +174,13 @@ public class SearchController {
         if (diagnosis.isPresent() && !diagnosis.get().isEmpty()) {
             for (String diag : diagnosis.get()) {
                 facetString = StringUtils.join(Arrays.asList("diagnosis=" + diag, facetString), "&");
+            }
+        }
+
+        if (mutation.isPresent() && !mutation.get().isEmpty()) {
+            for (String mut : mutation.get()) {
+
+                facetString = StringUtils.join(Arrays.asList("mutation=" + mut, facetString), "&");
             }
         }
 
@@ -257,9 +265,16 @@ public class SearchController {
             List<String> pieces = Arrays.asList(urlParams.split("="));
             String key = pieces.get(0);
             String value = pieces.get(1);
+            String replacementValue;
 
             if (!filters.containsKey(key)) {
                 filters.put(key, new TreeSet<>());
+            }
+
+            if(key.equals("mutation")){
+
+                replacementValue = value.replace("___MUT___", " variant ");
+                value = replacementValue;
             }
 
             filters.get(key).add(value);
