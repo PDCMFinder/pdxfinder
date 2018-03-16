@@ -153,7 +153,7 @@
                 <div class="row large-12 medium-12 expanded">
                     <ul class="tabs style-2" data-tabs id="example2-tabs">
                         <li class="tabs-title is-active"><a href="#summary" data-tabs-target="summary" aria-selected="true">Summary</a></li>
-                        <li class="tabs-title"><a href="#variation" data-tabs-target="variation" id="variation_data_link"> Genomic Data (<span th:text="${totalRecords}"></span>) </a></li>
+                        <li class="tabs-title "><a href="#variation" data-tabs-target="variation" id="variation_data_link"  onclick="showTabsFirst()"> Genomic Data (<span th:text="${totalRecords}"></span>) </a></li>
                         <li class="tabs-title"><a href="#plots" data-tabs-target="plots">Dosing studies (0)</a></li>
                     </ul>
                 </div>
@@ -273,7 +273,7 @@
 
 
 
-                    <div class="tabs-panel" id="variation">
+                    <div class="tabs-panel is-active" id="variation">
 
                         <p>
                         <div class="row large-12 medium-12 expanded" id="variationTableData">
@@ -310,7 +310,7 @@
                                          class="tab-pane active"  role="tabpanel">
 
                                                 <span>
-                                                        <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'showContent' : 'hideContent' ">
+                                                        <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'hideContent' : 'hideContent' ">
 
                                                             <b class="bLine">
                                                                 <span class="hdc">Tumor Type: </span>            <i>Patient Tumor</i>                  &nbsp; &nbsp;
@@ -352,9 +352,9 @@
 
 
 
-                            <!-- Start of Xenograft Variation data-->
 
-                            <div class="tab" role="tabpanel" th:if="${modelInfo.size() > 0}">
+                            <!-- Start of Xenograft Variation data-->
+                            <div class="tab hideContentShowFirst" role="tabpanel" th:if="${modelInfo.size() > 0}">
 
                                 <div id="sizeSwitch" >
                                     <a th:href="@{'/pdx/'+${dataSrc}+'/'+${modelId}+'/export'}" class="button outline"> Export Results <i class="fi-page-export-csv lpad10"></i> </a>
@@ -369,7 +369,7 @@
 
                                         <a th:href="@{'#'+${technology.key}}"
                                            data-th-attr="data-tabs-target=${technology.key},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
-                                           th:text="${technology.key}+' Platform'" > TAB TITLES </a>
+                                           th:text="${technology.key}+' Platform'" onclick="showTabs()"> TAB TITLES </a>
 
                                     </li>
 
@@ -382,7 +382,7 @@
 
                                     <div th:each="technology,iter : ${modelInfo}"
                                          th:id="${technology.key}"
-                                         class="tabs-panel"  th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
+                                         class="tabs-panel is-active"  th:classappend="( ${iter.index} == 0 ) ? 'hideContentShowFirst' : 'hideContent' ">
 
                                                     <span th:unless="${technology.value.size()<1}" th:each="num: ${#numbers.sequence(1,technology.value.size())}"> <!--/* Unable to capture index for inner loop so, this was used for innerloop : <tr th:each="passageList : ${technolog[y.value]}"> */-->
 
@@ -639,6 +639,12 @@
 
 
 
+
+    function showTabsFirst() {
+        for (var i=0; i<5; i++) {
+            document.getElementsByClassName("hideContentShowFirst")[i].style.position = "static";
+        }
+    }
 
     function showTabs() {
         for (var i=0; i<5; i++) {
