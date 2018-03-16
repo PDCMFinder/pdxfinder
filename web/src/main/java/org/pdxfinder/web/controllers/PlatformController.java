@@ -1,6 +1,7 @@
 package org.pdxfinder.web.controllers;
 
 import org.pdxfinder.services.PlatformService;
+import org.pdxfinder.services.dto.PlatformDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,9 +30,9 @@ public class PlatformController {
     }
 
     @RequestMapping(value = "/platformdata/{dataSrc}")
-    public List<Map<String,Object>> findPlatformDataBySource(@PathVariable String dataSrc) {
+    public List<PlatformDataDTO> findPlatformDataBySource(@PathVariable String dataSrc) {
 
-        //TODO: populate list with data [{dataType:"TargetedNGS",platform:"CTP", models:20},{},{}]
+        //populate list with data [{dataType:"mutation",platform:"CTP", models:20},{},{}]
         return  platformService.getPlatformDataCountBySource(dataSrc);
     }
 
