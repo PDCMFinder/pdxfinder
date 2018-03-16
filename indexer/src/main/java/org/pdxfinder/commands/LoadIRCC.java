@@ -196,7 +196,7 @@ public class LoadIRCC implements CommandLineRunner {
                     passageInts.add(intPassage - 1);
                 }
 
-                qa.setPassages(StringUtils.join(passages, ", "));
+                qa.setPassages(StringUtils.join(passageInts, ", "));
 
             }
 

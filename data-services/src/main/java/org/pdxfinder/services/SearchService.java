@@ -32,13 +32,18 @@ public class SearchService {
     private final String PDMR_URL_TEXT = "Access PDMR here";
     
     // for PDXNet
-    private final String HCI_URL = "https://www.pdxnetwork.org/hcibcm/";
+    //private final String HCI_URL = "https://www.pdxnetwork.org/hcibcm/";
+    private final String HCI_URL = "";
     private final String HCI_DS = "PDXNet-HCI-BCM";
-    private final String WISTAR_URL = "https://www.pdxnetwork.org/the-wistarmd-andersonpenn/";
+//    private final String WISTAR_URL = "https://www.pdxnetwork.org/the-wistarmd-andersonpenn/";
+    private final String WISTAR_URL = "";
+
     private final String WISTAR_DS = "PDXNet-Wistar-MDAnderson-Penn";
-    private final String MDA_URL = "https://www.pdxnetwork.org/md-anderson/";
+    private final String MDA_URL = "";
+    //private final String MDA_URL = "https://www.pdxnetwork.org/md-anderson/";
     private final String MDA_DS = "PDXNet-MDAnderson";
-    private final String WUSTL_URL = "https://www.pdxnetwork.org/wustl/";
+    //private final String WUSTL_URL = "https://www.pdxnetwork.org/wustl/";
+    private final String WUSTL_URL = "";
     private final String WUSTL_DS = "PDXNet-WUSTL";
 
 

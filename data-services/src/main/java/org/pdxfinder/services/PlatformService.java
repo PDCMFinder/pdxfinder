@@ -1,12 +1,15 @@
 package org.pdxfinder.services;
 
+import org.pdxfinder.dao.ModelCreation;
+import org.pdxfinder.dao.MolecularCharacterization;
 import org.pdxfinder.dao.Platform;
+import org.pdxfinder.dao.Sample;
+import org.pdxfinder.repositories.ModelCreationRepository;
 import org.pdxfinder.repositories.PlatformRepository;
+import org.pdxfinder.services.dto.PlatformDataDTO;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /*
  * Created by abayomi on 16/02/2018.
@@ -17,10 +20,12 @@ public class PlatformService
 
 
     private PlatformRepository platformRepository;
+    private ModelCreationRepository modelCreationRepository;
 
 
-    public PlatformService(PlatformRepository platformRepository) {
+    public PlatformService(PlatformRepository platformRepository, ModelCreationRepository modelCreationRepository) {
         this.platformRepository = platformRepository;
+        this.modelCreationRepository = modelCreationRepository;
     }
 
 
@@ -39,6 +44,70 @@ public class PlatformService
     }
 
 
+    public List<PlatformDataDTO> getPlatformDataCountBySource(String dataSource){
+
+        //datatype => platform => modelNumber
+        Map<String, Map<String, Integer>> platformDataMap = new HashMap<>();
+
+        Collection<ModelCreation> models = modelCreationRepository.getModelsWithMolCharBySource(dataSource);
+
+        for(ModelCreation m : models){
+
+            String platformName;
+            String mcType;
+
+            for(Sample s : m.getRelatedSamples()){
+
+                for(MolecularCharacterization mc : s.getMolecularCharacterizations()){
+
+                    platformName = mc.getPlatform().getName();
+                    mcType = mc.getType();
+
+                    if(platformDataMap.containsKey(mcType)){
+
+                        if(platformDataMap.get(mcType).containsKey(platformName)){
+
+                            int oldNum = platformDataMap.get(mcType).get(platformName).intValue();
+                            oldNum++;
+                            platformDataMap.get(mcType).put(platformName, oldNum);
+                        }
+                        //new platform
+                        else{
+
+                            platformDataMap.get(mcType).put(platformName, new Integer(1));
+                        }
+                    }
+                    //new mcType, new platform
+                    else{
+                        Map<String, Integer> plat = new HashMap<>();
+                        plat.put(platformName, new Integer(1));
+
+                        platformDataMap.put(mcType, plat);
+
+                    }
+                }
+            }
+
+        }
+
+        List<PlatformDataDTO> resultList = new ArrayList<>();
+
+        for(Map.Entry<String, Map<String, Integer>> mcTypeEntry : platformDataMap.entrySet()){
+
+            String mcType = mcTypeEntry.getKey();
+
+            for(Map.Entry<String, Integer> platformNameEntry : mcTypeEntry.getValue().entrySet()){
+
+                String platformName = platformNameEntry.getKey();
+                Integer modelNumbers = platformNameEntry.getValue();
+
+                PlatformDataDTO dto = new PlatformDataDTO(mcType, platformName, modelNumbers.toString());
+                resultList.add(dto);
+            }
+        }
+
+        return resultList;
+    }
 
 
 }
