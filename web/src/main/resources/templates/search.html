@@ -242,7 +242,7 @@
                                 <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
                                     data-allow-all-closed="true">
                                     <li class="accordion-item" data-accordion-item id="gender_filter">
-                                        <a href="#" class="accordion-title">Gender</a>
+                                        <a href="#" class="accordion-title">Sex</a>
 
 
                                         <div class="accordion-content" data-tab-content>
@@ -363,7 +363,7 @@
                                 <th>Collection site</th>
                                 <th>Type</th>
                                 <th>Age</th>
-                                <th>Gender</th>
+                                <th>Sex</th>
                                 <th>Data Available</th>
                                 <th th:if="${isMutationSelected} == true">Mutations</th>
                             </tr>
@@ -379,7 +379,7 @@
                                 <td th:text="${model.sampleSampleSite}">sample site</td>
                                 <td th:text="${model.sampleTumorType}">Metastatic</td>
                                 <td th:text="${model.patientAge}">Age</td>
-                                <td th:text="${model.patientGender}">Gender</td>
+                                <td th:text="${model.patientGender}">Sex</td>
                                 <td>
                                     <th:block th:each="platform : ${model.dataAvailable}">
                                         <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#'+${platform} }"
