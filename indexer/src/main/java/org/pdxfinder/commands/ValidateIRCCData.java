@@ -37,6 +37,7 @@ public class ValidateIRCCData implements CommandLineRunner {
     private final static String DATASOURCE_ABBREVIATION = "IRCC";
     private final static String DATASOURCE_NAME = "IRCC data";
     private final static String DATASOURCE_DESCRIPTION = "IRCC PDX mouse models.";
+    private final static String DATASOURCE_CONTACT = "andrea.bertotti@ircc.it";
     //private final static String NSG_BS_NAME = "NSG (NOD scid gamma)"; //background strain
     //private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     //private final static String NSG_BS_URL = "http://jax.org/strain/005557";
@@ -310,7 +311,7 @@ public class ValidateIRCCData implements CommandLineRunner {
     private void loadDataToNeo4j(){
 
         //Loading data to Neo4j
-        DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION);
+        DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
         //nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         int counter = 0;

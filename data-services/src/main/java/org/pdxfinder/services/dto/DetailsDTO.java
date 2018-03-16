@@ -42,6 +42,8 @@ public class DetailsDTO {
     private String technology;
     private String description;
     private String passages;
+    private String contacts;
+    private String externalDataSourceDesc;
 
 
     private List<Specimen> specimens;
@@ -80,6 +82,8 @@ public class DetailsDTO {
         this.passages = "";
 
         this.totalPages = 0;
+        this.contacts = "";
+        this.externalDataSourceDesc = "";
     }
 
 
@@ -323,5 +327,21 @@ public class DetailsDTO {
 
     public void setPassages(String passages) {
         this.passages = passages;
+    }
+
+    public String getContacts() {
+        return contacts;
+    }
+
+    public void setContacts(String contacts) {
+        this.contacts = contacts;
+    }
+
+    public String getExternalDataSourceDesc() {
+        return externalDataSourceDesc;
+    }
+
+    public void setExternalDataSourceDesc(String externalDataSourceDesc) {
+        this.externalDataSourceDesc = externalDataSourceDesc;
     }
 }

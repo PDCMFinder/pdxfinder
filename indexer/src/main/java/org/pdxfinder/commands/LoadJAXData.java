@@ -44,6 +44,7 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String JAX_DATASOURCE_ABBREVIATION = "JAX";
     private final static String JAX_DATASOURCE_NAME = "The Jackson Laboratory";
     private final static String JAX_DATASOURCE_DESCRIPTION = "The Jackson Laboratory PDX mouse models.";
+    private final static String DATASOURCE_CONTACT = "http://tumor.informatics.jax.org/mtbwi/pdxRequest.do?mice=";
 
     private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<scid> Il2rg<tm1Wjl>/SzJ";
@@ -52,7 +53,7 @@ public class LoadJAXData implements CommandLineRunner {
 
     private final static String HISTOLOGY_NOTE = "Pathologist assessment of patient tumor and pdx model tumor histology slides.";
     
-    private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
+   
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -129,7 +130,7 @@ public class LoadJAXData implements CommandLineRunner {
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
 
-        jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION);
+        jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
 
         nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
 
@@ -190,24 +191,61 @@ public class LoadJAXData implements CommandLineRunner {
 
         }
 
-        // TODO: When the QA information is available, replace this with actual data from the feed
+        
         String qaPassages = null;
-
-        QualityAssurance qa = new QualityAssurance("Histology", HISTOLOGY_NOTE, ValidationTechniques.VALIDATION, qaPassages);
-        loaderUtils.saveQualityAssurance(qa);
+        
+        
+        
 
         pSnap.addSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
+        
+         // Pending or Complete
+        String qc = j.getString("QC");
+        
+        QualityAssurance qa = new QualityAssurance("", "QC is "+qc, ValidationTechniques.FINGERPRINT, qaPassages);
+        loaderUtils.saveQualityAssurance(qa);
 
         ModelCreation mc = loaderUtils.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa);
         mc.addRelatedSample(sample);
+        
+        
+        String implantationTypeStr = j.getString("Sample Type");
+        String implantationSiteStr = j.getString("Engraftment Site");
 
-        String backgroundStrain = j.getString("Strain");
-        // JAX feed does not supply implantation type
-        String implantationType = "Subcutaneous";
-        String implantationSite = j.getString("Engraftment Site");
-
-        loadVariationData(mc, backgroundStrain, implantationSite, implantationType);
+        Specimen specimen = loaderUtils.getSpecimen(mc, id, jaxDS.getAbbreviation(), "");
+        specimen.setHostStrain(nsgBS);
+        ImplantationSite implantationSite = loaderUtils.getImplantationSite(implantationSiteStr);
+        ImplantationType implantationType = loaderUtils.getImplantationType(implantationTypeStr);
+        specimen.setImplantationSite(implantationSite);
+        specimen.setImplantationType(implantationType);
+        
+        
+        mc.addSpecimen(specimen);
+        
+        // seems like either the data model needs some work or I don't understand it
+        /*
+        try{
+            JSONArray treatments = j.getJSONArray("Treatments");
+            for(int t = 0; t < treatments.length(); t++){
+                JSONObject treatmentObject = treatments.getJSONObject(t);
+                Treatment treatment = new Treatment();
+                treatment.setSpecimen(specimen);
+                String therapy =treatmentObject.getString("Dose")+" "+treatmentObject.getString("Units")+ " "+ treatmentObject.getString("Drug");
+                treatment.setTherapy(therapy);
+                Response response = new Response();
+                response.setDescription(treatmentObject.getString("Response"));
+                // this seems backward
+                response.setTreatment(treatment);
+            }
+        }catch(Exception e){
+            // no treatments
+        }
+        */
+        
+        loaderUtils.saveSpecimen(specimen);
+        
+        loadVariationData(mc, implantationSite, implantationType);
 
     }
 
@@ -217,7 +255,7 @@ public class LoadJAXData implements CommandLineRunner {
     This is a set of makers with marker association details
     Since we are creating samples here attach any histology images to the sample based on passage #
      */
-    private void loadVariationData(ModelCreation modelCreation,String backgroundStrain,String implantationSite,String implantationType) {
+    private void loadVariationData(ModelCreation modelCreation,ImplantationSite implantationSite,ImplantationType implantationType) {
 
         if (maxVariations == 0) {
             return;
@@ -325,8 +363,6 @@ public class LoadJAXData implements CommandLineRunner {
 
                 }
 
-                //PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
-
                 
                 Specimen specimen = loaderUtils.getSpecimen(modelCreation, sampleKey, this.jaxDS.getAbbreviation(), passage);
      
@@ -334,7 +370,7 @@ public class LoadJAXData implements CommandLineRunner {
                 specSample.setSourceSampleId(sampleKey);
                 specimen.setSample(specSample);
                 specSample.setMolecularCharacterizations(mcs);
-                //specimen.setPdxPassage(pdxPassage);
+                
 
                 if (histologyMap.containsKey(passage)) {
                     Histology histology = new Histology();
@@ -345,20 +381,13 @@ public class LoadJAXData implements CommandLineRunner {
                 }
 
 
-                if(backgroundStrain != null){
-                    HostStrain bs = new HostStrain(backgroundStrain);
-                    specimen.setHostStrain(bs);
-                }
+                // all JAX mice are NSG, even if not specified in feed
+                specimen.setHostStrain(nsgBS);
+                
 
-                if(implantationSite != null){
-                    ImplantationSite is = new ImplantationSite(implantationSite);
-                    specimen.setImplantationSite(is);
-                }
+                specimen.setImplantationSite(implantationSite);
+                specimen.setImplantationType(implantationType);
 
-                if(implantationType != null){
-                    ImplantationType it = new ImplantationType(implantationType);
-                    specimen.setImplantationType(it);
-                }
 
                 loaderUtils.saveSpecimen(specimen);
 

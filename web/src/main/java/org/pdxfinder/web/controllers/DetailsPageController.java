@@ -1,5 +1,9 @@
 package org.pdxfinder.web.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.SearchService;
@@ -8,14 +12,10 @@ import org.pdxfinder.services.dto.VariationDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 /**
  * Created by csaba on 12/05/2017.
@@ -40,7 +40,7 @@ public class DetailsPageController {
                           @RequestParam(value="size", required = false) Integer size,Model model){
 
         int viewPage = (page == null || page < 1) ? 0 : page-1;
-        int viewSize = (size == null || size < 1) ? 10 : size;
+        int viewSize = (size == null || size < 1) ? 15000 : size;
 
         Map<String, String> patientTech = searchService.findPatientPlatforms(dataSrc,modelId);
         Map<String, Set<String>> modelTechAndPassages = searchService.findModelPlatformAndPassages(dataSrc,modelId,"");
@@ -49,13 +49,45 @@ public class DetailsPageController {
 
         List<String> relatedModels = searchService.getModelsOriginatedFromSamePatient(dataSrc, modelId);
 
+
+
         List<VariationDataDTO> variationDataDTOList = new ArrayList<>();
+
+        Map<String, String> techNPassToSampleId = new HashMap<>();
+
         for (String tech : modelTechAndPassages.keySet()) {
-            VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,"",viewPage,viewSize,"",1,"","");
-            variationDataDTOList.add(variationDataDTO);
+
+            //Retrieve the passages:
+            Set<String> passages = modelTechAndPassages.get(tech);
+
+            // Retrieve variation data by technology and passage
+            for (String passage : passages){
+                VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,passage,viewPage,viewSize,"",1,"","");
+                variationDataDTOList.add(variationDataDTO);
+
+                // Aggregate sampleIds for this Technology and passage in a Set<String>, to remove duplicates
+                Set<String> sampleIDSet = new HashSet<>();
+                for (String[] data : variationDataDTO.getData()){
+                    sampleIDSet.add(data[0]);
+                }
+
+                // Turn the Set<String> to a comma seperated String
+                String sampleIDs = "";
+                for (String sampleID : sampleIDSet){
+                    sampleIDs += sampleID+",";
+                }
+
+                // Create a Key Value map of (Technology+Passage , sampleIDs) and Pass to Thymeleaf front end
+                techNPassToSampleId.put(tech+passage,StringUtils.stripEnd(sampleIDs, ","));
+            }
+
+
+
+
+
         }
 
-        // dto.setTotalPages((int) Math.ceil(totalRecords/dSize) );
+        //dto.setTotalPages((int) Math.ceil(totalRecords/dSize) );
 
         //auto suggestions for the search field
         Set<String> autoSuggestList = graphService.getMappedNCITTerms();
@@ -78,14 +110,14 @@ public class DetailsPageController {
         model.addAttribute("ethnicity", dto.getEthnicity());
         model.addAttribute("diagnosis", dto.getDiagnosis());
         model.addAttribute("tumorType", dto.getTumorType());
-        model.addAttribute("classification", dto.getClassification());
+        model.addAttribute("class", dto.getClassification());
         model.addAttribute("originTissue", dto.getOriginTissue());
         model.addAttribute("sampleSite", dto.getSampleSite());
 
-        model.addAttribute("sampleType", dto.getSampleType());
-        model.addAttribute("strain", dto.getStrain());
+        model.addAttribute("sampleType", notEmpty(dto.getSampleType()));
+        model.addAttribute("strain", notEmpty(dto.getStrain()));
         model.addAttribute("mouseSex", dto.getMouseSex());
-        model.addAttribute("engraftmentSite", dto.getEngraftmentSite());
+        model.addAttribute("engraftmentSite", notEmpty(dto.getEngraftmentSite()));
         model.addAttribute("markers", dto.getCancerGenomics());
         model.addAttribute("url", dto.getExternalUrl());
         model.addAttribute("urlText", dto.getExternalUrlText());
@@ -106,6 +138,25 @@ public class DetailsPageController {
         model.addAttribute("patientInfo", patientTech);
 
         model.addAttribute("relatedModels", relatedModels);
+        model.addAttribute("technology", notEmpty(dto.getTechnology()));
+        model.addAttribute("description", notEmpty(dto.getDescription()));
+        model.addAttribute("passages", notEmpty(dto.getPassages()));
+        model.addAttribute("sampleIdMap",techNPassToSampleId);
+
+
+        Map<String, String> sorceDesc = new HashMap<>();
+        sorceDesc.put("JAX","The Jackson Laboratory");
+        sorceDesc.put("PDXNet-HCI-BCM","HCI-Baylor College of Medicine");
+        sorceDesc.put("PDXNet-Wistar-MDAnderson-Penn","Melanoma PDX established by the Wistar/MD Anderson/Penn");
+        sorceDesc.put("PDXNet-WUSTL","Washington University in St. Louis");
+        sorceDesc.put("PDXNet-MDAnderson","University of Texas MD Anderson Cancer Center");
+        sorceDesc.put("PDMR","NCI Patient-Derived Models Repository");
+        sorceDesc.put("IRCC","Candiolo Cancer Institute");
+
+
+        model.addAttribute("sourceDescription", sorceDesc.get(dto.getDataSource()));
+        model.addAttribute("contacts",dto.getContacts());
+
         /*
         if(relatedModels.size()>0){
             String rm = "";
@@ -121,4 +172,63 @@ public class DetailsPageController {
 
         return "details";
     }
+
+
+
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/pdx/{dataSrc}/{modelId}/export")
+    @ResponseBody
+    public String download(HttpServletResponse response,
+                                   @PathVariable String dataSrc,
+                                   @PathVariable String modelId){
+
+        Map<String, Set<String>> modelTechAndPassages = searchService.findModelPlatformAndPassages(dataSrc,modelId,"");
+
+        List<List<String[]>> variationDataDTOList = new ArrayList<>();
+
+        for (String tech : modelTechAndPassages.keySet()) {
+            VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,"",0,50000,"",1,"","");
+            variationDataDTOList.add(variationDataDTO.getData());
+        }
+
+        CsvMapper mapper = new CsvMapper();
+
+        CsvSchema schema = CsvSchema.builder()
+                .addColumn("Sample ID")
+                .addColumn("Chromosome")
+                .addColumn("Seq. Position")
+                .addColumn("Ref Allele")
+                .addColumn("Alt Allele")
+                .addColumn("Consequence")
+                .addColumn("Gene")
+                .addColumn("Amino Acid Change")
+                .addColumn("Read Depth")
+                .addColumn("Allele Freq")
+                .addColumn("RS Variant")
+                .build().withHeader();
+
+
+        String output = "CSV output";
+        try {
+            output = mapper.writer(schema).writeValueAsString(variationDataDTOList);
+        } catch (JsonProcessingException e) {}
+
+        response.setContentType("text/csv;charset=utf-8");
+        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder.org_variation"+dataSrc+"_"+modelId+".csv");
+
+        return output;
+
+    }
+
+
+
+    public String notEmpty(String incoming){
+
+        String result = (incoming == null) ? "Not Available" : incoming;
+        result = (result.length() == 0 ? "Not Available" : result );
+
+        return result;
+    }
+
 }

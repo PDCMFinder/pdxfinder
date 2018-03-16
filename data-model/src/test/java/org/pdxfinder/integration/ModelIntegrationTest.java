@@ -98,14 +98,14 @@ public class ModelIntegrationTest extends BaseTest {
         ExternalDataSource ds = externalDataSourceRepository.findByName(extDsName);
         if (ds == null) {
             log.debug("External data source {} not found. Creating", extDsName);
-            ds = new ExternalDataSource(extDsName, extDsName, extDsName, Date.from(Instant.now()));
+            ds = new ExternalDataSource(extDsName, extDsName, extDsName, extDsName, Date.from(Instant.now()));
             externalDataSourceRepository.save(ds);
         }
 
         ExternalDataSource dsAlt = externalDataSourceRepository.findByName(extDsNameAlternate);
         if (dsAlt == null) {
             log.debug("External data source {} not found. Creating", extDsNameAlternate);
-            dsAlt = new ExternalDataSource(extDsNameAlternate, extDsNameAlternate, extDsNameAlternate, Date.from(Instant.now()));
+            dsAlt = new ExternalDataSource(extDsNameAlternate, extDsNameAlternate, extDsNameAlternate, extDsNameAlternate, Date.from(Instant.now()));
             externalDataSourceRepository.save(dsAlt);
         }
 

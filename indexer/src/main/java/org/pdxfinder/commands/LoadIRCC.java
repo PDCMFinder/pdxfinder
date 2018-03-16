@@ -41,6 +41,7 @@ public class LoadIRCC implements CommandLineRunner {
     private final static String IRCC_DATASOURCE_ABBREVIATION = "IRCC";
     private final static String IRCC_DATASOURCE_NAME = "Candiolo Cancer Institute";
     private final static String IRCC_DATASOURCE_DESCRIPTION = "IRCC";
+    private final static String DATASOURCE_CONTACT = "andrea.bertotti@ircc.it";
 
     private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
@@ -100,7 +101,7 @@ public class LoadIRCC implements CommandLineRunner {
         parser.accepts("loadALL", "Load all, including IRCC PDX data");
         OptionSet options = parser.parse(args);
         
-        irccDS = loaderUtils.getExternalDataSource(IRCC_DATASOURCE_ABBREVIATION, IRCC_DATASOURCE_NAME, IRCC_DATASOURCE_DESCRIPTION);
+        irccDS = loaderUtils.getExternalDataSource(IRCC_DATASOURCE_ABBREVIATION, IRCC_DATASOURCE_NAME, IRCC_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
         nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         if (options.has("loadIRCC") || options.has("loadALL")) {
@@ -214,10 +215,10 @@ public class LoadIRCC implements CommandLineRunner {
 
             specimen.setHostStrain(this.nsgBS);
 
-            ImplantationSite is = new ImplantationSite(specimenJSON.getString("Engraftment Site"));
+            ImplantationSite is = loaderUtils.getImplantationSite(specimenJSON.getString("Engraftment Site"));
             specimen.setImplantationSite(is);
 
-            ImplantationType it = new ImplantationType(specimenJSON.getString("Engraftment Type"));
+            ImplantationType it = loaderUtils.getImplantationType(specimenJSON.getString("Engraftment Type"));
             specimen.setImplantationType(it);
 
             /*

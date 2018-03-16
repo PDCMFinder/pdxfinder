@@ -144,6 +144,17 @@ public class ModelForQuery {
     @JsonProperty("Patient Treatment History")
     private String treatmentHistory;
 
+    public List<String> getMutatedVariants() {
+        return mutatedVariants;
+    }
+
+    public void setMutatedVariants(List<String> mutatedVariants) {
+        this.mutatedVariants = mutatedVariants;
+    }
+
+    @JsonProperty("Mutated Variants")
+    private List<String> mutatedVariants;
+
     @JsonProperty("Other Available Data")
     private List<String> dataAvailable;
 

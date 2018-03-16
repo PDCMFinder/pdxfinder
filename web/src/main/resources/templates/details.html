@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -122,88 +121,105 @@
                 <div class="row">
 
                     <div class="columns medium-4 small-12 margin-top-30">
-                        <h4 class="pdxBig"><span class="float-left border-color-black" th:text="${externalId+': '+mappedOntology}"></span></h4>
+                            <h4 class="pdxBig"><span class="float-left border-color-black" th:text="${externalId+': '+mappedOntology}"></span></h4>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-30">
-                            <h4 class="pdxBig black"><span class="float-left"> The Jackson Laboratory </span></h4>
+                        <h4 class="pdxBig black"><span class="float-left" th:text="${sourceDescription}"> The Jackson Laboratory </span></h4>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-10">
-                        <a href="#"> <h4 class="button more uppercase margin-top-large">Contact Provider</h4> </a>
+
+                        <a th:href="@{'mailto:'+${contacts+'?subject='+externalId}}" th:if="${#strings.contains(contacts,'@')}">
+                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
+                        </a>
+                        <a th:href="@{${contacts+externalId}}" th:target="_blank" th:if="${not #strings.contains(contacts,'@')}">
+                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
+                        </a>
+
+                        <a th:href="@{${url}}" th:target="_blank" th:if="${#strings.contains(url,'http')}">
+                            <h4 class="button outline uppercase margin-top-large minwidth300" style='margin-top:-10px;' th:text="${urlText}">View at Provider</h4>
+                        </a>
+
                     </div>
                 </div>
             </section>
-            <hr class="margin-vertical-30">
+            <hr class="margin-vertical-20">
 
 
-              <!-- Tabs Section -->
+            <!-- Tabs Section -->
             <section class="row large-10 medium-12 expanded" id="detailsData">
 
                 <div class="row large-12 medium-12 expanded">
                     <ul class="tabs style-2" data-tabs id="example2-tabs">
-                        <li class="tabs-title"><a href="#summary" data-tabs-target="summary">Summary</a></li>
-                        <li class="tabs-title is-active"><a href="#variation" data-tabs-target="variation" id="variation_data_link" aria-selected="true"> Genomic Data (<span th:text="${totalRecords}"></span>) </a></li>
+                        <li class="tabs-title is-active"><a href="#summary" data-tabs-target="summary" aria-selected="true">Summary</a></li>
+                        <li class="tabs-title"><a href="#variation" data-tabs-target="variation" id="variation_data_link"> Genomic Data (<span th:text="${totalRecords}"></span>) </a></li>
                         <li class="tabs-title"><a href="#plots" data-tabs-target="plots">Dosing studies</a></li>
                     </ul>
                 </div>
 
                 <div class="tabs-content style-2" data-tabs-content="example2-tabs">
-                    <div class="tabs-panel" id="summary">
+                    <div class="tabs-panel is-active" id="summary">
 
 
-                            <!-- Summary first row -->
+                        <!-- Summary first row -->
                         <div class="row large-12 medium-12 expanded">
 
-                        <div class="columns medium-6 small-12 margin-top-30">
-                            <div class="responsive-table">
-                                <table class=" pdx-table head-left">
-                                    <thead>
+                            <div class="columns medium-12 small-12 margin-top-30">
+                                <div class="responsive-table">
+                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
+                                        <thead>
                                         <tr>
                                             <th colspan="2"> Patient</th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
+                                        </thead>
+                                        <tbody>
 
-                                    <tr><th class="text-left">Gender</th>     <td th:text="${gender}"></td></tr>
-                                    <tr><th class="text-left">Age</th>        <td th:text="${age}"></td></tr>
-                                    <tr><th class="text-left">Race / Ethnicity</th>      <td><span th:text="${race}"></span> / <span th:text="${ethnicity}"></span> </td></tr>
-                                    <tr th:if="${not #lists.isEmpty(relatedModels)}"><th class="text-left">Related models</th>        <td><span th:each="relMod:${relatedModels}"><a th:text="${relMod}" th:href="@{'/pdx/'+${dataSrc}+'/'+${relMod}}"></a> </span></td></tr>
-                                    </tbody>
-                                </table>
+                                        <tr><th class="text-left medium-4">Sex</th>     <td th:text="${gender}"></td></tr>
+                                        <tr><th class="text-left medium-4">Age at Time of Collection</th>        <td th:text="${age}"></td></tr>
+                                        <tr><th class="text-left medium-4">Race / Ethnicity</th>
+                                            <td>
+                                                <span th:text="${race}"></span>
+                                                <span th:if="${not ( #strings.isEmpty(race) || #strings.isEmpty(ethnicity) ) }"> / </span>
+                                                <span th:text="${ethnicity}"></span>
+                                            </td>
+                                        </tr>
+                                        <tr th:if="${not #lists.isEmpty(relatedModels)}"><th class="text-left">Related models</th>        <td><span th:each="relMod:${relatedModels}"><a th:text="${relMod}" th:href="@{'/pdx/'+${dataSrc}+'/'+${relMod}}"></a> </span></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
                             </div>
 
-                        </div>
-
-                        <div class="columns medium-6 small-12 margin-top-30">
-                            <div class="responsive-table">
-                                <table class="unstriped pdx-table head-left">
-                                    <thead>
-                                    <tr>
-                                        <th colspan="2"> Patient Tumor</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    <tr><th class="text-left">Histology</th>                  <td> <span th:text="${mappedOntology}"></span> </td></tr>
-                                    <tr><th class="text-left">Primary Tissue</th>             <td th:text="${originTissue}"></td></tr>
-                                    <tr><th class="text-left">Collection Site</th>          <td th:text="${sampleSite}"></td></tr>
-                                    <tr><th class="text-left">Tumor Type</th>                 <td th:text="${tumorType}"></td></tr>
-                                    <tr><th class="text-left">Stage / Grade</th>             <td th:text="${classification}"></td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                        </div>
-
-
-                        </div> <!-- Summary first row ends-->
-
-                        <div class="row large-12 medium-12 expanded"><!-- Summary second row -->
-
-                            <div class="columns medium-6 small-12 margin-top-30">
+                            <div class="columns medium-12 small-12 margin-top-medium">
                                 <div class="responsive-table">
-                                    <table class="unstriped pdx-table head-left">
+                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="2"> Patient Tumor</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        <tr><th class="text-left medium-4">Histology</th>                  <td class="text-left"> <span th:text="${mappedOntology}"></span> </td></tr>
+                                        <tr><th class="text-left medium-4">Primary Tissue</th>             <td class="text-left" th:text="${originTissue}"></td></tr>
+                                        <tr><th class="text-left medium-4">Collection Site</th>          <td class="text-left" th:text="${sampleSite}"></td></tr>
+                                        <tr><th class="text-left medium-4">Tumor Type</th>                 <td class="text-left" th:text="${tumorType}"></td></tr>
+                                        <tr><th class="text-left medium-4">Stage / Grade</th>
+                                            <td th:if="${#strings.equals(class, '/')}" th:text="${'Not Available'}"></td>
+                                            <td th:text="${#strings.endsWith(class,'/')} ? ${ #strings.substringBefore(class,'/') } : ${class} "></td>
+
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+
+                            <div class="columns medium-12 small-12 margin-top-medium">
+                                <div class="responsive-table">
+                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
                                         <thead>
                                         <tr>
                                             <th colspan="2">PDX model</th>
@@ -211,18 +227,18 @@
                                         </thead>
                                         <tbody>
 
-                                        <tr><th class="text-left">Strain</th><td th:text="${strain}"></td></tr>
-                                        <tr><th class="text-left">Engraftment Site</th><td th:text="${engraftmentSite}"></td></tr>
-                                        <tr><th class="text-left">Implantation Type</th><td th:text="${sampleType}"></td></tr>
+                                        <tr><th class="text-left medium-4">Strain</th><td class="text-left" th:text="${strain}"></td></tr>
+                                        <tr><th class="text-left medium-4">Engraftment Site</th><td th:text="${engraftmentSite}"></td></tr>
+                                        <tr><th class="text-left medium-4">Implantation Type</th><td th:text="${sampleType}"></td></tr>
                                         </tbody>
                                     </table>
                                 </div>
 
                             </div>
 
-                            <div class="columns medium-6 small-12 margin-top-30">
+                            <div class="columns medium-12 small-12 margin-top-medium">
                                 <div class="responsive-table">
-                                    <table class="unstriped pdx-table head-left">
+                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
                                         <thead>
                                         <tr>
                                             <th colspan="2">Model quality control</th>
@@ -231,16 +247,16 @@
                                         <tbody>
 
                                         <tr>
-                                            <th class="text-left">Technology</th>
-                                            <td th:text="${fullData.technology}"></td>
+                                            <th class="text-left medium-4">Technology</th>
+                                            <td th:text="${technology}"></td>
                                         </tr>
                                         <tr>
-                                            <th class="text-left">Description</th>
-                                            <td th:text="${fullData.description}"></td>
+                                            <th class="text-left medium-4">Description</th>
+                                            <td th:text="${description}"></td>
                                         </tr>
                                         <tr>
-                                            <th class="text-left">Passages</th>
-                                            <td th:text="${fullData.passages}"></td>
+                                            <th class="text-left medium-4">Passages</th>
+                                            <td th:text="${passages}"></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -254,7 +270,7 @@
                     </div>
 
 
-                    <div class="tabs-panel is-active" id="variation">
+                    <div class="tabs-panel" id="variation">
 
                         <p>
                         <div class="row large-12 medium-12 expanded" id="variationTableData">
@@ -269,7 +285,7 @@
                                 </div> -->
                             </div>
 
-                <!-- Start of Patient variation data -->
+                            <!-- Start of Patient variation data -->
                             <div class="tab" role="tabpanel" th:if="${patientInfo.size() > 0}" >
                                 <!-- Nav tabs -->
                                 <ul class="nav nav-tabs" role="tablist">
@@ -300,7 +316,7 @@
                                                             </b>
 
                                                             <table id="pdxFinder-grid"
-                                                                    class="unstriped pdx-table"> <!-- table-striped table-borderedPdx table-hover -->
+                                                                   class="unstriped pdx-table"> <!-- table-striped table-borderedPdx table-hover -->
 
                                                                 <thead>
                                                                 <tr>
@@ -327,18 +343,18 @@
                                 </div>
 
                             </div>
-                <!-- End of Patient Variation Data -->
+                            <!-- End of Patient Variation Data -->
 
 
 
 
 
-                <!-- Start of Xenograft Variation data-->
+                            <!-- Start of Xenograft Variation data-->
 
                             <div class="tab" role="tabpanel" th:if="${modelInfo.size() > 0}">
 
                                 <div id="sizeSwitch" >
-                                    <a class="button outline"> Export Results <i class="fi-page-export-csv lpad10"></i> </a>
+                                    <a th:href="@{'/pdx/'+${dataSrc}+'/'+${modelId}+'/export'}" class="button outline"> Export Results <i class="fi-page-export-csv lpad10"></i> </a>
                                 </div>
 
 
@@ -357,7 +373,7 @@
                                 </ul>
 
 
-                                <!-- Tab panes -->
+                                <!-- Tab panes --><strong ></strong>
                                 <div class="tabs-content"  data-tabs-content="example-tabs">
 
 
@@ -369,11 +385,17 @@
 
                                                             <div class="table-responsive">
 
-                                                                <b class="bLine" th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
-                                                                    <span class="hdc">Tumor Type: </span>            <i class="black">Xenograft Tumor</i>                  &nbsp; &nbsp;
-                                                                    <span class="hdc">Histology:</span> <i class="black" th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
-                                                                    <span class="hdc">Passage: </span>  <i class="black" th:text="${technology.value[num-1]}"></i>
-                                                                </b>
+                                                                <h4 class="bLine" th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
+
+                                                                    <span class="hdc">Sample ID: </span>
+
+                                                                    <b class="black" th:text="${sampleIdMap['__${technology.key}__'+'__${technology.value[num-1]}__']}"></b>    &nbsp; &nbsp;
+
+                                                                    <span class="hdc">Tumor Type: </span>            <b class="black">Xenograft Tumor</b>                  &nbsp; &nbsp;
+                                                                    <span class="hdc">Histology:</span> <b class="black" th:text="${#strings.capitalize(diagnosis)}"></b>     &nbsp; &nbsp;
+                                                                    <span class="hdc">Passage: </span>  <b class="black" th:text="${technology.value[num-1]}"></b>     &nbsp; &nbsp;
+                                                                    <a href="" target="_blank"><span class="hdc">Description: </span>  <b class="black" th:text="${technology.key+' Technology'}"></b></a>
+                                                                </h4>
 
                                                                 <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
                                                                        id="example-datatable"
@@ -382,7 +404,6 @@
                                                                     <thead>
                                                                     <tr>
                                                                         <th>Sample </th>
-                                                                        <th>Platform(s)</th>
                                                                         <th>Chromosome</th>
                                                                         <th>Seq. Position</th>
                                                                         <th>Ref. Allele</th>
@@ -404,7 +425,7 @@
                                 </div>
 
                             </div>
-                        <!-- End of Xenograft Variation data -->
+                            <!-- End of Xenograft Variation data -->
 
 
                         </div>
@@ -412,12 +433,12 @@
 
                     </div>
 
-                    </div>
+                </div>
 
 
-                    <div class="tabs-panel" id="plots">
-                        <p></p>
-                    </div>
+                <div class="tabs-panel" id="plots">
+                    <p></p>
+                </div>
             </section>
 
 

@@ -42,6 +42,7 @@ public class SearchService {
     private final String WUSTL_DS = "PDXNet-WUSTL";
 
 
+
     public SearchService(SampleRepository sampleRepository,
                          PatientRepository patientRepository,
                          PatientSnapshotRepository patientSnapshotRepository,
@@ -273,6 +274,11 @@ public class SearchService {
             dto.setGender(patient.getSex());
         }
 
+        if (patient != null && patient.getExternalDataSource() != null) {
+            dto.setContacts(patient.getExternalDataSource().getContact());
+            dto.setExternalDataSourceDesc(patient.getExternalDataSource().getDescription());
+        }
+
         if (ps != null) {
             for (PatientSnapshot patientSnapshots : ps) {
                 if (patientSnapshots != null && patientSnapshots.getAge() != null) {
@@ -455,6 +461,8 @@ public class SearchService {
 
 
 
+
+
     public Map<String, Set<String>> findModelPlatformAndPassages(String dataSource, String modelId,String passage){
 
         /**
@@ -605,17 +613,17 @@ public class SearchService {
 
                     String[] markerAssocArray = new String[12];
                     markerAssocArray[0] = sample.getSourceSampleId();
-                    markerAssocArray[1] = dMolChar.getPlatform().getName();
-                    markerAssocArray[2] = markerAssoc.getChromosome();
-                    markerAssocArray[3] = markerAssoc.getSeqPosition();
-                    markerAssocArray[4] = markerAssoc.getRefAllele();
-                    markerAssocArray[5] = markerAssoc.getAltAllele();
-                    markerAssocArray[6] = markerAssoc.getConsequence();
-                    markerAssocArray[7] = markerAssoc.getMarker().getSymbol();
-                    markerAssocArray[8] = markerAssoc.getAminoAcidChange();
-                    markerAssocArray[9] = markerAssoc.getReadDepth();
-                    markerAssocArray[10] = markerAssoc.getAlleleFrequency();
-                    markerAssocArray[11] = markerAssoc.getRsVariants();
+                    //markerAssocArray[1] = dMolChar.getPlatform().getName();
+                    markerAssocArray[1] = markerAssoc.getChromosome();
+                    markerAssocArray[2] = markerAssoc.getSeqPosition();
+                    markerAssocArray[3] = markerAssoc.getRefAllele();
+                    markerAssocArray[4] = markerAssoc.getAltAllele();
+                    markerAssocArray[5] = markerAssoc.getConsequence();
+                    markerAssocArray[6] = markerAssoc.getMarker().getSymbol();
+                    markerAssocArray[7] = markerAssoc.getAminoAcidChange();
+                    markerAssocArray[8] = markerAssoc.getReadDepth();
+                    markerAssocArray[9] = markerAssoc.getAlleleFrequency();
+                    markerAssocArray[10 ] = markerAssoc.getRsVariants();
 
                     variationData.add(markerAssocArray);
                 }
