@@ -5,7 +5,6 @@ package org.pdxfinder.dao;
  */
 public enum ValidationTechniques {
     NOT_SPECIFIED("Not specified"),
-    VALIDATION("Validation"),
     FINGERPRINT("Fingerprint"),
     FINGERPRINT_HISTOLOGY("Histology/STR"),
     HEALTH_CHECK("Health-check");

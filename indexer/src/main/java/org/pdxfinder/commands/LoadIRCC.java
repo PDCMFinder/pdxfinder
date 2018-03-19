@@ -449,8 +449,6 @@ public class LoadIRCC implements CommandLineRunner {
                     specimenSamples.put(specimen,samples);
                 }
                         
-                        
-               
                 
                 String gene = variation.getString("Gene");
                 String type = variation.getString("Type");

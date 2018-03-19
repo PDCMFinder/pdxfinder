@@ -169,7 +169,7 @@ public class LoadWISTAR implements CommandLineRunner {
         String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
 
         QualityAssurance qa = new QualityAssurance(qaType,
-                NOT_SPECIFIED, ValidationTechniques.VALIDATION, qaPassage);
+                NOT_SPECIFIED, ValidationTechniques.NOT_SPECIFIED, qaPassage);
         loaderUtils.saveQualityAssurance(qa);
 
         String strain = j.getString("Strain");

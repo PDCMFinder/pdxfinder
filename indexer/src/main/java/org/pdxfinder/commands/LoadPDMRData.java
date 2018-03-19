@@ -175,7 +175,7 @@ public class LoadPDMRData implements CommandLineRunner {
         // TODO: Update with actual QA data when available
         String qaPassage = null;
 
-        QualityAssurance qa = new QualityAssurance("", "", ValidationTechniques.VALIDATION, qaPassage);
+        QualityAssurance qa = new QualityAssurance("", "", ValidationTechniques.NOT_SPECIFIED, qaPassage);
         loaderUtils.saveQualityAssurance(qa);
 
         pSnap.addSample(sample);

@@ -203,6 +203,7 @@ public class LoadJAXData implements CommandLineRunner {
          // Pending or Complete
         String qc = j.getString("QC");
         
+        // the validation techniques are more than just fingerprint, we don't have a way to capture that
         QualityAssurance qa = new QualityAssurance("", "QC is "+qc, ValidationTechniques.FINGERPRINT, qaPassages);
         loaderUtils.saveQualityAssurance(qa);
 

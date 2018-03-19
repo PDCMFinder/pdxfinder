@@ -149,7 +149,7 @@ public class LoadHCI implements CommandLineRunner {
 
         String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
         QualityAssurance qa = new QualityAssurance(j.getString("QA"),
-                NOT_SPECIFIED, ValidationTechniques.VALIDATION, qaPassage);
+                NOT_SPECIFIED, ValidationTechniques.NOT_SPECIFIED, qaPassage);
         loaderUtils.saveQualityAssurance(qa);
         
         String engraftmentSite = Standardizer.getValue("Engraftment Site",j);
