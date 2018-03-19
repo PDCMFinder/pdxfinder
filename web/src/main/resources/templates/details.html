@@ -133,7 +133,10 @@
                         <a th:href="@{'mailto:'+${contacts+'?subject='+externalId}}" th:if="${#strings.contains(contacts,'@')}">
                             <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
                         </a>
-                        <a th:href="@{${contacts+externalId}}" th:target="_blank" th:if="${not #strings.contains(contacts,'@')}">
+                        <a th:href="@{${contacts+externalId}}" th:target="_blank" th:if="${#strings.contains(contacts,'http') && #strings.endsWith(contacts,'=')}">
+                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
+                        </a>
+                        <a th:href="@{${contacts}}" th:target="_blank" th:if="${#strings.contains(contacts,'http') && not #strings.endsWith(contacts,'=')}">
                             <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
                         </a>
 
@@ -394,10 +397,10 @@
 
                                                                     <b class="black" th:text="${sampleIdMap['__${technology.key}__'+'__${technology.value[num-1]}__']}"></b>    &nbsp; &nbsp;
 
-                                                                    <span class="hdc">Tumor Type: </span>            <b class="black">Xenograft Tumor</b>                  &nbsp; &nbsp;
                                                                     <span class="hdc">Histology:</span> <b class="black" th:text="${#strings.capitalize(diagnosis)}"></b>     &nbsp; &nbsp;
+                                                                    <span class="hdc">Tumor Type: </span>            <b class="black">Xenograft Tumor</b>                  &nbsp; &nbsp;
                                                                     <span class="hdc">Passage: </span>  <b class="black" th:text="${technology.value[num-1]}"></b>     &nbsp; &nbsp;
-                                                                    <a href="" target="_blank"><span class="hdc">Description: </span>  <b class="black" th:text="${technology.key+' Technology'}"></b></a>
+                                                                    <a href="" target="_blank"><span class="hdc">Platform: </span>  <b class="black" th:text="${technology.key}"></b></a>
                                                                 </h4>
 
                                                                 <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
