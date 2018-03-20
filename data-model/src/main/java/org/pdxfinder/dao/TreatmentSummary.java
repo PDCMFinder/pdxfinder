@@ -4,6 +4,7 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -51,4 +52,12 @@ public class TreatmentSummary {
     public void setPatientSnapshot(PatientSnapshot patientSnapshot) {
         this.patientSnapshot = patientSnapshot;
     }
+
+    public void addTreatmentProtocol(TreatmentProtocol tp){
+        if(this.treatmentProtocols == null){
+            this.treatmentProtocols = new HashSet<>();
+        }
+        this.treatmentProtocols.add(tp);
+    }
+
 }
