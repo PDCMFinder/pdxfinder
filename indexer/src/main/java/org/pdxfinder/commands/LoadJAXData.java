@@ -223,29 +223,46 @@ public class LoadJAXData implements CommandLineRunner {
         
         
         mc.addSpecimen(specimen);
-        
-        // seems like either the data model needs some work or I don't understand it
-        /*
+
+        //Create Treatment summary without linking TreatmentProtocols to specimens
+        TreatmentSummary ts;
+
+
         try{
-            JSONArray treatments = j.getJSONArray("Treatments");
-            for(int t = 0; t < treatments.length(); t++){
-                JSONObject treatmentObject = treatments.getJSONObject(t);
-                Treatment treatment = new Treatment();
-                treatment.setSpecimen(specimen);
-                String therapy =treatmentObject.getString("Dose")+" "+treatmentObject.getString("Units")+ " "+ treatmentObject.getString("Drug");
-                treatment.setTherapy(therapy);
-                Response response = new Response();
-                response.setDescription(treatmentObject.getString("Response"));
-                // this seems backward
-                response.setTreatment(treatment);
+            if(j.has("Treatments")){
+                JSONArray treatments = j.getJSONArray("Treatments");
+
+                if(treatments.length() > 0){
+                    //log.info("Treatments found for model "+mc.getSourcePdxId());
+                    ts = new TreatmentSummary();
+
+                    for(int t = 0; t<treatments.length(); t++){
+                        JSONObject treatmentObject = treatments.getJSONObject(t);
+                        TreatmentProtocol tp = new TreatmentProtocol();
+                        Response r = new Response();
+                        r.setDescription(treatmentObject.getString("Response"));
+                        tp.setDrug(treatmentObject.getString("Drug"));
+                        tp.setDose(treatmentObject.getString("Dose") + " "+treatmentObject.getString("Units"));
+                        tp.setResponse(r);
+
+                        ts.addTreatmentProtocol(tp);
+                    }
+
+                    ts.setModelCreation(mc);
+                    mc.setTreatmentSummary(ts);
+                }
             }
-        }catch(Exception e){
-            // no treatments
+
+
         }
-        */
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
+
         
         loaderUtils.saveSpecimen(specimen);
-        
+        //loaderUtils.saveModelCreation(mc);
         loadVariationData(mc, implantationSite, implantationType);
 
     }
