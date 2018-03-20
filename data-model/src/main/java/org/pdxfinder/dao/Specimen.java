@@ -21,8 +21,8 @@ public class Specimen {
     @Relationship(type = "SAMPLED_FROM")
     private Sample sample;
 
-    @Relationship(type = "TREATED_WITH")
-    private Treatment treatment;
+    @Relationship(type = "TREATED_WITH", direction = Relationship.INCOMING)
+    private TreatmentProtocol treatmentProtocol;
 
     @Relationship(type = "IMPLANTATION_SITE")
     private ImplantationSite implantationSite;
@@ -62,12 +62,12 @@ public class Specimen {
         this.sample = sample;
     }
 
-    public Treatment getTreatment() {
-        return treatment;
+    public TreatmentProtocol getTreatment() {
+        return treatmentProtocol;
     }
 
-    public void setTreatment(Treatment treatment) {
-        this.treatment = treatment;
+    public void setTreatment(TreatmentProtocol treatment) {
+        this.treatmentProtocol = treatment;
     }
 
     public ImplantationSite getImplantationSite() {

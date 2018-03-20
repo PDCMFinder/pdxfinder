@@ -33,6 +33,9 @@ public class ModelCreation {
     @Relationship(type = "SPECIMENS", direction = Relationship.INCOMING)
     private Set<Specimen> specimens;
 
+    @Relationship(type = "SUMMARY_OF_TREATMENT", direction = Relationship.INCOMING)
+    private TreatmentSummary treatmentSummary;
+
 
     public ModelCreation(String sourcePdxId, String dataSource, Sample sample, QualityAssurance qualityAssurance) {
         this.sourcePdxId = sourcePdxId;
@@ -114,5 +117,13 @@ public class ModelCreation {
 
     public void setDataSource(String dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public TreatmentSummary getTreatmentSummary() {
+        return treatmentSummary;
+    }
+
+    public void setTreatmentSummary(TreatmentSummary treatmentSummary) {
+        this.treatmentSummary = treatmentSummary;
     }
 }

@@ -24,8 +24,8 @@ public class PatientSnapshot {
     @Relationship(type = "SAMPLED_FROM")
     private Set<Sample> samples;
 
-    @Relationship(type = "TREATED_WITH", direction = Relationship.INCOMING)
-    private Set<Treatment> treatments;
+    @Relationship(type = "SUMMARY_OF_TREATMENT", direction = Relationship.INCOMING)
+    private TreatmentSummary treatmentSummary;
 
     public PatientSnapshot() {
     }
@@ -78,11 +78,11 @@ public class PatientSnapshot {
         this.samples = samples;
     }
 
-    public PatientSnapshot(Patient patient, String age, Set<Sample> samples, Set<Treatment> treatments) {
+    public PatientSnapshot(Patient patient, String age, Set<Sample> samples, TreatmentSummary treatmentSummary) {
         this.patient = patient;
         this.age = age;
         this.samples = samples;
-        this.treatments = treatments;
+        this.treatmentSummary = treatmentSummary;
     }
 
     public String getAge() {
@@ -116,14 +116,6 @@ public class PatientSnapshot {
         this.patient = patient;
     }
 
-    public Set<Treatment> getTreatments() {
-        return treatments;
-    }
-
-    public void setTreatments(Set<Treatment> treatments) {
-        this.treatments = treatments;
-    }
-
     public String getDateAtCollection() {
         return dateAtCollection;
     }
@@ -138,5 +130,13 @@ public class PatientSnapshot {
 
     public void setTreatmentNaive(Boolean treatmentNaive) {
         this.treatmentNaive = treatmentNaive;
+    }
+
+    public TreatmentSummary getTreatmentSummary() {
+        return treatmentSummary;
+    }
+
+    public void setTreatmentSummary(TreatmentSummary treatmentSummary) {
+        this.treatmentSummary = treatmentSummary;
     }
 }

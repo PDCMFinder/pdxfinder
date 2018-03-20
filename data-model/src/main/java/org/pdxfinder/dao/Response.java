@@ -16,13 +16,13 @@ public class Response {
     private String description;
 
     @Relationship(type = "RESPONSE", direction = Relationship.INCOMING)
-    private Treatment treatment;
+    private TreatmentProtocol treatment;
 
     //empty constructor
     public Response() {
     }
 
-    public Response(String description, Treatment treatment) {
+    public Response(String description, TreatmentProtocol treatment) {
         this.description = description;
         this.treatment = treatment;
     }
@@ -35,11 +35,11 @@ public class Response {
         this.description = description;
     }
 
-    public Treatment getTreatment() {
+    public TreatmentProtocol getTreatment() {
         return treatment;
     }
 
-    public void setTreatment(Treatment treatment) {
+    public void setTreatment(TreatmentProtocol treatment) {
         this.treatment = treatment;
     }
 }
