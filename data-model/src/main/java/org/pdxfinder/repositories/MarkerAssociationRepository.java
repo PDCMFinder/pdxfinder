@@ -7,12 +7,14 @@ import org.pdxfinder.dao.MolecularCharacterization;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
 /**
  * Created by csaba on 25/04/2017.
  */
+@Repository
 public interface MarkerAssociationRepository extends PagingAndSortingRepository<MarkerAssociation, Long>{
 
     //TODO: Verify cypher

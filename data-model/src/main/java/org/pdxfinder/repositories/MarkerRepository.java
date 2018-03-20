@@ -5,12 +5,14 @@ import org.pdxfinder.dao.MarkerAssociation;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 
 /**
  * Interface for Markers
  */
+@Repository
 public interface MarkerRepository extends PagingAndSortingRepository<Marker, Long> {
 
     @Query("MATCH (t:Marker) WHERE t.symbol = {symbol} RETURN t")
