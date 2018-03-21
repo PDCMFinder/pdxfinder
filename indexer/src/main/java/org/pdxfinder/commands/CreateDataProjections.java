@@ -339,7 +339,7 @@ public class CreateDataProjections implements CommandLineRunner{
             }
 
             if(loaderUtils.isTreatmentSummaryAvailable(mc.getDataSource(), mc.getSourcePdxId())){
-                dataAvailable.add("Dosing Study");
+                dataAvailable.add("Dosing Studies");
             }
 
             mfq.setDataAvailable(dataAvailable);
