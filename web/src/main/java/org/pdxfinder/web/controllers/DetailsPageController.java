@@ -8,6 +8,7 @@ import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.DetailsDTO;
+import org.pdxfinder.services.dto.DrugSummaryDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -49,7 +50,7 @@ public class DetailsPageController {
 
         List<String> relatedModels = searchService.getModelsOriginatedFromSamePatient(dataSrc, modelId);
 
-
+        List<DrugSummaryDTO> drugSummary = searchService.getDrugSummary(dataSrc, modelId);
 
         List<VariationDataDTO> variationDataDTOList = new ArrayList<>();
 
@@ -142,6 +143,9 @@ public class DetailsPageController {
         model.addAttribute("description", notEmpty(dto.getDescription()));
         model.addAttribute("passages", notEmpty(dto.getPassages()));
         model.addAttribute("sampleIdMap",techNPassToSampleId);
+
+        model.addAttribute("drugSummary", drugSummary);
+        model.addAttribute("drugSummaryRowNumber", drugSummary.size());
 
 
         Map<String, String> sorceDesc = new HashMap<>();
