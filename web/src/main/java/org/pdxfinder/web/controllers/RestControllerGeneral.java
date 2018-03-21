@@ -1,8 +1,7 @@
 package org.pdxfinder.web.controllers;
 
 
-
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.MolCharService;
@@ -10,9 +9,7 @@ import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -167,7 +164,8 @@ public class RestControllerGeneral {
 
 
     @RequestMapping(value = "/getmutatedmarkerswithvariants")
-    public ResponseEntity getMutatedMarkersWithVariants(){
+    public Object getMutatedMarkersWithVariants(){
+
         JSONObject j = new JSONObject();
 
         try {
@@ -176,8 +174,19 @@ public class RestControllerGeneral {
         catch(Exception e){
             e.printStackTrace();
         }
-        //TODO: Look for possible formatting, it looks bad
-        return new ResponseEntity(molCharService.getMutatedMarkersAndVariants(), HttpStatus.OK);
+
+        //ResponseEntity rEntity = new ResponseEntity(molCharService.getMutatedMarkersAndVariants(), HttpStatus.OK);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Object object = Object.class;
+
+        try{
+            object = mapper.readValue(molCharService.getMutatedMarkersAndVariants(), Object.class);
+        }catch (Exception e){
+        }
+
+        return object;
+
     }
 
 
