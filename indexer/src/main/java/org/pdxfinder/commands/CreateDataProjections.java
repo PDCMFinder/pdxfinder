@@ -328,7 +328,21 @@ public class CreateDataProjections implements CommandLineRunner{
             mfq.setExternalId(mc.getSourcePdxId());
             mfq.setDatasource(mc.getDataSource());
 
-            mfq.setDataAvailable(platformsByModel.get(mc.getId()));
+
+            List<String> dataAvailable = new ArrayList<>();
+
+            if(platformsByModel.containsKey(mc.getId())){
+
+                for(String available : platformsByModel.get(mc.getId())){
+                    dataAvailable.add(available);
+                }
+            }
+
+            if(loaderUtils.isTreatmentSummaryAvailable(mc.getDataSource(), mc.getSourcePdxId())){
+                dataAvailable.add("Dosing Study");
+            }
+
+            mfq.setDataAvailable(dataAvailable);
 
             if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
                 mfq.setTreatmentHistory(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());
