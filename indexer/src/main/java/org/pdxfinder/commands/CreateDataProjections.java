@@ -334,7 +334,7 @@ public class CreateDataProjections implements CommandLineRunner{
             if(platformsByModel.containsKey(mc.getId())){
 
                 for(String available : platformsByModel.get(mc.getId())){
-                    dataAvailable.add(available);
+                    dataAvailable.add("Mutation_"+available);
                 }
             }
 
