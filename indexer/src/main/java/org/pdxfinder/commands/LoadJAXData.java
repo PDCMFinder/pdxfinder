@@ -175,13 +175,19 @@ public class LoadJAXData implements CommandLineRunner {
         
         String age = Standardizer.getAge(j.getString("Age"));
         String gender = Standardizer.getGender(j.getString("Gender"));
+        
+        String race = Standardizer.fixNotString(j.getString("Race"));
+        String ethnicity = Standardizer.fixNotString(j.getString("Ethnicity"));
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), gender,
-                j.getString("Race"), j.getString("Ethnicity"), age, jaxDS);
+                race, ethnicity, age, jaxDS);
 
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), tumorType, diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, JAX_DATASOURCE_ABBREVIATION);
+        
+        String extraction = j.getString("Sample Type");
+        sample.setExtractionMethod(extraction);
 
         if (histologyMap.containsKey("Patient")) {
             Histology histology = new Histology();
@@ -192,26 +198,32 @@ public class LoadJAXData implements CommandLineRunner {
         }
 
         
-        String qaPassages = null;
+        String qaPassages = Standardizer.NOT_SPECIFIED;
         
         
-        
-
         pSnap.addSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
         
          // Pending or Complete
         String qc = j.getString("QC");
+        if("Pending".equals(qc)){
+            qc = Standardizer.NOT_SPECIFIED;
+        }else{
+            qc = "QC is "+qc;
+        }
+        
         
         // the validation techniques are more than just fingerprint, we don't have a way to capture that
-        QualityAssurance qa = new QualityAssurance("", "QC is "+qc, ValidationTechniques.FINGERPRINT, qaPassages);
+        QualityAssurance qa = new QualityAssurance("", qc, ValidationTechniques.FINGERPRINT, qaPassages);
         loaderUtils.saveQualityAssurance(qa);
 
         ModelCreation mc = loaderUtils.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa);
         mc.addRelatedSample(sample);
         
         
-        String implantationTypeStr = j.getString("Sample Type");
+        
+        
+        String implantationTypeStr = Standardizer.NOT_SPECIFIED;
         String implantationSiteStr = j.getString("Engraftment Site");
 
         Specimen specimen = loaderUtils.getSpecimen(mc, id, jaxDS.getAbbreviation(), "");
