@@ -50,6 +50,7 @@ public class LoaderUtils {
     private PlatformRepository platformRepository;
     private PlatformAssociationRepository platformAssociationRepository;
     private DataProjectionRepository dataProjectionRepository;
+    private TreatmentSummaryRepository treatmentSummaryRepository;
 
     private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
 
@@ -72,7 +73,8 @@ public class LoaderUtils {
                        SpecimenRepository specimenRepository,
                        PlatformRepository platformRepository,
                        PlatformAssociationRepository platformAssociationRepository,
-                       DataProjectionRepository dataProjectionRepository) {
+                       DataProjectionRepository dataProjectionRepository,
+                       TreatmentSummaryRepository treatmentSummaryRepository) {
 
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null");
         Assert.notNull(hostStrainRepository, "hostStrainRepository cannot be null");
@@ -108,6 +110,7 @@ public class LoaderUtils {
         this.platformRepository = platformRepository;
         this.platformAssociationRepository = platformAssociationRepository;
         this.dataProjectionRepository = dataProjectionRepository;
+        this.treatmentSummaryRepository = treatmentSummaryRepository;
 
     }
 
@@ -654,6 +657,16 @@ public class LoaderUtils {
     public DataProjection getDataProjectionByLabel(String label){
 
         return dataProjectionRepository.findByLabel(label);
+    }
+
+    public boolean isTreatmentSummaryAvailable(String dataSource, String modelId){
+
+        TreatmentSummary ts = treatmentSummaryRepository.findByDataSourceAndModelId(dataSource, modelId);
+
+        if(ts != null && ts.getTreatmentProtocols() != null){
+            return true;
+        }
+        return false;
     }
 
 }

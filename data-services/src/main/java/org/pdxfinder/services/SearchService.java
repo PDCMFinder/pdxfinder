@@ -4,6 +4,7 @@ package org.pdxfinder.services;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.dto.DetailsDTO;
+import org.pdxfinder.services.dto.DrugSummaryDTO;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class SearchService {
     private SpecimenRepository specimenRepository;
     private MolecularCharacterizationRepository molecularCharacterizationRepository;
     private PlatformRepository platformRepository;
+    private TreatmentSummaryRepository treatmentSummaryRepository;
 
     private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
     private final String JAX_URL_TEXT = "View data at JAX";
@@ -55,7 +57,8 @@ public class SearchService {
                          OntologyTermRepository ontologyTermRepository,
                          SpecimenRepository specimenRepository,
                          MolecularCharacterizationRepository molecularCharacterizationRepository,
-                         PlatformRepository platformRepository) {
+                         PlatformRepository platformRepository,
+                         TreatmentSummaryRepository treatmentSummaryRepository) {
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
         this.patientSnapshotRepository = patientSnapshotRepository;
@@ -64,6 +67,7 @@ public class SearchService {
         this.molecularCharacterizationRepository = molecularCharacterizationRepository;
         this.specimenRepository = specimenRepository;
         this.platformRepository = platformRepository;
+        this.treatmentSummaryRepository = treatmentSummaryRepository;
     }
 
 
@@ -599,6 +603,34 @@ public class SearchService {
         return patientRepository.getModelsOriginatedFromSamePatientByDataSourceAndModelId(dataSource, modelId);
     }
 
+
+    public List<DrugSummaryDTO> getDrugSummary(String dataSource, String modelId){
+
+        TreatmentSummary ts = treatmentSummaryRepository.findByDataSourceAndModelId(dataSource, modelId);
+
+        List<DrugSummaryDTO> results = new ArrayList<>();
+
+        if(ts != null && ts.getTreatmentProtocols() != null){
+
+            for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
+
+                DrugSummaryDTO dto = new DrugSummaryDTO();
+                dto.setDrugName(tp.getDrug());
+                dto.setDose(tp.getDose());
+
+                if(tp.getResponse() != null && tp.getResponse().getDescription() != null){
+                    dto.setResponse(tp.getResponse().getDescription());
+                }
+                else{
+                    dto.setResponse("");
+                }
+
+                results.add(dto);
+            }
+        }
+
+        return results;
+    }
 
     public List<String[]> buildUpDTO(Sample sample,int draw,int recordsTotal,int recordsFiltered){
 

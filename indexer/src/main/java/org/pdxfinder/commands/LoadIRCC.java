@@ -281,8 +281,48 @@ public class LoadIRCC implements CommandLineRunner {
 
         */
         }
-        
-        
+
+        //Create Treatment summary without linking TreatmentProtocols to specimens
+        TreatmentSummary ts;
+
+
+        try{
+            if(job.has("Treatment")){
+                JSONObject treatment = job.optJSONObject("Treatment");
+                //if the treatment attribute is not an object = it is an array
+                if(treatment == null && job.optJSONArray("Treatment") != null){
+
+                    JSONArray treatments = job.getJSONArray("Treatment");
+
+                    if(treatments.length() > 0){
+                        //log.info("Treatments found for model "+mc.getSourcePdxId());
+                        ts = new TreatmentSummary();
+
+                        for(int t = 0; t<treatments.length(); t++){
+                            JSONObject treatmentObject = treatments.getJSONObject(t);
+                            TreatmentProtocol tp = new TreatmentProtocol();
+                            Response r = new Response();
+                            r.setDescription(treatmentObject.getString("Response Class"));
+                            tp.setDrug(treatmentObject.getString("Drug"));
+                            tp.setDose(treatmentObject.getString("Dose") );
+                            tp.setResponse(r);
+
+                            ts.addTreatmentProtocol(tp);
+                        }
+
+                        ts.setModelCreation(modelCreation);
+                        modelCreation.setTreatmentSummary(ts);
+                    }
+                }
+
+            }
+
+
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
         
         loaderUtils.saveModelCreation(modelCreation);
         

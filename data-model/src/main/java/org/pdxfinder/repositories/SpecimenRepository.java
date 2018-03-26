@@ -4,6 +4,7 @@ import org.pdxfinder.dao.Specimen;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Set;
@@ -11,6 +12,7 @@ import java.util.Set;
 /**
  * Created by jmason on 08/06/2017.
  */
+@Repository
 public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
     Specimen findByExternalId(@Param("externalId") String externalId);

@@ -9,18 +9,9 @@ import java.util.List;
 /*
  * Created by csaba on 23/10/2017.
  */
+
+
 @NodeEntity
-/**
- * @param drug                      Which drug(s) were used in the treatment
- * @param drugManufacturer          What company manufactured the drug
- * @param dose                      What was the concentration of the drug used
- * @param duration                  For how long was the treatment administered
- * @param frequency                 How often the treatment was administered
- * @param armSize                   The number of animals used in the study arm
- * @param response                  A recist classification of the response to the treatment
- * @param responseCalculationMethod The method used to determine the response classification
- * @param passages                  The list of passages at which this treatment was applied
- */
 public class TreatmentProtocol {
 
     @GraphId
@@ -36,6 +27,19 @@ public class TreatmentProtocol {
     private String armSize;
     private String responseCalculationMethod;
     private String passages;
+
+
+    /**
+     * @param drug                      Which drug(s) were used in the treatment
+     * @param drugManufacturer          What company manufactured the drug
+     * @param dose                      What was the concentration of the drug used
+     * @param duration                  For how long was the treatment administered
+     * @param frequency                 How often the treatment was administered
+     * @param armSize                   The number of animals used in the study arm
+     * @param response                  A recist classification of the response to the treatment
+     * @param responseCalculationMethod The method used to determine the response classification
+     * @param passages                  The list of passages at which this treatment was applied
+     */
 
     @Relationship(type = "RESPONSE")
     private Response response;

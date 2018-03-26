@@ -175,13 +175,19 @@ public class LoadJAXData implements CommandLineRunner {
         
         String age = Standardizer.getAge(j.getString("Age"));
         String gender = Standardizer.getGender(j.getString("Gender"));
+        
+        String race = Standardizer.fixNotString(j.getString("Race"));
+        String ethnicity = Standardizer.fixNotString(j.getString("Ethnicity"));
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), gender,
-                j.getString("Race"), j.getString("Ethnicity"), age, jaxDS);
+                race, ethnicity, age, jaxDS);
 
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), tumorType, diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, JAX_DATASOURCE_ABBREVIATION);
+        
+        String extraction = j.getString("Sample Type");
+        sample.setExtractionMethod(extraction);
 
         if (histologyMap.containsKey("Patient")) {
             Histology histology = new Histology();
@@ -192,26 +198,32 @@ public class LoadJAXData implements CommandLineRunner {
         }
 
         
-        String qaPassages = null;
+        String qaPassages = Standardizer.NOT_SPECIFIED;
         
         
-        
-
         pSnap.addSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
         
          // Pending or Complete
         String qc = j.getString("QC");
+        if("Pending".equals(qc)){
+            qc = Standardizer.NOT_SPECIFIED;
+        }else{
+            qc = "QC is "+qc;
+        }
+        
         
         // the validation techniques are more than just fingerprint, we don't have a way to capture that
-        QualityAssurance qa = new QualityAssurance("", "QC is "+qc, ValidationTechniques.FINGERPRINT, qaPassages);
+        QualityAssurance qa = new QualityAssurance("", qc, ValidationTechniques.FINGERPRINT, qaPassages);
         loaderUtils.saveQualityAssurance(qa);
 
         ModelCreation mc = loaderUtils.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa);
         mc.addRelatedSample(sample);
         
         
-        String implantationTypeStr = j.getString("Sample Type");
+        
+        
+        String implantationTypeStr = Standardizer.NOT_SPECIFIED;
         String implantationSiteStr = j.getString("Engraftment Site");
 
         Specimen specimen = loaderUtils.getSpecimen(mc, id, jaxDS.getAbbreviation(), "");
@@ -223,29 +235,46 @@ public class LoadJAXData implements CommandLineRunner {
         
         
         mc.addSpecimen(specimen);
-        
-        // seems like either the data model needs some work or I don't understand it
-        /*
+
+        //Create Treatment summary without linking TreatmentProtocols to specimens
+        TreatmentSummary ts;
+
+
         try{
-            JSONArray treatments = j.getJSONArray("Treatments");
-            for(int t = 0; t < treatments.length(); t++){
-                JSONObject treatmentObject = treatments.getJSONObject(t);
-                Treatment treatment = new Treatment();
-                treatment.setSpecimen(specimen);
-                String therapy =treatmentObject.getString("Dose")+" "+treatmentObject.getString("Units")+ " "+ treatmentObject.getString("Drug");
-                treatment.setTherapy(therapy);
-                Response response = new Response();
-                response.setDescription(treatmentObject.getString("Response"));
-                // this seems backward
-                response.setTreatment(treatment);
+            if(j.has("Treatments")){
+                JSONArray treatments = j.getJSONArray("Treatments");
+
+                if(treatments.length() > 0){
+                    //log.info("Treatments found for model "+mc.getSourcePdxId());
+                    ts = new TreatmentSummary();
+
+                    for(int t = 0; t<treatments.length(); t++){
+                        JSONObject treatmentObject = treatments.getJSONObject(t);
+                        TreatmentProtocol tp = new TreatmentProtocol();
+                        Response r = new Response();
+                        r.setDescription(treatmentObject.getString("Response"));
+                        tp.setDrug(treatmentObject.getString("Drug"));
+                        tp.setDose(treatmentObject.getString("Dose") + " "+treatmentObject.getString("Units"));
+                        tp.setResponse(r);
+
+                        ts.addTreatmentProtocol(tp);
+                    }
+
+                    ts.setModelCreation(mc);
+                    mc.setTreatmentSummary(ts);
+                }
             }
-        }catch(Exception e){
-            // no treatments
+
+
         }
-        */
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
+
         
         loaderUtils.saveSpecimen(specimen);
-        
+        //loaderUtils.saveModelCreation(mc);
         loadVariationData(mc, implantationSite, implantationType);
 
     }

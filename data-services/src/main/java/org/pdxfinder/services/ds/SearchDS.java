@@ -332,37 +332,80 @@ public class SearchDS {
      */
     private void getModelsByMutatedMarkerAndVariant(String marker, String variant, Map<Long, Set<String>> previouslyFoundModels){
 
-        //Map<Long, Set<String>> modelPlatformMarkerVariant = new HashMap<>();
+        //platform=> marker=> variant=>{set of model ids}
 
-        for(Map.Entry<String, Map<String, Map<String, Set<Long>>>> platformEntry : mutations.entrySet()){
+        //marker with ALL variants
+        if(variant.toLowerCase().equals("all")){
 
-            String platformName = platformEntry.getKey();
+            for(Map.Entry<String, Map<String, Map<String, Set<Long>>>> platformEntry : mutations.entrySet()){
 
-            if(platformEntry.getValue().containsKey(marker)){
+                String platformName = platformEntry.getKey();
 
-                if(platformEntry.getValue().get(marker).containsKey(variant)){
+                if(platformEntry.getValue().containsKey(marker)){
 
-                    Set<Long> foundModels = platformEntry.getValue().get(marker).get(variant);
+                    for(Map.Entry<String, Set<Long>> markerVariants : platformEntry.getValue().get(marker).entrySet()){
 
-                    for(Long modelId : foundModels){
+                        String variantName = markerVariants.getKey();
+                        Set<Long> foundModels = markerVariants.getValue();
 
-                        if(previouslyFoundModels.containsKey(modelId)){
+                        for(Long modelId : foundModels){
 
-                            previouslyFoundModels.get(modelId).add(platformName+" "+marker+" "+variant);
-                        }
-                        else{
+                            if(previouslyFoundModels.containsKey(modelId)){
 
-                            Set<String>  newSet = new HashSet<>();
-                            newSet.add(platformName+" "+marker+" "+variant);
-                            previouslyFoundModels.put(modelId, newSet);
+                                previouslyFoundModels.get(modelId).add(platformName+" "+marker+" "+variantName);
+                            }
+                            else{
+
+                                Set<String>  newSet = new HashSet<>();
+                                newSet.add(platformName+" "+marker+" "+variantName);
+                                previouslyFoundModels.put(modelId, newSet);
+                            }
+
                         }
 
                     }
 
+
                 }
+
             }
 
+
         }
+        //a marker and a variant is given
+        else{
+
+            for(Map.Entry<String, Map<String, Map<String, Set<Long>>>> platformEntry : mutations.entrySet()){
+
+                String platformName = platformEntry.getKey();
+
+                if(platformEntry.getValue().containsKey(marker)){
+
+                    if(platformEntry.getValue().get(marker).containsKey(variant)){
+
+                        Set<Long> foundModels = platformEntry.getValue().get(marker).get(variant);
+
+                        for(Long modelId : foundModels){
+
+                            if(previouslyFoundModels.containsKey(modelId)){
+
+                                previouslyFoundModels.get(modelId).add(platformName+" "+marker+" "+variant);
+                            }
+                            else{
+
+                                Set<String>  newSet = new HashSet<>();
+                                newSet.add(platformName+" "+marker+" "+variant);
+                                previouslyFoundModels.put(modelId, newSet);
+                            }
+
+                        }
+
+                    }
+                }
+            }
+        }
+
+
 
 
     }

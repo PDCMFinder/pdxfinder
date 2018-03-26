@@ -5,6 +5,7 @@ import org.pdxfinder.dao.Sample;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Set;
@@ -12,6 +13,7 @@ import java.util.Set;
 /**
  * Repository for managing creating, finding, and deleting sample objects
  */
+@Repository
 public interface SampleRepository extends PagingAndSortingRepository<Sample, Long> {
 
     @Query("MATCH (s:Sample) WHERE s.sourceSampleId = {sourceSampleId} AND s.dataSource = {dataSource} return s")

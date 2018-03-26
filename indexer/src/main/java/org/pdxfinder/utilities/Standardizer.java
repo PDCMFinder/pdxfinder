@@ -81,5 +81,12 @@ public class Standardizer {
         }catch(Exception e){}
         return value;
     }
-    
+     
+     public static String fixNotString(String in){
+         if(in.toUpperCase().startsWith("Not")){
+             in = Standardizer.NOT_SPECIFIED;
+         }
+         return in;
+         
+     }
 }

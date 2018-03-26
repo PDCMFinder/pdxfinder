@@ -173,7 +173,7 @@
             <section class="row padding-vertical-30">
                 <div class="columns medium-12">
                     <span th:if="${#strings.isEmpty(text_search_desc)}">
-                        Viewing <span th:text="${totalResults}">a number of</span> result<span th:if="${totalResults ne 1}">s</span>.
+                        PDX Finder contains <span th:text="${totalResults}">a number of</span> model<span th:if="${totalResults ne 1}">s</span>
                     </span>
                     <span th:unless="${#strings.isEmpty(text_search_desc)}">
                         <span th:remove="tag" th:utext="${text_search_desc}">Viewing results</span>

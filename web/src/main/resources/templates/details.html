@@ -1,25 +1,31 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <title th:text="${externalId}"></title>
-    <meta name="description" content="PDX Finder" /><!-- Describe what this page is about -->
-    <meta name="keywords" content="Framework, Life Sciences" /><!-- A few keywords that relate to the content of THIS PAGE (not the whole project) -->
-    <meta name="author" content="PDX Finder" />
-    <meta name="HandheldFriendly" content="true" />
-    <meta name="MobileOptimized" content="width" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content="PDX Finder"/><!-- Describe what this page is about -->
+    <meta name="keywords" content="Framework, Life Sciences"/>
+    <!-- A few keywords that relate to the content of THIS PAGE (not the whole project) -->
+    <meta name="author" content="PDX Finder"/>
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="MobileOptimized" content="width"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/apple-touch-icon.png?v=1">
-    <link rel="icon" type="image/png" sizes="32x32" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon-32x32.png?v=1">
-    <link rel="icon" type="image/png" sizes="16x16" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon-16x16.png?v=1">
+    <link rel="apple-touch-icon" sizes="180x180"
+          href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/apple-touch-icon.png?v=1">
+    <link rel="icon" type="image/png" sizes="32x32"
+          href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon-32x32.png?v=1">
+    <link rel="icon" type="image/png" sizes="16x16"
+          href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon-16x16.png?v=1">
     <link rel="manifest" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/manifest.json?v=1">
-    <link rel="mask-icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/safari-pinned-tab.svg?v=1" color="#0032a0">
+    <link rel="mask-icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/safari-pinned-tab.svg?v=1"
+          color="#0032a0">
     <link rel="shortcut icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon.ico?v=1">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
     <meta name="apple-mobile-web-app-title" content="PDX Finder">
     <meta name="application-name" content="PDX Finder">
-    <meta name="msapplication-config" content="https://ebiwd.github.io/pdx-visual-framework/images/favicons/browserconfig.xml?v=1">
+    <meta name="msapplication-config"
+          content="https://ebiwd.github.io/pdx-visual-framework/images/favicons/browserconfig.xml?v=1">
     <meta name="theme-color" content="#0032a0">
     <!-- If you link to any other sites frequently, consider optimising performance with a DNS prefetch -->
     <!-- <link rel="dns-prefetch" href="//www.ebi.ac.uk" /> -->
@@ -28,9 +34,11 @@
     <!-- CSS concatenated and minified via ant build script-->
 
     <!-- <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/ebi-global.css" type="text/css" media="all" /> -->
-    <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css"
+          type="text/css" media="all"/>
     <!-- Import Choice Library stylesheet-->
-    <link rel="stylesheet" href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/styles/css/choices.min.css">
+    <link rel="stylesheet"
+          href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/styles/css/choices.min.css">
     <!-- Use this CSS file for any custom styling -->
     <!--    <link rel="stylesheet" href="https://raw.githubusercontent.com/ebiwd/pdx-visual-framework/master/css/app.min.css" type="text/css" media="all" /> -->
     <link rel="stylesheet" th:href="@{/css/app.min.css}" type="text/css" media="all"/>
@@ -113,7 +121,18 @@
             </div>
 
             <style>
-                hr{box-sizing:content-box;overflow:visible;clear:both;max-width:75rem;height:0;margin:1.25rem auto;border-top:0;border-right:0;border-bottom:2px solid #06369d;border-left:0}
+                hr {
+                    box-sizing: content-box;
+                    overflow: visible;
+                    clear: both;
+                    max-width: 75rem;
+                    height: 0;
+                    margin: 1.25rem auto;
+                    border-top: 0;
+                    border-right: 0;
+                    border-bottom: 2px solid #06369d;
+                    border-left: 0
+                }
             </style>
 
             <!-- Three Grids Section-->
@@ -121,27 +140,33 @@
                 <div class="row">
 
                     <div class="columns medium-4 small-12 margin-top-30">
-                            <h4 class="pdxBig"><span class="float-left border-color-black" th:text="${externalId+': '+mappedOntology}"></span></h4>
+                        <h4 class="pdxBig"><span class="float-left border-color-black"
+                                                 th:text="${externalId+': '+mappedOntology}"></span></h4>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-30">
-                        <h4 class="pdxBig black"><span class="float-left" th:text="${sourceDescription}"> The Jackson Laboratory </span></h4>
+                        <h4 class="pdxBig black"><span class="float-left" th:text="${sourceDescription}"> The Jackson Laboratory </span>
+                        </h4>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-10">
 
-                        <a th:href="@{'mailto:'+${contacts+'?subject='+externalId}}" th:if="${#strings.contains(contacts,'@')}">
+                        <a th:href="@{'mailto:'+${contacts+'?subject='+externalId}}"
+                           th:if="${#strings.contains(contacts,'@')}">
                             <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
                         </a>
-                        <a th:href="@{${contacts+externalId}}" th:target="_blank" th:if="${#strings.contains(contacts,'http') && #strings.endsWith(contacts,'=')}">
+                        <a th:href="@{${contacts+externalId}}" th:target="_blank"
+                           th:if="${#strings.contains(contacts,'http') && #strings.endsWith(contacts,'=')}">
                             <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
                         </a>
-                        <a th:href="@{${contacts}}" th:target="_blank" th:if="${#strings.contains(contacts,'http') && not #strings.endsWith(contacts,'=')}">
+                        <a th:href="@{${contacts}}" th:target="_blank"
+                           th:if="${#strings.contains(contacts,'http') && not #strings.endsWith(contacts,'=')}">
                             <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
                         </a>
 
                         <a th:href="@{${url}}" th:target="_blank" th:if="${#strings.contains(url,'http')}">
-                            <h4 class="button outline uppercase margin-top-large minwidth300" style='margin-top:-10px;' th:text="${urlText}">View at Provider</h4>
+                            <h4 class="button outline uppercase margin-top-large minwidth300" style='margin-top:-10px;'
+                                th:text="${urlText}">View at Provider</h4>
                         </a>
 
                     </div>
@@ -155,9 +180,19 @@
 
                 <div class="row large-12 medium-12 expanded">
                     <ul class="tabs style-2" data-tabs id="example2-tabs">
-                        <li class="tabs-title is-active"><a href="#summary" data-tabs-target="summary" aria-selected="true">Summary</a></li>
-                        <li class="tabs-title "><a href="#variation" data-tabs-target="variation" id="variation_data_link"  onclick="showTabsFirst()"> Genomic Data (<span th:text="${totalRecords}"></span>) </a></li>
-                        <li class="tabs-title"><a href="#plots" data-tabs-target="plots">Dosing studies (0)</a></li>
+                        <li class="tabs-title is-active"><a href="#summary" data-tabs-target="summary"
+                                                            aria-selected="true">Summary</a></li>
+                        <li class="tabs-title "><a href="#variation" data-tabs-target="variation"
+                                                   id="variation_data_link" onclick="showTabsFirst()"> Genomic Data
+                            (<span th:text="${totalRecords}"></span>) </a></li>
+
+                        <li th:if="${drugSummaryRowNumber} == 0" class="tabs-title"><a href="#dosing_studies"
+                                                                                       data-tabs-target="dosing_studies">Dosing
+                            studies (0)</a></li>
+                        <li th:if="${drugSummaryRowNumber} > 0" class="tabs-title"><a href="#dosing_studies"
+                                                                                      data-tabs-target="dosing_studies">Dosing
+                            studies (1)</a></li>
+
                     </ul>
                 </div>
 
@@ -178,16 +213,28 @@
                                         </thead>
                                         <tbody>
 
-                                        <tr><th class="text-left medium-4">Sex</th>     <td th:text="${gender}"></td></tr>
-                                        <tr><th class="text-left medium-4">Age at Time of Collection</th>        <td th:text="${age}"></td></tr>
-                                        <tr><th class="text-left medium-4">Race / Ethnicity</th>
+                                        <tr>
+                                            <th class="text-left medium-4">Sex</th>
+                                            <td th:text="${gender}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Age at Time of Collection</th>
+                                            <td th:text="${age}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Race / Ethnicity</th>
                                             <td>
                                                 <span th:text="${race}"></span>
                                                 <span th:if="${not ( #strings.isEmpty(race) || #strings.isEmpty(ethnicity) ) }"> / </span>
                                                 <span th:text="${ethnicity}"></span>
                                             </td>
                                         </tr>
-                                        <tr th:if="${not #lists.isEmpty(relatedModels)}"><th class="text-left">Related models</th>        <td><span th:each="relMod:${relatedModels}"><a th:text="${relMod}" th:href="@{'/pdx/'+${dataSrc}+'/'+${relMod}}"></a> </span></td></tr>
+                                        <tr th:if="${not #lists.isEmpty(relatedModels)}">
+                                            <th class="text-left">Related models</th>
+                                            <td><span th:each="relMod:${relatedModels}"><a th:text="${relMod}"
+                                                                                           th:href="@{'/pdx/'+${dataSrc}+'/'+${relMod}}"></a> </span>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -204,12 +251,26 @@
                                         </thead>
                                         <tbody>
 
-                                        <tr><th class="text-left medium-4">Histology</th>                  <td class="text-left"> <span th:text="${mappedOntology}"></span> </td></tr>
-                                        <tr><th class="text-left medium-4">Primary Tissue</th>             <td class="text-left" th:text="${originTissue}"></td></tr>
-                                        <tr><th class="text-left medium-4">Collection Site</th>          <td class="text-left" th:text="${sampleSite}"></td></tr>
-                                        <tr><th class="text-left medium-4">Tumor Type</th>                 <td class="text-left" th:text="${tumorType}"></td></tr>
-                                        <tr><th class="text-left medium-4">Stage / Grade</th>
-                                            <td th:if="${#strings.equals(class, '/')}" th:text="${'Not Available'}"></td>
+                                        <tr>
+                                            <th class="text-left medium-4">Histology</th>
+                                            <td class="text-left"><span th:text="${mappedOntology}"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Primary Tissue</th>
+                                            <td class="text-left" th:text="${originTissue}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Collection Site</th>
+                                            <td class="text-left" th:text="${sampleSite}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Tumor Type</th>
+                                            <td class="text-left" th:text="${tumorType}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Stage / Grade</th>
+                                            <td th:if="${#strings.equals(class, '/')}"
+                                                th:text="${'Not Available'}"></td>
                                             <td th:text="${#strings.endsWith(class,'/')} ? ${ #strings.substringBefore(class,'/') } : ${class} "></td>
 
                                         </tr>
@@ -230,9 +291,18 @@
                                         </thead>
                                         <tbody>
 
-                                        <tr><th class="text-left medium-4">Strain</th><td class="text-left" th:text="${strain}"></td></tr>
-                                        <tr><th class="text-left medium-4">Engraftment Site</th><td th:text="${engraftmentSite}"></td></tr>
-                                        <tr><th class="text-left medium-4">Implantation Type</th><td th:text="${sampleType}"></td></tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Strain</th>
+                                            <td class="text-left" th:text="${strain}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Engraftment Site</th>
+                                            <td th:text="${engraftmentSite}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Implantation Type</th>
+                                            <td th:text="${sampleType}"></td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -273,15 +343,16 @@
                     </div>
 
 
-
-
-
                     <div class="tabs-panel is-active" id="variation">
 
                         <p>
                         <div class="row large-12 medium-12 expanded" id="variationTableData">
 
-                            <style> table *{ -webkit-box-sizing:content-box; -moz-box-sizing:content-box; box-sizing:content-box;}</style>
+                            <style> table * {
+                                -webkit-box-sizing: content-box;
+                                -moz-box-sizing: content-box;
+                                box-sizing: content-box;
+                            }</style>
                             <div class="col-md-12 javaScriptBrowser">
 
                                 <!-- <div class="panel panel-info" th:if="${totalRecords > 0}" >
@@ -292,7 +363,7 @@
                             </div>
 
                             <!-- Start of Patient variation data -->
-                            <div class="tab" role="tabpanel" th:if="${patientInfo.size() > 0}" >
+                            <div class="tab" role="tabpanel" th:if="${patientInfo.size() > 0}">
                                 <!-- Nav tabs -->
                                 <ul class="nav nav-tabs" role="tablist">
                                     <li th:each="technology,iter : ${patientInfo}"
@@ -300,7 +371,8 @@
                                         role="presentation">
 
                                         <a th:href="@{'#'+${technology.key}}"
-                                           th:text="${technology.key}+' Platform'" role="tab" data-toggle="tab" onclick="showTabs()"> TAB TITLES </a>
+                                           th:text="${technology.key}+' Platform'" role="tab" data-toggle="tab"
+                                           onclick="showTabs()"> TAB TITLES </a>
 
                                     </li>
                                 </ul>
@@ -310,14 +382,16 @@
                                 <div class="tab-content">
                                     <div th:each="technology,iter : ${patientInfo}"
                                          th:id="${technology.key}"
-                                         class="tab-pane active"  role="tabpanel">
+                                         class="tab-pane active" role="tabpanel">
 
                                                 <span>
-                                                        <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'hideContent' : 'hideContent' ">
+                                                        <div class="table-responsive"
+                                                             th:classappend="( ${iter.index} == 0 ) ? 'hideContent' : 'hideContent' ">
 
                                                             <b class="bLine">
                                                                 <span class="hdc">Tumor Type: </span>            <i>Patient Tumor</i>                  &nbsp; &nbsp;
-                                                                <span class="hdc">Histology:</span> <i th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
+                                                                <span class="hdc">Histology:</span> <i
+                                                                    th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
                                                                 <span class="hdc">Grade: </span>  <i></i>
                                                             </b>
 
@@ -352,17 +426,13 @@
                             <!-- End of Patient Variation Data -->
 
 
-
-
-
-
                             <!-- Start of Xenograft Variation data-->
                             <div class="tab hideContentShowFirst" role="tabpanel" th:if="${modelInfo.size() > 0}">
 
-                                <div id="sizeSwitch" >
-                                    <a th:href="@{'/pdx/'+${dataSrc}+'/'+${modelId}+'/export'}" class="button outline"> Export Results <i class="fi-page-export-csv lpad10"></i> </a>
+                                <div id="sizeSwitch">
+                                    <a th:href="@{'/pdx/'+${dataSrc}+'/'+${modelId}+'/export'}" class="button outline">
+                                        Export Results <i class="fi-page-export-csv lpad10"></i> </a>
                                 </div>
-
 
 
                                 <ul class="tabs" data-tabs id="example-tabs">
@@ -379,33 +449,43 @@
                                 </ul>
 
 
-                                <!-- Tab panes --><strong ></strong>
-                                <div class="tabs-content"  data-tabs-content="example-tabs">
+                                <!-- Tab panes --><strong></strong>
+                                <div class="tabs-content" data-tabs-content="example-tabs">
 
 
                                     <div th:each="technology,iter : ${modelInfo}"
                                          th:id="${technology.key}"
-                                         class="tabs-panel is-active"  th:classappend="( ${iter.index} == 0 ) ? 'hideContentShowFirst' : 'hideContent' ">
+                                         class="tabs-panel is-active"
+                                         th:classappend="( ${iter.index} == 0 ) ? 'hideContentShowFirst' : 'hideContent' ">
 
-                                                    <span th:unless="${technology.value.size()<1}" th:each="num: ${#numbers.sequence(1,technology.value.size())}"> <!--/* Unable to capture index for inner loop so, this was used for innerloop : <tr th:each="passageList : ${technolog[y.value]}"> */-->
+                                                    <span th:unless="${technology.value.size()<1}"
+                                                          th:each="num: ${#numbers.sequence(1,technology.value.size())}"> <!--/* Unable to capture index for inner loop so, this was used for innerloop : <tr th:each="passageList : ${technolog[y.value]}"> */-->
 
                                                             <div class="table-responsive">
 
-                                                                <h4 class="bLine" th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
+                                                                <h4 class="bLine"
+                                                                    th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
 
                                                                     <span class="hdc">Sample ID: </span>
 
-                                                                    <b class="black" th:text="${sampleIdMap['__${technology.key}__'+'__${technology.value[num-1]}__']}"></b>    &nbsp; &nbsp;
+                                                                    <b class="black"
+                                                                       th:text="${sampleIdMap['__${technology.key}__'+'__${technology.value[num-1]}__']}"></b>    &nbsp; &nbsp;
 
-                                                                    <span class="hdc">Histology:</span> <b class="black" th:text="${#strings.capitalize(diagnosis)}"></b>     &nbsp; &nbsp;
-                                                                    <span class="hdc">Tumor Type: </span>            <b class="black">Xenograft Tumor</b>                  &nbsp; &nbsp;
-                                                                    <span class="hdc">Passage: </span>  <b class="black" th:text="${technology.value[num-1]}"></b>     &nbsp; &nbsp;
-                                                                    <a href="" target="_blank"><span class="hdc">Platform: </span>  <b class="black" th:text="${technology.key}"></b></a>
+                                                                    <span class="hdc">Histology:</span> <b class="black"
+                                                                                                           th:text="${#strings.capitalize(diagnosis)}"></b>     &nbsp; &nbsp;
+                                                                    <span class="hdc">Tumor Type: </span>            <b
+                                                                        class="black">Xenograft Tumor</b>                  &nbsp; &nbsp;
+                                                                    <span class="hdc">Passage: </span>  <b class="black"
+                                                                                                           th:text="${technology.value[num-1]}"></b>     &nbsp; &nbsp;
+                                                                    <a href="" target="_blank"><span class="hdc">Platform: </span>  <b
+                                                                            class="black"
+                                                                            th:text="${technology.key}"></b></a>
                                                                 </h4>
 
                                                                 <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
                                                                        id="example-datatable"
-                                                                       class="table display datatable-pdx table-borderedPdx" th:height="50" width="100%"> <!-- class=" "   table-condensed style="border:1px solid #000; padding:10px;"-->
+                                                                       class="table display datatable-pdx table-borderedPdx"
+                                                                       th:height="50" width="100%"> <!-- class=" "   table-condensed style="border:1px solid #000; padding:10px;"-->
 
                                                                     <thead>
                                                                     <tr>
@@ -439,20 +519,39 @@
 
                     </div>
 
-                    <div class="tabs-panel" id="plots">
-                        <p>  </p>
-                    </div>
+                    <div class="tabs-panel" id="dosing_studies">
+                        <div th:if="${not #lists.isEmpty(drugSummary)}">
+                            <p>
+
+                            <table class="datatable-pdx pdx-table table-borderedPdx head-left">
+                                <thead>
+                                <th>Drug</th>
+                                <th>Dose</th>
+                                <th>Response</th>
+                                </thead>
+                                <tbody>
+                                <tr th:each="drugData, iter : ${drugSummary}">
+                                    <td th:text="${drugData.drugName}"></td>
+                                    <td th:text="${drugData.dose}"></td>
+                                    <td th:text="${drugData.response}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            </p>
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(drugSummary)}">
+
+                        </div>
 
 
+                            </div>
 
-                </div>
 
-
+                        </div>
 
 
             </section>
-
-
 
 
         </section>
@@ -482,19 +581,19 @@
 <!--<script th:src="@{/js/main.js}"></script>-->
 
 
-
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
-    var searchStates = [[ ${mappedTerm} ]];
+    var searchStates = [[${mappedTerm}]];
 
 
     function constructSearchOptions(data) {
         var newOptions = [];
         for (var i = 0; i < data.length; i++) {
-            newOptions.push({'value':data[i],'label':data[i],selected: false,disabled: false})
+            newOptions.push({'value': data[i], 'label': data[i], selected: false, disabled: false})
         }
         return newOptions;
     }
+
     /*
     // Test choices integration
     const mainSearch = new Choices('#query', {
@@ -576,33 +675,34 @@
     //document.getElementsByClassName("javaScriptBrowser")[1].style.display = "block";
     var modelId = [[${externalId}]];
     var dataSrc = [[${dataSrc}]];
-    jQuery(document).ready(function() {
+    jQuery(document).ready(function () {
         console.log("ready");
         var modelInfo = [[${modelInfo}]];
-        var apiURL = "/data/patientdata/"+dataSrc+"/"+modelId;
+        var apiURL = "/data/patientdata/" + dataSrc + "/" + modelId;
 
 
-        drawTable("pdxFinder-grid",apiURL);
-        for (var tech in modelInfo){
+        drawTable("pdxFinder-grid", apiURL);
+        for (var tech in modelInfo) {
             //console.log(tech);
 
-            var counter=1;
-            for (var passage in modelInfo[tech]){
+            var counter = 1;
+            for (var passage in modelInfo[tech]) {
                 //console.log(modelInfo[tech][passage]);
                 var dTech = tech.replace(" ", "-");
                 //console.log(dTech);
-                apiURL = "/data/modeldata/"+dataSrc+"/"+modelId+"?platform="+tech+"&passage="+modelInfo[tech][passage];
-                var tableId = "pdxFinder-grid"+dTech+counter;
-                drawTable(tableId,apiURL);
+                apiURL = "/data/modeldata/" + dataSrc + "/" + modelId + "?platform=" + tech + "&passage=" + modelInfo[tech][passage];
+                var tableId = "pdxFinder-grid" + dTech + counter;
+                drawTable(tableId, apiURL);
                 //console.log(tableId);
                 console.log(apiURL);
                 counter++;
             }
 
         }
-    } );
+    });
+
     // We define the function
-    function drawTable(tableId,apiURL) {
+    function drawTable(tableId, apiURL) {
 
         var l = jQuery("#tableId tr").length;
         console.log(tableId + " " + l);
@@ -637,20 +737,18 @@
 
         $(window).bind('resize', function () {
             dataTable.fnAdjustColumnSizing();
-        } );
+        });
     }
 
 
-
-
     function showTabsFirst() {
-        for (var i=0; i<5; i++) {
+        for (var i = 0; i < 5; i++) {
             document.getElementsByClassName("hideContentShowFirst")[i].style.position = "static";
         }
     }
 
     function showTabs() {
-        for (var i=0; i<5; i++) {
+        for (var i = 0; i < 5; i++) {
             document.getElementsByClassName("hideContent")[i].style.position = "static";
         }
     }
