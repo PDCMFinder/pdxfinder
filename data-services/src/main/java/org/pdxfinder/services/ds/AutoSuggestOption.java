@@ -3,7 +3,7 @@ package org.pdxfinder.services.ds;
 /*
  * Created by csaba on 05/02/2018.
  */
-public class AutoSuggestOption {
+public class AutoSuggestOption implements Comparable<AutoSuggestOption> {
 
 
     private String value;
@@ -28,5 +28,10 @@ public class AutoSuggestOption {
 
     public void setContext(String context) {
         this.context = context;
+    }
+
+    @Override
+    public int compareTo(AutoSuggestOption o) {
+        return this.value.compareTo(o.value);
     }
 }

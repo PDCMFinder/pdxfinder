@@ -5,9 +5,8 @@ import org.pdxfinder.services.ds.AutoSuggestOption;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /*
  * Created by csaba on 02/02/2018.
@@ -25,7 +24,9 @@ public class AutoSuggestController {
     List<AutoSuggestOption> getAutoSuggestList(){
 
 
-        return autoCompleteService.getAutoSuggestions();
+        List<AutoSuggestOption> autoSuggestions = autoCompleteService.getAutoSuggestions();
+        Collections.sort(autoSuggestions);
+        return autoSuggestions;
 
     }
 
