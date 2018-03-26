@@ -24,11 +24,10 @@ import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
 
 /**
- * Load data from University of Texas MD Anderson PDXNet.
+ * Load data from HCI PDXNet.
  */
 @Component
 @Order(value = 0)
@@ -45,12 +44,17 @@ public class LoadHCI implements CommandLineRunner {
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
 
+    private final static String NS_BS_NAME = "NOD scid";
+    private final static String NS_BS_SYMBOL = "NOD.CB17-Prkd<sup>cscid</sup>/J"; //yay HTML in name
+    private final static String NS_BS_URL = "https://www.jax.org/strain/001303";
+
+    
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
-    private HostStrain nsgBS;
+    private HostStrain nsgBS, nsBS;
     private ExternalDataSource hciDS;
 
     private Options options;
@@ -99,6 +103,7 @@ public class LoadHCI implements CommandLineRunner {
 
         hciDS = loaderUtils.getExternalDataSource(HCI_DATASOURCE_ABBREVIATION, HCI_DATASOURCE_NAME, HCI_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
         nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
+        nsBS = loaderUtils.getHostStrain(NS_BS_NAME, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -119,14 +124,10 @@ public class LoadHCI implements CommandLineRunner {
 
     @Transactional
     void createGraphObjects(JSONObject j) throws Exception {
-        String id = j.getString("Model ID");
-
-        // the preference is for histology
+        String modelID = j.getString("Model ID");
+        String sampleID = j.getString("Sample ID");
         String diagnosis = j.getString("Clinical Diagnosis");
-        String histology = j.getString("Histology");
-        if (histology.trim().length() > 0) {
-            diagnosis = histology;
-        }
+       
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
 
@@ -139,83 +140,116 @@ public class LoadHCI implements CommandLineRunner {
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
         
         String sampleSite = Standardizer.getValue("Sample Site",j);
-        System.out.println("Sample Site="+sampleSite);
         
-        Sample sample = loaderUtils.getSample(id, tumorType, diagnosis,
+        Sample sample = loaderUtils.getSample(sampleID, tumorType, diagnosis,
                 j.getString("Primary Site"), sampleSite,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, hciDS.getAbbreviation());
 
         pSnap.addSample(sample);
-
-        String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
-        QualityAssurance qa = new QualityAssurance(j.getString("QA"),
-                NOT_SPECIFIED, ValidationTechniques.NOT_SPECIFIED, qaPassage);
-        loaderUtils.saveQualityAssurance(qa);
         
-        String engraftmentSite = Standardizer.getValue("Engraftment Site",j);
         
-        String tumorPrep = Standardizer.getValue("Tumor Prep",j);
+        // This multiple QA approach only works because Note and Passage are the same for all QAs
+        QualityAssurance qa = new QualityAssurance(Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED,ValidationTechniques.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED);
+        
+        StringBuilder technology = new StringBuilder();
+        if(j.has("QA")){
+            JSONArray qas = j.getJSONArray("QA");
+            for(int i = 0;  i< qas.length(); i++){
+                if(i>0){
+                    technology.append(", ");
+                }
+                technology.append(qas.getJSONObject(i).getString("Technology"));
+                
+            
+            }
+            qa.setDescription(qas.getJSONObject(0).getString("Note"));
+            qa.setTechnology(technology.toString());
+            qa.setPassages(qas.getJSONObject(0).getString("Passage"));
+            
+        }
+        
+        
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, this.hciDS.getAbbreviation(), sample, qa);
+        ModelCreation modelCreation = loaderUtils.createModelCreation(modelID, this.hciDS.getAbbreviation(), sample, qa);
         modelCreation.addRelatedSample(sample);
 
-        String markerStr = j.getString("Markers");
-
-        String[] markers = markerStr.split(";");
-        if (markerStr.trim().length() > 0) {
-
-            Platform pl = loaderUtils.getPlatform(j.getString("Platform"), hciDS);
-            MolecularCharacterization molC = new MolecularCharacterization();
-            molC.setPlatform(pl);
-            molC.setType("mutation");
-
-            Set<MarkerAssociation> markerAssocs = new HashSet();
-
-            for (int i = 0; i < markers.length; i++) {
-                Marker m = loaderUtils.getMarker(markers[i], markers[i]);
-                MarkerAssociation ma = new MarkerAssociation();
-                ma.setMarker(m);
-                markerAssocs.add(ma);
-            }
-            molC.setMarkerAssociations(markerAssocs);
-            Set<MolecularCharacterization> mcs = new HashSet<>();
-            mcs.add(molC);
-            sample.setMolecularCharacterizations(mcs);
-
-            // this is not the case AFAIK
-            if (true) {
-                pSnap.addSample(sample);
-
-            } else {
-
-                String passage = "0";
-                try {
-                    // this appears to be "multiple" for most values not sure how to handle default will be 0
-                    passage = j.getString("QA Passage").replaceAll("P", "");
-                } catch (NumberFormatException e) {
-                    // default is 0
-                }
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation,
-                        modelCreation.getSourcePdxId(), hciDS.getAbbreviation(), passage);
-                specimen.setSample(sample);
-
-                specimen.setHostStrain(this.nsgBS);
-
-                ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
-                specimen.setImplantationSite(is);
-
-                ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
-                specimen.setImplantationType(it);
-
-                specimen.setSample(sample);
-
-                loaderUtils.saveSpecimen(specimen);
-
-            }
-        }
+        
 
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
+        
+        String implantationTypeStr = Standardizer.NOT_SPECIFIED;
+        String implantationSiteStr = j.getString("Engraftment Site");
+        ImplantationSite implantationSite = loaderUtils.getImplantationSite(implantationSiteStr);
+        ImplantationType implantationType = loaderUtils.getImplantationType(implantationTypeStr);
+        
+        // uggh parse strains
+        ArrayList<HostStrain> strainList= new ArrayList();
+        String strains = j.getString("Strain");
+        if(strains.contains(" and ")){
+            strainList.add(nsgBS);
+            strainList.add(nsBS);
+        }else if(strains.contains("gamma")){
+            strainList.add(nsgBS);
+        }else{
+            strainList.add(nsBS);
+        }
+        
+        for(HostStrain strain : strainList){
+            Specimen specimen = new Specimen();
+            specimen.setExternalId(modelID);
+            specimen.setPassage(Standardizer.NOT_SPECIFIED);
+            specimen.setImplantationSite(implantationSite);
+            specimen.setImplantationType(implantationType);
+            specimen.setHostStrain(strain);
+            modelCreation.addSpecimen(specimen);
+        }
+        
+        
+        
+        TreatmentSummary ts;
+
+
+        try{
+            if(j.has("Treatments")){
+                JSONObject treatment = j.optJSONObject("Treatments");
+                //if the treatment attribute is not an object = it is an array
+                if(treatment == null && j.optJSONArray("Treatments") != null){
+
+                    JSONArray treatments = j.getJSONArray("Treatments");
+
+                    if(treatments.length() > 0){
+                        //log.info("Treatments found for model "+mc.getSourcePdxId());
+                        ts = new TreatmentSummary();
+
+                        for(int t = 0; t<treatments.length(); t++){
+                            JSONObject treatmentObject = treatments.getJSONObject(t);
+                            TreatmentProtocol tp = new TreatmentProtocol();
+                            Response r = new Response();
+                            r.setDescription(treatmentObject.getString("Response"));
+                            tp.setDrug(treatmentObject.getString("Drug"));
+                            tp.setDose(treatmentObject.getString("Dose") );
+                            tp.setResponse(r);
+
+                            ts.addTreatmentProtocol(tp);
+                        }
+
+                        ts.setModelCreation(modelCreation);
+                        modelCreation.setTreatmentSummary(ts);
+                    }
+                }
+
+            }
+
+            loaderUtils.saveModelCreation(modelCreation);
+
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
+        
+        
     }
     
 
