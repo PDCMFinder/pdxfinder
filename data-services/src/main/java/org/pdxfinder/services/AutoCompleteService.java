@@ -148,6 +148,8 @@ public class AutoCompleteService {
             }
         }
 
+        Collections.sort(autoSuggestList);
+
         return autoSuggestList;
     }
 
