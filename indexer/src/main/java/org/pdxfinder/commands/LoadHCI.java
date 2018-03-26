@@ -25,6 +25,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Load data from HCI PDXNet.
@@ -146,6 +148,36 @@ public class LoadHCI implements CommandLineRunner {
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, hciDS.getAbbreviation());
 
         pSnap.addSample(sample);
+        
+        
+        if(j.has("Markers")){
+            Set<MolecularCharacterization> mcs = new HashSet<>();
+            JSONArray markers = j.getJSONArray("Markers");
+            
+            MolecularCharacterization molC = new MolecularCharacterization();
+            Set<MarkerAssociation> markerAssocs = new HashSet();
+            for(int i =0; i< markers.length(); i++){
+                JSONObject job = markers.getJSONObject(i);
+                Platform pl = loaderUtils.getPlatform(job.getString("Platform"), hciDS);
+                
+                //all are IHC so this is ok to do over and over again
+                molC.setPlatform(pl);
+                
+
+                Marker m = loaderUtils.getMarker(job.getString("Marker"), job.getString("Marker"));
+                MarkerAssociation ma = new MarkerAssociation();
+                ma.setMarker(m);
+                ma.setImmunoHistoChemistryResult(job.getString("Association"));
+                markerAssocs.add(ma);
+                
+               
+                }
+            molC.setMarkerAssociations(markerAssocs);
+            mcs.add(molC);
+            sample.setMolecularCharacterizations(mcs);
+        
+        }
+        
         
         
         // This multiple QA approach only works because Note and Passage are the same for all QAs
