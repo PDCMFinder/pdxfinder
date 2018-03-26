@@ -46,6 +46,12 @@
           href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/styles/css/choices.min.css">
     <!-- Use this CSS file for any custom styling -->
     <link rel="stylesheet" th:href="@{/css/app.css}" type="text/css" media="all"/>
+    <link rel="stylesheet" th:href="@{/css/customStyles.css}" type="text/css" media="all"/>
+    <link rel="stylesheet" th:href="@{/icons/set-operations/css/set-operations.css}">
+    <link rel="stylesheet" th:href="@{/css/multiple-select.css}">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script th:src="@{/js/pdxFinder.autocomplete.js}"></script>
 
     <!-- If you have a custom header image or colour -->
     <!--
@@ -162,6 +168,7 @@
                 </form>
             </section>
 
+
             <!-- Search Result Message & Export Section -->
             <section class="row padding-vertical-30">
                 <div class="columns medium-12">
@@ -175,8 +182,13 @@
 
             </section>
 
+
+
+
+
             <!-- Search Result and Filter Section -->
             <section class="row expanded padding-right-large padding-left-large">
+
                 <div class="columns medium-3">
                     <h4 class="block-title clearfix"><span class="float-left">Filter By:</span></h4>
 
@@ -239,24 +251,20 @@
                                 </ul>
 
 
-                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
-                                    data-allow-all-closed="true">
+                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true" data-allow-all-closed="true">
                                     <li class="accordion-item" data-accordion-item id="gender_filter">
                                         <a href="#" class="accordion-title">Sex</a>
 
-
                                         <div class="accordion-content" data-tab-content>
-
                                             <div class="large-form">
-
                                                 <div class="checkbox-item"
                                                      th:each="instance:${facet_options['patient_gender_options']}">
                                                     <input th:id="'patient_gender__' + ${#strings.replace(instance, ' ', '_')}"
                                                            type="checkbox" class="gender filter"/>
-                                                    <label th:attr="for='patient_gender__'+${#strings.replace(instance, ' ', '_')}"><span
-                                                            th:text="${instance}"></span></label>
+                                                    <label th:attr="for='patient_gender__'+${#strings.replace(instance, ' ', '_')}">
+                                                        <span th:text="${instance}"></span>
+                                                    </label>
                                                 </div>
-
                                             </div>
                                         </div>
                                     </li>
@@ -267,8 +275,6 @@
                                     data-allow-all-closed="true">
                                     <li class="accordion-item" data-accordion-item id="age_filter">
                                         <a href="#" class="accordion-title">Age</a>
-
-
                                         <div class="accordion-content" data-tab-content>
 
                                             <div class="large-form">
@@ -293,41 +299,96 @@
 
 
                         <li class="accordion-item is-active" data-accordion-item>
-                                                                            <!-- Accordion tab title -->
+                            <!-- Accordion tab title -->
                             <a href="#" class="accordion-title">PDX model</a>
 
                             <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
                             <div class="accordion-content" data-tab-content>
-                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
-                                    data-allow-all-closed="true">
-
-                            <li class="accordion-item" data-accordion-item id="datasource_filter">
-                                 <a href="#" class="accordion-title">Datasource</a>
-
-                            <div class="accordion-content" data-tab-content>
-                                <div class="large-form">
 
 
-                                    <div class="checkbox-item" th:each="instance:${facet_options['datasource_options']}">
-                                        <input th:id="'datasource__' + ${instance}" type="checkbox" class="datasource filter"/>
-                                        <label th:attr="for='datasource__'+${instance}"><span th:text="${instance}"></span></label>
-                                    </div>
+                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true" data-allow-all-closed="true">
+                                    <li class="accordion-item" data-accordion-item id="datasource_filter">
+                                        <a href="#" class="accordion-title">Datasource</a>
+                                        <div class="accordion-content" data-tab-content>
+                                            <div class="large-form">
+                                                <div class="checkbox-item" th:each="instance:${facet_options['datasource_options']}">
+                                                    <input th:id="'datasource__' + ${instance}" type="checkbox" class="datasource filter"/>
+                                                    <label th:attr="for='datasource__'+${instance}"><span th:text="${instance}"></span></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
 
 
-
-                                </div>
                             </div>
+
+
                         </li>
 
 
 
+                        <style>.hidden{display:none;}</style>
+
+                        <li class="accordion-item is-active" data-accordion-item>
+                            <!-- Accordion tab title -->
+                            <a href="#" class="accordion-title"> MOLECULAR CHARACTERIZATION </a>
+
+                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
+                            <div class="accordion-content" data-tab-content>
+                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true" data-allow-all-closed="true">
+                                    <li class="accordion-item" data-accordion-item id="marker_filter">
+                                        <a href="#" class="accordion-title">Small Genetic Variation</a>
+                                        <div class="accordion-content" data-tab-content>
+                                            <div style="background-color: #f1f2f2; padding: 10px;">
+                                                <div class="checkbox-item"><span class="black" style="font-size: 19px; font-weight: bold;">Genes</span></div>
+                                                <div class="checkbox-item">
+
+                                                    <div class="row large-12 medium-12 expanded">
+                                                        <input type="text" id="geneFilter1" placeholder="MARKER" onblur="loadVariants(this,'1')" style="width: 19%; min-width: 70px; display: inline-block;"/>
+                                                        <input type="text" value="MUT" style="width: 13%; display: inline-block;"/>
+                                                        <!--<input type="text" id="variantFilter" style="width: 19%; min-width: 70px; display: inline-block;"/>-->
+
+                                                        <span id="filterOptions1">
+                                                            <select id='variantFilter1' multiple='multiple' style="width: 20%;  max-width: 70px;"> </select>
+                                                        </span>
+
+                                                        <button onclick="myTrigger('AND')" class="icoButn"  style="width: 20%;"> <i class="set set-intersect"></i> AND </button>
+                                                        <button onclick="myTrigger('OR')" href="#" class="icoButn"  style="width: 18%;"> <i class="set set-union"></i> OR </button>
+
+                                                        <p th:text="${param.mutation[0]}">Test</p>
+                                                    </div>
 
 
 
+
+                                                    <th:block th:each="i: ${#numbers.sequence(2, 20)}"><!-- 'geneFilter'+${i}-->
+
+                                                        <div class="row large-12 medium-12 expanded hidden" th:id="'geneticVar'+${i}" style="margin-top: -10px">
+                                                            <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}" style="width: 19%; min-width: 70px; display: inline-block;"/>
+                                                            <input type="text" value="MUT" style="width: 13%; display: inline-block;"/>
+
+                                                            <span th:id="'filterOptions'+${i}">
+                                                                <select th:id="'variantFilter'+${i}" multiple='multiple' style="width: 20%;  min-width: 70px;"> </select>
+                                                            </span>
+                                                        </div>
+
+                                                    </th:block>
+
+                                                </div>
+                                                <div class="checkbox-item" style="height: 70px;">
+                                                    <button id="markerFilter" href="#" class="button primary" style="color: #fff; float:right; box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);"> GO </button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
 
+
+                        <!-- <div id='adda'><a class='md-fab md-fab-small' onclick=\"myTrigger('','','open')\"><i class='material-icons'>&#xE145;</i></a></div> -->
 
                         <!--<li class="accordion-item is-active" data-accordion-item>-->
                         <!--&lt;!&ndash; Accordion tab title &ndash;&gt;-->
@@ -450,7 +511,6 @@
 
 </div>
 <!-- JavaScript -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
 <script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/scripts/dist/choices.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.highlightRegex/0.1.2/highlightRegex.min.js"></script>
@@ -473,6 +533,7 @@
     var cancerSystemFilters = [[${cancer_system_selected}]];
     var sampleTumorTypeFilters = [[${sample_tumor_type_selected}]];
     var genderFilters = [[${patient_gender_selected}]];
+    var mutationFilters = [[${mutations_selected}]];
 
     function constructSearchOptions(data) {
         var newOptions = [];
@@ -566,6 +627,12 @@
             redirectPage();
         });
 
+        //Add eventlistener to fields with filter class
+        jQuery('#markerFilter').click( function(){
+
+            redirectPage();
+        });
+
         //Add eventlistener to search field's button
         jQuery('#search_submit').click( function(){
 
@@ -589,6 +656,91 @@
     });
 */
 </script>
+
+
+
+
+<script type="text/javascript" language="javascript" th:inline="javascript">
+
+    var incomingString = [[ ${mutatedMarkersAndVariants} ]];
+    var mutatedMarkersAndVariants = JSON.parse(incomingString);
+    /* var mutatedMarkersAndVariants = {  "USP25" : [ "T1033M" ], "USP26" : [ "L362W" ],"USP20" : [ "D505Y", "P49A" ]} */
+    var keysAreMarkers = Object.keys(mutatedMarkersAndVariants);
+
+    $('#geneFilter1').autocomplete({
+        source:[keysAreMarkers]
+    });
+
+    for (var i=2; i<=20; i++){
+
+        $('#geneFilter'+i).autocomplete({
+            source:[keysAreMarkers]
+        });
+    }
+
+
+
+    function loadVariants(selectedMarker,compNumber) {
+
+        var marker = selectedMarker.value;
+        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker.value];
+
+        //alert(marker+"\n"+typeof valuesAreVariants);
+        var newOptions = "";
+        for (var i=0; i<valuesAreVariants.length; i++){
+            newOptions += "<option value='"+valuesAreVariants[i]+"'>"+valuesAreVariants[i]+"</option>";
+        }
+
+        var select = $('#variantFilter'+compNumber);
+        select.empty().append(newOptions);
+
+        $(function() {
+            $('#variantFilter'+compNumber).change(function() {
+                console.log($(this).val());
+            }).multipleSelect({
+                placeholder: " variants"
+            });
+        });
+
+    }
+
+
+    var geneticVar = 1;
+    function myTrigger(param){
+        geneticVar++;
+
+        for (var i=2; i<=20; i++){
+
+            if ((param=='AND'||param=='OR') && geneticVar == i){
+                document.getElementById("geneticVar"+i).style.display = "block";
+            }
+        }
+    }
+
+</script>
+
+<script th:src="@{/js/multiple-select.js}"></script>
+<script>
+    $(function() {
+
+        $('#variantFilter1').change(function() {
+            console.log($(this).val());
+        }).multipleSelect({
+            placeholder: "Variants"
+        });
+
+        for (var i=2; i<=20; i++){
+
+            $('#variantFilter'+i).change(function() {
+                console.log($(this).val());
+            }).multipleSelect({
+                placeholder: "Variants"
+            });
+        }
+
+    });
+</script>
+
 <!-- <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/js/foundationExtendEBI.js"></script> -->
 <!-- <script type="text/JavaScript">$(document).foundationExtendEBI();</script> -->
 

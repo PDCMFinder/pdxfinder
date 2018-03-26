@@ -174,7 +174,7 @@ h5{
 
 .pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown > .pdxFinder_autocomplete_copyright {
     color: #ddd;
-    font-size: 10px;
+    font-size: 1px;
     text-decoration: none;
     right: 5px;
     position: absolute;
@@ -192,7 +192,7 @@ h5{
 }
 
 .pdxFinder_autocomplete .pdxFinder_autocomplete_dropdown > div.active {
-    background: rgba(24, 188, 156, 1.0); /*#18BC9C;*/
+    background: rgba(6,54,157,1);
     color: #FFFFFF;
 }
 
@@ -428,7 +428,7 @@ th,td {
 
 
 
-.pagination>li>a,.pagination>li>span
+/*.pagination>li>a,.pagination>li>span
 {
     position:relative;
     float:left;
@@ -469,7 +469,7 @@ th,td {
 .pagination>.disabled>span,.pagination>.disabled>span:hover,.pagination>.disabled>span:focus,.pagination>.disabled>a,.pagination>.disabled>a:hover,.pagination>.disabled>a:focus
 {
     color:#ecf0f1;background-color:#337ab7;border-color:transparent;cursor:not-allowed
-}
+}*/
 
 
 
@@ -722,6 +722,7 @@ table.dataTable {
 /* Some Media Query to adjust visibility */
 @media (max-width:767px){
     .hideOnVSmall{display:none!important}
+
 }
 @media (min-width:768px) and (max-width:991px){
     .hideOnSmall{display:none!important}
@@ -778,6 +779,49 @@ table.dataTable {
 }
 
 
+.icoButn {
+    background-color: #FFF;
+    border: 3px ridge #fff;
+    color: #000;
+    padding: 11px 3px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    font-size: 16px;
+    cursor: pointer;
+
+    /*border-radius: 2px;
+    transition: .2s ease-out;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);*/
+}
+
+.icoButn:hover {
+    background-color: #06369d;
+    border: 1px solid #fff;
+    color: #fff;
+}
+
+
+.btn1 {
+    border-radius: 2px;
+    border: 0;
+    transition: .2s ease-out;
+    color: #fff;
+    margin: 6px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+.btn1:hover {
+    color: #fff;
+    box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+}
+
+.icoButn:active, .icoButn:focus, .icoButn.active {
+    outline: 0;
+    color: #fff;
+}
 
 
 
+/*PdxFinder Color: rgba(6,54,157,1) rgba(0,178,213,0.6);  /*#06369d; #00b2d5; */

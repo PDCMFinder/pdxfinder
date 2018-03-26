@@ -1750,7 +1750,7 @@ textarea::placeholder {
 input:disabled, input[readonly],
 textarea:disabled,
 textarea[readonly] {
-  background-color: #99999d;
+  background-color: #fff; /* #99999d; */
   cursor: not-allowed; }
 
 [type='submit'],

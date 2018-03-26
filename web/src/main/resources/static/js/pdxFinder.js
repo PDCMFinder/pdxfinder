@@ -194,6 +194,16 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
     }
 
 
+    var geneFilter = jQuery("#geneFilter1");
+    if (geneFilter.val() != null && geneFilter.val() != "") {
+
+        var openMarkerFacet = true;
+
+        if (openMarkerFacet) {
+            var markerFilterField = jQuery("li#marker_filter > a.accordion-title");
+            markerFilterField.click();
+        }
+    }
 
 
 
@@ -215,6 +225,23 @@ function redirectPage(){
     }
 
 
+    for (var i=1; i<20; i++){
+
+        var geneFilter = jQuery("#geneFilter"+i);
+        var variantFilter = jQuery("#variantFilter"+i);
+
+        if (geneFilter.val() != null && geneFilter.val() != "") {
+
+            if (!no_parameters) {
+                url = url + "&";
+            }
+            url += "mutation=" + geneFilter.val() + "___MUT" + "___"+variantFilter.val();
+            no_parameters = false;
+        }
+
+    }
+
+
     // Add all diagnosis filters to the URL
     jQuery(".diagnosis").each(function () {
         var id = jQuery(this).attr("id");
@@ -233,7 +260,6 @@ function redirectPage(){
             no_parameters = false;
 
         }
-
 
     });
 
@@ -265,8 +291,9 @@ function redirectPage(){
             return;
         }
 
-
     });
+
+
     console.log(url);
 
     window.location.replace(url);

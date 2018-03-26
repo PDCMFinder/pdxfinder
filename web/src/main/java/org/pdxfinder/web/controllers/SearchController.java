@@ -9,6 +9,7 @@ import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.services.AutoCompleteService;
 import org.pdxfinder.services.GraphService;
+import org.pdxfinder.services.MolCharService;
 import org.pdxfinder.services.ds.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ public class SearchController {
     private AutoCompleteService autoCompleteService;
     private SearchDS searchDS;
     private Map<String, List<String>> facets = new HashMap<>();
+    private MolCharService molCharService;
 
     List<String> patientAgeOptions = SearchDS.PATIENT_AGE_OPTIONS;
     List<String> datasourceOptions = SearchDS.DATASOURCE_OPTIONS;
@@ -42,10 +44,11 @@ public class SearchController {
     List<String> sampleTumorTypeOptions = SearchDS.SAMPLE_TUMOR_TYPE_OPTIONS;
     List<String> diagnosisOptions = SearchDS.DIAGNOSIS_OPTIONS;
 
-    public SearchController(GraphService graphService, SearchDS searchDS, AutoCompleteService autoCompleteService) {
+    public SearchController(GraphService graphService, SearchDS searchDS, AutoCompleteService autoCompleteService, MolCharService molCharService) {
         this.graphService = graphService;
         this.searchDS = searchDS;
         this.autoCompleteService = autoCompleteService;
+        this.molCharService = molCharService;
 
         facets.put("datasource_options", datasourceOptions);
         facets.put("patient_age_options", patientAgeOptions);
@@ -159,7 +162,8 @@ public class SearchController {
                                 patientGenderSelected,
                                 datasourceSelected,
                                 cancerSystemSelected,
-                                sampleTumorTypeSelected
+                                sampleTumorTypeSelected,
+                                mutationSelected
 
                         )
                 )
@@ -220,6 +224,7 @@ public class SearchController {
         model.addAttribute("text_search_desc", textSearchDescription);
 
         model.addAttribute("patient_age_selected", patientAgeSelected);
+        model.addAttribute("mutations_selected", mutationSelected);
         model.addAttribute("patient_gender_selected", patientGenderSelected);
         model.addAttribute("datasource_selected", datasourceSelected);
         model.addAttribute("cancer_system_selected", cancerSystemSelected);
@@ -230,6 +235,7 @@ public class SearchController {
 
         model.addAttribute("facet_options", facets);
         model.addAttribute("results", new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size())));
+        model.addAttribute("mutatedMarkersAndVariants", molCharService.getMutatedMarkersAndVariants());
 
         return "search";
     }
