@@ -49,6 +49,9 @@ public class MarkerAssociation {
     private String type; //Substitution
     private String annotation;
 
+    private String immunoHistoChemistryResult;
+    private String microsatelliteResult;
+
 
     public MarkerAssociation() {
     }
@@ -268,5 +271,21 @@ public class MarkerAssociation {
 
     public void setAnnotation(String annotation) {
         this.annotation = annotation;
+    }
+
+    public String getImmunoHistoChemistryResult() {
+        return immunoHistoChemistryResult;
+    }
+
+    public void setImmunoHistoChemistryResult(String immunoHistoChemistryResult) {
+        this.immunoHistoChemistryResult = immunoHistoChemistryResult;
+    }
+
+    public String getMicrosatelliteResult() {
+        return microsatelliteResult;
+    }
+
+    public void setMicrosatelliteResult(String microsatelliteResult) {
+        this.microsatelliteResult = microsatelliteResult;
     }
 }
