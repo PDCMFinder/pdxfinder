@@ -142,10 +142,12 @@ public class LoadWUSTL implements CommandLineRunner {
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
                 gender, "", race, age, mdaDS);
+        
+        String sampleSite = Standardizer.getValue("Sample Site", j);
 
-
+        //String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, String dataSource
         Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
-                NOT_SPECIFIED, NOT_SPECIFIED,
+                j.getString("Primary Site"), sampleSite,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
 
         pSnap.addSample(sample);
