@@ -341,30 +341,25 @@
                                         <a href="#" class="accordion-title">Small Genetic Variation</a>
                                         <div class="accordion-content" data-tab-content>
                                             <div style="background-color: #f1f2f2; padding: 10px;">
-                                                <div class="checkbox-item"><span class="black" style="font-size: 19px; font-weight: bold;">Genes</span></div>
                                                 <div class="checkbox-item">
-
-                                                    <div class="row large-12 medium-12 expanded">
-                                                        <input type="text" id="geneFilter1" placeholder="MARKER" onblur="loadVariants(this,'1')" style="width: 19%; min-width: 70px; display: inline-block;"/>
-                                                        <input type="text" value="MUT" style="width: 13%; display: inline-block;"/>
-                                                        <!--<input type="text" id="variantFilter" style="width: 19%; min-width: 70px; display: inline-block;"/>-->
-
-                                                        <span id="filterOptions1">
-                                                            <select id='variantFilter1' multiple='multiple' style="width: 20%;  max-width: 70px;"> </select>
-                                                        </span>
-
-                                                        <button onclick="myTrigger('AND')" class="icoButn"  style="width: 20%;"> <i class="set set-intersect"></i> AND </button>
-                                                        <button onclick="myTrigger('OR')" href="#" class="icoButn"  style="width: 18%;"> <i class="set set-union"></i> OR </button>
-
-                                                        <!--<p th:text="${param.mutation[0]}">Test</p> -->
-                                                    </div>
+                                                    <div class="checkbox-item"><span class="black" style="font-size: 19px; font-weight: bold;">Genes</span></div>
 
 
+                                                    <span th:if="${#lists.isEmpty(param.mutation)}">
+                                                        <div class="row large-12 medium-12 expanded">
+                                                            <input type="text" id="geneFilter1" placeholder="MARKER" onblur="loadVariants(this,'1')" style="width: 19%; min-width: 70px; display: inline-block;"/>
+                                                            <input type="text" value="MUT" style="width: 13%; display: inline-block;"/>
+                                                            <!--<input type="text" id="variantFilter" style="width: 19%; min-width: 70px; display: inline-block;"/>-->
 
+                                                            <span id="filterOptions1">
+                                                                <select id='variantFilter1' multiple='multiple' style="width: 20%;  max-width: 70px;"> </select>
+                                                            </span>
 
-                                                    <th:block th:each="i: ${#numbers.sequence(2, 20)}"><!-- 'geneFilter'+${i}-->
+                                                            <button onclick="myTrigger('AND',2)" class="icoButn"  style="width: 20%;"> <i class="set set-intersect"></i> AND </button>
+                                                            <button onclick="myTrigger('OR',2)" href="#" class="icoButn"  style="width: 18%;"> <i class="set set-union"></i> OR </button>
+                                                        </div>
 
-                                                        <div class="row large-12 medium-12 expanded hidden" th:id="'geneticVar'+${i}" style="margin-top: -10px">
+                                                        <div  th:each="i: ${#numbers.sequence(2, 20)}" class="row large-12 medium-12 expanded hidden" th:id="'geneticVar'+${i}" style="margin-top: -10px">
                                                             <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}" style="width: 19%; min-width: 70px; display: inline-block;"/>
                                                             <input type="text" value="MUT" style="width: 13%; display: inline-block;"/>
 
@@ -372,8 +367,53 @@
                                                                 <select th:id="'variantFilter'+${i}" multiple='multiple' style="width: 20%;  min-width: 70px;"> </select>
                                                             </span>
                                                         </div>
+                                                    </span>
 
-                                                    </th:block>
+
+
+                                                    <span th:if="${not #lists.isEmpty(param.mutation)}">
+                                                        <div th:each="eachMarker,iter :${markerMap}">
+
+                                                            <div class="row large-12 medium-12 expanded" th:id="'geneticVar'+${iter.index+1}" th:style="( ${iter.index} == 0 ) ? 'margin-top: 10px' : 'margin-top: -10px' ">
+
+                                                                <input th:value="${eachMarker.key}" th:onblur="'loadVariants(this,'+${iter.index+1}+')'" type="text" th:id="'geneFilter'+${iter.index+1}" style="width: 19%; min-width: 70px; display: inline-block;"/>
+                                                                <input type="text" value="MUT" style="width: 13%; display: inline-block;"/>
+
+                                                                <span th:id="'filterOptions'+${iter.index+1}">
+                                                                    <select th:id="'variantFilter'+${iter.index+1}" multiple='multiple' style="width: 4%;  min-width: 70px;">
+
+                                                                        <option  th:each="variant :${eachMarker.value}" th:value="${variant}" th:text="${variant}" selected> ... </option>
+
+                                                                    </select>
+                                                                </span>
+
+                                                                <th:block th:if="${iter.index} == 0">
+                                                                    <button onclick="myTrigger('AND',4)" class="icoButn"  style="width: 20%;"> <i class="set set-intersect"></i> AND </button>
+                                                                    <button onclick="myTrigger('OR',4)" href="#" class="icoButn"  style="width: 18%;"> <i class="set set-union"></i> OR </button>
+                                                                </th:block>
+
+                                                            </div>
+
+                                                        </div>
+
+
+
+                                                        <span th:if="${not #lists.isEmpty(param.mutation)}">
+                                                            <span th:each="i: ${#numbers.sequence(#maps.size(markerMap)+1, 20)}">
+
+                                                                <div class="row large-12 medium-12 expanded hidden" th:id="'geneticVar'+${i}" style="margin-top: -10px">
+                                                                    <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}" style="width: 19%; min-width: 70px; display: inline-block;"/>
+                                                                    <input type="text" value="MUT" style="width: 13%; display: inline-block;"/>
+
+                                                                    <span th:id="'filterOptions'+${i}">
+                                                                        <select th:id="'variantFilter'+${i}" multiple='multiple' style="width: 20%;  min-width: 70px;"> </select>
+                                                                    </span>
+                                                                </div>
+
+                                                            </span>
+                                                        </span>
+
+                                                    </span>
 
                                                 </div>
                                                 <div class="checkbox-item" style="height: 70px;">
@@ -678,6 +718,14 @@
         });
     }
 
+    // Open the Molchar Filter if needed
+    var urlParams = new URLSearchParams(window.location.search);
+    var dURLString = urlParams.toString();
+    var openMarkerFacet = dURLString.search("mutation");
+    if (openMarkerFacet != -1) {
+        var markerFilterField = jQuery("li#marker_filter > a.accordion-title");
+        markerFilterField.click();
+    }
 
 
     function loadVariants(selectedMarker,compNumber) {
@@ -706,10 +754,17 @@
 
 
     var geneticVar = 1;
-    function myTrigger(param){
-        geneticVar++;
+    var counter = 1;
+    function myTrigger(param,startIndex){
 
-        for (var i=2; i<=20; i++){
+        if (startIndex != 2 && counter == 1){
+            geneticVar = startIndex;
+        }
+
+        geneticVar++;
+        counter++;
+
+        for (var i=startIndex; i<=20; i++){
 
             if ((param=='AND'||param=='OR') && geneticVar == i){
                 document.getElementById("geneticVar"+i).style.display = "block";

@@ -70,7 +70,7 @@ public class SearchController {
                   @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
                   @RequestParam("cancer_system") Optional<List<String>> cancer_system,
                   @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type,
-                  @RequestParam("sample_tumor_type") Optional<List<String>> mutation
+                  @RequestParam("mutation") Optional<List<String>> mutation
     ) {
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
@@ -236,6 +236,39 @@ public class SearchController {
         model.addAttribute("facet_options", facets);
         model.addAttribute("results", new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size())));
         model.addAttribute("mutatedMarkersAndVariants", molCharService.getMutatedMarkersAndVariants());
+
+       // System.out.println(mutation.get());
+        String done = "";
+        Map<String, List<String>> userChoice = new HashMap<>();
+
+        try {
+            for (String markerReq : mutation.get()) {
+
+                String marka = markerReq.split("___")[0];
+                List<String> variantList = new ArrayList<>();
+                String variant = "";
+
+                if (!done.contains(marka)) { // New Marker
+
+                    for (String markerReq2 : mutation.get()) {
+
+                        if (marka.equals(markerReq2.split("___")[0])){
+
+                            variant = markerReq2.split("___")[2];
+                            variantList.add(variant);
+                        }
+
+                    }
+                    userChoice.put(marka,variantList);
+                }
+
+                done += marka;
+            }
+            System.out.println(userChoice);
+        }catch (Exception e){}
+
+        model.addAttribute("markerMap", userChoice);
+
 
         return "search";
     }

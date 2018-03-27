@@ -194,21 +194,6 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
     }
 
 
-    var geneFilter = jQuery("#geneFilter1");
-    if (geneFilter.val() != null && geneFilter.val() != "") {
-
-        var openMarkerFacet = true;
-
-        if (openMarkerFacet) {
-            var markerFilterField = jQuery("li#marker_filter > a.accordion-title");
-            markerFilterField.click();
-        }
-    }
-
-
-
-
-
 }
 
 
