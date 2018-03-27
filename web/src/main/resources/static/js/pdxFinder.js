@@ -230,13 +230,16 @@ function redirectPage(){
         var geneFilter = jQuery("#geneFilter"+i);
         var variantFilter = jQuery("#variantFilter"+i);
 
-        if (geneFilter.val() != null && geneFilter.val() != "") {
+        if (geneFilter.val() != null && geneFilter.val() != "")
+        {
+            for (var j=0; j<variantFilter.val().length; j++){
 
-            if (!no_parameters) {
-                url = url + "&";
+                if (!no_parameters) {
+                    url = url + "&";
+                }
+                url += "mutation=" + geneFilter.val() + "___MUT" + "___"+variantFilter.val()[j];
+                no_parameters = false;
             }
-            url += "mutation=" + geneFilter.val() + "___MUT" + "___"+variantFilter.val();
-            no_parameters = false;
         }
 
     }
