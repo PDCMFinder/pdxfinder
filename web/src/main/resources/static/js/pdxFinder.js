@@ -217,13 +217,24 @@ function redirectPage(){
 
         if (geneFilter.val() != null && geneFilter.val() != "")
         {
+            var allVariants = getVariantSize(geneFilter.val());
             for (var j=0; j<variantFilter.val().length; j++){
 
                 if (!no_parameters) {
                     url = url + "&";
                 }
-                url += "mutation=" + geneFilter.val() + "___MUT" + "___"+variantFilter.val()[j];
-                no_parameters = false;
+
+                if(allVariants.length == variantFilter.val().length){
+
+                    url += "mutation=" + geneFilter.val() + "___MUT" + "___ALL";
+                    no_parameters = false;
+                    break;
+                }else{
+
+                    url += "mutation=" + geneFilter.val() + "___MUT" + "___"+variantFilter.val()[j];
+                    no_parameters = false;
+
+                }
             }
         }
 

@@ -372,7 +372,7 @@
 
 
                                                     <span th:if="${not #lists.isEmpty(param.mutation)}">
-                                                        <div th:each="eachMarker,iter :${markerMap}">
+                                                        <div th:each="eachMarker,iter :${markerMapWithAllVariants}">
 
                                                             <div class="row large-12 medium-12 expanded" th:id="'geneticVar'+${iter.index+1}" th:style="( ${iter.index} == 0 ) ? 'margin-top: 10px' : 'margin-top: -10px' ">
 
@@ -382,7 +382,10 @@
                                                                 <span th:id="'filterOptions'+${iter.index+1}">
                                                                     <select th:id="'variantFilter'+${iter.index+1}" multiple='multiple' style="width: 4%;  min-width: 70px;">
 
-                                                                        <option  th:each="variant :${eachMarker.value}" th:value="${variant}" th:text="${variant}" selected> ... </option>
+                                                                        <option th:each="variant :${eachMarker.value}"
+                                                                                th:value="${variant}"
+                                                                                th:text="${variant}"
+                                                                                th:selected="( ${#lists.contains(markerMap.get(eachMarker.key), variant)} ) ? 'true' : 'false' "> ... </option>
 
                                                                     </select>
                                                                 </span>
@@ -725,6 +728,14 @@
     if (openMarkerFacet != -1) {
         var markerFilterField = jQuery("li#marker_filter > a.accordion-title");
         markerFilterField.click();
+    }
+
+
+    function getVariantSize(selectedMarker) {
+
+        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker];
+
+        return valuesAreVariants;
     }
 
 

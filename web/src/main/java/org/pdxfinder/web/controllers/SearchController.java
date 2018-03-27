@@ -1,6 +1,7 @@
 package org.pdxfinder.web.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.commons.lang3.StringUtils;
@@ -200,6 +201,7 @@ public class SearchController {
         int current = page;
         int begin = Math.max(1, current - 4);
         int end = Math.min(begin + 7, numPages);
+        String mutatedMarkers = molCharService.getMutatedMarkersAndVariants();;
 
         String textSearchDescription = getTextualDescription(facetString, results);
 
@@ -235,11 +237,21 @@ public class SearchController {
 
         model.addAttribute("facet_options", facets);
         model.addAttribute("results", new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size())));
-        model.addAttribute("mutatedMarkersAndVariants", molCharService.getMutatedMarkersAndVariants());
 
-       // System.out.println(mutation.get());
+        model.addAttribute("mutatedMarkersAndVariants", mutatedMarkers);
+
+
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, List<String>> mapObject = new HashMap<>();
+        try{
+            mapObject = mapper.readValue(mutatedMarkers, Map.class);
+        }catch (Exception e){}
+
         String done = "";
         Map<String, List<String>> userChoice = new HashMap<>();
+        Map<String, List<String>> allVariants = new HashMap<>();
 
         try {
             for (String markerReq : mutation.get()) {
@@ -255,11 +267,17 @@ public class SearchController {
                         if (marka.equals(markerReq2.split("___")[0])){
 
                             variant = markerReq2.split("___")[2];
-                            variantList.add(variant);
+
+                            if (variant.equals("ALL")){
+                                variantList = mapObject.get(marka);
+                            }else {
+                                variantList.add(variant);
+                            }
                         }
 
                     }
                     userChoice.put(marka,variantList);
+                    allVariants.put(marka,mapObject.get(marka));
                 }
 
                 done += marka;
@@ -268,7 +286,7 @@ public class SearchController {
         }catch (Exception e){}
 
         model.addAttribute("markerMap", userChoice);
-
+        model.addAttribute("markerMapWithAllVariants", allVariants);
 
         return "search";
     }
