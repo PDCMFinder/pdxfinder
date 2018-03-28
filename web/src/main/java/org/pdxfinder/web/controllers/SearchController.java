@@ -225,8 +225,10 @@ public class SearchController {
             mutSelected = true;
         }
 
-        //auto suggestions for the search field
         List<AutoSuggestOption> autoSuggestList = autoCompleteService.getAutoSuggestions();
+        List<ModelForQuery> resultSet = new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size()));
+
+        //auto suggestions for the search field
         model.addAttribute("autoCompleteList", autoSuggestList);
 
         model.addAttribute("numPages", numPages);
@@ -250,10 +252,16 @@ public class SearchController {
         model.addAttribute("query", query.orElse(""));
 
         model.addAttribute("facet_options", facets);
-        model.addAttribute("results", new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size())));
-
+        model.addAttribute("results", resultSet);
         model.addAttribute("mutatedMarkersAndVariants", mutatedMarkers);
         //model.addAttribute("selectedMutatedMarkerOrder", selectedMutatedMarkerOrder);
+
+        if (mutSelected == true){
+            model.addAttribute("platformMap", getPlatformOrMutationFromMutatedVariants(resultSet,"platformMap"));
+            model.addAttribute("mutationMap", getPlatformOrMutationFromMutatedVariants(resultSet,"mutationMap"));
+        }
+
+
 
 
 
@@ -297,7 +305,7 @@ public class SearchController {
 
                 done += marka;
             }
-            System.out.println(userChoice);
+            //System.out.println(userChoice);
         }catch (Exception e){}
 
         model.addAttribute("markerMap", userChoice);
@@ -305,6 +313,39 @@ public class SearchController {
 
         return "search";
     }
+
+
+
+
+    private Map<String, List<String>> getPlatformOrMutationFromMutatedVariants(List<ModelForQuery> resultSet, String whichMap){
+
+        Map<String, List<String>> platformMap = new HashMap<>();
+        Map<String, List<String>> mutationMap = new HashMap<>();
+
+        for (ModelForQuery mfq : resultSet){
+
+            List<String> dPlatforms = new ArrayList<>();
+            List<String> dMutations = new ArrayList<>();
+
+            for (String mutatedVariants : mfq.getMutatedVariants()){
+                String[] mv = mutatedVariants.split("\\s+");  // e.g  [Truseq_JAX BRAF V600E, CTP BRAF V600E]
+                dPlatforms.add(mv[0]);
+                dMutations.add(mv[1]+" "+mv[2]);
+            }
+
+            platformMap.put(mfq.getExternalId(), dPlatforms);
+            mutationMap.put(mfq.getExternalId(), dMutations);
+        }
+
+        if (whichMap.equals("platformMap")){
+            return platformMap;
+        }else{
+            return mutationMap;
+        }
+
+    }
+
+
 
     /**
      * Get a string representation of all the configured facets
