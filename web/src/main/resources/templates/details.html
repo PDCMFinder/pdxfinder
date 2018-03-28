@@ -179,19 +179,13 @@
             <section class="row large-10 medium-12 expanded" id="detailsData">
 
                 <div class="row large-12 medium-12 expanded">
-                    <ul class="tabs style-2" data-tabs id="example2-tabs">
-                        <li class="tabs-title is-active"><a href="#summary" data-tabs-target="summary"
-                                                            aria-selected="true">Summary</a></li>
-                        <li class="tabs-title "><a href="#variation" data-tabs-target="variation"
-                                                   id="variation_data_link" onclick="showTabsFirst()"> Genomic Data
+                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                        <li class="tabs-title is-active"><a href="#summary" aria-selected="true">Summary</a></li>
+                        <li class="tabs-title "><a href="#variation" id="variation_data_link" onclick="showTabsFirst()"> Genomic Data
                             (<span th:text="${totalRecords}"></span>) </a></li>
 
-                        <li th:if="${drugSummaryRowNumber} == 0" class="tabs-title"><a href="#dosing_studies"
-                                                                                       data-tabs-target="dosing_studies">Dosing
-                            studies (0)</a></li>
-                        <li th:if="${drugSummaryRowNumber} > 0" class="tabs-title"><a href="#dosing_studies"
-                                                                                      data-tabs-target="dosing_studies">Dosing
-                            studies (1)</a></li>
+                        <li th:if="${drugSummaryRowNumber} == 0" class="tabs-title"><a href="#dosing_studies">Dosing studies (0)</a></li>
+                        <li th:if="${drugSummaryRowNumber} > 0" class="tabs-title"><a href="#dosing_studies">Dosing studies (1)</a></li>
 
                     </ul>
                 </div>
@@ -378,15 +372,16 @@
                                 </ul>
 
 
+
                                 <!-- Tab panes -->
                                 <div class="tab-content">
                                     <div th:each="technology,iter : ${patientInfo}"
                                          th:id="${technology.key}"
                                          class="tab-pane active" role="tabpanel">
 
+
                                                 <span>
-                                                        <div class="table-responsive"
-                                                             th:classappend="( ${iter.index} == 0 ) ? 'hideContent' : 'hideContent' ">
+                                                        <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'hideContent' : 'hideContent' ">
 
                                                             <b class="bLine">
                                                                 <span class="hdc">Tumor Type: </span>            <i>Patient Tumor</i>                  &nbsp; &nbsp;
@@ -752,6 +747,17 @@
             document.getElementsByClassName("hideContent")[i].style.position = "static";
         }
     }
+
+    // Check if variation tab is deeplinked on page load:
+    $(document).ready(function(){
+        var hash = window.location.hash;
+
+        if (hash == "#variation"){
+            for (var i = 0; i < 5; i++) {
+                document.getElementsByClassName("hideContentShowFirst")[i].style.position = "static";
+            }
+        }
+    });
 
 
     /*function expandTable(action) {
