@@ -669,6 +669,9 @@
         $('.main-search .choices__input').attr("placeholder", "Search (e.g., Melanoma)");
     }, false);
 
+    mainSearch.passedElement.addEventListener('addItem', function(event) {
+        jQuery("form.main-search").submit();
+    }, false);
 
     console.log("before updating");
 
