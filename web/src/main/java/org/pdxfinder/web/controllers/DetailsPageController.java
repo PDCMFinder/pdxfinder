@@ -3,6 +3,7 @@ package org.pdxfinder.web.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.services.GraphService;
@@ -189,7 +190,7 @@ public class DetailsPageController {
 
         Map<String, Set<String>> modelTechAndPassages = searchService.findModelPlatformAndPassages(dataSrc,modelId,"");
 
-        List<List<String[]>> variationDataDTOList = new ArrayList<>();
+        Set<List<String[]>> variationDataDTOList = new HashSet<>();
 
         for (String tech : modelTechAndPassages.keySet()) {
             VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,"",0,50000,"",1,"","");
