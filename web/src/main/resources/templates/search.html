@@ -494,7 +494,7 @@
 
                                 <td th:if="${isMutationSelected} == true">
                                     <th:block th:each="platform : ${platformMap.get(model.externalId)}">
-                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#'+${platform} }"
+                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation' }"
                                            style="font-size: 12px;" th:utext="${platform} + '<br />'">platform</a>
                                     </th:block>
                                 </td>
@@ -747,7 +747,7 @@
 
     function getVariantSize(selectedMarker) {
 
-        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker];
+        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker].sort();
 
         return valuesAreVariants;
     }
