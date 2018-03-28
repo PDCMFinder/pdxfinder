@@ -170,6 +170,7 @@ public class SearchController {
                 )
         );
 
+        //logger.info("Before: "+facetString);
         // If there is a query, append the query parameter to any configured facet string
         if (query.isPresent() && !query.get().isEmpty()) {
             facetString = StringUtils.join(Arrays.asList("query=" + query.get(), facetString), "&");
@@ -182,13 +183,26 @@ public class SearchController {
             }
         }
 
+        List<String> selectedMutatedMarkerOrder = new ArrayList<>();
+
         if (mutation.isPresent() && !mutation.get().isEmpty()) {
+            List<String> mutList = new ArrayList<>();
             for (String mut : mutation.get()) {
-
-                facetString = StringUtils.join(Arrays.asList("mutation=" + mut, facetString), "&");
+                //logger.info(mut);
+                mutList.add("mutation="+mut);
+                //facetString = StringUtils.join(Arrays.asList("mutation=" + mut, facetString), "&");
             }
-        }
 
+            if(facetString.length() != 0 && !facetString.endsWith("&")) {
+                facetString += "&";
+            }
+            for(String mut: mutList){
+                facetString += mut+"&";
+            }
+            //facetString += StringUtils.join(mutList, "&");
+
+    }
+        //logger.info("After: " +facetString);
 
         // Num pages is converted to an int using this formula int n = a / b + (a % b == 0) ? 0 : 1;
         int numPages = results.size() / size + (results.size() % size == 0 ? 0 : 1);
@@ -240,6 +254,7 @@ public class SearchController {
         model.addAttribute("facet_options", facets);
         model.addAttribute("results", resultSet);
         model.addAttribute("mutatedMarkersAndVariants", mutatedMarkers);
+        //model.addAttribute("selectedMutatedMarkerOrder", selectedMutatedMarkerOrder);
 
         if (mutSelected == true){
             model.addAttribute("platformMap", getPlatformOrMutationFromMutatedVariants(resultSet,"platformMap"));
@@ -259,7 +274,7 @@ public class SearchController {
 
         String done = "";
         Map<String, List<String>> userChoice = new HashMap<>();
-        Map<String, List<String>> allVariants = new HashMap<>();
+        Map<String, List<String>> allVariants = new LinkedHashMap<>();
 
         try {
             for (String markerReq : mutation.get()) {
@@ -357,7 +372,7 @@ public class SearchController {
         }
 
         String textDescription = "Your filter for ";
-        Map<String, Set<String>> filters = new HashMap<>();
+        Map<String, Set<String>> filters = new LinkedHashMap<>();
 
         for (String urlParams : facetString.split("&")) {
             List<String> pieces = Arrays.asList(urlParams.split("="));
