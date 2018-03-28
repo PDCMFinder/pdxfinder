@@ -468,7 +468,7 @@
                                 <th>Type</th>
                                 <th>Age</th>
                                 <th>Sex</th>
-                                <th>Data Available</th>
+                                <th th:if="${isMutationSelected} == false">Data Available</th> <th th:if="${isMutationSelected} == true">Platform</th>
                                 <th th:if="${isMutationSelected} == true">Mutations</th>
                             </tr>
                             </thead>
@@ -484,13 +484,27 @@
                                 <td th:text="${model.sampleTumorType}">Metastatic</td>
                                 <td th:text="${model.patientAge}">Age</td>
                                 <td th:text="${model.patientGender}">Sex</td>
-                                <td>
+
+                                <td> <!--  th:if="${isMutationSelected} == true" -->
                                     <th:block th:each="platform : ${model.dataAvailable}">
                                         <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#'+${platform} }"
                                            style="font-size: 12px;" th:utext="${platform} + '<br />'">platform</a>
                                     </th:block>
                                 </td>
-                                <td th:if="${isMutationSelected} == true" th:text="${model.mutatedVariants}"></td>
+
+                                <!--<td th:if="${isMutationSelected} == true">
+                                    <th:block th:each="platform : ${platformMap.get(model.externalId)}">
+                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#'+${platform} }"
+                                           style="font-size: 12px;" th:utext="${platform} + '<br />'">platform</a>
+                                    </th:block>
+                                </td>-->
+
+                                <td th:if="${isMutationSelected} == true">
+                                    <th:block th:each="dMutations : ${mutationMap.get(model.externalId)}">
+                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#'+${dMutations} }"
+                                           style="font-size: 12px;" th:utext="${dMutations} + '<br />'">dMutations</a>
+                                    </th:block>
+                                </td>
                             </tr>
 
                             </tbody>
