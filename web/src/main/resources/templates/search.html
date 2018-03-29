@@ -752,7 +752,7 @@
 
     function getVariantSize(selectedMarker) {
 
-        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker].sort();
+        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker];
 
         return valuesAreVariants;
     }
@@ -761,7 +761,7 @@
     function loadVariants(selectedMarker,compNumber) {
 
         var marker = selectedMarker.value;
-        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker.value];
+        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker.value].sort();
 
         //alert(marker+"\n"+typeof valuesAreVariants);
         var newOptions = "";
