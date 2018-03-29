@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.SearchService;
@@ -187,18 +188,32 @@ public class DetailsPageController {
                                    @PathVariable String dataSrc,
                                    @PathVariable String modelId){
 
-            Set<Set<String[]>> variationDataDTOList = new LinkedHashSet<>();
-            Set<String[]> temp = new LinkedHashSet<>();
 
-            VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,"","",0,50000,"",1,"","");
+        Set<String[]> variationDataDTOSet = new LinkedHashSet<>();
 
-            for (String[] dData : variationDataDTO.getData()){
-                temp.add(dData);
-            }
-            variationDataDTOList.add(temp);
+        String[] space = {""}; String nil = "";
+
+        // Retreive all Genomic Datasets
+        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,nil,nil,0,50000,nil,1,nil,nil);
+        for (String[] dData : variationDataDTO.getData()){ variationDataDTOSet.add(dData); }
+
+        //Retreive Diagnosis Information
+        String diagnosis = searchService.searchForModel(dataSrc,modelId,0,50000,"","","").getDiagnosis();
+
+        // Retreive technology Information
+        List platforms = new ArrayList();
+        Map<String, Set<String>> modelTechAndPassages = searchService.findModelPlatformAndPassages(dataSrc,modelId,"");
+        for (String tech : modelTechAndPassages.keySet()) {
+            platforms.add(tech);
+        }
 
 
         CsvMapper mapper = new CsvMapper();
+
+        CsvSchema titleArea = CsvSchema.builder()
+                .addColumn("").addColumn("")
+                .addColumn("Histology: "+ WordUtils.capitalize(diagnosis)+" | Tumor Type: Xenograft Tumor | Platform: "+platforms)
+                .build().withHeader();
 
         CsvSchema schema = CsvSchema.builder()
                 .addColumn("Sample ID")
@@ -217,7 +232,8 @@ public class DetailsPageController {
 
         String output = "CSV output";
         try {
-            output = mapper.writer(schema).writeValueAsString(variationDataDTOList);
+            output = mapper.writer(titleArea).writeValueAsString(space);
+            output += mapper.writer(schema).writeValueAsString(variationDataDTOSet);
         } catch (JsonProcessingException e) {}
 
         response.setContentType("text/csv;charset=utf-8");
