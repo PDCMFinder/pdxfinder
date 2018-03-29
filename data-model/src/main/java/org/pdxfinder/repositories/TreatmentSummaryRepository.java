@@ -21,4 +21,8 @@ public interface TreatmentSummaryRepository extends Neo4jRepository<TreatmentSum
 
     @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary) WHERE toLower(mod.dataSource) = toLower({dataSource}) RETURN count(mod)")
     int findStudyNumberByDataSource(@Param("dataSource") String dataSource);
+
+
+    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary) WHERE toLower(mod.dataSource) = toLower({dataSource}) AND EXISTS(ts.url) RETURN ts.url LIMIT 1")
+    String findPlatformUrlByDataSource(@Param("dataSource") String dataSource);
 }

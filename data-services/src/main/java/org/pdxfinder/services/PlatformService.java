@@ -6,7 +6,7 @@ import org.pdxfinder.dao.Platform;
 import org.pdxfinder.dao.Sample;
 import org.pdxfinder.repositories.ModelCreationRepository;
 import org.pdxfinder.repositories.PlatformRepository;
-import org.pdxfinder.services.dto.PlatformDataDTO;
+import org.pdxfinder.services.dto.DataAvailableDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -46,7 +46,7 @@ public class PlatformService
     }
 
 
-    public List<PlatformDataDTO> getPlatformDataCountBySource(String dataSource){
+    public List<DataAvailableDTO> getPlatformDataCountBySource(String dataSource){
 
         //datatype => platform => modelNumber
         Map<String, Map<String, Integer>> platformDataMap = new HashMap<>();
@@ -92,7 +92,7 @@ public class PlatformService
 
         }
 
-        List<PlatformDataDTO> resultList = new ArrayList<>();
+        List<DataAvailableDTO> resultList = new ArrayList<>();
 
         for(Map.Entry<String, Map<String, Integer>> mcTypeEntry : platformDataMap.entrySet()){
 
@@ -103,7 +103,7 @@ public class PlatformService
                 String platformName = platformNameEntry.getKey();
                 Integer modelNumbers = platformNameEntry.getValue();
 
-                PlatformDataDTO dto = new PlatformDataDTO(mcType, platformName, modelNumbers.toString());
+                DataAvailableDTO dto = new DataAvailableDTO(mcType, platformName, modelNumbers.toString());
                 resultList.add(dto);
             }
         }
@@ -113,7 +113,15 @@ public class PlatformService
 
         if(dosingStudiesNumber > 0) {
 
-            PlatformDataDTO dto = new PlatformDataDTO("dosing studies", "Dosing Protocol", Integer.toString(dosingStudiesNumber));
+            DataAvailableDTO dto = new DataAvailableDTO("dosing studies", "Dosing Protocol", Integer.toString(dosingStudiesNumber));
+            String platformUrl = drugService.getPlatformUrlByDataSource(dataSource);
+
+            if(platformUrl == null || platformUrl.isEmpty()){
+                dto.setPlatformUrl("");
+            }
+            else{
+                dto.setPlatformUrl(platformUrl);
+            }
             resultList.add(dto);
         }
 

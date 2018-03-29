@@ -20,4 +20,10 @@ public class DrugService {
 
         return treatmentSummaryRepository.findStudyNumberByDataSource(dataSource);
     }
+
+
+    public String getPlatformUrlByDataSource(String dataSource){
+
+        return treatmentSummaryRepository.findPlatformUrlByDataSource(dataSource);
+    }
 }
