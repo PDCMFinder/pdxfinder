@@ -21,11 +21,13 @@ public class PlatformService
 
     private PlatformRepository platformRepository;
     private ModelCreationRepository modelCreationRepository;
+    private DrugService drugService;
 
 
-    public PlatformService(PlatformRepository platformRepository, ModelCreationRepository modelCreationRepository) {
+    public PlatformService(PlatformRepository platformRepository, ModelCreationRepository modelCreationRepository, DrugService drugService) {
         this.platformRepository = platformRepository;
         this.modelCreationRepository = modelCreationRepository;
+        this.drugService = drugService;
     }
 
 
@@ -104,6 +106,15 @@ public class PlatformService
                 PlatformDataDTO dto = new PlatformDataDTO(mcType, platformName, modelNumbers.toString());
                 resultList.add(dto);
             }
+        }
+
+        //Add dosing studies number
+        int dosingStudiesNumber = drugService.getDosingStudiesNumberByDataSource(dataSource);
+
+        if(dosingStudiesNumber > 0) {
+
+            PlatformDataDTO dto = new PlatformDataDTO("dosing studies", "Dosing Protocol", Integer.toString(dosingStudiesNumber));
+            resultList.add(dto);
         }
 
         return resultList;
