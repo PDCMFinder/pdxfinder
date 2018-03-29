@@ -781,7 +781,7 @@ table.dataTable {
 
 .icoButn {
     background-color: #FFF;
-    border: 3px ridge #fff;
+    border: 2px ridge #000;
     color: #000;
     padding: 11px 3px;
     text-align: center;
@@ -798,7 +798,7 @@ table.dataTable {
 
 .icoButn:hover {
     background-color: #06369d;
-    border: 1px solid #fff;
+    border: 2px ridge #000;
     color: #fff;
 }
 

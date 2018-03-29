@@ -298,36 +298,6 @@
 
 
 
-                        <li class="accordion-item is-active" data-accordion-item>
-                            <!-- Accordion tab title -->
-                            <a href="#" class="accordion-title">PDX model</a>
-
-                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
-                            <div class="accordion-content" data-tab-content>
-
-
-                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true" data-allow-all-closed="true">
-                                    <li class="accordion-item" data-accordion-item id="datasource_filter">
-                                        <a href="#" class="accordion-title">Datasource</a>
-                                        <div class="accordion-content" data-tab-content>
-                                            <div class="large-form">
-                                                <div class="checkbox-item" th:each="instance:${facet_options['datasource_options']}">
-                                                    <input th:id="'datasource__' + ${instance}" type="checkbox" class="datasource filter"/>
-                                                    <label th:attr="for='datasource__'+${instance}"><span th:text="${instance}"></span></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-
-
-                            </div>
-
-
-                        </li>
-
-
-
                         <style>.hidden{display:none;}</style>
 
                         <li class="accordion-item is-active" data-accordion-item>
@@ -340,47 +310,56 @@
                                     <li class="accordion-item" data-accordion-item id="marker_filter">
                                         <a href="#" class="accordion-title">Small Genetic Variation</a>
                                         <div class="accordion-content" data-tab-content>
-                                            <div style="background-color: #f1f2f2; padding: 10px;">
+                                            <div style="background-color: #f1f2f2; padding: 10px; position: relative;">
                                                 <div class="checkbox-item">
-                                                    <div class="checkbox-item"><span class="black" style="font-size: 19px; font-weight: bold;">Genes</span></div>
+                                                    <div class="checkbox-item"><span class="black" style="font-size: 16px; font-weight: bold;">Genes</span></div>
 
+
+                                                    <style>.columns .nospace{padding:1px;}</style>
 
                                                     <span th:if="${#lists.isEmpty(param.mutation)}">
-                                                        <div class="row large-12 medium-12 expanded">
-                                                            <input type="text" id="geneFilter1" placeholder="MARKER" onblur="loadVariants(this,'1')" style="width: 19%; min-width: 70px; display: inline-block;"/>
-                                                            <input type="text" value="MUT" style="width: 13%; display: inline-block;"/>
-                                                            <!--<input type="text" id="variantFilter" style="width: 19%; min-width: 70px; display: inline-block;"/>-->
+                                                        <div class="row" style="margin-top: 10px;">
 
-                                                            <span id="filterOptions1">
-                                                                <select id='variantFilter1' multiple='multiple' style="width: 20%;  max-width: 70px;"> </select>
-                                                            </span>
+                                                            <div class="columns nospace small-4 large-4"> <input type="text" id="geneFilter1" onblur="loadVariants(this,'1')"/> </div>
+                                                            <div class="columns nospace small-3 large-3"> <input type="text" value="MUT"/></div>
 
-                                                           <!-- <button onclick="myTrigger('AND',2)" class="icoButn"  style="width: 20%;"> <i class="set set-intersect"></i> AND </button> -->
-                                                            <button onclick="myTrigger('OR',2)" href="#" class="icoButn"  style="width: 18%;"> <i class="set set-union"></i> OR </button>
+                                                            <div id="filterOptions1" class="columns nospace small-5 large-5" style="margin-top: 3px;">
+                                                                <select id='variantFilter1' multiple='multiple'> </select>
+                                                            </div>
+
+                                                            <!-- <button onclick="myTrigger('AND',2)" class="icoButn"  style="width: 20%;"> <i class="set set-intersect"></i> AND </button> -->
+                                                            <!-- <button onclick="myTrigger('OR',2)" href="#" class="icoButn columns nospace large-2" > <i class="icon icon-functional" data-icon="+"></i> </button> -->
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="row hidden" th:each="i: ${#numbers.sequence(2, 20)}" th:id="'geneticVar'+${i}">
+                                                                <div class="columns nospace small-4 large-4">
+                                                                    <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}" />
+                                                                </div>
+                                                                <div class="columns nospace small-3 large-3"><input type="text" value="MUT" /></div>
+
+                                                                <div th:id="'filterOptions'+${i}" class="columns nospace small-5 large-5" style="margin-top: 3px;">
+                                                                    <select th:id="'variantFilter'+${i}" multiple='multiple'> </select>
+                                                                </div>
+                                                            </div>
                                                         </div>
 
-                                                        <div  th:each="i: ${#numbers.sequence(2, 20)}" class="row large-12 medium-12 expanded hidden" th:id="'geneticVar'+${i}" style="margin-top: -10px">
-                                                            <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}" style="width: 19%; min-width: 70px; display: inline-block;"/>
-                                                            <input type="text" value="MUT" style="width: 13%; display: inline-block;"/>
-
-                                                            <span th:id="'filterOptions'+${i}">
-                                                                <select th:id="'variantFilter'+${i}" multiple='multiple' style="width: 20%;  min-width: 70px;"> </select>
-                                                            </span>
-                                                        </div>
                                                     </span>
 
 
 
                                                     <span th:if="${not #lists.isEmpty(param.mutation)}">
-                                                        <div th:each="eachMarker,iter :${markerMapWithAllVariants}">
+                                                        <span th:each="eachMarker,iter :${markerMapWithAllVariants}">
 
-                                                            <div class="row large-12 medium-12 expanded" th:id="'geneticVar'+${iter.index+1}" th:style="( ${iter.index} == 0 ) ? 'margin-top: 10px' : 'margin-top: -10px' ">
 
-                                                                <input th:value="${eachMarker.key}" th:onblur="'loadVariants(this,'+${iter.index+1}+')'" type="text" th:id="'geneFilter'+${iter.index+1}" style="width: 19%; min-width: 70px; display: inline-block;"/>
-                                                                <input type="text" value="MUT" style="width: 13%; display: inline-block;"/>
+                                                            <div class="row large-12 medium-12 expanded" th:id="'geneticVar'+${iter.index+1}" ><!-- th:style="( ${iter.index} == 0 ) ? 'margin-top: 10px' : 'margin-top: -10px' " -->
 
-                                                                <span th:id="'filterOptions'+${iter.index+1}">
-                                                                    <select th:id="'variantFilter'+${iter.index+1}" multiple='multiple' style="width: 4%;  min-width: 70px;">
+                                                                <div class="columns nospace small-4 large-4">
+                                                                    <input th:value="${eachMarker.key}" th:onblur="'loadVariants(this,'+${iter.index+1}+')'" type="text" th:id="'geneFilter'+${iter.index+1}"/>
+                                                                </div>
+                                                                <div class="columns nospace small-3 large-3"><input type="text" value="MUT"/></div>
+
+                                                                <div class="columns nospace small-5 large-5" style="margin-top: 3px;" th:id="'filterOptions'+${iter.index+1}">
+                                                                    <select th:id="'variantFilter'+${iter.index+1}" style="width: 40%" multiple='multiple'>
 
                                                                         <option th:each="variant :${eachMarker.value}"
                                                                                 th:value="${variant}"
@@ -388,29 +367,27 @@
                                                                                 th:selected="( ${#lists.contains(markerMap.get(eachMarker.key), variant)} ) ? 'true' : 'false' "> ... </option>
 
                                                                     </select>
-                                                                </span>
+                                                                </div>
 
-                                                                <th:block th:if="${iter.index} == 0">
-                                                                    <!-- <button onclick="myTrigger('AND',4)" class="icoButn"  style="width: 20%;"> <i class="set set-intersect"></i> AND </button>  -->
-                                                                    <button onclick="myTrigger('OR',4)" href="#" class="icoButn"  style="width: 18%;"> <i class="set set-union"></i> OR </button>
-                                                                </th:block>
 
                                                             </div>
 
-                                                        </div>
+                                                        </span>
 
 
 
                                                         <span th:if="${not #lists.isEmpty(param.mutation)}">
                                                             <span th:each="i: ${#numbers.sequence(#maps.size(markerMap)+1, 20)}">
 
-                                                                <div class="row large-12 medium-12 expanded hidden" th:id="'geneticVar'+${i}" style="margin-top: -10px">
-                                                                    <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}" style="width: 19%; min-width: 70px; display: inline-block;"/>
-                                                                    <input type="text" value="MUT" style="width: 13%; display: inline-block;"/>
+                                                                <div class="row hidden" th:id="'geneticVar'+${i}">
+                                                                    <div class="columns nospace small-4 large-4">
+                                                                        <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}"/>
+                                                                    </div>
+                                                                    <div class="columns nospace small-3 large-3"><input type="text" value="MUT"/></div>
 
-                                                                    <span th:id="'filterOptions'+${i}">
-                                                                        <select th:id="'variantFilter'+${i}" multiple='multiple' style="width: 20%;  min-width: 70px;"> </select>
-                                                                    </span>
+                                                                    <div class="columns nospace small-5 large-5" style="margin-top: 3px;" th:id="'filterOptions'+${i}">
+                                                                        <select th:id="'variantFilter'+${i}" multiple='multiple'> </select>
+                                                                    </div>
                                                                 </div>
 
                                                             </span>
@@ -419,8 +396,18 @@
                                                     </span>
 
                                                 </div>
-                                                <div class="checkbox-item" style="height: 70px;">
-                                                    <button id="markerFilter" href="#" class="button primary" style="color: #fff; float:right; box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);"> GO </button>
+
+
+                                                <div class="checkbox-item" style="height: 70px;" th:if="${#lists.isEmpty(param.mutation)}">
+                                                    <button id="markerFilter" href="#" class="button primary columns large-3" style="color: #fff; float:right;"> <i class="icon icon-functional" data-icon="1"></i> </button>
+                                                    <!-- <button id="markerFilter" href="#" class="button outline columns large-3" style="color: #fff; float:right;"> <i class="icon icon-functional" data-icon="+"></i> </button> -->
+                                                    <button style="margin-top: -1px;" onclick="myTrigger('OR',2)" href="#" class="icoButn columns large-2" > <i class="icon icon-functional" data-icon="+"></i> </button>
+                                                </div>
+
+                                                <div class="checkbox-item" style="height: 70px;" th:if="${not #lists.isEmpty(param.mutation)}">
+                                                    <button id="markerFilter" href="#" class="button primary columns large-3" style="color: #fff; float:right;"> <i class="icon icon-functional" data-icon="1"></i> </button>
+                                                    <!-- <button onclick="myTrigger('AND',4)" class="icoButn"  style="width: 20%;"> <i class="set set-intersect"></i> AND </button>  -->
+                                                    <button style="margin-top: -1px;" onclick="myTrigger('OR',4)" href="#" class="icoButn columns large-2" > <i class="icon icon-functional" data-icon="+"></i> </button>
                                                 </div>
 
                                             </div>

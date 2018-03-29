@@ -274,7 +274,8 @@ public class SearchController {
 
         String done = "";
         Map<String, List<String>> userChoice = new HashMap<>();
-        Map<String, List<String>> allVariants = new LinkedHashMap<>();
+        Map<String, Set<String>> allVariants = new LinkedHashMap<>();
+
 
         try {
             for (String markerReq : mutation.get()) {
@@ -297,10 +298,13 @@ public class SearchController {
                                 variantList.add(variant);
                             }
                         }
-
                     }
                     userChoice.put(marka,variantList);
-                    allVariants.put(marka,mapObject.get(marka));
+
+                    Set<String> sortedVariantList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+                    sortedVariantList.addAll(mapObject.get(marka));
+
+                    allVariants.put(marka,sortedVariantList);
                 }
 
                 done += marka;
