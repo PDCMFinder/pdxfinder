@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.dao.Specimen;
+import org.pdxfinder.services.DrugService;
 import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.DetailsDTO;
@@ -27,12 +28,14 @@ public class DetailsPageController {
 
     private SearchService searchService;
     private GraphService graphService;
+    private DrugService drugService;
 
 
     @Autowired
-    public DetailsPageController(SearchService searchService, GraphService graphService) {
+    public DetailsPageController(SearchService searchService, GraphService graphService, DrugService drugService) {
         this.searchService = searchService;
         this.graphService = graphService;
+        this.drugService = drugService;
     }
 
     @RequestMapping(value = "/pdx/{dataSrc}/{modelId}")
@@ -52,6 +55,7 @@ public class DetailsPageController {
         List<String> relatedModels = searchService.getModelsOriginatedFromSamePatient(dataSrc, modelId);
 
         List<DrugSummaryDTO> drugSummary = searchService.getDrugSummary(dataSrc, modelId);
+        String drugProtocolUrl = drugService.getPlatformUrlByDataSource(dataSrc);
 
         List<VariationDataDTO> variationDataDTOList = new ArrayList<>();
 
@@ -147,6 +151,7 @@ public class DetailsPageController {
 
         model.addAttribute("drugSummary", drugSummary);
         model.addAttribute("drugSummaryRowNumber", drugSummary.size());
+        model.addAttribute("drugProtocolUrl", drugProtocolUrl);
 
 
         Map<String, String> sorceDesc = new HashMap<>();

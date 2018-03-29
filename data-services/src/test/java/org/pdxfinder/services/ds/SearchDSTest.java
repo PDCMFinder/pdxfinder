@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.xml.crypto.Data;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -56,7 +55,10 @@ public class SearchDSTest extends BaseTest {
 
         DataProjection dp = new DataProjection();
         dp.setLabel("ModelForQuery");
-        dp.setValue("[{\"modelId\":164005,\"datasource\":\"PDXNet-WUSTL\",\"externalId\":\"WUSTL 911-06\",\"patientAge\":\"30-39\",\"patientGender\":\"Female\",\"sampleOriginTissue\":\"Not Specified\",\"sampleSampleSite\":\"Not Specified\",\"sampleExtractionMethod\":\"surgical sample\",\"sampleClassification\":\"ypT3/N1b/M1a/G1/G2\",\"sampleTumorType\":\"Primary\",\"cancerSystem\":[\"Unclassified\"],\"diagnosis\":\"Adenocarcinoma\",\"mappedOntologyTerm\":\"Adenocarcinoma\",\"treatmentHistory\":\"Not Specified\",\"allOntologyTermAncestors\":[\"Adenocarcinoma\",\"Carcinoma\",\"Epithelial Neoplasm\",\"Cancer\",\"Glandular Cell Neoplasm\",\"Neoplasm by Morphology\"]}]");
+        dp.setValue("[" +
+                "{\"modelId\":164005,\"datasource\":\"PDXNet-WUSTL\",\"externalId\":\"WUSTL 911-06\",\"patientAge\":\"30-39\",\"patientGender\":\"Female\",\"sampleOriginTissue\":\"Not Specified\",\"sampleSampleSite\":\"Not Specified\",\"sampleExtractionMethod\":\"surgical sample\",\"sampleClassification\":\"ypT3/N1b/M1a/G1/G2\",\"sampleTumorType\":\"Primary\",\"cancerSystem\":[\"Unclassified\"],\"diagnosis\":\"Adenocarcinoma\",\"mappedOntologyTerm\":\"Adenocarcinoma\",\"treatmentHistory\":\"Not Specified\",\"allOntologyTermAncestors\":[\"Adenocarcinoma\",\"Carcinoma\",\"Epithelial Neoplasm\",\"Cancer\",\"Glandular Cell Neoplasm\",\"Neoplasm by Morphology\"]}," +
+                "{\"modelId\":158929,\"datasource\":\"JAX\",\"externalId\":\"J000104117\",\"patientAge\":\"60-69\",\"patientGender\":\"Female\",\"sampleOriginTissue\":\"Colon\",\"sampleSampleSite\":\"Abdominal wall\",\"sampleExtractionMethod\":\"Biopsy (type unspecified)\",\"sampleClassification\":\"AJCC IV/\",\"sampleTumorType\":\"Metastatic\",\"cancerSystem\":[\"Digestive System Cancer\"],\"diagnosis\":\"colon adenocarcinoma\",\"mappedOntologyTerm\":\"Colon Adenocarcinoma\",\"treatmentHistory\":\"Not Specified\",\"dataAvailable\":[\"CTP\"],\"allOntologyTermAncestors\":[\"Adenocarcinoma\",\"Colorectal Adenocarcinoma\",\"Colorectal Neoplasm\",\"Carcinoma\",\"Colon Neoplasm\",\"Colorectal Cancer\",\"Digestive System Carcinoma\",\"Colon Carcinoma\",\"Intestinal Cancer\",\"Neoplasm by Morphology\",\"Neoplasm by Site\",\"Colorectal Carcinoma\",\"Colon Cancer\",\"Intestinal Neoplasm\",\"Epithelial Neoplasm\",\"Digestive System Cancer\",\"Colon Adenocarcinoma\",\"Digestive System Neoplasm\",\"Glandular Cell Neoplasm\",\"Cancer\"]}" +
+                "]");
 
         DataProjection mutDP = new DataProjection();
         mutDP.setLabel("PlatformMarkerVariantModel");
@@ -115,6 +117,16 @@ public class SearchDSTest extends BaseTest {
 
         log.info("Result after filtering is ", filteredResults);
 
+
+    }
+
+    @Test
+    public void testGetDiagnosisCounts() {
+
+        Map<String, Integer> diagnosisCounts = searchDS.getDiagnosisCounts();
+        System.out.println(diagnosisCounts);
+        assertThat(diagnosisCounts.get("Adenocarcinoma"), is(2));
+        assertThat(diagnosisCounts.get("Colon Adenocarcinoma"), is(1));
 
     }
 

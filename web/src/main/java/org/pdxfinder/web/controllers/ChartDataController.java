@@ -31,21 +31,21 @@ public class ChartDataController {
     public Map<String, Collection<DataHolder>> getData() {
 
         final Set<ModelForQuery> models = searchDS.getModels();
+        final Map<String, Integer> diagnosisCounts = searchDS.getDiagnosisCounts();
 
         Map<String, Collection<DataHolder>> data = new HashMap<>();
         Map<String, DataHolder> cancers = new HashMap<>();
 
         int ids = 1;
 
-        for (ModelForQuery m : models) {
+        for (String key : diagnosisCounts.keySet()) {
 
-            if (!cancers.containsKey(m.getMappedOntologyTerm())) {
-                cancers.put(m.getMappedOntologyTerm(), new DataHolder(m.getMappedOntologyTerm()));
-                cancers.get(m.getMappedOntologyTerm()).setId(ids++);
+            if (!cancers.containsKey(key)) {
+                DataHolder dataHolder = new DataHolder(key);
+                dataHolder.setNumber(diagnosisCounts.get(key));
+                dataHolder.setId(ids++);
+                cancers.put(key, dataHolder);
             }
-
-            DataHolder dh = cancers.get(m.getMappedOntologyTerm());
-            dh.increment();
 
         }
 
