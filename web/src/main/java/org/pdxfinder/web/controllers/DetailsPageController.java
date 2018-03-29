@@ -187,17 +187,16 @@ public class DetailsPageController {
                                    @PathVariable String dataSrc,
                                    @PathVariable String modelId){
 
-        Map<String, Set<String>> modelTechAndPassages = searchService.findModelPlatformAndPassages(dataSrc,modelId,"");
+            Set<Set<String[]>> variationDataDTOList = new LinkedHashSet<>();
+            Set<String[]> temp = new LinkedHashSet<>();
 
-        Set<List<String[]>> variationDataDTOList = new HashSet<>();
+            VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,"","",0,50000,"",1,"","");
 
-        for (String tech : modelTechAndPassages.keySet()) {
-            VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,"",0,50000,"",1,"","");
+            for (String[] dData : variationDataDTO.getData()){
+                temp.add(dData);
+            }
+            variationDataDTOList.add(temp);
 
-            List<String[]> removeDuplicates = new ArrayList<String[]>(new LinkedHashSet<String[]>(variationDataDTO.getData()));
-
-            variationDataDTOList.add(removeDuplicates);
-        }
 
         CsvMapper mapper = new CsvMapper();
 
