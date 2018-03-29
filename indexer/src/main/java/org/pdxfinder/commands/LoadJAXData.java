@@ -52,8 +52,8 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
 
     private final static String HISTOLOGY_NOTE = "Pathologist assessment of patient tumor and pdx model tumor histology slides.";
-    
-   
+
+    private final static String DOSING_STUDY_URL = "http://www.pdxfinder.org/platform/jax-drug-dosing/";
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -247,6 +247,7 @@ public class LoadJAXData implements CommandLineRunner {
                 if(treatments.length() > 0){
                     //log.info("Treatments found for model "+mc.getSourcePdxId());
                     ts = new TreatmentSummary();
+                    ts.setUrl(DOSING_STUDY_URL);
 
                     for(int t = 0; t<treatments.length(); t++){
                         JSONObject treatmentObject = treatments.getJSONObject(t);
