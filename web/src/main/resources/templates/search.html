@@ -298,6 +298,38 @@
 
 
 
+                        <li class="accordion-item is-active" data-accordion-item>
+                            <!-- Accordion tab title -->
+                            <a href="#" class="accordion-title">PDX model</a>
+
+                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
+                            <div class="accordion-content" data-tab-content>
+
+
+                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true" data-allow-all-closed="true">
+                                    <li class="accordion-item" data-accordion-item id="datasource_filter">
+                                        <a href="#" class="accordion-title">Datasource</a>
+                                        <div class="accordion-content" data-tab-content>
+                                            <div class="large-form">
+                                                <div class="checkbox-item" th:each="instance:${facet_options['datasource_options']}">
+                                                    <input th:id="'datasource__' + ${instance}" type="checkbox" class="datasource filter"/>
+                                                    <label th:attr="for='datasource__'+${instance}"><span th:text="${instance}"></span></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+
+
+                            </div>
+
+
+                        </li>
+
+
+
+                        <style>.hidden{display:none;}</style>
+
                         <style>.hidden{display:none;}</style>
 
                         <li class="accordion-item is-active" data-accordion-item>
@@ -416,6 +448,7 @@
                                 </ul>
                             </div>
                         </li>
+
 
 
                         <!-- <div id='adda'><a class='md-fab md-fab-small' onclick=\"myTrigger('','','open')\"><i class='material-icons'>&#xE145;</i></a></div> -->
