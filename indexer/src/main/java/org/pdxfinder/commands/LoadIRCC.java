@@ -49,7 +49,7 @@ public class LoadIRCC implements CommandLineRunner {
     
     private final static String TECH = "MUT targeted NGS";
 
-    private final static String DOSING_STUDY_URL = "http://www.pdxfinder.org/platform/ircc-dosing-studies/";
+    private final static String DOSING_STUDY_URL = "/platform/ircc-dosing-studies/";
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
