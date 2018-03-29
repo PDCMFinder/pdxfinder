@@ -49,6 +49,8 @@ public class LoadIRCC implements CommandLineRunner {
     
     private final static String TECH = "MUT targeted NGS";
 
+    private final static String DOSING_STUDY_URL = "/platform/ircc-dosing-studies/";
+
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
@@ -297,13 +299,13 @@ public class LoadIRCC implements CommandLineRunner {
                     if(treatments.length() > 0){
                         //log.info("Treatments found for model "+mc.getSourcePdxId());
                         ts = new TreatmentSummary();
-
+                        ts.setUrl(DOSING_STUDY_URL);
                         for(int t = 0; t<treatments.length(); t++){
                             JSONObject treatmentObject = treatments.getJSONObject(t);
                             TreatmentProtocol tp = new TreatmentProtocol();
                             Response r = new Response();
-                            r.setDescription(treatmentObject.getString("Response Class"));
-                            tp.setDrug(treatmentObject.getString("Drug"));
+                            r.setDescription(Standardizer.getDrugResponse(treatmentObject.getString("Response Class")));
+                            tp.setDrug(Standardizer.getDrugName(treatmentObject.getString("Drug")));
                             tp.setDose(treatmentObject.getString("Dose") );
                             tp.setResponse(r);
 

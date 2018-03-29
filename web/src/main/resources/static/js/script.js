@@ -2,21 +2,40 @@ $(document).foundation();
 
 $(document).ready(function () {
 
-  /*
-  // Datatable Initialize. 
-  $('#example-datatable').DataTable({
-    columnDefs: [ {
-        targets: [ 0 ],
-        orderData: [ 0, 1 ]
-    }, {
-        targets: [ 1 ],
-        orderData: [ 1, 0 ]
-    }, {
-        targets: [ 4 ],
-        orderData: [ 4, 0 ]
-    } ]
-  });
-*/
+
+    // Datatable Initialize.
+    $('#example-datatable').DataTable({
+        columnDefs: [ {
+            targets: [ 0 ],
+            orderData: [ 0, 1 ]
+        }, {
+            targets: [ 1 ],
+            orderData: [ 1, 0 ]
+        }, {
+            targets: [ 4 ],
+            orderData: [ 4, 0 ]
+        } ]
+    });
+
+
+
+    /*$('#search-datatable').DataTable({
+        paging:   false,
+        ordering: true,
+        info:     false,
+        searching: false,
+        columnDefs: [ {
+            targets: [ 0 ],
+            orderData: [ 0, 1 ]
+        }, {
+            targets: [ 1 ],
+            orderData: [ 1, 0 ]
+        }, {
+            targets: [ 4 ],
+            orderData: [ 4, 0 ]
+        } ]
+    });*/
+
   $("[data-responsive-toggle]").click(function () {
     var targetMenuClass =  $(this).attr("data-responsive-toggle");
 

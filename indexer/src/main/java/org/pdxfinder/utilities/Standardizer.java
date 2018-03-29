@@ -89,4 +89,29 @@ public class Standardizer {
          return in;
          
      }
+
+
+     public static String getDrugResponse(String r){
+
+         if(r == null || r.isEmpty()) return "Not Specified";
+
+         if(r.toLowerCase().equals("pd")) return "Progressive Disease";
+         if(r.toLowerCase().equals("sd")) return "Stable Disease";
+         if(r.toLowerCase().equals("cr")) return "Complete Response";
+         if(r.toLowerCase().equals("pr")) return "Partial Response";
+
+         return r;
+     }
+
+
+     public static String getDrugName(String d){
+
+         if(d == null || d.isEmpty()) return "Not Specified";
+
+         if(d.equals("Erbitux, Cetuximab")) return "Cetuximab (Erbitux®)";
+         if(d.equals("0.9% Solution of Sodium Chloride")) return "0.9% Solution of Sodium Chloride (control)";
+
+         return d;
+     }
+
 }
