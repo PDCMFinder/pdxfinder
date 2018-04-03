@@ -616,7 +616,19 @@ public class LoaderUtils {
 
         return p;
     }
-    
+
+    public Platform getPlatform(String name, ExternalDataSource eds, String platformUrl) {
+        Platform p = platformRepository.findByNameAndDataSourceAndUrl(name, eds.getName(), platformUrl);
+        if (p == null) {
+            p = new Platform();
+            p.setName(name);
+            p.setExternalDataSource(eds);
+            p.setUrl(platformUrl);
+        }
+
+        return p;
+    }
+
     public void savePlatform(Platform p){
         platformRepository.save(p);
     }

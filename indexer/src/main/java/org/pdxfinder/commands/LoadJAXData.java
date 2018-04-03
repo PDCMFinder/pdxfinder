@@ -356,16 +356,19 @@ public class LoadJAXData implements CommandLineRunner {
                 ma.setMarker(marker);
 
                 Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
-                platform.setExternalDataSource(jaxDS);
+
+
                 if(technology.equals("Truseq_JAX")){
-                    platform.setUrl(TRUSEQ_PLATFORM_URL);
+                    platform = loaderUtils.getPlatform(technology, this.jaxDS, TRUSEQ_PLATFORM_URL);
                 }
                 else if(technology.equals("Whole_Exome")){
-                    platform.setUrl(WHOLE_EXOME_URL);
+                    platform = loaderUtils.getPlatform(technology, this.jaxDS, WHOLE_EXOME_URL);
                 }
                 else if(technology.equals("CTP")){
-                    platform.setUrl(CTP_PLATFORM_URL);
+                    platform = loaderUtils.getPlatform(technology, this.jaxDS, CTP_PLATFORM_URL);
                 }
+
+                platform.setExternalDataSource(jaxDS);
 
                 //loaderUtils.savePlatform(platform);
                 //loaderUtils.createPlatformAssociation(platform, marker);
@@ -402,7 +405,21 @@ public class LoadJAXData implements CommandLineRunner {
                 for (String tech : markerMap.keySet()) {
                     MolecularCharacterization mc = new MolecularCharacterization();
                     mc.setType("mutation");
-                    mc.setPlatform(loaderUtils.getPlatform(tech, this.jaxDS));
+
+                    Platform platform = null;
+
+                    if(tech.equals("Truseq_JAX")){
+                        platform = loaderUtils.getPlatform(tech, this.jaxDS, TRUSEQ_PLATFORM_URL);
+                    }
+                    else if(tech.equals("Whole_Exome")){
+                        platform = loaderUtils.getPlatform(tech, this.jaxDS, WHOLE_EXOME_URL);
+                    }
+                    else if(tech.equals("CTP")){
+                        platform = loaderUtils.getPlatform(tech, this.jaxDS, CTP_PLATFORM_URL);
+                    }
+
+
+                    mc.setPlatform(platform);
                     mc.setMarkerAssociations(markerMap.get(tech));
                     mcs.add(mc);
 
