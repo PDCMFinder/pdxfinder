@@ -321,7 +321,7 @@ public class LoadIRCCData implements CommandLineRunner {
 
     private void loadToNeo4j() {
 
-        DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
+        DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, null);
 
         for (Map.Entry<String, List<IRCCSample>> entry : this.samplesMap.entrySet()) {
 
