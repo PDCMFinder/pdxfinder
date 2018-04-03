@@ -114,7 +114,7 @@ public class LoaderUtils {
 
     }
 
-    public ExternalDataSource getExternalDataSource(String abbr, String name, String description, String contact) {
+    public ExternalDataSource getExternalDataSource(String abbr, String name, String description, String contact, String url) {
         ExternalDataSource eDS = externalDataSourceRepository.findByAbbreviation(abbr);
         if (eDS == null) {
             log.info("External data source '{}' not found. Creating", abbr);
@@ -123,7 +123,8 @@ public class LoaderUtils {
                     abbr,
                     description,
                     contact,
-                    Date.from(Instant.now()));
+                    Date.from(Instant.now()),
+                    url);
             externalDataSourceRepository.save(eDS);
         }
 

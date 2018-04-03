@@ -54,6 +54,10 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String HISTOLOGY_NOTE = "Pathologist assessment of patient tumor and pdx model tumor histology slides.";
 
     private final static String DOSING_STUDY_URL = "/platform/jax-drug-dosing/";
+    private final static String CTP_PLATFORM_URL = "/platform/jax-ctp/";
+    private final static String TRUSEQ_PLATFORM_URL = "/platform/jax-truseq/";
+    private final static String WHOLE_EXOME_URL = "/platform/jax-whole-exome/";
+    private final static String SOURCE_URL = "/source/jax/";
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -130,7 +134,7 @@ public class LoadJAXData implements CommandLineRunner {
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
 
-        jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
+        jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
 
         nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
 
@@ -353,6 +357,16 @@ public class LoadJAXData implements CommandLineRunner {
 
                 Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
                 platform.setExternalDataSource(jaxDS);
+                if(technology.equals("Truseq_JAX")){
+                    platform.setUrl(TRUSEQ_PLATFORM_URL);
+                }
+                else if(technology.equals("Whole_Exome")){
+                    platform.setUrl(WHOLE_EXOME_URL);
+                }
+                else if(technology.equals("CTP")){
+                    platform.setUrl(CTP_PLATFORM_URL);
+                }
+
                 //loaderUtils.savePlatform(platform);
                 //loaderUtils.createPlatformAssociation(platform, marker);
                 
