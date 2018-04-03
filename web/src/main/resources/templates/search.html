@@ -67,33 +67,58 @@
         .tooltip {
             max-width: none;
         }
-
         table.pdx-table thead th {
             font-size: 1.0rem;
         }
-
         table.pdx-table td {
             font-size: 1.0rem;
         }
-
         h4 {
             font-size: 1.0rem;
         }
-
         ul.pdx-accordion-1 a.accordion-title {
             font-size: 1.0rem;
         }
-
         ul.pdx-accordion-2 a.accordion-title {
             font-size: 0.95rem;
         }
-
         span.selected {
             color: #06369d;
             font-weight: bold;
         }
     </style>
 
+    <script type="text/javascript">
+        // IE JavaScript Bugs: Overriding Internet Explorer’s document.getElementById() To Be W3C Compliant Exposes An Additional Bug In getAttributes()
+        if (/msie/i.test (navigator.userAgent)) //only override IE
+        {
+            document.nativeGetElementById = document.getElementById;
+            document.getElementById = function(id)
+            {
+                var elem = document.nativeGetElementById(id);
+                if(elem)
+                {
+                    //make sure that it is a valid match on id
+                    if(elem.id == id)
+                    {
+                        return elem;
+                    }
+                    else
+                    {
+                        //otherwise find the correct element
+                        for(var i=1;i<document.all[id].length;i++)
+                        {
+                            if(document.all[id][i].id == id)
+                            {
+                                return document.all[id][i];
+                            }
+                        }
+                    }
+                }
+                return null;
+            };
+        }
+    </script>
 </head>
 
 <body class="level2"><!-- add any of your classes or IDs -->
@@ -352,7 +377,7 @@
                                                     <span th:if="${#lists.isEmpty(param.mutation)}">
                                                         <div class="row" style="margin-top: 10px;">
 
-                                                            <div class="columns nospace small-4 large-4"> <input type="text" id="geneFilter1" onblur="loadVariants(this,'1')"/> </div>
+                                                            <div class="columns nospace small-4 large-4"> <input type="text" id="geneFilter1" onblur="loadVariants(this,'1')" style="width:100%;"/> </div>
                                                             <div class="columns nospace small-3 large-3"> <input type="text" value="MUT"/></div>
 
                                                             <div id="filterOptions1" class="columns nospace small-5 large-5" style="margin-top: 3px;">
@@ -365,7 +390,7 @@
                                                         <div class="row">
                                                             <div class="row hidden" th:each="i: ${#numbers.sequence(2, 20)}" th:id="'geneticVar'+${i}">
                                                                 <div class="columns nospace small-4 large-4">
-                                                                    <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}" />
+                                                                    <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}" style="width:100%;"/>
                                                                 </div>
                                                                 <div class="columns nospace small-3 large-3"><input type="text" value="MUT" /></div>
 
@@ -386,7 +411,7 @@
                                                             <div class="row large-12 medium-12 expanded" th:id="'geneticVar'+${iter.index+1}" ><!-- th:style="( ${iter.index} == 0 ) ? 'margin-top: 10px' : 'margin-top: -10px' " -->
 
                                                                 <div class="columns nospace small-4 large-4">
-                                                                    <input th:value="${eachMarker.key}" th:onblur="'loadVariants(this,'+${iter.index+1}+')'" type="text" th:id="'geneFilter'+${iter.index+1}"/>
+                                                                    <input th:value="${eachMarker.key}" th:onblur="'loadVariants(this,'+${iter.index+1}+')'" type="text" th:id="'geneFilter'+${iter.index+1}"  style="width:100%;"/>
                                                                 </div>
                                                                 <div class="columns nospace small-3 large-3"><input type="text" value="MUT"/></div>
 
@@ -413,7 +438,7 @@
 
                                                                 <div class="row hidden" th:id="'geneticVar'+${i}">
                                                                     <div class="columns nospace small-4 large-4">
-                                                                        <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}"/>
+                                                                        <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}"  style="width:100%;"/>
                                                                     </div>
                                                                     <div class="columns nospace small-3 large-3"><input type="text" value="MUT"/></div>
 
@@ -599,21 +624,17 @@
 
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
-
     var searchOptions = [[ ${autoCompleteList} ]];
     var searchStates = [];
-
     for(var i=0; i<searchOptions.length;i++){
         searchStates.push(searchOptions[i].value);
     }
-
     var ageFilters = [[${patient_age_selected}]];
     var dsFilters = [[${datasource_selected}]];
     var cancerSystemFilters = [[${cancer_system_selected}]];
     var sampleTumorTypeFilters = [[${sample_tumor_type_selected}]];
     var genderFilters = [[${patient_gender_selected}]];
     var mutationFilters = [[${mutations_selected}]];
-
     function constructSearchOptions(data) {
         var newOptions = [];
         for (var i = 0; i < data.length; i++) {
@@ -690,76 +711,56 @@
         // show placeholder text
         $('.main-search .choices__input').attr("placeholder", "Search (e.g., Melanoma)");
     }, false);
-
     mainSearch.passedElement.addEventListener('addItem', function(event) {
         jQuery("form.main-search").submit();
     }, false);
-
     console.log("before updating");
-
-
     jQuery(document).ready(function() {
-
         updateFilters(ageFilters, genderFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters);
         console.log("updated");
-
         //Add eventlistener to fields with filter class
         jQuery('.filter').change( function(){
-
             redirectPage();
         });
-
         //Add eventlistener to fields with filter class
         jQuery('#markerFilter').click( function(){
-
             redirectPage();
         });
-
         //Add eventlistener to search field's button
         jQuery('#search_submit').click( function(){
-
             redirectPage();
         });
-
     });
-
 </script>
 
 <script>
-/*
-    const choices = new Choices('#query', {
-        silent: false,
-        items: ["Alpha", "Bravo", "Charlie"],
-        choices: [],
-        loadingText: 'Loading...',
-        noResultsText: 'No results found'
-
-
-    });
-*/
+    /*
+        const choices = new Choices('#query', {
+            silent: false,
+            items: ["Alpha", "Bravo", "Charlie"],
+            choices: [],
+            loadingText: 'Loading...',
+            noResultsText: 'No results found'
+        });
+    */
 </script>
 
 
 
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
-
     var incomingString = [[ ${mutatedMarkersAndVariants} ]];
     var mutatedMarkersAndVariants = JSON.parse(incomingString);
     /* var mutatedMarkersAndVariants = {  "USP25" : [ "T1033M" ], "USP26" : [ "L362W" ],"USP20" : [ "D505Y", "P49A" ]} */
     var keysAreMarkers = Object.keys(mutatedMarkersAndVariants);
-
     $('#geneFilter1').autocomplete({
         source:[keysAreMarkers]
     });
-
     for (var i=2; i<=20; i++){
-
         $('#geneFilter'+i).autocomplete({
             source:[keysAreMarkers]
         });
     }
-
     // Open the Molchar Filter if needed
     var urlParams = new URLSearchParams(window.location.search);
     var dURLString = urlParams.toString();
@@ -768,30 +769,20 @@
         var markerFilterField = jQuery("li#marker_filter > a.accordion-title");
         markerFilterField.click();
     }
-
-
     function getVariantSize(selectedMarker) {
-
         var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker];
-
         return valuesAreVariants;
     }
-
-
     function loadVariants(selectedMarker,compNumber) {
-
         var marker = selectedMarker.value;
         var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker.value].sort();
-
         //alert(marker+"\n"+typeof valuesAreVariants);
         var newOptions = "";
         for (var i=0; i<valuesAreVariants.length; i++){
             newOptions += "<option value='"+valuesAreVariants[i]+"'>"+valuesAreVariants[i]+"</option>";
         }
-
         var select = $('#variantFilter'+compNumber);
         select.empty().append(newOptions);
-
         $(function() {
             $('#variantFilter'+compNumber).change(function() {
                 console.log($(this).val());
@@ -799,50 +790,38 @@
                 placeholder: " variants"
             });
         });
-
     }
-
-
     var geneticVar = 1;
     var counter = 1;
     function myTrigger(param,startIndex){
-
         if (startIndex != 2 && counter == 1){
             geneticVar = startIndex;
         }
-
         geneticVar++;
         counter++;
-
         for (var i=startIndex; i<=20; i++){
-
             if ((param=='AND'||param=='OR') && geneticVar == i){
                 document.getElementById("geneticVar"+i).style.display = "block";
             }
         }
     }
-
 </script>
 
 <script th:src="@{/js/multiple-select.js}"></script>
 <script>
     $(function() {
-
         $('#variantFilter1').change(function() {
             console.log($(this).val());
         }).multipleSelect({
             placeholder: "Variants"
         });
-
         for (var i=2; i<=20; i++){
-
             $('#variantFilter'+i).change(function() {
                 console.log($(this).val());
             }).multipleSelect({
                 placeholder: "Variants"
             });
         }
-
     });
 </script>
 
