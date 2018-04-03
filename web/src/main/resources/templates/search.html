@@ -369,21 +369,21 @@
                                         <div class="accordion-content" data-tab-content>
                                             <div style="background-color: #f1f2f2; padding: 10px; position: relative;">
                                                 <div class="checkbox-item">
-                                                    <div class="checkbox-item"><span class="black" style="font-size: 16px; font-weight: bold;">Genes</span></div>
+                                                    <!--<div class="checkbox-item"><span class="black" style="font-size: 16px; font-weight: bold;">Genes</span></div> -->
 
 
-                                                    <style>.columns .nospace{padding:1px;}</style>
+                                                    <style>.columns .nospace{padding:1px;} .adjust{ text-align: center; font-weight: bold;} </style>
 
                                                     <span th:if="${#lists.isEmpty(param.mutation)}">
                                                         <div class="row" style="margin-top: 10px;">
-                                                            <div class="columns nospace small-4 large-4"> GENE </div>
-                                                            <div class="columns nospace small-3 large-3"> TYPE </div>
-                                                            <div class="columns nospace small-5 large-5"> VARIANT </div>
+                                                            <div class="columns nospace small-4 large-4 adjust"> GENE </div>
+                                                            <div class="columns nospace small-3 large-3 adjust"> TYPE </div>
+                                                            <div class="columns nospace small-5 large-5 adjust"> VARIANT </div>
                                                         </div>
-                                                        <div class="row" style="margin-top: 4px;">
+                                                        <div class="row" style="margin-top: 10px;">
 
                                                             <div class="columns nospace small-4 large-4"> <input type="text" id="geneFilter1" onblur="loadVariants(this,'1')" style="width:100%;"/> </div>
-                                                            <div class="columns nospace small-3 large-3"> <input type="text" value="MUT"/></div>
+                                                            <div class="columns nospace small-3 large-3"> <input type="text" value="MUT" readonly="readonly"/></div>
 
                                                             <div id="filterOptions1" class="columns nospace small-5 large-5" style="margin-top: 3px;">
                                                                 <select id='variantFilter1' multiple='multiple'> </select>
@@ -397,7 +397,7 @@
                                                                 <div class="columns nospace small-4 large-4">
                                                                     <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}" style="width:100%;"/>
                                                                 </div>
-                                                                <div class="columns nospace small-3 large-3"><input type="text" value="MUT" /></div>
+                                                                <div class="columns nospace small-3 large-3"><input type="text" value="MUT" readonly="readonly"/></div>
 
                                                                 <div th:id="'filterOptions'+${i}" class="columns nospace small-5 large-5" style="margin-top: 3px;">
                                                                     <select th:id="'variantFilter'+${i}" multiple='multiple'> </select>
@@ -411,17 +411,17 @@
 
                                                     <span th:if="${not #lists.isEmpty(param.mutation)}">
                                                             <div class="row" style="margin-top: 10px;">
-                                                                <div class="columns nospace small-4 large-4"> GENE </div>
-                                                                <div class="columns nospace small-3 large-3"> TYPE </div>
-                                                                <div class="columns nospace small-5 large-5"> VARIANT </div>
+                                                                <div class="columns nospace small-4 large-4 adjust"> GENE </div>
+                                                                <div class="columns nospace small-3 large-3 adjust"> TYPE </div>
+                                                                <div class="columns nospace small-5 large-5 adjust"> VARIANT </div>
                                                             </div>
                                                         <span th:each="eachMarker,iter :${markerMapWithAllVariants}">
-                                                            <div class="row large-12 medium-12 expanded" th:id="'geneticVar'+${iter.index+1}" ><!-- th:style="( ${iter.index} == 0 ) ? 'margin-top: 10px' : 'margin-top: -10px' " -->
+                                                            <div class="row large-12 medium-12 expanded" th:id="'geneticVar'+${iter.index+1}"  style="margin-top: 10px;"><!-- th:style="( ${iter.index} == 0 ) ? 'margin-top: 10px' : 'margin-top: -10px' " -->
 
                                                                 <div class="columns nospace small-4 large-4">
                                                                     <input th:value="${eachMarker.key}" th:onblur="'loadVariants(this,'+${iter.index+1}+')'" type="text" th:id="'geneFilter'+${iter.index+1}"  style="width:100%;"/>
                                                                 </div>
-                                                                <div class="columns nospace small-3 large-3"><input type="text" value="MUT"/></div>
+                                                                <div class="columns nospace small-3 large-3"><input type="text" value="MUT" readonly="readonly"/></div>
 
                                                                 <div class="columns nospace small-5 large-5" style="margin-top: 3px;" th:id="'filterOptions'+${iter.index+1}">
                                                                     <select th:id="'variantFilter'+${iter.index+1}" style="width: 40%" multiple='multiple'>
@@ -448,7 +448,7 @@
                                                                     <div class="columns nospace small-4 large-4">
                                                                         <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}"  style="width:100%;"/>
                                                                     </div>
-                                                                    <div class="columns nospace small-3 large-3"><input type="text" value="MUT"/></div>
+                                                                    <div class="columns nospace small-3 large-3"><input type="text" value="MUT" readonly="readonly"/></div>
 
                                                                     <div class="columns nospace small-5 large-5" style="margin-top: 3px;" th:id="'filterOptions'+${i}">
                                                                         <select th:id="'variantFilter'+${i}" multiple='multiple'> </select>
@@ -791,7 +791,7 @@
         //alert(marker+"\n"+typeof valuesAreVariants);
         var newOptions = "";
         for (var i=0; i<valuesAreVariants.length; i++){
-            newOptions += "<option value='"+valuesAreVariants[i]+"'>"+valuesAreVariants[i]+"</option>";
+            newOptions += "<option value='"+valuesAreVariants[i]+"' selected>"+valuesAreVariants[i]+"</option>";
         }
         var select = $('#variantFilter'+compNumber);
         select.empty().append(newOptions);
