@@ -376,6 +376,11 @@
 
                                                     <span th:if="${#lists.isEmpty(param.mutation)}">
                                                         <div class="row" style="margin-top: 10px;">
+                                                            <div class="columns nospace small-4 large-4"> GENE </div>
+                                                            <div class="columns nospace small-3 large-3"> TYPE </div>
+                                                            <div class="columns nospace small-5 large-5"> VARIANT </div>
+                                                        </div>
+                                                        <div class="row" style="margin-top: 4px;">
 
                                                             <div class="columns nospace small-4 large-4"> <input type="text" id="geneFilter1" onblur="loadVariants(this,'1')" style="width:100%;"/> </div>
                                                             <div class="columns nospace small-3 large-3"> <input type="text" value="MUT"/></div>
@@ -405,9 +410,12 @@
 
 
                                                     <span th:if="${not #lists.isEmpty(param.mutation)}">
+                                                            <div class="row" style="margin-top: 10px;">
+                                                                <div class="columns nospace small-4 large-4"> GENE </div>
+                                                                <div class="columns nospace small-3 large-3"> TYPE </div>
+                                                                <div class="columns nospace small-5 large-5"> VARIANT </div>
+                                                            </div>
                                                         <span th:each="eachMarker,iter :${markerMapWithAllVariants}">
-
-
                                                             <div class="row large-12 medium-12 expanded" th:id="'geneticVar'+${iter.index+1}" ><!-- th:style="( ${iter.index} == 0 ) ? 'margin-top: 10px' : 'margin-top: -10px' " -->
 
                                                                 <div class="columns nospace small-4 large-4">
@@ -532,7 +540,11 @@
 
                                 <td th:if="${isMutationSelected} == false">
                                     <th:block th:each="platform : ${model.dataAvailable}">
-                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#'+${platform} }"
+
+                                        <a th:if="${#strings.equals(platform, 'Dosing Studies')}" th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#dosing_studies' }"
+                                           style="font-size: 12px;" th:utext="${platform} + '<br />'">platform</a>
+
+                                        <a th:if="${not #strings.equals(platform, 'Dosing Studies')}" th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation' }"
                                            style="font-size: 12px;" th:utext="${platform} + '<br />'">platform</a>
                                     </th:block>
                                 </td>
@@ -793,6 +805,7 @@
     }
     var geneticVar = 1;
     var counter = 1;
+
     function myTrigger(param,startIndex){
         if (startIndex != 2 && counter == 1){
             geneticVar = startIndex;
@@ -801,7 +814,7 @@
         counter++;
         for (var i=startIndex; i<=20; i++){
             if ((param=='AND'||param=='OR') && geneticVar == i){
-                document.getElementById("geneticVar"+i).style.display = "block";
+                $("#geneticVar"+i).show();
             }
         }
     }
