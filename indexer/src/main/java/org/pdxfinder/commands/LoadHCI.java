@@ -149,8 +149,9 @@ public class LoadHCI implements CommandLineRunner {
 
         pSnap.addSample(sample);
         
-        
-        if(j.has("Markers")){
+        /*
+        I guess this is considered IHC and not markers
+        if(j.has("Markers") ){
             Set<MolecularCharacterization> mcs = new HashSet<>();
             JSONArray markers = j.getJSONArray("Markers");
             
@@ -177,7 +178,7 @@ public class LoadHCI implements CommandLineRunner {
             sample.setMolecularCharacterizations(mcs);
         
         }
-        
+        */
         
         
         // This multiple QA approach only works because Note and Passage are the same for all QAs
@@ -230,7 +231,6 @@ public class LoadHCI implements CommandLineRunner {
         for(HostStrain strain : strainList){
             Specimen specimen = new Specimen();
             specimen.setExternalId(modelID);
-            specimen.setPassage(Standardizer.NOT_SPECIFIED);
             specimen.setImplantationSite(implantationSite);
             specimen.setImplantationType(implantationType);
             specimen.setHostStrain(strain);
