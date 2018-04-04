@@ -8,81 +8,139 @@
 
 <div th:fragment="menu">
     <div data-sticky-container>
-        <header id="masthead" class="masthead" data-sticky data-options="marginTop: 0">
-            <div class="masthead-inner row">
-                <div class="columns medium-2 small-4 log-column" id="local-title">
-                    <h1><a href="/" title="Back to PDXFinder homepage"><img
-                            src="https://ebiwd.github.io/pdx-visual-framework/images/logo.png" class="padding-15"/></a>
-                    </h1>
-                </div>
-                <!-- Desktop Menu-->
-                <div class="columns medium-10 menu-column padding-vertical-30 hide-for-small-only" id="local-nav">
-                    <nav id="main-menu" class="navigation" role="navigation">
-                        <ul id="menu-main" class="dropdown menu main-menu float-right desktop-menu" data-dropdown-menu>
-                            <li id="menu-item-7"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home current-menu-item page_item page-item-5 current_page_item menu-item-7 active ">
-                                <a href="/">Home</a></li>
-                            <li id="menu-item-147"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-147">
-                                <a href="/about/">About</a>
-                                <ul class="menu" data-toggle data-dropdown-menu data-description="navigational">
-                                    <li id="menu-item-100"
-                                        class="menu-item menu-item-type-post_type menu-item-object-page menu-item-100">
-                                        <a
-                                                href="/pdx-standard/">PDX-MI Standard</a></li>
-                                    <li id="menu-item-42"
-                                        class="menu-item menu-item-type-post_type menu-item-object-page menu-item-42"><a
-                                            href="/pdx-data-submission-integration-and-distribution/">Methods</a></li>
-                                </ul>
-                            </li>
-                            <li id="menu-item-92"
-                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-92"><a
-                                    href="/data/search">Search</a></li>
-                            <li id="menu-item-36"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-36"><a
-                                    href="/get-in-touch-with-us/">Contact</a></li>
-                        </ul>
-                    </nav>
-                </div>
 
-
-                <!-- Mobile Menu -->
-                <div class="columns small-8 show-for-small-only padding-vertical-15 text-right"
-                     data-responsive-toggle="mobile-menu" data-hide-for="medium">
-                    <a class="menu-toggle"><i class="icon icon-functional" data-icon="M" data-toggle="mobile-menu"></i></a>
-                </div>
-
-                <div class="columns show-for-small-only">
-
-                    <nav class="vertical menu" id="mobile-menu" role="navigation">
-                        <ul id="menu-main-1" class="vertical menu" data-accordion-menu>
-                            <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home current-menu-item page_item page-item-5 current_page_item menu-item-7 active ">
-                                <a href="/">Home</a></li>
-                            <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-147">
-                                <a href="/about/">About</a>
-                                <ul class="vertical nested menu">
-                                    <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-100">
-                                        <a
-                                                href="/pdx-standard/">PDX-MI Standard</a></li>
-                                    <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-42"><a
-                                            href="/pdx-data-submission-integration-and-distribution/">Methods</a></li>
-                                </ul>
-                            </li>
-                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-92"><a
-                                    href="/data/search">Search</a></li>
-                            <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-36"><a
-                                    href="/get-in-touch-with-us/">Contact</a></li>
-                        </ul>
-                    </nav>
-                </div>
-
+        <div class="masthead-inner row">
+            <div class="columns medium-2 small-4 log-column" id="local-title">
+                <h1><a href="/" title="Back to PDXFinder homepage"><img
+                        src="https://ebiwd.github.io/pdx-visual-framework/images/logo.png" class="padding-15"/></a></h1>
             </div>
-        </header>
+            <!-- Desktop Menu-->
+            <div class="columns medium-10 menu-column padding-vertical-30 hide-for-small-only" id="local-nav">
+                <nav id="main-menu" class="navigation" role="navigation">
+                    <ul id="menu-main" class="dropdown menu main-menu float-right desktop-menu" data-dropdown-menu>
+                        <li id="menu-item-7"
+                            class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-7">
+                            <a href="/">Home</a></li>
+                        <li id="menu-item-92"
+                            class="menu-item menu-item-type-custom menu-item-object-custom menu-item-92"><a
+                                href="/data/search">Search</a></li>
+                        <li id="menu-item-147"
+                            class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-147">
+                            <a href="/about/">About</a>
+                            <ul class="menu" data-toggle data-dropdown-menu data-description="navigational">
+                                <li id="menu-item-1888"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1888"><a
+                                        href="/about/">Objectives</a></li>
+                                <li id="menu-item-1942"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1942"><a
+                                        href="/pdx-finder-publication/">How to cite?</a></li>
+                                <li id="menu-item-100"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page menu-item-100"><a
+                                        href="/pdx-standard/">PDX-MI Standard</a></li>
+                                <li id="menu-item-42"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page menu-item-42"><a
+                                        href="/pdx-data-submission-integration-and-distribution/">Data Flow</a></li>
+                                <li id="menu-item-1893"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1893"><a
+                                        href="/terms-of-use/">Terms of Use</a></li>
+                            </ul>
+                        </li>
+                        <li id="menu-item-1895"
+                            class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-1895">
+                            <a href="#">Providers</a>
+                            <ul class="menu" data-toggle data-dropdown-menu data-description="navigational">
+                                <li id="menu-item-1896"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1896"><a
+                                        href="/source/ircc/">Candiolo Cancer Institute</a></li>
+                                <li id="menu-item-1897"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1897"><a
+                                        href="/source/jax/">The Jackson Laboratory</a></li>
+                                <li id="menu-item-1898"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1898"><a
+                                        href="/source/pdmr/">Patient-Derived Models Repository</a></li>
+                                <li id="menu-item-1899"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1899"><a
+                                        href="/source/pdxnet-hci-bcm/">HCI-Baylor College of Medicine</a></li>
+                                <li id="menu-item-1900"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1900"><a
+                                        href="/source/pdxnet-mdanderson/">MD Anderson Cancer Center</a></li>
+                                <li id="menu-item-1901"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1901"><a
+                                        href="/source/pdxnet-wistar-mdanderson-penn/">The Wistar/MD Anderson/Penn</a>
+                                </li>
+                                <li id="menu-item-1902"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1902"><a
+                                        href="/source/pdxnet-wustl/">Washington University in St. Louis</a></li>
+                            </ul>
+                        </li>
+                        <li id="menu-item-36"
+                            class="menu-item menu-item-type-post_type menu-item-object-page menu-item-36"><a
+                                href="/get-in-touch-with-us/">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <!-- Mobile Menu -->
+            <div class="columns small-8 show-for-small-only padding-vertical-15 text-right"
+                 data-responsive-toggle="mobile-menu" data-hide-for="medium">
+                <a class="menu-toggle"><i class="icon icon-functional" data-icon="M" data-toggle="mobile-menu"></i></a>
+            </div>
+
+            <div class="columns show-for-small-only">
+
+                <nav class="vertical menu" id="mobile-menu" role="navigation">
+                    <ul id="menu-main-1" class="vertical menu" data-accordion-menu>
+                        <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-7">
+                            <a href="/">Home</a></li>
+                        <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-92"><a
+                                href="/data/search">Search</a></li>
+                        <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-147">
+                            <a href="/about/">About</a>
+                            <ul class="vertical nested menu">
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1888"><a
+                                        href="/about/">Objectives</a></li>
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1942"><a
+                                        href="/pdx-finder-publication/">How to cite?</a></li>
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-100"><a
+                                        href="/pdx-standard/">PDX-MI Standard</a></li>
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-42"><a
+                                        href="/pdx-data-submission-integration-and-distribution/">Data Flow</a></li>
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1893"><a
+                                        href="/terms-of-use/">Terms of Use</a></li>
+                            </ul>
+                        </li>
+                        <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-1895">
+                            <a href="#">Providers</a>
+                            <ul class="vertical nested menu">
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1896"><a
+                                        href="/source/ircc/">Candiolo Cancer Institute</a></li>
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1897"><a
+                                        href="/source/jax/">The Jackson Laboratory</a></li>
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1898"><a
+                                        href="/source/pdmr/">Patient-Derived Models Repository</a></li>
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1899"><a
+                                        href="/source/pdxnet-hci-bcm/">HCI-Baylor College of Medicine</a></li>
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1900"><a
+                                        href="/source/pdxnet-mdanderson/">MD Anderson Cancer Center</a></li>
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1901"><a
+                                        href="/source/pdxnet-wistar-mdanderson-penn/">The Wistar/MD Anderson/Penn</a>
+                                </li>
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1902"><a
+                                        href="/source/pdxnet-wustl/">Washington University in St. Louis</a></li>
+                            </ul>
+                        </li>
+                        <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-36"><a
+                                href="/get-in-touch-with-us/">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
     </div>
 </div>
 
 
 <div th:fragment="footer">
+
 
     <div id="footer-container">
         <footer id="footer">
@@ -90,17 +148,19 @@
                 <article id="custom_html-2" class="widget_text large-4 columns widget widget_custom_html">
                     <div class="textwidget custom-html-widget"><h3 class="highlight green">Quick links</h3>
                         <ul class="no-bullet">
-                            <li>How to cite PDX Finder? (A bioarchive preprint)</li>
+                            <li><a href="/pdx-finder-publication">How to cite PDX Finder?</a></li>
                             <li><a href="/pdx-standard">PDX Minimum Information standard publication</a></li>
                             <li><a href="/terms-of-use">PDX Finder Terms of Use</a></li>
+
                         </ul>
+
+
                     </div>
                 </article>
                 <article id="custom_html-4" class="widget_text large-4 columns widget widget_custom_html">
                     <div class="textwidget custom-html-widget"><h3 class="highlight green">Contacts</h3>
                         <ul class="no-bullet">
-                            <li><a href="/get-in-touch-with-us">Submit models</a></li>
-                            <li><a href="/get-in-touch-with-us">Feedback</a></li>
+                            <li><a href="/get-in-touch-with-us">Submit models / Feedback</a></li>
                         </ul>
                     </div>
                 </article>
@@ -111,15 +171,18 @@
                                 <a href="http://www.ebi.ac.uk/about/people/terry-meehan">EMBL-EBI</a> and <a
                                     href="https://www.jax.org/research-and-faculty/research-labs/the-bult-lab">The
                                 Jackson Laboratory</a> are co-developers of PDX Finder. This work is supported by the
-                                National Institutes of Health U24 CA204781 01 and the National Cancer Institute MTB R01
-                                R01CA089713.
+                                National Institutes of Health/National Cancer Institute U24 CA204781 01 and R01
+                                CA089713.
                             </li>
                         </ul>
+
+                        <img alt="NIH Logo" class="medium-6 small-4" src="/wp-content/uploads/2018/03/NCILogo.png">
                     </div>
                 </article>
             </div>
         </footer>
     </div>
+
 
 </div>
 
