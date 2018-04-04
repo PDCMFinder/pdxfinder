@@ -519,6 +519,10 @@
                         <div th:if="${not #lists.isEmpty(drugSummary)}">
                             <p>
 
+                            <div th:if="${drugProtocolUrl} != null" style="margin-bottom: 15px;text-transform: uppercase">
+                            <a th:href="${drugProtocolUrl}" >Dosing study protocol</a>
+                        </div>
+
                             <table class="datatable-pdx pdx-table table-borderedPdx head-left">
                                 <thead>
                                 <th>Drug</th>
