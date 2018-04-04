@@ -34,7 +34,7 @@ public class PlatformController {
     public List<DataAvailableDTO> findPlatformDataBySource(@PathVariable String dataSrc) {
 
         //populate list with data [{dataType:"mutation",platform:"CTP", models:20},{},{}]
-        return  platformService.getPlatformDataCountBySource(dataSrc);
+        return  platformService.getAvailableDataBySource(dataSrc);
     }
 
 

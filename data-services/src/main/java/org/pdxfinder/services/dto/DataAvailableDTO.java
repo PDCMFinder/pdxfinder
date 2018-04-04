@@ -21,6 +21,13 @@ public class DataAvailableDTO {
         this.modelNumbers = modelNumbers;
     }
 
+    public DataAvailableDTO(String dataType, String platformName, String modelNumbers, String platformUrl) {
+        this.dataType = dataType;
+        this.platformName = platformName;
+        this.modelNumbers = modelNumbers;
+        this.platformUrl = platformUrl;
+    }
+
     public String getDataType() {
         return dataType;
     }
@@ -52,4 +59,6 @@ public class DataAvailableDTO {
     public void setPlatformUrl(String platformUrl) {
         this.platformUrl = platformUrl;
     }
+
+
 }
