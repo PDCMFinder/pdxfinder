@@ -414,6 +414,12 @@ th,td {
     white-space:nowrap;
 }
 
+.closIcon {
+    background-image: url(../images/delete-sign.png);
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-origin: content-box;
+}
 
 .table-borderedPdx > thead > tr > th,
 .table-borderedPdx > thead > tr > td {
