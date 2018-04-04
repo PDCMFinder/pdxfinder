@@ -469,7 +469,7 @@ public class LoadIRCC implements CommandLineRunner {
             JSONArray jarray = job.getJSONArray("IRCCVariation");
          //   System.out.println("loading "+jarray.length()+" variant records");
 
-            Platform platform = loaderUtils.getPlatform(TECH, this.irccDS);
+            Platform platform = loaderUtils.getPlatform(TECH, this.irccDS, TARGETEDNGS_PLATFORM_URL);
             platform.setExternalDataSource(irccDS);
             loaderUtils.savePlatform(platform);
 

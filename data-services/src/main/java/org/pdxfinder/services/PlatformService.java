@@ -129,4 +129,78 @@ public class PlatformService
     }
 
 
+
+
+    public List<DataAvailableDTO> getAvailableDataBySource(String dataSource){
+
+        Map<String, DataAvailableDTO> daMap = new HashMap<>();
+
+        Collection<ModelCreation> models = modelCreationRepository.getModelsWithMolCharBySource(dataSource);
+
+        for(ModelCreation m : models){
+
+            String platformName;
+            String mcType;
+            String platformUrl;
+
+            for(Sample s : m.getRelatedSamples()){
+
+                for(MolecularCharacterization mc : s.getMolecularCharacterizations()){
+
+                    platformName = mc.getPlatform().getName();
+                    platformUrl = mc.getPlatform().getUrl();
+
+                    mcType = mc.getType();
+
+                    DataAvailableDTO dto;
+
+                    if(daMap.containsKey(mcType+platformName+platformUrl)){
+
+                        dto = daMap.get(mcType+platformName+platformUrl);
+                        int oldNum = Integer.parseInt(dto.getModelNumbers());
+                        oldNum++;
+                        dto.setModelNumbers(Integer.toString(oldNum));
+                        daMap.put(mcType+platformName+platformUrl, dto);
+
+                    }
+                    else{
+
+                        daMap.put(mcType+platformName+platformUrl, new DataAvailableDTO(mcType, platformName, "1", platformUrl));
+                    }
+
+
+                }
+            }
+
+        }
+
+        List<DataAvailableDTO> results = new ArrayList<>();
+
+        for(DataAvailableDTO dto : daMap.values()){
+
+            results.add(dto);
+        }
+
+
+        //Add dosing studies number
+        int dosingStudiesNumber = drugService.getDosingStudiesNumberByDataSource(dataSource);
+
+        if(dosingStudiesNumber > 0) {
+
+            DataAvailableDTO dto = new DataAvailableDTO("dosing studies", "Dosing Protocol", Integer.toString(dosingStudiesNumber));
+            String platformUrl = drugService.getPlatformUrlByDataSource(dataSource);
+
+            if(platformUrl == null || platformUrl.isEmpty()){
+                dto.setPlatformUrl("");
+            }
+            else{
+                dto.setPlatformUrl(platformUrl);
+            }
+            results.add(dto);
+        }
+
+        return results;
+    }
+
+
 }
