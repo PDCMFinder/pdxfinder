@@ -193,14 +193,9 @@ public class DetailsPageController {
                                    @PathVariable String dataSrc,
                                    @PathVariable String modelId){
 
-
         Set<String[]> variationDataDTOSet = new LinkedHashSet<>();
 
         String[] space = {""}; String nil = "";
-
-        // Retreive all Genomic Datasets
-        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,nil,nil,0,50000,nil,1,nil,nil);
-        for (String[] dData : variationDataDTO.getData()){ variationDataDTOSet.add(dData); }
 
         //Retreive Diagnosis Information
         String diagnosis = searchService.searchForModel(dataSrc,modelId,0,50000,"","","").getDiagnosis();
@@ -212,16 +207,22 @@ public class DetailsPageController {
             platforms.add(tech);
         }
 
+        // Retreive all Genomic Datasets
+        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,"","",0,50000,nil,1,nil,nil);
+        for (String[] dData : variationDataDTO.moreData())
+        {
+            dData[2] = WordUtils.capitalize(diagnosis);   //Histology
+            dData[3] = "Xenograft Tumor";                //Tumor type
+            variationDataDTOSet.add(dData);
+        }
 
         CsvMapper mapper = new CsvMapper();
 
-        CsvSchema titleArea = CsvSchema.builder()
-                .addColumn("").addColumn("")
-                .addColumn("Histology: "+ WordUtils.capitalize(diagnosis)+" | Tumor Type: Xenograft Tumor | Platform: "+platforms)
-                .build().withHeader();
-
         CsvSchema schema = CsvSchema.builder()
                 .addColumn("Sample ID")
+                .addColumn("Passage")
+                .addColumn("Histology")
+                .addColumn("Tumor type")
                 .addColumn("Chromosome")
                 .addColumn("Seq. Position")
                 .addColumn("Ref Allele")
@@ -232,13 +233,13 @@ public class DetailsPageController {
                 .addColumn("Read Depth")
                 .addColumn("Allele Freq")
                 .addColumn("RS Variant")
+                .addColumn("Platform")
                 .build().withHeader();
 
 
         String output = "CSV output";
         try {
-            output = mapper.writer(titleArea).writeValueAsString(space);
-            output += mapper.writer(schema).writeValueAsString(variationDataDTOSet);
+            output = mapper.writer(schema).writeValueAsString(variationDataDTOSet);
         } catch (JsonProcessingException e) {}
 
         response.setContentType("text/csv;charset=utf-8");

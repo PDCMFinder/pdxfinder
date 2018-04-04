@@ -1,6 +1,7 @@
 package org.pdxfinder.services.dto;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -13,6 +14,8 @@ public class VariationDataDTO {
     private int recordsFiltered;
 
     List<String[]> data = new ArrayList();
+
+    List<String[]> moreData = new ArrayList();
 
     public VariationDataDTO(){
 
@@ -53,5 +56,31 @@ public class VariationDataDTO {
 
     public void setData(List<String[]> data) {
         this.data = data;
+    }
+
+    public void setMoreData(List<String[]> moreData) {
+        this.moreData = moreData;
+    }
+
+    public List<String[]> moreData() {
+
+        List<String[]> adjustedData = new LinkedList<>();
+
+        for (String[] dataArr: data){
+
+            String[] dataArr2 = new String[15];
+
+            dataArr2[0] = dataArr[0];
+            dataArr2[1] = dataArr[12];
+            dataArr2[2] = "";
+            dataArr2[3] = "";
+
+            for (int i=1; i<12; i++){
+                dataArr2[i+3] = dataArr[i];
+            }
+
+            adjustedData.add(dataArr2);
+        }
+        return adjustedData;
     }
 }
