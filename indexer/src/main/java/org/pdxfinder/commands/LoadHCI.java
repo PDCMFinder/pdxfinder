@@ -156,6 +156,7 @@ public class LoadHCI implements CommandLineRunner {
             JSONArray markers = j.getJSONArray("Markers");
             
             MolecularCharacterization molC = new MolecularCharacterization();
+            molC.setTechnology("IHC");
             Set<MarkerAssociation> markerAssocs = new HashSet();
             for(int i =0; i< markers.length(); i++){
                 JSONObject job = markers.getJSONObject(i);

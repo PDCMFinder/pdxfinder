@@ -56,9 +56,9 @@ public class ChartDataController {
         Map<String, String> dataHolderDetails = new HashMap<>();
         dataHolderDetails.put("JAX","The Jackson Laboratory");
         dataHolderDetails.put("PDXNet-HCI-BCM","HCI-Baylor College of Medicine");
-        dataHolderDetails.put("PDXNet-Wistar-MDAnderson-Penn","Melanoma PDX established by the Wistar/MD Anderson/Penn");
+        dataHolderDetails.put("PDXNet-Wistar-MDAnderson-Penn","Wistar/MD Anderson/Penn");
         dataHolderDetails.put("PDXNet-WUSTL","Washington University in St. Louis");
-        dataHolderDetails.put("PDXNet-MDAnderson","University of Texas MD Anderson Cancer Center");
+        dataHolderDetails.put("PDXNet-MDAnderson","MD Anderson Cancer Center");
         dataHolderDetails.put("PDMR","NCI Patient-Derived Models Repository");
         dataHolderDetails.put("IRCC","Candiolo Cancer Institute");
 
