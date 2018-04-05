@@ -522,8 +522,10 @@
                                 <th>Type</th>
                                 <th>Age</th>
                                 <th>Sex</th>
-                                <th th:if="${isMutationSelected} == false">Data Available</th> <th th:if="${isMutationSelected} == true">Platform</th>
+                                <th th:if="${isMutationSelected} == false">Data Available</th>
                                 <th th:if="${isMutationSelected} == true">Mutations</th>
+                                <th th:if="${isMutationSelected} == true">Platform</th>
+
                             </tr>
                             </thead>
                             <tbody>
@@ -551,6 +553,13 @@
                                 </td>
 
                                 <td th:if="${isMutationSelected} == true">
+                                    <th:block th:each="dMutations : ${mutationMap.get(model.externalId)}">
+                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'?marker='+${dMutations}+'#variation' }"
+                                           style="font-size: 12px;" th:utext="${dMutations} + '<br />'">dMutations</a>
+                                    </th:block>
+                                </td>
+
+                                <td th:if="${isMutationSelected} == true">
                                     <th:block th:each="platform : ${platformMap.get(model.externalId)}">
 
                                         <div th:if="${platformsAndUrls[__${platform}__] != null}">
@@ -564,12 +573,7 @@
                                     </th:block>
                                 </td>
 
-                                <td th:if="${isMutationSelected} == true">
-                                    <th:block th:each="dMutations : ${mutationMap.get(model.externalId)}">
-                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'?marker='+${dMutations}+'#variation' }"
-                                           style="font-size: 12px;" th:utext="${dMutations} + '<br />'">dMutations</a>
-                                    </th:block>
-                                </td>
+
                             </tr>
 
                             </tbody>
