@@ -15,6 +15,7 @@ public class Platform {
     @GraphId
     private Long id;
     private String name;
+    private String url;
 
     @Relationship(type = "ASSOCIATED_WITH", direction = Relationship.INCOMING)
     private ExternalDataSource externalDataSource;
@@ -51,5 +52,13 @@ public class Platform {
 
     public void setExternalDataSource(ExternalDataSource externalDataSource) {
         this.externalDataSource = externalDataSource;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

@@ -16,6 +16,8 @@ public class TreatmentSummary {
 
     @GraphId
     Long id;
+    //url to a page that describes the treatment
+    String url;
 
     @Relationship(type = "TREATMENT_PROTOCOL")
     Set<TreatmentProtocol> treatmentProtocols;
@@ -60,4 +62,11 @@ public class TreatmentSummary {
         this.treatmentProtocols.add(tp);
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }

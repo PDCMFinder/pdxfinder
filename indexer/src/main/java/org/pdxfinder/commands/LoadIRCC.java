@@ -49,6 +49,10 @@ public class LoadIRCC implements CommandLineRunner {
     
     private final static String TECH = "MUT targeted NGS";
 
+    private final static String DOSING_STUDY_URL = "/platform/ircc-dosing-studies/";
+    private final static String TARGETEDNGS_PLATFORM_URL = "/platform/ircc-gene-panel/";
+    private final static String SOURCE_URL = "/source/ircc/";
+
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
@@ -101,7 +105,8 @@ public class LoadIRCC implements CommandLineRunner {
         parser.accepts("loadALL", "Load all, including IRCC PDX data");
         OptionSet options = parser.parse(args);
         
-        irccDS = loaderUtils.getExternalDataSource(IRCC_DATASOURCE_ABBREVIATION, IRCC_DATASOURCE_NAME, IRCC_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
+        irccDS = loaderUtils.getExternalDataSource(IRCC_DATASOURCE_ABBREVIATION, IRCC_DATASOURCE_NAME, IRCC_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+
         nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         if (options.has("loadIRCC") || options.has("loadALL")) {
@@ -297,13 +302,13 @@ public class LoadIRCC implements CommandLineRunner {
                     if(treatments.length() > 0){
                         //log.info("Treatments found for model "+mc.getSourcePdxId());
                         ts = new TreatmentSummary();
-
+                        ts.setUrl(DOSING_STUDY_URL);
                         for(int t = 0; t<treatments.length(); t++){
                             JSONObject treatmentObject = treatments.getJSONObject(t);
                             TreatmentProtocol tp = new TreatmentProtocol();
                             Response r = new Response();
-                            r.setDescription(treatmentObject.getString("Response Class"));
-                            tp.setDrug(treatmentObject.getString("Drug"));
+                            r.setDescription(Standardizer.getDrugResponse(treatmentObject.getString("Response Class")));
+                            tp.setDrug(Standardizer.getDrugName(treatmentObject.getString("Drug")));
                             tp.setDose(treatmentObject.getString("Dose") );
                             tp.setResponse(r);
 
@@ -335,6 +340,7 @@ public class LoadIRCC implements CommandLineRunner {
         //STEP 1: Save the platform
         Platform platform = loaderUtils.getPlatform(platformName, this.irccDS);
         platform.setExternalDataSource(irccDS);
+        platform.setUrl(TARGETEDNGS_PLATFORM_URL);
         loaderUtils.savePlatform(platform);
 
 
@@ -463,7 +469,7 @@ public class LoadIRCC implements CommandLineRunner {
             JSONArray jarray = job.getJSONArray("IRCCVariation");
          //   System.out.println("loading "+jarray.length()+" variant records");
 
-            Platform platform = loaderUtils.getPlatform(TECH, this.irccDS);
+            Platform platform = loaderUtils.getPlatform(TECH, this.irccDS, TARGETEDNGS_PLATFORM_URL);
             platform.setExternalDataSource(irccDS);
             loaderUtils.savePlatform(platform);
 

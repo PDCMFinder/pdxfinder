@@ -51,6 +51,8 @@ public class LoadPDMRData implements CommandLineRunner {
     private final static String NSG_BS_URL = "";
     private final static String HISTOLOGY_NOTE = "";
     private final static String ENGRAFTMENT = "Engraftment";
+    private final static String SOURCE_URL = "/source/pdmr/";
+    private final static String PLATFORM_URL = "/platform/nci-cancer-gene-panel/";
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -125,7 +127,7 @@ public class LoadPDMRData implements CommandLineRunner {
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
 
-        DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
+        DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
         nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         try {
@@ -259,6 +261,7 @@ public class LoadPDMRData implements CommandLineRunner {
                 ma.setMarker(marker);
 
                 Platform platform = loaderUtils.getPlatform(technology, this.DS);
+                platform.setUrl(PLATFORM_URL);
 
                 // why would this happen?
                 if (platform.getExternalDataSource() == null) {

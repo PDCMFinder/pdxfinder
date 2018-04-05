@@ -4,8 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.dao.Specimen;
+import org.pdxfinder.services.DrugService;
 import org.pdxfinder.services.GraphService;
+import org.pdxfinder.services.PlatformService;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
@@ -18,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
-/**
+/*
  * Created by csaba on 12/05/2017.
  */
 @Controller
@@ -26,12 +29,16 @@ public class DetailsPageController {
 
     private SearchService searchService;
     private GraphService graphService;
+    private DrugService drugService;
+    private PlatformService platformService;
 
 
     @Autowired
-    public DetailsPageController(SearchService searchService, GraphService graphService) {
+    public DetailsPageController(SearchService searchService, GraphService graphService, DrugService drugService, PlatformService platformService) {
         this.searchService = searchService;
         this.graphService = graphService;
+        this.drugService = drugService;
+        this.platformService = platformService;
     }
 
     @RequestMapping(value = "/pdx/{dataSrc}/{modelId}")
@@ -51,6 +58,7 @@ public class DetailsPageController {
         List<String> relatedModels = searchService.getModelsOriginatedFromSamePatient(dataSrc, modelId);
 
         List<DrugSummaryDTO> drugSummary = searchService.getDrugSummary(dataSrc, modelId);
+        String drugProtocolUrl = drugService.getPlatformUrlByDataSource(dataSrc);
 
         List<VariationDataDTO> variationDataDTOList = new ArrayList<>();
 
@@ -92,6 +100,8 @@ public class DetailsPageController {
 
         //auto suggestions for the search field
         Set<String> autoSuggestList = graphService.getMappedNCITTerms();
+
+        Map<String, String> platformsAndUrls = platformService.getPlatformsWithUrls();
         model.addAttribute("mappedTerm", autoSuggestList);
 
 
@@ -146,6 +156,8 @@ public class DetailsPageController {
 
         model.addAttribute("drugSummary", drugSummary);
         model.addAttribute("drugSummaryRowNumber", drugSummary.size());
+        model.addAttribute("drugProtocolUrl", drugProtocolUrl);
+        model.addAttribute("platformsAndUrls", platformsAndUrls);
 
 
         Map<String, String> sorceDesc = new HashMap<>();
@@ -187,19 +199,36 @@ public class DetailsPageController {
                                    @PathVariable String dataSrc,
                                    @PathVariable String modelId){
 
+        Set<String[]> variationDataDTOSet = new LinkedHashSet<>();
+
+        String[] space = {""}; String nil = "";
+
+        //Retreive Diagnosis Information
+        String diagnosis = searchService.searchForModel(dataSrc,modelId,0,50000,"","","").getDiagnosis();
+
+        // Retreive technology Information
+        List platforms = new ArrayList();
         Map<String, Set<String>> modelTechAndPassages = searchService.findModelPlatformAndPassages(dataSrc,modelId,"");
-
-        List<List<String[]>> variationDataDTOList = new ArrayList<>();
-
         for (String tech : modelTechAndPassages.keySet()) {
-            VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,"",0,50000,"",1,"","");
-            variationDataDTOList.add(variationDataDTO.getData());
+            platforms.add(tech);
+        }
+
+        // Retreive all Genomic Datasets
+        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,"","",0,50000,nil,1,nil,nil);
+        for (String[] dData : variationDataDTO.moreData())
+        {
+            dData[2] = WordUtils.capitalize(diagnosis);   //Histology
+            dData[3] = "Xenograft Tumor";                //Tumor type
+            variationDataDTOSet.add(dData);
         }
 
         CsvMapper mapper = new CsvMapper();
 
         CsvSchema schema = CsvSchema.builder()
                 .addColumn("Sample ID")
+                .addColumn("Passage")
+                .addColumn("Histology")
+                .addColumn("Tumor type")
                 .addColumn("Chromosome")
                 .addColumn("Seq. Position")
                 .addColumn("Ref Allele")
@@ -210,12 +239,13 @@ public class DetailsPageController {
                 .addColumn("Read Depth")
                 .addColumn("Allele Freq")
                 .addColumn("RS Variant")
+                .addColumn("Platform")
                 .build().withHeader();
 
 
         String output = "CSV output";
         try {
-            output = mapper.writer(schema).writeValueAsString(variationDataDTOList);
+            output = mapper.writer(schema).writeValueAsString(variationDataDTOSet);
         } catch (JsonProcessingException e) {}
 
         response.setContentType("text/csv;charset=utf-8");

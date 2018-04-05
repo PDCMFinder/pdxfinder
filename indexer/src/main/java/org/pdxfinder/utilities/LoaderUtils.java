@@ -114,7 +114,7 @@ public class LoaderUtils {
 
     }
 
-    public ExternalDataSource getExternalDataSource(String abbr, String name, String description, String contact) {
+    public ExternalDataSource getExternalDataSource(String abbr, String name, String description, String contact, String url) {
         ExternalDataSource eDS = externalDataSourceRepository.findByAbbreviation(abbr);
         if (eDS == null) {
             log.info("External data source '{}' not found. Creating", abbr);
@@ -123,7 +123,8 @@ public class LoaderUtils {
                     abbr,
                     description,
                     contact,
-                    Date.from(Instant.now()));
+                    Date.from(Instant.now()),
+                    url);
             externalDataSourceRepository.save(eDS);
         }
 
@@ -615,7 +616,19 @@ public class LoaderUtils {
 
         return p;
     }
-    
+
+    public Platform getPlatform(String name, ExternalDataSource eds, String platformUrl) {
+        Platform p = platformRepository.findByNameAndDataSourceAndUrl(name, eds.getName(), platformUrl);
+        if (p == null) {
+            p = new Platform();
+            p.setName(name);
+            p.setExternalDataSource(eds);
+            p.setUrl(platformUrl);
+        }
+
+        return p;
+    }
+
     public void savePlatform(Platform p){
         platformRepository.save(p);
     }

@@ -194,21 +194,6 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
     }
 
 
-    var geneFilter = jQuery("#geneFilter1");
-    if (geneFilter.val() != null && geneFilter.val() != "") {
-
-        var openMarkerFacet = true;
-
-        if (openMarkerFacet) {
-            var markerFilterField = jQuery("li#marker_filter > a.accordion-title");
-            markerFilterField.click();
-        }
-    }
-
-
-
-
-
 }
 
 
@@ -232,13 +217,24 @@ function redirectPage(){
 
         if (geneFilter.val() != null && geneFilter.val() != "")
         {
+            var allVariants = getVariantSize(geneFilter.val());
             for (var j=0; j<variantFilter.val().length; j++){
 
                 if (!no_parameters) {
                     url = url + "&";
                 }
-                url += "mutation=" + geneFilter.val() + "___MUT" + "___"+variantFilter.val()[j];
-                no_parameters = false;
+
+                if(allVariants.length == variantFilter.val().length){
+
+                    url += "mutation=" + geneFilter.val() + "___MUT" + "___ALL";
+                    no_parameters = false;
+                    break;
+                }else{
+
+                    url += "mutation=" + geneFilter.val() + "___MUT" + "___"+variantFilter.val()[j];
+                    no_parameters = false;
+
+                }
             }
         }
 

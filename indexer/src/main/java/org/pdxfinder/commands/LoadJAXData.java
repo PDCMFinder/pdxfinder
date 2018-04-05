@@ -52,8 +52,12 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
 
     private final static String HISTOLOGY_NOTE = "Pathologist assessment of patient tumor and pdx model tumor histology slides.";
-    
-   
+
+    private final static String DOSING_STUDY_URL = "/platform/jax-drug-dosing/";
+    private final static String CTP_PLATFORM_URL = "/platform/jax-ctp/";
+    private final static String TRUSEQ_PLATFORM_URL = "/platform/jax-truseq/";
+    private final static String WHOLE_EXOME_URL = "/platform/jax-whole-exome/";
+    private final static String SOURCE_URL = "/source/jax/";
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -130,7 +134,7 @@ public class LoadJAXData implements CommandLineRunner {
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
 
-        jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
+        jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
 
         nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
 
@@ -247,6 +251,7 @@ public class LoadJAXData implements CommandLineRunner {
                 if(treatments.length() > 0){
                     //log.info("Treatments found for model "+mc.getSourcePdxId());
                     ts = new TreatmentSummary();
+                    ts.setUrl(DOSING_STUDY_URL);
 
                     for(int t = 0; t<treatments.length(); t++){
                         JSONObject treatmentObject = treatments.getJSONObject(t);
@@ -351,7 +356,20 @@ public class LoadJAXData implements CommandLineRunner {
                 ma.setMarker(marker);
 
                 Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
+
+
+                if(technology.equals("Truseq_JAX")){
+                    platform = loaderUtils.getPlatform(technology, this.jaxDS, TRUSEQ_PLATFORM_URL);
+                }
+                else if(technology.equals("Whole_Exome")){
+                    platform = loaderUtils.getPlatform(technology, this.jaxDS, WHOLE_EXOME_URL);
+                }
+                else if(technology.equals("CTP")){
+                    platform = loaderUtils.getPlatform(technology, this.jaxDS, CTP_PLATFORM_URL);
+                }
+
                 platform.setExternalDataSource(jaxDS);
+
                 //loaderUtils.savePlatform(platform);
                 //loaderUtils.createPlatformAssociation(platform, marker);
                 
@@ -387,7 +405,21 @@ public class LoadJAXData implements CommandLineRunner {
                 for (String tech : markerMap.keySet()) {
                     MolecularCharacterization mc = new MolecularCharacterization();
                     mc.setType("mutation");
-                    mc.setPlatform(loaderUtils.getPlatform(tech, this.jaxDS));
+
+                    Platform platform = null;
+
+                    if(tech.equals("Truseq_JAX")){
+                        platform = loaderUtils.getPlatform(tech, this.jaxDS, TRUSEQ_PLATFORM_URL);
+                    }
+                    else if(tech.equals("Whole_Exome")){
+                        platform = loaderUtils.getPlatform(tech, this.jaxDS, WHOLE_EXOME_URL);
+                    }
+                    else if(tech.equals("CTP")){
+                        platform = loaderUtils.getPlatform(tech, this.jaxDS, CTP_PLATFORM_URL);
+                    }
+
+
+                    mc.setPlatform(platform);
                     mc.setMarkerAssociations(markerMap.get(tech));
                     mcs.add(mc);
 

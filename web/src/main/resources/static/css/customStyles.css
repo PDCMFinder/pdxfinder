@@ -106,12 +106,20 @@ h5{
     display: none;
 }
 
-.hideContentShowFirst{
+.hideContent0{
     position: absolute;
     top: -9999px;
 }
 
-.hideContent{
+.hideContent1{
+    position: absolute;
+    top: -9999px;
+}
+.hideContent2{
+    position: absolute;
+    top: -9999px;
+}
+.hideContent3{
     position: absolute;
     top: -9999px;
 }
@@ -414,6 +422,14 @@ th,td {
     white-space:nowrap;
 }
 
+/*
+.closIcon {
+    background: url(../images/delete-sign.png) no-repeat right 10px center;
+    background-size: 30px 30px;
+    background-position-x: 10px;
+    background-position-y: 40px;
+    cursor: hand;
+}*/
 
 .table-borderedPdx > thead > tr > th,
 .table-borderedPdx > thead > tr > td {
@@ -781,7 +797,7 @@ table.dataTable {
 
 .icoButn {
     background-color: #FFF;
-    border: 3px ridge #fff;
+    border: 2px ridge #000;
     color: #000;
     padding: 11px 3px;
     text-align: center;
@@ -798,7 +814,7 @@ table.dataTable {
 
 .icoButn:hover {
     background-color: #06369d;
-    border: 1px solid #fff;
+    border: 2px ridge #000;
     color: #fff;
 }
 

@@ -31,7 +31,7 @@ public class SearchService {
     private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
     private final String IRCC_URL_TEXT = "Contact IRCC here";
     private final String PDMR_URL = "https://pdmdb.cancer.gov/pls/apex/f?p=101:41";
-    private final String PDMR_URL_TEXT = "Access PDMR here";
+    private final String PDMR_URL_TEXT = "View data at PDMR";
     
     // for PDXNet
     //private final String HCI_URL = "https://www.pdxnetwork.org/hcibcm/";
@@ -545,7 +545,7 @@ public class SearchService {
 
         if (model != null && model.getSample() != null ) {
 
-            variationData.addAll(buildUpDTO(model.getSample(),draw,recordsTotal,recordsFiltered));
+            variationData.addAll(buildUpDTO(model.getSample(),"",draw,recordsTotal,recordsFiltered));
         }
 
         variationDataDTO.setDraw(draw);
@@ -584,9 +584,11 @@ public class SearchService {
 
         if (specimens != null) {
             for (Specimen specimen : specimens) {
-                variationData.addAll( buildUpDTO(specimen.getSample(),draw,recordsTotal,recordsFiltered) );
+                variationData.addAll( buildUpDTO(specimen.getSample(),specimen.getPassage(),draw,recordsTotal,recordsFiltered) );
             }
         }
+
+
 
         variationDataDTO.setDraw(draw);
         variationDataDTO.setRecordsTotal(recordsTotal);
@@ -632,7 +634,7 @@ public class SearchService {
         return results;
     }
 
-    public List<String[]> buildUpDTO(Sample sample,int draw,int recordsTotal,int recordsFiltered){
+    public List<String[]> buildUpDTO(Sample sample,String passage,int draw,int recordsTotal,int recordsFiltered){
 
         List<String[]> variationData = new ArrayList();
 
@@ -648,9 +650,8 @@ public class SearchService {
 
                 for (MarkerAssociation markerAssoc : markerAssociation) {
 
-                    String[] markerAssocArray = new String[12];
+                    String[] markerAssocArray = new String[13];
                     markerAssocArray[0] = sample.getSourceSampleId();
-                    //markerAssocArray[1] = dMolChar.getPlatform().getName();
                     markerAssocArray[1] = markerAssoc.getChromosome();
                     markerAssocArray[2] = markerAssoc.getSeqPosition();
                     markerAssocArray[3] = markerAssoc.getRefAllele();
@@ -661,6 +662,10 @@ public class SearchService {
                     markerAssocArray[8] = markerAssoc.getReadDepth();
                     markerAssocArray[9] = markerAssoc.getAlleleFrequency();
                     markerAssocArray[10 ] = markerAssoc.getRsVariants();
+                    markerAssocArray[11] = dMolChar.getPlatform().getName();
+                    markerAssocArray[12] = passage;
+                    //markerAssocArray[13] = sample.getDiagnosis();
+                   // markerAssocArray[14] = sample.getType().getName();
 
                     variationData.add(markerAssocArray);
                 }

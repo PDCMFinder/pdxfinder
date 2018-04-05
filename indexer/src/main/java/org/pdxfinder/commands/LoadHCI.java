@@ -50,7 +50,8 @@ public class LoadHCI implements CommandLineRunner {
     private final static String NS_BS_SYMBOL = "NOD.CB17-Prkd<sup>cscid</sup>/J"; //yay HTML in name
     private final static String NS_BS_URL = "https://www.jax.org/strain/001303";
 
-    
+    private final static String SOURCE_URL = null;
+
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
@@ -103,7 +104,7 @@ public class LoadHCI implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        hciDS = loaderUtils.getExternalDataSource(HCI_DATASOURCE_ABBREVIATION, HCI_DATASOURCE_NAME, HCI_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT);
+        hciDS = loaderUtils.getExternalDataSource(HCI_DATASOURCE_ABBREVIATION, HCI_DATASOURCE_NAME, HCI_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
         nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
         nsBS = loaderUtils.getHostStrain(NS_BS_NAME, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
 
@@ -156,6 +157,7 @@ public class LoadHCI implements CommandLineRunner {
             JSONArray markers = j.getJSONArray("Markers");
             
             MolecularCharacterization molC = new MolecularCharacterization();
+            molC.setTechnology("IHC");
             Set<MarkerAssociation> markerAssocs = new HashSet();
             for(int i =0; i< markers.length(); i++){
                 JSONObject job = markers.getJSONObject(i);

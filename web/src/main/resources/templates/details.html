@@ -179,19 +179,13 @@
             <section class="row large-10 medium-12 expanded" id="detailsData">
 
                 <div class="row large-12 medium-12 expanded">
-                    <ul class="tabs style-2" data-tabs id="example2-tabs">
-                        <li class="tabs-title is-active"><a href="#summary" data-tabs-target="summary"
-                                                            aria-selected="true">Summary</a></li>
-                        <li class="tabs-title "><a href="#variation" data-tabs-target="variation"
-                                                   id="variation_data_link" onclick="showTabsFirst()"> Genomic Data
+                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                        <li class="tabs-title is-active"><a href="#summary" aria-selected="true">Summary</a></li>
+                        <li class="tabs-title "><a href="#variation" id="variation_data_link" onclick="showTabs('0')"> Genomic Data
                             (<span th:text="${totalRecords}"></span>) </a></li>
 
-                        <li th:if="${drugSummaryRowNumber} == 0" class="tabs-title"><a href="#dosing_studies"
-                                                                                       data-tabs-target="dosing_studies">Dosing
-                            studies (0)</a></li>
-                        <li th:if="${drugSummaryRowNumber} > 0" class="tabs-title"><a href="#dosing_studies"
-                                                                                      data-tabs-target="dosing_studies">Dosing
-                            studies (1)</a></li>
+                        <li th:if="${drugSummaryRowNumber} == 0" class="tabs-title"><a href="#dosing_studies">Dosing studies (0)</a></li>
+                        <li th:if="${drugSummaryRowNumber} > 0" class="tabs-title"><a href="#dosing_studies">Dosing studies (1)</a></li>
 
                     </ul>
                 </div>
@@ -300,7 +294,7 @@
                                             <td th:text="${engraftmentSite}"></td>
                                         </tr>
                                         <tr>
-                                            <th class="text-left medium-4">Implantation Type</th>
+                                            <th class="text-left medium-4">Implantation Material</th>
                                             <td th:text="${sampleType}"></td>
                                         </tr>
                                         </tbody>
@@ -343,6 +337,7 @@
                     </div>
 
 
+
                     <div class="tabs-panel is-active" id="variation">
 
                         <p>
@@ -372,10 +367,11 @@
 
                                         <a th:href="@{'#'+${technology.key}}"
                                            th:text="${technology.key}+' Platform'" role="tab" data-toggle="tab"
-                                           onclick="showTabs()"> TAB TITLES </a>
+                                           th:onclick="'showTabs('+${iter.index}+')'"> TAB TITLES </a>
 
                                     </li>
                                 </ul>
+
 
 
                                 <!-- Tab panes -->
@@ -384,9 +380,9 @@
                                          th:id="${technology.key}"
                                          class="tab-pane active" role="tabpanel">
 
+
                                                 <span>
-                                                        <div class="table-responsive"
-                                                             th:classappend="( ${iter.index} == 0 ) ? 'hideContent' : 'hideContent' ">
+                                                        <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'hideContent' : 'hideContent' ">
 
                                                             <b class="bLine">
                                                                 <span class="hdc">Tumor Type: </span>            <i>Patient Tumor</i>                  &nbsp; &nbsp;
@@ -430,8 +426,8 @@
                             <div class="tab hideContentShowFirst" role="tabpanel" th:if="${modelInfo.size() > 0}">
 
                                 <div id="sizeSwitch">
-                                    <a th:href="@{'/pdx/'+${dataSrc}+'/'+${modelId}+'/export'}" class="button outline">
-                                        Export Results <i class="fi-page-export-csv lpad10"></i> </a>
+                                    <a th:href="@{'/pdx/'+${dataSrc}+'/'+${modelId}+'/export'}" class="button outline secondary">
+                                        Export Results <i class="icon icon-functional" data-icon="="></i> </a>
                                 </div>
 
 
@@ -442,7 +438,7 @@
 
                                         <a th:href="@{'#'+${technology.key}}"
                                            data-th-attr="data-tabs-target=${technology.key},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
-                                           th:text="${technology.key}+' Platform'" onclick="showTabs()"> TAB TITLES </a>
+                                           th:text="${technology.key}+' Platform'" th:onclick="'showTabs('+${iter.index}+')'"> TAB TITLES </a>
 
                                     </li>
 
@@ -456,7 +452,7 @@
                                     <div th:each="technology,iter : ${modelInfo}"
                                          th:id="${technology.key}"
                                          class="tabs-panel is-active"
-                                         th:classappend="( ${iter.index} == 0 ) ? 'hideContentShowFirst' : 'hideContent' ">
+                                         th:classappend=" 'hideContent'+${iter.index} ">
 
                                                     <span th:unless="${technology.value.size()<1}"
                                                           th:each="num: ${#numbers.sequence(1,technology.value.size())}"> <!--/* Unable to capture index for inner loop so, this was used for innerloop : <tr th:each="passageList : ${technolog[y.value]}"> */-->
@@ -473,13 +469,20 @@
 
                                                                     <span class="hdc">Histology:</span> <b class="black"
                                                                                                            th:text="${#strings.capitalize(diagnosis)}"></b>     &nbsp; &nbsp;
-                                                                    <span class="hdc">Tumor Type: </span>            <b
-                                                                        class="black">Xenograft Tumor</b>                  &nbsp; &nbsp;
+                                                                    <span class="hdc">Tumor Type: </span>
+                                                                    <b class="black">Xenograft Tumor</b>                  &nbsp; &nbsp;
                                                                     <span class="hdc">Passage: </span>  <b class="black"
                                                                                                            th:text="${technology.value[num-1]}"></b>     &nbsp; &nbsp;
-                                                                    <a href="" target="_blank"><span class="hdc">Platform: </span>  <b
-                                                                            class="black"
-                                                                            th:text="${technology.key}"></b></a>
+                                                                    <span class="hdc">Platform: </span>
+
+                                                                        <span th:if="${platformsAndUrls[__${technology.key}__] != null}">
+                                                                            <a th:href="${platformsAndUrls[__${technology.key}__]}" th:text="${technology.key}"></a>
+                                                                        </span>
+
+                                                                        <span th:if="${platformsAndUrls[__${technology.key}__] == null}">
+                                                                            <b class="black" th:text="${technology.key}"></b>
+                                                                        </span>
+
                                                                 </h4>
 
                                                                 <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
@@ -522,6 +525,10 @@
                     <div class="tabs-panel" id="dosing_studies">
                         <div th:if="${not #lists.isEmpty(drugSummary)}">
                             <p>
+
+                            <div th:if="${drugProtocolUrl} != null" style="margin-bottom: 15px;text-transform: uppercase">
+                            <a th:href="${drugProtocolUrl}" >Dosing study protocol</a>
+                        </div>
 
                             <table class="datatable-pdx pdx-table table-borderedPdx head-left">
                                 <thead>
@@ -704,6 +711,10 @@
     // We define the function
     function drawTable(tableId, apiURL) {
 
+        /*var markerNVariant = [[ ${param.marker} ]];
+        var marker = markerNVariant.split(" ");
+        alert(marker[0]); */
+
         var l = jQuery("#tableId tr").length;
         console.log(tableId + " " + l);
 
@@ -741,17 +752,22 @@
     }
 
 
-    function showTabsFirst() {
+    function showTabs(cnt) {
         for (var i = 0; i < 5; i++) {
-            document.getElementsByClassName("hideContentShowFirst")[i].style.position = "static";
+            document.getElementsByClassName("hideContent"+cnt)[i].style.position = "static";
         }
     }
 
-    function showTabs() {
-        for (var i = 0; i < 5; i++) {
-            document.getElementsByClassName("hideContent")[i].style.position = "static";
+    // Check if variation tab is deeplinked on page load:
+    $(document).ready(function(){
+        var hash = window.location.hash;
+
+        if (hash == "#variation"){
+            for (var i = 0; i < 5; i++) {
+                document.getElementsByClassName("hideContent0")[i].style.position = "static";
+            }
         }
-    }
+    });
 
 
     /*function expandTable(action) {

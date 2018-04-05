@@ -1,6 +1,7 @@
 package org.pdxfinder.web.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.services.AutoCompleteService;
 import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.MolCharService;
+import org.pdxfinder.services.PlatformService;
 import org.pdxfinder.services.ds.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,7 @@ public class SearchController {
     private SearchDS searchDS;
     private Map<String, List<String>> facets = new HashMap<>();
     private MolCharService molCharService;
+    private PlatformService platformService;
 
     List<String> patientAgeOptions = SearchDS.PATIENT_AGE_OPTIONS;
     List<String> datasourceOptions = SearchDS.DATASOURCE_OPTIONS;
@@ -44,11 +47,12 @@ public class SearchController {
     List<String> sampleTumorTypeOptions = SearchDS.SAMPLE_TUMOR_TYPE_OPTIONS;
     List<String> diagnosisOptions = SearchDS.DIAGNOSIS_OPTIONS;
 
-    public SearchController(GraphService graphService, SearchDS searchDS, AutoCompleteService autoCompleteService, MolCharService molCharService) {
+    public SearchController(GraphService graphService, SearchDS searchDS, AutoCompleteService autoCompleteService, MolCharService molCharService, PlatformService platformService) {
         this.graphService = graphService;
         this.searchDS = searchDS;
         this.autoCompleteService = autoCompleteService;
         this.molCharService = molCharService;
+        this.platformService = platformService;
 
         facets.put("datasource_options", datasourceOptions);
         facets.put("patient_age_options", patientAgeOptions);
@@ -70,7 +74,7 @@ public class SearchController {
                   @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
                   @RequestParam("cancer_system") Optional<List<String>> cancer_system,
                   @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type,
-                  @RequestParam("sample_tumor_type") Optional<List<String>> mutation
+                  @RequestParam("mutation") Optional<List<String>> mutation
     ) {
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
@@ -169,6 +173,7 @@ public class SearchController {
                 )
         );
 
+        //logger.info("Before: "+facetString);
         // If there is a query, append the query parameter to any configured facet string
         if (query.isPresent() && !query.get().isEmpty()) {
             facetString = StringUtils.join(Arrays.asList("query=" + query.get(), facetString), "&");
@@ -181,13 +186,26 @@ public class SearchController {
             }
         }
 
+        List<String> selectedMutatedMarkerOrder = new ArrayList<>();
+
         if (mutation.isPresent() && !mutation.get().isEmpty()) {
+            List<String> mutList = new ArrayList<>();
             for (String mut : mutation.get()) {
-
-                facetString = StringUtils.join(Arrays.asList("mutation=" + mut, facetString), "&");
+                //logger.info(mut);
+                mutList.add("mutation="+mut);
+                //facetString = StringUtils.join(Arrays.asList("mutation=" + mut, facetString), "&");
             }
-        }
 
+            if(facetString.length() != 0 && !facetString.endsWith("&")) {
+                facetString += "&";
+            }
+            for(String mut: mutList){
+                facetString += mut+"&";
+            }
+            //facetString += StringUtils.join(mutList, "&");
+
+    }
+        //logger.info("After: " +facetString);
 
         // Num pages is converted to an int using this formula int n = a / b + (a % b == 0) ? 0 : 1;
         int numPages = results.size() / size + (results.size() % size == 0 ? 0 : 1);
@@ -200,6 +218,7 @@ public class SearchController {
         int current = page;
         int begin = Math.max(1, current - 4);
         int end = Math.min(begin + 7, numPages);
+        String mutatedMarkers = molCharService.getMutatedMarkersAndVariants();;
 
         String textSearchDescription = getTextualDescription(facetString, results);
 
@@ -209,8 +228,11 @@ public class SearchController {
             mutSelected = true;
         }
 
-        //auto suggestions for the search field
         List<AutoSuggestOption> autoSuggestList = autoCompleteService.getAutoSuggestions();
+        List<ModelForQuery> resultSet = new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size()));
+
+        Map<String, String> platformsAndUrls = platformService.getPlatformsWithUrls();
+        //auto suggestions for the search field
         model.addAttribute("autoCompleteList", autoSuggestList);
 
         model.addAttribute("numPages", numPages);
@@ -234,11 +256,105 @@ public class SearchController {
         model.addAttribute("query", query.orElse(""));
 
         model.addAttribute("facet_options", facets);
-        model.addAttribute("results", new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size())));
-        model.addAttribute("mutatedMarkersAndVariants", molCharService.getMutatedMarkersAndVariants());
+        model.addAttribute("results", resultSet);
+        model.addAttribute("mutatedMarkersAndVariants", mutatedMarkers);
+        //model.addAttribute("selectedMutatedMarkerOrder", selectedMutatedMarkerOrder);
+        model.addAttribute("platformsAndUrls", platformsAndUrls);
+
+        if (mutSelected == true){
+            model.addAttribute("platformMap", getPlatformOrMutationFromMutatedVariants(resultSet,"platformMap"));
+            model.addAttribute("mutationMap", getPlatformOrMutationFromMutatedVariants(resultSet,"mutationMap"));
+        }
+
+
+
+
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, List<String>> mapObject = new HashMap<>();
+        try{
+            mapObject = mapper.readValue(mutatedMarkers, Map.class);
+        }catch (Exception e){}
+
+        String done = "";
+        Map<String, List<String>> userChoice = new HashMap<>();
+        Map<String, Set<String>> allVariants = new LinkedHashMap<>();
+
+
+        try {
+            for (String markerReq : mutation.get()) {
+
+                String marka = markerReq.split("___")[0];
+                List<String> variantList = new ArrayList<>();
+                String variant = "";
+
+                if (!done.contains(marka)) { // New Marker
+
+                    for (String markerReq2 : mutation.get()) {
+
+                        if (marka.equals(markerReq2.split("___")[0])){
+
+                            variant = markerReq2.split("___")[2];
+
+                            if (variant.equals("ALL")){
+                                variantList = mapObject.get(marka);
+                            }else {
+                                variantList.add(variant);
+                            }
+                        }
+                    }
+                    userChoice.put(marka,variantList);
+
+                    Set<String> sortedVariantList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+                    sortedVariantList.addAll(mapObject.get(marka));
+
+                    allVariants.put(marka,sortedVariantList);
+                }
+
+                done += marka;
+            }
+            //System.out.println(userChoice);
+        }catch (Exception e){}
+
+        model.addAttribute("markerMap", userChoice);
+        model.addAttribute("markerMapWithAllVariants", allVariants);
 
         return "search";
     }
+
+
+
+
+    private Map<String, List<String>> getPlatformOrMutationFromMutatedVariants(List<ModelForQuery> resultSet, String whichMap){
+
+        Map<String, List<String>> platformMap = new HashMap<>();
+        Map<String, List<String>> mutationMap = new HashMap<>();
+
+        for (ModelForQuery mfq : resultSet){
+
+            List<String> dPlatforms = new ArrayList<>();
+            List<String> dMutations = new ArrayList<>();
+
+            for (String mutatedVariants : mfq.getMutatedVariants()){
+                String[] mv = mutatedVariants.split("\\s+");  // e.g  [Truseq_JAX BRAF V600E, CTP BRAF V600E]
+                dPlatforms.add(mv[0]);
+                dMutations.add(mv[1]+" "+mv[2]);
+            }
+
+            platformMap.put(mfq.getExternalId(), dPlatforms);
+            mutationMap.put(mfq.getExternalId(), dMutations);
+        }
+
+        if (whichMap.equals("platformMap")){
+            return platformMap;
+        }else{
+            return mutationMap;
+        }
+
+    }
+
+
 
     /**
      * Get a string representation of all the configured facets
@@ -265,7 +381,7 @@ public class SearchController {
         }
 
         String textDescription = "Your filter for ";
-        Map<String, Set<String>> filters = new HashMap<>();
+        Map<String, Set<String>> filters = new LinkedHashMap<>();
 
         for (String urlParams : facetString.split("&")) {
             List<String> pieces = Arrays.asList(urlParams.split("="));

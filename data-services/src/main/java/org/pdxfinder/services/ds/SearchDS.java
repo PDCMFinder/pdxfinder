@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.dao.*;
+import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.repositories.DataProjectionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -634,7 +634,7 @@ public class SearchDS {
      * @param filters the set of strings to match against
      * @return a composed predicate case insensitive matching the supplied filters using disjunction (OR)
      */
-    Predicate getContainsMatchDisjunctionPredicate(List<String> filters) {
+    Predicate<String> getContainsMatchDisjunctionPredicate(List<String> filters) {
         List<Predicate<String>> preds = new ArrayList<>();
 
         // Iterate through the filter options passed in for this facet
@@ -737,6 +737,39 @@ public class SearchDS {
 
 
 //        Collections.sort(map);
+
+        return map;
+    }
+
+
+    /**
+     * Get the count of models for each diagnosis (including children).
+     * <p>
+     * This method will return counts of facet options for the supplied facet
+     *
+     * @return a Map of k: diagnosis v: count
+     */
+    @Cacheable("diagnosis_counts")
+    public Map<String, Integer> getDiagnosisCounts() {
+
+        Set<ModelForQuery> allResults = models;
+
+        Map<String, Integer> map = new HashMap<>();
+
+
+        // Get the list of diagnoses
+        Set<String> allDiagnoses = allResults.stream().map(ModelForQuery::getMappedOntologyTerm).collect(Collectors.toSet());
+
+        //  For each diagnosis, match all results using the same search technique as "query"
+        for (String diagnosis : allDiagnoses) {
+            Predicate<String> predicate = getContainsMatchDisjunctionPredicate(Arrays.asList(diagnosis));
+//            Long i = allResults.stream().map(x -> x.getAllOntologyTermAncestors().stream().filter(predicate).collect(Collectors.toSet())).map(x->((Set)x)).filter(x->x.size()>0).distinct().count();
+            Long i = allResults.stream()
+                    .filter(x -> x.getAllOntologyTermAncestors().stream().filter(predicate).collect(Collectors.toSet()).size() > 0)
+                    .distinct().count();
+//            Long i = allResults.stream().filter(x -> x.getAllOntologyTermAncestors().contains(diagnosis)).distinct().count();
+            map.put(diagnosis, i.intValue());
+        }
 
         return map;
     }

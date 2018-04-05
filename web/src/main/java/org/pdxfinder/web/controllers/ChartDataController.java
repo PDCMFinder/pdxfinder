@@ -31,21 +31,21 @@ public class ChartDataController {
     public Map<String, Collection<DataHolder>> getData() {
 
         final Set<ModelForQuery> models = searchDS.getModels();
+        final Map<String, Integer> diagnosisCounts = searchDS.getDiagnosisCounts();
 
         Map<String, Collection<DataHolder>> data = new HashMap<>();
         Map<String, DataHolder> cancers = new HashMap<>();
 
         int ids = 1;
 
-        for (ModelForQuery m : models) {
+        for (String key : diagnosisCounts.keySet()) {
 
-            if (!cancers.containsKey(m.getMappedOntologyTerm())) {
-                cancers.put(m.getMappedOntologyTerm(), new DataHolder(m.getMappedOntologyTerm()));
-                cancers.get(m.getMappedOntologyTerm()).setId(ids++);
+            if (!cancers.containsKey(key)) {
+                DataHolder dataHolder = new DataHolder(key);
+                dataHolder.setNumber(diagnosisCounts.get(key));
+                dataHolder.setId(ids++);
+                cancers.put(key, dataHolder);
             }
-
-            DataHolder dh = cancers.get(m.getMappedOntologyTerm());
-            dh.increment();
 
         }
 
@@ -56,9 +56,9 @@ public class ChartDataController {
         Map<String, String> dataHolderDetails = new HashMap<>();
         dataHolderDetails.put("JAX","The Jackson Laboratory");
         dataHolderDetails.put("PDXNet-HCI-BCM","HCI-Baylor College of Medicine");
-        dataHolderDetails.put("PDXNet-Wistar-MDAnderson-Penn","Melanoma PDX established by the Wistar/MD Anderson/Penn");
+        dataHolderDetails.put("PDXNet-Wistar-MDAnderson-Penn","Wistar/MD Anderson/Penn");
         dataHolderDetails.put("PDXNet-WUSTL","Washington University in St. Louis");
-        dataHolderDetails.put("PDXNet-MDAnderson","University of Texas MD Anderson Cancer Center");
+        dataHolderDetails.put("PDXNet-MDAnderson","MD Anderson Cancer Center");
         dataHolderDetails.put("PDMR","NCI Patient-Derived Models Repository");
         dataHolderDetails.put("IRCC","Candiolo Cancer Institute");
 
