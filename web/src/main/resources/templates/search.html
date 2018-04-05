@@ -551,8 +551,15 @@
 
                                 <td th:if="${isMutationSelected} == true">
                                     <th:block th:each="platform : ${platformMap.get(model.externalId)}">
-                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation' }"
-                                           style="font-size: 12px;" th:utext="${platform} + '<br />'">platform</a>
+
+                                        <div th:if="${platformsAndUrls[__${platform}__] != null}">
+                                            <a th:href="${platformsAndUrls[__${platform}__]}" th:text="${platform}" style=" font-size: 12px;"></a>
+                                        </div>
+
+                                        <div th:if="${platformsAndUrls[__${platform}__] == null}" th:text="${technology.key}" style="font-size: 12px;">
+
+                                        </div>
+
                                     </th:block>
                                 </td>
 
