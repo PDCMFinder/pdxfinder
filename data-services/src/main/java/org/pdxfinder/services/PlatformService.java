@@ -203,7 +203,7 @@ public class PlatformService
     }
 
 
-    Map<String, String> getPlatformsWithUrls(){
+    public Map<String, String> getPlatformsWithUrls(){
 
         Map<String, String> result = new HashMap<>();
         Collection<Platform> platforms = platformRepository.findAllWithUrl();
