@@ -203,4 +203,24 @@ public class PlatformService
     }
 
 
+    Map<String, String> getPlatformsWithUrls(){
+
+        Map<String, String> result = new HashMap<>();
+        Collection<Platform> platforms = platformRepository.findAllWithUrl();
+
+
+        for(Platform p: platforms){
+
+            if(p.getName() != null && !p.getName().isEmpty() && !p.getUrl().isEmpty()){
+
+                result.put(p.getName(), p.getUrl());
+            }
+        }
+
+
+        return result;
+    }
+
+
+
 }
