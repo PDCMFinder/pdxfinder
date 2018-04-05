@@ -6,6 +6,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -51,6 +52,10 @@ public interface PlatformRepository extends PagingAndSortingRepository<Platform,
             "WHERE p.name={platform} AND toLower(mod.dataSource)=toLower({dataSource}) " +
             "RETURN count(distinct mod)")
     int countModelsByPlatformAndExternalDataSource(@Param("platform") String platform, @Param("dataSource") String dataSource);
+
+
+    @Query("MATCH (pl:Platform) WHERE EXISTS(pl.url) RETURN pl")
+    Collection<Platform> findAllWithUrl();
 
 
 }

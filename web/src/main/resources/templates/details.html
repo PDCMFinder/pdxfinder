@@ -473,9 +473,16 @@
                                                                         class="black">Xenograft Tumor</b>                  &nbsp; &nbsp;
                                                                     <span class="hdc">Passage: </span>  <b class="black"
                                                                                                            th:text="${technology.value[num-1]}"></b>     &nbsp; &nbsp;
-                                                                    <a href="" target="_blank"><span class="hdc">Platform: </span>  <b
-                                                                            class="black"
-                                                                            th:text="${technology.key}"></b></a>
+                                                                    <span class="hdc">Platform: </span>
+
+                                                                        <span th:if="${platformsAndUrls[__${technology.key}__] != null}">
+                                                                            <a th:href="${platformsAndUrls[__${technology.key}__]}" th:text="${technology.key}"></a>
+                                                                        </span>
+
+                                                                        <span th:if="${platformsAndUrls[__${technology.key}__] == null}">
+                                                                            <b class="black" th:text="${technology.key}"></b>
+                                                                        </span>
+
                                                                 </h4>
 
                                                                 <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"

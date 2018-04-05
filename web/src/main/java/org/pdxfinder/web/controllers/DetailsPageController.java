@@ -8,6 +8,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.dao.Specimen;
 import org.pdxfinder.services.DrugService;
 import org.pdxfinder.services.GraphService;
+import org.pdxfinder.services.PlatformService;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
-/**
+/*
  * Created by csaba on 12/05/2017.
  */
 @Controller
@@ -29,13 +30,15 @@ public class DetailsPageController {
     private SearchService searchService;
     private GraphService graphService;
     private DrugService drugService;
+    private PlatformService platformService;
 
 
     @Autowired
-    public DetailsPageController(SearchService searchService, GraphService graphService, DrugService drugService) {
+    public DetailsPageController(SearchService searchService, GraphService graphService, DrugService drugService, PlatformService platformService) {
         this.searchService = searchService;
         this.graphService = graphService;
         this.drugService = drugService;
+        this.platformService = platformService;
     }
 
     @RequestMapping(value = "/pdx/{dataSrc}/{modelId}")
@@ -97,6 +100,8 @@ public class DetailsPageController {
 
         //auto suggestions for the search field
         Set<String> autoSuggestList = graphService.getMappedNCITTerms();
+
+        Map<String, String> platformsAndUrls = platformService.getPlatformsWithUrls();
         model.addAttribute("mappedTerm", autoSuggestList);
 
 
@@ -152,6 +157,7 @@ public class DetailsPageController {
         model.addAttribute("drugSummary", drugSummary);
         model.addAttribute("drugSummaryRowNumber", drugSummary.size());
         model.addAttribute("drugProtocolUrl", drugProtocolUrl);
+        model.addAttribute("platformsAndUrls", platformsAndUrls);
 
 
         Map<String, String> sorceDesc = new HashMap<>();
