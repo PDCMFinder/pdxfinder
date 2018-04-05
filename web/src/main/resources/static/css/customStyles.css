@@ -815,7 +815,7 @@ table.dataTable {
 .icoButn:hover {
     background-color: #06369d;
     border: 2px ridge #000;
-    color: #fff;
+    color: #000;
 }
 
 
@@ -835,7 +835,7 @@ table.dataTable {
 
 .icoButn:active, .icoButn:focus, .icoButn.active {
     outline: 0;
-    color: #fff;
+    color: #000;
 }
 
 
