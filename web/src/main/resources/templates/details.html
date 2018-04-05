@@ -175,8 +175,7 @@
                 <div class="row large-12 medium-12 expanded">
                     <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
                         <li class="tabs-title is-active"><a href="#summary" aria-selected="true">Summary</a></li>
-                        <li class="tabs-title "><a href="#variation" id="variation_data_link" onclick="showTabs('0')">
-                            Genomic Data
+                        <li class="tabs-title "><a href="#variation" id="variation_data_link" onclick="showTabs('0')"> Genomic Data
                             (<span th:text="${totalRecords}"></span>) </a></li>
 
                         <li th:if="${drugSummaryRowNumber} == 0" class="tabs-title"><a href="#dosing_studies">Dosing studies (0)</a></li>
@@ -418,32 +417,27 @@
 
 
                             <!-- Start of Xenograft Variation data-->
-                            <div class="tab hideContentShowFirst" role="tabpanel" th:if="${modelInfo.size() > 0}">
-
-                                <div id="sizeSwitch">
-                                    <a th:href="@{'/pdx/'+${dataSrc}+'/'+${modelId}+'/export'}" class="button outline secondary">
-                                        Export Results <i class="icon icon-functional" data-icon="="></i> </a>
-                                </div>
-
-
-                                <ul class="tabs" data-tabs id="example-tabs">
-
-                                    <li th:each="technology,iter : ${modelInfo}"
-                                        class="tabs-title" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
-
-                                        <a th:href="@{'#'+${technology.key}}"
-                                           data-th-attr="data-tabs-target=${technology.key},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
-                                           th:text="${technology.key}+' Platform'"
-                                           th:onclick="'showTabs('+${iter.index}+')'"> TAB TITLES </a>
-
-                                    </li>
-
-                                </ul>
-
+                            <div class="tab hideContent0" role="tabpanel" th:if="${modelInfo.size() > 0}">
 
                                 <!-- Tab panes --><strong></strong>
                                 <div class="tabs-content" data-tabs-content="example-tabs">
 
+
+                                    <div id="sizeSwitch">
+                                        <a th:href="@{'/pdx/'+${dataSrc}+'/'+${modelId}+'/export'}" class="button outline secondary">
+                                            Export Results <i class="icon icon-functional" data-icon="="></i> </a>
+                                    </div>
+
+                                    <ul class="tabs" data-tabs id="example-tabs">
+                                        <li th:each="technology,iter : ${modelInfo}"
+                                            class="tabs-title" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
+
+                                            <a th:href="@{'#'+${technology.key}}"
+                                               data-th-attr="data-tabs-target=${technology.key},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
+                                               th:text="${technology.key}+' Platform'" th:onclick="'showTabs('+${iter.index}+')'"> TAB TITLES </a>
+
+                                        </li>
+                                    </ul>
 
                                     <div th:each="technology,iter : ${modelInfo}"
                                          th:id="${technology.key}"
@@ -472,13 +466,11 @@
                                                                     <span class="hdc">Platform: </span>
 
                                                                         <span th:if="${platformsAndUrls[__${technology.key}__] != null}">
-                                                                            <a th:href="${platformsAndUrls[__${technology.key}__]}"
-                                                                               th:text="${technology.key}"></a>
+                                                                            <a th:href="${platformsAndUrls[__${technology.key}__]}" th:text="${technology.key}"></a>
                                                                         </span>
 
                                                                         <span th:if="${platformsAndUrls[__${technology.key}__] == null}">
-                                                                            <b class="black"
-                                                                               th:text="${technology.key}"></b>
+                                                                            <b class="black" th:text="${technology.key}"></b>
                                                                         </span>
 
                                                                 </h4>
@@ -525,8 +517,8 @@
                             <p>
 
                             <div th:if="${drugProtocolUrl} != null" style="margin-bottom: 15px;text-transform: uppercase">
-                            <a th:href="${drugProtocolUrl}" >Dosing study protocol</a>
-                        </div>
+                                <a th:href="${drugProtocolUrl}" >Dosing study protocol</a>
+                            </div>
 
                             <table class="datatable-pdx pdx-table table-borderedPdx head-left">
                                 <thead>
@@ -545,15 +537,11 @@
                             </p>
                         </div>
 
-                        <div th:if="${#lists.isEmpty(drugSummary)}">
-
-                        </div>
-
-
-                            </div>
+                        <div th:if="${#lists.isEmpty(drugSummary)}"></div>
+                    </div>
 
 
-                        </div>
+                </div>
 
 
             </section>
@@ -752,7 +740,7 @@
 
     function showTabs(cnt) {
         for (var i = 0; i < 5; i++) {
-            document.getElementsByClassName("hideContent" + cnt)[i].style.position = "static";
+            document.getElementsByClassName("hideContent"+cnt)[i].style.position = "static";
         }
     }
 
