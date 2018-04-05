@@ -31,7 +31,7 @@ public class SearchService {
     private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
     private final String IRCC_URL_TEXT = "Contact IRCC here";
     private final String PDMR_URL = "https://pdmdb.cancer.gov/pls/apex/f?p=101:41";
-    private final String PDMR_URL_TEXT = "Access PDMR here";
+    private final String PDMR_URL_TEXT = "View data at PDMR";
     
     // for PDXNet
     //private final String HCI_URL = "https://www.pdxnetwork.org/hcibcm/";

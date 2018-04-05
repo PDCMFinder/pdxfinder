@@ -106,12 +106,20 @@ h5{
     display: none;
 }
 
-.hideContentShowFirst{
+.hideContent0{
     position: absolute;
     top: -9999px;
 }
 
-.hideContent{
+.hideContent1{
+    position: absolute;
+    top: -9999px;
+}
+.hideContent2{
+    position: absolute;
+    top: -9999px;
+}
+.hideContent3{
     position: absolute;
     top: -9999px;
 }
