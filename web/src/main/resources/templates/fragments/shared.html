@@ -6,6 +6,25 @@
 </head>
 <body>
 
+
+<div th:fragment="header">
+
+    <!-- Google analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-100003949-1"></script>
+    <script th:if="${#arrays.contains(@environment.getActiveProfiles(),'live')}">
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'UA-100003949-1');
+    </script>
+
+</div>
+
 <div th:fragment="menu">
     <div data-sticky-container>
 

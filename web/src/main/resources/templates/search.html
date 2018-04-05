@@ -3,9 +3,8 @@
 <head>
     <meta charset="utf-8"/>
     <title>PDX Finder - Search</title>
-    <meta name="description" content="PDX Finder"/><!-- Describe what this page is about -->
+    <meta name="description" content="PDX Finder"/>
     <meta name="keywords" content="Framework, Life Sciences"/>
-    <!-- A few keywords that relate to the content of THIS PAGE (not the whole project) -->
     <meta name="author" content="PDX Finder"/>
     <meta name="HandheldFriendly" content="true"/>
     <meta name="MobileOptimized" content="width"/>
@@ -26,24 +25,21 @@
     <meta name="msapplication-config"
           content="https://ebiwd.github.io/pdx-visual-framework/images/favicons/browserconfig.xml?v=1">
     <meta name="theme-color" content="#0032a0">
+
     <!-- Add information on the life cycle of this page -->
     <meta name="ebi:owner" content="PDX"/> <!-- Who should be contacted about changes -->
     <meta name="ebi:review-cycle" content="60"/> <!-- In days, how often should the content be reviewed -->
     <meta name="ebi:last-review" content="2017-11-14"/> <!-- The last time the content was reviewed -->
     <meta name="ebi:expiry" content="2018-01-20"/> <!-- When this content is no longer relevant -->
 
-    <!-- If you link to any other sites frequently, consider optimising performance with a DNS prefetch -->
-    <!-- <link rel="dns-prefetch" href="//www.ebi.ac.uk" /> -->
 
-    <!-- CSS: implied media=all -->
-    <!-- CSS concatenated and minified via ant build script-->
-
-    <!-- <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/ebi-global.css" type="text/css" media="all" /> -->
     <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css"
           type="text/css" media="all"/>
+
     <!-- Import Choice Library stylesheet-->
     <link rel="stylesheet"
           href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/styles/css/choices.min.css">
+
     <!-- Use this CSS file for any custom styling -->
     <link rel="stylesheet" th:href="@{/css/app.css}" type="text/css" media="all"/>
     <link rel="stylesheet" th:href="@{/css/customStyles.css}" type="text/css" media="all"/>
@@ -53,15 +49,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <script th:src="@{/js/pdxFinder.autocomplete.js}"></script>
 
-    <!-- If you have a custom header image or colour -->
-    <!--
-    <meta name="ebi:masthead-color" content="#000" />
-    <meta name="ebi:masthead-image" content="//www.ebi.ac.uk/web_guidelines/EBI-Framework/images/backgrounds/embl-ebi-background.jpg" />
-    -->
-
-    <!-- you can replace this with theme-[projectname].css. See http://www.ebi.ac.uk/web/style/colour for details of how to do this -->
-    <!-- also inform ES so we can host your colour palette file -->
-    <!-- <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/theme-embl-petrol.css" type="text/css" media="all" /> -->
     <!-- end CSS-->
     <style>
         .tooltip {
@@ -88,41 +75,11 @@
         }
     </style>
 
-    <script type="text/javascript">
-        // IE JavaScript Bugs: Overriding Internet Explorer’s document.getElementById() To Be W3C Compliant Exposes An Additional Bug In getAttributes()
-        if (/msie/i.test (navigator.userAgent)) //only override IE
-        {
-            document.nativeGetElementById = document.getElementById;
-            document.getElementById = function(id)
-            {
-                var elem = document.nativeGetElementById(id);
-                if(elem)
-                {
-                    //make sure that it is a valid match on id
-                    if(elem.id == id)
-                    {
-                        return elem;
-                    }
-                    else
-                    {
-                        //otherwise find the correct element
-                        for(var i=1;i<document.all[id].length;i++)
-                        {
-                            if(document.all[id][i].id == id)
-                            {
-                                return document.all[id][i];
-                            }
-                        }
-                    }
-                }
-                return null;
-            };
-        }
-    </script>
+    <!--/*/ <th:block th:include="fragments/shared :: header"></th:block> /*/-->
+
 </head>
 
-<body class="level2"><!-- add any of your classes or IDs -->
-
+<body class="level2">
 
 
 <div content="content-wrapper">

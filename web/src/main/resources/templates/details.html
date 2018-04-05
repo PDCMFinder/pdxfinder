@@ -46,15 +46,6 @@
     <link rel="stylesheet" th:href="@{/css/customStyles.css}" type="text/css" media="all"/>
     <link rel="stylesheet" th:href="@{/icons/foundation-icons.css}" type="text/css" media="all"/>
 
-    <!-- If you have a custom header image or colour -->
-    <!--
-    <meta name="ebi:masthead-color" content="#000" />
-    <meta name="ebi:masthead-image" content="//www.ebi.ac.uk/web_guidelines/EBI-Framework/images/backgrounds/embl-ebi-background.jpg" />
-    -->
-
-    <!-- you can replace this with theme-[projectname].css. See http://www.ebi.ac.uk/web/style/colour for details of how to do this -->
-    <!-- also inform ES so we can host your colour palette file -->
-    <!-- <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/theme-embl-petrol.css" type="text/css" media="all" /> -->
     <!-- end CSS-->
 
     <style>
@@ -89,6 +80,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script th:src="@{/js/jquery.dataTables.js}"></script>
     <script th:src="@{/js/scroller.js}"></script>
+
+    <!--/*/ <th:block th:include="fragments/shared :: header"></th:block> /*/-->
+
 </head>
 
 <body class="level2">
