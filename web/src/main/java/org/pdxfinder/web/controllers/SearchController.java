@@ -11,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.services.AutoCompleteService;
 import org.pdxfinder.services.GraphService;
 import org.pdxfinder.services.MolCharService;
+import org.pdxfinder.services.PlatformService;
 import org.pdxfinder.services.ds.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ public class SearchController {
     private SearchDS searchDS;
     private Map<String, List<String>> facets = new HashMap<>();
     private MolCharService molCharService;
+    private PlatformService platformService;
 
     List<String> patientAgeOptions = SearchDS.PATIENT_AGE_OPTIONS;
     List<String> datasourceOptions = SearchDS.DATASOURCE_OPTIONS;
@@ -45,11 +47,12 @@ public class SearchController {
     List<String> sampleTumorTypeOptions = SearchDS.SAMPLE_TUMOR_TYPE_OPTIONS;
     List<String> diagnosisOptions = SearchDS.DIAGNOSIS_OPTIONS;
 
-    public SearchController(GraphService graphService, SearchDS searchDS, AutoCompleteService autoCompleteService, MolCharService molCharService) {
+    public SearchController(GraphService graphService, SearchDS searchDS, AutoCompleteService autoCompleteService, MolCharService molCharService, PlatformService platformService) {
         this.graphService = graphService;
         this.searchDS = searchDS;
         this.autoCompleteService = autoCompleteService;
         this.molCharService = molCharService;
+        this.platformService = platformService;
 
         facets.put("datasource_options", datasourceOptions);
         facets.put("patient_age_options", patientAgeOptions);
@@ -228,6 +231,7 @@ public class SearchController {
         List<AutoSuggestOption> autoSuggestList = autoCompleteService.getAutoSuggestions();
         List<ModelForQuery> resultSet = new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size()));
 
+        Map<String, String> platformsAndUrls = platformService.getPlatformsWithUrls();
         //auto suggestions for the search field
         model.addAttribute("autoCompleteList", autoSuggestList);
 
@@ -255,6 +259,7 @@ public class SearchController {
         model.addAttribute("results", resultSet);
         model.addAttribute("mutatedMarkersAndVariants", mutatedMarkers);
         //model.addAttribute("selectedMutatedMarkerOrder", selectedMutatedMarkerOrder);
+        model.addAttribute("platformsAndUrls", platformsAndUrls);
 
         if (mutSelected == true){
             model.addAttribute("platformMap", getPlatformOrMutationFromMutatedVariants(resultSet,"platformMap"));
