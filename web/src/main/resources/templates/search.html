@@ -393,7 +393,9 @@
                                                             <!-- <button onclick="myTrigger('OR',2)" href="#" class="icoButn columns nospace large-2" > <i class="icon icon-functional" data-icon="+"></i> </button> -->
                                                         </div>
                                                         <div class="row">
-                                                            <div class="row hidden" th:each="i: ${#numbers.sequence(2, 20)}" th:classappend="'geneticVar'+${i}">
+                                                            <div class="row hidden"
+                                                                 th:each="i: ${#numbers.sequence(2, 20)}"
+                                                                 th:classappend="'geneticVar'+${i}">
                                                                 <div class="columns nospace small-4 large-4">
                                                                     <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}" style="width:100%;"/>
                                                                 </div>
@@ -416,7 +418,9 @@
                                                                 <div class="columns nospace small-5 large-5 adjusti"> VARIANT </div>
                                                             </div>
                                                         <span th:each="eachMarker,iter :${markerMapWithAllVariants}">
-                                                            <div class="row large-12 medium-12 expanded" th:classappend="'geneticVar'+${iter.index+1}"  style="margin-top: 10px;"><!-- th:style="( ${iter.index} == 0 ) ? 'margin-top: 10px' : 'margin-top: -10px' " -->
+                                                            <div class="row large-12 medium-12 expanded"
+                                                                 th:classappend="'geneticVar'+${iter.index+1}"
+                                                                 style="margin-top: 10px;"><!-- th:style="( ${iter.index} == 0 ) ? 'margin-top: 10px' : 'margin-top: -10px' " -->
 
                                                                 <div class="columns nospace small-4 large-4">
                                                                     <input th:value="${eachMarker.key}" th:onblur="'loadVariants(this,'+${iter.index+1}+')'" type="text" th:id="'geneFilter'+${iter.index+1}"  style="width:100%;"/>
@@ -444,7 +448,8 @@
                                                         <span th:if="${not #lists.isEmpty(param.mutation)}">
                                                             <span th:each="i: ${#numbers.sequence(#maps.size(markerMap)+1, 20)}">
 
-                                                                <div class="row hidden" th:classappend="'geneticVar'+${i}">
+                                                                <div class="row hidden"
+                                                                     th:classappend="'geneticVar'+${i}">
                                                                     <div class="columns nospace small-4 large-4">
                                                                         <input th:onblur="'loadVariants(this,'+${i}+')'" type="text" th:id="'geneFilter'+${i}"  style="width:100%;"/>
                                                                     </div>
@@ -564,10 +569,12 @@
                                     <th:block th:each="platform : ${platformMap.get(model.externalId)}">
 
                                         <div th:if="${not #lists.isEmpty(platformsAndUrls[__${platform}__])}">
-                                            <a th:href="${platformsAndUrls[__${platform}__]}" th:text="${platform}" style=" font-size: 12px;"></a>
+                                            <a th:href="${platformsAndUrls[__${platform}__]}" th:text="${platform}"
+                                               style=" font-size: 12px;"></a>
                                         </div>
 
-                                        <div th:if="${#lists.isEmpty(platformsAndUrls[__${platform}__])}" th:text="${technology.key}" style="font-size: 12px;">
+                                        <div th:if="${#lists.isEmpty(platformsAndUrls[__${platform}__])}"
+                                             th:text="${technology.key}" style="font-size: 12px;">
 
                                         </div>
 
@@ -828,7 +835,7 @@
         for (var i=startIndex; i<=20; i++){
             if ((param=='AND'||param=='OR') && geneticVar == i){
                 //$("#geneticVar"+i).show();
-                document.getElementsByClassName("geneticVar"+i)[0].style.display = "block";
+                document.getElementsByClassName("geneticVar" + i)[0].style.display = "block";
             }
         }
     }
