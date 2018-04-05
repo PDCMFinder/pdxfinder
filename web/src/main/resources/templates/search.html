@@ -559,14 +559,15 @@
                                     </th:block>
                                 </td>
 
+
                                 <td th:if="${isMutationSelected} == true">
                                     <th:block th:each="platform : ${platformMap.get(model.externalId)}">
 
-                                        <div th:if="${platformsAndUrls[__${platform}__] != null}">
+                                        <div th:if="${not #lists.isEmpty(platformsAndUrls[__${platform}__])}">
                                             <a th:href="${platformsAndUrls[__${platform}__]}" th:text="${platform}" style=" font-size: 12px;"></a>
                                         </div>
 
-                                        <div th:if="${platformsAndUrls[__${platform}__] == null}" th:text="${technology.key}" style="font-size: 12px;">
+                                        <div th:if="${#lists.isEmpty(platformsAndUrls[__${platform}__])}" th:text="${technology.key}" style="font-size: 12px;">
 
                                         </div>
 
