@@ -209,7 +209,7 @@ public class LoadWUSTL implements CommandLineRunner {
 
             if (human) {
                 pSnap.addSample(sample);
-           }
+            }
             } else {
 
                 String passage = "0";
@@ -223,26 +223,26 @@ public class LoadWUSTL implements CommandLineRunner {
                 specimen.setSample(sample);
 
                 specimen.setHostStrain(bs);
-                System.out.println("setting strain to "+bs.getName());
-                if(engraftmentSite.contains(";")){
-                    String[] parts = engraftmentSite.split(";");
-                    engraftmentSite = parts[1].trim();
-                    tumorPrep = parts[0].trim();
-                }
+            System.out.println("setting strain to " + bs.getName());
+            if (engraftmentSite.contains(";")) {
+                String[] parts = engraftmentSite.split(";");
+                engraftmentSite = parts[1].trim();
+                tumorPrep = parts[0].trim();
+            }
                 ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
                 specimen.setImplantationSite(is);
-                System.out.println("setting implantation site to "+engraftmentSite);
+            System.out.println("setting implantation site to " + engraftmentSite);
 
                 ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
                 specimen.setImplantationType(it);
-                System.out.println("setting implantation type to "+tumorPrep);
+            System.out.println("setting implantation type to " + tumorPrep);
 
                 specimen.setSample(sample);
 
                 loaderUtils.saveSpecimen(specimen);
 
             }
-        
+
 
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
