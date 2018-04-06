@@ -211,7 +211,7 @@ public class LoadHCI implements CommandLineRunner {
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
         
-        String implantationTypeStr = Standardizer.NOT_SPECIFIED;
+        String implantationTypeStr = Standardizer.getValue("Impantation Type", j);
         String implantationSiteStr = j.getString("Engraftment Site");
         ImplantationSite implantationSite = loaderUtils.getImplantationSite(implantationSiteStr);
         ImplantationType implantationType = loaderUtils.getImplantationType(implantationTypeStr);
@@ -228,13 +228,22 @@ public class LoadHCI implements CommandLineRunner {
             strainList.add(nsBS);
         }
         
+        int count = 0;
         for(HostStrain strain : strainList){
+            count++;
             Specimen specimen = new Specimen();
-            specimen.setExternalId(modelID);
+            specimen.setExternalId(modelID+"-"+count);
             specimen.setImplantationSite(implantationSite);
             specimen.setImplantationType(implantationType);
             specimen.setHostStrain(strain);
+            
+             Sample specSample = new Sample();
+             specSample.setSourceSampleId(modelID+"-"+count);
+             specimen.setSample(specSample);
+            
             modelCreation.addSpecimen(specimen);
+            modelCreation.addRelatedSample(specSample);
+            
         }
         
         

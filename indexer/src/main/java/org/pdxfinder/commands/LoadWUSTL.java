@@ -209,6 +209,8 @@ public class LoadWUSTL implements CommandLineRunner {
 
             if (human) {
                 pSnap.addSample(sample);
+                loaderUtils.saveSample(sample);
+                loaderUtils.savePatientSnapshot(pSnap);
             }
             } else {
 
@@ -220,32 +222,28 @@ public class LoadWUSTL implements CommandLineRunner {
                 }
                 Specimen specimen = loaderUtils.getSpecimen(modelCreation,
                         modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
-                specimen.setSample(sample);
-
+               
                 specimen.setHostStrain(bs);
-            System.out.println("setting strain to " + bs.getName());
-            if (engraftmentSite.contains(";")) {
-                String[] parts = engraftmentSite.split(";");
-                engraftmentSite = parts[1].trim();
-                tumorPrep = parts[0].trim();
-            }
+            
+                if (engraftmentSite.contains(";")) {
+                    String[] parts = engraftmentSite.split(";");
+                    engraftmentSite = parts[1].trim();
+                    tumorPrep = parts[0].trim();
+                }
                 ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
                 specimen.setImplantationSite(is);
-            System.out.println("setting implantation site to " + engraftmentSite);
-
+           
                 ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
                 specimen.setImplantationType(it);
-            System.out.println("setting implantation type to " + tumorPrep);
-
-                specimen.setSample(sample);
+           
+                modelCreation.addSpecimen(specimen);
 
                 loaderUtils.saveSpecimen(specimen);
 
             }
 
-
-        loaderUtils.saveSample(sample);
-        loaderUtils.savePatientSnapshot(pSnap);
+        loaderUtils.saveModelCreation(modelCreation);
+        
     }
 
 
