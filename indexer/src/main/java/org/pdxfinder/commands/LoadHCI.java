@@ -243,9 +243,9 @@ public class LoadHCI implements CommandLineRunner {
             
             modelCreation.addSpecimen(specimen);
             modelCreation.addRelatedSample(specSample);
-            
+            loaderUtils.saveSpecimen(specimen);
         }
-        
+        loaderUtils.saveModelCreation(modelCreation);
         
         
         TreatmentSummary ts;
