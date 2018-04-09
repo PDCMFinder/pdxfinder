@@ -56,15 +56,15 @@ public class LoadWUSTL implements CommandLineRunner {
     private LoaderUtils loaderUtils;
     private Session session;
 
+    public LoadWUSTL(LoaderUtils loaderUtils) {
+        this.loaderUtils = loaderUtils;
+    }
+
     //   @Value("${mdapdx.url}")
     //   private String urlStr;
     @PostConstruct
     public void init() {
         formatter = new HelpFormatter();
-    }
-
-    public LoadWUSTL(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
     }
 
     @Override
@@ -94,7 +94,7 @@ public class LoadWUSTL implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        mdaDS = loaderUtils.getExternalDataSource(WUSTL_DATASOURCE_ABBREVIATION, WUSTL_DATASOURCE_NAME, WUSTL_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+        mdaDS = loaderUtils.getExternalDataSource(WUSTL_DATASOURCE_ABBREVIATION, WUSTL_DATASOURCE_NAME, WUSTL_DATASOURCE_DESCRIPTION, DATASOURCE_CONTACT, SOURCE_URL);
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
@@ -137,20 +137,20 @@ public class LoadWUSTL implements CommandLineRunner {
         } catch (Exception e) {
         }
 
-          String age = Standardizer.getAge(j.getString("Age"));
-          String gender = Standardizer.getGender(j.getString("Gender"));
+        String age = Standardizer.getAge(j.getString("Age"));
+        String gender = Standardizer.getGender(j.getString("Gender"));
 
         PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
                 gender, "", race, age, mdaDS);
-        
+
         String sampleSite = Standardizer.getValue("Sample Site", j);
 
         //String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, String dataSource
-        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
+        Sample humanSample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), sampleSite,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
 
-        pSnap.addSample(sample);
+        pSnap.addSample(humanSample);
 
         String qaType = NOT_SPECIFIED;
         try {
@@ -170,11 +170,12 @@ public class LoadWUSTL implements CommandLineRunner {
 
         String tumorPrep = Standardizer.getValue("Tumor Prep", j);
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, mdaDS.getAbbreviation(), sample, qa);
-        modelCreation.addRelatedSample(sample);
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, mdaDS.getAbbreviation(), humanSample, qa);
+        modelCreation.addRelatedSample(humanSample);
 
         boolean human = false;
-        String markerPlatform = NOT_SPECIFIED;;
+        String markerPlatform = NOT_SPECIFIED;
+
         try {
             markerPlatform = j.getString("Marker Platform");
             if ("CMS50".equals(markerPlatform) || "CMS400".equals(markerPlatform)) {
@@ -205,15 +206,16 @@ public class LoadWUSTL implements CommandLineRunner {
             molC.setMarkerAssociations(markerAssocs);
             Set<MolecularCharacterization> mcs = new HashSet<>();
             mcs.add(molC);
-            sample.setMolecularCharacterizations(mcs);
+
 
             if (human) {
-                pSnap.addSample(sample);
-                loaderUtils.saveSample(sample);
-                loaderUtils.savePatientSnapshot(pSnap);
-            }
+                humanSample.setMolecularCharacterizations(mcs);
+                pSnap.addSample(humanSample);
+
             } else {
 
+                Sample mouseSample = new Sample();
+                mouseSample.setMolecularCharacterizations(mcs);
                 String passage = "0";
                 try {
                     passage = j.getString("QA Passage").replaceAll("P", "");
@@ -222,9 +224,11 @@ public class LoadWUSTL implements CommandLineRunner {
                 }
                 Specimen specimen = loaderUtils.getSpecimen(modelCreation,
                         modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
-               
+
                 specimen.setHostStrain(bs);
-            
+
+                specimen.setSample(mouseSample);
+
                 if (engraftmentSite.contains(";")) {
                     String[] parts = engraftmentSite.split(";");
                     engraftmentSite = parts[1].trim();
@@ -232,20 +236,22 @@ public class LoadWUSTL implements CommandLineRunner {
                 }
                 ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
                 specimen.setImplantationSite(is);
-           
+
                 ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
                 specimen.setImplantationType(it);
-           
+
                 modelCreation.addSpecimen(specimen);
 
-                loaderUtils.saveSpecimen(specimen);
+                //loaderUtils.saveSpecimen(specimen);
 
             }
 
-        loaderUtils.saveModelCreation(modelCreation);
-        
-    }
+            //loaderUtils.saveModelCreation(modelCreation);
 
+        }
+        loaderUtils.saveModelCreation(modelCreation);
+        loaderUtils.savePatientSnapshot(pSnap);
+    }
 
 
     private String parseURL(String urlStr) {
