@@ -228,6 +228,7 @@ public class LoadWUSTL implements CommandLineRunner {
                 specimen.setHostStrain(bs);
 
                 specimen.setSample(mouseSample);
+                modelCreation.addRelatedSample(mouseSample);
 
                 if (engraftmentSite.contains(";")) {
                     String[] parts = engraftmentSite.split(";");
