@@ -96,26 +96,6 @@ public class SearchController {
         CsvMapper mapper = new CsvMapper();
         CsvSchema schema = mapper.schemaFor(ModelForQueryExport.class).withHeader();
 
-//        Integer i = 0;
-//        CsvSchema schema = mapper.schema().rebuild()
-//            .addColumn(new CsvSchema.Column(i++, "PDXFinder Id"))
-//            .addColumn(new CsvSchema.Column(i++, "Datasource"))
-//            .addColumn(new CsvSchema.Column(i++, "Source Id"))
-//            .addColumn(new CsvSchema.Column(i++, "Patient Age"))
-//            .addColumn(new CsvSchema.Column(i++, "Patient Gender"))
-//            .addColumn(new CsvSchema.Column(i++, "Patient Treatment Status"))
-//            .addColumn(new CsvSchema.Column(i++, "Patient Treatment History"))
-//            .addColumn(new CsvSchema.Column(i++, "Patient Original Diagnosis"))
-//            .addColumn(new CsvSchema.Column(i++, "NCIT Mapped Ontology Term"))
-//            .addColumn(new CsvSchema.Column(i++, "Origin Tissue"))
-//            .addColumn(new CsvSchema.Column(i++, "Sample Site"))
-//            .addColumn(new CsvSchema.Column(i++, "Origin Sample Extraction Method"))
-//            .addColumn(new CsvSchema.Column(i++, "Classification"))
-//            .addColumn(new CsvSchema.Column(i++, "Tumor Type"))
-//            .addColumn(new CsvSchema.Column(i++, "Cancer Systems"))
-//            .addColumn(new CsvSchema.Column(i++, "Other Available Data"))
-//            .build().withHeader();
-
         String output = "CSV output for configured values " + configuredFacets.toString();
         try {
             output = mapper.writer(schema).writeValueAsString(exportResults);
