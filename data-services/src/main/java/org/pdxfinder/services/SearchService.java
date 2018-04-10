@@ -10,6 +10,7 @@ import org.pdxfinder.services.dto.VariationDataDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SearchService {
@@ -351,19 +352,23 @@ public class SearchService {
 
             for(Specimen s:sp){
 
-                if(s.getHostStrain() != null && s.getPassage() != null){
+                if (s.getHostStrain() != null) {
 
                     String hostStrain = s.getHostStrain().getName();
                     String p = s.getPassage();
 
-                    if(hostStrainMap.containsKey(hostStrain)){
-                        String composedPassage = hostStrainMap.get(hostStrain);
-                        composedPassage+=", P"+p;
-                        hostStrainMap.put(hostStrain, composedPassage);
+                    // If the passage information is provided, associate it to the host strain
+                    if (p != null) {
+                        if (hostStrainMap.containsKey(hostStrain)) {
+                            String composedPassage = hostStrainMap.get(hostStrain);
+                            composedPassage += ", P" + p;
+                            hostStrainMap.put(hostStrain, composedPassage);
 
-                    }
-                    else{
-                        hostStrainMap.put(hostStrain, "P"+p);
+                        } else {
+                            hostStrainMap.put(hostStrain, "P" + p);
+                        }
+                    } else {
+                        hostStrainMap.put(hostStrain, "Not Specified");
                     }
 
 
@@ -397,12 +402,11 @@ public class SearchService {
 
         if(hostStrainMap.size() > 1){
 
-            for (Map.Entry<String, String> entry : hostStrainMap.entrySet()) {
-                String strain = entry.getKey();
-                String passages = entry.getValue();
-
-                composedStrain += strain+" ("+passages+" ); ";
-            }
+            composedStrain = hostStrainMap
+                    .keySet()
+                    .stream()
+                    .map(x -> getHostStrainString(x, hostStrainMap))
+                    .collect(Collectors.joining("; "));
         }
         else if(hostStrainMap.size() == 1){
 
@@ -469,6 +473,18 @@ public class SearchService {
     }
 
 
+    /**
+     * Return a formatted string representing the host and passage
+     *
+     * @param hostStrain    the key to the map of host strains
+     * @param hostStrainMap the map containing all the host strains associated to the model
+     * @return a formatted string representing the host strains
+     */
+    private String getHostStrainString(String hostStrain, Map<String, String> hostStrainMap) {
+        String passage = hostStrainMap.get(hostStrain).equals("Not Specified") ? "" : "(" + hostStrainMap.get(hostStrain) + ")";
+        String formatted = String.format("%s%s", hostStrain, passage);
+        return formatted;
+    }
 
 
 
