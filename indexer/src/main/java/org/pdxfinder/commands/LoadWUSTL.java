@@ -185,6 +185,10 @@ public class LoadWUSTL implements CommandLineRunner {
             // this is for the FANG data and we don't really care about markers at this point anyway
         }
 
+        //disable loading molchar for now
+
+        /*
+
         String markerStr = j.getString("Markers");
 
         String[] markers = markerStr.split(";");
@@ -250,6 +254,46 @@ public class LoadWUSTL implements CommandLineRunner {
             //loaderUtils.saveModelCreation(modelCreation);
 
         }
+
+        */
+
+        if (human) {
+            pSnap.addSample(humanSample);
+
+        }
+        else{
+
+            Sample mouseSample = new Sample();
+
+            String passage = "0";
+            try {
+                passage = j.getString("QA Passage").replaceAll("P", "");
+            } catch (Exception e) {
+                // default is 0
+            }
+            Specimen specimen = loaderUtils.getSpecimen(modelCreation,
+                    modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
+
+            specimen.setHostStrain(bs);
+
+            specimen.setSample(mouseSample);
+            modelCreation.addRelatedSample(mouseSample);
+
+            if (engraftmentSite.contains(";")) {
+                String[] parts = engraftmentSite.split(";");
+                engraftmentSite = parts[1].trim();
+                tumorPrep = parts[0].trim();
+            }
+            ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
+            specimen.setImplantationSite(is);
+
+            ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
+            specimen.setImplantationType(it);
+
+            modelCreation.addSpecimen(specimen);
+
+        }
+
         loaderUtils.saveModelCreation(modelCreation);
         loaderUtils.savePatientSnapshot(pSnap);
     }
