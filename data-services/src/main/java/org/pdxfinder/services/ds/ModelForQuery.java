@@ -49,9 +49,6 @@ modelHostStrain
 */
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -59,109 +56,31 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@JsonPropertyOrder({
-        "modelId",
-        "datasource",
-        "externalId",
-        "patientAge",
-        "patientGender",
-        "patientTreatmentStatus",
-        "treatmentHistory",
-        "diagnosis",
-        "mappedOntologyTerm",
-        "sampleOriginTissue",
-        "sampleSampleSite",
-        "sampleExtractionMethod",
-        "sampleClassification",
-        "sampleTumorType",
-        "modelImplantationSite",
-        "modelImplantationType",
-        "modelHostStrain",
-        "cancerSystem",
-        "cancerOrgan",
-        "cancerCellType",
-        "dataAvailable"
-})
 public class ModelForQuery {
 
-    @JsonProperty("PDXFinder Id")
     private Long modelId;
-
-    @JsonProperty("Datasource")
     private String datasource;
-
-    @JsonProperty("Source Id")
     private String externalId;
-
-    @JsonProperty("Patient Age")
     private String patientAge;
-
-    @JsonProperty("Patient Treatment Status")
     private String patientTreatmentStatus;
-
-    @JsonProperty("Patient Gender")
     private String patientGender;
-
-    @JsonProperty("Origin Tissue")
     private String sampleOriginTissue;
-
-    @JsonProperty("Sample Site")
     private String sampleSampleSite;
-
-    @JsonProperty("Origin Sample Extraction Method")
     private String sampleExtractionMethod;
-
-    @JsonProperty("Classification")
     private String sampleClassification;
-
-    @JsonProperty("Tumor Type")
     private String sampleTumorType;
-
-    @JsonProperty("Model Implantation Site")
     private String modelImplantationSite;
-
-    @JsonProperty("Model Implantation Type")
     private String modelImplantationType;
-
-    @JsonProperty("Model Host Strain")
     private Set<String> modelHostStrain;
-
-    @JsonProperty("Cancer Systems")
     private List<String> cancerSystem;
-
-    @JsonProperty("Cancer Organ")
     private String cancerOrgan;
-
-    @JsonProperty("Cancer Histology")
     private String cancerCellType;
-
-    @JsonProperty("Patient Original Diagnosis")
     private String diagnosis;
-
-    @JsonProperty("NCIT Mapped Ontology Term")
     private String mappedOntologyTerm;
-
-    @JsonProperty("Patient Treatment History")
     private String treatmentHistory;
-
-    public List<String> getMutatedVariants() {
-        return mutatedVariants;
-    }
-
-    public void setMutatedVariants(List<String> mutatedVariants) {
-        this.mutatedVariants = mutatedVariants;
-    }
-
-    @JsonProperty("Mutated Variants")
     private List<String> mutatedVariants;
-
-    @JsonProperty("Other Available Data")
     private List<String> dataAvailable;
-
-    @JsonIgnore
     private Set<String> allOntologyTermAncestors;
-
-    @JsonIgnore
     private Set<String> queryMatch;
 
 
@@ -404,6 +323,15 @@ public class ModelForQuery {
 
     public void setQueryMatch(Set<String> queryMatch) {
         this.queryMatch = queryMatch;
+    }
+
+
+    public List<String> getMutatedVariants() {
+        return mutatedVariants;
+    }
+
+    public void setMutatedVariants(List<String> mutatedVariants) {
+        this.mutatedVariants = mutatedVariants;
     }
 
     public String getFormattedQueryMatch(String query) {

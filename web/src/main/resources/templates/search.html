@@ -611,6 +611,24 @@
 <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script th:src="@{/js/pdxFinder.js}"></script>
 
+<script>
+    var geneticVar = 1;
+    var counter = 1;
+
+    function myTrigger(param,startIndex){
+        if (startIndex != 2 && counter == 1){
+            geneticVar = startIndex;
+        }
+        geneticVar++;
+        counter++;
+        for (var i=startIndex; i<=20; i++){
+            if ((param=='AND'||param=='OR') && geneticVar == i){
+                //$("#geneticVar"+i).show();
+                document.getElementsByClassName("geneticVar" + i)[0].style.display = "block";
+            }
+        }
+    }
+</script>
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
     var searchOptions = [[ ${autoCompleteList} ]];
@@ -780,22 +798,7 @@
             });
         });
     }
-    var geneticVar = 1;
-    var counter = 1;
 
-    function myTrigger(param,startIndex){
-        if (startIndex != 2 && counter == 1){
-            geneticVar = startIndex;
-        }
-        geneticVar++;
-        counter++;
-        for (var i=startIndex; i<=20; i++){
-            if ((param=='AND'||param=='OR') && geneticVar == i){
-                //$("#geneticVar"+i).show();
-                document.getElementsByClassName("geneticVar" + i)[0].style.display = "block";
-            }
-        }
-    }
 </script>
 
 <script th:src="@{/js/multiple-select.js}"></script>

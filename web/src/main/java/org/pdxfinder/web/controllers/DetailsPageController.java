@@ -259,8 +259,8 @@ public class DetailsPageController {
 
     public String notEmpty(String incoming){
 
-        String result = (incoming == null) ? "Not Available" : incoming;
-        result = (result.length() == 0 ? "Not Available" : result );
+        String result = (incoming == null) ? "Not Specified" : incoming;
+        result = (result.length() == 0 ? "Not Specified" : result);
 
         return result;
     }

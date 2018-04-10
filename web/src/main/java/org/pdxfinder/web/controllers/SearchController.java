@@ -91,12 +91,14 @@ public class SearchController {
         );
 
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
+        Set<ModelForQueryExport> exportResults = results.stream().map(ModelForQueryExport::new).collect(Collectors.toSet());
 
         CsvMapper mapper = new CsvMapper();
-        CsvSchema schema = mapper.schemaFor(ModelForQuery.class).withHeader();
+        CsvSchema schema = mapper.schemaFor(ModelForQueryExport.class).withHeader();
+
         String output = "CSV output for configured values " + configuredFacets.toString();
         try {
-            output = mapper.writer(schema).writeValueAsString(results);
+            output = mapper.writer(schema).writeValueAsString(exportResults);
         } catch (JsonProcessingException e) {
             logger.error("Could not convert result set to CSV file. Facetes: {}", configuredFacets.toString(), e);
         }
@@ -173,7 +175,6 @@ public class SearchController {
                 )
         );
 
-        //logger.info("Before: "+facetString);
         // If there is a query, append the query parameter to any configured facet string
         if (query.isPresent() && !query.get().isEmpty()) {
             facetString = StringUtils.join(Arrays.asList("query=" + query.get(), facetString), "&");
@@ -186,26 +187,21 @@ public class SearchController {
             }
         }
 
-        List<String> selectedMutatedMarkerOrder = new ArrayList<>();
 
         if (mutation.isPresent() && !mutation.get().isEmpty()) {
             List<String> mutList = new ArrayList<>();
             for (String mut : mutation.get()) {
-                //logger.info(mut);
-                mutList.add("mutation="+mut);
-                //facetString = StringUtils.join(Arrays.asList("mutation=" + mut, facetString), "&");
+                mutList.add("mutation=" + mut);
             }
 
-            if(facetString.length() != 0 && !facetString.endsWith("&")) {
+            if (facetString.length() != 0 && !facetString.endsWith("&")) {
                 facetString += "&";
             }
-            for(String mut: mutList){
-                facetString += mut+"&";
+            for (String mut : mutList) {
+                facetString += mut + "&";
             }
-            //facetString += StringUtils.join(mutList, "&");
 
-    }
-        //logger.info("After: " +facetString);
+        }
 
         // Num pages is converted to an int using this formula int n = a / b + (a % b == 0) ? 0 : 1;
         int numPages = results.size() / size + (results.size() % size == 0 ? 0 : 1);
