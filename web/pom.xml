@@ -69,6 +69,12 @@
             <artifactId>json</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.code</groupId>
+            <artifactId>sitemapgen4j</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
 
         <!-- WEBJARS -->
         <dependency>
