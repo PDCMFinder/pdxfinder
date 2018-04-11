@@ -2,9 +2,9 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <title>PDX Finder - Search</title>
-    <meta name="description" content="PDX Finder"/>
-    <meta name="keywords" content="Framework, Life Sciences"/>
+    <title>Search - PDX Finder</title>
+    <meta name="description" th:content="'Model details for PDX '+${modelId}+', produced by '+${dataSrc}"/>
+    <meta name="keywords" th:content="'Patient Derived Xenograft, PDX, PDX Finder, Cancer, Oncology, Life Sciences'"/>
     <meta name="author" content="PDX Finder"/>
     <meta name="HandheldFriendly" content="true"/>
     <meta name="MobileOptimized" content="width"/>
@@ -33,8 +33,8 @@
     <meta name="ebi:expiry" content="2018-01-20"/> <!-- When this content is no longer relevant -->
 
 
-    <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css"
-          type="text/css" media="all"/>
+    <!--<link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css"-->
+    <!--type="text/css" media="all"/>-->
 
     <!-- Import Choice Library stylesheet-->
     <link rel="stylesheet"
