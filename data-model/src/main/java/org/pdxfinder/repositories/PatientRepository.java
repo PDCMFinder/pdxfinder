@@ -88,7 +88,7 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
             "WITH p " +
             "MATCH (p:Patient)--(ps:PatientSnapshot)--(s:Sample)--(mod:ModelCreation) " +
             "WHERE mod.sourcePdxId <> {modelId} " +
-            "RETURN mod.sourcePdxId")
+            "RETURN DISTINCT mod.sourcePdxId ORDER BY mod.sourcePdxId")
     List<String> getModelsOriginatedFromSamePatientByDataSourceAndModelId(@Param("dataSource") String dataSource,
                                                                           @Param("modelId") String modelId);
 

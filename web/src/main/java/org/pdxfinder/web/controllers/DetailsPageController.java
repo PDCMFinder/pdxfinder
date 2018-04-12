@@ -41,7 +41,7 @@ public class DetailsPageController {
         this.platformService = platformService;
     }
 
-    @RequestMapping(value = "/pdx/{dataSrc}/{modelId}")
+    @RequestMapping(value = "/pdx/{dataSrc}/{modelId:.+}")
     public String details(@PathVariable String dataSrc,
                           @PathVariable String modelId,
                           @RequestParam(value="page", required = false) Integer page,
@@ -259,8 +259,8 @@ public class DetailsPageController {
 
     public String notEmpty(String incoming){
 
-        String result = (incoming == null) ? "Not Available" : incoming;
-        result = (result.length() == 0 ? "Not Available" : result );
+        String result = (incoming == null) ? "Not Specified" : incoming;
+        result = (result.length() == 0 ? "Not Specified" : result);
 
         return result;
     }

@@ -7,6 +7,7 @@ public enum ValidationTechniques {
     NOT_SPECIFIED("Not specified"),
     FINGERPRINT("Fingerprint"),
     FINGERPRINT_HISTOLOGY("Histology/STR"),
+    HISTOLOGY("Histology"),
     HEALTH_CHECK("Health-check");
 
     private String technique;

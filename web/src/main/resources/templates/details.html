@@ -2,10 +2,10 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <title th:text="${externalId}"></title>
-    <meta name="description" content="PDX Finder"/><!-- Describe what this page is about -->
-    <meta name="keywords" content="Framework, Life Sciences"/>
-    <!-- A few keywords that relate to the content of THIS PAGE (not the whole project) -->
+    <title th:text="${dataSrc}+' PDX model '+${modelId}+ ' details - PDX Finder'"></title>
+    <meta name="description" th:content="'Model details for PDX '+${modelId}+', produced by '+${dataSrc}"/>
+    <meta name="keywords"
+          th:content="'Patient Derived Xenograft, PDX, PDX Finder, Cancer, Oncology, Life Sciences, '+${dataSrc}"/>
     <meta name="author" content="PDX Finder"/>
     <meta name="HandheldFriendly" content="true"/>
     <meta name="MobileOptimized" content="width"/>
@@ -27,22 +27,14 @@
     <meta name="msapplication-config"
           content="https://ebiwd.github.io/pdx-visual-framework/images/favicons/browserconfig.xml?v=1">
     <meta name="theme-color" content="#0032a0">
-    <!-- If you link to any other sites frequently, consider optimising performance with a DNS prefetch -->
-    <!-- <link rel="dns-prefetch" href="//www.ebi.ac.uk" /> -->
 
-    <!-- CSS: implied media=all -->
-    <!-- CSS concatenated and minified via ant build script-->
-
-    <!-- <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/ebi-global.css" type="text/css" media="all" /> -->
     <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css"
           type="text/css" media="all"/>
-    <!-- Import Choice Library stylesheet-->
+
     <link rel="stylesheet"
           href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/styles/css/choices.min.css">
-    <!-- Use this CSS file for any custom styling -->
-    <!--    <link rel="stylesheet" href="https://raw.githubusercontent.com/ebiwd/pdx-visual-framework/master/css/app.min.css" type="text/css" media="all" /> -->
-    <link rel="stylesheet" th:href="@{/css/app.min.css}" type="text/css" media="all"/>
 
+    <link rel="stylesheet" th:href="@{/css/app.min.css}" type="text/css" media="all"/>
     <link rel="stylesheet" th:href="@{/css/customStyles.css}" type="text/css" media="all"/>
     <link rel="stylesheet" th:href="@{/icons/foundation-icons.css}" type="text/css" media="all"/>
 
@@ -108,7 +100,7 @@
                             Details
                         </li>
                         <li>
-                            <span class="show-for-sr">Current: </span> <span th:text="${externalId}">Model ID</span>
+                            <span class="show-for-sr">Current: </span> <span th:text="${modelId}">Model ID</span>
                         </li>
                     </ul>
                 </nav>
@@ -135,7 +127,7 @@
 
                     <div class="columns medium-4 small-12 margin-top-30">
                         <h4 class="pdxBig"><span class="float-left border-color-black"
-                                                 th:text="${externalId+': '+mappedOntology}"></span></h4>
+                                                 th:text="${modelId+': '+mappedOntology}"></span></h4>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-30">
@@ -145,11 +137,11 @@
 
                     <div class="columns medium-4 small-12 margin-top-10">
 
-                        <a th:href="@{'mailto:'+${contacts+'?subject='+externalId}}"
+                        <a th:href="@{'mailto:'+${contacts+'?subject='+modelId}}"
                            th:if="${#strings.contains(contacts,'@')}">
                             <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
                         </a>
-                        <a th:href="@{${contacts+externalId}}" th:target="_blank"
+                        <a th:href="@{${contacts+modelId}}" th:target="_blank"
                            th:if="${#strings.contains(contacts,'http') && #strings.endsWith(contacts,'=')}">
                             <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
                         </a>
@@ -259,7 +251,8 @@
                                             <th class="text-left medium-4">Stage / Grade</th>
                                             <td th:if="${#strings.equals(class, '/')}"
                                                 th:text="${'Not Available'}"></td>
-                                            <td th:text="${#strings.endsWith(class,'/')} ? ${ #strings.substringBefore(class,'/') } : ${class} "></td>
+                                            <td th:if="${not #strings.equals(class, '/')}"
+                                                th:text="${#strings.endsWith(class,'/')} ? ${ #strings.substringBefore(class,'/') } : ${class} "></td>
 
                                         </tr>
                                         </tbody>
@@ -548,15 +541,7 @@
 
 
         </section>
-        <!-- Optional local footer (insert citation / project-specific copyright / etc here -->
-        <!--
-        <footer id="local-footer" class="local-footer" role="local-footer">
-          <div class="row">
-            <span class="reference">How to reference this page: ...</span>
-          </div>
-        </footer>
-        -->
-        <!-- End optional local footer -->
+
     </div>
     <!-- End suggested layout containers / #content -->
 
@@ -587,86 +572,10 @@
         return newOptions;
     }
 
-    /*
-    // Test choices integration
-    const mainSearch = new Choices('#query', {
-        choices: constructSearchOptions(searchStates),
-        removeItemButton: true,
-        // placeholder: false,
-        // placeholderValue: 'This is a placeholder',
-        maxItemCount: 1,
-        searchFloor: 0,
-        searchResultLimit: 10,
-        noResultsText: 'No results found',
-        fuseOptions: {
-            threshold: 0.1,
-            // includeScore: true,
-            // includeMatches: true, //doesn't do anything as it's not integrated :(
-            tokenize: true,
-            distance: 1000
-        }
-    });
-    function conditionallyShowDropdown(str) {
-        if (str.length < 1) {
-            mainSearch.hideDropdown();
-        } else {
-            mainSearch.showDropdown();
-        }
-    }
-    function regexEscape(str) {
-        return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
-    }
-    */
-
-    /*
-    mainSearch.passedElement.addEventListener('showDropdown', function(event) {
-        if (mainSearch.currentState.items.length) {
-            if (mainSearch.currentState.items[mainSearch.currentState.items.length-1].active) {
-                // only show dropdown if something hasn't been selected
-                mainSearch.hideDropdown();
-                // hide placeholder text
-                $('.main-search .choices__input').attr("placeholder","  ");
-                // $('.choices__input').hide();
-            }
-        } else {
-            // show placeholder text
-            $('.main-search .choices__input').attr("placeholder","Search (e.g. Melanoma)");
-            // show dropdown if nothing selected and a long enough string entered
-            conditionallyShowDropdown(mainSearch.currentValue);
-        }
-    }, false);
-    mainSearch.passedElement.addEventListener('search', function(event) {
-        var currentSearch = mainSearch.currentValue;
-        // highlight match, docs:
-        // https://github.com/jbr/jQuery.highlightRegex
-        $('.main-search .choices__list--dropdown').highlightRegex(); //clear
-        $('.main-search .choices__list--dropdown').highlightRegex(new RegExp(regexEscape(currentSearch),'ig'), {
-            tagType:   'span',
-            className: 'search-highlight'
-        });
-        conditionallyShowDropdown(currentSearch);
-    }, false);
-    mainSearch.passedElement.addEventListener('choice', function(event) {
-        // Hide form after selecting an option
-        mainSearch.hideDropdown();
-        // hide placeholder text
-        $('.main-search .choices__input').attr("placeholder","  ");
-        // drop the parenthetical
-        $('.main-search .choices__list .choices__item').text('test')
-        // To autosubmit on select
-        // $('form.main-search').submit();
-    }, false);
-    mainSearch.passedElement.addEventListener('removeItem', function(event) {
-        // show placeholder text
-        $('.main-search .choices__input').attr("placeholder","Search (e.g. Melanoma)");
-    }, false);
-
-*/
-
 
     document.getElementsByClassName("javaScriptBrowser")[0].style.display = "block";
     //document.getElementsByClassName("javaScriptBrowser")[1].style.display = "block";
-    var modelId = [[${externalId}]];
+    var modelId = [[${modelId}]];
     var dataSrc = [[${dataSrc}]];
     jQuery(document).ready(function () {
         console.log("ready");
@@ -756,37 +665,10 @@
     });
 
 
-    /*function expandTable(action) {
 
-
-        var expandButton = "<a onclick=\"expandTable('open')\" class='button outline'> Expand table <i class='fi-arrows-expand lpad10'></i> </a>";
-        var compressButton = "<a onclick=\"expandTable('close')\" class='button outline'> Compress Table <i class='fi-arrows-compress lpad10'></i> </a>";
-
-        if (action == 'open')
-        {
-            //open it and activate compress button
-            document.getElementById("variationTableData").className = "row large-12 medium-12 expanded";
-            document.getElementById("detailsData").className = "row large-10 medium-12 expanded";
-            document.getElementById("sizeSwitch").innerHTML=compressButton;
-        }
-        else
-        {
-            // Close it and activate expand button
-            document.getElementById("variationTableData").className = "row";
-            document.getElementById("detailsData").className = "row";
-            document.getElementById("sizeSwitch").innerHTML=expandButton;
-        }
-
-    }*/
 
 
 </script>
 
-<!-- <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/js/foundationExtendEBI.js"></script> -->
-<!-- <script type="text/JavaScript">$(document).foundationExtendEBI();</script> -->
-
-<!-- Google Analytics details... -->
-<!-- Change UA-XXXXX-X to be your site's ID -->
-<!-- <script type="text/javascript">!function(e,a,n,t,i,o,c){e.GoogleAnalyticsObject=i,e[i]=e[i]||function(){(e[i].q=e[i].q||[]).push(arguments)},e[i].l=1*new Date,o=a.createElement(n),c=a.getElementsByTagName(n)[0],o.async=1,o.src="//www.google-analytics.com/analytics.js",c.parentNode.insertBefore(o,c)}(window,document,"script",0,"ga"),ga("create","UA-629242-1",{cookieDomain:"auto"}),ga("require","linkid","linkid.js"),ga("set","anonymizeIp",!0),ga("send","pageview");</script> -->
 </body>
 </html>

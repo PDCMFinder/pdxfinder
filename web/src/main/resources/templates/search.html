@@ -2,9 +2,9 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <title>PDX Finder - Search</title>
-    <meta name="description" content="PDX Finder"/>
-    <meta name="keywords" content="Framework, Life Sciences"/>
+    <title>Search - PDX Finder</title>
+    <meta name="description" th:content="'Model details for PDX '+${modelId}+', produced by '+${dataSrc}"/>
+    <meta name="keywords" th:content="'Patient Derived Xenograft, PDX, PDX Finder, Cancer, Oncology, Life Sciences'"/>
     <meta name="author" content="PDX Finder"/>
     <meta name="HandheldFriendly" content="true"/>
     <meta name="MobileOptimized" content="width"/>
@@ -48,6 +48,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <script th:src="@{/js/pdxFinder.autocomplete.js}"></script>
+    <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
 
     <!-- end CSS-->
     <style>
@@ -73,6 +74,7 @@
             color: #06369d;
             font-weight: bold;
         }
+
     </style>
 
     <!--/*/ <th:block th:include="fragments/shared :: header"></th:block> /*/-->
@@ -604,13 +606,82 @@
 
 </div>
 <!-- JavaScript -->
-<script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
+<script th:src="@{/js/script.js}"></script>
+
+
 <script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/scripts/dist/choices.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.highlightRegex/0.1.2/highlightRegex.min.js"></script>
-<script th:src="@{/js/script.js}"></script>
 <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script th:src="@{/js/pdxFinder.js}"></script>
 
+<script>
+    var geneticVar = 1;
+    var counter = 1;
+
+    function myTrigger(param,startIndex){
+        if (startIndex != 2 && counter == 1){
+            geneticVar = startIndex;
+        }
+        geneticVar++;
+        counter++;
+        for (var i=startIndex; i<=20; i++){
+            if ((param=='AND'||param=='OR') && geneticVar == i){
+                //$("#geneticVar"+i).show();
+                document.getElementsByClassName("geneticVar" + i)[0].style.display = "block";
+            }
+        }
+    }
+</script>
+
+<script type="text/javascript" language="javascript" th:inline="javascript">
+
+        var incomingString = [[${mutatedMarkersAndVariants}]];
+        var mutatedMarkersAndVariants = JSON.parse(incomingString);
+        /* var mutatedMarkersAndVariants = {  "USP25" : [ "T1033M" ], "USP26" : [ "L362W" ],"USP20" : [ "D505Y", "P49A" ]} */
+        var keysAreMarkers = Object.keys(mutatedMarkersAndVariants);
+        $('#geneFilter1').autocomplete({
+            source: [keysAreMarkers]
+        });
+        for (var i = 2; i <= 20; i++) {
+            $('#geneFilter' + i).autocomplete({
+                source: [keysAreMarkers]
+            });
+        }
+        // Open the Molchar Filter if needed
+        var urlParams = new URLSearchParams(window.location.search);
+        var dURLString = urlParams.toString();
+        var openMarkerFacet = dURLString.search("mutation");
+        if (openMarkerFacet != -1) {
+            var markerFilterField = jQuery("li#marker_filter > a.accordion-title");
+            markerFilterField.click();
+        }
+
+        function getVariantSize(selectedMarker) {
+            var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker];
+            return valuesAreVariants;
+        }
+
+        function loadVariants(selectedMarker, compNumber) {
+            var marker = selectedMarker.value;
+            var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker.value].sort();
+            //alert(marker+"\n"+typeof valuesAreVariants);
+            var newOptions = "";
+            for (var i = 0; i < valuesAreVariants.length; i++) {
+                newOptions += "<option value='" + valuesAreVariants[i] + "' selected>" + valuesAreVariants[i] + "</option>";
+            }
+            var select = $('#variantFilter' + compNumber);
+            select.empty().append(newOptions);
+            $(function () {
+                $('#variantFilter' + compNumber).change(function () {
+                    console.log($(this).val());
+                }).multipleSelect({
+                    placeholder: " variants"
+                });
+            });
+        }
+
+
+</script>
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
     var searchOptions = [[ ${autoCompleteList} ]];
@@ -719,6 +790,7 @@
         jQuery('#search_submit').click( function(){
             redirectPage();
         });
+
     });
 </script>
 
@@ -734,69 +806,6 @@
     */
 </script>
 
-
-
-
-<script type="text/javascript" language="javascript" th:inline="javascript">
-    var incomingString = [[ ${mutatedMarkersAndVariants} ]];
-    var mutatedMarkersAndVariants = JSON.parse(incomingString);
-    /* var mutatedMarkersAndVariants = {  "USP25" : [ "T1033M" ], "USP26" : [ "L362W" ],"USP20" : [ "D505Y", "P49A" ]} */
-    var keysAreMarkers = Object.keys(mutatedMarkersAndVariants);
-    $('#geneFilter1').autocomplete({
-        source:[keysAreMarkers]
-    });
-    for (var i=2; i<=20; i++){
-        $('#geneFilter'+i).autocomplete({
-            source:[keysAreMarkers]
-        });
-    }
-    // Open the Molchar Filter if needed
-    var urlParams = new URLSearchParams(window.location.search);
-    var dURLString = urlParams.toString();
-    var openMarkerFacet = dURLString.search("mutation");
-    if (openMarkerFacet != -1) {
-        var markerFilterField = jQuery("li#marker_filter > a.accordion-title");
-        markerFilterField.click();
-    }
-    function getVariantSize(selectedMarker) {
-        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker];
-        return valuesAreVariants;
-    }
-    function loadVariants(selectedMarker,compNumber) {
-        var marker = selectedMarker.value;
-        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker.value].sort();
-        //alert(marker+"\n"+typeof valuesAreVariants);
-        var newOptions = "";
-        for (var i=0; i<valuesAreVariants.length; i++){
-            newOptions += "<option value='"+valuesAreVariants[i]+"' selected>"+valuesAreVariants[i]+"</option>";
-        }
-        var select = $('#variantFilter'+compNumber);
-        select.empty().append(newOptions);
-        $(function() {
-            $('#variantFilter'+compNumber).change(function() {
-                console.log($(this).val());
-            }).multipleSelect({
-                placeholder: " variants"
-            });
-        });
-    }
-    var geneticVar = 1;
-    var counter = 1;
-
-    function myTrigger(param,startIndex){
-        if (startIndex != 2 && counter == 1){
-            geneticVar = startIndex;
-        }
-        geneticVar++;
-        counter++;
-        for (var i=startIndex; i<=20; i++){
-            if ((param=='AND'||param=='OR') && geneticVar == i){
-                //$("#geneticVar"+i).show();
-                document.getElementsByClassName("geneticVar" + i)[0].style.display = "block";
-            }
-        }
-    }
-</script>
 
 <script th:src="@{/js/multiple-select.js}"></script>
 <script>

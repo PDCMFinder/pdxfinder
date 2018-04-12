@@ -843,3 +843,8 @@ table.dataTable {
 
 
 /*PdxFinder Color: rgba(6,54,157,1) rgba(0,178,213,0.6);  /*#06369d; #00b2d5; */
+
+/* Hide navigation submenu from rendering, foundation will enable this via JS later */
+.dropdown ul {
+    display: none;
+}
