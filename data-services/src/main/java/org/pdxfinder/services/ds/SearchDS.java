@@ -445,7 +445,7 @@ public class SearchDS {
 
                 case query:
 
-                    predicate = getContainsMatchDisjunctionPredicate(filters.get(SearchFacetName.query));
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.query));
 
                     Set<ModelForQuery> accumulate = new HashSet<>();
                     for (ModelForQuery r : result) {
