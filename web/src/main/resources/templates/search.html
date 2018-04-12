@@ -634,8 +634,6 @@
 </script>
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
-    var marker_function = function () {
-        console.log("running marker_function");
 
         var incomingString = [[${mutatedMarkersAndVariants}]];
         var mutatedMarkersAndVariants = JSON.parse(incomingString);
@@ -681,7 +679,6 @@
                 });
             });
         }
-    }
 
 
 </script>
@@ -793,8 +790,6 @@
         jQuery('#search_submit').click( function(){
             redirectPage();
         });
-
-        marker_function();
 
     });
 </script>
