@@ -41,7 +41,7 @@ public class DetailsPageController {
         this.platformService = platformService;
     }
 
-    @RequestMapping(value = "/pdx/{dataSrc}/{modelId}")
+    @RequestMapping(value = "/pdx/{dataSrc}/{modelId:.+}")
     public String details(@PathVariable String dataSrc,
                           @PathVariable String modelId,
                           @RequestParam(value="page", required = false) Integer page,
