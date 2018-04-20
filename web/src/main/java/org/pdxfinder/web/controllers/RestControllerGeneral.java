@@ -56,7 +56,6 @@ public class RestControllerGeneral {
         String sortDir = data.getFirst("order[0][dir]").toString();
         int start = Integer.parseInt(data.getFirst("start").toString());
         int size = Integer.parseInt(data.getFirst("length").toString());
-
         sortColumn = getSortColumn(sortColumn);
 
         String dPlatform = (platform == null) ? "" : platform;
@@ -139,7 +138,7 @@ public class RestControllerGeneral {
         String dPlatform = (platform == null) ? "" : platform;
         String dPassage = (passage == null) ? "" : passage;
         String sortColumn = getSortColumn("6");
-        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,"",1,"mAss.chromosome","desc");
+        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,"",1,"mAss.chromosome","asc");
 
         return variationDataDTO;
 

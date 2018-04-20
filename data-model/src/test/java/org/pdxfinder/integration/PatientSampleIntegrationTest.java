@@ -124,7 +124,7 @@ public class PatientSampleIntegrationTest extends BaseTest {
 
         MarkerAssociation ma = new MarkerAssociation();
         ma.setMarker(marker);
-        mc.setMarkerAssociations(new HashSet<>(Collections.singletonList(ma)));
+        mc.setMarkerAssociations(Collections.singletonList(ma));
 
         for (Integer i = 0; i < 20; i++) {
 

@@ -4,8 +4,8 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jmason on 17/03/2017.
@@ -25,7 +25,7 @@ public class MolecularCharacterization {
     Platform platform;
 
     @Relationship(type = "ASSOCIATED_WITH")
-    Set<MarkerAssociation> markerAssociations;
+    List<MarkerAssociation> markerAssociations;
 
     public MolecularCharacterization() {
     }
@@ -62,11 +62,11 @@ public class MolecularCharacterization {
         this.platform = platform;
     }
 
-    public Set<MarkerAssociation> getMarkerAssociations() {
+    public List<MarkerAssociation> getMarkerAssociations() {
         return markerAssociations;
     }
 
-    public void setMarkerAssociations(Set<MarkerAssociation> markerAssociations) {
+    public void setMarkerAssociations(List<MarkerAssociation> markerAssociations) {
         this.markerAssociations = markerAssociations;
     }
 
@@ -81,7 +81,7 @@ public class MolecularCharacterization {
     public void addMarkerAssociation(MarkerAssociation ma){
 
         if(this.markerAssociations == null){
-            this.markerAssociations = new HashSet<>();
+            this.markerAssociations = new ArrayList<>();
         }
         this.markerAssociations.add(ma);
 
