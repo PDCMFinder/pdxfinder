@@ -91,7 +91,33 @@ public class RestControllerGeneral {
 
     }
 
-
+        /* Incoming data from @RequestBody MultiValueMap data
+                 draw 1
+                 columns[0][data] 0
+                 columns[0][name]
+                 columns[0][searchable] true
+                 columns[0][orderable] true
+                 columns[0][search][value]
+                 columns[0][search][regex] false
+                 columns[1][data] 1
+                 columns[1][name]
+                 columns[1][searchable] true
+                 columns[1][orderable] true
+                 columns[1][search][value]
+                 columns[1][search][regex] false
+                 columns[2][data] 2
+                 columns[2][name]
+                 columns[2][searchable] true
+                 columns[2][orderable] true
+                 columns[2][search][value]
+                 columns[2][search][regex] false
+                 * order[0][column] 0
+                 * order[0][dir] asc
+                 * start 0
+                 * length 10
+                 * search[value]
+                 search[regex] false
+         */
 
 
     @RequestMapping(value = "/getxdata/{dataSrc}/{modelId}")
@@ -112,7 +138,8 @@ public class RestControllerGeneral {
 
         String dPlatform = (platform == null) ? "" : platform;
         String dPassage = (passage == null) ? "" : passage;
-        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,"",1,"","");
+        String sortColumn = getSortColumn("6");
+        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,"",1,"mAss.chromosome","desc");
 
         return variationDataDTO;
 
@@ -152,14 +179,22 @@ public class RestControllerGeneral {
     }
 
 
-    public String getSortColumn(String sortolumn){
+    public String getSortColumn(String sortcolumn){
 
         Map<String, String> tableColumns = new HashMap<>();
-        tableColumns.put("0","mAss.technology");
-        tableColumns.put("1","mAss.technology");
-        tableColumns.put("2","mAss.technology");
+        tableColumns.put("0","msamp.sourceSampleId");
+        tableColumns.put("1","mAss.chromosome");
+        tableColumns.put("2","mAss.seqPosition");
+        tableColumns.put("3","mAss.refAllele");
+        tableColumns.put("4","mAss.altAllele");
+        tableColumns.put("5","mAss.consequence");
+        tableColumns.put("6","m.symbol");
+        tableColumns.put("7","mAss.aminoAcidChange");
+        tableColumns.put("8","mAss.aminoAcidChange");
+        tableColumns.put("9","mAss.alleleFrequency");
+        tableColumns.put("10","mAss.rsVariants");
 
-        return tableColumns.get(sortolumn);
+        return tableColumns.get(sortcolumn);
     }
 
 

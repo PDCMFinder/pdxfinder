@@ -7,6 +7,10 @@ import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -187,14 +191,18 @@ public class SearchService {
 
         QualityAssurance qa = pdx.getQualityAssurance();
 
-        int skip = page * size;
+        int start = page;
+        /**
+         * Set the Pagination parameters: start comes in as 0,10,20 e.t.c while pageable works in page batches 0,1,2,...
+         */
+        Pageable pageable = new PageRequest(start,size);
+        Page<Specimen> specimens = null;
         int totalRecords = 0;
-        Set<Specimen> specimens = new HashSet<>();
 
 
         totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,passage,searchFilter);
 
-        specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchFilter,skip,size);
+        specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchFilter,pageable);
 
 
         DetailsDTO dto = new DetailsDTO();
@@ -576,6 +584,15 @@ public class SearchService {
 
     public VariationDataDTO variationDataByPlatform(String dataSource, String modelId, String technology,String passage, int start, int size,
                                                     String searchParam, int draw, String sortColumn, String sortDir) {
+
+        /**
+         * Set the Pagination parameters: start comes in as 0,10,20 e.t.c while pageable works in page batches 0,1,2,...
+         */
+        //start /= 10;
+        Sort.Direction direction = getSortDirection(sortDir);
+        Pageable pageable = new PageRequest(start,size, direction,sortColumn);
+
+
         /**
          * 1st count all the records and set Total Records & Initialize Filtered Record as Total record
          */
@@ -594,7 +611,7 @@ public class SearchService {
         /**
          * Retrieve the Records based on search parameter
          */
-        Set<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchParam,start,size);
+        Page<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchParam,pageable);
         VariationDataDTO variationDataDTO = new VariationDataDTO();
         List<String[]> variationData = new ArrayList();
 
@@ -692,6 +709,17 @@ public class SearchService {
     }
 
 
+
+    public Sort.Direction getSortDirection(String sortDir){
+
+        Sort.Direction direction = Sort.Direction.ASC;
+
+        if (sortDir.equals("desc")){
+            direction = Sort.Direction.DESC;
+        }
+
+        return direction;
+    }
 
 
 
