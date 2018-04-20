@@ -585,7 +585,6 @@ public class SearchService {
         /**
          * Set the Pagination parameters: start comes in as 0,10,20 e.t.c while pageable works in page batches 0,1,2,...
          */
-        start /= 10;
         Sort.Direction direction = getSortDirection(sortDir);
         Pageable pageable = new PageRequest(start,size, direction,sortColumn);
 

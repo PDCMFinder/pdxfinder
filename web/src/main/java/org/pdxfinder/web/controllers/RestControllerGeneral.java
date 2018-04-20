@@ -60,6 +60,8 @@ public class RestControllerGeneral {
 
         String dPlatform = (platform == null) ? "" : platform;
         String dPassage = (passage == null) ? "" : passage;
+        start = (int) Math.ceil(start / 108.0);
+
         VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,searchText,draw,sortColumn,sortDir);
 
 
@@ -82,6 +84,7 @@ public class RestControllerGeneral {
         int size = Integer.parseInt(data.getFirst("length").toString());
 
         sortColumn = getSortColumn(sortColumn);
+        start = (int) Math.ceil(start / 108.0);
 
         String dPlatform = (platform == null) ? "" : platform;
         VariationDataDTO variationDataDTO = searchService.patientVariationDataByPlatform(dataSrc,modelId,dPlatform,searchText,draw,sortColumn,sortDir,start,size);
@@ -125,7 +128,8 @@ public class RestControllerGeneral {
                                                  @RequestParam(value="page", required = false) Integer page,
                                                  @RequestParam(value="size", required = false) Integer pageSize,
                                                  @RequestParam(value="passage", required = false) String passage,
-                                                 @RequestParam(value="platform", required = false) String platform) {
+                                                 @RequestParam(value="platform", required = false) String platform,
+                                                 @RequestParam(value="sortcolumn", required = false) String sortColumn) {
 
         int start = (page == null || page < 1) ? 0 : page - 1;
         int size = (pageSize == null || pageSize < 1) ? 20 : pageSize;
@@ -137,7 +141,8 @@ public class RestControllerGeneral {
 
         String dPlatform = (platform == null) ? "" : platform;
         String dPassage = (passage == null) ? "" : passage;
-        String sortColumn = getSortColumn("6");
+        String dSortColumn = (passage == null) ? "1" : sortColumn;
+
         VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,"",1,"mAss.chromosome","asc");
 
         return variationDataDTO;
