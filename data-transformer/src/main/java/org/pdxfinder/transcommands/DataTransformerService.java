@@ -56,6 +56,7 @@ public class DataTransformerService {
         String mouseSex = "";
         String treatmentNaive = "";
         String engraftmentSite = "";
+        String externalLinkId = "";
 
         String report = "";
 
@@ -86,6 +87,7 @@ public class DataTransformerService {
             strain = "NSG";
             mouseSex = "";
             engraftmentSite = "Subcutaneous";
+            externalLinkId = specimenSearch.get("SPECIMENSEQNBR")+"";
 
             treatmentNaive = "Unknown";
             age = "";
@@ -125,7 +127,7 @@ public class DataTransformerService {
             try{
                 pdmrPdxInfoRepository.save(
                         new PdmrPdxInfo(modelID,patientID,gender,age,race,ethnicity,specimenSite,primarySite,initialDiagnosis,
-                                clinicalDiagnosis,tumorType,grades,tumorStage,sampleType,strain,mouseSex,treatmentNaive,engraftmentSite)
+                                clinicalDiagnosis,tumorType,grades,tumorStage,sampleType,strain,mouseSex,treatmentNaive,engraftmentSite,externalLinkId)
                 );
                 log.info("Loaded Record for Patient"+specimenSearch.get("PATIENTID"));
             }catch (Exception e){
