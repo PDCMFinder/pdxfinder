@@ -16,6 +16,7 @@ import org.springframework.util.Assert;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -51,6 +52,7 @@ public class LoaderUtils {
     private PlatformAssociationRepository platformAssociationRepository;
     private DataProjectionRepository dataProjectionRepository;
     private TreatmentSummaryRepository treatmentSummaryRepository;
+    private ExternalUrlRepository externalUrlRepository;
 
     private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
 
@@ -74,7 +76,8 @@ public class LoaderUtils {
                        PlatformRepository platformRepository,
                        PlatformAssociationRepository platformAssociationRepository,
                        DataProjectionRepository dataProjectionRepository,
-                       TreatmentSummaryRepository treatmentSummaryRepository) {
+                       TreatmentSummaryRepository treatmentSummaryRepository,
+                       ExternalUrlRepository externalUrlRepository) {
 
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null");
         Assert.notNull(hostStrainRepository, "hostStrainRepository cannot be null");
@@ -89,6 +92,7 @@ public class LoaderUtils {
         Assert.notNull(markerRepository, "markerRepository cannot be null");
         Assert.notNull(markerAssociationRepository, "markerAssociationRepository cannot be null");
         Assert.notNull(molecularCharacterizationRepository, "molecularCharacterizationRepository cannot be null");
+        Assert.notNull(externalUrlRepository, "externalUrlRepository cannot be null");
 
         this.tumorTypeRepository = tumorTypeRepository;
         this.hostStrainRepository = hostStrainRepository;
@@ -111,6 +115,7 @@ public class LoaderUtils {
         this.platformAssociationRepository = platformAssociationRepository;
         this.dataProjectionRepository = dataProjectionRepository;
         this.treatmentSummaryRepository = treatmentSummaryRepository;
+        this.externalUrlRepository = externalUrlRepository;
 
     }
 
@@ -133,7 +138,22 @@ public class LoaderUtils {
     }
 
 
-    public ModelCreation createModelCreation(String pdxId, String dataSource,  Sample sample, QualityAssurance qa) {
+    public ExternalUrl getExternalUrl(ExternalUrl.Type type, String url) {
+        ExternalUrl externalUrl = externalUrlRepository.findByType(type);
+        if (externalUrl == null) {
+            log.info("External URL '{}' not found. Creating", type);
+            externalUrl = new ExternalUrl(
+                    type,
+                    url);
+            externalUrlRepository.save(externalUrl);
+        }
+
+        return externalUrl;
+
+    }
+
+
+    public ModelCreation createModelCreation(String pdxId, String dataSource,  Sample sample, QualityAssurance qa, List<ExternalUrl> externalUrls) {
 
         ModelCreation modelCreation = modelCreationRepository.findBySourcePdxIdAndDataSource(pdxId, dataSource);
 
@@ -141,7 +161,7 @@ public class LoaderUtils {
             log.info("Deleting existing ModelCreation " + pdxId);
             modelCreationRepository.delete(modelCreation);
         }
-        modelCreation = new ModelCreation(pdxId, dataSource, sample, qa);
+        modelCreation = new ModelCreation(pdxId, dataSource, sample, qa, externalUrls);
         modelCreationRepository.save(modelCreation);
         return modelCreation;
     }

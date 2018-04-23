@@ -23,7 +23,9 @@ import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -158,6 +160,9 @@ public class LoadMDAnderson implements CommandLineRunner {
 
         pSnap.addSample(sample);
 
+        List<ExternalUrl> externalUrls = new ArrayList<>();
+        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
+
         String qaType = NOT_SPECIFIED;
         try {
             qaType = j.getString("QA") + "on passage " + j.getString("QA Passage");
@@ -177,7 +182,7 @@ public class LoadMDAnderson implements CommandLineRunner {
         
         String tumorPrep = Standardizer.getValue("Tumor Prep",j);
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, mdaDS.getAbbreviation(), sample, qa);
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, mdaDS.getAbbreviation(), sample, qa, externalUrls);
         modelCreation.addRelatedSample(sample);
 
         boolean human = false;
@@ -200,7 +205,7 @@ public class LoadMDAnderson implements CommandLineRunner {
             MolecularCharacterization molC = new MolecularCharacterization();
             molC.setType("mutation");
             molC.setPlatform(pl);
-            Set<MarkerAssociation> markerAssocs = new HashSet();
+            List<MarkerAssociation> markerAssocs = new ArrayList<>();
 
             for (int i = 0; i < markers.length; i++) {
                 Marker m = loaderUtils.getMarker(markers[i], markers[i]);

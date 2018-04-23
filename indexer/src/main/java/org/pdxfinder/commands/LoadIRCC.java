@@ -179,6 +179,9 @@ public class LoadIRCC implements CommandLineRunner {
         loaderUtils.saveSample(ptSample);
         loaderUtils.savePatientSnapshot(pSnap);
 
+        List<ExternalUrl> externalUrls = new ArrayList<>();
+        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
+
         QualityAssurance qa = new QualityAssurance();
 
         if ("TRUE".equals(job.getString("Fingerprinting").toUpperCase())) {
@@ -207,7 +210,7 @@ public class LoadIRCC implements CommandLineRunner {
 
         }
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, this.irccDS.getAbbreviation(), ptSample, qa);
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, this.irccDS.getAbbreviation(), ptSample, qa, externalUrls);
 
         JSONArray specimens = job.getJSONArray("Specimens");
         for (int i = 0; i < specimens.length(); i++) {

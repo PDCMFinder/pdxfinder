@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Load data from HCI PDXNet.
@@ -141,10 +142,13 @@ public class LoadHCI implements CommandLineRunner {
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
         
         String sampleSite = Standardizer.getValue("Sample Site",j);
-        
+
         Sample sample = loaderUtils.getSample(sampleID, tumorType, diagnosis,
                 j.getString("Primary Site"), sampleSite,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, hciDS.getAbbreviation());
+
+        List<ExternalUrl> externalUrls = new ArrayList<>();
+        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
 
         pSnap.addSample(sample);
         
@@ -198,7 +202,7 @@ public class LoadHCI implements CommandLineRunner {
         }
         
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(modelID, this.hciDS.getAbbreviation(), sample, qa);
+        ModelCreation modelCreation = loaderUtils.createModelCreation(modelID, this.hciDS.getAbbreviation(), sample, qa, externalUrls);
         modelCreation.addRelatedSample(sample);
 
         

@@ -342,7 +342,11 @@ public class ValidateIRCCData implements CommandLineRunner {
                 QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT, null);
                 loaderUtils.saveQualityAssurance(qa);
 
-                ModelCreation mc = loaderUtils.createModelCreation(samples.get(i).getModelId(),DS.getAbbreviation(), sample, qa);
+
+                List<ExternalUrl> externalUrls = new ArrayList<>();
+                externalUrls.add( loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
+
+                ModelCreation mc = loaderUtils.createModelCreation(samples.get(i).getModelId(),DS.getAbbreviation(), sample, qa,externalUrls);
 
                 loadVariationData(mc, samples.get(i));
 

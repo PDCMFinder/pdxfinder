@@ -26,10 +26,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -174,6 +171,11 @@ public class LoadPDMRData implements CommandLineRunner {
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), tumorType, diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, DS.getAbbreviation());
 
+
+        List<ExternalUrl> externalUrls = new ArrayList<>();
+        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
+        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.SOURCE, j.getString("Source Url")));
+
         // TODO: Update with actual QA data when available
         String qaPassage = null;
 
@@ -183,7 +185,7 @@ public class LoadPDMRData implements CommandLineRunner {
         pSnap.addSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
 
-        ModelCreation mc = loaderUtils.createModelCreation(id, this.DS.getAbbreviation(), sample, qa);
+        ModelCreation mc = loaderUtils.createModelCreation(id, this.DS.getAbbreviation(), sample, qa, externalUrls);
         mc.addRelatedSample(sample);
         //loadVariationData(mc);
 
@@ -205,8 +207,8 @@ public class LoadPDMRData implements CommandLineRunner {
 
             passageMap = new HashMap<>();
 
-            HashMap<String, HashMap<String, Set<MarkerAssociation>>> sampleMap = new HashMap<>();
-            HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
+            HashMap<String, HashMap<String, List<MarkerAssociation>>> sampleMap = new HashMap<>();
+            HashMap<String, List<MarkerAssociation>> markerMap = new HashMap<>();
 
             JSONObject job = new JSONObject(parseURL(this.variationURL + modelCreation.getSourcePdxId()));
             JSONArray jarray = job.getJSONArray("variation");
@@ -278,10 +280,11 @@ public class LoadPDMRData implements CommandLineRunner {
                 // make a map of markerAssociation collections keyed to technology
                 if (markerMap.containsKey(technology)) {
                     markerMap.get(technology).add(ma);
-                } else {
-                    HashSet<MarkerAssociation> set = new HashSet<>();
-                    set.add(ma);
-                    markerMap.put(technology, set);
+                }
+                else {
+                    List<MarkerAssociation> list = new ArrayList<>();
+                    list.add(ma);
+                    markerMap.put(technology, list);
                 }
 
                 sampleMap.put(sample, markerMap);
