@@ -5,6 +5,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -36,12 +37,16 @@ public class ModelCreation {
     @Relationship(type = "SUMMARY_OF_TREATMENT", direction = Relationship.INCOMING)
     private TreatmentSummary treatmentSummary;
 
+    @Relationship(type = "EXTERNAL_URL", direction = Relationship.INCOMING)
+    private List<ExternalUrl> externalUrls;
 
-    public ModelCreation(String sourcePdxId, String dataSource, Sample sample, QualityAssurance qualityAssurance) {
+
+    public ModelCreation(String sourcePdxId, String dataSource, Sample sample, QualityAssurance qualityAssurance,List<ExternalUrl> externalUrls) {
         this.sourcePdxId = sourcePdxId;
         this.dataSource = dataSource;
         this.sample = sample;
         this.qualityAssurance = qualityAssurance;
+        this.externalUrls = externalUrls;
     }
 
     public ModelCreation() {
@@ -125,5 +130,13 @@ public class ModelCreation {
 
     public void setTreatmentSummary(TreatmentSummary treatmentSummary) {
         this.treatmentSummary = treatmentSummary;
+    }
+
+    public List<ExternalUrl> getExternalUrls() {
+        return externalUrls;
+    }
+
+    public void setExternalUrls(List<ExternalUrl> externalUrls) {
+        this.externalUrls = externalUrls;
     }
 }
