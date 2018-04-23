@@ -27,6 +27,7 @@ public class DataTransformerService {
 
     ObjectMapper mapper = new ObjectMapper();
     private PdmrPdxInfoRepository pdmrPdxInfoRepository;
+    private String DATASOURCE_URL_PREFIX = "https://pdmdb.cancer.gov/pls/apex/f?p=101:4:0::NO:4:P4_SPECIMENSEQNBR:";
 
     private final static Logger log = LoggerFactory.getLogger(TransController.class);
 
@@ -56,7 +57,7 @@ public class DataTransformerService {
         String mouseSex = "";
         String treatmentNaive = "";
         String engraftmentSite = "";
-        String externalLinkId = "";
+        String sourceUrl = "";
 
         String report = "";
 
@@ -87,7 +88,7 @@ public class DataTransformerService {
             strain = "NSG";
             mouseSex = "";
             engraftmentSite = "Subcutaneous";
-            externalLinkId = specimenSearch.get("SPECIMENSEQNBR")+"";
+            sourceUrl = DATASOURCE_URL_PREFIX+specimenSearch.get("SPECIMENSEQNBR");
 
             treatmentNaive = "Unknown";
             age = "";
@@ -127,7 +128,7 @@ public class DataTransformerService {
             try{
                 pdmrPdxInfoRepository.save(
                         new PdmrPdxInfo(modelID,patientID,gender,age,race,ethnicity,specimenSite,primarySite,initialDiagnosis,
-                                clinicalDiagnosis,tumorType,grades,tumorStage,sampleType,strain,mouseSex,treatmentNaive,engraftmentSite,externalLinkId)
+                                clinicalDiagnosis,tumorType,grades,tumorStage,sampleType,strain,mouseSex,treatmentNaive,engraftmentSite,sourceUrl)
                 );
                 log.info("Loaded Record for Patient"+specimenSearch.get("PATIENTID"));
             }catch (Exception e){
