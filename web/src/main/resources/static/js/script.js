@@ -19,22 +19,17 @@ $(document).ready(function () {
 
 
 
-    /*$('#search-datatable').DataTable({
-        paging:   false,
-        ordering: true,
-        info:     false,
-        searching: false,
-        columnDefs: [ {
-            targets: [ 0 ],
-            orderData: [ 0, 1 ]
-        }, {
-            targets: [ 1 ],
-            orderData: [ 1, 0 ]
-        }, {
-            targets: [ 4 ],
-            orderData: [ 4, 0 ]
-        } ]
-    });*/
+    $(document).ready(function() {
+        var table = $('#search-datatable').DataTable( {
+            paging:   false,
+            ordering: true,
+            info:     false,
+            searching: false,
+            fixedHeader: true
+        } );
+    } );
+
+
 
   $("[data-responsive-toggle]").click(function () {
     var targetMenuClass =  $(this).attr("data-responsive-toggle");

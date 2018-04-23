@@ -39,6 +39,7 @@
     <!-- Import Choice Library stylesheet-->
     <link rel="stylesheet"
           href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/styles/css/choices.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/fixedheader/3.1.3/css/fixedHeader.dataTables.min.css">
 
     <!-- Use this CSS file for any custom styling -->
     <link rel="stylesheet" th:href="@{/css/app.css}" type="text/css" media="all"/>
@@ -476,7 +477,7 @@
                 <div class="columns medium-9">
 
                     <div class="responsive-table">
-                        <table class="unstriped pdx-table">
+                        <table id="search-datatable" class="display datatable-pdx" cellspacing="0" width="100%">
                             <thead>
                             <tr>
                                 <th>Model</th>
@@ -547,7 +548,7 @@
                         </table>
                     </div>
 
-                    <div class="row">
+                    <div class="row topSpace50">
 
                         <div class="columns medium-8 small-6 padding-vertical-10">
                             <ul class="pagination pdx-pagination" role="navigation" aria-label="Pagination">
@@ -612,6 +613,7 @@
 <script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/scripts/dist/choices.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.highlightRegex/0.1.2/highlightRegex.min.js"></script>
 <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" language="javascript" src="//cdn.datatables.net/fixedheader/3.1.3/js/dataTables.fixedHeader.min.js"></script>
 <script th:src="@{/js/pdxFinder.js}"></script>
 
 <script>
