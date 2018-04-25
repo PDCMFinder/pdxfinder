@@ -186,6 +186,11 @@ public class LoaderUtils {
         return this.modelCreationRepository.getAllModels();
     }
 
+    public ModelCreation findModelByIdAndDataSource(String modelId, String dataSource){
+
+        return modelCreationRepository.findBySourcePdxIdAndDataSource(modelId, dataSource);
+    }
+
     public void saveModelCreation(ModelCreation modelCreation){
         this.modelCreationRepository.save(modelCreation);
     }

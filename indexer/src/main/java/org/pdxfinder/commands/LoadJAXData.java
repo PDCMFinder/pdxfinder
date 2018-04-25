@@ -157,6 +157,13 @@ public class LoadJAXData implements CommandLineRunner {
     void createGraphObjects(JSONObject j) throws Exception {
         String id = j.getString("Model ID");
 
+        //Check if model exists in DB
+        ModelCreation existingModel = loaderUtils.findModelByIdAndDataSource(id, JAX_DATASOURCE_ABBREVIATION);
+        //Do not load duplicates
+        if(existingModel != null) {
+            log.error("Skipping existing model "+id);
+            return;}
+
         histologyMap = getHistologyImageMap(id);
 
         // the preference is for clinical diagnosis but if not available use initial diagnosis
