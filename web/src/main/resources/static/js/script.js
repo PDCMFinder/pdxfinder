@@ -24,10 +24,22 @@ $(document).ready(function () {
             paging:   false,
             ordering: true,
             info:     false,
-            searching: false,
-            fixedHeader: true
+            searching: false
         } );
     } );
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
