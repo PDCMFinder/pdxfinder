@@ -290,7 +290,7 @@ public class SearchService {
         }
 
         if (patient != null && patient.getExternalDataSource() != null) {
-            dto.setContacts(patient.getExternalDataSource().getContact());
+            ///dto.setContacts(patient.getExternalDataSource().getContact());
             dto.setExternalDataSourceDesc(patient.getExternalDataSource().getDescription());
         }
 
@@ -349,6 +349,22 @@ public class SearchService {
         */
         if (pdx != null && pdx.getSourcePdxId() != null) {
             dto.setModelId(pdx.getSourcePdxId());
+        }
+
+        if(pdx!= null && pdx.getExternalUrls() != null){
+
+            List<ExternalUrl> externalUrls = pdx.getExternalUrls();
+
+            for(ExternalUrl externalUrl: externalUrls){
+
+                if(externalUrl.getType().equals(ExternalUrl.Type.CONTACT)){
+                    dto.setContacts(externalUrl.getUrl());
+
+                }else if(externalUrl.getType().equals(ExternalUrl.Type.SOURCE)){
+                    dto.setContacts(externalUrl.getUrl());
+                    dto.setExternalUrl(externalUrl.getUrl());
+                }
+            }
         }
 
         if(pdx!= null && pdx.getSpecimens() != null){
@@ -446,26 +462,26 @@ public class SearchService {
         }
 
         if (sample != null && sample.getDataSource().equals("JAX")) {
-            dto.setExternalUrl(JAX_URL+pdx.getSourcePdxId());
+            //dto.setExternalUrl(JAX_URL+pdx.getSourcePdxId());
             dto.setExternalUrlText(JAX_URL_TEXT);
         } else if (sample != null && sample.getDataSource().equals("IRCC")) {
-            dto.setExternalUrl(IRCC_URL + dto.getExternalId());
+           // dto.setExternalUrl(IRCC_URL + dto.getExternalId());
             dto.setExternalUrlText(IRCC_URL_TEXT);
         } else if(sample != null && sample.getDataSource().equals(HCI_DS)) {
-            dto.setExternalUrl(HCI_URL);
+            //dto.setExternalUrl(HCI_URL);
             dto.setExternalUrlText(HCI_DS);
         } else if(sample != null && sample.getDataSource().equals(MDA_DS)) {
-            dto.setExternalUrl(MDA_URL);
+            //dto.setExternalUrl(MDA_URL);
             dto.setExternalUrlText(MDA_DS);
         } else if(sample != null && sample.getDataSource().equals(WUSTL_DS)) {
-            dto.setExternalUrl(WUSTL_URL);
+            //dto.setExternalUrl(WUSTL_URL);
             dto.setExternalUrlText(WUSTL_DS);
         } else if(sample != null && sample.getDataSource().equals(WISTAR_DS)) {
-            dto.setExternalUrl(WISTAR_URL);
+            //dto.setExternalUrl(WISTAR_URL);
             dto.setExternalUrlText(WISTAR_DS);
         }
         else if(sample != null && sample.getDataSource().equals("PDMR")) {
-            dto.setExternalUrl(PDMR_URL);
+            //dto.setExternalUrl(PDMR_URL);
             dto.setExternalUrlText(PDMR_URL_TEXT);
         }
         else{
