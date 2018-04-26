@@ -230,8 +230,8 @@ public class SearchService {
         Set<MolecularCharacterization>  molecularCharacterizations = new HashSet<>();
         Set<Platform>  platforms = new HashSet<>();
 
-        if (qa != null && qa.getValidationTechniques() != null) {
-            dto.setTechnology(qa.getValidationTechniques().getTechnique());
+        if (qa != null && qa.getTechnology() != null) {
+            dto.setTechnology(qa.getTechnology());
         }
 
         if (qa != null && qa.getDescription() != null) dto.setDescription(qa.getDescription());
@@ -335,16 +335,16 @@ public class SearchService {
         }
 
         /*
-        if (pdx != null && pdx.getImplantationType() != null) {
-            dto.setSampleType(pdx.getImplantationType().getName());
+        if (pdx != null && pdx.getEngraftmentType() != null) {
+            dto.setSampleType(pdx.getEngraftmentType().getName());
         }
 
         if (pdx != null && pdx.getHostStrain() != null) {
             dto.setStrain(pdx.getHostStrain().getName());
         }
 
-        if (pdx != null && pdx.getImplantationSite() != null) {
-            dto.setEngraftmentSite(pdx.getImplantationSite().getName());
+        if (pdx != null && pdx.getEngraftmentSite() != null) {
+            dto.setEngraftmentSite(pdx.getEngraftmentSite().getName());
         }
         */
         if (pdx != null && pdx.getSourcePdxId() != null) {
@@ -378,16 +378,16 @@ public class SearchService {
 
 
                     //Set implantation site and type
-                    if(s.getImplantationSite() != null){
-                        dto.setEngraftmentSite(s.getImplantationSite().getName());
+                    if(s.getEngraftmentSite() != null){
+                        dto.setEngraftmentSite(s.getEngraftmentSite().getName());
                     }
                     else{
 
                         dto.setEngraftmentSite("Not Specified");
                     }
 
-                    if(s.getImplantationType() != null){
-                        dto.setSampleType(s.getImplantationType().getName());
+                    if(s.getEngraftmentType() != null){
+                        dto.setSampleType(s.getEngraftmentType().getName());
                     }
                     else{
 
