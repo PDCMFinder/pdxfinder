@@ -25,8 +25,8 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "OPTIONAL MATCH (model)-[spr:SPECIMENS]-(sp:Specimen)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
             "OPTIONAL MATCH (model)-[qar:QUALITY_ASSURED_BY]-(qa:QualityAssurance) "+
             "WITH model, spr, sp, hsr, hs, qar, qa " +
-            "OPTIONAL MATCH (sp)-[itr:IMPLANTATION_TYPE]-(it:ImplantationType) "+
-            "OPTIONAL MATCH (sp)-[isr:IMPLANTATION_SITE]-(is:ImplantationSite) "+
+            "OPTIONAL MATCH (sp)-[itr:ENGRAFTMENT_TYPE]-(it:EngraftmentType) "+
+            "OPTIONAL MATCH (sp)-[isr:ENGRAFTMENT_SITE]-(is:EngraftmentSite) "+
             "RETURN model, spr, sp, hsr, hs, itr, isr, it, is, qar, qa")
     ModelCreation findByDataSourceAndSourcePdxId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 

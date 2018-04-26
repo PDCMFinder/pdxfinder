@@ -7,18 +7,18 @@ import org.neo4j.ogm.annotation.NodeEntity;
  * Represents the type of implantation. e.g. Orthotopic, Heterotopic
  */
 @NodeEntity
-public class ImplantationType {
+public class EngraftmentType {
 
     @GraphId
     private Long id;
 
     private String name;
 
-    private ImplantationType() {
+    private EngraftmentType() {
         // Empty constructor required as of Neo4j API 2.0.5
     }
 
-    public ImplantationType(String name) {
+    public EngraftmentType(String name) {
         this.name = name;
     }
 

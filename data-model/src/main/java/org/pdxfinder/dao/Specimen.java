@@ -24,11 +24,11 @@ public class Specimen {
     @Relationship(type = "TREATED_WITH", direction = Relationship.INCOMING)
     private TreatmentProtocol treatmentProtocol;
 
-    @Relationship(type = "IMPLANTATION_SITE")
-    private ImplantationSite implantationSite;
+    @Relationship(type = "ENGRAFTMENT_SITE")
+    private EngraftmentSite engraftmentSite;
 
-    @Relationship(type = "IMPLANTATION_TYPE")
-    private ImplantationType implantationType;
+    @Relationship(type = "ENGRAFTMENT_TYPE")
+    private EngraftmentType engraftmentType;
 
     @Relationship(type = "HOST_STRAIN")
     private HostStrain hostStrain;
@@ -70,20 +70,20 @@ public class Specimen {
         this.treatmentProtocol = treatment;
     }
 
-    public ImplantationSite getImplantationSite() {
-        return implantationSite;
+    public EngraftmentSite getEngraftmentSite() {
+        return engraftmentSite;
     }
 
-    public void setImplantationSite(ImplantationSite implantationSite) {
-        this.implantationSite = implantationSite;
+    public void setEngraftmentSite(EngraftmentSite engraftmentSite) {
+        this.engraftmentSite = engraftmentSite;
     }
 
-    public ImplantationType getImplantationType() {
-        return implantationType;
+    public EngraftmentType getEngraftmentType() {
+        return engraftmentType;
     }
 
-    public void setImplantationType(ImplantationType implantationType) {
-        this.implantationType = implantationType;
+    public void setEngraftmentType(EngraftmentType engraftmentType) {
+        this.engraftmentType = engraftmentType;
     }
 
     public HostStrain getHostStrain() {

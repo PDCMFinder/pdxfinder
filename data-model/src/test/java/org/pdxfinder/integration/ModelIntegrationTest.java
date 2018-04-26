@@ -161,8 +161,8 @@ public class ModelIntegrationTest extends BaseTest {
         /*
         ModelCreation modelCreation = new ModelCreation(
                 modelCreationId,
-                new ImplantationSite(tissueName),
-                new ImplantationType("subcutis"),
+                new EngraftmentSite(tissueName),
+                new EngraftmentType("subcutis"),
                 sample,
                 new HostStrain("TEST_STRAIN"),
                 new QualityAssurance("test", "Test description", ValidationTechniques.VALIDATION));
