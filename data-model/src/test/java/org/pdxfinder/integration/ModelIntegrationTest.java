@@ -136,7 +136,7 @@ public class ModelIntegrationTest extends BaseTest {
 
         MarkerAssociation ma = new MarkerAssociation();
         ma.setMarker(marker);
-        mc.setMarkerAssociations(new HashSet<>(Collections.singletonList(ma)));
+        mc.setMarkerAssociations(Collections.singletonList(ma));
 
         Sample sample = new Sample("sample-1", tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false, externalDataSource.getAbbreviation());
         sampleRepository.save(sample);

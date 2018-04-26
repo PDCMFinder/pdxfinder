@@ -26,10 +26,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -45,6 +42,7 @@ public class LoadJAXData implements CommandLineRunner {
     private final static String JAX_DATASOURCE_NAME = "The Jackson Laboratory";
     private final static String JAX_DATASOURCE_DESCRIPTION = "The Jackson Laboratory PDX mouse models.";
     private final static String DATASOURCE_CONTACT = "http://tumor.informatics.jax.org/mtbwi/pdxRequest.do?mice=";
+    private final static String DATASOURCE_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
 
     private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<scid> Il2rg<tm1Wjl>/SzJ";
@@ -159,6 +157,13 @@ public class LoadJAXData implements CommandLineRunner {
     void createGraphObjects(JSONObject j) throws Exception {
         String id = j.getString("Model ID");
 
+        //Check if model exists in DB
+        ModelCreation existingModel = loaderUtils.findModelByIdAndDataSource(id, JAX_DATASOURCE_ABBREVIATION);
+        //Do not load duplicates
+        if(existingModel != null) {
+            log.error("Skipping existing model "+id);
+            return;}
+
         histologyMap = getHistologyImageMap(id);
 
         // the preference is for clinical diagnosis but if not available use initial diagnosis
@@ -189,7 +194,11 @@ public class LoadJAXData implements CommandLineRunner {
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
         Sample sample = loaderUtils.getSample(j.getString("Model ID"), tumorType, diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, JAX_DATASOURCE_ABBREVIATION);
-        
+
+        List<ExternalUrl> externalUrls = new ArrayList<>();
+        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT+id));
+        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.SOURCE, DATASOURCE_URL+id));
+
         String extraction = j.getString("Sample Type");
         sample.setExtractionMethod(extraction);
 
@@ -221,7 +230,7 @@ public class LoadJAXData implements CommandLineRunner {
         QualityAssurance qa = new QualityAssurance("", qc, ValidationTechniques.FINGERPRINT, qaPassages);
         loaderUtils.saveQualityAssurance(qa);
 
-        ModelCreation mc = loaderUtils.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa);
+        ModelCreation mc = loaderUtils.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa, externalUrls);
         mc.addRelatedSample(sample);
         
         
@@ -300,8 +309,8 @@ public class LoadJAXData implements CommandLineRunner {
 
             passageMap = new HashMap<>();
 
-            HashMap<String, HashMap<String, Set<MarkerAssociation>>> sampleMap = new HashMap<>();
-            HashMap<String, Set<MarkerAssociation>> markerMap = new HashMap<>();
+            HashMap<String, HashMap<String, List<MarkerAssociation>>> sampleMap = new HashMap<>();
+            HashMap<String, List<MarkerAssociation>> markerMap = new HashMap<>();
 
             JSONObject job = new JSONObject(parseURL(this.variationURL + modelCreation.getSourcePdxId()));
             JSONArray jarray = job.getJSONArray("variation");
@@ -383,9 +392,9 @@ public class LoadJAXData implements CommandLineRunner {
                 if (markerMap.containsKey(technology)) {
                     markerMap.get(technology).add(ma);
                 } else {
-                    HashSet<MarkerAssociation> set = new HashSet<>();
-                    set.add(ma);
-                    markerMap.put(technology, set);
+                    List<MarkerAssociation> list = new ArrayList<>();
+                    list.add(ma);
+                    markerMap.put(technology, list);
                 }
 
                 sampleMap.put(sample, markerMap);

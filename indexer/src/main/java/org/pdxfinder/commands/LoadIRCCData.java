@@ -364,7 +364,10 @@ public class LoadIRCCData implements CommandLineRunner {
                 QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT, "");
                 loaderUtils.saveQualityAssurance(qa);
 
-                ModelCreation modelCreation = loaderUtils.createModelCreation(modelId, DS.getAbbreviation(), humanSample, qa);
+                List<ExternalUrl> externalUrls = new ArrayList<>();
+                externalUrls.add( loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
+
+                ModelCreation modelCreation = loaderUtils.createModelCreation(modelId, DS.getAbbreviation(), humanSample, qa, externalUrls);
 
                 // determine whether sample is from human or mouse
                 if (markersMutationMap.containsKey(sampleId)) {
@@ -396,7 +399,7 @@ public class LoadIRCCData implements CommandLineRunner {
                             if (humanSample.getMolecularCharacterizations() == null) {
 
                                 mc = new MolecularCharacterization(mutation.getPlatform());
-                                Set<MarkerAssociation> mas = new HashSet<>();
+                                List<MarkerAssociation> mas = new ArrayList<>();
                                 mas.add(ma);
                                 mc.setMarkerAssociations(mas);
                                 Set<MolecularCharacterization> mcs = new HashSet<>();
@@ -414,7 +417,7 @@ public class LoadIRCCData implements CommandLineRunner {
 
                                 if (mc == null) {
                                     mc = new MolecularCharacterization(mutation.getPlatform());
-                                    mc.setMarkerAssociations(new HashSet<>());
+                                    mc.setMarkerAssociations(new ArrayList<>());
                                     humanSample.getMolecularCharacterizations().add(mc);
                                 }
 
@@ -437,9 +440,9 @@ public class LoadIRCCData implements CommandLineRunner {
                                 mouseSample.setSourceSampleId(mutation.getSampleId());
 
                                 mc = new MolecularCharacterization(mutation.getPlatform());
-                                Set<MarkerAssociation> mas = new HashSet<>();
-                                mas.add(ma);
-                                mc.setMarkerAssociations(mas);
+                                List<MarkerAssociation> list = new ArrayList<>();
+                                list.add(ma);
+                                mc.setMarkerAssociations(list);
                                 Set<MolecularCharacterization> mcs = new HashSet<>();
                                 mcs.add(mc);
                                 mouseSample.setMolecularCharacterizations(mcs);
@@ -452,9 +455,9 @@ public class LoadIRCCData implements CommandLineRunner {
                                     // no molchars on the mouse sample, create one
 
                                     mc = new MolecularCharacterization(mutation.getPlatform());
-                                    Set<MarkerAssociation> mas = new HashSet<>();
-                                    mas.add(ma);
-                                    mc.setMarkerAssociations(mas);
+                                    List<MarkerAssociation> list = new ArrayList<>();
+                                    list.add(ma);
+                                    mc.setMarkerAssociations(list);
                                     Set<MolecularCharacterization> mcs = new HashSet<>();
                                     mcs.add(mc);
                                     mouseSample.setMolecularCharacterizations(mcs);
@@ -473,7 +476,7 @@ public class LoadIRCCData implements CommandLineRunner {
                                     // if that technology wasn't used before, add it
                                     if (mc == null) {
                                         mc = new MolecularCharacterization(mutation.getPlatform());
-                                        mc.setMarkerAssociations(new HashSet<>());
+                                        mc.setMarkerAssociations(new ArrayList<>());
                                         mouseSample.getMolecularCharacterizations().add(mc);
                                     }
 
