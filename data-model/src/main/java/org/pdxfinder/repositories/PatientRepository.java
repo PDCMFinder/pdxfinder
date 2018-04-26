@@ -14,8 +14,6 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
 
     Set<Patient> findBySex(String sex);
 
-    Set<Patient> findBySexAndSnapshotsAge(String sex, String age);
-
     Patient findByExternalId(String externalId);
 
     @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +

@@ -53,7 +53,7 @@ public class CreateBaseCommand implements CommandLineRunner {
         log.info("Setting up CreateBaseCommand option");
     }
 
-    public CreateBaseCommand(TumorTypeRepository tumorTypeRepository, HostStrainRepository hostStrainRepository, EngraftmentSiteRepository engraftmentSiteRepository, EngraftmentTypeRepository engraftmentTypeRepository) {
+    public CreateBaseCommand(TumorTypeRepository tumorTypeRepository, HostStrainRepository hostStrainRepository, EngraftmentSiteRepository engraftmentSiteRepository, EngraftmentTypeRepository engraftmentTypeRepository, Session session) {
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository is null");
         Assert.notNull(hostStrainRepository, "hostStrainRepository is null");
         Assert.notNull(engraftmentSiteRepository, "implantationSiteRepository is null");
