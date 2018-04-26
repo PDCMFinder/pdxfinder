@@ -21,6 +21,10 @@ public class PatientSnapshot {
     private String dateAtCollection;
     private Boolean treatmentNaive;
 
+    private String collectionEvent;
+    private int ellapsedTime;
+    private String eventType;
+
     @Relationship(type = "SAMPLED_FROM")
     private Set<Sample> samples;
 
@@ -138,5 +142,29 @@ public class PatientSnapshot {
 
     public void setTreatmentSummary(TreatmentSummary treatmentSummary) {
         this.treatmentSummary = treatmentSummary;
+    }
+
+    public String getCollectionEvent() {
+        return collectionEvent;
+    }
+
+    public void setCollectionEvent(String collectionEvent) {
+        this.collectionEvent = collectionEvent;
+    }
+
+    public int getEllapsedTime() {
+        return ellapsedTime;
+    }
+
+    public void setEllapsedTime(int ellapsedTime) {
+        this.ellapsedTime = ellapsedTime;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 }
