@@ -210,10 +210,8 @@ public class LoadJAXData implements CommandLineRunner {
 
         }
 
-        
         String qaPassages = Standardizer.NOT_SPECIFIED;
-        
-        
+
         pSnap.addSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
         
@@ -225,17 +223,13 @@ public class LoadJAXData implements CommandLineRunner {
             qc = "QC is "+qc;
         }
         
-        
         // the validation techniques are more than just fingerprint, we don't have a way to capture that
         QualityAssurance qa = new QualityAssurance("Fingerprint", qc, qaPassages);
         loaderUtils.saveQualityAssurance(qa);
 
         ModelCreation mc = loaderUtils.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa, externalUrls);
         mc.addRelatedSample(sample);
-        
-        
-        
-        
+
         String implantationTypeStr = Standardizer.NOT_SPECIFIED;
         String implantationSiteStr = j.getString("Engraftment Site");
 
@@ -245,13 +239,11 @@ public class LoadJAXData implements CommandLineRunner {
         EngraftmentType engraftmentType = loaderUtils.getImplantationType(implantationTypeStr);
         specimen.setEngraftmentSite(engraftmentSite);
         specimen.setEngraftmentType(engraftmentType);
-        
-        
+
         mc.addSpecimen(specimen);
 
         //Create Treatment summary without linking TreatmentProtocols to specimens
         TreatmentSummary ts;
-
 
         try{
             if(j.has("Treatments")){
@@ -366,7 +358,6 @@ public class LoadJAXData implements CommandLineRunner {
 
                 Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
 
-
                 if(technology.equals("Truseq_JAX")){
                     platform = loaderUtils.getPlatform(technology, this.jaxDS, TRUSEQ_PLATFORM_URL);
                 }
@@ -378,10 +369,6 @@ public class LoadJAXData implements CommandLineRunner {
                 }
 
                 platform.setExternalDataSource(jaxDS);
-
-                //loaderUtils.savePlatform(platform);
-                //loaderUtils.createPlatformAssociation(platform, marker);
-                
 
                 markerMap = sampleMap.get(sample);
                 if (markerMap == null) {
