@@ -18,7 +18,7 @@ public class DetailsDTO {
     private String dataSource;
     private String patientId;
     private String gender;
-    private String age;
+    private String ageAtCollection;
     private String race;
     private String ethnicity;
 
@@ -59,7 +59,7 @@ public class DetailsDTO {
         this.dataSource = "";
         this.patientId = "";
         this.gender = "";
-        this.age = "";
+        this.ageAtCollection = "";
         this.race = "";
         this.ethnicity = "";
 
@@ -128,12 +128,12 @@ public class DetailsDTO {
         this.gender = gender;
     }
 
-    public String getAge() {
-        return age;
+    public String getAgeAtCollection() {
+        return ageAtCollection;
     }
 
-    public void setAge(String age) {
-        this.age = age;
+    public void setAgeAtCollection(String ageAtCollection) {
+        this.ageAtCollection = ageAtCollection;
     }
 
     public String getRace() {

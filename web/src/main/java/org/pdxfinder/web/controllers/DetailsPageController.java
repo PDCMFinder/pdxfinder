@@ -116,7 +116,7 @@ public class DetailsPageController {
         model.addAttribute("dataSource", dto.getDataSource());
         model.addAttribute("patientId", dto.getPatientId());
         model.addAttribute("gender", dto.getGender());
-        model.addAttribute("age", dto.getAge());
+        model.addAttribute("age", dto.getAgeAtCollection());
         model.addAttribute("race", dto.getRace());
         model.addAttribute("ethnicity", dto.getEthnicity());
         model.addAttribute("diagnosis", dto.getDiagnosis());

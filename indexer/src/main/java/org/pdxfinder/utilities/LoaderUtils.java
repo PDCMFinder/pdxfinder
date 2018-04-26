@@ -224,7 +224,7 @@ public class LoaderUtils {
         Set<PatientSnapshot> pSnaps = patientSnapshotRepository.findByPatient(patient.getExternalId());
         loop:
         for (PatientSnapshot ps : pSnaps) {
-            if (ps.getAge().equals(age)) {
+            if (ps.getAgeAtCollection().equals(age)) {
                 patientSnapshot = ps;
                 break loop;
             }

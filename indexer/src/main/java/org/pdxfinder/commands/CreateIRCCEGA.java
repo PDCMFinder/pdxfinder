@@ -129,7 +129,7 @@ public class CreateIRCCEGA implements CommandLineRunner {
 
             if(ps != null){
 
-                row.setAge(ps.getAge());
+                row.setAge(ps.getAgeAtCollection());
                 if(ps.getPatient()!= null){
                     row.setSex(ps.getPatient().getSex());
                     row.setEthnicity(ps.getPatient().getEthnicity());

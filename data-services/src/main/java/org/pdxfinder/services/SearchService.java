@@ -296,8 +296,8 @@ public class SearchService {
 
         if (ps != null) {
             for (PatientSnapshot patientSnapshots : ps) {
-                if (patientSnapshots != null && patientSnapshots.getAge() != null) {
-                    dto.setAge(patientSnapshots.getAge());
+                if (patientSnapshots != null && patientSnapshots.getAgeAtCollection() != null) {
+                    dto.setAgeAtCollection(patientSnapshots.getAgeAtCollection());
                 }
             }
 
