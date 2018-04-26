@@ -339,7 +339,7 @@ public class ValidateIRCCData implements CommandLineRunner {
                 pSnap.addSample(sample);
                 loaderUtils.savePatientSnapshot(pSnap);
 
-                QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT, null);
+                QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", null);
                 loaderUtils.saveQualityAssurance(qa);
 
 
