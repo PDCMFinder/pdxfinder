@@ -2,12 +2,7 @@ package org.pdxfinder.commands;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONException;
-import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
-import org.pdxfinder.dao.Sample;
-import org.pdxfinder.dao.SampleToOntologyRelationShip;
 import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

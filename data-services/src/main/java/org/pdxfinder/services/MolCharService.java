@@ -4,18 +4,12 @@ package org.pdxfinder.services;
  * Created by csaba on 06/03/2018.
  */
 
-import org.neo4j.cypher.internal.frontend.v2_3.ast.functions.Str;
 import org.pdxfinder.dao.DataProjection;
-import org.pdxfinder.dao.Marker;
-import org.pdxfinder.dao.MarkerAssociation;
-import org.pdxfinder.dao.MolecularCharacterization;
 import org.pdxfinder.repositories.DataProjectionRepository;
 import org.pdxfinder.repositories.MarkerAssociationRepository;
 import org.pdxfinder.repositories.MarkerRepository;
 import org.pdxfinder.repositories.MolecularCharacterizationRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 /**
  *

@@ -2,8 +2,8 @@ package org.pdxfinder.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pdxfinder.transcommands.DataTransformerService;
-import org.pdxfinder.transdatamodel.PdxInfo;
 import org.pdxfinder.transdatamodel.PdmrPdxInfo;
+import org.pdxfinder.transdatamodel.PdxInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

@@ -2,7 +2,6 @@ package org.pdxfinder.web.controllers;
 
 import org.pdxfinder.services.PlatformService;
 import org.pdxfinder.services.dto.DataAvailableDTO;
-import org.pdxfinder.services.dto.PlatformDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
