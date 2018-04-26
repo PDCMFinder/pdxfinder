@@ -185,7 +185,7 @@ public class LoadIRCC implements CommandLineRunner {
         QualityAssurance qa = new QualityAssurance();
 
         if ("TRUE".equals(job.getString("Fingerprinting").toUpperCase())) {
-            qa.setValidationTechniques(ValidationTechniques.FINGERPRINT);
+            qa.setTechnology("Fingerprint");
             qa.setDescription(FINGERPRINT_DESCRIPTION);
 
             // If the model includes which passages have had QA performed, set the passages on the QA node
@@ -223,11 +223,11 @@ public class LoadIRCC implements CommandLineRunner {
 
             specimen.setHostStrain(this.nsgBS);
 
-            ImplantationSite is = loaderUtils.getImplantationSite(specimenJSON.getString("Engraftment Site"));
-            specimen.setImplantationSite(is);
+            EngraftmentSite is = loaderUtils.getImplantationSite(specimenJSON.getString("Engraftment Site"));
+            specimen.setEngraftmentSite(is);
 
-            ImplantationType it = loaderUtils.getImplantationType(specimenJSON.getString("Engraftment Type"));
-            specimen.setImplantationType(it);
+            EngraftmentType it = loaderUtils.getImplantationType(specimenJSON.getString("Engraftment Type"));
+            specimen.setEngraftmentType(it);
 
             /*
             

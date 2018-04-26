@@ -33,8 +33,8 @@ public class LoaderUtils {
     
     private TumorTypeRepository tumorTypeRepository;
     private HostStrainRepository hostStrainRepository;
-    private ImplantationTypeRepository implantationTypeRepository;
-    private ImplantationSiteRepository implantationSiteRepository;
+    private EngraftmentTypeRepository engraftmentTypeRepository;
+    private EngraftmentSiteRepository engraftmentSiteRepository;
     private ExternalDataSourceRepository externalDataSourceRepository;
     private PatientRepository patientRepository;
     private ModelCreationRepository modelCreationRepository;
@@ -44,7 +44,7 @@ public class LoaderUtils {
     private MarkerRepository markerRepository;
     private MarkerAssociationRepository markerAssociationRepository;
     private MolecularCharacterizationRepository molecularCharacterizationRepository;
-    private PdxPassageRepository pdxPassageRepository;
+
     private QualityAssuranceRepository qualityAssuranceRepository;
     private OntologyTermRepository ontologyTermRepository;
     private SpecimenRepository specimenRepository;
@@ -58,8 +58,8 @@ public class LoaderUtils {
 
     public LoaderUtils(TumorTypeRepository tumorTypeRepository,
                        HostStrainRepository hostStrainRepository,
-                       ImplantationTypeRepository implantationTypeRepository,
-                       ImplantationSiteRepository implantationSiteRepository,
+                       EngraftmentTypeRepository engraftmentTypeRepository,
+                       EngraftmentSiteRepository engraftmentSiteRepository,
                        ExternalDataSourceRepository externalDataSourceRepository,
                        PatientRepository patientRepository,
                        ModelCreationRepository modelCreationRepository,
@@ -69,7 +69,6 @@ public class LoaderUtils {
                        MarkerRepository markerRepository,
                        MarkerAssociationRepository markerAssociationRepository,
                        MolecularCharacterizationRepository molecularCharacterizationRepository,
-                       PdxPassageRepository pdxPassageRepository,
                        QualityAssuranceRepository qualityAssuranceRepository,
                        OntologyTermRepository ontologyTermRepository,
                        SpecimenRepository specimenRepository,
@@ -81,8 +80,8 @@ public class LoaderUtils {
 
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null");
         Assert.notNull(hostStrainRepository, "hostStrainRepository cannot be null");
-        Assert.notNull(implantationTypeRepository, "implantationTypeRepository cannot be null");
-        Assert.notNull(implantationSiteRepository, "implantationSiteRepository cannot be null");
+        Assert.notNull(engraftmentTypeRepository, "implantationTypeRepository cannot be null");
+        Assert.notNull(engraftmentSiteRepository, "implantationSiteRepository cannot be null");
         Assert.notNull(externalDataSourceRepository, "externalDataSourceRepository cannot be null");
         Assert.notNull(patientRepository, "patientRepository cannot be null");
         Assert.notNull(modelCreationRepository, "modelCreationRepository cannot be null");
@@ -96,8 +95,8 @@ public class LoaderUtils {
 
         this.tumorTypeRepository = tumorTypeRepository;
         this.hostStrainRepository = hostStrainRepository;
-        this.implantationTypeRepository = implantationTypeRepository;
-        this.implantationSiteRepository = implantationSiteRepository;
+        this.engraftmentTypeRepository = engraftmentTypeRepository;
+        this.engraftmentSiteRepository = engraftmentSiteRepository;
         this.externalDataSourceRepository = externalDataSourceRepository;
         this.patientRepository = patientRepository;
         this.modelCreationRepository = modelCreationRepository;
@@ -107,7 +106,6 @@ public class LoaderUtils {
         this.markerRepository = markerRepository;
         this.markerAssociationRepository = markerAssociationRepository;
         this.molecularCharacterizationRepository = molecularCharacterizationRepository;
-        this.pdxPassageRepository = pdxPassageRepository;
         this.qualityAssuranceRepository = qualityAssuranceRepository;
         this.ontologyTermRepository = ontologyTermRepository;
         this.specimenRepository = specimenRepository;
@@ -353,23 +351,23 @@ public class LoaderUtils {
         sampleRepository.save(sample);
     }
 
-    public ImplantationSite getImplantationSite(String iSite) {
-        ImplantationSite site = implantationSiteRepository.findByName(iSite);
+    public EngraftmentSite getImplantationSite(String iSite) {
+        EngraftmentSite site = engraftmentSiteRepository.findByName(iSite);
         if (site == null) {
             log.info("Implantation Site '{}' not found. Creating.", iSite);
-            site = new ImplantationSite(iSite);
-            implantationSiteRepository.save(site);
+            site = new EngraftmentSite(iSite);
+            engraftmentSiteRepository.save(site);
         }
 
         return site;
     }
 
-    public ImplantationType getImplantationType(String iType) {
-        ImplantationType type = implantationTypeRepository.findByName(iType);
+    public EngraftmentType getImplantationType(String iType) {
+        EngraftmentType type = engraftmentTypeRepository.findByName(iType);
         if (type == null) {
             log.info("Implantation Site '{}' not found. Creating.", iType);
-            type = new ImplantationType(iType);
-            implantationTypeRepository.save(type);
+            type = new EngraftmentType(iType);
+            engraftmentTypeRepository.save(type);
         }
 
         return type;
@@ -478,7 +476,7 @@ public class LoaderUtils {
 
     public void saveQualityAssurance(QualityAssurance qa) {
         if (qa != null) {
-            if (null == qualityAssuranceRepository.findFirstByTechnologyAndDescriptionAndValidationTechniques(qa.getTechnology(), qa.getDescription(), qa.getValidationTechniques())) {
+            if (null == qualityAssuranceRepository.findFirstByTechnologyAndDescription(qa.getTechnology(), qa.getDescription())) {
                 qualityAssuranceRepository.save(qa);
             }
         }
@@ -488,24 +486,7 @@ public class LoaderUtils {
 
         return molecularCharacterizationRepository.getAllByType(type);
     }
-    
-    public void savePdxPassage(PdxPassage pdxPassage){
-        pdxPassageRepository.save(pdxPassage);
-    }
 
-
-    public PdxPassage getPassage(ModelCreation model, String dataSource, int passage){
-
-        PdxPassage pass = pdxPassageRepository.findByPassageAndModelIdAndDataSource(passage, model.getSourcePdxId(), dataSource);
-
-        if(pass == null){
-            pass = new PdxPassage(model, passage);
-            pdxPassageRepository.save(pass);
-
-        }
-
-        return pass;
-    }
     
     public Specimen getSpecimen(String id){
         Specimen specimen = specimenRepository.findByExternalId(id);

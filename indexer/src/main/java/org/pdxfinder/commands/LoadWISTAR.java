@@ -175,7 +175,7 @@ public class LoadWISTAR implements CommandLineRunner {
         String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
 
         QualityAssurance qa = new QualityAssurance(qaType,
-                NOT_SPECIFIED, ValidationTechniques.NOT_SPECIFIED, qaPassage);
+                NOT_SPECIFIED, qaPassage);
         loaderUtils.saveQualityAssurance(qa);
 
         String strain = j.getString("Strain");
@@ -193,11 +193,11 @@ public class LoadWISTAR implements CommandLineRunner {
 
         specimen.setHostStrain(bs);
 
-        ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
-        specimen.setImplantationSite(is);
+        EngraftmentSite is = loaderUtils.getImplantationSite(engraftmentSite);
+        specimen.setEngraftmentSite(is);
 
-        ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
-        specimen.setImplantationType(it);
+        EngraftmentType it = loaderUtils.getImplantationType(tumorPrep);
+        specimen.setEngraftmentType(it);
 
         specimen.setSample(sample);
 

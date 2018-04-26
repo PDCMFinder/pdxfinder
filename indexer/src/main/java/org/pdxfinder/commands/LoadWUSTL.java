@@ -164,7 +164,7 @@ public class LoadWUSTL implements CommandLineRunner {
         String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
 
         QualityAssurance qa = new QualityAssurance(qaType,
-                NOT_SPECIFIED, ValidationTechniques.NOT_SPECIFIED, qaPassage);
+                NOT_SPECIFIED, qaPassage);
         loaderUtils.saveQualityAssurance(qa);
         String strain = j.getString("Strain");
         HostStrain bs = loaderUtils.getHostStrain(strain, strain, "", "");
@@ -242,11 +242,11 @@ public class LoadWUSTL implements CommandLineRunner {
                     engraftmentSite = parts[1].trim();
                     tumorPrep = parts[0].trim();
                 }
-                ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
-                specimen.setImplantationSite(is);
+                EngraftmentSite is = loaderUtils.getEngraftmentSite(engraftmentSite);
+                specimen.setEngraftmentSite(is);
 
-                ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
-                specimen.setImplantationType(it);
+                EngraftmentType it = loaderUtils.getEngraftmentType(tumorPrep);
+                specimen.setEngraftmentType(it);
 
                 modelCreation.addSpecimen(specimen);
 
@@ -287,11 +287,11 @@ public class LoadWUSTL implements CommandLineRunner {
                 engraftmentSite = parts[1].trim();
                 tumorPrep = parts[0].trim();
             }
-            ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
-            specimen.setImplantationSite(is);
+            EngraftmentSite is = loaderUtils.getImplantationSite(engraftmentSite);
+            specimen.setEngraftmentSite(is);
 
-            ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
-            specimen.setImplantationType(it);
+            EngraftmentType it = loaderUtils.getImplantationType(tumorPrep);
+            specimen.setEngraftmentType(it);
 
             modelCreation.addSpecimen(specimen);
 

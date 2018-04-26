@@ -394,8 +394,8 @@ public class CreateDataProjections implements CommandLineRunner{
                 for (Specimen s: specimens){
                     hoststrains.add(s.getHostStrain().getName());
 
-                    mfq.setModelImplantationSite(s.getImplantationSite().getName());
-                    mfq.setModelImplantationType(s.getImplantationType().getName());
+                    mfq.setModelImplantationSite(s.getEngraftmentSite().getName());
+                    mfq.setModelImplantationType(s.getEngraftmentType().getName());
                 }
                 //Specimen s = specimens.iterator().next();
                 mfq.setModelHostStrain(hoststrains);
