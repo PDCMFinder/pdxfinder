@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface QualityAssuranceRepository extends Neo4jRepository<QualityAssurance, Long> {
 
-    QualityAssurance findFirstByTechnologyAndDescriptionAndValidationTechniques(@Param("technology") String technology, @Param("description") String description, @Param("technique") ValidationTechniques technique);
+    QualityAssurance findFirstByTechnologyAndDescription(@Param("technology") String technology, @Param("description") String description);
 
 }
