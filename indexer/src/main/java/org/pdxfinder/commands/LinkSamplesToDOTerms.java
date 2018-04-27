@@ -64,59 +64,7 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
 
 
     private void mapSamplesToTerms(){
-/*
-        System.out.println("Getting data from "+spreadsheetServiceUrl);
 
-        String json = parseURL(spreadsheetServiceUrl);
-
-        try {
-            JSONObject job = new JSONObject(json);
-            if (job.has("rows")){
-                JSONArray rows = job.getJSONArray("rows");
-
-                int errorCounter = 0;
-                int mapCounter = 0;
-
-                for(int i=0;i<rows.length();i++){
-                    JSONObject row = rows.getJSONObject(i);
-                    String sampleId = row.getString("sampleid");
-                    String doLabel = row.getString("dolabel");
-                    String type = row.getString("type");
-                    String justification = row.getString("justification");
-
-                    //Sample sample = loaderUtils.getSampleBySourceSampleId(sampleId);
-                    OntologyTerm term = loaderUtils.getOntologyTermByLabel(doLabel.toLowerCase());
-
-                    if(sample != null && term != null){
-
-                        SampleToOntologyRelationShip r = new SampleToOntologyRelationShip(type, justification, sample, term);
-                        sample.setSampleToOntologyRelationShip(r);
-                        term.setMappedTo(r);
-
-                        term.setDirectMappedSamplesNumber(term.getDirectMappedSamplesNumber() + 1);
-
-                        loaderUtils.saveSample(sample);
-                        loaderUtils.saveOntologyTerm(term);
-                        mapCounter++;
-                        //System.out.println("DONE "+sampleId+" "+doLabel);
-                    }
-                    else{
-                        errorCounter++;
-                        System.out.println("ERROR "+sampleId+" "+doLabel);
-                    }
-
-                }
-
-                System.out.println("Links created: "+mapCounter);
-                System.out.println("Mapping errors: "+errorCounter);
-            }
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-*/
     }
 
     private void updateIndirectMappingData() {

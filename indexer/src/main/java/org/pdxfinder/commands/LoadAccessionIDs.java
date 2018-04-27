@@ -161,23 +161,6 @@ public class LoadAccessionIDs implements CommandLineRunner {
 
                         System.out.println(symbol+" "+hgncId+" "+entrezId+" "+ ensemblId);
                         hmap.put(symbol,ad);
-                        /*
-                        if(rowData.length>2 && !rowData[2].isEmpty()){
-                            prevSymbols = rowData[2].split(",");
-
-                                for(int i=0;i<prevSymbols.length;i++){
-                                    if(hmap.containsKey(prevSymbols[i].trim())){
-                                        symbolConflicts++;
-                                        symbolConf = prevSymbols[i];
-                                        //break;
-                                    }
-                                    else{
-                                        hmap.put(prevSymbols[i].trim(),ad);
-                                    }
-                                }
-                        }
-                        */
-
 
                     }
                     rows++;
