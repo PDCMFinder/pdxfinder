@@ -34,7 +34,8 @@ import javax.persistence.*;
         "Strain",
         "Mouse Sex",
         "Treatment Naive",
-        "Engraftment Site"
+        "Engraftment Site",
+        "Source url"
 })
 public class PdmrPdxInfo {
 
@@ -62,13 +63,14 @@ public class PdmrPdxInfo {
     private String mouseSex;
     private String treatmentNaive;
     private String engraftmentSite;
+    private String sourceUrl;
 
     public PdmrPdxInfo() {
     }
 
     public PdmrPdxInfo(String modelID, String patientID, String gender, String age, String race, String ethnicity, String specimenSite,
                        String primarySite, String initialDiagnosis, String clinicalDiagnosis, String tumorType, String grades, String tumorStage,
-                       String sampleType, String strain, String mouseSex, String treatmentNaive, String engraftmentSite) {
+                       String sampleType, String strain, String mouseSex, String treatmentNaive, String engraftmentSite,String sourceUrl) {
         this.modelID = modelID;
         this.patientID = patientID;
         this.gender = gender;
@@ -87,6 +89,7 @@ public class PdmrPdxInfo {
         this.mouseSex = mouseSex;
         this.treatmentNaive = treatmentNaive;
         this.engraftmentSite = engraftmentSite;
+        this.sourceUrl = sourceUrl;
     }
 
     @JsonProperty("Model ID")
@@ -269,6 +272,15 @@ public class PdmrPdxInfo {
         this.engraftmentSite = engraftmentSite;
     }
 
+    @JsonProperty("Source url")
+    public String getSourceUrl() {
+        return sourceUrl;
+    }
+
+    @JsonProperty("Source url")
+    public void setSourceUrl(String sourceUrl) {
+        this.sourceUrl = sourceUrl;
+    }
 
 
 

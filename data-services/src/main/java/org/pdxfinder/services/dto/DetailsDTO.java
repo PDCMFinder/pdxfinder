@@ -49,7 +49,7 @@ public class DetailsDTO {
     private List<Specimen> specimens;
     private Set<Platform> platforms;
     private Set<MolecularCharacterization>  molecularCharacterizations;
-    private Set< Set<MarkerAssociation> > markerAssociations;
+    private Set< List<MarkerAssociation> > markerAssociations;
     private int totalPages;
     private int variationDataCount;
 
@@ -272,11 +272,11 @@ public class DetailsDTO {
         this.platforms = platforms;
     }
 
-    public Set< Set<MarkerAssociation> > getMarkerAssociations() {
+    public Set< List<MarkerAssociation> > getMarkerAssociations() {
         return markerAssociations;
     }
 
-    public void setMarkerAssociations(Set< Set<MarkerAssociation> > markerAssociations) {
+    public void setMarkerAssociations(Set< List<MarkerAssociation> > markerAssociations) {
         this.markerAssociations = markerAssociations;
     }
 

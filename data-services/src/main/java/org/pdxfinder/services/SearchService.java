@@ -7,6 +7,10 @@ import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -187,14 +191,15 @@ public class SearchService {
 
         QualityAssurance qa = pdx.getQualityAssurance();
 
-        int skip = page * size;
+        int start = page;
+        Pageable pageable = new PageRequest(start,size);
+        Page<Specimen> specimens = null;
         int totalRecords = 0;
-        Set<Specimen> specimens = new HashSet<>();
 
 
         totalRecords = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,passage,searchFilter);
 
-        specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchFilter,skip,size);
+        specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchFilter,pageable);
 
 
         DetailsDTO dto = new DetailsDTO();
@@ -220,7 +225,7 @@ public class SearchService {
                         this.engraftmentSite = "";
                          */
 
-        Set< Set<MarkerAssociation> > markerAssociatonSet = new HashSet<>();
+        Set< List<MarkerAssociation> > markerAssociatonSet = new HashSet<>();
         List<Specimen> specimenList = new ArrayList<>();
         Set<MolecularCharacterization>  molecularCharacterizations = new HashSet<>();
         Set<Platform>  platforms = new HashSet<>();
@@ -557,7 +562,7 @@ public class SearchService {
          */
         ModelCreation model = modelCreationRepository.findVariationBySourcePdxIdAndPlatform(dataSource,modelId,technology,searchParam,start,size);
         VariationDataDTO variationDataDTO = new VariationDataDTO();
-        List<String[]> variationData = new ArrayList();
+        List<String[]> variationData = new ArrayList<>();
 
         if (model != null && model.getSample() != null ) {
 
@@ -576,6 +581,14 @@ public class SearchService {
 
     public VariationDataDTO variationDataByPlatform(String dataSource, String modelId, String technology,String passage, int start, int size,
                                                     String searchParam, int draw, String sortColumn, String sortDir) {
+
+        /**
+         * Set the Pagination parameters: start comes in as 0,10,20 e.t.c while pageable works in page batches 0,1,2,...
+         */
+        Sort.Direction direction = getSortDirection(sortDir);
+        Pageable pageable = new PageRequest(start,size, direction,sortColumn);
+
+
         /**
          * 1st count all the records and set Total Records & Initialize Filtered Record as Total record
          */
@@ -594,7 +607,7 @@ public class SearchService {
         /**
          * Retrieve the Records based on search parameter
          */
-        Set<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchParam,start,size);
+        Page<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource,modelId,technology,passage,searchParam,pageable);
         VariationDataDTO variationDataDTO = new VariationDataDTO();
         List<String[]> variationData = new ArrayList();
 
@@ -652,7 +665,7 @@ public class SearchService {
 
     public List<String[]> buildUpDTO(Sample sample,String passage,int draw,int recordsTotal,int recordsFiltered){
 
-        List<String[]> variationData = new ArrayList();
+        List<String[]> variationData = new LinkedList<>();
 
         /**
          * Generate an equivalent 2-D array type of the Retrieved result Set, the Front end table must be a 2D JSON Array
@@ -677,24 +690,57 @@ public class SearchService {
                     markerAssocArray[7] = markerAssoc.getAminoAcidChange();
                     markerAssocArray[8] = markerAssoc.getReadDepth();
                     markerAssocArray[9] = markerAssoc.getAlleleFrequency();
-                    markerAssocArray[10 ] = markerAssoc.getRsVariants();
+                    markerAssocArray[10] = markerAssoc.getRsVariants();
                     markerAssocArray[11] = dMolChar.getPlatform().getName();
                     markerAssocArray[12] = passage;
                     //markerAssocArray[13] = sample.getDiagnosis();
                    // markerAssocArray[14] = sample.getType().getName();
 
                     variationData.add(markerAssocArray);
+
                 }
             }
+
+
         }catch (Exception e) { }
+
+//        int sortNum = 6;
+//        Collections.sort(variationData, new Comparator < String[] > () {
+//            public int compare(String[] x1, String[] x2) {
+//                if (x1.length > sortNum && x2.length > sortNum) {
+//                    return x2[sortNum].compareTo(x1[sortNum]);
+//                }
+//                if (x1.length > sortNum) {
+//                    return 1;
+//                }
+//                if (x2.length > sortNum) {
+//                    return -1;
+//                }
+//                return x2.length - x1.length;
+//            }
+//        });
 
         return variationData;
     }
 
 
 
+    public Sort.Direction getSortDirection(String sortDir){
+
+        Sort.Direction direction = Sort.Direction.ASC;
+
+        if (sortDir.equals("desc")){
+            direction = Sort.Direction.DESC;
+        }
+
+        return direction;
+    }
+
 
 
 
 
 }
+
+
+

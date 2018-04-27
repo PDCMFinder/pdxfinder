@@ -24,6 +24,8 @@ import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Load models from WISTAR
@@ -161,6 +163,9 @@ public class LoadWISTAR implements CommandLineRunner {
         loaderUtils.saveSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
 
+        List<ExternalUrl> externalUrls = new ArrayList<>();
+        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.SOURCE, DATASOURCE_CONTACT));
+
         String qaType = NOT_SPECIFIED;
         try {
             qaType = j.getString("QA") + "on passage " + j.getString("QA Passage");
@@ -180,7 +185,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
         String tumorPrep = Standardizer.getValue("Tumor Prep", j);
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, wistarDS.getAbbreviation(), sample, qa);
+        ModelCreation modelCreation = loaderUtils.createModelCreation(id, wistarDS.getAbbreviation(), sample, qa, externalUrls);
         modelCreation.addRelatedSample(sample);
 
         Specimen specimen = loaderUtils.getSpecimen(modelCreation,

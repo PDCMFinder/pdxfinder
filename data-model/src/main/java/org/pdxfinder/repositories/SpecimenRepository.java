@@ -1,13 +1,14 @@
 package org.pdxfinder.repositories;
 
 import org.pdxfinder.dao.Specimen;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by jmason on 08/06/2017.
@@ -48,14 +49,12 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
             "            OR toLower(tech.name) CONTAINS toLower({search})" +
             "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) ) ) " +
 
-            "            RETURN spec, sp, sfrm,msamp, char,molchar, assoc,mAss, aw,m,pl,tech SKIP {skip} LIMIT {lim} ")
-    Set<Specimen> findSpecimenBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
-                                                       @Param("modelId") String modelId,
-                                                       @Param("tech") String tech,
-                                                       @Param("passage") String passage,
-                                                       @Param("search") String search,
-                                                       @Param("skip") int skip,
-                                                       @Param("lim") int lim);
+            "            RETURN spec, sp, sfrm,msamp, char,molchar, assoc,mAss, aw,m,pl,tech ")
+    Page<Specimen> findSpecimenBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
+                                                        @Param("modelId") String modelId,
+                                                        @Param("tech") String tech,
+                                                        @Param("passage") String passage,
+                                                        @Param("search") String search, Pageable pageable);
 
 
 
@@ -71,8 +70,8 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
             "            RETURN spec, sfrm,msamp, char,molchar,pl,tech ")
     List<Specimen> findSpecimenBySourcePdxIdAndPlatform2(@Param("dataSource") String dataSource,
-                                                         @Param("modelId") String modelId,
-                                                         @Param("tech") String tech);
+                                                        @Param("modelId") String modelId,
+                                                        @Param("tech") String tech);
 
 
 

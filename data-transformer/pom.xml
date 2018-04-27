@@ -18,10 +18,10 @@
 
 <dependencies>
 
-    <dependency>
+    <!--<dependency>
         <groupId>org.pdxfinder</groupId>
         <artifactId>data-services</artifactId>
-    </dependency>
+    </dependency>-->
 
     <dependency>
         <groupId>commons-cli</groupId>

@@ -71,7 +71,7 @@ public class DetailsPageController {
 
             // Retrieve variation data by technology and passage
             for (String passage : passages){
-                VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,passage,viewPage,viewSize,"",1,"","");
+                VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,tech,passage,viewPage,viewSize,"",1,"mAss.seqPosition","");
                 variationDataDTOList.add(variationDataDTO);
 
                 // Aggregate sampleIds for this Technology and passage in a Set<String>, to remove duplicates
@@ -214,7 +214,7 @@ public class DetailsPageController {
         }
 
         // Retreive all Genomic Datasets
-        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,"","",0,50000,nil,1,nil,nil);
+        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,"","",0,50000,nil,1,"mAss.seqPosition",nil);
         for (String[] dData : variationDataDTO.moreData())
         {
             dData[2] = WordUtils.capitalize(diagnosis);   //Histology
