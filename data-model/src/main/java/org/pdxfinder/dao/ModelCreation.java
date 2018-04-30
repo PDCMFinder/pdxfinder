@@ -4,6 +4,7 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +24,7 @@ public class ModelCreation {
 
 
     @Relationship(type = "QUALITY_ASSURED_BY")
-    private QualityAssurance qualityAssurance;
+    private List<QualityAssurance> qualityAssurance;
 
     @Relationship(type = "IMPLANTED_IN", direction = Relationship.INCOMING)
     private Sample sample;
@@ -41,7 +42,7 @@ public class ModelCreation {
     private List<ExternalUrl> externalUrls;
 
 
-    public ModelCreation(String sourcePdxId, String dataSource, Sample sample, QualityAssurance qualityAssurance,List<ExternalUrl> externalUrls) {
+    public ModelCreation(String sourcePdxId, String dataSource, Sample sample, List<QualityAssurance> qualityAssurance,List<ExternalUrl> externalUrls) {
         this.sourcePdxId = sourcePdxId;
         this.dataSource = dataSource;
         this.sample = sample;
@@ -66,11 +67,11 @@ public class ModelCreation {
         this.sourcePdxId = sourcePdxId;
     }
 
-    public QualityAssurance getQualityAssurance() {
+    public List<QualityAssurance> getQualityAssurance() {
         return qualityAssurance;
     }
 
-    public void setQualityAssurance(QualityAssurance qualityAssurance) {
+    public void setQualityAssurance(List<QualityAssurance> qualityAssurance) {
         this.qualityAssurance = qualityAssurance;
     }
 
@@ -138,5 +139,15 @@ public class ModelCreation {
 
     public void setExternalUrls(List<ExternalUrl> externalUrls) {
         this.externalUrls = externalUrls;
+    }
+
+    public void addQualityAssurance(QualityAssurance qa){
+
+        if(this.qualityAssurance == null ){
+            this.qualityAssurance = new ArrayList<>();
+        }
+
+        this.qualityAssurance.add(qa);
+
     }
 }
