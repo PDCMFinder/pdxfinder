@@ -149,9 +149,9 @@ public class DetailsPageController {
         model.addAttribute("patientInfo", patientTech);
 
         model.addAttribute("relatedModels", relatedModels);
-        model.addAttribute("technology", notEmpty(dto.getTechnology()));
-        model.addAttribute("description", notEmpty(dto.getDescription()));
-        model.addAttribute("passages", notEmpty(dto.getPassages()));
+
+        model.addAttribute("qualityAssurace", dto.getQualityAssurances());
+
         model.addAttribute("sampleIdMap",techNPassToSampleId);
 
         model.addAttribute("drugSummary", drugSummary);
