@@ -176,8 +176,6 @@ public class SearchService {
         }
 
         return results;
-
-
     }
 
 
@@ -203,27 +201,6 @@ public class SearchService {
 
 
         DetailsDTO dto = new DetailsDTO();
-
-                        /*
-                        this.modelId = "";
-                        this.externalId = "";
-                        this.dataSource = "";
-                        this.patientId = "";
-                        this.gender = "";
-                        this.age = "";
-                        this.race = "";
-                        this.ethnicity = "";
-                        this.diagnosis = "";
-                        this.tumorType = "";
-                        this.classification = "";
-                        this.originTissue = "";
-                        this.sampleSite = "";Å
-
-                        this.sampleType = "";
-                        this.strain = "";
-                        this.mouseSex = "";
-                        this.engraftmentSite = "";
-                         */
 
         Set< List<MarkerAssociation> > markerAssociatonSet = new HashSet<>();
         List<Specimen> specimenList = new ArrayList<>();
@@ -329,19 +306,7 @@ public class SearchService {
             dto.setMappedOntology(sample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
         }
 
-        /*
-        if (pdx != null && pdx.getEngraftmentType() != null) {
-            dto.setSampleType(pdx.getEngraftmentType().getName());
-        }
 
-        if (pdx != null && pdx.getHostStrain() != null) {
-            dto.setStrain(pdx.getHostStrain().getName());
-        }
-
-        if (pdx != null && pdx.getEngraftmentSite() != null) {
-            dto.setEngraftmentSite(pdx.getEngraftmentSite().getName());
-        }
-        */
         if (pdx != null && pdx.getSourcePdxId() != null) {
             dto.setModelId(pdx.getSourcePdxId());
         }
