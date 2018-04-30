@@ -3,10 +3,7 @@ package org.pdxfinder.services;
 
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
-import org.pdxfinder.services.dto.DetailsDTO;
-import org.pdxfinder.services.dto.DrugSummaryDTO;
-import org.pdxfinder.services.dto.SearchDTO;
-import org.pdxfinder.services.dto.VariationDataDTO;
+import org.pdxfinder.services.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -680,7 +677,6 @@ public class SearchService {
 
         return direction;
     }
-
 
 
 

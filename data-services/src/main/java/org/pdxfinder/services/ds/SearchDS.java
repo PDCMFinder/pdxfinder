@@ -7,6 +7,7 @@ import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.repositories.DataProjectionRepository;
+import org.pdxfinder.services.dto.WebSearchDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -774,5 +775,24 @@ public class SearchDS {
         return map;
     }
 
+
+
+
+    public WebSearchDTO webSearch(Optional<String> query,
+                                  Optional<List<String>> datasource,
+                                  Optional<List<String>> diagnosis,
+                                  Optional<List<String>> patient_age,
+                                  Optional<List<String>> patient_treatment_status,
+                                  Optional<List<String>> patient_gender,
+                                  Optional<List<String>> sample_origin_tissue,
+                                  Optional<List<String>> cancer_system,
+                                  Optional<List<String>> sample_tumor_type,
+                                  Optional<List<String>> mutation,
+                                  Integer page,
+                                  Integer size){
+
+
+        return new WebSearchDTO();
+    }
 
 }
