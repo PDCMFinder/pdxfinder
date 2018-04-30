@@ -41,7 +41,7 @@ public class ModelCreation {
     @Relationship(type = "EXTERNAL_URL", direction = Relationship.INCOMING)
     private List<ExternalUrl> externalUrls;
 
-
+    //support constructor with list of QA
     public ModelCreation(String sourcePdxId, String dataSource, Sample sample, List<QualityAssurance> qualityAssurance,List<ExternalUrl> externalUrls) {
         this.sourcePdxId = sourcePdxId;
         this.dataSource = dataSource;
@@ -49,6 +49,18 @@ public class ModelCreation {
         this.qualityAssurance = qualityAssurance;
         this.externalUrls = externalUrls;
     }
+    //constructor for single QA
+    public ModelCreation(String sourcePdxId, String dataSource, Sample sample, QualityAssurance qualityAssurance,List<ExternalUrl> externalUrls) {
+        this.sourcePdxId = sourcePdxId;
+        this.dataSource = dataSource;
+        this.sample = sample;
+
+        this.qualityAssurance = new ArrayList<>();
+        this.qualityAssurance.add(qualityAssurance);
+
+        this.externalUrls = externalUrls;
+    }
+
 
     public ModelCreation() {
         // Empty constructor required as of Neo4j API 2.0.5
@@ -148,6 +160,5 @@ public class ModelCreation {
         }
 
         this.qualityAssurance.add(qa);
-
     }
 }
