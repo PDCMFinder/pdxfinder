@@ -1,9 +1,6 @@
 package org.pdxfinder.services.dto;
 
-import org.pdxfinder.dao.MarkerAssociation;
-import org.pdxfinder.dao.MolecularCharacterization;
-import org.pdxfinder.dao.Platform;
-import org.pdxfinder.dao.Specimen;
+import org.pdxfinder.dao.*;
 
 import java.util.List;
 import java.util.Set;
@@ -18,7 +15,7 @@ public class DetailsDTO {
     private String dataSource;
     private String patientId;
     private String gender;
-    private String age;
+    private String ageAtCollection;
     private String race;
     private String ethnicity;
 
@@ -39,9 +36,9 @@ public class DetailsDTO {
     private String mappedOntology;
 
     // Quality control information
-    private String technology;
-    private String description;
-    private String passages;
+    private List<QualityAssurance> qualityAssurances;
+
+
     private String contacts;
     private String externalDataSourceDesc;
 
@@ -59,7 +56,7 @@ public class DetailsDTO {
         this.dataSource = "";
         this.patientId = "";
         this.gender = "";
-        this.age = "";
+        this.ageAtCollection = "";
         this.race = "";
         this.ethnicity = "";
 
@@ -76,10 +73,6 @@ public class DetailsDTO {
         this.externalUrl = "";
         this.externalUrlText = "";
         this.mappedOntology = "";
-
-        this.technology = "";
-        this.description = "";
-        this.passages = "";
 
         this.totalPages = 0;
         this.contacts = "";
@@ -128,12 +121,12 @@ public class DetailsDTO {
         this.gender = gender;
     }
 
-    public String getAge() {
-        return age;
+    public String getAgeAtCollection() {
+        return ageAtCollection;
     }
 
-    public void setAge(String age) {
-        this.age = age;
+    public void setAgeAtCollection(String ageAtCollection) {
+        this.ageAtCollection = ageAtCollection;
     }
 
     public String getRace() {
@@ -305,30 +298,6 @@ public class DetailsDTO {
         this.variationDataCount = variationDataCount;
     }
 
-    public String getTechnology() {
-        return technology;
-    }
-
-    public void setTechnology(String technology) {
-        this.technology = technology;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPassages() {
-        return passages;
-    }
-
-    public void setPassages(String passages) {
-        this.passages = passages;
-    }
-
     public String getContacts() {
         return contacts;
     }
@@ -343,5 +312,13 @@ public class DetailsDTO {
 
     public void setExternalDataSourceDesc(String externalDataSourceDesc) {
         this.externalDataSourceDesc = externalDataSourceDesc;
+    }
+
+    public List<QualityAssurance> getQualityAssurances() {
+        return qualityAssurances;
+    }
+
+    public void setQualityAssurances(List<QualityAssurance> qualityAssurances) {
+        this.qualityAssurances = qualityAssurances;
     }
 }

@@ -210,10 +210,8 @@ public class LoadJAXData implements CommandLineRunner {
 
         }
 
-        
         String qaPassages = Standardizer.NOT_SPECIFIED;
-        
-        
+
         pSnap.addSample(sample);
         loaderUtils.savePatientSnapshot(pSnap);
         
@@ -225,33 +223,27 @@ public class LoadJAXData implements CommandLineRunner {
             qc = "QC is "+qc;
         }
         
-        
         // the validation techniques are more than just fingerprint, we don't have a way to capture that
-        QualityAssurance qa = new QualityAssurance("", qc, ValidationTechniques.FINGERPRINT, qaPassages);
+        QualityAssurance qa = new QualityAssurance("Fingerprint", qc, qaPassages);
         loaderUtils.saveQualityAssurance(qa);
 
         ModelCreation mc = loaderUtils.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa, externalUrls);
         mc.addRelatedSample(sample);
-        
-        
-        
-        
+
         String implantationTypeStr = Standardizer.NOT_SPECIFIED;
         String implantationSiteStr = j.getString("Engraftment Site");
 
         Specimen specimen = loaderUtils.getSpecimen(mc, id, jaxDS.getAbbreviation(), "");
         specimen.setHostStrain(nsgBS);
-        ImplantationSite implantationSite = loaderUtils.getImplantationSite(implantationSiteStr);
-        ImplantationType implantationType = loaderUtils.getImplantationType(implantationTypeStr);
-        specimen.setImplantationSite(implantationSite);
-        specimen.setImplantationType(implantationType);
-        
-        
+        EngraftmentSite engraftmentSite = loaderUtils.getImplantationSite(implantationSiteStr);
+        EngraftmentType engraftmentType = loaderUtils.getImplantationType(implantationTypeStr);
+        specimen.setEngraftmentSite(engraftmentSite);
+        specimen.setEngraftmentType(engraftmentType);
+
         mc.addSpecimen(specimen);
 
         //Create Treatment summary without linking TreatmentProtocols to specimens
         TreatmentSummary ts;
-
 
         try{
             if(j.has("Treatments")){
@@ -289,7 +281,7 @@ public class LoadJAXData implements CommandLineRunner {
         
         loaderUtils.saveSpecimen(specimen);
         //loaderUtils.saveModelCreation(mc);
-        loadVariationData(mc, implantationSite, implantationType);
+        loadVariationData(mc, engraftmentSite, engraftmentType);
 
     }
 
@@ -299,7 +291,7 @@ public class LoadJAXData implements CommandLineRunner {
     This is a set of makers with marker association details
     Since we are creating samples here attach any histology images to the sample based on passage #
      */
-    private void loadVariationData(ModelCreation modelCreation,ImplantationSite implantationSite,ImplantationType implantationType) {
+    private void loadVariationData(ModelCreation modelCreation, EngraftmentSite engraftmentSite, EngraftmentType engraftmentType) {
 
         if (maxVariations == 0) {
             return;
@@ -366,7 +358,6 @@ public class LoadJAXData implements CommandLineRunner {
 
                 Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
 
-
                 if(technology.equals("Truseq_JAX")){
                     platform = loaderUtils.getPlatform(technology, this.jaxDS, TRUSEQ_PLATFORM_URL);
                 }
@@ -378,10 +369,6 @@ public class LoadJAXData implements CommandLineRunner {
                 }
 
                 platform.setExternalDataSource(jaxDS);
-
-                //loaderUtils.savePlatform(platform);
-                //loaderUtils.createPlatformAssociation(platform, marker);
-                
 
                 markerMap = sampleMap.get(sample);
                 if (markerMap == null) {
@@ -456,8 +443,8 @@ public class LoadJAXData implements CommandLineRunner {
                 specimen.setHostStrain(nsgBS);
                 
 
-                specimen.setImplantationSite(implantationSite);
-                specimen.setImplantationType(implantationType);
+                specimen.setEngraftmentSite(engraftmentSite);
+                specimen.setEngraftmentType(engraftmentType);
 
 
                 loaderUtils.saveSpecimen(specimen);

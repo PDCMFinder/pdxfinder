@@ -164,7 +164,7 @@ public class LoadWUSTL implements CommandLineRunner {
         String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
 
         QualityAssurance qa = new QualityAssurance(qaType,
-                NOT_SPECIFIED, ValidationTechniques.NOT_SPECIFIED, qaPassage);
+                NOT_SPECIFIED, qaPassage);
         loaderUtils.saveQualityAssurance(qa);
         String strain = j.getString("Strain");
         HostStrain bs = loaderUtils.getHostStrain(strain, strain, "", "");
@@ -188,77 +188,6 @@ public class LoadWUSTL implements CommandLineRunner {
             // this is for the FANG data and we don't really care about markers at this point anyway
         }
 
-        //disable loading molchar for now
-
-        /*
-
-        String markerStr = j.getString("Markers");
-
-        String[] markers = markerStr.split(";");
-        if (markerStr.trim().length() > 0) {
-
-            Platform pl = loaderUtils.getPlatform(markerPlatform, mdaDS);
-            MolecularCharacterization molC = new MolecularCharacterization(markerPlatform);
-            molC.setType("mutation");
-            molC.setPlatform(pl);
-
-            Set<MarkerAssociation> markerAssocs = new HashSet();
-
-            for (int i = 0; i < markers.length; i++) {
-                Marker m = loaderUtils.getMarker(markers[i], markers[i]);
-                MarkerAssociation ma = new MarkerAssociation();
-                ma.setMarker(m);
-                markerAssocs.add(ma);
-            }
-            molC.setMarkerAssociations(markerAssocs);
-            Set<MolecularCharacterization> mcs = new HashSet<>();
-            mcs.add(molC);
-
-
-            if (human) {
-                humanSample.setMolecularCharacterizations(mcs);
-                pSnap.addSample(humanSample);
-
-            } else {
-
-                Sample mouseSample = new Sample();
-                mouseSample.setMolecularCharacterizations(mcs);
-                String passage = "0";
-                try {
-                    passage = j.getString("QA Passage").replaceAll("P", "");
-                } catch (Exception e) {
-                    // default is 0
-                }
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation,
-                        modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
-
-                specimen.setHostStrain(bs);
-
-                specimen.setSample(mouseSample);
-                modelCreation.addRelatedSample(mouseSample);
-
-                if (engraftmentSite.contains(";")) {
-                    String[] parts = engraftmentSite.split(";");
-                    engraftmentSite = parts[1].trim();
-                    tumorPrep = parts[0].trim();
-                }
-                ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
-                specimen.setImplantationSite(is);
-
-                ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
-                specimen.setImplantationType(it);
-
-                modelCreation.addSpecimen(specimen);
-
-                //loaderUtils.saveSpecimen(specimen);
-
-            }
-
-            //loaderUtils.saveModelCreation(modelCreation);
-
-        }
-
-        */
 
         if (human) {
             pSnap.addSample(humanSample);
@@ -287,11 +216,11 @@ public class LoadWUSTL implements CommandLineRunner {
                 engraftmentSite = parts[1].trim();
                 tumorPrep = parts[0].trim();
             }
-            ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
-            specimen.setImplantationSite(is);
+            EngraftmentSite is = loaderUtils.getImplantationSite(engraftmentSite);
+            specimen.setEngraftmentSite(is);
 
-            ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
-            specimen.setImplantationType(it);
+            EngraftmentType it = loaderUtils.getImplantationType(tumorPrep);
+            specimen.setEngraftmentType(it);
 
             modelCreation.addSpecimen(specimen);
 

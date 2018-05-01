@@ -17,9 +17,13 @@ public class PatientSnapshot {
     private Long id;
 
     private Patient patient;
-    private String age;
+    private String ageAtCollection;
     private String dateAtCollection;
     private Boolean treatmentNaive;
+
+    private String collectionEvent;
+    private int ellapsedTime;
+    private String eventType;
 
     @Relationship(type = "SAMPLED_FROM")
     private Set<Sample> samples;
@@ -30,16 +34,16 @@ public class PatientSnapshot {
     public PatientSnapshot() {
     }
 
-    public PatientSnapshot(Patient patient, String age) {
+    public PatientSnapshot(Patient patient, String ageAtCollection) {
         this.patient = patient;
-        this.age = age;
+        this.ageAtCollection = ageAtCollection;
     }
 
     public String getAgeBin() {
         String ageBin;
 
         try {
-            Integer ageInteger = Integer.parseInt(this.age);
+            Integer ageInteger = Integer.parseInt(this.ageAtCollection);
 
             if (ageInteger < 10) {
                 ageBin = "0-9";
@@ -66,31 +70,31 @@ public class PatientSnapshot {
 
         } catch (Exception e) {
             // probably a parse exception
-            ageBin = this.age;
+            ageBin = this.ageAtCollection;
         }
 
         return ageBin;
     }
 
-    public PatientSnapshot(Patient patient, String age, Set<Sample> samples) {
+    public PatientSnapshot(Patient patient, String ageAtCollection, Set<Sample> samples) {
         this.patient = patient;
-        this.age = age;
+        this.ageAtCollection = ageAtCollection;
         this.samples = samples;
     }
 
-    public PatientSnapshot(Patient patient, String age, Set<Sample> samples, TreatmentSummary treatmentSummary) {
+    public PatientSnapshot(Patient patient, String ageAtCollection, Set<Sample> samples, TreatmentSummary treatmentSummary) {
         this.patient = patient;
-        this.age = age;
+        this.ageAtCollection = ageAtCollection;
         this.samples = samples;
         this.treatmentSummary = treatmentSummary;
     }
 
-    public String getAge() {
-        return age;
+    public String getAgeAtCollection() {
+        return ageAtCollection;
     }
 
-    public void setAge(String age) {
-        this.age = age;
+    public void setAgeAtCollection(String ageAtCollection) {
+        this.ageAtCollection = ageAtCollection;
     }
 
     public Set<Sample> getSamples() {
@@ -138,5 +142,29 @@ public class PatientSnapshot {
 
     public void setTreatmentSummary(TreatmentSummary treatmentSummary) {
         this.treatmentSummary = treatmentSummary;
+    }
+
+    public String getCollectionEvent() {
+        return collectionEvent;
+    }
+
+    public void setCollectionEvent(String collectionEvent) {
+        this.collectionEvent = collectionEvent;
+    }
+
+    public int getEllapsedTime() {
+        return ellapsedTime;
+    }
+
+    public void setEllapsedTime(int ellapsedTime) {
+        this.ellapsedTime = ellapsedTime;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 }

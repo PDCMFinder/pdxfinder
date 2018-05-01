@@ -186,14 +186,13 @@ public class LoadHCI implements CommandLineRunner {
         
         
         // This multiple QA approach only works because Note and Passage are the same for all QAs
-        QualityAssurance qa = new QualityAssurance(Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED,ValidationTechniques.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED);
+        QualityAssurance qa = new QualityAssurance(Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED);
         
         StringBuilder technology = new StringBuilder();
         if(j.has("QA")){
             JSONArray qas = j.getJSONArray("QA");
             for (int i = 0; i < qas.length(); i++) {
                 if (qas.getJSONObject(i).getString("Technology").equalsIgnoreCase("histology")) {
-                    qa.setValidationTechniques(ValidationTechniques.HISTOLOGY);
                     qa.setTechnology(qas.getJSONObject(i).getString("Technology"));
                     qa.setDescription(qas.getJSONObject(i).getString("Note"));
                     qa.setPassages(qas.getJSONObject(i).getString("Passage"));
@@ -212,8 +211,8 @@ public class LoadHCI implements CommandLineRunner {
 
         String implantationTypeStr = Standardizer.getValue("Implantation Type", j);
         String implantationSiteStr = Standardizer.getValue("Engraftment Site", j);
-        ImplantationSite implantationSite = loaderUtils.getImplantationSite(implantationSiteStr);
-        ImplantationType implantationType = loaderUtils.getImplantationType(implantationTypeStr);
+        EngraftmentSite engraftmentSite = loaderUtils.getImplantationSite(implantationSiteStr);
+        EngraftmentType engraftmentType = loaderUtils.getImplantationType(implantationTypeStr);
         
         // uggh parse strains
         ArrayList<HostStrain> strainList= new ArrayList();
@@ -232,8 +231,8 @@ public class LoadHCI implements CommandLineRunner {
             count++;
             Specimen specimen = new Specimen();
             specimen.setExternalId(modelID+"-"+count);
-            specimen.setImplantationSite(implantationSite);
-            specimen.setImplantationType(implantationType);
+            specimen.setEngraftmentSite(engraftmentSite);
+            specimen.setEngraftmentType(engraftmentType);
             specimen.setHostStrain(strain);
             
              Sample specSample = new Sample();

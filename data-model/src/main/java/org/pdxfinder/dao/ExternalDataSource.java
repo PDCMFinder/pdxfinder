@@ -4,6 +4,7 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * ExternalDataSource represents an external data provider
@@ -21,6 +22,8 @@ public class ExternalDataSource {
     private Date dateLastUpdated;
 
     private String url;
+    private String type;
+    private List<String> serviceProvided;
 
     public ExternalDataSource() {
         // Empty constructor required as of Neo4j API 2.0.5
@@ -89,5 +92,21 @@ public class ExternalDataSource {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public List<String> getServiceProvided() {
+        return serviceProvided;
+    }
+
+    public void setServiceProvided(List<String> serviceProvided) {
+        this.serviceProvided = serviceProvided;
     }
 }

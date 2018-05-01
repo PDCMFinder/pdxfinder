@@ -361,7 +361,7 @@ public class LoadIRCCData implements CommandLineRunner {
                 pSnap.addSample(humanSample);
                 loaderUtils.savePatientSnapshot(pSnap);
 
-                QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT, "");
+                QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint",  "");
                 loaderUtils.saveQualityAssurance(qa);
 
                 List<ExternalUrl> externalUrls = new ArrayList<>();

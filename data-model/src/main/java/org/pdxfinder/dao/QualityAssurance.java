@@ -14,16 +14,15 @@ public class QualityAssurance {
 
     private String technology;
     private String description;
-    private ValidationTechniques validationTechniques;
     private String passages;
 
     public QualityAssurance() {
     }
 
-    public QualityAssurance(String technology, String description, ValidationTechniques validationTechniques, String passages) {
+    public QualityAssurance(String technology, String description, String passages) {
         this.technology = technology;
         this.description = description;
-        this.validationTechniques = validationTechniques;
+
         this.passages = passages;
     }
 
@@ -33,14 +32,6 @@ public class QualityAssurance {
 
     public void setTechnology(String technology) {
         this.technology = technology;
-    }
-
-    public ValidationTechniques getValidationTechniques() {
-        return validationTechniques;
-    }
-
-    public void setValidationTechniques(ValidationTechniques validationTechniques) {
-        this.validationTechniques = validationTechniques;
     }
 
     public String getDescription() {

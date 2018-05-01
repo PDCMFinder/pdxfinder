@@ -1,5 +1,6 @@
 package org.pdxfinder.commands;
 
+import com.google.gson.Gson;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONObject;
@@ -13,7 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import com.google.gson.Gson;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -394,8 +395,8 @@ public class CreateDataProjections implements CommandLineRunner{
                 for (Specimen s: specimens){
                     hoststrains.add(s.getHostStrain().getName());
 
-                    mfq.setModelImplantationSite(s.getImplantationSite().getName());
-                    mfq.setModelImplantationType(s.getImplantationType().getName());
+                    mfq.setModelImplantationSite(s.getEngraftmentSite().getName());
+                    mfq.setModelImplantationType(s.getEngraftmentType().getName());
                 }
                 //Specimen s = specimens.iterator().next();
                 mfq.setModelHostStrain(hoststrains);

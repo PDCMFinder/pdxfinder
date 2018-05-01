@@ -129,8 +129,6 @@ public class LoadIRCC implements CommandLineRunner {
 
     private void parseModels(String json) {
 
-       
-
         try {
             JSONObject job = new JSONObject(json);
             JSONArray jarray = job.getJSONArray("IRCC");
@@ -146,7 +144,6 @@ public class LoadIRCC implements CommandLineRunner {
             log.error("Error getting IRCC PDX models", e);
 
         }
-       
     }
 
     @Transactional
@@ -185,7 +182,7 @@ public class LoadIRCC implements CommandLineRunner {
         QualityAssurance qa = new QualityAssurance();
 
         if ("TRUE".equals(job.getString("Fingerprinting").toUpperCase())) {
-            qa.setValidationTechniques(ValidationTechniques.FINGERPRINT);
+            qa.setTechnology("Fingerprint");
             qa.setDescription(FINGERPRINT_DESCRIPTION);
 
             // If the model includes which passages have had QA performed, set the passages on the QA node
@@ -223,71 +220,22 @@ public class LoadIRCC implements CommandLineRunner {
 
             specimen.setHostStrain(this.nsgBS);
 
-            ImplantationSite is = loaderUtils.getImplantationSite(specimenJSON.getString("Engraftment Site"));
-            specimen.setImplantationSite(is);
+            EngraftmentSite is = loaderUtils.getImplantationSite(specimenJSON.getString("Engraftment Site"));
+            specimen.setEngraftmentSite(is);
 
-            ImplantationType it = loaderUtils.getImplantationType(specimenJSON.getString("Engraftment Type"));
-            specimen.setImplantationType(it);
-
-            /*
-            
-            JSONArray platforms = specimenJSON.getJSONArray("Platforms");
-            HashSet<MolecularCharacterization> mcs = new HashSet();
-
-            for (int j = 0; j < platforms.length(); j++) {
-                JSONObject platform = platforms.getJSONObject(j);
-                MolecularCharacterization mc = new MolecularCharacterization();
-                Platform p = loaderUtils.getPlatform(platform.getString("Platform"), this.irccDS);
-                loaderUtils.savePlatform(p);
-
-                mc.setPlatform(p);
-
-                mcs.add(mc);
-            }
-            */
+            EngraftmentType it = loaderUtils.getImplantationType(specimenJSON.getString("Engraftment Type"));
+            specimen.setEngraftmentType(it);
 
             Sample specSample = new Sample();
-            
-            
-            
+
             specSample.setSourceSampleId(specimenId);
             specSample.setDataSource(irccDS.getAbbreviation());
 
-            //specSample.setMolecularCharacterizations(mcs);
             specimen.setSample(specSample);
 
-            //    loaderUtils.saveSpecimen(specimen);
             modelCreation.addSpecimen(specimen);
             modelCreation.addRelatedSample(specSample);
-            /*
-          //  System.out.println("checking for samples for specimen "+specimenId);
-            if (specimenSamples.containsKey(specimenId)) {
-            for (String sampleID : specimenSamples.get(specimenId).keySet()) {
-          //      System.out.println("samples found for specimen");
-                Sample variationSample = new Sample();
-                variationSample.setSourceSampleId(sampleID);
 
-
-                MolecularCharacterization mc = new MolecularCharacterization();
-
-                mc.setMarkerAssociations(markerAssociations.get(sampleID));
-                Platform platform = loaderUtils.getPlatform(TECH, this.irccDS);
-                mc.setPlatform(platform);
-               
-                mcs = new HashSet();
-                mcs.add(mc); 
-                variationSample.setMolecularCharacterizations(mcs);
-
-
-                //modelCreation.addRelatedSample(variationSample);
-                //System.out.println("adding "+sampleID+ " to model "+id+ " for specimen "+specimenId);
-                
-                
-            }
-           
-        }
-
-        */
         }
 
         //Create Treatment summary without linking TreatmentProtocols to specimens
@@ -448,18 +396,13 @@ public class LoadIRCC implements CommandLineRunner {
                     e1.printStackTrace();
                 }
 
-
-
-
             }
 
         }
         catch (Exception e){
 
             e.printStackTrace();
-
         }
-
 
     }
     
@@ -517,13 +460,10 @@ public class LoadIRCC implements CommandLineRunner {
                 ma.setAminoAcidChange(variation.getString("Protein"));
                 ma.setAlleleFrequency(variation.getString("VAF"));
                 ma.setRsVariants(variation.getString("avsnp147"));
-                
-                
 
                 PlatformAssociation pa = loaderUtils.createPlatformAssociation(platform, marker);
                 loaderUtils.savePlatformAssociation(pa);
 
-            
                 if (markerAssociations.containsKey(sample)) {
                     markerAssociations.get(sample).add(ma);
                 } else {

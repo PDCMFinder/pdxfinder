@@ -2,13 +2,13 @@ package org.pdxfinder.commands;
 
 import org.apache.commons.cli.*;
 import org.neo4j.ogm.session.Session;
+import org.pdxfinder.dao.EngraftmentSite;
+import org.pdxfinder.dao.EngraftmentType;
 import org.pdxfinder.dao.HostStrain;
-import org.pdxfinder.dao.ImplantationSite;
-import org.pdxfinder.dao.ImplantationType;
 import org.pdxfinder.dao.TumorType;
+import org.pdxfinder.repositories.EngraftmentSiteRepository;
+import org.pdxfinder.repositories.EngraftmentTypeRepository;
 import org.pdxfinder.repositories.HostStrainRepository;
-import org.pdxfinder.repositories.ImplantationSiteRepository;
-import org.pdxfinder.repositories.ImplantationTypeRepository;
 import org.pdxfinder.repositories.TumorTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +40,8 @@ public class CreateBaseCommand implements CommandLineRunner {
 
     private TumorTypeRepository tumorTypeRepository;
     private HostStrainRepository hostStrainRepository;
-    private ImplantationTypeRepository implantationTypeRepository;
-    private ImplantationSiteRepository implantationSiteRepository;
+    private EngraftmentTypeRepository engraftmentTypeRepository;
+    private EngraftmentSiteRepository engraftmentSiteRepository;
 
     private Session session;
 
@@ -53,17 +53,17 @@ public class CreateBaseCommand implements CommandLineRunner {
         log.info("Setting up CreateBaseCommand option");
     }
 
-    public CreateBaseCommand(TumorTypeRepository tumorTypeRepository, HostStrainRepository hostStrainRepository, ImplantationSiteRepository implantationSiteRepository, ImplantationTypeRepository implantationTypeRepository, Session session) {
+    public CreateBaseCommand(TumorTypeRepository tumorTypeRepository, HostStrainRepository hostStrainRepository, EngraftmentSiteRepository engraftmentSiteRepository, EngraftmentTypeRepository engraftmentTypeRepository, Session session) {
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository is null");
         Assert.notNull(hostStrainRepository, "hostStrainRepository is null");
-        Assert.notNull(implantationSiteRepository, "implantationSiteRepository is null");
-        Assert.notNull(implantationTypeRepository, "implantationTypeRepository is null");
+        Assert.notNull(engraftmentSiteRepository, "implantationSiteRepository is null");
+        Assert.notNull(engraftmentTypeRepository, "implantationTypeRepository is null");
         Assert.notNull(session, "session is null");
 
         this.tumorTypeRepository = tumorTypeRepository;
         this.hostStrainRepository = hostStrainRepository;
-        this.implantationSiteRepository = implantationSiteRepository;
-        this.implantationTypeRepository = implantationTypeRepository;
+        this.engraftmentSiteRepository = engraftmentSiteRepository;
+        this.engraftmentTypeRepository = engraftmentTypeRepository;
         this.session = session;
     }
 
@@ -172,11 +172,11 @@ public class CreateBaseCommand implements CommandLineRunner {
         );
 
         for (String site : sites) {
-            ImplantationSite implantationSite = implantationSiteRepository.findByName(site);
-            if (implantationSite == null) {
+            EngraftmentSite engraftmentSite = engraftmentSiteRepository.findByName(site);
+            if (engraftmentSite == null) {
                 log.info("  Creating Implantation Site '{}'", site);
-                implantationSite = new ImplantationSite(site);
-                implantationSiteRepository.save(implantationSite);
+                engraftmentSite = new EngraftmentSite(site);
+                engraftmentSiteRepository.save(engraftmentSite);
             }
         }
 
@@ -196,11 +196,11 @@ public class CreateBaseCommand implements CommandLineRunner {
         );
 
         for (String type : types) {
-            ImplantationType implantationType = implantationTypeRepository.findByName(type);
-            if (implantationType == null) {
+            EngraftmentType engraftmentType = engraftmentTypeRepository.findByName(type);
+            if (engraftmentType == null) {
                 log.info("Implantation type '{}' not found. Creating", type);
-                implantationType = new ImplantationType(type);
-                implantationTypeRepository.save(implantationType);
+                engraftmentType = new EngraftmentType(type);
+                engraftmentTypeRepository.save(engraftmentType);
             }
         }
 

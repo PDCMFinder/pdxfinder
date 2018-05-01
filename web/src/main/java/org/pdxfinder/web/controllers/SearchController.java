@@ -110,6 +110,32 @@ public class SearchController {
 
     }
 
+    //TODO:remove /search requestmapping after refactoring this
+
+    @RequestMapping("/search_new")
+    String search2(Model model,
+                   @RequestParam("query") Optional<String> query,
+                   @RequestParam("datasource") Optional<List<String>> datasource,
+                   @RequestParam("diagnosis") Optional<List<String>> diagnosis,
+                   @RequestParam("patient_age") Optional<List<String>> patient_age,
+                   @RequestParam("patient_treatment_status") Optional<List<String>> patient_treatment_status,
+                   @RequestParam("patient_gender") Optional<List<String>> patient_gender,
+                   @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
+                   @RequestParam("cancer_system") Optional<List<String>> cancer_system,
+                   @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type,
+                   @RequestParam("mutation") Optional<List<String>> mutation,
+
+                   @RequestParam(value = "page", defaultValue = "1") Integer page,
+                   @RequestParam(value = "size", defaultValue = "10") Integer size){
+
+        model.addAttribute("websearch", searchDS.webSearch(query, datasource,
+                diagnosis, patient_age, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
+                sample_tumor_type, mutation, page, size));
+
+        return "search";
+    }
+
+
 
     @RequestMapping("/search")
     String search(Model model,
@@ -571,30 +597,3 @@ public class SearchController {
 
 
 }
-
-
-//        JSONArray cancerByCellTypeDataSeriesArray = new JSONArray();
-//
-//        Map<String, Integer> cancerByCellType = graphService.getModelCountsByCellType();
-//        for (String name : cancerByCellType.keySet()) {
-//
-//            JSONObject dataSeries = new JSONObject();
-//            dataSeries.put("name", name);
-//            dataSeries.put("y", cancerByCellType.get(name));
-//
-//            cancerByCellTypeDataSeriesArray.put(dataSeries);
-//
-//        }
-//
-//        model.addAttribute("cancerByCellType", cancerByCellTypeDataSeriesArray.toString());
-//        System.out.println("+++ cancerByCellType" + cancerByCellTypeDataSeriesArray);
-
-
-// The data for producing a highcharts pie chart format
-// [{
-//        name: 'IE',
-//                y: 56.33
-//    }, {
-//        name: 'Chrome',
-//                y: 24.03
-//    }]

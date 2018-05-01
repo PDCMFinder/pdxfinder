@@ -3,10 +3,7 @@ package org.pdxfinder.services;
 
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
-import org.pdxfinder.services.dto.DetailsDTO;
-import org.pdxfinder.services.dto.DrugSummaryDTO;
-import org.pdxfinder.services.dto.SearchDTO;
-import org.pdxfinder.services.dto.VariationDataDTO;
+import org.pdxfinder.services.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -176,8 +173,6 @@ public class SearchService {
         }
 
         return results;
-
-
     }
 
 
@@ -189,7 +184,7 @@ public class SearchService {
         List<PatientSnapshot> ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
         ModelCreation pdx = modelCreationRepository.findByDataSourceAndSourcePdxId(dataSource, modelId);
 
-        QualityAssurance qa = pdx.getQualityAssurance();
+        List<QualityAssurance> qa = pdx.getQualityAssurance();
 
         int start = page;
         Pageable pageable = new PageRequest(start,size);
@@ -204,38 +199,12 @@ public class SearchService {
 
         DetailsDTO dto = new DetailsDTO();
 
-                        /*
-                        this.modelId = "";
-                        this.externalId = "";
-                        this.dataSource = "";
-                        this.patientId = "";
-                        this.gender = "";
-                        this.age = "";
-                        this.race = "";
-                        this.ethnicity = "";
-                        this.diagnosis = "";
-                        this.tumorType = "";
-                        this.classification = "";
-                        this.originTissue = "";
-                        this.sampleSite = "";Å
-
-                        this.sampleType = "";
-                        this.strain = "";
-                        this.mouseSex = "";
-                        this.engraftmentSite = "";
-                         */
-
         Set< List<MarkerAssociation> > markerAssociatonSet = new HashSet<>();
         List<Specimen> specimenList = new ArrayList<>();
         Set<MolecularCharacterization>  molecularCharacterizations = new HashSet<>();
         Set<Platform>  platforms = new HashSet<>();
 
-        if (qa != null && qa.getValidationTechniques() != null) {
-            dto.setTechnology(qa.getValidationTechniques().getTechnique());
-        }
-
-        if (qa != null && qa.getDescription() != null) dto.setDescription(qa.getDescription());
-        if (qa != null && qa.getPassages() != null) dto.setPassages(qa.getPassages());
+        dto.setQualityAssurances(qa);
 
         if (specimens != null) {
 
@@ -296,8 +265,8 @@ public class SearchService {
 
         if (ps != null) {
             for (PatientSnapshot patientSnapshots : ps) {
-                if (patientSnapshots != null && patientSnapshots.getAge() != null) {
-                    dto.setAge(patientSnapshots.getAge());
+                if (patientSnapshots != null && patientSnapshots.getAgeAtCollection() != null) {
+                    dto.setAgeAtCollection(patientSnapshots.getAgeAtCollection());
                 }
             }
 
@@ -334,19 +303,7 @@ public class SearchService {
             dto.setMappedOntology(sample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
         }
 
-        /*
-        if (pdx != null && pdx.getImplantationType() != null) {
-            dto.setSampleType(pdx.getImplantationType().getName());
-        }
 
-        if (pdx != null && pdx.getHostStrain() != null) {
-            dto.setStrain(pdx.getHostStrain().getName());
-        }
-
-        if (pdx != null && pdx.getImplantationSite() != null) {
-            dto.setEngraftmentSite(pdx.getImplantationSite().getName());
-        }
-        */
         if (pdx != null && pdx.getSourcePdxId() != null) {
             dto.setModelId(pdx.getSourcePdxId());
         }
@@ -378,16 +335,16 @@ public class SearchService {
 
 
                     //Set implantation site and type
-                    if(s.getImplantationSite() != null){
-                        dto.setEngraftmentSite(s.getImplantationSite().getName());
+                    if(s.getEngraftmentSite() != null){
+                        dto.setEngraftmentSite(s.getEngraftmentSite().getName());
                     }
                     else{
 
                         dto.setEngraftmentSite("Not Specified");
                     }
 
-                    if(s.getImplantationType() != null){
-                        dto.setSampleType(s.getImplantationType().getName());
+                    if(s.getEngraftmentType() != null){
+                        dto.setSampleType(s.getEngraftmentType().getName());
                     }
                     else{
 
@@ -704,21 +661,6 @@ public class SearchService {
 
         }catch (Exception e) { }
 
-//        int sortNum = 6;
-//        Collections.sort(variationData, new Comparator < String[] > () {
-//            public int compare(String[] x1, String[] x2) {
-//                if (x1.length > sortNum && x2.length > sortNum) {
-//                    return x2[sortNum].compareTo(x1[sortNum]);
-//                }
-//                if (x1.length > sortNum) {
-//                    return 1;
-//                }
-//                if (x2.length > sortNum) {
-//                    return -1;
-//                }
-//                return x2.length - x1.length;
-//            }
-//        });
 
         return variationData;
     }
@@ -735,7 +677,6 @@ public class SearchService {
 
         return direction;
     }
-
 
 
 
