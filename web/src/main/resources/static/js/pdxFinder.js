@@ -449,6 +449,8 @@ function displayResults(q,data){
 
 }
 
+
+
 function getMarkers(){
 
     var ajaxrequest = jQuery.ajax({
