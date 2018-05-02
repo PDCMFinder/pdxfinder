@@ -38,6 +38,7 @@ public class SearchDS {
     //platform=> marker=> variant=>{set of model ids}
     Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<String, Map<String, Map<String, Set<Long>>>>();
 
+    private boolean INITIALIZED = false;
 
     private DataProjectionRepository dataProjectionRepository;
 
@@ -108,7 +109,6 @@ public class SearchDS {
         this.models = new HashSet<>();
     }
 
-    @PostConstruct
     void initialize() {
 
 
@@ -184,6 +184,8 @@ public class SearchDS {
                         .collect(Collectors.toSet())
                         .contains(x))
                 .collect(Collectors.toList());
+
+        INITIALIZED = true;
 
     }
 
@@ -430,6 +432,12 @@ public class SearchDS {
      * filters passed in as arguments
      */
     public Set<ModelForQuery> search(Map<SearchFacetName, List<String>> filters) {
+
+        synchronized (this){
+            if(! INITIALIZED ) {
+                initialize();
+            }
+        }
 
         Set<ModelForQuery> result = new HashSet<>(models);
 
