@@ -253,10 +253,20 @@ public class SearchService {
             numPages = 1;
         }
 
+        wsDTO.setNumPages(numPages);
+
         int current = page;
+        wsDTO.setCurrentIndex(current);
+
+
         int begin = Math.max(1, current - 4);
+        wsDTO.setBeginIndex(begin);
+
         int end = Math.min(begin + 7, numPages);
-        String mutatedMarkers = molCharService.getMutatedMarkersAndVariants();;
+        wsDTO.setEndIndex(end);
+
+        String mutatedMarkers = molCharService.getMutatedMarkersAndVariants();
+        wsDTO.setMutatedMarkersAndVariants(mutatedMarkers);
 
         String textSearchDescription = getTextualDescription(facetString, results);
         wsDTO.setTextSearchDescription(textSearchDescription);
@@ -272,6 +282,11 @@ public class SearchService {
 
         wsDTO.setSearchResults(resultSet);
         wsDTO.setPlatformsAndUrls(platformService.getPlatformsWithUrls());
+
+        if (mutSelected == true){
+            wsDTO.setPlatformMap(getPlatformOrMutationFromMutatedVariants(resultSet,"platformMap"));
+            wsDTO.setMutationMap(getPlatformOrMutationFromMutatedVariants(resultSet,"mutationMap"));
+        }
 
         return wsDTO;
     }
@@ -545,6 +560,34 @@ public class SearchService {
         }
 
         return results;
+    }
+
+    private Map<String, List<String>> getPlatformOrMutationFromMutatedVariants(List<ModelForQuery> resultSet, String whichMap){
+
+        Map<String, List<String>> platformMap = new HashMap<>();
+        Map<String, List<String>> mutationMap = new HashMap<>();
+
+        for (ModelForQuery mfq : resultSet){
+
+            List<String> dPlatforms = new ArrayList<>();
+            List<String> dMutations = new ArrayList<>();
+
+            for (String mutatedVariants : mfq.getMutatedVariants()){
+                String[] mv = mutatedVariants.split("\\s+");  // e.g  [Truseq_JAX BRAF V600E, CTP BRAF V600E]
+                dPlatforms.add(mv[0]);
+                dMutations.add(mv[1]+" "+mv[2]);
+            }
+
+            platformMap.put(mfq.getExternalId(), dPlatforms);
+            mutationMap.put(mfq.getExternalId(), dMutations);
+        }
+
+        if (whichMap.equals("platformMap")){
+            return platformMap;
+        }else{
+            return mutationMap;
+        }
+
     }
 
 
