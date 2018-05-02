@@ -1,8 +1,10 @@
 package org.pdxfinder.services;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
+import org.pdxfinder.services.ds.*;
 import org.pdxfinder.services.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +29,22 @@ public class SearchService {
     private MolecularCharacterizationRepository molecularCharacterizationRepository;
     private PlatformRepository platformRepository;
     private TreatmentSummaryRepository treatmentSummaryRepository;
+
+    private GraphService graphService;
+    private AutoCompleteService autoCompleteService;
+    private Map<String, List<String>> facets = new HashMap<>();
+    private MolCharService molCharService;
+    private PlatformService platformService;
+
+    private SearchDS searchDS;
+
+    List<String> patientAgeOptions = SearchDS.PATIENT_AGE_OPTIONS;
+    List<String> datasourceOptions = SearchDS.DATASOURCE_OPTIONS;
+    List<String> cancerBySystemOptions = SearchDS.CANCERS_BY_SYSTEM_OPTIONS;
+    List<String> patientGenderOptions = SearchDS.PATIENT_GENDERS;
+    List<String> sampleTumorTypeOptions = SearchDS.SAMPLE_TUMOR_TYPE_OPTIONS;
+    List<String> diagnosisOptions = SearchDS.DIAGNOSIS_OPTIONS;
+
 
     private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
     private final String JAX_URL_TEXT = "View data at JAX";
@@ -60,7 +78,13 @@ public class SearchService {
                          SpecimenRepository specimenRepository,
                          MolecularCharacterizationRepository molecularCharacterizationRepository,
                          PlatformRepository platformRepository,
-                         TreatmentSummaryRepository treatmentSummaryRepository) {
+                         TreatmentSummaryRepository treatmentSummaryRepository,
+                         GraphService graphService,
+                         AutoCompleteService autoCompleteService,
+                         MolCharService molCharService,
+                         PlatformService platformService,
+                         SearchDS searchDS) {
+
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
         this.patientSnapshotRepository = patientSnapshotRepository;
@@ -70,7 +94,355 @@ public class SearchService {
         this.specimenRepository = specimenRepository;
         this.platformRepository = platformRepository;
         this.treatmentSummaryRepository = treatmentSummaryRepository;
+        this.graphService = graphService;
+        this.autoCompleteService = autoCompleteService;
+        this.molCharService = molCharService;
+        this.platformService = platformService;
+
+        this.searchDS = searchDS;
+
+        facets.put("datasource_options", datasourceOptions);
+        facets.put("patient_age_options", patientAgeOptions);
+        facets.put("patient_gender_options", patientGenderOptions);
+        facets.put("cancer_system_options", cancerBySystemOptions);
+        facets.put("sample_tumor_type_options", sampleTumorTypeOptions);
     }
+
+
+
+    public ExportDTO export(Optional<String> query,
+                                     Optional<List<String>> datasource,
+                                     Optional<List<String>> diagnosis,
+                                     Optional<List<String>> patient_age,
+                                     Optional<List<String>> patient_treatment_status,
+                                     Optional<List<String>> patient_gender,
+                                     Optional<List<String>> sample_origin_tissue,
+                                     Optional<List<String>> cancer_system,
+                                     Optional<List<String>> sample_tumor_type,
+                                     Optional<List<String>> mutation){
+
+        Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
+                query,
+                datasource,
+                diagnosis,
+                patient_age,
+                patient_treatment_status,
+                patient_gender,
+                sample_origin_tissue,
+                cancer_system,
+                sample_tumor_type,
+                mutation
+        );
+
+        ExportDTO eDTO = new ExportDTO();
+        eDTO.setResults(searchDS.search(configuredFacets));
+        eDTO.setFacetsString(configuredFacets.toString());
+
+        return eDTO;
+    }
+
+
+    public WebSearchDTO webSearch(Optional<String> query,
+                                  Optional<List<String>> datasource,
+                                  Optional<List<String>> diagnosis,
+                                  Optional<List<String>> patient_age,
+                                  Optional<List<String>> patient_treatment_status,
+                                  Optional<List<String>> patient_gender,
+                                  Optional<List<String>> sample_origin_tissue,
+                                  Optional<List<String>> cancer_system,
+                                  Optional<List<String>> sample_tumor_type,
+                                  Optional<List<String>> mutation,
+                                  Integer page,
+                                  Integer size){
+
+
+        Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
+                query,
+                datasource,
+                diagnosis,
+                patient_age,
+                patient_treatment_status,
+                patient_gender,
+                sample_origin_tissue,
+                cancer_system,
+                sample_tumor_type,
+                mutation
+        );
+
+        WebSearchDTO wsDTO = new WebSearchDTO();
+
+
+        Set<ModelForQuery> results = searchDS.search(configuredFacets);
+
+        List<FacetOption> patientAgeSelected = searchDS.getFacetOptions(SearchFacetName.patient_age, patientAgeOptions, results, patient_age.orElse(null));
+        List<FacetOption> patientGenderSelected = searchDS.getFacetOptions(SearchFacetName.patient_gender, patientGenderOptions, results, patient_gender.orElse(null));
+        List<FacetOption> datasourceSelected = searchDS.getFacetOptions(SearchFacetName.datasource, datasourceOptions, results, datasource.orElse(null));
+        List<FacetOption> cancerSystemSelected = searchDS.getFacetOptions(SearchFacetName.cancer_system, cancerBySystemOptions, results, cancer_system.orElse(null));
+        List<FacetOption> sampleTumorTypeSelected = searchDS.getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
+        List<FacetOption> mutationSelected = searchDS.getFacetOptions(SearchFacetName.mutation, null, results, mutation.orElse(null));
+
+
+
+        wsDTO.setPatientAgeSelected(patientAgeSelected);
+        wsDTO.setPatientGenderSelected(patientGenderSelected);
+        wsDTO.setDatasourceSelected(datasourceSelected);
+        wsDTO.setCancerSystemSelected(cancerSystemSelected);
+        wsDTO.setSampleTumorTypeSelected(sampleTumorTypeSelected);
+        wsDTO.setMutationSelected(mutationSelected);
+
+
+
+        // Only add diagnosisSelected if diagnosis has actually been specified
+        List<FacetOption> diagnosisSelected = null;
+        if (diagnosis.isPresent()) {
+            diagnosisSelected = searchDS.getFacetOptions(SearchFacetName.diagnosis, null, results, diagnosis.orElse(null));
+        }
+
+        // Ensure to add the facet options to this list so the URL encoding retains the configured options
+        String facetString = getFacetString(
+                new HashSet<>(
+                        Arrays.asList(
+                                patientAgeSelected,
+                                patientGenderSelected,
+                                datasourceSelected,
+                                cancerSystemSelected,
+                                sampleTumorTypeSelected,
+                                mutationSelected
+
+                        )
+                )
+        );
+
+        // If there is a query, append the query parameter to any configured facet string
+        if (query.isPresent() && !query.get().isEmpty()) {
+            facetString = StringUtils.join(Arrays.asList("query=" + query.get(), facetString), "&");
+        }
+
+        // If there is a diagnosis, append the diagnosis parameters to any configured facet string
+        if (diagnosis.isPresent() && !diagnosis.get().isEmpty()) {
+            for (String diag : diagnosis.get()) {
+                facetString = StringUtils.join(Arrays.asList("diagnosis=" + diag, facetString), "&");
+            }
+        }
+
+
+        if (mutation.isPresent() && !mutation.get().isEmpty()) {
+            List<String> mutList = new ArrayList<>();
+            for (String mut : mutation.get()) {
+                mutList.add("mutation=" + mut);
+            }
+
+            if (facetString.length() != 0 && !facetString.endsWith("&")) {
+                facetString += "&";
+            }
+            for (String mut : mutList) {
+                facetString += mut + "&";
+            }
+
+        }
+
+        wsDTO.setFacetString(facetString);
+
+
+
+        // Num pages is converted to an int using this formula int n = a / b + (a % b == 0) ? 0 : 1;
+        int numPages = results.size() / size + (results.size() % size == 0 ? 0 : 1);
+
+        // If there are no results, default to 1 page (instead of 0 pages)
+        if (numPages < 1) {
+            numPages = 1;
+        }
+
+        int current = page;
+        int begin = Math.max(1, current - 4);
+        int end = Math.min(begin + 7, numPages);
+        String mutatedMarkers = molCharService.getMutatedMarkersAndVariants();;
+
+        String textSearchDescription = getTextualDescription(facetString, results);
+        wsDTO.setTextSearchDescription(textSearchDescription);
+
+        boolean mutSelected = false;
+
+        if(mutation.isPresent() && !mutation.get().isEmpty()){
+            mutSelected = true;
+        }
+
+        wsDTO.setAutoCompleteOptions(autoCompleteService.getAutoSuggestions());
+        List<ModelForQuery> resultSet = new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size()));
+
+        wsDTO.setSearchResults(resultSet);
+        wsDTO.setPlatformsAndUrls(platformService.getPlatformsWithUrls());
+
+        return wsDTO;
+    }
+
+
+    private Map<SearchFacetName, List<String>> getFacetMap(
+            Optional<String> query,
+            Optional<List<String>> datasource,
+            Optional<List<String>> diagnosis,
+            Optional<List<String>> patientAge,
+            Optional<List<String>> patientTreatmentStatus,
+            Optional<List<String>> patientGender,
+            Optional<List<String>> sampleOriginTissue,
+            Optional<List<String>> cancerSystem,
+            Optional<List<String>> sampleTumorType,
+            Optional<List<String>> mutation
+
+
+    ) {
+
+        Map<SearchFacetName, List<String>> configuredFacets = new HashMap<>();
+
+        if (query.isPresent() && !query.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.query, new ArrayList<>());
+            configuredFacets.get(SearchFacetName.query).add(query.get());
+        }
+
+        if (datasource.isPresent() && !datasource.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.datasource, new ArrayList<>());
+            for (String s : datasource.get()) {
+                configuredFacets.get(SearchFacetName.datasource).add(s);
+            }
+        }
+
+        if (diagnosis.isPresent() && !diagnosis.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.diagnosis, new ArrayList<>());
+            for (String s : diagnosis.get()) {
+                configuredFacets.get(SearchFacetName.diagnosis).add(s);
+            }
+        }
+
+        if (patientAge.isPresent() && !patientAge.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.patient_age, new ArrayList<>());
+            for (String s : patientAge.get()) {
+                configuredFacets.get(SearchFacetName.patient_age).add(s);
+            }
+        }
+
+        if (patientTreatmentStatus.isPresent() && !patientTreatmentStatus.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.patient_treatment_status, new ArrayList<>());
+            for (String s : patientTreatmentStatus.get()) {
+                configuredFacets.get(SearchFacetName.patient_treatment_status).add(s);
+            }
+        }
+
+        if (patientGender.isPresent() && !patientGender.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.patient_gender, new ArrayList<>());
+            for (String s : patientGender.get()) {
+                configuredFacets.get(SearchFacetName.patient_gender).add(s);
+            }
+        }
+
+        if (sampleOriginTissue.isPresent() && !sampleOriginTissue.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.sample_origin_tissue, new ArrayList<>());
+            for (String s : sampleOriginTissue.get()) {
+                configuredFacets.get(SearchFacetName.sample_origin_tissue).add(s);
+            }
+        }
+
+        if (cancerSystem.isPresent() && !cancerSystem.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.cancer_system, new ArrayList<>());
+            for (String s : cancerSystem.get()) {
+                configuredFacets.get(SearchFacetName.cancer_system).add(s);
+            }
+        }
+
+        if (sampleTumorType.isPresent() && !sampleTumorType.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.sample_tumor_type, new ArrayList<>());
+            for (String s : sampleTumorType.get()) {
+                configuredFacets.get(SearchFacetName.sample_tumor_type).add(s);
+            }
+        }
+
+        if (mutation.isPresent() && !mutation.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.mutation, new ArrayList<>());
+            for (String s : mutation.get()) {
+                configuredFacets.get(SearchFacetName.mutation).add(s);
+            }
+        }
+
+
+        return configuredFacets;
+    }
+
+    /**
+     * Get a string representation of all the configured facets
+     *
+     * @param allSelectedFacetOptions
+     * @return
+     */
+    private String getFacetString(Set<List<FacetOption>> allSelectedFacetOptions) {
+        List<String> pieces = new ArrayList<>();
+        for (List<FacetOption> facetOptions : allSelectedFacetOptions) {
+            pieces.add(facetOptions.stream()
+                    .filter(x -> x.getSelected() != null)
+                    .filter(FacetOption::getSelected)
+                    .map(x -> x.getFacetType() + "=" + x.getName())
+                    .collect(Collectors.joining("&")));
+        }
+        return pieces.stream().filter(x -> !x.isEmpty()).collect(Collectors.joining("&"));
+    }
+
+    public String getTextualDescription(String facetString, Set<ModelForQuery> results) {
+
+        if (StringUtils.isEmpty(facetString)) {
+            return null;
+        }
+
+        String textDescription = "Your filter for ";
+        Map<String, Set<String>> filters = new LinkedHashMap<>();
+
+        for (String urlParams : facetString.split("&")) {
+            List<String> pieces = Arrays.asList(urlParams.split("="));
+            String key = pieces.get(0);
+            String value = pieces.get(1);
+            String replacementValue;
+
+            if (!filters.containsKey(key)) {
+                filters.put(key, new TreeSet<>());
+            }
+
+            if(key.equals("mutation")){
+
+                replacementValue = value.replace("___MUT___", " variant ");
+                value = replacementValue;
+            }
+
+            filters.get(key).add(value);
+        }
+
+        Set<String> dataSourceCounter = new HashSet<>();
+        for(ModelForQuery mfq :results){
+            dataSourceCounter.add(mfq.getDatasource());
+        }
+
+        textDescription += StringUtils
+                .join(filters.keySet()
+                        .stream()
+                        .map(x -> "<b>" + x + ":</b> (" + StringUtils.join(filters.get(x), ", ").replaceAll("\\[", "").replaceAll("\\]", "") + ")")
+                        .collect(Collectors.toList()), ", ");
+
+        textDescription += " returned " + results.size() + " result";
+        textDescription += results.size() == 1 ? "" : "s";
+        textDescription += " in "+dataSourceCounter.size()+" source";
+        textDescription += dataSourceCounter.size() == 1 ? "" : "s";
+
+        if(dataSourceCounter.size() != 0) textDescription += " "+dataSourceCounter.toString();
+
+        return textDescription;
+
+    }
+
+
+
+
+
+
+
+
+
+
 
 
     public int modelCount() {
