@@ -15,9 +15,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @Configuration
 @EnableTransactionManagement
-@ComponentScan(value = "org.pdxfinder", excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = SearchDS.class)
-})
+@ComponentScan(value = "org.pdxfinder")
 @EnableNeo4jRepositories("org.pdxfinder.repositories")
 public class TestConfig {
 

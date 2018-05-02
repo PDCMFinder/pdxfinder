@@ -8,6 +8,7 @@ import org.pdxfinder.repositories.DataProjectionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -20,11 +21,14 @@ public class SearchDSTest extends BaseTest {
 
     private final static Logger log = LoggerFactory.getLogger(SearchDSTest.class);
 
+    @Autowired
     SearchDS searchDS;
-    private Set<ModelForQuery> models = new HashSet<>();
 
     @Autowired
     DataProjectionRepository dataProjectionRepository;
+
+
+    private Set<ModelForQuery> models = new HashSet<>();
 
     @Before
     public void setUp() {
@@ -68,9 +72,6 @@ public class SearchDSTest extends BaseTest {
         dataProjectionRepository.save(mutDP);
 
         assertThat(models.size(), is(4));
-
-        this.searchDS = new SearchDS(dataProjectionRepository);
-        searchDS.initialize();
 
     }
 
@@ -122,7 +123,7 @@ public class SearchDSTest extends BaseTest {
 
     @Test
     public void testGetDiagnosisCounts() {
-
+        searchDS.initialize();
         Map<String, Integer> diagnosisCounts = searchDS.getDiagnosisCounts();
         System.out.println(diagnosisCounts);
         assertThat(diagnosisCounts.get("Adenocarcinoma"), is(2));
