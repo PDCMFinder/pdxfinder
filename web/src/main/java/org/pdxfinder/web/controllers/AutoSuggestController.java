@@ -1,7 +1,7 @@
 package org.pdxfinder.web.controllers;
 
 import org.pdxfinder.services.AutoCompleteService;
-import org.pdxfinder.services.ds.AutoSuggestOption;
+import org.pdxfinder.services.ds.AutoCompleteOption;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,10 +20,10 @@ public class AutoSuggestController {
     }
 
     @RequestMapping(value = "/autosuggests")
-    List<AutoSuggestOption> getAutoSuggestList(){
+    List<AutoCompleteOption> getAutoSuggestList(){
 
 
-        List<AutoSuggestOption> autoSuggestions = autoCompleteService.getAutoSuggestions();
+        List<AutoCompleteOption> autoSuggestions = autoCompleteService.getAutoSuggestions();
         return autoSuggestions;
 
     }
