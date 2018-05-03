@@ -1,10 +1,14 @@
 package org.pdxfinder.services;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
-import org.pdxfinder.services.ds.*;
+import org.pdxfinder.services.ds.FacetOption;
+import org.pdxfinder.services.ds.ModelForQuery;
+import org.pdxfinder.services.ds.SearchDS;
+import org.pdxfinder.services.ds.SearchFacetName;
 import org.pdxfinder.services.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -287,6 +291,60 @@ public class SearchService {
             wsDTO.setPlatformMap(getPlatformOrMutationFromMutatedVariants(resultSet,"platformMap"));
             wsDTO.setMutationMap(getPlatformOrMutationFromMutatedVariants(resultSet,"mutationMap"));
         }
+
+        wsDTO.setIsMutationSelected(mutSelected);
+        wsDTO.setQuery(query.orElse(""));
+        wsDTO.setTotalResults(results.size());
+        wsDTO.setPage(page);
+        wsDTO.setSize(size);
+        wsDTO.setDiagnosisSelected(diagnosisSelected);
+        wsDTO.setFacetOptions(facets);
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, List<String>> mapObject = new HashMap<>();
+        try{
+            mapObject = mapper.readValue(mutatedMarkers, Map.class);
+        }catch (Exception e){}
+
+
+        String done = "";
+        Map<String, List<String>> userChoice = new HashMap<>();
+        Map<String, Set<String>> allVariants = new LinkedHashMap<>();
+
+        try {
+            for (String markerReq : mutation.get()) {
+                String marka = markerReq.split("___")[0];
+                List<String> variantList = new ArrayList<>();
+                String variant = "";
+
+                if (!done.contains(marka)) { // New Marker
+                    for (String markerReq2 : mutation.get()) {
+                        if (marka.equals(markerReq2.split("___")[0])){
+                            variant = markerReq2.split("___")[2];
+                            if (variant.equals("ALL")){
+                                variantList = mapObject.get(marka);
+                            }
+                            else {
+                                variantList.add(variant);
+                            }
+                        }
+                    }
+                    userChoice.put(marka,variantList);
+
+                    Set<String> sortedVariantList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+                    sortedVariantList.addAll(mapObject.get(marka));
+
+                    allVariants.put(marka,sortedVariantList);
+                }
+
+                done += marka;
+            }
+        }catch (Exception e){}
+
+        wsDTO.setMarkerMap(userChoice);
+        wsDTO.setMarkerMapWithAllVariants(allVariants);
+
 
         return wsDTO;
     }

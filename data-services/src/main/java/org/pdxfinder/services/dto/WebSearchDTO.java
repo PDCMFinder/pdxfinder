@@ -21,6 +21,7 @@ public class WebSearchDTO {
     private int totalResults;
     private Integer page;
     private Integer size;
+    private boolean isMutationSelected;
 
 
     private String query;
@@ -36,12 +37,16 @@ public class WebSearchDTO {
     private List<ModelForQuery> searchResults;
     private String textSearchDescription;
     private List<AutoCompleteOption> autoCompleteOptions;
-    Map<String, String> platformsAndUrls;
+    private Map<String, String> platformsAndUrls;
 
     private String mutatedMarkersAndVariants;
 
     private Map<String, List<String>> platformMap;
     private Map<String, List<String>> mutationMap;
+    private List<FacetOption> diagnosisSelected;
+    private Map<String, List<String>> facetOptions;
+    private Map<String, List<String>> markerMap;
+    private Map<String, Set<String>> markerMapWithAllVariants;
 
 
     public WebSearchDTO() {
@@ -102,6 +107,14 @@ public class WebSearchDTO {
 
     public void setSize(Integer size) {
         this.size = size;
+    }
+
+    public boolean getIsMutationSelected() {
+        return isMutationSelected;
+    }
+
+    public void setIsMutationSelected(boolean isMutationSelected) {
+        this.isMutationSelected = isMutationSelected;
     }
 
     public String getQuery() {
@@ -223,4 +236,36 @@ public class WebSearchDTO {
     public void setMutationMap(Map<String, List<String>> mutationMap) {
         this.mutationMap = mutationMap;
     }
+
+    public void setDiagnosisSelected(List<FacetOption> diagnosisSelected) {
+        this.diagnosisSelected = diagnosisSelected;
+    }
+
+    public List<FacetOption> getDiagnosisSelected() {
+        return diagnosisSelected;
+    }
+
+    public void setFacetOptions(Map<String, List<String>> facetOptions) {
+        this.facetOptions = facetOptions;
+    }
+
+    public Map<String, List<String>> getFacetOptions() {
+        return facetOptions;
+    }
+
+    public Map<String, List<String>> getMarkerMap() {
+        return markerMap;
+    }
+
+    public void setMarkerMap(Map<String, List<String>> markerMap) {
+        this.markerMap = markerMap;
+    }
+
+    public Map<String, Set<String>> getMarkerMapWithAllVariants() {
+        return markerMapWithAllVariants;
+    }
+    public void setMarkerMapWithAllVariants(Map<String, Set<String>> markerMapWithAllVariants) {
+        this.markerMapWithAllVariants = markerMapWithAllVariants;
+    }
+
 }
