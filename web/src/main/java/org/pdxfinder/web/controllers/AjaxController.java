@@ -1,11 +1,10 @@
 package org.pdxfinder.web.controllers;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
-import org.pdxfinder.services.GraphService;
-import org.pdxfinder.services.MolCharService;
-import org.pdxfinder.services.SearchService;
+import org.pdxfinder.services.*;
+import org.pdxfinder.services.ds.AutoCompleteOption;
+import org.pdxfinder.services.dto.DataAvailableDTO;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,33 +13,51 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-/**
- * Created by abayomi on 05/07/2017.
+/*
+ * Created by csaba on 03/05/2018.
  */
 @RestController
-public class RestControllerGeneral {
+public class AjaxController {
 
-    GraphService graphService;
-    SearchService searchService;
-    MolCharService molCharService;
+    private AutoCompleteService autoCompleteService;
+    private PlatformService platformService;
+    private SearchService searchService;
+    private MolCharService molCharService;
+
 
     @Autowired
-    public RestControllerGeneral(GraphService graphService, SearchService searchService, MolCharService molCharService) {
-        this.graphService = graphService;
+    public AjaxController(AutoCompleteService autoCompleteService, PlatformService platformService,
+                          SearchService searchService, MolCharService molCharService) {
+        this.autoCompleteService = autoCompleteService;
+        this.platformService = platformService;
         this.searchService = searchService;
         this.molCharService = molCharService;
     }
 
+    @RequestMapping(value = "/autosuggests")
+    List<AutoCompleteOption> getAutoSuggestList(){
 
-    @RequestMapping(method = RequestMethod.GET, value = "/DOAutoSuggest")
-    public Set<String> mappedDOTerm() {
-        Set<String> autoSuggestList = graphService.getMappedDOTerms();
-        return autoSuggestList;
+        List<AutoCompleteOption> autoSuggestions = autoCompleteService.getAutoSuggestions();
+        return autoSuggestions;
     }
 
+
+    @RequestMapping(value = "/platform/{dataSrc}")
+    public Map findPlatformBySource(@PathVariable String dataSrc) {
+
+        return  platformService.getPlatformCountBySource(dataSrc);
+    }
+
+
+    @RequestMapping(value = "/platformdata/{dataSrc}")
+    public List<DataAvailableDTO> findPlatformDataBySource(@PathVariable String dataSrc) {
+
+        //populate list with data [{dataType:"mutation",platform:"CTP", models:20},{},{}]
+        return  platformService.getAvailableDataBySource(dataSrc);
+    }
 
 
     @RequestMapping(value = "/modeldata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -93,34 +110,6 @@ public class RestControllerGeneral {
 
     }
 
-        /* Incoming data from @RequestBody MultiValueMap data
-                 draw 1
-                 columns[0][data] 0
-                 columns[0][name]
-                 columns[0][searchable] true
-                 columns[0][orderable] true
-                 columns[0][search][value]
-                 columns[0][search][regex] false
-                 columns[1][data] 1
-                 columns[1][name]
-                 columns[1][searchable] true
-                 columns[1][orderable] true
-                 columns[1][search][value]
-                 columns[1][search][regex] false
-                 columns[2][data] 2
-                 columns[2][name]
-                 columns[2][searchable] true
-                 columns[2][orderable] true
-                 columns[2][search][value]
-                 columns[2][search][regex] false
-                 * order[0][column] 0
-                 * order[0][dir] asc
-                 * start 0
-                 * length 10
-                 * search[value]
-                 search[regex] false
-         */
-
 
     @RequestMapping(value = "/getxdata/{dataSrc}/{modelId}")
     public VariationDataDTO getXenoVariationData(@PathVariable String dataSrc,
@@ -167,6 +156,7 @@ public class RestControllerGeneral {
     }
 
 
+
     @RequestMapping(value = "/modeltech/{dataSrc}/{modelId}")
     public Map findModelTechnology(@PathVariable String dataSrc, @PathVariable String modelId,
                                    @RequestParam(value="passage", required = false) String passage) {
@@ -180,25 +170,6 @@ public class RestControllerGeneral {
     public Map findPatientTechnology(@PathVariable String dataSrc, @PathVariable String modelId) {
 
         return  searchService.findPatientPlatforms(dataSrc,modelId);
-    }
-
-
-    public String getSortColumn(String sortcolumn){
-
-        Map<String, String> tableColumns = new HashMap<>();
-        tableColumns.put("0","msamp.sourceSampleId");
-        tableColumns.put("1","mAss.chromosome");
-        tableColumns.put("2","mAss.seqPosition");
-        tableColumns.put("3","mAss.refAllele");
-        tableColumns.put("4","mAss.altAllele");
-        tableColumns.put("5","mAss.consequence");
-        tableColumns.put("6","m.symbol");
-        tableColumns.put("7","mAss.aminoAcidChange");
-        tableColumns.put("8","mAss.aminoAcidChange");
-        tableColumns.put("9","mAss.alleleFrequency");
-        tableColumns.put("10","mAss.rsVariants");
-
-        return tableColumns.get(sortcolumn);
     }
 
 
@@ -230,4 +201,23 @@ public class RestControllerGeneral {
 
 
 
+    //HELPER METHODS
+
+    public String getSortColumn(String sortcolumn){
+
+        Map<String, String> tableColumns = new HashMap<>();
+        tableColumns.put("0","msamp.sourceSampleId");
+        tableColumns.put("1","mAss.chromosome");
+        tableColumns.put("2","mAss.seqPosition");
+        tableColumns.put("3","mAss.refAllele");
+        tableColumns.put("4","mAss.altAllele");
+        tableColumns.put("5","mAss.consequence");
+        tableColumns.put("6","m.symbol");
+        tableColumns.put("7","mAss.aminoAcidChange");
+        tableColumns.put("8","mAss.aminoAcidChange");
+        tableColumns.put("9","mAss.alleleFrequency");
+        tableColumns.put("10","mAss.rsVariants");
+
+        return tableColumns.get(sortcolumn);
+    }
 }
