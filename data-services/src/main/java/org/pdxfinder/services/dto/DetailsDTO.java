@@ -3,6 +3,7 @@ package org.pdxfinder.services.dto;
 import org.pdxfinder.dao.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -24,7 +25,6 @@ public class DetailsDTO {
     private String originTissue;
     private String sampleSite;
     private String classification;
-    private List<String> cancerGenomics;
 
     private String sampleType; //Implantation Type
     private String strain;
@@ -35,20 +35,35 @@ public class DetailsDTO {
     private String externalUrlText;
     private String mappedOntology;
 
+    private String contacts;
+    private String externalDataSourceDesc;
+    private String drugProtocolUrl;
+    private int totalPages;
+    private int presentPage;
+    private int variationDataCount;
+    private int drugSummaryRowNumber;
+
+
     // Quality control information
     private List<QualityAssurance> qualityAssurances;
 
-
-    private String contacts;
-    private String externalDataSourceDesc;
-
-
+    private List<String> cancerGenomics;
     private List<Specimen> specimens;
     private Set<Platform> platforms;
     private Set<MolecularCharacterization>  molecularCharacterizations;
     private Set< List<MarkerAssociation> > markerAssociations;
-    private int totalPages;
-    private int variationDataCount;
+
+    private Map<String, String> patientTech;
+    private Map<String, Set<String>> modelTechAndPassages;
+    private List<String> relatedModels;
+    private List<DrugSummaryDTO> drugSummary;
+    private List<VariationDataDTO> variationDataDTOList;
+    private Map<String, String> techNPassToSampleId;
+    private Set<String> autoSuggestList;
+    private Map<String, String> platformsAndUrls;
+
+
+
 
     public DetailsDTO() {
         this.modelId = "";
@@ -290,6 +305,14 @@ public class DetailsDTO {
         this.totalPages = totalPages;
     }
 
+    public int getPresentPage() {
+        return presentPage;
+    }
+
+    public void setPresentPage(int presentPage) {
+        this.presentPage = presentPage;
+    }
+
     public int getVariationDataCount() {
         return variationDataCount;
     }
@@ -320,5 +343,85 @@ public class DetailsDTO {
 
     public void setQualityAssurances(List<QualityAssurance> qualityAssurances) {
         this.qualityAssurances = qualityAssurances;
+    }
+
+    public String getDrugProtocolUrl() {
+        return drugProtocolUrl;
+    }
+
+    public void setDrugProtocolUrl(String drugProtocolUrl) {
+        this.drugProtocolUrl = drugProtocolUrl;
+    }
+
+    public Map<String, String> getPatientTech() {
+        return patientTech;
+    }
+
+    public void setPatientTech(Map<String, String> patientTech) {
+        this.patientTech = patientTech;
+    }
+
+    public Map<String, Set<String>> getModelTechAndPassages() {
+        return modelTechAndPassages;
+    }
+
+    public void setModelTechAndPassages(Map<String, Set<String>> modelTechAndPassages) {
+        this.modelTechAndPassages = modelTechAndPassages;
+    }
+
+    public List<String> getRelatedModels() {
+        return relatedModels;
+    }
+
+    public void setRelatedModels(List<String> relatedModels) {
+        this.relatedModels = relatedModels;
+    }
+
+    public List<DrugSummaryDTO> getDrugSummary() {
+        return drugSummary;
+    }
+
+    public void setDrugSummary(List<DrugSummaryDTO> drugSummary) {
+        this.drugSummary = drugSummary;
+    }
+
+    public int getDrugSummaryRowNumber() {
+        return drugSummaryRowNumber;
+    }
+
+    public void setDrugSummaryRowNumber(int drugSummaryRowNumber) {
+        this.drugSummaryRowNumber = drugSummaryRowNumber;
+    }
+
+    public List<VariationDataDTO> getVariationDataDTOList() {
+        return variationDataDTOList;
+    }
+
+    public void setVariationDataDTOList(List<VariationDataDTO> variationDataDTOList) {
+        this.variationDataDTOList = variationDataDTOList;
+    }
+
+    public Map<String, String> getTechNPassToSampleId() {
+        return techNPassToSampleId;
+    }
+
+    public void setTechNPassToSampleId(Map<String, String> techNPassToSampleId) {
+        this.techNPassToSampleId = techNPassToSampleId;
+    }
+
+    public Set<String> getAutoSuggestList() {
+        return autoSuggestList;
+    }
+
+    public void setAutoSuggestList(Set<String> autoSuggestList) {
+        this.autoSuggestList = autoSuggestList;
+    }
+
+    public Map<String, String> getPlatformsAndUrls() {
+        return platformsAndUrls;
+    }
+
+    public void setPlatformsAndUrls(Map<String, String> platformsAndUrls) {
+        this.platformsAndUrls = platformsAndUrls;
     }
 }
