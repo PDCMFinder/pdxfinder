@@ -85,7 +85,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
     private void createMutationDataProjection(){
 
-        Collection<MolecularCharacterization> mutatedMolchars = loaderUtils.getMolCharsByType("mutation");
+        Collection<MolecularCharacterization> mutatedMolchars = loaderUtils.findMolCharsByType("mutation");
 
         log.info("Looking at "+mutatedMolchars.size()+" MolChar objects. This may take a while folks...");
 
@@ -94,7 +94,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
 
 
-            ModelCreation model = loaderUtils.getModelByMolChar(mc);
+            ModelCreation model = loaderUtils.findModelByMolChar(mc);
 
             Long modelId = model.getId();
 
@@ -105,7 +105,7 @@ public class CreateDataProjections implements CommandLineRunner{
                 platformName = mc.getPlatform().getName();
             }
 
-            Set<MarkerAssociation> mas = loaderUtils.getMarkerAssocsByMolChar(mc);
+            Set<MarkerAssociation> mas = loaderUtils.findMarkerAssocsByMolChar(mc);
 
             if(mas != null){
 
@@ -142,7 +142,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
         log.info("Saving DataProjection");
 
-        DataProjection pmvmDP = loaderUtils.getDataProjectionByLabel("PlatformMarkerVariantModel");
+        DataProjection pmvmDP = loaderUtils.findDataProjectionByLabel("PlatformMarkerVariantModel");
 
         if (pmvmDP == null){
 
@@ -150,7 +150,7 @@ public class CreateDataProjections implements CommandLineRunner{
             pmvmDP.setLabel("PlatformMarkerVariantModel");
         }
 
-        DataProjection mvDP = loaderUtils.getDataProjectionByLabel("MarkerVariant");
+        DataProjection mvDP = loaderUtils.findDataProjectionByLabel("MarkerVariant");
 
         if(mvDP == null){
 
@@ -274,7 +274,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
         // Get out all platforms for all models and populate a map with the results
         Map<Long, List<String>> platformsByModel = new HashMap<>();
-        Collection<ModelCreation> allModelsPlatforms = loaderUtils.getAllModelsPlatforms();
+        Collection<ModelCreation> allModelsPlatforms = loaderUtils.findAllModelsPlatforms();
         for (ModelCreation mc : allModelsPlatforms) {
 
             if (!platformsByModel.containsKey(mc.getId())) {
@@ -322,7 +322,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
         log.info("Creating ModelForQuery DataProjection");
 
-        for (ModelCreation mc : loaderUtils.getModelsWithPatientData()) {
+        for (ModelCreation mc : loaderUtils.findModelsWithPatientData()) {
 
             ModelForQuery mfq = new ModelForQuery();
             mfq.setModelId(mc.getId());
@@ -451,7 +451,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
         log.info("Saving ModelForQuery DataProjection");
 
-        DataProjection mfqDP = loaderUtils.getDataProjectionByLabel("ModelForQuery");
+        DataProjection mfqDP = loaderUtils.findDataProjectionByLabel("ModelForQuery");
 
         if (mfqDP == null){
 

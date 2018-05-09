@@ -73,7 +73,7 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
 
         for (OntologyTerm ot : terms) {
             System.out.println("Updating " + ot.getLabel());
-            ot.setIndirectMappedSamplesNumber(loaderUtils.getDirectMappingNumber(ot.getLabel()));
+            ot.setIndirectMappedSamplesNumber(loaderUtils.findDirectMappingNumber(ot.getLabel()));
             loaderUtils.saveOntologyTerm(ot);
 
         }

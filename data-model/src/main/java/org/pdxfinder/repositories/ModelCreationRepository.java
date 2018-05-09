@@ -74,7 +74,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
                                              @Param("dataSource") String[] dataSource, @Param("tumorType") String[] tumorType);
 
     @Query("MATCH (n:ModelCreation) RETURN n")
-    Collection<ModelCreation> getAllModels();
+    Collection<ModelCreation> findAllModels();
 
     @Query("MATCH (mc:ModelCreation)<-[ir:IMPLANTED_IN]-(s:Sample)-[sfr:SAMPLED_FROM]-(ps:PatientSnapshot)-[pr:PATIENT]-(p:Patient) " +
             "WITH mc, ir, s, sfr, ps, pr, p " +
@@ -82,14 +82,14 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "WITH mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt " +
             "MATCH (t:Tissue)-[tr:ORIGIN_TISSUE]-(s)-[otm:MAPPED_TO]-(ot:OntologyTerm)-[ottm:SUBCLASS_OF *1..]->(term:OntologyTerm) " +
             "RETURN mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt, tr, t, otm, ot, ottm, term")
-    Collection<ModelCreation> getModelsWithPatientData();
+    Collection<ModelCreation> findModelsWithPatientData();
 
     @Query("MATCH " +
             "(mc:ModelCreation)-[msr:MODEL_SAMPLE_RELATION]-(s:Sample)" +
             "-[cbr:CHARACTERIZED_BY]-(molChar:MolecularCharacterization)" +
             "-[pur:PLATFORM_USED]-(p:Platform) " +
             "RETURN mc, msr, s, cbr, molChar, pur, p")
-    Collection<ModelCreation> getAllModelsPlatforms();
+    Collection<ModelCreation> findAllModelsPlatforms();
 
 
 

@@ -292,7 +292,7 @@ public class ValidateGeneSymbols implements CommandLineRunner{
 
     private void validateSymbols(){
 
-        Collection<ModelCreation> models = loaderUtils.getAllModels();
+        Collection<ModelCreation> models = loaderUtils.findAllModels();
         HashMap<String, AccessionData> hugoDB = loadHugoDatabase();
 
         for(ModelCreation m:models){

@@ -379,7 +379,7 @@ public class LoadIRCC implements CommandLineRunner {
                 String sampleId = entry.getKey();
                 MolecularCharacterization mc = entry.getValue();
                 try{
-                    Sample s = loaderUtils.getSampleByDataSourceAndSourceSampleId(irccDS.getAbbreviation(), sampleId);
+                    Sample s = loaderUtils.findSampleByDataSourceAndSourceSampleId(irccDS.getAbbreviation(), sampleId);
 
                     if(s == null){
                         log.error("Sample not found: "+sampleId);

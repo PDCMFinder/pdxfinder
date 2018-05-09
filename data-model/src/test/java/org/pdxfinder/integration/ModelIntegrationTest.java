@@ -178,7 +178,7 @@ public class ModelIntegrationTest extends BaseTest {
         specimenRepository.save(specimen);
 
         // Assert the nodes have been persisted in the correct graph
-        Specimen found = specimenRepository.findByExternalId("TEST_SPECIMEN");
+        Specimen found = specimenRepository.findByExternalIdAndDS("TEST_SPECIMEN");
         assert found.getPdxPassage().getPassage() == 1;
         assert found.getPdxPassage().getPdxPassage().getModelCreation().getSample().getSampleSite() == tissue;
 

@@ -232,7 +232,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
         while (startNode < maxSamplesNumber) {
 
             log.info("Mapping " + batchSize + " samples from " + startNode);
-            Collection<Sample> samples = loaderUtils.getHumanSamplesFromTo(startNode, batchSize);
+            Collection<Sample> samples = loaderUtils.findHumanSamplesFromTo(startNode, batchSize);
 
             for (Sample sample : samples) {
 
@@ -279,7 +279,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
                 } else {
 
-                    OntologyTerm ot = loaderUtils.getOntologyTermByLabel(mappingRule.getOntologyTerm());
+                    OntologyTerm ot = loaderUtils.findOntologyTermByLabel(mappingRule.getOntologyTerm());
 
 
                     if (ot == null) {

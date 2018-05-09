@@ -67,7 +67,7 @@ public class ExportSamplesWithoutMapping implements CommandLineRunner {
 
     public void getSamplesWithoutMapping(){
 
-        this.samplesWithoutMapping = loaderUtils.getSamplesWithoutOntologyMapping();
+        this.samplesWithoutMapping = loaderUtils.findSamplesWithoutOntologyMapping();
 
     }
 
