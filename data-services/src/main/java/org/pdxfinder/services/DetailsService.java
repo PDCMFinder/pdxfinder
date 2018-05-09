@@ -88,24 +88,7 @@ public class DetailsService {
 
 
 
-    public DetailsDTO getModelDetails(String dataSrc,
-                                      String modelId,
-                                      Integer page,
-                                      Integer size) {
-
-
-        int viewPage = (page == null || page < 1) ? 0 : page - 1;
-        int viewSize = (size == null || size < 1) ? 15000 : size;
-
-        DetailsDTO detailsDTO = searchForModel(dataSrc, modelId, viewPage, viewSize, "", "", "");
-
-        return detailsDTO;
-
-
-    }
-
-
-    public DetailsDTO searchForModel(String dataSource, String modelId, int page, int size, String technology, String passage, String searchFilter) {
+    public DetailsDTO getModelDetails(String dataSource, String modelId, int page, int size, String technology, String passage, String searchFilter) {
 
 
         Sample sample = sampleRepository.findByDataSourceAndPdxId(dataSource,modelId);
@@ -174,10 +157,6 @@ public class DetailsService {
 
         if (sample != null && sample.getSourceSampleId() != null) {
             dto.setExternalId(sample.getSourceSampleId());
-        }
-
-        if (sample != null && sample.getDataSource() != null) {
-            dto.setDataSource(sample.getDataSource());
         }
 
         if (patient != null && patient.getExternalId() != null) {
@@ -360,10 +339,6 @@ public class DetailsService {
         }
 
 
-
-
-
-
         Map<String, String> patientTech = findPatientPlatforms(dataSource, modelId);
         dto.setPatientTech(patientTech);
 
@@ -419,6 +394,21 @@ public class DetailsService {
 
         Map<String, String> platformsAndUrls = platformService.getPlatformsWithUrls();
         dto.setPlatformsAndUrls(platformsAndUrls);
+
+
+        Map<String, String> sorceDesc = new HashMap<>();
+        sorceDesc.put("JAX","The Jackson Laboratory");
+        sorceDesc.put("PDXNet-HCI-BCM","HCI-Baylor College of Medicine");
+        sorceDesc.put("PDXNet-Wistar-MDAnderson-Penn","Melanoma PDX established by the Wistar/MD Anderson/Penn");
+        sorceDesc.put("PDXNet-WUSTL","Washington University in St. Louis");
+        sorceDesc.put("PDXNet-MDAnderson","University of Texas MD Anderson Cancer Center");
+        sorceDesc.put("PDMR","NCI Patient-Derived Models Repository");
+        sorceDesc.put("IRCC","Candiolo Cancer Institute");
+
+        if (sample != null && sample.getDataSource() != null) {
+            dto.setDataSource(sample.getDataSource());
+            dto.setSourceDescription(sorceDesc.get(sample.getDataSource()));
+        }
 
 
         return dto;

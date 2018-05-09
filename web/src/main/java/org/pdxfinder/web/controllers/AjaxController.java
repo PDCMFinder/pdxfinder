@@ -145,15 +145,13 @@ public class AjaxController {
     @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
     public DetailsDTO details(@PathVariable String dataSrc,
                               @PathVariable String modelId,
-                              @RequestParam(value="page", required = false) Integer page,
-                              @RequestParam(value="size", required = false) Integer size,
+                              @RequestParam(value = "page", defaultValue = "0") Integer page,
+                              @RequestParam(value = "size", defaultValue = "20") Integer size,
                               @RequestParam(value="platform", required = false) String platform) {
 
-        int viewPage = (page == null || page < 1) ? 0 : page - 1;
-        int viewSize = (size == null || size < 1) ? 20 : size;
         String viewPlatform = (platform == null) ? "" : platform;
 
-        DetailsDTO dto = detailsService.searchForModel(dataSrc, modelId, viewPage,viewSize,viewPlatform,"","");
+        DetailsDTO dto = detailsService.getModelDetails(dataSrc, modelId, page, size,viewPlatform,"","");
 
         return  dto;
     }

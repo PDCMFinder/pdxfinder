@@ -14,6 +14,7 @@ public class DetailsDTO {
     private String modelId;
     private String externalId;
     private String dataSource;
+    private String sourceDescription;
     private String patientId;
     private String gender;
     private String ageAtCollection;
@@ -69,6 +70,7 @@ public class DetailsDTO {
         this.modelId = "";
         this.externalId = "";
         this.dataSource = "";
+        this.sourceDescription = "";
         this.patientId = "";
         this.gender = "";
         this.ageAtCollection = "";
@@ -118,6 +120,14 @@ public class DetailsDTO {
 
     public void setDataSource(String dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public String getSourceDescription() {
+        return sourceDescription;
+    }
+
+    public void setSourceDescription(String sourceDescription) {
+        this.sourceDescription = sourceDescription;
     }
 
     public String getPatientId() {

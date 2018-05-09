@@ -5,8 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.commons.lang3.text.WordUtils;
-import org.pdxfinder.services.*;
-import org.pdxfinder.services.dto.DetailsDTO;
+import org.pdxfinder.services.DetailsService;
 import org.pdxfinder.services.dto.VariationDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,80 +35,12 @@ public class DetailsController {
     public String details(Model model,
                           @PathVariable String dataSrc,
                           @PathVariable String modelId,
-                          @RequestParam(value="page", required = false) Integer page,
-                          @RequestParam(value="size", required = false) Integer size){
+                          @RequestParam(value = "page", defaultValue = "0") Integer page,
+                          @RequestParam(value = "size", defaultValue = "15000") Integer size){
 
-        int viewPage = (page == null || page < 1) ? 0 : page-1;
-        int viewSize = (size == null || size < 1) ? 15000 : size;
-
-        DetailsDTO dto = detailsService.searchForModel(dataSrc,modelId,viewPage,viewSize,"","","");
-        model.addAttribute("modelDetails",dto);
-
-        model.addAttribute("mappedTerm", dto.getAutoSuggestList());
-        model.addAttribute("nonjsVariationdata", dto.getVariationDataDTOList());
-        model.addAttribute("modelId",modelId);
-        model.addAttribute("dataSrc",dataSrc);
-        model.addAttribute("externalId", dto.getExternalId());
-        model.addAttribute("dataSource", dto.getDataSource());
-        model.addAttribute("patientId", dto.getPatientId());
-        model.addAttribute("gender", dto.getGender());
-        model.addAttribute("age", dto.getAgeAtCollection());
-        model.addAttribute("race", dto.getRace());
-        model.addAttribute("ethnicity", dto.getEthnicity());
-        model.addAttribute("diagnosis", dto.getDiagnosis());
-        model.addAttribute("tumorType", dto.getTumorType());
-        model.addAttribute("class", dto.getClassification());
-        model.addAttribute("originTissue", dto.getOriginTissue());
-        model.addAttribute("sampleSite", dto.getSampleSite());
-
-        model.addAttribute("sampleType", dto.getSampleType());
-        model.addAttribute("strain", dto.getStrain());
-        model.addAttribute("mouseSex", dto.getMouseSex());
-        model.addAttribute("engraftmentSite", dto.getEngraftmentSite());
-        model.addAttribute("markers", dto.getCancerGenomics());
-        model.addAttribute("url", dto.getExternalUrl());
-        model.addAttribute("urlText", dto.getExternalUrlText());
-        model.addAttribute("mappedOntology", dto.getMappedOntology());
-
-        model.addAttribute("totalPages", dto.getTotalPages());
-        model.addAttribute("presentPage", dto.getPresentPage());
-        model.addAttribute("totalRecords", dto.getVariationDataCount());
-
-        model.addAttribute("variationData", dto.getMarkerAssociations());
-
-        model.addAttribute("modelInfo", dto.getModelTechAndPassages());
-        model.addAttribute("patientInfo", dto.getPatientTech());
-
-        model.addAttribute("relatedModels", dto.getRelatedModels());
-
-        model.addAttribute("qualityAssurace", dto.getQualityAssurances());
-
-        model.addAttribute("sampleIdMap",dto.getTechNPassToSampleId());
-
-        model.addAttribute("drugSummary", dto.getDrugSummary());
-        model.addAttribute("drugSummaryRowNumber", dto.getDrugSummaryRowNumber());
-        model.addAttribute("drugProtocolUrl", dto.getDrugProtocolUrl());
-        model.addAttribute("platformsAndUrls", dto.getPlatformsAndUrls());
-
-
-        Map<String, String> sorceDesc = new HashMap<>();
-        sorceDesc.put("JAX","The Jackson Laboratory");
-        sorceDesc.put("PDXNet-HCI-BCM","HCI-Baylor College of Medicine");
-        sorceDesc.put("PDXNet-Wistar-MDAnderson-Penn","Melanoma PDX established by the Wistar/MD Anderson/Penn");
-        sorceDesc.put("PDXNet-WUSTL","Washington University in St. Louis");
-        sorceDesc.put("PDXNet-MDAnderson","University of Texas MD Anderson Cancer Center");
-        sorceDesc.put("PDMR","NCI Patient-Derived Models Repository");
-        sorceDesc.put("IRCC","Candiolo Cancer Institute");
-
-
-        model.addAttribute("sourceDescription", sorceDesc.get(dto.getDataSource()));
-        model.addAttribute("contacts",dto.getContacts());
-
-
+        model.addAttribute("data", detailsService.getModelDetails(dataSrc,modelId,page,size,"","","") );
         return "details";
     }
-
-
 
 
 
@@ -124,7 +55,7 @@ public class DetailsController {
         String[] space = {""}; String nil = "";
 
         //Retreive Diagnosis Information
-        String diagnosis = detailsService.searchForModel(dataSrc,modelId,0,50000,"","","").getDiagnosis();
+        String diagnosis = detailsService.getModelDetails(dataSrc,modelId,0,50000,"","","").getDiagnosis();
 
         // Retreive technology Information
         List platforms = new ArrayList();
