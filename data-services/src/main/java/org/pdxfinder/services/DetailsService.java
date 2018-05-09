@@ -1,6 +1,10 @@
 package org.pdxfinder.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.dto.DetailsDTO;
@@ -85,6 +89,64 @@ public class DetailsService {
         this.drugService = drugService;
 
     }
+
+
+
+    public String getVariationDataCSV(String dataSrc,String modelId) {
+
+        Set<String[]> variationDataDTOSet = new LinkedHashSet<>();
+        int size = 50000, page = 0, draw=1;
+        String technology = "", passage="", filter="", sortDir="", sortCol="mAss.seqPosition";
+
+        //Retreive Diagnosis Information
+        String diagnosis = getModelDetails(dataSrc,modelId,page,size,technology,passage,filter).getDiagnosis();
+
+        // Retreive technology Information
+        List platforms = new ArrayList();
+        Map<String, Set<String>> modelTechAndPassages = findModelPlatformAndPassages(dataSrc,modelId,passage);
+        for (String tech : modelTechAndPassages.keySet()) {
+            platforms.add(tech);
+        }
+
+        // Retreive all Genomic Datasets
+        VariationDataDTO variationDataDTO = variationDataByPlatform(dataSrc,modelId,technology,passage,page,size,filter,draw,sortCol,sortDir);
+        for (String[] dData : variationDataDTO.moreData())
+        {
+            dData[2] = WordUtils.capitalize(diagnosis);   //Histology
+            dData[3] = "Xenograft Tumor";                //Tumor type
+            variationDataDTOSet.add(dData);
+        }
+
+        CsvMapper mapper = new CsvMapper();
+
+        CsvSchema schema = CsvSchema.builder()
+                .addColumn("Sample ID")
+                .addColumn("Passage")
+                .addColumn("Histology")
+                .addColumn("Tumor type")
+                .addColumn("Chromosome")
+                .addColumn("Seq. Position")
+                .addColumn("Ref Allele")
+                .addColumn("Alt Allele")
+                .addColumn("Consequence")
+                .addColumn("Gene")
+                .addColumn("Amino Acid Change")
+                .addColumn("Read Depth")
+                .addColumn("Allele Freq")
+                .addColumn("RS Variant")
+                .addColumn("Platform")
+                .build().withHeader();
+
+
+        String output = "CSV output";
+        try {
+            output = mapper.writer(schema).writeValueAsString(variationDataDTOSet);
+        } catch (JsonProcessingException e) {}
+
+        return output;
+
+    }
+
 
 
 
