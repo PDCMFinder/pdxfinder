@@ -17,9 +17,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableNeo4jRepositories
 @EnableTransactionManagement
-@ComponentScan(value = "org.pdxfinder", excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = SearchDS.class)
-}) // SearchDS has to be excluded here as it may refer to nodes that are being created during the load process
 public class Loader {
 
     private final static Logger log = LoggerFactory.getLogger(Loader.class);

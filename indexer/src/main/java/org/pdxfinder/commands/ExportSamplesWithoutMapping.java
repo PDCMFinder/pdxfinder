@@ -7,7 +7,7 @@ import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.Sample;
 import org.pdxfinder.ontologymapping.MappingRule;
-import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +30,15 @@ import java.util.Map;
 public class ExportSamplesWithoutMapping implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(ExportSamplesWithoutMapping.class);
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
     private Collection<Sample> samplesWithoutMapping;
     private Map<String, MappingRule> mappingRules;
 
     private static final String spreadsheetServiceUrl = "http://gsx2json.com/api?id=17LixNQL_BoL_-yev1s_VJt9FDZAJQcl5kyMhHkSF7Xk";
 
     @Autowired
-    public ExportSamplesWithoutMapping(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public ExportSamplesWithoutMapping(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
 
@@ -67,7 +67,7 @@ public class ExportSamplesWithoutMapping implements CommandLineRunner {
 
     public void getSamplesWithoutMapping(){
 
-        this.samplesWithoutMapping = loaderUtils.getSamplesWithoutOntologyMapping();
+        this.samplesWithoutMapping = dataImportService.findSamplesWithoutOntologyMapping();
 
     }
 

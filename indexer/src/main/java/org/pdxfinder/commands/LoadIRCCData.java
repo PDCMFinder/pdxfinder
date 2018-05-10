@@ -11,7 +11,7 @@ import org.pdxfinder.dao.*;
 import org.pdxfinder.irccdatamodel.IRCCMarkerMutation;
 import org.pdxfinder.irccdatamodel.IRCCPatient;
 import org.pdxfinder.irccdatamodel.IRCCSample;
-import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,7 +57,7 @@ public class LoadIRCCData implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
     private Session session;
 
 
@@ -97,8 +97,8 @@ public class LoadIRCCData implements CommandLineRunner {
         }
     }
 
-    public LoadIRCCData(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LoadIRCCData(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
 
@@ -321,7 +321,7 @@ public class LoadIRCCData implements CommandLineRunner {
 
     private void loadToNeo4j() {
 
-        DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, null);
+        DS = dataImportService.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, null);
 
         for (Map.Entry<String, List<IRCCSample>> entry : this.samplesMap.entrySet()) {
 
@@ -337,7 +337,7 @@ public class LoadIRCCData implements CommandLineRunner {
                 String sampleId = s.getSampleId();
                 String modelId = s.getModelId();
 
-                PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(patientId, p.getSex(),
+                PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patientId, p.getSex(),
                         p.getRace(), p.getEthnicity(), s.getAgeAtCollection(), DS);
 
 
@@ -354,20 +354,20 @@ public class LoadIRCCData implements CommandLineRunner {
                 //getSample(String sourceSampleId, String typeStr, String diagnosis,
                 // String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, ExternalDataSource externalDataSource) {
 
-                humanSample = loaderUtils.getSample(sampleId, s.getTumorType(), s.getDiagnosis(),
+                humanSample = dataImportService.getSample(sampleId, s.getTumorType(), s.getDiagnosis(),
                         patientsMap.get(patientId).getPrimarySite(), s.getSampleSite(), "Extraction Method", "", NORMAL_TISSUE, DS.getAbbreviation());
 
 
                 pSnap.addSample(humanSample);
-                loaderUtils.savePatientSnapshot(pSnap);
+                dataImportService.savePatientSnapshot(pSnap);
 
                 QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint",  "");
-                loaderUtils.saveQualityAssurance(qa);
+                dataImportService.saveQualityAssurance(qa);
 
                 List<ExternalUrl> externalUrls = new ArrayList<>();
-                externalUrls.add( loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
+                externalUrls.add( dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
 
-                ModelCreation modelCreation = loaderUtils.createModelCreation(modelId, DS.getAbbreviation(), humanSample, qa, externalUrls);
+                ModelCreation modelCreation = dataImportService.createModelCreation(modelId, DS.getAbbreviation(), humanSample, qa, externalUrls);
 
                 // determine whether sample is from human or mouse
                 if (markersMutationMap.containsKey(sampleId)) {
@@ -382,7 +382,7 @@ public class LoadIRCCData implements CommandLineRunner {
                         }
 
 
-                        Marker m = loaderUtils.getMarker(mutation.getHugoSymbol(), mutation.getHugoSymbol());
+                        Marker m = dataImportService.getMarker(mutation.getHugoSymbol(), mutation.getHugoSymbol());
 
                         MarkerAssociation ma = new MarkerAssociation();
                         ma.setChromosome(mutation.getChromosome());
@@ -425,14 +425,14 @@ public class LoadIRCCData implements CommandLineRunner {
 
                             }
 
-                            loaderUtils.saveSample(humanSample);
+                            dataImportService.saveSample(humanSample);
 
                         } else {
                             //this is a mouse sample, link it to a specimen
                             int passage = Integer.valueOf(mutation.getXenoPassage());
                             passage -= 1; // its an ircc thing, if the passage is 0, it is a human sample, otherwise passage = xenopassage -1;
                             String pass = String.valueOf(passage);
-                            Specimen specimen = loaderUtils.getSpecimen(modelCreation, modelCreation.getSourcePdxId(), DS.getAbbreviation(), pass);
+                            Specimen specimen = dataImportService.getSpecimen(modelCreation, modelCreation.getSourcePdxId(), DS.getAbbreviation(), pass);
 
                             if (specimen.getSample() == null) {
 
@@ -485,8 +485,8 @@ public class LoadIRCCData implements CommandLineRunner {
                                 }
                             }
 
-                            loaderUtils.saveSample(mouseSample);
-                            loaderUtils.saveSpecimen(specimen);
+                            dataImportService.saveSample(mouseSample);
+                            dataImportService.saveSpecimen(specimen);
 
 
                         }

@@ -10,8 +10,8 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
-import org.pdxfinder.utilities.LoaderUtils;
-import org.pdxfinder.utilities.Standardizer;
+import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,7 +64,7 @@ public class LoadHCI implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
     private Session session;
 
     @Value("${hcipdx.url}")
@@ -75,8 +75,8 @@ public class LoadHCI implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadHCI(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LoadHCI(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     @Override
@@ -103,9 +103,9 @@ public class LoadHCI implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        hciDS = loaderUtils.getExternalDataSource(HCI_DATASOURCE_ABBREVIATION, HCI_DATASOURCE_NAME, HCI_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
-        nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
-        nsBS = loaderUtils.getHostStrain(NS_BS_NAME, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
+        hciDS = dataImportService.getExternalDataSource(HCI_DATASOURCE_ABBREVIATION, HCI_DATASOURCE_NAME, HCI_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+        nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
+        nsBS = dataImportService.getHostStrain(NS_BS_NAME, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -136,19 +136,19 @@ public class LoadHCI implements CommandLineRunner {
         String age = Standardizer.getAge(j.getString("Age"));
         String gender = Standardizer.getGender(j.getString("Gender"));
         
-        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"),
                 gender, "", j.getString("Ethnicity"), age, hciDS);
 
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
         
         String sampleSite = Standardizer.getValue("Sample Site",j);
 
-        Sample sample = loaderUtils.getSample(sampleID, tumorType, diagnosis,
+        Sample sample = dataImportService.getSample(sampleID, tumorType, diagnosis,
                 j.getString("Primary Site"), sampleSite,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, hciDS.getAbbreviation());
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
 
         pSnap.addSample(sample);
         
@@ -201,18 +201,18 @@ public class LoadHCI implements CommandLineRunner {
         }
         
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(modelID, this.hciDS.getAbbreviation(), sample, qa, externalUrls);
+        ModelCreation modelCreation = dataImportService.createModelCreation(modelID, this.hciDS.getAbbreviation(), sample, qa, externalUrls);
         modelCreation.addRelatedSample(sample);
 
         
 
-        loaderUtils.saveSample(sample);
-        loaderUtils.savePatientSnapshot(pSnap);
+        dataImportService.saveSample(sample);
+        dataImportService.savePatientSnapshot(pSnap);
 
         String implantationTypeStr = Standardizer.getValue("Implantation Type", j);
         String implantationSiteStr = Standardizer.getValue("Engraftment Site", j);
-        EngraftmentSite engraftmentSite = loaderUtils.getImplantationSite(implantationSiteStr);
-        EngraftmentType engraftmentType = loaderUtils.getImplantationType(implantationTypeStr);
+        EngraftmentSite engraftmentSite = dataImportService.getImplantationSite(implantationSiteStr);
+        EngraftmentType engraftmentType = dataImportService.getImplantationType(implantationTypeStr);
         
         // uggh parse strains
         ArrayList<HostStrain> strainList= new ArrayList();
@@ -241,9 +241,9 @@ public class LoadHCI implements CommandLineRunner {
             
             modelCreation.addSpecimen(specimen);
             modelCreation.addRelatedSample(specSample);
-            loaderUtils.saveSpecimen(specimen);
+            dataImportService.saveSpecimen(specimen);
         }
-        loaderUtils.saveModelCreation(modelCreation);
+        dataImportService.saveModelCreation(modelCreation);
         
         
         TreatmentSummary ts;
@@ -280,7 +280,7 @@ public class LoadHCI implements CommandLineRunner {
 
             }
 
-            loaderUtils.saveModelCreation(modelCreation);
+            dataImportService.saveModelCreation(modelCreation);
 
         }
         catch(Exception e){
