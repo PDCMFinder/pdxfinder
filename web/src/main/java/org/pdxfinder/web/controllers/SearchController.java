@@ -1,18 +1,6 @@
 package org.pdxfinder.web.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import org.apache.commons.lang3.StringUtils;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONException;
-import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.services.*;
-import org.pdxfinder.services.ds.*;
-import org.pdxfinder.services.dto.ExportDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.pdxfinder.services.SearchService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,16 +8,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by jmason on 16/03/2017.
  */
 @Controller
 public class SearchController {
-
-    private final static Logger logger = LoggerFactory.getLogger(SearchController.class);
 
     private SearchService searchService;
 
@@ -53,27 +39,12 @@ public class SearchController {
                   @RequestParam("mutation") Optional<List<String>> mutation
     ) {
 
-
-        ExportDTO results = searchService.export(query, datasource,
-                diagnosis, patient_age, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
-                sample_tumor_type, mutation);
-
-        Set<ModelForQueryExport> exportResults = results.getResults().stream().map(ModelForQueryExport::new).collect(Collectors.toSet());
-
-        CsvMapper mapper = new CsvMapper();
-        CsvSchema schema = mapper.schemaFor(ModelForQueryExport.class).withHeader();
-
-        String output = "CSV output for configured values " + results.getFacetsString();
-        try {
-            output = mapper.writer(schema).writeValueAsString(exportResults);
-        } catch (JsonProcessingException e) {
-            logger.error("Could not convert result set to CSV file. Facetes: {}", results.getFacetsString(), e);
-        }
-
         response.setContentType("text/csv;charset=utf-8");
         response.setHeader("Content-Disposition", "attachment; filename=pdxfinder_search_export.csv");
 
-        return output;
+        return searchService.export(query, datasource,
+                diagnosis, patient_age, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
+                sample_tumor_type, mutation);
 
     }
 

@@ -24,17 +24,20 @@ public class AjaxController {
 
     private AutoCompleteService autoCompleteService;
     private PlatformService platformService;
-    private SearchService searchService;
     private MolCharService molCharService;
+    private DetailsService detailsService;
 
 
     @Autowired
-    public AjaxController(AutoCompleteService autoCompleteService, PlatformService platformService,
-                          SearchService searchService, MolCharService molCharService) {
+    public AjaxController(AutoCompleteService autoCompleteService,
+                          PlatformService platformService,
+                          MolCharService molCharService,
+                          DetailsService detailsService) {
+
         this.autoCompleteService = autoCompleteService;
         this.platformService = platformService;
-        this.searchService = searchService;
         this.molCharService = molCharService;
+        this.detailsService = detailsService;
     }
 
     @RequestMapping(value = "/autosuggests")
@@ -79,7 +82,7 @@ public class AjaxController {
         String dPassage = (passage == null) ? "" : passage;
         start = (int) Math.ceil(start / 108.0);
 
-        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,searchText,draw,sortColumn,sortDir);
+        VariationDataDTO variationDataDTO = detailsService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,searchText,draw,sortColumn,sortDir);
 
 
         return variationDataDTO;
@@ -104,7 +107,7 @@ public class AjaxController {
         start = (int) Math.ceil(start / 108.0);
 
         String dPlatform = (platform == null) ? "" : platform;
-        VariationDataDTO variationDataDTO = searchService.patientVariationDataByPlatform(dataSrc,modelId,dPlatform,searchText,draw,sortColumn,sortDir,start,size);
+        VariationDataDTO variationDataDTO = detailsService.patientVariationDataByPlatform(dataSrc,modelId,dPlatform,searchText,draw,sortColumn,sortDir,start,size);
 
         return variationDataDTO;
 
@@ -132,7 +135,7 @@ public class AjaxController {
         String dPassage = (passage == null) ? "" : passage;
         String dSortColumn = (passage == null) ? "1" : sortColumn;
 
-        VariationDataDTO variationDataDTO = searchService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,"",1,"mAss.chromosome","asc");
+        VariationDataDTO variationDataDTO = detailsService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,"",1,"mAss.chromosome","asc");
 
         return variationDataDTO;
 
@@ -142,15 +145,13 @@ public class AjaxController {
     @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
     public DetailsDTO details(@PathVariable String dataSrc,
                               @PathVariable String modelId,
-                              @RequestParam(value="page", required = false) Integer page,
-                              @RequestParam(value="size", required = false) Integer size,
+                              @RequestParam(value = "page", defaultValue = "0") Integer page,
+                              @RequestParam(value = "size", defaultValue = "20") Integer size,
                               @RequestParam(value="platform", required = false) String platform) {
 
-        int viewPage = (page == null || page < 1) ? 0 : page - 1;
-        int viewSize = (size == null || size < 1) ? 20 : size;
         String viewPlatform = (platform == null) ? "" : platform;
 
-        DetailsDTO dto = searchService.searchForModel(dataSrc, modelId, viewPage,viewSize,viewPlatform,"","");
+        DetailsDTO dto = detailsService.getModelDetails(dataSrc, modelId, page, size,viewPlatform,"","");
 
         return  dto;
     }
@@ -162,14 +163,14 @@ public class AjaxController {
                                    @RequestParam(value="passage", required = false) String passage) {
 
         String dPassage = (passage == null) ? "" : passage;
-        return  searchService.findModelPlatformAndPassages(dataSrc,modelId,dPassage);
+        return  detailsService.findModelPlatformAndPassages(dataSrc,modelId,dPassage);
     }
 
 
     @RequestMapping(value = "/patienttech/{dataSrc}/{modelId}")
     public Map findPatientTechnology(@PathVariable String dataSrc, @PathVariable String modelId) {
 
-        return  searchService.findPatientPlatforms(dataSrc,modelId);
+        return  detailsService.findPatientPlatforms(dataSrc,modelId);
     }
 
 
