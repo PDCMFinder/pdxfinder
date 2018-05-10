@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.pdxfinder.utilities;
+package org.pdxfinder.services;
 
-import org.apache.commons.cli.Option;
+//import org.apache.commons.cli.Option;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
 import org.slf4j.Logger;
@@ -27,9 +27,9 @@ import java.util.Set;
  * @author sbn
  */
 @Component
-public class LoaderUtils {
+public class DataImportService {
 
-    public static Option loadAll = new Option("LoadAll", false, "Load all PDX Finder data");
+    //public static Option loadAll = new Option("LoadAll", false, "Load all PDX Finder data");
     
     private TumorTypeRepository tumorTypeRepository;
     private HostStrainRepository hostStrainRepository;
@@ -54,29 +54,29 @@ public class LoaderUtils {
     private TreatmentSummaryRepository treatmentSummaryRepository;
     private ExternalUrlRepository externalUrlRepository;
 
-    private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
+    private final static Logger log = LoggerFactory.getLogger(DataImportService.class);
 
-    public LoaderUtils(TumorTypeRepository tumorTypeRepository,
-                       HostStrainRepository hostStrainRepository,
-                       EngraftmentTypeRepository engraftmentTypeRepository,
-                       EngraftmentSiteRepository engraftmentSiteRepository,
-                       ExternalDataSourceRepository externalDataSourceRepository,
-                       PatientRepository patientRepository,
-                       ModelCreationRepository modelCreationRepository,
-                       TissueRepository tissueRepository,
-                       PatientSnapshotRepository patientSnapshotRepository,
-                       SampleRepository sampleRepository,
-                       MarkerRepository markerRepository,
-                       MarkerAssociationRepository markerAssociationRepository,
-                       MolecularCharacterizationRepository molecularCharacterizationRepository,
-                       QualityAssuranceRepository qualityAssuranceRepository,
-                       OntologyTermRepository ontologyTermRepository,
-                       SpecimenRepository specimenRepository,
-                       PlatformRepository platformRepository,
-                       PlatformAssociationRepository platformAssociationRepository,
-                       DataProjectionRepository dataProjectionRepository,
-                       TreatmentSummaryRepository treatmentSummaryRepository,
-                       ExternalUrlRepository externalUrlRepository) {
+    public DataImportService(TumorTypeRepository tumorTypeRepository,
+                             HostStrainRepository hostStrainRepository,
+                             EngraftmentTypeRepository engraftmentTypeRepository,
+                             EngraftmentSiteRepository engraftmentSiteRepository,
+                             ExternalDataSourceRepository externalDataSourceRepository,
+                             PatientRepository patientRepository,
+                             ModelCreationRepository modelCreationRepository,
+                             TissueRepository tissueRepository,
+                             PatientSnapshotRepository patientSnapshotRepository,
+                             SampleRepository sampleRepository,
+                             MarkerRepository markerRepository,
+                             MarkerAssociationRepository markerAssociationRepository,
+                             MolecularCharacterizationRepository molecularCharacterizationRepository,
+                             QualityAssuranceRepository qualityAssuranceRepository,
+                             OntologyTermRepository ontologyTermRepository,
+                             SpecimenRepository specimenRepository,
+                             PlatformRepository platformRepository,
+                             PlatformAssociationRepository platformAssociationRepository,
+                             DataProjectionRepository dataProjectionRepository,
+                             TreatmentSummaryRepository treatmentSummaryRepository,
+                             ExternalUrlRepository externalUrlRepository) {
 
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null");
         Assert.notNull(hostStrainRepository, "hostStrainRepository cannot be null");

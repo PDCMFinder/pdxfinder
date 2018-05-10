@@ -6,7 +6,7 @@ import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.services.ds.ModelForQuery;
-import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class CreateDataProjections implements CommandLineRunner{
 
     private final static Logger log = LoggerFactory.getLogger(CreateDataProjections.class);
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
 
     @Value("${user.home}")
     String homeDir;
@@ -44,8 +44,8 @@ public class CreateDataProjections implements CommandLineRunner{
 
 
     @Autowired
-    public CreateDataProjections(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public CreateDataProjections(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
     private void createMutationDataProjection(){
 
-        Collection<MolecularCharacterization> mutatedMolchars = loaderUtils.findMolCharsByType("mutation");
+        Collection<MolecularCharacterization> mutatedMolchars = dataImportService.findMolCharsByType("mutation");
 
         log.info("Looking at "+mutatedMolchars.size()+" MolChar objects. This may take a while folks...");
 
@@ -94,7 +94,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
 
 
-            ModelCreation model = loaderUtils.findModelByMolChar(mc);
+            ModelCreation model = dataImportService.findModelByMolChar(mc);
 
             Long modelId = model.getId();
 
@@ -105,7 +105,7 @@ public class CreateDataProjections implements CommandLineRunner{
                 platformName = mc.getPlatform().getName();
             }
 
-            Set<MarkerAssociation> mas = loaderUtils.findMarkerAssocsByMolChar(mc);
+            Set<MarkerAssociation> mas = dataImportService.findMarkerAssocsByMolChar(mc);
 
             if(mas != null){
 
@@ -142,7 +142,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
         log.info("Saving DataProjection");
 
-        DataProjection pmvmDP = loaderUtils.findDataProjectionByLabel("PlatformMarkerVariantModel");
+        DataProjection pmvmDP = dataImportService.findDataProjectionByLabel("PlatformMarkerVariantModel");
 
         if (pmvmDP == null){
 
@@ -150,7 +150,7 @@ public class CreateDataProjections implements CommandLineRunner{
             pmvmDP.setLabel("PlatformMarkerVariantModel");
         }
 
-        DataProjection mvDP = loaderUtils.findDataProjectionByLabel("MarkerVariant");
+        DataProjection mvDP = dataImportService.findDataProjectionByLabel("MarkerVariant");
 
         if(mvDP == null){
 
@@ -175,8 +175,8 @@ public class CreateDataProjections implements CommandLineRunner{
         }
 
 
-        loaderUtils.saveDataProjection(pmvmDP);
-        loaderUtils.saveDataProjection(mvDP);
+        dataImportService.saveDataProjection(pmvmDP);
+        dataImportService.saveDataProjection(mvDP);
 
         /*
         try {
@@ -274,7 +274,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
         // Get out all platforms for all models and populate a map with the results
         Map<Long, List<String>> platformsByModel = new HashMap<>();
-        Collection<ModelCreation> allModelsPlatforms = loaderUtils.findAllModelsPlatforms();
+        Collection<ModelCreation> allModelsPlatforms = dataImportService.findAllModelsPlatforms();
         for (ModelCreation mc : allModelsPlatforms) {
 
             if (!platformsByModel.containsKey(mc.getId())) {
@@ -290,7 +290,7 @@ public class CreateDataProjections implements CommandLineRunner{
                                 .map(Sample::getMolecularCharacterizations)
                                 .flatMap(Collection::stream)
                                 .map(x ->  {
-                                    if (loaderUtils.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), x.getPlatform().getName()) != 0) {
+                                    if (dataImportService.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), x.getPlatform().getName()) != 0) {
                                         return x.getPlatform().getName();
                                     } else {
                                         return " ";
@@ -322,7 +322,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
         log.info("Creating ModelForQuery DataProjection");
 
-        for (ModelCreation mc : loaderUtils.findModelsWithPatientData()) {
+        for (ModelCreation mc : dataImportService.findModelsWithPatientData()) {
 
             ModelForQuery mfq = new ModelForQuery();
             mfq.setModelId(mc.getId());
@@ -339,7 +339,7 @@ public class CreateDataProjections implements CommandLineRunner{
                 }
             }
 
-            if(loaderUtils.isTreatmentSummaryAvailable(mc.getDataSource(), mc.getSourcePdxId())){
+            if(dataImportService.isTreatmentSummaryAvailable(mc.getDataSource(), mc.getSourcePdxId())){
                 dataAvailable.add("Dosing Studies");
             }
 
@@ -451,7 +451,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
         log.info("Saving ModelForQuery DataProjection");
 
-        DataProjection mfqDP = loaderUtils.findDataProjectionByLabel("ModelForQuery");
+        DataProjection mfqDP = dataImportService.findDataProjectionByLabel("ModelForQuery");
 
         if (mfqDP == null){
 
@@ -463,7 +463,7 @@ public class CreateDataProjections implements CommandLineRunner{
         Gson gson = new Gson();
         String jsonMfqDP = gson.toJson(this.modelForQueryDP);
         mfqDP.setValue(jsonMfqDP);
-        loaderUtils.saveDataProjection(mfqDP);
+        dataImportService.saveDataProjection(mfqDP);
 
 
     }

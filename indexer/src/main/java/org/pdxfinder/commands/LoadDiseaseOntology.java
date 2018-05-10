@@ -5,7 +5,7 @@ import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
-import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +33,11 @@ public class LoadDiseaseOntology implements CommandLineRunner {
     private static final String cancerBranchUrl = "http://purl.obolibrary.org/obo/DOID_162";
     private static final String ontologyUrl = "http://www.ebi.ac.uk/ols/api/ontologies/doid/terms/";
 
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
 
     @Autowired
-    public LoadDiseaseOntology(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LoadDiseaseOntology(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class LoadDiseaseOntology implements CommandLineRunner {
         int requestCounter = 0;
 
         //create cancer root term
-        OntologyTerm ot = loaderUtils.getOntologyTerm(cancerBranchUrl,cancerRootLabel);
+        OntologyTerm ot = dataImportService.getOntologyTerm(cancerBranchUrl,cancerRootLabel);
         System.out.println("Creating node: "+cancerRootLabel);
 
         discoveredTerms.add(ot);
@@ -125,12 +125,12 @@ public class LoadDiseaseOntology implements CommandLineRunner {
                     JSONObject term = terms.getJSONObject(i);
                     System.out.println("TERM: "+term.getString("label"));
 
-                    OntologyTerm newTerm = loaderUtils.getOntologyTerm(term.getString("iri"), term.getString("label"));
+                    OntologyTerm newTerm = dataImportService.getOntologyTerm(term.getString("iri"), term.getString("label"));
                     discoveredTerms.add(newTerm);
 
-                    OntologyTerm parentTerm = loaderUtils.getOntologyTerm(notYetVisitedTerm.getUrl());
+                    OntologyTerm parentTerm = dataImportService.getOntologyTerm(notYetVisitedTerm.getUrl());
                     newTerm.addSubclass(parentTerm);
-                    loaderUtils.saveOntologyTerm(newTerm);
+                    dataImportService.saveOntologyTerm(newTerm);
 
                     termCounter++;
                 }

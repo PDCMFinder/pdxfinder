@@ -3,7 +3,7 @@ package org.pdxfinder.commands;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.pdxfinder.dao.OntologyTerm;
-import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +28,11 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
     private static final String spreadsheetServiceUrl = "http://gsx2json.com/api?id=1TpGeClk6bY-sJ_5Ffs0Rbl6Rfonc9SMzKERCY4KLnes";
 
     private final static Logger log = LoggerFactory.getLogger(LinkSamplesToDOTerms.class);
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
 
     @Autowired
-    public LinkSamplesToDOTerms(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LinkSamplesToDOTerms(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     @Override
@@ -69,12 +69,12 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
 
     private void updateIndirectMappingData() {
 
-        Collection<OntologyTerm> terms = loaderUtils.getAllOntologyTerms();
+        Collection<OntologyTerm> terms = dataImportService.getAllOntologyTerms();
 
         for (OntologyTerm ot : terms) {
             System.out.println("Updating " + ot.getLabel());
-            ot.setIndirectMappedSamplesNumber(loaderUtils.findDirectMappingNumber(ot.getLabel()));
-            loaderUtils.saveOntologyTerm(ot);
+            ot.setIndirectMappedSamplesNumber(dataImportService.findDirectMappingNumber(ot.getLabel()));
+            dataImportService.saveOntologyTerm(ot);
 
         }
 

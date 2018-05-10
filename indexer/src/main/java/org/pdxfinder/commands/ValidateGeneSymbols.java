@@ -7,7 +7,7 @@ import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.accessionidtatamodel.AccessionData;
 import org.pdxfinder.dao.ModelCreation;
-import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class ValidateGeneSymbols implements CommandLineRunner{
 
 
     private final static Logger log = LoggerFactory.getLogger(ValidateGeneSymbols.class);
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
     private Set<String> cnvSymbols;
     private Set<String> rnaseqSymbols;
     private List<String> cnvSymbolsWithIssues;
@@ -47,8 +47,8 @@ public class ValidateGeneSymbols implements CommandLineRunner{
     private String rnaSeqURL;
 
     @Autowired
-    public ValidateGeneSymbols(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public ValidateGeneSymbols(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
         this.cnvSymbols = new HashSet<>();
         this.rnaseqSymbols = new HashSet<>();
         this.cnvSymbolsWithIssues = new ArrayList<>();
@@ -292,7 +292,7 @@ public class ValidateGeneSymbols implements CommandLineRunner{
 
     private void validateSymbols(){
 
-        Collection<ModelCreation> models = loaderUtils.findAllModels();
+        Collection<ModelCreation> models = dataImportService.findAllModels();
         HashMap<String, AccessionData> hugoDB = loadHugoDatabase();
 
         for(ModelCreation m:models){

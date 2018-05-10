@@ -10,7 +10,7 @@ import org.pdxfinder.dao.Sample;
 import org.pdxfinder.dao.SampleToOntologyRelationShip;
 import org.pdxfinder.ontologymapping.MappingRule;
 import org.pdxfinder.ontologymapping.MissingMapping;
-import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
     //new mappings: https://docs.google.com/spreadsheets/d/17LixNQL_BoL_-yev1s_VJt9FDZAJQcl5kyMhHkSF7Xk
     private final static Logger log = LoggerFactory.getLogger(LinkSamplesToNCITTerms.class);
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
 
     private Map<String, Set<MissingMapping>> missingMappings;
     private Set<String> missingTerms;
@@ -45,8 +45,8 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
     private Map<String, MappingRule> mappingRules;
 
     @Autowired
-    public LinkSamplesToNCITTerms(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LinkSamplesToNCITTerms(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     @Override
@@ -223,7 +223,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
         int batchSize = 50;
         int startNode = 0;
-        int maxSamplesNumber = loaderUtils.getHumanSamplesNumber();
+        int maxSamplesNumber = dataImportService.getHumanSamplesNumber();
 
         this.missingMappings = new HashMap<>();
         this.missingTerms = new HashSet<>();
@@ -232,7 +232,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
         while (startNode < maxSamplesNumber) {
 
             log.info("Mapping " + batchSize + " samples from " + startNode);
-            Collection<Sample> samples = loaderUtils.findHumanSamplesFromTo(startNode, batchSize);
+            Collection<Sample> samples = dataImportService.findHumanSamplesFromTo(startNode, batchSize);
 
             for (Sample sample : samples) {
 
@@ -279,7 +279,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
                 } else {
 
-                    OntologyTerm ot = loaderUtils.findOntologyTermByLabel(mappingRule.getOntologyTerm());
+                    OntologyTerm ot = dataImportService.findOntologyTermByLabel(mappingRule.getOntologyTerm());
 
 
                     if (ot == null) {
@@ -291,8 +291,8 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                         SampleToOntologyRelationShip r = new SampleToOntologyRelationShip(mappingRule.getMapType(), mappingRule.getJustification(), sample, ot);
                         sample.setSampleToOntologyRelationShip(r);
                         ot.setMappedTo(r);
-                        loaderUtils.saveSample(sample);
-                        loaderUtils.saveOntologyTerm(ot);
+                        dataImportService.saveSample(sample);
+                        dataImportService.saveOntologyTerm(ot);
                         //log.info("Mapping "+diagnosis+" to "+mappingRule.getOntologyTerm());
                     }
                 }
@@ -333,7 +333,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
     private void updateIndirectMappingData() {
 
-        Collection<OntologyTerm> termsWithDirectMappings = loaderUtils.getAllOntologyTermsWithNotZeroDirectMapping();
+        Collection<OntologyTerm> termsWithDirectMappings = dataImportService.getAllOntologyTermsWithNotZeroDirectMapping();
         int remainingTermsToUpdate = termsWithDirectMappings.size();
         log.info("Found " + remainingTermsToUpdate + " terms with direct number. Updating graph...");
 
@@ -341,7 +341,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
             Set<OntologyTerm> discoveredTerms = new HashSet<>();
             Set<String> visitedTerms = new HashSet<>();
-            Collection<OntologyTerm> parents = loaderUtils.getAllDirectParents(ot.getUrl());
+            Collection<OntologyTerm> parents = dataImportService.getAllDirectParents(ot.getUrl());
 
             if (parents != null) {
 
@@ -359,9 +359,9 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                 visitedTerms.add(currentParentTerm.getUrl());
                 //update indirect number
                 currentParentTerm.setIndirectMappedSamplesNumber(currentParentTerm.getIndirectMappedSamplesNumber() + ot.getDirectMappedSamplesNumber());
-                loaderUtils.saveOntologyTerm(currentParentTerm);
+                dataImportService.saveOntologyTerm(currentParentTerm);
                 //get parents
-                parents = loaderUtils.getAllDirectParents(currentParentTerm.getUrl());
+                parents = dataImportService.getAllDirectParents(currentParentTerm.getUrl());
 
                 if (parents != null) {
 
@@ -381,7 +381,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
         log.info("Deleting terms and their relationships where direct and indirectMappedNumber is zero");
 
-        loaderUtils.deleteOntologyTermsWithoutMapping();
+        dataImportService.deleteOntologyTermsWithoutMapping();
     }
 
 

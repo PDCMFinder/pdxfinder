@@ -10,8 +10,8 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
-import org.pdxfinder.utilities.LoaderUtils;
-import org.pdxfinder.utilities.Standardizer;
+import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,7 +55,7 @@ public class LoadWISTAR implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
     private Session session;
 
     @Value("${wistarpdx.url}")
@@ -66,8 +66,8 @@ public class LoadWISTAR implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadWISTAR(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LoadWISTAR(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     @Override
@@ -90,7 +90,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        wistarDS = loaderUtils.getExternalDataSource(WISTAR_DATASOURCE_ABBREVIATION, WISTAR_DATASOURCE_NAME, WISTAR_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+        wistarDS = dataImportService.getExternalDataSource(WISTAR_DATASOURCE_ABBREVIATION, WISTAR_DATASOURCE_NAME, WISTAR_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
@@ -149,22 +149,22 @@ public class LoadWISTAR implements CommandLineRunner {
         String gender = Standardizer.getGender(j.getString("Gender"));
 
 
-        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"),
                 gender, "", race, age, wistarDS);
          String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
 
         
-        Sample sample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
+        Sample sample = dataImportService.getSample(id, j.getString("Tumor Type"), diagnosis,
                 NOT_SPECIFIED, NOT_SPECIFIED,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS.getAbbreviation());
 
         pSnap.addSample(sample);
 
-        loaderUtils.saveSample(sample);
-        loaderUtils.savePatientSnapshot(pSnap);
+        dataImportService.saveSample(sample);
+        dataImportService.savePatientSnapshot(pSnap);
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.SOURCE, DATASOURCE_CONTACT));
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, DATASOURCE_CONTACT));
 
         String qaType = NOT_SPECIFIED;
         try {
@@ -176,34 +176,34 @@ public class LoadWISTAR implements CommandLineRunner {
 
         QualityAssurance qa = new QualityAssurance(qaType,
                 NOT_SPECIFIED, qaPassage);
-        loaderUtils.saveQualityAssurance(qa);
+        dataImportService.saveQualityAssurance(qa);
 
         String strain = j.getString("Strain");
-        HostStrain bs = loaderUtils.getHostStrain(strain, strain, "", "");
+        HostStrain bs = dataImportService.getHostStrain(strain, strain, "", "");
 
         String engraftmentSite = Standardizer.getValue("Engraftment Site", j);
 
         String tumorPrep = Standardizer.getValue("Tumor Prep", j);
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, wistarDS.getAbbreviation(), sample, qa, externalUrls);
+        ModelCreation modelCreation = dataImportService.createModelCreation(id, wistarDS.getAbbreviation(), sample, qa, externalUrls);
         modelCreation.addRelatedSample(sample);
 
-        Specimen specimen = loaderUtils.getSpecimen(modelCreation,
+        Specimen specimen = dataImportService.getSpecimen(modelCreation,
                 modelCreation.getSourcePdxId(), wistarDS.getAbbreviation(), NOT_SPECIFIED);
 
         specimen.setHostStrain(bs);
 
-        EngraftmentSite is = loaderUtils.getImplantationSite(engraftmentSite);
+        EngraftmentSite is = dataImportService.getImplantationSite(engraftmentSite);
         specimen.setEngraftmentSite(is);
 
-        EngraftmentType it = loaderUtils.getImplantationType(tumorPrep);
+        EngraftmentType it = dataImportService.getImplantationType(tumorPrep);
         specimen.setEngraftmentType(it);
 
         specimen.setSample(sample);
 
-        loaderUtils.saveSpecimen(specimen);
+        dataImportService.saveSpecimen(specimen);
 
-        loaderUtils.saveModelCreation(modelCreation);
+        dataImportService.saveModelCreation(modelCreation);
 
     }
 
