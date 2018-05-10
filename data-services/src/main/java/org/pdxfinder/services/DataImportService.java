@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.pdxfinder.utilities;
+package org.pdxfinder.services;
 
-import org.apache.commons.cli.Option;
+//import org.apache.commons.cli.Option;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
 import org.slf4j.Logger;
@@ -27,9 +27,9 @@ import java.util.Set;
  * @author sbn
  */
 @Component
-public class LoaderUtils {
+public class DataImportService {
 
-    public static Option loadAll = new Option("LoadAll", false, "Load all PDX Finder data");
+    //public static Option loadAll = new Option("LoadAll", false, "Load all PDX Finder data");
     
     private TumorTypeRepository tumorTypeRepository;
     private HostStrainRepository hostStrainRepository;
@@ -54,29 +54,29 @@ public class LoaderUtils {
     private TreatmentSummaryRepository treatmentSummaryRepository;
     private ExternalUrlRepository externalUrlRepository;
 
-    private final static Logger log = LoggerFactory.getLogger(LoaderUtils.class);
+    private final static Logger log = LoggerFactory.getLogger(DataImportService.class);
 
-    public LoaderUtils(TumorTypeRepository tumorTypeRepository,
-                       HostStrainRepository hostStrainRepository,
-                       EngraftmentTypeRepository engraftmentTypeRepository,
-                       EngraftmentSiteRepository engraftmentSiteRepository,
-                       ExternalDataSourceRepository externalDataSourceRepository,
-                       PatientRepository patientRepository,
-                       ModelCreationRepository modelCreationRepository,
-                       TissueRepository tissueRepository,
-                       PatientSnapshotRepository patientSnapshotRepository,
-                       SampleRepository sampleRepository,
-                       MarkerRepository markerRepository,
-                       MarkerAssociationRepository markerAssociationRepository,
-                       MolecularCharacterizationRepository molecularCharacterizationRepository,
-                       QualityAssuranceRepository qualityAssuranceRepository,
-                       OntologyTermRepository ontologyTermRepository,
-                       SpecimenRepository specimenRepository,
-                       PlatformRepository platformRepository,
-                       PlatformAssociationRepository platformAssociationRepository,
-                       DataProjectionRepository dataProjectionRepository,
-                       TreatmentSummaryRepository treatmentSummaryRepository,
-                       ExternalUrlRepository externalUrlRepository) {
+    public DataImportService(TumorTypeRepository tumorTypeRepository,
+                             HostStrainRepository hostStrainRepository,
+                             EngraftmentTypeRepository engraftmentTypeRepository,
+                             EngraftmentSiteRepository engraftmentSiteRepository,
+                             ExternalDataSourceRepository externalDataSourceRepository,
+                             PatientRepository patientRepository,
+                             ModelCreationRepository modelCreationRepository,
+                             TissueRepository tissueRepository,
+                             PatientSnapshotRepository patientSnapshotRepository,
+                             SampleRepository sampleRepository,
+                             MarkerRepository markerRepository,
+                             MarkerAssociationRepository markerAssociationRepository,
+                             MolecularCharacterizationRepository molecularCharacterizationRepository,
+                             QualityAssuranceRepository qualityAssuranceRepository,
+                             OntologyTermRepository ontologyTermRepository,
+                             SpecimenRepository specimenRepository,
+                             PlatformRepository platformRepository,
+                             PlatformAssociationRepository platformAssociationRepository,
+                             DataProjectionRepository dataProjectionRepository,
+                             TreatmentSummaryRepository treatmentSummaryRepository,
+                             ExternalUrlRepository externalUrlRepository) {
 
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null");
         Assert.notNull(hostStrainRepository, "hostStrainRepository cannot be null");
@@ -164,9 +164,9 @@ public class LoaderUtils {
         return modelCreation;
     }
 
-    public Collection<ModelCreation> getAllModelsPlatforms(){
+    public Collection<ModelCreation> findAllModelsPlatforms(){
 
-        return modelCreationRepository.getAllModelsPlatforms();
+        return modelCreationRepository.findAllModelsPlatforms();
     }
 
     public int countMarkerAssociationBySourcePdxId(String modelId, String platformName){
@@ -174,14 +174,14 @@ public class LoaderUtils {
         return modelCreationRepository.countMarkerAssociationBySourcePdxId(modelId,platformName);
     }
 
-    public Collection<ModelCreation> getModelsWithPatientData(){
+    public Collection<ModelCreation> findModelsWithPatientData(){
 
-        return modelCreationRepository.getModelsWithPatientData();
+        return modelCreationRepository.findModelsWithPatientData();
     }
 
-    public Collection<ModelCreation> getAllModels(){
+    public Collection<ModelCreation> findAllModels(){
 
-        return this.modelCreationRepository.getAllModels();
+        return this.modelCreationRepository.findAllModels();
     }
 
     public ModelCreation findModelByIdAndDataSource(String modelId, String dataSource){
@@ -193,14 +193,14 @@ public class LoaderUtils {
         this.modelCreationRepository.save(modelCreation);
     }
 
-    public ModelCreation getModelByMolChar(MolecularCharacterization mc){
+    public ModelCreation findModelByMolChar(MolecularCharacterization mc){
 
         return modelCreationRepository.findByMolChar(mc);
     }
 
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, ExternalDataSource externalDataSource) {
 
-        Patient patient = patientRepository.findByExternalId(externalId);
+        Patient patient = patientRepository.findByExternalIdAndDS(externalId, externalDataSource);
         PatientSnapshot patientSnapshot;
 
         if (patient == null) {
@@ -248,7 +248,7 @@ public class LoaderUtils {
 
     public Patient getPatient(String externalId, String sex, String race, String ethnicity, ExternalDataSource externalDataSource) {
 
-        Patient patient = patientRepository.findByExternalId(externalId);
+        Patient patient = patientRepository.findByExternalIdAndDS(externalId, externalDataSource);
 
         if (patient == null) {
             log.info("Patient '{}' not found. Creating", externalId);
@@ -260,16 +260,7 @@ public class LoaderUtils {
 
         return patient;
     }
-
-    public Patient getPatientBySampleId(String sampleId){
-
-        return patientRepository.findBySampleId(sampleId);
-    }
-
-    public PatientSnapshot getPatientSnapshotByModelId(String modelId){
-
-        return patientSnapshotRepository.findByModelId(modelId);
-    }
+    
 
     public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, String dataSource) {
 
@@ -299,12 +290,12 @@ public class LoaderUtils {
         return sample;
     }
 
-    public Sample getSampleByDataSourceAndSourceSampleId(String dataSource, String sampleId){
+    public Sample findSampleByDataSourceAndSourceSampleId(String dataSource, String sampleId){
 
         return sampleRepository.findBySourceSampleIdAndDataSource(sampleId, dataSource);
     }
 
-    public Collection<Sample> getSamplesWithoutOntologyMapping(){
+    public Collection<Sample> findSamplesWithoutOntologyMapping(){
 
         return sampleRepository.findSamplesWithoutOntologyMapping();
     }
@@ -338,13 +329,9 @@ public class LoaderUtils {
         return sampleRepository.findHumanSamplesNumber();
     }
 
-    public Collection<Sample> getHumanSamplesFromTo(int from, int to){
+    public Collection<Sample> findHumanSamplesFromTo(int from, int to){
 
         return sampleRepository.findHumanSamplesFromTo(from, to);
-    }
-
-    public Sample getSampleBySourcePdxId(String pdxId){
-        return sampleRepository.findBySourcePdxId(pdxId);
     }
 
     public void saveSample(Sample sample){
@@ -425,18 +412,6 @@ public class LoaderUtils {
         }
         return marker;
     }
-    
-    public Marker getMarkerByEnsemblId(String id){
-        Marker marker = markerRepository.findByEnsemblId(id);
-        
-        if (marker == null) {
-            log.info("Marker '{}' not found. Creating ensemble", id);
-            marker = new Marker();
-            marker.setEnsemblId(id);
-            marker = markerRepository.save(marker);
-        }
-        return marker;
-    }
 
     public MarkerAssociation getMarkerAssociation(String type, String markerSymbol, String markerName) {
         Marker m = this.getMarker(markerSymbol, markerName);
@@ -455,20 +430,14 @@ public class LoaderUtils {
     }
 
 
-    public Set<MarkerAssociation> getMarkerAssocsByMolChar(MolecularCharacterization mc){
+    public Set<MarkerAssociation> findMarkerAssocsByMolChar(MolecularCharacterization mc){
 
         return markerAssociationRepository.findByMolChar(mc);
-    }
-
-    // wow this is misleading it doesn't do anyting!
-    public void deleteAllByEDSName(String edsName) throws Exception {
-        throw new Exception("Nothing deleted. Method not implemented!");
     }
 
     public void savePatientSnapshot(PatientSnapshot ps) {
         patientSnapshotRepository.save(ps);
     }
-
 
     public void saveMolecularCharacterization(MolecularCharacterization mc) {
         molecularCharacterizationRepository.save(mc);
@@ -482,20 +451,9 @@ public class LoaderUtils {
         }
     }
 
-    public Collection<MolecularCharacterization> getMolCharsByType(String type){
+    public Collection<MolecularCharacterization> findMolCharsByType(String type){
 
-        return molecularCharacterizationRepository.getAllByType(type);
-    }
-
-    
-    public Specimen getSpecimen(String id){
-        Specimen specimen = specimenRepository.findByExternalId(id);
-        if(specimen == null){
-            specimen = new Specimen();
-            specimen.setExternalId(id);
-        }
-             
-        return specimen;
+        return molecularCharacterizationRepository.findAllByType(type);
     }
 
 
@@ -539,7 +497,7 @@ public class LoaderUtils {
         return ot;
     }
 
-    public OntologyTerm getOntologyTermByLabel(String label){
+    public OntologyTerm findOntologyTermByLabel(String label){
 
         OntologyTerm ot = ontologyTermRepository.findByLabel(label);
         return ot;
@@ -566,7 +524,7 @@ public class LoaderUtils {
         return ontologyTermRepository.getIndirectMappingNumber(label);
     }
 
-    public int getDirectMappingNumber(String label) {
+    public int findDirectMappingNumber(String label) {
 
 
         Set<OntologyTerm> otset = ontologyTermRepository.getDistinctSubTreeNodes(label);
@@ -575,11 +533,6 @@ public class LoaderUtils {
             mapNum += ot.getDirectMappedSamplesNumber();
         }
         return mapNum;
-    }
-
-    public int getOntologyTermNumber(){
-
-        return ontologyTermRepository.getOntologyTermNumber();
     }
 
     public Collection<OntologyTerm> getAllOntologyTermsFromTo(int from, int to) {
@@ -673,7 +626,7 @@ public class LoaderUtils {
         dataProjectionRepository.save(dp);
     }
 
-    public DataProjection getDataProjectionByLabel(String label){
+    public DataProjection findDataProjectionByLabel(String label){
 
         return dataProjectionRepository.findByLabel(label);
     }

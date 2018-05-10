@@ -11,8 +11,8 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
-import org.pdxfinder.utilities.LoaderUtils;
-import org.pdxfinder.utilities.Standardizer;
+import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,7 +67,7 @@ public class LoadIRCC implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
     private Session session;
 
     // samples -> markerAsssociations
@@ -92,8 +92,8 @@ public class LoadIRCC implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadIRCC(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LoadIRCC(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     @Override
@@ -105,9 +105,9 @@ public class LoadIRCC implements CommandLineRunner {
         parser.accepts("loadALL", "Load all, including IRCC PDX data");
         OptionSet options = parser.parse(args);
         
-        irccDS = loaderUtils.getExternalDataSource(IRCC_DATASOURCE_ABBREVIATION, IRCC_DATASOURCE_NAME, IRCC_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+        irccDS = dataImportService.getExternalDataSource(IRCC_DATASOURCE_ABBREVIATION, IRCC_DATASOURCE_NAME, IRCC_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
 
-        nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
+        nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         if (options.has("loadIRCC") || options.has("loadALL")) {
 
@@ -162,22 +162,22 @@ public class LoadIRCC implements CommandLineRunner {
         String age = Standardizer.getAge(job.getString("Age"));
         String gender = Standardizer.getGender(job.getString("Gender"));
 
-        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(job.getString("Patient ID"),
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(job.getString("Patient ID"),
                 gender, "", NOT_SPECIFIED, age, irccDS);
 
         String tumorType = Standardizer.getTumorType(job.getString("Tumor Type"));
 
-        Sample ptSample = loaderUtils.getSample(id, tumorType, diagnosis,
+        Sample ptSample = dataImportService.getSample(id, tumorType, diagnosis,
                 job.getString("Primary Site"), job.getString("Sample Site"),
                 NOT_SPECIFIED, classification, NORMAL_TISSUE_FALSE, irccDS.getAbbreviation());
 
         pSnap.addSample(ptSample);
 
-        loaderUtils.saveSample(ptSample);
-        loaderUtils.savePatientSnapshot(pSnap);
+        dataImportService.saveSample(ptSample);
+        dataImportService.savePatientSnapshot(pSnap);
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
 
         QualityAssurance qa = new QualityAssurance();
 
@@ -207,7 +207,7 @@ public class LoadIRCC implements CommandLineRunner {
 
         }
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, this.irccDS.getAbbreviation(), ptSample, qa, externalUrls);
+        ModelCreation modelCreation = dataImportService.createModelCreation(id, this.irccDS.getAbbreviation(), ptSample, qa, externalUrls);
 
         JSONArray specimens = job.getJSONArray("Specimens");
         for (int i = 0; i < specimens.length(); i++) {
@@ -215,15 +215,15 @@ public class LoadIRCC implements CommandLineRunner {
 
             String specimenId = specimenJSON.getString("Specimen ID");
             
-            Specimen specimen = loaderUtils.getSpecimen(modelCreation,
+            Specimen specimen = dataImportService.getSpecimen(modelCreation,
                     specimenId, irccDS.getAbbreviation(), specimenJSON.getString("Passage"));
 
             specimen.setHostStrain(this.nsgBS);
 
-            EngraftmentSite is = loaderUtils.getImplantationSite(specimenJSON.getString("Engraftment Site"));
+            EngraftmentSite is = dataImportService.getImplantationSite(specimenJSON.getString("Engraftment Site"));
             specimen.setEngraftmentSite(is);
 
-            EngraftmentType it = loaderUtils.getImplantationType(specimenJSON.getString("Engraftment Type"));
+            EngraftmentType it = dataImportService.getImplantationType(specimenJSON.getString("Engraftment Type"));
             specimen.setEngraftmentType(it);
 
             Sample specSample = new Sample();
@@ -280,7 +280,7 @@ public class LoadIRCC implements CommandLineRunner {
             e.printStackTrace();
         }
         
-        loaderUtils.saveModelCreation(modelCreation);
+        dataImportService.saveModelCreation(modelCreation);
         
     }
 
@@ -289,10 +289,10 @@ public class LoadIRCC implements CommandLineRunner {
 
         log.info("Loading variation for platform "+platformName);
         //STEP 1: Save the platform
-        Platform platform = loaderUtils.getPlatform(platformName, this.irccDS);
+        Platform platform = dataImportService.getPlatform(platformName, this.irccDS);
         platform.setExternalDataSource(irccDS);
         platform.setUrl(TARGETEDNGS_PLATFORM_URL);
-        loaderUtils.savePlatform(platform);
+        dataImportService.savePlatform(platform);
 
 
         //STEP 2: get markers and save them with the platform linked
@@ -309,7 +309,7 @@ public class LoadIRCC implements CommandLineRunner {
             }
 
             for(String m:markers){
-                Marker marker = loaderUtils.getMarker(m, m);
+                Marker marker = dataImportService.getMarker(m, m);
                 //PlatformAssociation pa = loaderUtils.createPlatformAssociation(platform, marker);
                 //loaderUtils.savePlatformAssociation(pa);
 
@@ -339,7 +339,7 @@ public class LoadIRCC implements CommandLineRunner {
                 String gene = variation.getString("Gene");
                 String type = variation.getString("Type");
 
-                Marker marker = loaderUtils.getMarker(gene,gene);
+                Marker marker = dataImportService.getMarker(gene,gene);
 
                 MarkerAssociation ma = new MarkerAssociation();
 
@@ -379,14 +379,14 @@ public class LoadIRCC implements CommandLineRunner {
                 String sampleId = entry.getKey();
                 MolecularCharacterization mc = entry.getValue();
                 try{
-                    Sample s = loaderUtils.getSampleByDataSourceAndSourceSampleId(irccDS.getAbbreviation(), sampleId);
+                    Sample s = dataImportService.findSampleByDataSourceAndSourceSampleId(irccDS.getAbbreviation(), sampleId);
 
                     if(s == null){
                         log.error("Sample not found: "+sampleId);
                     }
                     else{
                         s.addMolecularCharacterization(mc);
-                        loaderUtils.saveSample(s);
+                        dataImportService.saveSample(s);
                         log.info("Saving molchar for sample: "+sampleId);
                     }
                 }
@@ -415,9 +415,9 @@ public class LoadIRCC implements CommandLineRunner {
             JSONArray jarray = job.getJSONArray("IRCCVariation");
          //   System.out.println("loading "+jarray.length()+" variant records");
 
-            Platform platform = loaderUtils.getPlatform(TECH, this.irccDS, TARGETEDNGS_PLATFORM_URL);
+            Platform platform = dataImportService.getPlatform(TECH, this.irccDS, TARGETEDNGS_PLATFORM_URL);
             platform.setExternalDataSource(irccDS);
-            loaderUtils.savePlatform(platform);
+            dataImportService.savePlatform(platform);
 
 
             for (int i = 0; i < jarray.length(); i++) {
@@ -445,7 +445,7 @@ public class LoadIRCC implements CommandLineRunner {
                 String gene = variation.getString("Gene");
                 String type = variation.getString("Type");
                 
-                Marker marker = loaderUtils.getMarker(gene,gene);
+                Marker marker = dataImportService.getMarker(gene,gene);
                 
                 MarkerAssociation ma = new MarkerAssociation();
                 
@@ -461,8 +461,8 @@ public class LoadIRCC implements CommandLineRunner {
                 ma.setAlleleFrequency(variation.getString("VAF"));
                 ma.setRsVariants(variation.getString("avsnp147"));
 
-                PlatformAssociation pa = loaderUtils.createPlatformAssociation(platform, marker);
-                loaderUtils.savePlatformAssociation(pa);
+                PlatformAssociation pa = dataImportService.createPlatformAssociation(platform, marker);
+                dataImportService.savePlatformAssociation(pa);
 
                 if (markerAssociations.containsKey(sample)) {
                     markerAssociations.get(sample).add(ma);

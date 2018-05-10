@@ -10,8 +10,8 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
-import org.pdxfinder.utilities.LoaderUtils;
-import org.pdxfinder.utilities.Standardizer;
+import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,7 +68,7 @@ public class LoadJAXData implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
     private Session session;
 
     @Value("${jaxpdx.file}")
@@ -98,8 +98,8 @@ public class LoadJAXData implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadJAXData(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LoadJAXData(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     @Override
@@ -132,9 +132,9 @@ public class LoadJAXData implements CommandLineRunner {
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
 
-        jaxDS = loaderUtils.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+        jaxDS = dataImportService.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
 
-        nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
+        nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -158,7 +158,7 @@ public class LoadJAXData implements CommandLineRunner {
         String id = j.getString("Model ID");
 
         //Check if model exists in DB
-        ModelCreation existingModel = loaderUtils.findModelByIdAndDataSource(id, JAX_DATASOURCE_ABBREVIATION);
+        ModelCreation existingModel = dataImportService.findModelByIdAndDataSource(id, JAX_DATASOURCE_ABBREVIATION);
         //Do not load duplicates
         if(existingModel != null) {
             log.error("Skipping existing model "+id);
@@ -188,16 +188,16 @@ public class LoadJAXData implements CommandLineRunner {
         String race = Standardizer.fixNotString(j.getString("Race"));
         String ethnicity = Standardizer.fixNotString(j.getString("Ethnicity"));
 
-        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), gender,
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"), gender,
                 race, ethnicity, age, jaxDS);
 
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
-        Sample sample = loaderUtils.getSample(j.getString("Model ID"), tumorType, diagnosis,
+        Sample sample = dataImportService.getSample(j.getString("Model ID"), tumorType, diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, JAX_DATASOURCE_ABBREVIATION);
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT+id));
-        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.SOURCE, DATASOURCE_URL+id));
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT+id));
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, DATASOURCE_URL+id));
 
         String extraction = j.getString("Sample Type");
         sample.setExtractionMethod(extraction);
@@ -213,7 +213,7 @@ public class LoadJAXData implements CommandLineRunner {
         String qaPassages = Standardizer.NOT_SPECIFIED;
 
         pSnap.addSample(sample);
-        loaderUtils.savePatientSnapshot(pSnap);
+        dataImportService.savePatientSnapshot(pSnap);
         
          // Pending or Complete
         String qc = j.getString("QC");
@@ -225,18 +225,18 @@ public class LoadJAXData implements CommandLineRunner {
         
         // the validation techniques are more than just fingerprint, we don't have a way to capture that
         QualityAssurance qa = new QualityAssurance("Fingerprint", qc, qaPassages);
-        loaderUtils.saveQualityAssurance(qa);
+        dataImportService.saveQualityAssurance(qa);
 
-        ModelCreation mc = loaderUtils.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa, externalUrls);
+        ModelCreation mc = dataImportService.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa, externalUrls);
         mc.addRelatedSample(sample);
 
         String implantationTypeStr = Standardizer.NOT_SPECIFIED;
         String implantationSiteStr = j.getString("Engraftment Site");
 
-        Specimen specimen = loaderUtils.getSpecimen(mc, id, jaxDS.getAbbreviation(), "");
+        Specimen specimen = dataImportService.getSpecimen(mc, id, jaxDS.getAbbreviation(), "");
         specimen.setHostStrain(nsgBS);
-        EngraftmentSite engraftmentSite = loaderUtils.getImplantationSite(implantationSiteStr);
-        EngraftmentType engraftmentType = loaderUtils.getImplantationType(implantationTypeStr);
+        EngraftmentSite engraftmentSite = dataImportService.getImplantationSite(implantationSiteStr);
+        EngraftmentType engraftmentType = dataImportService.getImplantationType(implantationTypeStr);
         specimen.setEngraftmentSite(engraftmentSite);
         specimen.setEngraftmentType(engraftmentType);
 
@@ -279,7 +279,7 @@ public class LoadJAXData implements CommandLineRunner {
         }
 
         
-        loaderUtils.saveSpecimen(specimen);
+        dataImportService.saveSpecimen(specimen);
         //loaderUtils.saveModelCreation(mc);
         loadVariationData(mc, engraftmentSite, engraftmentType);
 
@@ -351,21 +351,21 @@ public class LoadJAXData implements CommandLineRunner {
                 ma.setSeqPosition(seqPosition);
                 ma.setReadDepth(readDepth);
 
-                Marker marker = loaderUtils.getMarker(symbol);
+                Marker marker = dataImportService.getMarker(symbol);
                 marker.setEntrezId(id);
                 
                 ma.setMarker(marker);
 
-                Platform platform = loaderUtils.getPlatform(technology, this.jaxDS);
+                Platform platform = dataImportService.getPlatform(technology, this.jaxDS);
 
                 if(technology.equals("Truseq_JAX")){
-                    platform = loaderUtils.getPlatform(technology, this.jaxDS, TRUSEQ_PLATFORM_URL);
+                    platform = dataImportService.getPlatform(technology, this.jaxDS, TRUSEQ_PLATFORM_URL);
                 }
                 else if(technology.equals("Whole_Exome")){
-                    platform = loaderUtils.getPlatform(technology, this.jaxDS, WHOLE_EXOME_URL);
+                    platform = dataImportService.getPlatform(technology, this.jaxDS, WHOLE_EXOME_URL);
                 }
                 else if(technology.equals("CTP")){
-                    platform = loaderUtils.getPlatform(technology, this.jaxDS, CTP_PLATFORM_URL);
+                    platform = dataImportService.getPlatform(technology, this.jaxDS, CTP_PLATFORM_URL);
                 }
 
                 platform.setExternalDataSource(jaxDS);
@@ -405,13 +405,13 @@ public class LoadJAXData implements CommandLineRunner {
                     Platform platform = null;
 
                     if(tech.equals("Truseq_JAX")){
-                        platform = loaderUtils.getPlatform(tech, this.jaxDS, TRUSEQ_PLATFORM_URL);
+                        platform = dataImportService.getPlatform(tech, this.jaxDS, TRUSEQ_PLATFORM_URL);
                     }
                     else if(tech.equals("Whole_Exome")){
-                        platform = loaderUtils.getPlatform(tech, this.jaxDS, WHOLE_EXOME_URL);
+                        platform = dataImportService.getPlatform(tech, this.jaxDS, WHOLE_EXOME_URL);
                     }
                     else if(tech.equals("CTP")){
-                        platform = loaderUtils.getPlatform(tech, this.jaxDS, CTP_PLATFORM_URL);
+                        platform = dataImportService.getPlatform(tech, this.jaxDS, CTP_PLATFORM_URL);
                     }
 
 
@@ -422,7 +422,7 @@ public class LoadJAXData implements CommandLineRunner {
                 }
 
                 
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sampleKey, this.jaxDS.getAbbreviation(), passage);
+                Specimen specimen = dataImportService.getSpecimen(modelCreation, sampleKey, this.jaxDS.getAbbreviation(), passage);
      
                 Sample specSample = new Sample();
                 specSample.setSourceSampleId(sampleKey);
@@ -447,7 +447,7 @@ public class LoadJAXData implements CommandLineRunner {
                 specimen.setEngraftmentType(engraftmentType);
 
 
-                loaderUtils.saveSpecimen(specimen);
+                dataImportService.saveSpecimen(specimen);
 
                 modelCreation.addSpecimen(specimen);
                 modelCreation.addRelatedSample(specSample);
@@ -456,7 +456,7 @@ public class LoadJAXData implements CommandLineRunner {
                 System.out.println("saved passage " + passage + " for model " + modelCreation.getSourcePdxId() + " from sample " + sampleKey);
             }
 
-            loaderUtils.saveModelCreation(modelCreation);
+            dataImportService.saveModelCreation(modelCreation);
 
         } catch (Exception e) {
             log.error("", e);

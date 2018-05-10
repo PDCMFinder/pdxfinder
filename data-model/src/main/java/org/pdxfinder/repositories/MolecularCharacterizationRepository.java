@@ -41,5 +41,5 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
             "WHERE molch.type = {type} " +
             "OPTIONAL MATCH (molch)-[plr:PLATFORM_USED]-(pl:Platform) " +
             "RETURN molch, plr, pl")
-    Collection<MolecularCharacterization> getAllByType(@Param("type") String type);
+    Collection<MolecularCharacterization> findAllByType(@Param("type") String type);
 }

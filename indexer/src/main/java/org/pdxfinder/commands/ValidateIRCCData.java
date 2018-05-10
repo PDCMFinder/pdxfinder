@@ -11,7 +11,7 @@ import org.pdxfinder.dao.*;
 import org.pdxfinder.irccdatamodel.IRCCMarkerMutation;
 import org.pdxfinder.irccdatamodel.IRCCPatient;
 import org.pdxfinder.irccdatamodel.IRCCSample;
-import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,7 +56,7 @@ public class ValidateIRCCData implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
     private Session session;
 
 
@@ -94,8 +94,8 @@ public class ValidateIRCCData implements CommandLineRunner {
         }
     }
 
-    public ValidateIRCCData(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public ValidateIRCCData(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     private void loadDataFromFiles() {
@@ -311,7 +311,7 @@ public class ValidateIRCCData implements CommandLineRunner {
     private void loadDataToNeo4j(){
 
         //Loading data to Neo4j
-        DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, null);
+        DS = dataImportService.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, null);
         //nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         int counter = 0;
@@ -326,27 +326,27 @@ public class ValidateIRCCData implements CommandLineRunner {
 
 
 
-                PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(key, patientsMap.get(key).getSex(),
+                PatientSnapshot pSnap = dataImportService.getPatientSnapshot(key, patientsMap.get(key).getSex(),
                         "", "", samples.get(i).getAgeAtCollection(), DS);
 
 
 
-                Sample sample = loaderUtils.getSample(samples.get(i).getSampleId(), samples.get(i).getTumorType(),
+                Sample sample = dataImportService.getSample(samples.get(i).getSampleId(), samples.get(i).getTumorType(),
                         samples.get(i).getDiagnosis(), patientsMap.get(key).getPrimarySite(),
                         samples.get(i).getSampleSite(), "", "", NORMAL_TISSUE, DS.getAbbreviation());
 
 
                 pSnap.addSample(sample);
-                loaderUtils.savePatientSnapshot(pSnap);
+                dataImportService.savePatientSnapshot(pSnap);
 
                 QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", null);
-                loaderUtils.saveQualityAssurance(qa);
+                dataImportService.saveQualityAssurance(qa);
 
 
                 List<ExternalUrl> externalUrls = new ArrayList<>();
-                externalUrls.add( loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
+                externalUrls.add( dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
 
-                ModelCreation mc = loaderUtils.createModelCreation(samples.get(i).getModelId(),DS.getAbbreviation(), sample, qa,externalUrls);
+                ModelCreation mc = dataImportService.createModelCreation(samples.get(i).getModelId(),DS.getAbbreviation(), sample, qa,externalUrls);
 
                 loadVariationData(mc, samples.get(i));
 
