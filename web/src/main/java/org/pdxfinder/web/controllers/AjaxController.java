@@ -126,11 +126,6 @@ public class AjaxController {
         int start = (page == null || page < 1) ? 0 : page - 1;
         int size = (pageSize == null || pageSize < 1) ? 20 : pageSize;
 
-        /*
-        TM00231?platform=CTP&page=0&size=20
-        modeldata/JAX/TM00231?platform=CTP&passage=0
-         */
-
         String dPlatform = (platform == null) ? "" : platform;
         String dPassage = (passage == null) ? "" : passage;
         String dSortColumn = (passage == null) ? "1" : sortColumn;

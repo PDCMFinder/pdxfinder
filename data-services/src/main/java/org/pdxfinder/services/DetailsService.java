@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -92,7 +93,7 @@ public class DetailsService {
 
 
 
-    public String getVariationDataCSV(String dataSrc,String modelId) {
+    public String getVariationDataCSV(String dataSrc, String modelId, HttpServletResponse response) {
 
         Set<String[]> variationDataDTOSet = new LinkedHashSet<>();
         int size = 50000, page = 0, draw=1;
@@ -143,6 +144,14 @@ public class DetailsService {
             output = mapper.writer(schema).writeValueAsString(variationDataDTOSet);
         } catch (JsonProcessingException e) {}
 
+
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder.org_variation" + dataSrc + "_" + modelId + ".csv");
+        try{
+            response.getOutputStream().flush();
+        }catch (Exception e){
+
+        }
         return output;
 
     }

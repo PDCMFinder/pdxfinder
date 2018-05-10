@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,16 +70,17 @@ public class SearchService {
 
 
 
-    public String export(Optional<String> query,
-                                     Optional<List<String>> datasource,
-                                     Optional<List<String>> diagnosis,
-                                     Optional<List<String>> patient_age,
-                                     Optional<List<String>> patient_treatment_status,
-                                     Optional<List<String>> patient_gender,
-                                     Optional<List<String>> sample_origin_tissue,
-                                     Optional<List<String>> cancer_system,
-                                     Optional<List<String>> sample_tumor_type,
-                                     Optional<List<String>> mutation){
+    public String export(HttpServletResponse response,
+                         Optional<String> query,
+                         Optional<List<String>> datasource,
+                         Optional<List<String>> diagnosis,
+                         Optional<List<String>> patient_age,
+                         Optional<List<String>> patient_treatment_status,
+                         Optional<List<String>> patient_gender,
+                         Optional<List<String>> sample_origin_tissue,
+                         Optional<List<String>> cancer_system,
+                         Optional<List<String>> sample_tumor_type,
+                         Optional<List<String>> mutation){
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
                 query,
@@ -107,6 +109,14 @@ public class SearchService {
             output = mapper.writer(schema).writeValueAsString(exportResults);
         } catch (JsonProcessingException e) {
             logger.error("Could not convert result set to CSV file. Facetes: {}", eDTO.getFacetsString(), e);
+        }
+
+        response.setContentType("text/csv;charset=utf-8");
+        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder_search_export.csv");
+        try{
+            response.getOutputStream().flush();
+        }catch (Exception e){
+
         }
 
         return output;
