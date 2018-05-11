@@ -218,6 +218,13 @@ public class SearchDS {
     }
 
     public Set<ModelForQuery> getModels() {
+
+        synchronized (this){
+            if(! INITIALIZED ) {
+                initialize();
+            }
+        }
+
         return models;
     }
 
