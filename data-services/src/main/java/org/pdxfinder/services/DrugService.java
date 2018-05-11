@@ -1,7 +1,11 @@
 package org.pdxfinder.services;
 
+import org.pdxfinder.repositories.ResponseRepository;
+import org.pdxfinder.repositories.TreatmentProtocolRepository;
 import org.pdxfinder.repositories.TreatmentSummaryRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /*
  * Created by csaba on 29/03/2018.
@@ -10,9 +14,16 @@ import org.springframework.stereotype.Service;
 public class DrugService {
 
     private TreatmentSummaryRepository treatmentSummaryRepository;
+    private TreatmentProtocolRepository treatmentProtocolRepository;
+    private ResponseRepository responseRepository;
 
-    public DrugService(TreatmentSummaryRepository treatmentSummaryRepository) {
+    public DrugService(TreatmentSummaryRepository treatmentSummaryRepository,
+                       TreatmentProtocolRepository treatmentProtocolRepository,
+                       ResponseRepository responseRepository) {
+
         this.treatmentSummaryRepository = treatmentSummaryRepository;
+        this.treatmentProtocolRepository = treatmentProtocolRepository;
+        this.responseRepository = responseRepository;
     }
 
 
@@ -26,4 +37,15 @@ public class DrugService {
 
         return treatmentSummaryRepository.findPlatformUrlByDataSource(dataSource);
     }
+
+    public List<String> getDrugNames(){
+
+        return treatmentProtocolRepository.findDrugNames();
+    }
+
+    public List<String> getResponseOptions(){
+
+        return responseRepository.findAllResponses();
+    }
+
 }
