@@ -35,6 +35,7 @@ public class SearchService {
     private Map<String, List<String>> facets = new HashMap<>();
     private MolCharService molCharService;
     private PlatformService platformService;
+    private DrugService drugService;
 
     private SearchDS searchDS;
 
@@ -51,6 +52,7 @@ public class SearchService {
                          AutoCompleteService autoCompleteService,
                          MolCharService molCharService,
                          PlatformService platformService,
+                         DrugService drugService,
                          SearchDS searchDS) {
 
         this.modelCreationRepository = modelCreationRepository;
@@ -58,6 +60,7 @@ public class SearchService {
         this.autoCompleteService = autoCompleteService;
         this.molCharService = molCharService;
         this.platformService = platformService;
+        this.drugService = drugService;
 
         this.searchDS = searchDS;
 
@@ -322,6 +325,8 @@ public class SearchService {
         wsDTO.setMarkerMap(userChoice);
         wsDTO.setMarkerMapWithAllVariants(allVariants);
 
+        wsDTO.setDrugNames(drugService.getDrugNames());
+        wsDTO.setDrugResponses(drugService.getResponseOptions());
 
         return wsDTO;
     }
