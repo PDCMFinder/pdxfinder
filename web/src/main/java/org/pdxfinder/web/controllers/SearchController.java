@@ -39,10 +39,7 @@ public class SearchController {
                   @RequestParam("mutation") Optional<List<String>> mutation
     ) {
 
-        response.setContentType("text/csv;charset=utf-8");
-        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder_search_export.csv");
-
-        return searchService.export(query, datasource,
+        return searchService.export(response, query, datasource,
                 diagnosis, patient_age, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
                 sample_tumor_type, mutation);
 

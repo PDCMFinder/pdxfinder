@@ -43,10 +43,7 @@ public class DetailsController {
                            @PathVariable String dataSrc,
                            @PathVariable String modelId) {
 
-        response.setContentType("text/csv;charset=utf-8");
-        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder.org_variation" + dataSrc + "_" + modelId + ".csv");
-
-        return detailsService.getVariationDataCSV(dataSrc, modelId);
+        return detailsService.getVariationDataCSV(dataSrc, modelId, response);
     }
 
 
