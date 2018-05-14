@@ -48,6 +48,9 @@ public class WebSearchDTO {
     private Map<String, List<String>> markerMap;
     private Map<String, Set<String>> markerMapWithAllVariants;
 
+    private List<String> drugNames;
+    private List<String> drugResponses;
+
 
     public WebSearchDTO() {
     }
@@ -264,8 +267,32 @@ public class WebSearchDTO {
     public Map<String, Set<String>> getMarkerMapWithAllVariants() {
         return markerMapWithAllVariants;
     }
+
     public void setMarkerMapWithAllVariants(Map<String, Set<String>> markerMapWithAllVariants) {
         this.markerMapWithAllVariants = markerMapWithAllVariants;
     }
 
+    public boolean isMutationSelected() {
+        return isMutationSelected;
+    }
+
+    public void setMutationSelected(boolean mutationSelected) {
+        isMutationSelected = mutationSelected;
+    }
+
+    public List<String> getDrugNames() {
+        return drugNames;
+    }
+
+    public void setDrugNames(List<String> drugNames) {
+        this.drugNames = drugNames;
+    }
+
+    public List<String> getDrugResponses() {
+        return drugResponses;
+    }
+
+    public void setDrugResponses(List<String> drugResponses) {
+        this.drugResponses = drugResponses;
+    }
 }
