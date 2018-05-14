@@ -40,35 +40,6 @@
 
     <!-- end CSS-->
 
-    <style>
-        .tooltip {
-            max-width: none;
-        }
-
-        table.datatable-pdx thead th {
-            font-size: 1.0rem;
-        }
-
-        table.datatable-pdx td {
-            font-size: 0.9rem;
-        }
-
-        ul.pdx-accordion-1 a.accordion-title {
-            font-size: 1.0rem;
-        }
-
-        ul.pdx-accordion-2 a.accordion-title {
-            font-size: 0.95rem;
-        }
-
-        span.selected {
-            color: #06369d;
-            font-weight: bold;
-        }
-
-
-    </style>
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script th:src="@{/js/jquery.dataTables.js}"></script>
     <script th:src="@{/js/scroller.js}"></script>
@@ -106,21 +77,6 @@
                 </nav>
             </div>
 
-            <style>
-                hr {
-                    box-sizing: content-box;
-                    overflow: visible;
-                    clear: both;
-                    max-width: 75rem;
-                    height: 0;
-                    margin: 1.25rem auto;
-                    border-top: 0;
-                    border-right: 0;
-                    border-bottom: 2px solid #06369d;
-                    border-left: 0
-                }
-            </style>
-
             <!-- Three Grids Section-->
             <section>
                 <div class="row">
@@ -151,14 +107,14 @@
                         </a>
 
                         <a th:href="@{${data.externalUrl}}" th:target="_blank" th:if="${#strings.contains(data.externalUrl,'http')}">
-                            <h4 class="button outline uppercase margin-top-large minwidth300" style='margin-top:-10px;'
+                            <h4 class="button outline uppercase margin-top-large minwidth300 shiftUp10"
                                 th:text="${data.externalUrlText}">View at Provider</h4>
                         </a>
 
                     </div>
                 </div>
             </section>
-            <hr class="margin-vertical-20">
+            <hr class="margin-vertical-20 line_v2">
 
 
             <!-- Tabs Section -->
@@ -330,20 +286,6 @@
                         <p>
                         <div class="row large-12 medium-12 expanded" id="variationTableData">
 
-                            <style> table * {
-                                -webkit-box-sizing: content-box;
-                                -moz-box-sizing: content-box;
-                                box-sizing: content-box;
-                            }</style>
-                            <div class="col-md-12 javaScriptBrowser">
-
-                                <!-- <div class="panel panel-info" th:if="${totalRecords > 0}" >
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
-                                    </div>
-                                </div> -->
-                            </div>
-
                             <!-- Start of Patient variation data -->
                             <div class="tab" role="tabpanel" th:if="${data.patientTech.size() > 0}">
                                 <!-- Nav tabs -->
@@ -470,7 +412,7 @@
                                                                 <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
                                                                        id="example-datatable"
                                                                        class="table display datatable-pdx table-borderedPdx"
-                                                                       th:height="50" width="100%"> <!-- class=" "   table-condensed style="border:1px solid #000; padding:10px;"-->
+                                                                       th:height="50" width="100%">
 
                                                                     <thead>
                                                                     <tr>
@@ -508,7 +450,7 @@
                         <div th:if="${not #lists.isEmpty(data.drugSummary)}">
                             <p>
 
-                            <div th:if="${data.drugProtocolUrl} != null" style="margin-bottom: 15px;text-transform: uppercase">
+                            <div th:if="${data.drugProtocolUrl} != null" class="drug_spacing">
                                 <a th:href="${data.drugProtocolUrl}" >Dosing study protocol</a>
                             </div>
 
