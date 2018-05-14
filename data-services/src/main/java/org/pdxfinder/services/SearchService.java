@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -73,8 +72,7 @@ public class SearchService {
 
 
 
-    public String export(HttpServletResponse response,
-                         Optional<String> query,
+    public ExportDTO export(Optional<String> query,
                          Optional<List<String>> datasource,
                          Optional<List<String>> diagnosis,
                          Optional<List<String>> patient_age,
@@ -102,27 +100,7 @@ public class SearchService {
         eDTO.setResults(searchDS.search(configuredFacets));
         eDTO.setFacetsString(configuredFacets.toString());
 
-        Set<ModelForQueryExport> exportResults = eDTO.getResults().stream().map(ModelForQueryExport::new).collect(Collectors.toSet());
-
-        CsvMapper mapper = new CsvMapper();
-        CsvSchema schema = mapper.schemaFor(ModelForQueryExport.class).withHeader();
-
-        String output = "CSV output for configured values " + eDTO.getFacetsString();
-        try {
-            output = mapper.writer(schema).writeValueAsString(exportResults);
-        } catch (JsonProcessingException e) {
-            logger.error("Could not convert result set to CSV file. Facetes: {}", eDTO.getFacetsString(), e);
-        }
-
-        response.setContentType("text/csv;charset=utf-8");
-        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder_search_export.csv");
-        try{
-            response.getOutputStream().flush();
-        }catch (Exception e){
-
-        }
-
-        return output;
+        return eDTO;
     }
 
 

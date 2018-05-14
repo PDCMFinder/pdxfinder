@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,7 +92,7 @@ public class DetailsService {
 
 
 
-    public String getVariationDataCSV(String dataSrc, String modelId, HttpServletResponse response) {
+    public Set<String[]> getVariationDataCSV(String dataSrc, String modelId) {
 
         Set<String[]> variationDataDTOSet = new LinkedHashSet<>();
         int size = 50000, page = 0, draw=1;
@@ -118,41 +117,7 @@ public class DetailsService {
             variationDataDTOSet.add(dData);
         }
 
-        CsvMapper mapper = new CsvMapper();
-
-        CsvSchema schema = CsvSchema.builder()
-                .addColumn("Sample ID")
-                .addColumn("Passage")
-                .addColumn("Histology")
-                .addColumn("Tumor type")
-                .addColumn("Chromosome")
-                .addColumn("Seq. Position")
-                .addColumn("Ref Allele")
-                .addColumn("Alt Allele")
-                .addColumn("Consequence")
-                .addColumn("Gene")
-                .addColumn("Amino Acid Change")
-                .addColumn("Read Depth")
-                .addColumn("Allele Freq")
-                .addColumn("RS Variant")
-                .addColumn("Platform")
-                .build().withHeader();
-
-
-        String output = "CSV output";
-        try {
-            output = mapper.writer(schema).writeValueAsString(variationDataDTOSet);
-        } catch (JsonProcessingException e) {}
-
-
-        response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder.org_variation" + dataSrc + "_" + modelId + ".csv");
-        try{
-            response.getOutputStream().flush();
-        }catch (Exception e){
-
-        }
-        return output;
+        return variationDataDTOSet;
 
     }
 
