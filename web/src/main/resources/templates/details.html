@@ -248,25 +248,23 @@
 
                             <div class="columns medium-12 small-12 margin-top-medium">
                                 <div class="responsive-table">
-                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
+
+                                    <table class="datatable-pdx pdx-table table-borderedPdx head-left">
                                         <thead>
                                         <tr>
-                                            <th colspan="2">Model quality control</th>
+                                            <th colspan="3">Model quality control</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Technique</th>
+                                            <th>Description</th>
+                                            <th>Passage</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-
-                                        <tr>
-                                            <th class="text-left medium-4">Technology</th>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <th class="text-left medium-4">Description</th>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <th class="text-left medium-4">Passages</th>
-                                            <td></td>
+                                        <tr th:each="qa, iter : ${data.qualityAssurances}">
+                                            <td th:text="${qa.technology}"></td>
+                                            <td th:text="${qa.description}"></td>
+                                            <td th:text="${qa.passages}"></td>
                                         </tr>
                                         </tbody>
                                     </table>
