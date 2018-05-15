@@ -2,6 +2,7 @@ package org.pdxfinder.repositories;
 
 import org.pdxfinder.dao.ModelCreation;
 import org.pdxfinder.dao.MolecularCharacterization;
+import org.pdxfinder.dao.TreatmentSummary;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
@@ -153,4 +154,9 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN mod, msr, s, cbr, mc, pur, pl")
     Collection<ModelCreation> getModelsWithMolCharBySource(@Param("dataSource") String dataSource);
 
+
+    @Query("MATCH (model:ModelCreation)--(ts:TreatmentSummary) " +
+            "WHERE id(ts) = {ts} " +
+            "RETURN model")
+    ModelCreation findByTreatmentSummary(@Param("ts") TreatmentSummary ts);
 }
