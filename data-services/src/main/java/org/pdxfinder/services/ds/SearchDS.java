@@ -7,14 +7,12 @@ import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.repositories.DataProjectionRepository;
-import org.pdxfinder.services.dto.WebSearchDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;

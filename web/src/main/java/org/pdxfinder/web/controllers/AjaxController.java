@@ -2,7 +2,10 @@ package org.pdxfinder.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
-import org.pdxfinder.services.*;
+import org.pdxfinder.services.AutoCompleteService;
+import org.pdxfinder.services.DetailsService;
+import org.pdxfinder.services.MolCharService;
+import org.pdxfinder.services.PlatformService;
 import org.pdxfinder.services.ds.AutoCompleteOption;
 import org.pdxfinder.services.dto.DataAvailableDTO;
 import org.pdxfinder.services.dto.DetailsDTO;

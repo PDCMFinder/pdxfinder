@@ -1,7 +1,5 @@
 package org.pdxfinder.repositories;
 
-import org.neo4j.ogm.cypher.query.PagingAndSorting;
-import org.pdxfinder.dao.Marker;
 import org.pdxfinder.dao.MarkerAssociation;
 import org.pdxfinder.dao.MolecularCharacterization;
 import org.springframework.data.neo4j.annotation.Query;

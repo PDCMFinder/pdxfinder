@@ -1,6 +1,5 @@
 package org.pdxfinder.repositories;
 
-import org.pdxfinder.dao.Patient;
 import org.pdxfinder.dao.PatientSnapshot;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
