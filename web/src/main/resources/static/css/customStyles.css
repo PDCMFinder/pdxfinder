@@ -238,6 +238,10 @@ h5{
     margin-top: -5px;
 }
 
+.shiftUp10 {
+    margin-top: -10px;
+}
+
 .shiftUp20 {
     margin-top: -20px;
 }
@@ -944,6 +948,25 @@ span.selected {
 
 .white-text-right-float{
     color: #fff; float:right;
+}
+
+
+hr .line_v2 {
+    box-sizing: content-box;
+    overflow: visible;
+    clear: both;
+    max-width: 75rem;
+    height: 0;
+    margin: 1.25rem auto;
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 2px solid #06369d;
+    border-left: 0
+}
+
+.drug_spacing
+{
+    margin-bottom: 15px;text-transform: uppercase;
 }
 
 

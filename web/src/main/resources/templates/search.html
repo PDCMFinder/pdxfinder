@@ -394,7 +394,7 @@
 
 
 
-                                                        <!--<span th:if="${not #lists.isEmpty(param.mutation)}">
+                                                        <span th:if="${not #lists.isEmpty(param.mutation)}">
                                                             <span th:each="i: ${#numbers.sequence(#maps.size(websearch.markerMap)+1, 20)}">
 
                                                                 <div class="row hidden"
@@ -416,7 +416,7 @@
                                                                 </div>
 
                                                             </span>
-                                                        </span>-->
+                                                        </span>
 
                                                     </span>
 
@@ -694,6 +694,7 @@
         jQuery("form.main-search").submit();
     }, false);
     console.log("before updating");
+
     jQuery(document).ready(function () {
         updateFilters(ageFilters, genderFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters);
         console.log("updated");
@@ -710,49 +711,14 @@
             redirectPage();
         });
     });
-</script>
 
+     var incomingString = [[${websearch.mutatedMarkersAndVariants}]];
+     var mutatedMarkersAndVariants = JSON.parse(incomingString);
 
-<script type="text/javascript" language="javascript" th:inline="javascript">
-    function getMutatedMarkersAndVariants(){
-        var incomingString = [[${websearch.mutatedMarkersAndVariants}]];
-        var mutatedMarkersAndVariants = JSON.parse(incomingString);
-        /* var mutatedMarkersAndVariants = {  "USP25" : [ "T1033M" ], "USP26" : [ "L362W" ],"USP20" : [ "D505Y", "P49A" ]} */
-        return mutatedMarkersAndVariants;
-    }
-    var mutatedMarkersAndVariants = getMutatedMarkersAndVariants();
-    var keysAreMarkers = Object.keys(mutatedMarkersAndVariants);
-    $('#geneFilter1').autocomplete({
-        source: [keysAreMarkers]
-    });
-    for (var i = 2; i <= 20; i++) {
-        $('#geneFilter' + i).autocomplete({
-            source: [keysAreMarkers]
-        });
-    }
-    function getVariantSize(selectedMarker) {
-        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker];
-        return valuesAreVariants;
-    }
-    function loadVariants(selectedMarker, compNumber) {
-        var marker = selectedMarker.value;
-        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker.value].sort();
-        //alert(marker+"\n"+typeof valuesAreVariants);
-        var newOptions = "";
-        for (var i = 0; i < valuesAreVariants.length; i++) {
-            newOptions += "<option value='" + valuesAreVariants[i] + "' selected>" + valuesAreVariants[i] + "</option>";
-        }
-        var select = $('#variantFilter' + compNumber);
-        select.empty().append(newOptions);
-        $(function () {
-            $('#variantFilter' + compNumber).change(function () {
-                console.log($(this).val());
-            }).multipleSelect({
-                placeholder: " variants"
-            });
-        });
-    }
-    $(function () {
+    jQuery(document).ready(function () {
+
+        loadGeneTextFields(mutatedMarkersAndVariants);
+
         $('#variantFilter1').change(function () {
             console.log($(this).val());
         }).multipleSelect({
@@ -766,6 +732,7 @@
             });
         }
     });
+
 </script>
 
 </body>

@@ -303,12 +303,42 @@ function redirectPage(){
 
 
 
-
-
-
-
 var geneticVar = 1;
 var counter = 1;
+
+function loadGeneTextFields(){
+
+    var keysAreMarkers = Object.keys(mutatedMarkersAndVariants);
+    $('#geneFilter1').autocomplete({
+        source: [keysAreMarkers]
+    });
+
+    for (var i = 2; i <= 20; i++) {
+        $('#geneFilter' + i).autocomplete({
+            source: [keysAreMarkers]
+        });
+    }
+}
+
+function loadVariants(selectedMarker, compNumber) {
+    var marker = selectedMarker.value;
+    var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker.value].sort();
+    //alert(marker+"\n"+typeof valuesAreVariants);
+    var newOptions = "";
+    for (var i = 0; i < valuesAreVariants.length; i++) {
+        newOptions += "<option value='" + valuesAreVariants[i] + "' selected>" + valuesAreVariants[i] + "</option>";
+    }
+    var select = $('#variantFilter' + compNumber);
+    select.empty().append(newOptions);
+    $(function () {
+        $('#variantFilter' + compNumber).change(function () {
+            console.log($(this).val());
+        }).multipleSelect({
+            placeholder: " variants"
+        });
+    });
+}
+
 
 function addMarkerAndVariants(param, startIndex) {
     if (startIndex != 2 && counter == 1) {
@@ -322,6 +352,12 @@ function addMarkerAndVariants(param, startIndex) {
             document.getElementsByClassName("geneticVar" + i)[0].style.display = "block";
         }
     }
+}
+
+
+function getVariantSize(selectedMarker) {
+    var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker];
+    return valuesAreVariants;
 }
 
 
