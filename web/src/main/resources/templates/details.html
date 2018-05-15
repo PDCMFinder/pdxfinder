@@ -502,20 +502,6 @@
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
-    var searchStates = [[${data.autoSuggestList}]];
-
-
-    function constructSearchOptions(data) {
-        var newOptions = [];
-        for (var i = 0; i < data.length; i++) {
-            newOptions.push({'value': data[i], 'label': data[i], selected: false, disabled: false})
-        }
-        return newOptions;
-    }
-
-
-    document.getElementsByClassName("javaScriptBrowser")[0].style.display = "block";
-    //document.getElementsByClassName("javaScriptBrowser")[1].style.display = "block";
     var modelId = [[${data.modelId}]];
     var dataSrc = [[${data.dataSource}]];
     jQuery(document).ready(function () {
@@ -546,10 +532,6 @@
 
     // We define the function
     function drawTable(tableId, apiURL) {
-
-        /*var markerNVariant = [[ ${param.marker} ]];
-        var marker = markerNVariant.split(" ");
-        alert(marker[0]); */
 
         var l = jQuery("#tableId tr").length;
         console.log(tableId + " " + l);
