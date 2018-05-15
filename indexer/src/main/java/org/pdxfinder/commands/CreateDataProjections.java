@@ -481,33 +481,43 @@ public class CreateDataProjections implements CommandLineRunner{
 
     }
 
-    private void addToDrugResponseDP(Long modelId, String drug, String response){
+    private void addToDrugResponseDP(Long modelId, String drugName, String responseVal){
 
-        if(drugResponseDP.containsKey(drug)){
+        if(modelId != null && drugName != null && !drugName.isEmpty() && responseVal != null && !responseVal.isEmpty()){
 
-            if(drugResponseDP.get(drug).containsKey(response)){
+            //TODO: Remove regex after drug harmonization is done
+            String drug = drugName.replaceAll("[^a-zA-Z0-9 _-]","");
+            String response = responseVal.replaceAll("[^a-zA-Z0-9 _-]","");
 
-                drugResponseDP.get(drug).get(response).add(modelId);
+            if(drugResponseDP.containsKey(drug)){
+
+                if(drugResponseDP.get(drug).containsKey(response)){
+
+                    drugResponseDP.get(drug).get(response).add(modelId);
+                }
+                //new response
+                else{
+                    Set s = new HashSet();
+                    s.add(modelId);
+
+                    drugResponseDP.get(drug).put(response,s);
+                }
             }
-            //new response
+            //new drug, create response and add model
             else{
+
                 Set s = new HashSet();
                 s.add(modelId);
 
-                drugResponseDP.get(drug).put(response,s);
+                Map respMap = new HashMap();
+                respMap.put(response, s);
+
+                drugResponseDP.put(drug, respMap);
             }
+
         }
-        //new drug, create response and add model
-        else{
 
-            Set s = new HashSet();
-            s.add(modelId);
 
-            Map respMap = new HashMap();
-            respMap.put(response, s);
-
-            drugResponseDP.put(drug, respMap);
-        }
     }
 
 
