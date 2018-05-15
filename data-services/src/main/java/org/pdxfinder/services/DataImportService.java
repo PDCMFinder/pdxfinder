@@ -641,4 +641,9 @@ public class DataImportService {
         return false;
     }
 
+    public ModelCreation findModelByTreatmentSummary(TreatmentSummary ts){
+
+        return modelCreationRepository.findByTreatmentSummary(ts);
+    }
+
 }

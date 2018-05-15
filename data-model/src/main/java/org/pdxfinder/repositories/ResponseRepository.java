@@ -1,6 +1,5 @@
 package org.pdxfinder.repositories;
 
-import org.neo4j.ogm.cypher.query.PagingAndSorting;
 import org.pdxfinder.dao.Response;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;

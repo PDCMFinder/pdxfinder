@@ -1,5 +1,6 @@
 package org.pdxfinder.services;
 
+import org.pdxfinder.dao.TreatmentSummary;
 import org.pdxfinder.repositories.ResponseRepository;
 import org.pdxfinder.repositories.TreatmentProtocolRepository;
 import org.pdxfinder.repositories.TreatmentSummaryRepository;
@@ -46,6 +47,16 @@ public class DrugService {
     public List<String> getResponseOptions(){
 
         return responseRepository.findAllResponses();
+    }
+
+    public List<TreatmentSummary> getSummariesWithDrugAndResponse(){
+
+        return treatmentSummaryRepository.findAllWithDrugData();
+    }
+
+    public int getTotalSummaryNumber(){
+
+        return treatmentSummaryRepository.findTotalSummaryNumber();
     }
 
 }
