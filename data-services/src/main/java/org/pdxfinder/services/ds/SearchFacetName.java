@@ -16,7 +16,8 @@ public enum SearchFacetName {
     organ,
     cancer_system,
     cell_type,
-    mutation;
+    mutation,
+    drug;
 
     public String getName() {
         return name();

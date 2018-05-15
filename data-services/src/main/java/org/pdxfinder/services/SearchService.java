@@ -81,7 +81,9 @@ public class SearchService {
                          Optional<List<String>> sample_origin_tissue,
                          Optional<List<String>> cancer_system,
                          Optional<List<String>> sample_tumor_type,
-                         Optional<List<String>> mutation){
+                         Optional<List<String>> mutation,
+                         Optional<List<String>> drug
+    ){
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
                 query,
@@ -93,7 +95,8 @@ public class SearchService {
                 sample_origin_tissue,
                 cancer_system,
                 sample_tumor_type,
-                mutation
+                mutation,
+                drug
         );
 
         ExportDTO eDTO = new ExportDTO();
@@ -114,6 +117,7 @@ public class SearchService {
                                   Optional<List<String>> cancer_system,
                                   Optional<List<String>> sample_tumor_type,
                                   Optional<List<String>> mutation,
+                                  Optional<List<String>> drug,
                                   Integer page,
                                   Integer size){
 
@@ -128,7 +132,8 @@ public class SearchService {
                 sample_origin_tissue,
                 cancer_system,
                 sample_tumor_type,
-                mutation
+                mutation,
+                drug
         );
 
         WebSearchDTO wsDTO = new WebSearchDTO();
@@ -320,8 +325,8 @@ public class SearchService {
             Optional<List<String>> sampleOriginTissue,
             Optional<List<String>> cancerSystem,
             Optional<List<String>> sampleTumorType,
-            Optional<List<String>> mutation
-
+            Optional<List<String>> mutation,
+            Optional<List<String>> drug
 
     ) {
 
@@ -392,6 +397,13 @@ public class SearchService {
             configuredFacets.put(SearchFacetName.mutation, new ArrayList<>());
             for (String s : mutation.get()) {
                 configuredFacets.get(SearchFacetName.mutation).add(s);
+            }
+        }
+
+        if (drug.isPresent() && !drug.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.drug, new ArrayList<>());
+            for (String s : drug.get()) {
+                configuredFacets.get(SearchFacetName.drug).add(s);
             }
         }
 

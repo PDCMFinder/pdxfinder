@@ -36,6 +36,9 @@ public class SearchDS {
     //platform=> marker=> variant=>{set of model ids}
     Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<String, Map<String, Map<String, Set<Long>>>>();
 
+    //"drugname"=>"response"=>"set of model ids"
+    private Map<String, Map<String, Set<Long>>> drugResponses = new HashMap<>();
+
     private boolean INITIALIZED = false;
 
     private DataProjectionRepository dataProjectionRepository;
@@ -115,6 +118,10 @@ public class SearchDS {
 
         //loads the mutation map from Data Projection
         initializeMutations();
+
+
+        //loads drug response from Data Projection
+        initializeDrugResponses();
 
 
         List<String> padding = new ArrayList<>();
@@ -329,6 +336,29 @@ public class SearchDS {
     }
 
 
+    void initializeDrugResponses(){
+
+        log.info("Initializing drug responses");
+
+        String responses = dataProjectionRepository.findByLabel("DrugResponse").getValue();
+
+        try{
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            drugResponses = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
+
+            log.info("Lookup: "+drugResponses.get("doxorubicincyclophosphamide").get("progressive disease").toString());
+
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
+    }
+
+
+
     /**
      * Takes a marker and a variant. Looks up these variants in mutation.
      * Then creates a hashmap with modelids as keys and platform+marker+mutation as values
@@ -413,7 +443,74 @@ public class SearchDS {
             }
         }
 
+    }
 
+
+
+    private void getModelsByDrugAndResponse(String drug, String response, Map<Long, Set<String>> previouslyFoundModels){
+
+        //drug => response => set of model ids
+
+        //Cases
+        //1. drug + no response selected
+        //2. drug + ALL response
+        //3. drug + one response selected
+        //4. no drug + one response selected
+
+
+        //1. = 2.
+        if(drug != null && response.toLowerCase().equals("all")){
+
+            if(drugResponses.containsKey(drug)){
+
+                for(Map.Entry<String, Set<Long>> currResp:drugResponses.get(drug).entrySet()){
+
+                    String resp = currResp.getKey();
+                    Set<Long> foundModels = currResp.getValue();
+
+                    for(Long modelId: foundModels){
+
+                        if(previouslyFoundModels.containsKey(modelId)){
+
+                            previouslyFoundModels.get(modelId).add(drug+" "+response);
+                        }
+                        else{
+
+                            Set<String>  newSet = new HashSet<>();
+                            newSet.add(drug+" "+response);
+                            previouslyFoundModels.put(modelId, newSet);
+                        }
+                    }
+                }
+            }
+        }
+        //3.
+        else if(drug != null && response != null){
+
+            if(drugResponses.containsKey(drug)){
+
+                if(drugResponses.get(drug).containsKey(response)){
+
+                    Set<Long> foundModels = drugResponses.get(drug).get(response);
+
+                    for(Long modelId: foundModels){
+
+                        if(previouslyFoundModels.containsKey(modelId)){
+
+                            previouslyFoundModels.get(modelId).add(drug+" "+response);
+                        }
+                        else{
+
+                            Set<String>  newSet = new HashSet<>();
+                            newSet.add(drug+" "+response);
+                            previouslyFoundModels.put(modelId, newSet);
+                        }
+                    }
+                }
+            }
+        }
+
+        //TODO: Deal with the 4. case
 
 
     }
@@ -599,6 +696,21 @@ public class SearchDS {
                     result.forEach(x -> x.setMutatedVariants(new ArrayList<>(modelsWithMutatedMarkerAndVariant.get(x.getModelId()))));
                     break;
 
+                case drug:
+                    Map<Long, Set<String>> modelsWithDrug = new HashMap<>();
+
+                    for(String filt : filters.get(SearchFacetName.drug)){
+
+                        String[] drugAndResponse = filt.split("___");
+                        String drug = drugAndResponse[0];
+                        String response = drugAndResponse[1];
+                        getModelsByDrugAndResponse(drug,response, modelsWithDrug);
+                    }
+
+                    result = result.stream().filter(x -> modelsWithDrug.containsKey(x.getModelId())).collect(Collectors.toSet());
+                    // updates the remaining modelforquery objects with drug and response info
+                    result.forEach(x -> x.setMutatedVariants(new ArrayList<>(modelsWithDrug.get(x.getModelId()))));
+                    break;
 
 
                 default:
