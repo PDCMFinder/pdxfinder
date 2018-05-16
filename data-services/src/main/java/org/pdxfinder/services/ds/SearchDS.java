@@ -510,8 +510,34 @@ public class SearchDS {
             }
         }
 
-        //TODO: Deal with the 4. case
+        //4.
+        else if(drug == null && response != null){
 
+            for(Map.Entry<String, Map<String, Set<Long>>> drugs : drugResponses.entrySet()){
+
+                String drugName = drugs.getKey();
+
+                if(drugs.getValue().containsKey(response)){
+
+                    Set<Long> foundModels = drugs.getValue().get(response);
+
+                    for(Long modelId: foundModels){
+
+                        if(previouslyFoundModels.containsKey(modelId)){
+
+                            previouslyFoundModels.get(modelId).add(drug+" "+response);
+                        }
+                        else{
+
+                            Set<String>  newSet = new HashSet<>();
+                            newSet.add(drugName+" "+response);
+                            previouslyFoundModels.put(modelId, newSet);
+                        }
+                    }
+                }
+            }
+
+        }
 
     }
 
@@ -704,6 +730,8 @@ public class SearchDS {
                         String[] drugAndResponse = filt.split("___");
                         String drug = drugAndResponse[0];
                         String response = drugAndResponse[1];
+
+                        if(drug.isEmpty()) drug = null;
                         getModelsByDrugAndResponse(drug,response, modelsWithDrug);
                     }
 

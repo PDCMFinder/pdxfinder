@@ -208,6 +208,8 @@ public class SearchService {
 
         }
 
+
+
         wsDTO.setFacetString(facetString);
 
 
