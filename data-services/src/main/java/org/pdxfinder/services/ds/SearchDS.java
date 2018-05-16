@@ -348,7 +348,7 @@ public class SearchDS {
 
             drugResponses = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
 
-            log.info("Lookup: "+drugResponses.get("doxorubicincyclophosphamide").get("progressive disease").toString());
+            //log.info("Lookup: "+drugResponses.get("doxorubicincyclophosphamide").get("progressive disease").toString());
 
         }
         catch(Exception e){

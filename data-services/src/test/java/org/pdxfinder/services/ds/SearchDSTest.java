@@ -67,8 +67,14 @@ public class SearchDSTest extends BaseTest {
         mutDP.setLabel("PlatformMarkerVariantModel");
         mutDP.setValue("{\"TargetedNGS_MUT\":{\"RB1\":{\"N123D\":[10411],\"Q383E\":[10940],\"E323Q\":[16519],\"G38S\":[12539]}}}");
 
+
+        DataProjection drugDP = new DataProjection();
+        drugDP.setLabel("DrugResponse");
+        drugDP.setValue("{}");
+
         dataProjectionRepository.save(dp);
         dataProjectionRepository.save(mutDP);
+        dataProjectionRepository.save(drugDP);
 
         assertThat(models.size(), is(4));
 
