@@ -147,7 +147,7 @@ public class SearchService {
         List<FacetOption> cancerSystemSelected = searchDS.getFacetOptions(SearchFacetName.cancer_system, cancerBySystemOptions, results, cancer_system.orElse(null));
         List<FacetOption> sampleTumorTypeSelected = searchDS.getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
         List<FacetOption> mutationSelected = searchDS.getFacetOptions(SearchFacetName.mutation, null, results, mutation.orElse(null));
-
+        List<FacetOption> drugSelected = searchDS.getFacetOptions(SearchFacetName.drug, null, results, drug.orElse(null));
 
 
         wsDTO.setPatientAgeSelected(patientAgeSelected);
@@ -174,7 +174,8 @@ public class SearchService {
                                 datasourceSelected,
                                 cancerSystemSelected,
                                 sampleTumorTypeSelected,
-                                mutationSelected
+                                mutationSelected,
+                                drugSelected
 
                         )
                 )
@@ -208,6 +209,21 @@ public class SearchService {
 
         }
 
+
+        if (drug.isPresent() && !drug.get().isEmpty()) {
+            List<String> drugList = new ArrayList<>();
+            for (String d : drug.get()) {
+                drugList.add("drug=" + d);
+            }
+
+            if (facetString.length() != 0 && !facetString.endsWith("&")) {
+                facetString += "&";
+            }
+            for (String d : drugList) {
+                facetString += d + "&";
+            }
+
+        }
 
 
         wsDTO.setFacetString(facetString);
