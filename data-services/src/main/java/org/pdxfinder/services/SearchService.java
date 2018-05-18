@@ -3,6 +3,7 @@ package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.dao.MarkerAssociation;
 import org.pdxfinder.dao.ModelCreation;
 import org.pdxfinder.dao.MolecularCharacterization;
@@ -332,6 +333,10 @@ public class SearchService {
 
         List<String> drugResponses = drugService.getResponseOptions();
 
+        // Capitalize and Remove duplicates from drugResponses
+        drugResponses = drugResponses.stream().map(WordUtils::capitalize).collect(Collectors.toList());
+        drugResponses = drugResponses.stream().distinct().collect(Collectors.toList());
+
 
         done = "";
         Map<String, List<String>> drugResponseChoice = new HashMap<>();
@@ -373,7 +378,7 @@ public class SearchService {
 
 
         wsDTO.setDrugNames(drugService.getDrugNames());
-        wsDTO.setDrugResponses(drugService.getResponseOptions());
+        wsDTO.setDrugResponses(drugResponses);
 
         return wsDTO;
     }
