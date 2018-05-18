@@ -745,7 +745,7 @@
         selectAllText: 'Pick All',
         allSelected: 'All Picked',
         countSelected: '# of % Variants',
-        noMatchesFound: 'Select Marker',
+        noMatchesFound: 'Make a Choice',
 
         styler: function () {
             return false;

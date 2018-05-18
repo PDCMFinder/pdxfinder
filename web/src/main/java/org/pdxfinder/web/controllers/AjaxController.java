@@ -2,10 +2,7 @@ package org.pdxfinder.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
-import org.pdxfinder.services.AutoCompleteService;
-import org.pdxfinder.services.DetailsService;
-import org.pdxfinder.services.MolCharService;
-import org.pdxfinder.services.PlatformService;
+import org.pdxfinder.services.*;
 import org.pdxfinder.services.ds.AutoCompleteOption;
 import org.pdxfinder.services.dto.DataAvailableDTO;
 import org.pdxfinder.services.dto.DetailsDTO;
@@ -29,18 +26,27 @@ public class AjaxController {
     private PlatformService platformService;
     private MolCharService molCharService;
     private DetailsService detailsService;
+    private DrugService drugService;
 
 
     @Autowired
     public AjaxController(AutoCompleteService autoCompleteService,
                           PlatformService platformService,
                           MolCharService molCharService,
-                          DetailsService detailsService) {
+                          DetailsService detailsService,
+                          DrugService drugService) {
 
         this.autoCompleteService = autoCompleteService;
         this.platformService = platformService;
         this.molCharService = molCharService;
         this.detailsService = detailsService;
+        this.drugService = drugService;
+    }
+
+    @RequestMapping(value = "/drugnames")
+    List<String> getDrugnames(){
+
+        return drugService.getDrugNames();
     }
 
     @RequestMapping(value = "/autosuggests")
@@ -201,7 +207,6 @@ public class AjaxController {
 
 
     //HELPER METHODS
-
     public String getSortColumn(String sortcolumn){
 
         Map<String, String> tableColumns = new HashMap<>();

@@ -203,8 +203,13 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype) {
     var dURLString = urlParams.toString();
     var openMarkerFacet = dURLString.search("mutation");
     if (openMarkerFacet != -1) {
-        var markerFilterField = jQuery("li#marker_filter > a.accordion-title");
-        markerFilterField.click();
+        jQuery("li#marker_filter > a.accordion-title").click();
+    }
+
+    // Check if Dosing Study was selected
+    var openDrugFacet = dURLString.search("drug");
+    if (openDrugFacet != -1) {
+        jQuery("li#drug_filter > a.accordion-title").click();
     }
 
 }
@@ -244,6 +249,33 @@ function redirectPage(){
                     break;
                 }else{
                     url += "mutation=" + geneFilter.val() + "___MUT" + "___"+variantFilter.val()[j];
+                    no_parameters = false;
+
+                }
+            }
+        }
+
+    }
+
+
+    for (var i=1; i<20; i++){
+
+        var drugFilter = jQuery("#drugFilter"+i);
+        var responseFilter = jQuery("#responseFilter"+i);
+
+        if (drugFilter.val() != null && drugFilter.val() != "")
+        {
+            var allResponses = drugResponseList;
+            for (var j=0; j<responseFilter.val().length; j++){
+                if (!no_parameters) {
+                    url = url + "&";
+                }
+                if(allResponses.length == responseFilter.val().length){
+                    url += "drug=" + drugFilter.val() + "___ALL";
+                    no_parameters = false;
+                    break;
+                }else{
+                    url += "drug=" + drugFilter.val() + "___"+responseFilter.val()[j];
                     no_parameters = false;
 
                 }
@@ -340,6 +372,7 @@ function loadVariants(selectedMarker, compNumber) {
 }
 
 
+
 function addMarkerAndVariants(param, startIndex) {
     if (startIndex != 2 && counter == 1) {
         geneticVar = startIndex;
@@ -360,5 +393,58 @@ function getVariantSize(selectedMarker) {
     return valuesAreVariants;
 }
 
+
+
+
+/* Drug Response region */
+var dosingStudy = 1;
+var dosingStudyCount = 1;
+function loadDrugTextFields(){
+
+    var drugs = drugsList.sort();
+    $('#drugFilter1').autocomplete({
+        source: [drugs]
+    });
+
+    for (var i = 2; i <= 20; i++) {
+        $('#drugFilter' + i).autocomplete({
+            source: [drugs]
+        });
+    }
+}
+
+
+function loadDrugResponse(selectedMarker, compNumber) {
+    var marker = selectedMarker.value;
+    var drugResponses = drugResponseList.sort();
+    var newOptions = "";
+    for (var i = 0; i < drugResponses.length; i++) {
+        newOptions += "<option value='" + drugResponses[i] + "' selected>" + drugResponses[i] + "</option>";
+    }
+    var select = $('#responseFilter' + compNumber);
+    select.empty().append(newOptions);
+    $(function () {
+        $('#responseFilter' + compNumber).change(function () {
+            console.log($(this).val());
+        }).multipleSelect({
+            placeholder: " Responses"
+        });
+    });
+}
+
+
+
+function addDrugAndResponse(param, startIndex) {
+    if (startIndex != 2 && dosingStudyCount == 1) {
+        dosingStudy = startIndex;
+    }
+    dosingStudy++;
+    dosingStudyCount++;
+    for (var i = startIndex; i <= 20; i++) {
+        if ((param == 'AND' || param == 'OR') && dosingStudy == i) {
+            document.getElementsByClassName("dosingStudy" + i)[0].style.display = "block";
+        }
+    }
+}
 
 
