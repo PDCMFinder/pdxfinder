@@ -326,6 +326,52 @@ public class SearchService {
         wsDTO.setMarkerMap(userChoice);
         wsDTO.setMarkerMapWithAllVariants(allVariants);
 
+
+
+
+
+        List<String> drugResponses = drugService.getResponseOptions();
+
+
+        done = "";
+        Map<String, List<String>> drugResponseChoice = new HashMap<>();
+        Map<String, Set<String>> allDrugResponses = new LinkedHashMap<>();
+
+        try {
+            for (String drugReq : drug.get()) {
+                String disDrug = drugReq.split("___")[0];
+                List<String> userDrugResponseList = new ArrayList<>();
+                String drugResponse = "";
+
+                if (!done.contains(disDrug)) {
+
+                    for (String drugReq2 : drug.get()) {
+                        if (disDrug.equals(drugReq2.split("___")[0])){
+                            drugResponse = drugReq2.split("___")[1];
+                            if (drugResponse.equals("ALL")){
+                                userDrugResponseList = drugResponses;
+                            }
+                            else {
+                                userDrugResponseList.add(drugResponse);
+                            }
+                        }
+                    }
+
+                    Set<String> sortedDrugResponseList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+                    sortedDrugResponseList.addAll(drugResponses);
+
+                    drugResponseChoice.put(disDrug,userDrugResponseList);
+                    allDrugResponses.put(disDrug,sortedDrugResponseList);
+                }
+
+                done += disDrug;
+            }
+        }catch (Exception e){}
+
+        wsDTO.setDrugMap(drugResponseChoice);
+        wsDTO.setDrugMapWithAllResponses(allDrugResponses);
+
+
         wsDTO.setDrugNames(drugService.getDrugNames());
         wsDTO.setDrugResponses(drugService.getResponseOptions());
 
