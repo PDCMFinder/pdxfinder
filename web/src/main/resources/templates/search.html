@@ -480,7 +480,7 @@
                                                             <div class="columns nospace small-7 large-7"> <input
                                                                     type="text" id="drugFilter1"
                                                                     onblur="loadDrugResponse(this,'1')" class="fullWidth"/> </div>
-                                                            <div id="filterOptions1"
+                                                            <div id="drugResponseOptions1"
                                                                  class="columns nospace small-5 large-5 topSpace3">
                                                                 <select id='responseFilter1'
                                                                         multiple='multiple'> </select>
@@ -497,7 +497,7 @@
                                                                            class="fullWidth"/>
                                                                 </div>
 
-                                                                <div th:id="'filterOptions'+${i}"
+                                                                <div th:id="'drugResponseOptions'+${i}"
                                                                      class="columns nospace small-5 large-5 topSpace3">
                                                                     <select th:id="'responseFilter'+${i}"
                                                                             multiple='multiple'> </select>
@@ -572,7 +572,7 @@
 
 
                                                 <div class="checkbox-item height70px"
-                                                     th:if="${#lists.isEmpty(param.mutation)}">
+                                                     th:if="${#lists.isEmpty(param.drug)}">
                                                     <button id="drugFilterButton" href="#"
                                                             class="button primary columns large-3 white-text-right-float topSpace4">
                                                         <i class="icon icon-functional" data-icon="1"></i></button>
@@ -582,7 +582,7 @@
                                                 </div>
 
                                                 <div class="checkbox-item height70px"
-                                                     th:if="${not #lists.isEmpty(param.mutation)}">
+                                                     th:if="${not #lists.isEmpty(param.drug)}">
                                                     <button id="drugFilterButton" href="#"
                                                             class="button primary columns large-3 white-text-right-float topSpace4">
                                                         <i class="icon icon-functional" data-icon="1"></i></button>
