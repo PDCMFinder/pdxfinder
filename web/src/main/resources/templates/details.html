@@ -97,14 +97,21 @@
                            th:if="${#strings.contains(data.contacts,'@')}">
                             <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
                         </a>
-                        <a th:href="@{${data.contacts+data.modelId}}" th:target="_blank"
-                           th:if="${#strings.contains(data.contacts,'http') && #strings.endsWith(data.contacts,'=')}">
+
+                        <a th:href="@{'mailto:'+${data.externalUrl+'?subject='+data.modelId}}"
+                           th:if="${#strings.contains(data.externalUrl,'@')}">
                             <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
                         </a>
+
                         <a th:href="@{${data.contacts}}" th:target="_blank"
+                           th:if="${#strings.contains(data.contacts,'http') }">
+                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
+                        </a>
+
+                        <!--<a th:href="@{${data.contacts}}" th:target="_blank"     && #strings.endsWith(data.contacts,'=')
                            th:if="${#strings.contains(data.contacts,'http') && not #strings.endsWith(data.contacts,'=')}">
                             <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
-                        </a>
+                        </a> -->
 
                         <a th:href="@{${data.externalUrl}}" th:target="_blank" th:if="${#strings.contains(data.externalUrl,'http')}">
                             <h4 class="button outline uppercase margin-top-large minwidth300 shiftUp10"
