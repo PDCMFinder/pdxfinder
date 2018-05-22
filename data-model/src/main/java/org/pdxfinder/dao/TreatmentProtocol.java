@@ -4,6 +4,9 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
  * Created by csaba on 23/10/2017.
  */
@@ -17,7 +20,12 @@ public class TreatmentProtocol {
 
     private String regime;
 
-    private String drug;
+    private List<String> drug;
+    private List<String> type;
+    private List<String> target;
+
+
+
     private String drugManufacturer;
     private String dose;
     private String duration;
@@ -29,6 +37,8 @@ public class TreatmentProtocol {
 
     /**
      * @param drug                      Which drug(s) were used in the treatment
+     * @param type                      Type of the treatment, ie drug/control
+     * @param target                    Drug target, ie DNA, EGFR
      * @param drugManufacturer          What company manufactured the drug
      * @param dose                      What was the concentration of the drug used
      * @param duration                  For how long was the treatment administered
@@ -43,6 +53,10 @@ public class TreatmentProtocol {
     private Response response;
 
     public TreatmentProtocol() {
+
+        this.drug = new ArrayList<>();
+        this.type = new ArrayList<>();
+        this.target = new ArrayList<>();
     }
 
 
@@ -54,11 +68,11 @@ public class TreatmentProtocol {
         this.regime = regime;
     }
 
-    public String getDrug() {
+    public List<String> getDrug() {
         return drug;
     }
 
-    public void setDrug(String drug) {
+    public void setDrug(List<String> drug) {
         this.drug = drug;
     }
 
@@ -125,5 +139,36 @@ public class TreatmentProtocol {
 
     public void setResponse(Response response) {
         this.response = response;
+    }
+
+
+    public List<String> getType() {
+        return type;
+    }
+
+    public void setType(List<String> type) {
+        this.type = type;
+    }
+
+    public List<String> getTarget() {
+        return target;
+    }
+
+    public void setTarget(List<String> target) {
+        this.target = target;
+    }
+
+    public String getDrugString(){
+
+        String ret = "";
+        for(String s:drug){
+
+            if(!ret.equals("")){
+                ret+=" and ";
+            }
+            ret+=s;
+        }
+
+        return ret;
     }
 }
