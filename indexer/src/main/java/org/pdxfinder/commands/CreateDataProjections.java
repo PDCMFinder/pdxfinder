@@ -471,7 +471,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
             for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
 
-                String drugName = tp.getDrug();
+                String drugName = tp.getDrugString();
                 String response = tp.getResponse().getDescription();
 
                 addToDrugResponseDP(modelId, drugName, response);
