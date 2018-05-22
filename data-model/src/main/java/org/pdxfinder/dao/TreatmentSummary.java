@@ -4,7 +4,9 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,7 +22,7 @@ public class TreatmentSummary {
     String url;
 
     @Relationship(type = "TREATMENT_PROTOCOL")
-    Set<TreatmentProtocol> treatmentProtocols;
+    List<TreatmentProtocol> treatmentProtocols;
 
     @Relationship(type = "SUMMARY_OF_TREATMENT")
     ModelCreation modelCreation;
@@ -31,11 +33,11 @@ public class TreatmentSummary {
     public TreatmentSummary() {
     }
 
-    public Set<TreatmentProtocol> getTreatmentProtocols() {
+    public List<TreatmentProtocol> getTreatmentProtocols() {
         return treatmentProtocols;
     }
 
-    public void setTreatmentProtocols(Set<TreatmentProtocol> treatmentProtocols) {
+    public void setTreatmentProtocols(List<TreatmentProtocol> treatmentProtocols) {
         this.treatmentProtocols = treatmentProtocols;
     }
 
@@ -57,7 +59,7 @@ public class TreatmentSummary {
 
     public void addTreatmentProtocol(TreatmentProtocol tp){
         if(this.treatmentProtocols == null){
-            this.treatmentProtocols = new HashSet<>();
+            this.treatmentProtocols = new ArrayList<>();
         }
         this.treatmentProtocols.add(tp);
     }
