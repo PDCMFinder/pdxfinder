@@ -351,7 +351,7 @@ public class DetailsService {
                 if (externalUrl.getType().equals(ExternalUrl.Type.SOURCE.getValue())){
                     dto.setExternalUrl(externalUrl.getUrl());
                 }else{
-                    dto.setContacts(externalUrl.getUrl()+pdx.getDataSource());
+                    dto.setContacts(externalUrl.getUrl());
                 }
             }
 
