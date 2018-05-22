@@ -37,8 +37,8 @@ public class TreatmentProtocol {
 
     /**
      * @param drug                      Which drug(s) were used in the treatment
-     * @param type                      Type of the treatment, ie drug/control
-     * @param target                    Drug target, ie DNA, EGFR
+     * @param type                      Type of the treatment, ie drug/control (first type corresponds to the first drug, etc)
+     * @param target                    Drug target, ie DNA, EGFR (first target corresponds to the first drug, etc)
      * @param drugManufacturer          What company manufactured the drug
      * @param dose                      What was the concentration of the drug used
      * @param duration                  For how long was the treatment administered
