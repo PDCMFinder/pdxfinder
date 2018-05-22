@@ -171,4 +171,18 @@ public class TreatmentProtocol {
 
         return ret;
     }
+
+
+    public void addDrug(String drug){
+        this.drug.add(drug);
+    }
+
+    public void addType(String type){
+        this.type.add(type);
+    }
+
+    public void addTarget(String target){
+        this.target.add(target);
+    }
+
 }
