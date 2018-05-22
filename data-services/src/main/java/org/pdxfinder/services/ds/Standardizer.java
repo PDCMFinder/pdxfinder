@@ -5,8 +5,11 @@
  */
 package org.pdxfinder.services.ds;
 import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.dao.TreatmentProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -112,6 +115,265 @@ public class Standardizer {
          if(d.equals("0.9% Solution of Sodium Chloride")) return "0.9% Solution of Sodium Chloride (control)";
 
          return d;
+     }
+
+     public static TreatmentProtocol getTreatmentProtocol(String drug){
+
+         TreatmentProtocol tp = new TreatmentProtocol();
+         boolean updated = false;
+
+         if(drug.toLowerCase().equals("doxorubicin")){
+
+             tp.addDrug("Doxorubicin");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+             updated = true;
+         }
+         else if(drug.toLowerCase().equals("doxorubicin+cyclophosphamide")){
+
+             tp.addDrug("Doxorubicin");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+
+             tp.addDrug("Cyclophosphamide");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+             updated = true;
+         }
+         else if(drug.toLowerCase().equals("paclitaxel")){
+
+             tp.addDrug("Paclitaxel");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+             updated = true;
+         }
+         else if(drug.toLowerCase().equals("tamoxifen")){
+
+             tp.addDrug("Tamoxifen");
+             tp.addType("Drug");
+             tp.addTarget("estrogen receptor");
+             updated = true;
+         }
+         else if(drug.toLowerCase().equals("trastuzumab")){
+
+             tp.addDrug("Trastuzumab");
+             tp.addType("Drug");
+             tp.addTarget("erbb2");
+             updated = true;
+         }
+         else if(drug.equals("0.9% Solution of Sodium Chloride") || drug.equals("Saline")){
+
+             tp.addDrug("Sodium choride solution");
+             tp.addType("Control");
+             updated = true;
+         }
+         else if(drug.equals("Erbitux, Cetuximab")){
+
+             tp.addDrug("Cetuximab");
+             tp.addType("Drug");
+             tp.addTarget("EGFR");
+             updated = true;
+         }
+         else if(drug.equals("DSW (control)")){
+
+             tp.addDrug("Dextrose solution");
+             tp.addType("Control");
+             updated = true;
+         }
+         else if(drug.equals("D5W + CMC)")){
+
+             tp.addDrug("Dextrose solution");
+             tp.addType("Control");
+
+             tp.addDrug("Carboxymethyl cellulose");
+             tp.addType("Control");
+             updated = true;
+         }
+         else if(drug.equals("DMSO")){
+
+             tp.addDrug("Dimethyl sulfoxide");
+             tp.addType("Control");
+             updated = true;
+         }
+         else if(drug.equals("Docetaxel")){
+
+             tp.addDrug("Docetaxel");
+             tp.addType("Drug");
+             tp.addTarget("tubulin");
+             updated = true;
+         }
+         else if(drug.equals("Docetaxel + Trametinib")){
+
+             tp.addDrug("Docetaxel");
+             tp.addType("Drug");
+             tp.addTarget("tubulin");
+
+             tp.addDrug("Trametinib");
+             tp.addType("Drug");
+             tp.addTarget("MEK1 and Mek2");
+             updated = true;
+         }
+         else if(drug.equals("Erlotinib")){
+
+             tp.addDrug("Erlotinib");
+             tp.addType("Drug");
+             tp.addTarget("EGFR");
+             updated = true;
+         }
+         else if(drug.equals("Avastin + Rapamycin")){
+
+             tp.addDrug("Bevacizumab");
+             tp.addType("Drug");
+             tp.addTarget("VEGFA");
+
+             tp.addDrug("Rapamycin");
+             tp.addType("Drug");
+             tp.addTarget("mTOR");
+             updated = true;
+         }
+         else if(drug.equals("Carboplatin")){
+
+             tp.addDrug("Carboplatin");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("CMC")){
+
+             tp.addDrug("Carboxymethyl cellulose");
+             tp.addType("Control");
+             tp.addTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Cisplatin")){
+
+             tp.addDrug("Cisplatin");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Cisplatin + Etoposide")){
+
+             tp.addDrug("Cisplatin");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+
+             tp.addDrug("Etoposide");
+             tp.addType("Drug");
+             tp.addTarget("DNA topoisomerase 2-alpha");
+             updated = true;
+         }
+         else if(drug.equals("Cisplatin + Gemcitabine")){
+
+             tp.addDrug("Cisplatin");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+
+             tp.addDrug("Gemcitabine");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Crizotinib")){
+
+             tp.addDrug("Crizotinib");
+             tp.addType("Drug");
+             tp.addTarget("ALK");
+             updated = true;
+         }
+         else if(drug.equals("Dabrafenib")){
+
+             tp.addDrug("Crizotinib");
+             tp.addType("Drug");
+             tp.addTarget("BRAF");
+             updated = true;
+         }
+         else if(drug.equals("Topotecan") || drug.equals("Etoposide")){
+
+             tp.addDrug("Etoposide");
+             tp.addType("Drug");
+             tp.addTarget("DNA topoisomerase 2-alpha");
+             updated = true;
+         }
+         else if(drug.equals("5-FU")){
+
+             tp.addDrug("Fluorouracil");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Gemcitabine") || drug.equals("Cyclophosphamide")){
+
+             tp.addDrug("Gemcitabine");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Gemcitabine + 5-FU")){
+
+             tp.addDrug("Gemcitabine");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+
+             tp.addDrug("Fluorouracil");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Oxaliplatin + 5-FU")){
+
+             tp.addDrug("Oxaliplatin");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+
+             tp.addDrug("Fluorouracil");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Oxaliplatin")){
+
+             tp.addDrug("Oxaliplatin");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Rapamycin")){
+
+             tp.addDrug("Rapamycin");
+             tp.addType("Drug");
+             tp.addTarget("mTOR");
+             updated = true;
+         }
+         else if(drug.equals("Temozolomide")){
+
+             tp.addDrug("Temozolomide");
+             tp.addType("Drug");
+             tp.addTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Trametinib")){
+
+             tp.addDrug("Trametinib");
+             tp.addType("Drug");
+             tp.addTarget("MEK1 and Mek2");
+             updated = true;
+         }
+         else if(drug.equals("Valproic acid")){
+
+             tp.addDrug("Valproic Acid");
+             tp.addType("Drug");
+             tp.addTarget("HDAC9");
+             updated = true;
+         }
+
+
+        if(!updated){
+            tp.addDrug("Unknown drug");
+        }
+
+
+         return tp;
      }
 
 }
