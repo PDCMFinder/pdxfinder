@@ -529,7 +529,7 @@ public class DetailsService {
             for (TreatmentProtocol tp : ts.getTreatmentProtocols()) {
 
                 DrugSummaryDTO dto = new DrugSummaryDTO();
-                dto.setDrugName(tp.getDrug());
+                dto.setDrugName(tp.getDrugString());
                 dto.setDose(tp.getDose());
 
                 if (tp.getResponse() != null && tp.getResponse().getDescription() != null) {
