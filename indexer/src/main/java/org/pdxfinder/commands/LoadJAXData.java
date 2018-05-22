@@ -256,10 +256,10 @@ public class LoadJAXData implements CommandLineRunner {
 
                     for(int t = 0; t<treatments.length(); t++){
                         JSONObject treatmentObject = treatments.getJSONObject(t);
-                        TreatmentProtocol tp = new TreatmentProtocol();
+                        TreatmentProtocol tp = Standardizer.getTreatmentProtocol(treatmentObject.getString("Drug"));
                         Response r = new Response();
                         r.setDescription(treatmentObject.getString("Response"));
-                        tp.setDrug(treatmentObject.getString("Drug"));
+
                         tp.setDose(treatmentObject.getString("Dose") + " "+treatmentObject.getString("Units"));
                         tp.setResponse(r);
 

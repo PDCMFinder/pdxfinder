@@ -256,10 +256,12 @@ public class LoadIRCC implements CommandLineRunner {
                         ts.setUrl(DOSING_STUDY_URL);
                         for(int t = 0; t<treatments.length(); t++){
                             JSONObject treatmentObject = treatments.getJSONObject(t);
-                            TreatmentProtocol tp = new TreatmentProtocol();
+
+
+                            TreatmentProtocol tp = Standardizer.getTreatmentProtocol(treatmentObject.getString("Drug"));
                             Response r = new Response();
                             r.setDescription(Standardizer.getDrugResponse(treatmentObject.getString("Response Class")));
-                            tp.setDrug(Standardizer.getDrugName(treatmentObject.getString("Drug")));
+
                             tp.setDose(treatmentObject.getString("Dose") );
                             tp.setResponse(r);
 
