@@ -266,7 +266,7 @@ public class LoadHCI implements CommandLineRunner {
 
 
 
-                            TreatmentProtocol tp = Standardizer.getTreatmentProtocol(treatmentObject.getString("Drug"),
+                            TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
                                     treatmentObject.getString("Dose"), treatmentObject.getString("Response"));
 
 

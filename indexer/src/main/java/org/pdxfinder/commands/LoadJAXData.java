@@ -257,7 +257,7 @@ public class LoadJAXData implements CommandLineRunner {
                     for(int t = 0; t<treatments.length(); t++){
                         JSONObject treatmentObject = treatments.getJSONObject(t);
 
-                        TreatmentProtocol tp = Standardizer.getTreatmentProtocol(treatmentObject.getString("Drug"),
+                        TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
                                 treatmentObject.getString("Dose") + " "+treatmentObject.getString("Units"),
                                 treatmentObject.getString("Response"));
 
@@ -278,7 +278,7 @@ public class LoadJAXData implements CommandLineRunner {
 
         
         dataImportService.saveSpecimen(specimen);
-        //loaderUtils.saveModelCreation(mc);
+        //dataImportService.saveModelCreation(mc);
         loadVariationData(mc, engraftmentSite, engraftmentType);
 
     }
