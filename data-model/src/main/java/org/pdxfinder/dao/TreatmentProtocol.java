@@ -37,6 +37,7 @@ public class TreatmentProtocol {
     private String passages;
 
     public TreatmentProtocol() {
+        components = new ArrayList<>();
     }
 
 
@@ -97,6 +98,13 @@ public class TreatmentProtocol {
         return ret;
     }
 
+    public void addTreatmentComponent(TreatmentComponent tc){
 
+        if(components == null){
+            components = new ArrayList<>();
+        }
+
+        components.add(tc);
+    }
 
 }
