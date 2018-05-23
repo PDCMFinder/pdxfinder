@@ -5,6 +5,9 @@
  */
 package org.pdxfinder.services.ds;
 import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.dao.Drug;
+import org.pdxfinder.dao.Response;
+import org.pdxfinder.dao.TreatmentComponent;
 import org.pdxfinder.dao.TreatmentProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,279 +101,252 @@ public class Standardizer {
 
          if(r == null || r.isEmpty()) return "Not Specified";
 
-         if(r.toLowerCase().equals("pd")) return "Progressive Disease";
-         if(r.toLowerCase().equals("sd")) return "Stable Disease";
-         if(r.toLowerCase().equals("cr")) return "Complete Response";
-         if(r.toLowerCase().equals("pr")) return "Partial Response";
+         if(r.toLowerCase().equals("pd") || r.toLowerCase().equals("progressive disease")) return "Progressive Disease";
+         if(r.toLowerCase().equals("sd") || r.toLowerCase().equals("stable disease")) return "Stable Disease";
+         if(r.toLowerCase().equals("cr") || r.toLowerCase().equals("complete response")) return "Complete Response";
+         if(r.toLowerCase().equals("pr") || r.toLowerCase().equals("partial response")) return "Partial Response";
 
          return r;
      }
 
 
-     public static String getDrugName(String d){
+     public static Drug getDrug(String drug){
 
-         if(d == null || d.isEmpty()) return "Not Specified";
-
-         if(d.equals("Erbitux, Cetuximab")) return "Cetuximab (Erbitux®)";
-         if(d.equals("0.9% Solution of Sodium Chloride")) return "0.9% Solution of Sodium Chloride (control)";
-
-         return d;
-     }
-
-     public static TreatmentProtocol getTreatmentProtocol(String drug){
-
-         TreatmentProtocol tp = new TreatmentProtocol();
+         Drug d = new Drug();
          boolean updated = false;
 
          if(drug.toLowerCase().equals("doxorubicin")){
 
-             tp.addDrug("Doxorubicin");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
+             d.setName("Doxorubicin");
+             d.setTarget("DNA");
              updated = true;
          }
-         else if(drug.toLowerCase().equals("doxorubicin+cyclophosphamide")){
+         else if(drug.toLowerCase().equals("cyclophosphamide")){
 
-             tp.addDrug("Doxorubicin");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
 
-             tp.addDrug("Cyclophosphamide");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
+             d.setName("Cyclophosphamide");
+             d.setTarget("DNA");
              updated = true;
          }
          else if(drug.toLowerCase().equals("paclitaxel")){
 
-             tp.addDrug("Paclitaxel");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
+             d.setName("Paclitaxel");
+             d.setTarget("DNA");
              updated = true;
          }
          else if(drug.toLowerCase().equals("tamoxifen")){
 
-             tp.addDrug("Tamoxifen");
-             tp.addType("Drug");
-             tp.addTarget("estrogen receptor");
+             d.setName("Tamoxifen");
+             d.setTarget("estrogen receptor");
              updated = true;
          }
          else if(drug.toLowerCase().equals("trastuzumab")){
 
-             tp.addDrug("Trastuzumab");
-             tp.addType("Drug");
-             tp.addTarget("erbb2");
+             d.setName("Trastuzumab");
+             d.setTarget("erbb2");
              updated = true;
          }
          else if(drug.equals("0.9% Solution of Sodium Chloride") || drug.equals("Saline")){
 
-             tp.addDrug("Sodium choride solution");
-             tp.addType("Control");
+             d.setName("Sodium choride solution");
              updated = true;
          }
          else if(drug.equals("Erbitux, Cetuximab")){
 
-             tp.addDrug("Cetuximab");
-             tp.addType("Drug");
-             tp.addTarget("EGFR");
+             d.setName("Cetuximab");
+             d.setTarget("EGFR");
              updated = true;
+
          }
          else if(drug.equals("DSW (control)")){
 
-             tp.addDrug("Dextrose solution");
-             tp.addType("Control");
+             d.setName("Dextrose solution");
              updated = true;
          }
-         else if(drug.equals("D5W + CMC)")){
+         else if(drug.equals("D5W")){
 
-             tp.addDrug("Dextrose solution");
-             tp.addType("Control");
-
-             tp.addDrug("Carboxymethyl cellulose");
-             tp.addType("Control");
-             updated = true;
-         }
-         else if(drug.equals("DMSO")){
-
-             tp.addDrug("Dimethyl sulfoxide");
-             tp.addType("Control");
-             updated = true;
-         }
-         else if(drug.equals("Docetaxel")){
-
-             tp.addDrug("Docetaxel");
-             tp.addType("Drug");
-             tp.addTarget("tubulin");
-             updated = true;
-         }
-         else if(drug.equals("Docetaxel + Trametinib")){
-
-             tp.addDrug("Docetaxel");
-             tp.addType("Drug");
-             tp.addTarget("tubulin");
-
-             tp.addDrug("Trametinib");
-             tp.addType("Drug");
-             tp.addTarget("MEK1 and Mek2");
-             updated = true;
-         }
-         else if(drug.equals("Erlotinib")){
-
-             tp.addDrug("Erlotinib");
-             tp.addType("Drug");
-             tp.addTarget("EGFR");
-             updated = true;
-         }
-         else if(drug.equals("Avastin + Rapamycin")){
-
-             tp.addDrug("Bevacizumab");
-             tp.addType("Drug");
-             tp.addTarget("VEGFA");
-
-             tp.addDrug("Rapamycin");
-             tp.addType("Drug");
-             tp.addTarget("mTOR");
-             updated = true;
-         }
-         else if(drug.equals("Carboplatin")){
-
-             tp.addDrug("Carboplatin");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
+             d.setName("Dextrose solution");
              updated = true;
          }
          else if(drug.equals("CMC")){
 
-             tp.addDrug("Carboxymethyl cellulose");
-             tp.addType("Control");
-             tp.addTarget("DNA");
+             d.setName("Carboxymethyl cellulose");
              updated = true;
          }
-         else if(drug.equals("Cisplatin")){
+         else if(drug.equals("DMSO")){
 
-             tp.addDrug("Cisplatin");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
+             d.setName("Dimethyl sulfoxide");
              updated = true;
          }
-         else if(drug.equals("Cisplatin + Etoposide")){
+         else if(drug.equals("Docetaxel")){
 
-             tp.addDrug("Cisplatin");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
-
-             tp.addDrug("Etoposide");
-             tp.addType("Drug");
-             tp.addTarget("DNA topoisomerase 2-alpha");
-             updated = true;
-         }
-         else if(drug.equals("Cisplatin + Gemcitabine")){
-
-             tp.addDrug("Cisplatin");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
-
-             tp.addDrug("Gemcitabine");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
-             updated = true;
-         }
-         else if(drug.equals("Crizotinib")){
-
-             tp.addDrug("Crizotinib");
-             tp.addType("Drug");
-             tp.addTarget("ALK");
-             updated = true;
-         }
-         else if(drug.equals("Dabrafenib")){
-
-             tp.addDrug("Crizotinib");
-             tp.addType("Drug");
-             tp.addTarget("BRAF");
-             updated = true;
-         }
-         else if(drug.equals("Topotecan") || drug.equals("Etoposide")){
-
-             tp.addDrug("Etoposide");
-             tp.addType("Drug");
-             tp.addTarget("DNA topoisomerase 2-alpha");
-             updated = true;
-         }
-         else if(drug.equals("5-FU")){
-
-             tp.addDrug("Fluorouracil");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
-             updated = true;
-         }
-         else if(drug.equals("Gemcitabine") || drug.equals("Cyclophosphamide")){
-
-             tp.addDrug("Gemcitabine");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
-             updated = true;
-         }
-         else if(drug.equals("Gemcitabine + 5-FU")){
-
-             tp.addDrug("Gemcitabine");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
-
-             tp.addDrug("Fluorouracil");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
-             updated = true;
-         }
-         else if(drug.equals("Oxaliplatin + 5-FU")){
-
-             tp.addDrug("Oxaliplatin");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
-
-             tp.addDrug("Fluorouracil");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
-             updated = true;
-         }
-         else if(drug.equals("Oxaliplatin")){
-
-             tp.addDrug("Oxaliplatin");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
-             updated = true;
-         }
-         else if(drug.equals("Rapamycin")){
-
-             tp.addDrug("Rapamycin");
-             tp.addType("Drug");
-             tp.addTarget("mTOR");
-             updated = true;
-         }
-         else if(drug.equals("Temozolomide")){
-
-             tp.addDrug("Temozolomide");
-             tp.addType("Drug");
-             tp.addTarget("DNA");
+             d.setName("Docetaxel");
+             d.setTarget("tubulin");
              updated = true;
          }
          else if(drug.equals("Trametinib")){
 
-             tp.addDrug("Trametinib");
-             tp.addType("Drug");
-             tp.addTarget("MEK1 and Mek2");
+             d.setName("Trametinib");
+             d.setTarget("MEK1 and Mek2");
+             updated = true;
+
+         }
+         else if(drug.equals("Erlotinib")){
+
+             d.setName("Erlotinib");
+             d.setTarget("EGFR");
+             updated = true;
+         }
+         else if(drug.equals("Avastin")){
+
+             d.setName("Bevacizumab");
+             d.setTarget("VEGFA");
+             updated = true;
+         }
+         else if(drug.equals("Carboplatin")){
+
+             d.setName("Carboplatin");
+             d.setTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("CMC")){
+
+             d.setName("Carboxymethyl cellulose");
+             d.setTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Cisplatin")){
+
+             d.setName("Cisplatin");
+             d.setTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Etoposide")){
+
+             d.setName("Etoposide");
+             d.setTarget("DNA topoisomerase 2-alpha");
+             updated = true;
+         }
+         else if(drug.equals("Gemcitabine")){
+
+             d.setName("Gemcitabine");
+             d.setTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Crizotinib")){
+
+             d.setName("Crizotinib");
+             d.setTarget("ALK");
+             updated = true;
+         }
+         else if(drug.equals("Dabrafenib")){
+
+             d.setName("Dabrafenib");
+             d.setTarget("BRAF");
+             updated = true;
+         }
+         else if(drug.equals("Topotecan") || drug.equals("Etoposide")){
+
+             d.setName("Etoposide");
+             d.setTarget("DNA topoisomerase 2-alpha");
+             updated = true;
+         }
+         else if(drug.equals("5-FU")){
+
+             d.setName("Fluorouracil");
+             d.setTarget("DNA");
+             updated = true;
+         }
+
+         else if(drug.equals("Oxaliplatin")){
+
+             d.setName("Oxaliplatin");
+             d.setTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Rapamycin")){
+
+             d.setName("Rapamycin");
+             d.setTarget("mTOR");
+             updated = true;
+         }
+         else if(drug.equals("Temozolomide")){
+
+             d.setName("Temozolomide");
+             d.setTarget("DNA");
+             updated = true;
+         }
+         else if(drug.equals("Trametinib")){
+
+             d.setName("Trametinib");
+             d.setTarget("MEK1 and Mek2");
              updated = true;
          }
          else if(drug.equals("Valproic acid")){
 
-             tp.addDrug("Valproic Acid");
-             tp.addType("Drug");
-             tp.addTarget("HDAC9");
+             d.setName("Valproic Acid");
+             d.setTarget("HDAC9");
              updated = true;
          }
 
+         if(!updated){
+             d.setName("Unknown drug - "+drug);
+         }
 
-        if(!updated){
-            tp.addDrug("Unknown drug");
-        }
+         return d;
+     }
+
+    /**
+     *
+     * @param drugString
+     * @param doseString
+     * @param response
+     * @return
+     *
+     * Creates a (tp:TreatmentProtocol)--(tc:TreatmentComponent)--(d:Drug)
+     *           (tp)--(r:Response) node
+     */
+     public static TreatmentProtocol getTreatmentProtocol(String drugString, String doseString, String response){
+
+         TreatmentProtocol tp = new TreatmentProtocol();
+
+         //combination of drugs?
+         if(drugString.contains("+") && doseString.contains("+")){
+             String[] drugArray = drugString.split("\\+");
+             String[] doseArray = doseString.split(";");
+
+             if(drugArray.length == doseArray.length){
+
+                for(int i=0;i<drugArray.length;i++){
+
+                    Drug d = getDrug(drugArray[i].trim());
+                    TreatmentComponent tc = new TreatmentComponent();
+                    tc.setDose(doseArray[i].trim());
+                    tc.setDrug(d);
+                    tp.addTreatmentComponent(tc);
+                }
+
+             }
+             else{
+                 //TODO: deal with the case when there are more drugs than doses or vice versa
+             }
+
+         }
+         //one drug only
+         else{
+
+             Drug d = getDrug(drugString.trim());
+             TreatmentComponent tc = new TreatmentComponent();
+             tc.setDrug(d);
+             tc.setDose(doseString.trim());
+             tp.addTreatmentComponent(tc);
+         }
+
+            Response r = new Response();
+            r.setDescription(getDrugResponse(response));
+
+            tp.setResponse(r);
+
 
 
          return tp;
