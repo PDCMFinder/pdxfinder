@@ -110,246 +110,133 @@ public class Standardizer {
      }
 
 
-     public static Drug getDrug(String drug){
-
-         Drug d = new Drug();
-         boolean updated = false;
+     public static String getDrugName(String drug){
 
          if(drug.toLowerCase().equals("doxorubicin")){
 
-             d.setName("Doxorubicin");
-             d.setTarget("DNA");
-             updated = true;
+             return "Doxorubicin";
          }
          else if(drug.toLowerCase().equals("cyclophosphamide")){
 
 
-             d.setName("Cyclophosphamide");
-             d.setTarget("DNA");
-             updated = true;
+             return "Cyclophosphamide";
+
          }
          else if(drug.toLowerCase().equals("paclitaxel")){
 
-             d.setName("Paclitaxel");
-             d.setTarget("DNA");
-             updated = true;
+             return "Paclitaxel";
          }
          else if(drug.toLowerCase().equals("tamoxifen")){
 
-             d.setName("Tamoxifen");
-             d.setTarget("estrogen receptor");
-             updated = true;
+             return "Tamoxifen";
          }
          else if(drug.toLowerCase().equals("trastuzumab")){
 
-             d.setName("Trastuzumab");
-             d.setTarget("erbb2");
-             updated = true;
+             return "Trastuzumab";
          }
          else if(drug.equals("0.9% Solution of Sodium Chloride") || drug.equals("Saline")){
 
-             d.setName("Sodium choride solution");
-             updated = true;
+             return "Sodium choride solution";
          }
          else if(drug.equals("Erbitux, Cetuximab")){
 
-             d.setName("Cetuximab");
-             d.setTarget("EGFR");
-             updated = true;
-
+             return "Cetuximab";
          }
          else if(drug.equals("DSW (control)")){
 
-             d.setName("Dextrose solution");
-             updated = true;
+             return "Dextrose solution";
          }
          else if(drug.equals("D5W")){
 
-             d.setName("Dextrose solution");
-             updated = true;
+             return "Dextrose solution";
          }
          else if(drug.equals("CMC")){
 
-             d.setName("Carboxymethyl cellulose");
-             updated = true;
+             return "Carboxymethyl cellulose";
          }
          else if(drug.equals("DMSO")){
 
-             d.setName("Dimethyl sulfoxide");
-             updated = true;
+             return "Dimethyl sulfoxide";
          }
          else if(drug.equals("Docetaxel")){
 
-             d.setName("Docetaxel");
-             d.setTarget("tubulin");
-             updated = true;
+             return "Docetaxel";
          }
          else if(drug.equals("Trametinib")){
 
-             d.setName("Trametinib");
-             d.setTarget("MEK1 and Mek2");
-             updated = true;
-
+             return "Trametinib";
          }
          else if(drug.equals("Erlotinib")){
 
-             d.setName("Erlotinib");
-             d.setTarget("EGFR");
-             updated = true;
+             return "Erlotinib";
          }
          else if(drug.equals("Avastin")){
 
-             d.setName("Bevacizumab");
-             d.setTarget("VEGFA");
-             updated = true;
+             return "Bevacizumab";
          }
          else if(drug.equals("Carboplatin")){
 
-             d.setName("Carboplatin");
-             d.setTarget("DNA");
-             updated = true;
+             return "Carboplatin";
          }
          else if(drug.equals("CMC")){
 
-             d.setName("Carboxymethyl cellulose");
-             d.setTarget("DNA");
-             updated = true;
+             return "Carboxymethyl cellulose";
          }
          else if(drug.equals("Cisplatin")){
 
-             d.setName("Cisplatin");
-             d.setTarget("DNA");
-             updated = true;
+             return "Cisplatin";
          }
          else if(drug.equals("Etoposide")){
 
-             d.setName("Etoposide");
-             d.setTarget("DNA topoisomerase 2-alpha");
-             updated = true;
+             return "Etoposide";
          }
          else if(drug.equals("Gemcitabine")){
 
-             d.setName("Gemcitabine");
-             d.setTarget("DNA");
-             updated = true;
+             return "Gemcitabine";
          }
          else if(drug.equals("Crizotinib")){
 
-             d.setName("Crizotinib");
-             d.setTarget("ALK");
-             updated = true;
+             return "Crizotinib";
          }
          else if(drug.equals("Dabrafenib")){
 
-             d.setName("Dabrafenib");
-             d.setTarget("BRAF");
-             updated = true;
+             return "Dabrafenib";
          }
          else if(drug.equals("Topotecan") || drug.equals("Etoposide")){
 
-             d.setName("Etoposide");
-             d.setTarget("DNA topoisomerase 2-alpha");
-             updated = true;
+             return "Etoposide";
          }
          else if(drug.equals("5-FU")){
 
-             d.setName("Fluorouracil");
-             d.setTarget("DNA");
-             updated = true;
+             return "Fluorouracil";
          }
 
          else if(drug.equals("Oxaliplatin")){
 
-             d.setName("Oxaliplatin");
-             d.setTarget("DNA");
-             updated = true;
+             return "Oxaliplatin";
          }
          else if(drug.equals("Rapamycin")){
 
-             d.setName("Rapamycin");
-             d.setTarget("mTOR");
-             updated = true;
+             return "Rapamycin";
          }
          else if(drug.equals("Temozolomide")){
 
-             d.setName("Temozolomide");
-             d.setTarget("DNA");
-             updated = true;
+             return "Temozolomide";
          }
          else if(drug.equals("Trametinib")){
 
-             d.setName("Trametinib");
-             d.setTarget("MEK1 and Mek2");
-             updated = true;
+             return "Trametinib";
          }
          else if(drug.equals("Valproic acid")){
 
-             d.setName("Valproic Acid");
-             d.setTarget("HDAC9");
-             updated = true;
+             return "Valproic Acid";
          }
 
-         if(!updated){
-             d.setName("Unknown drug - "+drug);
-         }
 
-         return d;
+         return "Unknown drug - "+drug;
      }
 
-    /**
-     *
-     * @param drugString
-     * @param doseString
-     * @param response
-     * @return
-     *
-     * Creates a (tp:TreatmentProtocol)--(tc:TreatmentComponent)--(d:Drug)
-     *           (tp)--(r:Response) node
-     */
-     public static TreatmentProtocol getTreatmentProtocol(String drugString, String doseString, String response){
-
-         TreatmentProtocol tp = new TreatmentProtocol();
-
-         //combination of drugs?
-         if(drugString.contains("+") && doseString.contains("+")){
-             String[] drugArray = drugString.split("\\+");
-             String[] doseArray = doseString.split(";");
-
-             if(drugArray.length == doseArray.length){
-
-                for(int i=0;i<drugArray.length;i++){
-
-                    Drug d = getDrug(drugArray[i].trim());
-                    TreatmentComponent tc = new TreatmentComponent();
-                    tc.setDose(doseArray[i].trim());
-                    tc.setDrug(d);
-                    tp.addTreatmentComponent(tc);
-                }
-
-             }
-             else{
-                 //TODO: deal with the case when there are more drugs than doses or vice versa
-             }
-
-         }
-         //one drug only
-         else{
-
-             Drug d = getDrug(drugString.trim());
-             TreatmentComponent tc = new TreatmentComponent();
-             tc.setDrug(d);
-             tc.setDose(doseString.trim());
-             tp.addTreatmentComponent(tc);
-         }
-
-            Response r = new Response();
-            r.setDescription(getDrugResponse(response));
-
-            tp.setResponse(r);
 
 
-
-         return tp;
-     }
 
 }
