@@ -16,7 +16,7 @@ public interface TreatmentProtocolRepository extends Neo4jRepository<TreatmentPr
 
 
     @Query("MATCH (tp:TreatmentProtocol) RETURN DISTINCT tp.drug")
-    List<String> findDrugNames();
+    List<List<String>> findDrugNames();
 
 
 
