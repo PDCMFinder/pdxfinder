@@ -528,9 +528,22 @@ public class DetailsService {
 
             for (TreatmentProtocol tp : ts.getTreatmentProtocols()) {
 
+
+
                 DrugSummaryDTO dto = new DrugSummaryDTO();
                 dto.setDrugName(tp.getDrugString());
-                dto.setDose(tp.getDose());
+                List<TreatmentComponent> components = tp.getComponents();
+                String dose = "";
+
+                if(components.size()>0){
+                    for(TreatmentComponent tc : components){
+                        if(!dose.equals("")){
+                            dose += " / ";
+                        }
+                        dose += tc.getDose();
+                    }
+                }
+                dto.setDose(dose);
 
                 if (tp.getResponse() != null && tp.getResponse().getDescription() != null) {
                     dto.setResponse(tp.getResponse().getDescription());
