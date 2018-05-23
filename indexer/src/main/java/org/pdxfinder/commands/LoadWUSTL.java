@@ -153,7 +153,7 @@ public class LoadWUSTL implements CommandLineRunner {
         pSnap.addSample(humanSample);
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, DATASOURCE_CONTACT));
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
 
         String qaType = NOT_SPECIFIED;
         try {

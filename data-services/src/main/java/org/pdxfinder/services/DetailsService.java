@@ -201,7 +201,7 @@ public class DetailsService {
         }
 
         if (patient != null && patient.getExternalDataSource() != null) {
-            dto.setContacts(patient.getExternalDataSource().getContact());
+            //dto.setContacts(patient.getExternalDataSource().getContact());
             dto.setExternalDataSourceDesc(patient.getExternalDataSource().getDescription());
         }
 
@@ -343,10 +343,23 @@ public class DetailsService {
 
         }
 
-        if (sample != null && sample.getDataSource().equals("JAX")) {
-            dto.setExternalUrl(JAX_URL+pdx.getSourcePdxId());
-            dto.setExternalUrlText(JAX_URL_TEXT);
-        } else if (sample != null && sample.getDataSource().equals("IRCC")) {
+
+        if (pdx != null && pdx.getExternalUrls() != null) {
+
+            for (ExternalUrl externalUrl: pdx.getExternalUrls()){
+
+                if (externalUrl.getType().equals(ExternalUrl.Type.SOURCE.getValue())){
+                    dto.setExternalUrl(externalUrl.getUrl());
+                }else{
+                    dto.setContacts(externalUrl.getUrl());
+                }
+            }
+
+            dto.setExternalUrlText("View Data at "+pdx.getDataSource());
+        }
+
+
+        /*else if (sample != null && sample.getDataSource().equals("IRCC")) {
             dto.setExternalUrl(IRCC_URL + dto.getExternalId());
             dto.setExternalUrlText(IRCC_URL_TEXT);
         } else if(sample != null && sample.getDataSource().equals(HCI_DS)) {
@@ -365,7 +378,7 @@ public class DetailsService {
         else if(sample != null && sample.getDataSource().equals("PDMR")) {
             dto.setExternalUrl(PDMR_URL);
             dto.setExternalUrlText(PDMR_URL_TEXT);
-        }
+        }*/
         else{
             dto.setExternalUrl("#");
             dto.setExternalUrlText("Unknown source");
