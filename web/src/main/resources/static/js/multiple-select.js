@@ -222,6 +222,7 @@
             $.each(this.$el.children(), function (i, elm) {
                 $ul.append(that.optionToHtml(i, elm));
             });
+
             $ul.append(sprintf('<li class="ms-no-results">%s</li>', this.options.noMatchesFound));
             this.$drop.append($ul);
 
@@ -745,7 +746,7 @@
         selectAllText: 'Pick All',
         allSelected: 'All Picked',
         countSelected: '# of % Variants',
-        noMatchesFound: 'Select Marker',
+        noMatchesFound: 'Make a Choice',
 
         styler: function () {
             return false;

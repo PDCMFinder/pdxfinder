@@ -2,6 +2,7 @@ package org.pdxfinder.repositories;
 
 import org.pdxfinder.dao.ModelCreation;
 import org.pdxfinder.dao.MolecularCharacterization;
+import org.pdxfinder.dao.TreatmentSummary;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
@@ -24,10 +25,11 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "WITH model " +
             "OPTIONAL MATCH (model)-[spr:SPECIMENS]-(sp:Specimen)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
             "OPTIONAL MATCH (model)-[qar:QUALITY_ASSURED_BY]-(qa:QualityAssurance) "+
-            "WITH model, spr, sp, hsr, hs, qar, qa " +
+            "OPTIONAL MATCH (model)-[url:EXTERNAL_URL]-(ext_url:ExternalUrl) "+
+            "WITH model, spr, sp, hsr, hs, qar, qa, url, ext_url " +
             "OPTIONAL MATCH (sp)-[itr:ENGRAFTMENT_TYPE]-(it:EngraftmentType) "+
             "OPTIONAL MATCH (sp)-[isr:ENGRAFTMENT_SITE]-(is:EngraftmentSite) "+
-            "RETURN model, spr, sp, hsr, hs, itr, isr, it, is, qar, qa")
+            "RETURN model, spr, sp, hsr, hs, itr, isr, it, is, qar, qa, url, ext_url")
     ModelCreation findByDataSourceAndSourcePdxId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
     @Query("MATCH (model:ModelCreation) WHERE model.sourcePdxId = {modelId} AND model.dataSource = {dataSource} RETURN model ")
@@ -153,4 +155,9 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN mod, msr, s, cbr, mc, pur, pl")
     Collection<ModelCreation> getModelsWithMolCharBySource(@Param("dataSource") String dataSource);
 
+
+    @Query("MATCH (model:ModelCreation)--(ts:TreatmentSummary) " +
+            "WHERE id(ts) = {ts} " +
+            "RETURN model")
+    ModelCreation findByTreatmentSummary(@Param("ts") TreatmentSummary ts);
 }

@@ -394,7 +394,7 @@
 
 
 
-                                                        <!--<span th:if="${not #lists.isEmpty(param.mutation)}">
+                                                        <span th:if="${not #lists.isEmpty(param.mutation)}">
                                                             <span th:each="i: ${#numbers.sequence(#maps.size(websearch.markerMap)+1, 20)}">
 
                                                                 <div class="row hidden"
@@ -416,7 +416,7 @@
                                                                 </div>
 
                                                             </span>
-                                                        </span>-->
+                                                        </span>
 
                                                     </span>
 
@@ -451,6 +451,154 @@
                                 </ul>
                             </div>
                         </li>
+
+
+
+
+
+                        <li class="accordion-item is-active" data-accordion-item>
+                            <!-- Accordion tab title -->
+                            <a href="#" class="accordion-title"> TREATMENT INFORMATION </a>
+
+                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
+                            <div class="accordion-content" data-tab-content>
+                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
+                                    data-allow-all-closed="true">
+                                    <li class="accordion-item" data-accordion-item id="drug_filter">
+                                        <a href="#" class="accordion-title"> Model Dosing Study </a>
+                                        <div class="accordion-content" data-tab-content>
+                                            <div class="light-grey-bg-box">
+                                                <div class="checkbox-item">
+
+                                                    <span th:if="${#lists.isEmpty(param.drug)}">
+                                                        <div class="row topSace10">
+                                                            <div class="columns nospace small-7 large-7 adjusti"> DRUG </div>
+                                                            <div class="columns nospace small-5 large-5 adjusti"> RESPONSE </div>
+                                                        </div>
+                                                        <div class="row topSace10">
+
+                                                            <div class="columns nospace small-7 large-7"> <input
+                                                                    type="text" id="drugFilter1"
+                                                                    onblur="loadDrugResponse(this,'1')" class="fullWidth"/> </div>
+                                                            <div id="drugResponseOptions1"
+                                                                 class="columns nospace small-5 large-5 topSpace3">
+                                                                <select id='responseFilter1'
+                                                                        multiple='multiple'> </select>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="row hidden"
+                                                                 th:each="i: ${#numbers.sequence(2, 20)}"
+                                                                 th:classappend="'dosingStudy'+${i}">
+                                                                <div class="columns nospace small-7 large-7">
+                                                                    <input th:onblur="'loadDrugResponse(this,'+${i}+')'"
+                                                                           type="text" th:id="'drugFilter'+${i}"
+                                                                           class="fullWidth"/>
+                                                                </div>
+
+                                                                <div th:id="'drugResponseOptions'+${i}"
+                                                                     class="columns nospace small-5 large-5 topSpace3">
+                                                                    <select th:id="'responseFilter'+${i}"
+                                                                            multiple='multiple'> </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </span>
+
+
+                                                    <span th:if="${not #lists.isEmpty(param.drug)}">
+                                                            <div class="row topSace10">
+                                                                <div class="columns nospace small-7 large-7 adjusti"> DRUG </div>
+                                                                <div class="columns nospace small-5 large-5 adjusti"> RESPONSE </div>
+                                                            </div>
+                                                        <span th:each="eachDrug,iter :${websearch.drugMapWithAllResponses}">
+                                                            <div class="row large-12 medium-12 expanded topSace10"
+                                                                 th:classappend="'dosingStudy'+${iter.index+1}">
+
+                                                                <div class="columns nospace small-7 large-7">
+                                                                    <input th:value="${eachDrug.key}"
+                                                                           th:onblur="'loadDrugResponse(this,'+${iter.index+1}+')'"
+                                                                           type="text"
+                                                                           th:id="'drugFilter'+${iter.index+1}"
+                                                                           class="fullWidth"/>
+                                                                </div>
+
+                                                                <div class="columns nospace small-5 large-5 topSpace3"
+                                                                     th:id="'filterOptions'+${iter.index+1}">
+                                                                    <select th:id="'responseFilter'+${iter.index+1}"
+                                                                            class="width40" multiple='multiple'>
+
+                                                                        <option th:each="disResponse :${eachDrug.value}"
+                                                                                th:value="${disResponse}"
+                                                                                th:text="${disResponse}"
+                                                                                th:selected="( ${#lists.contains(websearch.drugMap.get(eachDrug.key), disResponse)} ) ? 'true' : 'false' "> ... </option>
+
+                                                                    </select>
+                                                                </div>
+
+
+                                                            </div>
+
+                                                        </span>
+
+
+
+                                                        <span th:if="${not #lists.isEmpty(param.drug)}">
+                                                            <span th:each="i: ${#numbers.sequence(#maps.size(websearch.drugMap)+1, 20)}">
+
+                                                                <div class="row hidden"
+                                                                     th:classappend="'dosingStudy'+${i}">
+                                                                    <div class="columns nospace small-7 large-7">
+                                                                        <input th:onblur="'loadDrugResponse(this,'+${i}+')'"
+                                                                               type="text" th:id="'drugFilter'+${i}"
+                                                                               class="fullWidth"/>
+                                                                    </div>
+
+                                                                    <div class="columns nospace small-5 large-5 topSpace3"
+                                                                         th:id="'filterOptions'+${i}">
+                                                                        <select th:id="'responseFilter'+${i}"
+                                                                                multiple='multiple'> </select>
+                                                                    </div>
+                                                                </div>
+
+                                                            </span>
+                                                        </span>
+
+                                                    </span>
+
+                                                </div>
+
+
+                                                <div class="checkbox-item height70px"
+                                                     th:if="${#lists.isEmpty(param.drug)}">
+                                                    <button id="drugFilterButton" href="#"
+                                                            class="button primary columns large-3 white-text-right-float topSpace4">
+                                                        <i class="icon icon-functional" data-icon="1"></i></button>
+                                                    <button onclick="addDrugAndResponse('OR',2)"
+                                                            href="#" class="icoButn columns large-2"> OR
+                                                    </button>
+                                                </div>
+
+                                                <div class="checkbox-item height70px"
+                                                     th:if="${not #lists.isEmpty(param.drug)}">
+                                                    <button id="drugFilterButton" href="#"
+                                                            class="button primary columns large-3 white-text-right-float topSpace4">
+                                                        <i class="icon icon-functional" data-icon="1"></i></button>
+                                                    <button onclick="addDrugAndResponse('OR',4)"
+                                                            href="#" class="icoButn columns large-2"> OR
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
+
 
 
                     </ul>
@@ -563,7 +711,7 @@
                                     <span th:if="${#strings.equals(websearch.page, #strings.toString(websearch.numPages))}"
                                           aria-label="Last page">Last </span>
                                     <a th:unless="${#strings.equals(websearch.page, #strings.toString(websearch.numPages))}"
-                                       th:href="'?' + ${websearch.facetString} + '&page=' + ${numPages}" aria-label="Last page">Last </a>
+                                       th:href="'?' + ${websearch.facetString} + '&page=' + ${websearch.numPages}" aria-label="Last page">Last </a>
                                 </li>
                             </ul>
                         </div>
@@ -694,6 +842,7 @@
         jQuery("form.main-search").submit();
     }, false);
     console.log("before updating");
+
     jQuery(document).ready(function () {
         updateFilters(ageFilters, genderFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters);
         console.log("updated");
@@ -705,54 +854,25 @@
         jQuery('#markerFilter').click(function () {
             redirectPage();
         });
+        jQuery('#drugFilterButton').click(function () {
+            redirectPage();
+        });
         //Add eventlistener to search field's button
         jQuery('#search_submit').click(function () {
             redirectPage();
         });
     });
-</script>
 
+    var incomingString = [[${websearch.mutatedMarkersAndVariants}]];
+    var mutatedMarkersAndVariants = JSON.parse(incomingString);
+    var drugsList = [[${websearch.drugNames}]];
+    var drugResponseList = [[${websearch.drugResponses}]];
 
-<script type="text/javascript" language="javascript" th:inline="javascript">
-    function getMutatedMarkersAndVariants(){
-        var incomingString = [[${websearch.mutatedMarkersAndVariants}]];
-        var mutatedMarkersAndVariants = JSON.parse(incomingString);
-        /* var mutatedMarkersAndVariants = {  "USP25" : [ "T1033M" ], "USP26" : [ "L362W" ],"USP20" : [ "D505Y", "P49A" ]} */
-        return mutatedMarkersAndVariants;
-    }
-    var mutatedMarkersAndVariants = getMutatedMarkersAndVariants();
-    var keysAreMarkers = Object.keys(mutatedMarkersAndVariants);
-    $('#geneFilter1').autocomplete({
-        source: [keysAreMarkers]
-    });
-    for (var i = 2; i <= 20; i++) {
-        $('#geneFilter' + i).autocomplete({
-            source: [keysAreMarkers]
-        });
-    }
-    function getVariantSize(selectedMarker) {
-        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker];
-        return valuesAreVariants;
-    }
-    function loadVariants(selectedMarker, compNumber) {
-        var marker = selectedMarker.value;
-        var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker.value].sort();
-        //alert(marker+"\n"+typeof valuesAreVariants);
-        var newOptions = "";
-        for (var i = 0; i < valuesAreVariants.length; i++) {
-            newOptions += "<option value='" + valuesAreVariants[i] + "' selected>" + valuesAreVariants[i] + "</option>";
-        }
-        var select = $('#variantFilter' + compNumber);
-        select.empty().append(newOptions);
-        $(function () {
-            $('#variantFilter' + compNumber).change(function () {
-                console.log($(this).val());
-            }).multipleSelect({
-                placeholder: " variants"
-            });
-        });
-    }
-    $(function () {
+    jQuery(document).ready(function () {
+
+        loadGeneTextFields();
+        loadDrugTextFields();
+
         $('#variantFilter1').change(function () {
             console.log($(this).val());
         }).multipleSelect({
@@ -765,7 +885,22 @@
                 placeholder: "Variants"
             });
         }
+
+
+        $('#responseFilter1').change(function () {
+            console.log($(this).val());
+        }).multipleSelect({
+            placeholder: "Responses"
+        });
+        for (var i = 2; i <= 20; i++) {
+            $('#responseFilter' + i).change(function () {
+                console.log($(this).val());
+            }).multipleSelect({
+                placeholder: "Responses"
+            });
+        }
     });
+
 </script>
 
 </body>

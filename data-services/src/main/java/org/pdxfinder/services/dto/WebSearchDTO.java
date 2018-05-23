@@ -32,6 +32,7 @@ public class WebSearchDTO {
     private List<FacetOption> cancerSystemSelected;
     private List<FacetOption> sampleTumorTypeSelected;
     private List<FacetOption> mutationSelected;
+    private List<FacetOption> drugSelected;
 
     private String facetString;
     private List<ModelForQuery> searchResults;
@@ -47,6 +48,8 @@ public class WebSearchDTO {
     private Map<String, List<String>> facetOptions;
     private Map<String, List<String>> markerMap;
     private Map<String, Set<String>> markerMapWithAllVariants;
+    private Map<String, List<String>> drugMap;
+    private Map<String, Set<String>> drugMapWithAllResponses;
 
     private List<String> drugNames;
     private List<String> drugResponses;
@@ -272,6 +275,22 @@ public class WebSearchDTO {
         this.markerMapWithAllVariants = markerMapWithAllVariants;
     }
 
+    public Map<String, List<String>> getDrugMap() {
+        return drugMap;
+    }
+
+    public void setDrugMap(Map<String, List<String>> drugMap) {
+        this.drugMap = drugMap;
+    }
+
+    public Map<String, Set<String>> getDrugMapWithAllResponses() {
+        return drugMapWithAllResponses;
+    }
+
+    public void setDrugMapWithAllResponses(Map<String, Set<String>> drugMapWithAllResponses) {
+        this.drugMapWithAllResponses = drugMapWithAllResponses;
+    }
+
     public boolean isMutationSelected() {
         return isMutationSelected;
     }
@@ -294,5 +313,13 @@ public class WebSearchDTO {
 
     public void setDrugResponses(List<String> drugResponses) {
         this.drugResponses = drugResponses;
+    }
+
+    public List<FacetOption> getDrugSelected() {
+        return drugSelected;
+    }
+
+    public void setDrugSelected(List<FacetOption> drugSelected) {
+        this.drugSelected = drugSelected;
     }
 }

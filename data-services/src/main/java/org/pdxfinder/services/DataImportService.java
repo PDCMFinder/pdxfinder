@@ -8,6 +8,7 @@ package org.pdxfinder.services;
 //import org.apache.commons.cli.Option;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
+import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -639,6 +640,90 @@ public class DataImportService {
             return true;
         }
         return false;
+    }
+
+    public ModelCreation findModelByTreatmentSummary(TreatmentSummary ts){
+
+        return modelCreationRepository.findByTreatmentSummary(ts);
+    }
+
+
+    public Drug getStandardizedDrug(String drugString){
+
+        Drug d = new Drug();
+        d.setName(Standardizer.getDrugName(drugString));
+
+        return d;
+    }
+
+    /**
+     *
+     * @param drugString
+     * @param doseString
+     * @param response
+     * @return
+     *
+     * Creates a (tp:TreatmentProtocol)--(tc:TreatmentComponent)--(d:Drug)
+     *           (tp)--(r:Response) node
+     */
+    public TreatmentProtocol getTreatmentProtocol(String drugString, String doseString, String response){
+
+        TreatmentProtocol tp = new TreatmentProtocol();
+
+        //combination of drugs?
+        if(drugString.contains("+") && doseString.contains(";")){
+            String[] drugArray = drugString.split("\\+");
+            String[] doseArray = doseString.split(";");
+
+            if(drugArray.length == doseArray.length){
+
+                for(int i=0;i<drugArray.length;i++){
+
+                    Drug d = getStandardizedDrug(drugArray[i].trim());
+                    TreatmentComponent tc = new TreatmentComponent();
+                    tc.setDose(doseArray[i].trim());
+                    tc.setDrug(d);
+                    tp.addTreatmentComponent(tc);
+                }
+
+            }
+
+            else{
+                //TODO: deal with the case when there are more drugs than doses or vice versa
+            }
+
+        }
+        else if(drugString.contains("+") && !doseString.contains(";")){
+
+            String[] drugArray = drugString.split("\\+");
+
+            for(int i=0;i<drugArray.length;i++){
+
+                Drug d = getStandardizedDrug(drugArray[i].trim());
+                TreatmentComponent tc = new TreatmentComponent();
+                tc.setDose(doseString.trim());
+                tc.setDrug(d);
+                tp.addTreatmentComponent(tc);
+            }
+        }
+        //one drug only
+        else{
+
+            Drug d = getStandardizedDrug(drugString.trim());
+            TreatmentComponent tc = new TreatmentComponent();
+            tc.setDrug(d);
+            tc.setDose(doseString.trim());
+            tp.addTreatmentComponent(tc);
+        }
+
+        Response r = new Response();
+        r.setDescription(Standardizer.getDrugResponse(response));
+
+        tp.setResponse(r);
+
+
+
+        return tp;
     }
 
 }

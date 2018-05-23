@@ -43,13 +43,14 @@ public class SearchController {
                   @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
                   @RequestParam("cancer_system") Optional<List<String>> cancer_system,
                   @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type,
-                  @RequestParam("mutation") Optional<List<String>> mutation
+                  @RequestParam("mutation") Optional<List<String>> mutation,
+                  @RequestParam("drug") Optional<List<String>> drug
     ) {
 
 
         ExportDTO eDTO = searchService.export(query, datasource,
                 diagnosis, patient_age, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
-                sample_tumor_type, mutation);
+                sample_tumor_type, mutation, drug);
 
         Set<ModelForQueryExport> exportResults = eDTO.getResults().stream().map(ModelForQueryExport::new).collect(Collectors.toSet());
 
@@ -89,13 +90,14 @@ public class SearchController {
                    @RequestParam("cancer_system") Optional<List<String>> cancer_system,
                    @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type,
                    @RequestParam("mutation") Optional<List<String>> mutation,
+                   @RequestParam("drug") Optional<List<String>> drug,
 
                    @RequestParam(value = "page", defaultValue = "1") Integer page,
                    @RequestParam(value = "size", defaultValue = "10") Integer size){
 
         model.addAttribute("websearch", searchService.webSearch(query, datasource,
                 diagnosis, patient_age, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
-                sample_tumor_type, mutation, page, size));
+                sample_tumor_type, mutation, drug, page, size));
 
         return "search";
     }

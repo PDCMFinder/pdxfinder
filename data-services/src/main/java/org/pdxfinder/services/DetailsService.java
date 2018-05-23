@@ -1,8 +1,5 @@
 package org.pdxfinder.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.dao.*;
@@ -204,7 +201,7 @@ public class DetailsService {
         }
 
         if (patient != null && patient.getExternalDataSource() != null) {
-            dto.setContacts(patient.getExternalDataSource().getContact());
+            //dto.setContacts(patient.getExternalDataSource().getContact());
             dto.setExternalDataSourceDesc(patient.getExternalDataSource().getDescription());
         }
 
@@ -346,29 +343,20 @@ public class DetailsService {
 
         }
 
-        if (sample != null && sample.getDataSource().equals("JAX")) {
-            dto.setExternalUrl(JAX_URL+pdx.getSourcePdxId());
-            dto.setExternalUrlText(JAX_URL_TEXT);
-        } else if (sample != null && sample.getDataSource().equals("IRCC")) {
-            dto.setExternalUrl(IRCC_URL + dto.getExternalId());
-            dto.setExternalUrlText(IRCC_URL_TEXT);
-        } else if(sample != null && sample.getDataSource().equals(HCI_DS)) {
-            dto.setExternalUrl(HCI_URL);
-            dto.setExternalUrlText(HCI_DS);
-        } else if(sample != null && sample.getDataSource().equals(MDA_DS)) {
-            dto.setExternalUrl(MDA_URL);
-            dto.setExternalUrlText(MDA_DS);
-        } else if(sample != null && sample.getDataSource().equals(WUSTL_DS)) {
-            dto.setExternalUrl(WUSTL_URL);
-            dto.setExternalUrlText(WUSTL_DS);
-        } else if(sample != null && sample.getDataSource().equals(WISTAR_DS)) {
-            dto.setExternalUrl(WISTAR_URL);
-            dto.setExternalUrlText(WISTAR_DS);
+
+        if (pdx != null && pdx.getExternalUrls() != null) {
+
+            pdx.getExternalUrls().stream().forEach(extUrl ->{
+                if (extUrl.getType().equals(ExternalUrl.Type.SOURCE.getValue())){
+                    dto.setExternalUrl(extUrl.getUrl());
+                }else{
+                    dto.setContacts(extUrl.getUrl());
+                }
+            });
+
+            dto.setExternalUrlText("View Data at "+pdx.getDataSource());
         }
-        else if(sample != null && sample.getDataSource().equals("PDMR")) {
-            dto.setExternalUrl(PDMR_URL);
-            dto.setExternalUrlText(PDMR_URL_TEXT);
-        }
+
         else{
             dto.setExternalUrl("#");
             dto.setExternalUrlText("Unknown source");
@@ -531,9 +519,22 @@ public class DetailsService {
 
             for (TreatmentProtocol tp : ts.getTreatmentProtocols()) {
 
+
+
                 DrugSummaryDTO dto = new DrugSummaryDTO();
-                dto.setDrugName(tp.getDrug());
-                dto.setDose(tp.getDose());
+                dto.setDrugName(tp.getDrugString());
+                List<TreatmentComponent> components = tp.getComponents();
+                String dose = "";
+
+                if(components.size()>0){
+                    for(TreatmentComponent tc : components){
+                        if(!dose.equals("")){
+                            dose += " / ";
+                        }
+                        dose += tc.getDose();
+                    }
+                }
+                dto.setDose(dose);
 
                 if (tp.getResponse() != null && tp.getResponse().getDescription() != null) {
                     dto.setResponse(tp.getResponse().getDescription());

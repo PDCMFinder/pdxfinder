@@ -1,17 +1,18 @@
 package org.pdxfinder.services;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.dao.MarkerAssociation;
 import org.pdxfinder.dao.ModelCreation;
 import org.pdxfinder.dao.MolecularCharacterization;
 import org.pdxfinder.repositories.ModelCreationRepository;
 import org.pdxfinder.repositories.OntologyTermRepository;
-import org.pdxfinder.services.ds.*;
+import org.pdxfinder.services.ds.FacetOption;
+import org.pdxfinder.services.ds.ModelForQuery;
+import org.pdxfinder.services.ds.SearchDS;
+import org.pdxfinder.services.ds.SearchFacetName;
 import org.pdxfinder.services.dto.ExportDTO;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.pdxfinder.services.dto.WebSearchDTO;
@@ -81,7 +82,9 @@ public class SearchService {
                          Optional<List<String>> sample_origin_tissue,
                          Optional<List<String>> cancer_system,
                          Optional<List<String>> sample_tumor_type,
-                         Optional<List<String>> mutation){
+                         Optional<List<String>> mutation,
+                         Optional<List<String>> drug
+    ){
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
                 query,
@@ -93,7 +96,8 @@ public class SearchService {
                 sample_origin_tissue,
                 cancer_system,
                 sample_tumor_type,
-                mutation
+                mutation,
+                drug
         );
 
         ExportDTO eDTO = new ExportDTO();
@@ -114,6 +118,7 @@ public class SearchService {
                                   Optional<List<String>> cancer_system,
                                   Optional<List<String>> sample_tumor_type,
                                   Optional<List<String>> mutation,
+                                  Optional<List<String>> drug,
                                   Integer page,
                                   Integer size){
 
@@ -128,7 +133,8 @@ public class SearchService {
                 sample_origin_tissue,
                 cancer_system,
                 sample_tumor_type,
-                mutation
+                mutation,
+                drug
         );
 
         WebSearchDTO wsDTO = new WebSearchDTO();
@@ -142,7 +148,7 @@ public class SearchService {
         List<FacetOption> cancerSystemSelected = searchDS.getFacetOptions(SearchFacetName.cancer_system, cancerBySystemOptions, results, cancer_system.orElse(null));
         List<FacetOption> sampleTumorTypeSelected = searchDS.getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
         List<FacetOption> mutationSelected = searchDS.getFacetOptions(SearchFacetName.mutation, null, results, mutation.orElse(null));
-
+        List<FacetOption> drugSelected = searchDS.getFacetOptions(SearchFacetName.drug, null, results, drug.orElse(null));
 
 
         wsDTO.setPatientAgeSelected(patientAgeSelected);
@@ -169,7 +175,8 @@ public class SearchService {
                                 datasourceSelected,
                                 cancerSystemSelected,
                                 sampleTumorTypeSelected,
-                                mutationSelected
+                                mutationSelected,
+                                drugSelected
 
                         )
                 )
@@ -202,6 +209,23 @@ public class SearchService {
             }
 
         }
+
+
+        if (drug.isPresent() && !drug.get().isEmpty()) {
+            List<String> drugList = new ArrayList<>();
+            for (String d : drug.get()) {
+                drugList.add("drug=" + d);
+            }
+
+            if (facetString.length() != 0 && !facetString.endsWith("&")) {
+                facetString += "&";
+            }
+            for (String d : drugList) {
+                facetString += d + "&";
+            }
+
+        }
+
 
         wsDTO.setFacetString(facetString);
 
@@ -303,8 +327,58 @@ public class SearchService {
         wsDTO.setMarkerMap(userChoice);
         wsDTO.setMarkerMapWithAllVariants(allVariants);
 
+
+
+
+
+        List<String> drugResponses = drugService.getResponseOptions();
+
+        // Capitalize and Remove duplicates from drugResponses
+        drugResponses = drugResponses.stream().map(WordUtils::capitalize).collect(Collectors.toList());
+        drugResponses = drugResponses.stream().distinct().collect(Collectors.toList());
+
+
+        done = "";
+        Map<String, List<String>> drugResponseChoice = new HashMap<>();
+        Map<String, Set<String>> allDrugResponses = new LinkedHashMap<>();
+
+        try {
+            for (String drugReq : drug.get()) {
+                String disDrug = drugReq.split("___")[0];
+                List<String> userDrugResponseList = new ArrayList<>();
+                String drugResponse = "";
+
+                if (!done.contains(disDrug)) {
+
+                    for (String drugReq2 : drug.get()) {
+                        if (disDrug.equals(drugReq2.split("___")[0])){
+                            drugResponse = drugReq2.split("___")[1];
+                            if (drugResponse.equals("ALL")){
+                                userDrugResponseList = drugResponses;
+                            }
+                            else {
+                                userDrugResponseList.add(drugResponse);
+                            }
+                        }
+                    }
+
+                    Set<String> sortedDrugResponseList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+                    sortedDrugResponseList.addAll(drugResponses);
+
+                    drugResponseChoice.put(disDrug,userDrugResponseList);
+                    allDrugResponses.put(disDrug,sortedDrugResponseList);
+                }
+
+                done += disDrug;
+            }
+        }catch (Exception e){}
+
+        wsDTO.setDrugMap(drugResponseChoice);
+        wsDTO.setDrugMapWithAllResponses(allDrugResponses);
+
+
         wsDTO.setDrugNames(drugService.getDrugNames());
-        wsDTO.setDrugResponses(drugService.getResponseOptions());
+        wsDTO.setDrugResponses(drugResponses);
 
         return wsDTO;
     }
@@ -320,8 +394,8 @@ public class SearchService {
             Optional<List<String>> sampleOriginTissue,
             Optional<List<String>> cancerSystem,
             Optional<List<String>> sampleTumorType,
-            Optional<List<String>> mutation
-
+            Optional<List<String>> mutation,
+            Optional<List<String>> drug
 
     ) {
 
@@ -392,6 +466,13 @@ public class SearchService {
             configuredFacets.put(SearchFacetName.mutation, new ArrayList<>());
             for (String s : mutation.get()) {
                 configuredFacets.get(SearchFacetName.mutation).add(s);
+            }
+        }
+
+        if (drug.isPresent() && !drug.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.drug, new ArrayList<>());
+            for (String s : drug.get()) {
+                configuredFacets.get(SearchFacetName.drug).add(s);
             }
         }
 

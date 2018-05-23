@@ -5,8 +5,14 @@
  */
 package org.pdxfinder.services.ds;
 import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.dao.Drug;
+import org.pdxfinder.dao.Response;
+import org.pdxfinder.dao.TreatmentComponent;
+import org.pdxfinder.dao.TreatmentProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -95,23 +101,142 @@ public class Standardizer {
 
          if(r == null || r.isEmpty()) return "Not Specified";
 
-         if(r.toLowerCase().equals("pd")) return "Progressive Disease";
-         if(r.toLowerCase().equals("sd")) return "Stable Disease";
-         if(r.toLowerCase().equals("cr")) return "Complete Response";
-         if(r.toLowerCase().equals("pr")) return "Partial Response";
+         if(r.toLowerCase().equals("pd") || r.toLowerCase().equals("progressive disease")) return "Progressive Disease";
+         if(r.toLowerCase().equals("sd") || r.toLowerCase().equals("stable disease") || r.contains("/")) return "Stable Disease";
+         if(r.toLowerCase().equals("cr") || r.toLowerCase().equals("complete response")) return "Complete Response";
+         if(r.toLowerCase().equals("pr") || r.toLowerCase().equals("partial response")) return "Partial Response";
 
          return r;
      }
 
 
-     public static String getDrugName(String d){
+     public static String getDrugName(String drug){
 
-         if(d == null || d.isEmpty()) return "Not Specified";
+         if(drug.toLowerCase().equals("doxorubicin")){
 
-         if(d.equals("Erbitux, Cetuximab")) return "Cetuximab (Erbitux®)";
-         if(d.equals("0.9% Solution of Sodium Chloride")) return "0.9% Solution of Sodium Chloride (control)";
+             return "Doxorubicin";
+         }
+         else if(drug.toLowerCase().equals("cyclophosphamide")){
 
-         return d;
+
+             return "Cyclophosphamide";
+
+         }
+         else if(drug.toLowerCase().equals("paclitaxel")){
+
+             return "Paclitaxel";
+         }
+         else if(drug.toLowerCase().equals("tamoxifen")){
+
+             return "Tamoxifen";
+         }
+         else if(drug.toLowerCase().equals("trastuzumab")){
+
+             return "Trastuzumab";
+         }
+         else if(drug.equals("0.9% Solution of Sodium Chloride") || drug.equals("Saline")){
+
+             return "Sodium choride solution";
+         }
+         else if(drug.equals("Erbitux, Cetuximab")){
+
+             return "Cetuximab";
+         }
+         else if(drug.equals("DSW (control)")){
+
+             return "Dextrose solution";
+         }
+         else if(drug.equals("D5W")){
+
+             return "Dextrose solution";
+         }
+         else if(drug.equals("CMC")){
+
+             return "Carboxymethyl cellulose";
+         }
+         else if(drug.equals("DMSO")){
+
+             return "Dimethyl sulfoxide";
+         }
+         else if(drug.equals("Docetaxel")){
+
+             return "Docetaxel";
+         }
+         else if(drug.equals("Trametinib")){
+
+             return "Trametinib";
+         }
+         else if(drug.equals("Erlotinib")){
+
+             return "Erlotinib";
+         }
+         else if(drug.equals("Avastin")){
+
+             return "Bevacizumab";
+         }
+         else if(drug.equals("Carboplatin")){
+
+             return "Carboplatin";
+         }
+         else if(drug.equals("CMC")){
+
+             return "Carboxymethyl cellulose";
+         }
+         else if(drug.equals("Cisplatin")){
+
+             return "Cisplatin";
+         }
+         else if(drug.equals("Etoposide")){
+
+             return "Etoposide";
+         }
+         else if(drug.equals("Gemcitabine")){
+
+             return "Gemcitabine";
+         }
+         else if(drug.equals("Crizotinib")){
+
+             return "Crizotinib";
+         }
+         else if(drug.equals("Dabrafenib")){
+
+             return "Dabrafenib";
+         }
+         else if(drug.equals("Topotecan") || drug.equals("Etoposide")){
+
+             return "Etoposide";
+         }
+         else if(drug.equals("5-FU")){
+
+             return "Fluorouracil";
+         }
+
+         else if(drug.equals("Oxaliplatin")){
+
+             return "Oxaliplatin";
+         }
+         else if(drug.equals("Rapamycin")){
+
+             return "Rapamycin";
+         }
+         else if(drug.equals("Temozolomide")){
+
+             return "Temozolomide";
+         }
+         else if(drug.equals("Trametinib")){
+
+             return "Trametinib";
+         }
+         else if(drug.equals("Valproic acid")){
+
+             return "Valproic Acid";
+         }
+
+
+         return "Unknown drug - "+drug;
      }
+
+
+
 
 }
