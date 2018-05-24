@@ -711,7 +711,7 @@
                                     <span th:if="${#strings.equals(websearch.page, #strings.toString(websearch.numPages))}"
                                           aria-label="Last page">Last </span>
                                     <a th:unless="${#strings.equals(websearch.page, #strings.toString(websearch.numPages))}"
-                                       th:href="'?' + ${websearch.facetString} + '&page=' + ${numPages}" aria-label="Last page">Last </a>
+                                       th:href="'?' + ${websearch.facetString} + '&page=' + ${websearch.numPages}" aria-label="Last page">Last </a>
                                 </li>
                             </ul>
                         </div>
