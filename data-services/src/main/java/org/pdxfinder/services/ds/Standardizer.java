@@ -237,6 +237,12 @@ public class Standardizer {
      }
 
 
+     public static String getTreatmentComponentType(String drugName){
+
+         if(drugName.toLowerCase().contains("control")) return "Control";
+
+         return "Drug";
+     }
 
 
 }
