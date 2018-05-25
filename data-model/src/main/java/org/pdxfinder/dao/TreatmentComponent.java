@@ -69,4 +69,12 @@ public class TreatmentComponent {
     public void setFrequency(String frequency) {
         this.frequency = frequency;
     }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }
