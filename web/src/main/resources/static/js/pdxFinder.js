@@ -263,7 +263,7 @@ function redirectPage(){
         var drugFilter = jQuery("#drugFilter"+i);
         var responseFilter = jQuery("#responseFilter"+i);
 
-        if (drugFilter.val() != null && drugFilter.val() != "")
+        if (drugFilter.val() != null && drugFilter.val() != "NULL")
         {
             var allResponses = drugResponseList;
             for (var j=0; j<responseFilter.val().length; j++){
@@ -414,8 +414,8 @@ function loadDrugTextFields(){
 }
 
 
-function loadDrugResponse(selectedMarker, compNumber) {
-    var marker = selectedMarker.value;
+function loadDrugResponse(compNumber) {
+
     var drugResponses = drugResponseList.sort();
     var newOptions = "";
     for (var i = 0; i < drugResponses.length; i++) {
@@ -443,6 +443,7 @@ function addDrugAndResponse(param, startIndex) {
     for (var i = startIndex; i <= 20; i++) {
         if ((param == 'AND' || param == 'OR') && dosingStudy == i) {
             document.getElementsByClassName("dosingStudy" + i)[0].style.display = "block";
+            $("#drugFilter"+i).val ("");
         }
     }
 }

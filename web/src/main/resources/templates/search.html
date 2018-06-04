@@ -478,12 +478,16 @@
                                                         <div class="row topSace10">
 
                                                             <div class="columns nospace small-7 large-7"> <input
-                                                                    type="text" id="drugFilter1"
-                                                                    onblur="loadDrugResponse(this,'1')" class="fullWidth"/> </div>
+                                                                    type="text" id="drugFilter1" class="fullWidth"/> </div>
                                                             <div id="drugResponseOptions1"
                                                                  class="columns nospace small-5 large-5 topSpace3">
                                                                 <select id='responseFilter1'
-                                                                        multiple='multiple'> </select>
+                                                                        multiple='multiple'>
+                                                                        <option th:each="disResponse :${websearch.drugResponses}"
+                                                                                th:value="${disResponse}"
+                                                                                th:text="${disResponse}"> ... </option>
+
+                                                                </select>
                                                             </div>
 
                                                         </div>
@@ -492,20 +496,29 @@
                                                                  th:each="i: ${#numbers.sequence(2, 20)}"
                                                                  th:classappend="'dosingStudy'+${i}">
                                                                 <div class="columns nospace small-7 large-7">
-                                                                    <input th:onblur="'loadDrugResponse(this,'+${i}+')'"
-                                                                           type="text" th:id="'drugFilter'+${i}"
+                                                                    <input type="text" value="NULL" th:id="'drugFilter'+${i}"
                                                                            class="fullWidth"/>
                                                                 </div>
 
                                                                 <div th:id="'drugResponseOptions'+${i}"
                                                                      class="columns nospace small-5 large-5 topSpace3">
                                                                     <select th:id="'responseFilter'+${i}"
-                                                                            multiple='multiple'> </select>
+                                                                            multiple='multiple'>
+
+                                                                        <option th:each="disResponse :${websearch.drugResponses}"
+                                                                                th:value="${disResponse}"
+                                                                                th:text="${disResponse}"
+                                                                                th:selected="true"> ... </option>
+                                                                    </select>
                                                                 </div>
                                                             </div>
                                                         </div>
 
                                                     </span>
+
+
+
+
 
 
                                                     <span th:if="${not #lists.isEmpty(param.drug)}">
@@ -551,15 +564,21 @@
                                                                 <div class="row hidden"
                                                                      th:classappend="'dosingStudy'+${i}">
                                                                     <div class="columns nospace small-7 large-7">
-                                                                        <input th:onblur="'loadDrugResponse(this,'+${i}+')'"
-                                                                               type="text" th:id="'drugFilter'+${i}"
+                                                                        <input type="text" value="NULL" th:id="'drugFilter'+${i}"
                                                                                class="fullWidth"/>
                                                                     </div>
 
                                                                     <div class="columns nospace small-5 large-5 topSpace3"
                                                                          th:id="'filterOptions'+${i}">
                                                                         <select th:id="'responseFilter'+${i}"
-                                                                                multiple='multiple'> </select>
+                                                                                multiple='multiple'>
+
+
+                                                                        <option th:each="disResponse :${websearch.drugResponses}"
+                                                                                th:value="${disResponse}"
+                                                                                th:text="${disResponse}"
+                                                                                th:selected="true"> ... </option>
+                                                                        </select>
                                                                     </div>
                                                                 </div>
 
@@ -739,6 +758,12 @@
 </div>
 
 
+<script  type='text/javascript' th:src="@{/js/banner-gdpr.js}"></script>
+<div id="data-protection-message-configuration"
+     data-message="Your message and links here."
+     data-service-id="ebi" data-data-protection-version="0.1">
+</div>
+
 <!-- JavaScript -->
 <script th:src="@{/js/sticky-header.js}"></script>
 <script th:src="@{/js/script.js}"></script>
@@ -866,6 +891,7 @@
     var incomingString = [[${websearch.mutatedMarkersAndVariants}]];
     var mutatedMarkersAndVariants = JSON.parse(incomingString);
     var drugsList = [[${websearch.drugNames}]];
+    //var drugsList = ["Cetuximab","Sodium choride solution","Doxorubicin","Cyclophosphamide","Paclitaxel","Tamoxifen","Trastuzumab","Carboplatin","Dextrose solution","Gemcitabine","Cisplatin","Docetaxel","Erlotinib","Trametinib","Oxaliplatin","Fluorouracil","Carboxymethyl cellulose","Crizotinib","Etoposide","Dimethyl sulfoxide","Dabrafenib","Temozolomide","Rapamycin","Bevacizumab","Valproic Acid"];
     var drugResponseList = [[${websearch.drugResponses}]];
 
     jQuery(document).ready(function () {

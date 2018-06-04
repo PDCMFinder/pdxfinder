@@ -681,6 +681,7 @@ public class DataImportService {
 
                     Drug d = getStandardizedDrug(drugArray[i].trim());
                     TreatmentComponent tc = new TreatmentComponent();
+                    tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                     tc.setDose(doseArray[i].trim());
                     tc.setDrug(d);
                     tp.addTreatmentComponent(tc);
@@ -701,6 +702,7 @@ public class DataImportService {
 
                 Drug d = getStandardizedDrug(drugArray[i].trim());
                 TreatmentComponent tc = new TreatmentComponent();
+                tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                 tc.setDose(doseString.trim());
                 tc.setDrug(d);
                 tp.addTreatmentComponent(tc);
@@ -711,6 +713,7 @@ public class DataImportService {
 
             Drug d = getStandardizedDrug(drugString.trim());
             TreatmentComponent tc = new TreatmentComponent();
+            tc.setType(Standardizer.getTreatmentComponentType(drugString));
             tc.setDrug(d);
             tc.setDose(doseString.trim());
             tp.addTreatmentComponent(tc);
