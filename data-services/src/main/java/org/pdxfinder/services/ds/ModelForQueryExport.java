@@ -3,8 +3,8 @@ package org.pdxfinder.services.ds;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @JsonPropertyOrder({
         "modelId",
@@ -81,10 +81,10 @@ public class ModelForQueryExport {
     private List<String> mutatedVariants;
 
     @JsonProperty("Drugs")
-    private List<String> drugs = new ArrayList();
+    private List<String> drugs;
 
     @JsonProperty("Responses")
-    private List<String> responses = new ArrayList();
+    private List<String> responses;
 
 
     public ModelForQueryExport(ModelForQuery mfq) {
@@ -105,13 +105,9 @@ public class ModelForQueryExport {
         this.dataAvailable = mfq.getDataAvailable();
         this.mutatedVariants = mfq.getMutatedVariants();
 
+        this.drugs = mfq.getDrugData().stream().map(x->x.getDrugName()).collect(Collectors.toList());
+        this.responses = mfq.getDrugData().stream().map(x->x.getResponse()).collect(Collectors.toList());
 
-        mfq.getDrugData().stream().forEach( data ->
-        {
-            this.drugs.add(data.getDrugName());
-            this.responses.add(data.getResponse());
-        }
-        );
 
 
     }
