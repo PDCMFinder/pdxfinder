@@ -343,14 +343,17 @@ public class SearchService {
         Map<String, Set<String>> allDrugResponses = new LinkedHashMap<>();
 
         try {
+
             for (String drugReq : drug.get()) {
                 String disDrug = drugReq.split("___")[0];
                 List<String> userDrugResponseList = new ArrayList<>();
                 String drugResponse = "";
 
-                if (!done.contains(disDrug)) {
+
+                if ( !done.contains(disDrug)  || disDrug.isEmpty() ) {
 
                     for (String drugReq2 : drug.get()) {
+
                         if (disDrug.equals(drugReq2.split("___")[0])){
                             drugResponse = drugReq2.split("___")[1];
                             if (drugResponse.equals("ALL")){
@@ -371,7 +374,7 @@ public class SearchService {
 
                 done += disDrug;
             }
-        }catch (Exception e){}
+        }catch (Exception e){      }
 
         wsDTO.setDrugMap(drugResponseChoice);
         wsDTO.setDrugMapWithAllResponses(allDrugResponses);
