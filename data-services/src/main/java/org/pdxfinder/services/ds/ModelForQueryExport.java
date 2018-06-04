@@ -3,6 +3,7 @@ package org.pdxfinder.services.ds;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonPropertyOrder({
@@ -26,7 +27,9 @@ import java.util.List;
         "cancerOrgan",
         "cancerCellType",
         "dataAvailable",
-        "mutatedVariants"
+        "mutatedVariants",
+        "drug",
+        "response"
 })
 public class ModelForQueryExport {
     @JsonProperty("PDXFinder Id")
@@ -77,6 +80,12 @@ public class ModelForQueryExport {
     @JsonProperty("Mutations")
     private List<String> mutatedVariants;
 
+    @JsonProperty("Drugs")
+    private List<String> drugs = new ArrayList();
+
+    @JsonProperty("Responses")
+    private List<String> responses = new ArrayList();
+
 
     public ModelForQueryExport(ModelForQuery mfq) {
         this.modelId = mfq.getModelId();
@@ -95,6 +104,23 @@ public class ModelForQueryExport {
         this.treatmentHistory = mfq.getTreatmentHistory();
         this.dataAvailable = mfq.getDataAvailable();
         this.mutatedVariants = mfq.getMutatedVariants();
+
+
+        mfq.getDrugData().stream().forEach( data ->
+        {
+            this.drugs.add(data.getDrugName());
+            this.responses.add(data.getResponse());
+        }
+        );
+
+
+
+
+        /*for (DrugSummaryDTO dDrugData : mfq.getDrugData()){
+            this.drug.add(dDrugData.getDrugName());
+            this.drug.add(dDrugData.getResponse());
+        }*/
+
     }
 
     public Long getModelId() {
@@ -224,5 +250,21 @@ public class ModelForQueryExport {
 
     public void setMutatedVariants(List<String> mutatedVariants) {
         this.mutatedVariants = mutatedVariants;
+    }
+
+    public List<String> getDrugs() {
+        return drugs;
+    }
+
+    public void setDrugs(List<String> drugs) {
+        this.drugs = drugs;
+    }
+
+    public List<String> getResponses() {
+        return responses;
+    }
+
+    public void setResponses(List<String> responses) {
+        this.responses = responses;
     }
 }
