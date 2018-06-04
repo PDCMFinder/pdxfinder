@@ -12,6 +12,11 @@ public class DrugSummaryDTO {
     public DrugSummaryDTO() {
     }
 
+    public DrugSummaryDTO(String drugName, String response) {
+        this.drugName = drugName;
+        this.response = response;
+    }
+
     public String getDrugName() {
         return drugName;
     }

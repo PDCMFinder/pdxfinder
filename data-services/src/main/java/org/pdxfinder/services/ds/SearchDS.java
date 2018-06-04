@@ -7,6 +7,7 @@ import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.repositories.DataProjectionRepository;
+import org.pdxfinder.services.dto.DrugSummaryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -447,7 +448,8 @@ public class SearchDS {
 
 
 
-    private void getModelsByDrugAndResponse(String drug, String response, Map<Long, Set<String>> previouslyFoundModels){
+    private void getModelsByDrugAndResponse(String drug, String response, Map<Long, Set<String>> previouslyFoundModels,
+                                            Map<Long, List<DrugSummaryDTO>> modelsDrugSummary){
 
         //drug => response => set of model ids
 
@@ -473,12 +475,33 @@ public class SearchDS {
                         if(previouslyFoundModels.containsKey(modelId)){
 
                             previouslyFoundModels.get(modelId).add(drug+" "+response);
+
+                            if(modelsDrugSummary.containsKey(modelId)){
+
+                                modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drug, resp));
+                            }
+                            else{
+                                List dr = new ArrayList();
+                                dr.add(new DrugSummaryDTO(drug, resp));
+                                modelsDrugSummary.put(modelId, dr);
+                            }
+
                         }
                         else{
 
                             Set<String>  newSet = new HashSet<>();
                             newSet.add(drug+" "+response);
                             previouslyFoundModels.put(modelId, newSet);
+
+                            if(modelsDrugSummary.containsKey(modelId)){
+
+                                modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drug, resp));
+                            }
+                            else{
+                                List dr = new ArrayList();
+                                dr.add(new DrugSummaryDTO(drug, resp));
+                                modelsDrugSummary.put(modelId, dr);
+                            }
                         }
                     }
                 }
@@ -498,12 +521,32 @@ public class SearchDS {
                         if(previouslyFoundModels.containsKey(modelId)){
 
                             previouslyFoundModels.get(modelId).add(drug+" "+response);
+
+                            if(modelsDrugSummary.containsKey(modelId)){
+
+                                modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drug, response));
+                            }
+                            else{
+                                List dr = new ArrayList();
+                                dr.add(new DrugSummaryDTO(drug, response));
+                                modelsDrugSummary.put(modelId, dr);
+                            }
                         }
                         else{
 
                             Set<String>  newSet = new HashSet<>();
                             newSet.add(drug+" "+response);
                             previouslyFoundModels.put(modelId, newSet);
+
+                            if(modelsDrugSummary.containsKey(modelId)){
+
+                                modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drug, response));
+                            }
+                            else{
+                                List dr = new ArrayList();
+                                dr.add(new DrugSummaryDTO(drug, response));
+                                modelsDrugSummary.put(modelId, dr);
+                            }
                         }
                     }
                 }
@@ -526,12 +569,32 @@ public class SearchDS {
                         if(previouslyFoundModels.containsKey(modelId)){
 
                             previouslyFoundModels.get(modelId).add(drug+" "+response);
+
+                            if(modelsDrugSummary.containsKey(modelId)){
+
+                                modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drugName, response));
+                            }
+                            else{
+                                List dr = new ArrayList();
+                                dr.add(new DrugSummaryDTO(drugName, response));
+                                modelsDrugSummary.put(modelId, dr);
+                            }
                         }
                         else{
 
                             Set<String>  newSet = new HashSet<>();
                             newSet.add(drugName+" "+response);
                             previouslyFoundModels.put(modelId, newSet);
+
+                            if(modelsDrugSummary.containsKey(modelId)){
+
+                                modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drugName, response));
+                            }
+                            else{
+                                List dr = new ArrayList();
+                                dr.add(new DrugSummaryDTO(drugName, response));
+                                modelsDrugSummary.put(modelId, dr);
+                            }
                         }
                     }
                 }
@@ -724,6 +787,7 @@ public class SearchDS {
 
                 case drug:
                     Map<Long, Set<String>> modelsWithDrug = new HashMap<>();
+                    Map<Long, List<DrugSummaryDTO>> modelsDrugSummary = new HashMap<>();
 
                     for(String filt : filters.get(SearchFacetName.drug)){
 
@@ -732,12 +796,14 @@ public class SearchDS {
                         String response = drugAndResponse[1];
 
                         if(drug.isEmpty()) drug = null;
-                        getModelsByDrugAndResponse(drug,response, modelsWithDrug);
+                        getModelsByDrugAndResponse(drug,response, modelsWithDrug, modelsDrugSummary);
                     }
 
                     result = result.stream().filter(x -> modelsWithDrug.containsKey(x.getModelId())).collect(Collectors.toSet());
                     // updates the remaining modelforquery objects with drug and response info
-                    result.forEach(x -> x.setMutatedVariants(new ArrayList<>(modelsWithDrug.get(x.getModelId()))));
+
+                    //result.forEach(x -> x.setMutatedVariants(new ArrayList<>(modelsWithDrug.get(x.getModelId()))));
+                    result.forEach(x -> x.setDrugData(modelsDrugSummary.get(x.getModelId())));
                     break;
 
 

@@ -13,6 +13,7 @@ import org.pdxfinder.services.ds.FacetOption;
 import org.pdxfinder.services.ds.ModelForQuery;
 import org.pdxfinder.services.ds.SearchDS;
 import org.pdxfinder.services.ds.SearchFacetName;
+import org.pdxfinder.services.dto.DrugSummaryDTO;
 import org.pdxfinder.services.dto.ExportDTO;
 import org.pdxfinder.services.dto.SearchDTO;
 import org.pdxfinder.services.dto.WebSearchDTO;
@@ -258,9 +259,17 @@ public class SearchService {
         wsDTO.setTextSearchDescription(textSearchDescription);
 
         boolean mutSelected = false;
+        boolean drSelected = false;
+        boolean dataAvailablePresent = true;
 
         if(mutation.isPresent() && !mutation.get().isEmpty()){
             mutSelected = true;
+            dataAvailablePresent = false;
+        }
+
+        if(drug.isPresent() && !drug.get().isEmpty()){
+            drSelected = true;
+            dataAvailablePresent = false;
         }
 
         wsDTO.setAutoCompleteOptions(autoCompleteService.getAutoSuggestions());
@@ -274,7 +283,14 @@ public class SearchService {
             wsDTO.setMutationMap(getPlatformOrMutationFromMutatedVariants(resultSet,"mutationMap"));
         }
 
+        if(drSelected){
+
+
+        }
+
+        wsDTO.setDataAvailableColumnPresent(dataAvailablePresent);
         wsDTO.setIsMutationSelected(mutSelected);
+        wsDTO.setIsDrugSelected(drSelected);
         wsDTO.setQuery(query.orElse(""));
         wsDTO.setTotalResults(results.size());
         wsDTO.setPage(page);
@@ -684,6 +700,12 @@ public class SearchService {
 
     }
 
+
+    private Map<String, List<DrugSummaryDTO>> getDrugSummaryMap(List<ModelForQuery> resultSet){
+
+
+        return new HashMap<>();
+    }
 
 
 
