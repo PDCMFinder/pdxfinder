@@ -21,7 +21,9 @@ public class WebSearchDTO {
     private int totalResults;
     private Integer page;
     private Integer size;
+    private boolean dataAvailableColumnPresent;
     private boolean isMutationSelected;
+    private boolean isDrugSelected;
 
 
     private String query;
@@ -321,5 +323,21 @@ public class WebSearchDTO {
 
     public void setDrugSelected(List<FacetOption> drugSelected) {
         this.drugSelected = drugSelected;
+    }
+
+    public boolean getIsDrugSelected() {
+        return isDrugSelected;
+    }
+
+    public void setIsDrugSelected(boolean drugSelected) {
+        isDrugSelected = drugSelected;
+    }
+
+    public boolean isDataAvailableColumnPresent() {
+        return dataAvailableColumnPresent;
+    }
+
+    public void setDataAvailableColumnPresent(boolean dataAvailablePresent) {
+        dataAvailableColumnPresent = dataAvailablePresent;
     }
 }

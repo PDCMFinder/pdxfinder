@@ -645,9 +645,11 @@
                                 <th>Type</th>
                                 <th>Age</th>
                                 <th>Sex</th>
-                                <th th:if="${websearch.isMutationSelected} == false">Data Available</th>
+                                <th th:if="${websearch.dataAvailableColumnPresent} == true">Data Available</th>
                                 <th th:if="${websearch.isMutationSelected} == true">Mutations</th>
                                 <th th:if="${websearch.isMutationSelected} == true">Platform</th>
+                                <th th:if="${websearch.isDrugSelected} == true">Drug</th>
+                                <th th:if="${websearch.isDrugSelected} == true">Response</th>
 
                             </tr>
                             </thead>
@@ -664,7 +666,7 @@
                                 <td th:text="${model.patientAge}">Age</td>
                                 <td th:text="${model.patientGender}">Sex</td>
 
-                                <td th:if="${websearch.isMutationSelected} == false">
+                                <td th:if="${websearch.dataAvailableColumnPresent} == true">
                                     <th:block th:each="platform : ${model.dataAvailable}">
 
                                         <a th:if="${#strings.equals(platform, 'Dosing Studies')}"
@@ -699,6 +701,22 @@
                                         </div>
 
                                     </th:block>
+                                </td>
+
+                                <td th:if="${websearch.isDrugSelected} == true">
+
+
+                                    <div th:each="drugData : ${model.drugData}">
+                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#dosing_studies'}" th:utext="${drugData.drugName}"></a>
+                                    </div>
+                                </td>
+
+                                <td th:if="${websearch.isDrugSelected} == true">
+
+
+                                    <div th:each="drugData : ${model.drugData}">
+                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#dosing_studies'}" th:utext="${drugData.response}"></a>
+                                    </div>
                                 </td>
 
 
