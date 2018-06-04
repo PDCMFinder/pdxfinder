@@ -114,13 +114,6 @@ public class ModelForQueryExport {
         );
 
 
-
-
-        /*for (DrugSummaryDTO dDrugData : mfq.getDrugData()){
-            this.drug.add(dDrugData.getDrugName());
-            this.drug.add(dDrugData.getResponse());
-        }*/
-
     }
 
     public Long getModelId() {
