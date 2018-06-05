@@ -105,10 +105,10 @@ public class ModelForQueryExport {
         this.dataAvailable = mfq.getDataAvailable();
         this.mutatedVariants = mfq.getMutatedVariants();
 
-        this.drugs = mfq.getDrugData().stream().map(x->x.getDrugName()).collect(Collectors.toList());
-        this.responses = mfq.getDrugData().stream().map(x->x.getResponse()).collect(Collectors.toList());
-
-
+        try{
+            this.drugs = mfq.getDrugData().stream().map(x->x.getDrugName()).collect(Collectors.toList());
+            this.responses = mfq.getDrugData().stream().map(x->x.getResponse()).collect(Collectors.toList());
+        }catch (Exception e){}
 
     }
 
@@ -256,4 +256,5 @@ public class ModelForQueryExport {
     public void setResponses(List<String> responses) {
         this.responses = responses;
     }
+
 }
