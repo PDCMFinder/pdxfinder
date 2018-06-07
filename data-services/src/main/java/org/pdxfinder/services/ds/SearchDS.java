@@ -568,7 +568,7 @@ public class SearchDS {
 
                         if(previouslyFoundModels.containsKey(modelId)){
 
-                            previouslyFoundModels.get(modelId).add(drug+" "+response);
+                            previouslyFoundModels.get(modelId).add(drugName+" "+response);
 
                             if(modelsDrugSummary.containsKey(modelId)){
 
