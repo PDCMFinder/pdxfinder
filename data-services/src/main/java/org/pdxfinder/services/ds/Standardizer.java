@@ -105,7 +105,7 @@ public class Standardizer {
          if(r.toLowerCase().equals("sd") || r.toLowerCase().equals("stable disease")) return "Stable Disease";
          if(r.toLowerCase().equals("cr") || r.toLowerCase().equals("complete response")) return "Complete Response";
          if(r.toLowerCase().equals("pr") || r.toLowerCase().equals("partial response")) return "Partial Response";
-         if(r.equals("stable disease/complete response")) return "Stable Disease and Complete Response";
+         if(r.equals("stable disease/complete response")) return "Stable Disease And Complete Response";
 
          return r;
      }
