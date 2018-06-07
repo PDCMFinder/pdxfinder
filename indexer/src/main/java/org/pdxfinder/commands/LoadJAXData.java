@@ -258,7 +258,7 @@ public class LoadJAXData implements CommandLineRunner {
                         JSONObject treatmentObject = treatments.getJSONObject(t);
 
                         TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
-                                treatmentObject.getString("Dose") + " "+treatmentObject.getString("Units"),
+                                treatmentObject.getString("Dose"),
                                 treatmentObject.getString("Response"));
 
                         ts.addTreatmentProtocol(tp);
