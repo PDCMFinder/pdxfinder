@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
         "drug",
         "response"
 })
+
 public class ModelForQueryExport {
     @JsonProperty("PDXFinder Id")
     private Long modelId;
@@ -256,5 +257,6 @@ public class ModelForQueryExport {
     public void setResponses(List<String> responses) {
         this.responses = responses;
     }
+
 
 }

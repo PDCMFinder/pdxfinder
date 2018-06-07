@@ -365,8 +365,10 @@ public class LoadJAXData implements CommandLineRunner {
                 else if(technology.equals("CTP")){
                     platform = dataImportService.getPlatform(technology, this.jaxDS, CTP_PLATFORM_URL);
                 }
+                else{
+                    platform = dataImportService.getPlatform(technology, this.jaxDS, "");
+                }
 
-                platform.setExternalDataSource(jaxDS);
 
                 markerMap = sampleMap.get(sample);
                 if (markerMap == null) {
@@ -410,6 +412,9 @@ public class LoadJAXData implements CommandLineRunner {
                     }
                     else if(tech.equals("CTP")){
                         platform = dataImportService.getPlatform(tech, this.jaxDS, CTP_PLATFORM_URL);
+                    }
+                    else{
+                        platform = dataImportService.getPlatform(tech, this.jaxDS, "");
                     }
 
 

@@ -61,7 +61,7 @@ public class SearchController {
         try {
             output = mapper.writer(schema).writeValueAsString(exportResults);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+
         }
 
         response.setContentType("text/csv;charset=utf-8");
