@@ -458,6 +458,7 @@ public class SearchDS {
         //2. drug + ALL response
         //3. drug + one response selected
         //4. no drug + one response selected
+        //5. no drug + ALL response
 
 
         //1. = 2.
@@ -553,54 +554,113 @@ public class SearchDS {
             }
         }
 
-        //4.
+        //4. 5.
         else if(drug == null && response != null){
 
-            for(Map.Entry<String, Map<String, Set<Long>>> drugs : drugResponses.entrySet()){
+            if(response.equals("ALL")){
 
-                String drugName = drugs.getKey();
+                for(Map.Entry<String, Map<String, Set<Long>>> currDrug:drugResponses.entrySet()){
 
-                if(drugs.getValue().containsKey(response)){
+                    String drugName = currDrug.getKey();
 
-                    Set<Long> foundModels = drugs.getValue().get(response);
+                    for(Map.Entry<String, Set<Long>> responses : currDrug.getValue().entrySet()){
 
-                    for(Long modelId: foundModels){
+                        String currResp = responses.getKey();
+                        Set<Long> foundModels = responses.getValue();
 
-                        if(previouslyFoundModels.containsKey(modelId)){
+                        for(Long modelId: foundModels){
 
-                            previouslyFoundModels.get(modelId).add(drugName+" "+response);
+                            if(previouslyFoundModels.containsKey(modelId)){
 
-                            if(modelsDrugSummary.containsKey(modelId)){
+                                previouslyFoundModels.get(modelId).add(drugName+" "+currResp);
 
-                                modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drugName, response));
+                                if(modelsDrugSummary.containsKey(modelId)){
+
+                                    modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drugName, currResp));
+                                }
+                                else{
+                                    List dr = new ArrayList();
+                                    dr.add(new DrugSummaryDTO(drugName, currResp));
+                                    modelsDrugSummary.put(modelId, dr);
+                                }
                             }
                             else{
-                                List dr = new ArrayList();
-                                dr.add(new DrugSummaryDTO(drugName, response));
-                                modelsDrugSummary.put(modelId, dr);
+
+                                Set<String>  newSet = new HashSet<>();
+                                newSet.add(drugName+" "+currResp);
+                                previouslyFoundModels.put(modelId, newSet);
+
+                                if(modelsDrugSummary.containsKey(modelId)){
+
+                                    modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drugName, currResp));
+                                }
+                                else{
+                                    List dr = new ArrayList();
+                                    dr.add(new DrugSummaryDTO(drugName, currResp));
+                                    modelsDrugSummary.put(modelId, dr);
+                                }
                             }
                         }
-                        else{
 
-                            Set<String>  newSet = new HashSet<>();
-                            newSet.add(drugName+" "+response);
-                            previouslyFoundModels.put(modelId, newSet);
+                    }
+                }
 
-                            if(modelsDrugSummary.containsKey(modelId)){
 
-                                modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drugName, response));
+            }
+            else{
+
+                for(Map.Entry<String, Map<String, Set<Long>>> drugs : drugResponses.entrySet()){
+
+                    String drugName = drugs.getKey();
+
+                    if(drugs.getValue().containsKey(response)){
+
+                        Set<Long> foundModels = drugs.getValue().get(response);
+
+                        for(Long modelId: foundModels){
+
+                            if(previouslyFoundModels.containsKey(modelId)){
+
+                                previouslyFoundModels.get(modelId).add(drugName+" "+response);
+
+                                if(modelsDrugSummary.containsKey(modelId)){
+
+                                    modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drugName, response));
+                                }
+                                else{
+                                    List dr = new ArrayList();
+                                    dr.add(new DrugSummaryDTO(drugName, response));
+                                    modelsDrugSummary.put(modelId, dr);
+                                }
                             }
                             else{
-                                List dr = new ArrayList();
-                                dr.add(new DrugSummaryDTO(drugName, response));
-                                modelsDrugSummary.put(modelId, dr);
+
+                                Set<String>  newSet = new HashSet<>();
+                                newSet.add(drugName+" "+response);
+                                previouslyFoundModels.put(modelId, newSet);
+
+                                if(modelsDrugSummary.containsKey(modelId)){
+
+                                    modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drugName, response));
+                                }
+                                else{
+                                    List dr = new ArrayList();
+                                    dr.add(new DrugSummaryDTO(drugName, response));
+                                    modelsDrugSummary.put(modelId, dr);
+                                }
                             }
                         }
                     }
                 }
+
             }
 
+
+
+
         }
+
+
 
     }
 
