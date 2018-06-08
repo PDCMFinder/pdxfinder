@@ -49,6 +49,8 @@ public class LoadHCI implements CommandLineRunner {
     private final static String NS_BS_SYMBOL = "NOD.CB17-Prkd<sup>cscid</sup>/J"; //yay HTML in name
     private final static String NS_BS_URL = "https://www.jax.org/strain/001303";
 
+    private final static String DOSING_STUDY_URL = "/platform/hci-drug-dosing/";
+
     private final static String SOURCE_URL = null;
 
     // for now all samples are of tumor tissue
@@ -260,6 +262,7 @@ public class LoadHCI implements CommandLineRunner {
                     if(treatments.length() > 0){
                         //log.info("Treatments found for model "+mc.getSourcePdxId());
                         ts = new TreatmentSummary();
+                        ts.setUrl(DOSING_STUDY_URL);
 
                         for(int t = 0; t<treatments.length(); t++){
                             JSONObject treatmentObject = treatments.getJSONObject(t);

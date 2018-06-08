@@ -14,6 +14,7 @@ import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,10 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
 
 /*
  * Created by csaba on 24/08/2017.
@@ -31,11 +35,9 @@ import java.util.*;
 public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
 
-    private static final String spreadsheetServiceUrl = "http://gsx2json.com/api?id=17LixNQL_BoL_-yev1s_VJt9FDZAJQcl5kyMhHkSF7Xk";
-    //old mappings file
-    //https://docs.google.com/spreadsheets/d/16JhGWCEUimsOF8q8bYN7wEJqVtjbO259X1YGrbRQLdc/edit
+    @Value("${mappings.diagnosis.file}")
+    private String diagnosisMappingsFile;
 
-    //new mappings: https://docs.google.com/spreadsheets/d/17LixNQL_BoL_-yev1s_VJt9FDZAJQcl5kyMhHkSF7Xk
     private final static Logger log = LoggerFactory.getLogger(LinkSamplesToNCITTerms.class);
     private DataImportService dataImportService;
 
@@ -98,8 +100,8 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
     private void loadMappingRules() {
 
-        String json = parseURL(spreadsheetServiceUrl);
-        log.info("Fetching mapping rules from " + spreadsheetServiceUrl);
+        String json = parseFile(diagnosisMappingsFile);
+        log.info("Fetching mapping rules from " + diagnosisMappingsFile);
 
         this.mappingRules = new HashMap<>();
 
@@ -399,6 +401,24 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
             in.close();
         } catch (Exception e) {
             log.error("Unable to read from URL " + urlStr, e);
+        }
+        return sb.toString();
+    }
+
+
+    private String parseFile(String path) {
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            Stream<String> stream = Files.lines(Paths.get(path));
+
+            Iterator itr = stream.iterator();
+            while (itr.hasNext()) {
+                sb.append(itr.next());
+            }
+        } catch (Exception e) {
+            log.error("Failed to load file " + path, e);
         }
         return sb.toString();
     }
