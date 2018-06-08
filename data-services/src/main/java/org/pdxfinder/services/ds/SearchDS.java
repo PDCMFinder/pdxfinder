@@ -692,6 +692,12 @@ public class SearchDS {
 
         Set<ModelForQuery> result = new HashSet<>(models);
 
+        //empty previously set variants
+        result.forEach(x -> x.setMutatedVariants(new ArrayList<>()));
+
+        //empty previously set drugs
+        result.forEach(x -> x.setDrugData(new ArrayList<>()));
+
         // If no filters have been specified, return the complete set
         if (filters == null) {
             return result;
