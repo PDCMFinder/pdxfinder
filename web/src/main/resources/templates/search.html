@@ -39,10 +39,10 @@
     <!-- Import Choice Library stylesheet-->
     <link rel="stylesheet"
           href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/styles/css/choices.min.css">
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
 
     <link rel="stylesheet" th:href="@{/css/app.css}" type="text/css" media="all"/>
     <link rel="stylesheet" th:href="@{/css/multiple-select.css}">
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
     <!-- Use this CSS file for any custom styling -->
     <link rel="stylesheet" th:href="@{/css/customStyles.css}" type="text/css" media="all"/>
 
@@ -518,9 +518,6 @@
 
 
 
-
-
-
                                                     <span th:if="${not #lists.isEmpty(param.drug)}">
                                                             <div class="row topSace10">
                                                                 <div class="columns nospace small-12 large-6 adjusti"> DRUG </div>
@@ -541,7 +538,7 @@
                                                                 <div class="columns nospace small-12 large-6 topSpace3"
                                                                      th:id="'filterOptions'+${iter.index+1}">
                                                                     <select th:id="'responseFilter'+${iter.index+1}"
-                                                                            class="width40" multiple='multiple'>
+                                                                            class="width50" multiple='multiple'>
 
                                                                         <option th:each="disResponse :${eachDrug.value}"
                                                                                 th:value="${disResponse}"
@@ -551,9 +548,7 @@
                                                                     </select>
                                                                 </div>
 
-
                                                             </div>
-
                                                         </span>
 
 
@@ -563,12 +558,12 @@
 
                                                                 <div class="row hidden"
                                                                      th:classappend="'dosingStudy'+${i}">
-                                                                    <div class="columns nospace small-7 large-7">
+                                                                    <div class="columns nospace small-12 large-6">
                                                                         <input type="text" value="NULL" th:id="'drugFilter'+${i}"
                                                                                class="fullWidth"/>
                                                                     </div>
 
-                                                                    <div class="columns nospace small-5 large-5 topSpace3"
+                                                                    <div class="columns nospace small-12 large-6 topSpace3"
                                                                          th:id="'filterOptions'+${i}">
                                                                         <select th:id="'responseFilter'+${i}"
                                                                                 multiple='multiple'>

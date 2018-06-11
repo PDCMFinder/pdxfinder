@@ -5120,9 +5120,11 @@ table.datatable-pdx thead th {
   font-size: 1.3rem;
   border-bottom: 2px solid #73cfaf; }
 table.datatable-pdx thead th.sorting_asc {
-  background-image: url("../images/sort_asc.png"); }
+  background-image: url("../images/sort_asc.png");
+  background-repeat: no-repeat; }
 table.datatable-pdx thead th.sorting_desc {
-  background-image: url("../images/sort_desc.png"); }
+  background-image: url("../images/sort_desc.png");
+  background-repeat: no-repeat; }
 table.datatable-pdx.display tbody tr.odd,
 table.datatable-pdx.display tbody tr:hover {
   background: #fefefe; }
