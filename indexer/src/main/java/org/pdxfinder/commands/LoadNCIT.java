@@ -9,7 +9,7 @@ import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
-import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +41,11 @@ public class LoadNCIT implements CommandLineRunner {
     @Value("${ncitpredef.file}")
     private String ncitFile;
 
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
 
     @Autowired
-    public LoadNCIT(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LoadNCIT(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     @Override
@@ -105,7 +105,7 @@ public class LoadNCIT implements CommandLineRunner {
         int requestCounter = 0;
 
         //create cancer root term
-        OntologyTerm ot = loaderUtils.getOntologyTerm(diseasesBranchUrl,diseaseRootLabel);
+        OntologyTerm ot = dataImportService.getOntologyTerm(diseasesBranchUrl,diseaseRootLabel);
         log.debug("Creating node: "+diseaseRootLabel);
 
         discoveredTerms.add(ot);
@@ -172,7 +172,7 @@ public class LoadNCIT implements CommandLineRunner {
 
                     termLabel = termLabel.replaceAll(",", "");
 
-                    OntologyTerm newTerm = loaderUtils.getOntologyTerm(term.getString("iri"), updatedTermlabel != null ? updatedTermlabel : termLabel);
+                    OntologyTerm newTerm = dataImportService.getOntologyTerm(term.getString("iri"), updatedTermlabel != null ? updatedTermlabel : termLabel);
 
                     JSONArray synonyms = term.getJSONArray("synonyms");
                     Set<String> synonymsSet = new HashSet<>();
@@ -184,9 +184,9 @@ public class LoadNCIT implements CommandLineRunner {
                     newTerm.setSynonyms(synonymsSet);
                     discoveredTerms.add(newTerm);
 
-                    OntologyTerm parentTerm = loaderUtils.getOntologyTerm(notYetVisitedTerm.getUrl());
+                    OntologyTerm parentTerm = dataImportService.getOntologyTerm(notYetVisitedTerm.getUrl());
                     newTerm.addSubclass(parentTerm);
-                    loaderUtils.saveOntologyTerm(newTerm);
+                    dataImportService.saveOntologyTerm(newTerm);
 
                     termCounter++;
 
@@ -233,7 +233,7 @@ public class LoadNCIT implements CommandLineRunner {
                     String url = rowData[0];
                     String label = rowData[1];
 
-                    OntologyTerm ot = loaderUtils.getOntologyTerm(url, label);
+                    OntologyTerm ot = dataImportService.getOntologyTerm(url, label);
                     ncitLoaded.put(url, ot);
 
                     log.info("Creating "+label);
@@ -296,7 +296,7 @@ public class LoadNCIT implements CommandLineRunner {
                     childTerm.setSynonyms(synonymsSet);
 
                     childTerm.addSubclass(parentTerm);
-                    loaderUtils.saveOntologyTerm(childTerm);
+                    dataImportService.saveOntologyTerm(childTerm);
 
                 }
 

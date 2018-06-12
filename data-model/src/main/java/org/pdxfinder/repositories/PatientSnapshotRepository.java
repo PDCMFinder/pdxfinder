@@ -1,6 +1,5 @@
 package org.pdxfinder.repositories;
 
-import org.pdxfinder.dao.Patient;
 import org.pdxfinder.dao.PatientSnapshot;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
@@ -12,12 +11,6 @@ import java.util.Set;
 
 @Repository
 public interface PatientSnapshotRepository extends Neo4jRepository<PatientSnapshot, Long> {
-
-    Set<Patient> findByAge(String sex);
-
-    Set<Patient> findByPatientSex(String sex);
-
-    Patient findByPatientExternalId(String externalId);
 
     @Query("MATCH (ps:PatientSnapshot)--(p:Patient) WHERE p.externalId = {patientId} RETURN ps")
     Set<PatientSnapshot> findByPatient(@Param("patientId") String patientId);
@@ -44,7 +37,7 @@ public interface PatientSnapshotRepository extends Neo4jRepository<PatientSnapsh
     @Query("MATCH (p:Patient)--(ps:PatientSnapshot) " +
             "WHERE p.externalId = {patientId} " +
             "AND p.dataSource = {dataSource} " +
-            "AND ps.age = {age} " +
+            "AND ps.ageAtCollection = {age} " +
             "RETURN ps")
     PatientSnapshot findByPatientIdAndDataSourceAndAge(@Param("patientId") String patientId,
                                                        @Param("dataSource") String dataSource,

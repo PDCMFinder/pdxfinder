@@ -10,8 +10,8 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
-import org.pdxfinder.utilities.LoaderUtils;
-import org.pdxfinder.utilities.Standardizer;
+import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -53,11 +53,11 @@ public class LoadWUSTL implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
     private Session session;
 
-    public LoadWUSTL(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LoadWUSTL(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     //   @Value("${mdapdx.url}")
@@ -94,7 +94,7 @@ public class LoadWUSTL implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        mdaDS = loaderUtils.getExternalDataSource(WUSTL_DATASOURCE_ABBREVIATION, WUSTL_DATASOURCE_NAME, WUSTL_DATASOURCE_DESCRIPTION, DATASOURCE_CONTACT, SOURCE_URL);
+        mdaDS = dataImportService.getExternalDataSource(WUSTL_DATASOURCE_ABBREVIATION, WUSTL_DATASOURCE_NAME, WUSTL_DATASOURCE_DESCRIPTION, DATASOURCE_CONTACT, SOURCE_URL);
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
@@ -140,20 +140,20 @@ public class LoadWUSTL implements CommandLineRunner {
         String age = Standardizer.getAge(j.getString("Age"));
         String gender = Standardizer.getGender(j.getString("Gender"));
 
-        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"),
                 gender, "", race, age, mdaDS);
 
         String sampleSite = Standardizer.getValue("Sample Site", j);
 
         //String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, String dataSource
-        Sample humanSample = loaderUtils.getSample(id, j.getString("Tumor Type"), diagnosis,
+        Sample humanSample = dataImportService.getSample(id, j.getString("Tumor Type"), diagnosis,
                 j.getString("Primary Site"), sampleSite,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
 
         pSnap.addSample(humanSample);
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.SOURCE, DATASOURCE_CONTACT));
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
 
         String qaType = NOT_SPECIFIED;
         try {
@@ -164,16 +164,16 @@ public class LoadWUSTL implements CommandLineRunner {
         String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
 
         QualityAssurance qa = new QualityAssurance(qaType,
-                NOT_SPECIFIED, ValidationTechniques.NOT_SPECIFIED, qaPassage);
-        loaderUtils.saveQualityAssurance(qa);
+                NOT_SPECIFIED, qaPassage);
+        dataImportService.saveQualityAssurance(qa);
         String strain = j.getString("Strain");
-        HostStrain bs = loaderUtils.getHostStrain(strain, strain, "", "");
+        HostStrain bs = dataImportService.getHostStrain(strain, strain, "", "");
 
         String engraftmentSite = Standardizer.getValue("Engraftment Site", j);
 
         String tumorPrep = Standardizer.getValue("Tumor Prep", j);
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, mdaDS.getAbbreviation(), humanSample, qa, externalUrls);
+        ModelCreation modelCreation = dataImportService.createModelCreation(id, mdaDS.getAbbreviation(), humanSample, qa, externalUrls);
         modelCreation.addRelatedSample(humanSample);
 
         boolean human = false;
@@ -188,77 +188,6 @@ public class LoadWUSTL implements CommandLineRunner {
             // this is for the FANG data and we don't really care about markers at this point anyway
         }
 
-        //disable loading molchar for now
-
-        /*
-
-        String markerStr = j.getString("Markers");
-
-        String[] markers = markerStr.split(";");
-        if (markerStr.trim().length() > 0) {
-
-            Platform pl = loaderUtils.getPlatform(markerPlatform, mdaDS);
-            MolecularCharacterization molC = new MolecularCharacterization(markerPlatform);
-            molC.setType("mutation");
-            molC.setPlatform(pl);
-
-            Set<MarkerAssociation> markerAssocs = new HashSet();
-
-            for (int i = 0; i < markers.length; i++) {
-                Marker m = loaderUtils.getMarker(markers[i], markers[i]);
-                MarkerAssociation ma = new MarkerAssociation();
-                ma.setMarker(m);
-                markerAssocs.add(ma);
-            }
-            molC.setMarkerAssociations(markerAssocs);
-            Set<MolecularCharacterization> mcs = new HashSet<>();
-            mcs.add(molC);
-
-
-            if (human) {
-                humanSample.setMolecularCharacterizations(mcs);
-                pSnap.addSample(humanSample);
-
-            } else {
-
-                Sample mouseSample = new Sample();
-                mouseSample.setMolecularCharacterizations(mcs);
-                String passage = "0";
-                try {
-                    passage = j.getString("QA Passage").replaceAll("P", "");
-                } catch (Exception e) {
-                    // default is 0
-                }
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation,
-                        modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
-
-                specimen.setHostStrain(bs);
-
-                specimen.setSample(mouseSample);
-                modelCreation.addRelatedSample(mouseSample);
-
-                if (engraftmentSite.contains(";")) {
-                    String[] parts = engraftmentSite.split(";");
-                    engraftmentSite = parts[1].trim();
-                    tumorPrep = parts[0].trim();
-                }
-                ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
-                specimen.setImplantationSite(is);
-
-                ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
-                specimen.setImplantationType(it);
-
-                modelCreation.addSpecimen(specimen);
-
-                //loaderUtils.saveSpecimen(specimen);
-
-            }
-
-            //loaderUtils.saveModelCreation(modelCreation);
-
-        }
-
-        */
 
         if (human) {
             pSnap.addSample(humanSample);
@@ -274,7 +203,7 @@ public class LoadWUSTL implements CommandLineRunner {
             } catch (Exception e) {
                 // default is 0
             }
-            Specimen specimen = loaderUtils.getSpecimen(modelCreation,
+            Specimen specimen = dataImportService.getSpecimen(modelCreation,
                     modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
 
             specimen.setHostStrain(bs);
@@ -287,18 +216,18 @@ public class LoadWUSTL implements CommandLineRunner {
                 engraftmentSite = parts[1].trim();
                 tumorPrep = parts[0].trim();
             }
-            ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
-            specimen.setImplantationSite(is);
+            EngraftmentSite is = dataImportService.getImplantationSite(engraftmentSite);
+            specimen.setEngraftmentSite(is);
 
-            ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
-            specimen.setImplantationType(it);
+            EngraftmentType it = dataImportService.getImplantationType(tumorPrep);
+            specimen.setEngraftmentType(it);
 
             modelCreation.addSpecimen(specimen);
 
         }
 
-        loaderUtils.saveModelCreation(modelCreation);
-        loaderUtils.savePatientSnapshot(pSnap);
+        dataImportService.saveModelCreation(modelCreation);
+        dataImportService.savePatientSnapshot(pSnap);
     }
 
 

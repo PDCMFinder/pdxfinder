@@ -5,7 +5,7 @@ import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
-import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +33,11 @@ public class LoadDiseaseOntology implements CommandLineRunner {
     private static final String cancerBranchUrl = "http://purl.obolibrary.org/obo/DOID_162";
     private static final String ontologyUrl = "http://www.ebi.ac.uk/ols/api/ontologies/doid/terms/";
 
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
 
     @Autowired
-    public LoadDiseaseOntology(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LoadDiseaseOntology(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class LoadDiseaseOntology implements CommandLineRunner {
         int requestCounter = 0;
 
         //create cancer root term
-        OntologyTerm ot = loaderUtils.getOntologyTerm(cancerBranchUrl,cancerRootLabel);
+        OntologyTerm ot = dataImportService.getOntologyTerm(cancerBranchUrl,cancerRootLabel);
         System.out.println("Creating node: "+cancerRootLabel);
 
         discoveredTerms.add(ot);
@@ -125,12 +125,12 @@ public class LoadDiseaseOntology implements CommandLineRunner {
                     JSONObject term = terms.getJSONObject(i);
                     System.out.println("TERM: "+term.getString("label"));
 
-                    OntologyTerm newTerm = loaderUtils.getOntologyTerm(term.getString("iri"), term.getString("label"));
+                    OntologyTerm newTerm = dataImportService.getOntologyTerm(term.getString("iri"), term.getString("label"));
                     discoveredTerms.add(newTerm);
 
-                    OntologyTerm parentTerm = loaderUtils.getOntologyTerm(notYetVisitedTerm.getUrl());
+                    OntologyTerm parentTerm = dataImportService.getOntologyTerm(notYetVisitedTerm.getUrl());
                     newTerm.addSubclass(parentTerm);
-                    loaderUtils.saveOntologyTerm(newTerm);
+                    dataImportService.saveOntologyTerm(newTerm);
 
                     termCounter++;
                 }
@@ -145,148 +145,6 @@ public class LoadDiseaseOntology implements CommandLineRunner {
         }
 
     }
-
-
-
-
-/*
-
-TOTAL terms: 2001
-TOTAL relationships: 2731
-Loading finished after 2 minute(s) and 40 second(s)
-
-Deleted 2119 nodes, deleted 2731 relationships, statement completed in 32 ms.
- */
-
-/*
-private void loadDO(){
-
-    Set<OntologyTerm> loadedTerms = new HashSet<>();
-
-    int termCounter = 1;
-    String cancerRootLabel = "cancer";
-    int relationshipCounter = 0;
-
-    //create cancer root term
-    OntologyTerm ot = loaderUtils.getOntologyTerm(cancerBranchUrl,cancerRootLabel);
-    System.out.println("Creating node: "+cancerRootLabel);
-
-    String cancerUrlEncoded = "";
-
-    try {
-        //have to double encode the url to get the desired result
-        cancerUrlEncoded = URLEncoder.encode(ot.getUrl(), "UTF-8");
-        cancerUrlEncoded = URLEncoder.encode(cancerUrlEncoded, "UTF-8");
-
-    } catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
-    }
-
-    int totalPages = 1;
-    boolean totalPagesDetermined = false;
-
-    for (int p=0;p<totalPages;p++){
-
-        String url = ontologyUrl+cancerUrlEncoded+"/descendants?size=500&page="+p;
-
-        System.out.println("Getting data from "+url);
-
-        String json = parseURL(url);
-
-        //First create all nodes
-        try {
-            JSONObject job = new JSONObject(json);
-
-            String embedded = job.getString("_embedded");
-
-            JSONObject job2 = new JSONObject(embedded);
-            JSONArray terms = job2.getJSONArray("terms");
-
-            for (int i = 0; i < terms.length(); i++) {
-
-                JSONObject term = terms.getJSONObject(i);
-                System.out.println("Creating term: "+term.getString("label"));
-
-                OntologyTerm newTerm = loaderUtils.getOntologyTerm(term.getString("iri"), term.getString("label"));
-                loadedTerms.add(newTerm);
-
-                termCounter++;
-            }
-
-            if(!totalPagesDetermined){
-                String page = job.getString("page");
-                JSONObject pageObj = new JSONObject(page);
-                totalPages = Integer.parseInt(pageObj.getString("totalPages"))-1;
-                totalPagesDetermined = true;
-            }
-
-
-        } catch (Exception e) {
-            log.error("", e);
-
-        }
-
-    }
-
-
-
-    //then create relationships
-
-    String urlEnc = "";
-    for (OntologyTerm t : loadedTerms) {
-
-        OntologyTerm childTerm = loaderUtils.getOntologyTerm(t.getUrl());
-
-        try {
-            urlEnc = URLEncoder.encode(childTerm.getUrl(), "UTF-8");
-            urlEnc = URLEncoder.encode(urlEnc, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-
-        String parentUrl = ontologyUrl+urlEnc+"/parents";
-
-        System.out.println("Getting parents data from "+parentUrl);
-
-        String parentJson = parseURL(parentUrl);
-
-        try {
-            JSONObject job = new JSONObject(parentJson);
-
-            String embedded = job.getString("_embedded");
-
-            JSONObject job2 = new JSONObject(embedded);
-            JSONArray terms = job2.getJSONArray("terms");
-
-            for (int i = 0; i < terms.length(); i++) {
-
-                JSONObject term = terms.getJSONObject(i);
-
-
-                OntologyTerm parentTerm = loaderUtils.getOntologyTerm(term.getString("iri"), term.getString("label"));
-                childTerm.addSubclass(parentTerm);
-                loaderUtils.saveOntologyTerm(childTerm);
-                relationshipCounter++;
-            }
-
-            System.out.println("Creating relationships for: "+childTerm.getLabel());
-
-
-
-        } catch (Exception e) {
-            log.error("", e);
-
-        }
-
-    }
-
-
-    System.out.println("TOTAL terms: "+termCounter);
-    System.out.println("TOTAL relationships: "+relationshipCounter);
-
-}
-*/
 
     private String parseURL(String urlStr) {
         StringBuilder sb = new StringBuilder();
@@ -305,8 +163,5 @@ private void loadDO(){
         }
         return sb.toString();
     }
-
-
-
 
 }

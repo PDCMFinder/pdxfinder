@@ -10,8 +10,8 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
-import org.pdxfinder.utilities.LoaderUtils;
-import org.pdxfinder.utilities.Standardizer;
+import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -56,7 +56,7 @@ public class LoadMDAnderson implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
     private Session session;
 
     //   @Value("${mdapdx.url}")
@@ -66,8 +66,8 @@ public class LoadMDAnderson implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadMDAnderson(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LoadMDAnderson(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     @Override
@@ -97,7 +97,7 @@ public class LoadMDAnderson implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        mdaDS = loaderUtils.getExternalDataSource(MDA_DATASOURCE_ABBREVIATION, MDA_DATASOURCE_NAME, MDA_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+        mdaDS = dataImportService.getExternalDataSource(MDA_DATASOURCE_ABBREVIATION, MDA_DATASOURCE_NAME, MDA_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {
@@ -146,7 +146,7 @@ public class LoadMDAnderson implements CommandLineRunner {
           String age = Standardizer.getAge(j.getString("Age"));
           String gender = Standardizer.getGender(j.getString("Gender"));
 
-        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"),
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"),
                 gender, "", race, age, mdaDS);
         
         
@@ -154,14 +154,14 @@ public class LoadMDAnderson implements CommandLineRunner {
         
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
        
-        Sample sample = loaderUtils.getSample(id, tumorType, diagnosis,
+        Sample sample = dataImportService.getSample(id, tumorType, diagnosis,
                 j.getString("Primary Site"), sampleSite,
                 j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
 
         pSnap.addSample(sample);
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
 
         String qaType = NOT_SPECIFIED;
         try {
@@ -173,16 +173,16 @@ public class LoadMDAnderson implements CommandLineRunner {
         String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
         
         QualityAssurance qa = new QualityAssurance(qaType,
-                NOT_SPECIFIED, ValidationTechniques.NOT_SPECIFIED, qaPassage);
-        loaderUtils.saveQualityAssurance(qa);
+                NOT_SPECIFIED, qaPassage);
+        dataImportService.saveQualityAssurance(qa);
         String strain = j.getString("Strain");
-        HostStrain bs = loaderUtils.getHostStrain(strain, strain, "", "");
+        HostStrain bs = dataImportService.getHostStrain(strain, strain, "", "");
 
         String engraftmentSite = Standardizer.getValue("Engraftment Site",j);
         
         String tumorPrep = Standardizer.getValue("Tumor Prep",j);
 
-        ModelCreation modelCreation = loaderUtils.createModelCreation(id, mdaDS.getAbbreviation(), sample, qa, externalUrls);
+        ModelCreation modelCreation = dataImportService.createModelCreation(id, mdaDS.getAbbreviation(), sample, qa, externalUrls);
         modelCreation.addRelatedSample(sample);
 
         boolean human = false;
@@ -201,14 +201,14 @@ public class LoadMDAnderson implements CommandLineRunner {
 
         String[] markers = markerStr.split(";");
         if (markerStr.trim().length() > 0) {
-            Platform pl = loaderUtils.getPlatform(markerPlatform, mdaDS);
+            Platform pl = dataImportService.getPlatform(markerPlatform, mdaDS);
             MolecularCharacterization molC = new MolecularCharacterization();
             molC.setType("mutation");
             molC.setPlatform(pl);
             List<MarkerAssociation> markerAssocs = new ArrayList<>();
 
             for (int i = 0; i < markers.length; i++) {
-                Marker m = loaderUtils.getMarker(markers[i], markers[i]);
+                Marker m = dataImportService.getMarker(markers[i], markers[i]);
                 MarkerAssociation ma = new MarkerAssociation();
                 ma.setMarker(m);
                 markerAssocs.add(ma);
@@ -229,26 +229,26 @@ public class LoadMDAnderson implements CommandLineRunner {
                 } catch (Exception e) {
                     // default is 0
                 }
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation,
+                Specimen specimen = dataImportService.getSpecimen(modelCreation,
                         modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
                 
                 specimen.setHostStrain(bs);
                 
-                ImplantationSite is = loaderUtils.getImplantationSite(engraftmentSite);
-                specimen.setImplantationSite(is);
+                EngraftmentSite is = dataImportService.getImplantationSite(engraftmentSite);
+                specimen.setEngraftmentSite(is);
                 
-                ImplantationType it = loaderUtils.getImplantationType(tumorPrep);
-                specimen.setImplantationType(it);
+                EngraftmentType it = dataImportService.getImplantationType(tumorPrep);
+                specimen.setEngraftmentType(it);
                   
                 specimen.setSample(sample);
 
-                loaderUtils.saveSpecimen(specimen);
+                dataImportService.saveSpecimen(specimen);
 
             }
         }
 
-        loaderUtils.saveSample(sample);
-        loaderUtils.savePatientSnapshot(pSnap);
+        dataImportService.saveSample(sample);
+        dataImportService.savePatientSnapshot(pSnap);
     }
     
      

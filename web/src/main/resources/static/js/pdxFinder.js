@@ -3,9 +3,16 @@
  */
 
 
-
-
-function updateFilters(ages, genders, cancersystem, datasources, tumortype){
+/** This function updates the UI filter based on latest changes in USER CHOICE
+ *
+ * @param ages : A list of patients age selected by the user
+ * @param genders : A list of patient genders/sex selected by the user
+ * @param cancersystem : A list of cancer systems selected by the user
+ * @param datasources : A list of data sources selced by the user
+ * @param tumortype : A list of tumour types selected by the user
+ *
+ */
+function updateFilters(ages, genders, cancersystem, datasources, tumortype) {
 
     console.log("updating filters!");
     //characters we want to see as values
@@ -18,29 +25,29 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
     var openTumorTypeFacet = false;
 
     //check selected age bins
-    if(ages != null && ages.length>0){
+    if (ages != null && ages.length > 0) {
 
-        jQuery.each(ages, function(key, value){
+        jQuery.each(ages, function (key, value) {
 
             var id = value.name;
-            id = id.replace(" ","_");
+            id = id.replace(" ", "_");
             var selected = value.selected;
 
             //testing id for invalid characters
-            if( reg.test(id)){
-                console.log("skipping id: "+id);
+            if (reg.test(id)) {
+                console.log("skipping id: " + id);
                 return;
             }
 
-            if(selected){
-                jQuery("#patient_age__"+id).prop('checked', true);
+            if (selected) {
+                jQuery("#patient_age__" + id).prop('checked', true);
                 jQuery("#patient_age__" + id).siblings("label").find("span").addClass("selected");
                 openAgeFacet = true;
             }
 
             //Add a plus to patient age 90
-            if(id == '90') {
-                jQuery("#patient_age__"+id).siblings("label").find("span").append("+");
+            if (id == '90') {
+                jQuery("#patient_age__" + id).siblings("label").find("span").append("+");
             }
 
             var count = " (" + value.count + " of " + value.totalCount + ")";
@@ -49,32 +56,30 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
 
         });
 
-        if(openAgeFacet){
+        if (openAgeFacet) {
             var ageFilterField = jQuery("li#age_filter > a.accordion-title");
             ageFilterField.click();
         }
     }
 
 
-
-
     //check selected gender options
-    if(genders != null && genders.length>0){
+    if (genders != null && genders.length > 0) {
 
-        jQuery.each(genders, function(key, value){
+        jQuery.each(genders, function (key, value) {
 
             var id = value.name;
-            id = id.replace(" ","_");
+            id = id.replace(" ", "_");
             var selected = value.selected;
 
             //testing id for invalid characters
-            if( reg.test(id)){
-                console.log("skipping id: "+id);
+            if (reg.test(id)) {
+                console.log("skipping id: " + id);
                 return;
             }
 
-            if(selected){
-                jQuery("#patient_gender__"+id).prop('checked', true);
+            if (selected) {
+                jQuery("#patient_gender__" + id).prop('checked', true);
                 jQuery("#patient_gender__" + id).siblings("label").find("span").addClass("selected");
                 openGenderFacet = true;
             }
@@ -84,7 +89,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
 
         });
 
-        if(openGenderFacet){
+        if (openGenderFacet) {
             var genderFilterField = jQuery("li#gender_filter > a.accordion-title");
             genderFilterField.click();
         }
@@ -92,23 +97,23 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
 
 
     //check selected cancer systems
-    if(cancersystem != null && cancersystem.length>0){
+    if (cancersystem != null && cancersystem.length > 0) {
 
-        jQuery.each(cancersystem, function(key, value){
+        jQuery.each(cancersystem, function (key, value) {
 
             var id = value.name;
-            id = id.replace(/ /g,"_");
+            id = id.replace(/ /g, "_");
             var selected = value.selected;
 
-            console.log("system id:"+id);
+            console.log("system id:" + id);
             //testing id for invalid characters
-            if( reg.test(id)){
-                console.log("skipping id: "+id);
+            if (reg.test(id)) {
+                console.log("skipping id: " + id);
                 return;
             }
 
-            if(selected){
-                jQuery("#cancer_system__"+id).prop('checked', true);
+            if (selected) {
+                jQuery("#cancer_system__" + id).prop('checked', true);
                 jQuery("#cancer_system__" + id).siblings("label").find("span").addClass("selected");
                 openCancerBySystem = true;
             }
@@ -118,7 +123,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
 
         });
 
-        if(openCancerBySystem){
+        if (openCancerBySystem) {
             var cancerSystemFilterField = jQuery("li#cancer_system_filter > a.accordion-title");
             cancerSystemFilterField.click();
         }
@@ -126,12 +131,12 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
 
 
     //check selected datasources
-    if(datasources != null && datasources.length>0) {
+    if (datasources != null && datasources.length > 0) {
 
         jQuery.each(datasources, function (key, value) {
 
             var id = value.name;
-            id = id.replace(" ","_");
+            id = id.replace(" ", "_");
             var selected = value.selected;
 
             //testing id for invalid characters
@@ -160,12 +165,12 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
     }
 
     //check selected tumorTypes
-    if(tumortype != null && tumortype.length>0) {
+    if (tumortype != null && tumortype.length > 0) {
 
         jQuery.each(tumortype, function (key, value) {
 
             var id = value.name;
-            id = id.replace(" ","_");
+            id = id.replace(" ", "_");
             var selected = value.selected;
 
             //testing id for invalid characters
@@ -193,8 +198,24 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype){
 
     }
 
+    // Check selected Molechular Characterization:
+    var urlParams = new URLSearchParams(window.location.search);
+    var dURLString = urlParams.toString();
+    var openMarkerFacet = dURLString.search("mutation");
+    if (openMarkerFacet != -1) {
+        jQuery("li#marker_filter > a.accordion-title").click();
+    }
+
+    // Check if Dosing Study was selected
+    var openDrugFacet = dURLString.search("drug");
+    if (openDrugFacet != -1) {
+        jQuery("li#drug_filter > a.accordion-title").click();
+    }
 
 }
+/* End updateFilters function */
+
+
 
 
 function redirectPage(){
@@ -219,19 +240,42 @@ function redirectPage(){
         {
             var allVariants = getVariantSize(geneFilter.val());
             for (var j=0; j<variantFilter.val().length; j++){
-
                 if (!no_parameters) {
                     url = url + "&";
                 }
-
                 if(allVariants.length == variantFilter.val().length){
-
                     url += "mutation=" + geneFilter.val() + "___MUT" + "___ALL";
                     no_parameters = false;
                     break;
                 }else{
-
                     url += "mutation=" + geneFilter.val() + "___MUT" + "___"+variantFilter.val()[j];
+                    no_parameters = false;
+
+                }
+            }
+        }
+
+    }
+
+
+    for (var i=1; i<20; i++){
+
+        var drugFilter = jQuery("#drugFilter"+i);
+        var responseFilter = jQuery("#responseFilter"+i);
+
+        if (drugFilter.val() != null && drugFilter.val() != "NULL")
+        {
+            var allResponses = drugResponseList;
+            for (var j=0; j<responseFilter.val().length; j++){
+                if (!no_parameters) {
+                    url = url + "&";
+                }
+                if(allResponses.length == responseFilter.val().length){
+                    url += "drug=" + drugFilter.val() + "___ALL";
+                    no_parameters = false;
+                    break;
+                }else{
+                    url += "drug=" + drugFilter.val() + "___"+responseFilter.val()[j];
                     no_parameters = false;
 
                 }
@@ -257,11 +301,8 @@ function redirectPage(){
         if (!reg.test(res[1])) {
             url = url + res[0] + "=" + encodeURIComponent(res[1].replace(/_/g, ' '));
             no_parameters = false;
-
         }
-
     });
-
 
 
     //get all filters with values
@@ -272,7 +313,6 @@ function redirectPage(){
         var reg = /[^A-Za-z0-9 _-]/;
 
         if (jQuery(this).is(':checked')){
-
 
             var res = id.split("__");
 
@@ -289,186 +329,123 @@ function redirectPage(){
         else if(jQuery(this).is("input:text")){
             return;
         }
-
     });
-
-
-    console.log(url);
-
     window.location.replace(url);
 }
 
 
-//GLOBAL for displaying tooltips
 
-var markerDefs = {};
-markerDefs['ALK-EML4'] = 'Echinoderm microtubule-associated protein-like 4 (EML4) - Anaplastic lymphoma kinase (ALK) gene fusion';
-markerDefs['BRAF']='B-Raf proto-oncogene, serine/threonine kinase';
-markerDefs['BRAF V600E']='B-Raf proto-oncogene, serine/threonine kinase';
-markerDefs['BRCA1']='Breast Cancer 1, DNA repair associated';
-markerDefs['CD117 (c-Kit)']='KIT proto-oncogene receptor tyrosine kinase';
-markerDefs['EGFR']='Epidermal growth factor receptor gene';
-markerDefs['EGFR L858R']='Epidermal growth factor receptor gene';
-markerDefs['EGFR T790M']='Epidermal growth factor receptor gene';
-markerDefs['ER'] = 'Estrogen receptor ';
-markerDefs['ERBB2 (HER2)']='Erb-b2 receptor tyrosine kinase 2';
-markerDefs['KRAS']='KRAS proto-oncogene, GTPase';
-markerDefs['MSI'] = 'Microsatellite instability ';
-markerDefs['NRAS']='NRAS proto-oncogene, GTPase';
-markerDefs['PIK3CA']='Phosphatidylinositol-4,5-bisphosphate 3-kinase catalytic subunit alpha';
-markerDefs['PR'] = 'Progesterone receptor ';
-markerDefs['ROS']='ROS proto-oncogene 1, receptor tyrosine kinase';
+var geneticVar = 1;
+var counter = 1;
 
-function init(){
-    getMarkers();
-}
+function loadGeneTextFields(){
 
-function applyChosen(){
-    jQuery(".chosen").chosen({width: "100%"});
-}
+    var keysAreMarkers = Object.keys(mutatedMarkersAndVariants);
+    $('#geneFilter1').autocomplete({
+        source: [keysAreMarkers]
+    });
 
-function insertSpinner(){
-    console.log('spinner');
-    var div = jQuery("#resultsDiv");
-    div.empty();
-    if(div.hasClass("hidden")){
-        div.removeClass("hidden");
+    for (var i = 2; i <= 20; i++) {
+        $('#geneFilter' + i).autocomplete({
+            source: [keysAreMarkers]
+        });
     }
-    div.append('<div class="row"><div class="col-md-2 col-md-offset-5"><div class="loader"></div>  Loading... </div></div></div>');
 }
 
-function search() {
-
-    var q = jQuery("#pdxFinder").val();
-    var markers = [];
-    var dataSources = [];
-    var originTumorTypes = [];
-    //var filters = "/";
-    var filters = Object;
-
-    jQuery("#markerSelect_chosen ul li.search-choice").each(function( index, element ){
-        markers.push(jQuery(this).text());
-    });
-
-    jQuery("#sourceSelect_chosen ul li.search-choice").each(function( index, element ){
-        dataSources.push(jQuery(this).text());
-    });
-
-    jQuery("#tumorTypeSelect_chosen ul li.search-choice").each(function( index, element ){
-        originTumorTypes.push(jQuery(this).text());
-    });
-
-    filters["diag"] = q;
-    filters["markers"] = markers;
-    filters["datasources"] = dataSources;
-    filters["origintumortypes"] = originTumorTypes;
-
-    insertSpinner();
-
-    var ajaxrequest = jQuery.ajax({
-        url : "/searchmodels/",
-        type : "get",
-        datatype: 'json',
-        data: filters
-    }).done(function(data) {
-        displayResults(q,data);
-    }).fail(function() {
-        console.log("Error");
-    });
-
-
-}
-
-
-
-function displayResults(q,data){
-    var div = jQuery("#resultsDiv");
-    var sources = [];
-
-    if(div.hasClass("hidden")){
-        div.removeClass("hidden");
+function loadVariants(selectedMarker, compNumber) {
+    var marker = selectedMarker.value;
+    var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker.value].sort();
+    //alert(marker+"\n"+typeof valuesAreVariants);
+    var newOptions = "";
+    for (var i = 0; i < valuesAreVariants.length; i++) {
+        newOptions += "<option value='" + valuesAreVariants[i] + "' selected>" + valuesAreVariants[i] + "</option>";
     }
-    div.empty();
-
-    var rpanel = jQuery("<div/>");
-    rpanel.addClass("panel panel-primary lilPadding");
-
-    var tbody = jQuery("<tbody/>");
-    //var markerString = '';
-    for (var i in data){
-
-        if (data[i].cancerGenomics != null && data[i].cancerGenomics.length > 0) {
-            var m = data[i].cancerGenomics;
-            /*markerString = '';
-
-            for(var j=0;j<m.length;j++){
-                markerString += '<span class="marker-description" data-toggle="tooltip" data-placement="top" title="' + markerDefs[m[j]] + '">' + m[j] + '</span>';
-                if(j<m.length-1){
-                    markerString+=', ';
-                }
-            }*/
-        }
-
-        var tr = jQuery('<tr><td><a href="/pdx/'+ data[i].dataSource+'/'+ data[i].modelId+
-            '" target="_blank" class="pdxfinder-link" style="text-decoration:none">'+data[i].modelId+'</a></td><td>'+data[i].diagnosis+'</td><td>'+data[i].tissueOfOrigin+'</td><td>'+ data[i].mappedOntology+'</td><td>'+data[i].dataSource+'</td></tr>');
-
-        if(sources.indexOf(data[i].dataSource) == -1){
-            sources.push(data[i].dataSource);
-        }
-
-        tbody.append(tr);
-
-
-    }
-
-    var searchedFor = "";
-    if(q){
-        searchedFor = "You searched for '"+q+"'. ";
-    }
-    
-    rpanel.append('<div class="panel-heading"><h5>'+searchedFor+'Found '+data.length+' result(s) in '+sources.length+' source(s). </h5></div>');
-    rpanel.append('<div class="panel-body"></div>');
-
-    var resTable = jQuery("<table/>");
-    resTable.attr("id","resultsTable");
-    resTable.addClass("table table-striped table-borderedPdx table-hover");
-
-    resTable.append('<thead><tr><th>Model ID</th><th>Histology</th><th>Primary Tissue</th><th>Ontology Mapping</th><th>Data source</th></tr></thead>');
-
-
-    resTable.append(tbody);
-    rpanel.append(resTable);
-    div.append(rpanel);
-    jQuery("#resultsTable").DataTable({
-        language: {
-            sSearch: "Filter:"
-        }
+    var select = $('#variantFilter' + compNumber);
+    select.empty().append(newOptions);
+    $(function () {
+        $('#variantFilter' + compNumber).change(function () {
+            console.log($(this).val());
+        }).multipleSelect({
+            placeholder: " variants"
+        });
     });
-
-    $('[data-toggle="tooltip"]').tooltip();
-
 }
 
-function getMarkers(){
 
-    var ajaxrequest = jQuery.ajax({
-        url : "/getallmarkers",
-        type : "get"
-    }).done(function(data) {
 
-        markers = data;
-        markers.sort();
-
-        var markerSelect = jQuery("#markerSelect");
-
-        for(var i=0;i<markers.length;i++){
-            markerSelect.append('<option>'+markers[i]+'</option>');
-
+function addMarkerAndVariants(param, startIndex) {
+    if (startIndex != 2 && counter == 1) {
+        geneticVar = startIndex;
+    }
+    geneticVar++;
+    counter++;
+    for (var i = startIndex; i <= 20; i++) {
+        if ((param == 'AND' || param == 'OR') && geneticVar == i) {
+            //$("#geneticVar"+i).show();
+            document.getElementsByClassName("geneticVar" + i)[0].style.display = "block";
         }
+    }
+}
 
-        applyChosen();
-    }).fail(function() {
-        console.log("Error getting markers");
+
+function getVariantSize(selectedMarker) {
+    var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker];
+    return valuesAreVariants;
+}
+
+
+
+
+/* Drug Response region */
+var dosingStudy = 1;
+var dosingStudyCount = 1;
+function loadDrugTextFields(){
+
+    var drugs = drugsList.sort();
+    $('#drugFilter1').autocomplete({
+        source: [drugs]
     });
 
+    for (var i = 2; i <= 20; i++) {
+        $('#drugFilter' + i).autocomplete({
+            source: [drugs]
+        });
+    }
 }
+
+
+function loadDrugResponse(compNumber) {
+
+    var drugResponses = drugResponseList.sort();
+    var newOptions = "";
+    for (var i = 0; i < drugResponses.length; i++) {
+        newOptions += "<option value='" + drugResponses[i] + "' selected>" + drugResponses[i] + "</option>";
+    }
+    var select = $('#responseFilter' + compNumber);
+    select.empty().append(newOptions);
+    $(function () {
+        $('#responseFilter' + compNumber).change(function () {
+            console.log($(this).val());
+        }).multipleSelect({
+            placeholder: " Responses"
+        });
+    });
+}
+
+
+
+function addDrugAndResponse(param, startIndex) {
+    if (startIndex != 2 && dosingStudyCount == 1) {
+        dosingStudy = startIndex;
+    }
+    dosingStudy++;
+    dosingStudyCount++;
+    for (var i = startIndex; i <= 20; i++) {
+        if ((param == 'AND' || param == 'OR') && dosingStudy == i) {
+            document.getElementsByClassName("dosingStudy" + i)[0].style.display = "block";
+            $("#drugFilter"+i).val ("");
+        }
+    }
+}
+
+

@@ -1,6 +1,5 @@
 package org.pdxfinder.services;
 
-import org.pdxfinder.dao.ExternalDataSource;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.dao.Sample;
 import org.pdxfinder.repositories.ExternalDataSourceRepository;

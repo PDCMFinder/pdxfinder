@@ -10,8 +10,8 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
-import org.pdxfinder.utilities.LoaderUtils;
-import org.pdxfinder.utilities.Standardizer;
+import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,7 +62,7 @@ public class LoadPDMRData implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
     private Session session;
 
     @Value("${pdmrpdx.file}")
@@ -91,8 +91,8 @@ public class LoadPDMRData implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadPDMRData(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LoadPDMRData(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     @Override
@@ -124,8 +124,8 @@ public class LoadPDMRData implements CommandLineRunner {
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
 
-        DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
-        nsgBS = loaderUtils.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
+        DS = dataImportService.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+        nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -165,27 +165,27 @@ public class LoadPDMRData implements CommandLineRunner {
         String gender = Standardizer.getGender(j.getString("Gender"));
 
 
-        PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(j.getString("Patient ID"), gender,
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"), gender,
                 j.getString("Race"), j.getString("Ethnicity"), age, DS);
 
-        Sample sample = loaderUtils.getSample(j.getString("Model ID"), tumorType, diagnosis,
+        Sample sample = dataImportService.getSample(j.getString("Model ID"), tumorType, diagnosis,
                 j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, DS.getAbbreviation());
 
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
-        externalUrls.add(loaderUtils.getExternalUrl(ExternalUrl.Type.SOURCE, j.getString("Source Url")));
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, j.getString("Source Url")));
 
         // TODO: Update with actual QA data when available
         String qaPassage = null;
 
-        QualityAssurance qa = new QualityAssurance("", "", ValidationTechniques.NOT_SPECIFIED, qaPassage);
-        loaderUtils.saveQualityAssurance(qa);
+        QualityAssurance qa = new QualityAssurance("", "", qaPassage);
+        dataImportService.saveQualityAssurance(qa);
 
         pSnap.addSample(sample);
-        loaderUtils.savePatientSnapshot(pSnap);
+        dataImportService.savePatientSnapshot(pSnap);
 
-        ModelCreation mc = loaderUtils.createModelCreation(id, this.DS.getAbbreviation(), sample, qa, externalUrls);
+        ModelCreation mc = dataImportService.createModelCreation(id, this.DS.getAbbreviation(), sample, qa, externalUrls);
         mc.addRelatedSample(sample);
         //loadVariationData(mc);
 
@@ -257,19 +257,19 @@ public class LoadPDMRData implements CommandLineRunner {
                 ma.setSeqPosition(seqPosition);
                 ma.setReadDepth(readDepth);
 
-                Marker marker = loaderUtils.getMarker(symbol);
+                Marker marker = dataImportService.getMarker(symbol);
                 marker.setEntrezId(id);
 
                 ma.setMarker(marker);
 
-                Platform platform = loaderUtils.getPlatform(technology, this.DS);
+                Platform platform = dataImportService.getPlatform(technology, this.DS);
                 platform.setUrl(PLATFORM_URL);
 
                 // why would this happen?
                 if (platform.getExternalDataSource() == null) {
                     platform.setExternalDataSource(DS);
                 }
-                loaderUtils.createPlatformAssociation(platform, marker);
+                dataImportService.createPlatformAssociation(platform, marker);
 
 
                 markerMap = sampleMap.get(sample);
@@ -304,7 +304,7 @@ public class LoadPDMRData implements CommandLineRunner {
                 for (String tech : markerMap.keySet()) {
                     MolecularCharacterization mc = new MolecularCharacterization();
                     mc.setType("mutation");
-                    mc.setPlatform(loaderUtils.getPlatform(tech, this.DS));
+                    mc.setPlatform(dataImportService.getPlatform(tech, this.DS));
                     mc.setMarkerAssociations(markerMap.get(tech));
                     mcs.add(mc);
 
@@ -313,7 +313,7 @@ public class LoadPDMRData implements CommandLineRunner {
                 //PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
 
 
-                Specimen specimen = loaderUtils.getSpecimen(modelCreation, sampleKey, this.DS.getName(), passage);
+                Specimen specimen = dataImportService.getSpecimen(modelCreation, sampleKey, this.DS.getName(), passage);
 
                 Sample specSample = new Sample();
                 specSample.setSourceSampleId(sampleKey);
@@ -332,10 +332,10 @@ public class LoadPDMRData implements CommandLineRunner {
                 //pdxPassage.setModelCreation(modelCreation);
 
                 //loaderUtils.savePdxPassage(pdxPassage);
-                loaderUtils.saveSpecimen(specimen);
+                dataImportService.saveSpecimen(specimen);
 
                 modelCreation.addRelatedSample(specSample);
-                loaderUtils.saveModelCreation(modelCreation);
+                dataImportService.saveModelCreation(modelCreation);
 
                 System.out.println("saved passage " + passage + " for model " + modelCreation.getSourcePdxId() + " from sample " + sampleKey);
             }

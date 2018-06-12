@@ -55,8 +55,8 @@ public class PatientRepositoryTest extends BaseTest {
 
         log.info(foundFemalePatient.toString());
 
-        patientRepository.delete(patientRepository.findByExternalId("-9999"));
-        Patient notFoundFemalePatient = patientRepository.findByExternalId("-9999");
+        patientRepository.delete(patientRepository.findByExternalIdAndDS("-9999", externalDataSource));
+        Patient notFoundFemalePatient = patientRepository.findByExternalIdAndDS("-9999", externalDataSource);
         assert (notFoundFemalePatient == null);
 
 

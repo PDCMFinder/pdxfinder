@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @JsonPropertyOrder({
         "modelId",
@@ -26,8 +27,11 @@ import java.util.List;
         "cancerOrgan",
         "cancerCellType",
         "dataAvailable",
-        "mutatedVariants"
+        "mutatedVariants",
+        "drug",
+        "response"
 })
+
 public class ModelForQueryExport {
     @JsonProperty("PDXFinder Id")
     private Long modelId;
@@ -77,6 +81,12 @@ public class ModelForQueryExport {
     @JsonProperty("Mutations")
     private List<String> mutatedVariants;
 
+    @JsonProperty("Drugs")
+    private List<String> drugs;
+
+    @JsonProperty("Responses")
+    private List<String> responses;
+
 
     public ModelForQueryExport(ModelForQuery mfq) {
         this.modelId = mfq.getModelId();
@@ -95,6 +105,12 @@ public class ModelForQueryExport {
         this.treatmentHistory = mfq.getTreatmentHistory();
         this.dataAvailable = mfq.getDataAvailable();
         this.mutatedVariants = mfq.getMutatedVariants();
+
+        try{
+            this.drugs = mfq.getDrugData().stream().map(x->x.getDrugName()).collect(Collectors.toList());
+            this.responses = mfq.getDrugData().stream().map(x->x.getResponse()).collect(Collectors.toList());
+        }catch (Exception e){}
+
     }
 
     public Long getModelId() {
@@ -225,4 +241,22 @@ public class ModelForQueryExport {
     public void setMutatedVariants(List<String> mutatedVariants) {
         this.mutatedVariants = mutatedVariants;
     }
+
+    public List<String> getDrugs() {
+        return drugs;
+    }
+
+    public void setDrugs(List<String> drugs) {
+        this.drugs = drugs;
+    }
+
+    public List<String> getResponses() {
+        return responses;
+    }
+
+    public void setResponses(List<String> responses) {
+        this.responses = responses;
+    }
+
+
 }

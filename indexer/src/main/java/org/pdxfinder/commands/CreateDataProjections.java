@@ -1,11 +1,13 @@
 package org.pdxfinder.commands;
 
+import com.google.gson.Gson;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.*;
+import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.DrugService;
 import org.pdxfinder.services.ds.ModelForQuery;
-import org.pdxfinder.utilities.LoaderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import com.google.gson.Gson;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,7 +27,8 @@ import java.util.stream.Collectors;
 public class CreateDataProjections implements CommandLineRunner{
 
     private final static Logger log = LoggerFactory.getLogger(CreateDataProjections.class);
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
+    private DrugService drugService;
 
     @Value("${user.home}")
     String homeDir;
@@ -41,10 +44,15 @@ public class CreateDataProjections implements CommandLineRunner{
     //"platform"=>"marker"=>"set of model ids"
     private Map<String, Map<String, Set<Long>>> wtMarkersDataProjection = new HashMap<>();
 
+    //"drugname"=>"response"=>"set of model ids"
+    private Map<String, Map<String, Set<Long>>> drugResponseDP = new HashMap<>();
+
 
     @Autowired
-    public CreateDataProjections(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public CreateDataProjections(DataImportService dataImportService, DrugService drugService) {
+
+        this.dataImportService = dataImportService;
+        this.drugService = drugService;
     }
 
     @Override
@@ -67,6 +75,10 @@ public class CreateDataProjections implements CommandLineRunner{
 
             createModelForQueryDataProjection();
 
+            createDrugResponseDataProjection();
+
+            saveDataProjections();
+
         }
 
         long endTime = System.currentTimeMillis();
@@ -84,16 +96,15 @@ public class CreateDataProjections implements CommandLineRunner{
 
     private void createMutationDataProjection(){
 
-        Collection<MolecularCharacterization> mutatedMolchars = loaderUtils.getMolCharsByType("mutation");
+        Collection<MolecularCharacterization> mutatedMolchars = dataImportService.findMolCharsByType("mutation");
 
         log.info("Looking at "+mutatedMolchars.size()+" MolChar objects. This may take a while folks...");
 
         int count = 0;
+
         for(MolecularCharacterization mc:mutatedMolchars){
 
-
-
-            ModelCreation model = loaderUtils.getModelByMolChar(mc);
+            ModelCreation model = dataImportService.findModelByMolChar(mc);
 
             Long modelId = model.getId();
 
@@ -104,13 +115,11 @@ public class CreateDataProjections implements CommandLineRunner{
                 platformName = mc.getPlatform().getName();
             }
 
-            Set<MarkerAssociation> mas = loaderUtils.getMarkerAssocsByMolChar(mc);
+            Set<MarkerAssociation> mas = dataImportService.findMarkerAssocsByMolChar(mc);
 
             if(mas != null){
 
-
                 for(MarkerAssociation ma: mas){
-
 
                     Marker m = ma.getMarker();
 
@@ -136,55 +145,6 @@ public class CreateDataProjections implements CommandLineRunner{
             }
 
         }
-
-
-
-        log.info("Saving DataProjection");
-
-        DataProjection pmvmDP = loaderUtils.getDataProjectionByLabel("PlatformMarkerVariantModel");
-
-        if (pmvmDP == null){
-
-            pmvmDP = new DataProjection();
-            pmvmDP.setLabel("PlatformMarkerVariantModel");
-        }
-
-        DataProjection mvDP = loaderUtils.getDataProjectionByLabel("MarkerVariant");
-
-        if(mvDP == null){
-
-            mvDP = new DataProjection();
-            mvDP.setLabel("MarkerVariant");
-        }
-
-        JSONObject j1 ,j2;
-
-        try{
-
-            j1 = new JSONObject(this.mutatedPlatformMarkerVariantModelDP.toString());
-            j2 = new JSONObject(this.mutatedMarkerVariantDP.toString());
-
-            pmvmDP.setValue(j1.toString());
-            mvDP.setValue(j2.toString());
-
-        }
-        catch(Exception e){
-
-            e.printStackTrace();
-        }
-
-
-        loaderUtils.saveDataProjection(pmvmDP);
-        loaderUtils.saveDataProjection(mvDP);
-
-        /*
-        try {
-            Files.write(Paths.get(homeDir + "/PDX/mutated.json"), createJsonString().getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
-
     }
 
     /**
@@ -273,7 +233,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
         // Get out all platforms for all models and populate a map with the results
         Map<Long, List<String>> platformsByModel = new HashMap<>();
-        Collection<ModelCreation> allModelsPlatforms = loaderUtils.getAllModelsPlatforms();
+        Collection<ModelCreation> allModelsPlatforms = dataImportService.findAllModelsPlatforms();
         for (ModelCreation mc : allModelsPlatforms) {
 
             if (!platformsByModel.containsKey(mc.getId())) {
@@ -289,7 +249,7 @@ public class CreateDataProjections implements CommandLineRunner{
                                 .map(Sample::getMolecularCharacterizations)
                                 .flatMap(Collection::stream)
                                 .map(x ->  {
-                                    if (loaderUtils.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), x.getPlatform().getName()) != 0) {
+                                    if (dataImportService.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), x.getPlatform().getName()) != 0) {
                                         return x.getPlatform().getName();
                                     } else {
                                         return " ";
@@ -321,7 +281,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
         log.info("Creating ModelForQuery DataProjection");
 
-        for (ModelCreation mc : loaderUtils.getModelsWithPatientData()) {
+        for (ModelCreation mc : dataImportService.findModelsWithPatientData()) {
 
             ModelForQuery mfq = new ModelForQuery();
             mfq.setModelId(mc.getId());
@@ -338,7 +298,7 @@ public class CreateDataProjections implements CommandLineRunner{
                 }
             }
 
-            if(loaderUtils.isTreatmentSummaryAvailable(mc.getDataSource(), mc.getSourcePdxId())){
+            if(dataImportService.isTreatmentSummaryAvailable(mc.getDataSource(), mc.getSourcePdxId())){
                 dataAvailable.add("Dosing Studies");
             }
 
@@ -394,8 +354,8 @@ public class CreateDataProjections implements CommandLineRunner{
                 for (Specimen s: specimens){
                     hoststrains.add(s.getHostStrain().getName());
 
-                    mfq.setModelImplantationSite(s.getImplantationSite().getName());
-                    mfq.setModelImplantationType(s.getImplantationType().getName());
+                    mfq.setModelImplantationSite(s.getEngraftmentSite().getName());
+                    mfq.setModelImplantationType(s.getEngraftmentType().getName());
                 }
                 //Specimen s = specimens.iterator().next();
                 mfq.setModelHostStrain(hoststrains);
@@ -450,7 +410,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
         log.info("Saving ModelForQuery DataProjection");
 
-        DataProjection mfqDP = loaderUtils.getDataProjectionByLabel("ModelForQuery");
+        DataProjection mfqDP = dataImportService.findDataProjectionByLabel("ModelForQuery");
 
         if (mfqDP == null){
 
@@ -462,7 +422,7 @@ public class CreateDataProjections implements CommandLineRunner{
         Gson gson = new Gson();
         String jsonMfqDP = gson.toJson(this.modelForQueryDP);
         mfqDP.setValue(jsonMfqDP);
-        loaderUtils.saveDataProjection(mfqDP);
+        dataImportService.saveDataProjection(mfqDP);
 
 
     }
@@ -495,6 +455,129 @@ public class CreateDataProjections implements CommandLineRunner{
         // Return the full set
         return retSet;
     }
+
+
+    private void createDrugResponseDataProjection(){
+
+        log.info("Creating Drug Response DP");
+
+        List<TreatmentSummary> treatmentSummaries = drugService.getSummariesWithDrugAndResponse();
+
+        for(TreatmentSummary ts : treatmentSummaries){
+
+            ModelCreation model = dataImportService.findModelByTreatmentSummary(ts);
+
+            Long modelId = model.getId();
+
+            for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
+
+
+                String drugName = tp.getDrugString();
+                String response = tp.getResponse().getDescription();
+
+                addToDrugResponseDP(modelId, drugName, response);
+            }
+        }
+        System.out.println();
+
+    }
+
+    private void addToDrugResponseDP(Long modelId, String drugName, String responseVal){
+
+        if(modelId != null && drugName != null && !drugName.isEmpty() && responseVal != null && !responseVal.isEmpty()){
+
+            //TODO: Remove regex after drug harmonization is done
+            String drug = drugName.replaceAll("[^a-zA-Z0-9 _-]","");
+            String response = responseVal.replaceAll("[^a-zA-Z0-9 _-]","");
+
+            if(drugResponseDP.containsKey(drug)){
+
+                if(drugResponseDP.get(drug).containsKey(response)){
+
+                    drugResponseDP.get(drug).get(response).add(modelId);
+                }
+                //new response
+                else{
+                    Set s = new HashSet();
+                    s.add(modelId);
+
+                    drugResponseDP.get(drug).put(response,s);
+                }
+            }
+            //new drug, create response and add model
+            else{
+
+                Set s = new HashSet();
+                s.add(modelId);
+
+                Map respMap = new HashMap();
+                respMap.put(response, s);
+
+                drugResponseDP.put(drug, respMap);
+            }
+
+        }
+
+
+    }
+
+
+
+    private void saveDataProjections(){
+
+        log.info("Saving DataProjections");
+
+        DataProjection pmvmDP = dataImportService.findDataProjectionByLabel("PlatformMarkerVariantModel");
+
+        if (pmvmDP == null){
+
+            pmvmDP = new DataProjection();
+            pmvmDP.setLabel("PlatformMarkerVariantModel");
+        }
+
+        DataProjection mvDP = dataImportService.findDataProjectionByLabel("MarkerVariant");
+
+        if(mvDP == null){
+
+            mvDP = new DataProjection();
+            mvDP.setLabel("MarkerVariant");
+        }
+
+        DataProjection drugDP = dataImportService.findDataProjectionByLabel("DrugResponse");
+
+        if(drugDP == null){
+
+            drugDP = new DataProjection();
+            drugDP.setLabel("DrugResponse");
+        }
+
+
+
+        JSONObject j1 ,j2, j3;
+
+        try{
+
+            j1 = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
+            j2 = new JSONObject(mutatedMarkerVariantDP.toString());
+            j3 = new JSONObject(drugResponseDP.toString());
+
+            pmvmDP.setValue(j1.toString());
+            mvDP.setValue(j2.toString());
+            drugDP.setValue(j3.toString());
+
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
+
+
+        dataImportService.saveDataProjection(pmvmDP);
+        dataImportService.saveDataProjection(mvDP);
+        dataImportService.saveDataProjection(drugDP);
+
+    }
+
 
 
     private String createJsonString(Object jstring){

@@ -37,10 +37,10 @@ public class AllLookupNodeRepositoriesTest extends BaseTest {
     private HostStrainRepository hostStrainRepository;
 
     @Autowired
-    private ImplantationSiteRepository implantationSiteRepository;
+    private EngraftmentSiteRepository engraftmentSiteRepository;
 
     @Autowired
-    private ImplantationTypeRepository implantationTypeRepository;
+    private EngraftmentTypeRepository engraftmentTypeRepository;
 
 
     @Before
@@ -109,29 +109,29 @@ public class AllLookupNodeRepositoriesTest extends BaseTest {
     @Test
     public void createImplantationSite() {
 
-        ImplantationSite site = implantationSiteRepository.findByName(IMPLANTATION_SITE);
+        EngraftmentSite site = engraftmentSiteRepository.findByName(IMPLANTATION_SITE);
         if (site == null) {
             log.debug("Implantation site {} not found. Creating", IMPLANTATION_SITE);
-            site = new ImplantationSite(IMPLANTATION_SITE);
-            implantationSiteRepository.save(site);
+            site = new EngraftmentSite(IMPLANTATION_SITE);
+            engraftmentSiteRepository.save(site);
         }
 
-        Assert.assertNotNull(implantationSiteRepository.findByName(IMPLANTATION_SITE));
-        log.info("  Found Implantation Site {}", implantationSiteRepository.findByName(IMPLANTATION_SITE).getName());
+        Assert.assertNotNull(engraftmentSiteRepository.findByName(IMPLANTATION_SITE));
+        log.info("  Found Implantation Site {}", engraftmentSiteRepository.findByName(IMPLANTATION_SITE).getName());
     }
 
     @Test
     public void createImplantationType() {
 
-        ImplantationType type = implantationTypeRepository.findByName(IMPLANTATION_TYPE);
+        EngraftmentType type = engraftmentTypeRepository.findByName(IMPLANTATION_TYPE);
         if (type == null) {
             log.debug("Implantation type {} not found. Creating", IMPLANTATION_TYPE);
-            type = new ImplantationType(IMPLANTATION_TYPE);
-            implantationTypeRepository.save(type);
+            type = new EngraftmentType(IMPLANTATION_TYPE);
+            engraftmentTypeRepository.save(type);
         }
 
-        Assert.assertNotNull(implantationTypeRepository.findByName(IMPLANTATION_TYPE));
-        log.info("  Found Implantation Type {}", implantationTypeRepository.findByName(IMPLANTATION_TYPE).getName());
+        Assert.assertNotNull(engraftmentTypeRepository.findByName(IMPLANTATION_TYPE));
+        log.info("  Found Implantation Type {}", engraftmentTypeRepository.findByName(IMPLANTATION_TYPE).getName());
 
     }
 

@@ -230,8 +230,16 @@ h5{
     text-align: justify;
 }
 
+.shiftUp1 {
+    margin-top: -1px;
+}
+
 .shiftUp5 {
     margin-top: -5px;
+}
+
+.shiftUp10 {
+    margin-top: -10px;
 }
 
 .shiftUp20 {
@@ -254,8 +262,20 @@ h5{
     margin-top: -100px;
 }
 
+.topSpace3 {
+    margin-top: 3px;
+}
+
+.topSpace4 {
+    margin-top: 4px;
+}
+
 .topSpace5 {
     margin-top: 5px;
+}
+
+.topSace10 {
+    margin-top: 10px;
 }
 
 .topSpace50 {
@@ -283,6 +303,18 @@ h5{
 
 .fullWidth {
     width: 100%;
+}
+
+.height70px {
+    height: 70px;
+}
+
+.width40 {
+    width: 40%;
+}
+
+.width50 {
+    width: 47%;
 }
 
 .lilPadding {
@@ -819,7 +851,7 @@ table.dataTable {
     border: 2px ridge #000;
     color: #000;
 }
-
+    
 
 .btn1 {
     border-radius: 2px;
@@ -861,12 +893,86 @@ table.floatThead-table {
     background-color: #fff;
 }
 
-/*table.dataTable thead .sorting
-{
-    background-image:url("../images/sort_both.png");
-    background-repeat: no-repeat;
+
+
+
+.tooltip {
+    max-width: none;
 }
-table.dataTable thead .sorting_asc{background-image:url("../images/sort_asc.png"); background-repeat: no-repeat;}
-table.dataTable thead .sorting_desc{background-image:url("../images/sort_desc.png"); background-repeat: no-repeat;}*/
+table.pdx-table thead th {
+    font-size: 1.0rem;
+}
+table.pdx-table td {
+    font-size: 1.0rem;
+}
+h4 {
+    font-size: 1.0rem;
+}
+ul.pdx-accordion-1 a.accordion-title {
+    font-size: 1.0rem;
+}
+ul.pdx-accordion-2 a.accordion-title {
+    font-size: 0.95rem;
+}
+span.selected {
+    color: #06369d;
+    font-weight: bold;
+}
+
+
+
+/**
+ *  Text Formatting
+ */
+
+.line-height8{
+    line-height:.9
+}
+
+.size12{
+    font-size: 12px;
+}
+
+.hidden {
+    display: none;
+}
+
+.light-grey-bg-box{
+    background-color: #f1f2f2; padding: 10px; position: relative;
+}
+
+.columns .nospace {
+    padding: 1px;
+}
+
+.adjusti {
+    text-align: center;
+    font-weight: bold;
+}
+
+.white-text-right-float{
+    color: #fff; float:right;
+}
+
+
+hr .line_v2 {
+    box-sizing: content-box;
+    overflow: visible;
+    clear: both;
+    max-width: 75rem;
+    height: 0;
+    margin: 1.25rem auto;
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 2px solid #06369d;
+    border-left: 0
+}
+
+.drug_spacing
+{
+    margin-bottom: 15px;text-transform: uppercase;
+}
+
+
 
 

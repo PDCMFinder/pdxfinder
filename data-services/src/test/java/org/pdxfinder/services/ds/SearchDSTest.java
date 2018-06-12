@@ -20,11 +20,14 @@ public class SearchDSTest extends BaseTest {
 
     private final static Logger log = LoggerFactory.getLogger(SearchDSTest.class);
 
+    @Autowired
     SearchDS searchDS;
-    private Set<ModelForQuery> models = new HashSet<>();
 
     @Autowired
     DataProjectionRepository dataProjectionRepository;
+
+
+    private Set<ModelForQuery> models = new HashSet<>();
 
     @Before
     public void setUp() {
@@ -64,13 +67,16 @@ public class SearchDSTest extends BaseTest {
         mutDP.setLabel("PlatformMarkerVariantModel");
         mutDP.setValue("{\"TargetedNGS_MUT\":{\"RB1\":{\"N123D\":[10411],\"Q383E\":[10940],\"E323Q\":[16519],\"G38S\":[12539]}}}");
 
+
+        DataProjection drugDP = new DataProjection();
+        drugDP.setLabel("DrugResponse");
+        drugDP.setValue("{}");
+
         dataProjectionRepository.save(dp);
         dataProjectionRepository.save(mutDP);
+        dataProjectionRepository.save(drugDP);
 
         assertThat(models.size(), is(4));
-
-        this.searchDS = new SearchDS(dataProjectionRepository);
-        searchDS.initialize();
 
     }
 
@@ -122,7 +128,7 @@ public class SearchDSTest extends BaseTest {
 
     @Test
     public void testGetDiagnosisCounts() {
-
+        searchDS.initialize();
         Map<String, Integer> diagnosisCounts = searchDS.getDiagnosisCounts();
         System.out.println(diagnosisCounts);
         assertThat(diagnosisCounts.get("Adenocarcinoma"), is(2));

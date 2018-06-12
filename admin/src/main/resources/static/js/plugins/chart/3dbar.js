@@ -3,7 +3,7 @@ var chart = AmCharts.makeChart("chartdiv", {
     "type": "serial",
 	"startDuration": 2,
     "dataProvider": [{
-        "country": "Colon",
+        "country": "Breast Cancer",
         "visits": 4025,
         "color": "#FF0F00"
     }, {
@@ -81,7 +81,8 @@ var chart = AmCharts.makeChart("chartdiv", {
         "fillAlphas": 1,
         "lineAlpha": 0.1,
         "type": "column",
-        "valueField": "visits"
+        "valueField": "visits",
+        "showHandOnHover": true
     }],
     "depth3D": 20,
 	"angle": 30,
@@ -95,6 +96,13 @@ var chart = AmCharts.makeChart("chartdiv", {
         "gridPosition": "start",
         "labelRotation": 0
     },
+    "listeners": [{
+        "event": "clickGraphItem",
+        "method": function(event) {
+            var drillDownLink = 'http://www.pdxfinder.org/data/search?cancer_system='+event.item.category;
+            window.open(drillDownLink,'_blank');
+        }
+    }],
     "export": {
     	"enabled": true
      }

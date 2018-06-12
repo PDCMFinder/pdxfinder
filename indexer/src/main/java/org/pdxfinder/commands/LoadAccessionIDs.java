@@ -5,7 +5,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.pdxfinder.accessionidtatamodel.AccessionData;
 import org.pdxfinder.dao.Marker;
-import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +37,11 @@ public class LoadAccessionIDs implements CommandLineRunner {
 
 
     private final static Logger log = LoggerFactory.getLogger(LoadAccessionIDs.class);
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
 
     @Autowired
-    public LoadAccessionIDs(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public LoadAccessionIDs(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
 
@@ -161,23 +161,6 @@ public class LoadAccessionIDs implements CommandLineRunner {
 
                         System.out.println(symbol+" "+hgncId+" "+entrezId+" "+ ensemblId);
                         hmap.put(symbol,ad);
-                        /*
-                        if(rowData.length>2 && !rowData[2].isEmpty()){
-                            prevSymbols = rowData[2].split(",");
-
-                                for(int i=0;i<prevSymbols.length;i++){
-                                    if(hmap.containsKey(prevSymbols[i].trim())){
-                                        symbolConflicts++;
-                                        symbolConf = prevSymbols[i];
-                                        //break;
-                                    }
-                                    else{
-                                        hmap.put(prevSymbols[i].trim(),ad);
-                                    }
-                                }
-                        }
-                        */
-
 
                     }
                     rows++;
@@ -203,7 +186,7 @@ private void updateMarkers(HashMap hmap){
     List<String> entrezIdMismatch = new ArrayList<>();
 
     System.out.println("Loading all markers from Neo4j...");
-    Collection<Marker> markers = loaderUtils.getAllHumanMarkers();
+    Collection<Marker> markers = dataImportService.getAllHumanMarkers();
     System.out.println(markers.size()+" markers were loaded from Neo4j.");
     for(Marker m:markers){
 
@@ -227,7 +210,7 @@ private void updateMarkers(HashMap hmap){
                 }
                 updatedMarkers++;
                 System.out.println("Updating marker:"+m.getSymbol());
-                loaderUtils.saveMarker(m);
+                dataImportService.saveMarker(m);
             }
             else{
                 entrezIdMismatch.add(m.getSymbol());

@@ -9,5 +9,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface TissueRepository extends Neo4jRepository<Tissue, Long> {
+
     Tissue findByName(String name);
 }

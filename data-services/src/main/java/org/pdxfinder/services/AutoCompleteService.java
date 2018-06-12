@@ -2,7 +2,7 @@ package org.pdxfinder.services;
 
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.repositories.OntologyTermRepository;
-import org.pdxfinder.services.ds.AutoSuggestOption;
+import org.pdxfinder.services.ds.AutoCompleteOption;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -22,7 +22,7 @@ public class AutoCompleteService {
     }
 
 
-    public List<AutoSuggestOption> getAutoSuggestions(){
+    public List<AutoCompleteOption> getAutoSuggestions(){
 
         String[] doNotDisplay = {"Neoplasm by Morphology",
                 "Neoplasm by Site",
@@ -135,14 +135,14 @@ public class AutoCompleteService {
 
         Collection<OntologyTerm> ontologyTerms = ontologyTermRepository.findAllWithMappings();
 
-        List<AutoSuggestOption> autoSuggestList = new ArrayList<>();
+        List<AutoCompleteOption> autoSuggestList = new ArrayList<>();
 
         for (OntologyTerm ontologyTerm : ontologyTerms) {
             if (ontologyTerm.getLabel() != null) {
 
                 if(!termsToRemove.contains(ontologyTerm.getLabel()) || ontologyTerm.getDirectMappedSamplesNumber() > 0){
 
-                    autoSuggestList.add(new AutoSuggestOption(ontologyTerm.getLabel(), "OntologyTerm"));
+                    autoSuggestList.add(new AutoCompleteOption(ontologyTerm.getLabel(), "OntologyTerm"));
                 }
 
             }

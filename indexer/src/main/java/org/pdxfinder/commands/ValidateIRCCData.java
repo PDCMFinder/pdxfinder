@@ -11,7 +11,7 @@ import org.pdxfinder.dao.*;
 import org.pdxfinder.irccdatamodel.IRCCMarkerMutation;
 import org.pdxfinder.irccdatamodel.IRCCPatient;
 import org.pdxfinder.irccdatamodel.IRCCSample;
-import org.pdxfinder.utilities.LoaderUtils;
+import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,7 +56,7 @@ public class ValidateIRCCData implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private LoaderUtils loaderUtils;
+    private DataImportService dataImportService;
     private Session session;
 
 
@@ -94,8 +94,8 @@ public class ValidateIRCCData implements CommandLineRunner {
         }
     }
 
-    public ValidateIRCCData(LoaderUtils loaderUtils) {
-        this.loaderUtils = loaderUtils;
+    public ValidateIRCCData(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
     }
 
     private void loadDataFromFiles() {
@@ -311,7 +311,7 @@ public class ValidateIRCCData implements CommandLineRunner {
     private void loadDataToNeo4j(){
 
         //Loading data to Neo4j
-        DS = loaderUtils.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, null);
+        DS = dataImportService.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, null);
         //nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         int counter = 0;
@@ -326,27 +326,27 @@ public class ValidateIRCCData implements CommandLineRunner {
 
 
 
-                PatientSnapshot pSnap = loaderUtils.getPatientSnapshot(key, patientsMap.get(key).getSex(),
+                PatientSnapshot pSnap = dataImportService.getPatientSnapshot(key, patientsMap.get(key).getSex(),
                         "", "", samples.get(i).getAgeAtCollection(), DS);
 
 
 
-                Sample sample = loaderUtils.getSample(samples.get(i).getSampleId(), samples.get(i).getTumorType(),
+                Sample sample = dataImportService.getSample(samples.get(i).getSampleId(), samples.get(i).getTumorType(),
                         samples.get(i).getDiagnosis(), patientsMap.get(key).getPrimarySite(),
                         samples.get(i).getSampleSite(), "", "", NORMAL_TISSUE, DS.getAbbreviation());
 
 
                 pSnap.addSample(sample);
-                loaderUtils.savePatientSnapshot(pSnap);
+                dataImportService.savePatientSnapshot(pSnap);
 
-                QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", ValidationTechniques.FINGERPRINT, null);
-                loaderUtils.saveQualityAssurance(qa);
+                QualityAssurance qa = new QualityAssurance("Fingerprint", "Fingerprint", null);
+                dataImportService.saveQualityAssurance(qa);
 
 
                 List<ExternalUrl> externalUrls = new ArrayList<>();
-                externalUrls.add( loaderUtils.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
+                externalUrls.add( dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
 
-                ModelCreation mc = loaderUtils.createModelCreation(samples.get(i).getModelId(),DS.getAbbreviation(), sample, qa,externalUrls);
+                ModelCreation mc = dataImportService.createModelCreation(samples.get(i).getModelId(),DS.getAbbreviation(), sample, qa,externalUrls);
 
                 loadVariationData(mc, samples.get(i));
 
@@ -361,201 +361,6 @@ public class ValidateIRCCData implements CommandLineRunner {
 
     private void loadVariationData(ModelCreation modelCreation, IRCCSample sampleRow){
 
-        /*
-
-    String kras = sampleRow.getKrasStatus();
-    String braf = sampleRow.getBrafStatus();
-    String nras = sampleRow.getNrasStatus();
-    String pik3ca = sampleRow.getPik3caStatus();
-    String passageNum = "";
-    MolecularCharacterization molchar = new MolecularCharacterization();
-
-    //if all four markers are WT, assume its passage 0
-    //TODO: check this
-    if(kras.equals("WT") && braf.equals("WT") && nras.equals("WT") && pik3ca.equals("WT")){
-
-        MarkerAssociation krasMa = new MarkerAssociation();
-        krasMa.setDescription("Wild Type");
-        krasMa.setMarker(loaderUtils.getMarker("KRAS"));
-
-        MarkerAssociation brafMa = new MarkerAssociation();
-        brafMa.setDescription("Wild Type");
-        brafMa.setMarker(loaderUtils.getMarker("BRAF"));
-
-        MarkerAssociation nrasMa = new MarkerAssociation();
-        nrasMa.setDescription("Wild Type");
-        nrasMa.setMarker(loaderUtils.getMarker("NRAS"));
-
-        MarkerAssociation pik3caMa = new MarkerAssociation();
-        pik3caMa.setDescription("Wild Type");
-        pik3caMa.setMarker(loaderUtils.getMarker("PIK3CA"));
-
-        HashSet<MarkerAssociation> mas = new HashSet<>();
-        mas.add(krasMa);
-        mas.add(brafMa);
-        mas.add(nrasMa);
-        mas.add(pik3caMa);
-
-        molchar.setMarkerAssociations(mas);
-
-        PdxPassage pdxPassage = new PdxPassage(modelCreation, 0);
-
-        Specimen specimen = loaderUtils.getSpecimen(sampleRow.getSampleId());
-
-        HashSet<MolecularCharacterization> mcs = new HashSet<>();
-        mcs.add(molchar);
-        specimen.setMolecularCharacterizations(mcs);
-        specimen.setPdxPassage(pdxPassage);
-
-
-        pdxPassage.setModelCreation(modelCreation);
-
-        loaderUtils.savePdxPassage(pdxPassage);
-        loaderUtils.saveSpecimen(specimen);
-
-    }else{
-
-        int passage = -1;
-        String modelId;
-
-        List<IRCCMarkerMutation> mlist;
-
-
-        //HashSet<MolecularCharacterization> mcs = new HashSet<>();
-
-
-        if(kras.toLowerCase().contains("mut")){
-
-            modelId = sampleRow.getModelId()+"_KRAS";
-            mlist = this.markersMutationMap.get(modelId);
-
-
-            for(IRCCMarkerMutation mmut:mlist){
-                MarkerAssociation krasMa = new MarkerAssociation();
-                krasMa.setMarker(loaderUtils.getMarker("KRAS"));
-                krasMa.setChromosome(mmut.getChromosome());
-                krasMa.setConsequence(mmut.getVariantClassification());
-                krasMa.setAminoAcidChange(mmut.getHgvspShort());
-                krasMa.setRefAssembly(mmut.getNcbiBuild());
-                krasMa.setSeqStartPosition(mmut.getStartPosition());
-                krasMa.setSeqEndPosition(mmut.getEndPosition());
-                krasMa.setStrand(mmut.getStrand());
-                passage = Integer.parseInt(mmut.getXenoPassage());
-                molchar.getMarkerAssociations().add(krasMa);
-
-            }
-
-
-
-        }
-        else{
-            krasMa.setDescription("Wild Type");
-            krasMa.setMarker(loaderUtils.getMarker("KRAS"));
-        }
-
-
-
-        if(braf.toLowerCase().contains("mut")){
-
-            modelId = sampleRow.getModelId()+"_BRAF";
-            IRCCMarkerMutation mmut = this.markersMutationMap.get(modelId);
-            brafMa.setMarker(loaderUtils.getMarker("BRAF"));
-            brafMa.setChromosome(mmut.getChromosome());
-            brafMa.setConsequence(mmut.getVariantClassification());
-            brafMa.setAminoAcidChange(mmut.getHgvspShort());
-            brafMa.setRefAssembly(mmut.getNcbiBuild());
-            brafMa.setSeqStartPosition(mmut.getStartPosition());
-            brafMa.setSeqEndPosition(mmut.getEndPosition());
-            brafMa.setStrand(mmut.getStrand());
-            passage = Integer.parseInt(mmut.getXenoPassage());
-
-        }
-        else{
-            brafMa.setDescription("Wild Type");
-            brafMa.setMarker(loaderUtils.getMarker("BRAF"));
-        }
-
-
-        if(nras.toLowerCase().contains("mut")){
-
-            modelId = sampleRow.getModelId()+"_NRAS";
-            IRCCMarkerMutation mmut = this.markersMutationMap.get(modelId);
-            nrasMa.setMarker(loaderUtils.getMarker("NRAS"));
-            nrasMa.setChromosome(mmut.getChromosome());
-            nrasMa.setConsequence(mmut.getVariantClassification());
-            nrasMa.setAminoAcidChange(mmut.getHgvspShort());
-            nrasMa.setRefAssembly(mmut.getNcbiBuild());
-            nrasMa.setSeqStartPosition(mmut.getStartPosition());
-            nrasMa.setSeqEndPosition(mmut.getEndPosition());
-            nrasMa.setStrand(mmut.getStrand());
-            passage = Integer.parseInt(mmut.getXenoPassage());
-
-        }
-        else{
-            nrasMa.setDescription("Wild Type");
-            nrasMa.setMarker(loaderUtils.getMarker("NRAS"));
-        }
-
-
-
-        if(pik3ca.toLowerCase().contains("mut")){
-
-            modelId = sampleRow.getModelId()+"_PIK3CA";
-            IRCCMarkerMutation mmut = this.markersMutationMap.get(modelId);
-            pik3caMa.setMarker(loaderUtils.getMarker("PIK3CA"));
-            pik3caMa.setChromosome(mmut.getChromosome());
-            pik3caMa.setConsequence(mmut.getVariantClassification());
-            pik3caMa.setAminoAcidChange(mmut.getHgvspShort());
-            pik3caMa.setRefAssembly(mmut.getNcbiBuild());
-            pik3caMa.setSeqStartPosition(mmut.getStartPosition());
-            pik3caMa.setSeqEndPosition(mmut.getEndPosition());
-            pik3caMa.setStrand(mmut.getStrand());
-            passage = Integer.parseInt(mmut.getXenoPassage());
-
-        }
-        else{
-            pik3caMa.setDescription("Wild Type");
-            pik3caMa.setMarker(loaderUtils.getMarker("PIK3CA"));
-        }
-
-        //check if passage number has been changed
-        if(passage<0) {
-            System.out.println("Assuming 0 passage for "+modelCreation.getSourcePdxId());
-            passage = 0;
-        }
-        PdxPassage pdxPassage = new PdxPassage(modelCreation, passage);
-        Specimen specimen = loaderUtils.getSpecimen(sampleRow.getSampleId());
-
-
-
-        molchar.setPlatform(loaderUtils.getPlatform("Sanger sequencing", DS));
-        Set<MarkerAssociation> mas = new HashSet<>();
-        mas.add(krasMa);
-        mas.add(nrasMa);
-        mas.add(brafMa);
-        mas.add(pik3caMa);
-
-        molchar.setMarkerAssociations(mas);
-
-        mcs.add(molchar);
-        specimen.setMolecularCharacterizations(mcs);
-        specimen.setPdxPassage(pdxPassage);
-
-        pdxPassage.setModelCreation(modelCreation);
-
-        loaderUtils.savePdxPassage(pdxPassage);
-        loaderUtils.saveSpecimen(specimen);
-
     }
-
-    */
-
-
-
-
-    }
-
-
-
 
 }

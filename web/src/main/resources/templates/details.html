@@ -2,10 +2,10 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <title th:text="${dataSrc}+' PDX model '+${modelId}+ ' details - PDX Finder'"></title>
-    <meta name="description" th:content="'Model details for PDX '+${modelId}+', produced by '+${dataSrc}"/>
+    <title th:text="${data.dataSource}+' PDX model '+${data.modelId}+ ' details - PDX Finder'"></title>
+    <meta name="description" th:content="'Model details for PDX '+${data.modelId}+', produced by '+${data.dataSource}"/>
     <meta name="keywords"
-          th:content="'Patient Derived Xenograft, PDX, PDX Finder, Cancer, Oncology, Life Sciences, '+${dataSrc}"/>
+          th:content="'Patient Derived Xenograft, PDX, PDX Finder, Cancer, Oncology, Life Sciences, '+${data.dataSource}"/>
     <meta name="author" content="PDX Finder"/>
     <meta name="HandheldFriendly" content="true"/>
     <meta name="MobileOptimized" content="width"/>
@@ -40,35 +40,6 @@
 
     <!-- end CSS-->
 
-    <style>
-        .tooltip {
-            max-width: none;
-        }
-
-        table.datatable-pdx thead th {
-            font-size: 1.0rem;
-        }
-
-        table.datatable-pdx td {
-            font-size: 0.9rem;
-        }
-
-        ul.pdx-accordion-1 a.accordion-title {
-            font-size: 1.0rem;
-        }
-
-        ul.pdx-accordion-2 a.accordion-title {
-            font-size: 0.95rem;
-        }
-
-        span.selected {
-            color: #06369d;
-            font-weight: bold;
-        }
-
-
-    </style>
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script th:src="@{/js/jquery.dataTables.js}"></script>
     <script th:src="@{/js/scroller.js}"></script>
@@ -100,26 +71,11 @@
                             Details
                         </li>
                         <li>
-                            <span class="show-for-sr">Current: </span> <span th:text="${modelId}">Model ID</span>
+                            <span class="show-for-sr">Current: </span> <span th:text="${data.modelId}">Model ID</span>
                         </li>
                     </ul>
                 </nav>
             </div>
-
-            <style>
-                hr {
-                    box-sizing: content-box;
-                    overflow: visible;
-                    clear: both;
-                    max-width: 75rem;
-                    height: 0;
-                    margin: 1.25rem auto;
-                    border-top: 0;
-                    border-right: 0;
-                    border-bottom: 2px solid #06369d;
-                    border-left: 0
-                }
-            </style>
 
             <!-- Three Grids Section-->
             <section>
@@ -127,38 +83,45 @@
 
                     <div class="columns medium-4 small-12 margin-top-30">
                         <h4 class="pdxBig"><span class="float-left border-color-black"
-                                                 th:text="${modelId+': '+mappedOntology}"></span></h4>
+                                                 th:text="${data.modelId+': '+data.mappedOntology}"></span></h4>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-30">
-                        <h4 class="pdxBig black"><span class="float-left" th:text="${sourceDescription}"> The Jackson Laboratory </span>
+                        <h4 class="pdxBig black"><span class="float-left" th:text="${data.sourceDescription}"> The Jackson Laboratory </span>
                         </h4>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-10">
 
-                        <a th:href="@{'mailto:'+${contacts+'?subject='+modelId}}"
-                           th:if="${#strings.contains(contacts,'@')}">
-                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
-                        </a>
-                        <a th:href="@{${contacts+modelId}}" th:target="_blank"
-                           th:if="${#strings.contains(contacts,'http') && #strings.endsWith(contacts,'=')}">
-                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
-                        </a>
-                        <a th:href="@{${contacts}}" th:target="_blank"
-                           th:if="${#strings.contains(contacts,'http') && not #strings.endsWith(contacts,'=')}">
+                        <a th:href="@{'mailto:'+${data.contacts+'?subject='+data.modelId}}"
+                           th:if="${#strings.contains(data.contacts,'@')}">
                             <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
                         </a>
 
-                        <a th:href="@{${url}}" th:target="_blank" th:if="${#strings.contains(url,'http')}">
-                            <h4 class="button outline uppercase margin-top-large minwidth300" style='margin-top:-10px;'
-                                th:text="${urlText}">View at Provider</h4>
+                        <a th:href="@{'mailto:'+${data.externalUrl+'?subject='+data.modelId}}"
+                           th:if="${#strings.contains(data.externalUrl,'@')}">
+                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
+                        </a>
+
+                        <a th:href="@{${data.contacts}}" th:target="_blank"
+                           th:if="${#strings.contains(data.contacts,'http') }">
+                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
+                        </a>
+
+                        <!--<a th:href="@{${data.contacts}}" th:target="_blank"     && #strings.endsWith(data.contacts,'=')
+                           th:if="${#strings.contains(data.contacts,'http') && not #strings.endsWith(data.contacts,'=')}">
+                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
+                        </a> -->
+
+                        <a th:href="@{${data.externalUrl}}" th:target="_blank" th:if="${#strings.contains(data.externalUrl,'http')}">
+                            <h4 class="button outline uppercase margin-top-large minwidth300 shiftUp10"
+                                th:text="${data.externalUrlText}">View at Provider</h4>
                         </a>
 
                     </div>
                 </div>
             </section>
-            <hr class="margin-vertical-20">
+            <hr class="margin-vertical-20 line_v2">
 
 
             <!-- Tabs Section -->
@@ -168,10 +131,10 @@
                     <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
                         <li class="tabs-title is-active"><a href="#summary" aria-selected="true">Summary</a></li>
                         <li class="tabs-title "><a href="#variation" id="variation_data_link" onclick="showTabs('0')"> Genomic Data
-                            (<span th:text="${totalRecords}"></span>) </a></li>
+                            (<span th:text="${data.variationDataCount}"></span>) </a></li>
 
-                        <li th:if="${drugSummaryRowNumber} == 0" class="tabs-title"><a href="#dosing_studies">Dosing studies (0)</a></li>
-                        <li th:if="${drugSummaryRowNumber} > 0" class="tabs-title"><a href="#dosing_studies">Dosing studies (1)</a></li>
+                        <li th:if="${data.drugSummaryRowNumber} == 0" class="tabs-title"><a href="#dosing_studies">Dosing studies (0)</a></li>
+                        <li th:if="${data.drugSummaryRowNumber} > 0" class="tabs-title"><a href="#dosing_studies">Dosing studies (1)</a></li>
 
                     </ul>
                 </div>
@@ -195,24 +158,24 @@
 
                                         <tr>
                                             <th class="text-left medium-4">Sex</th>
-                                            <td th:text="${gender}"></td>
+                                            <td th:text="${data.gender}"></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left medium-4">Age at Time of Collection</th>
-                                            <td th:text="${age}"></td>
+                                            <td th:text="${data.ageAtCollection}"></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left medium-4">Race / Ethnicity</th>
                                             <td>
-                                                <span th:text="${race}"></span>
-                                                <span th:if="${not ( #strings.isEmpty(race) || #strings.isEmpty(ethnicity) ) }"> / </span>
-                                                <span th:text="${ethnicity}"></span>
+                                                <span th:text="${data.race}"></span>
+                                                <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
+                                                <span th:text="${data.ethnicity}"></span>
                                             </td>
                                         </tr>
-                                        <tr th:if="${not #lists.isEmpty(relatedModels)}">
+                                        <tr th:if="${not #lists.isEmpty(data.relatedModels)}">
                                             <th class="text-left">Related models</th>
-                                            <td><span th:each="relMod:${relatedModels}"><a th:text="${relMod}"
-                                                                                           th:href="@{'/pdx/'+${dataSrc}+'/'+${relMod}}"></a> </span>
+                                            <td><span th:each="relMod:${data.relatedModels}"><a th:text="${relMod}"
+                                                                                           th:href="@{'/pdx/'+${data.dataSource}+'/'+${relMod}}"></a> </span>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -233,26 +196,26 @@
 
                                         <tr>
                                             <th class="text-left medium-4">Histology</th>
-                                            <td class="text-left"><span th:text="${mappedOntology}"></span></td>
+                                            <td class="text-left"><span th:text="${data.mappedOntology}"></span></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left medium-4">Primary Tissue</th>
-                                            <td class="text-left" th:text="${originTissue}"></td>
+                                            <td class="text-left" th:text="${data.originTissue}"></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left medium-4">Collection Site</th>
-                                            <td class="text-left" th:text="${sampleSite}"></td>
+                                            <td class="text-left" th:text="${data.sampleSite}"></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left medium-4">Tumor Type</th>
-                                            <td class="text-left" th:text="${tumorType}"></td>
+                                            <td class="text-left" th:text="${data.tumorType}"></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left medium-4">Stage / Grade</th>
-                                            <td th:if="${#strings.equals(class, '/')}"
+                                            <td th:if="${#strings.equals(data.classification, '/')}"
                                                 th:text="${'Not Available'}"></td>
-                                            <td th:if="${not #strings.equals(class, '/')}"
-                                                th:text="${#strings.endsWith(class,'/')} ? ${ #strings.substringBefore(class,'/') } : ${class} "></td>
+                                            <td th:if="${not #strings.equals(data.classification, '/')}"
+                                                th:text="${#strings.endsWith(data.classification,'/')} ? ${ #strings.substringBefore(data.classification,'/') } : ${data.classification} "></td>
 
                                         </tr>
                                         </tbody>
@@ -274,15 +237,15 @@
 
                                         <tr>
                                             <th class="text-left medium-4">Strain</th>
-                                            <td class="text-left" th:text="${strain}"></td>
+                                            <td class="text-left" th:text="${data.strain}"></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left medium-4">Engraftment Site</th>
-                                            <td th:text="${engraftmentSite}"></td>
+                                            <td th:text="${data.engraftmentSite}"></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left medium-4">Implantation Material</th>
-                                            <td th:text="${sampleType}"></td>
+                                            <td th:text="${data.sampleType}"></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -292,25 +255,23 @@
 
                             <div class="columns medium-12 small-12 margin-top-medium">
                                 <div class="responsive-table">
-                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
+
+                                    <table class="datatable-pdx pdx-table table-borderedPdx head-left">
                                         <thead>
                                         <tr>
-                                            <th colspan="2">Model quality control</th>
+                                            <th colspan="3">Model quality control</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Technique</th>
+                                            <th>Description</th>
+                                            <th>Passage</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-
-                                        <tr>
-                                            <th class="text-left medium-4">Technology</th>
-                                            <td th:text="${technology}"></td>
-                                        </tr>
-                                        <tr>
-                                            <th class="text-left medium-4">Description</th>
-                                            <td th:text="${description}"></td>
-                                        </tr>
-                                        <tr>
-                                            <th class="text-left medium-4">Passages</th>
-                                            <td th:text="${passages}"></td>
+                                        <tr th:each="qa, iter : ${data.qualityAssurances}">
+                                            <td th:text="${qa.technology}"></td>
+                                            <td th:text="${qa.description}"></td>
+                                            <td th:text="${qa.passages}"></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -330,25 +291,11 @@
                         <p>
                         <div class="row large-12 medium-12 expanded" id="variationTableData">
 
-                            <style> table * {
-                                -webkit-box-sizing: content-box;
-                                -moz-box-sizing: content-box;
-                                box-sizing: content-box;
-                            }</style>
-                            <div class="col-md-12 javaScriptBrowser">
-
-                                <!-- <div class="panel panel-info" th:if="${totalRecords > 0}" >
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title">PDX model studies - <span th:text="${totalRecords}"></span> entries</h3>
-                                    </div>
-                                </div> -->
-                            </div>
-
                             <!-- Start of Patient variation data -->
-                            <div class="tab" role="tabpanel" th:if="${patientInfo.size() > 0}">
+                            <div class="tab" role="tabpanel" th:if="${data.patientTech.size() > 0}">
                                 <!-- Nav tabs -->
                                 <ul class="nav nav-tabs" role="tablist">
-                                    <li th:each="technology,iter : ${patientInfo}"
+                                    <li th:each="technology,iter : ${data.patientTech}"
                                         th:class="( ${iter.index} == 0 ) ? 'active' : '' "
                                         role="presentation">
 
@@ -363,7 +310,7 @@
 
                                 <!-- Tab panes -->
                                 <div class="tab-content">
-                                    <div th:each="technology,iter : ${patientInfo}"
+                                    <div th:each="technology,iter : ${data.patientTech}"
                                          th:id="${technology.key}"
                                          class="tab-pane active" role="tabpanel">
 
@@ -374,7 +321,7 @@
                                                             <b class="bLine">
                                                                 <span class="hdc">Tumor Type: </span>            <i>Patient Tumor</i>                  &nbsp; &nbsp;
                                                                 <span class="hdc">Histology:</span> <i
-                                                                    th:text="${#strings.capitalize(diagnosis)}"></i>     &nbsp; &nbsp;
+                                                                    th:text="${#strings.capitalize(data.diagnosis)}"></i>     &nbsp; &nbsp;
                                                                 <span class="hdc">Grade: </span>  <i></i>
                                                             </b>
 
@@ -410,19 +357,18 @@
 
 
                             <!-- Start of Xenograft Variation data-->
-                            <div class="tab hideContent0" role="tabpanel" th:if="${modelInfo.size() > 0}">
+                            <div class="tab hideContent0" role="tabpanel" th:if="${data.modelTechAndPassages.size() > 0}">
 
                                 <!-- Tab panes --><strong></strong>
                                 <div class="tabs-content" data-tabs-content="example-tabs">
 
-
                                     <div id="sizeSwitch">
-                                        <a th:href="@{'/pdx/'+${dataSrc}+'/'+${modelId}+'/export'}" class="button outline secondary">
+                                        <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}" class="button outline secondary">
                                             Export Results <i class="icon icon-functional" data-icon="="></i> </a>
                                     </div>
 
                                     <ul class="tabs" data-tabs id="example-tabs">
-                                        <li th:each="technology,iter : ${modelInfo}"
+                                        <li th:each="technology,iter : ${data.modelTechAndPassages}"
                                             class="tabs-title" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
 
                                             <a th:href="@{'#'+${technology.key}}"
@@ -432,7 +378,7 @@
                                         </li>
                                     </ul>
 
-                                    <div th:each="technology,iter : ${modelInfo}"
+                                    <div th:each="technology,iter : ${data.modelTechAndPassages}"
                                          th:id="${technology.key}"
                                          class="tabs-panel is-active"
                                          th:classappend=" 'hideContent'+${iter.index} ">
@@ -448,21 +394,21 @@
                                                                     <span class="hdc">Sample ID: </span>
 
                                                                     <b class="black"
-                                                                       th:text="${sampleIdMap['__${technology.key}__'+'__${technology.value[num-1]}__']}"></b>    &nbsp; &nbsp;
+                                                                       th:text="${data.techNPassToSampleId['__${technology.key}__'+'__${technology.value[num-1]}__']}"></b>    &nbsp; &nbsp;
 
                                                                     <span class="hdc">Histology:</span> <b class="black"
-                                                                                                           th:text="${#strings.capitalize(diagnosis)}"></b>     &nbsp; &nbsp;
+                                                                                                           th:text="${#strings.capitalize(data.diagnosis)}"></b>     &nbsp; &nbsp;
                                                                     <span class="hdc">Tumor Type: </span>
                                                                     <b class="black">Xenograft Tumor</b>                  &nbsp; &nbsp;
                                                                     <span class="hdc">Passage: </span>  <b class="black"
                                                                                                            th:text="${technology.value[num-1]}"></b>     &nbsp; &nbsp;
                                                                     <span class="hdc">Platform: </span>
 
-                                                                        <span th:if="${platformsAndUrls[__${technology.key}__] != null}">
-                                                                            <a th:href="${platformsAndUrls[__${technology.key}__]}" th:text="${technology.key}"></a>
+                                                                        <span th:if="${data.platformsAndUrls[__${technology.key}__] != null}">
+                                                                            <a th:href="${data.platformsAndUrls[__${technology.key}__]}" th:text="${technology.key}"></a>
                                                                         </span>
 
-                                                                        <span th:if="${platformsAndUrls[__${technology.key}__] == null}">
+                                                                        <span th:if="${data.platformsAndUrls[__${technology.key}__] == null}">
                                                                             <b class="black" th:text="${technology.key}"></b>
                                                                         </span>
 
@@ -471,7 +417,7 @@
                                                                 <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
                                                                        id="example-datatable"
                                                                        class="table display datatable-pdx table-borderedPdx"
-                                                                       th:height="50" width="100%"> <!-- class=" "   table-condensed style="border:1px solid #000; padding:10px;"-->
+                                                                       th:height="50" width="100%">
 
                                                                     <thead>
                                                                     <tr>
@@ -506,11 +452,11 @@
                     </div>
 
                     <div class="tabs-panel" id="dosing_studies">
-                        <div th:if="${not #lists.isEmpty(drugSummary)}">
+                        <div th:if="${not #lists.isEmpty(data.drugSummary)}">
                             <p>
 
-                            <div th:if="${drugProtocolUrl} != null" style="margin-bottom: 15px;text-transform: uppercase">
-                                <a th:href="${drugProtocolUrl}" >Dosing study protocol</a>
+                            <div th:if="${data.drugProtocolUrl} != null" class="drug_spacing">
+                                <a th:href="${data.drugProtocolUrl}" >Dosing study protocol</a>
                             </div>
 
                             <table class="datatable-pdx pdx-table table-borderedPdx head-left">
@@ -520,7 +466,7 @@
                                 <th>Response</th>
                                 </thead>
                                 <tbody>
-                                <tr th:each="drugData, iter : ${drugSummary}">
+                                <tr th:each="drugData, iter : ${data.drugSummary}">
                                     <td th:text="${drugData.drugName}"></td>
                                     <td th:text="${drugData.dose}"></td>
                                     <td th:text="${drugData.response}"></td>
@@ -530,7 +476,7 @@
                             </p>
                         </div>
 
-                        <div th:if="${#lists.isEmpty(drugSummary)}"></div>
+                        <div th:if="${#lists.isEmpty(data.drugSummary)}"></div>
                     </div>
 
 
@@ -552,6 +498,12 @@
 </div>
 <!-- JavaScript -->
 
+<script  type='text/javascript' th:src="@{/js/banner-gdpr.js}"></script>
+<div id="data-protection-message-configuration"
+     data-message="Your message and links here."
+     data-service-id="ebi" data-data-protection-version="0.1">
+</div>
+
 <script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/scripts/dist/choices.min.js"></script>
 <script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.highlightRegex/0.1.2/highlightRegex.min.js"></script>
@@ -561,25 +513,11 @@
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
-    var searchStates = [[${mappedTerm}]];
-
-
-    function constructSearchOptions(data) {
-        var newOptions = [];
-        for (var i = 0; i < data.length; i++) {
-            newOptions.push({'value': data[i], 'label': data[i], selected: false, disabled: false})
-        }
-        return newOptions;
-    }
-
-
-    document.getElementsByClassName("javaScriptBrowser")[0].style.display = "block";
-    //document.getElementsByClassName("javaScriptBrowser")[1].style.display = "block";
-    var modelId = [[${modelId}]];
-    var dataSrc = [[${dataSrc}]];
+    var modelId = [[${data.modelId}]];
+    var dataSrc = [[${data.dataSource}]];
     jQuery(document).ready(function () {
         console.log("ready");
-        var modelInfo = [[${modelInfo}]];
+        var modelInfo = [[${data.modelTechAndPassages}]];
         var apiURL = "/data/patientdata/" + dataSrc + "/" + modelId;
 
 
@@ -605,10 +543,6 @@
 
     // We define the function
     function drawTable(tableId, apiURL) {
-
-        /*var markerNVariant = [[ ${param.marker} ]];
-        var marker = markerNVariant.split(" ");
-        alert(marker[0]); */
 
         var l = jQuery("#tableId tr").length;
         console.log(tableId + " " + l);

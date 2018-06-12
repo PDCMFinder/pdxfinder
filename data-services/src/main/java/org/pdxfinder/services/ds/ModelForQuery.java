@@ -50,6 +50,7 @@ modelHostStrain
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.pdxfinder.services.dto.DrugSummaryDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +83,8 @@ public class ModelForQuery {
     private List<String> dataAvailable;
     private Set<String> allOntologyTermAncestors;
     private Set<String> queryMatch;
+
+    private List<DrugSummaryDTO> drugData;
 
 
     public ModelForQuery() {
@@ -364,4 +367,11 @@ public class ModelForQuery {
         return null;
     }
 
+    public List<DrugSummaryDTO> getDrugData() {
+        return drugData;
+    }
+
+    public void setDrugData(List<DrugSummaryDTO> drugData) {
+        this.drugData = drugData;
+    }
 }
