@@ -1,5 +1,6 @@
 package org.pdxfinder.services;
 
+import org.pdxfinder.dao.TreatmentProtocol;
 import org.pdxfinder.dao.TreatmentSummary;
 import org.pdxfinder.repositories.DrugRepository;
 import org.pdxfinder.repositories.ResponseRepository;
@@ -8,7 +9,9 @@ import org.pdxfinder.repositories.TreatmentSummaryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /*
  * Created by csaba on 29/03/2018.
@@ -46,7 +49,22 @@ public class DrugService {
 
     public List<String> getDrugNames(){
 
-        return drugRepository.findDistinctDrugNames();
+        Set<String> drugNamesSet = new HashSet<>();
+        List<String> drugNames = new ArrayList<>();
+
+        List<TreatmentSummary> treatmentSummaries = getSummariesWithDrugAndResponse();
+
+        for(TreatmentSummary ts : treatmentSummaries){
+
+            for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
+
+                String drugName = tp.getDrugString();
+                drugNamesSet.add(drugName);
+            }
+        }
+
+        drugNames.addAll(drugNamesSet);
+        return drugNames;
     }
 
     public List<String> getResponseOptions(){
