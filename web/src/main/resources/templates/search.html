@@ -150,6 +150,7 @@
             <section class="row expanded padding-right-large padding-left-large">
 
                 <div class="columns medium-3">
+
                     <h4 class="block-title clearfix"><span class="float-left">Filter By:</span></h4>
 
                     <ul class="accordion pdx-accordion-1" data-accordion data-multi-expand="true"
@@ -612,18 +613,26 @@
                             </div>
                         </li>
 
-
-
-
                     </ul>
 
-                    <span th:each="instance:${websearch.diagnosisSelected}">
-                        <input th:id="'diagnosis__' + ${#strings.replace(instance.name, ' ', '_')}" type="hidden"
-                               class="diagnosis filter"/>
-                    </span>
+                        <span th:each="instance:${websearch.diagnosisSelected}">
+                            <input th:id="'diagnosis__' + ${#strings.replace(instance.name, ' ', '_')}" type="hidden"
+                                   class="diagnosis filter"/>
+                        </span>
+
+                        <div>
+                            <a href="/data/search"
+                                    class="button secondary columns large-4 white-text-left-float topSpace4">
+                                <i class="icon icon-functional" data-icon="d"></i> &nbsp; RESET ALL </a>
+                        </div>
 
 
+                        <!--<input class="button secondary columns large-4 white-text-left-float topSpace4"
+                               type="button" onclick="clearFacet()" value=" CLEAR">-->
                 </div>
+
+
+
 
                 <div class="columns medium-9">
 
