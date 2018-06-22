@@ -49,6 +49,12 @@ public class AjaxController {
         return drugService.getDrugNames();
     }
 
+    @RequestMapping(value = "/modelperdrug")
+    public Iterable<Map<String, Object>> getModelCountByDrug() {
+
+        return  drugService.getModelCountByDrug();
+    }
+
     @RequestMapping(value = "/autosuggests")
     List<AutoCompleteOption> getAutoSuggestList(){
 
