@@ -27,6 +27,7 @@ public class AjaxController {
     private MolCharService molCharService;
     private DetailsService detailsService;
     private DrugService drugService;
+    private GraphService graphService;
 
 
     @Autowired
@@ -34,13 +35,15 @@ public class AjaxController {
                           PlatformService platformService,
                           MolCharService molCharService,
                           DetailsService detailsService,
-                          DrugService drugService) {
+                          DrugService drugService,
+                          GraphService graphService) {
 
         this.autoCompleteService = autoCompleteService;
         this.platformService = platformService;
         this.molCharService = molCharService;
         this.detailsService = detailsService;
         this.drugService = drugService;
+        this.graphService = graphService;
     }
 
     @RequestMapping(value = "/drugnames")
@@ -49,10 +52,16 @@ public class AjaxController {
         return drugService.getDrugNames();
     }
 
-    @RequestMapping(value = "/modelperdrug")
+    @RequestMapping(value = "/modelcountperdrug")
     public Iterable<Map<String, Object>> getModelCountByDrug() {
 
         return  drugService.getModelCountByDrug();
+    }
+
+    @RequestMapping(value = "/modelcountpergene")
+    public Iterable<Map<String, Object>> getModelCountByMarker() {
+
+        return  graphService.getModelCountByGene();
     }
 
     @RequestMapping(value = "/autosuggests")

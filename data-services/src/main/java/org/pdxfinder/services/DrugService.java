@@ -82,8 +82,6 @@ public class DrugService {
 
     public Iterable<Map<String, Object>> getModelCountByDrug(){
 
-        Map<String, Integer> modelPerDrugMap = new HashMap<>();
-
         Iterable<Map<String, Object>> iterableResults = drugRepository.countModelsByDrug().queryResults();
 
         return iterableResults;

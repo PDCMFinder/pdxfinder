@@ -3,6 +3,7 @@ package org.pdxfinder.services;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.dao.Sample;
 import org.pdxfinder.repositories.ExternalDataSourceRepository;
+import org.pdxfinder.repositories.MarkerRepository;
 import org.pdxfinder.repositories.OntologyTermRepository;
 import org.pdxfinder.repositories.SampleRepository;
 import org.slf4j.Logger;
@@ -24,11 +25,16 @@ public class GraphService {
     private SampleRepository sampleRepository;
     private OntologyTermRepository ontologyTermRepository;
     private ExternalDataSourceRepository externalDataSourceRepository;
+    private MarkerRepository markerRepository;
 
-    public GraphService(SampleRepository sampleRepository, OntologyTermRepository ontologyTermRepository, ExternalDataSourceRepository externalDataSourceRepository) {
+    public GraphService(SampleRepository sampleRepository,
+                        OntologyTermRepository ontologyTermRepository,
+                        ExternalDataSourceRepository externalDataSourceRepository,
+                        MarkerRepository markerRepository) {
         this.sampleRepository = sampleRepository;
         this.ontologyTermRepository = ontologyTermRepository;
         this.externalDataSourceRepository = externalDataSourceRepository;
+        this.markerRepository = markerRepository;
     }
 
     public Set<String> getMappedDOTerms() {
@@ -222,6 +228,16 @@ public class GraphService {
 
         return externalDataSourceRepository.findAllAbbreviations();
     }
+
+
+    public Iterable<Map<String, Object>> getModelCountByGene(){
+
+        Iterable<Map<String, Object>> iterableResults = markerRepository.countModelsByMarker().queryResults();
+
+        return iterableResults;
+
+    }
+
 
 
 }
