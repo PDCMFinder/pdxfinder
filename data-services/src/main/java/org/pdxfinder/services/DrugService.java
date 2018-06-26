@@ -55,7 +55,7 @@ public class DrugService {
 
             for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
 
-                String drugName = tp.getDrugString();
+                String drugName = tp.getDrugString(false);
                 drugNamesSet.add(drugName);
             }
         }
