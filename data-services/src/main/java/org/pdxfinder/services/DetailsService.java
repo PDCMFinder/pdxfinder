@@ -522,7 +522,7 @@ public class DetailsService {
 
 
                 DrugSummaryDTO dto = new DrugSummaryDTO();
-                dto.setDrugName(tp.getDrugString());
+                dto.setDrugName(tp.getDrugString(true));
                 List<TreatmentComponent> components = tp.getComponents();
                 String dose = "";
 

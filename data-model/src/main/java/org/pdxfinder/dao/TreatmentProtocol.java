@@ -81,7 +81,7 @@ public class TreatmentProtocol {
         this.passages = passages;
     }
 
-    public String getDrugString(){
+    public String getDrugString(boolean includeControlDrugs){
 
         String ret = "";
 
@@ -89,10 +89,25 @@ public class TreatmentProtocol {
 
             String drugName = comp.getDrug().getName();
 
-            if(!ret.isEmpty()){
-                ret+=" and ";
+            if(includeControlDrugs){
+                if(!ret.isEmpty()){
+                    ret+=" and ";
+                }
+                ret+=drugName;
             }
-            ret+=drugName;
+            //include only Drugs but no Controls
+            else{
+
+                if(comp.getType().equals("Drug")){
+
+                    if(!ret.isEmpty()){
+                        ret+=" and ";
+                    }
+                    ret+=drugName;
+                }
+
+            }
+
         }
 
         return ret;
