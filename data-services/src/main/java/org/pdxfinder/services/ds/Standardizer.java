@@ -203,9 +203,12 @@ public class Standardizer {
 
              return "Dabrafenib";
          }
-         else if(drug.equals("Topotecan") || drug.equals("Etoposide")){
+         else if(drug.equals("Etoposide")){
 
              return "Etoposide";
+         }
+         else if(drug.equals("Topotecan")){
+             return drug;
          }
          else if(drug.equals("5-FU")){
 
@@ -241,6 +244,8 @@ public class Standardizer {
      public static String getTreatmentComponentType(String drugName){
 
          if(drugName.toLowerCase().contains("control")) return "Control";
+
+         if(drugName.equals("Saline") || drugName.equals("D5W") || drugName.equals("CMC") || drugName.equals("DMSO")) return "Control";
 
          return "Drug";
      }
