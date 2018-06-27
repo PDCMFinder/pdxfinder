@@ -16,6 +16,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -160,6 +163,8 @@ public class CreateDataProjections implements CommandLineRunner{
      */
     private void addToMutatedPlatformMarkerVariantModelDP(String platformName, String markerName, String variantName, Long modelId){
 
+        if(variantName == null || variantName.length()<3) variantName = "Not applicable";
+
         if(this.mutatedPlatformMarkerVariantModelDP.containsKey(platformName)){
 
             if(this.mutatedPlatformMarkerVariantModelDP.get(platformName).containsKey(markerName)){
@@ -211,6 +216,8 @@ public class CreateDataProjections implements CommandLineRunner{
      * @param variantName
      */
     private void addToMutatedMarkerVariantDP(String markerName, String variantName){
+
+        if(variantName == null || variantName.length()<3) variantName = "Not applicable";
 
         if(this.mutatedMarkerVariantDP.containsKey(markerName)){
 
@@ -569,6 +576,7 @@ public class CreateDataProjections implements CommandLineRunner{
         catch(Exception e){
 
             e.printStackTrace();
+            //dumpDataToFile();
         }
 
 
@@ -595,5 +603,19 @@ public class CreateDataProjections implements CommandLineRunner{
         return "";
     }
 
+    private void dumpDataToFile(){
+        log.info("Dumping data to file");
+        String fileName = "/Users/csaba/Documents/pdxFinderDump.txt";
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
+
+            writer.append(mutatedPlatformMarkerVariantModelDP.toString());
+            writer.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 }
