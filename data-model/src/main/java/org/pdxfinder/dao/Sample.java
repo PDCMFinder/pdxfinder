@@ -24,6 +24,12 @@ public class Sample {
     private Tissue sampleSite;
     private String extractionMethod;
     private String classification;
+    private String stage;
+    private String stageClassification;
+    private String grade;
+    private String gradeClassification;
+    //TODO: remove classification field and use stage and grade instead.
+
     public Boolean normalTissue;
     private String dataSource;
 
