@@ -20,10 +20,10 @@ public interface PlatformRepository extends PagingAndSortingRepository<Platform,
 
     Platform findByName(@Param("name") String name);
 
-    @Query("MATCH (p:Platform)-[]-(d:ExternalDataSource) where p.name = {name} and d.name={dataSource} return p")
+    @Query("MATCH (p:Platform)-[]-(g:Group) where p.name = {name} and g.name={dataSource} and g.type='Provider' return p")
     Platform findByNameAndDataSource(@Param("name") String name, @Param("dataSource") String dataSource);
 
-    @Query("MATCH (p:Platform)-[]-(d:ExternalDataSource) where p.name = {name} and d.name={dataSource} and p.url = {url} return p")
+    @Query("MATCH (p:Platform)-[]-(g:Group) where p.name = {name} and g.name={dataSource} and g.type='Provider' and p.url = {url} return p")
     Platform findByNameAndDataSourceAndUrl(@Param("name") String name, @Param("dataSource") String dataSource, @Param("url") String url);
 
 

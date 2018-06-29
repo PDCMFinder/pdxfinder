@@ -1,6 +1,6 @@
 package org.pdxfinder.repositories;
 
-import org.pdxfinder.dao.ExternalDataSource;
+import org.pdxfinder.dao.Group;
 import org.pdxfinder.dao.Patient;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
@@ -15,8 +15,8 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
 
     Set<Patient> findBySex(String sex);
 
-    @Query("MATCH (p:Patient)--(ds:ExternalDataSource) WHERE p.externalId = {externalId} AND id(ds) = {xds} RETURN p")
-    Patient findByExternalIdAndDS(@Param("externalId") String externalId, @Param("xds") ExternalDataSource xds);
+    @Query("MATCH (p:Patient)--(g:Group) WHERE p.externalId = {externalId} AND id(g) = {g} RETURN p")
+    Patient findByExternalIdAndGroup(@Param("externalId") String externalId, @Param("g") Group g);
 
     @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
             "MATCH (s:Sample)-[sf:SAMPLED_FROM]-(ps:PatientSnapshot)-[pt:PATIENT]-(p:Patient) " +
