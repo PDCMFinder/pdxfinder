@@ -2,10 +2,7 @@ package org.pdxfinder.services;
 
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.dao.Sample;
-import org.pdxfinder.repositories.ExternalDataSourceRepository;
-import org.pdxfinder.repositories.MarkerRepository;
-import org.pdxfinder.repositories.OntologyTermRepository;
-import org.pdxfinder.repositories.SampleRepository;
+import org.pdxfinder.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,16 +21,16 @@ public class GraphService {
 
     private SampleRepository sampleRepository;
     private OntologyTermRepository ontologyTermRepository;
-    private ExternalDataSourceRepository externalDataSourceRepository;
+    private GroupRepository groupRepository;
     private MarkerRepository markerRepository;
 
     public GraphService(SampleRepository sampleRepository,
                         OntologyTermRepository ontologyTermRepository,
-                        ExternalDataSourceRepository externalDataSourceRepository,
+                        GroupRepository groupRepository,
                         MarkerRepository markerRepository) {
         this.sampleRepository = sampleRepository;
         this.ontologyTermRepository = ontologyTermRepository;
-        this.externalDataSourceRepository = externalDataSourceRepository;
+        this.groupRepository = groupRepository;
         this.markerRepository = markerRepository;
     }
 
@@ -226,7 +223,7 @@ public class GraphService {
 
     public List<String> getDataSourceAbbreviations(){
 
-        return externalDataSourceRepository.findAllAbbreviations();
+        return groupRepository.findAllAbbreviations();
     }
 
 
