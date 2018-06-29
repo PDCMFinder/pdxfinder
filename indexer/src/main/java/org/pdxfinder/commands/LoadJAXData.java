@@ -38,11 +38,14 @@ public class LoadJAXData implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadJAXData.class);
 
-    private final static String JAX_DATASOURCE_ABBREVIATION = "JAX";
-    private final static String JAX_DATASOURCE_NAME = "The Jackson Laboratory";
-    private final static String JAX_DATASOURCE_DESCRIPTION = "The Jackson Laboratory PDX mouse models.";
+    private final static String DATASOURCE_ABBREVIATION = "JAX";
+    private final static String DATASOURCE_NAME = "The Jackson Laboratory";
+    private final static String DATASOURCE_DESCRIPTION = "The Jackson Laboratory PDX mouse models.";
     private final static String DATASOURCE_CONTACT = "http://tumor.informatics.jax.org/mtbwi/pdxRequest.do?mice=";
     private final static String DATASOURCE_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
+
+    private final static String PROVIDER_TYPE = "";
+    private final static String ACCESSIBILITY = "";
 
     private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<scid> Il2rg<tm1Wjl>/SzJ";
@@ -61,7 +64,7 @@ public class LoadJAXData implements CommandLineRunner {
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
     private HostStrain nsgBS;
-    private ExternalDataSource jaxDS;
+    private Group jaxDS;
 
     private Options options;
     private CommandLineParser parser;
@@ -132,7 +135,8 @@ public class LoadJAXData implements CommandLineRunner {
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
 
-        jaxDS = dataImportService.getExternalDataSource(JAX_DATASOURCE_ABBREVIATION, JAX_DATASOURCE_NAME, JAX_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+        jaxDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
+                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
         nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
 
@@ -158,7 +162,7 @@ public class LoadJAXData implements CommandLineRunner {
         String id = j.getString("Model ID");
 
         //Check if model exists in DB
-        ModelCreation existingModel = dataImportService.findModelByIdAndDataSource(id, JAX_DATASOURCE_ABBREVIATION);
+        ModelCreation existingModel = dataImportService.findModelByIdAndDataSource(id, DATASOURCE_ABBREVIATION);
         //Do not load duplicates
         if(existingModel != null) {
             log.error("Skipping existing model "+id);
@@ -193,7 +197,7 @@ public class LoadJAXData implements CommandLineRunner {
 
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
         Sample sample = dataImportService.getSample(j.getString("Model ID"), tumorType, diagnosis,
-                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, JAX_DATASOURCE_ABBREVIATION);
+                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, DATASOURCE_ABBREVIATION);
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
         externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT+id));
