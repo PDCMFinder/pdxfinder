@@ -23,7 +23,10 @@ public class PatientSampleIntegrationTest extends BaseTest {
     private final static Logger log = LoggerFactory.getLogger(PatientSampleIntegrationTest.class);
     private String tumorTypeName = "TEST_TUMORTYPE";
     private String extDsName = "TEST_SOURCE";
+    private String extDsAbbrev = "TS";
+
     private String extDsNameAlternate = "ALTERNATE_TEST_SOURCE";
+    private String extDsNameAlternateAbbrev = "ATS";
     private String tissueName = "TEST_TISSUE";
     private String markerSymbol = "TEST_MARKER";
     private String molCharTechnology = "TEST_MOLCHAR";
@@ -44,7 +47,7 @@ public class PatientSampleIntegrationTest extends BaseTest {
     private PatientSnapshotRepository patientsnapshotRepository;
 
     @Autowired
-    private ExternalDataSourceRepository externalDataSourceRepository;
+    private GroupRepository groupRepository;
 
     @Autowired
     private MolecularCharacterizationRepository mcRepository;
@@ -60,7 +63,7 @@ public class PatientSampleIntegrationTest extends BaseTest {
 
         sampleRepository.deleteAll();
         patientRepository.deleteAll();
-        externalDataSourceRepository.deleteAll();
+        groupRepository.deleteAll();
         tissueRepository.deleteAll();
         mcRepository.deleteAll();
         markerRepository.deleteAll();
@@ -83,18 +86,21 @@ public class PatientSampleIntegrationTest extends BaseTest {
 
 
 
-        ExternalDataSource ds = externalDataSourceRepository.findByName(extDsName);
-        if (ds == null) {
-            log.debug("External data source {} not found. Creating", extDsName);
-            ds = new ExternalDataSource(extDsName, extDsName, extDsName, extDsName, Date.from(Instant.now()));
-            externalDataSourceRepository.save(ds);
+        Group ds = groupRepository.findByNameAndType(extDsName, "Provider");
+        if(ds == null){
+            log.info("Group not found. Creating", extDsName);
+
+            ds = new Group(extDsName, extDsAbbrev, "Provider");
+            groupRepository.save(ds);
+
         }
 
-        ExternalDataSource dsAlt = externalDataSourceRepository.findByName(extDsNameAlternate);
+
+        Group dsAlt = groupRepository.findByNameAndType(extDsNameAlternate, "Provider");
         if (dsAlt == null) {
-            log.debug("External data source {} not found. Creating", extDsNameAlternate);
-            dsAlt = new ExternalDataSource(extDsNameAlternate, extDsNameAlternate, extDsNameAlternate, extDsNameAlternate, Date.from(Instant.now()));
-            externalDataSourceRepository.save(dsAlt);
+            log.debug("Group {} not found. Creating", extDsNameAlternate);
+            dsAlt = new Group(extDsNameAlternate, extDsNameAlternateAbbrev, "Provider");
+            groupRepository.save(dsAlt);
         }
 
         TumorType tumorType = tumorTypeRepository.findByName(tumorTypeName);
@@ -117,7 +123,7 @@ public class PatientSampleIntegrationTest extends BaseTest {
 
         TumorType tumorType = tumorTypeRepository.findByName(tumorTypeName);
         Tissue tissue = tissueRepository.findByName(tissueName);
-        ExternalDataSource externalDataSource = externalDataSourceRepository.findByAbbreviation(extDsName);
+        Group group = groupRepository.findByNameAndType(extDsName, "Provider");
         MolecularCharacterization mc = mcRepository.findByTechnology(molCharTechnology);
         Marker marker = markerRepository.findBySymbol(markerSymbol);
 
@@ -131,13 +137,13 @@ public class PatientSampleIntegrationTest extends BaseTest {
             String sex = i % 2 == 0 ? "M" : "F";
             Long age = Math.round(Math.random() * 90);
 
-            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false ,externalDataSource.getAbbreviation());
+            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false ,group.getAbbreviation());
             sampleRepository.save(sample);
 
-            Patient patient = new Patient(Double.toString(Math.pow(i, age)), sex, null, null, externalDataSource);
+            Patient patient = new Patient(Double.toString(Math.pow(i, age)), sex, null, null, group);
             PatientSnapshot ps = new PatientSnapshot(patient, "67");
             patient.hasSnapshot(ps);
-            Sample s = new Sample("test", tumorType, "adinocarcinoma", tissue, null, "Surgical Resection", "F", false,externalDataSource.getAbbreviation());
+            Sample s = new Sample("test", tumorType, "adinocarcinoma", tissue, null, "Surgical Resection", "F", false,group.getAbbreviation());
             s.normalTissue = Boolean.FALSE;
             s.setMolecularCharacterizations(new HashSet<>(Collections.singletonList(mc)));
 
@@ -147,14 +153,14 @@ public class PatientSampleIntegrationTest extends BaseTest {
 
         }
 
-        ExternalDataSource externalDataSourceAlternate = externalDataSourceRepository.findByAbbreviation(extDsNameAlternate);
+        Group groupAlternate = groupRepository.findByNameAndType(extDsNameAlternate, "Provider");
 
         for (Integer i = 0; i < 22; i++) {
 
             String sex = i % 2 == 0 ? "M" : "F";
             Long age = Math.round(Math.random() * 80);
 
-            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false,externalDataSource.getAbbreviation());
+            Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false,group.getAbbreviation());
             sampleRepository.save(sample);
 
             PatientSnapshot ps = new PatientSnapshot(null, "67");
