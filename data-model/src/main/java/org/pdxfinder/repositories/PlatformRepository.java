@@ -16,8 +16,6 @@ import java.util.Set;
 @Repository
 public interface PlatformRepository extends PagingAndSortingRepository<Platform, Long> {
 
-    Set<Platform> findAllByExternalDataSource_Name(@Param("name") String name);
-
     Platform findByName(@Param("name") String name);
 
     @Query("MATCH (p:Platform)-[]-(g:Group) where p.name = {name} and g.name={dataSource} and g.type='Provider' return p")
@@ -34,19 +32,11 @@ public interface PlatformRepository extends PagingAndSortingRepository<Platform,
     List<Platform> findModelPlatformByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
 
-    @Query("MATCH (plat:Platform)--(src:ExternalDataSource) " +
+    @Query("MATCH (plat:Platform)--(src:Group) " +
             "WHERE toLower(src.abbreviation)=toLower({dataSource}) " +
             "RETURN plat ")
     List<Platform> findPlatformByExternalDataSource(@Param("dataSource") String dataSource);
 
-
-    @Query("MATCH (molChar:MolecularCharacterization)-[pus:PLATFORM_USED]-(p:Platform)-[assW:ASSOCIATED_WITH]-(eds:ExternalDataSource) " +
-            "WHERE p.name={platform} AND toLower(eds.abbreviation)=toLower({dataSource}) " +
-
-            "WITH molChar, pus, p " +
-            "OPTIONAL MATCH (molChar)-[assW:ASSOCIATED_WITH]-(mAss:MarkerAssociation) " +
-            "RETURN count(mAss)")
-    int countMarkerAssocByPlatformAndExternalDataSource(@Param("platform") String platform, @Param("dataSource") String dataSource);
 
     @Query("MATCH (mod:ModelCreation)--(s:Sample)--(molChar:MolecularCharacterization)-[pus:PLATFORM_USED]-(p:Platform) " +
             "WHERE p.name={platform} AND toLower(mod.dataSource)=toLower({dataSource}) " +
