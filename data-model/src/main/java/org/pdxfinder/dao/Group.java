@@ -31,6 +31,8 @@ public class Group {
 
     private String url;
 
+    public Group() {
+    }
 
     public Group(String name, String abbrev, String type) {
         this.name = name;
