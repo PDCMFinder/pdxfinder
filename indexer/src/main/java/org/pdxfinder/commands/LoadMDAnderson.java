@@ -52,7 +52,7 @@ public class LoadMDAnderson implements CommandLineRunner {
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
     //   private HostStrain nsgBS;
-    private  Group mdaDS;
+    private Group mdaDS;
 
     private Options options;
     private CommandLineParser parser;
