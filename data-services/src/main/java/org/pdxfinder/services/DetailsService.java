@@ -200,9 +200,9 @@ public class DetailsService {
             dto.setGender(patient.getSex());
         }
 
-        if (patient != null && patient.getExternalDataSource() != null) {
+        if (patient != null && patient.getProviderGroup() != null) {
             //dto.setContacts(patient.getExternalDataSource().getContact());
-            dto.setExternalDataSourceDesc(patient.getExternalDataSource().getDescription());
+            dto.setExternalDataSourceDesc(patient.getProviderGroup().getDescription());
         }
 
         if (ps != null) {
