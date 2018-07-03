@@ -26,6 +26,21 @@ public class TransformPDMR implements CommandLineRunner {
     @Value("${mydatasource.url2}")
     private String url2;
 
+    @Value("${mydatasource.url3}")
+    private String url3;
+
+    @Value("${mydatasource.url4}")
+    private String url4;
+
+    @Value("${mydatasource.url5}")
+    private String url5;
+
+    @Value("${mydatasource.url6}")
+    private String url6;
+
+    @Value("${mydatasource.url7}")
+    private String url7;
+
     @Autowired
     public TransformPDMR(DataTransformerService dataTransformerService){
         this.dataTransformerService = dataTransformerService;
@@ -49,7 +64,7 @@ public class TransformPDMR implements CommandLineRunner {
                 log.info("Loading from URL " + url1);
                 log.info("Loading from URL " + url2);
 
-                dataTransformerService.transformDataAndSave(url1,url2);
+                dataTransformerService.transformDataAndSave(url1, url2, url3, url4, url5, url6, url7);
             }
             else {
                 log.error("No mydatasource.url1 or mydatasource.url2 provided in properties");
