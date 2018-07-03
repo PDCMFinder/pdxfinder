@@ -16,10 +16,10 @@ public interface PlatformAssociationRepository extends PagingAndSortingRepositor
 
     Set<PlatformAssociation> findAllByPlatform_Name(@Param("name") String name);
 
-    @Query("MATCH (pa:PlatformAssociation), (p:Platform), (ds:ExternalDataSource) WHERE (pa)--(p)--(ds) AND ds.name = {name} RETURN pa")
+    @Query("MATCH (pa:PlatformAssociation), (p:Platform), (ds:Group) WHERE (pa)--(p)--(ds) AND ds.name = {name} AND ds.type='Provider' RETURN pa")
     Set<PlatformAssociation> findByPlatform_ExternalDataSource_Name(@Param("name") String name);
 
-    @Query("MATCH (ds:ExternalDataSource), (pa:PlatformAssociation), (p:Platform), (m:Marker) WHERE (ds)--(p)--(pa)--(m) AND ds.name = {dsName} and p.name = {pName} and m.symbol = {mSymbol} RETURN pa")
+    @Query("MATCH (ds:Group), (pa:PlatformAssociation), (p:Platform), (m:Marker) WHERE (ds)--(p)--(pa)--(m) AND ds.name = {dsName} and p.name = {pName} and m.symbol = {mSymbol} AND ds.type='Provider' RETURN pa")
     PlatformAssociation findByPlatformAndMarker(@Param("pName") String pName, @Param("dsName") String dsName, @Param("mSymbol") String mSymbol);
 
 }

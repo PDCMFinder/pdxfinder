@@ -35,18 +35,23 @@ public class LoadWUSTL implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadWUSTL.class);
 
-    private final static String WUSTL_DATASOURCE_ABBREVIATION = "PDXNet-WUSTL";
-    private final static String WUSTL_DATASOURCE_NAME = "Washington University in St. Louis";
-    private final static String WUSTL_DATASOURCE_DESCRIPTION = "Washington University St. Louis PDX mouse models for PDXNet.";
+    private final static String DATASOURCE_ABBREVIATION = "PDXNet-WUSTL";
+    private final static String DATASOURCE_NAME = "Washington University in St. Louis";
+    private final static String DATASOURCE_DESCRIPTION = "Washington University St. Louis PDX mouse models for PDXNet.";
     private final static String DATASOURCE_CONTACT = "bvantine@wustl.edu,rcfields@wustl.edu,jmudd@wustl.edu,sqli@wustl.edu,tprimeau@wustl.edu";
     private final static String SOURCE_URL = null;
+
+
+    private final static String PROVIDER_TYPE = "";
+    private final static String ACCESSIBILITY = "";
+
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
     //   private HostStrain nsgBS;
-    private ExternalDataSource mdaDS;
+    private Group mdaDS;
 
     private Options options;
     private CommandLineParser parser;
@@ -94,7 +99,9 @@ public class LoadWUSTL implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        mdaDS = dataImportService.getExternalDataSource(WUSTL_DATASOURCE_ABBREVIATION, WUSTL_DATASOURCE_NAME, WUSTL_DATASOURCE_DESCRIPTION, DATASOURCE_CONTACT, SOURCE_URL);
+        mdaDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
+                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {

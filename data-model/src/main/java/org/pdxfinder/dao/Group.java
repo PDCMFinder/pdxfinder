@@ -17,10 +17,10 @@ public class Group {
     private String name; //The name of the group, ie: The Jackson Laboratory
     private String type; // Group type: Provider, Project, Publication
     private String providerType; // Academia, Industry
-    private String accessibility; //Academia only, Academia and Industry
+    private String accessibility; //for provider group only: Academia only, Academia and Industry
     private String accessModalities; //transnational access, collaboration only (this is specific to EuroPDX)
 
-    private String abbreviation; // used for DataSource type only
+    private String abbreviation; // used for Provider type only
     private String description; // The description of the group
 
     private String contact;
@@ -31,13 +31,30 @@ public class Group {
 
     private String url;
 
-
-
-    public Group(String name, String type) {
-        this.name = name;
-        this.type = type;
+    public Group() {
     }
 
+    public Group(String name, String abbrev, String type) {
+        this.name = name;
+        this.type = type;
+        this.abbreviation = abbrev;
+    }
+
+
+    //Special constructor for Provider Groups
+    public Group(String name, String abbrev, String description, String providerType, String accessibility,
+                 String accessModalities, String contact, String url){
+
+        this.name = name;
+        this.abbreviation = abbrev;
+        this.description = description;
+        this.providerType = providerType;
+        this.accessibility = accessibility;
+        this.accessModalities = accessModalities;
+        this.contact = contact;
+        this.url = url;
+        this.type = "Provider";
+    }
 
     public String getName() {
         return name;
