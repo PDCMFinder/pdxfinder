@@ -90,9 +90,14 @@ public class DataTransformerService {
 
             modelID = specimenSearch.get("PATIENTID")+"-"+specimenSearch.get("SPECIMENID");
             patientID = specimenSearch.get("PATIENTID")+"";
-            gender = specimenSearch.get("GENDER")+"";
+            gender = specimenSearch.get("GENDER").toString().equals("M") ? "Male" : "Female";
+
             race = specimenSearch.get("RACEDESCRIPTION")+"";
+            race = race.equals("Not Provided") ? "Not Specified" : race;
+
             ethnicity = specimenSearch.get("ETHNICITYDESCRIPTION")+"";
+            ethnicity = ethnicity.equals("Not Provided") ? "Not Specified" : ethnicity;
+
             primarySite = specimenSearch.get("DISEASELOCATIONDESCRIPTION")+"";
             initialDiagnosis = "";
             clinicalDiagnosis = specimenSearch.get("MEDDRADESCRIPTION")+"";
@@ -110,9 +115,10 @@ public class DataTransformerService {
             dateAtCollection = "";
             accessibility = "";
 
-            treatmentNaive = "Unknown";
+            treatmentNaive = "Not Specified";
             age = "";
             specimenSite = "";
+
 
 
             // Treatment naive
@@ -150,6 +156,7 @@ public class DataTransformerService {
                     }else{
                         //2,3,4,5,6,7,12,13
                         gradeClassification = dTumorGradeStageType.get("TUMORGRADESTAGESHORTNAME")+"";
+                        gradeClassification = gradeClassification.equals("NA") ? "Not Specified" : gradeClassification;
                         stageClassification = "Not Specified";
                     }
                 }
@@ -216,6 +223,7 @@ public class DataTransformerService {
                             Map<String, Object> tissue = mapper.convertValue(tissueOrigin, Map.class);
                             if (specimen.get("PROVIDEDTISSUEORIGINSEQNBR").equals(tissue.get("PROVIDEDTISSUEORIGINSEQNBR"))) {
                                 tumorType = tissue.get("PROVIDEDTISSUEORIGINDESCRIPT") + "";
+                                tumorType = tumorType.equals("Metastatic Site") ? "Metastatic" : tumorType;
                             }
                         }
 

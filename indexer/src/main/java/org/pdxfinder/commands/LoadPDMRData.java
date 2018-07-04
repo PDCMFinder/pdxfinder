@@ -160,7 +160,6 @@ public class LoadPDMRData implements CommandLineRunner {
         String diagnosis = j.getString("Clinical Diagnosis");
         if (diagnosis.trim().length() == 0 || "Not specified".equals(diagnosis)) {
             diagnosis = j.getString("Initial Diagnosis");
-
         }
 
         String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
@@ -168,7 +167,6 @@ public class LoadPDMRData implements CommandLineRunner {
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
         String age = Standardizer.getAge(j.getString("Age"));
         String gender = Standardizer.getGender(j.getString("Gender"));
-
 
         PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"), gender,
                 j.getString("Race"), j.getString("Ethnicity"), age, DS);
