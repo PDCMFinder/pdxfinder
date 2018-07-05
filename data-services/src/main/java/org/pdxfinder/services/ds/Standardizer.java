@@ -243,6 +243,8 @@ public class Standardizer {
 
      public static String getTreatmentComponentType(String drugName){
 
+         drugName = drugName.trim();
+
          if(drugName.toLowerCase().contains("control")) return "Control";
 
          if(drugName.equals("Saline") || drugName.equals("D5W") || drugName.equals("CMC") || drugName.equals("DMSO")) return "Control";
