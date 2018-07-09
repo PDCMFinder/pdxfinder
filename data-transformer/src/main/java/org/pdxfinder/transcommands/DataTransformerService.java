@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pdxfinder.controller.TransController;
 import org.pdxfinder.transdatamodel.PdmrPdxInfo;
+import org.pdxfinder.transdatamodel.Treatment;
 import org.pdxfinder.transrepository.PdmrPdxInfoRepository;
+import org.pdxfinder.transrepository.PdmrTreatmentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,12 +30,15 @@ public class DataTransformerService {
 
     ObjectMapper mapper = new ObjectMapper();
     private PdmrPdxInfoRepository pdmrPdxInfoRepository;
+    private PdmrTreatmentRepository pdmrTreatmentRepository;
+
     private String DATASOURCE_URL_PREFIX = "https://pdmdb.cancer.gov/pls/apex/f?p=101:4:0::NO:4:P4_SPECIMENSEQNBR:";
 
     private final static Logger log = LoggerFactory.getLogger(TransController.class);
 
-    public DataTransformerService(PdmrPdxInfoRepository pdmrPdxInfoRepository) {
+    public DataTransformerService(PdmrPdxInfoRepository pdmrPdxInfoRepository, PdmrTreatmentRepository pdmrTreatmentRepository) {
         this.pdmrPdxInfoRepository = pdmrPdxInfoRepository;
+        this.pdmrTreatmentRepository = pdmrTreatmentRepository;
     }
 
     //Transformation rule as specified here: https://docs.google.com/spreadsheets/d/1buUu5yj3Xq8tbEtL1l2UILV9kLnouGqF0vIjFlGGbEE
@@ -180,6 +186,17 @@ public class DataTransformerService {
 
 
 
+
+            // From specimensearch table - pick PATIENTSEQNBR column
+            // Look CURRENTTHERAPY table for key PATIENTSEQNBR and retrieve the STANDARDIZEDREGIMENSEQNBR column
+            // Look STANDARDIZEDREGIMENS table for key STANDARDIZEDREGIMENSEQNBR and retrieve DISPLAYEDREGIMEN
+
+
+
+
+
+
+
             for (JsonNode tumorGradeStageType : tumorGradeStageTypes) {
 
                 Map<String, Object> dTumorGradeStageType = mapper.convertValue(tumorGradeStageType, Map.class);
@@ -277,12 +294,24 @@ public class DataTransformerService {
             }
 
 
+            List<Treatment> treatments = new ArrayList<>();
+            treatments.add(new Treatment("aaa","bbb","ccc","ddd","555","777","jjj","rt5yyy"));
+
             try {
-                pdmrPdxInfoRepository.save(
-                        new PdmrPdxInfo(modelID, patientID, gender, age, race, ethnicity, specimenSite, primarySite, initialDiagnosis,
-                                clinicalDiagnosis, tumorType, stageClassification, stageValue, gradeClassification, gradeValue,
-                                sampleType, strain, mouseSex, treatmentNaive, engraftmentSite, engraftmentType, sourceUrl, extractionMethod, dateAtCollection, accessibility)
-                );
+
+                PdmrPdxInfo pdmrPdxInfo = new PdmrPdxInfo(modelID, patientID, gender, age, race, ethnicity, specimenSite, primarySite, initialDiagnosis,
+                        clinicalDiagnosis, tumorType, stageClassification, stageValue, gradeClassification, gradeValue, sampleType, strain, mouseSex,
+                        treatmentNaive, engraftmentSite, engraftmentType, sourceUrl, extractionMethod, dateAtCollection, accessibility,treatments);
+
+                pdmrPdxInfoRepository.save(pdmrPdxInfo);
+
+                // Update the Foreign Key pdxinfo_id for the coresponding treatments
+                for (Treatment treatment: treatments){
+                    treatment.setPdmrPdxInfo(pdmrPdxInfo);
+                }
+                pdmrTreatmentRepository.save(treatments);
+
+
                 log.info("Loaded Record for Patient" + specimenSearch.get("PATIENTID"));
             } catch (Exception e) {
                 log.info("Record for Patient" + specimenSearch.get("PATIENTID") + "Not Loaded");
@@ -290,6 +319,7 @@ public class DataTransformerService {
 
             report += "Loaded Record for Patient " + specimenSearch.get("PATIENTID") + "<br>";
 
+            break;
         }
 
         return rootArray;

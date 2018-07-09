@@ -20,32 +20,3 @@ public class PdxInfo {
     }
 
 }
-
-
-/*
-import java.util.List;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonPropertyOrder({
-            "pdxInfo"
-    })
-    public class Example {
-
-        @JsonProperty("pdxInfo")
-        private List<PdxInfo> pdxInfo = null;
-
-        @JsonProperty("pdxInfo")
-        public List<PdxInfo> getPdxInfo() {
-            return pdxInfo;
-        }
-
-        @JsonProperty("pdxInfo")
-        public void setPdxInfo(List<PdxInfo> pdxInfo) {
-            this.pdxInfo = pdxInfo;
-        }
-
-    }
- */

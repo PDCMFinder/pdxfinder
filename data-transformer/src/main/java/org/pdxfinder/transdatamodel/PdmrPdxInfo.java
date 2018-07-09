@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by abayomi on 20/11/2017.
@@ -35,6 +36,7 @@ import javax.persistence.*;
         "Sample Type",
         "Strain",
         "Mouse Sex",
+        "Treatments",
         "Treatment Naive",
         "Engraftment Site",
         "Engraftment Type",
@@ -80,6 +82,10 @@ public class PdmrPdxInfo {
     private String dateAtCollection;
     private String accessibility;
 
+    @OneToMany(mappedBy = "pdmrPdxInfo")
+    private List<Treatment> treatments;
+
+
     public PdmrPdxInfo() {
     }
 
@@ -87,7 +93,8 @@ public class PdmrPdxInfo {
     public PdmrPdxInfo(String modelID, String patientID, String gender, String age, String race, String ethnicity, String specimenSite,
                        String primarySite, String initialDiagnosis, String clinicalDiagnosis, String tumorType, String stageClassification,
                        String stageValue, String gradeClassification, String gradeValue, String sampleType, String strain, String mouseSex,
-                       String treatmentNaive, String engraftmentSite, String engraftmentType, String sourceUrl, String extractionMethod, String dateAtCollection, String accessibility) {
+                       String treatmentNaive, String engraftmentSite, String engraftmentType, String sourceUrl,
+                       String extractionMethod, String dateAtCollection, String accessibility, List<Treatment> treatments) {
         this.modelID = modelID;
         this.patientID = patientID;
         this.gender = gender;
@@ -113,6 +120,7 @@ public class PdmrPdxInfo {
         this.extractionMethod = extractionMethod;
         this.dateAtCollection = dateAtCollection;
         this.accessibility = accessibility;
+        this.treatments = treatments;
     }
 
     @JsonProperty("Model ID")
@@ -294,6 +302,16 @@ public class PdmrPdxInfo {
     @JsonProperty("Mouse Sex")
     public void setMouseSex(String mouseSex) {
         this.mouseSex = mouseSex;
+    }
+
+    @JsonProperty("Treatments")
+    public void setTreatments(List<Treatment> treatments) {
+        this.treatments = treatments;
+    }
+
+    @JsonProperty("Treatments")
+    public List<Treatment> getTreatments() {
+        return treatments;
     }
 
     @JsonProperty("Treatment Naive")
