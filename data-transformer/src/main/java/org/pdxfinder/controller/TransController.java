@@ -24,26 +24,36 @@ public class TransController {
     ObjectMapper mapper = new ObjectMapper();
     private DataTransformerService dataTransformerService;
 
-    @Value("${mydatasource.url1}")
-    private String url1;
+    @Value("${mydatasource.specimenSearchUrl}")
+    private String specimenSearchUrl;
 
-    @Value("${mydatasource.url2}")
-    private String url2;
+    @Value("${mydatasource.specimenUrl}")
+    private String specimenUrl;
 
-    @Value("${mydatasource.url3}")
-    private String url3;
+    @Value("${mydatasource.tissueOriginsUrl}")
+    private String tissueOriginsUrl;
 
-    @Value("${mydatasource.url4}")
-    private String url4;
+    @Value("${mydatasource.tumoGradeStateTypesUrl}")
+    private String tumoGradeStateTypesUrl;
 
-    @Value("${mydatasource.url5}")
-    private String url5;
+    @Value("${mydatasource.mouseStrainsUrl}")
+    private String mouseStrainsUrl;
 
-    @Value("${mydatasource.url6}")
-    private String url6;
+    @Value("${mydatasource.implantationSitesUrl}")
+    private String implantationSitesUrl;
 
-    @Value("${mydatasource.url7}")
-    private String url7;
+    @Value("${mydatasource.tissueTypeUrl}")
+    private String tissueTypeUrl;
+
+    @Value("${mydatasource.histologyUrl}")
+    private String histologyUrl;
+
+    @Value("${mydatasource.tumorGradeUrl}")
+    private String tumorGradeUrl;
+
+    @Value("${mydatasource.samplesUrl}")
+    private String samplesUrl;
+
 
 
     private final static Logger log = LoggerFactory.getLogger(TransController.class);
@@ -70,7 +80,8 @@ public class TransController {
     @GetMapping("/load-data")
     public String connectPdmr(){
 
-        dataTransformerService.transformDataAndSave(url1, url2, url3, url4, url5, url6, url7);
+        dataTransformerService.transformDataAndSave(specimenSearchUrl, specimenUrl, tissueOriginsUrl, tumoGradeStateTypesUrl, mouseStrainsUrl,
+                implantationSitesUrl, tissueTypeUrl, histologyUrl, tumorGradeUrl, samplesUrl);
         return "success";
 
     }

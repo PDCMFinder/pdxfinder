@@ -37,6 +37,7 @@ import javax.persistence.*;
         "Mouse Sex",
         "Treatment Naive",
         "Engraftment Site",
+        "Engraftment Type",
         "Source url",
         "Extraction Method",
         "Date At Collection",
@@ -72,6 +73,7 @@ public class PdmrPdxInfo {
     private String mouseSex;
     private String treatmentNaive;
     private String engraftmentSite;
+    private String engraftmentType;
     private String sourceUrl;
 
     private String extractionMethod;
@@ -85,8 +87,7 @@ public class PdmrPdxInfo {
     public PdmrPdxInfo(String modelID, String patientID, String gender, String age, String race, String ethnicity, String specimenSite,
                        String primarySite, String initialDiagnosis, String clinicalDiagnosis, String tumorType, String stageClassification,
                        String stageValue, String gradeClassification, String gradeValue, String sampleType, String strain, String mouseSex,
-                       String treatmentNaive, String engraftmentSite, String sourceUrl, String extractionMethod, String dateAtCollection,
-                       String accessibility) {
+                       String treatmentNaive, String engraftmentSite, String engraftmentType, String sourceUrl, String extractionMethod, String dateAtCollection, String accessibility) {
         this.modelID = modelID;
         this.patientID = patientID;
         this.gender = gender;
@@ -107,6 +108,7 @@ public class PdmrPdxInfo {
         this.mouseSex = mouseSex;
         this.treatmentNaive = treatmentNaive;
         this.engraftmentSite = engraftmentSite;
+        this.engraftmentType = engraftmentType;
         this.sourceUrl = sourceUrl;
         this.extractionMethod = extractionMethod;
         this.dateAtCollection = dateAtCollection;
@@ -312,6 +314,16 @@ public class PdmrPdxInfo {
     @JsonProperty("Engraftment Site")
     public void setEngraftmentSite(String engraftmentSite) {
         this.engraftmentSite = engraftmentSite;
+    }
+
+    @JsonProperty("Engraftment Type")
+    public String getEngraftmentType() {
+        return engraftmentType;
+    }
+
+    @JsonProperty("Engraftment Type")
+    public void setEngraftmentType(String engraftmentType) {
+        this.engraftmentType = engraftmentType;
     }
 
     @JsonProperty("Source url")
