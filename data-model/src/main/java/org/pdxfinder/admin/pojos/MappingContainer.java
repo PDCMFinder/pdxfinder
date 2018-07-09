@@ -15,7 +15,13 @@ public class MappingContainer {
 
 
     public MappingContainer(TreeMap<Long, MappingEntity> mappings) {
+        this.mappings = new TreeMap<>();
         this.mappings = mappings;
+    }
+
+    public MappingContainer() {
+
+        mappings = new TreeMap<>();
     }
 
     public TreeMap<Long, MappingEntity> getMappings() {
@@ -41,5 +47,11 @@ public class MappingContainer {
         currentSize++;
 
         return (long) currentSize;
+    }
+
+
+    public void add(MappingEntity me){
+
+        mappings.put(me.getEntityId(), me);
     }
 }
