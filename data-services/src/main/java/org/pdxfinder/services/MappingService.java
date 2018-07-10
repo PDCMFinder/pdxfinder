@@ -22,6 +22,8 @@ public class MappingService {
 
     private final static Logger log = LoggerFactory.getLogger(MappingService.class);
 
+
+
     public MappingService() {
 
 
@@ -30,7 +32,7 @@ public class MappingService {
 
     public MappingContainer getSavedDiagnosisMappings(String mappingFileLocation){
 
-        mappingFileLocation = "/Users/csaba/PDX/LoaderData/mappings/diagnosis_to_ncit.json";
+        //mappingFileLocation = "/Users/csaba/PDX/LoaderData/mappings/diagnosis_to_ncit.json";
 
         String json = parseFile(mappingFileLocation);
         MappingContainer mc = new MappingContainer();
@@ -92,7 +94,7 @@ public class MappingService {
                     mappingValues.put("OriginTissue", originTissue);
                     mappingValues.put("TumorType", tumorType);
 
-                    MappingEntity me = new MappingEntity(new Long(i++), "DIAGNOSIS", mapLabels, mappingValues);
+                    MappingEntity me = new MappingEntity(new Long(i+1), "DIAGNOSIS", mapLabels, mappingValues);
                     me.setMappedTerm(ontologyTerm);
                     me.setMapType(mapType);
                     me.setJustification(justification);
@@ -108,6 +110,16 @@ public class MappingService {
 
 
     return mc;
+    }
+
+
+    public MappingContainer getMissingMappings(){
+
+        MappingContainer mc = new MappingContainer();
+
+
+
+        return mc;
     }
 
 
