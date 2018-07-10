@@ -55,7 +55,7 @@ public class AjaxController {
     @RequestMapping(value = "/modelcountperdrug")
     public Iterable<Map<String, Object>> getModelCountByDrug() {
 
-        return  drugService.getModelCountByDrug();
+        return  drugService.getModelCountByDrugAndComponentType("Drug");
     }
 
     @RequestMapping(value = "/modelcountpergene")

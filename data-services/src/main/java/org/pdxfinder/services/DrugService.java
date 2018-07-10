@@ -88,4 +88,12 @@ public class DrugService {
 
     }
 
+    public Iterable<Map<String, Object>> getModelCountByDrugAndComponentType(String type){
+
+        Iterable<Map<String, Object>> iterableResults = drugRepository.countModelsByDrugAndComponentType(type).queryResults();
+
+        return iterableResults;
+
+    }
+
 }
