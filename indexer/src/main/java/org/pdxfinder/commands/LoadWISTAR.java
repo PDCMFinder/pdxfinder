@@ -36,11 +36,14 @@ public class LoadWISTAR implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadWISTAR.class);
 
-    private final static String WISTAR_DATASOURCE_ABBREVIATION = "PDXNet-Wistar-MDAnderson-Penn";
-    private final static String WISTAR_DATASOURCE_NAME = "Wistar/MD Anderson/Penn";
-    private final static String WISTAR_DATASOURCE_DESCRIPTION = "Wistar-MDAnderson-Penn PDX mouse models for PDXNet.";
+    private final static String DATASOURCE_ABBREVIATION = "PDXNet-Wistar-MDAnderson-Penn";
+    private final static String DATASOURCE_NAME = "Wistar/MD Anderson/Penn";
+    private final static String DATASOURCE_DESCRIPTION = "Wistar-MDAnderson-Penn PDX mouse models for PDXNet.";
     private final static String DATASOURCE_CONTACT = "herlynm@Wistar.org,MDavies@mdanderson.org";
     private final static String SOURCE_URL = null;
+
+    private final static String PROVIDER_TYPE = "";
+    private final static String ACCESSIBILITY = "";
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
@@ -48,7 +51,7 @@ public class LoadWISTAR implements CommandLineRunner {
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
     //   private HostStrain nsgBS;
-    private ExternalDataSource wistarDS;
+    private Group wistarDS;
 
     private Options options;
     private CommandLineParser parser;
@@ -90,7 +93,9 @@ public class LoadWISTAR implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        wistarDS = dataImportService.getExternalDataSource(WISTAR_DATASOURCE_ABBREVIATION, WISTAR_DATASOURCE_NAME, WISTAR_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+        wistarDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
+                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {

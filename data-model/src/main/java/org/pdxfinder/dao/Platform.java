@@ -17,8 +17,8 @@ public class Platform {
     private String name;
     private String url;
 
-    @Relationship(type = "ASSOCIATED_WITH", direction = Relationship.INCOMING)
-    private ExternalDataSource externalDataSource;
+    @Relationship(type = "GROUP", direction = Relationship.INCOMING)
+    private Group group;
 
     @Relationship(type = "ASSOCIATED_WITH")
     private Set<PlatformAssociation> platformAssociations;
@@ -46,19 +46,19 @@ public class Platform {
         this.name = name;
     }
 
-    public ExternalDataSource getExternalDataSource() {
-        return externalDataSource;
-    }
-
-    public void setExternalDataSource(ExternalDataSource externalDataSource) {
-        this.externalDataSource = externalDataSource;
-    }
-
     public String getUrl() {
         return url;
     }
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
     }
 }

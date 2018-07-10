@@ -28,14 +28,19 @@ import javax.persistence.*;
         "Initial Diagnosis",
         "Clinical Diagnosis",
         "Tumor Type",
-        "Grades",
-        "Tumor Stage",
+        "Stage Classification",
+        "Stage Value",
+        "Grade Classification",
+        "Grade Value",
         "Sample Type",
         "Strain",
         "Mouse Sex",
         "Treatment Naive",
         "Engraftment Site",
-        "Source url"
+        "Source url",
+        "Extraction Method",
+        "Date At Collection",
+        "Accessibility"
 })
 public class PdmrPdxInfo {
 
@@ -56,8 +61,12 @@ public class PdmrPdxInfo {
     private String initialDiagnosis;
     private String clinicalDiagnosis;
     private String tumorType;
-    private String grades;
-    private String tumorStage;
+
+    private String stageClassification;
+    private String stageValue;
+    private String gradeClassification;
+    private String gradeValue;
+
     private String sampleType;
     private String strain;
     private String mouseSex;
@@ -65,12 +74,19 @@ public class PdmrPdxInfo {
     private String engraftmentSite;
     private String sourceUrl;
 
+    private String extractionMethod;
+    private String dateAtCollection;
+    private String accessibility;
+
     public PdmrPdxInfo() {
     }
 
+
     public PdmrPdxInfo(String modelID, String patientID, String gender, String age, String race, String ethnicity, String specimenSite,
-                       String primarySite, String initialDiagnosis, String clinicalDiagnosis, String tumorType, String grades, String tumorStage,
-                       String sampleType, String strain, String mouseSex, String treatmentNaive, String engraftmentSite,String sourceUrl) {
+                       String primarySite, String initialDiagnosis, String clinicalDiagnosis, String tumorType, String stageClassification,
+                       String stageValue, String gradeClassification, String gradeValue, String sampleType, String strain, String mouseSex,
+                       String treatmentNaive, String engraftmentSite, String sourceUrl, String extractionMethod, String dateAtCollection,
+                       String accessibility) {
         this.modelID = modelID;
         this.patientID = patientID;
         this.gender = gender;
@@ -82,14 +98,19 @@ public class PdmrPdxInfo {
         this.initialDiagnosis = initialDiagnosis;
         this.clinicalDiagnosis = clinicalDiagnosis;
         this.tumorType = tumorType;
-        this.grades = grades;
-        this.tumorStage = tumorStage;
+        this.stageClassification = stageClassification;
+        this.stageValue = stageValue;
+        this.gradeClassification = gradeClassification;
+        this.gradeValue = gradeValue;
         this.sampleType = sampleType;
         this.strain = strain;
         this.mouseSex = mouseSex;
         this.treatmentNaive = treatmentNaive;
         this.engraftmentSite = engraftmentSite;
         this.sourceUrl = sourceUrl;
+        this.extractionMethod = extractionMethod;
+        this.dateAtCollection = dateAtCollection;
+        this.accessibility = accessibility;
     }
 
     @JsonProperty("Model ID")
@@ -202,24 +223,45 @@ public class PdmrPdxInfo {
         this.tumorType = tumorType;
     }
 
-    @JsonProperty("Grades")
-    public String getGrades() {
-        return grades;
+    @JsonProperty("Stage Classification")
+    public String getStageClassification() {
+        return stageClassification;
     }
 
-    @JsonProperty("Grades")
-    public void setGrades(String grades) {
-        this.grades = grades;
+    @JsonProperty("Stage Classification")
+    public void setStageClassification(String stageClassification) {
+        this.stageClassification = stageClassification;
     }
 
-    @JsonProperty("Tumor Stage")
-    public String getTumorStage() {
-        return tumorStage;
+    @JsonProperty("Stage Value")
+    public String getStageValue() {
+        return stageValue;
     }
 
-    @JsonProperty("Tumor Stage")
-    public void setTumorStage(String tumorStage) {
-        this.tumorStage = tumorStage;
+
+    @JsonProperty("Stage Value")
+    public void setStageValue(String stageValue) {
+        this.stageValue = stageValue;
+    }
+
+    @JsonProperty("Grade Classification")
+    public String getGradeClassification() {
+        return gradeClassification;
+    }
+
+    @JsonProperty("Grade Classification")
+    public void setGradeClassification(String gradeClassification) {
+        this.gradeClassification = gradeClassification;
+    }
+
+    @JsonProperty("Grade Value")
+    public String getGradeValue() {
+        return gradeValue;
+    }
+
+    @JsonProperty("Grade Value")
+    public void setGradeValue(String gradeValue) {
+        this.gradeValue = gradeValue;
     }
 
     @JsonProperty("Sample Type")
@@ -282,8 +324,35 @@ public class PdmrPdxInfo {
         this.sourceUrl = sourceUrl;
     }
 
+    @JsonProperty("Extraction Method")
+    public String getExtractionMethod() {
+        return extractionMethod;
+    }
 
+    @JsonProperty("Extraction Method")
+    public void setExtractionMethod(String extractionMethod) {
+        this.extractionMethod = extractionMethod;
+    }
 
+    @JsonProperty("Date At Collection")
+    public String getDateAtCollection() {
+        return dateAtCollection;
+    }
+
+    @JsonProperty("Date At Collection")
+    public void setDateAtCollection(String dateAtCollection) {
+        this.dateAtCollection = dateAtCollection;
+    }
+
+    @JsonProperty("Accessibility")
+    public String getAccessibility() {
+        return accessibility;
+    }
+
+    @JsonProperty("Accessibility")
+    public void setAccessibility(String accessibility) {
+        this.accessibility = accessibility;
+    }
 }
 
 

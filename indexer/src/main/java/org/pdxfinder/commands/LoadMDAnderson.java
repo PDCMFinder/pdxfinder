@@ -37,11 +37,14 @@ public class LoadMDAnderson implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadMDAnderson.class);
 
-    private final static String MDA_DATASOURCE_ABBREVIATION = "PDXNet-MDAnderson";
-    private final static String MDA_DATASOURCE_NAME = "University of Texas MD Anderson Cancer Center";
-    private final static String MDA_DATASOURCE_DESCRIPTION = "University Texas MD Anderson PDX mouse models for PDXNet.";
+    private final static String DATASOURCE_ABBREVIATION = "PDXNet-MDAnderson";
+    private final static String DATASOURCE_NAME = "University of Texas MD Anderson Cancer Center";
+    private final static String DATASOURCE_DESCRIPTION = "University Texas MD Anderson PDX mouse models for PDXNet.";
     private final static String DATASOURCE_CONTACT = "bfang@mdanderson.org";
     private final static String SOURCE_URL = null;
+
+    private final static String PROVIDER_TYPE = "";
+    private final static String ACCESSIBILITY = "";
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
@@ -49,7 +52,7 @@ public class LoadMDAnderson implements CommandLineRunner {
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
     //   private HostStrain nsgBS;
-    private ExternalDataSource mdaDS;
+    private Group mdaDS;
 
     private Options options;
     private CommandLineParser parser;
@@ -97,7 +100,8 @@ public class LoadMDAnderson implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        mdaDS = dataImportService.getExternalDataSource(MDA_DATASOURCE_ABBREVIATION, MDA_DATASOURCE_NAME, MDA_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+        mdaDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
+                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
         try {

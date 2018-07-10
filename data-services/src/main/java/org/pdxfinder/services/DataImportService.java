@@ -14,9 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +34,7 @@ public class DataImportService {
     private HostStrainRepository hostStrainRepository;
     private EngraftmentTypeRepository engraftmentTypeRepository;
     private EngraftmentSiteRepository engraftmentSiteRepository;
-    private ExternalDataSourceRepository externalDataSourceRepository;
+    private GroupRepository groupRepository;
     private PatientRepository patientRepository;
     private ModelCreationRepository modelCreationRepository;
     private TissueRepository tissueRepository;
@@ -61,7 +59,7 @@ public class DataImportService {
                              HostStrainRepository hostStrainRepository,
                              EngraftmentTypeRepository engraftmentTypeRepository,
                              EngraftmentSiteRepository engraftmentSiteRepository,
-                             ExternalDataSourceRepository externalDataSourceRepository,
+                             GroupRepository groupRepository,
                              PatientRepository patientRepository,
                              ModelCreationRepository modelCreationRepository,
                              TissueRepository tissueRepository,
@@ -83,7 +81,7 @@ public class DataImportService {
         Assert.notNull(hostStrainRepository, "hostStrainRepository cannot be null");
         Assert.notNull(engraftmentTypeRepository, "implantationTypeRepository cannot be null");
         Assert.notNull(engraftmentSiteRepository, "implantationSiteRepository cannot be null");
-        Assert.notNull(externalDataSourceRepository, "externalDataSourceRepository cannot be null");
+        Assert.notNull(groupRepository, "GroupRepository cannot be null");
         Assert.notNull(patientRepository, "patientRepository cannot be null");
         Assert.notNull(modelCreationRepository, "modelCreationRepository cannot be null");
         Assert.notNull(tissueRepository, "tissueRepository cannot be null");
@@ -98,7 +96,7 @@ public class DataImportService {
         this.hostStrainRepository = hostStrainRepository;
         this.engraftmentTypeRepository = engraftmentTypeRepository;
         this.engraftmentSiteRepository = engraftmentSiteRepository;
-        this.externalDataSourceRepository = externalDataSourceRepository;
+        this.groupRepository = groupRepository;
         this.patientRepository = patientRepository;
         this.modelCreationRepository = modelCreationRepository;
         this.tissueRepository = tissueRepository;
@@ -118,22 +116,34 @@ public class DataImportService {
 
     }
 
-    public ExternalDataSource getExternalDataSource(String abbr, String name, String description, String contact, String url) {
-        ExternalDataSource eDS = externalDataSourceRepository.findByAbbreviation(abbr);
-        if (eDS == null) {
-            log.info("External data source '{}' not found. Creating", abbr);
-            eDS = new ExternalDataSource(
-                    name,
-                    abbr,
-                    description,
-                    contact,
-                    Date.from(Instant.now()),
-                    url);
-            externalDataSourceRepository.save(eDS);
+    public Group getGroup(String name, String abbrev, String type){
+
+        Group g = groupRepository.findByNameAndType(name, type);
+
+        if(g == null){
+            log.info("Group not found. Creating", name);
+
+            g = new Group(name, abbrev, type);
+            groupRepository.save(g);
+
         }
 
-        return eDS;
+        return g;
+    }
 
+    public Group getProviderGroup(String name, String abbrev, String description, String providerType, String accessibility,
+                                  String accessModalities, String contact, String url){
+
+        Group g = groupRepository.findByNameAndType(name, "Provider");
+
+        if(g == null){
+            log.info("Provider group not found. Creating", name);
+
+            g = new Group(name, abbrev, description, providerType, accessibility, accessModalities, contact, url);
+            groupRepository.save(g);
+
+        }
+        return g;
     }
 
 
@@ -199,15 +209,15 @@ public class DataImportService {
         return modelCreationRepository.findByMolChar(mc);
     }
 
-    public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, ExternalDataSource externalDataSource) {
+    public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, Group group) {
 
-        Patient patient = patientRepository.findByExternalIdAndDS(externalId, externalDataSource);
+        Patient patient = patientRepository.findByExternalIdAndGroup(externalId, group);
         PatientSnapshot patientSnapshot;
 
         if (patient == null) {
             log.info("Patient '{}' not found. Creating", externalId);
 
-            patient = this.getPatient(externalId, sex, race, ethnicity, externalDataSource);
+            patient = this.getPatient(externalId, sex, race, ethnicity, group);
 
             patientSnapshot = new PatientSnapshot(patient, age);
             patientSnapshotRepository.save(patientSnapshot);
@@ -247,14 +257,14 @@ public class DataImportService {
 
     }
 
-    public Patient getPatient(String externalId, String sex, String race, String ethnicity, ExternalDataSource externalDataSource) {
+    public Patient getPatient(String externalId, String sex, String race, String ethnicity, Group group) {
 
-        Patient patient = patientRepository.findByExternalIdAndDS(externalId, externalDataSource);
+        Patient patient = patientRepository.findByExternalIdAndGroup(externalId, group);
 
         if (patient == null) {
             log.info("Patient '{}' not found. Creating", externalId);
 
-            patient = new Patient(externalId, sex, race, ethnicity, externalDataSource);
+            patient = new Patient(externalId, sex, race, ethnicity, group);
 
             patientRepository.save(patient);
         }
@@ -565,24 +575,25 @@ public class DataImportService {
         return markerRepository.findAllHumanMarkers();
     }
 
-    public Platform getPlatform(String name, ExternalDataSource eds) {
-        Platform p = platformRepository.findByNameAndDataSource(name, eds.getName());
+    public Platform getPlatform(String name, Group group) {
+        Platform p = platformRepository.findByNameAndDataSource(name, group.getName());
         if (p == null) {
             p = new Platform();
             p.setName(name);
-            p.setExternalDataSource(eds);
+            p.setGroup(group);
       //      platformRepository.save(p);
         }
 
         return p;
     }
 
-    public Platform getPlatform(String name, ExternalDataSource eds, String platformUrl) {
-        Platform p = platformRepository.findByNameAndDataSourceAndUrl(name, eds.getName(), platformUrl);
+    public Platform getPlatform(String name, Group group, String platformUrl) {
+        Platform p = platformRepository.findByNameAndDataSourceAndUrl(name, group.getName(), platformUrl);
+
         if (p == null) {
             p = new Platform();
             p.setName(name);
-            p.setExternalDataSource(eds);
+            p.setGroup(group);
             p.setUrl(platformUrl);
         }
 
@@ -600,13 +611,13 @@ public class DataImportService {
         if (p == null) {
             System.out.println("Platform is null");
         }
-        if (p.getExternalDataSource() == null) {
+        if (p.getGroup() == null) {
             System.out.println("P.EDS is null");
         }
         if (m == null) {
             System.out.println("Marker is null");
         }
-        PlatformAssociation pa = platformAssociationRepository.findByPlatformAndMarker(p.getName(), p.getExternalDataSource().getName(), m.getSymbol());
+        PlatformAssociation pa = platformAssociationRepository.findByPlatformAndMarker(p.getName(), p.getGroup().getName(), m.getSymbol());
         if (pa == null) {
             pa = new PlatformAssociation();
             pa.setPlatform(p);

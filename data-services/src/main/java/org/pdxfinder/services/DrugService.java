@@ -8,10 +8,7 @@ import org.pdxfinder.repositories.TreatmentProtocolRepository;
 import org.pdxfinder.repositories.TreatmentSummaryRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /*
  * Created by csaba on 29/03/2018.
@@ -58,7 +55,7 @@ public class DrugService {
 
             for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
 
-                String drugName = tp.getDrugString();
+                String drugName = tp.getDrugString(false);
                 drugNamesSet.add(drugName);
             }
         }
@@ -80,6 +77,23 @@ public class DrugService {
     public int getTotalSummaryNumber(){
 
         return treatmentSummaryRepository.findTotalSummaryNumber();
+    }
+
+
+    public Iterable<Map<String, Object>> getModelCountByDrug(){
+
+        Iterable<Map<String, Object>> iterableResults = drugRepository.countModelsByDrug().queryResults();
+
+        return iterableResults;
+
+    }
+
+    public Iterable<Map<String, Object>> getModelCountByDrugAndComponentType(String type){
+
+        Iterable<Map<String, Object>> iterableResults = drugRepository.countModelsByDrugAndComponentType(type).queryResults();
+
+        return iterableResults;
+
     }
 
 }

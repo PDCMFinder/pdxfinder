@@ -24,6 +24,12 @@ public class Sample {
     private Tissue sampleSite;
     private String extractionMethod;
     private String classification;
+    private String stage;
+    private String stageClassification;
+    private String grade;
+    private String gradeClassification;
+    //TODO: remove classification field and use stage and grade instead.
+
     public Boolean normalTissue;
     private String dataSource;
 
@@ -185,5 +191,37 @@ public class Sample {
 
     public void setPatientSnapshot(PatientSnapshot patientSnapshot) {
         this.patientSnapshot = patientSnapshot;
+    }
+
+    public String getStage() {
+        return stage;
+    }
+
+    public void setStage(String stage) {
+        this.stage = stage;
+    }
+
+    public String getStageClassification() {
+        return stageClassification;
+    }
+
+    public void setStageClassification(String stageClassification) {
+        this.stageClassification = stageClassification;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
+    public String getGradeClassification() {
+        return gradeClassification;
+    }
+
+    public void setGradeClassification(String gradeClassification) {
+        this.gradeClassification = gradeClassification;
     }
 }
