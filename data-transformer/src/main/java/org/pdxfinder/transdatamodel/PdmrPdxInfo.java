@@ -43,7 +43,8 @@ import java.util.List;
         "Source url",
         "Extraction Method",
         "Date At Collection",
-        "Accessibility"
+        "Accessibility",
+        "Validations"
 })
 public class PdmrPdxInfo {
 
@@ -85,6 +86,9 @@ public class PdmrPdxInfo {
     @OneToMany(mappedBy = "pdmrPdxInfo")
     private List<Treatment> treatments;
 
+    @OneToMany(mappedBy = "pdmrPdxInfo")
+    private List<Validation> validations;
+
 
     public PdmrPdxInfo() {
     }
@@ -94,7 +98,7 @@ public class PdmrPdxInfo {
                        String primarySite, String initialDiagnosis, String clinicalDiagnosis, String tumorType, String stageClassification,
                        String stageValue, String gradeClassification, String gradeValue, String sampleType, String strain, String mouseSex,
                        String treatmentNaive, String engraftmentSite, String engraftmentType, String sourceUrl,
-                       String extractionMethod, String dateAtCollection, String accessibility, List<Treatment> treatments) {
+                       String extractionMethod, String dateAtCollection, String accessibility, List<Treatment> treatments, List<Validation> validations) {
         this.modelID = modelID;
         this.patientID = patientID;
         this.gender = gender;
@@ -121,6 +125,7 @@ public class PdmrPdxInfo {
         this.dateAtCollection = dateAtCollection;
         this.accessibility = accessibility;
         this.treatments = treatments;
+        this.validations = validations;
     }
 
     @JsonProperty("Model ID")
@@ -382,6 +387,11 @@ public class PdmrPdxInfo {
     @JsonProperty("Accessibility")
     public void setAccessibility(String accessibility) {
         this.accessibility = accessibility;
+    }
+
+    @JsonProperty("Validations")
+    public List<Validation> getValidations() {
+        return validations;
     }
 }
 

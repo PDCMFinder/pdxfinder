@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pdxfinder.controller.TransController;
 import org.pdxfinder.transdatamodel.PdmrPdxInfo;
 import org.pdxfinder.transdatamodel.Treatment;
+import org.pdxfinder.transdatamodel.Validation;
 import org.pdxfinder.transrepository.PdmrPdxInfoRepository;
 import org.pdxfinder.transrepository.PdmrTreatmentRepository;
+import org.pdxfinder.transrepository.ValidationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,14 +33,18 @@ public class DataTransformerService {
     ObjectMapper mapper = new ObjectMapper();
     private PdmrPdxInfoRepository pdmrPdxInfoRepository;
     private PdmrTreatmentRepository pdmrTreatmentRepository;
+    private ValidationRepository validationRepository;
 
     private String DATASOURCE_URL_PREFIX = "https://pdmdb.cancer.gov/pls/apex/f?p=101:4:0::NO:4:P4_SPECIMENSEQNBR:";
 
     private final static Logger log = LoggerFactory.getLogger(TransController.class);
 
-    public DataTransformerService(PdmrPdxInfoRepository pdmrPdxInfoRepository, PdmrTreatmentRepository pdmrTreatmentRepository) {
+    public DataTransformerService(PdmrPdxInfoRepository pdmrPdxInfoRepository,
+                                  PdmrTreatmentRepository pdmrTreatmentRepository,
+                                  ValidationRepository validationRepository) {
         this.pdmrPdxInfoRepository = pdmrPdxInfoRepository;
         this.pdmrTreatmentRepository = pdmrTreatmentRepository;
+        this.validationRepository = validationRepository;
     }
 
     //Transformation rule as specified here: https://docs.google.com/spreadsheets/d/1buUu5yj3Xq8tbEtL1l2UILV9kLnouGqF0vIjFlGGbEE
@@ -96,7 +102,7 @@ public class DataTransformerService {
         String report = "";
 
 
-        //If seqnumber is ) input in finder "Heterotopic" else if (1,2,3,4,5,6) put "Orthotopic" else(99) pit not specified
+        //If seqnumber is ) input in finder "Heterotopic" else if (1,2,3,4,5,6) put "Orthotopic" else(99) put not specified
 
         // Read the whole JSOn as a JsonNode type & Retrieve each specimen search record as a Map (key value type) type
         JsonNode rootArray = connectToJSON(specimenSearchUrl);
@@ -393,11 +399,17 @@ public class DataTransformerService {
             }
 
 
+            // Hardcode the validation techniques.
+            List<Validation> validations = new ArrayList<>();
+            validations.add(new Validation("Fingerprinting","Model validated against  patient tumour or P0 xenograft","All"));
+            validations.add(new Validation("Human mouse/DNA","Model validated against  patient tumour or P0 xenograft","All"));
+            validations.add(new Validation("Histology","Model validated against histological features of same diagnosis","All"));
+
             try {
 
                 PdmrPdxInfo pdmrPdxInfo = new PdmrPdxInfo(modelID, patientID, gender, age, race, ethnicity, specimenSite, primarySite, initialDiagnosis,
                         clinicalDiagnosis, tumorType, stageClassification, stageValue, gradeClassification, gradeValue, sampleType, strain, mouseSex,
-                        treatmentNaive, engraftmentSite, engraftmentType, sourceUrl, extractionMethod, dateAtCollection, accessibility,treatments);
+                        treatmentNaive, engraftmentSite, engraftmentType, sourceUrl, extractionMethod, dateAtCollection, accessibility,treatments,validations);
 
                 pdmrPdxInfoRepository.save(pdmrPdxInfo);
 
@@ -406,6 +418,12 @@ public class DataTransformerService {
                     treatment.setPdmrPdxInfo(pdmrPdxInfo);
                 }
                 pdmrTreatmentRepository.save(treatments);
+
+                // Update the Foreign Key pdxinfo_id for the corresponding validations
+                for (Validation validation : validations){
+                    validation.setPdmrPdxInfo(pdmrPdxInfo);
+                }
+                validationRepository.save(validations);
 
 
                 log.info("Loaded Record for Patient" + specimenSearch.get("PATIENTID"));

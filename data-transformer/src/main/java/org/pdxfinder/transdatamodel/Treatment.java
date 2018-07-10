@@ -24,7 +24,6 @@ import javax.persistence.*;
 
 
 
-
 public class Treatment {
 
     @Id
