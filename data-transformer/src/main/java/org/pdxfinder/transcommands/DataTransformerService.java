@@ -51,8 +51,12 @@ public class DataTransformerService {
                                          String tissueTypeUrl,
                                          String histologyUrl,
                                          String tumorGradeUrl,
-                                         String samplesUrl) {
+                                         String samplesUrl,
+                                         String currentTherapyUrl,
+                                         String standardRegimensUrl,
+                                         String clinicalResponseUrl) {
 
+        String unKnown = "Not Specified";
         String modelID = "";
         String patientID = "";
         String gender = "";
@@ -78,6 +82,13 @@ public class DataTransformerService {
         String extractionMethod = "";
         String dateAtCollection = "";
         String accessibility = "";
+
+        String drug = "";
+        String startingDate = "";
+        String response = "";
+        String duration = unKnown;
+
+
 
 
         String report = "";
@@ -106,9 +117,20 @@ public class DataTransformerService {
 
         JsonNode tumorGrades = connectToJSON(tumorGradeUrl);
 
+        JsonNode currentTherapies = connectToJSON(currentTherapyUrl);
+
+        JsonNode standardRegimens = connectToJSON(standardRegimensUrl);
+
+        JsonNode clinicalResponses = connectToJSON(clinicalResponseUrl);
+
+
+
         //engraftmentType
+        int count = 0;
 
         for (JsonNode node : rootArray) {
+
+            count++;
 
             Map<String, Object> specimenSearch = mapper.convertValue(node, Map.class);
 
@@ -117,10 +139,10 @@ public class DataTransformerService {
             gender = specimenSearch.get("GENDER").toString().equals("M") ? "Male" : "Female";
 
             race = specimenSearch.get("RACEDESCRIPTION") + "";
-            race = race.equals("Not Provided") ? "Not Specified" : race;
+            race = race.equals("Not Provided") ? unKnown : race;
 
             ethnicity = specimenSearch.get("ETHNICITYDESCRIPTION") + "";
-            ethnicity = ethnicity.equals("Not Provided") ? "Not Specified" : ethnicity;
+            ethnicity = ethnicity.equals("Not Provided") ? unKnown : ethnicity;
 
             primarySite = specimenSearch.get("DISEASELOCATIONDESCRIPTION") + "";
             initialDiagnosis = "";
@@ -139,7 +161,7 @@ public class DataTransformerService {
             dateAtCollection = "";
             accessibility = "";
 
-            treatmentNaive = "Not Specified";
+            treatmentNaive = unKnown;
             age = "";
             specimenSite = "";
 
@@ -175,7 +197,7 @@ public class DataTransformerService {
                                 if (dHistology.get("TUMORGRADESEQNBR").equals(dTumorGrade.get("TUMORGRADESEQNBR"))) {
 
                                     gradeValue = dTumorGrade.get("TUMORGRADESHORTNAME")+"";
-                                    gradeValue = gradeValue.equals("---") ? "Not Specified" : gradeValue;
+                                    gradeValue = gradeValue.equals("---") ? unKnown : gradeValue;
                                 }
                             }
                         }
@@ -188,10 +210,51 @@ public class DataTransformerService {
 
 
             // From specimensearch table - pick PATIENTSEQNBR column
-            // Look CURRENTTHERAPY table for key PATIENTSEQNBR and retrieve the STANDARDIZEDREGIMENSEQNBR column
-            // Look STANDARDIZEDREGIMENS table for key STANDARDIZEDREGIMENSEQNBR and retrieve DISPLAYEDREGIMEN
+            /**Look CURRENTTHERAPY table for key PATIENTSEQNBR and retrieve the STANDARDIZEDREGIMENSEQNBR column
+             Look STANDARDIZEDREGIMENS table for key STANDARDIZEDREGIMENSEQNBR and retrieve DISPLAYEDREGIMEN */
+
+            /** From CURRENTTHERAPY table also retrieve the BESTRESPONSESEQNBR column
+             Look CLINICALRESPONSES table for key CLINICALRESPONSESEQNBR (->BESTRESPONSESEQNBR) and retrieve CLINICALRESPONSEDESCRIPTION */
+
+            for (JsonNode currentTherapy : currentTherapies) {
+                Map<String, Object> dCurrentTherapy = mapper.convertValue(currentTherapy, Map.class);
 
 
+                if (specimenSearch.get("PATIENTSEQNBR").equals(dCurrentTherapy.get("PATIENTSEQNBR"))) {
+
+
+                    startingDate = dCurrentTherapy.get("DATEREGIMENSTARTED")+"";
+                    try {
+                        startingDate = startingDate.equals("null") ? unKnown : startingDate.substring(0, 10);
+                    } catch (Exception e) {}
+
+
+
+                    for (JsonNode standardregimen : standardRegimens) {
+                        Map<String, Object> dStandardregimen = mapper.convertValue(standardregimen, Map.class);
+
+                        if (dCurrentTherapy.get("STANDARDIZEDREGIMENSEQNBR").equals(dStandardregimen.get("REGIMENSEQNBR"))) {
+                            drug = dStandardregimen.get("DISPLAYEDREGIMEN")+"";
+                        }
+                    }
+
+
+                    for (JsonNode clinicalResponse : clinicalResponses) {
+                        Map<String, Object> dClinicalResponse = mapper.convertValue(clinicalResponse, Map.class);
+
+                        if (dCurrentTherapy.get("BESTRESPONSESEQNBR").equals(dClinicalResponse.get("CLINICALRESPONSESEQNBR"))) {
+                            response = dClinicalResponse.get("CLINICALRESPONSEDESCRIPTION")+"";
+                            response = response.equals("<Unknown>") ? unKnown : response;
+                        }
+                    }
+
+                }
+
+            }
+
+
+            List<Treatment> treatments = new ArrayList<>();
+            treatments.add(new Treatment(drug,unKnown,unKnown,duration,unKnown,unKnown,response,unKnown,startingDate));
 
 
 
@@ -208,16 +271,15 @@ public class DataTransformerService {
                     if (x.equals("1") || x.equals("8") || x.equals("9") || x.equals("10") || x.equals("11")) {
                         //1,8,9,10,11
                         stageClassification = dTumorGradeStageType.get("TUMORGRADESTAGESHORTNAME") + "";
-                        gradeClassification = "Not Specified";
+                        gradeClassification = unKnown;
                     } else {
                         //2,3,4,5,6,7,12,13
                         gradeClassification = dTumorGradeStageType.get("TUMORGRADESTAGESHORTNAME") + "";
                         gradeClassification = gradeClassification.equals("NA") ? "Not Specified" : gradeClassification;
-                        stageClassification = "Not Specified";
+                        stageClassification = unKnown;
                     }
                 }
             }
-
 
 
             for (JsonNode tissueType : tissueTypes)
@@ -272,8 +334,8 @@ public class DataTransformerService {
                     if (specimen.get("IMPLANTATIONSITESEQNBR").equals("0")) {
                         engraftmentType = "Heterotopic";
                     }else if(specimen.get("IMPLANTATIONSITESEQNBR").equals("99")){
-                        engraftmentSite = "Not Specified";
-                        engraftmentType = "Not Specified";
+                        engraftmentSite = unKnown;
+                        engraftmentType = unKnown;
                     }else{
                         engraftmentType = "Orthotopic";
                     }
@@ -294,9 +356,6 @@ public class DataTransformerService {
             }
 
 
-            List<Treatment> treatments = new ArrayList<>();
-            treatments.add(new Treatment("aaa","bbb","ccc","ddd","555","777","jjj","rt5yyy"));
-
             try {
 
                 PdmrPdxInfo pdmrPdxInfo = new PdmrPdxInfo(modelID, patientID, gender, age, race, ethnicity, specimenSite, primarySite, initialDiagnosis,
@@ -305,7 +364,7 @@ public class DataTransformerService {
 
                 pdmrPdxInfoRepository.save(pdmrPdxInfo);
 
-                // Update the Foreign Key pdxinfo_id for the coresponding treatments
+                // Update the Foreign Key pdxinfo_id for the corresponding treatments
                 for (Treatment treatment: treatments){
                     treatment.setPdmrPdxInfo(pdmrPdxInfo);
                 }
@@ -319,7 +378,7 @@ public class DataTransformerService {
 
             report += "Loaded Record for Patient " + specimenSearch.get("PATIENTID") + "<br>";
 
-            break;
+            if (count == 40){ break; }
         }
 
         return rootArray;

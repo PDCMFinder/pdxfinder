@@ -50,6 +50,17 @@ public class TransformPDMR implements CommandLineRunner {
     @Value("${mydatasource.samplesUrl}")
     private String samplesUrl;
 
+    @Value("${mydatasource.currentTherapyUrl}")
+    private String currentTherapyUrl;
+
+    @Value("${mydatasource.standardRegimensUrl}")
+    private String standardRegimensUrl;
+
+    @Value("${mydatasource.clinicalResponseUrl}")
+    private String clinicalResponseUrl;
+
+
+
 
 
     @Autowired
@@ -75,7 +86,8 @@ public class TransformPDMR implements CommandLineRunner {
                 log.info("Loading from URL " + specimenUrl);
 
                 dataTransformerService.transformDataAndSave(specimenSearchUrl, specimenUrl, tissueOriginsUrl, tumoGradeStateTypesUrl, mouseStrainsUrl,
-                        implantationSitesUrl, tissueTypeUrl, histologyUrl, tumorGradeUrl, samplesUrl);
+                        implantationSitesUrl, tissueTypeUrl, histologyUrl, tumorGradeUrl, samplesUrl,
+                        currentTherapyUrl, standardRegimensUrl, clinicalResponseUrl);
             } else {
                 log.error("No mydatasource.url1 or mydatasource.url2 provided in properties");
             }

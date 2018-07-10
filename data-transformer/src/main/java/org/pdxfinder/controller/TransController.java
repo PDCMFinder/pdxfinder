@@ -54,6 +54,15 @@ public class TransController {
     @Value("${mydatasource.samplesUrl}")
     private String samplesUrl;
 
+    @Value("${mydatasource.currentTherapyUrl}")
+    private String currentTherapyUrl;
+
+    @Value("${mydatasource.standardRegimensUrl}")
+    private String standardRegimensUrl;
+
+    @Value("${mydatasource.clinicalResponseUrl}")
+    private String clinicalResponseUrl;
+
 
 
     private final static Logger log = LoggerFactory.getLogger(TransController.class);
@@ -81,7 +90,8 @@ public class TransController {
     public String connectPdmr(){
 
         dataTransformerService.transformDataAndSave(specimenSearchUrl, specimenUrl, tissueOriginsUrl, tumoGradeStateTypesUrl, mouseStrainsUrl,
-                implantationSitesUrl, tissueTypeUrl, histologyUrl, tumorGradeUrl, samplesUrl);
+                implantationSitesUrl, tissueTypeUrl, histologyUrl, tumorGradeUrl, samplesUrl,
+                currentTherapyUrl, standardRegimensUrl, clinicalResponseUrl);
         return "success";
 
     }

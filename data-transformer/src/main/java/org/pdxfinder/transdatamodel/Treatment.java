@@ -15,8 +15,9 @@ import javax.persistence.*;
         "Duration",
         "Frequency",
         "Arm Size",
-        "Response Class",
-        "Passage Range"
+        "Response",
+        "Passage Range",
+        "Starting Date"
 })
 
 
@@ -34,8 +35,9 @@ public class Treatment {
     private String duration;
     private String frequency;
     private String armSize;
-    private String responseClass;
+    private String response;
     private String passageRange;
+    private String startingDate;
 
     @ManyToOne
     @JoinColumn(name="pdxinfo_id")
@@ -45,15 +47,16 @@ public class Treatment {
     public Treatment(String drug, String manufacturer,
                      String dose, String duration,
                      String frequency, String armSize,
-                     String responseClass, String passageRange) {
+                     String response, String passageRange, String startingDate) {
         this.drug = drug;
         this.manufacturer = manufacturer;
         this.dose = dose;
         this.duration = duration;
         this.frequency = frequency;
         this.armSize = armSize;
-        this.responseClass = responseClass;
+        this.response = response;
         this.passageRange = passageRange;
+        this.startingDate = startingDate;
     }
 
     public Treatment() {
@@ -71,18 +74,8 @@ public class Treatment {
     }
 
     @JsonProperty("Manufacturer")
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    @JsonProperty("Manufacturer")
     public void setManufacturer(String manufacturer) {
         this.manufacturer = manufacturer;
-    }
-
-    @JsonProperty("Dose")
-    public String getDose() {
-        return dose;
     }
 
     @JsonProperty("Dose")
@@ -101,18 +94,8 @@ public class Treatment {
     }
 
     @JsonProperty("Frequency")
-    public String getFrequency() {
-        return frequency;
-    }
-
-    @JsonProperty("Frequency")
     public void setFrequency(String frequency) {
         this.frequency = frequency;
-    }
-
-    @JsonProperty("Arm Size")
-    public String getArmSize() {
-        return armSize;
     }
 
     @JsonProperty("Arm Size")
@@ -120,24 +103,29 @@ public class Treatment {
         this.armSize = armSize;
     }
 
-    @JsonProperty("Response Class")
-    public String getResponseClass() {
-        return responseClass;
+    @JsonProperty("Response")
+    public String getResponse() {
+        return response;
     }
 
-    @JsonProperty("Response Class")
-    public void setResponseClass(String responseClass) {
-        this.responseClass = responseClass;
-    }
-
-    @JsonProperty("Passage Range")
-    public String getPassageRange() {
-        return passageRange;
+    @JsonProperty("Response")
+    public void setResponse(String response) {
+        this.response = response;
     }
 
     @JsonProperty("Passage Range")
     public void setPassageRange(String passageRange) {
         this.passageRange = passageRange;
+    }
+
+    @JsonProperty("Starting Date")
+    public String getStartingDate() {
+        return startingDate;
+    }
+
+    @JsonProperty("Starting Date")
+    public void setStartingDate(String startingDate) {
+        this.startingDate = startingDate;
     }
 
     public void setPdmrPdxInfo(PdmrPdxInfo pdmrPdxInfo) {
