@@ -36,10 +36,12 @@ public class LoadHCI implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadHCI.class);
 
-    private final static String HCI_DATASOURCE_ABBREVIATION = "PDXNet-HCI-BCM";
-    private final static String HCI_DATASOURCE_NAME = "HCI-Baylor College of Medicine";
-    private final static String HCI_DATASOURCE_DESCRIPTION = "HCI BCM PDX mouse models for PDXNet.";
+    private final static String DATASOURCE_ABBREVIATION = "PDXNet-HCI-BCM";
+    private final static String DATASOURCE_NAME = "HCI-Baylor College of Medicine";
+    private final static String DATASOURCE_DESCRIPTION = "HCI BCM PDX mouse models for PDXNet.";
     private final static String DATASOURCE_CONTACT = "Alana.Welm@hci.utah.edu";
+    private final static String PROVIDER_TYPE = "";
+    private final static String ACCESSIBILITY = "";
 
     private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
@@ -59,7 +61,7 @@ public class LoadHCI implements CommandLineRunner {
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
     private HostStrain nsgBS, nsBS;
-    private ExternalDataSource hciDS;
+    private Group hciDS;
 
     private Options options;
     private CommandLineParser parser;
@@ -105,7 +107,9 @@ public class LoadHCI implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        hciDS = dataImportService.getExternalDataSource(HCI_DATASOURCE_ABBREVIATION, HCI_DATASOURCE_NAME, HCI_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+        hciDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
+                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+
         nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
         nsBS = dataImportService.getHostStrain(NS_BS_NAME, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
 

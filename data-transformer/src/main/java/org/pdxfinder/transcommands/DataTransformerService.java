@@ -35,9 +35,8 @@ public class DataTransformerService {
         this.pdmrPdxInfoRepository = pdmrPdxInfoRepository;
     }
 
-
     //Transformation rule as specified here: https://docs.google.com/spreadsheets/d/1buUu5yj3Xq8tbEtL1l2UILV9kLnouGqF0vIjFlGGbEE
-    public JsonNode transformDataAndSave(String url1,String url2){
+    public JsonNode transformDataAndSave(String url1,String url2,String url3,String url4,String url5,String url6,String url7){
 
         String modelID = "";
         String patientID = "";
@@ -50,14 +49,20 @@ public class DataTransformerService {
         String initialDiagnosis = "";
         String clinicalDiagnosis = "";
         String tumorType = "";
-        String grades = "";
-        String tumorStage = "";
+        String stageClassification = "";
+        String stageValue = "";
+        String gradeClassification = "";
+        String gradeValue = "";
         String sampleType = "";
         String strain = "";
         String mouseSex = "";
         String treatmentNaive = "";
         String engraftmentSite = "";
         String sourceUrl = "";
+        String extractionMethod = "";
+        String dateAtCollection = "";
+        String accessibility = "";
+
 
         String report = "";
 
@@ -66,6 +71,16 @@ public class DataTransformerService {
         JsonNode rootArray = connectToJSON(url1);
 
         JsonNode pdmrSpecimenData = connectToJSON(url2);
+
+        JsonNode tissueOrigins = connectToJSON(url3);
+
+        JsonNode tumorGradeStageTypes = connectToJSON(url4);
+
+        JsonNode mouseStrains = connectToJSON(url5);
+
+        JsonNode impantationSites = connectToJSON(url6);
+
+        JsonNode tissueTypes = connectToJSON(url7);
 
 
         for (JsonNode node : rootArray)
@@ -82,13 +97,18 @@ public class DataTransformerService {
             initialDiagnosis = "";
             clinicalDiagnosis = specimenSearch.get("MEDDRADESCRIPTION")+"";
             tumorType = "";
-            grades = specimenSearch.get("TUMORGRADESTAGEDESCRIPTION")+"";
-            tumorStage = specimenSearch.get("TUMORGRADESTAGEDESCRIPTION")+"";
+            stageClassification = "";
+            stageValue = "";
+            gradeClassification = "";
+            gradeValue = "";
             sampleType = specimenSearch.get("TISSUETYPEDESCRIPTION")+"";
-            strain = "NSG";
+            strain = "";
             mouseSex = "";
-            engraftmentSite = "Subcutaneous";
+            engraftmentSite = "";
             sourceUrl = DATASOURCE_URL_PREFIX+specimenSearch.get("SPECIMENSEQNBR");
+            extractionMethod = "";
+            dateAtCollection = "";
+            accessibility = "";
 
             treatmentNaive = "Unknown";
             age = "";
@@ -110,6 +130,43 @@ public class DataTransformerService {
             }catch (Exception e){}
 
 
+
+
+
+
+            for (JsonNode tumorGradeStageType : tumorGradeStageTypes)
+            {
+
+                Map<String, Object> dTumorGradeStageType = mapper.convertValue(tumorGradeStageType, Map.class);
+
+                if (specimenSearch.get("TUMORGRADESTAGESEQNBR").equals(dTumorGradeStageType.get("TUMORGRADESTAGESEQNBR"))){
+
+                    String x = specimenSearch.get("TUMORGRADESTAGESEQNBR")+"";
+
+                    if ( x.equals("1") || x.equals("8") || x.equals("9") || x.equals("10") || x.equals("11") ){
+                        //1,8,9,10,11
+                        stageClassification = dTumorGradeStageType.get("TUMORGRADESTAGESHORTNAME")+"";
+                        gradeClassification = "Not Specified";
+                    }else{
+                        //2,3,4,5,6,7,12,13
+                        gradeClassification = dTumorGradeStageType.get("TUMORGRADESTAGESHORTNAME")+"";
+                        stageClassification = "Not Specified";
+                    }
+                }
+            }
+
+
+            for (JsonNode tissueType : tissueTypes) // TISSUETYPESHORTNAME
+            {
+                Map<String, Object> dTissueType = mapper.convertValue(tissueType, Map.class);
+
+                if (specimenSearch.get("TISSUETYPESHORTNAME").equals(dTissueType.get("TISSUETYPESHORTNAME"))){
+                    extractionMethod = dTissueType.get("TISSUETYPEDESCRIPTION")+"";
+                }
+            }
+
+
+
             for (JsonNode pdmrSpecimen : pdmrSpecimenData)
             {
 
@@ -119,6 +176,49 @@ public class DataTransformerService {
 
                     age = specimen.get("AGEATSAMPLING")+"";
                     specimenSite = specimen.get("BIOPSYSITE")+"";
+
+                    dateAtCollection = specimen.get("COLLECTIONDATE")+"";
+                    try {
+                        dateAtCollection = dateAtCollection.substring(0, 10);
+                    }catch (Exception e){}
+
+                    accessibility = specimen.get("PUBLICACCESSYN")+"";
+                    if (accessibility.equals("Y")){
+                        accessibility = "Public";
+                    }
+
+
+                        for (JsonNode mouseStrain : mouseStrains)
+                        {
+                            Map<String, Object> dMouseStrains = mapper.convertValue(mouseStrain, Map.class);
+
+                            if (specimen.get("MOUSESTRAINSEQNBR").equals(dMouseStrains.get("MOUSESTRAINSEQNBR"))){
+                                    strain = dMouseStrains.get("MOUSESTRAINDESCRIPT")+"";
+                            }
+                        }
+
+
+
+                        for (JsonNode impantationSite : impantationSites)
+                        {
+                            Map<String, Object> dImpantationSites = mapper.convertValue(impantationSite, Map.class);
+
+                            if (specimen.get("IMPLANTATIONSITESEQNBR").equals(dImpantationSites.get("IMPLANTATIONSITESEQNBR"))){
+                                engraftmentSite = dImpantationSites.get("IMPLANTATIONSITEDESCRIPTION")+"";
+                            }
+                            /* with the number to to table IMPLANTATIONSITES, key is IMPLANTATIONSITESEQNBR, value in finde should be IMPLANTATIONSITEDESCRIPTION */
+                        }
+
+
+                        // Retrieve details of specimen.get("PROVIDEDTISSUEORIGINSEQNBR").
+                        for (JsonNode tissueOrigin : tissueOrigins)
+                        {
+                            Map<String, Object> tissue = mapper.convertValue(tissueOrigin, Map.class);
+                            if (specimen.get("PROVIDEDTISSUEORIGINSEQNBR").equals(tissue.get("PROVIDEDTISSUEORIGINSEQNBR"))) {
+                                tumorType = tissue.get("PROVIDEDTISSUEORIGINDESCRIPT") + "";
+                            }
+                        }
+
                 }
 
 
@@ -128,7 +228,8 @@ public class DataTransformerService {
             try{
                 pdmrPdxInfoRepository.save(
                         new PdmrPdxInfo(modelID,patientID,gender,age,race,ethnicity,specimenSite,primarySite,initialDiagnosis,
-                                clinicalDiagnosis,tumorType,grades,tumorStage,sampleType,strain,mouseSex,treatmentNaive,engraftmentSite,sourceUrl)
+                                clinicalDiagnosis,tumorType,stageClassification,stageValue,gradeClassification,gradeValue,
+                                sampleType,strain,mouseSex,treatmentNaive,engraftmentSite,sourceUrl,extractionMethod,dateAtCollection,accessibility)
                 );
                 log.info("Loaded Record for Patient"+specimenSearch.get("PATIENTID"));
             }catch (Exception e){

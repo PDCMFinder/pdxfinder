@@ -38,10 +38,13 @@ public class LoadIRCC implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadIRCC.class);
 
-    private final static String IRCC_DATASOURCE_ABBREVIATION = "IRCC";
-    private final static String IRCC_DATASOURCE_NAME = "Candiolo Cancer Institute";
-    private final static String IRCC_DATASOURCE_DESCRIPTION = "IRCC";
+    private final static String DATASOURCE_ABBREVIATION = "IRCC";
+    private final static String DATASOURCE_NAME = "Candiolo Cancer Institute";
+    private final static String DATASOURCE_DESCRIPTION = "IRCC";
     private final static String DATASOURCE_CONTACT = "andrea.bertotti@ircc.it";
+
+    private final static String PROVIDER_TYPE = "";
+    private final static String ACCESSIBILITY = "";
 
     private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
@@ -60,7 +63,7 @@ public class LoadIRCC implements CommandLineRunner {
     public static final String FINGERPRINT_DESCRIPTION = "Model validated against patient germline.";
 
     private HostStrain nsgBS;
-    private ExternalDataSource irccDS;
+    private Group irccDS;
 
     private Options options;
     private CommandLineParser parser;
@@ -105,7 +108,8 @@ public class LoadIRCC implements CommandLineRunner {
         parser.accepts("loadALL", "Load all, including IRCC PDX data");
         OptionSet options = parser.parse(args);
         
-        irccDS = dataImportService.getExternalDataSource(IRCC_DATASOURCE_ABBREVIATION, IRCC_DATASOURCE_NAME, IRCC_DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+        irccDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
+                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
         nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
@@ -288,7 +292,7 @@ public class LoadIRCC implements CommandLineRunner {
         log.info("Loading variation for platform "+platformName);
         //STEP 1: Save the platform
         Platform platform = dataImportService.getPlatform(platformName, this.irccDS);
-        platform.setExternalDataSource(irccDS);
+        platform.setGroup(irccDS);
         platform.setUrl(TARGETEDNGS_PLATFORM_URL);
         dataImportService.savePlatform(platform);
 
@@ -414,7 +418,7 @@ public class LoadIRCC implements CommandLineRunner {
          //   System.out.println("loading "+jarray.length()+" variant records");
 
             Platform platform = dataImportService.getPlatform(TECH, this.irccDS, TARGETEDNGS_PLATFORM_URL);
-            platform.setExternalDataSource(irccDS);
+            platform.setGroup(irccDS);
             dataImportService.savePlatform(platform);
 
 

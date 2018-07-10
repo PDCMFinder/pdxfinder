@@ -5,7 +5,9 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 /**
  * Entity class for storing the Patient from whom the Xenograft was derived
@@ -23,8 +25,8 @@ public class Patient {
     private String ethnicity;
     private String dataSource;
 
-    @Relationship(type = "EXTERNAL_DATASOURCE", direction = Relationship.INCOMING)
-    private ExternalDataSource externalDataSource;
+    @Relationship(type = "GROUP", direction = Relationship.INCOMING)
+    private List<Group> groups;
 
     @Relationship(type = "COLLECTION_EVENT")
     private Set<PatientSnapshot> snapshots;
@@ -42,15 +44,16 @@ public class Patient {
      * @param sex  This is the patient's gender
      * @param race The Patient's physical characteristics such as skin, hair, or eye color
      * @param ethnicity The Patients origin either by birth e.g German or Spanish ancestry
-     * @param externalDataSource The source of the Patient's data
+     * @param group The source of the Patient's data (Provider)
      */
-    public Patient(String externalId, String sex, String race, String ethnicity, ExternalDataSource externalDataSource) {
+    public Patient(String externalId, String sex, String race, String ethnicity, Group group) {
         this.externalId = externalId;
         this.sex = sex;
         this.race = race;
         this.ethnicity = ethnicity;
-        this.dataSource = externalDataSource.getAbbreviation();
-        this.externalDataSource = externalDataSource;
+        this.dataSource = group.getAbbreviation();
+        this.groups = new ArrayList<>();
+        this.groups.add(group);
     }
 
 
@@ -157,20 +160,21 @@ public class Patient {
         this.dataSource = dataSource;
     }
 
-    /**
-     * Retrieves the full source of the patients data
-     * @return String This returns the source of the Patient's data in full description
-     */
-    public ExternalDataSource getExternalDataSource() {
-        return externalDataSource;
+    public List<Group> getGroups() {
+        return groups;
     }
 
-    /**
-     * Assigns a fully described value of the source of the patients data
-     * @param externalDataSource This is the non-abbreviated version of the patient's data source
-     */
-    public void setExternalDataSource(ExternalDataSource externalDataSource) {
-        this.externalDataSource = externalDataSource;
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+    }
+
+    public Group getProviderGroup(){
+
+        for(Group g : groups){
+            if(g != null && g.getType().equals("Provider")) return g;
+        }
+
+        return null;
     }
 }
 
