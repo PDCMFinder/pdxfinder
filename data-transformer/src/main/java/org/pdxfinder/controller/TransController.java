@@ -63,6 +63,8 @@ public class TransController {
     @Value("${mydatasource.clinicalResponseUrl}")
     private String clinicalResponseUrl;
 
+    @Value("${mydatasource.priorTherapyUrl}")
+    private String priorTherapyUrl;
 
 
     private final static Logger log = LoggerFactory.getLogger(TransController.class);
@@ -91,7 +93,7 @@ public class TransController {
 
         dataTransformerService.transformDataAndSave(specimenSearchUrl, specimenUrl, tissueOriginsUrl, tumoGradeStateTypesUrl, mouseStrainsUrl,
                 implantationSitesUrl, tissueTypeUrl, histologyUrl, tumorGradeUrl, samplesUrl,
-                currentTherapyUrl, standardRegimensUrl, clinicalResponseUrl);
+                currentTherapyUrl, standardRegimensUrl, clinicalResponseUrl, priorTherapyUrl);
         return "success";
 
     }

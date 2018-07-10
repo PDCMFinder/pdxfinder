@@ -9,7 +9,8 @@ import javax.persistence.*;
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "Drug",
+        "Current Drug",
+        "Prior Drug",
         "Manufacturer",
         "Dose",
         "Duration",
@@ -17,7 +18,8 @@ import javax.persistence.*;
         "Arm Size",
         "Response",
         "Passage Range",
-        "Starting Date"
+        "Starting Date",
+        "Prior Date"
 })
 
 
@@ -29,7 +31,8 @@ public class Treatment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private String drug;
+    private String currentDrug;
+    private String priorDrug;
     private String manufacturer;
     private String dose;
     private String duration;
@@ -38,17 +41,19 @@ public class Treatment {
     private String response;
     private String passageRange;
     private String startingDate;
+    private String priorDate;
 
     @ManyToOne
     @JoinColumn(name="pdxinfo_id")
     private PdmrPdxInfo pdmrPdxInfo;
 
 
-    public Treatment(String drug, String manufacturer,
+    public Treatment(String currentDrug, String priorDrug, String manufacturer,
                      String dose, String duration,
                      String frequency, String armSize,
-                     String response, String passageRange, String startingDate) {
-        this.drug = drug;
+                     String response, String passageRange, String startingDate, String priorDate) {
+        this.priorDrug = priorDrug;
+        this.currentDrug = currentDrug;
         this.manufacturer = manufacturer;
         this.dose = dose;
         this.duration = duration;
@@ -57,30 +62,28 @@ public class Treatment {
         this.response = response;
         this.passageRange = passageRange;
         this.startingDate = startingDate;
+        this.priorDate = priorDate;
     }
 
     public Treatment() {
     }
 
-
-    @JsonProperty("Drug")
-    public String getDrug() {
-        return drug;
+    @JsonProperty("Current Drug")
+    public String getCurrentDrug() {
+        return currentDrug;
     }
 
-    @JsonProperty("Drug")
-    public void setDrug(String drug) {
-        this.drug = drug;
+    @JsonProperty("Prior Drug")
+    public String getPriorDrug() {
+        return priorDrug;
     }
 
-    @JsonProperty("Manufacturer")
-    public void setManufacturer(String manufacturer) {
-        this.manufacturer = manufacturer;
+    public String getManufacturer() {
+        return manufacturer;
     }
 
-    @JsonProperty("Dose")
-    public void setDose(String dose) {
-        this.dose = dose;
+    public String getDose() {
+        return dose;
     }
 
     @JsonProperty("Duration")
@@ -88,9 +91,8 @@ public class Treatment {
         return duration;
     }
 
-    @JsonProperty("Duration")
-    public void setDuration(String duration) {
-        this.duration = duration;
+    public String getFrequency() {
+        return frequency;
     }
 
     @JsonProperty("Frequency")
@@ -98,9 +100,8 @@ public class Treatment {
         this.frequency = frequency;
     }
 
-    @JsonProperty("Arm Size")
-    public void setArmSize(String armSize) {
-        this.armSize = armSize;
+    public String getArmSize() {
+        return armSize;
     }
 
     @JsonProperty("Response")
@@ -108,14 +109,8 @@ public class Treatment {
         return response;
     }
 
-    @JsonProperty("Response")
-    public void setResponse(String response) {
-        this.response = response;
-    }
-
-    @JsonProperty("Passage Range")
-    public void setPassageRange(String passageRange) {
-        this.passageRange = passageRange;
+    public String getPassageRange() {
+        return passageRange;
     }
 
     @JsonProperty("Starting Date")
@@ -123,9 +118,9 @@ public class Treatment {
         return startingDate;
     }
 
-    @JsonProperty("Starting Date")
-    public void setStartingDate(String startingDate) {
-        this.startingDate = startingDate;
+    @JsonProperty("Prior Date")
+    public String getPriorDate() {
+        return priorDate;
     }
 
     public void setPdmrPdxInfo(PdmrPdxInfo pdmrPdxInfo) {

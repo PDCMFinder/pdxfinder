@@ -54,7 +54,8 @@ public class DataTransformerService {
                                          String samplesUrl,
                                          String currentTherapyUrl,
                                          String standardRegimensUrl,
-                                         String clinicalResponseUrl) {
+                                         String clinicalResponseUrl,
+                                         String priorTherapyUrl) {
 
         String unKnown = "Not Specified";
         String modelID = "";
@@ -85,6 +86,7 @@ public class DataTransformerService {
 
         String drug = "";
         String startingDate = "";
+        String priorDate = "";
         String response = "";
         String duration = unKnown;
 
@@ -123,6 +125,7 @@ public class DataTransformerService {
 
         JsonNode clinicalResponses = connectToJSON(clinicalResponseUrl);
 
+        JsonNode priorTherapies = connectToJSON(priorTherapyUrl);
 
 
         //engraftmentType
@@ -210,11 +213,13 @@ public class DataTransformerService {
 
 
             // From specimensearch table - pick PATIENTSEQNBR column
-            /**Look CURRENTTHERAPY table for key PATIENTSEQNBR and retrieve the STANDARDIZEDREGIMENSEQNBR column
-             Look STANDARDIZEDREGIMENS table for key STANDARDIZEDREGIMENSEQNBR and retrieve DISPLAYEDREGIMEN */
+            //Look CURRENTTHERAPY table for key PATIENTSEQNBR and retrieve the STANDARDIZEDREGIMENSEQNBR column
+            // Look STANDARDIZEDREGIMENS table for key STANDARDIZEDREGIMENSEQNBR and retrieve DISPLAYEDREGIMEN
 
-            /** From CURRENTTHERAPY table also retrieve the BESTRESPONSESEQNBR column
-             Look CLINICALRESPONSES table for key CLINICALRESPONSESEQNBR (->BESTRESPONSESEQNBR) and retrieve CLINICALRESPONSEDESCRIPTION */
+            //From CURRENTTHERAPY table also retrieve the BESTRESPONSESEQNBR column
+            // Look CLINICALRESPONSES table for key CLINICALRESPONSESEQNBR (->BESTRESPONSESEQNBR) and retrieve CLINICALRESPONSEDESCRIPTION
+
+            List<Treatment> treatments = new ArrayList<>();
 
             for (JsonNode currentTherapy : currentTherapies) {
                 Map<String, Object> dCurrentTherapy = mapper.convertValue(currentTherapy, Map.class);
@@ -247,16 +252,48 @@ public class DataTransformerService {
                             response = response.equals("<Unknown>") ? unKnown : response;
                         }
                     }
-
+                    treatments.add(new Treatment(drug,null,null,null,duration,null,
+                                                null,response,null,startingDate,null));
                 }
 
             }
 
 
-            List<Treatment> treatments = new ArrayList<>();
-            treatments.add(new Treatment(drug,unKnown,unKnown,duration,unKnown,unKnown,response,unKnown,startingDate));
 
 
+            for (JsonNode priorTherapy : priorTherapies) {
+                Map<String, Object> dPriorTherapy = mapper.convertValue(priorTherapy, Map.class);
+
+                if (specimenSearch.get("PATIENTSEQNBR").equals(dPriorTherapy.get("PATIENTSEQNBR"))) {
+
+                    priorDate = dPriorTherapy.get("DATEREGIMENSTARTED")+"";
+                    try {
+                        priorDate = priorDate.equals("null") ? unKnown : priorDate.substring(0, 10);
+                    } catch (Exception e) {}
+
+                    duration = dPriorTherapy.get("DURATIONMONTHS")+" Months";
+
+                    for (JsonNode standardregimen : standardRegimens) {
+                        Map<String, Object> dStandardregimen = mapper.convertValue(standardregimen, Map.class);
+
+                        if (dPriorTherapy.get("STANDARDIZEDREGIMENSEQNBR").equals(dStandardregimen.get("REGIMENSEQNBR"))) {
+                            drug = dStandardregimen.get("DISPLAYEDREGIMEN")+"";
+                        }
+                    }
+
+
+                    for (JsonNode clinicalResponse : clinicalResponses) {
+                        Map<String, Object> dClinicalResponse = mapper.convertValue(clinicalResponse, Map.class);
+
+                        if (dClinicalResponse.get("CLINICALRESPONSESEQNBR").equals(dPriorTherapy.get("BESTRESPONSESEQNBR"))) {
+                            response = dClinicalResponse.get("CLINICALRESPONSEDESCRIPTION")+"";
+                            response = response.equals("<Unknown>") ? unKnown : response;
+                        }
+                    }
+                    treatments.add(new Treatment(null,drug,null,null,duration,null,
+                                                null,response,null,null,priorDate));
+                }
+            }
 
 
 
