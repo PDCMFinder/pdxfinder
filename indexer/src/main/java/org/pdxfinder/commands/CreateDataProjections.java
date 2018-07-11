@@ -375,8 +375,10 @@ public class CreateDataProjections implements CommandLineRunner{
             allOntologyTerms.add(mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm());
 
             // Add all ancestors of direct mapped term
-            for (OntologyTerm t : mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getSubclassOf()) {
-                allOntologyTerms.addAll(getAllAncestors(t));
+            if(mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getSubclassOf() != null){
+                for (OntologyTerm t : mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getSubclassOf()) {
+                    allOntologyTerms.addAll(getAllAncestors(t));
+                }
             }
 
             mfq.setAllOntologyTermAncestors(allOntologyTerms.stream().map(OntologyTerm::getLabel).collect(Collectors.toSet()));
