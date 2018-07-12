@@ -1,10 +1,7 @@
 package org.pdxfinder.transdatamodel;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -34,17 +31,18 @@ import java.util.List;
         "Grade Classification",
         "Grade Value",
         "Sample Type",
+        "Samples",
         "Strain",
         "Mouse Sex",
         "Treatments",
         "Treatment Naive",
         "Engraftment Site",
         "Engraftment Type",
-        "Source url",
         "Extraction Method",
         "Date At Collection",
         "Accessibility",
-        "Validations"
+        "Validations",
+        "Source url"
 })
 public class PdmrPdxInfo {
 
@@ -74,6 +72,7 @@ public class PdmrPdxInfo {
     private String sampleType;
     private String strain;
     private String mouseSex;
+
     private String treatmentNaive;
     private String engraftmentSite;
     private String engraftmentType;
@@ -89,6 +88,9 @@ public class PdmrPdxInfo {
     @OneToMany(mappedBy = "pdmrPdxInfo")
     private List<Validation> validations;
 
+    @OneToMany(mappedBy = "pdmrPdxInfo")
+    private List<Sample> samples;
+
 
     public PdmrPdxInfo() {
     }
@@ -98,7 +100,8 @@ public class PdmrPdxInfo {
                        String primarySite, String initialDiagnosis, String clinicalDiagnosis, String tumorType, String stageClassification,
                        String stageValue, String gradeClassification, String gradeValue, String sampleType, String strain, String mouseSex,
                        String treatmentNaive, String engraftmentSite, String engraftmentType, String sourceUrl,
-                       String extractionMethod, String dateAtCollection, String accessibility, List<Treatment> treatments, List<Validation> validations) {
+                       String extractionMethod, String dateAtCollection, String accessibility,
+                       List<Treatment> treatments, List<Validation> validations, List<Sample> samples) {
         this.modelID = modelID;
         this.patientID = patientID;
         this.gender = gender;
@@ -126,6 +129,7 @@ public class PdmrPdxInfo {
         this.accessibility = accessibility;
         this.treatments = treatments;
         this.validations = validations;
+        this.samples = samples;
     }
 
     @JsonProperty("Model ID")
@@ -392,6 +396,11 @@ public class PdmrPdxInfo {
     @JsonProperty("Validations")
     public List<Validation> getValidations() {
         return validations;
+    }
+
+    @JsonProperty("Samples")
+    public List<Sample> getSamples() {
+        return samples;
     }
 }
 
