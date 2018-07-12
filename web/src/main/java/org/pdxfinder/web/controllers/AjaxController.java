@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.pdxfinder.services.*;
 import org.pdxfinder.services.ds.AutoCompleteOption;
+import org.pdxfinder.services.dto.CountDTO;
 import org.pdxfinder.services.dto.DataAvailableDTO;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
@@ -53,7 +54,7 @@ public class AjaxController {
     }
 
     @RequestMapping(value = "/modelcountperdrug")
-    public Iterable<Map<String, Object>> getModelCountByDrug() {
+    public List<CountDTO> getModelCountByDrug() {
 
         return  drugService.getModelCountByDrugAndComponentType("Drug");
     }
