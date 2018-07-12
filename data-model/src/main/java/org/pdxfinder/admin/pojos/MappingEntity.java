@@ -1,4 +1,4 @@
-package org.pdxfinder.admin.models;
+package org.pdxfinder.admin.pojos;
 
 import java.util.ArrayList;
 import java.util.Date;
