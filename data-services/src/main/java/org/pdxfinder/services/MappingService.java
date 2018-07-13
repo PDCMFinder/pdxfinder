@@ -35,7 +35,7 @@ public class MappingService {
     }
 
 
-    public MappingContainer getSavedDiagnosisMappings(String mappingFileLocation){
+    public MappingContainer getSavedDiagnosisMappings(String mappingFileLocation, String ds){
 
         //mappingFileLocation = "/Users/csaba/PDX/LoaderData/mappings/diagnosis_to_ncit.json";
 
@@ -59,6 +59,10 @@ public class MappingService {
                     String ontologyTerm = row.getString("ontologyterm");
                     String mapType = row.getString("maptype");
                     String justification = row.getString("justification");
+
+
+                    log.info(dataSource.toLowerCase() + " "+ds.toLowerCase());
+                    if(ds!= null && !ds.toLowerCase().equals(dataSource.toLowerCase())) continue;
 
                     if (ontologyTerm.equals("") || ontologyTerm == null) continue;
                     if (sampleDiagnosis.equals("") || sampleDiagnosis == null) continue;

@@ -41,5 +41,17 @@ public class AjaxController {
     }
 
 
+    @RequestMapping(value = "/api/mapping/diagnosis")
+    @ResponseBody
+    public MappingContainer getDiagnosisMappings(@RequestParam("ds") Optional<String> dataSource){
+
+        String ds = null;
+        if(dataSource.isPresent() && !dataSource.get().isEmpty()){
+            ds = dataSource.get();
+        }
+
+        return mappingService.getSavedDiagnosisMappings(savedDiagnosisMappingsFile, ds);
+    }
+
 
 }
