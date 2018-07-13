@@ -28,9 +28,9 @@ public class AjaxController {
         this.mappingService = mappingService;
     }
 
-    @RequestMapping(value = "/getmissingdiagnosismappings")
+    @RequestMapping(value = "/api/missingmapping/diagnosis")
     @ResponseBody
-    public MappingContainer getMissingMappings(@RequestParam("datasource") Optional<String> dataSource){
+    public MappingContainer getMissingMappings(@RequestParam("ds") Optional<String> dataSource){
 
         String ds = null;
         if(dataSource.isPresent() && !dataSource.get().isEmpty()){
