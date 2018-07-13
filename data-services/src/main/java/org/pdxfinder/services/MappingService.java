@@ -5,8 +5,11 @@ import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.admin.pojos.MappingContainer;
 import org.pdxfinder.admin.pojos.MappingEntity;
+import org.pdxfinder.dao.Sample;
+import org.pdxfinder.repositories.SampleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
@@ -22,10 +25,12 @@ public class MappingService {
 
     private final static Logger log = LoggerFactory.getLogger(MappingService.class);
 
+    private SampleRepository sampleRepository;
 
+    @Autowired
+    public MappingService(SampleRepository sampleRepository) {
 
-    public MappingService() {
-
+        this.sampleRepository = sampleRepository;
 
     }
 
@@ -58,13 +63,6 @@ public class MappingService {
                     if (ontologyTerm.equals("") || ontologyTerm == null) continue;
                     if (sampleDiagnosis.equals("") || sampleDiagnosis == null) continue;
 
-                    List<String> mapLabels = new ArrayList<>();
-                    mapLabels.add("DataSource");
-                    mapLabels.add("SampleDiagnosis");
-                    mapLabels.add("OriginTissue");
-                    mapLabels.add("TumorType");
-
-
                     String updatedDiagnosis = sampleDiagnosis;
                     String pattern = "(.*)Malignant(.*)Neoplasm(.*)";
 
@@ -94,7 +92,7 @@ public class MappingService {
                     mappingValues.put("OriginTissue", originTissue);
                     mappingValues.put("TumorType", tumorType);
 
-                    MappingEntity me = new MappingEntity(new Long(i+1), "DIAGNOSIS", mapLabels, mappingValues);
+                    MappingEntity me = new MappingEntity(new Long(i+1), "DIAGNOSIS", getDiagnosisMappingLabels(), mappingValues);
                     me.setMappedTerm(ontologyTerm);
                     me.setMapType(mapType);
                     me.setJustification(justification);
@@ -113,10 +111,58 @@ public class MappingService {
     }
 
 
-    public MappingContainer getMissingMappings(){
+    public MappingContainer getMissingMappings(String ds){
 
         MappingContainer mc = new MappingContainer();
 
+        Collection<Sample> samplesWithoutMappedTerm;
+        Set<String> existingCombinations = new HashSet<>();
+
+        if(ds == null || ds.isEmpty()){
+
+            samplesWithoutMappedTerm = sampleRepository.findSamplesWithoutOntologyMapping();
+        }
+        else{
+
+            samplesWithoutMappedTerm = sampleRepository.findSamplesWithoutOntologyMappingByDataSource(ds);
+        }
+
+        int mappingCounter = 1;
+        log.info("Size: "+samplesWithoutMappedTerm.size());
+
+        for(Sample s : samplesWithoutMappedTerm){
+
+            String dataSource = s.getDataSource();
+            String sampleDiagnosis = s.getDiagnosis();
+            String originTissue = "";
+            String tumorType = "";
+
+            if(s.getOriginTissue() != null){
+
+                originTissue = s.getOriginTissue().getName();
+            }
+
+            if(s.getType() != null){
+
+                tumorType = s.getType().getName();
+            }
+
+            if(!existingCombinations.contains(dataSource+";"+sampleDiagnosis+";"+originTissue+";"+tumorType)){
+
+                Map<String, String> mappingValues = new HashMap<>();
+                mappingValues.put("DataSource", dataSource);
+                mappingValues.put("SampleDiagnosis", sampleDiagnosis);
+                mappingValues.put("OriginTissue", originTissue);
+                mappingValues.put("TumorType", tumorType);
+
+                MappingEntity me = new MappingEntity(mc.getNextAvailableId(), "DIAGNOSIS", getDiagnosisMappingLabels(), mappingValues);
+
+                mc.add(me);
+                existingCombinations.add(dataSource+";"+sampleDiagnosis+";"+originTissue+";"+tumorType);
+            }
+
+
+        }
 
 
         return mc;
@@ -141,5 +187,20 @@ public class MappingService {
         }
         return sb.toString();
     }
+
+
+
+    List<String> getDiagnosisMappingLabels(){
+
+        List<String> mapLabels = new ArrayList<>();
+        mapLabels.add("DataSource");
+        mapLabels.add("SampleDiagnosis");
+        mapLabels.add("OriginTissue");
+        mapLabels.add("TumorType");
+
+        return mapLabels;
+    }
+
+
 
 }
