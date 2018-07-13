@@ -7,6 +7,8 @@ import java.util.TreeMap;
  */
 public class MappingContainer {
 
+    private int size;
+
     /**
      * A container holding mapped and unmapped entities
      */
@@ -17,11 +19,13 @@ public class MappingContainer {
     public MappingContainer(TreeMap<Long, MappingEntity> mappings) {
         this.mappings = new TreeMap<>();
         this.mappings = mappings;
+        size = mappings.size();
     }
 
     public MappingContainer() {
 
         mappings = new TreeMap<>();
+        size = 0;
     }
 
     public TreeMap<Long, MappingEntity> getMappings() {
@@ -43,15 +47,22 @@ public class MappingContainer {
 
     public Long getNextAvailableId(){
 
-        int currentSize = mappings.size();
-        currentSize++;
 
-        return (long) currentSize;
+        return (long) size +1;
     }
 
 
     public void add(MappingEntity me){
 
         mappings.put(me.getEntityId(), me);
+        size += 1;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 }
