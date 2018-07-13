@@ -60,8 +60,6 @@ public class MappingService {
                     String mapType = row.getString("maptype");
                     String justification = row.getString("justification");
 
-
-                    log.info(dataSource.toLowerCase() + " "+ds.toLowerCase());
                     if(ds!= null && !ds.toLowerCase().equals(dataSource.toLowerCase())) continue;
 
                     if (ontologyTerm.equals("") || ontologyTerm == null) continue;
