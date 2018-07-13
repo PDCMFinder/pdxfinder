@@ -96,6 +96,15 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "WITH s " +
             "OPTIONAL MATCH (s)-[ot:ORIGIN_TISSUE]-(ti:Tissue) " +
             "OPTIONAL MATCH  (s)-[oft:OF_TYPE]-(t:TumorType) " +
-            "RETURN DISTINCT  s, ti, t, ot, oft")
+            "RETURN DISTINCT  s, ti, t, ot, oft ORDER BY s.diagnosis")
     Collection<Sample> findSamplesWithoutOntologyMapping();
+
+    @Query("MATCH (ps:PatientSnapshot)-[sf:SAMPLED_FROM]-(s:Sample) " +
+            "WHERE NOT (s)-[:MAPPED_TO]-() " +
+            "AND s.dataSource = {ds}" +
+            "WITH s " +
+            "OPTIONAL MATCH (s)-[ot:ORIGIN_TISSUE]-(ti:Tissue) " +
+            "OPTIONAL MATCH  (s)-[oft:OF_TYPE]-(t:TumorType) " +
+            "RETURN DISTINCT  s, ti, t, ot, oft ORDER BY s.diagnosis")
+    Collection<Sample> findSamplesWithoutOntologyMappingByDataSource(@Param("ds") String dataSource);
 }
