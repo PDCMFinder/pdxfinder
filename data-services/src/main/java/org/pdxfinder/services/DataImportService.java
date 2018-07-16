@@ -148,7 +148,7 @@ public class DataImportService {
 
 
     public ExternalUrl getExternalUrl(ExternalUrl.Type type, String url) {
-        ExternalUrl externalUrl = externalUrlRepository.findByTypeAndUrl(type, url);
+        ExternalUrl externalUrl = externalUrlRepository.findByTypeAndUrl(type.getValue(), url);
         if (externalUrl == null) {
             log.info("External URL '{}' not found. Creating", type);
             externalUrl = new ExternalUrl(
