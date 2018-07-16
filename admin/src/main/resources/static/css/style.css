@@ -5666,6 +5666,7 @@ body.body-small .vote-icon {
     transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
   }
 }
+
 /*
  *  Usage:
  *
@@ -5675,6 +5676,7 @@ body.body-small .vote-icon {
  *    </div>
  *
  */
+
 .sk-spinner-double-bounce.sk-spinner {
   width: 40px;
   height: 40px;
