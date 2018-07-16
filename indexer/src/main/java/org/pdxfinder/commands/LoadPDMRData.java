@@ -162,36 +162,100 @@ public class LoadPDMRData implements CommandLineRunner {
             diagnosis = j.getString("Initial Diagnosis");
         }
 
-        String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
+        String classification = j.getString("Stage Value") + "/" + j.getString("Grade Value");
 
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
         String age = Standardizer.getAge(j.getString("Age"));
         String gender = Standardizer.getGender(j.getString("Gender"));
+        String patientId = j.getString("Patient ID");
+        String race = j.getString("Race");
+        String ethnicity = j.getString("Ethnicity");
+        String modelId = j.getString("Model ID");
+        String primarySite = j.getString("Primary Site");
+        String collectionSite = j.getString("Specimen Site");
+        String extractionType = j.getString("Sample Type");
 
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"), gender,
-                j.getString("Race"), j.getString("Ethnicity"), age, DS);
 
-        Sample sample = dataImportService.getSample(j.getString("Model ID"), tumorType, diagnosis,
-                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, DS.getAbbreviation());
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patientId, gender,
+                race, ethnicity, age, DS);
+
+        Sample humanSample = dataImportService.getSample(modelId, tumorType, diagnosis,
+                primarySite, collectionSite, extractionType, classification, NORMAL_TISSUE_FALSE, DS.getAbbreviation());
 
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
         externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
-        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, j.getString("Source Url")));
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, j.getString("Source url")));
 
-        // TODO: Update with actual QA data when available
-        String qaPassage = null;
+        JSONArray validations = j.getJSONArray("Validations");
 
-        QualityAssurance qa = new QualityAssurance("", "", qaPassage);
-        dataImportService.saveQualityAssurance(qa);
+        List<QualityAssurance> validationList = new ArrayList<>();
+        if(validations.length() > 0){
 
-        pSnap.addSample(sample);
+            for(int i=0; i<validations.length(); i++){
+
+                JSONObject validationObj = validations.getJSONObject(i);
+                QualityAssurance qa = new QualityAssurance(validationObj.getString("Technique"), validationObj.getString("Description"), validationObj.getString("Passage"));
+                validationList.add(qa);
+            }
+        }
+
+        pSnap.addSample(humanSample);
         dataImportService.savePatientSnapshot(pSnap);
 
-        ModelCreation mc = dataImportService.createModelCreation(id, this.DS.getAbbreviation(), sample, qa, externalUrls);
-        mc.addRelatedSample(sample);
-        //loadVariationData(mc);
+        ModelCreation modelCreation = dataImportService.createModelCreation(id, this.DS.getAbbreviation(), humanSample, validationList, externalUrls);
+        modelCreation.addRelatedSample(humanSample);
 
+        //load specimens
+        String engraftmentSite = j.getString("Engraftment Site");
+        String engraftmentType = j.getString("Engraftment Type");
+        String extractionMethod = j.getString("Extraction Method");
+
+        JSONArray samplesArr = j.getJSONArray("Samples");
+
+        if(samplesArr.length() > 0){
+            for(int i=0; i<samplesArr.length();i++){
+
+                JSONObject sampleObj = samplesArr.getJSONObject(i);
+                String sampleType = sampleObj.getString("Tumor Type");
+
+                if(sampleType.equals("Xenograft Tumor")){
+
+                    String specimenId = sampleObj.getString("Sample ID");
+                    String passage = sampleObj.getString("Passage");
+
+                    Specimen specimen = dataImportService.getSpecimen(modelCreation,
+                            specimenId, DS.getAbbreviation(), passage);
+
+                    specimen.setHostStrain(nsgBS);
+
+                    EngraftmentSite es = dataImportService.getImplantationSite(engraftmentSite);
+                    specimen.setEngraftmentSite(es);
+
+                    EngraftmentType et = dataImportService.getImplantationType(engraftmentType);
+                    specimen.setEngraftmentType(et);
+
+                    Sample specSample = new Sample();
+
+                    specSample.setSourceSampleId(specimenId);
+                    specSample.setDataSource(DS.getAbbreviation());
+
+                    specimen.setSample(specSample);
+
+                    modelCreation.addSpecimen(specimen);
+                    modelCreation.addRelatedSample(specSample);
+
+                }
+
+            }
+        }
+
+        //load patient treatment
+
+
+
+        //loadVariationData(mc);
+        dataImportService.saveModelCreation(modelCreation);
     }
 
 
