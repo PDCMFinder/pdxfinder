@@ -175,6 +175,19 @@ public class DataImportService {
         return modelCreation;
     }
 
+    public ModelCreation createModelCreation(String pdxId, String dataSource,  Sample sample, List<QualityAssurance> qa, List<ExternalUrl> externalUrls) {
+
+        ModelCreation modelCreation = modelCreationRepository.findBySourcePdxIdAndDataSource(pdxId, dataSource);
+
+        if (modelCreation != null) {
+            log.info("Deleting existing ModelCreation " + pdxId);
+            modelCreationRepository.delete(modelCreation);
+        }
+        modelCreation = new ModelCreation(pdxId, dataSource, sample, qa, externalUrls);
+        modelCreationRepository.save(modelCreation);
+        return modelCreation;
+    }
+
     public Collection<ModelCreation> findAllModelsPlatforms(){
 
         return modelCreationRepository.findAllModelsPlatforms();
