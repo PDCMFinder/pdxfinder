@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title th:text="${data.dataSource}+' PDX model '+${data.modelId}+ ' details - PDX Finder'"></title>
+    <meta name="description" th:content="'Model details for PDX '+${data.modelId}+', produced by '+${data.dataSource}"/>
+    <meta name="keywords"
+          th:content="'Patient Derived Xenograft, PDX, PDX Finder, Cancer, Oncology, Life Sciences, '+${data.dataSource}"/>
+    <meta name="author" content="PDX Finder"/>
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="MobileOptimized" content="width"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+    <link rel="apple-touch-icon" sizes="180x180"
+          href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/apple-touch-icon.png?v=1">
+    <link rel="icon" type="image/png" sizes="32x32"
+          href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon-32x32.png?v=1">
+    <link rel="icon" type="image/png" sizes="16x16"
+          href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon-16x16.png?v=1">
+    <link rel="manifest" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/manifest.json?v=1">
+    <link rel="mask-icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/safari-pinned-tab.svg?v=1"
+          color="#0032a0">
+    <link rel="shortcut icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon.ico?v=1">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+    <meta name="apple-mobile-web-app-title" content="PDX Finder">
+    <meta name="application-name" content="PDX Finder">
+    <meta name="msapplication-config"
+          content="https://ebiwd.github.io/pdx-visual-framework/images/favicons/browserconfig.xml?v=1">
+    <meta name="theme-color" content="#0032a0">
+
+    <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css"
+          type="text/css" media="all"/>
+
+    <link rel="stylesheet"
+          href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/styles/css/choices.min.css">
+
+    <link rel="stylesheet" th:href="@{/css/app.min.css}" type="text/css" media="all"/>
+    <link rel="stylesheet" th:href="@{/css/customStyles.css}" type="text/css" media="all"/>
+    <link rel="stylesheet" th:href="@{/icons/foundation-icons.css}" type="text/css" media="all"/>
+
+    <!-- end CSS-->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script th:src="@{/js/jquery.dataTables.js}"></script>
+    <script th:src="@{/js/scroller.js}"></script>
+
+    <!--/*/ <th:block th:include="fragments/shared :: header"></th:block> /*/-->
+
+</head>
+
+<body class="level2">
+
+<div content="content-wrapper">
+    <div id="skip-to">
+        <a href="#content">Skip to main content</a>
+    </div>
+
+    <div id="content">
+
+
+        <!--/*/ <th:block th:include="fragments/shared :: menu"></th:block> /*/-->
+
+        <!-- Suggested layout containers -->
+        <section id="main-content-area" role="main">
+
+            <div class="row">
+                <nav aria-label="You are here:" role="navigation">
+                    <ul class="breadcrumbs columns">
+                        <li><a href="/">Home</a></li>
+                        <li>
+                            Patients
+                        </li>
+                        <li>
+                            <span class="show-for-sr">Current: </span> <span th:text="${data.modelId}">Model ID</span>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Three Grids Section-->
+            <section>
+                <div class="row">
+
+                    <div class="columns medium-4 small-12 margin-top-30">
+                        <h4 class="pdxBig"><span class="float-left border-color-black"
+                                                 th:text="${'Patient ID : '+data.modelId}"></span></h4>
+                    </div>
+
+                    <div class="columns medium-4 small-12 margin-top-30">
+                        <h4 class="pdxBig black"><span class="float-left" th:text="${data.sourceDescription}"> The Jackson Laboratory </span>
+                        </h4>
+                    </div>
+
+                    <div class="columns medium-4 small-12 margin-top-10">
+
+                        <a th:href="@{'mailto:'+${data.contacts+'?subject='+data.modelId}}"
+                           th:if="${#strings.contains(data.contacts,'@')}">
+                            <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
+                        </a>
+
+                        <a th:href="@{'mailto:'+${data.externalUrl+'?subject='+data.modelId}}"
+                           th:if="${#strings.contains(data.externalUrl,'@')}">
+                            <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
+                        </a>
+
+                        <a th:href="@{${data.contacts}}" th:target="_blank"
+                           th:if="${#strings.contains(data.contacts,'http') }">
+                            <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
+                        </a>
+
+                        <a th:href="@{${data.externalUrl}}" th:target="_blank" th:if="${#strings.contains(data.externalUrl,'http')}">
+                            <h4 class="button outline uppercase margin-top-large minwidth300 shiftUp10 card-3b"
+                                th:text="${data.externalUrlText}">View at Provider</h4>
+                        </a>
+
+                    </div>
+                </div>
+            </section>
+
+
+            <hr class="margin-vertical-20 line_v2">
+            <!-- Tabs Section -->
+            <section class="row large-10 medium-12 expanded" id="detailsData">
+                <div class="row large-12 medium-12 expanded">
+                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;">Initial Diagnosis</a></li>
+                    </ul>
+                </div>
+
+                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                    <div class="tabs-panel is-active" id="summary">
+
+                        <!-- Summary first row -->
+                        <div class="row large-12 medium-12 expanded">
+
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;">
+                                    <table class="pdx-table head-left">
+                                        <tbody>
+                                        <tr>
+                                            <th class="text-left medium-4">Gender</th>
+                                            <td th:text="${'Female'}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4"> Age at Diagnosis</th>
+                                            <td th:text="${'123'}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Disease Body Location</th>
+                                            <td th:text="${'Musculoskeletal'}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">CTEP SDC Code</th>
+                                            <td th:text="${'10039494 - Non-Rhabdo, soft tissue sarcoma'}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Diagnosis Subtype</th>
+                                            <td th:text="${'Spindle Cell'}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Race / Ethnicity</th>
+                                            <td th:text="${'Asian'}"></td>
+                                        </tr>
+                                        <tr th:if="${not #lists.isEmpty(data.relatedModels)}">
+                                            <th class="text-left">Related models</th>
+                                            <td><span th:each="relMod:${data.relatedModels}"><a th:text="${relMod}"
+                                                                                                th:href="@{'/pdx/'+${data.dataSource}+'/'+${relMod}}"></a> </span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+
+            <section class="row large-10 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+                <div class="row large-12 medium-12 expanded">
+                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;">Additional patient History</a></li>
+                    </ul>
+                </div>
+
+                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                    <div class="tabs-panel is-active" id="summary">
+
+                        <!-- Summary first row -->
+                        <div class="row large-12 medium-12 expanded">
+
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;">
+                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="2"> Known Genetic Mutations / Tumor Markers</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        <tr>
+                                            <!--<th class="text-left large-12" style="font-size: 17px;">IHC: CD34+, CD99+, EMA+, bcl2+; AE1/AE3 -, CAM5.2 - </th>-->
+                                            <td th:text="${'IHC: CD34+, CD99+, EMA+, bcl2+; AE1/AE3 -, CAM5.2 - '}"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+
+
+            <section class="row large-10 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+
+                <div class="row large-12 medium-12 expanded">
+                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Collection Events </a></li>
+                    </ul>
+                </div>
+
+
+
+                <!--<div id="containerd">
+                    <div id="thumbs">
+                        <div class="history-block bg-66">
+                            <div class="cover"></div>
+                            <div class="year">COLLECTION 1</div>
+                            <div class="title">Age:60 | Diagnosis : Colorectal carcinoma ... Click for details</div>
+                            <div class="timeline">
+                                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                                    <div class="tabs-panel is-active" id="summary">
+
+                                        <div class="row large-12 medium-12 expanded">
+
+                                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                                <div class="responsive-table" style="margin-top: 20px;">
+                                                    <table class="pdx-table head-left">
+                                                        <thead>
+                                                        <th> </th>
+                                                        <th>Collection 1</th>
+                                                        <th>Collection 2</th>
+                                                        <th>Collection 3</th>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr>
+                                                            <th class="text-left medium-4">Age</th>
+                                                            <td th:text="${'90'}">90</td>
+                                                            <td th:text="${'95'}">95</td>
+                                                            <td th:text="${'100'}">100</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4"> Diagnosis</th>
+                                                            <td th:text="${'Colorectal Carcinoma'}"> </td>
+                                                            <td th:text="${'Colorectal Carcinoma'}"> </td>
+                                                            <td th:text="${'Colorectal Carcinoma'}"> </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4"> Type </th>
+                                                            <td th:text="${'Primary'}">Primary</td>
+                                                            <td th:text="${'Metastatic'}">Metastatic</td>
+                                                            <td th:text="${'Refactory'}">Refactory</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4"> PDX Mouse </th>
+                                                            <td th:text="${'TM01381'}"></td>
+                                                            <td th:text="${'J000096652'}"></td>
+                                                            <td th:text="${'J000102326'}"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4">Data</th>
+                                                            <td th:text="${'Omic Pathology'}"></td>
+                                                            <td th:text="${'Omic Pathology'}"></td>
+                                                            <td th:text="${'Omic Pathology'}"></td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        <div class="history-block bg-76">
+                            <div class="cover"></div>
+                            <div class="year">COLLECTION 2</div>
+                            <div class="title">...</div>
+                            <div class="timeline">
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+
+
+
+
+
+
+
+
+                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                    <div class="tabs-panel is-active" id="summary">
+
+                        <div class="row large-12 medium-12 expanded">
+
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;">
+                                    <table class="pdx-table head-left">
+                                        <thead>
+                                            <th> </th>
+                                            <th>Collection 1</th>
+                                            <th>Collection 2</th>
+                                            <th>Collection 3</th>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <th class="text-left medium-4">Age</th>
+                                            <td th:text="${'90'}">90</td>
+                                            <td th:text="${'95'}">95</td>
+                                            <td th:text="${'100'}">100</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4"> Diagnosis</th>
+                                            <td th:text="${'Colorectal Carcinoma'}"> </td>
+                                            <td th:text="${'Colorectal Carcinoma'}"> </td>
+                                            <td th:text="${'Colorectal Carcinoma'}"> </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4"> Type </th>
+                                            <td th:text="${'Primary'}">Primary</td>
+                                            <td th:text="${'Metastatic'}">Metastatic</td>
+                                            <td th:text="${'Refactory'}">Refactory</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4"> PDX Mouse </th>
+                                            <td th:text="${'TM01381'}"></td>
+                                            <td th:text="${'J000096652'}"></td>
+                                            <td th:text="${'J000102326'}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Data</th>
+                                            <td th:text="${'Omic Pathology'}"></td>
+                                            <td th:text="${'Omic Pathology'}"></td>
+                                            <td th:text="${'Omic Pathology'}"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+
+
+
+            <section class="row large-10 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+                <div class="row large-12 medium-12 expanded">
+                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Current Therapy </a></li>
+                    </ul>
+                </div>
+
+                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                    <div class="tabs-panel is-active" id="summary">
+
+                        <!-- Summary first row -->
+                        <div class="row large-12 medium-12 expanded">
+
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;">
+                                    <table class="pdx-table head-left">
+                                        <thead>
+                                        <th> Date Regimen Started </th>
+                                        <th> Standardized Regimen </th>
+                                        <th> Best Response </th>
+                                        <th> Number of Cycles </th>
+                                        <th> Date of Progression  </th>
+                                        <th> Comments </th>
+                                        <th>Reason for Off Therapy</th>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <th class="text-left medium-4"> Not Specified </th>
+                                            <td th:text="${'No Current Therapy'}">  </td>
+                                            <td th:text="${'Not Specified'}">  </td>
+                                            <td th:text="${'0'}"> </td>
+                                            <td th:text="${''}">  </td>
+                                            <td th:text="${''}">  </td>
+                                            <td th:text="${''}">  </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section class="row large-10 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+                <div class="row large-12 medium-12 expanded">
+                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Prior Therapies & response </a></li>
+                    </ul>
+                </div>
+
+                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                    <div class="tabs-panel is-active" id="summary">
+
+                        <!-- Summary first row -->
+                        <div class="row large-12 medium-12 expanded">
+
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;">
+                                    <table class="pdx-table head-left">
+                                        <thead>
+                                        <th> Date Regimen Started </th>
+                                        <th> Standardized Regimen </th>
+                                        <th> Best Response </th>
+                                        <th> Duration </th>
+                                        <th> Comments </th>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <th class="text-left medium-4"> 10/2014 </th>
+                                            <td th:text="${'Bevacizumab, Temozolomide'}"></td>
+                                            <td th:text="${'Stable Disease'}">  </td>
+                                            <td th:text="${'6 Months'}"> </td>
+                                            <td th:text="${'Adjuvant'}">  </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4"> 03/2006 </th>
+                                            <td th:text="${'Radiation'}">  </td>
+                                            <td th:text="${'Not Specified'}">  </td>
+                                            <td th:text="${'1 Month'}"> </td>
+                                            <td th:text="${'Adjuvant 4250cGy total, 25 fractions'}">  </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+
+        </section>
+
+    </div>
+    <!-- End suggested layout containers / #content -->
+
+
+    <!--/*/ <th:block th:include="fragments/shared :: footer"></th:block> /*/-->
+
+
+</div>
+<!-- JavaScript -->
+
+<script  type='text/javascript' th:src="@{/js/banner-gdpr.js}"></script>
+<div id="data-protection-message-configuration"
+     data-message="Your message and links here."
+     data-service-id="ebi" data-data-protection-version="0.1">
+</div>
+
+<script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/scripts/dist/choices.min.js"></script>
+<script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.highlightRegex/0.1.2/highlightRegex.min.js"></script>
+<script th:src="@{/js/script.js}"></script>
+<!--<script th:src="@{/js/main.js}"></script>-->
+
+
+<script type="text/javascript" language="javascript" th:inline="javascript">
+
+    var modelId = [[${data.modelId}]];
+    var dataSrc = [[${data.dataSource}]];
+    jQuery(document).ready(function () {
+        console.log("ready");
+        var modelInfo = [[${data.modelTechAndPassages}]];
+        var apiURL = "/data/patientdata/" + dataSrc + "/" + modelId;
+
+
+        drawTable("pdxFinder-grid", apiURL);
+        for (var tech in modelInfo) {
+            //console.log(tech);
+
+            var counter = 1;
+            for (var passage in modelInfo[tech]) {
+                //console.log(modelInfo[tech][passage]);
+                var dTech = tech.replace(" ", "-");
+                //console.log(dTech);
+                apiURL = "/data/modeldata/" + dataSrc + "/" + modelId + "?platform=" + tech + "&passage=" + modelInfo[tech][passage];
+                var tableId = "pdxFinder-grid" + dTech + counter;
+                drawTable(tableId, apiURL);
+                //console.log(tableId);
+                console.log(apiURL);
+                counter++;
+            }
+
+        }
+    });
+
+    // We define the function
+    function drawTable(tableId, apiURL) {
+
+        var l = jQuery("#tableId tr").length;
+        console.log(tableId + " " + l);
+
+        var dataTable = $('#' + tableId).DataTable({
+            iDisplayLength: 10,
+            serverSide: true,
+            ajax: {
+                url: apiURL, // json datasource
+                type: "post",  // method  , by default get
+
+                error: function () {  // error handling
+                    $(".pdxFinder-grid-error").html("");
+                    $("#" + tableId).append('<tbody class="pdxFinder-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    $("#pdxFinder-grid_processing").css("display", "none");
+                }
+            },
+
+            dom: "frtiS",
+            scrollY: 350,
+            scrollX: true,
+            deferRender: true,
+            responsive: true,
+            bAutoWidth: true,
+            scrollCollapse: true,
+            scroller: {
+                loadingIndicator: true,
+                rowHeight: 30
+            }
+
+        });
+
+        $(window).bind('resize', function () {
+            dataTable.fnAdjustColumnSizing();
+        });
+    }
+
+
+    function showTabs(cnt) {
+        for (var i = 0; i < 5; i++) {
+            document.getElementsByClassName("hideContent"+cnt)[i].style.position = "static";
+        }
+    }
+
+    // Check if variation tab is deeplinked on page load:
+    $(document).ready(function(){
+        var hash = window.location.hash;
+
+        if (hash == "#variation"){
+            for (var i = 0; i < 5; i++) {
+                document.getElementsByClassName("hideContent0")[i].style.position = "static";
+            }
+        }
+    });
+
+
+
+
+    var viewportWidth, divWidth, tb;
+    $(function() {
+
+        viewport = $('#container').innerWidth();
+        tb = $('#thumbs');
+        divWidth = tb.outerWidth();
+
+        /*$('#container').mousemove(function(e)
+        {
+      tb.css({left: ((viewport - divWidth)*((e.pageX / viewport).toFixed(3))).toFixed(1) +"px" });
+         });*/
+
+        $('.history-block').on('click', function(){
+            $('.history-block').css('width', '300px');
+            $('.history-block').find('.title').css('width', '260px');
+            $('.history-block .timeline').hide(300);
+            $(this).css('width', '1000px');
+            $(this).find('.title').css('width', '500px');
+            $(this).find('.timeline').show(800);
+            /*$('#container').mousemove(function(e)
+              {
+                tb.css({left: ((viewport - divWidth-300)*((e.pageX / viewport).toFixed(3))).toFixed(1) + 300 + "px" });
+                });*/
+        });
+
+        $('.timeline ul li').on('click', function(){
+            $(this).parent().blink();
+        });
+    });
+
+</script>
+
+</body>
+</html>
