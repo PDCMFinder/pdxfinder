@@ -143,4 +143,16 @@ public class TreatmentProtocol {
         components.add(tc);
     }
 
+
+    public void addDurationForAllComponents(String duration){
+
+        if(components != null){
+
+            for(TreatmentComponent tc : components){
+
+                tc.setDuration(duration);
+            }
+        }
+    }
+
 }
