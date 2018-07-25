@@ -39,6 +39,8 @@ public class TreatmentProtocol {
     private String responseCalculationMethod;
     private String passages;
 
+    private String treatmentDate;
+
     public TreatmentProtocol() {
         components = new ArrayList<>();
     }
@@ -90,6 +92,14 @@ public class TreatmentProtocol {
 
     public void setCurrentTreatment(CurrentTreatment currentTreatment) {
         this.currentTreatment = currentTreatment;
+    }
+
+    public String getTreatmentDate() {
+        return treatmentDate;
+    }
+
+    public void setTreatmentDate(String treatmentDate) {
+        this.treatmentDate = treatmentDate;
     }
 
     public String getDrugString(boolean includeControlDrugs){
