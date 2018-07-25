@@ -32,6 +32,9 @@ public class TreatmentProtocol {
     @Relationship(type = "RESPONSE")
     private Response response;
 
+    @Relationship(type = "CURRENT_TREATMENT")
+    private CurrentTreatment currentTreatment;
+
     private String armSize;
     private String responseCalculationMethod;
     private String passages;
@@ -79,6 +82,14 @@ public class TreatmentProtocol {
 
     public void setPassages(String passages) {
         this.passages = passages;
+    }
+
+    public CurrentTreatment getCurrentTreatment() {
+        return currentTreatment;
+    }
+
+    public void setCurrentTreatment(CurrentTreatment currentTreatment) {
+        this.currentTreatment = currentTreatment;
     }
 
     public String getDrugString(boolean includeControlDrugs){
