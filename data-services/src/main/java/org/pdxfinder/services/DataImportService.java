@@ -354,6 +354,18 @@ public class DataImportService {
         return sampleRepository.findHumanSampleBySampleIdAndDataSource(sampleId, dataSource);
     }
 
+    public Sample findHumanSample(String modelId, String dsAbbrev){
+
+        return sampleRepository.findHumanSampleByModelIdAndDS(modelId, dsAbbrev);
+
+    }
+
+    public Sample findXenograftSample(String modelId, String dataSource, String specimenId){
+
+        return sampleRepository.findMouseSampleByModelIdAndDataSourceAndSpecimenId(modelId, dataSource, specimenId);
+    }
+
+
     public int getHumanSamplesNumber(){
 
         return sampleRepository.findHumanSamplesNumber();
