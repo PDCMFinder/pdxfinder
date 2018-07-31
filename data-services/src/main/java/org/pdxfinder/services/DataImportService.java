@@ -51,6 +51,8 @@ public class DataImportService {
     private PlatformAssociationRepository platformAssociationRepository;
     private DataProjectionRepository dataProjectionRepository;
     private TreatmentSummaryRepository treatmentSummaryRepository;
+    private TreatmentProtocolRepository treatmentProtocolRepository;
+    private CurrentTreatmentRepository currentTreatmentRepository;
     private ExternalUrlRepository externalUrlRepository;
 
     private final static Logger log = LoggerFactory.getLogger(DataImportService.class);
@@ -75,6 +77,8 @@ public class DataImportService {
                              PlatformAssociationRepository platformAssociationRepository,
                              DataProjectionRepository dataProjectionRepository,
                              TreatmentSummaryRepository treatmentSummaryRepository,
+                             TreatmentProtocolRepository treatmentProtocolRepository,
+                             CurrentTreatmentRepository currentTreatmentRepository,
                              ExternalUrlRepository externalUrlRepository) {
 
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null");
@@ -112,6 +116,8 @@ public class DataImportService {
         this.platformAssociationRepository = platformAssociationRepository;
         this.dataProjectionRepository = dataProjectionRepository;
         this.treatmentSummaryRepository = treatmentSummaryRepository;
+        this.treatmentProtocolRepository = treatmentProtocolRepository;
+        this.currentTreatmentRepository = currentTreatmentRepository;
         this.externalUrlRepository = externalUrlRepository;
 
     }
@@ -148,7 +154,7 @@ public class DataImportService {
 
 
     public ExternalUrl getExternalUrl(ExternalUrl.Type type, String url) {
-        ExternalUrl externalUrl = externalUrlRepository.findByType(type);
+        ExternalUrl externalUrl = externalUrlRepository.findByTypeAndUrl(type.getValue(), url);
         if (externalUrl == null) {
             log.info("External URL '{}' not found. Creating", type);
             externalUrl = new ExternalUrl(
@@ -163,6 +169,19 @@ public class DataImportService {
 
 
     public ModelCreation createModelCreation(String pdxId, String dataSource,  Sample sample, QualityAssurance qa, List<ExternalUrl> externalUrls) {
+
+        ModelCreation modelCreation = modelCreationRepository.findBySourcePdxIdAndDataSource(pdxId, dataSource);
+
+        if (modelCreation != null) {
+            log.info("Deleting existing ModelCreation " + pdxId);
+            modelCreationRepository.delete(modelCreation);
+        }
+        modelCreation = new ModelCreation(pdxId, dataSource, sample, qa, externalUrls);
+        modelCreationRepository.save(modelCreation);
+        return modelCreation;
+    }
+
+    public ModelCreation createModelCreation(String pdxId, String dataSource,  Sample sample, List<QualityAssurance> qa, List<ExternalUrl> externalUrls) {
 
         ModelCreation modelCreation = modelCreationRepository.findBySourcePdxIdAndDataSource(pdxId, dataSource);
 
@@ -334,6 +353,18 @@ public class DataImportService {
 
         return sampleRepository.findHumanSampleBySampleIdAndDataSource(sampleId, dataSource);
     }
+
+    public Sample findHumanSample(String modelId, String dsAbbrev){
+
+        return sampleRepository.findHumanSampleByModelIdAndDS(modelId, dsAbbrev);
+
+    }
+
+    public Sample findXenograftSample(String modelId, String dataSource, String specimenId){
+
+        return sampleRepository.findMouseSampleByModelIdAndDataSourceAndSpecimenId(modelId, dataSource, specimenId);
+    }
+
 
     public int getHumanSamplesNumber(){
 
@@ -667,6 +698,21 @@ public class DataImportService {
         return d;
     }
 
+    public CurrentTreatment getCurrentTreatment(String name){
+
+        CurrentTreatment ct = currentTreatmentRepository.findByName(name);
+
+        if(ct == null){
+
+            ct = new CurrentTreatment(name);
+            currentTreatmentRepository.save(ct);
+        }
+
+        return ct;
+    }
+
+
+
     /**
      *
      * @param drugString
@@ -740,4 +786,19 @@ public class DataImportService {
         return tp;
     }
 
+
+
+    public TreatmentProtocol getTreatmentProtocol(String drugString, String doseString, String response, boolean currentTreatment){
+
+        TreatmentProtocol tp = getTreatmentProtocol(drugString, doseString, response);
+
+        if(currentTreatment && tp.getCurrentTreatment() == null){
+
+            CurrentTreatment ct = getCurrentTreatment("Current Treatment");
+            tp.setCurrentTreatment(ct);
+        }
+
+        return tp;
+
+    }
 }

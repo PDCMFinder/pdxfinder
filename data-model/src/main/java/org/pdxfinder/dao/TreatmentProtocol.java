@@ -32,9 +32,14 @@ public class TreatmentProtocol {
     @Relationship(type = "RESPONSE")
     private Response response;
 
+    @Relationship(type = "CURRENT_TREATMENT")
+    private CurrentTreatment currentTreatment;
+
     private String armSize;
     private String responseCalculationMethod;
     private String passages;
+
+    private String treatmentDate;
 
     public TreatmentProtocol() {
         components = new ArrayList<>();
@@ -81,6 +86,22 @@ public class TreatmentProtocol {
         this.passages = passages;
     }
 
+    public CurrentTreatment getCurrentTreatment() {
+        return currentTreatment;
+    }
+
+    public void setCurrentTreatment(CurrentTreatment currentTreatment) {
+        this.currentTreatment = currentTreatment;
+    }
+
+    public String getTreatmentDate() {
+        return treatmentDate;
+    }
+
+    public void setTreatmentDate(String treatmentDate) {
+        this.treatmentDate = treatmentDate;
+    }
+
     public String getDrugString(boolean includeControlDrugs){
 
         String ret = "";
@@ -120,6 +141,18 @@ public class TreatmentProtocol {
         }
 
         components.add(tc);
+    }
+
+
+    public void addDurationForAllComponents(String duration){
+
+        if(components != null){
+
+            for(TreatmentComponent tc : components){
+
+                tc.setDuration(duration);
+            }
+        }
     }
 
 }
