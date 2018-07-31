@@ -20,8 +20,7 @@ public class AjaxController {
 
     private MappingService mappingService;
 
-    @Value("${diagnosis.mappings.file}")
-    private String savedDiagnosisMappingsFile;
+
 
     @Autowired
     public AjaxController(MappingService mappingService) {
@@ -37,7 +36,7 @@ public class AjaxController {
             ds = dataSource.get();
         }
 
-        return mappingService.getMissingMappings(ds);
+        return mappingService.getMissingDiagnosisMappings(ds);
     }
 
 
@@ -50,7 +49,7 @@ public class AjaxController {
             ds = dataSource.get();
         }
 
-        return mappingService.getSavedDiagnosisMappings(savedDiagnosisMappingsFile, ds);
+        return mappingService.getSavedDiagnosisMappings(ds);
     }
 
 
