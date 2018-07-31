@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
@@ -86,6 +87,9 @@ public class LoadPDMRData implements CommandLineRunner {
     @Value("${pdmrpdx.ref.assembly}")
     private String refAssembly;
 
+    @Value("${pdmrpdx.mutations.file}")
+    private String mutationsFile;
+
     HashMap<String, String> passageMap = null;
     HashMap<String, Image> histologyMap = null;
 
@@ -114,6 +118,10 @@ public class LoadPDMRData implements CommandLineRunner {
             if (file != null) {
                 log.info("Loading from file " + file);
                 parseJSON(parseFile(file));
+
+                loadMutationData();
+
+
             } /* else if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
                 parseJSON(parseURL(urlStr));
@@ -250,13 +258,179 @@ public class LoadPDMRData implements CommandLineRunner {
             }
         }
 
+
+
         //load patient treatment
 
+        TreatmentSummary ts = new TreatmentSummary();
 
+        JSONArray treatmentArr = j.getJSONArray("Treatments");
+
+        for(int k=0; k<treatmentArr.length();k++){
+
+            JSONObject treatmentObj = treatmentArr.getJSONObject(k);
+            TreatmentProtocol tp;
+
+            String drugString;
+            String date;
+            String duration = treatmentObj.getString("Duration");
+            String response = treatmentObj.getString("Response");
+            //this is the current treatment
+            if(treatmentObj.has("Current Drug")){
+
+                drugString = treatmentObj.getString("Current Drug");
+                date = treatmentObj.getString("Starting Date");
+                tp = dataImportService.getTreatmentProtocol(drugString, "", response, true);
+
+            }
+            //not current treatment, create default TreatmentProtocol object
+            else{
+
+                drugString = treatmentObj.getString("Prior Drug");
+                date = treatmentObj.getString("Prior Date");
+                tp = dataImportService.getTreatmentProtocol(drugString, "", response, false);
+            }
+
+            tp.setTreatmentDate(date);
+            tp.addDurationForAllComponents(duration);
+            ts.addTreatmentProtocol(tp);
+        }
+
+        //save summary on snapshot
+        pSnap.setTreatmentSummary(ts);
+        dataImportService.savePatientSnapshot(pSnap);
 
         //loadVariationData(mc);
         dataImportService.saveModelCreation(modelCreation);
     }
+
+
+
+    private void loadMutationData(){
+
+        log.info("Loading mutation data for PDMR samples");
+        //load samples file
+        int currentLineCounter = 1;
+        String currentLine;
+        String[] row;
+        Sample sample;
+        MolecularCharacterization mc;
+
+        Platform pl = dataImportService.getPlatform("Gene Panel", DS);
+
+        Map<String, Sample> sampleMap = new HashMap<>();
+        Map<String, MolecularCharacterization> molcharMap = new HashMap<>();
+
+        try {
+            BufferedReader buf = new BufferedReader(new FileReader(mutationsFile));
+
+            while (true) {
+                currentLine = buf.readLine();
+                if (currentLine == null) {
+                    break;
+                } else if (currentLineCounter < 2) {
+                    currentLineCounter++;
+                    continue;
+
+                } else {
+                    row = currentLine.split("\t");
+
+                    String modelId = row[1] + "-" + row[2];
+                    String sampleId = row[3];
+                    String markerSymbol = row[8];
+                    String aaChange = row[9];
+                    String alleleFreq = row[11];
+                    String readDepth = row[12];
+
+                    //skip rows where there is no marker
+                    if(markerSymbol.equals("None Found")) continue;
+
+
+                    //check if this is a sample that we already have in the map
+                    if(sampleMap.containsKey(modelId+sampleId)){
+
+                        sample = sampleMap.get(modelId+sampleId);
+                    }
+                    //this is a sample that is not in the map yet, get it from the db
+                    else{
+
+                        if(sampleId.equals("ORIGINATOR")){
+
+                            //get a human sample
+                            sample = dataImportService.findHumanSample(modelId, DS.getAbbreviation());
+                        }
+                        else{
+
+                            //get the xenograft sample
+                            sample = dataImportService.findXenograftSample(modelId, DS.getAbbreviation(), sampleId);
+                        }
+
+                    }
+
+
+                    if(sample == null){
+
+                        log.error("Sample "+sampleId + " is not found.");
+                        continue;
+                    }
+                    //found the sample
+                    else{
+
+                        //add it to the sample map
+                        sampleMap.put(modelId+sampleId, sample);
+
+                        //does this sample have molchar obj?
+                        if(molcharMap.containsKey(modelId+sampleId)){
+
+                            mc = molcharMap.get(modelId+sampleId);
+                        }
+                        else{
+
+                            mc = new MolecularCharacterization();
+                            mc.setType("mutation");
+                            mc.setPlatform(pl);
+                        }
+
+
+                        Marker m = dataImportService.getMarker(markerSymbol);
+                        MarkerAssociation ma = new MarkerAssociation();
+
+                        ma.setMarker(m);
+                        ma.setAminoAcidChange(aaChange);
+                        ma.setAlleleFrequency(alleleFreq);
+                        ma.setReadDepth(readDepth);
+                        mc.addMarkerAssociation(ma);
+
+                        //put the updated mc back into the map
+                        molcharMap.put(modelId+sampleId, mc);
+
+                    }
+
+                }
+                currentLineCounter++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        //go through the samples and save the mc object for them
+        for (Map.Entry<String, Sample> entry : sampleMap.entrySet()) {
+            String key = entry.getKey();
+            Sample s = entry.getValue();
+
+            MolecularCharacterization molchar = molcharMap.get(key);
+
+            s.addMolecularCharacterization(molchar);
+            dataImportService.saveSample(s);
+
+        }
+
+
+        log.info("DONE loading mutation data for PDMR.");
+
+    }
+
 
 
     /*
