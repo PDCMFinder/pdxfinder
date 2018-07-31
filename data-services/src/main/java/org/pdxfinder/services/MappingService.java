@@ -1,5 +1,6 @@
 package org.pdxfinder.services;
 
+import org.apache.lucene.util.automaton.LevenshteinAutomata;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
@@ -7,14 +8,17 @@ import org.pdxfinder.admin.pojos.MappingContainer;
 import org.pdxfinder.admin.pojos.MappingEntity;
 import org.pdxfinder.dao.Sample;
 import org.pdxfinder.repositories.SampleRepository;
+import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /*
@@ -25,22 +29,27 @@ public class MappingService {
 
     private final static Logger log = LoggerFactory.getLogger(MappingService.class);
 
+
+    @Value("${diagnosis.mappings.file}")
+    private String savedDiagnosisMappingsFile;
+
     private SampleRepository sampleRepository;
+
+    private MappingContainer existingDiagnosisMappings;
 
     @Autowired
     public MappingService(SampleRepository sampleRepository) {
 
         this.sampleRepository = sampleRepository;
 
+
     }
 
 
-    public MappingContainer getSavedDiagnosisMappings(String mappingFileLocation, String ds){
+    private void loadSavedDiagnosisMappings(){
 
-        //mappingFileLocation = "/Users/csaba/PDX/LoaderData/mappings/diagnosis_to_ncit.json";
-
-        String json = parseFile(mappingFileLocation);
-        MappingContainer mc = new MappingContainer();
+        String json = parseFile(savedDiagnosisMappingsFile);
+        existingDiagnosisMappings = new MappingContainer();
 
 
         try {
@@ -60,7 +69,7 @@ public class MappingService {
                     String mapType = row.getString("maptype");
                     String justification = row.getString("justification");
 
-                    if(ds!= null && !ds.toLowerCase().equals(dataSource.toLowerCase())) continue;
+                    //if(ds!= null && !ds.toLowerCase().equals(dataSource.toLowerCase())) continue;
 
                     if (ontologyTerm.equals("") || ontologyTerm == null) continue;
                     if (sampleDiagnosis.equals("") || sampleDiagnosis == null) continue;
@@ -99,7 +108,7 @@ public class MappingService {
                     me.setMapType(mapType);
                     me.setJustification(justification);
 
-                    mc.add(me);
+                    existingDiagnosisMappings.add(me);
                 }
             }
 
@@ -108,12 +117,36 @@ public class MappingService {
         }
 
 
+    }
+
+
+
+    public MappingContainer getSavedDiagnosisMappings(String ds){
+
+        if(existingDiagnosisMappings == null){
+
+            loadSavedDiagnosisMappings();
+        }
+
+        //no filter, return everything
+        if(ds == null) return existingDiagnosisMappings;
+
+        MappingContainer mc = new MappingContainer();
+
+        List<MappingEntity> results = existingDiagnosisMappings.getMappings().values().stream().filter(
+                x -> x.getEntityType().equals("DIAGNOSIS") &&
+                        x.getMappingValues().get("DataSource").equals(ds)).collect(Collectors.toList());
+
+        results.forEach(x -> {
+            mc.add(x);
+        });
+
 
     return mc;
     }
 
 
-    public MappingContainer getMissingMappings(String ds){
+    public MappingContainer getMissingDiagnosisMappings(String ds){
 
         MappingContainer mc = new MappingContainer();
 
@@ -159,6 +192,9 @@ public class MappingService {
 
                 MappingEntity me = new MappingEntity(mc.getNextAvailableId(), "DIAGNOSIS", getDiagnosisMappingLabels(), mappingValues);
 
+                //get suggestions for missing mapping
+                me.setSuggestedMappings(getSuggestionsForUnmappedEntity(me, getSavedDiagnosisMappings(null)));
+
                 mc.add(me);
                 existingCombinations.add(dataSource+";"+sampleDiagnosis+";"+originTissue+";"+tumorType);
             }
@@ -170,6 +206,50 @@ public class MappingService {
         return mc;
     }
 
+
+
+
+    private List<MappingEntity> getSuggestionsForUnmappedEntity(MappingEntity me, MappingContainer mc){
+
+
+        String entityType = me.getEntityType();
+
+
+        //APPLY MAPPING SUGGESTION LOGIC HERE
+
+        List<MappingEntity> mapSuggList =  mc.getMappings().values().stream().filter(x -> x.getEntityType().equals(entityType)).collect(Collectors.toList());
+
+        //Use the Damerau Levenshtein algorithm to determine string similarity
+
+        DamerauLevenshteinAlgorithm dla = new DamerauLevenshteinAlgorithm(1,1,2,2);
+        String typeKeyValues1 = getTypeKeyValues(me);
+
+        mapSuggList.forEach(x -> {
+
+            //get similarity index components
+            int simIndex = 0;
+
+            for(String label : x.getMappingLabels()){
+
+                simIndex += getSimilarityIndexComponent(dla, me.getEntityType(), label, me.getMappingValues().get(label), x.getMappingValues().get(label));
+            }
+
+            //x.setSimilarityIndex(getStringSimilarity(dla, typeKeyValues1, getTypeKeyValues(x)));
+
+            x.setSimilarityIndex(simIndex);
+        });
+
+
+        //take all mapped entities and order them by their stringsimilarity to the unmapped entity
+        //mapSuggList.stream().sorted((x1, x2) -> Integer.compare(getStringSimilarity(dla, typeKeyValues1, getTypeKeyValues(x1)),  getStringSimilarity(dla, typeKeyValues1, getTypeKeyValues(x2))) );
+        mapSuggList = mapSuggList.stream().sorted(Comparator.comparing(MappingEntity::getSimilarityIndex)).collect(Collectors.toList());
+
+        //return the first 10 suggestions
+        int limit = mapSuggList.size();
+        if (limit > 10) limit = 10;
+
+        return mapSuggList.subList(0, limit);
+    }
 
 
 
@@ -192,6 +272,55 @@ public class MappingService {
 
 
 
+    private int getSimilarityIndexComponent(DamerauLevenshteinAlgorithm dla, String entityType, String entityAttribute, String attribute1, String attribute2){
+
+
+        if(entityType.equals("DIAGNOSIS")){
+
+            if(entityAttribute.equals("SampleDiagnosis")){
+
+                return dla.execute(attribute1.toLowerCase(), attribute2.toLowerCase());
+            }
+            else{
+
+                int diff = dla.execute(attribute1.toLowerCase(), attribute2.toLowerCase());
+
+                if(diff > 4) return 1;
+                return diff;
+            }
+
+        }
+
+        return 10000;
+
+    }
+
+
+    String getTypeKeyValues(MappingEntity me){
+
+
+        String key = "";
+
+        if(me == null) return key;
+
+        switch (me.getEntityType()){
+
+            case "DIAGNOSIS":
+                for(String label : getDiagnosisMappingLabels()){
+                    key += me.getMappingValues().get(label).toLowerCase();
+                }
+
+                break;
+
+            default: key = "";
+        }
+
+
+        return key;
+    }
+
+
+
     List<String> getDiagnosisMappingLabels(){
 
         List<String> mapLabels = new ArrayList<>();
@@ -204,5 +333,11 @@ public class MappingService {
     }
 
 
+
+
+    private int getStringSimilarity(DamerauLevenshteinAlgorithm dla, String key1, String key2){
+
+        return dla.execute(key1, key2);
+    }
 
 }
