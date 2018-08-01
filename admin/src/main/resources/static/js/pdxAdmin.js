@@ -292,3 +292,96 @@ function WinMove() {
 }
 
 
+function getMissingMappingData(){
+
+    var url = "/api/missingmapping/diagnosis"
+
+    var jqxhr = $.get( url, function() {
+
+    })
+        .done(function(data) {
+
+            drawMappingTable(data);
+        })
+        .fail(function() {
+            alert( "error" );
+        });
+
+}
+
+
+function drawMappingTable(jsonData){
+
+    var table = jQuery("<table/>");
+    table.addClass("table table-bordered");
+
+    var theader = jQuery("<thead><th>ID</th><th>DataSource</th><th>SampleDiagnosis</th><th>OriginTissue</th><th>TumorType</th><th>MappedTerm</th><th>Actions</th>");
+    theader.addClass("table-active");
+    table.append(theader);
+
+    var tbody = jQuery("<tbody/>");
+
+    var th = null;
+    var mappingData = jsonData["mappings"];
+
+    for(var i=0;i<mappingData.length; i++){
+
+        var entity = mappingData[i];
+        var entityRow = jQuery("<tr style=\"font-weight:bold\"/>");
+        entityRow.addClass("bg-danger");
+
+        var entityId = entity["entityId"];
+        entityRow.append("<td>" + entityId + "</td>");
+
+        var mappingLabels = entity["mappingLabels"];
+        var mappingValues = entity["mappingValues"];
+
+        //add values from the custom attributes to row
+        for(var j=0; j<mappingLabels.length; j++){
+
+            var labelValue = mappingValues[mappingLabels[j]];
+            entityRow.append("<td>" + labelValue + "</td>");
+        }
+
+        //add the rest of the values to the row
+        entityRow.append("<td></td><td></td>");
+
+        //entityRow.addClass("table-danger");
+        tbody.append(entityRow);
+
+        //get the suggested mapping entities and add them to the table
+        var suggestedMappings = entity["suggestedMappings"];
+
+        for(var k=0;k<suggestedMappings.length; k++){
+
+            entity = suggestedMappings[k];
+            entityId = entity["entityId"];
+            entityRow = jQuery("<tr/>");
+            entityRow.append("<td>" + entityId + "</td>");
+
+            var mappingLabels = entity["mappingLabels"];
+            var mappingValues = entity["mappingValues"];
+
+            //add values from the custom attributes to row
+            for(var j=0; j<mappingLabels.length; j++){
+
+                var labelValue = mappingValues[mappingLabels[j]];
+                entityRow.append("<td>" + labelValue + "</td>");
+            }
+
+            //add the rest of the values to the row
+            var mappedTerm = entity["mappedTerm"];
+            entityRow.append("<td>" + mappedTerm + "</td><td></td>");
+
+            //entityRow.addClass("table-danger");
+            tbody.append(entityRow);
+
+        }
+
+    }
+
+    table.append(tbody);
+
+    jQuery("#mappingTableDiv").append(table);
+
+}
