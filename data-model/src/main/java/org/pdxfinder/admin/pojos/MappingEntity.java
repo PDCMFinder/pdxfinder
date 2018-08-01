@@ -81,8 +81,6 @@ public class MappingEntity {
     private Date dateUpdated;
 
 
-    private int similarityIndex;
-
 
     public MappingEntity(Long entityId, String entityType, List<String> mappingLabels, Map<String, String> mappingValues) {
         this.entityId = entityId;
@@ -95,7 +93,6 @@ public class MappingEntity {
         //TODO: get current date, specify date format
         this.dateCreated = null;
         this.dateUpdated = null;
-        this.similarityIndex = -1;
 
     }
 
@@ -203,11 +200,4 @@ public class MappingEntity {
         this.dateUpdated = dateUpdated;
     }
 
-    public int getSimilarityIndex() {
-        return similarityIndex;
-    }
-
-    public void setSimilarityIndex(int similarityIndex) {
-        this.similarityIndex = similarityIndex;
-    }
 }
