@@ -213,7 +213,7 @@ public class MappingService {
 
 
         String entityType = me.getEntityType();
-
+        TreeMap<Integer, List<MappingEntity>> unorderedSuggestions = new TreeMap<>();
 
         //APPLY MAPPING SUGGESTION LOGIC HERE
 
@@ -236,19 +236,50 @@ public class MappingService {
 
             //x.setSimilarityIndex(getStringSimilarity(dla, typeKeyValues1, getTypeKeyValues(x)));
 
-            x.setSimilarityIndex(simIndex);
+            Integer index = new Integer(simIndex);
+
+            if(unorderedSuggestions.containsKey(index)){
+
+                unorderedSuggestions.get(index).add(x);
+            }
+            else{
+                List<MappingEntity> list = new ArrayList<>();
+                list.add(x);
+                unorderedSuggestions.put(index, list);
+            }
+
         });
 
 
         //take all mapped entities and order them by their stringsimilarity to the unmapped entity
         //mapSuggList.stream().sorted((x1, x2) -> Integer.compare(getStringSimilarity(dla, typeKeyValues1, getTypeKeyValues(x1)),  getStringSimilarity(dla, typeKeyValues1, getTypeKeyValues(x2))) );
-        mapSuggList = mapSuggList.stream().sorted(Comparator.comparing(MappingEntity::getSimilarityIndex)).collect(Collectors.toList());
+        //mapSuggList = mapSuggList.stream().sorted(Comparator.comparing(MappingEntity::getSimilarityIndex)).collect(Collectors.toList());
+
+        TreeMap<Integer, List<MappingEntity>> orderedSuggestions = new TreeMap<>(unorderedSuggestions);
+        List<MappingEntity> resultList = new ArrayList<>();
+
+        log.info("UNMAPPED: "+me.getMappingValues().get("SampleDiagnosis")+" "+me.getMappingValues().get("OriginTissue"));
+
+        int entityCounter = 0;
+        for(Map.Entry<Integer, List<MappingEntity>> entry : orderedSuggestions.entrySet()){
+
+            Integer ix = entry.getKey();
+            List<MappingEntity> list = entry.getValue();
+            for(MappingEntity ment : list){
+
+                log.info("SUGG: "+ment.getMappingValues().get("SampleDiagnosis")+" "+ment.getMappingValues().get("OriginTissue") + "INDEX:"+ix);
+                resultList.add(ment);
+                entityCounter++;
+
+                if(entityCounter>=10) break;
+            }
+
+            if(entityCounter>=10) break;
+        }
 
         //return the first 10 suggestions
-        int limit = mapSuggList.size();
-        if (limit > 10) limit = 10;
 
-        return mapSuggList.subList(0, limit);
+        return resultList;
     }
 
 
@@ -279,7 +310,14 @@ public class MappingService {
 
             if(entityAttribute.equals("SampleDiagnosis")){
 
-                return dla.execute(attribute1.toLowerCase(), attribute2.toLowerCase());
+                return dla.execute(attribute1.toLowerCase(), attribute2.toLowerCase()) * 5;
+            }
+            else if(entityAttribute.equals("OriginTissue")){
+
+                int diff = dla.execute(attribute1.toLowerCase(), attribute2.toLowerCase());
+                //the origin tissue is very different, less likely will be a good suggestion
+                if(diff > 4) return 50;
+                return diff;
             }
             else{
 
