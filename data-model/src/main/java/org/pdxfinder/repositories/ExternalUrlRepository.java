@@ -9,7 +9,9 @@ import java.util.List;
 
 public interface ExternalUrlRepository extends PagingAndSortingRepository<ExternalUrl, Long> {
 
-    ExternalUrl findByType(@Param("type") ExternalUrl.Type type);
+
+    @Query("MATCH (u:ExternalUrl) WHERE u.type = {type} AND u.url = {url} RETURN u")
+    ExternalUrl findByTypeAndUrl(@Param("type") String type, @Param("url") String url);
 
     @Query("MATCH (exturl:ExternalUrl) RETURN DISTINCT exturl.type ORDER BY exturl.type")
     List<String> findAllTypes();
