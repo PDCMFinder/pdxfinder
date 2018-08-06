@@ -28,4 +28,7 @@ public class CountDTO {
     public void setValue(int value) {
         this.value = value;
     }
+
 }
+
+
