@@ -30,7 +30,7 @@ public class MappingService {
     private final static Logger log = LoggerFactory.getLogger(MappingService.class);
 
 
-    @Value("${diagnosis.mappings.file}")
+    @Value("${mappings.diagnosis.file}")
     private String savedDiagnosisMappingsFile;
 
     private SampleRepository sampleRepository;
