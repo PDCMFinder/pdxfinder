@@ -15,11 +15,10 @@ public class MappingEntity {
      */
     private Long entityId;
 
-
     /**
      * Describes what kind of mapping info is held in the entity, ie: diagnosis, drug, etc
      */
-    private String mapType;
+    private String entityType;
 
 
     /**
@@ -43,6 +42,17 @@ public class MappingEntity {
      */
     private String mappedTerm;
 
+
+    /**
+     * Describes whether the mapping rule is direct or inferred
+     */
+    private String mapType;
+
+
+    /**
+     * Gives info about the justification: ie. manual curation, combination of diagnosis and primary tumor, etc
+     */
+    private String justification;
 
     /**
      * Possible values:
@@ -71,9 +81,10 @@ public class MappingEntity {
     private Date dateUpdated;
 
 
-    public MappingEntity(Long entityId, String mapType, List<String> mappingLabels, Map<String, String> mappingValues) {
+
+    public MappingEntity(Long entityId, String entityType, List<String> mappingLabels, Map<String, String> mappingValues) {
         this.entityId = entityId;
-        this.mapType = mapType;
+        this.entityType = entityType;
         this.mappingLabels = mappingLabels;
         this.mappingValues = mappingValues;
         this.mappedTerm = null;
@@ -85,12 +96,12 @@ public class MappingEntity {
 
     }
 
-    public MappingEntity(Long entityId, String mapType, List<String> mappingLabels, Map<String, String> mappingValues,
+    public MappingEntity(Long entityId, String entityType, List<String> mappingLabels, Map<String, String> mappingValues,
                          String mappedTerm, String status, List<MappingEntity> suggestedMappings, Date dateCreated,
                          Date dateUpdated) {
 
         this.entityId = entityId;
-        this.mapType = mapType;
+        this.entityType = entityType;
         this.mappingLabels = mappingLabels;
         this.mappingValues = mappingValues;
         this.mappedTerm = mappedTerm;
@@ -109,12 +120,12 @@ public class MappingEntity {
         this.entityId = entityId;
     }
 
-    public String getMapType() {
-        return mapType;
+    public String getEntityType() {
+        return entityType;
     }
 
-    public void setMapType(String mapType) {
-        this.mapType = mapType;
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
     }
 
     public List<String> getMappingLabels() {
@@ -139,6 +150,22 @@ public class MappingEntity {
 
     public void setMappedTerm(String mappedTerm) {
         this.mappedTerm = mappedTerm;
+    }
+
+    public String getMapType() {
+        return mapType;
+    }
+
+    public void setMapType(String mapType) {
+        this.mapType = mapType;
+    }
+
+    public String getJustification() {
+        return justification;
+    }
+
+    public void setJustification(String justification) {
+        this.justification = justification;
     }
 
     public String getStatus() {
@@ -172,4 +199,5 @@ public class MappingEntity {
     public void setDateUpdated(Date dateUpdated) {
         this.dateUpdated = dateUpdated;
     }
+
 }

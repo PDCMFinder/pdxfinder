@@ -96,8 +96,9 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "WITH s " +
             "OPTIONAL MATCH (s)-[ot:ORIGIN_TISSUE]-(ti:Tissue) " +
             "OPTIONAL MATCH  (s)-[oft:OF_TYPE]-(t:TumorType) " +
-            "RETURN DISTINCT  s, ti, t, ot, oft")
+            "RETURN DISTINCT s, ti, t, ot, oft ORDER BY s.diagnosis")
     Collection<Sample> findSamplesWithoutOntologyMapping();
+
 
     @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) WHERE mod.sourcePdxId = {modelId} AND mod.dataSource = {ds} RETURN s")
     Sample findHumanSampleByModelIdAndDS(@Param("modelId") String modelId, @Param("ds") String ds);
@@ -108,5 +109,15 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "AND sp.externalId = {specimenId} " +
             "RETURN s")
     Sample findMouseSampleByModelIdAndDataSourceAndSpecimenId(@Param("modelId") String modelId, @Param("ds") String dataSource, @Param("specimenId") String specimenId);
+
+
+    @Query("MATCH (ps:PatientSnapshot)-[sf:SAMPLED_FROM]-(s:Sample) " +
+            "WHERE NOT (s)-[:MAPPED_TO]-() " +
+            "AND s.dataSource = {ds}" +
+            "WITH s " +
+            "OPTIONAL MATCH (s)-[ot:ORIGIN_TISSUE]-(ti:Tissue) " +
+            "OPTIONAL MATCH  (s)-[oft:OF_TYPE]-(t:TumorType) " +
+            "RETURN DISTINCT  s, ti, t, ot, oft ORDER BY s.diagnosis")
+    Collection<Sample> findSamplesWithoutOntologyMappingByDataSource(@Param("ds") String dataSource);
 
 }
