@@ -607,6 +607,11 @@ public class DataImportService {
     }
 
     public Platform getPlatform(String name, Group group) {
+
+        //remove special characters from platform name
+        name = name.replaceAll("[^A-Za-z0-9 _-]", "");
+
+
         Platform p = platformRepository.findByNameAndDataSource(name, group.getName());
         if (p == null) {
             p = new Platform();
@@ -619,6 +624,10 @@ public class DataImportService {
     }
 
     public Platform getPlatform(String name, Group group, String platformUrl) {
+
+        //remove special characters from platform name
+        name = name.replaceAll("[^A-Za-z0-9 _-]", "");
+
         Platform p = platformRepository.findByNameAndDataSourceAndUrl(name, group.getName(), platformUrl);
 
         if (p == null) {
