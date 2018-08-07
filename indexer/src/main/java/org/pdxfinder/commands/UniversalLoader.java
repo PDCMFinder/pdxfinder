@@ -30,11 +30,15 @@ import java.util.List;
 
 import org.apache.poi.ss.usermodel.*;
 
-/**
- * Load data from JAX.
+/*
+ * Created by csaba on 06/08/2018.
  */
 @Component
 @Order(value = 0)
+/**
+ *
+ * aka UPDOG: Universal PdxData tO Graph
+ */
 public class UniversalLoader implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(UniversalLoader.class);
@@ -51,9 +55,10 @@ public class UniversalLoader implements CommandLineRunner {
     private String templateFiles;
 
     private List<List<String>> patientSheetData;
-
-    private FileInputStream excelFile;
-
+    private List<List<String>> patientTumorSheetData;
+    private List<List<String>> patientTreatmentSheetData;
+    private List<List<String>> pdxModelSheetData;
+    private List<List<String>> pdxModelVariationSheetData;
 
     @PostConstruct
     public void init() {
@@ -62,7 +67,6 @@ public class UniversalLoader implements CommandLineRunner {
 
     public UniversalLoader(DataImportService dataImportService) {
         this.dataImportService = dataImportService;
-        this.patientSheetData = new ArrayList<>();
     }
 
     @Override
@@ -79,58 +83,39 @@ public class UniversalLoader implements CommandLineRunner {
             log.info("Running universal");
             FileInputStream excelFile = new FileInputStream(new File(templateFiles));
 
-            //WorkbookFactory.create(excelFile);
             Workbook workbook = new XSSFWorkbook(excelFile);
             log.info("Loading template");
-            loadTemplateData(workbook);
+            initializeTemplateData(workbook);
+
+            loadTemplateData();
+
             workbook.close();
             excelFile.close();
 
-            System.out.println(patientSheetData.toString());
         }
     }
 
 
+    /**
+     * Loads the data from the spreadsheet and stores it in lists
+     * @param workbook
+     */
+    private void initializeTemplateData(Workbook workbook){
 
+        patientSheetData = new ArrayList<>();
+        patientTumorSheetData = new ArrayList<>();
+        patientTreatmentSheetData = new ArrayList<>();
+        pdxModelSheetData = new ArrayList<>();
+        pdxModelVariationSheetData = new ArrayList<>();
 
-
-    private void initializeWorkbook(String fileName){
-
-        try {
-
-            excelFile = new FileInputStream(new File(fileName));
-            Workbook workbook = new XSSFWorkbook(excelFile);
-
-            loadTemplateData(workbook);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        initializeSheetData(workbook.getSheetAt(1), "patientSheetData");
+        initializeSheetData(workbook.getSheetAt(2), "patientTumorSheetData");
+        initializeSheetData(workbook.getSheetAt(3), "patientTreatmentSheetData");
+        initializeSheetData(workbook.getSheetAt(4), "pdxModelSheetData");
+        initializeSheetData(workbook.getSheetAt(5), "pdxModelVariationSheetData");
     }
 
-
-    private void initializeSheets(Workbook workbook){
-
-        Sheet patientSheet = workbook.getSheetAt(0);
-        Sheet patientTumorSheet = workbook.getSheetAt(1);
-        Sheet patientTreatmentSheet = workbook.getSheetAt(2);
-        Sheet pdxModelSheet = workbook.getSheetAt(3);
-        Sheet pdxModelValidationSheet = workbook.getSheetAt(4);
-
-    }
-
-    private void loadTemplateData(Workbook workbook){
-
-        initializePatientSheetData(workbook.getSheetAt(1));
-        createPatientTumors();
-        createPatientTreatments();
-        createPdxModels();
-        createPdxModelValidations();
-    }
-
-
-
-    private void initializePatientSheetData(Sheet sheet){
+    private void initializeSheetData(Sheet sheet, String sheetName){
 
         Iterator<Row> iterator = sheet.iterator();
         int rowCounter = 0;
@@ -170,10 +155,49 @@ public class UniversalLoader implements CommandLineRunner {
                 }
 
                 dataRow.add(value);
-
             }
-            patientSheetData.add(dataRow);
+
+
+            if(sheetName.equals("patientSheetData")){
+
+                patientSheetData.add(dataRow);
+            }
+            else if(sheetName.equals("patientTumorSheetData")){
+
+                patientTumorSheetData.add(dataRow);
+            }
+            else if(sheetName.equals("patientTreatmentSheetData")){
+
+                patientTreatmentSheetData.add(dataRow);
+            }
+            else if(sheetName.equals("pdxModelSheetData")){
+
+                pdxModelSheetData.add(dataRow);
+            }
+            else if(sheetName.equals("pdxModelVariationSheetData")){
+
+                pdxModelVariationSheetData.add(dataRow);
+            }
+
         }
+    }
+
+    /**
+     * Loads the data from the lists into the DB
+     */
+    private void loadTemplateData(){
+
+        createPatients();
+        createPatientTumors();
+        createPatientTreatments();
+        createPdxModels();
+        createPdxModelValidations();
+
+    }
+
+    private void createPatients(){
+
+
     }
 
     private void createPatientTumors(){
