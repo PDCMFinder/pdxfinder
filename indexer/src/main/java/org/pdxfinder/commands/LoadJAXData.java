@@ -358,7 +358,7 @@ public class LoadJAXData implements CommandLineRunner {
                 
                 ma.setMarker(marker);
 
-                Platform platform = dataImportService.getPlatform(technology, this.jaxDS);
+                Platform platform;
 
                 if(technology.equals("Truseq_JAX")){
                     platform = dataImportService.getPlatform(technology, this.jaxDS, TRUSEQ_PLATFORM_URL);
