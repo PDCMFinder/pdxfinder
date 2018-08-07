@@ -2,48 +2,60 @@ package org.pdxfinder.commands;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
 
-import org.apache.poi.hssf.usermodel.*;
 
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.neo4j.ogm.session.Session;
+
 import org.pdxfinder.services.DataImportService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.Iterator;
 
-/*
- * Created by csaba on 06/08/2018.
+import org.apache.poi.ss.usermodel.*;
+
+/**
+ * Load data from JAX.
  */
 @Component
-@Order(value = 50)
-public class UniversalLoader implements CommandLineRunner{
-
+@Order(value = 0)
+public class UniversalLoader implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(UniversalLoader.class);
 
+    private Options options;
+    private CommandLineParser parser;
+    private CommandLine cmd;
+    private HelpFormatter formatter;
+
     private DataImportService dataImportService;
+    private Session session;
 
     @Value("${universal.template.files}")
-    private String[] templateFiles;
+    private String templateFiles;
+
 
     private FileInputStream excelFile;
-    private Workbook workbook;
-    private Sheet patientSheet;
-    private Sheet patientTumorSheet;
-    private Sheet patientTreatmentSheet;
-    private Sheet pdxModelSheet;
-    private Sheet pdxModelValidationSheet;
 
+
+    @PostConstruct
+    public void init() {
+        formatter = new HelpFormatter();
+    }
 
     public UniversalLoader(DataImportService dataImportService) {
         this.dataImportService = dataImportService;
@@ -54,24 +66,24 @@ public class UniversalLoader implements CommandLineRunner{
 
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("loadUniversal", "Running the universal loader");
-        parser.accepts("loadALL", "Load all");
-
+        parser.accepts("loadUniversal", "Run universal loader");
+        parser.accepts("loadALL", "Load all, including JAX PDX data");
         OptionSet options = parser.parse(args);
 
-        if (options.has("loadUniversal") || options.has("loadALL")) {
+        if (options.has("loadUniversal") || options.has("loadALL")  || options.has("loadSlim")) {
 
-            //deal with loading multiple templates here
-            for(int i=0; i<templateFiles.length; i++){
+            log.info("Running universal");
+            FileInputStream excelFile = new FileInputStream(new File(templateFiles));
 
-                initializeWorkbook(templateFiles[i]);
-                loadTemplateData();
+            WorkbookFactory.create(excelFile);
+            Workbook workbook = new XSSFWorkbook(excelFile);
 
-            }
+            Sheet datatypeSheet = workbook.getSheetAt(0);
 
         }
-
     }
+
+
 
 
 
@@ -80,9 +92,9 @@ public class UniversalLoader implements CommandLineRunner{
         try {
 
             excelFile = new FileInputStream(new File(fileName));
-            workbook = new XSSFWorkbook(excelFile);
+            Workbook workbook = new XSSFWorkbook(excelFile);
 
-            initializeSheets();
+            loadTemplateData(workbook);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -90,19 +102,19 @@ public class UniversalLoader implements CommandLineRunner{
     }
 
 
-    private void initializeSheets(){
+    private void initializeSheets(Workbook workbook){
 
-        patientSheet = workbook.getSheetAt(0);
-        patientTumorSheet = workbook.getSheetAt(1);
-        patientTreatmentSheet = workbook.getSheetAt(2);
-        pdxModelSheet = workbook.getSheetAt(3);
-        pdxModelValidationSheet = workbook.getSheetAt(4);
+        Sheet patientSheet = workbook.getSheetAt(0);
+        Sheet patientTumorSheet = workbook.getSheetAt(1);
+        Sheet patientTreatmentSheet = workbook.getSheetAt(2);
+        Sheet pdxModelSheet = workbook.getSheetAt(3);
+        Sheet pdxModelValidationSheet = workbook.getSheetAt(4);
 
     }
 
-    private void loadTemplateData(){
+    private void loadTemplateData(Workbook workbook){
 
-        createPatients();
+        createPatients(workbook.getSheetAt(0));
         createPatientTumors();
         createPatientTreatments();
         createPdxModels();
@@ -111,9 +123,30 @@ public class UniversalLoader implements CommandLineRunner{
 
 
 
-    private void createPatients(){
+    private void createPatients(Sheet patientSheet){
+
+        Iterator<Row> iterator = patientSheet.iterator();
+        int rowCounter = 0;
+        while (iterator.hasNext()) {
+
+            Row currentRow = iterator.next();
+            rowCounter++;
+
+            if(rowCounter<5) continue;
+
+            Iterator<Cell> cellIterator = currentRow.iterator();
+
+            while (cellIterator.hasNext()) {
+
+                Cell currentCell = cellIterator.next();
+                //getCellTypeEnum shown as deprecated for version 3.15
+                //getCellTypeEnum ill be renamed to getCellType starting from version 4.0
+
+                System.out.print(currentCell.getStringCellValue() + "--");
 
 
+            }
+        }
     }
 
     private void createPatientTumors(){
@@ -131,6 +164,7 @@ public class UniversalLoader implements CommandLineRunner{
     private void createPdxModelValidations(){
 
     }
+
 
 
 
