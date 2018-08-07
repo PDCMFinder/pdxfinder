@@ -24,7 +24,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.poi.ss.usermodel.*;
 
@@ -48,6 +50,7 @@ public class UniversalLoader implements CommandLineRunner {
     @Value("${universal.template.files}")
     private String templateFiles;
 
+    private List<List<String>> patientSheetData;
 
     private FileInputStream excelFile;
 
@@ -59,6 +62,7 @@ public class UniversalLoader implements CommandLineRunner {
 
     public UniversalLoader(DataImportService dataImportService) {
         this.dataImportService = dataImportService;
+        this.patientSheetData = new ArrayList<>();
     }
 
     @Override
@@ -70,16 +74,19 @@ public class UniversalLoader implements CommandLineRunner {
         parser.accepts("loadALL", "Load all, including JAX PDX data");
         OptionSet options = parser.parse(args);
 
-        if (options.has("loadUniversal") || options.has("loadALL")  || options.has("loadSlim")) {
+        if (options.has("loadUniversal")) {
 
             log.info("Running universal");
             FileInputStream excelFile = new FileInputStream(new File(templateFiles));
 
-            WorkbookFactory.create(excelFile);
+            //WorkbookFactory.create(excelFile);
             Workbook workbook = new XSSFWorkbook(excelFile);
+            log.info("Loading template");
+            loadTemplateData(workbook);
+            workbook.close();
+            excelFile.close();
 
-            Sheet datatypeSheet = workbook.getSheetAt(0);
-
+            System.out.println(patientSheetData.toString());
         }
     }
 
@@ -114,7 +121,7 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void loadTemplateData(Workbook workbook){
 
-        createPatients(workbook.getSheetAt(0));
+        initializePatientSheetData(workbook.getSheetAt(1));
         createPatientTumors();
         createPatientTreatments();
         createPdxModels();
@@ -123,29 +130,49 @@ public class UniversalLoader implements CommandLineRunner {
 
 
 
-    private void createPatients(Sheet patientSheet){
+    private void initializePatientSheetData(Sheet sheet){
 
-        Iterator<Row> iterator = patientSheet.iterator();
+        Iterator<Row> iterator = sheet.iterator();
         int rowCounter = 0;
         while (iterator.hasNext()) {
 
             Row currentRow = iterator.next();
             rowCounter++;
 
-            if(rowCounter<5) continue;
+            if(rowCounter<6) continue;
 
             Iterator<Cell> cellIterator = currentRow.iterator();
-
+            List dataRow = new ArrayList();
+            boolean isFirstColumn = true;
             while (cellIterator.hasNext()) {
 
                 Cell currentCell = cellIterator.next();
+                //skip the first column
+                if(isFirstColumn){
+                    isFirstColumn = false;
+                    continue;
+                }
+
                 //getCellTypeEnum shown as deprecated for version 3.15
-                //getCellTypeEnum ill be renamed to getCellType starting from version 4.0
+                //getCellTypeEnum will be renamed to getCellType starting from version 4.0
 
-                System.out.print(currentCell.getStringCellValue() + "--");
+                String value = null;
+                switch (currentCell.getCellType()) {
+                    case Cell.CELL_TYPE_STRING:
+                        value = currentCell.getStringCellValue();
+                        break;
+                    case Cell.CELL_TYPE_BOOLEAN:
+                        value = String.valueOf(currentCell.getBooleanCellValue());
+                        break;
+                    case Cell.CELL_TYPE_NUMERIC:
+                        value = String.valueOf(currentCell.getNumericCellValue());
+                        break;
+                }
 
+                dataRow.add(value);
 
             }
+            patientSheetData.add(dataRow);
         }
     }
 
