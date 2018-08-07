@@ -476,16 +476,21 @@ public class CreateDataProjections implements CommandLineRunner{
 
             ModelCreation model = dataImportService.findModelByTreatmentSummary(ts);
 
-            Long modelId = model.getId();
+            //check if treatment is linked to a model
+            if(model != null){
 
-            for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
+                Long modelId = model.getId();
+
+                for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
 
 
-                String drugName = tp.getDrugString(true);
-                String response = tp.getResponse().getDescription();
+                    String drugName = tp.getDrugString(true);
+                    String response = tp.getResponse().getDescription();
 
-                addToDrugResponseDP(modelId, drugName, response);
+                    addToDrugResponseDP(modelId, drugName, response);
+                }
             }
+
         }
         System.out.println();
 
@@ -609,7 +614,7 @@ public class CreateDataProjections implements CommandLineRunner{
         log.info("Dumping data to file");
         String fileName = "/Users/csaba/Documents/pdxFinderDump.txt";
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
 
             writer.append(mutatedPlatformMarkerVariantModelDP.toString());
             writer.close();
