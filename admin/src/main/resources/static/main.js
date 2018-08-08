@@ -23,6 +23,59 @@ webpackEmptyAsyncContext.id = "./src/$$_lazy_route_resource lazy recursive";
 
 /***/ }),
 
+/***/ "./src/app/app-routing.module.ts":
+/*!***************************************!*\
+  !*** ./src/app/app-routing.module.ts ***!
+  \***************************************/
+/*! exports provided: AppRoutingModule, routingComponents */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppRoutingModule", function() { return AppRoutingModule; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "routingComponents", function() { return routingComponents; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
+/* harmony import */ var _curation_mapping_curation_mapping_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./curation-mapping/curation-mapping.component */ "./src/app/curation-mapping/curation-mapping.component.ts");
+/* harmony import */ var _datasource_summary_datasource_summary_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./datasource-summary/datasource-summary.component */ "./src/app/datasource-summary/datasource-summary.component.ts");
+/* harmony import */ var _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./dashboard/dashboard.component */ "./src/app/dashboard/dashboard.component.ts");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
+
+
+
+
+var routes = [
+    //{ path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+    { path: '', component: _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_4__["DashboardComponent"] },
+    { path: 'dashboard', component: _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_4__["DashboardComponent"] },
+    { path: 'curation', component: _curation_mapping_curation_mapping_component__WEBPACK_IMPORTED_MODULE_2__["CurationMappingComponent"] },
+    { path: 'summary', component: _datasource_summary_datasource_summary_component__WEBPACK_IMPORTED_MODULE_3__["DatasourceSummaryComponent"] }
+];
+var AppRoutingModule = /** @class */ (function () {
+    function AppRoutingModule() {
+    }
+    AppRoutingModule = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["NgModule"])({
+            imports: [_angular_router__WEBPACK_IMPORTED_MODULE_1__["RouterModule"].forRoot(routes)],
+            exports: [_angular_router__WEBPACK_IMPORTED_MODULE_1__["RouterModule"]]
+        })
+    ], AppRoutingModule);
+    return AppRoutingModule;
+}());
+
+var routingComponents = [_dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_4__["DashboardComponent"],
+    _curation_mapping_curation_mapping_component__WEBPACK_IMPORTED_MODULE_2__["CurationMappingComponent"],
+    _datasource_summary_datasource_summary_component__WEBPACK_IMPORTED_MODULE_3__["DatasourceSummaryComponent"]];
+
+
+/***/ }),
+
 /***/ "./src/app/app.component.css":
 /*!***********************************!*\
   !*** ./src/app/app.component.css ***!
@@ -41,7 +94,7 @@ module.exports = ""
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "\n<!-- Selector:app-side-nav-bar for Components from the side-nav-bar.component.html -->\n\n<app-side-nav-bar>\n  ...\n</app-side-nav-bar>\n\n\n<div id=\"page-wrapper\" class=\"gray-bg\">\n  <app-top-nav-bar>\n    ...\n  </app-top-nav-bar>\n\n  <app-dashboard>\n    ...\n  </app-dashboard>\n</div>\n"
+module.exports = "\n<!-- Selector:app-side-nav-bar for Components from the side-nav-bar.component.html -->\n\n<app-side-nav-bar>\n  ...\n</app-side-nav-bar>\n\n\n<div id=\"page-wrapper\" class=\"gray-bg\">\n  <app-top-nav-bar>\n\n  </app-top-nav-bar>\n\n    <!-- ... The Router view goes here -->\n    <router-outlet>\n\n    </router-outlet>\n</div>\n"
 
 /***/ }),
 
@@ -94,9 +147,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_platform_browser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/platform-browser */ "./node_modules/@angular/platform-browser/fesm5/platform-browser.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./app.component */ "./src/app/app.component.ts");
-/* harmony import */ var _side_nav_bar_side_nav_bar_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./side-nav-bar/side-nav-bar.component */ "./src/app/side-nav-bar/side-nav-bar.component.ts");
-/* harmony import */ var _top_nav_bar_top_nav_bar_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./top-nav-bar/top-nav-bar.component */ "./src/app/top-nav-bar/top-nav-bar.component.ts");
-/* harmony import */ var _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./dashboard/dashboard.component */ "./src/app/dashboard/dashboard.component.ts");
+/* harmony import */ var _app_routing_module__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./app-routing.module */ "./src/app/app-routing.module.ts");
+/* harmony import */ var _side_nav_bar_side_nav_bar_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./side-nav-bar/side-nav-bar.component */ "./src/app/side-nav-bar/side-nav-bar.component.ts");
+/* harmony import */ var _top_nav_bar_top_nav_bar_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./top-nav-bar/top-nav-bar.component */ "./src/app/top-nav-bar/top-nav-bar.component.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -116,18 +169,71 @@ var AppModule = /** @class */ (function () {
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["NgModule"])({
             declarations: [
                 _app_component__WEBPACK_IMPORTED_MODULE_2__["AppComponent"],
-                _side_nav_bar_side_nav_bar_component__WEBPACK_IMPORTED_MODULE_3__["SideNavBarComponent"],
-                _top_nav_bar_top_nav_bar_component__WEBPACK_IMPORTED_MODULE_4__["TopNavBarComponent"],
-                _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_5__["DashboardComponent"]
+                _side_nav_bar_side_nav_bar_component__WEBPACK_IMPORTED_MODULE_4__["SideNavBarComponent"],
+                _top_nav_bar_top_nav_bar_component__WEBPACK_IMPORTED_MODULE_5__["TopNavBarComponent"],
+                _app_routing_module__WEBPACK_IMPORTED_MODULE_3__["routingComponents"]
             ],
             imports: [
-                _angular_platform_browser__WEBPACK_IMPORTED_MODULE_0__["BrowserModule"]
+                _angular_platform_browser__WEBPACK_IMPORTED_MODULE_0__["BrowserModule"],
+                _app_routing_module__WEBPACK_IMPORTED_MODULE_3__["AppRoutingModule"]
             ],
             providers: [],
             bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_2__["AppComponent"]]
         })
     ], AppModule);
     return AppModule;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/curation-mapping/curation-mapping.component.html":
+/*!******************************************************************!*\
+  !*** ./src/app/curation-mapping/curation-mapping.component.html ***!
+  \******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "<p>\n  curation-mapping works!\n</p>\n"
+
+/***/ }),
+
+/***/ "./src/app/curation-mapping/curation-mapping.component.ts":
+/*!****************************************************************!*\
+  !*** ./src/app/curation-mapping/curation-mapping.component.ts ***!
+  \****************************************************************/
+/*! exports provided: CurationMappingComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CurationMappingComponent", function() { return CurationMappingComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+var CurationMappingComponent = /** @class */ (function () {
+    function CurationMappingComponent() {
+    }
+    CurationMappingComponent.prototype.ngOnInit = function () {
+    };
+    CurationMappingComponent = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
+            selector: 'app-curation-mapping',
+            template: __webpack_require__(/*! ./curation-mapping.component.html */ "./src/app/curation-mapping/curation-mapping.component.html"),
+            styles: [""]
+        }),
+        __metadata("design:paramtypes", [])
+    ], CurationMappingComponent);
+    return CurationMappingComponent;
 }());
 
 
@@ -180,6 +286,58 @@ var DashboardComponent = /** @class */ (function () {
         __metadata("design:paramtypes", [])
     ], DashboardComponent);
     return DashboardComponent;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/datasource-summary/datasource-summary.component.html":
+/*!**********************************************************************!*\
+  !*** ./src/app/datasource-summary/datasource-summary.component.html ***!
+  \**********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "<p>\n  datasource-summary works!\n</p>\n"
+
+/***/ }),
+
+/***/ "./src/app/datasource-summary/datasource-summary.component.ts":
+/*!********************************************************************!*\
+  !*** ./src/app/datasource-summary/datasource-summary.component.ts ***!
+  \********************************************************************/
+/*! exports provided: DatasourceSummaryComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DatasourceSummaryComponent", function() { return DatasourceSummaryComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+var DatasourceSummaryComponent = /** @class */ (function () {
+    function DatasourceSummaryComponent() {
+    }
+    DatasourceSummaryComponent.prototype.ngOnInit = function () {
+    };
+    DatasourceSummaryComponent = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
+            selector: 'app-datasource-summary',
+            template: __webpack_require__(/*! ./datasource-summary.component.html */ "./src/app/datasource-summary/datasource-summary.component.html"),
+            styles: [""]
+        }),
+        __metadata("design:paramtypes", [])
+    ], DatasourceSummaryComponent);
+    return DatasourceSummaryComponent;
 }());
 
 
@@ -245,7 +403,7 @@ var SideNavBarComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "\n  <div class=\"row border-bottom\">\n\n    <!-- Top Navigation Menu here  -->\n    <nav class=\"navbar navbar-static-top white-bg\" role=\"navigation\" style=\"margin-bottom: 0\">\n      <div class=\"navbar-header\">\n        <a class=\"navbar-minimalize minimalize-styl-2 btn btn-primary \" href=\"#\"><i class=\"ti-layers\"></i>  </a>\n      </div>\n    </nav>\n    <!-- Top Navigation ends here -->\n\n  </div>\n"
+module.exports = "\n  <div class=\"row border-bottom\">\n\n    <!-- Top Navigation Menu here  -->\n    <nav class=\"navbar navbar-static-top white-bg\" role=\"navigation\" style=\"margin-bottom: 0\">\n      <div class=\"navbar-header\">\n        <button class=\"navbar-minimalize minimalize-styl-2 btn btn-primary \" href=\"#\"><i class=\"ti-location-arrow\" style=\"font-size: 25px;\"></i>  </button>\n      </div>\n    </nav>\n    <!-- Top Navigation ends here -->\n\n  </div>\n"
 
 /***/ }),
 

@@ -87,6 +87,10 @@ MIT
 MIT
 MIT
 
+@angular/router@6.1.1
+MIT
+MIT
+
 rxjs@6.2.2
 Apache-2.0
 Apache License

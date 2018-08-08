@@ -1,9 +1,7 @@
-
-
 <!-- Side Navigation menu here-->
 <nav class="navbar-default navbar-static-side" role="navigation">
   <div class="sidebar-collapse">
-    <a class="close-canvas-menu"><i class="ti-close"></i></a>
+    <a class="close-canvas-menu"><i class="ti-close" style="color: #ffffff;"></i></a>
 
 
     <ul class="nav metismenu" id="side-menu">
@@ -11,7 +9,7 @@
       <li class="nav-header">
         <div class="dropdown profile-element">
           <span>
-                <img alt="image" class="img-circle" src="/assets/icons/profile_small.jpg" />
+                <img alt="image" class="img-circle" src="/assets/icons/user.jpg" />
           </span>
           <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                 <span class="clear">
@@ -26,10 +24,11 @@
         </div>
       </li>
 
+      <li> <a href="/dashboard"><i class="ti-server"></i> <span class="nav-label"> &nbsp; Dashboard </span></a> </li>
       <li class="active">
-        <a href="dashboard_1.html"><i class="ti-menu-alt"></i> &nbsp; <span class="nav-label">Tool Box</span> </a>
+        <a href="#"><i class="ti-menu-alt"></i> <span class="nav-label"> &nbsp; Tool Box</span> </a>
         <ul class="nav nav-second-level">
-          <li class="active"><a href="#" class="active">Curation Mappings</a></li>
+          <li><a routerLink="/curation" class="active">Curation Mappings</a></li>
           <li><a href="#">PDX Finder Jira <span class="label label-primary pull-right">8</span></a></li>
           <li><a href="#">Raw Data <span class="label label-primary pull-right">2</span></a></li>
           <li><a href="#">Reports </a></li>
@@ -39,31 +38,15 @@
           <li><a href="#">Community Contacts </a></li>
         </ul>
       </li>
-      <li> <a href="#"><i class="ti-server"></i> <span class="nav-label">Manage IRCC Data</span></a> </li>
-      <li> <a href="#"><i class="ti-server"></i>  <span class="nav-label">Manage JAX Data</span></a> </li>
-      <li>
-        <a href="#"><i class="ti-menu"></i>  <span class="nav-label">PDX Models</span><i class="ti-truck"></i> </a>
-        <ul class="nav nav-second-level collapse">
-          <li><a href="#">Mouse Models <span class="label label-primary pull-right">Catalog</span></a></li>
-          <li><a href="#">Histopathological Data</a></li>
-          <li><a href="#">Host-Mouse Metadata</a></li>
-          <li><a href="#">Genomic Data <span class="label label-primary pull-right">435</span></a></li>
-          <li><a href="#">Chemotherapeutic</a></li>
-          <li><a href="#">Image Data</a></li>
-        </ul>
-      </li>
-      <li><a href="#"><i class="ti-stats-down"></i>  <span class="nav-label">PDX Model Request</span>  </a></li>
-      <li><a href="#"><i class="ti-stats-up"></i>  <span class="nav-label">API Access Request</span>  </a></li>
+      <li> <a href="#"><i class="ti-server"></i> <span class="nav-label"> &nbsp; Manage IRCC Data</span></a> </li>
+      <li> <a href="#"><i class="ti-server"></i>  <span class="nav-label"> &nbsp; Manage JAX Data</span></a> </li>
 
-      <li>
-        <a href="#"><i class="ti-search"></i>  <span class="nav-label">User Search Report</span></a>
-      </li>
 
       <li class="landing_link">
-        <a target="_blank" href="landing.html"><i class="ti-tablet"></i>  <span class="nav-label">PDX Finder Website</span> </a>
+        <a target="_blank" href="landing.html"><i class="ti-tablet"></i>  <span class="nav-label"> &nbsp; PDX Finder Website</span> </a>
       </li>
       <li class="special_link">
-        <a href="package.html"><i class="ti-server"></i>  <span class="nav-label">Neo4j Database</span></a>
+        <a href="package.html"><i class="ti-server"></i>  <span class="nav-label"> &nbsp; Neo4j Database</span></a>
       </li>
     </ul>
 
