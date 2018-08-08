@@ -11,7 +11,6 @@ const routes: Routes = [
     { path: 'dashboard',   component: DashboardComponent },
   { path: 'curation', component: CurationMappingComponent },
   { path: 'summary',   component: DatasourceSummaryComponent }
-  
 ];
 
 @NgModule({
