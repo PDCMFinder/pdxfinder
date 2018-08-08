@@ -228,6 +228,27 @@ public class DataImportService {
         return modelCreationRepository.findByMolChar(mc);
     }
 
+    public Patient createPatient(String patientId, Group dataSource, String sex, String race, String ethnicity){
+
+        Patient patient = findPatient(patientId, dataSource);
+
+        if(patient == null){
+
+            patient = this.getPatient(patientId, sex, race, ethnicity, dataSource);
+            patientRepository.save(patient);
+        }
+
+        return patient;
+    }
+
+    public Patient findPatient(String patientId, Group dataSource){
+
+        return patientRepository.findByExternalIdAndGroup(patientId, dataSource);
+
+    }
+
+
+
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, Group group) {
 
         Patient patient = patientRepository.findByExternalIdAndGroup(externalId, group);
@@ -267,6 +288,18 @@ public class DataImportService {
 
         return patientSnapshot;
     }
+
+    public PatientSnapshot findPatientSnapshot(Patient patient, String ageAtCollection, String collectionDate, String collectionEvent, String ellapsedTime){
+
+        PatientSnapshot ps = null;
+
+        if(patient.getSnapshots() != null){
+            ps = patient.getSnapShotByCollection(ageAtCollection, collectionDate, collectionEvent, ellapsedTime);
+        }
+
+        return ps;
+    }
+
 
     public PatientSnapshot getPatientSnapshot(String patientId, String age, String dataSource){
 
@@ -319,6 +352,40 @@ public class DataImportService {
 
         return sample;
     }
+
+    public Sample getSample(String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
+                            String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
+                            String grade, String gradeClassification){
+
+        TumorType type = this.getTumorType(typeStr);
+        Tissue origin = this.getTissue(originStr);
+        Tissue sampleSite = this.getTissue(sampleSiteStr);
+        Sample sample = sampleRepository.findBySourceSampleIdAndDataSource(sourceSampleId, dataSource);
+
+        String updatedDiagnosis = diagnosis;
+
+        // Changes Malignant * Neoplasm to * Cancer
+        String pattern = "(.*)Malignant(.*)Neoplasm(.*)";
+
+        if (diagnosis.matches(pattern)) {
+            updatedDiagnosis = (diagnosis.replaceAll(pattern, "\t$1$2Cancer$3")).trim();
+            log.info("Replacing diagnosis '{}' with '{}'", diagnosis, updatedDiagnosis);
+        }
+
+        updatedDiagnosis = updatedDiagnosis.replaceAll(",", "");
+
+        if (sample == null) {
+
+            //String sourceSampleId, TumorType type, String diagnosis, Tissue originTissue, Tissue sampleSite, String extractionMethod,
+            // String stage, String stageClassification, String grade, String gradeClassification, Boolean normalTissue, String dataSource
+            sample = new Sample(sourceSampleId, type, updatedDiagnosis, origin, sampleSite, extractionMethod, stage, stage, grade, gradeClassification, normalTissue, dataSource);
+            sampleRepository.save(sample);
+        }
+
+        return sample;
+
+    }
+
 
     public Sample findSampleByDataSourceAndSourceSampleId(String dataSource, String sampleId){
 
