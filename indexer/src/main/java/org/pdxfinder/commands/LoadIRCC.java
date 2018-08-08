@@ -107,15 +107,17 @@ public class LoadIRCC implements CommandLineRunner {
         parser.accepts("loadIRCC", "Load IRCC PDX data");
         parser.accepts("loadALL", "Load all, including IRCC PDX data");
         OptionSet options = parser.parse(args);
-        
-        irccDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
-                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
-        nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         if (options.has("loadIRCC") || options.has("loadALL")) {
 
             log.info("Loading IRCC PDX data.");
+
+
+            irccDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
+                    DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+
+            nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
 
             if (urlStr != null) {
