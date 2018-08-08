@@ -176,5 +176,38 @@ public class Patient {
 
         return null;
     }
+
+    public PatientSnapshot getSnapshotByDate(String date){
+
+        if(snapshots != null){
+
+            for(PatientSnapshot psnap : snapshots){
+
+                if(psnap.getDateAtCollection().equals(date)) return psnap;
+            }
+
+        }
+
+        return null;
+    }
+
+    public PatientSnapshot getSnapShotByCollection(String age, String collectionDate, String collectionEvent, String ellapsedTime){
+
+        if(snapshots != null){
+
+            for(PatientSnapshot psnap : snapshots){
+
+                if(psnap.getAgeAtCollection().equals(age) &&
+                        psnap.getDateAtCollection().equals(collectionDate) &&
+                        psnap.getCollectionEvent().equals(collectionEvent) &&
+                        psnap.getElapsedTime() == Integer.parseInt(ellapsedTime) ) return psnap;
+            }
+
+        }
+
+        return null;
+
+    }
+
 }
 

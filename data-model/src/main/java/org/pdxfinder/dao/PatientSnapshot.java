@@ -22,7 +22,7 @@ public class PatientSnapshot {
     private Boolean treatmentNaive;
 
     private String collectionEvent;
-    private int ellapsedTime;
+    private int elapsedTime;
     private String eventType;
 
     @Relationship(type = "SAMPLED_FROM")
@@ -37,6 +37,14 @@ public class PatientSnapshot {
     public PatientSnapshot(Patient patient, String ageAtCollection) {
         this.patient = patient;
         this.ageAtCollection = ageAtCollection;
+    }
+
+    public PatientSnapshot(Patient patient, String ageAtCollection, String dateAtCollection, String collectionEvent, int elapsedTime) {
+        this.patient = patient;
+        this.ageAtCollection = ageAtCollection;
+        this.dateAtCollection = dateAtCollection;
+        this.collectionEvent = collectionEvent;
+        this.elapsedTime = elapsedTime;
     }
 
     public String getAgeBin() {
@@ -152,12 +160,12 @@ public class PatientSnapshot {
         this.collectionEvent = collectionEvent;
     }
 
-    public int getEllapsedTime() {
-        return ellapsedTime;
+    public int getElapsedTime() {
+        return elapsedTime;
     }
 
-    public void setEllapsedTime(int ellapsedTime) {
-        this.ellapsedTime = ellapsedTime;
+    public void setElapsedTime(int elapsedTime) {
+        this.elapsedTime = elapsedTime;
     }
 
     public String getEventType() {
