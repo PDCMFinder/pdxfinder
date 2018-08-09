@@ -5,6 +5,8 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule, routingComponents } from "./app-routing.module";
 import { SideNavBarComponent } from './side-nav-bar/side-nav-bar.component';
 import { TopNavBarComponent } from './top-nav-bar/top-nav-bar.component';
+import {MappingService} from "./mapping.service";
+import {HttpClient} from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -15,9 +17,10 @@ import { TopNavBarComponent } from './top-nav-bar/top-nav-bar.component';
   ],
   imports: [
     BrowserModule,
+      HttpClient,
       AppRoutingModule
   ],
-  providers: [],
+  providers: [MappingService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
