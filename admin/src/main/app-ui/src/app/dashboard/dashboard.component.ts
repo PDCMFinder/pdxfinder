@@ -12,6 +12,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
 
 
+
       this.loadScript('../pdxfinder/dependencies/chart/amcharts.js');
       this.loadScript('../pdxfinder/dependencies/chart/serial.js');
       this.loadScript('../pdxfinder/dependencies/chart/export.min.js');
