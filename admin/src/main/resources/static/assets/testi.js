@@ -1,1 +1,0 @@
-alert("hello everybody You are blessed");

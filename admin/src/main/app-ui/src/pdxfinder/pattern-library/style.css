@@ -1,4 +1,24 @@
 
+
+.pdx-badge {
+    position:relative;
+}
+.pdx-badge[pdxfinder-badge]:after {
+    content:attr(pdxfinder-badge);
+    position:absolute;
+    top:-10px;
+    right:-10px;
+    font-size:.9em;
+    background:red;
+    color:white;
+    width:25px;height:25px;
+    text-align:center;
+    line-height:25px;
+    border-radius:50%;
+    box-shadow:0 0 1px #333;
+    font-weight: bold;
+}
+
 h1,h2,h3,h4,h5,h6 {
   font-weight: 100;
 }
@@ -24,18 +44,6 @@ h3,h4,h5 {
   margin-top: 5px;
   font-weight: 600;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

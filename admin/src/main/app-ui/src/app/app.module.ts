@@ -6,7 +6,7 @@ import { AppRoutingModule, routingComponents } from "./app-routing.module";
 import { SideNavBarComponent } from './side-nav-bar/side-nav-bar.component';
 import { TopNavBarComponent } from './top-nav-bar/top-nav-bar.component';
 import {MappingService} from "./mapping.service";
-import {HttpClient} from "@angular/common/http";
+import { HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -17,7 +17,7 @@ import {HttpClient} from "@angular/common/http";
   ],
   imports: [
     BrowserModule,
-      HttpClient,
+      HttpClientModule,
       AppRoutingModule
   ],
   providers: [MappingService],
