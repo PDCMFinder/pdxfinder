@@ -14,6 +14,10 @@
     <artifactId>admin</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <npm.executable>npm</npm.executable>
+    </properties>
+
     <dependencies>
 
         <dependency>
@@ -73,26 +77,42 @@
 
     <build>
         <plugins>
-            <!--<plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <executions>
                     <execution>
+                        <id>install-dependencies</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
+                        <configuration>
+                            <executable>${npm.executable}</executable>
+                            <workingDirectory>src/main/app-ui</workingDirectory>
+                            <arguments>
+                                <argument>install</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>build-angular-app</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>ng</executable>
+                            <workingDirectory>src/main/app-ui</workingDirectory>
+                            <arguments>
+                                <argument>build</argument>
+                            </arguments>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <executable>ng</executable>
-                    <workingDirectory>src/main/app-ui</workingDirectory>
-                    <arguments>
-                        <argument>build</argument>
-                    </arguments>
-                </configuration>
-            </plugin>-->
+
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -106,5 +126,22 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- Windows requires different command line -->
+    <profiles>
+        <profile>
+            <id>platform-windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <npm.executable>npm.cmd</npm.executable>
+                <grunt.executable>grunt.cmd</grunt.executable>
+                <bower.executable>bower.cmd</bower.executable>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
