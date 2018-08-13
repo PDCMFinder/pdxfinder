@@ -289,13 +289,27 @@ public class DataImportService {
         return patientSnapshot;
     }
 
-    public PatientSnapshot findPatientSnapshot(Patient patient, String ageAtCollection, String collectionDate, String collectionEvent, String ellapsedTime){
+    public PatientSnapshot getPatientSnapshot(Patient patient, String ageAtCollection, String collectionDate, String collectionEvent, String ellapsedTime){
 
-        PatientSnapshot ps = null;
+        PatientSnapshot ps;
 
         if(patient.getSnapshots() != null){
-            ps = patient.getSnapShotByCollection(ageAtCollection, collectionDate, collectionEvent, ellapsedTime);
+
+            for(PatientSnapshot psnap : patient.getSnapshots()){
+
+                if(psnap.getAgeAtCollection().equals(ageAtCollection) && psnap.getDateAtCollection().equals(collectionDate) &&
+                        psnap.getCollectionEvent().equals(collectionEvent) && psnap.getElapsedTime() == Integer.parseInt(ellapsedTime)){
+
+                    return psnap;
+                }
+
+            }
+
+            //ps = patient.getSnapShotByCollection(ageAtCollection, collectionDate, collectionEvent, ellapsedTime);
         }
+        //create new snapshot and save it with the patient
+        ps = new PatientSnapshot(patient, ageAtCollection, collectionDate, collectionEvent, Integer.parseInt(ellapsedTime));
+        patientSnapshotRepository.save(ps);
 
         return ps;
     }
