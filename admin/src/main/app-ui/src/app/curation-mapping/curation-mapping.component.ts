@@ -9,13 +9,27 @@ import {MappingService} from "../mapping.service";
 
 export class CurationMappingComponent implements OnInit {
 
-  public mappingData = [];
+    public mappings = [];
+    public mappingCnt: number;
 
-  constructor(private _mappingService: MappingService) { }
+    constructor(private _mappingService: MappingService) { }
 
-  ngOnInit() {
-      this._mappingService.getMappings()
-          .subscribe(data => this.mappingData = data);
-  }
+    ngOnInit() {
 
+        this._mappingService.connectToStream()
+            .subscribe(
+                data => {
+
+                    let myData = data["mappings"]; // This recieves the mappings node of the json in required format
+                    // Transform all d mappingValues node objects of each json to array format
+                    var count:number = 0;
+                    for (var i of myData) {
+                        myData[count].mappingValues = Array.of(myData[count].mappingValues);
+                        count++;
+                    }
+                    this.mappingCnt = count;
+                    this.mappings =  myData;
+                }
+            );
+    }
 }

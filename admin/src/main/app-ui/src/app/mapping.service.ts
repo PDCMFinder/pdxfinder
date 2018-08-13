@@ -8,12 +8,12 @@ import {Observable} from "rxjs/index";
 })
 export class MappingService {
 
-    private _url = "/assets/data/diagnosis2.json";
+    private _url = "/assets/data/diagnosis.json";
 
   constructor(private http: HttpClient) { }
 
     //Retrieve mapping data
-    getMappings(): Observable<MappingInterface[]>{
+    connectToStream(): Observable<MappingInterface[]>{
 
         return this.http.get<MappingInterface[]>(this._url);
 

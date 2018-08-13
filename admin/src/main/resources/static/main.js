@@ -200,7 +200,7 @@ var AppModule = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "\n<div class=\"row wrapper border-bottom white-bg page-heading\">\n    <div class=\"col-lg-8\">\n        <h2>Curation Mappings</h2>\n        <ol class=\"breadcrumb\">\n            <li>\n                <a routerLink=\"/dashboard\">Dashboard</a>\n            </li>\n            <li class=\"active\"  style=\"color:green;\">\n                Curation Mappings\n            </li>\n        </ol>\n    </div>\n</div>\n\n\n\n<ul *ngFor=\"let data of mappingData\">\n    <li>{{data.mappings}}</li>\n</ul>\n\n\n\n\n\n<div class=\"wrapper wrapper-content animated  bounceIn\">\n  <div class=\"p-w-md m-t-sm container\">\n\n\n    <div class=\"row\">\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <a routerLink=\"/summary\"> <img src=\"assets/icons/diagnosis.png\" class=\"icon\"> </a>\n            <div class='text-navy pdx-singleLine'> DIAGNOSIS MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/drug.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> DRUG MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n    </div>\n\n\n\n  </div>\n</div>"
+module.exports = "<div class=\"row wrapper border-bottom white-bg page-heading\">\n    <div class=\"col-lg-8\">\n        <h2>Curation Mappings</h2>\n        <ol class=\"breadcrumb\">\n            <li>\n                <a routerLink=\"/dashboard\">Dashboard </a>\n            </li>\n            <li class=\"active\"  style=\"color:green;\">\n                Curation Mappings\n            </li>\n        </ol>\n    </div>\n</div>\n\n\n\n<div class=\"wrapper wrapper-content animated  bounceIn\">\n  <div class=\"p-w-md m-t-sm container\">\n\n\n    <div class=\"row\">\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content pdx-badge\" style=\"padding-bottom:10px;\" attr.pdxfinder-badge={{mappingCnt}}>\n            <a routerLink=\"/summary\"> <img src=\"assets/icons/diagnosis.png\" class=\"icon\"> </a>\n            <div class='text-navy pdx-singleLine'> DIAGNOSIS MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/drug.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> DRUG MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n    </div>\n\n\n\n  </div>\n</div>"
 
 /***/ }),
 
@@ -230,12 +230,23 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 var CurationMappingComponent = /** @class */ (function () {
     function CurationMappingComponent(_mappingService) {
         this._mappingService = _mappingService;
-        this.mappingData = [];
+        this.mappings = [];
     }
     CurationMappingComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this._mappingService.getMappings()
-            .subscribe(function (data) { return _this.mappingData = data; });
+        this._mappingService.connectToStream()
+            .subscribe(function (data) {
+            var myData = data["mappings"]; // This recieves the mappings node of the json in required format
+            // Transform all d mappingValues node objects of each json to array format
+            var count = 0;
+            for (var _i = 0, myData_1 = myData; _i < myData_1.length; _i++) {
+                var i = myData_1[_i];
+                myData[count].mappingValues = Array.of(myData[count].mappingValues);
+                count++;
+            }
+            _this.mappingCnt = count;
+            _this.mappings = myData;
+        });
     };
     CurationMappingComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
@@ -396,10 +407,10 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 var MappingService = /** @class */ (function () {
     function MappingService(http) {
         this.http = http;
-        this._url = "/api/missingmapping/diagnosis2";
+        this._url = "/assets/data/diagnosis.json";
     }
     //Retrieve mapping data
-    MappingService.prototype.getMappings = function () {
+    MappingService.prototype.connectToStream = function () {
         return this.http.get(this._url);
     };
     MappingService = __decorate([
