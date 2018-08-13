@@ -339,8 +339,14 @@ public class LoadPDMRData implements CommandLineRunner {
                     String sampleId = row[3];
                     String markerSymbol = row[8];
                     String aaChange = row[9];
-                    String alleleFreq = row[11];
-                    String readDepth = row[12];
+
+                    String chromosome = row[12];
+                    String position = row[13];
+                    String refAllele = row[14];
+                    String altAllele = row[15];
+                    String alleleFreq = row[16];
+
+                    String readDepth = row[17];
 
                     //skip rows where there is no marker
                     if(markerSymbol.equals("None Found")) continue;
@@ -370,7 +376,7 @@ public class LoadPDMRData implements CommandLineRunner {
 
                     if(sample == null){
 
-                        log.error("Sample "+sampleId + " is not found.");
+                        log.error("Sample "+sampleId + " not found for model "+modelId);
                         continue;
                     }
                     //found the sample
@@ -397,8 +403,14 @@ public class LoadPDMRData implements CommandLineRunner {
 
                         ma.setMarker(m);
                         ma.setAminoAcidChange(aaChange);
+                        ma.setChromosome(chromosome);
+                        ma.setSeqPosition(position);
+                        ma.setRefAllele(refAllele);
+                        ma.setAltAllele(altAllele);
                         ma.setAlleleFrequency(alleleFreq);
                         ma.setReadDepth(readDepth);
+
+
                         mc.addMarkerAssociation(ma);
 
                         //put the updated mc back into the map
