@@ -1,3 +1,4 @@
+
 <div class="row wrapper border-bottom white-bg page-heading">
   <div class="col-lg-8">
     <h2>Center Summary</h2>
@@ -16,15 +17,18 @@
   </div>
 </div>
 
-<div class="wrapper wrapper-content animated bounceIn">
-  <!--<div class="p-w-md m-t-sm col-lg-10 col-lg-offset-1">
+
+
+
+<div class="wrapper wrapper-content animated pulse">
+  <div class="p-w-md m-t-sm col-lg-10 col-lg-offset-1">
 
 
     <div class="row">
       <div class="col-lg-12">
         <div class="pdxfinder float-e-margins">
           <div class="pdxfinder-title">
-            <h5>Unmapped Models By Data Source</h5>
+            <h5>UNAMAPPED DIAGNOSIS - <b style="color: #03369D"> {{dataSource | uppercase}}  </b> </h5>
           </div>
           <div class="pdxfinder-content">
             <div class="table-responsive">
@@ -33,23 +37,28 @@
                 <thead>
                 <tr>
                   <th style="width:10px;">S/N</th>
-                  <th>SOURCE </th>
-                  <th>MISSING MAPPINGS </th>
-                  <th>TOTAL MAPPED</th>
-                  <th>VALIDATED</th>
-                  <th>UNVALIDATED</th>
+                  <th> SOURCE </th>
+                  <th> DIAGNOSIS </th>
+                  <th> TUMOR TYPE </th>
+                  <th> PRIMARY TUMOR </th>
+                  <th> MAPPED TERM </th>
+                  <th> TYPE </th>
+                  <th>JUSTIFICATION</th>
                 </tr>
                 </thead>
                 <tbody>
 
-                <tr class="pdxfinder-clickable-rows" *ngFor=" let source of pdxStatArray.source; index as i " (click)="onSelect(source)">
+                <tr class="pdxfinder-clickable-rows" *ngFor="let mapping of mappings; index as i" >
                   <td> {{i+1}} </td>
-                  <td> {{ source | uppercase }} </td>
-                  <td> {{pdxStatArray.missing[i]}} </td>
-                  <td> {{pdxStatArray.total[i]}} </td>
-                  <td> {{pdxStatArray.validated[i]}} </td>
-                  <td> {{pdxStatArray.unvalidated[i]}} </td>
+                  <td> {{ mapping.mappingValues.DataSource | uppercase }} </td>
+                  <td> {{ mapping.mappingValues.SampleDiagnosis | uppercase }} </td>
+                  <td> {{ mapping.mappingValues.TumorType | uppercase }} </td>
+                  <td> {{ mapping.mappingValues.OriginTissue | uppercase }} </td>
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
                 </tr>
+
                 </tbody>
               </table>
 
@@ -60,5 +69,5 @@
       </div>
     </div>
 
-  </div>-->
+  </div>
 </div>
