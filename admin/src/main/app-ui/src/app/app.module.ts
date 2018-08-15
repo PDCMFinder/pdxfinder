@@ -7,13 +7,15 @@ import { SideNavBarComponent } from './side-nav-bar/side-nav-bar.component';
 import { TopNavBarComponent } from './top-nav-bar/top-nav-bar.component';
 import {MappingService} from "./mapping.service";
 import { HttpClientModule} from "@angular/common/http";
+import { DatasourceSpecificComponent } from './datasource-specific/datasource-specific.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SideNavBarComponent,
     TopNavBarComponent,
-      routingComponents
+      routingComponents,
+      DatasourceSpecificComponent
   ],
   imports: [
     BrowserModule,

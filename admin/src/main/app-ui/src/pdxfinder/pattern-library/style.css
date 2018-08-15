@@ -1,4 +1,19 @@
 
+.pdxfinder-clickable-rows{
+  cursor: pointer;
+}
+
+.breadcrumb {
+    background-color: #ffffff;
+    padding: 0;
+    margin-bottom: 0;
+}
+.breadcrumb > li a {
+    color: #03369D;
+}
+.breadcrumb > .active {
+    color:inherit;
+}
 
 .pdx-badge {
     position:relative;
@@ -380,16 +395,12 @@ body.canvas-menu.mini-navbar nav.navbar-static-side {
 
 
 
-
-
-
-
 body{
   font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: #ffffff;
 }
 .nav-header {
-  background: url("../../assets/icons/13.jpg") no-repeat;
+  background: url("../../assets/icons/image3.jpg") no-repeat;
 }
 .label,
 .badge {
@@ -758,7 +769,7 @@ ul.notes li div {
   }
 }
 .btn {
-  border-radius: 3px;
+  border-radius: 0px;
 }
 .float-e-margins .btn {
   margin-bottom: 5px;
@@ -3011,17 +3022,7 @@ img.circle-border {
 .ui-draggable .pdxfinder-title {
   cursor: move;
 }
-.breadcrumb {
-  background-color: #ffffff;
-  padding: 0;
-  margin-bottom: 0;
-}
-.breadcrumb > li a {
-  color: inherit;
-}
-.breadcrumb > .active {
-  color: inherit;
-}
+
 code {
   background-color: #F9F2F4;
   border-radius: 4px;

@@ -39,6 +39,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _curation_mapping_curation_mapping_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./curation-mapping/curation-mapping.component */ "./src/app/curation-mapping/curation-mapping.component.ts");
 /* harmony import */ var _datasource_summary_datasource_summary_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./datasource-summary/datasource-summary.component */ "./src/app/datasource-summary/datasource-summary.component.ts");
 /* harmony import */ var _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./dashboard/dashboard.component */ "./src/app/dashboard/dashboard.component.ts");
+/* harmony import */ var _datasource_specific_datasource_specific_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./datasource-specific/datasource-specific.component */ "./src/app/datasource-specific/datasource-specific.component.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -50,12 +51,14 @@ var __decorate = (undefined && undefined.__decorate) || function (decorators, ta
 
 
 
+
 var routes = [
     //{ path: '', redirectTo: '/dashboard', pathMatch: 'full' },
     { path: '', component: _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_4__["DashboardComponent"] },
     { path: 'dashboard', component: _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_4__["DashboardComponent"] },
     { path: 'curation', component: _curation_mapping_curation_mapping_component__WEBPACK_IMPORTED_MODULE_2__["CurationMappingComponent"] },
-    { path: 'summary', component: _datasource_summary_datasource_summary_component__WEBPACK_IMPORTED_MODULE_3__["DatasourceSummaryComponent"] }
+    { path: 'summary', component: _datasource_summary_datasource_summary_component__WEBPACK_IMPORTED_MODULE_3__["DatasourceSummaryComponent"] },
+    { path: 'specific', component: _datasource_specific_datasource_specific_component__WEBPACK_IMPORTED_MODULE_5__["DatasourceSpecificComponent"] }
 ];
 var AppRoutingModule = /** @class */ (function () {
     function AppRoutingModule() {
@@ -71,7 +74,7 @@ var AppRoutingModule = /** @class */ (function () {
 
 var routingComponents = [_dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_4__["DashboardComponent"],
     _curation_mapping_curation_mapping_component__WEBPACK_IMPORTED_MODULE_2__["CurationMappingComponent"],
-    _datasource_summary_datasource_summary_component__WEBPACK_IMPORTED_MODULE_3__["DatasourceSummaryComponent"]];
+    _datasource_summary_datasource_summary_component__WEBPACK_IMPORTED_MODULE_3__["DatasourceSummaryComponent"], _datasource_specific_datasource_specific_component__WEBPACK_IMPORTED_MODULE_5__["DatasourceSpecificComponent"]];
 
 
 /***/ }),
@@ -152,12 +155,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _top_nav_bar_top_nav_bar_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./top-nav-bar/top-nav-bar.component */ "./src/app/top-nav-bar/top-nav-bar.component.ts");
 /* harmony import */ var _mapping_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./mapping.service */ "./src/app/mapping.service.ts");
 /* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
+/* harmony import */ var _datasource_specific_datasource_specific_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./datasource-specific/datasource-specific.component */ "./src/app/datasource-specific/datasource-specific.component.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+
 
 
 
@@ -175,7 +180,8 @@ var AppModule = /** @class */ (function () {
                 _app_component__WEBPACK_IMPORTED_MODULE_2__["AppComponent"],
                 _side_nav_bar_side_nav_bar_component__WEBPACK_IMPORTED_MODULE_4__["SideNavBarComponent"],
                 _top_nav_bar_top_nav_bar_component__WEBPACK_IMPORTED_MODULE_5__["TopNavBarComponent"],
-                _app_routing_module__WEBPACK_IMPORTED_MODULE_3__["routingComponents"]
+                _app_routing_module__WEBPACK_IMPORTED_MODULE_3__["routingComponents"],
+                _datasource_specific_datasource_specific_component__WEBPACK_IMPORTED_MODULE_8__["DatasourceSpecificComponent"]
             ],
             imports: [
                 _angular_platform_browser__WEBPACK_IMPORTED_MODULE_0__["BrowserModule"],
@@ -327,6 +333,58 @@ var DashboardComponent = /** @class */ (function () {
 
 /***/ }),
 
+/***/ "./src/app/datasource-specific/datasource-specific.component.html":
+/*!************************************************************************!*\
+  !*** ./src/app/datasource-specific/datasource-specific.component.html ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "<p>\n  datasource-specific works!\n</p>\n"
+
+/***/ }),
+
+/***/ "./src/app/datasource-specific/datasource-specific.component.ts":
+/*!**********************************************************************!*\
+  !*** ./src/app/datasource-specific/datasource-specific.component.ts ***!
+  \**********************************************************************/
+/*! exports provided: DatasourceSpecificComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DatasourceSpecificComponent", function() { return DatasourceSpecificComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+var DatasourceSpecificComponent = /** @class */ (function () {
+    function DatasourceSpecificComponent() {
+    }
+    DatasourceSpecificComponent.prototype.ngOnInit = function () {
+    };
+    DatasourceSpecificComponent = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
+            selector: 'app-datasource-specific',
+            template: __webpack_require__(/*! ./datasource-specific.component.html */ "./src/app/datasource-specific/datasource-specific.component.html"),
+            styles: [""]
+        }),
+        __metadata("design:paramtypes", [])
+    ], DatasourceSpecificComponent);
+    return DatasourceSpecificComponent;
+}());
+
+
+
+/***/ }),
+
 /***/ "./src/app/datasource-summary/datasource-summary.component.html":
 /*!**********************************************************************!*\
   !*** ./src/app/datasource-summary/datasource-summary.component.html ***!
@@ -334,7 +392,7 @@ var DashboardComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "\n                  <!--<tbody *ngFor=\" let fullData of pdxStatArray \">\n\n                        <tr class=\"gradeX\">\n                       \n                            {{fullData.source}}\n\n                            {{fullData.total}}\n                          \n                          </tr>\n    \n                        </tbody>-->\n\n<div class=\"row wrapper border-bottom white-bg page-heading\">\n    <div class=\"col-lg-8\">\n        <h2>Center Summary</h2>\n        <ol class=\"breadcrumb\">\n            <li>\n                <a routerLink=\"/dashboard\">Dashboard</a>\n            </li>\n            <li>\n                <a routerLink=\"/curation\">Curation Mappings</a>\n            </li>\n            <li class=\"active\" style=\"color:green;\">\n                JAX Summary\n            </li>\n        </ol>\n    </div>\n</div>\n\n<div class=\"wrapper wrapper-content animated fadeInRight\">\n  <div class=\"p-w-md m-t-sm col-lg-10 col-lg-offset-1\">\n\n\n    <div class=\"row\">\n      <div class=\"col-lg-12\">\n        <div class=\"pdxfinder float-e-margins\">\n          <div class=\"pdxfinder-title\">\n            <h5>Unmapped Models By Data Source</h5>\n          </div>\n          <div class=\"pdxfinder-content\">\n            <div class=\"table-responsive\">\n\n                <table class=\"table table-striped table-bordered table-hover dataTables-example\" >\n                    <thead>\n                    <tr>\n                        <th style=\"width:10px;\">S/N</th>\n                        <th>SOURCE </th>\n                        <th>MISSING MAPPINGS </th>\n                        <th>TOTAL MAPPED</th>\n                        <th>VALIDATED</th>\n                        <th>UNVALIDATED</th>\n                    </tr>\n                    </thead>\n                    <tbody>\n\n                    <tr class=\"gradeX\" *ngFor=\" let source of pdxStatArray.source; index as i \">\n                        <td> {{i+1}} </td>\n                        <td> {{ source | uppercase }} </td>\n                        <td> {{pdxStatArray.missing[i]}} </td>\n                        <td> {{pdxStatArray.total[i]}} </td>\n                        <td> {{pdxStatArray.validated[i]}} </td>\n                        <td> {{pdxStatArray.unvalidated[i]}} </td>\n                    </tr>\n                    </tbody>\n                </table>\n\n            </div>\n\n          </div>\n        </div>\n      </div>\n    </div>\n\n  </div>\n</div>\n<!-- use container or blank for small screen and col-lg-10 col-lg-offset-1 for 17 inches upwards  swing tada wobble bounceIn (Up,Left,Right,Down) lightSpeedIn , flipInY, rotateInDownRight, rotateInUpLeft, slideInLeft, hinge, rollIn-->"
+module.exports = " <div class=\"row wrapper border-bottom white-bg page-heading\">\n    <div class=\"col-lg-8\">\n        <h2>Center Summary</h2>\n        <ol class=\"breadcrumb\">\n            <li>\n                <a routerLink=\"/dashboard\">Dashboard</a>\n            </li>\n            <li>\n                <a routerLink=\"/curation\">Curation Mappings</a>\n            </li>\n            <li class=\"active\" style=\"color:green;\">\n                JAX Summary\n            </li>\n        </ol>\n    </div>\n</div>\n\n<div class=\"wrapper wrapper-content animated bounceIn\">\n  <div class=\"p-w-md m-t-sm col-lg-10 col-lg-offset-1\">\n\n\n    <div class=\"row\">\n      <div class=\"col-lg-12\">\n        <div class=\"pdxfinder float-e-margins\">\n          <div class=\"pdxfinder-title\">\n            <h5>Unmapped Models By Data Source</h5>\n          </div>\n          <div class=\"pdxfinder-content\">\n            <div class=\"table-responsive\">\n\n                <table class=\"table table-striped table-bordered table-hover dataTables-example\" >\n                    <thead>\n                    <tr>\n                        <th style=\"width:10px;\">S/N</th>\n                        <th>SOURCE </th>\n                        <th>MISSING MAPPINGS </th>\n                        <th>TOTAL MAPPED</th>\n                        <th>VALIDATED</th>\n                        <th>UNVALIDATED</th>\n                    </tr>\n                    </thead>\n                    <tbody>\n\n                    <tr class=\"gradeX\" *ngFor=\" let source of pdxStatArray.source; index as i \">\n                        <td> {{i+1}} </td>\n                        <td> {{ source | uppercase }} </td>\n                        <td> {{pdxStatArray.missing[i]}} </td>\n                        <td> {{pdxStatArray.total[i]}} </td>\n                        <td> {{pdxStatArray.validated[i]}} </td>\n                        <td> {{pdxStatArray.unvalidated[i]}} </td>\n                    </tr>\n                    </tbody>\n                </table>\n\n            </div>\n\n          </div>\n        </div>\n      </div>\n    </div>\n\n  </div>\n</div>\n<!-- use container or blank for small screen and col-lg-10 col-lg-offset-1 for 17 inches upwards  swing tada wobble bounceIn (Up,Left,Right,Down) lightSpeedIn , flipInY, rotateInDownRight, rotateInUpLeft, slideInLeft, hinge, rollIn-->"
 
 /***/ }),
 
@@ -462,8 +520,10 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 var MappingService = /** @class */ (function () {
     function MappingService(http) {
         this.http = http;
-        this._totalMappedUrl = "/api/mapping/diagnosis";
-        this._missingMappedUrl = "/api/missingmapping/diagnosis";
+        //private _totalMappedUrl = "/api/mapping/diagnosis";
+        //private _missingMappedUrl = "/api/missingmapping/diagnosis";
+        this._totalMappedUrl = "/assets/data/mapped-diagnosis.json";
+        this._missingMappedUrl = "/assets/data/diagnosis.json";
     }
     //Retrieve Total mapped diagnosis
     MappingService.prototype.connectTotalMappedStream = function () {
@@ -493,7 +553,7 @@ var MappingService = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<!-- Side Navigation menu here-->\n<nav class=\"navbar-default navbar-static-side\" role=\"navigation\">\n  <div class=\"sidebar-collapse\">\n    <a class=\"close-canvas-menu\"><i class=\"ti-close\" style=\"color: #ffffff;\"></i></a>\n\n\n    <ul class=\"nav metismenu\" id=\"side-menu\">\n\n      <li class=\"nav-header\">\n        <div class=\"dropdown profile-element\">\n          <span>\n                <img alt=\"image\" class=\"img-circle\" src=\"/assets/icons/user.jpg\" />\n          </span>\n          <a data-toggle=\"dropdown\" class=\"dropdown-toggle\" href=\"#\">\n                <span class=\"clear\">\n                  <span class=\"block m-t-xs\">\n                  <strong class=\"font-bold\" style=\"color:#efefef;\">Nathalie Conte</strong>\n                  </span>\n                  </span>\n          </a>\n        </div>\n        <div class=\"logo-element\">\n          PDX+\n        </div>\n      </li>\n\n      <li> <a routerLink=\"/dashboard\"><i class=\"ti-server\"></i> <span class=\"nav-label\"> &nbsp; Dashboard </span></a> </li>\n      <li class=\"active\">\n        <a href=\"#\"><i class=\"ti-menu-alt\"></i> <span class=\"nav-label\"> &nbsp; Tool Box</span> </a>\n        <ul class=\"nav nav-second-level\">\n          <li><a routerLink=\"/curation\" class=\"active\">Curation Mappings</a></li>\n          <li><a href=\"#\">PDX Finder Jira <span class=\"label label-primary pull-right\">8</span></a></li>\n          <li><a href=\"#\">Raw Data <span class=\"label label-primary pull-right\">2</span></a></li>\n          <li><a href=\"#\">Reports </a></li>\n          <li><a href=\"#\">SOPs & Methods </a></li>\n          <li><a href=\"#\">Finder </a></li>\n          <li><a href=\"#\">Github </a></li>\n          <li><a href=\"#\">Community Contacts </a></li>\n        </ul>\n      </li>\n      <li> <a href=\"#\"><i class=\"ti-server\"></i> <span class=\"nav-label\"> &nbsp; Manage IRCC Data</span></a> </li>\n      <li> <a href=\"#\"><i class=\"ti-server\"></i>  <span class=\"nav-label\"> &nbsp; Manage JAX Data</span></a> </li>\n\n\n      <li class=\"landing_link\">\n        <a target=\"_blank\" href=\"landing.html\"><i class=\"ti-tablet\"></i>  <span class=\"nav-label\"> &nbsp; PDX Finder Website</span> </a>\n      </li>\n      <li class=\"special_link\">\n        <a href=\"package.html\"><i class=\"ti-server\"></i>  <span class=\"nav-label\"> &nbsp; Neo4j Database</span></a>\n      </li>\n    </ul>\n\n\n\n  </div>\n</nav>\n\n\n\n\n\n\n"
+module.exports = "<!-- Side Navigation menu here-->\n<nav class=\"navbar-default navbar-static-side\" role=\"navigation\">\n  <div class=\"sidebar-collapse\">\n    <a class=\"close-canvas-menu\"><i class=\"ti-close\" style=\"color: #ffffff;\"></i></a>\n\n\n    <ul class=\"nav metismenu\" id=\"side-menu\">\n\n      <li class=\"nav-header\">\n        <div class=\"dropdown profile-element\">\n          <span>\n                <img alt=\"image\" class=\"img-circle\" src=\"/assets/icons/user.jpg\" />\n          </span>\n          <a data-toggle=\"dropdown\" class=\"dropdown-toggle\" href=\"#\">\n                <span class=\"clear\">\n                  <span class=\"block m-t-xs\">\n                  <strong class=\"font-bold\" style=\"color:#efefef;\">Nathalie Conte</strong>\n                  </span>\n                  </span>\n          </a>\n        </div>\n        <div class=\"logo-element\">\n          PDX+\n        </div>\n      </li>\n\n      <li> <a routerLink=\"/dashboard\"><i class=\"ti-dashboard\"></i> <span class=\"nav-label\"> &nbsp; Dashboard </span></a> </li>\n      <li class=\"active\">\n        <a href=\"#\"><i class=\"ti-menu-alt\"></i> <span class=\"nav-label\"> &nbsp; Tool Box</span> </a>\n        <ul class=\"nav nav-second-level\">\n            <li><a routerLink=\"/curation\" class=\"active\">Curation Mappings</a></li>\n            <li><a routerLink=\"/summary\" class=\"active\">Diagnosis Mappings</a></li>\n          <!--<li><a href=\"#\">PDX Finder Jira <span class=\"label label-primary pull-right\">8</span></a></li>\n          <li><a href=\"#\">Raw Data <span class=\"label label-primary pull-right\">2</span></a></li>\n          <li><a href=\"#\">Reports </a></li>\n          <li><a href=\"#\">SOPs & Methods </a></li>\n          <li><a href=\"#\">Finder </a></li>\n          <li><a href=\"#\">Github </a></li>\n          <li><a href=\"#\">Community Contacts </a></li>-->\n        </ul>\n      </li>\n\n      <li>\n        <a href=\"#\"><i class=\"ti-server\"></i> <span class=\"nav-label\"> &nbsp; Web Server </span> </a>\n        <ul class=\"nav nav-second-level\">\n            <li><a href=\"http://ves-ebi-bc.ebi.ac.uk\" target=\"_blank\" class=\"active\"> Dev Webapp </a></li>\n            <li><a href=\"http://ves-ebi-b4.ebi.ac.uk\" target=\"_blank\" class=\"active\"> Beta Webapp </a></li>\n            <li><a href=\"http://wp-p1m-b0.ebi.ac.uk\" target=\"_blank\" class=\"active\"> Production Webapp 1 </a></li>\n            <li><a href=\"http://wp-p1m-b0.ebi.ac.uk\" target=\"_blank\" class=\"active\"> Production Webapp 2 </a></li>\n        </ul>\n      </li>\n      <li> <a href=\"#\"><i class=\"ti-harddrive\"></i> <span class=\"nav-label\"> &nbsp; Manage IRCC Data</span></a> </li>\n      <li> <a href=\"#\"><i class=\"ti-harddrive\"></i>  <span class=\"nav-label\"> &nbsp; Manage JAX Data</span></a> </li>\n\n\n      <li class=\"pdxFinderActive2\">\n        <a target=\"_blank\" href=\"http://www.pdxfinder.org\"><i class=\"ti-tablet\"></i>  <span class=\"nav-label\"> &nbsp; PDX Finder Website</span> </a>\n      </li>\n      <li class=\"pdxFinderActive\">\n        <a target=\"_blank\" href=\"http://ves-ebi-bc.ebi.ac.uk:7474/browser\"><i class=\"ti-harddrives\"></i>  <span class=\"nav-label\"> &nbsp; Neo4j Database</span></a>\n      </li>\n    </ul>\n\n\n\n  </div>\n</nav>\n\n\n\n\n\n\n"
 
 /***/ }),
 
@@ -545,7 +605,7 @@ var SideNavBarComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "\n  <div class=\"row border-bottom\">\n\n    <nav class=\"navbar navbar-static-top white-bg\" role=\"navigation\" style=\"margin-bottom: 0\">\n      <div class=\"navbar-header\">\n        <button class=\"navbar-minimalize minimalize-styl-2 btn btn-primary \" href=\"#\"><i class=\"ti-location-arrow\" style=\"font-size: 25px;\"></i>  </button>\n      </div>\n    </nav>\n\n  </div>\n"
+module.exports = "\n  <div class=\"row border-bottom\">\n\n    <nav class=\"navbar navbar-static-top white-bg\" role=\"navigation\" style=\"margin-bottom: 0\">\n      <div class=\"navbar-header\">\n        <button class=\"navbar-minimalize minimalize-styl-2 btn btn-primary\" href=\"#\" style=\"margin: 4px;\"><i class=\"ti-location-arrow\" style=\"font-size: 25px;\"></i>  </button>\n      </div>\n    </nav>\n\n  </div>\n"
 
 /***/ }),
 

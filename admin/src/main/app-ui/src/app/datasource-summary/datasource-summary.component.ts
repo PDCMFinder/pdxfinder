@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import {MappingService} from "../mapping.service";
 import { from} from "rxjs/index";
 import {groupBy, mergeMap, toArray} from "rxjs/internal/operators";
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
     selector: 'app-datasource-summary',
@@ -11,7 +12,7 @@ import {groupBy, mergeMap, toArray} from "rxjs/internal/operators";
 })
 export class DatasourceSummaryComponent implements OnInit {
 
-    constructor(private _mappingService: MappingService) { }
+    constructor(private _mappingService: MappingService,private router: Router, private route: ActivatedRoute) { }
 
     public pdxStatArray =  {
         source: [],
@@ -20,7 +21,6 @@ export class DatasourceSummaryComponent implements OnInit {
         validated: [],
         unvalidated: []
     };
-
 
     ngOnInit() {
 
@@ -89,7 +89,12 @@ export class DatasourceSummaryComponent implements OnInit {
 
                 }
             );
+    }
 
+
+    onSelect(source){
+
+        this.router.navigate([source],{relativeTo: this.route})
     }
 
 

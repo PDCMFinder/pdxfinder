@@ -1,17 +1,4 @@
-
-                  <!--<tbody *ngFor=" let fullData of pdxStatArray ">
-
-                        <tr class="gradeX">
-                       
-                            {{fullData.source}}
-
-                            {{fullData.total}}
-                          
-                          </tr>
-    
-                        </tbody>-->
-
-<div class="row wrapper border-bottom white-bg page-heading">
+ <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-8">
         <h2>Center Summary</h2>
         <ol class="breadcrumb">
@@ -21,8 +8,8 @@
             <li>
                 <a routerLink="/curation">Curation Mappings</a>
             </li>
-            <li class="active" style="color:green;">
-                JAX Summary
+            <li class="active">
+                Unmapped Diagnosis
             </li>
         </ol>
     </div>
@@ -54,7 +41,7 @@
                     </thead>
                     <tbody>
 
-                    <tr class="gradeX" *ngFor=" let source of pdxStatArray.source; index as i ">
+                    <tr class="pdxfinder-clickable-rows" *ngFor=" let source of pdxStatArray.source; index as i " (click)="onSelect(source)">
                         <td> {{i+1}} </td>
                         <td> {{ source | uppercase }} </td>
                         <td> {{pdxStatArray.missing[i]}} </td>
