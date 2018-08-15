@@ -79,27 +79,27 @@ body.mini-navbar .navbar-default .nav > li > .nav-second-level li a {
 .mini-navbar li.active .nav-second-level {
   left: 65px;
 }
-.navbar-default .special_link a {
-  background: #007C82;
+.navbar-default .pdxFinderActive a {
+  background: #03369D;
   color: white;
 }
-.navbar-default .special_link a:hover {
-  background: #17987e !important;
+.navbar-default .pdxFinderActive a:hover {
+  background: #00b2d5 !important;
   color: white;
 }
-.navbar-default .special_link a span.label {
+.navbar-default .pdxFinderActive a span.label {
   background: #fff;
   color: #007C82;
 }
-.navbar-default .landing_link a {
-  background: #1cc09f;
+.navbar-default .pdxFinderActive2 a {
+  background: #676a6c;
   color: white;
 }
-.navbar-default .landing_link a:hover {
-  background: #007C82 !important;
+.navbar-default .pdxFinderActive2 a:hover {
+  background: #00b2d5 !important;
   color: white;
 }
-.navbar-default .landing_link a span.label {
+.navbar-default .pdxFinderActive2 a span.label {
   background: #fff;
   color: #1cc09f;
 }
@@ -389,7 +389,7 @@ body{
   background-color: #ffffff;
 }
 .nav-header {
-  background: url("../../assets/icons/4.png") no-repeat;
+  background: url("../../assets/icons/13.jpg") no-repeat;
 }
 .label,
 .badge {
@@ -652,8 +652,8 @@ ul.notes li div {
 .md-skin.landing-page.body-small .nav.navbar-right > li > a {
   color: #676a6c;
 }
-.landing_link a,
-.special_link a {
+.pdxFinderActive2 a,
+.pdxFinderActive a {
   color: #ffffff !important;
 }
 .md-skin.canvas-menu.mini-navbar .nav-second-level {
@@ -767,7 +767,7 @@ ul.notes li div {
   min-width: 120px;
 }
 .btn-primary.btn-outline {
-  color: #007C82;
+  color: #03369D;
 }
 .btn-success.btn-outline {
   color: #1c84c6;
@@ -789,8 +789,8 @@ ul.notes li div {
   color: #fff;
 }
 .btn-primary {
-  background-color: #007C82;
-  border-color: #007C82;
+  background-color: #03369D;
+  border-color: #03369D;
   color: #FFFFFF;
 }
 .btn-primary:hover,
@@ -802,8 +802,8 @@ ul.notes li div {
 .btn-primary:active:hover,
 .btn-primary.active:hover,
 .btn-primary.active:focus {
-  background-color: #18a689;
-  border-color: #18a689;
+  background-color: #00b2d5;
+  border-color: #00b2d5;
   color: #FFFFFF;
 }
 .btn-primary:active,
