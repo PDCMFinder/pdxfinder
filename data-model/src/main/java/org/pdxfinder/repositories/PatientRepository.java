@@ -92,4 +92,7 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
     List<String> getModelsOriginatedFromSamePatientByDataSourceAndModelId(@Param("dataSource") String dataSource,
                                                                           @Param("modelId") String modelId);
 
+
+    @Query("MATCH (ps:PatientSnapshot)-[ce:COLLECTION_EVENT]-(p:Patient)--(g:Group) WHERE p.externalId = {externalId} AND id(g) = {g} RETURN p, ce, ps")
+    Patient findByExternalIdAndGroupWithSnapshots(@Param("externalId") String externalId, @Param("g") Group g);
 }
