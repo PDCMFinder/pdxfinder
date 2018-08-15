@@ -323,6 +323,20 @@ public class DataImportService {
 
     }
 
+    public PatientSnapshot findLastPatientSnapshot(String patientId, Group ds){
+
+        Patient patient = patientRepository.findByExternalIdAndGroupWithSnapshots(patientId, ds);
+        PatientSnapshot ps = null;
+
+        if(patient != null){
+
+            ps = patient.getLastSnapshot();
+        }
+        return ps;
+    }
+
+
+
     public Patient getPatient(String externalId, String sex, String race, String ethnicity, Group group) {
 
         Patient patient = patientRepository.findByExternalIdAndGroup(externalId, group);
