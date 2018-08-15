@@ -209,5 +209,34 @@ public class Patient {
 
     }
 
+
+    public PatientSnapshot getLastSnapshot(){
+
+        if(snapshots == null) return null;
+
+        PatientSnapshot latestPS = null;
+        for(PatientSnapshot ps: snapshots){
+
+            if(latestPS == null){
+                latestPS = ps;
+            }
+            else{
+                //compare age at collection
+                if(latestPS.getAgeAtCollection().compareTo(ps.getAgeAtCollection()) < 0 ){
+
+                    latestPS = ps;
+                }
+                //compare date collection
+                else if(latestPS.getDateAtCollection().compareTo(ps.getDateAtCollection()) < 0){
+
+                    latestPS = ps;
+                }
+            }
+
+        }
+
+        return latestPS;
+    }
+
 }
 
