@@ -22,3 +22,5 @@ export interface Mapping {
 export interface MappingInterface {
     mappings: Mapping[];
 }
+
+

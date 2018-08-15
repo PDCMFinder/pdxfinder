@@ -230,11 +230,10 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 var CurationMappingComponent = /** @class */ (function () {
     function CurationMappingComponent(_mappingService) {
         this._mappingService = _mappingService;
-        this.mappings = [];
     }
     CurationMappingComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this._mappingService.connectToStream()
+        this._mappingService.connectMissingMappingStream()
             .subscribe(function (data) {
             var myData = data["mappings"]; // This recieves the mappings node of the json in required format
             // Transform all d mappingValues node objects of each json to array format
@@ -245,7 +244,6 @@ var CurationMappingComponent = /** @class */ (function () {
                 count++;
             }
             _this.mappingCnt = count;
-            _this.mappings = myData;
         });
     };
     CurationMappingComponent = __decorate([
@@ -336,7 +334,7 @@ var DashboardComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row wrapper border-bottom white-bg page-heading\">\n    <div class=\"col-lg-8\">\n        <h2>Center Summary</h2>\n        <ol class=\"breadcrumb\">\n            <li>\n                <a routerLink=\"/dashboard\">Dashboard</a>\n            </li>\n            <li>\n                <a routerLink=\"/curation\">Curation Mappings</a>\n            </li>\n            <li class=\"active\" style=\"color:green;\">\n                JAX Summary\n            </li>\n        </ol>\n    </div>\n</div>\n\n\n<div class=\"wrapper wrapper-content animated  bounceIn\">\n  <div class=\"p-w-md m-t-sm col-lg-10 col-lg-offset-1\">\n\n\n    <div class=\"row\">\n      <div class=\"col-lg-12\">\n        <div class=\"pdxfinder float-e-margins\">\n          <div class=\"pdxfinder-title\">\n            <h5>Unmapped Models By Data Source</h5>\n          </div>\n          <div class=\"pdxfinder-content\">\n            <div class=\"table-responsive\">\n              <table class=\"table table-striped table-bordered table-hover dataTables-example\" >\n                <thead>\n                <tr>\n                  <th style=\"width:10px;\">S/N</th>\n                  <th>SOURCE </th>\n                  <th>MISSING MAPPINGS </th>\n                  <th>TOTAL MAPPED</th>\n                  <th>VALIDATED</th>\n                  <th>UNVALIDATED</th>\n                </tr>\n                </thead>\n                <tbody>\n                <tr class=\"gradeX\">\n                  <td>1. </td>\n                  <td>The Jackson Laboratory</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                </tr>\n                <tr class=\"gradeX\">\n                  <td>2. </td>\n                  <td>Candiolo Cancer Institute (IRCC)</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                </tr>\n                <tr class=\"gradeC\">\n                  <td>3. </td>\n                  <td>MD Anderson Cancer Center (PDXNet-MDAnderson)</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                </tr>\n                <tr class=\"gradeC\">\n                  <td>4. </td>\n                  <td>PDXNet-Wistar-MDAnderson-Penn/</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                </tr>\n                <tr class=\"gradeC\">\n                  <td>5. </td>\n                  <td>Washington University in St. Louis (PDXNet-WUSTL)</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                </tr>\n                <tr class=\"gradeU\">\n                  <td>6. </td>\n                  <td> HCI-Baylor College of Medicine (PDXNet-HCI-BCM)</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                </tr>\n                <tr class=\"gradeU\">\n                  <td>7. </td>\n                  <td> NCI Patient-Derived Models Repository (PDMR)</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                  <td>Data Count</td>\n                </tr>\n                </tbody>\n              </table>\n            </div>\n\n          </div>\n        </div>\n      </div>\n    </div>\n\n  </div>\n</div>"
+module.exports = "\n                  <!--<tbody *ngFor=\" let fullData of pdxStatArray \">\n\n                        <tr class=\"gradeX\">\n                       \n                            {{fullData.source}}\n\n                            {{fullData.total}}\n                          \n                          </tr>\n    \n                        </tbody>-->\n\n<div class=\"row wrapper border-bottom white-bg page-heading\">\n    <div class=\"col-lg-8\">\n        <h2>Center Summary</h2>\n        <ol class=\"breadcrumb\">\n            <li>\n                <a routerLink=\"/dashboard\">Dashboard</a>\n            </li>\n            <li>\n                <a routerLink=\"/curation\">Curation Mappings</a>\n            </li>\n            <li class=\"active\" style=\"color:green;\">\n                JAX Summary\n            </li>\n        </ol>\n    </div>\n</div>\n\n<div class=\"wrapper wrapper-content animated fadeInRight\">\n  <div class=\"p-w-md m-t-sm col-lg-10 col-lg-offset-1\">\n\n\n    <div class=\"row\">\n      <div class=\"col-lg-12\">\n        <div class=\"pdxfinder float-e-margins\">\n          <div class=\"pdxfinder-title\">\n            <h5>Unmapped Models By Data Source</h5>\n          </div>\n          <div class=\"pdxfinder-content\">\n            <div class=\"table-responsive\">\n\n                <table class=\"table table-striped table-bordered table-hover dataTables-example\" >\n                    <thead>\n                    <tr>\n                        <th style=\"width:10px;\">S/N</th>\n                        <th>SOURCE </th>\n                        <th>MISSING MAPPINGS </th>\n                        <th>TOTAL MAPPED</th>\n                        <th>VALIDATED</th>\n                        <th>UNVALIDATED</th>\n                    </tr>\n                    </thead>\n                    <tbody>\n\n                    <tr class=\"gradeX\" *ngFor=\" let source of pdxStatArray.source; index as i \">\n                        <td> {{i+1}} </td>\n                        <td> {{ source | uppercase }} </td>\n                        <td> {{pdxStatArray.missing[i]}} </td>\n                        <td> {{pdxStatArray.total[i]}} </td>\n                        <td> {{pdxStatArray.validated[i]}} </td>\n                        <td> {{pdxStatArray.unvalidated[i]}} </td>\n                    </tr>\n                    </tbody>\n                </table>\n\n            </div>\n\n          </div>\n        </div>\n      </div>\n    </div>\n\n  </div>\n</div>\n<!-- use container or blank for small screen and col-lg-10 col-lg-offset-1 for 17 inches upwards  swing tada wobble bounceIn (Up,Left,Right,Down) lightSpeedIn , flipInY, rotateInDownRight, rotateInUpLeft, slideInLeft, hinge, rollIn-->"
 
 /***/ }),
 
@@ -351,6 +349,11 @@ module.exports = "<div class=\"row wrapper border-bottom white-bg page-heading\"
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DatasourceSummaryComponent", function() { return DatasourceSummaryComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _mapping_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../mapping.service */ "./src/app/mapping.service.ts");
+/* harmony import */ var rxjs_index__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/index */ "./node_modules/rxjs/index.js");
+/* harmony import */ var rxjs_index__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(rxjs_index__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs/internal/operators */ "./node_modules/rxjs/internal/operators/index.js");
+/* harmony import */ var rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_3__);
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -361,10 +364,62 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 
+
+
+
 var DatasourceSummaryComponent = /** @class */ (function () {
-    function DatasourceSummaryComponent() {
+    function DatasourceSummaryComponent(_mappingService) {
+        this._mappingService = _mappingService;
+        this.pdxStatArray = {
+            source: [],
+            missing: [],
+            total: [],
+            validated: [],
+            unvalidated: []
+        };
     }
     DatasourceSummaryComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        var tempArr = [];
+        // Component to the Service using Reactive Observables
+        this._mappingService.connectTotalMappedStream()
+            .subscribe(function (data) {
+            // This receives the mappings node of the json in required format
+            var myData = data["mappings"];
+            // Emit Each Unmapped Diagnosis
+            var source = Object(rxjs_index__WEBPACK_IMPORTED_MODULE_2__["from"])(myData);
+            // Group by Data Source
+            var groupedByImpl = source.pipe(Object(rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_3__["groupBy"])(function (missingMapping) { return missingMapping["mappingValues"].DataSource; }), Object(rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_3__["mergeMap"])(function (grouped) { return grouped.pipe(Object(rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_3__["toArray"])()); }) // Return each item in the grouped array.
+            );
+            // Retrieve the data from the groupedByImpl (The Grouped By Implementation of the missing Mappings JSON)
+            var subscribe = groupedByImpl.subscribe(function (result) {
+                //console.log(result);
+                _this.pdxStatArray.source.push(result[0]["mappingValues"].DataSource);
+                _this.pdxStatArray.total.push(result.length);
+                _this.pdxStatArray.validated.push(result.length);
+                _this.pdxStatArray.unvalidated.push(0);
+            });
+        });
+        this._mappingService.connectMissingMappingStream()
+            .subscribe(function (data) {
+            // Group by Data Source
+            var groupedByImpl = Object(rxjs_index__WEBPACK_IMPORTED_MODULE_2__["from"])(data["mappings"]).pipe(Object(rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_3__["groupBy"])(function (missingMapping) { return missingMapping["mappingValues"].DataSource; }), Object(rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_3__["mergeMap"])(function (grouped) { return grouped.pipe(Object(rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_3__["toArray"])()); }) // Return each item in the grouped array.
+            );
+            var subscribe = groupedByImpl.subscribe(function (result) {
+                tempArr.push(result[0]["mappingValues"].DataSource + "__" + result.length);
+            });
+            for (var i = 0; i < _this.pdxStatArray.source.length; i++) {
+                for (var num = 0; num < tempArr.length; num++) {
+                    if (tempArr[num].split("__")[0].toUpperCase() == _this.pdxStatArray.source[i].toUpperCase()) {
+                        _this.pdxStatArray.missing[i] = tempArr[num].split("__")[1];
+                        break;
+                    }
+                    else {
+                        _this.pdxStatArray.missing[i] = 0;
+                    }
+                }
+            }
+        });
     };
     DatasourceSummaryComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
@@ -372,7 +427,7 @@ var DatasourceSummaryComponent = /** @class */ (function () {
             template: __webpack_require__(/*! ./datasource-summary.component.html */ "./src/app/datasource-summary/datasource-summary.component.html"),
             styles: [""]
         }),
-        __metadata("design:paramtypes", [])
+        __metadata("design:paramtypes", [_mapping_service__WEBPACK_IMPORTED_MODULE_1__["MappingService"]])
     ], DatasourceSummaryComponent);
     return DatasourceSummaryComponent;
 }());
@@ -407,11 +462,16 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 var MappingService = /** @class */ (function () {
     function MappingService(http) {
         this.http = http;
-        this._url = "/assets/data/diagnosis.json";
+        this._totalMappedUrl = "/api/mapping/diagnosis";
+        this._missingMappedUrl = "/api/missingmapping/diagnosis";
     }
-    //Retrieve mapping data
-    MappingService.prototype.connectToStream = function () {
-        return this.http.get(this._url);
+    //Retrieve Total mapped diagnosis
+    MappingService.prototype.connectTotalMappedStream = function () {
+        return this.http.get(this._totalMappedUrl);
+    };
+    //Retrieve missing mapping diagnosis
+    MappingService.prototype.connectMissingMappingStream = function () {
+        return this.http.get(this._missingMappedUrl);
     };
     MappingService = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])({

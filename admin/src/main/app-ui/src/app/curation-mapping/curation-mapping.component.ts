@@ -9,14 +9,13 @@ import {MappingService} from "../mapping.service";
 
 export class CurationMappingComponent implements OnInit {
 
-    public mappings = [];
     public mappingCnt: number;
 
     constructor(private _mappingService: MappingService) { }
 
     ngOnInit() {
 
-        this._mappingService.connectToStream()
+        this._mappingService.connectMissingMappingStream()
             .subscribe(
                 data => {
 
@@ -28,7 +27,6 @@ export class CurationMappingComponent implements OnInit {
                         count++;
                     }
                     this.mappingCnt = count;
-                    this.mappings =  myData;
                 }
             );
     }

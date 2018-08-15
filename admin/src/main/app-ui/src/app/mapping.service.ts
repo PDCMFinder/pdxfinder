@@ -8,16 +8,29 @@ import {Observable} from "rxjs/index";
 })
 export class MappingService {
 
-    private _url = "/assets/data/diagnosis.json";
+    private _totalMappedUrl = "/api/mapping/diagnosis";
+    private _missingMappedUrl = "/api/missingmapping/diagnosis";
 
   constructor(private http: HttpClient) { }
 
-    //Retrieve mapping data
-    connectToStream(): Observable<MappingInterface[]>{
+    //Retrieve Total mapped diagnosis
+    connectTotalMappedStream(): Observable<MappingInterface[]>{
 
-        return this.http.get<MappingInterface[]>(this._url);
+        return this.http.get<MappingInterface[]>(this._totalMappedUrl);
 
     }
+
+    //Retrieve missing mapping diagnosis
+    connectMissingMappingStream(): Observable<MappingInterface[]>{
+
+        return this.http.get<MappingInterface[]>(this._missingMappedUrl);
+
+    }
+
+
+
+
+
 
 
 }
