@@ -15,7 +15,7 @@ const routes: Routes = [
     { path: 'diagnosis-mapping',   component: DatasourceSummaryComponent },
     {
         path: 'diagnosis-mapping/:source',  component: DatasourceSpecificComponent,
-        children: [ { path: 'suggested-mappings', component: DatasourceSpecificSuggestionsComponent } ]
+        children: [ { path: 'suggested-mapping/:id', component: DatasourceSpecificSuggestionsComponent } ]
     }
 ];
 

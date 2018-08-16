@@ -1,7 +1,7 @@
 
 <div class="row wrapper border-bottom white-bg page-heading">
   <div class="col-lg-8">
-    <h2>Center Summary</h2>
+    <h2> {{dataSource | uppercase}} Unmapped Diagnosis</h2>
     <ol class="breadcrumb">
       <li>
         <a routerLink="/dashboard">...</a>
@@ -12,7 +12,7 @@
       <li>
         <a routerLink="/diagnosis-mapping">Center Summary</a>
       </li>
-      <li class="active">{{dataSource | uppercase}} </li>
+      <li class="active"> {{dataSource | uppercase}} </li>
     </ol>
   </div>
 </div>
@@ -20,7 +20,7 @@
 
 
 
-<div class="wrapper wrapper-content animated pulse">
+<div class="wrapper wrapper-content animated swing">
   <div class="p-w-md m-t-sm col-lg-10 col-lg-offset-1">
 
 
@@ -28,12 +28,14 @@
       <div class="col-lg-12">
         <div class="pdxfinder float-e-margins">
           <div class="pdxfinder-title">
-            <h5>UNAMAPPED DIAGNOSIS - <b style="color: #03369D"> {{dataSource | uppercase}}  </b> </h5>
+              <h5 style="font-weight: bold;"> Unmapped Diagnosis - <span style="color: #03369D"> {{dataSource | uppercase}}  </span> </h5>
           </div>
-          <div class="pdxfinder-content">
+
+
+            <div class="pdxfinder-content">
             <div class="table-responsive">
 
-              <table class="table table-striped table-bordered table-hover dataTables-example" >
+              <table class="table table-striped table-bordered table-hover" >
                 <thead>
                 <tr>
                   <th style="width:10px;">S/N</th>
@@ -48,7 +50,7 @@
                 </thead>
                 <tbody>
 
-                <tr class="pdxfinder-clickable-rows" *ngFor="let mapping of mappings; index as i" >
+                <tr class="pdxfinder-clickable-rows2" *ngFor="let mapping of mappings; index as i" [routerLink]="['suggested-mapping',mapping.entityId ]">
                   <td> {{i+1}} </td>
                   <td> {{ mapping.mappingValues.DataSource | uppercase }} </td>
                   <td> {{ mapping.mappingValues.SampleDiagnosis | uppercase }} </td>
@@ -71,3 +73,10 @@
 
   </div>
 </div>
+
+
+
+<!-- The Suggested Mappings Displayes here as a child route with deeplinked url  (click)="showSuggestedMappings(34)" -->
+<router-outlet>
+
+</router-outlet>

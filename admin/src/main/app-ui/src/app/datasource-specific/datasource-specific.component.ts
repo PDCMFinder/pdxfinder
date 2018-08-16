@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute  } from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {MappingService} from "../mapping.service";
 
 @Component({
@@ -12,7 +12,9 @@ export class DatasourceSpecificComponent implements OnInit {
   public dataSource;
   public mappings = [];
 
-  constructor(private route: ActivatedRoute, private _mappingService: MappingService) { }
+  constructor(private router: Router,
+              private route: ActivatedRoute,
+              private _mappingService: MappingService) { }
 
   ngOnInit() {
 
@@ -23,7 +25,7 @@ export class DatasourceSpecificComponent implements OnInit {
           .subscribe(
               data => {
 
-                  let myData = data["mappings"]; // This recieves the mappings node of the json in required format
+                  let myData = data["mappings"]; // This receives the mappings node of the json in required format
 
                   var count:number = 0;
                   for (var i of myData) {
@@ -34,11 +36,16 @@ export class DatasourceSpecificComponent implements OnInit {
                       count++;
                   }
 
-
-
               }
           );
 
+  }
+
+
+  showSuggestedMappings(id){
+
+      //this.router.navigate(['/suggested-mappings',id])
+      this.router.navigate(['suggested-mappings'],{relativeTo: this.route})
   }
 
 }
