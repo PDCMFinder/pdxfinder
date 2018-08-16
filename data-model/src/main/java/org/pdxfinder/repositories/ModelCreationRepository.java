@@ -78,7 +78,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     @Query("MATCH (n:ModelCreation) RETURN n")
     Collection<ModelCreation> findAllModels();
 
-    @Query("MATCH (mc:ModelCreation)<-[ir:IMPLANTED_IN]-(s:Sample)-[sfr:SAMPLED_FROM]-(ps:PatientSnapshot)-[pr:PATIENT]-(p:Patient) " +
+    @Query("MATCH (mc:ModelCreation)<-[ir:IMPLANTED_IN]-(s:Sample)-[sfr:SAMPLED_FROM]-(ps:PatientSnapshot)-[pr:COLLECTION_EVENT]-(p:Patient) " +
             "WITH mc, ir, s, sfr, ps, pr, p " +
             "MATCH (c:Tissue)-[cr:SAMPLE_SITE]-(s)-[ttr:OF_TYPE]-(tt:TumorType) " +
             "WITH mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt " +
