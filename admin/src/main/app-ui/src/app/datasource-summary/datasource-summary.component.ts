@@ -73,18 +73,20 @@ export class DatasourceSummaryComponent implements OnInit {
                         result =>  {
 
                             tempArr.push(result[0]["mappingValues"].DataSource +"__"+result.length);
-                        }
-                    );
 
-                    for (var i = 0;i < this.pdxStatArray.source.length; i++) {
-                        for (var num = 0; num < tempArr.length; num++) {
-                            if ( tempArr[num].split("__")[0].toUpperCase() == this.pdxStatArray.source[i].toUpperCase() ){
-                                this.pdxStatArray.missing[i] = tempArr[num].split("__")[1]; break;
-                            }else{
-                                this.pdxStatArray.missing[i] = 0;
+                            for (var i = 0;i < this.pdxStatArray.source.length; i++) {
+                                for (var num = 0; num < tempArr.length; num++) {
+                                    if ( tempArr[num].split("__")[0].toUpperCase() == this.pdxStatArray.source[i].toUpperCase() ){
+                                        this.pdxStatArray.missing[i] = tempArr[num].split("__")[1]; break;
+                                    }else{
+                                        this.pdxStatArray.missing[i] = 0;
+                                    }
+                                }
                             }
                         }
-                    }
+
+
+                    );
 
 
                 }

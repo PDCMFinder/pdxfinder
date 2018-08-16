@@ -8,8 +8,11 @@ import {Observable} from "rxjs/index";
 })
 export class MappingService {
 
-    private _totalMappedUrl = "/api/mapping/diagnosis";
-    private _missingMappedUrl = "/api/missingmapping/diagnosis";
+    //private _totalMappedUrl = "/api/mapping/diagnosis";
+    //private _missingMappedUrl = "/api/missingmapping/diagnosis";
+
+    private _totalMappedUrl = "/assets/data/mapped-diagnosis.json";
+    private _missingMappedUrl = "/assets/data/unmapped-diag-slim.json";
 
 
     constructor(private http: HttpClient) { }

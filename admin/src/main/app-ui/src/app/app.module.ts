@@ -8,6 +8,7 @@ import { TopNavBarComponent } from './top-nav-bar/top-nav-bar.component';
 import {MappingService} from "./mapping.service";
 import { HttpClientModule} from "@angular/common/http";
 import { DatasourceSpecificComponent } from './datasource-specific/datasource-specific.component';
+import { DatasourceSpecificSuggestionsComponent } from './datasource-specific-suggestions/datasource-specific-suggestions.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import { DatasourceSpecificComponent } from './datasource-specific/datasource-sp
     SideNavBarComponent,
     TopNavBarComponent,
       routingComponents,
-      DatasourceSpecificComponent
+      DatasourceSpecificComponent,
+      DatasourceSpecificSuggestionsComponent
   ],
   imports: [
     BrowserModule,

@@ -549,10 +549,8 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 var MappingService = /** @class */ (function () {
     function MappingService(http) {
         this.http = http;
-        //private _totalMappedUrl = "/api/mapping/diagnosis";
-        //private _missingMappedUrl = "/api/missingmapping/diagnosis";
-        this._totalMappedUrl = "/assets/data/mapped-diagnosis.json";
-        this._missingMappedUrl = "/assets/data/diagnosis.json";
+        this._totalMappedUrl = "/api/mapping/diagnosis";
+        this._missingMappedUrl = "/api/missingmapping/diagnosis";
     }
     //Retrieve Total mapped diagnosis
     MappingService.prototype.connectTotalMappedStream = function () {
