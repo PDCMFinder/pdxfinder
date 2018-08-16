@@ -57,8 +57,8 @@ var routes = [
     { path: '', component: _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_4__["DashboardComponent"] },
     { path: 'dashboard', component: _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_4__["DashboardComponent"] },
     { path: 'curation', component: _curation_mapping_curation_mapping_component__WEBPACK_IMPORTED_MODULE_2__["CurationMappingComponent"] },
-    { path: 'summary', component: _datasource_summary_datasource_summary_component__WEBPACK_IMPORTED_MODULE_3__["DatasourceSummaryComponent"] },
-    { path: 'specific', component: _datasource_specific_datasource_specific_component__WEBPACK_IMPORTED_MODULE_5__["DatasourceSpecificComponent"] }
+    { path: 'diagnosis-mapping', component: _datasource_summary_datasource_summary_component__WEBPACK_IMPORTED_MODULE_3__["DatasourceSummaryComponent"] },
+    { path: 'diagnosis-mapping/:source', component: _datasource_specific_datasource_specific_component__WEBPACK_IMPORTED_MODULE_5__["DatasourceSpecificComponent"] }
 ];
 var AppRoutingModule = /** @class */ (function () {
     function AppRoutingModule() {
@@ -206,7 +206,7 @@ var AppModule = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row wrapper border-bottom white-bg page-heading\">\n    <div class=\"col-lg-8\">\n        <h2>Curation Mappings</h2>\n        <ol class=\"breadcrumb\">\n            <li>\n                <a routerLink=\"/dashboard\">Dashboard </a>\n            </li>\n            <li class=\"active\"  style=\"color:green;\">\n                Curation Mappings\n            </li>\n        </ol>\n    </div>\n</div>\n\n\n\n<div class=\"wrapper wrapper-content animated  bounceIn\">\n  <div class=\"p-w-md m-t-sm container\">\n\n\n    <div class=\"row\">\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content pdx-badge\" style=\"padding-bottom:10px;\" attr.pdxfinder-badge={{mappingCnt}}>\n            <a routerLink=\"/summary\"> <img src=\"assets/icons/diagnosis.png\" class=\"icon\"> </a>\n            <div class='text-navy pdx-singleLine'> DIAGNOSIS MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/drug.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> DRUG MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n    </div>\n\n\n\n  </div>\n</div>"
+module.exports = "<div class=\"row wrapper border-bottom white-bg page-heading\">\n    <div class=\"col-lg-8\">\n        <h2>Curation Mappings</h2>\n        <ol class=\"breadcrumb\">\n            <li>\n                <a routerLink=\"/dashboard\">Dashboard </a>\n            </li>\n            <li class=\"active\">\n                Curation Mappings\n            </li>\n        </ol>\n    </div>\n</div>\n\n\n\n<div class=\"wrapper wrapper-content animated  bounceIn\">\n  <div class=\"p-w-md m-t-sm container\">\n\n\n    <div class=\"row\">\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content pdx-badge\" style=\"padding-bottom:10px;\" attr.pdxfinder-badge={{mappingCnt}}>\n            <a routerLink=\"/diagnosis-mapping\"> <img src=\"assets/icons/diagnosis.png\" class=\"icon\"> </a>\n            <div class='text-navy pdx-singleLine'> DIAGNOSIS MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/drug.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> DRUG MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"col-lg-2 col-md-3 col-sm-4 col-xs-6\">\n        <div class=\"pdxfinder\">\n          <div class=\"pdxfinder-content\" style=\"padding-bottom:10px;\">\n            <img src=\"assets/icons/images.png\" class=\"icon\">\n            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>\n          </div>\n        </div>\n      </div>\n\n    </div>\n\n\n\n  </div>\n</div>"
 
 /***/ }),
 
@@ -340,7 +340,7 @@ var DashboardComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<p>\n  datasource-specific works!\n</p>\n"
+module.exports = "\n<div class=\"row wrapper border-bottom white-bg page-heading\">\n  <div class=\"col-lg-8\">\n    <h2>Center Summary</h2>\n    <ol class=\"breadcrumb\">\n      <li>\n        <a routerLink=\"/dashboard\">...</a>\n      </li>\n      <li>\n        <a routerLink=\"/curation\">Curation Mappings</a>\n      </li>\n      <li>\n        <a routerLink=\"/diagnosis-mapping\">Center Summary</a>\n      </li>\n      <li class=\"active\">{{dataSource | uppercase}} </li>\n    </ol>\n  </div>\n</div>\n\n\n\n\n<div class=\"wrapper wrapper-content animated pulse\">\n  <div class=\"p-w-md m-t-sm col-lg-10 col-lg-offset-1\">\n\n\n    <div class=\"row\">\n      <div class=\"col-lg-12\">\n        <div class=\"pdxfinder float-e-margins\">\n          <div class=\"pdxfinder-title\">\n            <h5>UNAMAPPED DIAGNOSIS - <b style=\"color: #03369D\"> {{dataSource | uppercase}}  </b> </h5>\n          </div>\n          <div class=\"pdxfinder-content\">\n            <div class=\"table-responsive\">\n\n              <table class=\"table table-striped table-bordered table-hover dataTables-example\" >\n                <thead>\n                <tr>\n                  <th style=\"width:10px;\">S/N</th>\n                  <th> SOURCE </th>\n                  <th> DIAGNOSIS </th>\n                  <th> TUMOR TYPE </th>\n                  <th> PRIMARY TUMOR </th>\n                  <th> MAPPED TERM </th>\n                  <th> TYPE </th>\n                  <th>JUSTIFICATION</th>\n                </tr>\n                </thead>\n                <tbody>\n\n                <tr class=\"pdxfinder-clickable-rows\" *ngFor=\"let mapping of mappings; index as i\" >\n                  <td> {{i+1}} </td>\n                  <td> {{ mapping.mappingValues.DataSource | uppercase }} </td>\n                  <td> {{ mapping.mappingValues.SampleDiagnosis | uppercase }} </td>\n                  <td> {{ mapping.mappingValues.TumorType | uppercase }} </td>\n                  <td> {{ mapping.mappingValues.OriginTissue | uppercase }} </td>\n                  <td> </td>\n                  <td> </td>\n                  <td> </td>\n                </tr>\n\n                </tbody>\n              </table>\n\n            </div>\n\n          </div>\n        </div>\n      </div>\n    </div>\n\n  </div>\n</div>"
 
 /***/ }),
 
@@ -355,6 +355,8 @@ module.exports = "<p>\n  datasource-specific works!\n</p>\n"
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DatasourceSpecificComponent", function() { return DatasourceSpecificComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
+/* harmony import */ var _mapping_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../mapping.service */ "./src/app/mapping.service.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -365,10 +367,30 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 
+
+
 var DatasourceSpecificComponent = /** @class */ (function () {
-    function DatasourceSpecificComponent() {
+    function DatasourceSpecificComponent(route, _mappingService) {
+        this.route = route;
+        this._mappingService = _mappingService;
+        this.mappings = [];
     }
     DatasourceSpecificComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        // From the current url snapshot, get the source parameter and assign to the dataSource property
+        this.dataSource = this.route.snapshot.paramMap.get('source');
+        this._mappingService.connectMissingMappingStream()
+            .subscribe(function (data) {
+            var myData = data["mappings"]; // This recieves the mappings node of the json in required format
+            var count = 0;
+            for (var _i = 0, myData_1 = myData; _i < myData_1.length; _i++) {
+                var i = myData_1[_i];
+                if (myData[count].mappingValues.DataSource.toUpperCase() === _this.dataSource.toUpperCase()) {
+                    _this.mappings.push(myData[count]);
+                }
+                count++;
+            }
+        });
     };
     DatasourceSpecificComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
@@ -376,7 +398,7 @@ var DatasourceSpecificComponent = /** @class */ (function () {
             template: __webpack_require__(/*! ./datasource-specific.component.html */ "./src/app/datasource-specific/datasource-specific.component.html"),
             styles: [""]
         }),
-        __metadata("design:paramtypes", [])
+        __metadata("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_1__["ActivatedRoute"], _mapping_service__WEBPACK_IMPORTED_MODULE_2__["MappingService"]])
     ], DatasourceSpecificComponent);
     return DatasourceSpecificComponent;
 }());
@@ -392,7 +414,7 @@ var DatasourceSpecificComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = " <div class=\"row wrapper border-bottom white-bg page-heading\">\n    <div class=\"col-lg-8\">\n        <h2>Center Summary</h2>\n        <ol class=\"breadcrumb\">\n            <li>\n                <a routerLink=\"/dashboard\">Dashboard</a>\n            </li>\n            <li>\n                <a routerLink=\"/curation\">Curation Mappings</a>\n            </li>\n            <li class=\"active\" style=\"color:green;\">\n                JAX Summary\n            </li>\n        </ol>\n    </div>\n</div>\n\n<div class=\"wrapper wrapper-content animated bounceIn\">\n  <div class=\"p-w-md m-t-sm col-lg-10 col-lg-offset-1\">\n\n\n    <div class=\"row\">\n      <div class=\"col-lg-12\">\n        <div class=\"pdxfinder float-e-margins\">\n          <div class=\"pdxfinder-title\">\n            <h5>Unmapped Models By Data Source</h5>\n          </div>\n          <div class=\"pdxfinder-content\">\n            <div class=\"table-responsive\">\n\n                <table class=\"table table-striped table-bordered table-hover dataTables-example\" >\n                    <thead>\n                    <tr>\n                        <th style=\"width:10px;\">S/N</th>\n                        <th>SOURCE </th>\n                        <th>MISSING MAPPINGS </th>\n                        <th>TOTAL MAPPED</th>\n                        <th>VALIDATED</th>\n                        <th>UNVALIDATED</th>\n                    </tr>\n                    </thead>\n                    <tbody>\n\n                    <tr class=\"gradeX\" *ngFor=\" let source of pdxStatArray.source; index as i \">\n                        <td> {{i+1}} </td>\n                        <td> {{ source | uppercase }} </td>\n                        <td> {{pdxStatArray.missing[i]}} </td>\n                        <td> {{pdxStatArray.total[i]}} </td>\n                        <td> {{pdxStatArray.validated[i]}} </td>\n                        <td> {{pdxStatArray.unvalidated[i]}} </td>\n                    </tr>\n                    </tbody>\n                </table>\n\n            </div>\n\n          </div>\n        </div>\n      </div>\n    </div>\n\n  </div>\n</div>\n<!-- use container or blank for small screen and col-lg-10 col-lg-offset-1 for 17 inches upwards  swing tada wobble bounceIn (Up,Left,Right,Down) lightSpeedIn , flipInY, rotateInDownRight, rotateInUpLeft, slideInLeft, hinge, rollIn-->"
+module.exports = " <div class=\"row wrapper border-bottom white-bg page-heading\">\n    <div class=\"col-lg-8\">\n        <h2>Center Summary</h2>\n        <ol class=\"breadcrumb\">\n            <li>\n                <a routerLink=\"/dashboard\">Dashboard</a>\n            </li>\n            <li>\n                <a routerLink=\"/curation\">Curation Mappings</a>\n            </li>\n            <li class=\"active\">\n                Unmapped Diagnosis\n            </li>\n        </ol>\n    </div>\n</div>\n\n<div class=\"wrapper wrapper-content animated rotateInUpLeft\">\n  <div class=\"p-w-md m-t-sm col-lg-10 col-lg-offset-1\">\n\n\n    <div class=\"row\">\n      <div class=\"col-lg-12\">\n        <div class=\"pdxfinder float-e-margins\">\n          <div class=\"pdxfinder-title\">\n            <h5>Unmapped Models By Data Source</h5>\n          </div>\n          <div class=\"pdxfinder-content\">\n            <div class=\"table-responsive\">\n\n                <table class=\"table table-striped table-bordered table-hover dataTables-example\" >\n                    <thead>\n                    <tr>\n                        <th style=\"width:10px;\">S/N</th>\n                        <th>SOURCE </th>\n                        <th>MISSING MAPPINGS </th>\n                        <th>TOTAL MAPPED</th>\n                        <th>VALIDATED</th>\n                        <th>UNVALIDATED</th>\n                    </tr>\n                    </thead>\n                    <tbody>\n\n                    <tr class=\"pdxfinder-clickable-rows\" *ngFor=\" let source of pdxStatArray.source; index as i \" (click)=\"onSelect(source)\">\n                        <td> {{i+1}} </td>\n                        <td> {{ source | uppercase }} </td>\n                        <td> {{pdxStatArray.missing[i]}} </td>\n                        <td> {{pdxStatArray.total[i]}} </td>\n                        <td> {{pdxStatArray.validated[i]}} </td>\n                        <td> {{pdxStatArray.unvalidated[i]}} </td>\n                    </tr>\n                    </tbody>\n                </table>\n\n            </div>\n\n          </div>\n        </div>\n      </div>\n    </div>\n\n  </div>\n</div>\n<!-- use container or blank for small screen and col-lg-10 col-lg-offset-1 for 17 inches upwards  swing tada wobble bounceIn (Up,Left,Right,Down) lightSpeedIn , flipInY, rotateInDownRight, rotateInUpLeft, slideInLeft, hinge, rollIn-->"
 
 /***/ }),
 
@@ -412,6 +434,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var rxjs_index__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(rxjs_index__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs/internal/operators */ "./node_modules/rxjs/internal/operators/index.js");
 /* harmony import */ var rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(rxjs_internal_operators__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -425,9 +448,12 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 
 
 
+
 var DatasourceSummaryComponent = /** @class */ (function () {
-    function DatasourceSummaryComponent(_mappingService) {
+    function DatasourceSummaryComponent(_mappingService, router, route) {
         this._mappingService = _mappingService;
+        this.router = router;
+        this.route = route;
         this.pdxStatArray = {
             source: [],
             missing: [],
@@ -479,13 +505,16 @@ var DatasourceSummaryComponent = /** @class */ (function () {
             }
         });
     };
+    DatasourceSummaryComponent.prototype.onSelect = function (source) {
+        this.router.navigate([source], { relativeTo: this.route });
+    };
     DatasourceSummaryComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
             selector: 'app-datasource-summary',
             template: __webpack_require__(/*! ./datasource-summary.component.html */ "./src/app/datasource-summary/datasource-summary.component.html"),
             styles: [""]
         }),
-        __metadata("design:paramtypes", [_mapping_service__WEBPACK_IMPORTED_MODULE_1__["MappingService"]])
+        __metadata("design:paramtypes", [_mapping_service__WEBPACK_IMPORTED_MODULE_1__["MappingService"], _angular_router__WEBPACK_IMPORTED_MODULE_4__["Router"], _angular_router__WEBPACK_IMPORTED_MODULE_4__["ActivatedRoute"]])
     ], DatasourceSummaryComponent);
     return DatasourceSummaryComponent;
 }());
@@ -553,7 +582,7 @@ var MappingService = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<!-- Side Navigation menu here-->\n<nav class=\"navbar-default navbar-static-side\" role=\"navigation\">\n  <div class=\"sidebar-collapse\">\n    <a class=\"close-canvas-menu\"><i class=\"ti-close\" style=\"color: #ffffff;\"></i></a>\n\n\n    <ul class=\"nav metismenu\" id=\"side-menu\">\n\n      <li class=\"nav-header\">\n        <div class=\"dropdown profile-element\">\n          <span>\n                <img alt=\"image\" class=\"img-circle\" src=\"/assets/icons/user.jpg\" />\n          </span>\n          <a data-toggle=\"dropdown\" class=\"dropdown-toggle\" href=\"#\">\n                <span class=\"clear\">\n                  <span class=\"block m-t-xs\">\n                  <strong class=\"font-bold\" style=\"color:#efefef;\">Nathalie Conte</strong>\n                  </span>\n                  </span>\n          </a>\n        </div>\n        <div class=\"logo-element\">\n          PDX+\n        </div>\n      </li>\n\n      <li> <a routerLink=\"/dashboard\"><i class=\"ti-dashboard\"></i> <span class=\"nav-label\"> &nbsp; Dashboard </span></a> </li>\n      <li class=\"active\">\n        <a href=\"#\"><i class=\"ti-menu-alt\"></i> <span class=\"nav-label\"> &nbsp; Tool Box</span> </a>\n        <ul class=\"nav nav-second-level\">\n            <li><a routerLink=\"/curation\" class=\"active\">Curation Mappings</a></li>\n            <li><a routerLink=\"/summary\" class=\"active\">Diagnosis Mappings</a></li>\n          <!--<li><a href=\"#\">PDX Finder Jira <span class=\"label label-primary pull-right\">8</span></a></li>\n          <li><a href=\"#\">Raw Data <span class=\"label label-primary pull-right\">2</span></a></li>\n          <li><a href=\"#\">Reports </a></li>\n          <li><a href=\"#\">SOPs & Methods </a></li>\n          <li><a href=\"#\">Finder </a></li>\n          <li><a href=\"#\">Github </a></li>\n          <li><a href=\"#\">Community Contacts </a></li>-->\n        </ul>\n      </li>\n\n      <li>\n        <a href=\"#\"><i class=\"ti-server\"></i> <span class=\"nav-label\"> &nbsp; Web Server </span> </a>\n        <ul class=\"nav nav-second-level\">\n            <li><a href=\"http://ves-ebi-bc.ebi.ac.uk\" target=\"_blank\" class=\"active\"> Dev Webapp </a></li>\n            <li><a href=\"http://ves-ebi-b4.ebi.ac.uk\" target=\"_blank\" class=\"active\"> Beta Webapp </a></li>\n            <li><a href=\"http://wp-p1m-b0.ebi.ac.uk\" target=\"_blank\" class=\"active\"> Production Webapp 1 </a></li>\n            <li><a href=\"http://wp-p1m-b0.ebi.ac.uk\" target=\"_blank\" class=\"active\"> Production Webapp 2 </a></li>\n        </ul>\n      </li>\n      <li> <a href=\"#\"><i class=\"ti-harddrive\"></i> <span class=\"nav-label\"> &nbsp; Manage IRCC Data</span></a> </li>\n      <li> <a href=\"#\"><i class=\"ti-harddrive\"></i>  <span class=\"nav-label\"> &nbsp; Manage JAX Data</span></a> </li>\n\n\n      <li class=\"pdxFinderActive2\">\n        <a target=\"_blank\" href=\"http://www.pdxfinder.org\"><i class=\"ti-tablet\"></i>  <span class=\"nav-label\"> &nbsp; PDX Finder Website</span> </a>\n      </li>\n      <li class=\"pdxFinderActive\">\n        <a target=\"_blank\" href=\"http://ves-ebi-bc.ebi.ac.uk:7474/browser\"><i class=\"ti-harddrives\"></i>  <span class=\"nav-label\"> &nbsp; Neo4j Database</span></a>\n      </li>\n    </ul>\n\n\n\n  </div>\n</nav>\n\n\n\n\n\n\n"
+module.exports = "<!-- Side Navigation menu here-->\n<nav class=\"navbar-default navbar-static-side\" role=\"navigation\">\n  <div class=\"sidebar-collapse\">\n    <a class=\"close-canvas-menu\"><i class=\"ti-close\" style=\"color: #ffffff;\"></i></a>\n\n\n    <ul class=\"nav metismenu\" id=\"side-menu\">\n\n      <li class=\"nav-header\">\n        <div class=\"dropdown profile-element\">\n          <span>\n                <img alt=\"image\" class=\"img-circle\" src=\"/assets/icons/user.jpg\" />\n          </span>\n          <a data-toggle=\"dropdown\" class=\"dropdown-toggle\" href=\"#\">\n                <span class=\"clear\">\n                  <span class=\"block m-t-xs\">\n                  <strong class=\"font-bold\" style=\"color:#efefef;\">Nathalie Conte</strong>\n                  </span>\n                  </span>\n          </a>\n        </div>\n        <div class=\"logo-element\">\n          PDX+\n        </div>\n      </li>\n\n      <li> <a routerLink=\"/dashboard\"><i class=\"ti-dashboard\"></i> <span class=\"nav-label\"> &nbsp; Dashboard </span></a> </li>\n      <li class=\"active\">\n        <a href=\"#\"><i class=\"ti-menu-alt\"></i> <span class=\"nav-label\"> &nbsp; Tool Box</span> </a>\n        <ul class=\"nav nav-second-level\">\n            <li><a routerLink=\"/curation\" class=\"active\">Curation Mappings</a></li>\n            <li><a routerLink=\"/diagnosis-mapping\" class=\"active\">Diagnosis Mappings</a></li>\n          <!--<li><a href=\"#\">PDX Finder Jira <span class=\"label label-primary pull-right\">8</span></a></li>\n          <li><a href=\"#\">Raw Data <span class=\"label label-primary pull-right\">2</span></a></li>\n          <li><a href=\"#\">Reports </a></li>\n          <li><a href=\"#\">SOPs & Methods </a></li>\n          <li><a href=\"#\">Finder </a></li>\n          <li><a href=\"#\">Github </a></li>\n          <li><a href=\"#\">Community Contacts </a></li>-->\n        </ul>\n      </li>\n\n      <li>\n        <a href=\"#\"><i class=\"ti-server\"></i> <span class=\"nav-label\"> &nbsp; Web Server </span> </a>\n        <ul class=\"nav nav-second-level\">\n            <li><a href=\"http://ves-ebi-bc.ebi.ac.uk\" target=\"_blank\" class=\"active\"> Dev Webapp </a></li>\n            <li><a href=\"http://ves-ebi-b4.ebi.ac.uk\" target=\"_blank\" class=\"active\"> Beta Webapp </a></li>\n            <li><a href=\"http://wp-p1m-b0.ebi.ac.uk\" target=\"_blank\" class=\"active\"> Production Webapp 1 </a></li>\n            <li><a href=\"http://wp-p1m-b0.ebi.ac.uk\" target=\"_blank\" class=\"active\"> Production Webapp 2 </a></li>\n        </ul>\n      </li>\n      <li> <a href=\"#\"><i class=\"ti-harddrive\"></i> <span class=\"nav-label\"> &nbsp; Manage IRCC Data</span></a> </li>\n      <li> <a href=\"#\"><i class=\"ti-harddrive\"></i>  <span class=\"nav-label\"> &nbsp; Manage JAX Data</span></a> </li>\n\n\n      <li class=\"pdxFinderActive2\">\n        <a target=\"_blank\" href=\"http://www.pdxfinder.org\"><i class=\"ti-tablet\"></i>  <span class=\"nav-label\"> &nbsp; PDX Finder Website</span> </a>\n      </li>\n      <li class=\"pdxFinderActive\">\n        <a target=\"_blank\" href=\"http://ves-ebi-bc.ebi.ac.uk:7474/browser\"><i class=\"ti-harddrives\"></i>  <span class=\"nav-label\"> &nbsp; Neo4j Database</span></a>\n      </li>\n    </ul>\n\n\n\n  </div>\n</nav>\n\n\n\n\n\n\n"
 
 /***/ }),
 
