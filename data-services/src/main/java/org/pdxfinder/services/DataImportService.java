@@ -241,9 +241,21 @@ public class DataImportService {
         return patient;
     }
 
+    public Patient getPatientWithSnapshots(String patientId, Group group){
+
+        return patientRepository.findByExternalIdAndGroupWithSnapshots(patientId, group);
+    }
+
+
+    public void savePatient(Patient patient){
+
+        patientRepository.save(patient);
+    }
+
+
     public Patient findPatient(String patientId, Group dataSource){
 
-        return patientRepository.findByExternalIdAndGroup(patientId, dataSource);
+        return patientRepository.findByExternalIdAndGroupWithSnapshots(patientId, dataSource);
 
     }
 
@@ -309,6 +321,9 @@ public class DataImportService {
         }
         //create new snapshot and save it with the patient
         ps = new PatientSnapshot(patient, ageAtCollection, collectionDate, collectionEvent, Integer.parseInt(ellapsedTime));
+        patient.hasSnapshot(ps);
+        ps.setPatient(patient);
+        patientRepository.save(patient);
         patientSnapshotRepository.save(ps);
 
         return ps;
@@ -833,6 +848,7 @@ public class DataImportService {
 
         //combination of drugs?
         if(drugString.contains("+") && doseString.contains(";")){
+
             String[] drugArray = drugString.split("\\+");
             String[] doseArray = doseString.split(";");
 
@@ -857,17 +873,44 @@ public class DataImportService {
         }
         else if(drugString.contains("+") && !doseString.contains(";")){
 
-            String[] drugArray = drugString.split("\\+");
+            if(doseString.contains("+")){
+                //this data is coming from the universal loader, dose combinations are separated with + instead of ;
 
-            for(int i=0;i<drugArray.length;i++){
+                String[] drugArray = drugString.split("\\+");
+                String[] doseArray = doseString.split("\\+");
 
-                Drug d = getStandardizedDrug(drugArray[i].trim());
-                TreatmentComponent tc = new TreatmentComponent();
-                tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
-                tc.setDose(doseString.trim());
-                tc.setDrug(d);
-                tp.addTreatmentComponent(tc);
+                if(drugArray.length == doseArray.length){
+
+                    for(int i=0;i<drugArray.length;i++){
+
+                        Drug d = getStandardizedDrug(drugArray[i].trim());
+                        TreatmentComponent tc = new TreatmentComponent();
+                        tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
+                        tc.setDose(doseArray[i].trim());
+                        tc.setDrug(d);
+                        tp.addTreatmentComponent(tc);
+                    }
+
+                }
+
+
+
             }
+            else{
+
+                String[] drugArray = drugString.split("\\+");
+
+                for(int i=0;i<drugArray.length;i++){
+
+                    Drug d = getStandardizedDrug(drugArray[i].trim());
+                    TreatmentComponent tc = new TreatmentComponent();
+                    tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
+                    tc.setDose(doseString.trim());
+                    tc.setDrug(d);
+                    tp.addTreatmentComponent(tc);
+                }
+            }
+
         }
         //one drug only
         else{
@@ -903,6 +946,25 @@ public class DataImportService {
         }
 
         return tp;
+
+    }
+
+
+
+
+
+    public TreatmentSummary findTreatmentSummaryByPatientSnapshot(PatientSnapshot ps){
+
+        TreatmentSummary ts = treatmentSummaryRepository.findByPatientSnapshot(ps);
+
+        if(ts == null){
+            //no summary yet, create one
+            ts = new TreatmentSummary();
+
+
+        }
+
+        return ts;
 
     }
 }

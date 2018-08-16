@@ -1,6 +1,6 @@
 package org.pdxfinder.repositories;
 
-import org.pdxfinder.dao.ModelCreation;
+import org.pdxfinder.dao.PatientSnapshot;
 import org.pdxfinder.dao.TreatmentSummary;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
@@ -37,5 +37,15 @@ public interface TreatmentSummaryRepository extends Neo4jRepository<TreatmentSum
 
     @Query("MATCH (ts:TreatmentSummary) RETURN count(ts)")
     int findTotalSummaryNumber();
+
+
+    @Query("MATCH (ts:TreatmentSummary)--(ps:PatientSnapshot) WHERE id(ps) = {snapshot} " +
+            "WITH ts " +
+            "OPTIONAL MATCH (ts)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[rr:RESPONSE]-(r:Response) " +
+            "OPTIONAL MATCH (tp)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:DRUG]-(d:Drug) "+
+            "RETURN ts, tpr, tp, rr, r, tcr, tc, dr, d")
+    TreatmentSummary findByPatientSnapshot(@Param("snapshot")PatientSnapshot ps);
+
+
 
 }
