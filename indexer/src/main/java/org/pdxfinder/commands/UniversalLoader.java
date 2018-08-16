@@ -35,6 +35,7 @@ import org.apache.poi.ss.usermodel.*;
 /*
  * Created by csaba on 06/08/2018.
  */
+
 @Component
 @Order(value = 0)
 /**
@@ -108,7 +109,6 @@ public class UniversalLoader implements CommandLineRunner {
 
             workbook.close();
             excelFile.close();
-
         }
     }
 
@@ -120,6 +120,9 @@ public class UniversalLoader implements CommandLineRunner {
      */
     private void initializeTemplateData(Workbook workbook) {
 
+        log.info("******************************************");
+        log.info("* Initializing Sheet data                *");
+        log.info("******************************************");
 
         ds = null;
         patientSheetData = new ArrayList<>();
@@ -204,8 +207,6 @@ public class UniversalLoader implements CommandLineRunner {
 
             }
 
-
-
         }
     }
 
@@ -228,6 +229,9 @@ public class UniversalLoader implements CommandLineRunner {
 
         //TODO: this data has to come from the spreadsheet, I am using constants for now
 
+        log.info("******************************************");
+        log.info("* Creating DataSource                    *");
+        log.info("******************************************");
         ds = dataImportService.getProviderGroup("TRACE", "TR", "Trace data from template", "", "", "", "", "");
 
     }
@@ -235,7 +239,10 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPatients() {
 
-        log.info("Creating Patients");
+        log.info("******************************************");
+        log.info("* Creating Patients                      *");
+        log.info("******************************************");
+
         for (List<String> patientRow : patientSheetData) {
 
             String patientId = patientRow.get(0);
@@ -252,7 +259,10 @@ public class UniversalLoader implements CommandLineRunner {
 
 
     private void createPatientTumors() {
-        log.info("Creating Patient samples and snapshots");
+        log.info("******************************************");
+        log.info("* Creating Patient samples and snapshots *");
+        log.info("******************************************");
+
         int row = 6;
         log.info("Tumor row number: "+patientTumorSheetData.size());
         for (List<String> patientTumorRow : patientTumorSheetData) {
@@ -282,7 +292,7 @@ public class UniversalLoader implements CommandLineRunner {
                 //hack to avoid 0.0 values and negative numbers
                 elapsedTime = elapsedTime.replaceAll("[^0-9]", "");
 
-                Patient patient = dataImportService.findPatient(patientId, ds);
+                Patient patient = dataImportService.getPatientWithSnapshots(patientId, ds);
 
                 if (patient == null) {
 
@@ -312,6 +322,9 @@ public class UniversalLoader implements CommandLineRunner {
                 mc.setSample(sample);
                 mc.addRelatedSample(sample);
 
+                patient.hasSnapshot(ps);
+
+                dataImportService.savePatient(patient);
                 dataImportService.savePatientSnapshot(ps);
                 dataImportService.saveModelCreation(mc);
                 row++;
@@ -328,6 +341,66 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPatientTreatments() {
 
+        log.info("******************************************");
+        log.info("* Creating Patient treatments            *");
+        log.info("******************************************");
+
+        int row = 6;
+        for(List<String> patientTreatmentRow : patientTreatmentSheetData){
+
+            String patientId = patientTreatmentRow.get(0);
+            String treatment = patientTreatmentRow.get(1);
+            String dose = patientTreatmentRow.get(2);
+            String startingDate = patientTreatmentRow.get(3);
+            String duration = patientTreatmentRow.get(4);
+            String response = patientTreatmentRow.get(5);
+
+            if(patientId.isEmpty() || treatment.isEmpty()){
+
+                log.error("Empty patient id or treatment in row "+row);
+                continue;
+            }
+
+
+            Patient patient = dataImportService.findPatient(patientId, ds);
+
+            if(patient == null){
+
+                log.error("Patient not found: "+patientId);
+                continue;
+            }
+
+            PatientSnapshot ps = dataImportService.findLastPatientSnapshot(patientId, ds);
+
+            //at this point a patient should have at least one snapshot, so if ps is null, thats an error
+            if(ps == null){
+
+                log.error("No snapshot for patient: "+patientId);
+                continue;
+            }
+
+
+            TreatmentSummary ts = dataImportService.findTreatmentSummaryByPatientSnapshot(ps);
+
+
+            TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatment, dose, response);
+
+            //update treatment component type and duration
+            for(TreatmentComponent tc : tp.getComponents()){
+
+                tc.setDuration(duration);
+                //never control on humans!
+                tc.setType("Drug");
+            }
+
+            tp.setTreatmentDate(startingDate);
+            ts.addTreatmentProtocol(tp);
+
+            ps.setTreatmentSummary(ts);
+            dataImportService.savePatientSnapshot(ps);
+            row++;
+        }
+
     }
 
     private void createPdxModels() {
@@ -338,7 +411,11 @@ public class UniversalLoader implements CommandLineRunner {
 
     }
 
-
+    /**
+     * Checks if a list consists of nulls only
+     * @param list
+     *
+     */
     boolean isRowOfNulls(List list){
         for(Object o: list)
             if(!(o == null))
