@@ -1,5 +1,6 @@
 package org.pdxfinder.dao;
 
+import org.neo4j.cypher.internal.frontend.v2_3.SemanticDirection;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -16,7 +17,6 @@ public class PatientSnapshot {
     @GraphId
     private Long id;
 
-    private Patient patient;
     private String ageAtCollection;
     private String dateAtCollection;
     private Boolean treatmentNaive;
@@ -24,6 +24,9 @@ public class PatientSnapshot {
     private String collectionEvent;
     private int elapsedTime;
     private String eventType;
+
+    @Relationship(type = "COLLECTION_EVENT", direction = Relationship.INCOMING)
+    private Patient patient;
 
     @Relationship(type = "SAMPLED_FROM")
     private Set<Sample> samples;
