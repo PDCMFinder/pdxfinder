@@ -19,9 +19,9 @@
 
 
 
-
 <div class="wrapper wrapper-content animated swing">
   <div class="p-w-md m-t-sm col-lg-10 col-lg-offset-1">
+
 
 
     <div class="row">
@@ -50,7 +50,7 @@
                 </thead>
                 <tbody>
 
-                <tr class="pdxfinder-clickable-rows2" *ngFor="let mapping of mappings; index as i" [routerLink]="['suggested-mapping',mapping.entityId ]">
+                <tr class="pdxfinder-clickable-rows2" *ngFor="let mapping of mappings; index as i" [routerLink]="['suggested-mapping',mapping.entityId ]" (click)="setClickedRow(i)" [class.active]="i == selectedRow">
                   <td> {{i+1}} </td>
                   <td> {{ mapping.mappingValues.DataSource | uppercase }} </td>
                   <td> {{ mapping.mappingValues.SampleDiagnosis | uppercase }} </td>

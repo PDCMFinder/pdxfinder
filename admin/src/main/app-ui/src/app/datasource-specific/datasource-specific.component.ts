@@ -12,6 +12,10 @@ export class DatasourceSpecificComponent implements OnInit {
   public dataSource;
   public mappings = [];
 
+  public selectedRow : Number;
+  public setClickedRow : Function;
+
+
   constructor(private router: Router,
               private route: ActivatedRoute,
               private _mappingService: MappingService) { }
@@ -39,7 +43,11 @@ export class DatasourceSpecificComponent implements OnInit {
               }
           );
 
-  }
+      this.setClickedRow = function(index){
+          this.selectedRow = index;
+      }
+  };
+
 
 
   showSuggestedMappings(id){

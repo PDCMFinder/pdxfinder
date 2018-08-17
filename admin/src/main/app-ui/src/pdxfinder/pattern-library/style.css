@@ -1,4 +1,14 @@
+/* rgba(6,54,157,0.5) rgba(0,178,213,0.6) */
 
+.table tr.active td {
+    background-color: rgba(6,54,157,0.3) !important;
+    color: black;
+    font-weight: 600;
+}
+
+a,tr {
+    outline: none;
+}
 
 .material-switch > input[type="radio"] {
     display: none;
