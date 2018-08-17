@@ -321,6 +321,7 @@ public class LoadPDMRData implements CommandLineRunner {
         Map<String, Sample> sampleMap = new HashMap<>();
         Map<String, MolecularCharacterization> molcharMap = new HashMap<>();
 
+        Set<String> missingPatients = new HashSet<>();
         try {
             BufferedReader buf = new BufferedReader(new FileReader(mutationsFile));
 
@@ -335,6 +336,7 @@ public class LoadPDMRData implements CommandLineRunner {
                 } else {
                     row = currentLine.split("\t");
 
+                    String patientId = row[1];
                     String modelId = row[1] + "-" + row[2];
                     String sampleId = row[3];
                     String markerSymbol = row[8];
@@ -377,6 +379,7 @@ public class LoadPDMRData implements CommandLineRunner {
                     if(sample == null){
 
                         log.error("Sample "+sampleId + " not found for model "+modelId);
+                        missingPatients.add(patientId);
                         continue;
                     }
                     //found the sample
@@ -440,6 +443,11 @@ public class LoadPDMRData implements CommandLineRunner {
 
 
         log.info("DONE loading mutation data for PDMR.");
+
+        if(missingPatients.size() > 0){
+
+            log.error("Missing patients: " + missingPatients.toString());
+        }
 
     }
 
