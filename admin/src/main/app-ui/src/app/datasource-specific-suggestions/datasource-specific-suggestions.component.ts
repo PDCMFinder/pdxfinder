@@ -10,8 +10,14 @@ import {MappingService} from "../mapping.service";
 export class DatasourceSpecificSuggestionsComponent implements OnInit {
 
     public entityId;
-    public selectedEntity = [];
-    public data = [];
+    public selectedEntity;
+
+    public data : {
+        DataSource: string,
+        SampleDiagnosis : string,
+        TumorType : string,
+        OriginTissue : string
+    };
 
     constructor(private router: Router,
                 private route: ActivatedRoute,
