@@ -350,6 +350,7 @@ public class LoadPDMRData implements CommandLineRunner {
 
                     String readDepth = row[17];
                     String consequence = row[18];
+                    String rsVariant = row[21];
 
                     //skip rows where there is no marker
                     if(markerSymbol.equals("None Found")) continue;
@@ -414,6 +415,7 @@ public class LoadPDMRData implements CommandLineRunner {
                         ma.setAlleleFrequency(alleleFreq);
                         ma.setReadDepth(readDepth);
                         ma.setConsequence(consequence);
+                        ma.setRsVariants(rsVariant);
 
 
                         mc.addMarkerAssociation(ma);
