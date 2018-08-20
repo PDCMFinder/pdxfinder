@@ -200,7 +200,7 @@ public class Patient {
                 if(psnap.getAgeAtCollection().equals(age) &&
                         psnap.getDateAtCollection().equals(collectionDate) &&
                         psnap.getCollectionEvent().equals(collectionEvent) &&
-                        psnap.getElapsedTime() == Integer.parseInt(ellapsedTime) ) return psnap;
+                        psnap.getElapsedTime().equals(ellapsedTime)) return psnap;
             }
 
         }
