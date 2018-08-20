@@ -170,8 +170,6 @@ public class LoadPDMRData implements CommandLineRunner {
             diagnosis = j.getString("Initial Diagnosis");
         }
 
-        String classification = j.getString("Stage Value") + "/" + j.getString("Grade Value");
-
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
         String age = Standardizer.getAge(j.getString("Age"));
         String gender = Standardizer.getGender(j.getString("Gender"));
@@ -180,15 +178,29 @@ public class LoadPDMRData implements CommandLineRunner {
         String ethnicity = j.getString("Ethnicity");
         String modelId = j.getString("Model ID");
         String primarySite = j.getString("Primary Site");
-        String collectionSite = j.getString("Specimen Site");
+        String sampleSite = j.getString("Specimen Site");
         String extractionType = j.getString("Sample Type");
+        String stage = j.getString("Stage Value");
+        String grade = j.getString("Grade Value");
 
 
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patientId, gender,
-                race, ethnicity, age, DS);
 
-        Sample humanSample = dataImportService.getSample(modelId, tumorType, diagnosis,
-                primarySite, collectionSite, extractionType, classification, NORMAL_TISSUE_FALSE, DS.getAbbreviation());
+        Patient patient = dataImportService.getPatientWithSnapshots(patientId, DS);
+
+        if(patient == null){
+
+            patient = dataImportService.createPatient(patientId, DS, gender, "", ethnicity);
+        }
+
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
+
+
+        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
+        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
+        // String grade, String gradeClassification
+        Sample humanSample = dataImportService.getSample(id, DS.getAbbreviation(), tumorType, diagnosis, primarySite,
+                sampleSite, extractionType, false, stage, "", grade, "");
+
 
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
