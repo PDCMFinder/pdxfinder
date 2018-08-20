@@ -137,30 +137,46 @@ public class LoadMDAnderson implements CommandLineRunner {
         }
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
-
-        String race = Standardizer.getValue("Race",j);
+        String stage = j.getString("Stage");
+        String grade = j.getString("Grades");
+        String ethnicity = Standardizer.getValue("Race",j);
 
         try {
             if (j.getString("Ethnicity").trim().length() > 0) {
-                race = j.getString("Ethnicity");
+                ethnicity = j.getString("Ethnicity");
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
         
-          String age = Standardizer.getAge(j.getString("Age"));
-          String gender = Standardizer.getGender(j.getString("Gender"));
+        String age = Standardizer.getAge(j.getString("Age"));
+        String gender = Standardizer.getGender(j.getString("Gender"));
 
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"),
-                gender, "", race, age, mdaDS);
-        
-        
+
         String sampleSite = Standardizer.getValue("Sample Site",j);
-        
+
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
-       
-        Sample sample = dataImportService.getSample(id, tumorType, diagnosis,
-                j.getString("Primary Site"), sampleSite,
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
+        String patientId = j.getString("Patient ID");
+        String primarySite = j.getString("Primary Site");
+        String extractionMethod = j.getString("Sample Type");
+
+
+        Patient patient = dataImportService.getPatientWithSnapshots(patientId, mdaDS);
+
+        if(patient == null){
+
+            patient = dataImportService.createPatient(patientId, mdaDS, gender, "", ethnicity);
+        }
+
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
+
+
+        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
+        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
+        // String grade, String gradeClassification
+        Sample sample = dataImportService.getSample(id, mdaDS.getAbbreviation(), tumorType, diagnosis, primarySite,
+                sampleSite, extractionMethod, false, stage, "", grade, "");
+
 
         pSnap.addSample(sample);
 
