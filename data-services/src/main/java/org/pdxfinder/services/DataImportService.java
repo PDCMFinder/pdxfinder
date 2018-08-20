@@ -177,6 +177,7 @@ public class DataImportService {
             modelCreationRepository.delete(modelCreation);
         }
         modelCreation = new ModelCreation(pdxId, dataSource, sample, qa, externalUrls);
+        modelCreation.addRelatedSample(sample);
         modelCreationRepository.save(modelCreation);
         return modelCreation;
     }
@@ -190,6 +191,7 @@ public class DataImportService {
             modelCreationRepository.delete(modelCreation);
         }
         modelCreation = new ModelCreation(pdxId, dataSource, sample, qa, externalUrls);
+        modelCreation.addRelatedSample(sample);
         modelCreationRepository.save(modelCreation);
         return modelCreation;
     }
@@ -310,7 +312,7 @@ public class DataImportService {
             for(PatientSnapshot psnap : patient.getSnapshots()){
 
                 if(psnap.getAgeAtCollection().equals(ageAtCollection) && psnap.getDateAtCollection().equals(collectionDate) &&
-                        psnap.getCollectionEvent().equals(collectionEvent) && psnap.getElapsedTime() == Integer.parseInt(ellapsedTime)){
+                        psnap.getCollectionEvent().equals(collectionEvent) && psnap.getElapsedTime().equals(ellapsedTime)){
 
                     return psnap;
                 }
@@ -320,7 +322,7 @@ public class DataImportService {
             //ps = patient.getSnapShotByCollection(ageAtCollection, collectionDate, collectionEvent, ellapsedTime);
         }
         //create new snapshot and save it with the patient
-        ps = new PatientSnapshot(patient, ageAtCollection, collectionDate, collectionEvent, Integer.parseInt(ellapsedTime));
+        ps = new PatientSnapshot(patient, ageAtCollection, collectionDate, collectionEvent, ellapsedTime);
         patient.hasSnapshot(ps);
         ps.setPatient(patient);
         patientRepository.save(patient);
@@ -421,7 +423,7 @@ public class DataImportService {
 
             //String sourceSampleId, TumorType type, String diagnosis, Tissue originTissue, Tissue sampleSite, String extractionMethod,
             // String stage, String stageClassification, String grade, String gradeClassification, Boolean normalTissue, String dataSource
-            sample = new Sample(sourceSampleId, type, updatedDiagnosis, origin, sampleSite, extractionMethod, stage, stage, grade, gradeClassification, normalTissue, dataSource);
+            sample = new Sample(sourceSampleId, type, updatedDiagnosis, origin, sampleSite, extractionMethod, stage, stageClassification, grade, gradeClassification, normalTissue, dataSource);
             sampleRepository.save(sample);
         }
 
