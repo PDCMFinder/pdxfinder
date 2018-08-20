@@ -14,6 +14,7 @@ export class DatasourceSpecificComponent implements OnInit {
 
   public selectedRow : Number;
   public setClickedRow : Function;
+  public selectedEntity: String;
 
 
   constructor(private router: Router,
@@ -43,9 +44,32 @@ export class DatasourceSpecificComponent implements OnInit {
               }
           );
 
-      this.setClickedRow = function(index){
+      this.setClickedRow = function(index, entityId){
           this.selectedRow = index;
+          this.selectedEntity = entityId;
       }
+
+
+      this._mappingService.dataSubject.subscribe(
+          data => {
+
+              for (var i=0; i < this.mappings.length; i++) {
+
+                  if (this.mappings[i].entityId == this.selectedEntity){
+
+                      this.mappings[i].mappedTerm = data.mappedTerm;
+                      this.mappings[i].mapType = data.mapType;
+                      this.mappings[i].justification = data.justification;
+
+                  }
+                  //console.log(this.mappings);
+
+              }
+
+          }
+      )
+
+
   };
 
 

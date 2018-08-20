@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {MappingInterface} from "./mapping-interface";
-import {Observable} from "rxjs/index";
+import {Observable, Subject} from "rxjs/index";
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +14,7 @@ export class MappingService {
     private _totalMappedUrl = "/assets/data/mapped-diagnosis.json";
     private _missingMappedUrl = "/assets/data/unmapped-diag-slim.json";
 
+    public dataSubject = new Subject<any>();
 
     constructor(private http: HttpClient) { }
 
@@ -30,6 +31,11 @@ export class MappingService {
         return this.http.get<MappingInterface[]>(this._missingMappedUrl);
 
     }
+
+    componentsDataBus(data): void{
+        this.dataSubject.next(data);
+    }
+
 
 
 

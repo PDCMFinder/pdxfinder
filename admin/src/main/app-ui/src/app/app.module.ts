@@ -9,6 +9,7 @@ import {MappingService} from "./mapping.service";
 import { HttpClientModule} from "@angular/common/http";
 import { DatasourceSpecificComponent } from './datasource-specific/datasource-specific.component';
 import { DatasourceSpecificSuggestionsComponent } from './datasource-specific-suggestions/datasource-specific-suggestions.component';
+import {FormsModule} from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { DatasourceSpecificSuggestionsComponent } from './datasource-specific-su
   imports: [
     BrowserModule,
       HttpClientModule,
+      FormsModule,
       AppRoutingModule
   ],
   providers: [MappingService],

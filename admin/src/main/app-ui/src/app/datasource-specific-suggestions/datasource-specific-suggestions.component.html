@@ -10,6 +10,7 @@
               <div class="pdxfinder-content">
                 <div class="table-responsive">
 
+                  <form #userForm="ngForm">
                   <table class="table table-striped table-bordered table-hover" >
                     <thead>
                     <tr>
@@ -35,7 +36,8 @@
                         <td> {{ suggestion.justification | uppercase }} </td>
                         <td>
                             <div class="material-switch pull-right">
-                                <input id="{{i}}"  name="someSwitchOption001" type="radio"/>
+                                <input id="{{i}}"  name="suggestions" type="radio"
+                                (change)="onSuggestionSubmit(suggestion)"/>
                                 <label for="{{i}}" class="label-success"></label>
                             </div>
                         </td>
@@ -43,6 +45,7 @@
 
                     </tbody>
                   </table>
+                  </form>
 
 
                 </div>

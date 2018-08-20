@@ -9,15 +9,17 @@ import {MappingService} from "../mapping.service";
 })
 export class DatasourceSpecificSuggestionsComponent implements OnInit {
 
-    public entityId;
-    public selectedEntity;
+    public entityId = [];
+    public selectedEntity = [];
 
-    public data : {
-        DataSource: string,
-        SampleDiagnosis : string,
-        TumorType : string,
-        OriginTissue : string
-    };
+    public data = {
+        DataSource: "",
+        SampleDiagnosis : "",
+        TumorType : "",
+        OriginTissue : ""
+    }
+
+
 
     constructor(private router: Router,
                 private route: ActivatedRoute,
@@ -56,5 +58,9 @@ export class DatasourceSpecificSuggestionsComponent implements OnInit {
           }
       )
   }
+
+    onSuggestionSubmit(suggestion){
+        this._mappingService.componentsDataBus(suggestion);
+    }
 
 }
