@@ -56,9 +56,13 @@
                                   <td> {{ mapping.mappingValues.SampleDiagnosis | uppercase }} </td>
                                   <td> {{ mapping.mappingValues.TumorType | uppercase }} </td>
                                   <td> {{ mapping.mappingValues.OriginTissue | uppercase }} </td>
-                                  <td> {{ mapping.mappedTerm | uppercase }} </td>
-                                  <td> {{ mapping.mapType | uppercase }} </td>
-                                  <td> {{ mapping.justification | uppercase }} </td>
+
+                                  <td> <input class="editableField" [(ngModel)]="mapping.mappedTerm"  value="{{ mapping.mappedTerm }}"> </td>
+
+                                  <td> <input class="editableField" #curatorMapType  type="text" (input)="mapping.mapType=curatorMapType.value" value="{{ mapping.mapType }}"> </td>
+
+                                  <td> <input class="editableField" [(ngModel)]="mapping.justification" value="{{ mapping.justification }}"> </td>
+
                               </tr>
 
                               </tbody>
@@ -73,7 +77,6 @@
 
   </div>
 </div>
-
 
 
 <!-- The Suggested Mappings Displayes here as a child route with deeplinked url  (click)="showSuggestedMappings(34)" -->

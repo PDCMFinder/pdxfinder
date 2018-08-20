@@ -1,5 +1,17 @@
 /* rgba(6,54,157,0.5) rgba(0,178,213,0.6) */
 
+
+[contenteditable] {
+    outline: none;
+    padding: 5px 2px;
+}
+
+
+.editableField{
+    width: 100%; border:none; background: none; outline: none;
+    text-transform: uppercase;
+}
+
 .table tr.active td {
     background-color: rgba(6,54,157,0.3) !important;
     color: black;

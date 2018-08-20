@@ -57,12 +57,13 @@ export class DatasourceSpecificComponent implements OnInit {
 
                   if (this.mappings[i].entityId == this.selectedEntity){
 
-                      this.mappings[i].mappedTerm = data.mappedTerm;
-                      this.mappings[i].mapType = data.mapType;
-                      this.mappings[i].justification = data.justification;
+                      this.mappings[i].mappedTerm = data.mappedTerm.toUpperCase();
+                      this.mappings[i].mapType = data.mapType.toUpperCase();
+                      this.mappings[i].justification = data.justification.toUpperCase();
 
                   }
-                  //console.log(this.mappings);
+                  console.clear();
+                  console.log(this.mappings);
 
               }
 
