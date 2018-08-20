@@ -22,7 +22,7 @@ public class PatientSnapshot {
     private Boolean treatmentNaive;
 
     private String collectionEvent;
-    private int elapsedTime;
+    private String elapsedTime;
     private String eventType;
 
     @Relationship(type = "COLLECTION_EVENT", direction = Relationship.INCOMING)
@@ -42,7 +42,7 @@ public class PatientSnapshot {
         this.ageAtCollection = ageAtCollection;
     }
 
-    public PatientSnapshot(Patient patient, String ageAtCollection, String dateAtCollection, String collectionEvent, int elapsedTime) {
+    public PatientSnapshot(Patient patient, String ageAtCollection, String dateAtCollection, String collectionEvent, String elapsedTime) {
         this.patient = patient;
         this.ageAtCollection = ageAtCollection;
         this.dateAtCollection = dateAtCollection;
@@ -163,11 +163,11 @@ public class PatientSnapshot {
         this.collectionEvent = collectionEvent;
     }
 
-    public int getElapsedTime() {
+    public String getElapsedTime() {
         return elapsedTime;
     }
 
-    public void setElapsedTime(int elapsedTime) {
+    public void setElapsedTime(String elapsedTime) {
         this.elapsedTime = elapsedTime;
     }
 
