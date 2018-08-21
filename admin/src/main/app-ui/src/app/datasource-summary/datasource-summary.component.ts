@@ -4,6 +4,7 @@ import {MappingService} from "../mapping.service";
 import { from} from "rxjs/index";
 import {groupBy, mergeMap, toArray} from "rxjs/internal/operators";
 import {ActivatedRoute, Router} from '@angular/router';
+import {GeneralService} from "../general.service";
 
 @Component({
     selector: 'app-datasource-summary',
@@ -12,7 +13,10 @@ import {ActivatedRoute, Router} from '@angular/router';
 })
 export class DatasourceSummaryComponent implements OnInit {
 
-    constructor(private _mappingService: MappingService,private router: Router, private route: ActivatedRoute) { }
+    constructor(private _mappingService: MappingService,
+                private router: Router,
+                private route: ActivatedRoute,
+                private gs: GeneralService) { }
 
     public pdxStatArray =  {
         source: [],
@@ -91,6 +95,13 @@ export class DatasourceSummaryComponent implements OnInit {
 
                 }
             );
+
+
+        this.gs.loadScript('../pdxfinder/dependencies/chart/amcharts.js');
+        this.gs.loadScript('../pdxfinder/dependencies/chart/serial.js');
+        this.gs.loadScript('../pdxfinder/dependencies/chart/export.min.js');
+        this.gs.loadScript('../pdxfinder/dependencies/chart/light.js');
+        this.gs.loadScript('../pdxfinder/dependencies/chart/3dbar.js');
     }
 
 
