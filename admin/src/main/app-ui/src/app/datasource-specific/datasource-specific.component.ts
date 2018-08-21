@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {MappingService} from "../mapping.service";
+import {MappingInterface} from "../mapping-interface";
 
 @Component({
   selector: 'app-datasource-specific',
@@ -15,7 +16,7 @@ export class DatasourceSpecificComponent implements OnInit {
   public selectedRow : Number;
   public setClickedRow : Function;
   public selectedEntity: String;
-
+  public errorMsg = "";
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -44,6 +45,7 @@ export class DatasourceSpecificComponent implements OnInit {
               }
           );
 
+
       this.setClickedRow = function(index, entityId){
           this.selectedRow = index;
           this.selectedEntity = entityId;
@@ -62,8 +64,6 @@ export class DatasourceSpecificComponent implements OnInit {
                       this.mappings[i].justification = data.justification.toUpperCase();
 
                   }
-                  console.clear();
-                  console.log(this.mappings);
 
               }
 
@@ -74,11 +74,26 @@ export class DatasourceSpecificComponent implements OnInit {
   };
 
 
-
   showSuggestedMappings(id){
 
       //this.router.navigate(['/suggested-mappings',id])
       this.router.navigate(['suggested-mappings'],{relativeTo: this.route})
   }
+
+    submitCuration(){
+
+      console.clear();
+
+        let curatedMappings: any = this.mappings;
+        let mappingObject: MappingInterface = <MappingInterface>curatedMappings;
+
+        this._mappingService.submitCuration(mappingObject)
+            .subscribe(
+                response => console.log('Success!', response),
+                error => this.errorMsg = error.statusText
+            )
+
+        console.log(this.mappings);
+    }
 
 }

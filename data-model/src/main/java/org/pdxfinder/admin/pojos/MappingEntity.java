@@ -81,6 +81,8 @@ public class MappingEntity {
     private Date dateUpdated;
 
 
+    public MappingEntity() {
+    }
 
     public MappingEntity(Long entityId, String entityType, List<String> mappingLabels, Map<String, String> mappingValues) {
         this.entityId = entityId;

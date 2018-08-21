@@ -26,9 +26,12 @@
 
       <div class="row">
           <div class="col-lg-12">
+
+              <form #mappingForm="ngForm" *ngIf="!submitted" (ngSubmit)="submitCuration()" novalidate>
               <div class="pdxfinder float-e-margins">
                   <div class="pdxfinder-title">
-                      <h5 style="font-weight: bold;"> Unmapped Diagnosis - <span style="color: #03369D"> {{dataSource | uppercase}}  </span> </h5>
+                      <h5 style="font-weight: bold;"> Unmapped Diagnosis - <span style="color: #03369D"> {{dataSource | uppercase}}  </span>  </h5>
+                      <button style="float: right; margin-top:-7px;" class="btn btn-primary btn-sm" type="submit" [disabled]="mappingForm.form.invalid"> Submit Mapping </button>
                   </div>
 
 
@@ -57,21 +60,29 @@
                                   <td> {{ mapping.mappingValues.TumorType | uppercase }} </td>
                                   <td> {{ mapping.mappingValues.OriginTissue | uppercase }} </td>
 
-                                  <td> <input class="editableField" [(ngModel)]="mapping.mappedTerm"  value="{{ mapping.mappedTerm }}"> </td>
+                                  <td> <input type="text" name="{{'mappedTerm'+i}}" class="editableField"
+                                              [(ngModel)]="mapping.mappedTerm"
+                                              value="{{ mapping.mappedTerm }}"
+                                              required [class.is-invalid]="'mappedTerm'+i.invalid && 'mappedTerm'+i.touched"> </td>
 
-                                  <td> <input class="editableField" #curatorMapType  type="text" (input)="mapping.mapType=curatorMapType.value" value="{{ mapping.mapType }}"> </td>
+                                  <td> <input type="text" name="{{'mapType'+i}}" class="editableField" #curatorMapType
+                                              (input)="mapping.mapType=curatorMapType.value"
+                                              value="{{ mapping.mapType }}"
+                                              required [class.is-invalid]="'mapType'+i.invalid && 'mapType'+i.touched"> </td>
 
-                                  <td> <input class="editableField" [(ngModel)]="mapping.justification" value="{{ mapping.justification }}"> </td>
-
+                                  <td> <input type="text" name="{{'justification'+i}}" class="editableField"
+                                              [(ngModel)]="mapping.justification"
+                                              value="{{ mapping.justification }}"
+                                              required [class.is-invalid]="'justification'+i.invalid && 'justification'+i.touched"> </td>
                               </tr>
 
                               </tbody>
                           </table>
-
                       </div>
-
                   </div>
               </div>
+              </form>
+
           </div>
       </div>
 
@@ -79,7 +90,7 @@
 </div>
 
 
-<!-- The Suggested Mappings Displayes here as a child route with deeplinked url  (click)="showSuggestedMappings(34)" -->
+<!-- The Suggested Mappings Displayes here as a child route with deeplinked url  (click)="showSuggestedMappings(34)"  [disabled]="mappingForm.form.invalid || topicHasError"  -->
 <router-outlet>
 
 </router-outlet>

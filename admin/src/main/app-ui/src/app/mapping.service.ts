@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {MappingInterface} from "./mapping-interface";
-import {Observable, Subject} from "rxjs/index";
+import {Observable, Subject, throwError} from "rxjs/index";
+import {catchError} from "rxjs/internal/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,8 @@ export class MappingService {
 
     private _totalMappedUrl = "/assets/data/mapped-diagnosis.json";
     private _missingMappedUrl = "/assets/data/unmapped-diag-slim.json";
+
+    private _submitCurationUrl = "/api/diagnosis";
 
     public dataSubject = new Subject<any>();
 
@@ -37,7 +40,16 @@ export class MappingService {
     }
 
 
+    submitCuration (mappings: MappingInterface) {
 
+        return this.http.post<any>(this._submitCurationUrl, mappings)
+            .pipe(catchError(this.errorHandler));
+    }
+
+
+    errorHandler(error: HttpErrorResponse) {
+        return throwError(error);
+    }
 
 
 
