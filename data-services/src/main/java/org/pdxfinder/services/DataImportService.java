@@ -34,6 +34,7 @@ public class DataImportService {
     private HostStrainRepository hostStrainRepository;
     private EngraftmentTypeRepository engraftmentTypeRepository;
     private EngraftmentSiteRepository engraftmentSiteRepository;
+    private EngraftmentMaterialRepository engraftmentMaterialRepository;
     private GroupRepository groupRepository;
     private PatientRepository patientRepository;
     private ModelCreationRepository modelCreationRepository;
@@ -61,6 +62,7 @@ public class DataImportService {
                              HostStrainRepository hostStrainRepository,
                              EngraftmentTypeRepository engraftmentTypeRepository,
                              EngraftmentSiteRepository engraftmentSiteRepository,
+                             EngraftmentMaterialRepository engraftmentMaterialRepository,
                              GroupRepository groupRepository,
                              PatientRepository patientRepository,
                              ModelCreationRepository modelCreationRepository,
@@ -85,6 +87,7 @@ public class DataImportService {
         Assert.notNull(hostStrainRepository, "hostStrainRepository cannot be null");
         Assert.notNull(engraftmentTypeRepository, "implantationTypeRepository cannot be null");
         Assert.notNull(engraftmentSiteRepository, "implantationSiteRepository cannot be null");
+        Assert.notNull(engraftmentMaterialRepository, "engraftmentMaterialRepository cannot be null");
         Assert.notNull(groupRepository, "GroupRepository cannot be null");
         Assert.notNull(patientRepository, "patientRepository cannot be null");
         Assert.notNull(modelCreationRepository, "modelCreationRepository cannot be null");
@@ -100,6 +103,7 @@ public class DataImportService {
         this.hostStrainRepository = hostStrainRepository;
         this.engraftmentTypeRepository = engraftmentTypeRepository;
         this.engraftmentSiteRepository = engraftmentSiteRepository;
+        this.engraftmentMaterialRepository = engraftmentMaterialRepository;
         this.groupRepository = groupRepository;
         this.patientRepository = patientRepository;
         this.modelCreationRepository = modelCreationRepository;
@@ -514,13 +518,27 @@ public class DataImportService {
     public EngraftmentType getImplantationType(String iType) {
         EngraftmentType type = engraftmentTypeRepository.findByName(iType);
         if (type == null) {
-            log.info("Implantation Site '{}' not found. Creating.", iType);
+            log.info("Implantation Type '{}' not found. Creating.", iType);
             type = new EngraftmentType(iType);
             engraftmentTypeRepository.save(type);
         }
 
         return type;
     }
+
+    public EngraftmentMaterial getEngraftmentMaterial(String eMat){
+
+        EngraftmentMaterial em = engraftmentMaterialRepository.findByName(eMat);
+
+        if(em == null){
+            em = new EngraftmentMaterial();
+            em.setName(eMat);
+            engraftmentMaterialRepository.save(em);
+        }
+
+        return em;
+    }
+
 
     public Tissue getTissue(String t) {
         Tissue tissue = tissueRepository.findByName(t);
@@ -619,9 +637,9 @@ public class DataImportService {
     }
 
 
-    public Specimen findSpecimen(ModelCreation model, String specimenId, String dataSource, String passage){
+    public List<Specimen> findSpecimenByPassage(ModelCreation model, String passage){
 
-        return specimenRepository.findByModelIdAndDataSourceAndSpecimenIdAndPassage(model.getSourcePdxId(), dataSource, specimenId, passage);
+        return specimenRepository.findByModelIdAndDataSourceAndAndPassage(model.getSourcePdxId(), model.getDataSource(), passage);
     }
 
     public Specimen getSpecimen(ModelCreation model, String specimenId, String dataSource, String passage){
