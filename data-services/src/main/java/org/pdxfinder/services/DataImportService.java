@@ -221,6 +221,13 @@ public class DataImportService {
         return modelCreationRepository.findBySourcePdxIdAndDataSource(modelId, dataSource);
     }
 
+    public ModelCreation findModelByIdAndDataSourceWithSpecimens(String modelId, String dataSource){
+
+        return modelCreationRepository.findBySourcePdxIdAndDataSourceWithSpecimens(modelId, dataSource);
+    }
+
+
+
     public void saveModelCreation(ModelCreation modelCreation){
         this.modelCreationRepository.save(modelCreation);
     }
@@ -450,6 +457,7 @@ public class DataImportService {
         if(specimen.getSample() == null){
             sample = new Sample();
             sample.setSourceSampleId(sampleId);
+            sample.setDataSource(dataSource);
             sampleRepository.save(sample);
         }
         else{
@@ -611,6 +619,11 @@ public class DataImportService {
     }
 
 
+    public Specimen findSpecimen(ModelCreation model, String specimenId, String dataSource, String passage){
+
+        return specimenRepository.findByModelIdAndDataSourceAndSpecimenIdAndPassage(model.getSourcePdxId(), dataSource, specimenId, passage);
+    }
+
     public Specimen getSpecimen(ModelCreation model, String specimenId, String dataSource, String passage){
 
         Specimen specimen = specimenRepository.findByModelIdAndDataSourceAndSpecimenIdAndPassage(model.getSourcePdxId(), dataSource, specimenId, passage);
@@ -626,7 +639,10 @@ public class DataImportService {
 
     }
 
+    public List<Specimen> getAllSpecimenByModel(String modelId, String dataSource){
 
+        return specimenRepository.getByModelIdAndDataSource(modelId, dataSource);
+    }
 
     public void saveSpecimen(Specimen specimen){
         specimenRepository.save(specimen);
