@@ -72,8 +72,25 @@ public class UniversalLoader implements CommandLineRunner {
      * Placeholder for the data stored in the "patient treatment information" tab
      */
     private List<List<String>> patientTreatmentSheetData;
+
+    /**
+     * Placeholder for the data stored in the "PDX model detail" tab
+     */
     private List<List<String>> pdxModelSheetData;
-    private List<List<String>> pdxModelVariationSheetData;
+
+
+    /**
+     * Placeholder for the data stored in the "PDX model validation" tab
+     */
+    private List<List<String>> pdxModelValidationSheetData;
+
+
+    /**
+     * Placeholder for the data stored in the "dataset derived from patient" tab
+     */
+    private List<List<String>> derivedDatasetSheetData;
+
+
 
     private Group ds;
 
@@ -120,22 +137,25 @@ public class UniversalLoader implements CommandLineRunner {
      */
     private void initializeTemplateData(Workbook workbook) {
 
-        log.info("******************************************");
-        log.info("* Initializing Sheet data                *");
-        log.info("******************************************");
+        log.info("******************************************************");
+        log.info("* Initializing Sheet data                            *");
+        log.info("******************************************************");
 
         ds = null;
         patientSheetData = new ArrayList<>();
         patientTumorSheetData = new ArrayList<>();
         patientTreatmentSheetData = new ArrayList<>();
         pdxModelSheetData = new ArrayList<>();
-        pdxModelVariationSheetData = new ArrayList<>();
+        pdxModelValidationSheetData = new ArrayList<>();
+        derivedDatasetSheetData = new ArrayList<>();
 
         initializeSheetData(workbook.getSheetAt(1), "patientSheetData");
         initializeSheetData(workbook.getSheetAt(2), "patientTumorSheetData");
         initializeSheetData(workbook.getSheetAt(3), "patientTreatmentSheetData");
         initializeSheetData(workbook.getSheetAt(4), "pdxModelSheetData");
-        initializeSheetData(workbook.getSheetAt(5), "pdxModelVariationSheetData");
+        initializeSheetData(workbook.getSheetAt(5), "pdxModelValidationSheetData");
+        initializeSheetData(workbook.getSheetAt(6), "derivedDatasetSheetData");
+
     }
 
     /**
@@ -191,18 +211,26 @@ public class UniversalLoader implements CommandLineRunner {
                 if (sheetName.equals("patientSheetData")) {
 
                     patientSheetData.add(dataRow);
-                } else if (sheetName.equals("patientTumorSheetData")) {
+                }
+                else if (sheetName.equals("patientTumorSheetData")) {
 
                     patientTumorSheetData.add(dataRow);
-                } else if (sheetName.equals("patientTreatmentSheetData")) {
+                }
+                else if (sheetName.equals("patientTreatmentSheetData")) {
 
                     patientTreatmentSheetData.add(dataRow);
-                } else if (sheetName.equals("pdxModelSheetData")) {
+                }
+                else if (sheetName.equals("pdxModelSheetData")) {
 
                     pdxModelSheetData.add(dataRow);
-                } else if (sheetName.equals("pdxModelVariationSheetData")) {
+                }
+                else if (sheetName.equals("pdxModelValidationSheetData")) {
 
-                    pdxModelVariationSheetData.add(dataRow);
+                    pdxModelValidationSheetData.add(dataRow);
+                }
+                else if(sheetName.equals("derivedDatasetSheetData")){
+
+                    derivedDatasetSheetData.add(dataRow);
                 }
 
             }
@@ -215,11 +243,15 @@ public class UniversalLoader implements CommandLineRunner {
      */
     private void loadTemplateData() {
 
+        //DON'T CHANGE THE ORDER OF THESE METHODS!
         createDataSourceGroup();
         createPatients();
         createPatientTumors();
         createPatientTreatments();
-        createPdxModels();
+
+        createDerivedPatientModelDataset();
+
+        createPdxModelDetails();
         createPdxModelValidations();
 
     }
@@ -229,9 +261,9 @@ public class UniversalLoader implements CommandLineRunner {
 
         //TODO: this data has to come from the spreadsheet, I am using constants for now
 
-        log.info("******************************************");
-        log.info("* Creating DataSource                    *");
-        log.info("******************************************");
+        log.info("******************************************************");
+        log.info("* Creating DataSource                                *");
+        log.info("******************************************************");
         ds = dataImportService.getProviderGroup("TRACE", "TR", "Trace data from template", "", "", "", "", "");
 
     }
@@ -239,9 +271,9 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPatients() {
 
-        log.info("******************************************");
-        log.info("* Creating Patients                      *");
-        log.info("******************************************");
+        log.info("******************************************************");
+        log.info("* Creating Patients                                  *");
+        log.info("******************************************************");
 
         for (List<String> patientRow : patientSheetData) {
 
@@ -259,9 +291,9 @@ public class UniversalLoader implements CommandLineRunner {
 
 
     private void createPatientTumors() {
-        log.info("******************************************");
-        log.info("* Creating Patient samples and snapshots *");
-        log.info("******************************************");
+        log.info("******************************************************");
+        log.info("* Creating Patient samples and snapshots             *");
+        log.info("******************************************************");
 
         int row = 6;
         log.info("Tumor row number: "+patientTumorSheetData.size());
@@ -287,6 +319,11 @@ public class UniversalLoader implements CommandLineRunner {
                 String stageClassification = patientTumorRow.get(11);
                 String grade = patientTumorRow.get(12);
                 String gradeClassification = patientTumorRow.get(13);
+
+                if(modelId.isEmpty()){
+                    log.error("Missing corresponding Model ID in row " + row);
+                    continue;
+                }
 
 
                 //hack to avoid 0.0 values and negative numbers
@@ -341,9 +378,9 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPatientTreatments() {
 
-        log.info("******************************************");
-        log.info("* Creating Patient treatments            *");
-        log.info("******************************************");
+        log.info("******************************************************");
+        log.info("* Creating Patient treatments                        *");
+        log.info("******************************************************");
 
         int row = 6;
         for(List<String> patientTreatmentRow : patientTreatmentSheetData){
@@ -403,13 +440,179 @@ public class UniversalLoader implements CommandLineRunner {
 
     }
 
-    private void createPdxModels() {
+    private void createDerivedPatientModelDataset(){
+
+
+        log.info("******************************************************");
+        log.info("* Creating dataset derived from patients and models  *");
+        log.info("******************************************************");
+
+        int row = 6;
+
+        for(List<String> derivedDatasetRow : derivedDatasetSheetData){
+
+            String sampleId = derivedDatasetRow.get(0);
+            String origin = derivedDatasetRow.get(1);
+            String passage = derivedDatasetRow.get(2);
+            String nomenclature = derivedDatasetRow.get(3);
+            String modelId = derivedDatasetRow.get(4);
+            String molCharType = derivedDatasetRow.get(5);
+            String platformName = derivedDatasetRow.get(6);
+            String platformTechnology = derivedDatasetRow.get(7);
+            String platformDescription = derivedDatasetRow.get(8);
+            String analysisProtocol = derivedDatasetRow.get(9);
+            //TODO: get additional fields from the sheet
+
+            //check essential values
+
+            if(sampleId.isEmpty() || origin.isEmpty() || passage.isEmpty() || nomenclature.isEmpty() || modelId.isEmpty()
+                    || molCharType.isEmpty() || platformName.isEmpty() || platformTechnology.isEmpty() || platformDescription.isEmpty()
+                    || analysisProtocol.isEmpty()){
+
+
+                log.error("Missing essential value in row " + row);
+                continue;
+            }
+
+            ModelCreation model;
+            Sample sample;
+            Platform platform;
+
+            //patient sample
+            if(origin.toLowerCase().equals("patient")){
+
+                sample = dataImportService.getHumanSample(sampleId, ds.getAbbreviation());
+
+                if(sample != null){
+
+                    platform = dataImportService.getPlatform(platformName, ds);
+                    MolecularCharacterization mc = new MolecularCharacterization();
+                    mc.setPlatform(platform);
+                    mc.setType(molCharType);
+                    mc.setTechnology(platformTechnology);
+                    sample.addMolecularCharacterization(mc);
+                    dataImportService.saveSample(sample);
+
+                }
+                else{
+
+                    log.error("Unknown human sample with id: " + sampleId);
+                    continue;
+                }
+
+
+            }
+            //xenograft sample
+            else if(origin.toLowerCase().equals("xenograft")){
+
+                model = dataImportService.findModelByIdAndDataSourceWithSpecimens(modelId, ds.getAbbreviation());
+
+                if(model != null){
+
+                    Specimen specimen = dataImportService.getSpecimen(model,
+                            sampleId, ds.getAbbreviation(), passage);
+
+                    sample = dataImportService.getMouseSample(model, sampleId, ds.getAbbreviation(), passage, sampleId);
+
+                    //create molchar, get platform
+
+
+                    platform = dataImportService.getPlatform(platformName, ds);
+                    MolecularCharacterization mc = new MolecularCharacterization();
+                    mc.setPlatform(platform);
+                    mc.setType(molCharType);
+                    mc.setTechnology(platformTechnology);
+                    sample.addMolecularCharacterization(mc);
+                    model.addRelatedSample(sample);
+
+                    specimen.setSample(sample);
+
+                    model.addSpecimen(specimen);
+
+                    dataImportService.saveModelCreation(model);
+                    dataImportService.saveSample(sample);
+                }
+                else{
+
+                    log.error("Model not found with id: " + modelId);
+                    continue;
+                }
+
+            }
+            else{
+
+                log.error("Unknown sample origin in row " +row);
+                continue;
+            }
+
+
+
+
+        }
+
+
+
+    }
+
+
+
+    private void createPdxModelDetails() {
+
+
+        log.info("******************************************************");
+        log.info("* Creating Model details                             *");
+        log.info("******************************************************");
+
+        int row = 6;
+
+        for(List<String> modelDetailsRow : pdxModelSheetData){
+
+            String modelId = modelDetailsRow.get(0);
+            String hostStrainName = modelDetailsRow.get(1);
+            String hostStrainNomenclature = modelDetailsRow.get(2);
+            String engraftmentSite = modelDetailsRow.get(3);
+            String engraftmentType = modelDetailsRow.get(4);
+            String engraftmentMaterial = modelDetailsRow.get(5);
+            String passage;
+
+            //check if essential values are not empty
+            if(modelId.isEmpty() || hostStrainName.isEmpty() || hostStrainNomenclature.isEmpty() ||
+                    engraftmentSite.isEmpty() || engraftmentType.isEmpty() || engraftmentMaterial.isEmpty()){
+
+                log.error("Missing essential value in row: "+row);
+                continue;
+
+            }
+
+            //at this point the corresponding pdx model node should be created and linked to a human sample
+
+            ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
+
+            if(model == null){
+
+                log.error("Missing model, cannot add details: "+modelId);
+                continue;
+            }
+
+
+
+
+
+
+        }
 
     }
 
     private void createPdxModelValidations() {
 
     }
+
+
+
+
+
+
+
 
     /**
      * Checks if a list consists of nulls only

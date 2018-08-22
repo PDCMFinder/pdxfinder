@@ -112,4 +112,8 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
                                               @Param("tech") String tech,
                                               @Param("passage") String passage);
 
+
+    @Query("MATCH (mod:ModelCreation)--(sp:Specimen) WHERE mod.sourcePdxId = {modelId} AND mod.dataSource = {dataSource} RETURN sp")
+    List<Specimen> getByModelIdAndDataSource( @Param("modelId") String modelId, @Param("dataSource") String dataSource);
+
 }

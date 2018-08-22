@@ -160,4 +160,11 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "WHERE id(ts) = {ts} " +
             "RETURN model")
     ModelCreation findByTreatmentSummary(@Param("ts") TreatmentSummary ts);
+
+
+    @Query("MATCH (model:ModelCreation) WHERE model.sourcePdxId = {modelId} AND model.dataSource = {dataSource} " +
+            "WITH model " +
+            "OPTIONAL MATCH (model)-[sr:SPECIMENS]-(s:Specimen) " +
+            "RETURN model, sr, s ")
+    ModelCreation findBySourcePdxIdAndDataSourceWithSpecimens(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
 }
