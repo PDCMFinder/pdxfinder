@@ -30,6 +30,9 @@ public class Specimen {
     @Relationship(type = "ENGRAFTMENT_TYPE")
     private EngraftmentType engraftmentType;
 
+    @Relationship(type = "ENGRAFTMENT_MATERIAL")
+    private EngraftmentMaterial engraftmentMaterial;
+
     @Relationship(type = "HOST_STRAIN")
     private HostStrain hostStrain;
 
@@ -84,6 +87,14 @@ public class Specimen {
 
     public void setEngraftmentType(EngraftmentType engraftmentType) {
         this.engraftmentType = engraftmentType;
+    }
+
+    public EngraftmentMaterial getEngraftmentMaterial() {
+        return engraftmentMaterial;
+    }
+
+    public void setEngraftmentMaterial(EngraftmentMaterial engraftmentMaterial) {
+        this.engraftmentMaterial = engraftmentMaterial;
     }
 
     public HostStrain getHostStrain() {
