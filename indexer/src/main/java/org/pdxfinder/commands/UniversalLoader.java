@@ -115,7 +115,9 @@ public class UniversalLoader implements CommandLineRunner {
 
         if (options.has("loadUniversal")) {
 
-            log.info("Running universal");
+            log.info("******************************************************");
+            log.info("* Running universal loader                           *");
+            log.info("******************************************************");
             FileInputStream excelFile = new FileInputStream(new File(templateFiles));
 
             Workbook workbook = new XSSFWorkbook(excelFile);
@@ -126,6 +128,10 @@ public class UniversalLoader implements CommandLineRunner {
 
             workbook.close();
             excelFile.close();
+
+            log.info("******************************************************");
+            log.info("* Finished running universal loader                  *");
+            log.info("******************************************************");
         }
     }
 
@@ -573,13 +579,15 @@ public class UniversalLoader implements CommandLineRunner {
             String engraftmentSite = modelDetailsRow.get(3);
             String engraftmentType = modelDetailsRow.get(4);
             String engraftmentMaterial = modelDetailsRow.get(5);
-            String passage;
+            String passage = modelDetailsRow.get(7);
+
 
             //check if essential values are not empty
             if(modelId.isEmpty() || hostStrainName.isEmpty() || hostStrainNomenclature.isEmpty() ||
                     engraftmentSite.isEmpty() || engraftmentType.isEmpty() || engraftmentMaterial.isEmpty()){
 
                 log.error("Missing essential value in row: "+row);
+                row++;
                 continue;
 
             }
@@ -591,14 +599,61 @@ public class UniversalLoader implements CommandLineRunner {
             if(model == null){
 
                 log.error("Missing model, cannot add details: "+modelId);
+                row++;
                 continue;
+            }
+
+            //UPDATING SPECIMENS: engraftment site, type and material
+
+            EngraftmentSite es = dataImportService.getImplantationSite(engraftmentSite);
+            EngraftmentType et = dataImportService.getImplantationType(engraftmentType);
+            EngraftmentMaterial em = dataImportService.getEngraftmentMaterial(engraftmentMaterial);
+            HostStrain hostStrain = dataImportService.getHostStrain(hostStrainName, hostStrainNomenclature, "", "");
+
+            //passage = all
+            if(passage.toLowerCase().equals("all")){
+
+                //update all specimens with the same site, type etc.
+                List<Specimen> specimens = dataImportService.getAllSpecimenByModel(modelId, ds.getAbbreviation());
+
+                for(Specimen specimen :specimens){
+
+                    specimen.setEngraftmentSite(es);
+                    specimen.setEngraftmentType(et);
+                    specimen.setEngraftmentMaterial(em);
+                    specimen.setHostStrain(hostStrain);
+                    dataImportService.saveSpecimen(specimen);
+                }
+            }
+            // passage = 1,3,5
+            else if(passage.contains(",")){
+
+                String[] passageArr = passage.split(",");
+
+                for(int i = 0; i<passageArr.length; i++){
+
+                    List<Specimen> specimens = dataImportService.findSpecimenByPassage(model, passage);
+                    for(Specimen specimen : specimens){
+
+                        specimen.setEngraftmentSite(es);
+                        specimen.setEngraftmentType(et);
+                        specimen.setEngraftmentMaterial(em);
+                        specimen.setHostStrain(hostStrain);
+                        dataImportService.saveSpecimen(specimen);
+                    }
+
+                }
+            }
+            else{
+
+                log.error("Not supported value for passage at row " +row);
             }
 
 
 
 
 
-
+            row++;
         }
 
     }
