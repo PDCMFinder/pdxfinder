@@ -280,7 +280,7 @@ public class LoadJAXData implements CommandLineRunner {
 
                         TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
                                 treatmentObject.getString("Dose"),
-                                treatmentObject.getString("Response"));
+                                treatmentObject.getString("Response"), "");
 
                         ts.addTreatmentProtocol(tp);
                     }
