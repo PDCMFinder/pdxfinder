@@ -288,7 +288,7 @@ public class LoadHCI implements CommandLineRunner {
 
 
                             TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
-                                    treatmentObject.getString("Dose"), treatmentObject.getString("Response"));
+                                    treatmentObject.getString("Dose"), treatmentObject.getString("Response"),"");
 
 
                             ts.addTreatmentProtocol(tp);

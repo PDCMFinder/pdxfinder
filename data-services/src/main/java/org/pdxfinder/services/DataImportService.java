@@ -878,7 +878,7 @@ public class DataImportService {
      * Creates a (tp:TreatmentProtocol)--(tc:TreatmentComponent)--(d:Drug)
      *           (tp)--(r:Response) node
      */
-    public TreatmentProtocol getTreatmentProtocol(String drugString, String doseString, String response){
+    public TreatmentProtocol getTreatmentProtocol(String drugString, String doseString, String response, String responseClassification){
 
         TreatmentProtocol tp = new TreatmentProtocol();
 
@@ -961,6 +961,7 @@ public class DataImportService {
 
         Response r = new Response();
         r.setDescription(Standardizer.getDrugResponse(response));
+        r.setDescriptionClassification(responseClassification);
 
         tp.setResponse(r);
 
@@ -973,7 +974,7 @@ public class DataImportService {
 
     public TreatmentProtocol getTreatmentProtocol(String drugString, String doseString, String response, boolean currentTreatment){
 
-        TreatmentProtocol tp = getTreatmentProtocol(drugString, doseString, response);
+        TreatmentProtocol tp = getTreatmentProtocol(drugString, doseString, response, "");
 
         if(currentTreatment && tp.getCurrentTreatment() == null){
 
