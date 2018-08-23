@@ -285,11 +285,19 @@ public class UniversalLoader implements CommandLineRunner {
 
             String patientId = patientRow.get(0);
             String sex = patientRow.get(1);
-            String ethnicity = patientRow.get(2);
+            String cancerHistory = patientRow.get(2);
+            String ethnicity = patientRow.get(3);
+            String firstDiagnosis = patientRow.get(4);
+            String ageAtFirstDiagnosis = patientRow.get(5);
 
             if (patientId != null && ds != null) {
 
-                dataImportService.createPatient(patientId, ds, sex, "", ethnicity);
+                Patient patient = dataImportService.createPatient(patientId, ds, sex, "", ethnicity);
+                patient.setCancerRelevantHistory(cancerHistory);
+                patient.setFirstDiagnosis(firstDiagnosis);
+                patient.setAgeAtFirstDiagnosis(ageAtFirstDiagnosis);
+
+                dataImportService.savePatient(patient);
 
             }
         }
@@ -325,6 +333,9 @@ public class UniversalLoader implements CommandLineRunner {
                 String stageClassification = patientTumorRow.get(11);
                 String grade = patientTumorRow.get(12);
                 String gradeClassification = patientTumorRow.get(13);
+                String virologyStatus = patientTumorRow.get(14);
+                String treatmentNaive = patientTumorRow.get(16);
+
 
                 if(modelId.isEmpty()){
                     log.error("Missing corresponding Model ID in row " + row);
@@ -344,6 +355,9 @@ public class UniversalLoader implements CommandLineRunner {
                 }
 
                 PatientSnapshot ps = dataImportService.getPatientSnapshot(patient, ageAtCollection, dateOfCollection, collectionEvent, elapsedTime);
+                ps.setTreatmentNaive(treatmentNaive);
+                ps.setVirologyStatus(virologyStatus);
+
 
                 //have the correct snapshot, create a human sample and link it to the snapshot
                 tumorType = Standardizer.getTumorType(tumorType);
@@ -397,6 +411,7 @@ public class UniversalLoader implements CommandLineRunner {
             String startingDate = patientTreatmentRow.get(3);
             String duration = patientTreatmentRow.get(4);
             String response = patientTreatmentRow.get(5);
+            String responseClassification = patientTreatmentRow.get(6);
 
             if(patientId.isEmpty() || treatment.isEmpty()){
 
@@ -426,7 +441,7 @@ public class UniversalLoader implements CommandLineRunner {
             TreatmentSummary ts = dataImportService.findTreatmentSummaryByPatientSnapshot(ps);
 
 
-            TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatment, dose, response);
+            TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatment, dose, response, responseClassification);
 
             //update treatment component type and duration
             for(TreatmentComponent tc : tp.getComponents()){
@@ -579,7 +594,9 @@ public class UniversalLoader implements CommandLineRunner {
             String engraftmentSite = modelDetailsRow.get(3);
             String engraftmentType = modelDetailsRow.get(4);
             String engraftmentMaterial = modelDetailsRow.get(5);
+            String engraftmentMaterialStatus = modelDetailsRow.get(6);
             String passage = modelDetailsRow.get(7);
+            String pubmedIdString = modelDetailsRow.get(8);
 
 
             //check if essential values are not empty
@@ -607,7 +624,7 @@ public class UniversalLoader implements CommandLineRunner {
 
             EngraftmentSite es = dataImportService.getImplantationSite(engraftmentSite);
             EngraftmentType et = dataImportService.getImplantationType(engraftmentType);
-            EngraftmentMaterial em = dataImportService.getEngraftmentMaterial(engraftmentMaterial);
+            EngraftmentMaterial em = dataImportService.createEngraftmentMaterial(engraftmentMaterial, engraftmentMaterialStatus);
             HostStrain hostStrain = dataImportService.getHostStrain(hostStrainName, hostStrainNomenclature, "", "");
 
             //passage = all
@@ -649,13 +666,34 @@ public class UniversalLoader implements CommandLineRunner {
                 log.error("Not supported value for passage at row " +row);
             }
 
+            //CREATE PUBLICATION GROUPS
 
+            if(!pubmedIdString.isEmpty()){
 
+                // pubmed ids separated with a comma, create multiple groups
+                if(pubmedIdString.contains(",")){
+
+                    String[] pubmedArr = pubmedIdString.split(",");
+
+                    for(int i=0; i<pubmedArr.length; i++){
+
+                        Group g = dataImportService.getPublicationGroup(pubmedArr[i].trim());
+                        model.addGroup(g);
+                    }
+                }
+                //single publication, create one group only
+                else{
+
+                    Group g = dataImportService.getPublicationGroup(pubmedIdString.trim());
+                    model.addGroup(g);
+                }
+
+                dataImportService.saveModelCreation(model);
+            }
 
 
             row++;
         }
-
     }
 
     private void createPdxModelValidations() {
