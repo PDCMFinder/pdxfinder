@@ -156,6 +156,25 @@ public class DataImportService {
         return g;
     }
 
+    public Group getPublicationGroup(String publicationId){
+
+        Group g = groupRepository.findByPubmedIdAndType(publicationId, "Publication");
+
+
+        if(g == null){
+            log.info("Publication group not found. Creating", publicationId);
+
+            g = new Group();
+            g.setType("Publication");
+            g.setPubMedId(publicationId);
+            groupRepository.save(g);
+
+        }
+        return g;
+
+    }
+
+
 
     public ExternalUrl getExternalUrl(ExternalUrl.Type type, String url) {
         ExternalUrl externalUrl = externalUrlRepository.findByTypeAndUrl(type.getValue(), url);
@@ -539,6 +558,16 @@ public class DataImportService {
         return em;
     }
 
+    public EngraftmentMaterial createEngraftmentMaterial(String material, String status){
+
+        EngraftmentMaterial em = new EngraftmentMaterial();
+        em.setName(material);
+        em.setState(status);
+        engraftmentMaterialRepository.save(em);
+
+        return em;
+
+    }
 
     public Tissue getTissue(String t) {
         Tissue tissue = tissueRepository.findByName(t);
