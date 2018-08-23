@@ -668,7 +668,8 @@ public class UniversalLoader implements CommandLineRunner {
 
             //CREATE PUBLICATION GROUPS
 
-            if(!pubmedIdString.isEmpty()){
+            //check if pubmed id is in the right format, ie id starts with PMID
+            if(!pubmedIdString.isEmpty() && pubmedIdString.toLowerCase().contains("pmid")){
 
                 // pubmed ids separated with a comma, create multiple groups
                 if(pubmedIdString.contains(",")){
