@@ -19,11 +19,14 @@ public class PatientSnapshot {
 
     private String ageAtCollection;
     private String dateAtCollection;
-    private Boolean treatmentNaive;
+    private String treatmentNaive;
 
     private String collectionEvent;
     private String elapsedTime;
     private String eventType;
+
+    private String virologyStatus;
+
 
     @Relationship(type = "COLLECTION_EVENT", direction = Relationship.INCOMING)
     private Patient patient;
@@ -139,11 +142,11 @@ public class PatientSnapshot {
         this.dateAtCollection = dateAtCollection;
     }
 
-    public Boolean getTreatmentNaive() {
+    public String getTreatmentNaive() {
         return treatmentNaive;
     }
 
-    public void setTreatmentNaive(Boolean treatmentNaive) {
+    public void setTreatmentNaive(String treatmentNaive) {
         this.treatmentNaive = treatmentNaive;
     }
 
@@ -177,5 +180,13 @@ public class PatientSnapshot {
 
     public void setEventType(String eventType) {
         this.eventType = eventType;
+    }
+
+    public String getVirologyStatus() {
+        return virologyStatus;
+    }
+
+    public void setVirologyStatus(String virologyStatus) {
+        this.virologyStatus = virologyStatus;
     }
 }

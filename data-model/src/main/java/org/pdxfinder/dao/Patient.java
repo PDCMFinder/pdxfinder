@@ -24,6 +24,9 @@ public class Patient {
     private String race;
     private String ethnicity;
     private String dataSource;
+    private String cancerRelevantHistory;
+    private String firstDiagnosis;
+    private String ageAtFirstDiagnosis;
 
     @Relationship(type = "GROUP", direction = Relationship.INCOMING)
     private List<Group> groups;
@@ -175,6 +178,30 @@ public class Patient {
         }
 
         return null;
+    }
+
+    public String getCancerRelevantHistory() {
+        return cancerRelevantHistory;
+    }
+
+    public void setCancerRelevantHistory(String cancerRelevantHistory) {
+        this.cancerRelevantHistory = cancerRelevantHistory;
+    }
+
+    public String getFirstDiagnosis() {
+        return firstDiagnosis;
+    }
+
+    public void setFirstDiagnosis(String firstDiagnosis) {
+        this.firstDiagnosis = firstDiagnosis;
+    }
+
+    public String getAgeAtFirstDiagnosis() {
+        return ageAtFirstDiagnosis;
+    }
+
+    public void setAgeAtFirstDiagnosis(String ageAtFirstDiagnosis) {
+        this.ageAtFirstDiagnosis = ageAtFirstDiagnosis;
     }
 
     public PatientSnapshot getSnapshotByDate(String date){
