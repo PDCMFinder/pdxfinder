@@ -44,6 +44,9 @@ public class ModelCreation {
     @Relationship(type = "EXTERNAL_URL", direction = Relationship.INCOMING)
     private List<ExternalUrl> externalUrls;
 
+    @Relationship(type = "GROUP", direction = Relationship.INCOMING)
+    private Set<Group> groups;
+
     //support constructor with list of QA
     public ModelCreation(String sourcePdxId, String dataSource, Sample sample, List<QualityAssurance> qualityAssurance,List<ExternalUrl> externalUrls) {
         this.sourcePdxId = sourcePdxId;
@@ -196,5 +199,24 @@ public class ModelCreation {
         omicDataShareable = true;
 
     }
+
+    public Set<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(Set<Group> groups) {
+        this.groups = groups;
+    }
+
+    public void addGroup(Group g){
+
+        if(this.groups == null){
+
+            this.groups = new HashSet<>();
+        }
+
+        this.groups.add(g);
+    }
+
 
 }
