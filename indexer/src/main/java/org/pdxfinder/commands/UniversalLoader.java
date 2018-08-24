@@ -699,6 +699,54 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPdxModelValidations() {
 
+
+        log.info("******************************************************");
+        log.info("* Creating Model validations                         *");
+        log.info("******************************************************");
+
+        int row = 6;
+
+        for(List<String> pdxModelValidationRow : pdxModelValidationSheetData){
+
+
+
+            String modelId = pdxModelValidationRow.get(0);
+            String validationTechnique = pdxModelValidationRow.get(1);
+            String validationDescription = pdxModelValidationRow.get(2);
+            String passages = pdxModelValidationRow.get(3);
+            String validationHostStrain = pdxModelValidationRow.get(4);
+
+            if(modelId.isEmpty() || validationTechnique.isEmpty()){
+
+                log.error("Empty essential value in row: " +row);
+                row++;
+                continue;
+            }
+
+
+            //at this point the corresponding pdx model node should be created and available for lookup
+            ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
+
+            if(model == null){
+
+                log.error("Missing model, cannot add validation: "+modelId);
+                row++;
+                continue;
+            }
+
+
+            QualityAssurance qa = new QualityAssurance();
+            qa.setTechnology(validationTechnique);
+            qa.setDescription(validationDescription);
+            qa.setPassages(passages);
+
+            model.addQualityAssurance(qa);
+            dataImportService.saveModelCreation(model);
+
+        }
+
+
+
     }
 
 
