@@ -126,7 +126,6 @@ public class DetailsService {
 
         Sample sample = sampleRepository.findByDataSourceAndPdxId(dataSource,modelId);
         Patient patient = patientRepository.findByDataSourceAndModelId(dataSource,modelId);
-        List<PatientSnapshot> ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
         ModelCreation pdx = modelCreationRepository.findByDataSourceAndSourcePdxId(dataSource, modelId);
 
         List<QualityAssurance> qa = pdx.getQualityAssurance();
@@ -205,10 +204,10 @@ public class DetailsService {
             dto.setExternalDataSourceDesc(patient.getProviderGroup().getDescription());
         }
 
-        if (ps != null) {
-            for (PatientSnapshot patientSnapshots : ps) {
-                if (patientSnapshots != null && patientSnapshots.getAgeAtCollection() != null) {
-                    dto.setAgeAtCollection(patientSnapshots.getAgeAtCollection());
+        if (patient != null && patient.getSnapshots() != null) {
+            for (PatientSnapshot patientSnapshot : patient.getSnapshots()) {
+                if (patientSnapshot != null && patientSnapshot.getAgeAtCollection() != null) {
+                    dto.setAgeAtCollection(patientSnapshot.getAgeAtCollection());
                 }
             }
 

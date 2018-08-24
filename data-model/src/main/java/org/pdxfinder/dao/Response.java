@@ -15,6 +15,8 @@ public class Response {
 
     private String description;
 
+    private String descriptionClassification;
+
     @Relationship(type = "RESPONSE", direction = Relationship.INCOMING)
     private TreatmentProtocol treatment;
 
@@ -41,5 +43,13 @@ public class Response {
 
     public void setTreatment(TreatmentProtocol treatment) {
         this.treatment = treatment;
+    }
+
+    public String getDescriptionClassification() {
+        return descriptionClassification;
+    }
+
+    public void setDescriptionClassification(String descriptionClassification) {
+        this.descriptionClassification = descriptionClassification;
     }
 }

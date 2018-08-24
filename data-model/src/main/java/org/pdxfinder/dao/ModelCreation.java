@@ -22,6 +22,9 @@ public class ModelCreation {
     private String sourcePdxId;
     private String dataSource;
 
+    private Boolean omicDataShareable;
+    private List<String> omicRawDataFile;
+
 
     @Relationship(type = "QUALITY_ASSURED_BY")
     private List<QualityAssurance> qualityAssurance;
@@ -41,6 +44,9 @@ public class ModelCreation {
     @Relationship(type = "EXTERNAL_URL", direction = Relationship.INCOMING)
     private List<ExternalUrl> externalUrls;
 
+    @Relationship(type = "GROUP", direction = Relationship.INCOMING)
+    private Set<Group> groups;
+
     //support constructor with list of QA
     public ModelCreation(String sourcePdxId, String dataSource, Sample sample, List<QualityAssurance> qualityAssurance,List<ExternalUrl> externalUrls) {
         this.sourcePdxId = sourcePdxId;
@@ -48,6 +54,7 @@ public class ModelCreation {
         this.sample = sample;
         this.qualityAssurance = qualityAssurance;
         this.externalUrls = externalUrls;
+        this.omicDataShareable = false;
     }
     //constructor for single QA
     public ModelCreation(String sourcePdxId, String dataSource, Sample sample, QualityAssurance qualityAssurance,List<ExternalUrl> externalUrls) {
@@ -59,11 +66,13 @@ public class ModelCreation {
         this.qualityAssurance.add(qualityAssurance);
 
         this.externalUrls = externalUrls;
+        this.omicDataShareable = false;
     }
 
 
     public ModelCreation() {
         // Empty constructor required as of Neo4j API 2.0.5
+        this.omicDataShareable = false;
     }
 
 
@@ -161,4 +170,53 @@ public class ModelCreation {
 
         this.qualityAssurance.add(qa);
     }
+
+
+    public Boolean getOmicDataShareable() {
+        return omicDataShareable;
+    }
+
+    public void setOmicDataShareable(Boolean omicDataShareable) {
+        this.omicDataShareable = omicDataShareable;
+    }
+
+    public List<String> getOmicRawDataFile() {
+        return omicRawDataFile;
+    }
+
+    public void setOmicRawDataFile(List<String> omicRawDataFile) {
+        this.omicRawDataFile = omicRawDataFile;
+    }
+
+    public void addOmicRawDataFile(String file){
+
+        if(omicRawDataFile == null){
+
+            omicRawDataFile = new ArrayList<>();
+        }
+
+        omicRawDataFile.add(file);
+        omicDataShareable = true;
+
+    }
+
+    public Set<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(Set<Group> groups) {
+        this.groups = groups;
+    }
+
+    public void addGroup(Group g){
+
+        if(this.groups == null){
+
+            this.groups = new HashSet<>();
+        }
+
+        this.groups.add(g);
+    }
+
+
 }

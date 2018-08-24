@@ -34,6 +34,7 @@ public class DataImportService {
     private HostStrainRepository hostStrainRepository;
     private EngraftmentTypeRepository engraftmentTypeRepository;
     private EngraftmentSiteRepository engraftmentSiteRepository;
+    private EngraftmentMaterialRepository engraftmentMaterialRepository;
     private GroupRepository groupRepository;
     private PatientRepository patientRepository;
     private ModelCreationRepository modelCreationRepository;
@@ -61,6 +62,7 @@ public class DataImportService {
                              HostStrainRepository hostStrainRepository,
                              EngraftmentTypeRepository engraftmentTypeRepository,
                              EngraftmentSiteRepository engraftmentSiteRepository,
+                             EngraftmentMaterialRepository engraftmentMaterialRepository,
                              GroupRepository groupRepository,
                              PatientRepository patientRepository,
                              ModelCreationRepository modelCreationRepository,
@@ -85,6 +87,7 @@ public class DataImportService {
         Assert.notNull(hostStrainRepository, "hostStrainRepository cannot be null");
         Assert.notNull(engraftmentTypeRepository, "implantationTypeRepository cannot be null");
         Assert.notNull(engraftmentSiteRepository, "implantationSiteRepository cannot be null");
+        Assert.notNull(engraftmentMaterialRepository, "engraftmentMaterialRepository cannot be null");
         Assert.notNull(groupRepository, "GroupRepository cannot be null");
         Assert.notNull(patientRepository, "patientRepository cannot be null");
         Assert.notNull(modelCreationRepository, "modelCreationRepository cannot be null");
@@ -100,6 +103,7 @@ public class DataImportService {
         this.hostStrainRepository = hostStrainRepository;
         this.engraftmentTypeRepository = engraftmentTypeRepository;
         this.engraftmentSiteRepository = engraftmentSiteRepository;
+        this.engraftmentMaterialRepository = engraftmentMaterialRepository;
         this.groupRepository = groupRepository;
         this.patientRepository = patientRepository;
         this.modelCreationRepository = modelCreationRepository;
@@ -152,6 +156,25 @@ public class DataImportService {
         return g;
     }
 
+    public Group getPublicationGroup(String publicationId){
+
+        Group g = groupRepository.findByPubmedIdAndType(publicationId, "Publication");
+
+
+        if(g == null){
+            log.info("Publication group not found. Creating", publicationId);
+
+            g = new Group();
+            g.setType("Publication");
+            g.setPubMedId(publicationId);
+            groupRepository.save(g);
+
+        }
+        return g;
+
+    }
+
+
 
     public ExternalUrl getExternalUrl(ExternalUrl.Type type, String url) {
         ExternalUrl externalUrl = externalUrlRepository.findByTypeAndUrl(type.getValue(), url);
@@ -177,6 +200,7 @@ public class DataImportService {
             modelCreationRepository.delete(modelCreation);
         }
         modelCreation = new ModelCreation(pdxId, dataSource, sample, qa, externalUrls);
+        modelCreation.addRelatedSample(sample);
         modelCreationRepository.save(modelCreation);
         return modelCreation;
     }
@@ -190,6 +214,7 @@ public class DataImportService {
             modelCreationRepository.delete(modelCreation);
         }
         modelCreation = new ModelCreation(pdxId, dataSource, sample, qa, externalUrls);
+        modelCreation.addRelatedSample(sample);
         modelCreationRepository.save(modelCreation);
         return modelCreation;
     }
@@ -219,6 +244,13 @@ public class DataImportService {
         return modelCreationRepository.findBySourcePdxIdAndDataSource(modelId, dataSource);
     }
 
+    public ModelCreation findModelByIdAndDataSourceWithSpecimens(String modelId, String dataSource){
+
+        return modelCreationRepository.findBySourcePdxIdAndDataSourceWithSpecimens(modelId, dataSource);
+    }
+
+
+
     public void saveModelCreation(ModelCreation modelCreation){
         this.modelCreationRepository.save(modelCreation);
     }
@@ -227,6 +259,39 @@ public class DataImportService {
 
         return modelCreationRepository.findByMolChar(mc);
     }
+
+    public Patient createPatient(String patientId, Group dataSource, String sex, String race, String ethnicity){
+
+        Patient patient = findPatient(patientId, dataSource);
+
+        if(patient == null){
+
+            patient = this.getPatient(patientId, sex, race, ethnicity, dataSource);
+            patientRepository.save(patient);
+        }
+
+        return patient;
+    }
+
+    public Patient getPatientWithSnapshots(String patientId, Group group){
+
+        return patientRepository.findByExternalIdAndGroupWithSnapshots(patientId, group);
+    }
+
+
+    public void savePatient(Patient patient){
+
+        patientRepository.save(patient);
+    }
+
+
+    public Patient findPatient(String patientId, Group dataSource){
+
+        return patientRepository.findByExternalIdAndGroupWithSnapshots(patientId, dataSource);
+
+    }
+
+
 
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, Group group) {
 
@@ -268,6 +333,35 @@ public class DataImportService {
         return patientSnapshot;
     }
 
+    public PatientSnapshot getPatientSnapshot(Patient patient, String ageAtCollection, String collectionDate, String collectionEvent, String ellapsedTime){
+
+        PatientSnapshot ps;
+
+        if(patient.getSnapshots() != null){
+
+            for(PatientSnapshot psnap : patient.getSnapshots()){
+
+                if(psnap.getAgeAtCollection().equals(ageAtCollection) && psnap.getDateAtCollection().equals(collectionDate) &&
+                        psnap.getCollectionEvent().equals(collectionEvent) && psnap.getElapsedTime().equals(ellapsedTime)){
+
+                    return psnap;
+                }
+
+            }
+
+            //ps = patient.getSnapShotByCollection(ageAtCollection, collectionDate, collectionEvent, ellapsedTime);
+        }
+        //create new snapshot and save it with the patient
+        ps = new PatientSnapshot(patient, ageAtCollection, collectionDate, collectionEvent, ellapsedTime);
+        patient.hasSnapshot(ps);
+        ps.setPatient(patient);
+        patientRepository.save(patient);
+        patientSnapshotRepository.save(ps);
+
+        return ps;
+    }
+
+
     public PatientSnapshot getPatientSnapshot(String patientId, String age, String dataSource){
 
         PatientSnapshot ps = patientSnapshotRepository.findByPatientIdAndDataSourceAndAge(patientId, dataSource, age);
@@ -275,6 +369,20 @@ public class DataImportService {
         return ps;
 
     }
+
+    public PatientSnapshot findLastPatientSnapshot(String patientId, Group ds){
+
+        Patient patient = patientRepository.findByExternalIdAndGroupWithSnapshots(patientId, ds);
+        PatientSnapshot ps = null;
+
+        if(patient != null){
+
+            ps = patient.getLastSnapshot();
+        }
+        return ps;
+    }
+
+
 
     public Patient getPatient(String externalId, String sex, String race, String ethnicity, Group group) {
 
@@ -320,6 +428,40 @@ public class DataImportService {
         return sample;
     }
 
+    public Sample getSample(String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
+                            String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
+                            String grade, String gradeClassification){
+
+        TumorType type = this.getTumorType(typeStr);
+        Tissue origin = this.getTissue(originStr);
+        Tissue sampleSite = this.getTissue(sampleSiteStr);
+        Sample sample = sampleRepository.findBySourceSampleIdAndDataSource(sourceSampleId, dataSource);
+
+        String updatedDiagnosis = diagnosis;
+
+        // Changes Malignant * Neoplasm to * Cancer
+        String pattern = "(.*)Malignant(.*)Neoplasm(.*)";
+
+        if (diagnosis.matches(pattern)) {
+            updatedDiagnosis = (diagnosis.replaceAll(pattern, "\t$1$2Cancer$3")).trim();
+            log.info("Replacing diagnosis '{}' with '{}'", diagnosis, updatedDiagnosis);
+        }
+
+        updatedDiagnosis = updatedDiagnosis.replaceAll(",", "");
+
+        if (sample == null) {
+
+            //String sourceSampleId, TumorType type, String diagnosis, Tissue originTissue, Tissue sampleSite, String extractionMethod,
+            // String stage, String stageClassification, String grade, String gradeClassification, Boolean normalTissue, String dataSource
+            sample = new Sample(sourceSampleId, type, updatedDiagnosis, origin, sampleSite, extractionMethod, stage, stageClassification, grade, gradeClassification, normalTissue, dataSource);
+            sampleRepository.save(sample);
+        }
+
+        return sample;
+
+    }
+
+
     public Sample findSampleByDataSourceAndSourceSampleId(String dataSource, String sampleId){
 
         return sampleRepository.findBySourceSampleIdAndDataSource(sampleId, dataSource);
@@ -338,6 +480,7 @@ public class DataImportService {
         if(specimen.getSample() == null){
             sample = new Sample();
             sample.setSourceSampleId(sampleId);
+            sample.setDataSource(dataSource);
             sampleRepository.save(sample);
         }
         else{
@@ -394,12 +537,36 @@ public class DataImportService {
     public EngraftmentType getImplantationType(String iType) {
         EngraftmentType type = engraftmentTypeRepository.findByName(iType);
         if (type == null) {
-            log.info("Implantation Site '{}' not found. Creating.", iType);
+            log.info("Implantation Type '{}' not found. Creating.", iType);
             type = new EngraftmentType(iType);
             engraftmentTypeRepository.save(type);
         }
 
         return type;
+    }
+
+    public EngraftmentMaterial getEngraftmentMaterial(String eMat){
+
+        EngraftmentMaterial em = engraftmentMaterialRepository.findByName(eMat);
+
+        if(em == null){
+            em = new EngraftmentMaterial();
+            em.setName(eMat);
+            engraftmentMaterialRepository.save(em);
+        }
+
+        return em;
+    }
+
+    public EngraftmentMaterial createEngraftmentMaterial(String material, String status){
+
+        EngraftmentMaterial em = new EngraftmentMaterial();
+        em.setName(material);
+        em.setState(status);
+        engraftmentMaterialRepository.save(em);
+
+        return em;
+
     }
 
     public Tissue getTissue(String t) {
@@ -499,6 +666,11 @@ public class DataImportService {
     }
 
 
+    public List<Specimen> findSpecimenByPassage(ModelCreation model, String passage){
+
+        return specimenRepository.findByModelIdAndDataSourceAndAndPassage(model.getSourcePdxId(), model.getDataSource(), passage);
+    }
+
     public Specimen getSpecimen(ModelCreation model, String specimenId, String dataSource, String passage){
 
         Specimen specimen = specimenRepository.findByModelIdAndDataSourceAndSpecimenIdAndPassage(model.getSourcePdxId(), dataSource, specimenId, passage);
@@ -514,7 +686,10 @@ public class DataImportService {
 
     }
 
+    public List<Specimen> getAllSpecimenByModel(String modelId, String dataSource){
 
+        return specimenRepository.getByModelIdAndDataSource(modelId, dataSource);
+    }
 
     public void saveSpecimen(Specimen specimen){
         specimenRepository.save(specimen);
@@ -607,6 +782,11 @@ public class DataImportService {
     }
 
     public Platform getPlatform(String name, Group group) {
+
+        //remove special characters from platform name
+        name = name.replaceAll("[^A-Za-z0-9 _-]", "");
+
+
         Platform p = platformRepository.findByNameAndDataSource(name, group.getName());
         if (p == null) {
             p = new Platform();
@@ -619,6 +799,10 @@ public class DataImportService {
     }
 
     public Platform getPlatform(String name, Group group, String platformUrl) {
+
+        //remove special characters from platform name
+        name = name.replaceAll("[^A-Za-z0-9 _-]", "");
+
         Platform p = platformRepository.findByNameAndDataSourceAndUrl(name, group.getName(), platformUrl);
 
         if (p == null) {
@@ -723,12 +907,13 @@ public class DataImportService {
      * Creates a (tp:TreatmentProtocol)--(tc:TreatmentComponent)--(d:Drug)
      *           (tp)--(r:Response) node
      */
-    public TreatmentProtocol getTreatmentProtocol(String drugString, String doseString, String response){
+    public TreatmentProtocol getTreatmentProtocol(String drugString, String doseString, String response, String responseClassification){
 
         TreatmentProtocol tp = new TreatmentProtocol();
 
         //combination of drugs?
         if(drugString.contains("+") && doseString.contains(";")){
+
             String[] drugArray = drugString.split("\\+");
             String[] doseArray = doseString.split(";");
 
@@ -753,17 +938,44 @@ public class DataImportService {
         }
         else if(drugString.contains("+") && !doseString.contains(";")){
 
-            String[] drugArray = drugString.split("\\+");
+            if(doseString.contains("+")){
+                //this data is coming from the universal loader, dose combinations are separated with + instead of ;
 
-            for(int i=0;i<drugArray.length;i++){
+                String[] drugArray = drugString.split("\\+");
+                String[] doseArray = doseString.split("\\+");
 
-                Drug d = getStandardizedDrug(drugArray[i].trim());
-                TreatmentComponent tc = new TreatmentComponent();
-                tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
-                tc.setDose(doseString.trim());
-                tc.setDrug(d);
-                tp.addTreatmentComponent(tc);
+                if(drugArray.length == doseArray.length){
+
+                    for(int i=0;i<drugArray.length;i++){
+
+                        Drug d = getStandardizedDrug(drugArray[i].trim());
+                        TreatmentComponent tc = new TreatmentComponent();
+                        tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
+                        tc.setDose(doseArray[i].trim());
+                        tc.setDrug(d);
+                        tp.addTreatmentComponent(tc);
+                    }
+
+                }
+
+
+
             }
+            else{
+
+                String[] drugArray = drugString.split("\\+");
+
+                for(int i=0;i<drugArray.length;i++){
+
+                    Drug d = getStandardizedDrug(drugArray[i].trim());
+                    TreatmentComponent tc = new TreatmentComponent();
+                    tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
+                    tc.setDose(doseString.trim());
+                    tc.setDrug(d);
+                    tp.addTreatmentComponent(tc);
+                }
+            }
+
         }
         //one drug only
         else{
@@ -778,6 +990,7 @@ public class DataImportService {
 
         Response r = new Response();
         r.setDescription(Standardizer.getDrugResponse(response));
+        r.setDescriptionClassification(responseClassification);
 
         tp.setResponse(r);
 
@@ -790,7 +1003,7 @@ public class DataImportService {
 
     public TreatmentProtocol getTreatmentProtocol(String drugString, String doseString, String response, boolean currentTreatment){
 
-        TreatmentProtocol tp = getTreatmentProtocol(drugString, doseString, response);
+        TreatmentProtocol tp = getTreatmentProtocol(drugString, doseString, response, "");
 
         if(currentTreatment && tp.getCurrentTreatment() == null){
 
@@ -799,6 +1012,25 @@ public class DataImportService {
         }
 
         return tp;
+
+    }
+
+
+
+
+
+    public TreatmentSummary findTreatmentSummaryByPatientSnapshot(PatientSnapshot ps){
+
+        TreatmentSummary ts = treatmentSummaryRepository.findByPatientSnapshot(ps);
+
+        if(ts == null){
+            //no summary yet, create one
+            ts = new TreatmentSummary();
+
+
+        }
+
+        return ts;
 
     }
 }

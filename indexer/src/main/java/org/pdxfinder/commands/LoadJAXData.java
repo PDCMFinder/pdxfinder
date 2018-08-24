@@ -185,19 +185,36 @@ public class LoadJAXData implements CommandLineRunner {
         }
 
         String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
-        
+        String stage = j.getString("Tumor Stage");
+        String grade = j.getString("Grades");
         String age = Standardizer.getAge(j.getString("Age"));
         String gender = Standardizer.getGender(j.getString("Gender"));
         
         String race = Standardizer.fixNotString(j.getString("Race"));
         String ethnicity = Standardizer.fixNotString(j.getString("Ethnicity"));
+        String patientId = j.getString("Patient ID");
 
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"), gender,
-                race, ethnicity, age, jaxDS);
+        String tumorType = j.getString("Tumor Type");
+        String primarySite = j.getString("Primary Site");
+        String sampleSite = j.getString("Specimen Site");
+        String extractionMethod = j.getString("Sample Type");
 
-        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
-        Sample sample = dataImportService.getSample(j.getString("Model ID"), tumorType, diagnosis,
-                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, DATASOURCE_ABBREVIATION);
+        Patient patient = dataImportService.getPatientWithSnapshots(patientId, jaxDS);
+
+        if(patient == null){
+
+            patient = dataImportService.createPatient(patientId, jaxDS, gender, "", ethnicity);
+        }
+
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
+
+
+        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
+        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
+        // String grade, String gradeClassification
+        Sample sample = dataImportService.getSample(id, jaxDS.getAbbreviation(), tumorType, diagnosis, primarySite,
+                sampleSite, extractionMethod, false, stage, "", grade, "");
+
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
         externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT+id));
@@ -263,7 +280,7 @@ public class LoadJAXData implements CommandLineRunner {
 
                         TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
                                 treatmentObject.getString("Dose"),
-                                treatmentObject.getString("Response"));
+                                treatmentObject.getString("Response"), "");
 
                         ts.addTreatmentProtocol(tp);
                     }
@@ -358,7 +375,7 @@ public class LoadJAXData implements CommandLineRunner {
                 
                 ma.setMarker(marker);
 
-                Platform platform = dataImportService.getPlatform(technology, this.jaxDS);
+                Platform platform;
 
                 if(technology.equals("Truseq_JAX")){
                     platform = dataImportService.getPlatform(technology, this.jaxDS, TRUSEQ_PLATFORM_URL);

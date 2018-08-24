@@ -404,13 +404,13 @@
                                                                                                            th:text="${technology.value[num-1]}"></b>     &nbsp; &nbsp;
                                                                     <span class="hdc">Platform: </span>
 
-                                                                        <span th:if="${data.platformsAndUrls[__${technology.key}__] != null}">
-                                                                            <a th:href="${data.platformsAndUrls[__${technology.key}__]}" th:text="${technology.key}"></a>
+                                                                    <span th:if="${data.platformsAndUrls.containsKey(technology.key)}">
+                                                                            <a th:href="${data.platformsAndUrls[technology.key]}" th:text="${technology.key}"></a>
                                                                         </span>
 
-                                                                        <span th:if="${data.platformsAndUrls[__${technology.key}__] == null}">
+                                                                    <span th:if="${not data.platformsAndUrls.containsKey(technology.key)}">
                                                                             <b class="black" th:text="${technology.key}"></b>
-                                                                        </span>
+                                                                    </span>
 
                                                                 </h4>
 

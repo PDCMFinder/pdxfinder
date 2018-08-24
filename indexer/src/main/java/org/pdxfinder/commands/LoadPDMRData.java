@@ -170,8 +170,6 @@ public class LoadPDMRData implements CommandLineRunner {
             diagnosis = j.getString("Initial Diagnosis");
         }
 
-        String classification = j.getString("Stage Value") + "/" + j.getString("Grade Value");
-
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
         String age = Standardizer.getAge(j.getString("Age"));
         String gender = Standardizer.getGender(j.getString("Gender"));
@@ -180,15 +178,29 @@ public class LoadPDMRData implements CommandLineRunner {
         String ethnicity = j.getString("Ethnicity");
         String modelId = j.getString("Model ID");
         String primarySite = j.getString("Primary Site");
-        String collectionSite = j.getString("Specimen Site");
+        String sampleSite = j.getString("Specimen Site");
         String extractionType = j.getString("Sample Type");
+        String stage = j.getString("Stage Value");
+        String grade = j.getString("Grade Value");
 
 
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patientId, gender,
-                race, ethnicity, age, DS);
 
-        Sample humanSample = dataImportService.getSample(modelId, tumorType, diagnosis,
-                primarySite, collectionSite, extractionType, classification, NORMAL_TISSUE_FALSE, DS.getAbbreviation());
+        Patient patient = dataImportService.getPatientWithSnapshots(patientId, DS);
+
+        if(patient == null){
+
+            patient = dataImportService.createPatient(patientId, DS, gender, "", ethnicity);
+        }
+
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
+
+
+        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
+        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
+        // String grade, String gradeClassification
+        Sample humanSample = dataImportService.getSample(id, DS.getAbbreviation(), tumorType, diagnosis, primarySite,
+                sampleSite, extractionType, false, stage, "", grade, "");
+
 
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
@@ -321,6 +333,7 @@ public class LoadPDMRData implements CommandLineRunner {
         Map<String, Sample> sampleMap = new HashMap<>();
         Map<String, MolecularCharacterization> molcharMap = new HashMap<>();
 
+        Set<String> missingPatients = new HashSet<>();
         try {
             BufferedReader buf = new BufferedReader(new FileReader(mutationsFile));
 
@@ -335,12 +348,21 @@ public class LoadPDMRData implements CommandLineRunner {
                 } else {
                     row = currentLine.split("\t");
 
+                    String patientId = row[1];
                     String modelId = row[1] + "-" + row[2];
                     String sampleId = row[3];
                     String markerSymbol = row[8];
                     String aaChange = row[9];
-                    String alleleFreq = row[11];
-                    String readDepth = row[12];
+
+                    String chromosome = row[12];
+                    String position = row[13];
+                    String refAllele = row[14];
+                    String altAllele = row[15];
+                    String alleleFreq = row[16];
+
+                    String readDepth = row[17];
+                    String consequence = row[18];
+                    String rsVariant = row[21];
 
                     //skip rows where there is no marker
                     if(markerSymbol.equals("None Found")) continue;
@@ -370,7 +392,8 @@ public class LoadPDMRData implements CommandLineRunner {
 
                     if(sample == null){
 
-                        log.error("Sample "+sampleId + " is not found.");
+                        log.error("Sample "+sampleId + " not found for model "+modelId);
+                        missingPatients.add(patientId);
                         continue;
                     }
                     //found the sample
@@ -397,8 +420,16 @@ public class LoadPDMRData implements CommandLineRunner {
 
                         ma.setMarker(m);
                         ma.setAminoAcidChange(aaChange);
+                        ma.setChromosome(chromosome);
+                        ma.setSeqPosition(position);
+                        ma.setRefAllele(refAllele);
+                        ma.setAltAllele(altAllele);
                         ma.setAlleleFrequency(alleleFreq);
                         ma.setReadDepth(readDepth);
+                        ma.setConsequence(consequence);
+                        ma.setRsVariants(rsVariant);
+
+
                         mc.addMarkerAssociation(ma);
 
                         //put the updated mc back into the map
@@ -428,6 +459,11 @@ public class LoadPDMRData implements CommandLineRunner {
 
 
         log.info("DONE loading mutation data for PDMR.");
+
+        if(missingPatients.size() > 0){
+
+            log.error("Missing patients: " + missingPatients.toString());
+        }
 
     }
 

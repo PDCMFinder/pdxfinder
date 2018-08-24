@@ -107,15 +107,17 @@ public class LoadIRCC implements CommandLineRunner {
         parser.accepts("loadIRCC", "Load IRCC PDX data");
         parser.accepts("loadALL", "Load all, including IRCC PDX data");
         OptionSet options = parser.parse(args);
-        
-        irccDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
-                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
-        nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         if (options.has("loadIRCC") || options.has("loadALL")) {
 
             log.info("Loading IRCC PDX data.");
+
+
+            irccDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
+                    DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+
+            nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
 
             if (urlStr != null) {
@@ -162,18 +164,30 @@ public class LoadIRCC implements CommandLineRunner {
         String diagnosis = job.getString("Clinical Diagnosis");
 
         String classification = job.getString("Stage");
-
+        String stage = job.getString("Stage");
         String age = Standardizer.getAge(job.getString("Age"));
         String gender = Standardizer.getGender(job.getString("Gender"));
-
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(job.getString("Patient ID"),
-                gender, "", NOT_SPECIFIED, age, irccDS);
+        String patientId = job.getString("Patient ID");
 
         String tumorType = Standardizer.getTumorType(job.getString("Tumor Type"));
+        String primarySite = job.getString("Primary Site");
+        String sampleSite = job.getString("Sample Site");
 
-        Sample ptSample = dataImportService.getSample(id, tumorType, diagnosis,
-                job.getString("Primary Site"), job.getString("Sample Site"),
-                NOT_SPECIFIED, classification, NORMAL_TISSUE_FALSE, irccDS.getAbbreviation());
+        Patient patient = dataImportService.getPatientWithSnapshots(patientId, irccDS);
+
+        if(patient == null){
+
+            patient = dataImportService.createPatient(patientId, irccDS, gender, "", NOT_SPECIFIED);
+        }
+
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
+
+
+        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
+        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
+        // String grade, String gradeClassification
+        Sample ptSample = dataImportService.getSample(id, irccDS.getAbbreviation(), tumorType, diagnosis, primarySite,
+                sampleSite, NOT_SPECIFIED, false, stage, "", "", "");
 
         pSnap.addSample(ptSample);
 
@@ -263,7 +277,7 @@ public class LoadIRCC implements CommandLineRunner {
 
 
                             TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
-                                    treatmentObject.getString("Dose"), treatmentObject.getString("Response Class"));
+                                    treatmentObject.getString("Dose"), treatmentObject.getString("Response Class"), "");
 
                             ts.addTreatmentProtocol(tp);
                         }
@@ -281,7 +295,9 @@ public class LoadIRCC implements CommandLineRunner {
 
             e.printStackTrace();
         }
-        
+
+        dataImportService.savePatient(patient);
+        dataImportService.savePatientSnapshot(pSnap);
         dataImportService.saveModelCreation(modelCreation);
         
     }
