@@ -30,7 +30,7 @@
               <form #mappingForm="ngForm" *ngIf="!submitted" (ngSubmit)="submitCuration()" novalidate>
               <div class="pdxfinder float-e-margins">
                   <div class="pdxfinder-title">
-                      <h5 style="font-weight: bold;"> Unmapped Diagnosis - <span style="color: #03369D"> {{dataSource | uppercase}}  </span>  </h5>
+                      <h5 style="font-weight: bold;" class="testMobile"> Unmapped Diagnosis - <span style="color: #03369D"> {{dataSource | uppercase}}  </span>  </h5>
                       <button style="float: right; margin-top:-7px;" class="btn btn-primary btn-sm" type="submit" [disabled]="mappingForm.form.invalid"> Submit Mapping </button>
                   </div>
 

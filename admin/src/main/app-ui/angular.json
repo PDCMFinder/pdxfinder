@@ -39,7 +39,12 @@
               "src/pdxfinder/dependencies/datatables.min.js",
               "src/pdxfinder/dependencies/plugins/metisMenu/jquery.metisMenu.js",
               "src/pdxfinder/dependencies/plugins/slimscroll/jquery.slimscroll.min.js",
-              "src/pdxfinder/dependencies/pdxAdmin.js"
+              "src/pdxfinder/dependencies/pdxAdmin.js",
+              "src/pdxfinder/dependencies/chart/amcharts.js",
+              "src/pdxfinder/dependencies/chart/serial.js",
+              "src/pdxfinder/dependencies/chart/export.min.js",
+              "src/pdxfinder/dependencies/chart/light.js",
+              "src/pdxfinder/dependencies/chart/3dbar.js"
             ]
           },
           "configurations": {
