@@ -29,7 +29,7 @@ public class Group {
     private String publicationTitle;
     private String authors;
 
-    private String url;
+    private String url; // a url to their website
 
     public Group() {
     }
