@@ -448,4 +448,8 @@ function addDrugAndResponse(param, startIndex) {
     }
 }
 
+function clearFacet() {
+    document.getElementById("pdxFinderFacet").reset();
+}
+
 

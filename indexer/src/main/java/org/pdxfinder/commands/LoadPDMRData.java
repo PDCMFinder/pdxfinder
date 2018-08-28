@@ -43,6 +43,9 @@ public class LoadPDMRData implements CommandLineRunner {
     private final static String DATASOURCE_DESCRIPTION = "NCI Patient-Derived Models Repository ";
     private final static String DATASOURCE_CONTACT = "https://pdmr.cancer.gov/request/default.htm";
 
+    private final static String PROVIDER_TYPE = "";
+    private final static String ACCESSIBILITY = "";
+
     private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-PrkdcscidIl2rgtm1Wjl/SzJ";
     private final static String NSG_BS_URL = "";
@@ -55,7 +58,7 @@ public class LoadPDMRData implements CommandLineRunner {
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
     private HostStrain nsgBS;
-    private ExternalDataSource DS;
+    private Group DS;
 
     private Options options;
     private CommandLineParser parser;
@@ -124,7 +127,9 @@ public class LoadPDMRData implements CommandLineRunner {
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
     private void parseJSON(String json) {
 
-        DS = dataImportService.getExternalDataSource(DATASOURCE_ABBREVIATION, DATASOURCE_NAME, DATASOURCE_DESCRIPTION,DATASOURCE_CONTACT, SOURCE_URL);
+        DS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
+                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+
         nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
         try {
@@ -266,8 +271,8 @@ public class LoadPDMRData implements CommandLineRunner {
                 platform.setUrl(PLATFORM_URL);
 
                 // why would this happen?
-                if (platform.getExternalDataSource() == null) {
-                    platform.setExternalDataSource(DS);
+                if (platform.getGroup() == null) {
+                    platform.setGroup(DS);
                 }
                 dataImportService.createPlatformAssociation(platform, marker);
 

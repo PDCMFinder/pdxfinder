@@ -149,12 +149,16 @@
             <!-- Search Result and Filter Section -->
             <section class="row expanded padding-right-large padding-left-large">
 
-                <div class="columns medium-3">
+                <div class="columns medium-3" style="position: relative;  ">
+
+                    <div class="column large-12 cl_filter">
+                        <a href="/data/search" class="button outline secondary columns large-6 white-text-right-float">
+                             Reset <span class="hide-for-medium-only"> Filters   &nbsp; <i class="icon icon-functional" data-icon="x" style="font-size: 10px;"></i> </span> </a>
+                    </div>
                     <h4 class="block-title clearfix"><span class="float-left">Filter By:</span></h4>
 
                     <ul class="accordion pdx-accordion-1" data-accordion data-multi-expand="true"
                         data-allow-all-closed="true">
-
 
                         <li class="accordion-item is-active" data-accordion-item>
                             <!-- Accordion tab title -->
@@ -259,7 +263,6 @@
 
                             </div>
                         </li>
-
 
                         <li class="accordion-item is-active" data-accordion-item>
                             <!-- Accordion tab title -->
@@ -612,18 +615,18 @@
                             </div>
                         </li>
 
-
-
-
                     </ul>
 
-                    <span th:each="instance:${websearch.diagnosisSelected}">
-                        <input th:id="'diagnosis__' + ${#strings.replace(instance.name, ' ', '_')}" type="hidden"
-                               class="diagnosis filter"/>
-                    </span>
+                        <span th:each="instance:${websearch.diagnosisSelected}">
+                            <input th:id="'diagnosis__' + ${#strings.replace(instance.name, ' ', '_')}" type="hidden"
+                                   class="diagnosis filter"/>
+                        </span>
 
 
                 </div>
+
+
+
 
                 <div class="columns medium-9">
 

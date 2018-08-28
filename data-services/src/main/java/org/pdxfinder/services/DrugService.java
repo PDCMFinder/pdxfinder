@@ -1,5 +1,6 @@
 package org.pdxfinder.services;
 
+import org.pdxfinder.dao.TreatmentProtocol;
 import org.pdxfinder.dao.TreatmentSummary;
 import org.pdxfinder.repositories.DrugRepository;
 import org.pdxfinder.repositories.ResponseRepository;
@@ -7,8 +8,7 @@ import org.pdxfinder.repositories.TreatmentProtocolRepository;
 import org.pdxfinder.repositories.TreatmentSummaryRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /*
  * Created by csaba on 29/03/2018.
@@ -46,7 +46,22 @@ public class DrugService {
 
     public List<String> getDrugNames(){
 
-        return drugRepository.findDistinctDrugNames();
+        Set<String> drugNamesSet = new HashSet<>();
+        List<String> drugNames = new ArrayList<>();
+
+        List<TreatmentSummary> treatmentSummaries = getSummariesWithDrugAndResponse();
+
+        for(TreatmentSummary ts : treatmentSummaries){
+
+            for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
+
+                String drugName = tp.getDrugString(false);
+                drugNamesSet.add(drugName);
+            }
+        }
+
+        drugNames.addAll(drugNamesSet);
+        return drugNames;
     }
 
     public List<String> getResponseOptions(){
@@ -62,6 +77,23 @@ public class DrugService {
     public int getTotalSummaryNumber(){
 
         return treatmentSummaryRepository.findTotalSummaryNumber();
+    }
+
+
+    public Iterable<Map<String, Object>> getModelCountByDrug(){
+
+        Iterable<Map<String, Object>> iterableResults = drugRepository.countModelsByDrug().queryResults();
+
+        return iterableResults;
+
+    }
+
+    public Iterable<Map<String, Object>> getModelCountByDrugAndComponentType(String type){
+
+        Iterable<Map<String, Object>> iterableResults = drugRepository.countModelsByDrugAndComponentType(type).queryResults();
+
+        return iterableResults;
+
     }
 
 }

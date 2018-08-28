@@ -973,6 +973,13 @@ hr .line_v2 {
     margin-bottom: 15px;text-transform: uppercase;
 }
 
+.cl_filter { position: absolute; left:-2px; }
+@media screen and (max-width: 39.9375em) {
+    .cl_filter { position: relative; left: 0px; }
+}
+@media screen and (min-width: 40em) and (max-width: 63.9375em) {
+    .cl_filter { position: relative; left: 0px; }
+}
 
 
 
