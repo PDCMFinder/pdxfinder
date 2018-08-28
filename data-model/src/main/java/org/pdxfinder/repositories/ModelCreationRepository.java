@@ -82,7 +82,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "WITH mc, ir, s, sfr, ps, pr, p " +
             "MATCH (c:Tissue)-[cr:SAMPLE_SITE]-(s)-[ttr:OF_TYPE]-(tt:TumorType) " +
             "WITH mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt " +
-            "MATCH (t:Tissue)-[tr:ORIGIN_TISSUE]-(s)-[otm:MAPPED_TO]-(ot:OntologyTerm)-[ottm:SUBCLASS_OF *1..]->(term:OntologyTerm) " +
+            "MATCH (t:Tissue)-[tr:ORIGIN_TISSUE]-(s)-[otm:MAPPED_TO]-(ot:OntologyTerm)-[ottm:SUBCLASS_OF *0..]->(term:OntologyTerm) " +
             "RETURN mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt, tr, t, otm, ot, ottm, term")
     Collection<ModelCreation> findModelsWithPatientData();
 
