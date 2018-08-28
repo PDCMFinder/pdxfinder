@@ -7,6 +7,8 @@ import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -58,6 +60,8 @@ public class DetailsService {
     //private final String WUSTL_URL = "https://www.pdxnetwork.org/wustl/";
     private final String WUSTL_URL = "";
     private final String WUSTL_DS = "PDXNet-WUSTL";
+
+    private final static Logger log = LoggerFactory.getLogger(DetailsService.class);
 
 
 
@@ -181,7 +185,6 @@ public class DetailsService {
         dto.setPlatforms(platforms);
 
 
-
         try {
             dto.setSpecimens(specimenList);
         }catch (Exception e){ }
@@ -195,14 +198,17 @@ public class DetailsService {
             dto.setPatientId(patient.getExternalId());
         }
 
+
         if (patient != null && patient.getSex() != null) {
             dto.setGender(patient.getSex());
         }
+
 
         if (patient != null && patient.getProviderGroup() != null) {
             //dto.setContacts(patient.getExternalDataSource().getContact());
             dto.setExternalDataSourceDesc(patient.getProviderGroup().getDescription());
         }
+
 
         if (patient != null && patient.getSnapshots() != null) {
             for (PatientSnapshot patientSnapshot : patient.getSnapshots()) {
@@ -212,6 +218,7 @@ public class DetailsService {
             }
 
         }
+
 
         if (patient != null && patient.getRace() != null) {
             dto.setRace(patient.getRace());
@@ -381,6 +388,7 @@ public class DetailsService {
         List<VariationDataDTO> variationDataDTOList = new ArrayList<>();
         dto.setVariationDataDTOList(variationDataDTOList);
 
+
         Map<String, String> techNPassToSampleId = new HashMap<>();
         for (String tech : modelTechAndPassages.keySet()) {
 
@@ -410,6 +418,10 @@ public class DetailsService {
 
         }
         dto.setTechNPassToSampleId(techNPassToSampleId);
+
+        log.info(techNPassToSampleId+" XXXXXXX");
+
+
 
 
         Set<String> autoSuggestList = graphService.getMappedNCITTerms();
