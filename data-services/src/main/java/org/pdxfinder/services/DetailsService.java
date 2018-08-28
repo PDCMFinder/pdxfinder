@@ -390,6 +390,8 @@ public class DetailsService {
 
 
         Map<String, String> techNPassToSampleId = new HashMap<>();
+        List<Map> dataSummaryList = new ArrayList<>();
+
         for (String tech : modelTechAndPassages.keySet()) {
 
             //Retrieve the passages:
@@ -410,19 +412,31 @@ public class DetailsService {
                 String sampleIDs = "";
                 for (String sampleID : sampleIDSet) {
                     sampleIDs += sampleID + ",";
+
+                    Map<String, String> dataSummary = new HashMap<>();
+
+                    dataSummary.put("sampleId", sampleID);
+                    dataSummary.put("sampleType","Xenograft");
+                    dataSummary.put("xenograftPassage",dPassage);
+                    dataSummary.put("dataAvailable","Mutation_"+tech);
+                    dataSummary.put("platformUsed",tech);
+                    dataSummary.put("rawData","Not Available");
+
+                    dataSummaryList.add(dataSummary);
                 }
 
                 // Create a Key Value map of (Technology+Passage , sampleIDs) and Pass to DTO
                 techNPassToSampleId.put(tech + dPassage, StringUtils.stripEnd(sampleIDs, ","));
+
+                // SampleType - Xenograft
+                // XenograftPassage - dPassage
+                // DataAvailable -
+                // PlatformUsed - tech
+                // RawData -
             }
-
         }
+        dto.setDataSummary(dataSummaryList);
         dto.setTechNPassToSampleId(techNPassToSampleId);
-
-        log.info(techNPassToSampleId+" XXXXXXX");
-
-
-
 
         Set<String> autoSuggestList = graphService.getMappedNCITTerms();
         dto.setAutoSuggestList(autoSuggestList);

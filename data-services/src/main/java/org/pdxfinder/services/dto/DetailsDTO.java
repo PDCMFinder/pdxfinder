@@ -62,6 +62,7 @@ public class DetailsDTO {
     private Map<String, String> techNPassToSampleId;
     private Set<String> autoSuggestList;
     private Map<String, String> platformsAndUrls;
+    private List<Map> dataSummary;
 
 
 
@@ -433,5 +434,13 @@ public class DetailsDTO {
 
     public void setPlatformsAndUrls(Map<String, String> platformsAndUrls) {
         this.platformsAndUrls = platformsAndUrls;
+    }
+
+    public void setDataSummary(List<Map> dataSummary) {
+        this.dataSummary = dataSummary;
+    }
+
+    public List<Map> getDataSummary() {
+        return dataSummary;
     }
 }
