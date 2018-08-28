@@ -15,6 +15,7 @@ public class QualityAssurance {
     private String technology;
     private String description;
     private String passages;
+    private String validationHostStrain;
 
     public QualityAssurance() {
     }
@@ -24,6 +25,13 @@ public class QualityAssurance {
         this.description = description;
 
         this.passages = passages;
+    }
+
+    public QualityAssurance(String technology, String description, String passages, String validationHostStrain) {
+        this.technology = technology;
+        this.description = description;
+        this.passages = passages;
+        this.validationHostStrain = validationHostStrain;
     }
 
     public String getTechnology() {
@@ -48,5 +56,13 @@ public class QualityAssurance {
 
     public void setPassages(String passages) {
         this.passages = passages;
+    }
+
+    public String getValidationHostStrain() {
+        return validationHostStrain;
+    }
+
+    public void setValidationHostStrain(String validationHostStrain) {
+        this.validationHostStrain = validationHostStrain;
     }
 }
