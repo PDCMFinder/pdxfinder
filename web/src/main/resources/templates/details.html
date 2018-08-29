@@ -57,7 +57,6 @@
 
     <div id="content">
 
-
         <!--/*/ <th:block th:include="fragments/shared :: menu"></th:block> /*/-->
 
         <!-- Suggested layout containers -->
@@ -95,17 +94,17 @@
 
                         <a th:href="@{'mailto:'+${data.contacts+'?subject='+data.modelId}}"
                            th:if="${#strings.contains(data.contacts,'@')}">
-                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
+                            <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
                         </a>
 
                         <a th:href="@{'mailto:'+${data.externalUrl+'?subject='+data.modelId}}"
                            th:if="${#strings.contains(data.externalUrl,'@')}">
-                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
+                            <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
                         </a>
 
                         <a th:href="@{${data.contacts}}" th:target="_blank"
                            th:if="${#strings.contains(data.contacts,'http') }">
-                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
+                            <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
                         </a>
 
                         <!--<a th:href="@{${data.contacts}}" th:target="_blank"     && #strings.endsWith(data.contacts,'=')
@@ -114,7 +113,7 @@
                         </a> -->
 
                         <a th:href="@{${data.externalUrl}}" th:target="_blank" th:if="${#strings.contains(data.externalUrl,'http')}">
-                            <h4 class="button outline uppercase margin-top-large minwidth300 shiftUp10"
+                            <h4 class="button outline uppercase margin-top-large minwidth300 shiftUp10 card-3b"
                                 th:text="${data.externalUrlText}">View at Provider</h4>
                         </a>
 
@@ -129,20 +128,41 @@
 
                 <div class="row large-12 medium-12 expanded">
                     <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
-                        <li class="tabs-title is-active"><a href="#summary" aria-selected="true"  style="font-size: 17px; padding: 15px;">Summary</a></li>
-                        <li class="tabs-title "><a href="#variation" id="variation_data_link" onclick="showTabs('0')" style="font-size: 17px; padding: 15px;"> Genomic Data
-                            (<span th:text="${data.variationDataCount}"></span>) </a></li>
 
-                        <li th:if="${data.drugSummaryRowNumber} == 0" class="tabs-title"><a href="#dosing_studies" style="font-size: 17px; padding: 15px;">Dosing studies (0)</a></li>
-                        <li th:if="${data.drugSummaryRowNumber} > 0" class="tabs-title"><a href="#dosing_studies" style="font-size: 17px; padding: 15px;">Dosing studies (1)</a></li>
+                        <li class="tabs-title is-active">
+                            <a href="#summary" aria-selected="true" >Summary</a>
+                        </li>
 
-                        <li th:if="${#lists.isEmpty(data.dataSummary)}" class="tabs-title"><a href="#data-available" style="font-size: 17px; padding: 15px;"> Data Available (0) </a></li>
-                        <li th:if="${not #lists.isEmpty(data.dataSummary)}" class="tabs-title"><a href="#data-available" style="font-size: 17px; padding: 15px;"> Data Available (<span th:text="${#lists.size(data.dataSummary)}"> ... </span>)</a></li>
+
+                        <li th:if="${#lists.isEmpty(data.dataSummary)}"
+                            class="tabs-title ">
+                            <a href="#variation" id="variation_data_link" onclick="showTabs('0')" >
+                                Data Available (0)
+                            </a>
+                        </li>
+                        <li th:if="${not #lists.isEmpty(data.dataSummary)}"
+                            class="tabs-title ">
+                            <a href="#variation" id="variation_data_link" onclick="showTabs('0')" >
+                                Data Available
+                                (<span th:text="${#lists.size(data.dataSummary)}"> ... </span>)
+                            </a>
+                        </li>
+
+
+                        <li th:if="${data.drugSummaryRowNumber} == 0" class="tabs-title">
+                            <a href="#dosing_studies">Dosing studies (0)</a>
+                        </li>
+
+
+                        <li th:if="${data.drugSummaryRowNumber} > 0" class="tabs-title">
+                            <a href="#dosing_studies">Dosing studies (1)</a>
+                        </li>
 
                     </ul>
                 </div>
 
                 <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+
                     <div class="tabs-panel is-active" id="summary">
 
 
@@ -291,12 +311,12 @@
 
                     <div class="tabs-panel is-active" id="variation">
 
-                        <p>
+
                         <div class="row large-12 medium-12 expanded" id="variationTableData">
 
-                            <!-- Start of Patient variation data -->
+                            <!-- Start of Patient variation data
                             <div class="tab" role="tabpanel" th:if="${data.patientTech.size() > 0}">
-                                <!-- Nav tabs -->
+
                                 <ul class="nav nav-tabs" role="tablist">
                                     <li th:each="technology,iter : ${data.patientTech}"
                                         th:class="( ${iter.index} == 0 ) ? 'active' : '' "
@@ -311,7 +331,7 @@
 
 
 
-                                <!-- Tab panes -->
+                                <!-- Tab panes
                                 <div class="tab-content">
                                     <div th:each="technology,iter : ${data.patientTech}"
                                          th:id="${technology.key}"
@@ -329,7 +349,7 @@
                                                             </b>
 
                                                             <table id="pdxFinder-grid"
-                                                                   class="unstriped pdx-table"> <!-- table-striped table-borderedPdx table-hover -->
+                                                                   class="unstriped pdx-table">
 
                                                                 <thead>
                                                                 <tr>
@@ -356,19 +376,84 @@
                                 </div>
 
                             </div>
-                            <!-- End of Patient Variation Data -->
+                            End of Patient Variation Data -->
 
 
                             <!-- Start of Xenograft Variation data-->
                             <div class="tab hideContent0" role="tabpanel" th:if="${data.modelTechAndPassages.size() > 0}">
 
-                                <!-- Tab panes --><strong></strong>
-                                <div class="tabs-content" data-tabs-content="example-tabs">
+
+                                <div  th:if="${not #lists.isEmpty(data.dataSummary)}" class="row large-12 medium-12 expanded">
+
+                                    <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                        <div class="responsive-table" style="margin-top: 20px;">
+
+                                            <table class="datatable-pdx pdx-table table-borderedPdx head-left">
+                                                <thead>
+                                                <th>S/N</th>
+                                                <th>Sample ID</th>
+                                                <th>Sample Type</th>
+                                                <th>Xenograft Passage</th>
+                                                <th>Data Available</th>
+                                                <th>Platform Used</th>
+                                                <th>Raw Data</th>
+                                                </thead>
+                                                <tbody>
+
+                                                <tr th:each="dataSummary, iter : ${data.dataSummary}">
+
+                                                    <td th:text="${ iter.index+1 }"> ... </td>
+                                                    <td th:text="${dataSummary.sampleId}"> ... </td>
+                                                    <td th:text="${dataSummary.sampleType}"> ... </td>
+                                                    <td th:text="${'Passage '+dataSummary.xenograftPassage}"> ... </td>
+                                                    <td>
+                                                        <a th:text="${dataSummary.dataAvailable}"
+                                                           th:href="${'#variation'}"
+                                                           onclick="showTabs('0')">
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a target="_blank"
+                                                           th:text="${dataSummary.platformUsed}"
+                                                           th:href="${data.platformsAndUrls[dataSummary.platformUsed]}">
+                                                            ...
+                                                        </a>
+                                                    </td>
+                                                    <td th:text="${dataSummary.rawData}"></td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="columns medium-12 small-12 top-space-20 card-3" style="padding: 15px;">
+
+
+                                    <div class="row large-12 medium-12 expanded">
+                                        <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                                            <li class="tabs-title is-active">
+                                                <a href="#initialDiagnosis"
+                                                   aria-selected="true"
+                                                   style="font-size: 14px;
+                                                   padding: 15px;">
+                                                    Genomic Data (<span th:text="${data.variationDataCount}"></span>)
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div> <br>
 
                                     <div id="sizeSwitch">
-                                        <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}" class="button outline secondary">
-                                            Export Results <i class="icon icon-functional" data-icon="="></i> </a>
+                                        <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"
+                                           class="button outline secondary">
+                                            Export Results
+                                            <i class="icon icon-functional" data-icon="="></i>
+                                        </a>
                                     </div>
+                                <div class="tabs-content" data-tabs-content="example-tabs">
 
                                     <ul class="tabs" data-tabs id="example-tabs">
                                         <li th:each="technology,iter : ${data.modelTechAndPassages}"
@@ -376,8 +461,9 @@
 
                                             <a th:href="@{'#'+${technology.key}}"
                                                data-th-attr="data-tabs-target=${technology.key},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
-                                               th:text="${technology.key}+' Platform'" th:onclick="'showTabs('+${iter.index}+')'"> TAB TITLES </a>
-
+                                               th:text="${technology.key}+' Platform'" th:onclick="'showTabs('+${iter.index}+')'">
+                                                TAB TITLES
+                                            </a>
                                         </li>
                                     </ul>
 
@@ -445,80 +531,86 @@
                                     </div>
                                 </div>
 
+
+                                </div>
+
                             </div>
                             <!-- End of Xenograft Variation data -->
 
-
                         </div>
-                        </p>
 
                     </div>
 
                     <div class="tabs-panel" id="dosing_studies">
                         <div th:if="${not #lists.isEmpty(data.drugSummary)}">
-                            <p>
 
-                            <div th:if="${data.drugProtocolUrl} != null" class="drug_spacing">
-                                <a th:href="${data.drugProtocolUrl}" >Dosing study protocol</a>
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;">
+
+                                    <div th:if="${data.drugProtocolUrl} != null" class="drug_spacing">
+                                        <a th:href="${data.drugProtocolUrl}" >Dosing study protocol</a>
+                                    </div>
+
+                                    <table class="datatable-pdx pdx-table table-borderedPdx head-left">
+                                        <thead>
+                                        <th>Drug</th>
+                                        <th>Dose</th>
+                                        <th>Response</th>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="drugData, iter : ${data.drugSummary}">
+                                            <td th:text="${drugData.drugName}"></td>
+                                            <td th:text="${drugData.dose}"></td>
+                                            <td th:text="${drugData.response}"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
                             </div>
 
-                            <table class="datatable-pdx pdx-table table-borderedPdx head-left">
-                                <thead>
-                                <th>Drug</th>
-                                <th>Dose</th>
-                                <th>Response</th>
-                                </thead>
-                                <tbody>
-                                <tr th:each="drugData, iter : ${data.drugSummary}">
-                                    <td th:text="${drugData.drugName}"></td>
-                                    <td th:text="${drugData.dose}"></td>
-                                    <td th:text="${drugData.response}"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                            </p>
                         </div>
 
                         <div th:if="${#lists.isEmpty(data.drugSummary)}"></div>
                     </div>
 
 
-                    <div class="tabs-panel" id="data-available">
+                    <!--<div class="tabs-panel" id="data-available">
                         <div  th:if="${not #lists.isEmpty(data.dataSummary)}" class="row large-12 medium-12 expanded">
 
-                                <div class="columns medium-12 small-12 margin-top-10 card-3">
-                                    <div class="responsive-table" style="margin-top: 20px;">
+                           <div class="columns medium-12 small-12 margin-top-10 card-3">
+                               <div class="responsive-table" style="margin-top: 20px;">
 
-                            <table class="datatable-pdx pdx-table table-borderedPdx head-left">
-                                <thead>
-                                <th>S/N</th>
-                                <th>Sample ID</th>
-                                <th>Sample Type</th>
-                                <th>Xenograft Passage</th>
-                                <th>Data Available</th>
-                                <th>Platform Used</th>
-                                <th>Raw Data</th>
-                                </thead>
-                                <tbody>
+                                    <table class="datatable-pdx pdx-table table-borderedPdx head-left">
+                                        <thead>
+                                        <th>S/N</th>
+                                        <th>Sample ID</th>
+                                        <th>Sample Type</th>
+                                        <th>Xenograft Passage</th>
+                                        <th>Data Available</th>
+                                        <th>Platform Used</th>
+                                        <th>Raw Data</th>
+                                        </thead>
+                                        <tbody>
 
-                                <tr th:each="dataSummary, iter : ${data.dataSummary}">
+                                        <tr th:each="dataSummary, iter : ${data.dataSummary}">
 
-                                    <td th:text="${ iter.index+1 }"></td>
-                                    <td th:text="${dataSummary.sampleId}"></td>
-                                    <td th:text="${dataSummary.sampleType}"></td>
-                                    <td th:text="${'Passage '+dataSummary.xenograftPassage}"></td>
-                                    <td> <a th:text="${dataSummary.dataAvailable}" th:href="${'#variation'}"></a>  </td>
-                                    <td>  <a target="_blank" th:text="${dataSummary.platformUsed}" th:href="${data.platformsAndUrls[dataSummary.platformUsed]}"> ... </a>   </td>
-                                    <td th:text="${dataSummary.rawData}"></td>
-                                </tr>
-                                </tbody>
-                            </table>
+                                            <td th:text="${ iter.index+1 }"></td>
+                                            <td th:text="${dataSummary.sampleId}"></td>
+                                            <td th:text="${dataSummary.sampleType}"></td>
+                                            <td th:text="${'Passage '+dataSummary.xenograftPassage}"></td>
+                                            <td> <a th:text="${dataSummary.dataAvailable}" th:href="${'#variation'}" onclick="showTabs('0')"></a>  </td>
+                                            <td>  <a target="_blank" th:text="${dataSummary.platformUsed}" th:href="${data.platformsAndUrls[dataSummary.platformUsed]}"> ... </a>   </td>
+                                            <td th:text="${dataSummary.rawData}"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
 
-                                    </div>
-                                </div>
+                               </div>
+                           </div>
 
                         </div>
-                    </div>
+                    </div>-->
 
                 </div>
 
