@@ -198,7 +198,7 @@
                                         <tr th:if="${not #lists.isEmpty(data.relatedModels)}">
                                             <th class="text-left">Related models</th>
                                             <td><span th:each="relMod:${data.relatedModels}"><a th:text="${relMod}"
-                                                                                           th:href="@{'/pdx/'+${data.dataSource}+'/'+${relMod}}"></a> </span>
+                                                                                                th:href="@{'/pdx/'+${data.dataSource}+'/'+${relMod}}"></a> </span>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -382,237 +382,199 @@
                             <!-- Start of Xenograft Variation data-->
                             <div class="tab hideContent0" role="tabpanel" th:if="${data.modelTechAndPassages.size() > 0}">
 
-
                                 <div  th:if="${not #lists.isEmpty(data.dataSummary)}" class="row large-12 medium-12 expanded">
 
                                     <div class="columns medium-12 small-12 margin-top-10 card-3">
                                         <div class="responsive-table" style="margin-top: 20px;">
 
-                                            <table class="datatable-pdx pdx-table table-borderedPdx head-left">
-                                                <thead>
-                                                <th>S/N</th>
-                                                <th>Sample ID</th>
-                                                <th>Sample Type</th>
-                                                <th>Xenograft Passage</th>
-                                                <th>Data Available</th>
-                                                <th>Platform Used</th>
-                                                <th>Raw Data</th>
-                                                </thead>
-                                                <tbody>
+                                                <table class="datatable-pdx pdx-table table-borderedPdx head-left">
+                                                    <thead>
+                                                    <th>S/N</th>
+                                                    <th>Sample ID</th>
+                                                    <th>Sample Type</th>
+                                                    <th>Xenograft Passage</th>
+                                                    <th>Data Available</th>
+                                                    <th>Platform Used</th>
+                                                    <th>Raw Data</th>
+                                                    </thead>
+                                                    <tbody>
 
-                                                <tr th:each="dataSummary, iter : ${data.dataSummary}">
+                                                    <tr th:each="dataSummary, iter : ${data.dataSummary}">
 
-                                                    <td th:text="${ iter.index+1 }"> ... </td>
-                                                    <td th:text="${dataSummary.sampleId}"> ... </td>
-                                                    <td th:text="${dataSummary.sampleType}"> ... </td>
-                                                    <td th:text="${'Passage '+dataSummary.xenograftPassage}"> ... </td>
-                                                    <td>
-                                                        <a th:text="${dataSummary.dataAvailable}"
-                                                           th:href="${'#variation'}"
-                                                           onclick="showTabs('0')">
-                                                        </a>
-                                                    </td>
-                                                    <td>
-                                                        <a target="_blank"
-                                                           th:text="${dataSummary.platformUsed}"
-                                                           th:href="${data.platformsAndUrls[dataSummary.platformUsed]}">
-                                                            ...
-                                                        </a>
-                                                    </td>
-                                                    <td th:text="${dataSummary.rawData}"></td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
+                                                        <td th:text="${ iter.index+1 }"> ... </td>
+                                                        <td th:text="${dataSummary.sampleId}"> ... </td>
+                                                        <td th:text="${dataSummary.sampleType}"> ... </td>
+                                                        <td th:text="${'Passage '+dataSummary.xenograftPassage}"> ... </td>
+                                                        <td>
+                                                            <a th:text="${dataSummary.dataAvailable}"
+                                                               th:href="${'#variation'}"
+                                                               onclick="revealVariationData()">
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <a target="_blank"
+                                                               th:text="${dataSummary.platformUsed}"
+                                                               th:href="${data.platformsAndUrls[dataSummary.platformUsed]}">
+                                                                ...
+                                                            </a>
+                                                        </td>
+                                                        <td th:text="${dataSummary.rawData}"></td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
 
+                                            </div>
                                         </div>
+
                                     </div>
 
-                                </div>
 
-
-                                <div class="columns medium-12 small-12 top-space-20 card-3" style="padding: 15px;">
-
-
-                                    <div class="row large-12 medium-12 expanded">
+                                <div class="hideVariationData">
+                                    <div class="row large-12 medium-12 expanded top-space-30 ">
                                         <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
                                             <li class="tabs-title is-active">
                                                 <a href="#initialDiagnosis"
                                                    aria-selected="true"
-                                                   style="font-size: 14px;
-                                                   padding: 15px;">
+                                                   style="font-size: 15px;
+                                                       padding: 15px;">
                                                     Genomic Data (<span th:text="${data.variationDataCount}"></span>)
                                                 </a>
                                             </li>
                                         </ul>
-                                    </div> <br>
-
-                                    <div id="sizeSwitch">
-                                        <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"
-                                           class="button outline secondary">
-                                            Export Results
-                                            <i class="icon icon-functional" data-icon="="></i>
-                                        </a>
                                     </div>
-                                <div class="tabs-content" data-tabs-content="example-tabs">
+                                    <div class="columns medium-12 small-12 card-3" style="padding: 15px;">
 
-                                    <ul class="tabs" data-tabs id="example-tabs">
-                                        <li th:each="technology,iter : ${data.modelTechAndPassages}"
-                                            class="tabs-title" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
 
-                                            <a th:href="@{'#'+${technology.key}}"
-                                               data-th-attr="data-tabs-target=${technology.key},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
-                                               th:text="${technology.key}+' Platform'" th:onclick="'showTabs('+${iter.index}+')'">
-                                                TAB TITLES
+
+                                        <div id="sizeSwitch">
+                                            <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"
+                                               class="button outline secondary">
+                                                Export Results
+                                                <i class="icon icon-functional" data-icon="="></i>
                                             </a>
-                                        </li>
-                                    </ul>
+                                        </div>
 
-                                    <div th:each="technology,iter : ${data.modelTechAndPassages}"
-                                         th:id="${technology.key}"
-                                         class="tabs-panel is-active"
-                                         th:classappend=" 'hideContent'+${iter.index} ">
+                                        <div class="tabs-content" data-tabs-content="example-tabs">
 
-                                                    <span th:unless="${technology.value.size()<1}"
-                                                          th:each="num: ${#numbers.sequence(1,technology.value.size())}"> <!--/* Unable to capture index for inner loop so, this was used for innerloop : <tr th:each="passageList : ${technolog[y.value]}"> */-->
+                                            <ul class="tabs rem-side-borders" data-tabs id="example-tabs">
+                                                <li th:each="technology,iter : ${data.modelTechAndPassages}"
+                                                    class="tabs-title" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
 
-                                                            <div class="table-responsive">
+                                                    <a th:href="@{'#'+${technology.key}}"
+                                                       data-th-attr="data-tabs-target=${technology.key},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
+                                                       th:text="${technology.key}+' Platform'" th:onclick="'showTabs('+${iter.index}+')'">
+                                                        TAB TITLES
+                                                    </a>
+                                                </li>
+                                            </ul>
 
-                                                                <h4 class="bLine"
-                                                                    th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
+                                            <div th:each="technology,iter : ${data.modelTechAndPassages}"
+                                                 th:id="${technology.key}"
+                                                 class="tabs-panel is-active"
+                                                 th:classappend=" 'hideContent'+${iter.index} ">
 
-                                                                    <span class="hdc">Sample ID: </span>
+                                                        <span th:unless="${technology.value.size()<1}"
+                                                              th:each="num: ${#numbers.sequence(1,technology.value.size())}"> <!--/* Unable to capture index for inner loop so, this was used for innerloop : <tr th:each="passageList : ${technolog[y.value]}"> */-->
 
-                                                                    <b class="black"
-                                                                       th:text="${data.techNPassToSampleId['__${technology.key}__'+'__${technology.value[num-1]}__']}"></b>    &nbsp; &nbsp;
+                                                                <div class="table-responsive">
 
-                                                                    <span class="hdc">Histology:</span> <b class="black"
-                                                                                                           th:text="${#strings.capitalize(data.diagnosis)}"></b>     &nbsp; &nbsp;
-                                                                    <span class="hdc">Tumor Type: </span>
-                                                                    <b class="black">Xenograft Tumor</b>                  &nbsp; &nbsp;
-                                                                    <span class="hdc">Passage: </span>  <b class="black"
-                                                                                                           th:text="${technology.value[num-1]}"></b>     &nbsp; &nbsp;
-                                                                    <span class="hdc">Platform: </span>
+                                                                    <h4 class="bLine"
+                                                                        th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
 
-                                                                    <span th:if="${data.platformsAndUrls.containsKey(technology.key)}">
-                                                                            <a th:href="${data.platformsAndUrls[technology.key]}" th:text="${technology.key}"></a>
+                                                                        <span class="hdc">Sample ID: </span>
+
+                                                                        <b class="black"
+                                                                           th:text="${data.techNPassToSampleId['__${technology.key}__'+'__${technology.value[num-1]}__']}"></b>    &nbsp; &nbsp;
+
+                                                                        <span class="hdc">Histology:</span> <b class="black"
+                                                                                                               th:text="${#strings.capitalize(data.diagnosis)}"></b>     &nbsp; &nbsp;
+                                                                        <span class="hdc">Tumor Type: </span>
+                                                                        <b class="black">Xenograft Tumor</b>                  &nbsp; &nbsp;
+                                                                        <span class="hdc">Passage: </span>  <b class="black"
+                                                                                                               th:text="${technology.value[num-1]}"></b>     &nbsp; &nbsp;
+                                                                        <span class="hdc">Platform: </span>
+
+                                                                        <span th:if="${data.platformsAndUrls.containsKey(technology.key)}">
+                                                                                <a th:href="${data.platformsAndUrls[technology.key]}" th:text="${technology.key}"></a>
+                                                                            </span>
+
+                                                                        <span th:if="${not data.platformsAndUrls.containsKey(technology.key)}">
+                                                                                <b class="black" th:text="${technology.key}"></b>
                                                                         </span>
 
-                                                                    <span th:if="${not data.platformsAndUrls.containsKey(technology.key)}">
-                                                                            <b class="black" th:text="${technology.key}"></b>
-                                                                    </span>
+                                                                    </h4>
 
-                                                                </h4>
+                                                                    <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
+                                                                           id="example-datatable"
+                                                                           class="table display datatable-pdx table-borderedPdx"
+                                                                           th:height="50" width="100%">
 
-                                                                <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
-                                                                       id="example-datatable"
-                                                                       class="table display datatable-pdx table-borderedPdx"
-                                                                       th:height="50" width="100%">
+                                                                        <thead>
+                                                                        <tr>
+                                                                            <th>Sample </th>
+                                                                            <th>Chromosome</th>
+                                                                            <th>Seq. Position</th>
+                                                                            <th>Ref. Allele</th>
+                                                                            <th>Alt. Allele</th>
+                                                                            <th>Consequence</th>
+                                                                            <th>Gene</th>
+                                                                            <th>Amino Acid Change</th>
+                                                                            <th>Read Depth</th>
+                                                                            <th>Allele Freq.</th>
+                                                                            <th>RS Variants</th>
+                                                                        </tr>
+                                                                        </thead>
+                                                                    </table>
+                                                                </div>
 
-                                                                    <thead>
-                                                                    <tr>
-                                                                        <th>Sample </th>
-                                                                        <th>Chromosome</th>
-                                                                        <th>Seq. Position</th>
-                                                                        <th>Ref. Allele</th>
-                                                                        <th>Alt. Allele</th>
-                                                                        <th>Consequence</th>
-                                                                        <th>Gene</th>
-                                                                        <th>Amino Acid Change</th>
-                                                                        <th>Read Depth</th>
-                                                                        <th>Allele Freq.</th>
-                                                                        <th>RS Variants</th>
-                                                                    </tr>
-                                                                    </thead>
-                                                                </table>
-                                                            </div>
+                                                        </span>
 
-                                                    </span>
-
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
-
                                 </div>
+                                <!-- End of Xenograft Variation data -->
 
-                            </div>
-                            <!-- End of Xenograft Variation data -->
-
-                        </div>
-
-                    </div>
-
-                    <div class="tabs-panel" id="dosing_studies">
-                        <div th:if="${not #lists.isEmpty(data.drugSummary)}">
-
-                            <div class="columns medium-12 small-12 margin-top-10 card-3">
-                                <div class="responsive-table" style="margin-top: 20px;">
-
-                                    <div th:if="${data.drugProtocolUrl} != null" class="drug_spacing">
-                                        <a th:href="${data.drugProtocolUrl}" >Dosing study protocol</a>
-                                    </div>
-
-                                    <table class="datatable-pdx pdx-table table-borderedPdx head-left">
-                                        <thead>
-                                        <th>Drug</th>
-                                        <th>Dose</th>
-                                        <th>Response</th>
-                                        </thead>
-                                        <tbody>
-                                        <tr th:each="drugData, iter : ${data.drugSummary}">
-                                            <td th:text="${drugData.drugName}"></td>
-                                            <td th:text="${drugData.dose}"></td>
-                                            <td th:text="${drugData.response}"></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-
-                                </div>
                             </div>
 
                         </div>
 
-                        <div th:if="${#lists.isEmpty(data.drugSummary)}"></div>
-                    </div>
+                        <div class="tabs-panel" id="dosing_studies">
+                            <div th:if="${not #lists.isEmpty(data.drugSummary)}">
 
+                                <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                    <div class="responsive-table" style="margin-top: 20px;">
 
-                    <!--<div class="tabs-panel" id="data-available">
-                        <div  th:if="${not #lists.isEmpty(data.dataSummary)}" class="row large-12 medium-12 expanded">
+                                        <div th:if="${data.drugProtocolUrl} != null" class="drug_spacing">
+                                            <a th:href="${data.drugProtocolUrl}" >Dosing study protocol</a>
+                                        </div>
 
-                           <div class="columns medium-12 small-12 margin-top-10 card-3">
-                               <div class="responsive-table" style="margin-top: 20px;">
+                                        <table class="datatable-pdx pdx-table table-borderedPdx head-left">
+                                            <thead>
+                                            <th>Drug</th>
+                                            <th>Dose</th>
+                                            <th>Response</th>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="drugData, iter : ${data.drugSummary}">
+                                                <td th:text="${drugData.drugName}"></td>
+                                                <td th:text="${drugData.dose}"></td>
+                                                <td th:text="${drugData.response}"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
 
-                                    <table class="datatable-pdx pdx-table table-borderedPdx head-left">
-                                        <thead>
-                                        <th>S/N</th>
-                                        <th>Sample ID</th>
-                                        <th>Sample Type</th>
-                                        <th>Xenograft Passage</th>
-                                        <th>Data Available</th>
-                                        <th>Platform Used</th>
-                                        <th>Raw Data</th>
-                                        </thead>
-                                        <tbody>
+                                    </div>
+                                </div>
 
-                                        <tr th:each="dataSummary, iter : ${data.dataSummary}">
+                            </div>
 
-                                            <td th:text="${ iter.index+1 }"></td>
-                                            <td th:text="${dataSummary.sampleId}"></td>
-                                            <td th:text="${dataSummary.sampleType}"></td>
-                                            <td th:text="${'Passage '+dataSummary.xenograftPassage}"></td>
-                                            <td> <a th:text="${dataSummary.dataAvailable}" th:href="${'#variation'}" onclick="showTabs('0')"></a>  </td>
-                                            <td>  <a target="_blank" th:text="${dataSummary.platformUsed}" th:href="${data.platformsAndUrls[dataSummary.platformUsed]}"> ... </a>   </td>
-                                            <td th:text="${dataSummary.rawData}"></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-
-                               </div>
-                           </div>
-
+                            <div th:if="${#lists.isEmpty(data.drugSummary)}"></div>
                         </div>
-                    </div>-->
 
-                </div>
+                    </div>
 
 
             </section>
@@ -718,6 +680,17 @@
             document.getElementsByClassName("hideContent"+cnt)[i].style.position = "static";
         }
     }
+
+
+    function revealVariationData() {
+
+        // Activate the display of the vData
+        document.getElementsByClassName("hideVariationData")[0].style.position = "static";
+
+        // Open the corresponding tech Tab:
+        // showTabs(cnt);
+    }
+
 
     // Check if variation tab is deeplinked on page load:
     $(document).ready(function(){

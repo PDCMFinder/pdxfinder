@@ -106,7 +106,7 @@ h5{
     display: none;
 }
 
-.hideContent0 {
+.hideContent0, .hideVariationData {
     position: absolute;
     top: -9999px;
 }
@@ -279,6 +279,10 @@ h5{
 }
 
 .top-space-20 {
+    margin-top: 20px;
+}
+
+.top-space-30 {
     margin-top: 20px;
 }
 
@@ -1284,4 +1288,10 @@ hr .line_v2 {
 .timeline ul li:hover .timelineYear {
     position: static;
     top:-10px;
+}
+
+
+.rem-side-borders{
+    border-left:none;
+    border-right:none;
 }
