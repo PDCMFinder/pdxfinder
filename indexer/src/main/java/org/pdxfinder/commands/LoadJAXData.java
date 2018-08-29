@@ -194,7 +194,7 @@ public class LoadJAXData implements CommandLineRunner {
         String ethnicity = Standardizer.fixNotString(j.getString("Ethnicity"));
         String patientId = j.getString("Patient ID");
 
-        String tumorType = j.getString("Tumor Type");
+        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
         String primarySite = j.getString("Primary Site");
         String sampleSite = j.getString("Specimen Site");
         String extractionMethod = j.getString("Sample Type");
