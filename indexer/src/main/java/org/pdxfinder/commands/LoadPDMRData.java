@@ -119,7 +119,7 @@ public class LoadPDMRData implements CommandLineRunner {
                 log.info("Loading from file " + file);
                 parseJSON(parseFile(file));
 
-                loadMutationData();
+                //loadMutationData();
 
 
             } /* else if (urlStr != null) {
