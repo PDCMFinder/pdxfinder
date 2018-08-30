@@ -130,20 +130,20 @@
                     <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
 
                         <li class="tabs-title is-active">
-                            <a href="#summary" aria-selected="true" >Summary</a>
+                            <a href="#summary" aria-selected="true" > PDX Model Data</a>
                         </li>
 
 
                         <li th:if="${#lists.isEmpty(data.dataSummary)}"
                             class="tabs-title ">
                             <a href="#variation" id="variation_data_link" onclick="showTabs('0')" >
-                                Data Available (0)
+                                Molecular Data (0)
                             </a>
                         </li>
                         <li th:if="${not #lists.isEmpty(data.dataSummary)}"
                             class="tabs-title ">
                             <a href="#variation" id="variation_data_link" onclick="showTabs('0')" >
-                                Data Available
+                                Molecular Data
                                 (<span th:text="${#lists.size(data.dataSummary)}"> ... </span>)
                             </a>
                         </li>
@@ -389,7 +389,6 @@
 
                                                 <table class="datatable-pdx pdx-table table-borderedPdx head-left">
                                                     <thead>
-                                                    <th>S/N</th>
                                                     <th>Sample ID</th>
                                                     <th>Sample Type</th>
                                                     <th>Xenograft Passage</th>
@@ -401,7 +400,6 @@
 
                                                     <tr th:each="dataSummary, iter : ${data.dataSummary}">
 
-                                                        <td th:text="${ iter.index+1 }"> ... </td>
                                                         <td th:text="${dataSummary.sampleId}"> ... </td>
                                                         <td th:text="${dataSummary.sampleType}"> ... </td>
                                                         <td th:text="${'Passage '+dataSummary.xenograftPassage}"> ... </td>
