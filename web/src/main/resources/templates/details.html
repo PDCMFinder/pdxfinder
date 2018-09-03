@@ -136,13 +136,13 @@
 
                         <li th:if="${#lists.isEmpty(data.dataSummary)}"
                             class="tabs-title ">
-                            <a href="#variation" id="variation_data_link" onclick="showTabs('0')" >
+                            <a href="#variation" id="variation_data_link" onclick="initTabs('0')">
                                 Molecular Data (0)
                             </a>
                         </li>
                         <li th:if="${not #lists.isEmpty(data.dataSummary)}"
                             class="tabs-title ">
-                            <a href="#variation" id="variation_data_link" onclick="showTabs('0')" >
+                            <a href="#variation" id="variation_data_link" onclick="initTabs('0')">
                                 Molecular Data
                                 (<span th:text="${#lists.size(data.dataSummary)}"> ... </span>)
                             </a>
@@ -378,6 +378,17 @@
                             </div>
                             End of Patient Variation Data -->
 
+                            <!--
+
+                            Development of an Interactive cloud software for simplifying GWAS nalysis workflow,
+
+
+                            Develop web services to re-use and implement the stages of the project to build otehr tools
+                            Develop multitenant applcation for this GWAS Analysis. Set Up on your server and have your users, account and reports ...
+
+                            Develop mu;tiple result oriented data for the entire application software ...
+
+                            -->
 
                             <!-- Start of Xenograft Variation data-->
                             <div class="tab hideContent0" role="tabpanel" th:if="${data.modelTechAndPassages.size() > 0}">
@@ -387,7 +398,7 @@
                                     <div class="columns medium-12 small-12 margin-top-10 card-3">
                                         <div class="responsive-table" style="margin-top: 20px;">
 
-                                                <table class="datatable-pdx pdx-table table-borderedPdx head-left">
+                                                <table class="datatable-pdx pdx-table table-borderedPdx head-left" data-tabs id="example-tabs">
                                                     <thead>
                                                     <th>Sample ID</th>
                                                     <th>Sample Type</th>
@@ -398,15 +409,21 @@
                                                     </thead>
                                                     <tbody>
 
-                                                    <tr th:each="dataSummary, iter : ${data.dataSummary}">
+
+                                                    <tr th:each="dataSummary,iter : ${data.dataSummary}"
+                                                        class="tabs-title" style="float:none; text-transform: capitalize;" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
 
                                                         <td th:text="${dataSummary.sampleId}"> ... </td>
                                                         <td th:text="${dataSummary.sampleType}"> ... </td>
                                                         <td th:text="${'Passage '+dataSummary.xenograftPassage}"> ... </td>
+
+
                                                         <td>
-                                                            <a th:text="${dataSummary.dataAvailable}"
-                                                               th:href="${'#variation'}"
-                                                               onclick="revealVariationData()">
+                                                            <a th:href="@{'#'+${dataSummary.platformUsed}}"
+                                                               data-th-attr="data-tabs-target=${dataSummary.platformUsed},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
+                                                               th:text="${dataSummary.platformUsed}+' Platform'"
+                                                               th:onclick="'showTabs('+${iter.index}+')'">
+                                                                TAB TITLES
                                                             </a>
                                                         </td>
                                                         <td>
@@ -418,6 +435,7 @@
                                                         </td>
                                                         <td th:text="${dataSummary.rawData}"></td>
                                                     </tr>
+
                                                     </tbody>
                                                 </table>
 
@@ -425,6 +443,7 @@
                                         </div>
 
                                     </div>
+
 
 
                                 <div class="hideVariationData">
@@ -454,7 +473,7 @@
 
                                         <div class="tabs-content" data-tabs-content="example-tabs">
 
-                                            <ul class="tabs rem-side-borders" data-tabs id="example-tabs">
+                                            <!--<ul class="tabs rem-side-borders" data-tabs id="example-tabs">
                                                 <li th:each="technology,iter : ${data.modelTechAndPassages}"
                                                     class="tabs-title" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
 
@@ -464,15 +483,19 @@
                                                         TAB TITLES
                                                     </a>
                                                 </li>
-                                            </ul>
+                                            </ul>-->
 
                                             <div th:each="technology,iter : ${data.modelTechAndPassages}"
                                                  th:id="${technology.key}"
                                                  class="tabs-panel is-active"
-                                                 th:classappend=" 'hideContent'+${iter.index} ">
+                                                 th:classappend=" 'hideContent'+${iter.index} " style="border-top: 1px solid #5ea88f;">
+
+                                                <hr class="hr-text" th:attr="data-content=${technology.key+' PLATFORM '}">
 
                                                         <span th:unless="${technology.value.size()<1}"
                                                               th:each="num: ${#numbers.sequence(1,technology.value.size())}"> <!--/* Unable to capture index for inner loop so, this was used for innerloop : <tr th:each="passageList : ${technolog[y.value]}"> */-->
+
+
 
                                                                 <div class="table-responsive">
 
@@ -676,9 +699,17 @@
     function showTabs(cnt) {
         for (var i = 0; i < 5; i++) {
             document.getElementsByClassName("hideContent"+cnt)[i].style.position = "static";
+
+            document.getElementsByClassName("hideVariationData")[0].style.position = "static";
         }
     }
 
+
+    function initTabs(cnt) {
+        for (var i = 0; i < 5; i++) {
+            document.getElementsByClassName("hideContent"+cnt)[i].style.position = "static";
+        }
+    }
 
     function revealVariationData() {
 
