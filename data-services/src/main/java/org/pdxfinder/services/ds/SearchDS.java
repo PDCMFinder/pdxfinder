@@ -109,7 +109,6 @@ public class SearchDS {
 
     public static List<String> DIAGNOSIS_OPTIONS = new ArrayList<>();
 
-    public static List<String> PROJECT_OPTIONS = new ArrayList<>();
 
     /**
      * Populate the complete set of models for searching when this object is instantiated
@@ -772,12 +771,6 @@ public class SearchDS {
                     result = result.stream().filter(x -> predicate.test(x.getDatasource())).collect(Collectors.toSet());
                     break;
 
-                case project:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.project));
-                    result = result.stream().filter(x -> predicate.test(x.getProject())).collect(Collectors.toSet());
-                    break;
-
                 case diagnosis:
 
                     predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.diagnosis));
@@ -922,9 +915,11 @@ public class SearchDS {
                     for (ModelForQuery res : result) {
                         Boolean keep = Boolean.FALSE;
                         for (String s : filters.get(SearchFacetName.project)) {
-                            if (res.getProjects().contains(s)) {
-                                keep = Boolean.TRUE;
-                            }
+                            try{
+                                if (res.getProjects().contains(s)) {
+                                    keep = Boolean.TRUE;
+                                }
+                            } catch(Exception e){}
                         }
                         if (!keep) {
                             projectsToRemove.add(res);
