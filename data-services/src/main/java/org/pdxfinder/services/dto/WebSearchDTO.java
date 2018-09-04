@@ -350,4 +350,12 @@ public class WebSearchDTO {
     public void setProjects(List<String> projects) {
         this.projects = projects;
     }
+
+    public List<FacetOption> getProjectSelected() {
+        return projectSelected;
+    }
+
+    public void setProjectSelected(List<FacetOption> projectSelected) {
+        this.projectSelected = projectSelected;
+    }
 }
