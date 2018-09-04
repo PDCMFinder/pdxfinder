@@ -393,4 +393,15 @@ public class ModelForQuery {
     public void setDrugData(List<DrugSummaryDTO> drugData) {
         this.drugData = drugData;
     }
+
+
+    public void addProject(String project){
+
+        if(projects == null){
+            projects = new ArrayList<>();
+        }
+
+        projects.add(project);
+
+    }
 }
