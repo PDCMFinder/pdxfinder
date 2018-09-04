@@ -159,14 +159,6 @@ public class WebSearchDTO {
         this.datasourceSelected = datasourceSelected;
     }
 
-    public List<FacetOption> getProjectSelected() {
-        return projectSelected;
-    }
-
-    public void setProjectSelected(List<FacetOption> projectSelected) {
-        this.projectSelected = projectSelected;
-    }
-
     public List<FacetOption> getCancerSystemSelected() {
         return cancerSystemSelected;
     }
