@@ -56,6 +56,7 @@ public class WebSearchDTO {
 
     private List<String> drugNames;
     private List<String> drugResponses;
+    private List<String> projects;
 
 
     public WebSearchDTO() {
@@ -348,5 +349,21 @@ public class WebSearchDTO {
 
     public void setDataAvailableColumnPresent(boolean dataAvailablePresent) {
         dataAvailableColumnPresent = dataAvailablePresent;
+    }
+
+    public List<String> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<String> projects) {
+        this.projects = projects;
+    }
+
+    public List<FacetOption> getProjectSelected() {
+        return projectSelected;
+    }
+
+    public void setProjectSelected(List<FacetOption> projectSelected) {
+        this.projectSelected = projectSelected;
     }
 }

@@ -53,6 +53,7 @@ public class LoadMDAnderson implements CommandLineRunner {
 
     //   private HostStrain nsgBS;
     private Group mdaDS;
+    private Group projectGroup;
 
     private Options options;
     private CommandLineParser parser;
@@ -103,6 +104,8 @@ public class LoadMDAnderson implements CommandLineRunner {
         mdaDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
                 DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+
+        projectGroup = dataImportService.getProjectGroup("PDXNet");
 
         try {
             JSONObject job = new JSONObject(json);
@@ -204,6 +207,7 @@ public class LoadMDAnderson implements CommandLineRunner {
 
         ModelCreation modelCreation = dataImportService.createModelCreation(id, mdaDS.getAbbreviation(), sample, qa, externalUrls);
         modelCreation.addRelatedSample(sample);
+        modelCreation.addGroup(projectGroup);
 
         boolean human = false;
         

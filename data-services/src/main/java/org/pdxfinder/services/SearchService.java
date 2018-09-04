@@ -45,8 +45,7 @@ public class SearchService {
     List<String> cancerBySystemOptions = SearchDS.CANCERS_BY_SYSTEM_OPTIONS;
     List<String> patientGenderOptions = SearchDS.PATIENT_GENDERS;
     List<String> sampleTumorTypeOptions = SearchDS.SAMPLE_TUMOR_TYPE_OPTIONS;
-    List<String> projectOptions = SearchDS.PROJECT_OPTIONS;
-
+    List<String> projectOptions = searchDS.PROJECT_OPTIONS;
 
 
     public SearchService(ModelCreationRepository modelCreationRepository,
@@ -146,20 +145,8 @@ public class SearchService {
 
         WebSearchDTO wsDTO = new WebSearchDTO();
 
+
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
-
-        // STUBBING AND MOCKING UNTIL DATA IS READY
-        Boolean euroPDX = false;
-        Boolean pdxNet = false;
-        try{
-            if (project.get().contains("EuroPDX")){ euroPDX = true; }
-            if (project.get().contains("PDXNet")){ pdxNet = true; }
-        }catch (Exception e){}
-
-        List<FacetOption> fakeData = new ArrayList<>();
-        fakeData.add(new FacetOption("EuroPDX", 186, 186 , euroPDX, SearchFacetName.project));
-        fakeData.add(new FacetOption("PDXNet", 639, 639 , pdxNet, SearchFacetName.project));
-
 
         List<FacetOption> patientAgeSelected = searchDS.getFacetOptions(SearchFacetName.patient_age, patientAgeOptions, results, patient_age.orElse(null));
         List<FacetOption> patientGenderSelected = searchDS.getFacetOptions(SearchFacetName.patient_gender, patientGenderOptions, results, patient_gender.orElse(null));
@@ -168,8 +155,7 @@ public class SearchService {
         List<FacetOption> sampleTumorTypeSelected = searchDS.getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
         List<FacetOption> mutationSelected = searchDS.getFacetOptions(SearchFacetName.mutation, null, results, mutation.orElse(null));
         List<FacetOption> drugSelected = searchDS.getFacetOptions(SearchFacetName.drug, null, results, drug.orElse(null));
-        List<FacetOption> projectSelected = fakeData; //searchDS.getFacetOptions(SearchFacetName.project, null, results, project.orElse(null));
-
+        List<FacetOption> projectSelected = searchDS.getFacetOptions(SearchFacetName.project, null, results, drug.orElse(null));
 
         wsDTO.setPatientAgeSelected(patientAgeSelected);
         wsDTO.setPatientGenderSelected(patientGenderSelected);
@@ -248,6 +234,22 @@ public class SearchService {
 
         }
 
+        if(project.isPresent() && !project.get().isEmpty()){
+
+            List<String> projectList = new ArrayList<>();
+            for(String p : project.get()){
+                projectList.add("project=" + p);
+            }
+
+            if (facetString.length() != 0 && !facetString.endsWith("&")) {
+                facetString += "&";
+            }
+            for (String p : projectList) {
+                facetString += p + "&";
+            }
+
+
+        }
 
         wsDTO.setFacetString(facetString);
 
