@@ -169,8 +169,8 @@
                         <!-- Summary first row -->
                         <div class="row large-12 medium-12 expanded">
 
-                            <div class="columns medium-12 small-12 margin-top-30">
-                                <div class="responsive-table">
+                            <div class="columns medium-12 small-12 margin-top-30 card-3">
+                                <div class="responsive-table top-space-20">
                                     <table class="datatable-pdx table-borderedPdx pdx-table head-left">
                                         <thead>
                                         <tr>
@@ -207,8 +207,8 @@
 
                             </div>
 
-                            <div class="columns medium-12 small-12 margin-top-medium">
-                                <div class="responsive-table">
+                            <div class="columns medium-12 small-12 margin-top-medium card-3">
+                                <div class="responsive-table top-space-20">
                                     <table class="datatable-pdx table-borderedPdx pdx-table head-left">
                                         <thead>
                                         <tr>
@@ -248,8 +248,8 @@
                             </div>
 
 
-                            <div class="columns medium-12 small-12 margin-top-medium">
-                                <div class="responsive-table">
+                            <div class="columns medium-12 small-12 margin-top-medium card-3">
+                                <div class="responsive-table top-space-20">
                                     <table class="datatable-pdx table-borderedPdx pdx-table head-left">
                                         <thead>
                                         <tr>
@@ -276,8 +276,8 @@
 
                             </div>
 
-                            <div class="columns medium-12 small-12 margin-top-medium">
-                                <div class="responsive-table">
+                            <div class="columns medium-12 small-12 margin-top-medium card-3">
+                                <div class="responsive-table top-space-20">
 
                                     <table class="datatable-pdx pdx-table table-borderedPdx head-left">
                                         <thead>
@@ -452,7 +452,7 @@
 
 
 
-                                        <div id="sizeSwitch">
+                                        <div id="sizeSwitch" style="float: right; margin-top:-65px;">
                                             <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"
                                                class="button outline secondary">
                                                 Export Results
@@ -477,7 +477,7 @@
                                             <div th:each="technology,iter : ${data.modelTechAndPassages}"
                                                  th:id="${technology.key}"
                                                  class="tabs-panel is-active"
-                                                 th:classappend=" 'hideContent'+${iter.index} " style="border-top: 1px solid #5ea88f;">
+                                                 th:classappend=" 'hideContent'+${iter.index} " style="border-top: 1px solid #5ea88f; margin-top:20px;">
 
                                                 <hr class="hr-text" th:attr="data-content=${technology.key+' PLATFORM '}">
 

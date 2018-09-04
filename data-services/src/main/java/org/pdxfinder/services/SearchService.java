@@ -148,6 +148,17 @@ public class SearchService {
 
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
 
+        // STUBBING AND MOCKING UNTIL DATA IS READY to avoid [classes/:na] NullPointerException on SearchDS.java on Line 918
+        Boolean euroPDX = false;
+        Boolean pdxNet = false;
+        try{
+            if (project.get().contains("EuroPDX")){ euroPDX = true; }
+            if (project.get().contains("PDXNet")){ pdxNet = true; }
+        }catch (Exception e){}
+        List<FacetOption> fakeData = new ArrayList<>();
+        fakeData.add(new FacetOption("EuroPDX", 186, 186 , euroPDX, SearchFacetName.project));
+        fakeData.add(new FacetOption("PDXNet", 639, 639 , pdxNet, SearchFacetName.project));
+
         List<FacetOption> patientAgeSelected = searchDS.getFacetOptions(SearchFacetName.patient_age, patientAgeOptions, results, patient_age.orElse(null));
         List<FacetOption> patientGenderSelected = searchDS.getFacetOptions(SearchFacetName.patient_gender, patientGenderOptions, results, patient_gender.orElse(null));
         List<FacetOption> datasourceSelected = searchDS.getFacetOptions(SearchFacetName.datasource, datasourceOptions, results, datasource.orElse(null));
@@ -155,7 +166,7 @@ public class SearchService {
         List<FacetOption> sampleTumorTypeSelected = searchDS.getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
         List<FacetOption> mutationSelected = searchDS.getFacetOptions(SearchFacetName.mutation, null, results, mutation.orElse(null));
         List<FacetOption> drugSelected = searchDS.getFacetOptions(SearchFacetName.drug, null, results, drug.orElse(null));
-        List<FacetOption> projectSelected = searchDS.getFacetOptions(SearchFacetName.project, null, results, drug.orElse(null));
+        List<FacetOption> projectSelected = fakeData; //searchDS.getFacetOptions(SearchFacetName.project, null, results, drug.orElse(null));
 
         wsDTO.setPatientAgeSelected(patientAgeSelected);
         wsDTO.setPatientGenderSelected(patientGenderSelected);

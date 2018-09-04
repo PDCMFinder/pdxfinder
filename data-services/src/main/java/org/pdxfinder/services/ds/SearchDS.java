@@ -44,6 +44,8 @@ public class SearchDS {
 
     private DataProjectionRepository dataProjectionRepository;
 
+    private final static Logger logger = LoggerFactory.getLogger(SearchDS.class);
+
     public static List<String> PATIENT_AGE_OPTIONS = Arrays.asList(
             "0-9",
             "10-19",
@@ -99,9 +101,14 @@ public class SearchDS {
             "Refractory",
             "Not Specified"
     );
+
+    public static List<String> PROJECT_OPTIONS = Arrays.asList(
+            "PDXNet",
+            "EuroPDX"
+    );
+
     public static List<String> DIAGNOSIS_OPTIONS = new ArrayList<>();
 
-    public static List<String> PROJECT_OPTIONS = new ArrayList<>();
 
     /**
      * Populate the complete set of models for searching when this object is instantiated
@@ -155,6 +162,16 @@ public class SearchDS {
                         .collect(Collectors.toSet())
                         .contains(x))
                 .collect(Collectors.toList());
+
+        PROJECT_OPTIONS = PROJECT_OPTIONS
+                .stream()
+                .filter(x -> models
+                        .stream()
+                        .map(ModelForQuery::getDatasource)
+                        .collect(Collectors.toSet())
+                        .contains(x))
+                .collect(Collectors.toList());
+
 
         CANCERS_BY_SYSTEM_OPTIONS = CANCERS_BY_SYSTEM_OPTIONS
                 .stream()
@@ -898,9 +915,11 @@ public class SearchDS {
                     for (ModelForQuery res : result) {
                         Boolean keep = Boolean.FALSE;
                         for (String s : filters.get(SearchFacetName.project)) {
-                            if (res.getProjects().contains(s)) {
-                                keep = Boolean.TRUE;
-                            }
+                            try{
+                                if (res.getProjects().contains(s)) {
+                                    keep = Boolean.TRUE;
+                                }
+                            } catch(Exception e){}
                         }
                         if (!keep) {
                             projectsToRemove.add(res);
@@ -988,6 +1007,7 @@ public class SearchDS {
      */
     @Cacheable("facet_counts")
     public List<FacetOption> getFacetOptions(SearchFacetName facet, List<String> options, Set<ModelForQuery> results, List<String> selected) {
+
 
         Set<ModelForQuery> allResults = models;
 
