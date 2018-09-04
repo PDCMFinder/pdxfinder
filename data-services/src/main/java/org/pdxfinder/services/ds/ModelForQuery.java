@@ -61,7 +61,6 @@ public class ModelForQuery {
 
     private Long modelId;
     private String datasource;
-    private String project;
     private String externalId;
     private String patientAge;
     private String patientTreatmentStatus;
@@ -103,9 +102,6 @@ public class ModelForQuery {
                 break;
             case datasource:
                 s = datasource;
-                break;
-            case project:
-                s = project;
                 break;
             case patient_age:
                 s = patientAge;
@@ -261,14 +257,6 @@ public class ModelForQuery {
 
     public void setDatasource(String datasource) {
         this.datasource = datasource;
-    }
-
-    public String getProject() {
-        return project;
-    }
-
-    public void setProject(String project) {
-        this.project = project;
     }
 
     public List<String> getCancerSystem() {

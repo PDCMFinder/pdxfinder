@@ -102,10 +102,7 @@ public class SearchDS {
             "Not Specified"
     );
 
-    public static List<String> PROJECT_OPTIONS = Arrays.asList(
-            "PDXNet",
-            "EuroPDX"
-    );
+    public static List<String> PROJECT_OPTIONS = new ArrayList<>();
 
     public static List<String> DIAGNOSIS_OPTIONS = new ArrayList<>();
 
@@ -916,10 +913,12 @@ public class SearchDS {
                         Boolean keep = Boolean.FALSE;
                         for (String s : filters.get(SearchFacetName.project)) {
                             try{
-                                if (res.getProjects().contains(s)) {
+                                if (res.getProjects() != null && res.getProjects().contains(s)) {
                                     keep = Boolean.TRUE;
                                 }
-                            } catch(Exception e){}
+                            } catch(Exception e){
+                                e.printStackTrace();
+                            }
                         }
                         if (!keep) {
                             projectsToRemove.add(res);
