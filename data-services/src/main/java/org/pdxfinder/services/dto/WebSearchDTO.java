@@ -35,6 +35,7 @@ public class WebSearchDTO {
     private List<FacetOption> sampleTumorTypeSelected;
     private List<FacetOption> mutationSelected;
     private List<FacetOption> drugSelected;
+    private List<FacetOption> projectSelected;
 
     private String facetString;
     private List<ModelForQuery> searchResults;
@@ -155,6 +156,14 @@ public class WebSearchDTO {
 
     public void setDatasourceSelected(List<FacetOption> datasourceSelected) {
         this.datasourceSelected = datasourceSelected;
+    }
+
+    public List<FacetOption> getProjectSelected() {
+        return projectSelected;
+    }
+
+    public void setProjectSelected(List<FacetOption> projectSelected) {
+        this.projectSelected = projectSelected;
     }
 
     public List<FacetOption> getCancerSystemSelected() {
