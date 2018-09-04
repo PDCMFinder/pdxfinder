@@ -65,6 +65,8 @@ public class LoadIRCC implements CommandLineRunner {
     private HostStrain nsgBS;
     private Group irccDS;
 
+    private Group projectGroup;
+
     private Options options;
     private CommandLineParser parser;
     private CommandLine cmd;
@@ -118,6 +120,8 @@ public class LoadIRCC implements CommandLineRunner {
                     DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
             nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
+
+            projectGroup = dataImportService.getProjectGroup("EuroPDX");
 
 
             if (urlStr != null) {
@@ -226,6 +230,8 @@ public class LoadIRCC implements CommandLineRunner {
         }
 
         ModelCreation modelCreation = dataImportService.createModelCreation(id, this.irccDS.getAbbreviation(), ptSample, qa, externalUrls);
+
+        modelCreation.addGroup(projectGroup);
 
         JSONArray specimens = job.getJSONArray("Specimens");
         for (int i = 0; i < specimens.length(); i++) {

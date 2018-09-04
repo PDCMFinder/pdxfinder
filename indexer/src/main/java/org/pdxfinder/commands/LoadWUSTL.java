@@ -52,6 +52,7 @@ public class LoadWUSTL implements CommandLineRunner {
 
     //   private HostStrain nsgBS;
     private Group DS;
+    private Group projectGroup;
 
     private Options options;
     private CommandLineParser parser;
@@ -103,6 +104,8 @@ public class LoadWUSTL implements CommandLineRunner {
                 DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+
+        projectGroup = dataImportService.getProjectGroup("PDXNet");
 
         try {
             JSONObject job = new JSONObject(json);
@@ -198,6 +201,7 @@ public class LoadWUSTL implements CommandLineRunner {
 
         ModelCreation modelCreation = dataImportService.createModelCreation(id, DS.getAbbreviation(), humanSample, qa, externalUrls);
         modelCreation.addRelatedSample(humanSample);
+        modelCreation.addGroup(projectGroup);
 
         boolean human = false;
         String markerPlatform = NOT_SPECIFIED;
