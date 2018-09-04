@@ -166,7 +166,7 @@ public class SearchService {
         List<FacetOption> sampleTumorTypeSelected = searchDS.getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
         List<FacetOption> mutationSelected = searchDS.getFacetOptions(SearchFacetName.mutation, null, results, mutation.orElse(null));
         List<FacetOption> drugSelected = searchDS.getFacetOptions(SearchFacetName.drug, null, results, drug.orElse(null));
-        List<FacetOption> projectSelected = fakeData; //searchDS.getFacetOptions(SearchFacetName.project, null, results, drug.orElse(null));
+        List<FacetOption> projectSelected = searchDS.getFacetOptions(SearchFacetName.project, null, results, drug.orElse(null));
 
         wsDTO.setPatientAgeSelected(patientAgeSelected);
         wsDTO.setPatientGenderSelected(patientGenderSelected);
