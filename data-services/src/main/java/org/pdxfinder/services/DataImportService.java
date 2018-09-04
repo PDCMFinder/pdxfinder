@@ -174,7 +174,22 @@ public class DataImportService {
 
     }
 
+    public Group getProjectGroup(String groupName){
 
+        Group g = groupRepository.findByNameAndType(groupName, "Project");
+
+        if(g == null){
+            log.info("Project group not found. Creating", groupName);
+
+            g = new Group();
+            g.setType("Project");
+            g.setName(groupName);
+            groupRepository.save(g);
+
+        }
+        return g;
+
+    }
 
     public ExternalUrl getExternalUrl(ExternalUrl.Type type, String url) {
         ExternalUrl externalUrl = externalUrlRepository.findByTypeAndUrl(type.getValue(), url);
