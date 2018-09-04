@@ -52,6 +52,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
     //   private HostStrain nsgBS;
     private Group wistarDS;
+    private Group projectGroup;
 
     private Options options;
     private CommandLineParser parser;
@@ -97,6 +98,8 @@ public class LoadWISTAR implements CommandLineRunner {
                 DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+
+        projectGroup = dataImportService.getProjectGroup("PDXNet");
 
         try {
             JSONObject job = new JSONObject(json);
@@ -207,6 +210,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
         ModelCreation modelCreation = dataImportService.createModelCreation(id, wistarDS.getAbbreviation(), sample, qa, externalUrls);
         modelCreation.addRelatedSample(sample);
+        modelCreation.addGroup(projectGroup);
 
         Specimen specimen = dataImportService.getSpecimen(modelCreation,
                 modelCreation.getSourcePdxId(), wistarDS.getAbbreviation(), NOT_SPECIFIED);

@@ -62,6 +62,7 @@ public class LoadHCI implements CommandLineRunner {
 
     private HostStrain nsgBS, nsBS;
     private Group hciDS;
+    private Group projectGroup;
 
     private Options options;
     private CommandLineParser parser;
@@ -112,6 +113,8 @@ public class LoadHCI implements CommandLineRunner {
 
         nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
         nsBS = dataImportService.getHostStrain(NS_BS_NAME, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
+
+        projectGroup = dataImportService.getProjectGroup("PDXNet");
 
         try {
             JSONObject job = new JSONObject(json);
@@ -223,7 +226,7 @@ public class LoadHCI implements CommandLineRunner {
 
         ModelCreation modelCreation = dataImportService.createModelCreation(modelID, this.hciDS.getAbbreviation(), sample, qa, externalUrls);
         modelCreation.addRelatedSample(sample);
-
+        modelCreation.addGroup(projectGroup);
         
 
         dataImportService.saveSample(sample);
