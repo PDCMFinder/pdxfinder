@@ -44,6 +44,8 @@ public class SearchDS {
 
     private DataProjectionRepository dataProjectionRepository;
 
+    private final static Logger logger = LoggerFactory.getLogger(SearchDS.class);
+
     public static List<String> PATIENT_AGE_OPTIONS = Arrays.asList(
             "0-9",
             "10-19",
@@ -99,6 +101,12 @@ public class SearchDS {
             "Refractory",
             "Not Specified"
     );
+
+    public static List<String> PROJECT_OPTIONS = Arrays.asList(
+            "PDXNet",
+            "EuroPDX"
+    );
+
     public static List<String> DIAGNOSIS_OPTIONS = new ArrayList<>();
 
     public static List<String> PROJECT_OPTIONS = new ArrayList<>();
@@ -155,6 +163,16 @@ public class SearchDS {
                         .collect(Collectors.toSet())
                         .contains(x))
                 .collect(Collectors.toList());
+
+        PROJECT_OPTIONS = PROJECT_OPTIONS
+                .stream()
+                .filter(x -> models
+                        .stream()
+                        .map(ModelForQuery::getDatasource)
+                        .collect(Collectors.toSet())
+                        .contains(x))
+                .collect(Collectors.toList());
+
 
         CANCERS_BY_SYSTEM_OPTIONS = CANCERS_BY_SYSTEM_OPTIONS
                 .stream()
@@ -754,6 +772,12 @@ public class SearchDS {
                     result = result.stream().filter(x -> predicate.test(x.getDatasource())).collect(Collectors.toSet());
                     break;
 
+                case project:
+
+                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.project));
+                    result = result.stream().filter(x -> predicate.test(x.getProject())).collect(Collectors.toSet());
+                    break;
+
                 case diagnosis:
 
                     predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.diagnosis));
@@ -988,6 +1012,7 @@ public class SearchDS {
      */
     @Cacheable("facet_counts")
     public List<FacetOption> getFacetOptions(SearchFacetName facet, List<String> options, Set<ModelForQuery> results, List<String> selected) {
+
 
         Set<ModelForQuery> allResults = models;
 
