@@ -86,6 +86,9 @@ public class ModelForQuery {
 
     private List<DrugSummaryDTO> drugData;
 
+    private List<String> projects;
+    private List<String> publications;
+
 
     public ModelForQuery() {
     }
@@ -335,6 +338,22 @@ public class ModelForQuery {
 
     public void setMutatedVariants(List<String> mutatedVariants) {
         this.mutatedVariants = mutatedVariants;
+    }
+
+    public List<String> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<String> projects) {
+        this.projects = projects;
+    }
+
+    public List<String> getPublications() {
+        return publications;
+    }
+
+    public void setPublications(List<String> publications) {
+        this.publications = publications;
     }
 
     public String getFormattedQueryMatch(String query) {
