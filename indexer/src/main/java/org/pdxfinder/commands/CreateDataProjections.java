@@ -411,8 +411,19 @@ public class CreateDataProjections implements CommandLineRunner{
             // TODO: Complete the cell type options
             // TODO: Complete the patient treatment options
 
+            //ADD PROJECTS TO MFQ
+            for(Group g : mc.getGroups()){
+
+                if(g.getType().equals("Project")){
+
+                    mfq.addProject(g.getName());
+                }
+
+            }
+
 
             this.modelForQueryDP.add(mfq);
+
         }
 
 
