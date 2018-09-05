@@ -2,6 +2,7 @@ package org.pdxfinder.services.ds;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
@@ -39,6 +40,8 @@ public class SearchDS {
 
     //"drugname"=>"response"=>"set of model ids"
     private Map<String, Map<String, Set<Long>>> drugResponses = new HashMap<>();
+
+    private List<String> projectOptions = new ArrayList<>();
 
     private boolean INITIALIZED = false;
 
@@ -102,7 +105,7 @@ public class SearchDS {
             "Not Specified"
     );
 
-    public static List<String> PROJECT_OPTIONS = new ArrayList<>();
+
 
     public static List<String> DIAGNOSIS_OPTIONS = new ArrayList<>();
 
@@ -130,6 +133,9 @@ public class SearchDS {
         //loads drug response from Data Projection
         initializeDrugResponses();
 
+        //loads projects
+        initializeAdditionalOptions();
+
 
         List<String> padding = new ArrayList<>();
         padding.add("NO DATA");
@@ -152,15 +158,6 @@ public class SearchDS {
                 .collect(Collectors.toList());
 
         DATASOURCE_OPTIONS = DATASOURCE_OPTIONS
-                .stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getDatasource)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
-
-        PROJECT_OPTIONS = PROJECT_OPTIONS
                 .stream()
                 .filter(x -> models
                         .stream()
@@ -207,14 +204,8 @@ public class SearchDS {
                         .contains(x))
                 .collect(Collectors.toList());
 
-        PROJECT_OPTIONS = PROJECT_OPTIONS.stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getProjects)
-                        .flatMap(Collection::stream)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
+
+        //PROJECT_OPTIONS =new ArrayList<>(models.stream().map(model -> model.getProjects()).flatMap(Collection::stream).collect(Collectors.toSet()));
 
         INITIALIZED = true;
 
@@ -263,6 +254,10 @@ public class SearchDS {
         this.models = models;
     }
 
+
+    public List<String> getProjectOptions() {
+        return projectOptions;
+    }
 
     /**
      * This method loads the ModelForQuery Data Projection object and initializes the models
@@ -698,6 +693,29 @@ public class SearchDS {
 
 
     }
+
+
+    public void initializeAdditionalOptions(){
+
+
+        log.info("Models: "+models.size());
+
+        Set<String> projectsSet = new HashSet<>();
+        for(ModelForQuery mfk : models){
+
+            if(mfk.getProjects() != null){
+                for(String s: mfk.getProjects()){
+                    projectsSet.add(s);
+                }
+            }
+        }
+
+        projectOptions = new ArrayList<>(projectsSet);
+
+
+    }
+
+
 
 
     /**
