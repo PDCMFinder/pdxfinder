@@ -298,7 +298,7 @@
                                         <div class="accordion-content" data-tab-content>
                                             <div class="large-form">
                                                 <div class="checkbox-item"
-                                                     th:each="instance:${websearch.facetOptions['project_options']}">
+                                                     th:each="instance:${websearch.projects}">
                                                     <input th:id="'project__' + ${instance}" type="checkbox"
                                                            class="project filter"/>
                                                     <label th:attr="for='project__'+${instance}"><span
@@ -822,6 +822,7 @@
     var sampleTumorTypeFilters = [[${websearch.sampleTumorTypeSelected}]];
     var genderFilters = [[${websearch.patientGenderSelected}]];
     var mutationFilters = [[${websearch.mutationSelected}]];
+
     function constructSearchOptions(data) {
         var newOptions = [];
         for (var i = 0; i < data.length; i++) {
@@ -928,6 +929,7 @@
     var mutatedMarkersAndVariants = JSON.parse(incomingString);
     var drugsList = [[${websearch.drugNames}]];
     var drugResponseList = [[${websearch.drugResponses}]];
+
 
     jQuery(document).ready(function () {
 
