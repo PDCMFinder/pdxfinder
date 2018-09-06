@@ -317,14 +317,14 @@
 
                         <li class="accordion-item is-active" data-accordion-item>
                             <!-- Accordion tab title -->
-                            <a href="#" class="accordion-title"> MOLECULAR CHARACTERIZATION </a>
+                            <a href="#" class="accordion-title"> MOLECULAR DATA </a>
 
                             <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
                             <div class="accordion-content" data-tab-content>
                                 <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
                                     data-allow-all-closed="true">
                                     <li class="accordion-item" data-accordion-item id="marker_filter">
-                                        <a href="#" class="accordion-title">Small Genetic Variation</a>
+                                        <a href="#" class="accordion-title"> GENE MUTATION </a>
                                         <div class="accordion-content" data-tab-content>
                                             <div class="light-grey-bg-box">
                                                 <div class="checkbox-item">
@@ -687,11 +687,11 @@
 
                                         <a th:if="${#strings.equals(platform, 'Dosing Studies')}"
                                            th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#dosing_studies' }"
-                                           class="size12" th:utext="${platform} + '<br />'">platform</a>
+                                           class="size12" th:utext="${'Dosing Study'} + '<br />'">platform</a> <!-- platform -->
 
                                         <a th:if="${not #strings.equals(platform, 'Dosing Studies')}"
                                            th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation' }"
-                                           class="size12" th:utext="${platform} + '<br />'">platform</a>
+                                           class="size12" th:utext="${'Molecular Data'} + '<br />'">platform</a> <!-- platform -->
                                     </th:block>
                                 </td>
 
