@@ -90,9 +90,21 @@ public class UniversalLoader implements CommandLineRunner {
      */
     private List<List<String>> derivedDatasetSheetData;
 
+    /**
+     * Placeholder for the data stored in the "sharing and contact" tab
+     */
+    private List<List<String>> sharingAndContactSheetData;
 
+
+    /**
+     * Placeholder for the data stored in the "Loader related data tab
+     */
+    private List<List<String>> loaderRelatedDataSheetData;
 
     private Group ds;
+
+    private Boolean stopLoading;
+
 
     @PostConstruct
     public void init() {
@@ -148,12 +160,16 @@ public class UniversalLoader implements CommandLineRunner {
         log.info("******************************************************");
 
         ds = null;
+        stopLoading = false;
+
         patientSheetData = new ArrayList<>();
         patientTumorSheetData = new ArrayList<>();
         patientTreatmentSheetData = new ArrayList<>();
         pdxModelSheetData = new ArrayList<>();
         pdxModelValidationSheetData = new ArrayList<>();
         derivedDatasetSheetData = new ArrayList<>();
+        sharingAndContactSheetData = new ArrayList<>();
+        loaderRelatedDataSheetData = new ArrayList<>();
 
         initializeSheetData(workbook.getSheetAt(1), "patientSheetData");
         initializeSheetData(workbook.getSheetAt(2), "patientTumorSheetData");
@@ -161,6 +177,9 @@ public class UniversalLoader implements CommandLineRunner {
         initializeSheetData(workbook.getSheetAt(4), "pdxModelSheetData");
         initializeSheetData(workbook.getSheetAt(5), "pdxModelValidationSheetData");
         initializeSheetData(workbook.getSheetAt(6), "derivedDatasetSheetData");
+        initializeSheetData(workbook.getSheetAt(7), "sharingAndContactSheetData");
+
+        initializeSheetData(workbook.getSheetAt(9), "loaderRelatedDataSheetData");
 
     }
 
@@ -238,6 +257,14 @@ public class UniversalLoader implements CommandLineRunner {
 
                     derivedDatasetSheetData.add(dataRow);
                 }
+                else if(sheetName.equals("sharingAndContactSheetData")){
+
+                    sharingAndContactSheetData.add(dataRow);
+                }
+                else if(sheetName.equals("loaderRelatedDataSheetData")){
+
+                    loaderRelatedDataSheetData.add(dataRow);
+                }
 
             }
 
@@ -249,7 +276,7 @@ public class UniversalLoader implements CommandLineRunner {
      */
     private void loadTemplateData() {
 
-        //DON'T CHANGE THE ORDER OF THESE METHODS!
+        //:: DON'T CHANGE THE ORDER OF THESE METHODS UNLESS YOU WANT TO RISK THE UNIVERSE TO COLLAPSE!
         createDataSourceGroup();
         createPatients();
         createPatientTumors();
@@ -259,6 +286,8 @@ public class UniversalLoader implements CommandLineRunner {
 
         createPdxModelDetails();
         createPdxModelValidations();
+
+        createSharingAndContacts();
 
     }
 
@@ -270,7 +299,26 @@ public class UniversalLoader implements CommandLineRunner {
         log.info("******************************************************");
         log.info("* Creating DataSource                                *");
         log.info("******************************************************");
-        ds = dataImportService.getProviderGroup("TRACE", "TR", "Trace data from template", "", "", "", "", "");
+
+        if(loaderRelatedDataSheetData.size() != 1){
+            stopLoading = true;
+
+            log.error("Zero or multiple provider definitions! Loading process is being terminated.");
+            return;
+        }
+
+        String providerName = loaderRelatedDataSheetData.get(0).get(0);
+        String providerAbbreviation = loaderRelatedDataSheetData.get(0).get(1);
+        String sourceUrl = loaderRelatedDataSheetData.get(0).get(2);
+
+        if(providerName.isEmpty() || providerAbbreviation.isEmpty()){
+            stopLoading = true;
+
+            log.error("Missing provider name or abbreviation! Loading process is being terminated.");
+            return;
+        }
+
+        ds = dataImportService.getProviderGroup(providerName, providerAbbreviation, "", "", "", "", "", sourceUrl);
 
     }
 
@@ -280,6 +328,8 @@ public class UniversalLoader implements CommandLineRunner {
         log.info("******************************************************");
         log.info("* Creating Patients                                  *");
         log.info("******************************************************");
+
+        if(stopLoading) return;
 
         for (List<String> patientRow : patientSheetData) {
 
@@ -308,6 +358,8 @@ public class UniversalLoader implements CommandLineRunner {
         log.info("******************************************************");
         log.info("* Creating Patient samples and snapshots             *");
         log.info("******************************************************");
+
+        if(stopLoading) return;
 
         int row = 6;
         log.info("Tumor row number: "+patientTumorSheetData.size());
@@ -402,6 +454,8 @@ public class UniversalLoader implements CommandLineRunner {
         log.info("* Creating Patient treatments                        *");
         log.info("******************************************************");
 
+        if(stopLoading) return;
+
         int row = 6;
         for(List<String> patientTreatmentRow : patientTreatmentSheetData){
 
@@ -463,10 +517,11 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createDerivedPatientModelDataset(){
 
-
         log.info("******************************************************");
         log.info("* Creating dataset derived from patients and models  *");
         log.info("******************************************************");
+
+        if(stopLoading) return;
 
         int row = 6;
 
@@ -575,14 +630,13 @@ public class UniversalLoader implements CommandLineRunner {
 
     }
 
-
-
     private void createPdxModelDetails() {
-
 
         log.info("******************************************************");
         log.info("* Creating Model details                             *");
         log.info("******************************************************");
+
+        if(stopLoading) return;
 
         int row = 6;
 
@@ -699,10 +753,11 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPdxModelValidations() {
 
-
         log.info("******************************************************");
         log.info("* Creating Model validations                         *");
         log.info("******************************************************");
+
+        if(stopLoading) return;
 
         int row = 6;
 
@@ -744,13 +799,65 @@ public class UniversalLoader implements CommandLineRunner {
             dataImportService.saveModelCreation(model);
 
         }
-
-
-
     }
 
+    private void createSharingAndContacts(){
 
+        log.info("******************************************************");
+        log.info("* Creating Sharing and contact info                  *");
+        log.info("******************************************************");
 
+        if(stopLoading) return;
+
+        int row = 6;
+
+        for(List<String> sharingAndContactRow : sharingAndContactSheetData){
+
+            String modelId = sharingAndContactRow.get(0);
+            String dataProviderType = sharingAndContactRow.get(1);
+            String modelAccessibility = sharingAndContactRow.get(2);
+            String accessModalities = sharingAndContactRow.get(3);
+            String contactEmail = sharingAndContactRow.get(4);
+            String contanctFormLink = sharingAndContactRow.get(6);
+            String modelLinkToDB = sharingAndContactRow.get(7);
+            String providerAbbreviation = sharingAndContactRow.get(9);
+            String projectName = sharingAndContactRow.get(10);
+
+            if(modelId.isEmpty()){
+
+                log.error("Model id is empty in row: " +row);
+                row++;
+                continue;
+            }
+
+            //at this point the corresponding pdx model node should be created
+
+            ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
+
+            if(model == null){
+
+                log.error("Missing model, cannot add sharing and contact info: "+modelId);
+                row++;
+                continue;
+            }
+
+            //Add contact provider and view data
+            List<ExternalUrl> externalUrls = new ArrayList<>();
+            externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contanctFormLink));
+            externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, modelLinkToDB));
+            model.setExternalUrls(externalUrls);
+            dataImportService.saveModelCreation(model);
+
+            //Update datasource
+            ds.setProviderType(dataProviderType);
+            ds.setAccessibility(modelAccessibility);
+            ds.setAccessModalities(accessModalities);
+
+        }
+
+        dataImportService.saveGroup(ds);
+
+    }
 
 
 
