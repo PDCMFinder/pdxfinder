@@ -272,6 +272,7 @@ public class LoadMDAnderson implements CommandLineRunner {
         }
 
         dataImportService.saveSample(sample);
+        dataImportService.saveModelCreation(modelCreation);
         dataImportService.savePatientSnapshot(pSnap);
     }
     
