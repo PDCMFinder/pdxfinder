@@ -846,6 +846,14 @@ public class UniversalLoader implements CommandLineRunner {
             externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contanctFormLink));
             externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, modelLinkToDB));
             model.setExternalUrls(externalUrls);
+
+
+            if(!projectName.isEmpty()){
+
+                Group project = dataImportService.getProjectGroup(projectName);
+                model.addGroup(project);
+            }
+
             dataImportService.saveModelCreation(model);
 
             //Update datasource
