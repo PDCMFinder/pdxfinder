@@ -191,6 +191,12 @@ public class DataImportService {
 
     }
 
+    public void saveGroup(Group g){
+
+        groupRepository.save(g);
+    }
+
+
     public ExternalUrl getExternalUrl(ExternalUrl.Type type, String url) {
         ExternalUrl externalUrl = externalUrlRepository.findByTypeAndUrl(type.getValue(), url);
         if (externalUrl == null) {
