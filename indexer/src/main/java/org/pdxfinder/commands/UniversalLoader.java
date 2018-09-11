@@ -303,7 +303,7 @@ public class UniversalLoader implements CommandLineRunner {
         if(loaderRelatedDataSheetData.size() != 1){
             stopLoading = true;
 
-            log.error("Zero or multiple provider definitions! Loading process is being terminated.");
+            log.error("Zero or multiple provider definitions! Loading process is terminated.");
             return;
         }
 
@@ -314,7 +314,7 @@ public class UniversalLoader implements CommandLineRunner {
         if(providerName.isEmpty() || providerAbbreviation.isEmpty()){
             stopLoading = true;
 
-            log.error("Missing provider name or abbreviation! Loading process is being terminated.");
+            log.error("Missing provider name or abbreviation! Loading process is terminated!");
             return;
         }
 
@@ -325,11 +325,11 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPatients() {
 
+        if(stopLoading) return;
+
         log.info("******************************************************");
         log.info("* Creating Patients                                  *");
         log.info("******************************************************");
-
-        if(stopLoading) return;
 
         for (List<String> patientRow : patientSheetData) {
 
@@ -355,11 +355,12 @@ public class UniversalLoader implements CommandLineRunner {
 
 
     private void createPatientTumors() {
+
+        if(stopLoading) return;
+
         log.info("******************************************************");
         log.info("* Creating Patient samples and snapshots             *");
         log.info("******************************************************");
-
-        if(stopLoading) return;
 
         int row = 6;
         log.info("Tumor row number: "+patientTumorSheetData.size());
@@ -450,11 +451,11 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPatientTreatments() {
 
+        if(stopLoading) return;
+
         log.info("******************************************************");
         log.info("* Creating Patient treatments                        *");
         log.info("******************************************************");
-
-        if(stopLoading) return;
 
         int row = 6;
         for(List<String> patientTreatmentRow : patientTreatmentSheetData){
@@ -517,11 +518,11 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createDerivedPatientModelDataset(){
 
+        if(stopLoading) return;
+
         log.info("******************************************************");
         log.info("* Creating dataset derived from patients and models  *");
         log.info("******************************************************");
-
-        if(stopLoading) return;
 
         int row = 6;
 
@@ -549,6 +550,11 @@ public class UniversalLoader implements CommandLineRunner {
                 log.error("Missing essential value in row " + row);
                 continue;
             }
+
+            //need this trick to get rid of 0.0 if there is any
+            //if(passage.equals("0.0")) passage = "0";
+            int passageInt = (int)Float.parseFloat(passage);
+            passage = String.valueOf(passageInt);
 
             ModelCreation model;
             Sample sample;
@@ -632,11 +638,11 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPdxModelDetails() {
 
+        if(stopLoading) return;
+
         log.info("******************************************************");
         log.info("* Creating Model details                             *");
         log.info("******************************************************");
-
-        if(stopLoading) return;
 
         int row = 6;
 
@@ -682,7 +688,7 @@ public class UniversalLoader implements CommandLineRunner {
             HostStrain hostStrain = dataImportService.getHostStrain(hostStrainName, hostStrainNomenclature, "", "");
 
             //passage = all
-            if(passage.toLowerCase().equals("all")){
+            if(passage.toLowerCase().trim().equals("all")){
 
                 //update all specimens with the same site, type etc.
                 List<Specimen> specimens = dataImportService.getAllSpecimenByModel(modelId, ds.getAbbreviation());
@@ -703,7 +709,7 @@ public class UniversalLoader implements CommandLineRunner {
 
                 for(int i = 0; i<passageArr.length; i++){
 
-                    List<Specimen> specimens = dataImportService.findSpecimenByPassage(model, passage);
+                    List<Specimen> specimens = dataImportService.findSpecimenByPassage(model, passageArr[i]);
                     for(Specimen specimen : specimens){
 
                         specimen.setEngraftmentSite(es);
@@ -715,9 +721,27 @@ public class UniversalLoader implements CommandLineRunner {
 
                 }
             }
+            //the passage is a single number
+            else if(passage.matches("\\d+")){
+
+                //need this trick to get rid of fractures if there is any
+                int passageInt = Integer.parseInt(passage);
+                passage = String.valueOf(passageInt);
+
+                List<Specimen> specimens = dataImportService.findSpecimenByPassage(model, passage);
+                for(Specimen specimen : specimens){
+
+                    specimen.setEngraftmentSite(es);
+                    specimen.setEngraftmentType(et);
+                    specimen.setEngraftmentMaterial(em);
+                    specimen.setHostStrain(hostStrain);
+                    dataImportService.saveSpecimen(specimen);
+                }
+
+            }
             else{
 
-                log.error("Not supported value for passage at row " +row);
+                log.error("Not supported value("+ passage +") for passage at row " +row);
             }
 
             //CREATE PUBLICATION GROUPS
@@ -753,11 +777,11 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPdxModelValidations() {
 
+        if(stopLoading) return;
+
         log.info("******************************************************");
         log.info("* Creating Model validations                         *");
         log.info("******************************************************");
-
-        if(stopLoading) return;
 
         int row = 6;
 
@@ -789,6 +813,17 @@ public class UniversalLoader implements CommandLineRunner {
                 continue;
             }
 
+            //need this trick to get rid of 0.0 if there is any
+            String[] passageArr = passages.split(",");
+            passages = "";
+
+            for(int i=0; i<passageArr.length; i++){
+
+                int passageInt = (int)Float.parseFloat(passageArr[i]);
+                passages += String.valueOf(passageInt) + ",";
+            }
+            //remove that last comma
+            passages = passages.substring(0, passages.length() - 1);
 
             QualityAssurance qa = new QualityAssurance();
             qa.setTechnology(validationTechnique);
@@ -803,11 +838,11 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createSharingAndContacts(){
 
+        if(stopLoading) return;
+
         log.info("******************************************************");
         log.info("* Creating Sharing and contact info                  *");
         log.info("******************************************************");
-
-        if(stopLoading) return;
 
         int row = 6;
 
