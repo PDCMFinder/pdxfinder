@@ -121,11 +121,10 @@ public class UniversalLoader implements CommandLineRunner {
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadUniversal", "Run universal loader");
-        //TODO: enable this when loader is finished
-        //parser.accepts("loadALL", "Load all, run universal data");
+        parser.accepts("loadALL", "Load all, run universal data");
         OptionSet options = parser.parse(args);
 
-        if (options.has("loadUniversal")) {
+        if (options.has("loadUniversal") || options.has("loadALL")) {
 
             log.info("******************************************************");
             log.info("* Running universal loader                           *");
@@ -180,7 +179,6 @@ public class UniversalLoader implements CommandLineRunner {
         initializeSheetData(workbook.getSheetAt(7), "sharingAndContactSheetData");
 
         initializeSheetData(workbook.getSheetAt(9), "loaderRelatedDataSheetData");
-
     }
 
     /**
@@ -291,7 +289,6 @@ public class UniversalLoader implements CommandLineRunner {
 
     }
 
-
     private void createDataSourceGroup() {
 
         //TODO: this data has to come from the spreadsheet, I am using constants for now
@@ -322,7 +319,6 @@ public class UniversalLoader implements CommandLineRunner {
 
     }
 
-
     private void createPatients() {
 
         if(stopLoading) return;
@@ -352,7 +348,6 @@ public class UniversalLoader implements CommandLineRunner {
             }
         }
     }
-
 
     private void createPatientTumors() {
 
@@ -903,13 +898,9 @@ public class UniversalLoader implements CommandLineRunner {
     }
 
 
-
-
-
     /**
      * Checks if a list consists of nulls only
      * @param list
-     *
      */
     boolean isRowOfNulls(List list){
         for(Object o: list)
