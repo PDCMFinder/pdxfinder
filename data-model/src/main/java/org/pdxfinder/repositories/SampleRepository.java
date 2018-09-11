@@ -60,10 +60,12 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "AND toLower(s.dataSource) = toLower({dataSource}) " +
             "WITH s, mod, ii " +
             "OPTIONAL MATCH (s)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
+            "OPTIONAL MATCH (s)-[ssr:SAMPLE_SITE]-(ss:Tissue) " +
+
             "OPTIONAL MATCH (s)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
             "OPTIONAL MATCH (s)-[ot:OF_TYPE]-(tt:TumorType) " +
             "OPTIONAL MATCH (s)-[mapped:MAPPED_TO]-(oterm:OntologyTerm) " +
-            "RETURN mod,ii,s,o,t,ot, tt, mc, ma, m, mar, cb, aw, mapped, oterm")
+            "RETURN mod,ii,s,o,t,ot, tt, mc, ma, m, mar, cb, aw, mapped, oterm, ssr, ss")
     Sample findByDataSourceAndPdxId(@Param("dataSource") String dataSource, @Param("sourcePdxId") String sourcePdxId);
 
 
