@@ -121,7 +121,7 @@ public class LoadIRCC implements CommandLineRunner {
 
             nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
-            projectGroup = dataImportService.getProjectGroup("EuroPDX");
+            projectGroup = dataImportService.getProjectGroup("EurOPDX");
 
 
             if (urlStr != null) {
