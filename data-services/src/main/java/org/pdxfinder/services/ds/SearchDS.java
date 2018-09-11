@@ -32,7 +32,16 @@ public class SearchDS {
 
     private final static Logger log = LoggerFactory.getLogger(SearchDS.class);
 
+    private DataProjectionRepository dataProjectionRepository;
+
+    private boolean INITIALIZED = false;
+
     private Set<ModelForQuery> models;
+
+    /*
+     * DYNAMIC FACETS
+     */
+
     private Map<String, String> cancerSystemMap = new HashMap<>();
 
     //platform=> marker=> variant=>{set of model ids}
@@ -43,11 +52,10 @@ public class SearchDS {
 
     private List<String> projectOptions = new ArrayList<>();
 
-    private boolean INITIALIZED = false;
 
-    private DataProjectionRepository dataProjectionRepository;
-
-    private final static Logger logger = LoggerFactory.getLogger(SearchDS.class);
+    /*
+     * STATIC FACETS
+     */
 
     public static List<String> PATIENT_AGE_OPTIONS = Arrays.asList(
             "0-9",
@@ -69,7 +77,8 @@ public class SearchDS {
             "PDXNet-HCI-BCM",
             "PDXNet-MDAnderson",
             "PDXNet-WUSTL",
-            "PDXNet-Wistar-MDAnderson-Penn"
+            "PDXNet-Wistar-MDAnderson-Penn",
+            "TRACE"
     );
     public static List<String> PATIENT_GENDERS = Arrays.asList(
             "Male",
