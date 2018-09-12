@@ -141,7 +141,12 @@ public class ModelForQuery {
                 s = cancerCellType;
                 break;
             case project:
-                s = projects.stream().collect(Collectors.joining("::"));
+                if(projects != null){
+                    s = projects.stream().collect(Collectors.joining("::"));
+                }
+                else{
+                    s = null;
+                }
                 break;
             default:
                 s = null;
