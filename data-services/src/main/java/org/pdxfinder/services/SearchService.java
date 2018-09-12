@@ -48,6 +48,8 @@ public class SearchService {
 
 
 
+
+
     public SearchService(ModelCreationRepository modelCreationRepository,
                          OntologyTermRepository ontologyTermRepository,
                          AutoCompleteService autoCompleteService,
@@ -69,47 +71,11 @@ public class SearchService {
         facets.put("patient_age_options", patientAgeOptions);
         facets.put("patient_gender_options", patientGenderOptions);
         facets.put("cancer_system_options", cancerBySystemOptions);
-        facets.put("sample_tumor_type_options", sampleTumorTypeOptions);
 
     }
 
 
 
-    public ExportDTO export(Optional<String> query,
-                         Optional<List<String>> datasource,
-                         Optional<List<String>> diagnosis,
-                         Optional<List<String>> patient_age,
-                         Optional<List<String>> patient_treatment_status,
-                         Optional<List<String>> patient_gender,
-                         Optional<List<String>> sample_origin_tissue,
-                         Optional<List<String>> cancer_system,
-                         Optional<List<String>> sample_tumor_type,
-                         Optional<List<String>> mutation,
-                         Optional<List<String>> drug,
-                         Optional<List<String>> project
-    ){
-
-        Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
-                query,
-                datasource,
-                diagnosis,
-                patient_age,
-                patient_treatment_status,
-                patient_gender,
-                sample_origin_tissue,
-                cancer_system,
-                sample_tumor_type,
-                mutation,
-                drug,
-                project
-        );
-
-        ExportDTO eDTO = new ExportDTO();
-        eDTO.setResults(searchDS.search(configuredFacets));
-        eDTO.setFacetsString(configuredFacets.toString());
-
-        return eDTO;
-    }
 
 
     public WebSearchDTO webSearch(Optional<String> query,
@@ -429,6 +395,42 @@ public class SearchService {
         return wsDTO;
     }
 
+
+
+    public ExportDTO export(Optional<String> query,
+                            Optional<List<String>> datasource,
+                            Optional<List<String>> diagnosis,
+                            Optional<List<String>> patient_age,
+                            Optional<List<String>> patient_treatment_status,
+                            Optional<List<String>> patient_gender,
+                            Optional<List<String>> sample_origin_tissue,
+                            Optional<List<String>> cancer_system,
+                            Optional<List<String>> sample_tumor_type,
+                            Optional<List<String>> mutation,
+                            Optional<List<String>> drug,
+                            Optional<List<String>> project){
+
+        Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
+                query,
+                datasource,
+                diagnosis,
+                patient_age,
+                patient_treatment_status,
+                patient_gender,
+                sample_origin_tissue,
+                cancer_system,
+                sample_tumor_type,
+                mutation,
+                drug,
+                project
+        );
+
+        ExportDTO eDTO = new ExportDTO();
+        eDTO.setResults(searchDS.search(configuredFacets));
+        eDTO.setFacetsString(configuredFacets.toString());
+
+        return eDTO;
+    }
 
     private Map<SearchFacetName, List<String>> getFacetMap(
             Optional<String> query,
