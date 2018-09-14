@@ -36,6 +36,7 @@ public class WebSearchDTO {
     private List<FacetOption> mutationSelected;
     private List<FacetOption> drugSelected;
     private List<FacetOption> projectSelected;
+    private List<FacetOption> dataAvailableSelected;
 
     private String facetString;
     private List<ModelForQuery> searchResults;
