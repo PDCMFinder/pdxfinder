@@ -74,11 +74,11 @@ public class CreateDataProjections implements CommandLineRunner{
 
             log.info("Creating data projections");
 
-            //createMutationDataProjection();
+            createMutationDataProjection();
 
             createModelForQueryDataProjection();
 
-            //createDrugResponseDataProjection();
+            createDrugResponseDataProjection();
 
             saveDataProjections();
 
