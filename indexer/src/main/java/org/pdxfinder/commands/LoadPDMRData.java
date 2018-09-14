@@ -163,6 +163,7 @@ public class LoadPDMRData implements CommandLineRunner {
         String id = j.getString("Model ID");
 
         //histologyMap = getHistologyImageMap(id);
+        if (dataImportService.isExistingModel(DS.getAbbreviation(), id)) return;
 
         // the preference is for clinical diagnosis but if not available use initial diagnosis
         String diagnosis = j.getString("Clinical Diagnosis");
