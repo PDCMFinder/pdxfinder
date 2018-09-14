@@ -20,8 +20,14 @@ public interface TreatmentSummaryRepository extends Neo4jRepository<TreatmentSum
             "MATCH (ts)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[rr:RESPONSE]-(r:Response) " +
             "MATCH (tp)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:DRUG]-(d:Drug) "+
             "RETURN ts, tpr, tp, rr, r, tcr, tc, dr, d")
-    TreatmentSummary findByDataSourceAndModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
+    TreatmentSummary findModelTreatmentByDataSourceAndModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
+    @Query("MATCH (mod:ModelCreation)--(s:Sample)--(ps:PatientSnapshot)--(ts:TreatmentSummary) WHERE mod.dataSource = {dataSource} AND mod.sourcePdxId = {modelId} " +
+            "WITH ts " +
+            "MATCH (ts)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[rr:RESPONSE]-(r:Response) " +
+            "MATCH (tp)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:DRUG]-(d:Drug) "+
+            "RETURN ts, tpr, tp, rr, r, tcr, tc, dr, d")
+    TreatmentSummary findPatientTreatmentByDataSourceAndModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
     @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary) WHERE toLower(mod.dataSource) = toLower({dataSource}) RETURN count(mod)")
     int findStudyNumberByDataSource(@Param("dataSource") String dataSource);

@@ -74,11 +74,11 @@ public class CreateDataProjections implements CommandLineRunner{
 
             log.info("Creating data projections");
 
-            createMutationDataProjection();
+            //createMutationDataProjection();
 
             createModelForQueryDataProjection();
 
-            createDrugResponseDataProjection();
+            //createDrugResponseDataProjection();
 
             saveDataProjections();
 
@@ -365,8 +365,17 @@ public class CreateDataProjections implements CommandLineRunner{
                 dataAvailable.add("Copy Number Alteration");
             }
 
-            if(dataImportService.isTreatmentSummaryAvailable(mc.getDataSource(), mc.getSourcePdxId())){
+            if(dataImportService.isTreatmentSummaryAvailableOnModel(mc.getDataSource(), mc.getSourcePdxId())){
                 dataAvailable.add("Dosing Studies");
+            }
+            try {
+                if (dataImportService.isTreatmentSummaryAvailableOnPatient(mc.getDataSource(), mc.getSourcePdxId())) {
+                    dataAvailable.add("Patient Treatment");
+                }
+            }
+            catch(Exception e){
+                e.printStackTrace();
+                log.error(mc.getSourcePdxId());
             }
 
             mfq.setDataAvailable(new ArrayList<>(dataAvailable));

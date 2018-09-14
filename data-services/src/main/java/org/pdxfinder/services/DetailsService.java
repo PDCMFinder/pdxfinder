@@ -536,7 +536,7 @@ public class DetailsService {
 
     public List<DrugSummaryDTO> getDrugSummary(String dataSource, String modelId) {
 
-        TreatmentSummary ts = treatmentSummaryRepository.findByDataSourceAndModelId(dataSource, modelId);
+        TreatmentSummary ts = treatmentSummaryRepository.findModelTreatmentByDataSourceAndModelId(dataSource, modelId);
 
         List<DrugSummaryDTO> results = new ArrayList<>();
 

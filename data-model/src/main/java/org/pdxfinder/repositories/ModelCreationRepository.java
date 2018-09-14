@@ -141,7 +141,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "OPTIONAL MATCH (molChar)-[assW:ASSOCIATED_WITH]-(mAss:MarkerAssociation) " +
             "RETURN count(mAss) ")
     Integer countMarkerAssociationBySourcePdxId(@Param("sourcePdxId") String sourcePdxId,
-                                                @Param("datasource") String dataSource,
+                                                @Param("dataSource") String dataSource,
                                                 @Param("platform") String platform);
 
 
