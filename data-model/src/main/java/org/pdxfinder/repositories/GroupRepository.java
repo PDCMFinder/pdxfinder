@@ -23,4 +23,7 @@ public interface GroupRepository extends PagingAndSortingRepository<Group, Long>
     @Query("MATCH (ed:Group) RETURN DISTINCT ed.abbreviation ORDER BY ed.abbreviation")
     List<String> findAllAbbreviations();
 
+    @Query("MATCH (g:Group) WHERE g.type = {type} RETURN g")
+    List<Group> findAllByType(@Param("type") String type);
+
 }

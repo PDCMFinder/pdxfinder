@@ -191,6 +191,11 @@ public class DataImportService {
 
     }
 
+    public List<Group> getAllProviderGroups(){
+
+        return groupRepository.findAllByType("Provider");
+    }
+
     public void saveGroup(Group g){
 
         groupRepository.save(g);
