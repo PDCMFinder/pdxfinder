@@ -275,43 +275,49 @@ public class LoadPDMRData implements CommandLineRunner {
 
         //load patient treatment
 
-        TreatmentSummary ts = new TreatmentSummary();
+        TreatmentSummary ts;
 
-        JSONArray treatmentArr = j.getJSONArray("Treatments");
+        //don't create two treatmentsummaries for the same snapshot
+        if(dataImportService.findTreatmentSummaryByPatientSnapshot(pSnap) == null){
+            ts = new TreatmentSummary();
 
-        for(int k=0; k<treatmentArr.length();k++){
+            JSONArray treatmentArr = j.getJSONArray("Treatments");
 
-            JSONObject treatmentObj = treatmentArr.getJSONObject(k);
-            TreatmentProtocol tp;
+            for(int k=0; k<treatmentArr.length();k++){
 
-            String drugString;
-            String date;
-            String duration = treatmentObj.getString("Duration");
-            String response = treatmentObj.getString("Response");
-            //this is the current treatment
-            if(treatmentObj.has("Current Drug")){
+                JSONObject treatmentObj = treatmentArr.getJSONObject(k);
+                TreatmentProtocol tp;
 
-                drugString = treatmentObj.getString("Current Drug");
-                date = treatmentObj.getString("Starting Date");
-                tp = dataImportService.getTreatmentProtocol(drugString, "", response, true);
+                String drugString;
+                String date;
+                String duration = treatmentObj.getString("Duration");
+                String response = treatmentObj.getString("Response");
+                //this is the current treatment
+                if(treatmentObj.has("Current Drug")){
 
+                    drugString = treatmentObj.getString("Current Drug");
+                    date = treatmentObj.getString("Starting Date");
+                    tp = dataImportService.getTreatmentProtocol(drugString, "", response, true);
+
+                }
+                //not current treatment, create default TreatmentProtocol object
+                else{
+
+                    drugString = treatmentObj.getString("Prior Drug");
+                    date = treatmentObj.getString("Prior Date");
+                    tp = dataImportService.getTreatmentProtocol(drugString, "", response, false);
+                }
+
+                tp.setTreatmentDate(date);
+                tp.addDurationForAllComponents(duration);
+                ts.addTreatmentProtocol(tp);
             }
-            //not current treatment, create default TreatmentProtocol object
-            else{
 
-                drugString = treatmentObj.getString("Prior Drug");
-                date = treatmentObj.getString("Prior Date");
-                tp = dataImportService.getTreatmentProtocol(drugString, "", response, false);
-            }
-
-            tp.setTreatmentDate(date);
-            tp.addDurationForAllComponents(duration);
-            ts.addTreatmentProtocol(tp);
+            //save summary on snapshot
+            pSnap.setTreatmentSummary(ts);
+            dataImportService.savePatientSnapshot(pSnap);
         }
 
-        //save summary on snapshot
-        pSnap.setTreatmentSummary(ts);
-        dataImportService.savePatientSnapshot(pSnap);
 
         //loadVariationData(mc);
         dataImportService.saveModelCreation(modelCreation);
