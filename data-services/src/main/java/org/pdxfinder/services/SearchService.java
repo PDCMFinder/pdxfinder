@@ -220,6 +220,23 @@ public class SearchService {
 
 
         }
+        if(data_available.isPresent() && !data_available.get().isEmpty()){
+
+            List<String> dataAvList = new ArrayList<>();
+            for(String p : data_available.get()){
+                dataAvList.add("data_available=" + p);
+            }
+
+            if (facetString.length() != 0 && !facetString.endsWith("&")) {
+                facetString += "&";
+            }
+            for (String p : dataAvList) {
+                facetString += p + "&";
+            }
+
+
+        }
+
 
         wsDTO.setFacetString(facetString);
 
