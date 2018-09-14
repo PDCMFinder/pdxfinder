@@ -245,9 +245,9 @@ public class DataImportService {
         return modelCreationRepository.findAllModelsPlatforms();
     }
 
-    public int countMarkerAssociationBySourcePdxId(String modelId, String platformName){
+    public int countMarkerAssociationBySourcePdxId(String modelId, String dataSource,  String platformName){
 
-        return modelCreationRepository.countMarkerAssociationBySourcePdxId(modelId,platformName);
+        return modelCreationRepository.countMarkerAssociationBySourcePdxId(modelId, dataSource, platformName);
     }
 
     public Collection<ModelCreation> findModelsWithPatientData(){

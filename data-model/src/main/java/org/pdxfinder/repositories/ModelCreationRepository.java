@@ -135,12 +135,13 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
                                                         @Param("lim") int lim);
 
     @Query("MATCH (mc)-[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(molChar:MolecularCharacterization)-[pur:PLATFORM_USED]-(p:Platform) " +
-            "WHERE mc.sourcePdxId={sourcePdxId}  AND p.name={platform} " +
+            "WHERE mc.sourcePdxId={sourcePdxId}  AND p.name={platform} AND mc.dataSource = {dataSource} " +
             "WITH mc, msr, s, cbr, molChar, pur, p " +
 
             "OPTIONAL MATCH (molChar)-[assW:ASSOCIATED_WITH]-(mAss:MarkerAssociation) " +
             "RETURN count(mAss) ")
     Integer countMarkerAssociationBySourcePdxId(@Param("sourcePdxId") String sourcePdxId,
+                                                @Param("datasource") String dataSource,
                                                 @Param("platform") String platform);
 
 

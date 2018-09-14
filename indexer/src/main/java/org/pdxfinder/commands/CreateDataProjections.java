@@ -239,19 +239,70 @@ public class CreateDataProjections implements CommandLineRunner{
 
 
         // Get out all platforms for all models and populate a map with the results
-        Map<Long, List<String>> platformsByModel = new HashMap<>();
-        Collection<ModelCreation> allModelsPlatforms = dataImportService.findAllModelsPlatforms();
-        for (ModelCreation mc : allModelsPlatforms) {
+        Map<Long, List<String>> mutationPlatformsByModel = new HashMap<>();
+        Map<Long, List<String>> cnaPlatformsByModel = new HashMap<>();
 
-            if (!platformsByModel.containsKey(mc.getId())) {
-                platformsByModel.put(mc.getId(), new ArrayList<>());
+
+        Collection<ModelCreation> allModelsWithPlatforms = dataImportService.findAllModelsPlatforms();
+
+        for (ModelCreation mc : allModelsWithPlatforms) {
+
+
+            if(mc.getRelatedSamples() != null){
+
+                for(Sample s : mc.getRelatedSamples()){
+
+                    if(s.getMolecularCharacterizations() != null){
+
+                        for(MolecularCharacterization molc : s.getMolecularCharacterizations()){
+
+                            if(molc.getPlatform() != null){
+                                String platformName = molc.getPlatform().getName();
+
+                                if(dataImportService.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), mc.getDataSource(), platformName) > 0){
+
+                                    if(molc.getType().toLowerCase().equals("mutation")){
+
+                                        if (!mutationPlatformsByModel.containsKey(mc.getId())) {
+                                            mutationPlatformsByModel.put(mc.getId(), new ArrayList<>());
+                                        }
+
+                                        mutationPlatformsByModel.get(mc.getId()).add(platformName);
+                                    }
+                                    else if(molc.getType().toLowerCase().equals("copy number alteration")){
+
+                                        if(!cnaPlatformsByModel.containsKey(mc.getId())){
+
+                                            cnaPlatformsByModel.put(mc.getId(), new ArrayList<>());
+                                        }
+
+                                        cnaPlatformsByModel.get(mc.getId()).add(platformName);
+                                    }
+
+                                }
+
+                            }
+
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+
+            /*
+            if (!mutationPlatformsByModel.containsKey(mc.getId())) {
+                mutationPlatformsByModel.put(mc.getId(), new ArrayList<>());
             }
 
             // Are there any molecular characterizations associated to this model?
             if (mc.getRelatedSamples().stream().map(Sample::getMolecularCharacterizations).mapToLong(Collection::size).sum() > 0) {
 
                 // Get all molecular characterizations platforms into a list
-                platformsByModel.get(mc.getId()).addAll(
+                mutationPlatformsByModel.get(mc.getId()).addAll(
                         mc.getRelatedSamples().stream()
                                 .map(Sample::getMolecularCharacterizations)
                                 .flatMap(Collection::stream)
@@ -264,7 +315,13 @@ public class CreateDataProjections implements CommandLineRunner{
                                 })
                                 .distinct()
                                 .collect(Collectors.toList()));
+
+
+
+
             }
+            */
+
         }
 
         Map<String, String> cancerSystemMap = new HashMap<>();
@@ -296,20 +353,23 @@ public class CreateDataProjections implements CommandLineRunner{
             mfq.setDatasource(mc.getDataSource());
 
 
-            List<String> dataAvailable = new ArrayList<>();
+            Set<String> dataAvailable = new HashSet<>();
 
-            if(platformsByModel.containsKey(mc.getId())){
+            if(mutationPlatformsByModel.containsKey(mc.getId())){
 
-                for(String available : platformsByModel.get(mc.getId())){
-                    dataAvailable.add("Mutation_"+available);
-                }
+                dataAvailable.add("Gene Mutation");
+
+            }
+
+            if(cnaPlatformsByModel.containsKey(mc.getId())){
+                dataAvailable.add("Copy Number Alteration");
             }
 
             if(dataImportService.isTreatmentSummaryAvailable(mc.getDataSource(), mc.getSourcePdxId())){
                 dataAvailable.add("Dosing Studies");
             }
 
-            mfq.setDataAvailable(dataAvailable);
+            mfq.setDataAvailable(new ArrayList<>(dataAvailable));
 
             if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
                 mfq.setTreatmentHistory(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());

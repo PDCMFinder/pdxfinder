@@ -18,7 +18,8 @@ public enum SearchFacetName {
     cell_type,
     mutation,
     drug,
-    project;
+    project,
+    data_available;
 
     public String getName() {
         return name();
