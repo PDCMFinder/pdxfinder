@@ -90,6 +90,7 @@ public class SearchService {
                                   Optional<List<String>> mutation,
                                   Optional<List<String>> drug,
                                   Optional<List<String>> project,
+                                  Optional<List<String>> data_available,
                                   Integer page,
                                   Integer size){
 
@@ -106,7 +107,8 @@ public class SearchService {
                 sample_tumor_type,
                 mutation,
                 drug,
-                project
+                project,
+                data_available
         );
 
         WebSearchDTO wsDTO = new WebSearchDTO();
@@ -123,6 +125,7 @@ public class SearchService {
         List<FacetOption> mutationSelected = searchDS.getFacetOptions(SearchFacetName.mutation, null, results, mutation.orElse(null));
         List<FacetOption> drugSelected = searchDS.getFacetOptions(SearchFacetName.drug, null, results, drug.orElse(null));
         List<FacetOption> projectSelected = searchDS.getFacetOptions(SearchFacetName.project, null, results, project.orElse(null));
+        List<FacetOption> dataAvailableSelected = searchDS.getFacetOptions(SearchFacetName.data_available, null, results, data_available.orElse(null));
 
         wsDTO.setPatientAgeSelected(patientAgeSelected);
         wsDTO.setPatientGenderSelected(patientGenderSelected);
@@ -408,7 +411,8 @@ public class SearchService {
                             Optional<List<String>> sample_tumor_type,
                             Optional<List<String>> mutation,
                             Optional<List<String>> drug,
-                            Optional<List<String>> project){
+                            Optional<List<String>> project,
+                            Optional<List<String>> data_available){
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
                 query,
@@ -422,7 +426,9 @@ public class SearchService {
                 sample_tumor_type,
                 mutation,
                 drug,
-                project
+                project,
+                data_available
+
         );
 
         ExportDTO eDTO = new ExportDTO();
@@ -444,9 +450,11 @@ public class SearchService {
             Optional<List<String>> sampleTumorType,
             Optional<List<String>> mutation,
             Optional<List<String>> drug,
-            Optional<List<String>> project
+            Optional<List<String>> project,
+            Optional<List<String>> data_available
 
-    ) {
+
+            ) {
 
         Map<SearchFacetName, List<String>> configuredFacets = new HashMap<>();
 
@@ -532,6 +540,12 @@ public class SearchService {
             }
         }
 
+        if (data_available.isPresent() && !data_available.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.data_available, new ArrayList<>());
+            for (String s : data_available.get()) {
+                configuredFacets.get(SearchFacetName.data_available).add(s);
+            }
+        }
 
         return configuredFacets;
     }
