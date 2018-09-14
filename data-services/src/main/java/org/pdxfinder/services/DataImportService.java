@@ -240,6 +240,14 @@ public class DataImportService {
         return modelCreation;
     }
 
+    public boolean isExistingModel(String dataSource, String modelId){
+
+        ModelCreation modelCreation = modelCreationRepository.findBySourcePdxIdAndDataSource(modelId, dataSource);
+
+        if(modelCreation == null) return false;
+        return true;
+    }
+
     public Collection<ModelCreation> findAllModelsPlatforms(){
 
         return modelCreationRepository.findAllModelsPlatforms();
@@ -879,13 +887,24 @@ public class DataImportService {
         return dataProjectionRepository.findByLabel(label);
     }
 
-    public boolean isTreatmentSummaryAvailable(String dataSource, String modelId){
+    public boolean isTreatmentSummaryAvailableOnModel(String dataSource, String modelId){
 
-        TreatmentSummary ts = treatmentSummaryRepository.findByDataSourceAndModelId(dataSource, modelId);
+        TreatmentSummary ts = treatmentSummaryRepository.findModelTreatmentByDataSourceAndModelId(dataSource, modelId);
 
         if(ts != null && ts.getTreatmentProtocols() != null){
             return true;
         }
+        return false;
+    }
+
+    public boolean isTreatmentSummaryAvailableOnPatient(String dataSource, String modelId){
+
+        TreatmentSummary ts = treatmentSummaryRepository.findPatientTreatmentByDataSourceAndModelId(dataSource, modelId);
+
+        if(ts != null && ts.getTreatmentProtocols() != null){
+            return true;
+        }
+
         return false;
     }
 
