@@ -116,7 +116,12 @@ public class SearchDS {
 
 
 
-    public static List<String> DIAGNOSIS_OPTIONS = new ArrayList<>();
+    public static List<String> DATA_AVAILABLE_OPTIONS = Arrays.asList(
+            "Gene Mutation",
+            "Copy Number Alteration",
+            "Dosing Studies",
+            "Patient Treatment"
+    );
 
 
     /**
@@ -150,8 +155,6 @@ public class SearchDS {
         padding.add("NO DATA");
 
 
-        // Populate the list of possible diagnoses
-        DIAGNOSIS_OPTIONS = models.stream().map(ModelForQuery::getDiagnosis).distinct().collect(Collectors.toList());
 
 
         //
@@ -204,14 +207,7 @@ public class SearchDS {
                         .contains(x))
                 .collect(Collectors.toList());
 
-        DIAGNOSIS_OPTIONS = DIAGNOSIS_OPTIONS
-                .stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getDiagnosis)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
+
 
 
         //PROJECT_OPTIONS =new ArrayList<>(models.stream().map(model -> model.getProjects()).flatMap(Collection::stream).collect(Collectors.toSet()));
@@ -954,7 +950,26 @@ public class SearchDS {
 
                     result.removeAll(projectsToRemove);
                     break;
+                case data_available:
+                    Set<ModelForQuery> mfqToRemove = new HashSet<>();
+                    for (ModelForQuery res : result) {
+                        Boolean keep = Boolean.FALSE;
+                        for (String s : filters.get(SearchFacetName.data_available)) {
+                            try{
+                                if (res.getDataAvailable() != null && res.getDataAvailable().contains(s)) {
+                                    keep = Boolean.TRUE;
+                                }
+                            } catch(Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                        if (!keep) {
+                            mfqToRemove.add(res);
+                        }
+                    }
 
+                    result.removeAll(mfqToRemove);
+                    break;
 
                 default:
                     // default case is an unexpected filter option
