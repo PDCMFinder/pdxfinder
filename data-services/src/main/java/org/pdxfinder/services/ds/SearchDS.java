@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.dao.DataProjection;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.repositories.DataProjectionRepository;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
@@ -375,7 +376,13 @@ public class SearchDS {
 
         log.info("Initializing model drug responses");
 
-        String responses = dataProjectionRepository.findByLabel("ModelDrugData").getValue();
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("ModelDrugData");
+        String responses = "{}";
+
+        if(dataProjection != null){
+
+            responses = dataProjection.getValue();
+        }
 
         try{
 
