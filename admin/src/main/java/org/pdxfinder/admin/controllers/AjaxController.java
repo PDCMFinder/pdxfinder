@@ -1,19 +1,17 @@
 package org.pdxfinder.admin.controllers;
 
-import org.pdxfinder.admin.pojos.MappingContainer;
 import org.pdxfinder.admin.pojos.MappingEntity;
 import org.pdxfinder.services.MappingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 
 /*
  * Created by csaba on 09/07/2018.
@@ -22,7 +20,7 @@ import java.util.Optional;
 public class AjaxController {
 
     private MappingService mappingService;
-
+    private final static Logger log = LoggerFactory.getLogger(AjaxController.class);
 
 
     @Autowired
@@ -53,6 +51,14 @@ public class AjaxController {
         }
 
         return mappingService.getSavedDiagnosisMappings(ds).getEntityList();
+    }
+
+
+    @PostMapping("/api/diagnosis")
+    public ResponseEntity<?> createDiagnosisMappings(@RequestBody List<MappingEntity> newMappings){
+
+        log.info(newMappings.toString());
+        return ResponseEntity.noContent().build();
     }
 
 
