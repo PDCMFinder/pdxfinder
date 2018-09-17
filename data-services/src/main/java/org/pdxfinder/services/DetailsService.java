@@ -240,6 +240,22 @@ public class DetailsService {
             dto.setClassification(sample.getClassification());
         }
 
+        if (sample != null && sample.getStage() != null) {
+            dto.setStage(sample.getStage());
+        }
+
+        if (sample != null && sample.getStageClassification() != null) {
+            dto.setStageClassification(sample.getStageClassification());
+        }
+
+        if (sample != null && sample.getGrade() != null) {
+            dto.setGrade(sample.getGrade());
+        }
+
+        if (sample != null && sample.getGradeClassification() != null) {
+            dto.setGradeClassification(sample.getGradeClassification());
+        }
+
         if (sample != null && sample.getOriginTissue() != null) {
             dto.setOriginTissue(sample.getOriginTissue().getName());
         }
