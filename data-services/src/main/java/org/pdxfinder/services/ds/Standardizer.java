@@ -210,7 +210,7 @@ public class Standardizer {
         else if(drug.equals("Topotecan")){
             return drug;
         }
-        else if(drug.equals("5-FU")){
+        else if(drug.equals("5-FU") || drug.equals("5-Fluorouracil")){
 
             return "Fluorouracil";
         }
