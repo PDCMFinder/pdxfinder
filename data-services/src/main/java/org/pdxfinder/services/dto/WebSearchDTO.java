@@ -359,4 +359,12 @@ public class WebSearchDTO {
     public void setProjectSelected(List<FacetOption> projectSelected) {
         this.projectSelected = projectSelected;
     }
+
+    public List<FacetOption> getDataAvailableSelected() {
+        return dataAvailableSelected;
+    }
+
+    public void setDataAvailableSelected(List<FacetOption> dataAvailableSelected) {
+        this.dataAvailableSelected = dataAvailableSelected;
+    }
 }

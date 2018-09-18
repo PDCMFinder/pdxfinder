@@ -1042,6 +1042,38 @@ public class SearchDS {
     }
 
 
+    public List<FacetOption> getFacetOptions(SearchFacetName facet,List<String> options, Map<SearchFacetName, List<String>> configuredFacets){
+
+        List<FacetOption> facetOptions = new ArrayList<>();
+
+        for(String s : options){
+
+            FacetOption fo = new FacetOption(s, 0);
+            fo.setSelected(false);
+            facetOptions.add(fo);
+        }
+
+        if(configuredFacets.containsKey(facet)){
+
+            List<String> selectedFacets = configuredFacets.get(facet);
+            for(String sf : selectedFacets){
+
+                for(FacetOption fo : facetOptions){
+
+                    if(fo.getName().equals(sf)){
+                        fo.setSelected(true);
+                    }
+                }
+
+
+            }
+
+        }
+
+        return facetOptions;
+    }
+
+
     /**
      * Get the count of models for a supplied facet.
      * <p>
