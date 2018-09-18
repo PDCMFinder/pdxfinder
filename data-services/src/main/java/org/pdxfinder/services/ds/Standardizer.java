@@ -237,7 +237,7 @@ public class Standardizer {
         }
 
 
-        return "Unknown drug - "+drug;
+        return "Not Specified";
     }
 
 

@@ -970,8 +970,12 @@ public class DataImportService {
                     TreatmentComponent tc = new TreatmentComponent();
                     tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                     tc.setDose(doseArray[i].trim());
-                    tc.setDrug(d);
-                    tp.addTreatmentComponent(tc);
+                    //don't load unknown drugs
+                    if(!d.getName().equals("Not Specified")){
+                        tc.setDrug(d);
+                        tp.addTreatmentComponent(tc);
+                    }
+
                 }
 
             }
@@ -997,8 +1001,13 @@ public class DataImportService {
                         TreatmentComponent tc = new TreatmentComponent();
                         tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                         tc.setDose(doseArray[i].trim());
-                        tc.setDrug(d);
-                        tp.addTreatmentComponent(tc);
+
+                        //don't load unknown drugs
+                        if(!d.getName().equals("Not Specified")){
+                            tc.setDrug(d);
+                            tp.addTreatmentComponent(tc);
+                        }
+
                     }
 
                 }
@@ -1016,8 +1025,11 @@ public class DataImportService {
                     TreatmentComponent tc = new TreatmentComponent();
                     tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                     tc.setDose(doseString.trim());
-                    tc.setDrug(d);
-                    tp.addTreatmentComponent(tc);
+                    //don't load unknown drugs
+                    if(!d.getName().equals("Not Specified")){
+                        tc.setDrug(d);
+                        tp.addTreatmentComponent(tc);
+                    }
                 }
             }
 
@@ -1029,8 +1041,11 @@ public class DataImportService {
             TreatmentComponent tc = new TreatmentComponent();
             tc.setType(Standardizer.getTreatmentComponentType(drugString));
             tc.setDrug(d);
-            tc.setDose(doseString.trim());
-            tp.addTreatmentComponent(tc);
+            //don't load unknown drugs
+            if(!d.getName().equals("Not Specified")){
+                tc.setDrug(d);
+                tp.addTreatmentComponent(tc);
+            }
         }
 
         Response r = new Response();
@@ -1039,7 +1054,7 @@ public class DataImportService {
 
         tp.setResponse(r);
 
-
+        if(tp.getComponents() == null || tp.getComponents().size() == 0) return null;
 
         return tp;
     }

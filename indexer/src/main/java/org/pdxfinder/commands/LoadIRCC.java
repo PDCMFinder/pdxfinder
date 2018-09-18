@@ -285,7 +285,9 @@ public class LoadIRCC implements CommandLineRunner {
                             TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
                                     treatmentObject.getString("Dose"), treatmentObject.getString("Response Class"), "");
 
-                            ts.addTreatmentProtocol(tp);
+                            if(tp != null){
+                                ts.addTreatmentProtocol(tp);
+                            }
                         }
 
                         ts.setModelCreation(modelCreation);

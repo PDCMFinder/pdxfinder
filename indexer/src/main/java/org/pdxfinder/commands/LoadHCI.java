@@ -294,7 +294,9 @@ public class LoadHCI implements CommandLineRunner {
                                     treatmentObject.getString("Dose"), treatmentObject.getString("Response"),"");
 
 
-                            ts.addTreatmentProtocol(tp);
+                            if(tp != null){
+                                ts.addTreatmentProtocol(tp);
+                            }
                         }
 
                         ts.setModelCreation(modelCreation);
