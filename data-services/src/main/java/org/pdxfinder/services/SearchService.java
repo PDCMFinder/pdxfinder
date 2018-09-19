@@ -45,7 +45,7 @@ public class SearchService {
     List<String> cancerBySystemOptions = SearchDS.CANCERS_BY_SYSTEM_OPTIONS;
     List<String> patientGenderOptions = SearchDS.PATIENT_GENDERS;
     List<String> sampleTumorTypeOptions = SearchDS.SAMPLE_TUMOR_TYPE_OPTIONS;
-
+    List<String> dataAvailableOptions = SearchDS.DATA_AVAILABLE_OPTIONS;
 
 
 
@@ -71,6 +71,7 @@ public class SearchService {
         facets.put("patient_age_options", patientAgeOptions);
         facets.put("patient_gender_options", patientGenderOptions);
         facets.put("cancer_system_options", cancerBySystemOptions);
+        facets.put("data_available_options", dataAvailableOptions);
 
     }
 
@@ -125,7 +126,7 @@ public class SearchService {
         List<FacetOption> mutationSelected = searchDS.getFacetOptions(SearchFacetName.mutation, null, results, mutation.orElse(null));
         List<FacetOption> drugSelected = searchDS.getFacetOptions(SearchFacetName.drug, null, results, drug.orElse(null));
         List<FacetOption> projectSelected = searchDS.getFacetOptions(SearchFacetName.project, null, results, project.orElse(null));
-        List<FacetOption> dataAvailableSelected = searchDS.getFacetOptions(SearchFacetName.data_available, null, results, data_available.orElse(null));
+        List<FacetOption> dataAvailableSelected = searchDS.getFacetOptions(SearchFacetName.data_available, dataAvailableOptions, configuredFacets);
 
         wsDTO.setPatientAgeSelected(patientAgeSelected);
         wsDTO.setPatientGenderSelected(patientGenderSelected);
@@ -134,6 +135,8 @@ public class SearchService {
         wsDTO.setSampleTumorTypeSelected(sampleTumorTypeSelected);
         wsDTO.setMutationSelected(mutationSelected);
         wsDTO.setProjectSelected(projectSelected);
+        wsDTO.setDataAvailableSelected(dataAvailableSelected);
+
 
 
 

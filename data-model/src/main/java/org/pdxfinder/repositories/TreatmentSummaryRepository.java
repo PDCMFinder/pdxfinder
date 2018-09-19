@@ -41,6 +41,16 @@ public interface TreatmentSummaryRepository extends Neo4jRepository<TreatmentSum
             "RETURN ts, tpr, tp, tcr, tc, dr, d, rr, r")
     List<TreatmentSummary> findAllWithDrugData();
 
+    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:DRUG]-(d:Drug) " +
+            "MATCH (tp)-[rr:RESPONSE]-(r:Response) " +
+            "RETURN ts, tpr, tp, tcr, tc, dr, d, rr, r")
+    List<TreatmentSummary> findAllMouseTreatments();
+
+    @Query("MATCH (ps:PatientSnapshot)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:DRUG]-(d:Drug) " +
+            "MATCH (tp)-[rr:RESPONSE]-(r:Response) " +
+            "RETURN ts, tpr, tp, tcr, tc, dr, d, rr, r")
+    List<TreatmentSummary> findAllPatientTreatments();
+
     @Query("MATCH (ts:TreatmentSummary) RETURN count(ts)")
     int findTotalSummaryNumber();
 

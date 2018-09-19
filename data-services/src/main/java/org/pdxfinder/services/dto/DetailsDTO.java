@@ -25,7 +25,14 @@ public class DetailsDTO {
     private String tumorType;
     private String originTissue;
     private String sampleSite;
+
+    @Deprecated
     private String classification;
+
+    private String stage;
+    private String grade;
+    private String stageClassification;
+    private String gradeClassification;
 
     private String sampleType; //Implantation Type
     private String strain;
@@ -63,7 +70,6 @@ public class DetailsDTO {
     private Set<String> autoSuggestList;
     private Map<String, String> platformsAndUrls;
     private List<Map> dataSummary;
-    private PatientDTO patient;
 
 
 
@@ -82,6 +88,12 @@ public class DetailsDTO {
         this.diagnosis = "";
         this.tumorType = "";
         this.classification = "";
+
+        this.stage = "";
+        this.grade = "";
+        this.stageClassification = "";
+        this.gradeClassification = "";
+
         this.originTissue = "";
         this.sampleSite = "";
 
@@ -445,11 +457,35 @@ public class DetailsDTO {
         return dataSummary;
     }
 
-    public PatientDTO getPatient() {
-        return patient;
+    public String getStage() {
+        return stage;
     }
 
-    public void setPatient(PatientDTO patient) {
-        this.patient = patient;
+    public void setStage(String stage) {
+        this.stage = stage;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
+    public String getStageClassification() {
+        return stageClassification;
+    }
+
+    public void setStageClassification(String stageClassification) {
+        this.stageClassification = stageClassification;
+    }
+
+    public String getGradeClassification() {
+        return gradeClassification;
+    }
+
+    public void setGradeClassification(String gradeClassification) {
+        this.gradeClassification = gradeClassification;
     }
 }

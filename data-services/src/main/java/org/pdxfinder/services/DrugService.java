@@ -8,9 +8,7 @@ import org.pdxfinder.repositories.ResponseRepository;
 import org.pdxfinder.repositories.TreatmentProtocolRepository;
 import org.pdxfinder.repositories.TreatmentSummaryRepository;
 import org.pdxfinder.services.dto.CountDTO;
-import org.pdxfinder.services.dto.KeyValuePairDTO;
 import org.springframework.stereotype.Service;
-import scala.collection.parallel.ParIterableLike;
 
 import java.util.*;
 
@@ -53,7 +51,7 @@ public class DrugService {
         Set<String> drugNamesSet = new HashSet<>();
         List<String> drugNames = new ArrayList<>();
 
-        List<TreatmentSummary> treatmentSummaries = getSummariesWithDrugAndResponse();
+        List<TreatmentSummary> treatmentSummaries = getModelTreatmentSummariesWithDrugAndResponse();
 
         for(TreatmentSummary ts : treatmentSummaries){
 
@@ -73,9 +71,9 @@ public class DrugService {
         return responseRepository.findAllResponses();
     }
 
-    public List<TreatmentSummary> getSummariesWithDrugAndResponse(){
+    public List<TreatmentSummary> getModelTreatmentSummariesWithDrugAndResponse(){
 
-        return treatmentSummaryRepository.findAllWithDrugData();
+        return treatmentSummaryRepository.findAllMouseTreatments();
     }
 
     public int getTotalSummaryNumber(){

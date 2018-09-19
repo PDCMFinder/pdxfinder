@@ -493,16 +493,20 @@ public class UniversalLoader implements CommandLineRunner {
 
             TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatment, dose, response, responseClassification);
 
-            //update treatment component type and duration
-            for(TreatmentComponent tc : tp.getComponents()){
+            if(tp != null){
 
-                tc.setDuration(duration);
-                //never control on humans!
-                tc.setType("Drug");
+                //update treatment component type and duration
+                for(TreatmentComponent tc : tp.getComponents()){
+
+                    tc.setDuration(duration);
+                    //never control on humans!
+                    tc.setType("Drug");
+                }
+
+                tp.setTreatmentDate(startingDate);
+                ts.addTreatmentProtocol(tp);
             }
 
-            tp.setTreatmentDate(startingDate);
-            ts.addTreatmentProtocol(tp);
 
             ps.setTreatmentSummary(ts);
             dataImportService.savePatientSnapshot(ps);

@@ -2,10 +2,10 @@ package org.pdxfinder.services.ds;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.dao.DataProjection;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.repositories.DataProjectionRepository;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
@@ -48,7 +48,7 @@ public class SearchDS {
     Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<String, Map<String, Map<String, Set<Long>>>>();
 
     //"drugname"=>"response"=>"set of model ids"
-    private Map<String, Map<String, Set<Long>>> drugResponses = new HashMap<>();
+    private Map<String, Map<String, Set<Long>>> modelDrugResponses = new HashMap<>();
 
     private List<String> projectOptions = new ArrayList<>();
 
@@ -144,8 +144,8 @@ public class SearchDS {
         initializeMutations();
 
 
-        //loads drug response from Data Projection
-        initializeDrugResponses();
+        //loads model drug response from Data Projection
+        initializeModelDrugResponses();
 
         //loads projects
         initializeAdditionalOptions();
@@ -372,19 +372,25 @@ public class SearchDS {
     }
 
 
-    void initializeDrugResponses(){
+    void initializeModelDrugResponses(){
 
-        log.info("Initializing drug responses");
+        log.info("Initializing model drug responses");
 
-        String responses = dataProjectionRepository.findByLabel("DrugResponse").getValue();
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("ModelDrugData");
+        String responses = "{}";
+
+        if(dataProjection != null){
+
+            responses = dataProjection.getValue();
+        }
 
         try{
 
             ObjectMapper mapper = new ObjectMapper();
 
-            drugResponses = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
+            modelDrugResponses = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
 
-            //log.info("Lookup: "+drugResponses.get("doxorubicincyclophosphamide").get("progressive disease").toString());
+            //log.info("Lookup: "+modelDrugResponses.get("doxorubicincyclophosphamide").get("progressive disease").toString());
 
         }
         catch(Exception e){
@@ -499,9 +505,9 @@ public class SearchDS {
         //1. = 2.
         if(drug != null && response.toLowerCase().equals("all")){
 
-            if(drugResponses.containsKey(drug)){
+            if(modelDrugResponses.containsKey(drug)){
 
-                for(Map.Entry<String, Set<Long>> currResp:drugResponses.get(drug).entrySet()){
+                for(Map.Entry<String, Set<Long>> currResp: modelDrugResponses.get(drug).entrySet()){
 
                     String resp = currResp.getKey();
                     Set<Long> foundModels = currResp.getValue();
@@ -546,11 +552,11 @@ public class SearchDS {
         //3.
         else if(drug != null && response != null){
 
-            if(drugResponses.containsKey(drug)){
+            if(modelDrugResponses.containsKey(drug)){
 
-                if(drugResponses.get(drug).containsKey(response)){
+                if(modelDrugResponses.get(drug).containsKey(response)){
 
-                    Set<Long> foundModels = drugResponses.get(drug).get(response);
+                    Set<Long> foundModels = modelDrugResponses.get(drug).get(response);
 
                     for(Long modelId: foundModels){
 
@@ -594,7 +600,7 @@ public class SearchDS {
 
             if(response.equals("ALL")){
 
-                for(Map.Entry<String, Map<String, Set<Long>>> currDrug:drugResponses.entrySet()){
+                for(Map.Entry<String, Map<String, Set<Long>>> currDrug: modelDrugResponses.entrySet()){
 
                     String drugName = currDrug.getKey();
 
@@ -644,7 +650,7 @@ public class SearchDS {
             }
             else{
 
-                for(Map.Entry<String, Map<String, Set<Long>>> drugs : drugResponses.entrySet()){
+                for(Map.Entry<String, Map<String, Set<Long>>> drugs : modelDrugResponses.entrySet()){
 
                     String drugName = drugs.getKey();
 
@@ -1033,6 +1039,38 @@ public class SearchDS {
 
         // Create a "combination" predicate containing sub-predicates "OR"ed together
         return preds.stream().reduce(Predicate::or).orElse(x -> false);
+    }
+
+
+    public List<FacetOption> getFacetOptions(SearchFacetName facet,List<String> options, Map<SearchFacetName, List<String>> configuredFacets){
+
+        List<FacetOption> facetOptions = new ArrayList<>();
+
+        for(String s : options){
+
+            FacetOption fo = new FacetOption(s, 0);
+            fo.setSelected(false);
+            facetOptions.add(fo);
+        }
+
+        if(configuredFacets.containsKey(facet)){
+
+            List<String> selectedFacets = configuredFacets.get(facet);
+            for(String sf : selectedFacets){
+
+                for(FacetOption fo : facetOptions){
+
+                    if(fo.getName().equals(sf)){
+                        fo.setSelected(true);
+                    }
+                }
+
+
+            }
+
+        }
+
+        return facetOptions;
     }
 
 

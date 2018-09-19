@@ -48,7 +48,7 @@ public class CreateDataProjections implements CommandLineRunner{
     private Map<String, Map<String, Set<Long>>> wtMarkersDataProjection = new HashMap<>();
 
     //"drugname"=>"response"=>"set of model ids"
-    private Map<String, Map<String, Set<Long>>> drugResponseDP = new HashMap<>();
+    private Map<String, Map<String, Set<Long>>> modelDrugResponseDP = new HashMap<>();
 
 
     @Autowired
@@ -78,7 +78,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
             createModelForQueryDataProjection();
 
-            createDrugResponseDataProjection();
+            createModelDrugResponseDataProjection();
 
             saveDataProjections();
 
@@ -550,11 +550,11 @@ public class CreateDataProjections implements CommandLineRunner{
     }
 
 
-    private void createDrugResponseDataProjection(){
+    private void createModelDrugResponseDataProjection(){
 
-        log.info("Creating Drug Response DP");
+        log.info("Creating Model Drug Response DP");
 
-        List<TreatmentSummary> treatmentSummaries = drugService.getSummariesWithDrugAndResponse();
+        List<TreatmentSummary> treatmentSummaries = drugService.getModelTreatmentSummariesWithDrugAndResponse();
 
         for(TreatmentSummary ts : treatmentSummaries){
 
@@ -571,7 +571,7 @@ public class CreateDataProjections implements CommandLineRunner{
                     String drugName = tp.getDrugString(true);
                     String response = tp.getResponse().getDescription();
 
-                    addToDrugResponseDP(modelId, drugName, response);
+                    addToModelDrugResponseDP(modelId, drugName, response);
                 }
             }
 
@@ -580,7 +580,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
     }
 
-    private void addToDrugResponseDP(Long modelId, String drugName, String responseVal){
+    private void addToModelDrugResponseDP(Long modelId, String drugName, String responseVal){
 
         if(modelId != null && drugName != null && !drugName.isEmpty() && responseVal != null && !responseVal.isEmpty()){
 
@@ -588,18 +588,18 @@ public class CreateDataProjections implements CommandLineRunner{
             String drug = drugName.replaceAll("[^a-zA-Z0-9 _-]","");
             String response = responseVal.replaceAll("[^a-zA-Z0-9 _-]","");
 
-            if(drugResponseDP.containsKey(drug)){
+            if(modelDrugResponseDP.containsKey(drug)){
 
-                if(drugResponseDP.get(drug).containsKey(response)){
+                if(modelDrugResponseDP.get(drug).containsKey(response)){
 
-                    drugResponseDP.get(drug).get(response).add(modelId);
+                    modelDrugResponseDP.get(drug).get(response).add(modelId);
                 }
                 //new response
                 else{
                     Set s = new HashSet();
                     s.add(modelId);
 
-                    drugResponseDP.get(drug).put(response,s);
+                    modelDrugResponseDP.get(drug).put(response,s);
                 }
             }
             //new drug, create response and add model
@@ -611,7 +611,7 @@ public class CreateDataProjections implements CommandLineRunner{
                 Map respMap = new HashMap();
                 respMap.put(response, s);
 
-                drugResponseDP.put(drug, respMap);
+                modelDrugResponseDP.put(drug, respMap);
             }
 
         }
@@ -641,12 +641,12 @@ public class CreateDataProjections implements CommandLineRunner{
             mvDP.setLabel("MarkerVariant");
         }
 
-        DataProjection drugDP = dataImportService.findDataProjectionByLabel("DrugResponse");
+        DataProjection drugDP = dataImportService.findDataProjectionByLabel("ModelDrugData");
 
         if(drugDP == null){
 
             drugDP = new DataProjection();
-            drugDP.setLabel("DrugResponse");
+            drugDP.setLabel("ModelDrugData");
         }
 
 
@@ -657,7 +657,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
             j1 = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
             j2 = new JSONObject(mutatedMarkerVariantDP.toString());
-            j3 = new JSONObject(drugResponseDP.toString());
+            j3 = new JSONObject(modelDrugResponseDP.toString());
 
             pmvmDP.setValue(j1.toString());
             mvDP.setValue(j2.toString());
