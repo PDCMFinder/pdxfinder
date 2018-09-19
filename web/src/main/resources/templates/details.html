@@ -134,6 +134,10 @@
                         </li>
 
 
+                        <li class="tabs-title">
+                            <a href="#patients"> Patient Data</a>
+                        </li>
+
                         <li th:if="${#lists.isEmpty(data.dataSummary)}"
                             class="tabs-title ">
                             <a href="#variation" id="variation_data_link" onclick="initTabs('0')">
@@ -306,6 +310,294 @@
 
 
                     </div>
+
+
+
+
+
+
+
+
+                    <div class="tabs-panel" id="patients">
+
+                            <!-- Tabs Section -->
+                            <section class="row large-12 medium-12 expanded" id="detailsData">
+                                <div class="row large-12 medium-12 expanded">
+                                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Initial Diagnosis </a></li>
+                                    </ul>
+                                </div>
+
+                                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                                    <div class="tabs-panel is-active" id="summary">
+
+                                        <!-- Summary first row -->
+                                        <div class="row large-12 medium-12 expanded">
+
+                                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                                <div class="responsive-table" style="margin-top: 20px;">
+                                                    <table class="pdx-table head-left">
+                                                        <tbody>
+                                                        <tr>
+                                                            <th class="text-left medium-4">Gender</th>
+                                                            <td th:text="${data.patient.gender}"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4"> Age at Diagnosis</th>
+                                                            <td th:text="${data.patient.ageAtDiagnosis}"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4">Disease Body Location</th>
+                                                            <td th:text="${data.patient.diseaseBodyLocation}"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4">CTEP SDC Code</th>
+                                                            <td th:text="${data.patient.CTEPSDCCode}"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4">Diagnosis Subtype</th>
+                                                            <td th:text="${data.patient.diagnosisSubtype}"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4">Race / Ethnicity</th>
+                                                            <td th:text="${data.patient.raceAndEthnicity}"></td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+
+
+
+                            <section class="row large-12 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+                                <div class="row large-12 medium-12 expanded">
+                                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;">Additional patient History</a></li>
+                                    </ul>
+                                </div>
+
+                                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                                    <div class="tabs-panel is-active" id="summary">
+
+                                        <!-- Summary first row -->
+                                        <div class="row large-12 medium-12 expanded">
+
+                                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                                <div class="responsive-table" style="margin-top: 20px;">
+                                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
+                                                        <thead>
+                                                        <tr>
+                                                            <th colspan="2"> Known Genetic Mutations / Tumor Markers</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                        <tr>
+                                                            <!--<th class="text-left large-12" style="font-size: 17px;">IHC: CD34+, CD99+, EMA+, bcl2+; AE1/AE3 -, CAM5.2 - </th>-->
+                                                            <td>
+                                                    <span th:each="mut : ${data.patient.knownGeneticMutations}"
+                                                          th:text="${mut}"> ...
+                                                    </span>
+
+                                                            </td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+
+
+
+
+                            <section class="row large-12 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+
+                                <div class="row large-12 medium-12 expanded">
+                                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Collection Events </a></li>
+                                    </ul>
+                                </div>
+
+
+
+
+                                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                                    <div class="tabs-panel is-active" id="summary">
+
+                                        <div class="row large-12 medium-12 expanded">
+
+                                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                                <div class="responsive-table" style="margin-top: 20px;">
+                                                    <table class="pdx-table head-left">
+                                                        <thead>
+                                                        <th> </th>
+                                                        <th:block th:if="${not #lists.isEmpty(data.patient.collectionEvents)}"
+                                                                  th:each="event, iter : ${data.patient.collectionEvents}">
+                                                            <th th:text="${'Collection Event '} + ${iter.index+1}">Collection 1</th>
+                                                        </th:block>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr>
+                                                            <th class="text-left medium-4">Age</th>
+                                                            <th:block th:if="${not #lists.isEmpty(data.patient.collectionEvents)}"
+                                                                      th:each="event : ${data.patient.collectionEvents}">
+                                                                <td th:text="${event.age}"> ... AGE ... </td>
+                                                            </th:block>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4"> Diagnosis</th>
+                                                            <th:block th:if="${not #lists.isEmpty(data.patient.collectionEvents)}"
+                                                                      th:each="event : ${data.patient.collectionEvents}">
+                                                                <td th:text="${event.diagnosis}"> ... AGE ... </td>
+                                                            </th:block>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4"> Type </th>
+                                                            <th:block th:if="${not #lists.isEmpty(data.patient.collectionEvents)}"
+                                                                      th:each="event : ${data.patient.collectionEvents}">
+                                                                <td th:text="${event.type}"> ... AGE ... </td>
+                                                            </th:block>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4"> PDX Mouse </th>
+                                                            <th:block th:if="${not #lists.isEmpty(data.patient.collectionEvents)}"
+                                                                      th:each="event : ${data.patient.collectionEvents}">
+                                                                <td th:text="${event.pdxMouse}"> ... AGE ... </td>
+                                                            </th:block>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4">Data</th>
+                                                            <th:block th:if="${not #lists.isEmpty(data.patient.collectionEvents)}"
+                                                                      th:each="event : ${data.patient.collectionEvents}">
+                                                                <td th:text="${event.data}"> ... AGE ... </td>
+                                                            </th:block>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+
+
+
+
+
+                            <section class="row large-12 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+                                <div class="row large-12 medium-12 expanded">
+                                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Current Therapy </a></li>
+                                    </ul>
+                                </div>
+
+                                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                                    <div class="tabs-panel is-active" id="summary">
+
+                                        <!-- Summary first row -->
+                                        <div class="row large-12 medium-12 expanded">
+
+                                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                                <div class="responsive-table" style="margin-top: 20px;">
+                                                    <table class="pdx-table head-left">
+                                                        <thead>
+                                                        <th> Date Regimen Started </th>
+                                                        <th> Standardized Regimen </th>
+                                                        <th> Best Response </th>
+                                                        <th> Number of Cycles </th>
+                                                        <th> Date of Progression  </th>
+                                                        <th> Comments </th>
+                                                        <th>Reason for Off Therapy</th>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr>
+                                                            <th class="text-left medium-4"> Not Specified </th>
+                                                            <td th:text="${'No Current Therapy'}">  </td>
+                                                            <td th:text="${'Not Specified'}">  </td>
+                                                            <td th:text="${'0'}"> </td>
+                                                            <td th:text="${''}">  </td>
+                                                            <td th:text="${''}">  </td>
+                                                            <td th:text="${''}">  </td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+
+                            <section class="row large-12 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+                                <div class="row large-12 medium-12 expanded">
+                                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Prior Therapies & response </a></li>
+                                    </ul>
+                                </div>
+
+                                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                                    <div class="tabs-panel is-active" id="summary">
+
+                                        <!-- Summary first row -->
+                                        <div class="row large-12 medium-12 expanded">
+
+                                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                                <div class="responsive-table" style="margin-top: 20px;">
+                                                    <table class="pdx-table head-left">
+                                                        <thead>
+                                                        <th> Date Regimen Started </th>
+                                                        <th> Standardized Regimen </th>
+                                                        <th> Best Response </th>
+                                                        <th> Duration </th>
+                                                        <th> Comments </th>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr>
+                                                            <th class="text-left medium-4"> 10/2014 </th>
+                                                            <td th:text="${'Bevacizumab, Temozolomide'}"></td>
+                                                            <td th:text="${'Stable Disease'}">  </td>
+                                                            <td th:text="${'6 Months'}"> </td>
+                                                            <td th:text="${'Adjuvant'}">  </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4"> 03/2006 </th>
+                                                            <td th:text="${'Radiation'}">  </td>
+                                                            <td th:text="${'Not Specified'}">  </td>
+                                                            <td th:text="${'1 Month'}"> </td>
+                                                            <td th:text="${'Adjuvant 4250cGy total, 25 fractions'}">  </td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        
+
+                    </div>
+
+
+
+
 
 
 
