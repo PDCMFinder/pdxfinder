@@ -63,6 +63,7 @@ public class DetailsDTO {
     private Set<String> autoSuggestList;
     private Map<String, String> platformsAndUrls;
     private List<Map> dataSummary;
+    private PatientDTO patient;
 
 
 
@@ -442,5 +443,13 @@ public class DetailsDTO {
 
     public List<Map> getDataSummary() {
         return dataSummary;
+    }
+
+    public PatientDTO getPatient() {
+        return patient;
+    }
+
+    public void setPatient(PatientDTO patient) {
+        this.patient = patient;
     }
 }

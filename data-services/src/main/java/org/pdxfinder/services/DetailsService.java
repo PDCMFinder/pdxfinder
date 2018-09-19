@@ -6,6 +6,7 @@ import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
+import org.pdxfinder.services.dto.PatientDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ public class DetailsService {
     private Map<String, List<String>> facets = new HashMap<>();
     private PlatformService platformService;
     private DrugService drugService;
+    private PatientService patientService;
 
     private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
     private final String JAX_URL_TEXT = "View data at JAX";
@@ -75,7 +77,8 @@ public class DetailsService {
                          TreatmentSummaryRepository treatmentSummaryRepository,
                          GraphService graphService,
                          PlatformService platformService,
-                         DrugService drugService) {
+                         DrugService drugService,
+                          PatientService patientService) {
 
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
@@ -88,6 +91,7 @@ public class DetailsService {
         this.graphService = graphService;
         this.platformService = platformService;
         this.drugService = drugService;
+        this.patientService = patientService;
 
     }
 
@@ -459,6 +463,10 @@ public class DetailsService {
             dto.setSourceDescription(sorceDesc.get(sample.getDataSource()));
         }
 
+
+        // Retrive Patint Information:
+        PatientDTO patientDTO = patientService.getPatientDetails(dataSource, modelId);
+        dto.setPatient(patientDTO);
 
         return dto;
     }
