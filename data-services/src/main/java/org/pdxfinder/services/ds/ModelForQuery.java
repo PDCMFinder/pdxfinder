@@ -65,6 +65,7 @@ public class ModelForQuery {
     private String patientAge;
     private String patientTreatmentStatus;
     private String patientGender;
+    private String patientEthnicity;
     private String sampleOriginTissue;
     private String sampleSampleSite;
     private String sampleExtractionMethod;
@@ -411,5 +412,13 @@ public class ModelForQuery {
 
         projects.add(project);
 
+    }
+
+    public String getPatientEthnicity() {
+        return patientEthnicity;
+    }
+
+    public void setPatientEthnicity(String patientEthnicity) {
+        this.patientEthnicity = patientEthnicity;
     }
 }
