@@ -166,7 +166,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
         if(patient == null){
 
-            patient = dataImportService.createPatient(patientId, wistarDS, gender, "", ethnicity);
+            patient = dataImportService.createPatient(patientId, wistarDS, gender, "", Standardizer.getEthnicity(ethnicity));
         }
 
         PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
