@@ -286,7 +286,11 @@ public class SearchDS {
                 mfq.setExternalId(j.getString("externalId"));
                 mfq.setPatientAge(j.getString("patientAge"));
                 mfq.setPatientGender(j.getString("patientGender"));
-                mfq.setPatientEthnicity(j.getString("patientEthnicity"));
+
+                if(j.has("patientEthnicity")){
+                    mfq.setPatientEthnicity(j.getString("patientEthnicity"));
+                }
+
                 mfq.setSampleOriginTissue(j.getString("sampleOriginTissue"));
                 mfq.setSampleSampleSite(j.getString("sampleSampleSite"));
                 mfq.setSampleExtractionMethod(j.getString("sampleExtractionMethod"));
