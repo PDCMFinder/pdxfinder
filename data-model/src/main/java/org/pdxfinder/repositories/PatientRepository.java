@@ -100,4 +100,22 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
             "OPTIONAL MATCH (p)-[ce:COLLECTION_EVENT]-(ps:PatientSnapshot) " +
             "RETURN p, ce, ps")
     Patient findByExternalIdAndGroupWithSnapshots(@Param("externalId") String externalId, @Param("g") Group g);
+
+
+
+    @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
+            "            WHERE mod.sourcePdxId = {modelId} " +
+            "            AND toLower(mod.dataSource) = toLower({dataSource}) "+
+            "            WITH s " +
+            "            MATCH (s)-[sf:SAMPLED_FROM]-(pst:PatientSnapshot)--(pat:Patient) " +
+            "            WITH pat " +
+            "            MATCH (pat)-[cev:COLLECTION_EVENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(hs:Sample) " +
+
+            "            OPTIONAL MATCH (hs)-[char:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mk:MARKER]-(gene:Marker) " +
+            "            OPTIONAL MATCH (hs)-[ot:OF_TYPE]-(tt:TumorType) " +
+
+            "RETURN pat,cev,ps,sfrm,hs, char,mc,aw,ma,mk,gene, ot,tt")
+    Patient findByPatientByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 }
+
+// "            MATCH (hs)-[sf:SAMPLED_FROM]-(ps:PatientSnapshot)-[cev:COLLECTION_EVENT]-(pat:Patient) " +

@@ -8,6 +8,9 @@ public class CollectionEventsDTO {
     private String pdxMouse;
     private String data;
 
+    public CollectionEventsDTO() {
+    }
+
     public CollectionEventsDTO(String age,
                                String diagnosis,
                                String type,

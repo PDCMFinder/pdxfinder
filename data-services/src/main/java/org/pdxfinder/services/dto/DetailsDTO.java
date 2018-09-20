@@ -50,6 +50,7 @@ public class DetailsDTO {
     private int presentPage;
     private int variationDataCount;
     private int drugSummaryRowNumber;
+    private PatientDTO patient;
 
 
     // Quality control information
@@ -487,5 +488,13 @@ public class DetailsDTO {
 
     public void setGradeClassification(String gradeClassification) {
         this.gradeClassification = gradeClassification;
+    }
+
+    public void setPatient(PatientDTO patient) {
+        this.patient = patient;
+    }
+
+    public PatientDTO getPatient() {
+        return patient;
     }
 }
