@@ -701,7 +701,7 @@
                                 <th>Type</th>
                                 <th>Age</th>
                                 <th>Sex</th>
-                                <th th:if="${websearch.dataAvailableColumnPresent} == true">Data Available</th>
+                                <th>Data Available</th>
                                 <th th:if="${websearch.isMutationSelected} == true">Mutations</th>
                                 <th th:if="${websearch.isMutationSelected} == true">Platform</th>
                                 <th th:if="${websearch.isDrugSelected} == true">Drug</th>
@@ -722,7 +722,7 @@
                                 <td th:text="${model.patientAge}">Age</td>
                                 <td th:text="${model.patientGender}">Sex</td>
 
-                                <td th:if="${websearch.dataAvailableColumnPresent} == true">
+                                <td>
                                     <th:block th:each="platform : ${model.dataAvailable}">
 
                                         <a th:if="${#strings.equals(platform, 'Dosing Studies')}"
