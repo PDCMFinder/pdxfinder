@@ -3,7 +3,9 @@ package org.pdxfinder.services;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.PatientRepository;
 import org.pdxfinder.services.dto.CollectionEventsDTO;
+import org.pdxfinder.services.dto.DrugSummaryDTO;
 import org.pdxfinder.services.dto.PatientDTO;
+import org.pdxfinder.services.dto.TreatmentSummaryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,10 +44,12 @@ public class PatientService {
             patientDTO.setRaceAndEthnicity(patient.getRace()+"/"+patient.getEthnicity());
 
             List<String> geneticMutations = new ArrayList<>();
+            List<TreatmentSummaryDTO> treatmentSummaries = new ArrayList<>();
 
             Set<PatientSnapshot> patientSnapshots = patient.getSnapshots();
 
             for (PatientSnapshot ps : patientSnapshots) {
+
 
                 for (Sample sample : ps.getSamples()){
 
@@ -89,10 +93,35 @@ public class PatientService {
                     collectionEvents.add(new CollectionEventsDTO(age, diagnosis, tumorType, pdxMouse, data, collectionSite));
                 }
 
+
+
+
+                try{
+
+                    for (TreatmentProtocol protocol : ps.getTreatmentSummary().getTreatmentProtocols()){
+
+                        // Aggregate the treatment summaries for this Treatment Protocol
+                        List<DrugSummaryDTO> drugSummaries = new ArrayList<>();
+                        for (TreatmentComponent comp : protocol.getComponents()){
+
+                            drugSummaries.add(new DrugSummaryDTO(
+                                    comp.getDrug().getName(),
+                                    comp.getDose(),
+                                    protocol.getResponse().getDescription(),
+                                    comp.getDuration())
+                            );
+                        }
+                        treatmentSummaries.add(new TreatmentSummaryDTO(protocol.getTreatmentDate(),drugSummaries));
+                    }
+
+                }catch (Exception e){}
+
             }
+
 
             patientDTO.setKnownGeneticMutations(geneticMutations);
             patientDTO.setCollectionEvents(collectionEvents);
+            patientDTO.setTreatmentSummaries(treatmentSummaries);
 
 
         }

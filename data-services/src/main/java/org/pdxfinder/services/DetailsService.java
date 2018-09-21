@@ -258,10 +258,6 @@ public class DetailsService {
 
         if (sample != null && sample.getGradeClassification() != null) {
             dto.setGradeClassification( notEmpty(sample.getGradeClassification()) );
-
-
-            log.info(notEmpty(sample.getGradeClassification())+" AAAAAAAAA");
-
         }
 
         if (sample != null && sample.getOriginTissue() != null) {

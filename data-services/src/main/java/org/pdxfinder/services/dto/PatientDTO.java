@@ -11,6 +11,7 @@ public class PatientDTO {
     private String CTEPSDCCode;
     private String diagnosisSubtype;
     private String raceAndEthnicity;
+    private List<TreatmentSummaryDTO> treatmentSummaries;
 
     // Additional Patient History
     private List<String> knownGeneticMutations;
@@ -97,5 +98,13 @@ public class PatientDTO {
 
     public void setCollectionEvents(List<CollectionEventsDTO> collectionEvents) {
         this.collectionEvents = collectionEvents;
+    }
+
+    public void setTreatmentSummaries(List<TreatmentSummaryDTO> treatmentSummaries) {
+        this.treatmentSummaries = treatmentSummaries;
+    }
+
+    public List<TreatmentSummaryDTO> getTreatmentSummaries() {
+        return treatmentSummaries;
     }
 }
