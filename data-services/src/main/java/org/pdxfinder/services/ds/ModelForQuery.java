@@ -63,6 +63,7 @@ public class ModelForQuery {
     private String datasource;
     private String externalId;
     private String patientAge;
+    private String patientEthnicity;
     private String patientTreatmentStatus;
     private String patientGender;
     private String sampleOriginTissue;
@@ -193,6 +194,14 @@ public class ModelForQuery {
 
     public void setPatientGender(String patientGender) {
         this.patientGender = patientGender;
+    }
+
+    public String getPatientEthnicity() {
+        return patientEthnicity;
+    }
+
+    public void setPatientEthnicity(String patientEthnicity) {
+        this.patientEthnicity = patientEthnicity;
     }
 
     public String getSampleOriginTissue() {
