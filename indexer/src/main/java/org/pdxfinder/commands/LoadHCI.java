@@ -157,7 +157,7 @@ public class LoadHCI implements CommandLineRunner {
 
         if(patient == null){
 
-            patient = dataImportService.createPatient(patientId, hciDS, gender, "", ethnicity);
+            patient = dataImportService.createPatient(patientId, hciDS, gender, "", Standardizer.getEthnicity(ethnicity));
         }
 
         PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");

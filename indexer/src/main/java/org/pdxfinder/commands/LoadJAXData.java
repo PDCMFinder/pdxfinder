@@ -203,7 +203,7 @@ public class LoadJAXData implements CommandLineRunner {
 
         if(patient == null){
 
-            patient = dataImportService.createPatient(patientId, jaxDS, gender, "", ethnicity);
+            patient = dataImportService.createPatient(patientId, jaxDS, gender, "", Standardizer.getEthnicity(ethnicity));
         }
 
         PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");

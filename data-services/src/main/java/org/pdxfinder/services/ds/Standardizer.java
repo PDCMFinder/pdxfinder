@@ -254,4 +254,36 @@ public class Standardizer {
     }
 
 
+
+    public static String getEthnicity(String ethnicity){
+
+        if(ethnicity.toLowerCase().equals("caucasian")) return "Caucasian";
+
+        if(ethnicity.toLowerCase().equals("hispanic") || ethnicity.toLowerCase().equals("hispanic or latino")) return "Hispanic or Latino";
+
+        if(ethnicity.toLowerCase().equals("white")) return "White";
+
+        if(ethnicity.toLowerCase().equals("african american") || ethnicity.toLowerCase().equals("aa")) return "African American";
+
+        if(ethnicity.toLowerCase().equals("unknown") || ethnicity.toLowerCase().equals("not specified") || ethnicity.toLowerCase().equals("not reported")) return "Not Specified";
+
+        if(ethnicity.equals("White; Hispanic or Latino")) return ethnicity;
+
+        if(ethnicity.toLowerCase().equals("black")) return "Black";
+
+        if(ethnicity.toLowerCase().equals("asian")) return "Asian";
+
+        if(ethnicity.equals("Black or African American; Not Hispanic or Latino")) return "Black or African American; Not Hispanic or Latino";
+
+        if(ethnicity.equals("White; Not Hispanic or Latino")) return ethnicity;
+
+        if(ethnicity.equals("Black or African American")) return ethnicity;
+
+        if(ethnicity.equals("Not Hispanic or Latino")) return ethnicity;
+
+        return "Not Specified";
+
+    }
+
+
 }

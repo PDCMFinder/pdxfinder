@@ -190,7 +190,7 @@ public class LoadPDMRData implements CommandLineRunner {
 
         if(patient == null){
 
-            patient = dataImportService.createPatient(patientId, DS, gender, "", ethnicity);
+            patient = dataImportService.createPatient(patientId, DS, gender, "", Standardizer.getEthnicity(ethnicity));
         }
 
         PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");

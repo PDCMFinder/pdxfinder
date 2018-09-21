@@ -338,7 +338,7 @@ public class UniversalLoader implements CommandLineRunner {
 
             if (patientId != null && ds != null) {
 
-                Patient patient = dataImportService.createPatient(patientId, ds, sex, "", ethnicity);
+                Patient patient = dataImportService.createPatient(patientId, ds, sex, "", Standardizer.getEthnicity(ethnicity));
                 patient.setCancerRelevantHistory(cancerHistory);
                 patient.setFirstDiagnosis(firstDiagnosis);
                 patient.setAgeAtFirstDiagnosis(ageAtFirstDiagnosis);

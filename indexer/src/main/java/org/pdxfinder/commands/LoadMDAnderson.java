@@ -168,7 +168,7 @@ public class LoadMDAnderson implements CommandLineRunner {
 
         if(patient == null){
 
-            patient = dataImportService.createPatient(patientId, mdaDS, gender, "", ethnicity);
+            patient = dataImportService.createPatient(patientId, mdaDS, gender, "", Standardizer.getEthnicity(ethnicity));
         }
 
         PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");

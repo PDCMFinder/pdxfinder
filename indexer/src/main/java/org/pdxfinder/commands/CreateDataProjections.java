@@ -407,6 +407,7 @@ public class CreateDataProjections implements CommandLineRunner{
             // Patient information
             mfq.setPatientAge(mc.getSample().getPatientSnapshot().getAgeBin());
             mfq.setPatientGender(mc.getSample().getPatientSnapshot().getPatient().getSex());
+            mfq.setPatientEthnicity(mc.getSample().getPatientSnapshot().getPatient().getEthnicity());
             mfq.setDiagnosis(mc.getSample().getDiagnosis());
             mfq.setMappedOntologyTerm(mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
 
