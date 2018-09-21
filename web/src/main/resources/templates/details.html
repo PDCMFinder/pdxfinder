@@ -225,26 +225,44 @@
                                             <th class="text-left medium-4">Histology</th>
                                             <td class="text-left"><span th:text="${data.mappedOntology}"></span></td>
                                         </tr>
+
                                         <tr>
                                             <th class="text-left medium-4">Primary Tissue</th>
                                             <td class="text-left" th:text="${data.originTissue}"></td>
                                         </tr>
+
                                         <tr>
                                             <th class="text-left medium-4">Collection Site</th>
                                             <td class="text-left" th:text="${data.sampleSite}"></td>
                                         </tr>
+
                                         <tr>
                                             <th class="text-left medium-4">Tumor Type</th>
                                             <td class="text-left" th:text="${data.tumorType}"></td>
                                         </tr>
-                                        <tr>
-                                            <th class="text-left medium-4">Stage / Grade</th>
-                                            <td th:if="${#strings.equals(data.classification, '/')}"
-                                                th:text="${'Not Available'}"></td>
-                                            <td th:if="${not #strings.equals(data.classification, '/')}"
-                                                th:text="${#strings.endsWith(data.classification,'/')} ? ${ #strings.substringBefore(data.classification,'/') } : ${data.classification} "></td>
 
+                                        <tr>
+                                            <th class="text-left medium-4"> Grade</th>
+                                            <td th:if="${#strings.equalsIgnoreCase(data.grade, 'Not Specified') || #strings.equalsIgnoreCase(data.gradeClassification, 'Not Specified')}">
+                                                <span th:utext="${data.grade}"></span>
+                                            </td>
+                                            <td th:if="${not ( #strings.equalsIgnoreCase(data.grade, 'Not Specified') || #strings.equalsIgnoreCase(data.gradeClassification, 'Not Specified') ) }">
+                                                <span th:utext="${data.grade}"></span>
+                                                <span th:utext="${'(<b> Classification: </b>'+data.gradeClassification+')'}"></span>
+                                            </td>
                                         </tr>
+
+                                        <tr>
+                                            <th class="text-left medium-4"> Stage</th>
+                                            <td th:if="${#strings.equalsIgnoreCase(data.stage, 'Not Specified') || #strings.equalsIgnoreCase(data.stageClassification, 'Not Specified')}">
+                                                <span th:utext="${data.stage}"></span>
+                                            </td>
+                                            <td th:if="${not ( #strings.equalsIgnoreCase(data.stage, 'Not Specified') || #strings.equalsIgnoreCase(data.stageClassification, 'Not Specified') ) }">
+                                                <span th:utext="${data.stage}"></span>
+                                                <span th:utext="${'(<b> Classification: </b>'+data.stageClassification+')'}"></span>
+                                            </td>
+                                        </tr>
+
                                         </tbody>
                                     </table>
                                 </div>
