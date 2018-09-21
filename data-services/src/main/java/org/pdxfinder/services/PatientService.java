@@ -54,6 +54,7 @@ public class PatientService {
                     String tumorType = "Not Specified";
                     String pdxMouse = "Not Specified";
                     String data = "Not Specified";
+                    String collectionSite = "Not Specified";
 
                     try {
                         age = ps.getAgeAtCollection();
@@ -71,6 +72,10 @@ public class PatientService {
                         pdxMouse = sample.getSourceSampleId();
                     } catch (Exception e) {}
 
+                    try {
+                        collectionSite = notEmpty(sample.getSampleSite().getName());
+                    } catch (Exception e) {}
+
 
                     try{
                         for (MolecularCharacterization molc : sample.getMolecularCharacterizations()){
@@ -81,7 +86,7 @@ public class PatientService {
                     }catch (Exception e) {}
 
 
-                    collectionEvents.add(new CollectionEventsDTO(age, diagnosis, tumorType, pdxMouse, data));
+                    collectionEvents.add(new CollectionEventsDTO(age, diagnosis, tumorType, pdxMouse, data, collectionSite));
                 }
 
             }
@@ -93,7 +98,18 @@ public class PatientService {
         }
 
         return patientDTO;
-// pdxMouse = ps.getSamples().stream().map(Sample::getSourceSampleId).collect(Collectors.joining(","));
+
+    }
+
+
+    public String notEmpty(String input){
+
+        String output = (input == null) ? "Not Specified" : input;
+        output = output.equals("null") ? "Not Specified" : output;
+        output = output.length() == 0 ? "Not Specified" : output;
+        output = output.equals("Unknown") ? "Not Specified" : output;
+
+        return output;
     }
 
 }

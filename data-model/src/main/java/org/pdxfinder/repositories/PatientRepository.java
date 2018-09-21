@@ -109,12 +109,12 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
             "            WITH s " +
             "            MATCH (s)-[sf:SAMPLED_FROM]-(pst:PatientSnapshot)--(pat:Patient) " +
             "            WITH pat " +
-            "            MATCH (pat)-[cev:COLLECTION_EVENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(hs:Sample) " +
+            "            MATCH (pat)-[cev:COLLECTION_EVENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(hs:Sample)-[ss:SAMPLE_SITE]-(tiss:Tissue) " +
 
             "            OPTIONAL MATCH (hs)-[char:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mk:MARKER]-(gene:Marker) " +
             "            OPTIONAL MATCH (hs)-[ot:OF_TYPE]-(tt:TumorType) " +
 
-            "RETURN pat,cev,ps,sfrm,hs, char,mc,aw,ma,mk,gene, ot,tt")
+            "RETURN  pat,cev,ps,sfrm,hs,ss,tiss,  char,mc,aw,ma,mk,gene, ot,tt")
     Patient findByPatientByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 }
 

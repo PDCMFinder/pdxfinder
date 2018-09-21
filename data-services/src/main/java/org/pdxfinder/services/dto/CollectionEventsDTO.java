@@ -7,6 +7,7 @@ public class CollectionEventsDTO {
     private String type;
     private String pdxMouse;
     private String data;
+    private String collectionSite;
 
     public CollectionEventsDTO() {
     }
@@ -15,12 +16,14 @@ public class CollectionEventsDTO {
                                String diagnosis,
                                String type,
                                String pdxMouse,
-                               String data) {
+                               String data,
+                               String collectionSite) {
         this.age = age;
         this.diagnosis = diagnosis;
         this.type = type;
         this.pdxMouse = pdxMouse;
         this.data = data;
+        this.collectionSite = collectionSite;
     }
 
     public String getAge() {
@@ -61,5 +64,13 @@ public class CollectionEventsDTO {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public String getCollectionSite() {
+        return collectionSite;
+    }
+
+    public void setCollectionSite(String collectionSite) {
+        this.collectionSite = collectionSite;
     }
 }
