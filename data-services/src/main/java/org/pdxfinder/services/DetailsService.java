@@ -245,26 +245,30 @@ public class DetailsService {
         }
 
         if (sample != null && sample.getStage() != null) {
-            dto.setStage(sample.getStage());
+            dto.setStage( notEmpty(sample.getStage()) );
         }
 
         if (sample != null && sample.getStageClassification() != null) {
-            dto.setStageClassification(sample.getStageClassification());
+            dto.setStageClassification( notEmpty(sample.getStageClassification()) );
         }
 
         if (sample != null && sample.getGrade() != null) {
-            dto.setGrade(sample.getGrade());
+            dto.setGrade( notEmpty(sample.getGrade()) );
         }
 
         if (sample != null && sample.getGradeClassification() != null) {
-            dto.setGradeClassification(sample.getGradeClassification());
+            dto.setGradeClassification( notEmpty(sample.getGradeClassification()) );
+
+
+            log.info(notEmpty(sample.getGradeClassification())+" AAAAAAAAA");
+
         }
 
         if (sample != null && sample.getOriginTissue() != null) {
             dto.setOriginTissue(sample.getOriginTissue().getName());
         }
         if (sample != null && sample.getSampleSite() != null) {
-            dto.setSampleSite(sample.getSampleSite().getName());
+            dto.setSampleSite(notEmpty(sample.getSampleSite().getName()));
         }
 
         if (sample != null && sample.getSampleToOntologyRelationShip() != null) {
@@ -746,7 +750,12 @@ public class DetailsService {
     public String notEmpty(String incoming){
 
         String result = (incoming == null) ? "Not Specified" : incoming;
-        result = (result.length() == 0 ? "Not Specified" : result);
+
+        result = result.equals("null") ? "Not Specified" : result;
+
+        result = result.length() == 0 ? "Not Specified" : result;
+
+        result = result.equals("Unknown") ? "Not Specified" : result;
 
         return result;
     }
