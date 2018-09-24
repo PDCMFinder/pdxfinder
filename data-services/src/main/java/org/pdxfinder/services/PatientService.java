@@ -96,6 +96,11 @@ public class PatientService {
 
 
 
+                String drugName = "";
+                String dose = "-";
+                String response = "";
+                String duration = "";
+                boolean current = false;
                 try{
 
                     for (TreatmentProtocol protocol : ps.getTreatmentSummary().getTreatmentProtocols()){
@@ -104,14 +109,27 @@ public class PatientService {
                         List<DrugSummaryDTO> drugSummaries = new ArrayList<>();
                         for (TreatmentComponent comp : protocol.getComponents()){
 
-                            drugSummaries.add(new DrugSummaryDTO(
-                                    comp.getDrug().getName(),
-                                    comp.getDose(),
-                                    protocol.getResponse().getDescription(),
-                                    comp.getDuration())
-                            );
+                            drugName = comp.getDrug().getName();
+                            dose = comp.getDose();
+                            response = protocol.getResponse().getDescription();
+                            duration = comp.getDuration();
+
+                            drugSummaries.add(new DrugSummaryDTO(drugName, dose, response, duration));
                         }
-                        treatmentSummaries.add(new TreatmentSummaryDTO(protocol.getTreatmentDate(),drugSummaries));
+
+                        if (protocol.getCurrentTreatment() != null){
+                            current = true;
+                        }else{
+                            current = false;
+                        }
+
+                        try{
+                            current = true;
+                            logger.info(protocol.getCurrentTreatment().getName()+" XXXXXXXXXXX");
+                        }catch (Exception e){
+                            current = false;
+                        }
+                        treatmentSummaries.add(new TreatmentSummaryDTO(protocol.getTreatmentDate(),drugSummaries, current));
                     }
 
                 }catch (Exception e){}
@@ -122,6 +140,8 @@ public class PatientService {
             patientDTO.setKnownGeneticMutations(geneticMutations);
             patientDTO.setCollectionEvents(collectionEvents);
             patientDTO.setTreatmentSummaries(treatmentSummaries);
+
+
 
 
         }

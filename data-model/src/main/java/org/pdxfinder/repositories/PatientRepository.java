@@ -112,12 +112,13 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
             "            MATCH (pat)-[cev:COLLECTION_EVENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(hs:Sample)-[ss:SAMPLE_SITE]-(tiss:Tissue) " +
 
             "            OPTIONAL MATCH (ps)-[st:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[drr:DRUG]-(dr:Drug) " +
+            "            OPTIONAL MATCH (tp)-[rsp:RESPONSE]-(resp:Response)" +
+            "            OPTIONAL MATCH (tp)-[cur:CURRENT_TREATMENT]-(curt:CurrentTreatment)" +
 
             "            OPTIONAL MATCH (hs)-[char:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mk:MARKER]-(gene:Marker) " +
             "            OPTIONAL MATCH (hs)-[ot:OF_TYPE]-(tt:TumorType) " +
 
-            "RETURN  pat,cev,ps,sfrm,hs,ss,tiss,  st,ts,tpr,tp,tcr,tc ,drr,dr,   char,mc,aw,ma,mk,gene, ot,tt")
+            "RETURN  pat,cev,ps,sfrm,hs,ss,tiss,  st,ts,tpr,tp,tcr,tc ,drr,dr,   cur,curt,   rsp,resp,   char,mc,aw,ma,mk,gene,   ot,tt")
     Patient findByPatientByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 }
 
-// "            MATCH (hs)-[sf:SAMPLED_FROM]-(ps:PatientSnapshot)-[cev:COLLECTION_EVENT]-(pat:Patient) " +
