@@ -444,7 +444,11 @@
                                                         <th> </th>
                                                         <th:block th:if="${not #lists.isEmpty(data.patient.collectionEvents)}"
                                                                   th:each="event, iter : ${data.patient.collectionEvents}">
-                                                            <th th:text="${'Collection Event '} + ${iter.index+1}">Collection 1</th>
+
+
+                                                            <th th:if="${event.pdxMouse != data.modelId}" th:text="${'Collection Event '} + ${iter.index+1}">Collection 1</th>
+                                                            <th th:if="${event.pdxMouse == data.modelId}" th:text="${'Collection Event (Current) '} + ${iter.index+1}">Collection 1</th>
+
                                                         </th:block>
                                                         </thead>
                                                         <tbody>
