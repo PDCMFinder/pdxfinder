@@ -338,7 +338,7 @@
 
                     <div class="tabs-panel" id="patients">
 
-                            <!-- Tabs Section -->
+                            <!-- Tabs Section
                             <section class="row large-12 medium-12 expanded" id="detailsData">
                                 <div class="row large-12 medium-12 expanded">
                                     <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
@@ -349,7 +349,6 @@
                                 <div class="tabs-content style-2" data-tabs-content="example2-tabs">
                                     <div class="tabs-panel is-active" id="summary">
 
-                                        <!-- Summary first row -->
                                         <div class="row large-12 medium-12 expanded">
 
                                             <div class="columns medium-12 small-12 margin-top-10 card-3">
@@ -379,7 +378,7 @@
                                                         <tr>
                                                             <th class="text-left medium-4">Race / Ethnicity</th>
                                                             <td th:text="${data.patient.raceAndEthnicity}"></td>
-                                                        </tr>-->
+                                                        </tr>
                                                         <tr>
                                                             <th class="text-left medium-4">Sex</th>
                                                             <td th:text="${data.patient.gender}"></td>
@@ -400,7 +399,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </section>
+                            </section> -->
 
 
 
@@ -469,12 +468,15 @@
 
                                             <div class="columns medium-12 small-12 margin-top-10 card-3">
                                                 <div class="responsive-table" style="margin-top: 20px;">
-                                                    <table class="pdx-table head-left" style="text-align: center;">
+                                                    <table class="pdx-table head-left">
                                                         <thead>
                                                         <th> </th>
                                                         <th:block th:if="${not #lists.isEmpty(data.patient.collectionEvents)}"
                                                                   th:each="event, iter : ${data.patient.collectionEvents}">
-                                                            <th th:text="${'Collection Event '} + ${iter.index+1}" style="text-align: center;">Collection 1</th>
+
+                                                            <th th:if="${event.pdxMouse != data.modelId}" th:text="${'Collection Event '} + ${iter.index+1}" s>Collection 1</th>
+                                                            <th th:if="${event.pdxMouse == data.modelId}" th:text="${'Collection Event (Current) '} + ${iter.index+1}" >Collection 1</th>
+
                                                         </th:block>
                                                         </thead>
                                                         <tbody>
@@ -560,6 +562,24 @@
 
                                                         </tbody>
                                                     </table>
+
+                                                    <table class="pdx-table head-left"  >
+                                                        <tbody>
+                                                        <tr>
+                                                            <th class="text-left medium-4">Sex</th>
+                                                            <td th:text="${data.patient.gender}"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-left medium-4">Race / Ethnicity</th>
+                                                            <td>
+                                                                <span th:text="${data.race}"></span>
+                                                                <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
+                                                                <span th:text="${data.ethnicity}"></span>
+                                                            </td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+
                                                 </div>
 
 
