@@ -240,7 +240,8 @@ public class LoadMDAnderson implements CommandLineRunner {
             molC.setMarkerAssociations(markerAssocs);
             Set<MolecularCharacterization> mcs = new HashSet<>();
             mcs.add(molC);
-            sample.setMolecularCharacterizations(mcs);
+
+            //sample.setMolecularCharacterizations(mcs);
 
             if (human) {
                 pSnap.addSample(sample);
