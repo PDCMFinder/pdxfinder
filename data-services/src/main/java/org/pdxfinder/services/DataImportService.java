@@ -1081,16 +1081,7 @@ public class DataImportService {
 
     public TreatmentSummary findTreatmentSummaryByPatientSnapshot(PatientSnapshot ps){
 
-        TreatmentSummary ts = treatmentSummaryRepository.findByPatientSnapshot(ps);
-
-        if(ts == null){
-            //no summary yet, create one
-            ts = new TreatmentSummary();
-
-
-        }
-
-        return ts;
+        return treatmentSummaryRepository.findByPatientSnapshot(ps);
 
     }
 }
