@@ -3,7 +3,9 @@ package org.pdxfinder.services;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.PatientRepository;
 import org.pdxfinder.services.dto.CollectionEventsDTO;
+import org.pdxfinder.services.dto.DrugSummaryDTO;
 import org.pdxfinder.services.dto.PatientDTO;
+import org.pdxfinder.services.dto.TreatmentSummaryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,10 +44,12 @@ public class PatientService {
             patientDTO.setRaceAndEthnicity(patient.getRace()+"/"+patient.getEthnicity());
 
             List<String> geneticMutations = new ArrayList<>();
+            List<TreatmentSummaryDTO> treatmentSummaries = new ArrayList<>();
 
             Set<PatientSnapshot> patientSnapshots = patient.getSnapshots();
 
             for (PatientSnapshot ps : patientSnapshots) {
+
 
                 for (Sample sample : ps.getSamples()){
 
@@ -54,6 +58,7 @@ public class PatientService {
                     String tumorType = "Not Specified";
                     String pdxMouse = "Not Specified";
                     String data = "Not Specified";
+                    String collectionSite = "Not Specified";
 
                     try {
                         age = ps.getAgeAtCollection();
@@ -71,6 +76,10 @@ public class PatientService {
                         pdxMouse = sample.getSourceSampleId();
                     } catch (Exception e) {}
 
+                    try {
+                        collectionSite = notEmpty(sample.getSampleSite().getName());
+                    } catch (Exception e) {}
+
 
                     try{
                         for (MolecularCharacterization molc : sample.getMolecularCharacterizations()){
@@ -81,19 +90,69 @@ public class PatientService {
                     }catch (Exception e) {}
 
 
-                    collectionEvents.add(new CollectionEventsDTO(age, diagnosis, tumorType, pdxMouse, data));
+                    collectionEvents.add(new CollectionEventsDTO(age, diagnosis, tumorType, pdxMouse, data, collectionSite));
                 }
+
+
+
+
+                String drugName = "";
+                String dose = "-";
+                String response = "";
+                String duration = "";
+                boolean current = false;
+                try{
+
+                    for (TreatmentProtocol protocol : ps.getTreatmentSummary().getTreatmentProtocols()){
+
+                        // Aggregate the treatment summaries for this Treatment Protocol
+                        List<DrugSummaryDTO> drugSummaries = new ArrayList<>();
+                        for (TreatmentComponent comp : protocol.getComponents()){
+
+                            drugName = comp.getDrug().getName();
+                            dose = comp.getDose();
+                            response = protocol.getResponse().getDescription();
+                            duration = comp.getDuration();
+
+                            drugSummaries.add(new DrugSummaryDTO(drugName, dose, response, duration));
+                        }
+
+                        if (protocol.getCurrentTreatment() != null){
+                            current = true;
+                        }else{
+                            current = false;
+                        }
+
+                        treatmentSummaries.add(new TreatmentSummaryDTO(protocol.getTreatmentDate(),drugSummaries, current));
+                    }
+
+                }catch (Exception e){}
 
             }
 
+
             patientDTO.setKnownGeneticMutations(geneticMutations);
             patientDTO.setCollectionEvents(collectionEvents);
+            patientDTO.setTreatmentSummaries(treatmentSummaries);
+
+
 
 
         }
 
         return patientDTO;
-// pdxMouse = ps.getSamples().stream().map(Sample::getSourceSampleId).collect(Collectors.joining(","));
+
+    }
+
+
+    public String notEmpty(String input){
+
+        String output = (input == null) ? "Not Specified" : input;
+        output = output.equals("null") ? "Not Specified" : output;
+        output = output.length() == 0 ? "Not Specified" : output;
+        output = output.equals("Unknown") ? "Not Specified" : output;
+
+        return output;
     }
 
 }

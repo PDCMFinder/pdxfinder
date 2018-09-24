@@ -1329,3 +1329,14 @@ hr .line_v2 {
     border-left:none;
     border-right:none;
 }
+
+.highlight-bg{
+    background-color: rgba(255,255,255,1);   /* rgba(0,178,213,0.6); rgba(6,54,157,0.1);  */
+
+}
+
+
+.table-focus{
+    background-color: #F1F2F2; /*#E6E7E8;*/
+    font-weight: 600;;
+}
