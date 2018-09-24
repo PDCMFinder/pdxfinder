@@ -123,12 +123,6 @@ public class PatientService {
                             current = false;
                         }
 
-                        try{
-                            current = true;
-                            logger.info(protocol.getCurrentTreatment().getName()+" XXXXXXXXXXX");
-                        }catch (Exception e){
-                            current = false;
-                        }
                         treatmentSummaries.add(new TreatmentSummaryDTO(protocol.getTreatmentDate(),drugSummaries, current));
                     }
 
