@@ -496,7 +496,9 @@ public class UniversalLoader implements CommandLineRunner {
 
 
             TreatmentSummary ts = dataImportService.findTreatmentSummaryByPatientSnapshot(ps);
-
+            if(ts == null){
+                ts = new TreatmentSummary();
+            }
 
             TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatment, dose, response, responseClassification);
 
