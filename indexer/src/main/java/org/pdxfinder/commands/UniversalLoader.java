@@ -402,6 +402,13 @@ public class UniversalLoader implements CommandLineRunner {
                     continue;
                 }
 
+                //need this trick to remove float values, ie: patient age = 30.0
+                if(!ageAtCollection.equals("Not Specified")){
+                    int ageAtColl = (int)Float.parseFloat(ageAtCollection);
+                    ageAtCollection = ageAtColl+"";
+                }
+
+
                 PatientSnapshot ps = dataImportService.getPatientSnapshot(patient, ageAtCollection, dateOfCollection, collectionEvent, elapsedTime);
                 ps.setTreatmentNaive(treatmentNaive);
                 ps.setVirologyStatus(virologyStatus);
