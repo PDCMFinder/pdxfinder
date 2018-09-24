@@ -65,7 +65,7 @@ public class PatientService {
                     } catch (Exception e) {}
 
                     try {
-                        diagnosis = sample.getDiagnosis();
+                        diagnosis = sample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel();
                     } catch (Exception e) {}
 
                     try {
@@ -73,7 +73,7 @@ public class PatientService {
                     } catch (Exception e) {}
 
                     try {
-                        pdxMouse = sample.getSourceSampleId();
+                        pdxMouse = patientRepository.getModelIdByDataSourceAndPatientSampleId(dataSource, sample.getSourceSampleId());
                     } catch (Exception e) {}
 
                     try {
