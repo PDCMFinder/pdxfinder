@@ -120,5 +120,14 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
 
             "RETURN  pat,cev,ps,sfrm,hs,ss,tiss,  st,ts,tpr,tp,tcr,tc ,drr,dr,   cur,curt,   rsp,resp,   char,mc,aw,ma,mk,gene,   ot,tt")
     Patient findByPatientByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
+
+
+    @Query("MATCH (samp:Sample)-[im:IMPLANTED_IN]-(mod:ModelCreation) " +
+            "WHERE mod.dataSource = {dataSource} " +
+            "AND samp.sourceSampleId = {sourceSampleId} " +
+            " RETURN mod.sourcePdxId ")
+    String getModelIdByDataSourceAndPatientSampleId(@Param("dataSource") String dataSource,
+                                                                          @Param("sourceSampleId") String modelId);
+
 }
 
