@@ -138,25 +138,39 @@ public class TreatmentProtocol {
 
 
 
-    public String getDurationString(){
+    public String getDurationString(boolean includeControlDrugs){
 
         String durString = "";
 
         for(TreatmentComponent comp:components){
 
-            String duration = comp.getDuration();
+            String dur = comp.getDuration();
 
+            if(includeControlDrugs){
                 if(!durString.isEmpty()){
                     durString+=" / ";
                 }
-                durString += duration;
+                durString+=dur;
+            }
+            //include only Drugs but no Controls
+            else{
+
+                if(comp.getType().equals("Drug")){
+
+                    if(!durString.isEmpty()){
+                        durString+=" / ";
+                    }
+                    durString+=dur;
+                }
+
+            }
 
         }
 
         return durString;
     }
 
-    public String getDoseString(){
+    public String getDoseString(boolean includeControlDrugs){
 
         String doseString = "";
 
@@ -164,10 +178,24 @@ public class TreatmentProtocol {
 
             String dose = comp.getDose();
 
-            if(!doseString.isEmpty()){
-                doseString+=" / ";
+            if(includeControlDrugs){
+                if(!doseString.isEmpty()){
+                    doseString+=" / ";
+                }
+                doseString+=dose;
             }
-            doseString += dose;
+            //include only Drugs but no Controls
+            else{
+
+                if(comp.getType().equals("Drug")){
+
+                    if(!doseString.isEmpty()){
+                        doseString+=" / ";
+                    }
+                    doseString+=dose;
+                }
+
+            }
 
         }
 
