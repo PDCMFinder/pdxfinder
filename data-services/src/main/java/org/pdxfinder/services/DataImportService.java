@@ -1041,6 +1041,7 @@ public class DataImportService {
             TreatmentComponent tc = new TreatmentComponent();
             tc.setType(Standardizer.getTreatmentComponentType(drugString));
             tc.setDrug(d);
+            tc.setDose(doseString.trim());
             //don't load unknown drugs
             if(!d.getName().equals("Not Specified")){
                 tc.setDrug(d);
