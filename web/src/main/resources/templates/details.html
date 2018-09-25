@@ -591,12 +591,12 @@
                             </section>
 
 
+                        <section class="row large-12 medium-12 expanded"
+                                 id="detailsData"
+                                 style="margin-top: 20px;"
+                                 th:if="${ #bools.isTrue(data.patient.currentTreatmentExists) } ">
 
-
-
-
-                            <section class="row large-12 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
-                                <div class="row large-12 medium-12 expanded">
+                            <div class="row large-12 medium-12 expanded">
                                     <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
                                         <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Current Therapy </a></li>
                                     </ul>
@@ -649,8 +649,12 @@
                             </section>
 
 
-                            <section class="row large-12 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
-                                <div class="row large-12 medium-12 expanded">
+                        <section class="row large-12 medium-12 expanded"
+                                 id="detailsData"
+                                 style="margin-top: 20px;"
+                                 th:if="${ #bools.isTrue(data.patient.treatmentExists) } ">
+
+                            <div class="row large-12 medium-12 expanded">
                                     <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
                                         <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Prior Therapies & response </a></li>
                                     </ul>
