@@ -3,7 +3,6 @@ package org.pdxfinder.services;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.PatientRepository;
 import org.pdxfinder.services.dto.CollectionEventsDTO;
-import org.pdxfinder.services.dto.DrugSummaryDTO;
 import org.pdxfinder.services.dto.PatientDTO;
 import org.pdxfinder.services.dto.TreatmentSummaryDTO;
 import org.slf4j.Logger;
@@ -96,25 +95,22 @@ public class PatientService {
 
 
                 String drugName = "";
-                String dose = "-";
-                String response = "";
-                String duration = "";
+                String treatmentDose = "-";
+                String treatmentResponse = "";
+                String treatmentDuration = "";
+                String treatmentDate = "";
+
                 boolean current = false;
                 try{
 
+                    // Aggregate the treatment summaries for this Treatment Protocol
                     for (TreatmentProtocol protocol : ps.getTreatmentSummary().getTreatmentProtocols()){
 
-                        // Aggregate the treatment summaries for this Treatment Protocol
-                        List<DrugSummaryDTO> drugSummaries = new ArrayList<>();
-                        for (TreatmentComponent comp : protocol.getComponents()){
-
-                            drugName = comp.getDrug().getName();
-                            dose = comp.getDose();
-                            response = protocol.getResponse().getDescription();
-                            duration = comp.getDuration();
-
-                            drugSummaries.add(new DrugSummaryDTO(drugName, dose, response, duration));
-                        }
+                        drugName = protocol.getDrugString(false);
+                        treatmentResponse = protocol.getResponse().getDescription();
+                        treatmentDose = notEmpty(protocol.getDoseString(false));
+                        treatmentDuration = protocol.getDurationString(false);
+                        treatmentDate = protocol.getTreatmentDate();
 
                         if (protocol.getCurrentTreatment() != null){
                             current = true;
@@ -122,13 +118,12 @@ public class PatientService {
                             current = false;
                         }
 
-                        treatmentSummaries.add(new TreatmentSummaryDTO(protocol.getTreatmentDate(),drugSummaries, current));
+                        treatmentSummaries.add(new TreatmentSummaryDTO(treatmentDate,drugName, treatmentDose, treatmentResponse, treatmentDuration, current));
                     }
 
                 }catch (Exception e){}
 
             }
-
 
             patientDTO.setKnownGeneticMutations(geneticMutations);
             patientDTO.setCollectionEvents(collectionEvents);
