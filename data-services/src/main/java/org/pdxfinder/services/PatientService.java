@@ -108,7 +108,7 @@ public class PatientService {
 
                         drugName = protocol.getDrugString(false);
                         treatmentResponse = protocol.getResponse().getDescription();
-                        treatmentDose = protocol.getDoseString(false);
+                        treatmentDose = notEmpty(protocol.getDoseString(false));
                         treatmentDuration = protocol.getDurationString(false);
                         treatmentDate = protocol.getTreatmentDate();
 
