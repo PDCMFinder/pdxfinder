@@ -277,8 +277,10 @@ public class LoadPDMRData implements CommandLineRunner {
 
         TreatmentSummary ts;
 
+        //Disable loading treatment temporarily, drug names are not harmonized!
+        Boolean loadTreatment = false;
         //don't create two treatmentsummaries for the same snapshot
-        if(dataImportService.findTreatmentSummaryByPatientSnapshot(pSnap) == null){
+        if(loadTreatment && dataImportService.findTreatmentSummaryByPatientSnapshot(pSnap) == null){
             ts = new TreatmentSummary();
 
             JSONArray treatmentArr = j.getJSONArray("Treatments");

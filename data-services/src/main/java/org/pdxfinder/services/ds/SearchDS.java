@@ -118,7 +118,6 @@ public class SearchDS {
 
     public static List<String> DATA_AVAILABLE_OPTIONS = Arrays.asList(
             "Gene Mutation",
-            "Copy Number Alteration",
             "Dosing Studies",
             "Patient Treatment"
     );

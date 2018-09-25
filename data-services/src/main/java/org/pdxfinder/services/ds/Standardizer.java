@@ -235,8 +235,30 @@ public class Standardizer {
 
             return "Valproic Acid";
         }
+        else if(drug.equals("Epirubicin")){
 
+            return "Epirubicin";
+        }
+        else if(drug.equals("Radiotherapy")){
 
+            return drug;
+        }
+        else if(drug.equals("Goserelin")){
+
+            return drug;
+        }
+        else if(drug.equals("Letrozole")){
+
+            return drug;
+        }
+        else if(drug.equals("Capecitabine")){
+
+            return drug;
+        }
+        else if(drug.equals("Denosumab")){
+
+            return drug;
+        }
         return "Not Specified";
     }
 
