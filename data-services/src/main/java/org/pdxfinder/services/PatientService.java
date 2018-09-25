@@ -31,7 +31,11 @@ public class PatientService {
 
         Patient patient = patientRepository.findByPatientByModelId(dataSource,modelId);
         PatientDTO patientDTO =  new PatientDTO();
+
         List<CollectionEventsDTO> collectionEvents = new ArrayList<>();
+        Boolean treatmentExists = false;
+        Boolean currentTreatmentExists = false;
+
 
         if (patient != null){
 
@@ -114,11 +118,13 @@ public class PatientService {
 
                         if (protocol.getCurrentTreatment() != null){
                             current = true;
+                            currentTreatmentExists = true;
                         }else{
                             current = false;
                         }
 
                         treatmentSummaries.add(new TreatmentSummaryDTO(treatmentDate,drugName, treatmentDose, treatmentResponse, treatmentDuration, current));
+                        treatmentExists = true;
                     }
 
                 }catch (Exception e){}
@@ -128,7 +134,8 @@ public class PatientService {
             patientDTO.setKnownGeneticMutations(geneticMutations);
             patientDTO.setCollectionEvents(collectionEvents);
             patientDTO.setTreatmentSummaries(treatmentSummaries);
-
+            patientDTO.setTreatmentExists(treatmentExists);
+            patientDTO.setCurrentTreatmentExists(currentTreatmentExists);
 
 
 

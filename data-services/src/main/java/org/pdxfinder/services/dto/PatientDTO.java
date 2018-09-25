@@ -13,6 +13,9 @@ public class PatientDTO {
     private String raceAndEthnicity;
     private List<TreatmentSummaryDTO> treatmentSummaries;
 
+    private Boolean treatmentExists = false;
+    private Boolean currentTreatmentExists = false;
+
     // Additional Patient History
     private List<String> knownGeneticMutations;
 
@@ -22,19 +25,29 @@ public class PatientDTO {
     public PatientDTO() {
     }
 
-    public PatientDTO(String gender, String ageAtDiagnosis, String diseaseBodyLocation,
-                      String CTEPSDCCode, String diagnosisSubtype, String raceAndEthnicity,
-                      List<String> knownGeneticMutations, List<CollectionEventsDTO> collectionEvents) {
+    public PatientDTO(String gender,
+                      String ageAtDiagnosis,
+                      String diseaseBodyLocation,
+                      String CTEPSDCCode,
+                      String diagnosisSubtype,
+                      String raceAndEthnicity,
+                      List<TreatmentSummaryDTO> treatmentSummaries,
+                      Boolean treatmentExists,
+                      Boolean currentTreatmentExists,
+                      List<String> knownGeneticMutations,
+                      List<CollectionEventsDTO> collectionEvents) {
         this.gender = gender;
         this.ageAtDiagnosis = ageAtDiagnosis;
         this.diseaseBodyLocation = diseaseBodyLocation;
         this.CTEPSDCCode = CTEPSDCCode;
         this.diagnosisSubtype = diagnosisSubtype;
         this.raceAndEthnicity = raceAndEthnicity;
+        this.treatmentSummaries = treatmentSummaries;
+        this.treatmentExists = treatmentExists;
+        this.currentTreatmentExists = currentTreatmentExists;
         this.knownGeneticMutations = knownGeneticMutations;
         this.collectionEvents = collectionEvents;
     }
-
 
     public String getGender() {
         return gender;
@@ -106,5 +119,21 @@ public class PatientDTO {
 
     public List<TreatmentSummaryDTO> getTreatmentSummaries() {
         return treatmentSummaries;
+    }
+
+    public void setCurrentTreatmentExists(Boolean currentTreatmentExists) {
+        this.currentTreatmentExists = currentTreatmentExists;
+    }
+
+    public Boolean getCurrentTreatmentExists() {
+        return currentTreatmentExists;
+    }
+
+    public void setTreatmentExists(Boolean treatmentExists) {
+        this.treatmentExists = treatmentExists;
+    }
+
+    public Boolean getTreatmentExists() {
+        return treatmentExists;
     }
 }
