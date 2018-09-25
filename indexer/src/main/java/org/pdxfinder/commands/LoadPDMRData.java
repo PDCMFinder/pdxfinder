@@ -40,8 +40,8 @@ public class LoadPDMRData implements CommandLineRunner {
     private final static Logger log = LoggerFactory.getLogger(LoadPDMRData.class);
 
     private final static String DATASOURCE_ABBREVIATION = "PDMR";
-    private final static String DATASOURCE_NAME = "National Cancer Institute";
-    private final static String DATASOURCE_DESCRIPTION = "Patient-Derived Models Repository ";
+    private final static String DATASOURCE_NAME = "Patient-Derived Models Repository";
+    private final static String DATASOURCE_DESCRIPTION = "Patient-Derived Models Repository";
     private final static String DATASOURCE_CONTACT = "https://pdmr.cancer.gov/request/default.htm";
 
     private final static String PROVIDER_TYPE = "";
