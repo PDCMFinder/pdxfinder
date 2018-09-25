@@ -1,24 +1,29 @@
 package org.pdxfinder.services.dto;
 
-import java.util.List;
-
 /*
  * Created by abayomi on 21/09/2018.
  */
 public class TreatmentSummaryDTO {
 
     private String treatmentDate;
-    private List<DrugSummaryDTO> drugSummaries;
+    private String drugNames;
+    private String dose;
+    private String response;
+    private String duration;
     private Boolean current = false;
 
     public TreatmentSummaryDTO() {
     }
 
-    public TreatmentSummaryDTO(String treatmentDate, List<DrugSummaryDTO> drugSummaries, Boolean current) {
+    public TreatmentSummaryDTO(String treatmentDate, String drugNames, String dose, String response, String duration, Boolean current) {
         this.treatmentDate = treatmentDate;
-        this.drugSummaries = drugSummaries;
+        this.drugNames = drugNames;
+        this.dose = dose;
+        this.response = response;
+        this.duration = duration;
         this.current = current;
     }
+
 
     public String getTreatmentDate() {
         return treatmentDate;
@@ -28,12 +33,36 @@ public class TreatmentSummaryDTO {
         this.treatmentDate = treatmentDate;
     }
 
-    public List<DrugSummaryDTO> getDrugSummaries() {
-        return drugSummaries;
+    public String getDrugNames() {
+        return drugNames;
     }
 
-    public void setDrugSummaries(List<DrugSummaryDTO> drugSummaries) {
-        this.drugSummaries = drugSummaries;
+    public void setDrugNames(String drugNames) {
+        this.drugNames = drugNames;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
+    }
+
+    public String getDose() {
+        return dose;
+    }
+
+    public void setDose(String dose) {
+        this.dose = dose;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 
     public Boolean getCurrent() {
