@@ -95,7 +95,6 @@ public class PatientService {
 
 
 
-
                 String drugName = "";
                 String dose = "-";
                 String response = "";
