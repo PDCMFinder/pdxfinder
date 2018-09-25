@@ -134,6 +134,47 @@ public class TreatmentProtocol {
         return ret;
     }
 
+
+
+
+
+    public String getDurationString(){
+
+        String durString = "";
+
+        for(TreatmentComponent comp:components){
+
+            String duration = comp.getDuration();
+
+                if(!durString.isEmpty()){
+                    durString+=" / ";
+                }
+                durString += duration;
+
+        }
+
+        return durString;
+    }
+
+    public String getDoseString(){
+
+        String doseString = "";
+
+        for(TreatmentComponent comp:components){
+
+            String dose = comp.getDose();
+
+            if(!doseString.isEmpty()){
+                doseString+=" / ";
+            }
+            doseString += dose;
+
+        }
+
+        return doseString;
+    }
+
+
     public void addTreatmentComponent(TreatmentComponent tc){
 
         if(components == null){
