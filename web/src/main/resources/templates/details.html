@@ -474,8 +474,13 @@
                                                         <th:block th:if="${not #lists.isEmpty(data.patient.collectionEvents)}"
                                                                   th:each="event, iter : ${data.patient.collectionEvents}">
 
-                                                            <th th:if="${event.pdxMouse != data.modelId}" th:text="${'Collection Event '} + ${iter.index+1}" s>Collection 1</th>
-                                                            <th th:if="${event.pdxMouse == data.modelId}" th:text="${'Collection Event '} + ${iter.index+1} + ${' (Current)'}" >Collection 1</th>
+                                                            <th th:if="${event.pdxMouse != data.modelId}"
+                                                                th:text="${'Collection Event '} ">Collection
+                                                            </th>
+                                                            <th th:if="${event.pdxMouse == data.modelId}"
+                                                                th:text="${'Collection Event '} + ${' (Current)'}">
+                                                                Collection
+                                                            </th>
 
                                                         </th:block>
                                                         </thead>
