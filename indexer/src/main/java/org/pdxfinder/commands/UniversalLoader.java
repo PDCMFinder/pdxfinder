@@ -494,10 +494,13 @@ public class UniversalLoader implements CommandLineRunner {
                 continue;
             }
 
+            String treatmentUrl = loaderRelatedDataSheetData.get(0).get(3);
 
             TreatmentSummary ts = dataImportService.findTreatmentSummaryByPatientSnapshot(ps);
+
             if(ts == null){
                 ts = new TreatmentSummary();
+                ts.setUrl(treatmentUrl);
             }
 
             TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatment, dose, response, responseClassification);
