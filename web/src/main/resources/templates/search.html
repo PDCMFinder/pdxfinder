@@ -291,6 +291,64 @@
                                 </ul>
 
 
+                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
+                                    data-allow-all-closed="true">
+                                    <li class="accordion-item" data-accordion-item id="project_filter">
+                                        <a href="#" class="accordion-title">Project</a>
+                                        <div class="accordion-content" data-tab-content>
+                                            <div class="large-form">
+                                                <div class="checkbox-item"
+                                                     th:each="instance:${websearch.projects}">
+                                                    <input th:id="'project__' + ${instance}" type="checkbox"
+                                                           class="project filter"/>
+                                                    <label th:attr="for='project__'+${instance}"><span
+                                                            th:text="${instance}"></span></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+
+
+                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
+                                    data-allow-all-closed="true">
+                                    <li class="accordion-item" data-accordion-item id="data_available_filter">
+                                        <a href="#" class="accordion-title">DATASET AVAILABLE</a>
+
+                                        <div class="accordion-content" data-tab-content>
+                                            <div class="large-form">
+                                                <div class="checkbox-item"
+                                                     th:each="instance:${websearch.facetOptions['data_available_options']}">
+                                                    <input th:id="'data_available__' + ${#strings.replace(instance, ' ', '_')}"
+                                                           type="checkbox" class="data_available filter"/>
+                                                    <label th:attr="for='data_available__'+${#strings.replace(instance, ' ', '_')}"><span
+                                                            th:text="${instance}"></span></label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </li>
+                                </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                             </div>
 
 
@@ -299,14 +357,14 @@
 
                         <li class="accordion-item is-active" data-accordion-item>
                             <!-- Accordion tab title -->
-                            <a href="#" class="accordion-title"> MOLECULAR CHARACTERIZATION </a>
+                            <a href="#" class="accordion-title"> MOLECULAR DATA </a>
 
                             <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
                             <div class="accordion-content" data-tab-content>
                                 <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
                                     data-allow-all-closed="true">
                                     <li class="accordion-item" data-accordion-item id="marker_filter">
-                                        <a href="#" class="accordion-title">Small Genetic Variation</a>
+                                        <a href="#" class="accordion-title"> GENE MUTATION </a>
                                         <div class="accordion-content" data-tab-content>
                                             <div class="light-grey-bg-box">
                                                 <div class="checkbox-item">
@@ -643,7 +701,7 @@
                                 <th>Type</th>
                                 <th>Age</th>
                                 <th>Sex</th>
-                                <th th:if="${websearch.dataAvailableColumnPresent} == true">Data Available</th>
+                                <th>Data Available</th>
                                 <th th:if="${websearch.isMutationSelected} == true">Mutations</th>
                                 <th th:if="${websearch.isMutationSelected} == true">Platform</th>
                                 <th th:if="${websearch.isDrugSelected} == true">Drug</th>
@@ -664,16 +722,21 @@
                                 <td th:text="${model.patientAge}">Age</td>
                                 <td th:text="${model.patientGender}">Sex</td>
 
-                                <td th:if="${websearch.dataAvailableColumnPresent} == true">
-                                    <th:block th:each="platform : ${model.dataAvailable}">
+                                <td>
+                                    <th:block th:each="dataavailable : ${model.dataAvailable}">
 
-                                        <a th:if="${#strings.equals(platform, 'Dosing Studies')}"
+                                        <a th:if="${#strings.equals(dataavailable, 'Dosing Studies')}"
                                            th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#dosing_studies' }"
-                                           class="size12" th:utext="${platform} + '<br />'">platform</a>
+                                           class="size12" th:utext="${dataavailable} + '<br />'"></a> <!-- platform -->
 
-                                        <a th:if="${not #strings.equals(platform, 'Dosing Studies')}"
+                                        <a th:if="${#strings.equals(dataavailable, 'Gene Mutation')}"
                                            th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation' }"
-                                           class="size12" th:utext="${platform} + '<br />'">platform</a>
+                                           class="size12" th:utext="${dataavailable} + '<br />'"></a> <!-- platform -->
+
+                                        <a th:if="${#strings.equals(dataavailable, 'Patient Treatment')}"
+                                           th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#patients' }"
+                                           class="size12" th:utext="${dataavailable} + '<br />'"></a> <!-- platform -->
+
                                     </th:block>
                                 </td>
 
@@ -799,10 +862,13 @@
     }
     var ageFilters = [[${websearch.patientAgeSelected}]];
     var dsFilters = [[${websearch.datasourceSelected}]];
+    var projectFilters = [[${websearch.projectSelected}]];
     var cancerSystemFilters = [[${websearch.cancerSystemSelected}]];
     var sampleTumorTypeFilters = [[${websearch.sampleTumorTypeSelected}]];
     var genderFilters = [[${websearch.patientGenderSelected}]];
     var mutationFilters = [[${websearch.mutationSelected}]];
+    var dataAvailableFilters = [[${websearch.dataAvailableSelected}]];
+
     function constructSearchOptions(data) {
         var newOptions = [];
         for (var i = 0; i < data.length; i++) {
@@ -871,6 +937,7 @@
         // hide placeholder text
         $('.main-search .choices__input').attr("placeholder", "  ");
         // drop the parenthetical
+
         $('.main-search .choices__list .choices__item').text('test')
         // To autosubmit on select
         // $('form.main-search').submit();
@@ -885,7 +952,7 @@
     console.log("before updating");
 
     jQuery(document).ready(function () {
-        updateFilters(ageFilters, genderFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters);
+        updateFilters(ageFilters, genderFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters, projectFilters, dataAvailableFilters);
         console.log("updated");
         //Add eventlistener to fields with filter class
         jQuery('.filter').change(function () {
@@ -908,6 +975,7 @@
     var mutatedMarkersAndVariants = JSON.parse(incomingString);
     var drugsList = [[${websearch.drugNames}]];
     var drugResponseList = [[${websearch.drugResponses}]];
+
 
     jQuery(document).ready(function () {
 

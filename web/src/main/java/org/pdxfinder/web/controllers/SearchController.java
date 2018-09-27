@@ -44,13 +44,15 @@ public class SearchController {
                   @RequestParam("cancer_system") Optional<List<String>> cancer_system,
                   @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type,
                   @RequestParam("mutation") Optional<List<String>> mutation,
-                  @RequestParam("drug") Optional<List<String>> drug
+                  @RequestParam("drug") Optional<List<String>> drug,
+                  @RequestParam("project") Optional<List<String>> project,
+                  @RequestParam("data_available") Optional<List<String>> data_available
     ) {
 
 
         ExportDTO eDTO = searchService.export(query, datasource,
                 diagnosis, patient_age, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
-                sample_tumor_type, mutation, drug);
+                sample_tumor_type, mutation, drug, project, data_available);
 
         Set<ModelForQueryExport> exportResults = eDTO.getResults().stream().map(ModelForQueryExport::new).collect(Collectors.toSet());
 
@@ -91,13 +93,14 @@ public class SearchController {
                    @RequestParam("sample_tumor_type") Optional<List<String>> sample_tumor_type,
                    @RequestParam("mutation") Optional<List<String>> mutation,
                    @RequestParam("drug") Optional<List<String>> drug,
-
+                   @RequestParam("project") Optional<List<String>> project,
+                   @RequestParam("data_available") Optional<List<String>> data_available,
                    @RequestParam(value = "page", defaultValue = "1") Integer page,
                    @RequestParam(value = "size", defaultValue = "10") Integer size){
 
         model.addAttribute("websearch", searchService.webSearch(query, datasource,
                 diagnosis, patient_age, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
-                sample_tumor_type, mutation, drug, page, size));
+                sample_tumor_type, mutation, drug, project, data_available, page, size));
 
         return "search";
     }

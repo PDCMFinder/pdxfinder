@@ -52,6 +52,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
     //   private HostStrain nsgBS;
     private Group wistarDS;
+    private Group projectGroup;
 
     private Options options;
     private CommandLineParser parser;
@@ -98,6 +99,8 @@ public class LoadWISTAR implements CommandLineRunner {
 
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
+        projectGroup = dataImportService.getProjectGroup("PDXNet");
+
         try {
             JSONObject job = new JSONObject(json);
             JSONArray jarray = job.getJSONArray("WISTAR");
@@ -133,18 +136,20 @@ public class LoadWISTAR implements CommandLineRunner {
         }
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
+        String stage = j.getString("Stage");
+        String grade = j.getString("Grades");
 
-        String race = NOT_SPECIFIED;
+        String ethnicity = NOT_SPECIFIED;
         try {
             if (j.getString("Race").trim().length() > 0) {
-                race = j.getString("Race");
+                ethnicity = j.getString("Race");
             }
         } catch (Exception e) {
         }
 
         try {
             if (j.getString("Ethnicity").trim().length() > 0) {
-                race = j.getString("Ethnicity");
+                ethnicity = j.getString("Ethnicity");
             }
         } catch (Exception e) {
         }
@@ -152,16 +157,29 @@ public class LoadWISTAR implements CommandLineRunner {
         String age = Standardizer.getAge(j.getString("Age"));
 
         String gender = Standardizer.getGender(j.getString("Gender"));
+        String patientId = j.getString("Patient ID");
+
+        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
+        String extractionMethod = j.getString("Sample Type");
+
+        Patient patient = dataImportService.getPatientWithSnapshots(patientId, wistarDS);
+
+        if(patient == null){
+
+            patient = dataImportService.createPatient(patientId, wistarDS, gender, "", Standardizer.getEthnicity(ethnicity));
+        }
+
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
 
 
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"),
-                gender, "", race, age, wistarDS);
-         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
+        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
+        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
+        // String grade, String gradeClassification
+        Sample sample = dataImportService.getSample(id, wistarDS.getAbbreviation(), tumorType, diagnosis, NOT_SPECIFIED,
+                NOT_SPECIFIED, extractionMethod, false, stage, "", grade, "");
 
-        
-        Sample sample = dataImportService.getSample(id, j.getString("Tumor Type"), diagnosis,
-                NOT_SPECIFIED, NOT_SPECIFIED,
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, wistarDS.getAbbreviation());
+
+
 
         pSnap.addSample(sample);
 
@@ -192,6 +210,7 @@ public class LoadWISTAR implements CommandLineRunner {
 
         ModelCreation modelCreation = dataImportService.createModelCreation(id, wistarDS.getAbbreviation(), sample, qa, externalUrls);
         modelCreation.addRelatedSample(sample);
+        modelCreation.addGroup(projectGroup);
 
         Specimen specimen = dataImportService.getSpecimen(modelCreation,
                 modelCreation.getSourcePdxId(), wistarDS.getAbbreviation(), NOT_SPECIFIED);

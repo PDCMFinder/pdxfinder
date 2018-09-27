@@ -35,6 +35,8 @@ public class WebSearchDTO {
     private List<FacetOption> sampleTumorTypeSelected;
     private List<FacetOption> mutationSelected;
     private List<FacetOption> drugSelected;
+    private List<FacetOption> projectSelected;
+    private List<FacetOption> dataAvailableSelected;
 
     private String facetString;
     private List<ModelForQuery> searchResults;
@@ -55,6 +57,7 @@ public class WebSearchDTO {
 
     private List<String> drugNames;
     private List<String> drugResponses;
+    private List<String> projects;
 
 
     public WebSearchDTO() {
@@ -339,5 +342,29 @@ public class WebSearchDTO {
 
     public void setDataAvailableColumnPresent(boolean dataAvailablePresent) {
         dataAvailableColumnPresent = dataAvailablePresent;
+    }
+
+    public List<String> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<String> projects) {
+        this.projects = projects;
+    }
+
+    public List<FacetOption> getProjectSelected() {
+        return projectSelected;
+    }
+
+    public void setProjectSelected(List<FacetOption> projectSelected) {
+        this.projectSelected = projectSelected;
+    }
+
+    public List<FacetOption> getDataAvailableSelected() {
+        return dataAvailableSelected;
+    }
+
+    public void setDataAvailableSelected(List<FacetOption> dataAvailableSelected) {
+        this.dataAvailableSelected = dataAvailableSelected;
     }
 }

@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title ></title>
+    <meta name="description" th:content="'Model details for PDX, produced by '"/>
+    <meta name="keywords"
+          th:content="'Patient Derived Xenograft, PDX, PDX Finder, Cancer, Oncology, Life Sciences,'"/>
+    <meta name="author" content="PDX Finder"/>
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="MobileOptimized" content="width"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+    <link rel="apple-touch-icon" sizes="180x180"
+          href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/apple-touch-icon.png?v=1">
+    <link rel="icon" type="image/png" sizes="32x32"
+          href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon-32x32.png?v=1">
+    <link rel="icon" type="image/png" sizes="16x16"
+          href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon-16x16.png?v=1">
+    <link rel="manifest" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/manifest.json?v=1">
+    <link rel="mask-icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/safari-pinned-tab.svg?v=1"
+          color="#0032a0">
+    <link rel="shortcut icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon.ico?v=1">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+    <meta name="apple-mobile-web-app-title" content="PDX Finder">
+    <meta name="application-name" content="PDX Finder">
+    <meta name="msapplication-config"
+          content="https://ebiwd.github.io/pdx-visual-framework/images/favicons/browserconfig.xml?v=1">
+    <meta name="theme-color" content="#0032a0">
+
+    <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css"
+          type="text/css" media="all"/>
+
+    <link rel="stylesheet"
+          href="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/styles/css/choices.min.css">
+
+    <link rel="stylesheet" th:href="@{/css/app.min.css}" type="text/css" media="all"/>
+    <link rel="stylesheet" th:href="@{/css/customStyles.css}" type="text/css" media="all"/>
+    <link rel="stylesheet" th:href="@{/icons/foundation-icons.css}" type="text/css" media="all"/>
+
+    <!-- end CSS-->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script th:src="@{/js/jquery.dataTables.js}"></script>
+    <script th:src="@{/js/scroller.js}"></script>
+
+    <!--/*/ <th:block th:include="fragments/shared :: header"></th:block> /*/-->
+
+</head>
+
+<body class="level2">
+
+<div content="content-wrapper">
+    <div id="skip-to">
+        <a href="#content">Skip to main content</a>
+    </div>
+
+    <div id="content">
+
+
+        <!--/*/ <th:block th:include="fragments/shared :: menu"></th:block> /*/-->
+
+        <!-- Suggested layout containers -->
+        <section id="main-content-area" role="main">
+
+            <!--<div class="row">
+                <nav aria-label="You are here:" role="navigation">
+                    <ul class="breadcrumbs columns">
+                        <li><a href="/">Home</a></li>
+                        <li>
+                            Patients
+                        </li>
+                        <li>
+                            <span class="show-for-sr">Current: </span> <span th:text="${data.modelId}">Model ID</span>
+                        </li>
+                    </ul>
+                </nav>
+            </div>-->
+
+            <!-- Three Grids Section
+            <section>
+                <div class="row">
+
+                    <div class="columns medium-4 small-12 margin-top-30">
+                        <h4 class="pdxBig"><span class="float-left border-color-black"
+                                                 th:text="${'Patient ID : '+data.modelId}"></span></h4>
+                    </div>
+
+                    <div class="columns medium-4 small-12 margin-top-30">
+                        <h4 class="pdxBig black"><span class="float-left" th:text="${data.sourceDescription}"> The Jackson Laboratory </span>
+                        </h4>
+                    </div>
+
+                    <div class="columns medium-4 small-12 margin-top-10">
+
+                        <a th:href="@{'mailto:'+${data.contacts+'?subject='+data.modelId}}"
+                           th:if="${#strings.contains(data.contacts,'@')}">
+                            <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
+                        </a>
+
+                        <a th:href="@{'mailto:'+${data.externalUrl+'?subject='+data.modelId}}"
+                           th:if="${#strings.contains(data.externalUrl,'@')}">
+                            <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
+                        </a>
+
+                        <a th:href="@{${data.contacts}}" th:target="_blank"
+                           th:if="${#strings.contains(data.contacts,'http') }">
+                            <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
+                        </a>
+
+                        <a th:href="@{${data.externalUrl}}" th:target="_blank" th:if="${#strings.contains(data.externalUrl,'http')}">
+                            <h4 class="button outline uppercase margin-top-large minwidth300 shiftUp10 card-3b"
+                                th:text="${data.externalUrlText}">View at Provider</h4>
+                        </a>
+
+                    </div>
+                </div>
+            </section> -->
+
+
+            <hr class="margin-vertical-20 line_v2">
+            <!-- Tabs Section -->
+            <section class="row large-10 medium-12 expanded" id="detailsData">
+                <div class="row large-12 medium-12 expanded">
+                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Initial Diagnosis </a></li>
+                    </ul>
+                </div>
+
+                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                    <div class="tabs-panel is-active" id="summary">
+
+                        <!-- Summary first row -->
+                        <div class="row large-12 medium-12 expanded">
+
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;">
+                                    <table class="pdx-table head-left">
+                                        <tbody>
+                                        <tr>
+                                            <th class="text-left medium-4">Gender</th>
+                                            <td th:text="${data.gender}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4"> Age at Diagnosis</th>
+                                            <td th:text="${data.ageAtDiagnosis}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Disease Body Location</th>
+                                            <td th:text="${data.diseaseBodyLocation}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">CTEP SDC Code</th>
+                                            <td th:text="${data.CTEPSDCCode}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Diagnosis Subtype</th>
+                                            <td th:text="${data.diagnosisSubtype}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Race / Ethnicity</th>
+                                            <td th:text="${data.raceAndEthnicity}"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+
+            <section class="row large-10 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+                <div class="row large-12 medium-12 expanded">
+                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;">Additional patient History</a></li>
+                    </ul>
+                </div>
+
+                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                    <div class="tabs-panel is-active" id="summary">
+
+                        <!-- Summary first row -->
+                        <div class="row large-12 medium-12 expanded">
+
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;">
+                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="2"> Known Genetic Mutations / Tumor Markers</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        <tr>
+                                            <!--<th class="text-left large-12" style="font-size: 17px;">IHC: CD34+, CD99+, EMA+, bcl2+; AE1/AE3 -, CAM5.2 - </th>-->
+                                            <td>
+                                                    <span th:each="mut : ${data.knownGeneticMutations}"
+                                                          th:text="${mut}"> ...
+                                                    </span>
+
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+
+
+            <section class="row large-10 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+
+                <div class="row large-12 medium-12 expanded">
+                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Collection Events </a></li>
+                    </ul>
+                </div>
+
+
+
+
+                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                    <div class="tabs-panel is-active" id="summary">
+
+                        <div class="row large-12 medium-12 expanded">
+
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;">
+                                    <table class="pdx-table head-left">
+                                        <thead>
+                                            <th> </th>
+                                            <th:block th:if="${not #lists.isEmpty(data.collectionEvents)}"
+                                                      th:each="event, iter : ${data.collectionEvents}">
+                                                <th th:text="${'Collection Event '} + ${iter.index+1}">Collection 1</th>
+                                            </th:block>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <th class="text-left medium-4">Age</th>
+                                            <th:block th:if="${not #lists.isEmpty(data.collectionEvents)}"
+                                                      th:each="event : ${data.collectionEvents}">
+                                                <td th:text="${event.age}"> ... AGE ... </td>
+                                            </th:block>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4"> Diagnosis</th>
+                                            <th:block th:if="${not #lists.isEmpty(data.collectionEvents)}"
+                                                      th:each="event : ${data.collectionEvents}">
+                                                <td th:text="${event.diagnosis}"> ... AGE ... </td>
+                                            </th:block>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4"> Type </th>
+                                            <th:block th:if="${not #lists.isEmpty(data.collectionEvents)}"
+                                                      th:each="event : ${data.collectionEvents}">
+                                                <td th:text="${event.type}"> ... AGE ... </td>
+                                            </th:block>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4"> PDX Mouse </th>
+                                            <th:block th:if="${not #lists.isEmpty(data.collectionEvents)}"
+                                                      th:each="event : ${data.collectionEvents}">
+                                                <td th:text="${event.pdxMouse}"> ... AGE ... </td>
+                                            </th:block>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Data</th>
+                                            <th:block th:if="${not #lists.isEmpty(data.collectionEvents)}"
+                                                      th:each="event : ${data.collectionEvents}">
+                                                <td th:text="${event.data}"> ... AGE ... </td>
+                                            </th:block>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+
+
+
+            <section class="row large-10 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+                <div class="row large-12 medium-12 expanded">
+                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Current Therapy </a></li>
+                    </ul>
+                </div>
+
+                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                    <div class="tabs-panel is-active" id="summary">
+
+                        <!-- Summary first row -->
+                        <div class="row large-12 medium-12 expanded">
+
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;">
+                                    <table class="pdx-table head-left">
+                                        <thead>
+                                        <th> Date Regimen Started </th>
+                                        <th> Standardized Regimen </th>
+                                        <th> Best Response </th>
+                                        <th> Number of Cycles </th>
+                                        <th> Date of Progression  </th>
+                                        <th> Comments </th>
+                                        <th>Reason for Off Therapy</th>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <th class="text-left medium-4"> Not Specified </th>
+                                            <td th:text="${'No Current Therapy'}">  </td>
+                                            <td th:text="${'Not Specified'}">  </td>
+                                            <td th:text="${'0'}"> </td>
+                                            <td th:text="${''}">  </td>
+                                            <td th:text="${''}">  </td>
+                                            <td th:text="${''}">  </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section class="row large-10 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+                <div class="row large-12 medium-12 expanded">
+                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Prior Therapies & response </a></li>
+                    </ul>
+                </div>
+
+                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                    <div class="tabs-panel is-active" id="summary">
+
+                        <!-- Summary first row -->
+                        <div class="row large-12 medium-12 expanded">
+
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;">
+                                    <table class="pdx-table head-left">
+                                        <thead>
+                                        <th> Date Regimen Started </th>
+                                        <th> Standardized Regimen </th>
+                                        <th> Best Response </th>
+                                        <th> Duration </th>
+                                        <th> Comments </th>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <th class="text-left medium-4"> 10/2014 </th>
+                                            <td th:text="${'Bevacizumab, Temozolomide'}"></td>
+                                            <td th:text="${'Stable Disease'}">  </td>
+                                            <td th:text="${'6 Months'}"> </td>
+                                            <td th:text="${'Adjuvant'}">  </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4"> 03/2006 </th>
+                                            <td th:text="${'Radiation'}">  </td>
+                                            <td th:text="${'Not Specified'}">  </td>
+                                            <td th:text="${'1 Month'}"> </td>
+                                            <td th:text="${'Adjuvant 4250cGy total, 25 fractions'}">  </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+
+        </section>
+
+    </div>
+    <!-- End suggested layout containers / #content -->
+
+
+    <!--/*/ <th:block th:include="fragments/shared :: footer"></th:block> /*/-->
+
+
+</div>
+<!-- JavaScript -->
+
+<script  type='text/javascript' th:src="@{/js/banner-gdpr.js}"></script>
+<div id="data-protection-message-configuration"
+     data-message="Your message and links here."
+     data-service-id="ebi" data-data-protection-version="0.1">
+</div>
+
+<script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.2/libraries/Choices/assets/scripts/dist/choices.min.js"></script>
+<script src="https://wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.highlightRegex/0.1.2/highlightRegex.min.js"></script>
+<script th:src="@{/js/script.js}"></script>
+<!--<script th:src="@{/js/main.js}"></script>-->
+
+
+<script type="text/javascript" language="javascript" th:inline="javascript">
+
+
+
+
+
+</script>
+
+</body>
+</html>

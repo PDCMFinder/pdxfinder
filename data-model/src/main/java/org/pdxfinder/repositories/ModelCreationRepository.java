@@ -78,12 +78,13 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     @Query("MATCH (n:ModelCreation) RETURN n")
     Collection<ModelCreation> findAllModels();
 
-    @Query("MATCH (mc:ModelCreation)<-[ir:IMPLANTED_IN]-(s:Sample)-[sfr:SAMPLED_FROM]-(ps:PatientSnapshot)-[pr:PATIENT]-(p:Patient) " +
+    @Query("MATCH (mc:ModelCreation)<-[ir:IMPLANTED_IN]-(s:Sample)-[sfr:SAMPLED_FROM]-(ps:PatientSnapshot)-[pr:COLLECTION_EVENT]-(p:Patient) " +
             "WITH mc, ir, s, sfr, ps, pr, p " +
             "MATCH (c:Tissue)-[cr:SAMPLE_SITE]-(s)-[ttr:OF_TYPE]-(tt:TumorType) " +
             "WITH mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt " +
-            "MATCH (t:Tissue)-[tr:ORIGIN_TISSUE]-(s)-[otm:MAPPED_TO]-(ot:OntologyTerm)-[ottm:SUBCLASS_OF *1..]->(term:OntologyTerm) " +
-            "RETURN mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt, tr, t, otm, ot, ottm, term")
+            "MATCH (t:Tissue)-[tr:ORIGIN_TISSUE]-(s)-[otm:MAPPED_TO]-(ot:OntologyTerm)-[ottm:SUBCLASS_OF *0..]->(term:OntologyTerm) " +
+            "OPTIONAL MATCH (mc)-[gr:GROUP]-(g:Group) " +
+            "RETURN mc, ir, s, sfr, ps, pr, p, cr, c, ttr, tt, tr, t, otm, ot, ottm, term, gr, g")
     Collection<ModelCreation> findModelsWithPatientData();
 
     @Query("MATCH " +
@@ -134,12 +135,13 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
                                                         @Param("lim") int lim);
 
     @Query("MATCH (mc)-[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(molChar:MolecularCharacterization)-[pur:PLATFORM_USED]-(p:Platform) " +
-            "WHERE mc.sourcePdxId={sourcePdxId}  AND p.name={platform} " +
+            "WHERE mc.sourcePdxId={sourcePdxId}  AND p.name={platform} AND mc.dataSource = {dataSource} " +
             "WITH mc, msr, s, cbr, molChar, pur, p " +
 
             "OPTIONAL MATCH (molChar)-[assW:ASSOCIATED_WITH]-(mAss:MarkerAssociation) " +
             "RETURN count(mAss) ")
     Integer countMarkerAssociationBySourcePdxId(@Param("sourcePdxId") String sourcePdxId,
+                                                @Param("dataSource") String dataSource,
                                                 @Param("platform") String platform);
 
 
@@ -151,7 +153,9 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
 
     @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource}) " +
             "WITH mod " +
-            "MATCH (mod)-[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[pur:PLATFORM_USED]-(pl:Platform) " +
+            "MATCH (mod)-[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)--(ma:MarkerAssociation) " +
+            "WITH mod, msr, s, cbr, mc " +
+            "MATCH (mc)-[pur:PLATFORM_USED]-(pl:Platform) " +
             "RETURN mod, msr, s, cbr, mc, pur, pl")
     Collection<ModelCreation> getModelsWithMolCharBySource(@Param("dataSource") String dataSource);
 
@@ -160,4 +164,11 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "WHERE id(ts) = {ts} " +
             "RETURN model")
     ModelCreation findByTreatmentSummary(@Param("ts") TreatmentSummary ts);
+
+
+    @Query("MATCH (model:ModelCreation) WHERE model.sourcePdxId = {modelId} AND model.dataSource = {dataSource} " +
+            "WITH model " +
+            "OPTIONAL MATCH (model)-[sr:SPECIMENS]-(s:Specimen) " +
+            "RETURN model, sr, s ")
+    ModelCreation findBySourcePdxIdAndDataSourceWithSpecimens(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
 }

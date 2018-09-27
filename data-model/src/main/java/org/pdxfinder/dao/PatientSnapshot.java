@@ -1,5 +1,6 @@
 package org.pdxfinder.dao;
 
+import org.neo4j.cypher.internal.frontend.v2_3.SemanticDirection;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -16,14 +17,19 @@ public class PatientSnapshot {
     @GraphId
     private Long id;
 
-    private Patient patient;
     private String ageAtCollection;
     private String dateAtCollection;
-    private Boolean treatmentNaive;
+    private String treatmentNaive;
 
     private String collectionEvent;
-    private int ellapsedTime;
+    private String elapsedTime;
     private String eventType;
+
+    private String virologyStatus;
+
+
+    @Relationship(type = "COLLECTION_EVENT", direction = Relationship.INCOMING)
+    private Patient patient;
 
     @Relationship(type = "SAMPLED_FROM")
     private Set<Sample> samples;
@@ -37,6 +43,14 @@ public class PatientSnapshot {
     public PatientSnapshot(Patient patient, String ageAtCollection) {
         this.patient = patient;
         this.ageAtCollection = ageAtCollection;
+    }
+
+    public PatientSnapshot(Patient patient, String ageAtCollection, String dateAtCollection, String collectionEvent, String elapsedTime) {
+        this.patient = patient;
+        this.ageAtCollection = ageAtCollection;
+        this.dateAtCollection = dateAtCollection;
+        this.collectionEvent = collectionEvent;
+        this.elapsedTime = elapsedTime;
     }
 
     public String getAgeBin() {
@@ -128,11 +142,11 @@ public class PatientSnapshot {
         this.dateAtCollection = dateAtCollection;
     }
 
-    public Boolean getTreatmentNaive() {
+    public String getTreatmentNaive() {
         return treatmentNaive;
     }
 
-    public void setTreatmentNaive(Boolean treatmentNaive) {
+    public void setTreatmentNaive(String treatmentNaive) {
         this.treatmentNaive = treatmentNaive;
     }
 
@@ -152,12 +166,12 @@ public class PatientSnapshot {
         this.collectionEvent = collectionEvent;
     }
 
-    public int getEllapsedTime() {
-        return ellapsedTime;
+    public String getElapsedTime() {
+        return elapsedTime;
     }
 
-    public void setEllapsedTime(int ellapsedTime) {
-        this.ellapsedTime = ellapsedTime;
+    public void setElapsedTime(String elapsedTime) {
+        this.elapsedTime = elapsedTime;
     }
 
     public String getEventType() {
@@ -166,5 +180,13 @@ public class PatientSnapshot {
 
     public void setEventType(String eventType) {
         this.eventType = eventType;
+    }
+
+    public String getVirologyStatus() {
+        return virologyStatus;
+    }
+
+    public void setVirologyStatus(String virologyStatus) {
+        this.virologyStatus = virologyStatus;
     }
 }

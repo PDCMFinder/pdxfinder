@@ -1,12 +1,10 @@
 package org.pdxfinder.transdatamodel;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by abayomi on 20/11/2017.
@@ -33,14 +31,18 @@ import javax.persistence.*;
         "Grade Classification",
         "Grade Value",
         "Sample Type",
+        "Samples",
         "Strain",
         "Mouse Sex",
+        "Treatments",
         "Treatment Naive",
         "Engraftment Site",
-        "Source url",
+        "Engraftment Type",
         "Extraction Method",
         "Date At Collection",
-        "Accessibility"
+        "Accessibility",
+        "Validations",
+        "Source url"
 })
 public class PdmrPdxInfo {
 
@@ -70,13 +72,25 @@ public class PdmrPdxInfo {
     private String sampleType;
     private String strain;
     private String mouseSex;
+
     private String treatmentNaive;
     private String engraftmentSite;
+    private String engraftmentType;
     private String sourceUrl;
 
     private String extractionMethod;
     private String dateAtCollection;
     private String accessibility;
+
+    @OneToMany(mappedBy = "pdmrPdxInfo")
+    private List<Treatment> treatments;
+
+    @OneToMany(mappedBy = "pdmrPdxInfo")
+    private List<Validation> validations;
+
+    @OneToMany(mappedBy = "pdmrPdxInfo")
+    private List<Sample> samples;
+
 
     public PdmrPdxInfo() {
     }
@@ -85,8 +99,9 @@ public class PdmrPdxInfo {
     public PdmrPdxInfo(String modelID, String patientID, String gender, String age, String race, String ethnicity, String specimenSite,
                        String primarySite, String initialDiagnosis, String clinicalDiagnosis, String tumorType, String stageClassification,
                        String stageValue, String gradeClassification, String gradeValue, String sampleType, String strain, String mouseSex,
-                       String treatmentNaive, String engraftmentSite, String sourceUrl, String extractionMethod, String dateAtCollection,
-                       String accessibility) {
+                       String treatmentNaive, String engraftmentSite, String engraftmentType, String sourceUrl,
+                       String extractionMethod, String dateAtCollection, String accessibility,
+                       List<Treatment> treatments, List<Validation> validations, List<Sample> samples) {
         this.modelID = modelID;
         this.patientID = patientID;
         this.gender = gender;
@@ -107,10 +122,14 @@ public class PdmrPdxInfo {
         this.mouseSex = mouseSex;
         this.treatmentNaive = treatmentNaive;
         this.engraftmentSite = engraftmentSite;
+        this.engraftmentType = engraftmentType;
         this.sourceUrl = sourceUrl;
         this.extractionMethod = extractionMethod;
         this.dateAtCollection = dateAtCollection;
         this.accessibility = accessibility;
+        this.treatments = treatments;
+        this.validations = validations;
+        this.samples = samples;
     }
 
     @JsonProperty("Model ID")
@@ -294,6 +313,16 @@ public class PdmrPdxInfo {
         this.mouseSex = mouseSex;
     }
 
+    @JsonProperty("Treatments")
+    public void setTreatments(List<Treatment> treatments) {
+        this.treatments = treatments;
+    }
+
+    @JsonProperty("Treatments")
+    public List<Treatment> getTreatments() {
+        return treatments;
+    }
+
     @JsonProperty("Treatment Naive")
     public String getTreatmentNaive() {
         return treatmentNaive;
@@ -312,6 +341,16 @@ public class PdmrPdxInfo {
     @JsonProperty("Engraftment Site")
     public void setEngraftmentSite(String engraftmentSite) {
         this.engraftmentSite = engraftmentSite;
+    }
+
+    @JsonProperty("Engraftment Type")
+    public String getEngraftmentType() {
+        return engraftmentType;
+    }
+
+    @JsonProperty("Engraftment Type")
+    public void setEngraftmentType(String engraftmentType) {
+        this.engraftmentType = engraftmentType;
     }
 
     @JsonProperty("Source url")
@@ -352,6 +391,16 @@ public class PdmrPdxInfo {
     @JsonProperty("Accessibility")
     public void setAccessibility(String accessibility) {
         this.accessibility = accessibility;
+    }
+
+    @JsonProperty("Validations")
+    public List<Validation> getValidations() {
+        return validations;
+    }
+
+    @JsonProperty("Samples")
+    public List<Sample> getSamples() {
+        return samples;
     }
 }
 

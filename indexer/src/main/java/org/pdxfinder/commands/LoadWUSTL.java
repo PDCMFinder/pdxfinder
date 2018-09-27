@@ -51,7 +51,8 @@ public class LoadWUSTL implements CommandLineRunner {
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
     //   private HostStrain nsgBS;
-    private Group mdaDS;
+    private Group DS;
+    private Group projectGroup;
 
     private Options options;
     private CommandLineParser parser;
@@ -99,10 +100,12 @@ public class LoadWUSTL implements CommandLineRunner {
 
     private void parseJSON(String json) {
 
-        mdaDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
+        DS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
                 DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+
+        projectGroup = dataImportService.getProjectGroup("PDXNet");
 
         try {
             JSONObject job = new JSONObject(json);
@@ -134,28 +137,44 @@ public class LoadWUSTL implements CommandLineRunner {
         }
 
         String classification = j.getString("Stage") + "/" + j.getString("Grades");
+        String stage = j.getString("Stage");
+        String grade = j.getString("Grades");
 
-        String race = Standardizer.getValue("Race", j);
+        String ethnicity = Standardizer.getValue("Race", j);
 
         try {
             if (j.getString("Ethnicity").trim().length() > 0) {
-                race = j.getString("Ethnicity");
+                ethnicity = j.getString("Ethnicity");
             }
         } catch (Exception e) {
         }
 
         String age = Standardizer.getAge(j.getString("Age"));
         String gender = Standardizer.getGender(j.getString("Gender"));
-
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"),
-                gender, "", race, age, mdaDS);
-
+        String patientId = j.getString("Patient ID");
+        String tumorType = j.getString("Tumor Type");
+        String primaryTissue = j.getString("Primary Site");
         String sampleSite = Standardizer.getValue("Sample Site", j);
+        String extractionMethod = j.getString("Sample Type");
 
-        //String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, String dataSource
-        Sample humanSample = dataImportService.getSample(id, j.getString("Tumor Type"), diagnosis,
-                j.getString("Primary Site"), sampleSite,
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, mdaDS.getAbbreviation());
+
+        Patient patient = dataImportService.getPatientWithSnapshots(patientId, DS);
+
+        if(patient == null){
+
+            patient = dataImportService.createPatient(patientId, DS, gender, "", Standardizer.getEthnicity(ethnicity));
+        }
+
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
+
+
+        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
+        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
+        // String grade, String gradeClassification
+        Sample humanSample = dataImportService.getSample(id, DS.getAbbreviation(), tumorType, diagnosis, primaryTissue,
+                sampleSite, extractionMethod, false, stage, "", grade, "");
+
+
 
         pSnap.addSample(humanSample);
 
@@ -180,8 +199,9 @@ public class LoadWUSTL implements CommandLineRunner {
 
         String tumorPrep = Standardizer.getValue("Tumor Prep", j);
 
-        ModelCreation modelCreation = dataImportService.createModelCreation(id, mdaDS.getAbbreviation(), humanSample, qa, externalUrls);
+        ModelCreation modelCreation = dataImportService.createModelCreation(id, DS.getAbbreviation(), humanSample, qa, externalUrls);
         modelCreation.addRelatedSample(humanSample);
+        modelCreation.addGroup(projectGroup);
 
         boolean human = false;
         String markerPlatform = NOT_SPECIFIED;
@@ -211,7 +231,7 @@ public class LoadWUSTL implements CommandLineRunner {
                 // default is 0
             }
             Specimen specimen = dataImportService.getSpecimen(modelCreation,
-                    modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
+                    modelCreation.getSourcePdxId(), DS.getAbbreviation(), passage);
 
             specimen.setHostStrain(bs);
 

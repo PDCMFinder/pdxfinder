@@ -32,9 +32,14 @@ public class TreatmentProtocol {
     @Relationship(type = "RESPONSE")
     private Response response;
 
+    @Relationship(type = "CURRENT_TREATMENT")
+    private CurrentTreatment currentTreatment;
+
     private String armSize;
     private String responseCalculationMethod;
     private String passages;
+
+    private String treatmentDate;
 
     public TreatmentProtocol() {
         components = new ArrayList<>();
@@ -81,6 +86,22 @@ public class TreatmentProtocol {
         this.passages = passages;
     }
 
+    public CurrentTreatment getCurrentTreatment() {
+        return currentTreatment;
+    }
+
+    public void setCurrentTreatment(CurrentTreatment currentTreatment) {
+        this.currentTreatment = currentTreatment;
+    }
+
+    public String getTreatmentDate() {
+        return treatmentDate;
+    }
+
+    public void setTreatmentDate(String treatmentDate) {
+        this.treatmentDate = treatmentDate;
+    }
+
     public String getDrugString(boolean includeControlDrugs){
 
         String ret = "";
@@ -113,6 +134,75 @@ public class TreatmentProtocol {
         return ret;
     }
 
+
+
+
+
+    public String getDurationString(boolean includeControlDrugs){
+
+        String durString = "";
+
+        for(TreatmentComponent comp:components){
+
+            String dur = comp.getDuration();
+
+            if(includeControlDrugs){
+                if(!durString.isEmpty()){
+                    durString+=" / ";
+                }
+                durString+=dur;
+            }
+            //include only Drugs but no Controls
+            else{
+
+                if(comp.getType().equals("Drug")){
+
+                    if(!durString.isEmpty()){
+                        durString+=" / ";
+                    }
+                    durString+=dur;
+                }
+
+            }
+
+        }
+
+        return durString;
+    }
+
+    public String getDoseString(boolean includeControlDrugs){
+
+        String doseString = "";
+
+        for(TreatmentComponent comp:components){
+
+            String dose = comp.getDose();
+
+            if(includeControlDrugs){
+                if(!doseString.isEmpty()){
+                    doseString+=" / ";
+                }
+                doseString+=dose;
+            }
+            //include only Drugs but no Controls
+            else{
+
+                if(comp.getType().equals("Drug")){
+
+                    if(!doseString.isEmpty()){
+                        doseString+=" / ";
+                    }
+                    doseString+=dose;
+                }
+
+            }
+
+        }
+
+        return doseString;
+    }
+
+
     public void addTreatmentComponent(TreatmentComponent tc){
 
         if(components == null){
@@ -120,6 +210,18 @@ public class TreatmentProtocol {
         }
 
         components.add(tc);
+    }
+
+
+    public void addDurationForAllComponents(String duration){
+
+        if(components != null){
+
+            for(TreatmentComponent tc : components){
+
+                tc.setDuration(duration);
+            }
+        }
     }
 
 }
