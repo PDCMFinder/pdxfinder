@@ -573,6 +573,7 @@ public class CreateDataProjections implements CommandLineRunner{
                     String response = tp.getResponse().getDescription();
 
                     addToModelDrugResponseDP(modelId, drugName, response);
+
                 }
             }
 
