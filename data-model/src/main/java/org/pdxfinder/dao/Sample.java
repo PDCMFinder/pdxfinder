@@ -53,7 +53,8 @@ public class Sample {
         // Empty constructor required as of Neo4j API 2.0.5
     }
 
-    public Sample(String sourceSampleId, TumorType type, String diagnosis, Tissue originTissue, Tissue sampleSite, String extractionMethod, String classification, Boolean normalTissue, String dataSource) {
+    public Sample(String sourceSampleId, TumorType type, String diagnosis, Tissue originTissue, Tissue sampleSite, String extractionMethod,
+                  String classification, Boolean normalTissue, String dataSource) {
         this.sourceSampleId = sourceSampleId;
         this.type = type;
         this.diagnosis = diagnosis;
@@ -64,6 +65,22 @@ public class Sample {
         this.normalTissue = normalTissue;
         this.dataSource = dataSource;
 
+    }
+
+    public Sample(String sourceSampleId, TumorType type, String diagnosis, Tissue originTissue, Tissue sampleSite, String extractionMethod,
+                  String stage, String stageClassification, String grade, String gradeClassification, Boolean normalTissue, String dataSource) {
+        this.sourceSampleId = sourceSampleId;
+        this.type = type;
+        this.diagnosis = diagnosis;
+        this.originTissue = originTissue;
+        this.sampleSite = sampleSite;
+        this.extractionMethod = extractionMethod;
+        this.stage = stage;
+        this.stageClassification = stageClassification;
+        this.grade = grade;
+        this.gradeClassification = gradeClassification;
+        this.normalTissue = normalTissue;
+        this.dataSource = dataSource;
     }
 
     public String getSourceSampleId() {

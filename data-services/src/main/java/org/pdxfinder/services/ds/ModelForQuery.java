@@ -65,6 +65,7 @@ public class ModelForQuery {
     private String patientAge;
     private String patientTreatmentStatus;
     private String patientGender;
+    private String patientEthnicity;
     private String sampleOriginTissue;
     private String sampleSampleSite;
     private String sampleExtractionMethod;
@@ -85,6 +86,9 @@ public class ModelForQuery {
     private Set<String> queryMatch;
 
     private List<DrugSummaryDTO> drugData;
+
+    private List<String> projects;
+    private List<String> publications;
 
 
     public ModelForQuery() {
@@ -136,6 +140,14 @@ public class ModelForQuery {
                 break;
             case cell_type:
                 s = cancerCellType;
+                break;
+            case project:
+                if(projects != null){
+                    s = projects.stream().collect(Collectors.joining("::"));
+                }
+                else{
+                    s = null;
+                }
                 break;
             default:
                 s = null;
@@ -337,6 +349,22 @@ public class ModelForQuery {
         this.mutatedVariants = mutatedVariants;
     }
 
+    public List<String> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<String> projects) {
+        this.projects = projects;
+    }
+
+    public List<String> getPublications() {
+        return publications;
+    }
+
+    public void setPublications(List<String> publications) {
+        this.publications = publications;
+    }
+
     public String getFormattedQueryMatch(String query) {
 
         // Return nothing if there is no query
@@ -373,5 +401,24 @@ public class ModelForQuery {
 
     public void setDrugData(List<DrugSummaryDTO> drugData) {
         this.drugData = drugData;
+    }
+
+
+    public void addProject(String project){
+
+        if(projects == null){
+            projects = new ArrayList<>();
+        }
+
+        projects.add(project);
+
+    }
+
+    public String getPatientEthnicity() {
+        return patientEthnicity;
+    }
+
+    public void setPatientEthnicity(String patientEthnicity) {
+        this.patientEthnicity = patientEthnicity;
     }
 }

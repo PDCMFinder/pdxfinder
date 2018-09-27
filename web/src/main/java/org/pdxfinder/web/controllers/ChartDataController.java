@@ -1,5 +1,7 @@
 package org.pdxfinder.web.controllers;
 
+import org.pdxfinder.dao.Group;
+import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.ds.ModelForQuery;
 import org.pdxfinder.services.ds.SearchDS;
 import org.springframework.cache.annotation.Cacheable;
@@ -7,18 +9,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 public class ChartDataController {
 
     private SearchDS searchDS;
+    private DataImportService dataImportService;
 
-    public ChartDataController(SearchDS searchDS) {
+    public ChartDataController(SearchDS searchDS, DataImportService dataImportService) {
         this.searchDS = searchDS;
+        this.dataImportService = dataImportService;
+
     }
 
     @RequestMapping("/graphdata")
@@ -54,14 +56,12 @@ public class ChartDataController {
         Map<String, DataHolder> dataHolderMap = new HashMap<>();
 
         Map<String, String> dataHolderDetails = new HashMap<>();
-        dataHolderDetails.put("JAX","The Jackson Laboratory");
-        dataHolderDetails.put("PDXNet-HCI-BCM","HCI-Baylor College of Medicine");
-        dataHolderDetails.put("PDXNet-Wistar-MDAnderson-Penn","Wistar/MD Anderson/Penn");
-        dataHolderDetails.put("PDXNet-WUSTL","Washington University in St. Louis");
-        dataHolderDetails.put("PDXNet-MDAnderson","MD Anderson Cancer Center");
-        dataHolderDetails.put("PDMR","NCI Patient-Derived Models Repository");
-        dataHolderDetails.put("IRCC","Candiolo Cancer Institute");
 
+        List<Group> providers = dataImportService.getAllProviderGroups();
+
+        for(Group g : providers){
+            dataHolderDetails.put(g.getAbbreviation(), g.getName());
+        }
 
         for (ModelForQuery m : models) {
 

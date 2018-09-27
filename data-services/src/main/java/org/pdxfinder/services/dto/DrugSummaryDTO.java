@@ -8,6 +8,7 @@ public class DrugSummaryDTO {
     private String drugName;
     private String dose;
     private String response;
+    private String duration;
 
     public DrugSummaryDTO() {
     }
@@ -15,6 +16,13 @@ public class DrugSummaryDTO {
     public DrugSummaryDTO(String drugName, String response) {
         this.drugName = drugName;
         this.response = response;
+    }
+
+    public DrugSummaryDTO(String drugName, String dose, String response, String duration) {
+        this.drugName = drugName;
+        this.dose = dose;
+        this.response = response;
+        this.duration = duration;
     }
 
     public String getDrugName() {
@@ -47,4 +55,14 @@ public class DrugSummaryDTO {
         }
 
     }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
 }
+
+

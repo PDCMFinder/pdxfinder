@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.dao.DataProjection;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.repositories.DataProjectionRepository;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
@@ -31,18 +32,30 @@ public class SearchDS {
 
     private final static Logger log = LoggerFactory.getLogger(SearchDS.class);
 
+    private DataProjectionRepository dataProjectionRepository;
+
+    private boolean INITIALIZED = false;
+
     private Set<ModelForQuery> models;
+
+    /*
+     * DYNAMIC FACETS
+     */
+
     private Map<String, String> cancerSystemMap = new HashMap<>();
 
     //platform=> marker=> variant=>{set of model ids}
     Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<String, Map<String, Map<String, Set<Long>>>>();
 
     //"drugname"=>"response"=>"set of model ids"
-    private Map<String, Map<String, Set<Long>>> drugResponses = new HashMap<>();
+    private Map<String, Map<String, Set<Long>>> modelDrugResponses = new HashMap<>();
 
-    private boolean INITIALIZED = false;
+    private List<String> projectOptions = new ArrayList<>();
 
-    private DataProjectionRepository dataProjectionRepository;
+
+    /*
+     * STATIC FACETS
+     */
 
     public static List<String> PATIENT_AGE_OPTIONS = Arrays.asList(
             "0-9",
@@ -64,7 +77,8 @@ public class SearchDS {
             "PDXNet-HCI-BCM",
             "PDXNet-MDAnderson",
             "PDXNet-WUSTL",
-            "PDXNet-Wistar-MDAnderson-Penn"
+            "PDXNet-Wistar-MDAnderson-Penn",
+            "TRACE"
     );
     public static List<String> PATIENT_GENDERS = Arrays.asList(
             "Male",
@@ -99,7 +113,15 @@ public class SearchDS {
             "Refractory",
             "Not Specified"
     );
-    public static List<String> DIAGNOSIS_OPTIONS = new ArrayList<>();
+
+
+
+    public static List<String> DATA_AVAILABLE_OPTIONS = Arrays.asList(
+            "Gene Mutation",
+            "Dosing Studies",
+            "Patient Treatment"
+    );
+
 
     /**
      * Populate the complete set of models for searching when this object is instantiated
@@ -121,16 +143,17 @@ public class SearchDS {
         initializeMutations();
 
 
-        //loads drug response from Data Projection
-        initializeDrugResponses();
+        //loads model drug response from Data Projection
+        initializeModelDrugResponses();
+
+        //loads projects
+        initializeAdditionalOptions();
 
 
         List<String> padding = new ArrayList<>();
         padding.add("NO DATA");
 
 
-        // Populate the list of possible diagnoses
-        DIAGNOSIS_OPTIONS = models.stream().map(ModelForQuery::getDiagnosis).distinct().collect(Collectors.toList());
 
 
         //
@@ -153,6 +176,7 @@ public class SearchDS {
                         .collect(Collectors.toSet())
                         .contains(x))
                 .collect(Collectors.toList());
+
 
         CANCERS_BY_SYSTEM_OPTIONS = CANCERS_BY_SYSTEM_OPTIONS
                 .stream()
@@ -182,14 +206,10 @@ public class SearchDS {
                         .contains(x))
                 .collect(Collectors.toList());
 
-        DIAGNOSIS_OPTIONS = DIAGNOSIS_OPTIONS
-                .stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getDiagnosis)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
+
+
+
+        //PROJECT_OPTIONS =new ArrayList<>(models.stream().map(model -> model.getProjects()).flatMap(Collection::stream).collect(Collectors.toSet()));
 
         INITIALIZED = true;
 
@@ -239,6 +259,10 @@ public class SearchDS {
     }
 
 
+    public List<String> getProjectOptions() {
+        return projectOptions;
+    }
+
     /**
      * This method loads the ModelForQuery Data Projection object and initializes the models
      */
@@ -261,10 +285,15 @@ public class SearchDS {
                 mfq.setExternalId(j.getString("externalId"));
                 mfq.setPatientAge(j.getString("patientAge"));
                 mfq.setPatientGender(j.getString("patientGender"));
+
+                if(j.has("patientEthnicity")){
+                    mfq.setPatientEthnicity(j.getString("patientEthnicity"));
+                }
+
                 mfq.setSampleOriginTissue(j.getString("sampleOriginTissue"));
                 mfq.setSampleSampleSite(j.getString("sampleSampleSite"));
                 mfq.setSampleExtractionMethod(j.getString("sampleExtractionMethod"));
-                mfq.setSampleClassification(j.getString("sampleClassification"));
+                //mfq.setSampleClassification(j.getString("sampleClassification"));
                 mfq.setSampleTumorType(j.getString("sampleTumorType"));
                 mfq.setDiagnosis(j.getString("diagnosis"));
                 mfq.setMappedOntologyTerm(j.getString("mappedOntologyTerm"));
@@ -302,6 +331,16 @@ public class SearchDS {
                     mfq.setDataAvailable(dataAvailable);
                 }
 
+                if(j.has("projects")){
+
+                    ja = j.getJSONArray("projects");
+
+                    for(int k = 0; k < ja.length(); k++){
+                        mfq.addProject(ja.getString(k));
+                    }
+
+                }
+
 
                 this.models.add(mfq);
             }
@@ -326,7 +365,7 @@ public class SearchDS {
 
             mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<Long>>>>>(){});
 
-            log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
+            //log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
 
         }
         catch(Exception e){
@@ -337,19 +376,25 @@ public class SearchDS {
     }
 
 
-    void initializeDrugResponses(){
+    void initializeModelDrugResponses(){
 
-        log.info("Initializing drug responses");
+        log.info("Initializing model drug responses");
 
-        String responses = dataProjectionRepository.findByLabel("DrugResponse").getValue();
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("ModelDrugData");
+        String responses = "{}";
+
+        if(dataProjection != null){
+
+            responses = dataProjection.getValue();
+        }
 
         try{
 
             ObjectMapper mapper = new ObjectMapper();
 
-            drugResponses = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
+            modelDrugResponses = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
 
-            //log.info("Lookup: "+drugResponses.get("doxorubicincyclophosphamide").get("progressive disease").toString());
+            //log.info("Lookup: "+modelDrugResponses.get("doxorubicincyclophosphamide").get("progressive disease").toString());
 
         }
         catch(Exception e){
@@ -464,9 +509,9 @@ public class SearchDS {
         //1. = 2.
         if(drug != null && response.toLowerCase().equals("all")){
 
-            if(drugResponses.containsKey(drug)){
+            if(modelDrugResponses.containsKey(drug)){
 
-                for(Map.Entry<String, Set<Long>> currResp:drugResponses.get(drug).entrySet()){
+                for(Map.Entry<String, Set<Long>> currResp: modelDrugResponses.get(drug).entrySet()){
 
                     String resp = currResp.getKey();
                     Set<Long> foundModels = currResp.getValue();
@@ -511,11 +556,11 @@ public class SearchDS {
         //3.
         else if(drug != null && response != null){
 
-            if(drugResponses.containsKey(drug)){
+            if(modelDrugResponses.containsKey(drug)){
 
-                if(drugResponses.get(drug).containsKey(response)){
+                if(modelDrugResponses.get(drug).containsKey(response)){
 
-                    Set<Long> foundModels = drugResponses.get(drug).get(response);
+                    Set<Long> foundModels = modelDrugResponses.get(drug).get(response);
 
                     for(Long modelId: foundModels){
 
@@ -559,7 +604,7 @@ public class SearchDS {
 
             if(response.equals("ALL")){
 
-                for(Map.Entry<String, Map<String, Set<Long>>> currDrug:drugResponses.entrySet()){
+                for(Map.Entry<String, Map<String, Set<Long>>> currDrug: modelDrugResponses.entrySet()){
 
                     String drugName = currDrug.getKey();
 
@@ -609,7 +654,7 @@ public class SearchDS {
             }
             else{
 
-                for(Map.Entry<String, Map<String, Set<Long>>> drugs : drugResponses.entrySet()){
+                for(Map.Entry<String, Map<String, Set<Long>>> drugs : modelDrugResponses.entrySet()){
 
                     String drugName = drugs.getKey();
 
@@ -663,6 +708,29 @@ public class SearchDS {
 
 
     }
+
+
+    public void initializeAdditionalOptions(){
+
+
+        log.info("Models: "+models.size());
+
+        Set<String> projectsSet = new HashSet<>();
+        for(ModelForQuery mfk : models){
+
+            if(mfk.getProjects() != null){
+                for(String s: mfk.getProjects()){
+                    projectsSet.add(s);
+                }
+            }
+        }
+
+        projectOptions = new ArrayList<>(projectsSet);
+
+
+    }
+
+
 
 
     /**
@@ -872,6 +940,46 @@ public class SearchDS {
                     result.forEach(x -> x.setDrugData(modelsDrugSummary.get(x.getModelId())));
                     break;
 
+                case project:
+                    Set<ModelForQuery> projectsToRemove = new HashSet<>();
+                    for (ModelForQuery res : result) {
+                        Boolean keep = Boolean.FALSE;
+                        for (String s : filters.get(SearchFacetName.project)) {
+                            try{
+                                if (res.getProjects() != null && res.getProjects().contains(s)) {
+                                    keep = Boolean.TRUE;
+                                }
+                            } catch(Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                        if (!keep) {
+                            projectsToRemove.add(res);
+                        }
+                    }
+
+                    result.removeAll(projectsToRemove);
+                    break;
+                case data_available:
+                    Set<ModelForQuery> mfqToRemove = new HashSet<>();
+                    for (ModelForQuery res : result) {
+                        Boolean keep = Boolean.FALSE;
+                        for (String s : filters.get(SearchFacetName.data_available)) {
+                            try{
+                                if (res.getDataAvailable() != null && res.getDataAvailable().contains(s)) {
+                                    keep = Boolean.TRUE;
+                                }
+                            } catch(Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                        if (!keep) {
+                            mfqToRemove.add(res);
+                        }
+                    }
+
+                    result.removeAll(mfqToRemove);
+                    break;
 
                 default:
                     // default case is an unexpected filter option
@@ -938,6 +1046,38 @@ public class SearchDS {
     }
 
 
+    public List<FacetOption> getFacetOptions(SearchFacetName facet,List<String> options, Map<SearchFacetName, List<String>> configuredFacets){
+
+        List<FacetOption> facetOptions = new ArrayList<>();
+
+        for(String s : options){
+
+            FacetOption fo = new FacetOption(s, 0);
+            fo.setSelected(false);
+            facetOptions.add(fo);
+        }
+
+        if(configuredFacets.containsKey(facet)){
+
+            List<String> selectedFacets = configuredFacets.get(facet);
+            for(String sf : selectedFacets){
+
+                for(FacetOption fo : facetOptions){
+
+                    if(fo.getName().equals(sf)){
+                        fo.setSelected(true);
+                    }
+                }
+
+
+            }
+
+        }
+
+        return facetOptions;
+    }
+
+
     /**
      * Get the count of models for a supplied facet.
      * <p>
@@ -950,6 +1090,7 @@ public class SearchDS {
      */
     @Cacheable("facet_counts")
     public List<FacetOption> getFacetOptions(SearchFacetName facet, List<String> options, Set<ModelForQuery> results, List<String> selected) {
+
 
         Set<ModelForQuery> allResults = models;
 

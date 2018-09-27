@@ -6,7 +6,10 @@ import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
+import org.pdxfinder.services.dto.PatientDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +40,7 @@ public class DetailsService {
     private Map<String, List<String>> facets = new HashMap<>();
     private PlatformService platformService;
     private DrugService drugService;
+    private PatientService patientService;
 
     private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
     private final String JAX_URL_TEXT = "View data at JAX";
@@ -59,6 +63,8 @@ public class DetailsService {
     private final String WUSTL_URL = "";
     private final String WUSTL_DS = "PDXNet-WUSTL";
 
+    private final static Logger log = LoggerFactory.getLogger(DetailsService.class);
+
 
 
     public DetailsService(SampleRepository sampleRepository,
@@ -71,7 +77,8 @@ public class DetailsService {
                          TreatmentSummaryRepository treatmentSummaryRepository,
                          GraphService graphService,
                          PlatformService platformService,
-                         DrugService drugService) {
+                         DrugService drugService,
+                          PatientService patientService) {
 
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
@@ -84,6 +91,7 @@ public class DetailsService {
         this.graphService = graphService;
         this.platformService = platformService;
         this.drugService = drugService;
+        this.patientService = patientService;
 
     }
 
@@ -126,7 +134,6 @@ public class DetailsService {
 
         Sample sample = sampleRepository.findByDataSourceAndPdxId(dataSource,modelId);
         Patient patient = patientRepository.findByDataSourceAndModelId(dataSource,modelId);
-        List<PatientSnapshot> ps = patientSnapshotRepository.findByDataSourceAndModelId(dataSource,modelId);
         ModelCreation pdx = modelCreationRepository.findByDataSourceAndSourcePdxId(dataSource, modelId);
 
         List<QualityAssurance> qa = pdx.getQualityAssurance();
@@ -182,7 +189,6 @@ public class DetailsService {
         dto.setPlatforms(platforms);
 
 
-
         try {
             dto.setSpecimens(specimenList);
         }catch (Exception e){ }
@@ -196,23 +202,27 @@ public class DetailsService {
             dto.setPatientId(patient.getExternalId());
         }
 
+
         if (patient != null && patient.getSex() != null) {
             dto.setGender(patient.getSex());
         }
+
 
         if (patient != null && patient.getProviderGroup() != null) {
             //dto.setContacts(patient.getExternalDataSource().getContact());
             dto.setExternalDataSourceDesc(patient.getProviderGroup().getDescription());
         }
 
-        if (ps != null) {
-            for (PatientSnapshot patientSnapshots : ps) {
-                if (patientSnapshots != null && patientSnapshots.getAgeAtCollection() != null) {
-                    dto.setAgeAtCollection(patientSnapshots.getAgeAtCollection());
+
+        if (patient != null && patient.getSnapshots() != null) {
+            for (PatientSnapshot patientSnapshot : patient.getSnapshots()) {
+                if (patientSnapshot != null && patientSnapshot.getAgeAtCollection() != null) {
+                    dto.setAgeAtCollection(patientSnapshot.getAgeAtCollection());
                 }
             }
 
         }
+
 
         if (patient != null && patient.getRace() != null) {
             dto.setRace(patient.getRace());
@@ -234,11 +244,27 @@ public class DetailsService {
             dto.setClassification(sample.getClassification());
         }
 
+        if (sample != null && sample.getStage() != null) {
+            dto.setStage( notEmpty(sample.getStage()) );
+        }
+
+        if (sample != null && sample.getStageClassification() != null) {
+            dto.setStageClassification( notEmpty(sample.getStageClassification()) );
+        }
+
+        if (sample != null && sample.getGrade() != null) {
+            dto.setGrade( notEmpty(sample.getGrade()) );
+        }
+
+        if (sample != null && sample.getGradeClassification() != null) {
+            dto.setGradeClassification( notEmpty(sample.getGradeClassification()) );
+        }
+
         if (sample != null && sample.getOriginTissue() != null) {
             dto.setOriginTissue(sample.getOriginTissue().getName());
         }
         if (sample != null && sample.getSampleSite() != null) {
-            dto.setSampleSite(sample.getSampleSite().getName());
+            dto.setSampleSite(notEmpty(sample.getSampleSite().getName()));
         }
 
         if (sample != null && sample.getSampleToOntologyRelationShip() != null) {
@@ -382,7 +408,10 @@ public class DetailsService {
         List<VariationDataDTO> variationDataDTOList = new ArrayList<>();
         dto.setVariationDataDTOList(variationDataDTOList);
 
+
         Map<String, String> techNPassToSampleId = new HashMap<>();
+        List<Map> dataSummaryList = new ArrayList<>();
+
         for (String tech : modelTechAndPassages.keySet()) {
 
             //Retrieve the passages:
@@ -403,15 +432,31 @@ public class DetailsService {
                 String sampleIDs = "";
                 for (String sampleID : sampleIDSet) {
                     sampleIDs += sampleID + ",";
+
+                    Map<String, String> dataSummary = new HashMap<>();
+
+                    dataSummary.put("sampleId", sampleID);
+                    dataSummary.put("sampleType","Xenograft");
+                    dataSummary.put("xenograftPassage",dPassage);
+                    dataSummary.put("dataAvailable","Mutation_"+tech);
+                    dataSummary.put("platformUsed",tech);
+                    dataSummary.put("rawData","Not Available");
+
+                    dataSummaryList.add(dataSummary);
                 }
 
                 // Create a Key Value map of (Technology+Passage , sampleIDs) and Pass to DTO
                 techNPassToSampleId.put(tech + dPassage, StringUtils.stripEnd(sampleIDs, ","));
+
+                // SampleType - Xenograft
+                // XenograftPassage - dPassage
+                // DataAvailable -
+                // PlatformUsed - tech
+                // RawData -
             }
-
         }
+        dto.setDataSummary(dataSummaryList);
         dto.setTechNPassToSampleId(techNPassToSampleId);
-
 
         Set<String> autoSuggestList = graphService.getMappedNCITTerms();
         dto.setAutoSuggestList(autoSuggestList);
@@ -434,6 +479,10 @@ public class DetailsService {
             dto.setSourceDescription(sorceDesc.get(sample.getDataSource()));
         }
 
+
+        // Retrive Patint Information:
+        PatientDTO patientDTO = patientService.getPatientDetails(dataSource, modelId);
+        dto.setPatient(patientDTO);
 
         return dto;
     }
@@ -511,7 +560,7 @@ public class DetailsService {
 
     public List<DrugSummaryDTO> getDrugSummary(String dataSource, String modelId) {
 
-        TreatmentSummary ts = treatmentSummaryRepository.findByDataSourceAndModelId(dataSource, modelId);
+        TreatmentSummary ts = treatmentSummaryRepository.findModelTreatmentByDataSourceAndModelId(dataSource, modelId);
 
         List<DrugSummaryDTO> results = new ArrayList<>();
 
@@ -697,7 +746,12 @@ public class DetailsService {
     public String notEmpty(String incoming){
 
         String result = (incoming == null) ? "Not Specified" : incoming;
-        result = (result.length() == 0 ? "Not Specified" : result);
+
+        result = result.equals("null") ? "Not Specified" : result;
+
+        result = result.length() == 0 ? "Not Specified" : result;
+
+        result = result.equals("Unknown") ? "Not Specified" : result;
 
         return result;
     }

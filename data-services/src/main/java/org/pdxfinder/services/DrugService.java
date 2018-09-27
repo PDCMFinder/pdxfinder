@@ -1,11 +1,13 @@
 package org.pdxfinder.services;
 
+import org.pdxfinder.dao.ModelCreation;
 import org.pdxfinder.dao.TreatmentProtocol;
 import org.pdxfinder.dao.TreatmentSummary;
 import org.pdxfinder.repositories.DrugRepository;
 import org.pdxfinder.repositories.ResponseRepository;
 import org.pdxfinder.repositories.TreatmentProtocolRepository;
 import org.pdxfinder.repositories.TreatmentSummaryRepository;
+import org.pdxfinder.services.dto.CountDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -49,7 +51,7 @@ public class DrugService {
         Set<String> drugNamesSet = new HashSet<>();
         List<String> drugNames = new ArrayList<>();
 
-        List<TreatmentSummary> treatmentSummaries = getSummariesWithDrugAndResponse();
+        List<TreatmentSummary> treatmentSummaries = getModelTreatmentSummariesWithDrugAndResponse();
 
         for(TreatmentSummary ts : treatmentSummaries){
 
@@ -64,14 +66,14 @@ public class DrugService {
         return drugNames;
     }
 
-    public List<String> getResponseOptions(){
+    public List<String> getSpecimenDrugResponseOptions(){
 
-        return responseRepository.findAllResponses();
+        return responseRepository.findAllSpecimenDrugResponses();
     }
 
-    public List<TreatmentSummary> getSummariesWithDrugAndResponse(){
+    public List<TreatmentSummary> getModelTreatmentSummariesWithDrugAndResponse(){
 
-        return treatmentSummaryRepository.findAllWithDrugData();
+        return treatmentSummaryRepository.findAllMouseTreatments();
     }
 
     public int getTotalSummaryNumber(){
@@ -88,11 +90,40 @@ public class DrugService {
 
     }
 
-    public Iterable<Map<String, Object>> getModelCountByDrugAndComponentType(String type){
+    public List<CountDTO> getModelCountByDrugAndComponentType(String type){
 
-        Iterable<Map<String, Object>> iterableResults = drugRepository.countModelsByDrugAndComponentType(type).queryResults();
+        Map<String, Set<String>> results = new HashMap<>();
+        Set<ModelCreation> models = drugRepository.getModelsTreatmentsAndDrugs(type);
+        List<CountDTO> res = new ArrayList<CountDTO>();
 
-        return iterableResults;
+        for(ModelCreation mod : models){
+            String modelId = mod.getDataSource() + mod.getSourcePdxId();
+            for(TreatmentProtocol tp : mod.getTreatmentSummary().getTreatmentProtocols()){
+
+
+                String drugName = tp.getDrugString(false);
+
+                if(results.containsKey(drugName)){
+
+                    results.get(drugName).add(modelId);
+                }
+                else{
+                    Set s = new HashSet();
+                    s.add(modelId);
+                    results.put(drugName, s);
+                }
+            }
+        }
+
+        for(Map.Entry<String, Set<String>> entry : results.entrySet()){
+
+            CountDTO c = new CountDTO(entry.getKey(), entry.getValue().size());
+            res.add(c);
+        }
+
+        Collections.sort(res, (CountDTO c1, CountDTO c2) -> c2.getValue()-c1.getValue());
+
+        return res;
 
     }
 

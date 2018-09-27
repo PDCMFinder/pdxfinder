@@ -20,32 +20,55 @@ public class TransformPDMR implements CommandLineRunner {
     private CommandLineParser parser;
     private DataTransformerService dataTransformerService;
 
-    @Value("${mydatasource.url1}")
-    private String url1;
+    @Value("${mydatasource.specimenSearchUrl}")
+    private String specimenSearchUrl;
 
-    @Value("${mydatasource.url2}")
-    private String url2;
+    @Value("${mydatasource.specimenUrl}")
+    private String specimenUrl;
 
-    @Value("${mydatasource.url3}")
-    private String url3;
+    @Value("${mydatasource.tissueOriginsUrl}")
+    private String tissueOriginsUrl;
 
-    @Value("${mydatasource.url4}")
-    private String url4;
+    @Value("${mydatasource.tumoGradeStateTypesUrl}")
+    private String tumoGradeStateTypesUrl;
 
-    @Value("${mydatasource.url5}")
-    private String url5;
+    @Value("${mydatasource.mouseStrainsUrl}")
+    private String mouseStrainsUrl;
 
-    @Value("${mydatasource.url6}")
-    private String url6;
+    @Value("${mydatasource.implantationSitesUrl}")
+    private String implantationSitesUrl;
 
-    @Value("${mydatasource.url7}")
-    private String url7;
+    @Value("${mydatasource.tissueTypeUrl}")
+    private String tissueTypeUrl;
+
+    @Value("${mydatasource.histologyUrl}")
+    private String histologyUrl;
+
+    @Value("${mydatasource.tumorGradeUrl}")
+    private String tumorGradeUrl;
+
+    @Value("${mydatasource.samplesUrl}")
+    private String samplesUrl;
+
+    @Value("${mydatasource.currentTherapyUrl}")
+    private String currentTherapyUrl;
+
+    @Value("${mydatasource.standardRegimensUrl}")
+    private String standardRegimensUrl;
+
+    @Value("${mydatasource.clinicalResponseUrl}")
+    private String clinicalResponseUrl;
+
+    @Value("${mydatasource.priorTherapyUrl}")
+    private String priorTherapyUrl;
+
+
+
 
     @Autowired
     public TransformPDMR(DataTransformerService dataTransformerService){
         this.dataTransformerService = dataTransformerService;
     }
-
 
 
     @Override
@@ -56,17 +79,18 @@ public class TransformPDMR implements CommandLineRunner {
         parser.accepts("transformPDMR", "Transform and Map PDMR data to PdxFinder Format");
         OptionSet options = parser.parse(args);
 
-        if (options.has("transformPDMR") ) {
+        if (options.has("transformPDMR")) {
 
             log.info("Loading PDMR PDX data.");
 
-            if (url1 != null && url2 != null) {
-                log.info("Loading from URL " + url1);
-                log.info("Loading from URL " + url2);
+            if (specimenSearchUrl != null && specimenUrl != null) {
+                log.info("Loading from URL " + specimenSearchUrl);
+                log.info("Loading from URL " + specimenUrl);
 
-                dataTransformerService.transformDataAndSave(url1, url2, url3, url4, url5, url6, url7);
-            }
-            else {
+                dataTransformerService.transformDataAndSave(specimenSearchUrl, specimenUrl, tissueOriginsUrl, tumoGradeStateTypesUrl, mouseStrainsUrl,
+                        implantationSitesUrl, tissueTypeUrl, histologyUrl, tumorGradeUrl, samplesUrl,
+                        currentTherapyUrl, standardRegimensUrl, clinicalResponseUrl, priorTherapyUrl);
+            } else {
                 log.error("No mydatasource.url1 or mydatasource.url2 provided in properties");
             }
         }

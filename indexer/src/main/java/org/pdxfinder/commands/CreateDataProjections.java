@@ -48,7 +48,7 @@ public class CreateDataProjections implements CommandLineRunner{
     private Map<String, Map<String, Set<Long>>> wtMarkersDataProjection = new HashMap<>();
 
     //"drugname"=>"response"=>"set of model ids"
-    private Map<String, Map<String, Set<Long>>> drugResponseDP = new HashMap<>();
+    private Map<String, Map<String, Set<Long>>> modelDrugResponseDP = new HashMap<>();
 
 
     @Autowired
@@ -78,7 +78,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
             createModelForQueryDataProjection();
 
-            createDrugResponseDataProjection();
+            createModelDrugResponseDataProjection();
 
             saveDataProjections();
 
@@ -239,19 +239,70 @@ public class CreateDataProjections implements CommandLineRunner{
 
 
         // Get out all platforms for all models and populate a map with the results
-        Map<Long, List<String>> platformsByModel = new HashMap<>();
-        Collection<ModelCreation> allModelsPlatforms = dataImportService.findAllModelsPlatforms();
-        for (ModelCreation mc : allModelsPlatforms) {
+        Map<Long, List<String>> mutationPlatformsByModel = new HashMap<>();
+        Map<Long, List<String>> cnaPlatformsByModel = new HashMap<>();
 
-            if (!platformsByModel.containsKey(mc.getId())) {
-                platformsByModel.put(mc.getId(), new ArrayList<>());
+
+        Collection<ModelCreation> allModelsWithPlatforms = dataImportService.findAllModelsPlatforms();
+
+        for (ModelCreation mc : allModelsWithPlatforms) {
+
+
+            if(mc.getRelatedSamples() != null){
+
+                for(Sample s : mc.getRelatedSamples()){
+
+                    if(s.getMolecularCharacterizations() != null){
+
+                        for(MolecularCharacterization molc : s.getMolecularCharacterizations()){
+
+                            if(molc.getPlatform() != null){
+                                String platformName = molc.getPlatform().getName();
+
+                                if(dataImportService.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), mc.getDataSource(), platformName) > 0){
+
+                                    if(molc.getType().toLowerCase().equals("mutation")){
+
+                                        if (!mutationPlatformsByModel.containsKey(mc.getId())) {
+                                            mutationPlatformsByModel.put(mc.getId(), new ArrayList<>());
+                                        }
+
+                                        mutationPlatformsByModel.get(mc.getId()).add(platformName);
+                                    }
+                                    else if(molc.getType().toLowerCase().equals("copy number alteration")){
+
+                                        if(!cnaPlatformsByModel.containsKey(mc.getId())){
+
+                                            cnaPlatformsByModel.put(mc.getId(), new ArrayList<>());
+                                        }
+
+                                        cnaPlatformsByModel.get(mc.getId()).add(platformName);
+                                    }
+
+                                }
+
+                            }
+
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+
+            /*
+            if (!mutationPlatformsByModel.containsKey(mc.getId())) {
+                mutationPlatformsByModel.put(mc.getId(), new ArrayList<>());
             }
 
             // Are there any molecular characterizations associated to this model?
             if (mc.getRelatedSamples().stream().map(Sample::getMolecularCharacterizations).mapToLong(Collection::size).sum() > 0) {
 
                 // Get all molecular characterizations platforms into a list
-                platformsByModel.get(mc.getId()).addAll(
+                mutationPlatformsByModel.get(mc.getId()).addAll(
                         mc.getRelatedSamples().stream()
                                 .map(Sample::getMolecularCharacterizations)
                                 .flatMap(Collection::stream)
@@ -264,7 +315,13 @@ public class CreateDataProjections implements CommandLineRunner{
                                 })
                                 .distinct()
                                 .collect(Collectors.toList()));
+
+
+
+
             }
+            */
+
         }
 
         Map<String, String> cancerSystemMap = new HashMap<>();
@@ -296,20 +353,32 @@ public class CreateDataProjections implements CommandLineRunner{
             mfq.setDatasource(mc.getDataSource());
 
 
-            List<String> dataAvailable = new ArrayList<>();
+            Set<String> dataAvailable = new HashSet<>();
 
-            if(platformsByModel.containsKey(mc.getId())){
+            if(mutationPlatformsByModel.containsKey(mc.getId())){
 
-                for(String available : platformsByModel.get(mc.getId())){
-                    dataAvailable.add("Mutation_"+available);
-                }
+                dataAvailable.add("Gene Mutation");
+
             }
 
-            if(dataImportService.isTreatmentSummaryAvailable(mc.getDataSource(), mc.getSourcePdxId())){
+            if(cnaPlatformsByModel.containsKey(mc.getId())){
+                dataAvailable.add("Copy Number Alteration");
+            }
+
+            if(dataImportService.isTreatmentSummaryAvailableOnModel(mc.getDataSource(), mc.getSourcePdxId())){
                 dataAvailable.add("Dosing Studies");
             }
+            try {
+                if (dataImportService.isTreatmentSummaryAvailableOnPatient(mc.getDataSource(), mc.getSourcePdxId())) {
+                    dataAvailable.add("Patient Treatment");
+                }
+            }
+            catch(Exception e){
+                e.printStackTrace();
+                log.error(mc.getSourcePdxId());
+            }
 
-            mfq.setDataAvailable(dataAvailable);
+            mfq.setDataAvailable(new ArrayList<>(dataAvailable));
 
             if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
                 mfq.setTreatmentHistory(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());
@@ -338,6 +407,7 @@ public class CreateDataProjections implements CommandLineRunner{
             // Patient information
             mfq.setPatientAge(mc.getSample().getPatientSnapshot().getAgeBin());
             mfq.setPatientGender(mc.getSample().getPatientSnapshot().getPatient().getSex());
+            mfq.setPatientEthnicity(mc.getSample().getPatientSnapshot().getPatient().getEthnicity());
             mfq.setDiagnosis(mc.getSample().getDiagnosis());
             mfq.setMappedOntologyTerm(mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
 
@@ -411,8 +481,23 @@ public class CreateDataProjections implements CommandLineRunner{
             // TODO: Complete the cell type options
             // TODO: Complete the patient treatment options
 
+            //ADD PROJECTS TO MFQ
+            if(mc.getGroups() != null){
+
+                for(Group g : mc.getGroups()){
+
+                    if(g.getType().equals("Project")){
+
+                        mfq.addProject(g.getName());
+                    }
+
+                }
+            }
+
+
 
             this.modelForQueryDP.add(mfq);
+
         }
 
 
@@ -466,11 +551,11 @@ public class CreateDataProjections implements CommandLineRunner{
     }
 
 
-    private void createDrugResponseDataProjection(){
+    private void createModelDrugResponseDataProjection(){
 
-        log.info("Creating Drug Response DP");
+        log.info("Creating Model Drug Response DP");
 
-        List<TreatmentSummary> treatmentSummaries = drugService.getSummariesWithDrugAndResponse();
+        List<TreatmentSummary> treatmentSummaries = drugService.getModelTreatmentSummariesWithDrugAndResponse();
 
         for(TreatmentSummary ts : treatmentSummaries){
 
@@ -487,7 +572,8 @@ public class CreateDataProjections implements CommandLineRunner{
                     String drugName = tp.getDrugString(true);
                     String response = tp.getResponse().getDescription();
 
-                    addToDrugResponseDP(modelId, drugName, response);
+                    addToModelDrugResponseDP(modelId, drugName, response);
+
                 }
             }
 
@@ -496,7 +582,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
     }
 
-    private void addToDrugResponseDP(Long modelId, String drugName, String responseVal){
+    private void addToModelDrugResponseDP(Long modelId, String drugName, String responseVal){
 
         if(modelId != null && drugName != null && !drugName.isEmpty() && responseVal != null && !responseVal.isEmpty()){
 
@@ -504,18 +590,18 @@ public class CreateDataProjections implements CommandLineRunner{
             String drug = drugName.replaceAll("[^a-zA-Z0-9 _-]","");
             String response = responseVal.replaceAll("[^a-zA-Z0-9 _-]","");
 
-            if(drugResponseDP.containsKey(drug)){
+            if(modelDrugResponseDP.containsKey(drug)){
 
-                if(drugResponseDP.get(drug).containsKey(response)){
+                if(modelDrugResponseDP.get(drug).containsKey(response)){
 
-                    drugResponseDP.get(drug).get(response).add(modelId);
+                    modelDrugResponseDP.get(drug).get(response).add(modelId);
                 }
                 //new response
                 else{
                     Set s = new HashSet();
                     s.add(modelId);
 
-                    drugResponseDP.get(drug).put(response,s);
+                    modelDrugResponseDP.get(drug).put(response,s);
                 }
             }
             //new drug, create response and add model
@@ -527,7 +613,7 @@ public class CreateDataProjections implements CommandLineRunner{
                 Map respMap = new HashMap();
                 respMap.put(response, s);
 
-                drugResponseDP.put(drug, respMap);
+                modelDrugResponseDP.put(drug, respMap);
             }
 
         }
@@ -557,12 +643,12 @@ public class CreateDataProjections implements CommandLineRunner{
             mvDP.setLabel("MarkerVariant");
         }
 
-        DataProjection drugDP = dataImportService.findDataProjectionByLabel("DrugResponse");
+        DataProjection drugDP = dataImportService.findDataProjectionByLabel("ModelDrugData");
 
         if(drugDP == null){
 
             drugDP = new DataProjection();
-            drugDP.setLabel("DrugResponse");
+            drugDP.setLabel("ModelDrugData");
         }
 
 
@@ -573,7 +659,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
             j1 = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
             j2 = new JSONObject(mutatedMarkerVariantDP.toString());
-            j3 = new JSONObject(drugResponseDP.toString());
+            j3 = new JSONObject(modelDrugResponseDP.toString());
 
             pmvmDP.setValue(j1.toString());
             mvDP.setValue(j2.toString());

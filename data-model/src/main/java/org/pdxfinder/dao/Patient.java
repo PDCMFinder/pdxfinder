@@ -24,6 +24,9 @@ public class Patient {
     private String race;
     private String ethnicity;
     private String dataSource;
+    private String cancerRelevantHistory;
+    private String firstDiagnosis;
+    private String ageAtFirstDiagnosis;
 
     @Relationship(type = "GROUP", direction = Relationship.INCOMING)
     private List<Group> groups;
@@ -176,5 +179,91 @@ public class Patient {
 
         return null;
     }
+
+    public String getCancerRelevantHistory() {
+        return cancerRelevantHistory;
+    }
+
+    public void setCancerRelevantHistory(String cancerRelevantHistory) {
+        this.cancerRelevantHistory = cancerRelevantHistory;
+    }
+
+    public String getFirstDiagnosis() {
+        return firstDiagnosis;
+    }
+
+    public void setFirstDiagnosis(String firstDiagnosis) {
+        this.firstDiagnosis = firstDiagnosis;
+    }
+
+    public String getAgeAtFirstDiagnosis() {
+        return ageAtFirstDiagnosis;
+    }
+
+    public void setAgeAtFirstDiagnosis(String ageAtFirstDiagnosis) {
+        this.ageAtFirstDiagnosis = ageAtFirstDiagnosis;
+    }
+
+    public PatientSnapshot getSnapshotByDate(String date){
+
+        if(snapshots != null){
+
+            for(PatientSnapshot psnap : snapshots){
+
+                if(psnap.getDateAtCollection().equals(date)) return psnap;
+            }
+
+        }
+
+        return null;
+    }
+
+    public PatientSnapshot getSnapShotByCollection(String age, String collectionDate, String collectionEvent, String ellapsedTime){
+
+        if(snapshots != null){
+
+            for(PatientSnapshot psnap : snapshots){
+
+                if(psnap.getAgeAtCollection().equals(age) &&
+                        psnap.getDateAtCollection().equals(collectionDate) &&
+                        psnap.getCollectionEvent().equals(collectionEvent) &&
+                        psnap.getElapsedTime().equals(ellapsedTime)) return psnap;
+            }
+
+        }
+
+        return null;
+
+    }
+
+
+    public PatientSnapshot getLastSnapshot(){
+
+        if(snapshots == null) return null;
+
+        PatientSnapshot latestPS = null;
+        for(PatientSnapshot ps: snapshots){
+
+            if(latestPS == null){
+                latestPS = ps;
+            }
+            else{
+                //compare age at collection
+                if(latestPS.getAgeAtCollection().compareTo(ps.getAgeAtCollection()) < 0 ){
+
+                    latestPS = ps;
+                }
+                //compare date collection
+                else if(latestPS.getDateAtCollection().compareTo(ps.getDateAtCollection()) < 0){
+
+                    latestPS = ps;
+                }
+            }
+
+        }
+
+        return latestPS;
+    }
+
 }
 

@@ -45,6 +45,8 @@ public class SearchService {
     List<String> cancerBySystemOptions = SearchDS.CANCERS_BY_SYSTEM_OPTIONS;
     List<String> patientGenderOptions = SearchDS.PATIENT_GENDERS;
     List<String> sampleTumorTypeOptions = SearchDS.SAMPLE_TUMOR_TYPE_OPTIONS;
+    List<String> dataAvailableOptions = SearchDS.DATA_AVAILABLE_OPTIONS;
+
 
 
 
@@ -69,44 +71,12 @@ public class SearchService {
         facets.put("patient_age_options", patientAgeOptions);
         facets.put("patient_gender_options", patientGenderOptions);
         facets.put("cancer_system_options", cancerBySystemOptions);
-        facets.put("sample_tumor_type_options", sampleTumorTypeOptions);
+        facets.put("data_available_options", dataAvailableOptions);
+
     }
 
 
 
-    public ExportDTO export(Optional<String> query,
-                         Optional<List<String>> datasource,
-                         Optional<List<String>> diagnosis,
-                         Optional<List<String>> patient_age,
-                         Optional<List<String>> patient_treatment_status,
-                         Optional<List<String>> patient_gender,
-                         Optional<List<String>> sample_origin_tissue,
-                         Optional<List<String>> cancer_system,
-                         Optional<List<String>> sample_tumor_type,
-                         Optional<List<String>> mutation,
-                         Optional<List<String>> drug
-    ){
-
-        Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
-                query,
-                datasource,
-                diagnosis,
-                patient_age,
-                patient_treatment_status,
-                patient_gender,
-                sample_origin_tissue,
-                cancer_system,
-                sample_tumor_type,
-                mutation,
-                drug
-        );
-
-        ExportDTO eDTO = new ExportDTO();
-        eDTO.setResults(searchDS.search(configuredFacets));
-        eDTO.setFacetsString(configuredFacets.toString());
-
-        return eDTO;
-    }
 
 
     public WebSearchDTO webSearch(Optional<String> query,
@@ -120,6 +90,8 @@ public class SearchService {
                                   Optional<List<String>> sample_tumor_type,
                                   Optional<List<String>> mutation,
                                   Optional<List<String>> drug,
+                                  Optional<List<String>> project,
+                                  Optional<List<String>> data_available,
                                   Integer page,
                                   Integer size){
 
@@ -135,13 +107,16 @@ public class SearchService {
                 cancer_system,
                 sample_tumor_type,
                 mutation,
-                drug
+                drug,
+                project,
+                data_available
         );
 
         WebSearchDTO wsDTO = new WebSearchDTO();
 
 
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
+
 
         List<FacetOption> patientAgeSelected = searchDS.getFacetOptions(SearchFacetName.patient_age, patientAgeOptions, results, patient_age.orElse(null));
         List<FacetOption> patientGenderSelected = searchDS.getFacetOptions(SearchFacetName.patient_gender, patientGenderOptions, results, patient_gender.orElse(null));
@@ -150,7 +125,8 @@ public class SearchService {
         List<FacetOption> sampleTumorTypeSelected = searchDS.getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
         List<FacetOption> mutationSelected = searchDS.getFacetOptions(SearchFacetName.mutation, null, results, mutation.orElse(null));
         List<FacetOption> drugSelected = searchDS.getFacetOptions(SearchFacetName.drug, null, results, drug.orElse(null));
-
+        List<FacetOption> projectSelected = searchDS.getFacetOptions(SearchFacetName.project, null, results, project.orElse(null));
+        List<FacetOption> dataAvailableSelected = searchDS.getFacetOptions(SearchFacetName.data_available, dataAvailableOptions, configuredFacets);
 
         wsDTO.setPatientAgeSelected(patientAgeSelected);
         wsDTO.setPatientGenderSelected(patientGenderSelected);
@@ -158,6 +134,9 @@ public class SearchService {
         wsDTO.setCancerSystemSelected(cancerSystemSelected);
         wsDTO.setSampleTumorTypeSelected(sampleTumorTypeSelected);
         wsDTO.setMutationSelected(mutationSelected);
+        wsDTO.setProjectSelected(projectSelected);
+        wsDTO.setDataAvailableSelected(dataAvailableSelected);
+
 
 
 
@@ -177,7 +156,8 @@ public class SearchService {
                                 cancerSystemSelected,
                                 sampleTumorTypeSelected,
                                 mutationSelected,
-                                drugSelected
+                                drugSelected,
+                                projectSelected
 
                         )
                 )
@@ -224,6 +204,39 @@ public class SearchService {
             for (String d : drugList) {
                 facetString += d + "&";
             }
+
+        }
+
+        if(project.isPresent() && !project.get().isEmpty()){
+
+            List<String> projectList = new ArrayList<>();
+            for(String p : project.get()){
+                projectList.add("project=" + p);
+            }
+
+            if (facetString.length() != 0 && !facetString.endsWith("&")) {
+                facetString += "&";
+            }
+            for (String p : projectList) {
+                facetString += p + "&";
+            }
+
+
+        }
+        if(data_available.isPresent() && !data_available.get().isEmpty()){
+
+            List<String> dataAvList = new ArrayList<>();
+            for(String p : data_available.get()){
+                dataAvList.add("data_available=" + p);
+            }
+
+            if (facetString.length() != 0 && !facetString.endsWith("&")) {
+                facetString += "&";
+            }
+            for (String p : dataAvList) {
+                facetString += p + "&";
+            }
+
 
         }
 
@@ -296,6 +309,7 @@ public class SearchService {
         wsDTO.setPage(page);
         wsDTO.setSize(size);
         wsDTO.setDiagnosisSelected(diagnosisSelected);
+        wsDTO.setProjectSelected(projectSelected);
         wsDTO.setFacetOptions(facets);
 
 
@@ -347,7 +361,7 @@ public class SearchService {
 
 
 
-        List<String> drugResponses = drugService.getResponseOptions();
+        List<String> drugResponses = drugService.getSpecimenDrugResponseOptions();
 
         // Capitalize and Remove duplicates from drugResponses
         drugResponses = drugResponses.stream().map(WordUtils::capitalize).collect(Collectors.toList());
@@ -399,9 +413,50 @@ public class SearchService {
         wsDTO.setDrugNames(drugService.getDrugNames());
         wsDTO.setDrugResponses(drugResponses);
 
+        wsDTO.setProjects(searchDS.getProjectOptions());
+
         return wsDTO;
     }
 
+
+
+    public ExportDTO export(Optional<String> query,
+                            Optional<List<String>> datasource,
+                            Optional<List<String>> diagnosis,
+                            Optional<List<String>> patient_age,
+                            Optional<List<String>> patient_treatment_status,
+                            Optional<List<String>> patient_gender,
+                            Optional<List<String>> sample_origin_tissue,
+                            Optional<List<String>> cancer_system,
+                            Optional<List<String>> sample_tumor_type,
+                            Optional<List<String>> mutation,
+                            Optional<List<String>> drug,
+                            Optional<List<String>> project,
+                            Optional<List<String>> data_available){
+
+        Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
+                query,
+                datasource,
+                diagnosis,
+                patient_age,
+                patient_treatment_status,
+                patient_gender,
+                sample_origin_tissue,
+                cancer_system,
+                sample_tumor_type,
+                mutation,
+                drug,
+                project,
+                data_available
+
+        );
+
+        ExportDTO eDTO = new ExportDTO();
+        eDTO.setResults(searchDS.search(configuredFacets));
+        eDTO.setFacetsString(configuredFacets.toString());
+
+        return eDTO;
+    }
 
     private Map<SearchFacetName, List<String>> getFacetMap(
             Optional<String> query,
@@ -414,9 +469,12 @@ public class SearchService {
             Optional<List<String>> cancerSystem,
             Optional<List<String>> sampleTumorType,
             Optional<List<String>> mutation,
-            Optional<List<String>> drug
+            Optional<List<String>> drug,
+            Optional<List<String>> project,
+            Optional<List<String>> data_available
 
-    ) {
+
+            ) {
 
         Map<SearchFacetName, List<String>> configuredFacets = new HashMap<>();
 
@@ -495,6 +553,19 @@ public class SearchService {
             }
         }
 
+        if (project.isPresent() && !project.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.project, new ArrayList<>());
+            for (String s : project.get()) {
+                configuredFacets.get(SearchFacetName.project).add(s);
+            }
+        }
+
+        if (data_available.isPresent() && !data_available.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.data_available, new ArrayList<>());
+            for (String s : data_available.get()) {
+                configuredFacets.get(SearchFacetName.data_available).add(s);
+            }
+        }
 
         return configuredFacets;
     }

@@ -62,6 +62,7 @@ public class LoadHCI implements CommandLineRunner {
 
     private HostStrain nsgBS, nsBS;
     private Group hciDS;
+    private Group projectGroup;
 
     private Options options;
     private CommandLineParser parser;
@@ -113,6 +114,8 @@ public class LoadHCI implements CommandLineRunner {
         nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
         nsBS = dataImportService.getHostStrain(NS_BS_NAME, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
 
+        projectGroup = dataImportService.getProjectGroup("PDXNet");
+
         try {
             JSONObject job = new JSONObject(json);
             JSONArray jarray = job.getJSONArray("HCI");
@@ -135,23 +138,37 @@ public class LoadHCI implements CommandLineRunner {
         String modelID = j.getString("Model ID");
         String sampleID = j.getString("Sample ID");
         String diagnosis = j.getString("Clinical Diagnosis");
-       
+        String patientId = j.getString("Patient ID");
+        String ethnicity = j.getString("Ethnicity");
 
-        String classification = j.getString("Stage") + "/" + j.getString("Grades");
+        String stage = j.getString("Stage");
+        String grade = j.getString("Grades");
 
         String age = Standardizer.getAge(j.getString("Age"));
         String gender = Standardizer.getGender(j.getString("Gender"));
-        
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"),
-                gender, "", j.getString("Ethnicity"), age, hciDS);
 
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
-        
-        String sampleSite = Standardizer.getValue("Sample Site",j);
 
-        Sample sample = dataImportService.getSample(sampleID, tumorType, diagnosis,
-                j.getString("Primary Site"), sampleSite,
-                j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, hciDS.getAbbreviation());
+        String sampleSite = Standardizer.getValue("Sample Site",j);
+        String primarySite = j.getString("Primary Site");
+        String extractionMethod = j.getString("Sample Type");
+
+        Patient patient = dataImportService.getPatientWithSnapshots(patientId, hciDS);
+
+        if(patient == null){
+
+            patient = dataImportService.createPatient(patientId, hciDS, gender, "", Standardizer.getEthnicity(ethnicity));
+        }
+
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
+
+
+        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
+        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
+        // String grade, String gradeClassification
+        Sample sample = dataImportService.getSample(sampleID, hciDS.getAbbreviation(), tumorType, diagnosis, primarySite,
+                sampleSite, extractionMethod, false, stage, "", grade, "");
+
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
         externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
@@ -209,7 +226,7 @@ public class LoadHCI implements CommandLineRunner {
 
         ModelCreation modelCreation = dataImportService.createModelCreation(modelID, this.hciDS.getAbbreviation(), sample, qa, externalUrls);
         modelCreation.addRelatedSample(sample);
-
+        modelCreation.addGroup(projectGroup);
         
 
         dataImportService.saveSample(sample);
@@ -274,10 +291,12 @@ public class LoadHCI implements CommandLineRunner {
 
 
                             TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
-                                    treatmentObject.getString("Dose"), treatmentObject.getString("Response"));
+                                    treatmentObject.getString("Dose"), treatmentObject.getString("Response"),"");
 
 
-                            ts.addTreatmentProtocol(tp);
+                            if(tp != null){
+                                ts.addTreatmentProtocol(tp);
+                            }
                         }
 
                         ts.setModelCreation(modelCreation);

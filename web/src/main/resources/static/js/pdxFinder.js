@@ -12,7 +12,7 @@
  * @param tumortype : A list of tumour types selected by the user
  *
  */
-function updateFilters(ages, genders, cancersystem, datasources, tumortype) {
+function updateFilters(ages, genders, cancersystem, datasources, tumortype, projects, dataAvailable) {
 
     console.log("updating filters!");
     //characters we want to see as values
@@ -23,6 +23,8 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype) {
     var openDatasourceFacet = false;
     var openCancerBySystem = false;
     var openTumorTypeFacet = false;
+    var openProjectsFacet = false;
+    var openDatAvailable = false;
 
     //check selected age bins
     if (ages != null && ages.length > 0) {
@@ -163,6 +165,89 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype) {
 
 
     }
+
+
+
+
+
+    //check selected projects
+    if (projects != null && projects.length > 0) {
+
+        jQuery.each(projects, function (key, value) {
+
+            var id = value.name;
+            id = id.replace(" ", "_");
+            var selected = value.selected;
+
+            //testing id for invalid characters
+            if (reg.test(id)) {
+                console.log("skipping id: " + id);
+                return;
+            }
+
+            if (selected) {
+                jQuery("#project__" + id).prop('checked', true);
+                jQuery("#project__" + id).siblings("label").find("span").addClass("selected");
+                openProjectsFacet = true;
+            }
+
+            var count = " (" + value.count + " of " + value.totalCount + ")";
+            // jQuery("#datasource__" + id).siblings("label").find("span").append(count);
+
+        });
+
+        if (openProjectsFacet) {
+            var projectFilterField = jQuery("li#project_filter > a.accordion-title");
+            projectFilterField.click();
+        }
+
+
+    }
+
+
+
+
+
+
+
+    //check selected Data Avaiable Options
+    if (dataAvailable != null && dataAvailable.length > 0) {
+
+        jQuery.each(dataAvailable, function (key, value) {
+
+            var id = value.name;
+            id = id.replace(/ /g, "_");
+            var selected = value.selected;
+
+            //testing id for invalid characters
+            if (reg.test(id)) {
+                console.log("skipping id: " + id);
+                return;
+            }
+
+            if (selected) {
+                jQuery("#data_available__" + id).prop('checked', true);
+                jQuery("#data_available__" + id).siblings("label").find("span").addClass("selected");
+                openDatAvailable = true;
+            }
+
+            var count = " (" + value.count + " of " + value.totalCount + ")";
+            // jQuery("#data_available__"+id).siblings("label").find("span").append(count);
+
+        });
+
+        if (openDatAvailable) {
+            var dataAvailableFilterField = jQuery("li#data_available_filter > a.accordion-title");
+            dataAvailableFilterField.click();
+        }
+    }
+
+
+
+
+
+
+
 
     //check selected tumorTypes
     if (tumortype != null && tumortype.length > 0) {

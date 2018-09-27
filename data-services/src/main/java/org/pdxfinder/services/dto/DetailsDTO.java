@@ -25,7 +25,14 @@ public class DetailsDTO {
     private String tumorType;
     private String originTissue;
     private String sampleSite;
+
+    @Deprecated
     private String classification;
+
+    private String stage;
+    private String grade;
+    private String stageClassification;
+    private String gradeClassification;
 
     private String sampleType; //Implantation Type
     private String strain;
@@ -43,6 +50,7 @@ public class DetailsDTO {
     private int presentPage;
     private int variationDataCount;
     private int drugSummaryRowNumber;
+    private PatientDTO patient;
 
 
     // Quality control information
@@ -62,6 +70,7 @@ public class DetailsDTO {
     private Map<String, String> techNPassToSampleId;
     private Set<String> autoSuggestList;
     private Map<String, String> platformsAndUrls;
+    private List<Map> dataSummary;
 
 
 
@@ -80,6 +89,12 @@ public class DetailsDTO {
         this.diagnosis = "";
         this.tumorType = "";
         this.classification = "";
+
+        this.stage = "";
+        this.grade = "";
+        this.stageClassification = "";
+        this.gradeClassification = "";
+
         this.originTissue = "";
         this.sampleSite = "";
 
@@ -433,5 +448,53 @@ public class DetailsDTO {
 
     public void setPlatformsAndUrls(Map<String, String> platformsAndUrls) {
         this.platformsAndUrls = platformsAndUrls;
+    }
+
+    public void setDataSummary(List<Map> dataSummary) {
+        this.dataSummary = dataSummary;
+    }
+
+    public List<Map> getDataSummary() {
+        return dataSummary;
+    }
+
+    public String getStage() {
+        return stage;
+    }
+
+    public void setStage(String stage) {
+        this.stage = stage;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
+    public String getStageClassification() {
+        return stageClassification;
+    }
+
+    public void setStageClassification(String stageClassification) {
+        this.stageClassification = stageClassification;
+    }
+
+    public String getGradeClassification() {
+        return gradeClassification;
+    }
+
+    public void setGradeClassification(String gradeClassification) {
+        this.gradeClassification = gradeClassification;
+    }
+
+    public void setPatient(PatientDTO patient) {
+        this.patient = patient;
+    }
+
+    public PatientDTO getPatient() {
+        return patient;
     }
 }

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
         "externalId",
         "patientAge",
         "patientGender",
+        "patientEthnicity",
         "treatmentHistory",
         "diagnosis",
         "mappedOntologyTerm",
@@ -47,6 +48,9 @@ public class ModelForQueryExport {
 
     @JsonProperty("Patient Gender")
     private String patientGender;
+
+    @JsonProperty("Patient Ethnicity")
+    private String patientEthnicity;
 
     @JsonProperty("Origin Tissue")
     private String sampleOriginTissue;
@@ -94,6 +98,7 @@ public class ModelForQueryExport {
         this.externalId = mfq.getExternalId();
         this.patientAge = mfq.getPatientAge();
         this.patientGender = mfq.getPatientGender();
+        this.patientEthnicity = mfq.getPatientEthnicity();
         this.sampleOriginTissue = mfq.getSampleOriginTissue();
         this.sampleSampleSite = mfq.getSampleSampleSite();
         this.sampleExtractionMethod = mfq.getSampleExtractionMethod();
@@ -145,13 +150,20 @@ public class ModelForQueryExport {
         this.patientAge = patientAge;
     }
 
-
     public String getPatientGender() {
         return patientGender;
     }
 
     public void setPatientGender(String patientGender) {
         this.patientGender = patientGender;
+    }
+
+    public String getPatientEthnicity() {
+        return patientEthnicity;
+    }
+
+    public void setPatientEthnicity(String patientEthnicity) {
+        this.patientEthnicity = patientEthnicity;
     }
 
     public String getSampleOriginTissue() {

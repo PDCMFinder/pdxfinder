@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
@@ -39,8 +40,8 @@ public class LoadPDMRData implements CommandLineRunner {
     private final static Logger log = LoggerFactory.getLogger(LoadPDMRData.class);
 
     private final static String DATASOURCE_ABBREVIATION = "PDMR";
-    private final static String DATASOURCE_NAME = "National Cancer Institute";
-    private final static String DATASOURCE_DESCRIPTION = "NCI Patient-Derived Models Repository ";
+    private final static String DATASOURCE_NAME = "Patient-Derived Models Repository";
+    private final static String DATASOURCE_DESCRIPTION = "Patient-Derived Models Repository";
     private final static String DATASOURCE_CONTACT = "https://pdmr.cancer.gov/request/default.htm";
 
     private final static String PROVIDER_TYPE = "";
@@ -86,6 +87,9 @@ public class LoadPDMRData implements CommandLineRunner {
     @Value("${pdmrpdx.ref.assembly}")
     private String refAssembly;
 
+    @Value("${pdmrpdx.mutations.file}")
+    private String mutationsFile;
+
     HashMap<String, String> passageMap = null;
     HashMap<String, Image> histologyMap = null;
 
@@ -114,6 +118,10 @@ public class LoadPDMRData implements CommandLineRunner {
             if (file != null) {
                 log.info("Loading from file " + file);
                 parseJSON(parseFile(file));
+
+                //loadMutationData();
+
+
             } /* else if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
                 parseJSON(parseURL(urlStr));
@@ -155,46 +163,319 @@ public class LoadPDMRData implements CommandLineRunner {
         String id = j.getString("Model ID");
 
         //histologyMap = getHistologyImageMap(id);
+        if (dataImportService.isExistingModel(DS.getAbbreviation(), id)) return;
 
         // the preference is for clinical diagnosis but if not available use initial diagnosis
         String diagnosis = j.getString("Clinical Diagnosis");
         if (diagnosis.trim().length() == 0 || "Not specified".equals(diagnosis)) {
             diagnosis = j.getString("Initial Diagnosis");
-
         }
-
-        String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
 
         String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
         String age = Standardizer.getAge(j.getString("Age"));
         String gender = Standardizer.getGender(j.getString("Gender"));
+        String patientId = j.getString("Patient ID");
+        String race = j.getString("Race");
+        String ethnicity = j.getString("Ethnicity");
+        String modelId = j.getString("Model ID");
+        String primarySite = j.getString("Primary Site");
+        String sampleSite = j.getString("Specimen Site");
+        String extractionType = j.getString("Sample Type");
+        String stage = j.getString("Stage Value");
+        String grade = j.getString("Grade Value");
 
 
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(j.getString("Patient ID"), gender,
-                j.getString("Race"), j.getString("Ethnicity"), age, DS);
 
-        Sample sample = dataImportService.getSample(j.getString("Model ID"), tumorType, diagnosis,
-                j.getString("Primary Site"), j.getString("Specimen Site"), j.getString("Sample Type"), classification, NORMAL_TISSUE_FALSE, DS.getAbbreviation());
+        Patient patient = dataImportService.getPatientWithSnapshots(patientId, DS);
+
+        if(patient == null){
+
+            patient = dataImportService.createPatient(patientId, DS, gender, "", Standardizer.getEthnicity(ethnicity));
+        }
+
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
+
+
+        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
+        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
+        // String grade, String gradeClassification
+        Sample humanSample = dataImportService.getSample(id, DS.getAbbreviation(), tumorType, diagnosis, primarySite,
+                sampleSite, extractionType, false, stage, "", grade, "");
+
 
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
         externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
-        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, j.getString("Source Url")));
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, j.getString("Source url")));
 
-        // TODO: Update with actual QA data when available
-        String qaPassage = null;
+        JSONArray validations = j.getJSONArray("Validations");
 
-        QualityAssurance qa = new QualityAssurance("", "", qaPassage);
-        dataImportService.saveQualityAssurance(qa);
+        List<QualityAssurance> validationList = new ArrayList<>();
+        if(validations.length() > 0){
 
-        pSnap.addSample(sample);
+            for(int i=0; i<validations.length(); i++){
+
+                JSONObject validationObj = validations.getJSONObject(i);
+                QualityAssurance qa = new QualityAssurance(validationObj.getString("Technique"), validationObj.getString("Description"), validationObj.getString("Passage"));
+                validationList.add(qa);
+            }
+        }
+
+        pSnap.addSample(humanSample);
         dataImportService.savePatientSnapshot(pSnap);
 
-        ModelCreation mc = dataImportService.createModelCreation(id, this.DS.getAbbreviation(), sample, qa, externalUrls);
-        mc.addRelatedSample(sample);
+        ModelCreation modelCreation = dataImportService.createModelCreation(id, this.DS.getAbbreviation(), humanSample, validationList, externalUrls);
+        modelCreation.addRelatedSample(humanSample);
+
+        //load specimens
+        String engraftmentSite = j.getString("Engraftment Site");
+        String engraftmentType = j.getString("Engraftment Type");
+        String extractionMethod = j.getString("Extraction Method");
+
+        JSONArray samplesArr = j.getJSONArray("Samples");
+
+        if(samplesArr.length() > 0){
+            for(int i=0; i<samplesArr.length();i++){
+
+                JSONObject sampleObj = samplesArr.getJSONObject(i);
+                String sampleType = sampleObj.getString("Tumor Type");
+
+                if(sampleType.equals("Xenograft Tumor")){
+
+                    String specimenId = sampleObj.getString("Sample ID");
+                    String passage = sampleObj.getString("Passage");
+
+                    Specimen specimen = dataImportService.getSpecimen(modelCreation,
+                            specimenId, DS.getAbbreviation(), passage);
+
+                    specimen.setHostStrain(nsgBS);
+
+                    EngraftmentSite es = dataImportService.getImplantationSite(engraftmentSite);
+                    specimen.setEngraftmentSite(es);
+
+                    EngraftmentType et = dataImportService.getImplantationType(engraftmentType);
+                    specimen.setEngraftmentType(et);
+
+                    Sample specSample = new Sample();
+
+                    specSample.setSourceSampleId(specimenId);
+                    specSample.setDataSource(DS.getAbbreviation());
+
+                    specimen.setSample(specSample);
+
+                    modelCreation.addSpecimen(specimen);
+                    modelCreation.addRelatedSample(specSample);
+
+                }
+
+            }
+        }
+
+
+
+        //load patient treatment
+
+        TreatmentSummary ts;
+
+        //Disable loading treatment temporarily, drug names are not harmonized!
+        Boolean loadTreatment = false;
+        //don't create two treatmentsummaries for the same snapshot
+        if(loadTreatment && dataImportService.findTreatmentSummaryByPatientSnapshot(pSnap) == null){
+            ts = new TreatmentSummary();
+
+            JSONArray treatmentArr = j.getJSONArray("Treatments");
+
+            for(int k=0; k<treatmentArr.length();k++){
+
+                JSONObject treatmentObj = treatmentArr.getJSONObject(k);
+                TreatmentProtocol tp;
+
+                String drugString;
+                String date;
+                String duration = treatmentObj.getString("Duration");
+                String response = treatmentObj.getString("Response");
+                //this is the current treatment
+                if(treatmentObj.has("Current Drug")){
+
+                    drugString = treatmentObj.getString("Current Drug");
+                    date = treatmentObj.getString("Starting Date");
+                    tp = dataImportService.getTreatmentProtocol(drugString, "", response, true);
+
+                }
+                //not current treatment, create default TreatmentProtocol object
+                else{
+
+                    drugString = treatmentObj.getString("Prior Drug");
+                    date = treatmentObj.getString("Prior Date");
+                    tp = dataImportService.getTreatmentProtocol(drugString, "", response, false);
+                }
+
+                tp.setTreatmentDate(date);
+                tp.addDurationForAllComponents(duration);
+                ts.addTreatmentProtocol(tp);
+            }
+
+            //save summary on snapshot
+            pSnap.setTreatmentSummary(ts);
+            dataImportService.savePatientSnapshot(pSnap);
+        }
+
+
         //loadVariationData(mc);
+        dataImportService.saveModelCreation(modelCreation);
+    }
+
+
+
+    private void loadMutationData(){
+
+        log.info("Loading mutation data for PDMR samples");
+        //load samples file
+        int currentLineCounter = 1;
+        String currentLine;
+        String[] row;
+        Sample sample;
+        MolecularCharacterization mc;
+
+        Platform pl = dataImportService.getPlatform("Gene Panel", DS);
+
+        Map<String, Sample> sampleMap = new HashMap<>();
+        Map<String, MolecularCharacterization> molcharMap = new HashMap<>();
+
+        Set<String> missingPatients = new HashSet<>();
+        try {
+            BufferedReader buf = new BufferedReader(new FileReader(mutationsFile));
+
+            while (true) {
+                currentLine = buf.readLine();
+                if (currentLine == null) {
+                    break;
+                } else if (currentLineCounter < 2) {
+                    currentLineCounter++;
+                    continue;
+
+                } else {
+                    row = currentLine.split("\t");
+
+                    String patientId = row[1];
+                    String modelId = row[1] + "-" + row[2];
+                    String sampleId = row[3];
+                    String markerSymbol = row[8];
+                    String aaChange = row[9];
+
+                    String chromosome = row[12];
+                    String position = row[13];
+                    String refAllele = row[14];
+                    String altAllele = row[15];
+                    String alleleFreq = row[16];
+
+                    String readDepth = row[17];
+                    String consequence = row[18];
+                    String rsVariant = row[21];
+
+                    //skip rows where there is no marker
+                    if(markerSymbol.equals("None Found")) continue;
+
+
+                    //check if this is a sample that we already have in the map
+                    if(sampleMap.containsKey(modelId+sampleId)){
+
+                        sample = sampleMap.get(modelId+sampleId);
+                    }
+                    //this is a sample that is not in the map yet, get it from the db
+                    else{
+
+                        if(sampleId.equals("ORIGINATOR")){
+
+                            //get a human sample
+                            sample = dataImportService.findHumanSample(modelId, DS.getAbbreviation());
+                        }
+                        else{
+
+                            //get the xenograft sample
+                            sample = dataImportService.findXenograftSample(modelId, DS.getAbbreviation(), sampleId);
+                        }
+
+                    }
+
+
+                    if(sample == null){
+
+                        log.error("Sample "+sampleId + " not found for model "+modelId);
+                        missingPatients.add(patientId);
+                        continue;
+                    }
+                    //found the sample
+                    else{
+
+                        //add it to the sample map
+                        sampleMap.put(modelId+sampleId, sample);
+
+                        //does this sample have molchar obj?
+                        if(molcharMap.containsKey(modelId+sampleId)){
+
+                            mc = molcharMap.get(modelId+sampleId);
+                        }
+                        else{
+
+                            mc = new MolecularCharacterization();
+                            mc.setType("mutation");
+                            mc.setPlatform(pl);
+                        }
+
+
+                        Marker m = dataImportService.getMarker(markerSymbol);
+                        MarkerAssociation ma = new MarkerAssociation();
+
+                        ma.setMarker(m);
+                        ma.setAminoAcidChange(aaChange);
+                        ma.setChromosome(chromosome);
+                        ma.setSeqPosition(position);
+                        ma.setRefAllele(refAllele);
+                        ma.setAltAllele(altAllele);
+                        ma.setAlleleFrequency(alleleFreq);
+                        ma.setReadDepth(readDepth);
+                        ma.setConsequence(consequence);
+                        ma.setRsVariants(rsVariant);
+
+
+                        mc.addMarkerAssociation(ma);
+
+                        //put the updated mc back into the map
+                        molcharMap.put(modelId+sampleId, mc);
+
+                    }
+
+                }
+                currentLineCounter++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        //go through the samples and save the mc object for them
+        for (Map.Entry<String, Sample> entry : sampleMap.entrySet()) {
+            String key = entry.getKey();
+            Sample s = entry.getValue();
+
+            MolecularCharacterization molchar = molcharMap.get(key);
+
+            s.addMolecularCharacterization(molchar);
+            dataImportService.saveSample(s);
+
+        }
+
+
+        log.info("DONE loading mutation data for PDMR.");
+
+        if(missingPatients.size() > 0){
+
+            log.error("Missing patients: " + missingPatients.toString());
+        }
 
     }
+
 
 
     /*

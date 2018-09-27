@@ -60,10 +60,12 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "AND toLower(s.dataSource) = toLower({dataSource}) " +
             "WITH s, mod, ii " +
             "OPTIONAL MATCH (s)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
+            "OPTIONAL MATCH (s)-[ssr:SAMPLE_SITE]-(ss:Tissue) " +
+
             "OPTIONAL MATCH (s)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mar:MARKER]-(m:Marker) " +
             "OPTIONAL MATCH (s)-[ot:OF_TYPE]-(tt:TumorType) " +
             "OPTIONAL MATCH (s)-[mapped:MAPPED_TO]-(oterm:OntologyTerm) " +
-            "RETURN mod,ii,s,o,t,ot, tt, mc, ma, m, mar, cb, aw, mapped, oterm")
+            "RETURN mod,ii,s,o,t,ot, tt, mc, ma, m, mar, cb, aw, mapped, oterm, ssr, ss")
     Sample findByDataSourceAndPdxId(@Param("dataSource") String dataSource, @Param("sourcePdxId") String sourcePdxId);
 
 
@@ -96,6 +98,28 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "WITH s " +
             "OPTIONAL MATCH (s)-[ot:ORIGIN_TISSUE]-(ti:Tissue) " +
             "OPTIONAL MATCH  (s)-[oft:OF_TYPE]-(t:TumorType) " +
-            "RETURN DISTINCT  s, ti, t, ot, oft")
+            "RETURN DISTINCT s, ti, t, ot, oft ORDER BY s.diagnosis")
     Collection<Sample> findSamplesWithoutOntologyMapping();
+
+
+    @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) WHERE mod.sourcePdxId = {modelId} AND mod.dataSource = {ds} RETURN s")
+    Sample findHumanSampleByModelIdAndDS(@Param("modelId") String modelId, @Param("ds") String ds);
+
+    @Query("MATCH (mod:ModelCreation)--(sp:Specimen)--(s:Sample)" +
+            "WHERE mod.sourcePdxId = {modelId} " +
+            "AND mod.dataSource = {ds} " +
+            "AND sp.externalId = {specimenId} " +
+            "RETURN s")
+    Sample findMouseSampleByModelIdAndDataSourceAndSpecimenId(@Param("modelId") String modelId, @Param("ds") String dataSource, @Param("specimenId") String specimenId);
+
+
+    @Query("MATCH (ps:PatientSnapshot)-[sf:SAMPLED_FROM]-(s:Sample) " +
+            "WHERE NOT (s)-[:MAPPED_TO]-() " +
+            "AND s.dataSource = {ds}" +
+            "WITH s " +
+            "OPTIONAL MATCH (s)-[ot:ORIGIN_TISSUE]-(ti:Tissue) " +
+            "OPTIONAL MATCH  (s)-[oft:OF_TYPE]-(t:TumorType) " +
+            "RETURN DISTINCT  s, ti, t, ot, oft ORDER BY s.diagnosis")
+    Collection<Sample> findSamplesWithoutOntologyMappingByDataSource(@Param("ds") String dataSource);
+
 }
