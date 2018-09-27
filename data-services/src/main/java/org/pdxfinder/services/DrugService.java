@@ -66,9 +66,9 @@ public class DrugService {
         return drugNames;
     }
 
-    public List<String> getResponseOptions(){
+    public List<String> getSpecimenDrugResponseOptions(){
 
-        return responseRepository.findAllResponses();
+        return responseRepository.findAllSpecimenDrugResponses();
     }
 
     public List<TreatmentSummary> getModelTreatmentSummariesWithDrugAndResponse(){

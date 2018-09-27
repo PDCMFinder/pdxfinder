@@ -361,7 +361,7 @@ public class SearchService {
 
 
 
-        List<String> drugResponses = drugService.getResponseOptions();
+        List<String> drugResponses = drugService.getSpecimenDrugResponseOptions();
 
         // Capitalize and Remove duplicates from drugResponses
         drugResponses = drugResponses.stream().map(WordUtils::capitalize).collect(Collectors.toList());
