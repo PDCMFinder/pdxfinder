@@ -72,6 +72,7 @@ public class SearchService {
         facets.put("patient_gender_options", patientGenderOptions);
         facets.put("cancer_system_options", cancerBySystemOptions);
         facets.put("data_available_options", dataAvailableOptions);
+        facets.put("sample_tumor_type_options", sampleTumorTypeOptions);
 
     }
 
