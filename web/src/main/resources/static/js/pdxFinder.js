@@ -26,6 +26,16 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype, proj
     var openProjectsFacet = false;
     var openDatAvailable = false;
 
+    var node = "";
+    var disURLRequest = "";
+    node = window.location.search;
+    try {
+        disURLRequest = node.split("?")[1].split("=")[0];
+    } catch (e) {
+    }
+
+
+
     //check selected age bins
     if (ages != null && ages.length > 0) {
 
@@ -58,7 +68,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype, proj
 
         });
 
-        if (openAgeFacet) {
+        if (openAgeFacet || disURLRequest == "patient_age") {
             var ageFilterField = jQuery("li#age_filter > a.accordion-title");
             ageFilterField.click();
         }
@@ -67,6 +77,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype, proj
 
     //check selected gender options
     if (genders != null && genders.length > 0) {
+
 
         jQuery.each(genders, function (key, value) {
 
@@ -91,7 +102,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype, proj
 
         });
 
-        if (openGenderFacet) {
+        if (openGenderFacet || disURLRequest == "patient_gender") {
             var genderFilterField = jQuery("li#gender_filter > a.accordion-title");
             genderFilterField.click();
         }
@@ -125,7 +136,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype, proj
 
         });
 
-        if (openCancerBySystem) {
+        if (openCancerBySystem || disURLRequest == "cancer_system") {
             var cancerSystemFilterField = jQuery("li#cancer_system_filter > a.accordion-title");
             cancerSystemFilterField.click();
         }
@@ -158,7 +169,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype, proj
 
         });
 
-        if (openDatasourceFacet) {
+        if (openDatasourceFacet || disURLRequest == "datasource") {
             var dsFilterField = jQuery("li#datasource_filter > a.accordion-title");
             dsFilterField.click();
         }
@@ -196,7 +207,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype, proj
 
         });
 
-        if (openProjectsFacet) {
+        if (openProjectsFacet || disURLRequest == "project") {
             var projectFilterField = jQuery("li#project_filter > a.accordion-title");
             projectFilterField.click();
         }
@@ -236,7 +247,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype, proj
 
         });
 
-        if (openDatAvailable) {
+        if (openDatAvailable || disURLRequest == "data_available") {
             var dataAvailableFilterField = jQuery("li#data_available_filter > a.accordion-title");
             dataAvailableFilterField.click();
         }
@@ -275,7 +286,7 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype, proj
 
         });
 
-        if (openTumorTypeFacet) {
+        if (openTumorTypeFacet || disURLRequest == "sample_tumor_type") {
             var ttFilterField = jQuery("li#tumor_type_filter > a.accordion-title");
             ttFilterField.click();
         }
@@ -287,13 +298,14 @@ function updateFilters(ages, genders, cancersystem, datasources, tumortype, proj
     var urlParams = new URLSearchParams(window.location.search);
     var dURLString = urlParams.toString();
     var openMarkerFacet = dURLString.search("mutation");
-    if (openMarkerFacet != -1) {
+
+    if (disURLRequest == "mutation") {   // openMarkerFacet != -1  ||
         jQuery("li#marker_filter > a.accordion-title").click();
     }
 
     // Check if Dosing Study was selected
     var openDrugFacet = dURLString.search("drug");
-    if (openDrugFacet != -1) {
+    if (openDrugFacet != -1 || disURLRequest == "drug") {
         jQuery("li#drug_filter > a.accordion-title").click();
     }
 
