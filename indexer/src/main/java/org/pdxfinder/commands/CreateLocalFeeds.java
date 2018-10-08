@@ -33,7 +33,7 @@ import java.net.URL;
  * Created by csaba on 08/10/2018.
  */
 @Component
-@Order(value = 99)
+@Order(value = 0)
 public class CreateLocalFeeds implements CommandLineRunner {
 
 
@@ -44,13 +44,22 @@ public class CreateLocalFeeds implements CommandLineRunner {
 
     //JAX
     @Value("${jaxpdx.url}")
-    private String jaxURLStr;
+    private String jaxUrlStr;
 
     @Value("${jaxpdx.variation.url}")
     private String jaxVariationURL;
 
     @Value("${jaxpdx.histology.url}")
-    private String histologyURL;
+    private String jaxHistologyURL;
+
+    //IRCC
+    @Value("${irccpdx.url}")
+    private String irccUrlStr;
+
+    @Value("${irccpdx.variation.url}")
+    private String irccVariationURLStr;
+
+
 
 
 
@@ -66,8 +75,11 @@ public class CreateLocalFeeds implements CommandLineRunner {
         long startTime = System.currentTimeMillis();
 
         if (options.has("createLocalFeeds")) {
+            log.info("Creating local feeds");
 
             createJAXFeeds();
+
+            createIRCCFeeds();
 
         }
 
@@ -83,9 +95,10 @@ public class CreateLocalFeeds implements CommandLineRunner {
 
     private void createJAXFeeds(){
 
-        String jsonString = parseURL(jaxURLStr);
+        log.info("Creating JAX feeds");
+        String jsonString = parseURL(jaxUrlStr);
 
-        saveFile(dataRootDir+"JAX/pdx/models.json", jsonString);
+        saveFile(dataRootDir+"JAX/pdx/", "models.json", jsonString);
 
         try {
             JSONObject job = new JSONObject(jsonString);
@@ -97,7 +110,7 @@ public class CreateLocalFeeds implements CommandLineRunner {
                 String modelId = j.getString("Model ID");
 
                 String mutation = parseURL(jaxVariationURL + modelId);
-                saveFile(dataRootDir+"JAX/mut/"+modelId+".json", mutation);
+                saveFile(dataRootDir+"JAX/mut/", modelId+".json", mutation);
 
             }
 
@@ -109,6 +122,17 @@ public class CreateLocalFeeds implements CommandLineRunner {
 
 
 
+    private void createIRCCFeeds(){
+
+        log.info("Creating IRCC feeds");
+        String jsonString = parseURL(irccUrlStr);
+
+        saveFile(dataRootDir+"IRCC/pdx/", "models.json", jsonString);
+
+        String mutation = parseURL(irccVariationURLStr);
+        saveFile(dataRootDir+"IRCC/mut/", "data.json", mutation);
+
+    }
 
 
 
@@ -116,10 +140,20 @@ public class CreateLocalFeeds implements CommandLineRunner {
 
 
 
-    private void saveFile(String fileName, String fileContent){
 
+    private void saveFile(String dirPath, String fileName, String fileContent){
+
+        File directory = new File(dirPath);
+        if (! directory.exists()){
+            directory.mkdirs();
+
+        }
+
+        String fileWithPath = dirPath+fileName;
+
+        log.info("Saving file "+fileWithPath);
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileWithPath, false));
 
             writer.write(fileContent);
             writer.close();
