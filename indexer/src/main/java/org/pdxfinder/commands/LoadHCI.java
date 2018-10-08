@@ -11,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.MolCharService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +22,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Load data from HCI PDXNet.
@@ -74,6 +73,9 @@ public class LoadHCI implements CommandLineRunner {
 
     @Value("${hcipdx.url}")
     private String urlStr;
+
+    @Value("${hci.ihc.file}")
+    private String ihcFileStr;
 
     @PostConstruct
     public void init() {
@@ -131,6 +133,9 @@ public class LoadHCI implements CommandLineRunner {
             log.error("Error getting HCI PDX models", e);
 
         }
+
+        loadImmunoHistoChemistry();
+
     }
 
     @Transactional
@@ -316,7 +321,104 @@ public class LoadHCI implements CommandLineRunner {
         
         
     }
-    
+
+    private void loadImmunoHistoChemistry(){
+
+        Platform pl = dataImportService.getPlatform("ImmunoHistoChemistry", hciDS);
+
+        String currentLine = "";
+        int currentLineCounter = 1;
+        String[] row;
+
+        Map<String, MolecularCharacterization> molCharMap = new HashMap<>();
+
+        try {
+            BufferedReader buf = new BufferedReader(new FileReader(ihcFileStr));
+
+            while (true) {
+                currentLine = buf.readLine();
+                if (currentLine == null) {
+                    break;
+                    //skip the first two rows
+                } else if (currentLineCounter < 3) {
+                    currentLineCounter++;
+                    continue;
+
+                } else {
+                    row = currentLine.split("\t");
+
+                    if(row.length > 0){
+
+                        String modelId = row[0];
+                        String samleId = row[1];
+                        String marker = row[2];
+                        String result = row[3];
+                        System.out.println(modelId);
+
+                        if(modelId.isEmpty() || samleId.isEmpty() || marker.isEmpty() || result.isEmpty()) continue;
+
+                        if(molCharMap.containsKey(modelId+"---"+samleId)){
+
+                            MolecularCharacterization mc = molCharMap.get(modelId+"---"+samleId);
+                            Marker m = dataImportService.getMarker(marker);
+
+                            MarkerAssociation ma = new MarkerAssociation();
+                            ma.setImmunoHistoChemistryResult(result);
+                            ma.setMarker(m);
+                            mc.addMarkerAssociation(ma);
+                        }
+                        else{
+
+                            MolecularCharacterization mc = new MolecularCharacterization();
+                            mc.setType("IHC");
+                            mc.setPlatform(pl);
+
+
+                            Marker m = dataImportService.getMarker(marker);
+                            MarkerAssociation ma = new MarkerAssociation();
+                            ma.setImmunoHistoChemistryResult(result);
+                            ma.setMarker(m);
+                            mc.addMarkerAssociation(ma);
+
+                            molCharMap.put(modelId+"---"+samleId, mc);
+                        }
+
+                    }
+
+
+
+                }
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            System.out.println(currentLineCounter + " " +currentLine.toString());
+        }
+
+        System.out.println(molCharMap.toString());
+
+        for (Map.Entry<String, MolecularCharacterization> entry : molCharMap.entrySet()) {
+            String key = entry.getKey();
+            MolecularCharacterization mc = entry.getValue();
+
+            String[] modAndSamp = key.split("---");
+            String modelId = modAndSamp[0];
+            String sampleId = modAndSamp[1];
+
+            Sample sample = dataImportService.findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(modelId, hciDS.getAbbreviation(), sampleId);
+
+            if(sample == null) {
+                log.error("Missing model or sample: "+modelId +" "+sampleId);
+                continue;
+            }
+
+            sample.addMolecularCharacterization(mc);
+            dataImportService.saveSample(sample);
+
+        }
+
+
+    }
 
 
     private String parseURL(String urlStr) {
