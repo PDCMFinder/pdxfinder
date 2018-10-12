@@ -38,8 +38,8 @@ public class LoadIRCC implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadIRCC.class);
 
-    private final static String DATASOURCE_ABBREVIATION = "IRCC";
-    private final static String DATASOURCE_NAME = "Candiolo Cancer Institute";
+    private final static String DATASOURCE_ABBREVIATION = "IRCC-CRC";
+    private final static String DATASOURCE_NAME = "Candiolo Cancer Institute - Colorectal Cancer Collection";
     private final static String DATASOURCE_DESCRIPTION = "IRCC";
     private final static String DATASOURCE_CONTACT = "andrea.bertotti@ircc.it";
 
