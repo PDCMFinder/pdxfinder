@@ -54,8 +54,9 @@ public class UniversalLoader implements CommandLineRunner {
     private DataImportService dataImportService;
     private Session session;
 
-    @Value("${universal.template.files}")
-    private String templateFiles;
+
+    @Value("#{'${universal.template.files}'.split(',')}")
+    private List<String> templateFiles;
 
     /**
      * Placeholder for the data stored in the "patient" tab
@@ -126,23 +127,34 @@ public class UniversalLoader implements CommandLineRunner {
 
         if (options.has("loadUniversal") || options.has("loadALL")) {
 
-            log.info("******************************************************");
-            log.info("* Running universal loader                           *");
-            log.info("******************************************************");
-            FileInputStream excelFile = new FileInputStream(new File(templateFiles));
+            for(String fileName : templateFiles){
 
-            Workbook workbook = new XSSFWorkbook(excelFile);
-            log.info("Loading template");
-            initializeTemplateData(workbook);
+                log.info("******************************************************");
+                log.info("* Starting universal loader                          *");
+                log.info("******************************************************");
 
-            loadTemplateData();
+                if(!fileName.isEmpty()){
 
-            workbook.close();
-            excelFile.close();
+                    FileInputStream excelFile = new FileInputStream(new File(fileName));
 
-            log.info("******************************************************");
-            log.info("* Finished running universal loader                  *");
-            log.info("******************************************************");
+                    Workbook workbook = new XSSFWorkbook(excelFile);
+                    log.info("Loading template from "+fileName);
+
+                    initializeTemplateData(workbook);
+
+                    loadTemplateData();
+
+                    workbook.close();
+                    excelFile.close();
+
+                }
+
+                log.info("******************************************************");
+                log.info("* Finished running universal loader                  *");
+                log.info("******************************************************");
+
+            }
+
         }
     }
 
