@@ -118,7 +118,7 @@ public class DetailsService {
         for (String[] dData : variationDataDTO.moreData())
         {
             dData[2] = WordUtils.capitalize(diagnosis);   //Histology
-            dData[3] = "Xenograft Tumor";                //Tumor type
+            dData[3] = "Engrafted Tumo Tumor";                //Tumor type
             variationDataDTOSet.add(dData);
         }
 
@@ -436,7 +436,7 @@ public class DetailsService {
                     Map<String, String> dataSummary = new HashMap<>();
 
                     dataSummary.put("sampleId", sampleID);
-                    dataSummary.put("sampleType","Xenograft");
+                    dataSummary.put("sampleType", "Engrafted Tumor");
                     dataSummary.put("xenograftPassage",dPassage);
                     dataSummary.put("dataAvailable","Mutation_"+tech);
                     dataSummary.put("platformUsed",tech);
@@ -448,7 +448,7 @@ public class DetailsService {
                 // Create a Key Value map of (Technology+Passage , sampleIDs) and Pass to DTO
                 techNPassToSampleId.put(tech + dPassage, StringUtils.stripEnd(sampleIDs, ","));
 
-                // SampleType - Xenograft
+                // SampleType - Engrafted Tumor
                 // XenograftPassage - dPassage
                 // DataAvailable -
                 // PlatformUsed - tech
