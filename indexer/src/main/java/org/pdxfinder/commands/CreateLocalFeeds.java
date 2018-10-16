@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.net.URL;
+import java.util.List;
 
 
 /**
@@ -25,7 +26,10 @@ import java.net.URL;
  *
  * mutation for datasource 1 = /abc/def/DATASOURCEABBREV1/mut/
  * drug for datasource 1 = /abc/def/DATASOURCEABBREV1/drug/
+ * immunohistochemistry for ds 1 = /abc/def/DATASOURCEABBREV1/ihc/
  *
+ *
+ * MAKE SURE THE DEPLOYMENT SCRIPT COPIES OVER ADDITIONAL DATA FILES
  */
 
 
@@ -52,7 +56,7 @@ public class CreateLocalFeeds implements CommandLineRunner {
     @Value("${jaxpdx.histology.url}")
     private String jaxHistologyURL;
 
-    //IRCC
+    //IRCC-CRC
     @Value("${irccpdx.url}")
     private String irccUrlStr;
 
@@ -60,8 +64,25 @@ public class CreateLocalFeeds implements CommandLineRunner {
     private String irccVariationURLStr;
 
 
+    //HCI
+    @Value("${hcipdx.url}")
+    private String hciUrlStr;
+
+    @Value("${hci.ihc.file}")
+    private String hciIhcFileStr;
 
 
+    //MDA
+    @Value("#{'${mda.urls}'.split(',')}")
+    private List<String> mdaUrlsStr;
+
+    //WISTAR
+    @Value("${wistarpdx.url}")
+    private String wistarUrlStr;
+
+
+    @Value("#{'${wustl.urls}'.split(',')}")
+    private List<String> wustlUrlsStr;
 
 
     @Override
@@ -80,6 +101,14 @@ public class CreateLocalFeeds implements CommandLineRunner {
             createJAXFeeds();
 
             createIRCCFeeds();
+
+            createHCIFeeds();
+
+            createMDAFeeds();
+
+            createWistarFeeds();
+
+            createWustlFeeds();
 
         }
 
@@ -124,22 +153,81 @@ public class CreateLocalFeeds implements CommandLineRunner {
 
     private void createIRCCFeeds(){
 
-        log.info("Creating IRCC feeds");
+        log.info("Creating IRCC-CRC feeds");
         String jsonString = parseURL(irccUrlStr);
 
-        saveFile(dataRootDir+"IRCC/pdx/", "models.json", jsonString);
+        saveFile(dataRootDir+"IRCC-CRC/pdx/", "models.json", jsonString);
 
         String mutation = parseURL(irccVariationURLStr);
-        saveFile(dataRootDir+"IRCC/mut/", "data.json", mutation);
+        saveFile(dataRootDir+"IRCC-CRC/mut/", "data.json", mutation);
 
     }
 
 
+    private void createHCIFeeds(){
 
+        log.info("Creating HCI feeds");
+        String jsonString = parseURL(hciUrlStr);
 
+        saveFile(dataRootDir+"PDXNet-HCI-BCM/pdx/", "models.json", jsonString);
 
+        String ihc = parseURL(hciIhcFileStr);
+        saveFile(dataRootDir+"PDXNet-HCI-BCM/ihc/", "data.json", ihc);
 
+    }
 
+    private void createMDAFeeds(){
+
+        log.info("Creating MDA feeds");
+
+        int counter = 1;
+        String fileName;
+        for(String url : mdaUrlsStr){
+
+            String jsonString = parseURL(url);
+            if(counter == 1){
+
+                fileName = "models.json";
+            }
+            else{
+                fileName = "models"+counter+".json";
+            }
+
+            saveFile(dataRootDir+"PDXNet-MDAnderson/pdx/", fileName, jsonString);
+            counter++;
+        }
+
+    }
+
+    private void createWistarFeeds(){
+
+        log.info("Creating WISTAR feeds");
+        String jsonString = parseURL(wistarUrlStr);
+
+        saveFile(dataRootDir+"PDXNet-Wistar-MDAnderson-Penn/pdx/", "models.json", jsonString);
+
+    }
+
+    private void createWustlFeeds(){
+        log.info("Creating WUSTL feeds");
+        int counter = 1;
+        String fileName;
+        for(String url : wustlUrlsStr){
+
+            String jsonString = parseURL(url);
+            if(counter == 1){
+
+                fileName = "models.json";
+            }
+            else{
+                fileName = "models"+counter+".json";
+            }
+
+            saveFile(dataRootDir+"PDXNet-WUSTL/pdx/", fileName, jsonString);
+            counter++;
+        }
+
+    }
 
     private void saveFile(String dirPath, String fileName, String fileContent){
 
@@ -162,8 +250,6 @@ public class CreateLocalFeeds implements CommandLineRunner {
             e.printStackTrace();
         }
     }
-
-
 
 
     private String parseURL(String urlStr) {

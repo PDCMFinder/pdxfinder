@@ -39,7 +39,7 @@ public class LoadIRCC implements CommandLineRunner {
     private final static Logger log = LoggerFactory.getLogger(LoadIRCC.class);
 
     private final static String DATASOURCE_ABBREVIATION = "IRCC-CRC";
-    private final static String DATASOURCE_NAME = "Candiolo Cancer Institute - Colorectal Cancer Collection";
+    private final static String DATASOURCE_NAME = "Candiolo Cancer Institute - Colorectal";
     private final static String DATASOURCE_DESCRIPTION = "IRCC";
     private final static String DATASOURCE_CONTACT = "andrea.bertotti@ircc.it";
 
@@ -54,7 +54,7 @@ public class LoadIRCC implements CommandLineRunner {
 
     private final static String DOSING_STUDY_URL = "/platform/ircc-dosing-studies/";
     private final static String TARGETEDNGS_PLATFORM_URL = "/platform/ircc-gene-panel/";
-    private final static String SOURCE_URL = "/source/ircc/";
+    private final static String SOURCE_URL = "/source/ircc-crc/";
 
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
