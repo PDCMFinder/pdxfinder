@@ -72,7 +72,7 @@ public class SearchDS {
     );
     public static List<String> DATASOURCE_OPTIONS = Arrays.asList(
             "JAX",
-            "IRCC",
+            "IRCC-CRC",
             "PDMR",
             "PDXNet-HCI-BCM",
             "PDXNet-MDAnderson",

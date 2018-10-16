@@ -49,6 +49,7 @@ public class MarkerAssociation {
     private String type; //Substitution
     private String annotation;
 
+    //maybe use marker status in the future to have a general approach?
     private String immunoHistoChemistryResult;
     private String microsatelliteResult;
 

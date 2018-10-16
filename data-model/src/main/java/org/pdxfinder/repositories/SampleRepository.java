@@ -122,4 +122,15 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "RETURN DISTINCT  s, ti, t, ot, oft ORDER BY s.diagnosis")
     Collection<Sample> findSamplesWithoutOntologyMappingByDataSource(@Param("ds") String dataSource);
 
+
+    @Query("MATCH (mod:ModelCreation)--(sp:Specimen)--(s:Sample) " +
+            "WHERE mod.sourcePdxId = {modelId} " +
+            "AND mod.dataSource = {ds} " +
+            "AND s.sourceSampleId = {sampleId} " +
+            "WITH s " +
+            "OPTIONAL MATCH (s)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization) " +
+            "RETURN s, cb, mc"
+    )
+    Sample findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(@Param("modelId") String modelId, @Param("ds") String ds, @Param("sampleId") String sampleId);
+
 }
