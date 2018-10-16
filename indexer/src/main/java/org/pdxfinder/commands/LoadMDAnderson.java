@@ -188,7 +188,7 @@ public class LoadMDAnderson implements CommandLineRunner {
 
         String qaType = NOT_SPECIFIED;
         try {
-            qaType = j.getString("QA") + "on passage " + j.getString("QA Passage");
+            qaType = j.getString("QA") + " on passage " + j.getString("QA Passage");
         } catch (Exception e) {
             // not all groups supplied QA
         }
