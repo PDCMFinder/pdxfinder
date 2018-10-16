@@ -827,7 +827,7 @@
                                                         <td>
                                                             <a target="_blank"
                                                                th:text="${dataSummary.platformUsed}"
-                                                               th:href="${data.platformsAndUrls[dataSummary.platformUsed]}">
+                                                               th:onclick="'window.open(\''+${data.platformsAndUrls[dataSummary.platformUsed]}+'\')'">
                                                                 ...
                                                             </a>
                                                         </td>
