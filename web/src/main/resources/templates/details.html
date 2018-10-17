@@ -454,7 +454,10 @@
 
                                 <div class="row large-12 medium-12 expanded">
                                     <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
-                                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Collection Events </a></li>
+                                        <li class="tabs-title is-active"><a href="#initialDiagnosis"
+                                                                            aria-selected="true"
+                                                                            style="font-size: 15px; padding: 15px;">
+                                            Patient Collection Events </a></li>
                                     </ul>
                                 </div>
 
@@ -596,6 +599,7 @@
                             </section>
 
 
+                        <!-- Disable Current Treatment Table
                         <section class="row large-12 medium-12 expanded"
                                  id="detailsData"
                                  style="margin-top: 20px;"
@@ -610,7 +614,6 @@
                                 <div class="tabs-content style-2" data-tabs-content="example2-tabs">
                                     <div class="tabs-panel is-active" id="summary">
 
-                                        <!-- Summary first row -->
                                         <div class="row large-12 medium-12 expanded">
 
                                             <div class="columns medium-12 small-12 margin-top-10 card-3">
@@ -621,7 +624,7 @@
                                                         <th> Regimen </th>
                                                         <th> Dose </th>
                                                         <th> Best Response </th>
-                                                        <th> Duration </th>
+                                                        <th> Duration (Months) </th>
                                                         </thead>
                                                         <tbody>
 
@@ -632,10 +635,12 @@
                                                             <tr  th:if="${ #bools.isTrue(treatment.current) } ">
 
                                                                 <th class="text-left medium-4"
-                                                                    th:text="${treatment.treatmentDate}"> ...DATE... </th>
+                                                                    th:text="${treatment.treatmentDate+' (Current)'}"> ...DATE... </th>
 
                                                                 <td th:text="${treatment.drugNames}"></td>
                                                                 <td th:text="${treatment.dose}">  </td>
+
+
                                                                 <td th:text="${treatment.response}">  </td>
                                                                 <td th:text="${treatment.duration}"> </td>
 
@@ -651,7 +656,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        </section>
+                        </section> -->
 
 
                         <section class="row large-12 medium-12 expanded"
@@ -661,7 +666,10 @@
 
                             <div class="row large-12 medium-12 expanded">
                                     <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
-                                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Prior Therapies & response </a></li>
+                                        <li class="tabs-title is-active"><a href="#initialDiagnosis"
+                                                                            aria-selected="true"
+                                                                            style="font-size: 15px; padding: 15px;">
+                                            Patient Therapies & Response </a></li>
                                     </ul>
                                 </div>
 
@@ -679,7 +687,7 @@
                                                         <th> Regimen </th>
                                                         <th> Dose </th>
                                                         <th> Best Response </th>
-                                                        <th> Duration </th>
+                                                        <th> Duration (Months)</th>
                                                         </thead>
                                                         <tbody>
 
@@ -696,6 +704,29 @@
                                                                 <td th:text="${treatment.dose}">  </td>
                                                                 <td th:text="${treatment.response}">  </td>
                                                                 <td th:text="${treatment.duration}"> </td>
+
+                                                            </tr>
+
+                                                        </th:block>
+
+
+                                                        <th:block
+                                                                th:if="${not #lists.isEmpty(data.patient.treatmentSummaries)}"
+                                                                th:each="treatment : ${data.patient.treatmentSummaries}">
+
+                                                            <tr th:if="${ #bools.isTrue(treatment.current) } ">
+
+                                                                <th class="text-left medium-4"
+                                                                    th:text="${treatment.treatmentDate+' (Current)'}">
+                                                                    ...DATE...
+                                                                </th>
+
+                                                                <td th:text="${treatment.drugNames}"></td>
+                                                                <td th:text="${treatment.dose}"></td>
+
+
+                                                                <td th:text="${treatment.response}"></td>
+                                                                <td th:text="${treatment.duration}"></td>
 
                                                             </tr>
 
@@ -800,7 +831,7 @@
                                                     <thead>
                                                     <th>Sample ID</th>
                                                     <th>Sample Type</th>
-                                                    <th>Xenograft Passage</th>
+                                                    <th>Engrafted Tumor Passage</th>
                                                     <th>Data Available</th>
                                                     <th>Platform Used</th>
                                                     <th>Raw Data</th>
@@ -827,7 +858,7 @@
                                                         <td>
                                                             <a target="_blank"
                                                                th:text="${dataSummary.platformUsed}"
-                                                               th:href="${data.platformsAndUrls[dataSummary.platformUsed]}">
+                                                               th:onclick="'window.open(\''+${data.platformsAndUrls[dataSummary.platformUsed]}+'\')'">
                                                                 ...
                                                             </a>
                                                         </td>
@@ -908,7 +939,7 @@
                                                                         <span class="hdc">Histology:</span> <b class="black"
                                                                                                                th:text="${#strings.capitalize(data.diagnosis)}"></b>     &nbsp; &nbsp;
                                                                         <span class="hdc">Tumor Type: </span>
-                                                                        <b class="black">Xenograft Tumor</b>                  &nbsp; &nbsp;
+                                                                        <b class="black">Engrafted Tumor</b>                  &nbsp; &nbsp;
                                                                         <span class="hdc">Passage: </span>  <b class="black"
                                                                                                                th:text="${technology.value[num-1]}"></b>     &nbsp; &nbsp;
                                                                         <span class="hdc">Platform: </span>
