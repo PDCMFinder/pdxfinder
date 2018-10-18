@@ -279,8 +279,13 @@ public class DetailsService {
         if(pdx!= null && pdx.getSpecimens() != null){
 
             Set<Specimen> sp = pdx.getSpecimens();
+            List<Object> pdxModelList = new ArrayList<>();
+
 
             for(Specimen s:sp){
+
+
+                Map pdxModel = new HashMap();
 
                 if (s.getHostStrain() != null) {
 
@@ -301,53 +306,60 @@ public class DetailsService {
                         hostStrainMap.put(hostStrain, "Not Specified");
                     }
 
-
                     //Set implantation site and type
                     if(s.getEngraftmentSite() != null){
                         dto.setEngraftmentSite( notEmpty(s.getEngraftmentSite().getName()) );
-                    }
-                    else{
+                        pdxModel.put("engraftmentSite", notEmpty(s.getEngraftmentSite().getName()));
+                    } else{
 
                         dto.setEngraftmentSite("Not Specified");
+                        pdxModel.put("engraftmentSite", "Not Specified");
                     }
+
 
                     if(s.getEngraftmentType() != null){
                         dto.setSampleType( notEmpty(s.getEngraftmentType().getName()) );
-                    }
-                    else{
+                        pdxModel.put("sampleType", notEmpty(s.getEngraftmentType().getName()));
+                    } else{
 
                         dto.setSampleType("Not Specified");
+                        pdxModel.put("sampleType", "Not Specified");
                     }
-
-
 
                 }
 
+
+                String composedStrain = "";
+
+                if (hostStrainMap.size() > 1) {
+
+                    composedStrain = hostStrainMap
+                            .keySet()
+                            .stream()
+                            .map(x -> getHostStrainString(x, hostStrainMap))
+                            .collect(Collectors.joining("; "));
+                } else if (hostStrainMap.size() == 1) {
+
+                    for (String key : hostStrainMap.keySet()) {
+                        composedStrain = key;
+                    }
+                } else {
+                    composedStrain = "Not Specified";
+                }
+
+                dto.setStrain(notEmpty(composedStrain));
+
+                pdxModel.put("strain", notEmpty(composedStrain));
+
+                pdxModelList.add(pdxModel);
+
             }
 
-
+            dto.setPdxModelList(pdxModelList);
         }
 
-        String composedStrain = "";
 
-        if(hostStrainMap.size() > 1){
 
-            composedStrain = hostStrainMap
-                    .keySet()
-                    .stream()
-                    .map(x -> getHostStrainString(x, hostStrainMap))
-                    .collect(Collectors.joining("; "));
-        }
-        else if(hostStrainMap.size() == 1){
-
-            for(String key:hostStrainMap.keySet()){
-                composedStrain = key;
-            }
-        }
-        else{
-            composedStrain = "Not Specified";
-        }
-        dto.setStrain(notEmpty(composedStrain));
 
 
         if (sample != null && sample.getMolecularCharacterizations() != null) {
