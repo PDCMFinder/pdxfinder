@@ -11,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.MolCharService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,17 +22,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Load data from HCI PDXNet.
  */
 @Component
-@Order(value = 0)
+@Order(value = -20)
 public class LoadHCI implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadHCI.class);
@@ -72,8 +74,8 @@ public class LoadHCI implements CommandLineRunner {
     private DataImportService dataImportService;
     private Session session;
 
-    @Value("${hcipdx.url}")
-    private String urlStr;
+    @Value("${pdxfinder.data.root.dir}")
+    private String dataRootDir;
 
     @PostConstruct
     public void init() {
@@ -97,12 +99,18 @@ public class LoadHCI implements CommandLineRunner {
 
             log.info("Loading Huntsman PDX data.");
 
-            if (urlStr != null) {
-                log.info("Loading from URL " + urlStr);
-                parseJSON(parseURL(urlStr));
-            } else {
-                log.error("No hcipdx.url provided in properties");
-            }
+                String modelJson = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
+
+                File file = new File(modelJson);
+                if(file.exists()){
+
+                    parseJSON(parseFile(modelJson));
+                }
+                else{
+                    log.info("No file found for "+DATASOURCE_ABBREVIATION+", skipping");
+                }
+
+
         }
     }
 
@@ -131,6 +139,9 @@ public class LoadHCI implements CommandLineRunner {
             log.error("Error getting HCI PDX models", e);
 
         }
+
+        loadImmunoHistoChemistry();
+
     }
 
     @Transactional
@@ -316,7 +327,119 @@ public class LoadHCI implements CommandLineRunner {
         
         
     }
-    
+
+    private void loadImmunoHistoChemistry(){
+
+
+        String ihcFileStr = dataRootDir+DATASOURCE_ABBREVIATION+"/ihc/ihc.txt";
+
+        File file = new File(ihcFileStr);
+
+        if(file.exists()){
+
+            Platform pl = dataImportService.getPlatform("ImmunoHistoChemistry", hciDS);
+
+            String currentLine = "";
+            int currentLineCounter = 1;
+            String[] row;
+
+            Map<String, MolecularCharacterization> molCharMap = new HashMap<>();
+
+            try {
+                BufferedReader buf = new BufferedReader(new FileReader(ihcFileStr));
+
+                while (true) {
+                    currentLine = buf.readLine();
+                    if (currentLine == null) {
+                        break;
+                        //skip the first two rows
+                    } else if (currentLineCounter < 3) {
+                        currentLineCounter++;
+                        continue;
+
+                    } else {
+                        row = currentLine.split("\t");
+
+                        if(row.length > 0){
+
+                            String modelId = row[0];
+                            String samleId = row[1];
+                            String marker = row[2];
+                            String result = row[3];
+                            System.out.println(modelId);
+
+                            if(modelId.isEmpty() || samleId.isEmpty() || marker.isEmpty() || result.isEmpty()) continue;
+
+                            if(molCharMap.containsKey(modelId+"---"+samleId)){
+
+                                MolecularCharacterization mc = molCharMap.get(modelId+"---"+samleId);
+                                Marker m = dataImportService.getMarker(marker);
+
+                                MarkerAssociation ma = new MarkerAssociation();
+                                ma.setImmunoHistoChemistryResult(result);
+                                ma.setMarker(m);
+                                mc.addMarkerAssociation(ma);
+                            }
+                            else{
+
+                                MolecularCharacterization mc = new MolecularCharacterization();
+                                mc.setType("IHC");
+                                mc.setPlatform(pl);
+
+
+                                Marker m = dataImportService.getMarker(marker);
+                                MarkerAssociation ma = new MarkerAssociation();
+                                ma.setImmunoHistoChemistryResult(result);
+                                ma.setMarker(m);
+                                mc.addMarkerAssociation(ma);
+
+                                molCharMap.put(modelId+"---"+samleId, mc);
+                            }
+
+                        }
+
+
+
+                    }
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                System.out.println(currentLineCounter + " " +currentLine.toString());
+            }
+
+            System.out.println(molCharMap.toString());
+
+            for (Map.Entry<String, MolecularCharacterization> entry : molCharMap.entrySet()) {
+                String key = entry.getKey();
+                MolecularCharacterization mc = entry.getValue();
+
+                String[] modAndSamp = key.split("---");
+                String modelId = modAndSamp[0];
+                String sampleId = modAndSamp[1];
+
+                Sample sample = dataImportService.findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(modelId, hciDS.getAbbreviation(), sampleId);
+
+                if(sample == null) {
+                    log.warn("Missing model or sample: "+modelId +" "+sampleId);
+                    continue;
+                }
+
+                sample.addMolecularCharacterization(mc);
+                dataImportService.saveSample(sample);
+
+            }
+
+        }
+        else{
+
+            log.warn("Skipping loading IHC for HCI");
+        }
+
+
+
+
+    }
 
 
     private String parseURL(String urlStr) {
@@ -333,6 +456,23 @@ public class LoadHCI implements CommandLineRunner {
             in.close();
         } catch (Exception e) {
             log.error("Unable to read from MD Anderson JSON URL " + urlStr, e);
+        }
+        return sb.toString();
+    }
+
+    private String parseFile(String path) {
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            Stream<String> stream = Files.lines(Paths.get(path));
+
+            Iterator itr = stream.iterator();
+            while (itr.hasNext()) {
+                sb.append(itr.next());
+            }
+        } catch (Exception e) {
+            log.error("Failed to load file " + path, e);
         }
         return sb.toString();
     }

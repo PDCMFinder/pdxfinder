@@ -67,6 +67,8 @@ public class Standardizer {
 
     public static String getAge(String age){
 
+        if(age.toLowerCase().equals("not specified")) return NOT_SPECIFIED;
+
         try{
             age = new Integer(age).toString();
         }catch(NumberFormatException nfe){

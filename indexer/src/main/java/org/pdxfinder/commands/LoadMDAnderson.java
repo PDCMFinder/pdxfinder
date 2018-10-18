@@ -14,6 +14,7 @@ import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -21,18 +22,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Load data from University of Texas MD Anderson PDXNet.
  */
 @Component
-@Order(value = 0)
+@Order(value = -17)
 public class LoadMDAnderson implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadMDAnderson.class);
@@ -63,6 +65,9 @@ public class LoadMDAnderson implements CommandLineRunner {
     private DataImportService dataImportService;
     private Session session;
 
+    @Value("${pdxfinder.data.root.dir}")
+    private String dataRootDir;
+
     //   @Value("${mdapdx.url}")
     //   private String urlStr;
     @PostConstruct
@@ -77,7 +82,6 @@ public class LoadMDAnderson implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        String[] urls = {"http://tumor.informatics.jax.org/PDXInfo/MBMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/CRCMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/MinnaMDAnderson.json", "http://tumor.informatics.jax.org/PDXInfo/FangMDAnderson.json"};
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadMDA", "Load MDAnderson PDX data");
@@ -89,12 +93,29 @@ public class LoadMDAnderson implements CommandLineRunner {
 
             log.info("Loading MDAnderson PDX data.");
 
-            for (String urlStr : urls) {
+            File folder = new File(dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/");
+            if(folder.exists()){
+                File[] listOfFiles = folder.listFiles();
 
-                log.info("Loading from URL " + urlStr);
-                parseJSON(parseURL(urlStr));
+                for (int i = 0; i < listOfFiles.length; i++) {
+                    if (listOfFiles[i].isFile()) {
+                        String fileName = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/"+listOfFiles[i].getName();
+
+                        parseJSON(parseFile(fileName));
+
+                    }
+                }
 
             }
+            else{
+
+                log.info("MDA directory not found");
+            }
+
+
+
+
+            log.info("Finished loading MDAnderson PDX data.");
         }
 
     }
@@ -188,7 +209,7 @@ public class LoadMDAnderson implements CommandLineRunner {
 
         String qaType = NOT_SPECIFIED;
         try {
-            qaType = j.getString("QA") + "on passage " + j.getString("QA Passage");
+            qaType = j.getString("QA") + " on passage " + j.getString("QA Passage");
         } catch (Exception e) {
             // not all groups supplied QA
         }
@@ -293,6 +314,23 @@ public class LoadMDAnderson implements CommandLineRunner {
             in.close();
         } catch (Exception e) {
             log.error("Unable to read from MD Anderson JSON URL " + urlStr, e);
+        }
+        return sb.toString();
+    }
+
+    private String parseFile(String path) {
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            Stream<String> stream = Files.lines(Paths.get(path));
+
+            Iterator itr = stream.iterator();
+            while (itr.hasNext()) {
+                sb.append(itr.next());
+            }
+        } catch (Exception e) {
+            log.error("Failed to load file " + path, e);
         }
         return sb.toString();
     }
