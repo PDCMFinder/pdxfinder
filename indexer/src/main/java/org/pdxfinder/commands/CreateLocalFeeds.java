@@ -141,6 +141,9 @@ public class CreateLocalFeeds implements CommandLineRunner {
                 String mutation = parseURL(jaxVariationURL + modelId);
                 saveFile(dataRootDir+"JAX/mut/", modelId+".json", mutation);
 
+                String histology = parseURL(jaxHistologyURL + modelId);
+                saveFile(dataRootDir+"JAX/hist/", modelId+".json", histology);
+
             }
 
         } catch (Exception e) {
@@ -171,8 +174,8 @@ public class CreateLocalFeeds implements CommandLineRunner {
 
         saveFile(dataRootDir+"PDXNet-HCI-BCM/pdx/", "models.json", jsonString);
 
-        String ihc = parseURL(hciIhcFileStr);
-        saveFile(dataRootDir+"PDXNet-HCI-BCM/ihc/", "data.json", ihc);
+        //String ihc = parseURL(hciIhcFileStr);
+        //saveFile(dataRootDir+"PDXNet-HCI-BCM/ihc/", "data.json", ihc);
 
     }
 
