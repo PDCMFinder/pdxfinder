@@ -23,8 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,7 +36,7 @@ import java.util.stream.Stream;
  * Load data from IRCC.
  */
 @Component
-@Order(value = 0)
+@Order(value = -19)
 public class LoadIRCC implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadIRCC.class);
@@ -82,12 +85,8 @@ public class LoadIRCC implements CommandLineRunner {
 
     private HashSet<Integer> loadedModelHashes = new HashSet<>();
 
-
-    @Value("${irccpdx.url}")
-    private String urlStr;
-
-    @Value("${irccpdx.variation.url}")
-    private String variationURLStr;
+    @Value("${pdxfinder.data.root.dir}")
+    private String dataRootDir;
 
     @Value("${irccpdx.variation.max}")
     private int variationMax;
@@ -115,25 +114,40 @@ public class LoadIRCC implements CommandLineRunner {
 
             log.info("Loading IRCC PDX data.");
 
+            String fileStr = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
+            File file = new File(fileStr);
 
-            irccDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
-                    DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, "transnational access", DATASOURCE_CONTACT, SOURCE_URL);
+            if(file.exists()){
 
-            nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
+                irccDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
+                        DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, "transnational access", DATASOURCE_CONTACT, SOURCE_URL);
 
-            projectGroup = dataImportService.getProjectGroup("EurOPDX");
+                nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
+
+                projectGroup = dataImportService.getProjectGroup("EurOPDX");
 
 
-            if (urlStr != null) {
-                log.info("Loading from URL " + urlStr);
-                parseModels(parseURL(urlStr));
+                parseModels(parseFile(fileStr));
+
+                String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
+                File varFile = new File(variationURLStr);
+
+                if(varFile.exists()){
+
+                    if (variationURLStr != null && variationMax != 0) {
+                        loadVariants(variationURLStr, "TargetedNGS_MUT", "mutation");
+                    }
+                }
+
+
             }
-            if (variationURLStr != null && variationMax != 0) {
-                loadVariants(variationURLStr, "TargetedNGS_MUT", "mutation");
+            else{
+
+                log.info("No file found for "+DATASOURCE_ABBREVIATION+", skipping");
             }
-            else {
-                log.error("No irccpdx.url provided in properties");
-            }
+
+
+
         }
     }
 
@@ -324,7 +338,7 @@ public class LoadIRCC implements CommandLineRunner {
         //STEP 2: get markers and save them with the platform linked
         try{
 
-            JSONObject job = new JSONObject(parseURL(variationURLStr));
+            JSONObject job = new JSONObject(parseFile(variationURLStr));
             JSONArray jarray = job.getJSONArray("IRCCVariation");
             Set<String> markers = new HashSet<>();
             log.info("Saving Markers to DB");
@@ -437,7 +451,8 @@ public class LoadIRCC implements CommandLineRunner {
     public void loadVariantsBySpecimen() {
 
         try {
-            JSONObject job = new JSONObject(parseURL(variationURLStr));
+            String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
+            JSONObject job = new JSONObject(parseFile(variationURLStr));
             JSONArray jarray = job.getJSONArray("IRCCVariation");
          //   System.out.println("loading "+jarray.length()+" variant records");
 
@@ -521,6 +536,23 @@ public class LoadIRCC implements CommandLineRunner {
             in.close();
         } catch (Exception e) {
             log.error("Unable to read from IRCC JSON URL " + urlStr, e);
+        }
+        return sb.toString();
+    }
+
+    private String parseFile(String path) {
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            Stream<String> stream = Files.lines(Paths.get(path));
+
+            Iterator itr = stream.iterator();
+            while (itr.hasNext()) {
+                sb.append(itr.next());
+            }
+        } catch (Exception e) {
+            log.error("Failed to load file " + path, e);
         }
         return sb.toString();
     }

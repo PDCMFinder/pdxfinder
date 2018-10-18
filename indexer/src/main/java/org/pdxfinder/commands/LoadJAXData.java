@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
@@ -33,7 +34,7 @@ import java.util.stream.Stream;
  * Load data from JAX.
  */
 @Component
-@Order(value = 0)
+@Order(value = -18)
 public class LoadJAXData implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadJAXData.class);
@@ -74,24 +75,14 @@ public class LoadJAXData implements CommandLineRunner {
     private DataImportService dataImportService;
     private Session session;
 
-    @Value("${jaxpdx.file}")
-    private String file;
-
-    @Value("${jaxpdx.url}")
-    private String urlStr;
-
-    @Value("${jaxpdx.variation.url}")
-    private String variationURL;
-
-    @Value("${jaxpdx.histology.url}")
-    private String histologyURL;
-
     @Value("${jaxpdx.variation.max}")
     private int maxVariations;
 
     @Value("${jaxpdx.ref.assembly}")
     private String refAssembly;
 
+    @Value("${pdxfinder.data.root.dir}")
+    private String dataRootDir;
 
     HashMap<String, String> passageMap = null;
     HashMap<String, Image> histologyMap = null;
@@ -119,14 +110,16 @@ public class LoadJAXData implements CommandLineRunner {
 
             log.info("Loading JAX PDX data.");
 
-            if (urlStr != null) {
-                log.info("Loading from URL " + urlStr);
-                parseJSON(parseURL(urlStr));
-            } else if (file != null) {
-                log.info("Loading from file " + file);
-                parseJSON(parseFile(file));
-            } else {
-                log.error("No jaxpdx.file or jaxpdx.url provided in properties");
+            String urlStr = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
+            File file = new File(urlStr);
+
+            if (file.exists()) {
+                log.info("Loading from file " + urlStr);
+                parseJSON(parseFile(urlStr));
+            }
+            else{
+
+                log.info("No file found for "+DATASOURCE_ABBREVIATION+", skipping");
             }
         }
     }
@@ -326,164 +319,176 @@ public class LoadJAXData implements CommandLineRunner {
             HashMap<String, HashMap<String, List<MarkerAssociation>>> sampleMap = new HashMap<>();
             HashMap<String, List<MarkerAssociation>> markerMap = new HashMap<>();
 
-            JSONObject job = new JSONObject(parseURL(this.variationURL + modelCreation.getSourcePdxId()));
-            JSONArray jarray = job.getJSONArray("variation");
-            String sample = null;
-            String symbol, id, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency, altAllele = null;
-            log.info(jarray.length() + " gene variants for model " + modelCreation.getSourcePdxId());
+            String variationFile = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/" + modelCreation.getSourcePdxId()+".json";
+            File file = new File(variationFile);
 
-            // configure the maximum variations to load in properties file
-            // loading them all will take a while (hour?)
-            int stop = jarray.length();
-            if (maxVariations > 0 && maxVariations < jarray.length()) {
-                stop = maxVariations;
-            }
-            for (int i = 0; i < stop;) {
-                JSONObject j = jarray.getJSONObject(i);
+            if (file.exists()){
 
-                sample = j.getString("sample");
-                symbol = j.getString("gene symbol");
-                id = j.getString("gene id");
-                aaChange = j.getString("amino acid change");
-                technology = j.getString("platform");
-                chromosome = j.getString("chromosome");
-                seqPosition = j.getString("seq position");
-                refAllele = j.getString("ref allele");
-                consequence = j.getString("consequence");
-                rsVariants = j.getString("rs variants");
-                readDepth = j.getString("read depth");
-                alleleFrequency = j.getString("allele frequency");
-                altAllele = j.getString("alt allele");
+                JSONObject job = new JSONObject(parseFile(variationFile));
+                JSONArray jarray = job.getJSONArray("variation");
+                String sample = null;
+                String symbol, id, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency, altAllele = null;
+                log.info(jarray.length() + " gene variants for model " + modelCreation.getSourcePdxId());
 
-                passageMap.put(sample, j.getString("passage num"));
-
-                // since there are 8 fields assume (incorrectly?) all MAs are unique
-                // create a new one rather than look for exisitng one
-                MarkerAssociation ma = new MarkerAssociation();
-
-                ma.setAminoAcidChange(aaChange);
-                ma.setConsequence(consequence);
-                ma.setAlleleFrequency(alleleFrequency);
-                ma.setChromosome(chromosome);
-                ma.setReadDepth(readDepth);
-                ma.setRefAllele(refAllele);
-                ma.setAltAllele(altAllele);
-                ma.setRefAssembly(refAssembly);
-                ma.setRsVariants(rsVariants);
-                ma.setSeqPosition(seqPosition);
-                ma.setReadDepth(readDepth);
-
-                Marker marker = dataImportService.getMarker(symbol);
-                marker.setEntrezId(id);
-                
-                ma.setMarker(marker);
-
-                Platform platform;
-
-                if(technology.equals("Truseq_JAX")){
-                    platform = dataImportService.getPlatform(technology, this.jaxDS, TRUSEQ_PLATFORM_URL);
+                // configure the maximum variations to load in properties file
+                // loading them all will take a while (hour?)
+                int stop = jarray.length();
+                if (maxVariations > 0 && maxVariations < jarray.length()) {
+                    stop = maxVariations;
                 }
-                else if(technology.equals("Whole_Exome")){
-                    platform = dataImportService.getPlatform(technology, this.jaxDS, WHOLE_EXOME_URL);
-                }
-                else if(technology.equals("CTP")){
-                    platform = dataImportService.getPlatform(technology, this.jaxDS, CTP_PLATFORM_URL);
-                }
-                else{
-                    platform = dataImportService.getPlatform(technology, this.jaxDS, "");
-                }
+                for (int i = 0; i < stop;) {
+                    JSONObject j = jarray.getJSONObject(i);
 
+                    sample = j.getString("sample");
+                    symbol = j.getString("gene symbol");
+                    id = j.getString("gene id");
+                    aaChange = j.getString("amino acid change");
+                    technology = j.getString("platform");
+                    chromosome = j.getString("chromosome");
+                    seqPosition = j.getString("seq position");
+                    refAllele = j.getString("ref allele");
+                    consequence = j.getString("consequence");
+                    rsVariants = j.getString("rs variants");
+                    readDepth = j.getString("read depth");
+                    alleleFrequency = j.getString("allele frequency");
+                    altAllele = j.getString("alt allele");
 
-                markerMap = sampleMap.get(sample);
-                if (markerMap == null) {
-                    markerMap = new HashMap<>();
-                }
+                    passageMap.put(sample, j.getString("passage num"));
 
-                // make a map of markerAssociation collections keyed to technology
-                if (markerMap.containsKey(technology)) {
-                    markerMap.get(technology).add(ma);
-                } else {
-                    List<MarkerAssociation> list = new ArrayList<>();
-                    list.add(ma);
-                    markerMap.put(technology, list);
-                }
+                    // since there are 8 fields assume (incorrectly?) all MAs are unique
+                    // create a new one rather than look for exisitng one
+                    MarkerAssociation ma = new MarkerAssociation();
 
-                sampleMap.put(sample, markerMap);
-                i++;
-                if (i % 100 == 0) {
-                    System.out.println("loaded " + i + " markers");
-                }
-            }
-            System.out.println("loaded " + stop + " markers for " + modelCreation.getSourcePdxId());
+                    ma.setAminoAcidChange(aaChange);
+                    ma.setConsequence(consequence);
+                    ma.setAlleleFrequency(alleleFrequency);
+                    ma.setChromosome(chromosome);
+                    ma.setReadDepth(readDepth);
+                    ma.setRefAllele(refAllele);
+                    ma.setAltAllele(altAllele);
+                    ma.setRefAssembly(refAssembly);
+                    ma.setRsVariants(rsVariants);
+                    ma.setSeqPosition(seqPosition);
+                    ma.setReadDepth(readDepth);
 
-            for (String sampleKey : sampleMap.keySet()) {
+                    Marker marker = dataImportService.getMarker(symbol);
+                    marker.setEntrezId(id);
 
-                String passage = getPassage(sampleKey);
-                markerMap = sampleMap.get(sampleKey);
+                    ma.setMarker(marker);
 
-                HashSet<MolecularCharacterization> mcs = new HashSet<>();
-                for (String tech : markerMap.keySet()) {
-                    MolecularCharacterization mc = new MolecularCharacterization();
-                    mc.setType("mutation");
+                    Platform platform;
 
-                    Platform platform = null;
-
-                    if(tech.equals("Truseq_JAX")){
-                        platform = dataImportService.getPlatform(tech, this.jaxDS, TRUSEQ_PLATFORM_URL);
+                    if(technology.equals("Truseq_JAX")){
+                        platform = dataImportService.getPlatform(technology, this.jaxDS, TRUSEQ_PLATFORM_URL);
                     }
-                    else if(tech.equals("Whole_Exome")){
-                        platform = dataImportService.getPlatform(tech, this.jaxDS, WHOLE_EXOME_URL);
+                    else if(technology.equals("Whole_Exome")){
+                        platform = dataImportService.getPlatform(technology, this.jaxDS, WHOLE_EXOME_URL);
                     }
-                    else if(tech.equals("CTP")){
-                        platform = dataImportService.getPlatform(tech, this.jaxDS, CTP_PLATFORM_URL);
+                    else if(technology.equals("CTP")){
+                        platform = dataImportService.getPlatform(technology, this.jaxDS, CTP_PLATFORM_URL);
                     }
                     else{
-                        platform = dataImportService.getPlatform(tech, this.jaxDS, "");
+                        platform = dataImportService.getPlatform(technology, this.jaxDS, "");
                     }
 
 
-                    mc.setPlatform(platform);
-                    mc.setMarkerAssociations(markerMap.get(tech));
-                    mcs.add(mc);
+                    markerMap = sampleMap.get(sample);
+                    if (markerMap == null) {
+                        markerMap = new HashMap<>();
+                    }
 
+                    // make a map of markerAssociation collections keyed to technology
+                    if (markerMap.containsKey(technology)) {
+                        markerMap.get(technology).add(ma);
+                    } else {
+                        List<MarkerAssociation> list = new ArrayList<>();
+                        list.add(ma);
+                        markerMap.put(technology, list);
+                    }
+
+                    sampleMap.put(sample, markerMap);
+                    i++;
+                    if (i % 100 == 0) {
+                        System.out.println("loaded " + i + " markers");
+                    }
+                }
+                System.out.println("loaded " + stop + " markers for " + modelCreation.getSourcePdxId());
+
+                for (String sampleKey : sampleMap.keySet()) {
+
+                    String passage = getPassage(sampleKey);
+                    markerMap = sampleMap.get(sampleKey);
+
+                    HashSet<MolecularCharacterization> mcs = new HashSet<>();
+                    for (String tech : markerMap.keySet()) {
+                        MolecularCharacterization mc = new MolecularCharacterization();
+                        mc.setType("mutation");
+
+                        Platform platform = null;
+
+                        if(tech.equals("Truseq_JAX")){
+                            platform = dataImportService.getPlatform(tech, this.jaxDS, TRUSEQ_PLATFORM_URL);
+                        }
+                        else if(tech.equals("Whole_Exome")){
+                            platform = dataImportService.getPlatform(tech, this.jaxDS, WHOLE_EXOME_URL);
+                        }
+                        else if(tech.equals("CTP")){
+                            platform = dataImportService.getPlatform(tech, this.jaxDS, CTP_PLATFORM_URL);
+                        }
+                        else{
+                            platform = dataImportService.getPlatform(tech, this.jaxDS, "");
+                        }
+
+
+                        mc.setPlatform(platform);
+                        mc.setMarkerAssociations(markerMap.get(tech));
+                        mcs.add(mc);
+
+                    }
+
+
+                    Specimen specimen = dataImportService.getSpecimen(modelCreation, sampleKey, this.jaxDS.getAbbreviation(), passage);
+
+                    Sample specSample = new Sample();
+                    specSample.setSourceSampleId(sampleKey);
+                    specimen.setSample(specSample);
+                    specSample.setMolecularCharacterizations(mcs);
+
+
+                    if (histologyMap.containsKey(passage)) {
+                        Histology histology = new Histology();
+                        Image image = histologyMap.get(passage);
+                        histology.addImage(image);
+                        specSample.addHistology(histology);
+
+                    }
+
+
+                    // all JAX mice are NSG, even if not specified in feed
+                    specimen.setHostStrain(nsgBS);
+
+
+                    specimen.setEngraftmentSite(engraftmentSite);
+                    specimen.setEngraftmentType(engraftmentType);
+
+
+                    dataImportService.saveSpecimen(specimen);
+
+                    modelCreation.addSpecimen(specimen);
+                    modelCreation.addRelatedSample(specSample);
+
+
+                    System.out.println("saved passage " + passage + " for model " + modelCreation.getSourcePdxId() + " from sample " + sampleKey);
                 }
 
-                
-                Specimen specimen = dataImportService.getSpecimen(modelCreation, sampleKey, this.jaxDS.getAbbreviation(), passage);
-     
-                Sample specSample = new Sample();
-                specSample.setSourceSampleId(sampleKey);
-                specimen.setSample(specSample);
-                specSample.setMolecularCharacterizations(mcs);
-                
+                dataImportService.saveModelCreation(modelCreation);
 
-                if (histologyMap.containsKey(passage)) {
-                    Histology histology = new Histology();
-                    Image image = histologyMap.get(passage);
-                    histology.addImage(image);
-                    specSample.addHistology(histology);
-
-                }
-
-
-                // all JAX mice are NSG, even if not specified in feed
-                specimen.setHostStrain(nsgBS);
-                
-
-                specimen.setEngraftmentSite(engraftmentSite);
-                specimen.setEngraftmentType(engraftmentType);
-
-
-                dataImportService.saveSpecimen(specimen);
-
-                modelCreation.addSpecimen(specimen);
-                modelCreation.addRelatedSample(specSample);
-
-
-                System.out.println("saved passage " + passage + " for model " + modelCreation.getSourcePdxId() + " from sample " + sampleKey);
+            }
+            else{
+                log.warn("Variation file not found for "+modelCreation.getSourcePdxId());
             }
 
-            dataImportService.saveModelCreation(modelCreation);
+
 
         } catch (Exception e) {
             log.error("", e);
@@ -508,47 +513,57 @@ public class LoadJAXData implements CommandLineRunner {
      */
     private HashMap<String, Image> getHistologyImageMap(String id) {
         HashMap<String, Image> map = new HashMap<>();
-        try {
-            JSONObject job = new JSONObject(parseURL(this.histologyURL + id));
-            JSONArray jarray = job.getJSONObject("pdxHistology").getJSONArray("Graphics");
-            String comment = job.getJSONObject("pdxHistology").getString("Comment");
 
-            for (int i = 0; i < jarray.length(); i++) {
-                job = jarray.getJSONObject(i);
-                String desc = job.getString("Description");
+            String histologyFile = dataRootDir+DATASOURCE_ABBREVIATION+"/hist/"+id;
+            File file = new File(histologyFile);
 
-                // comments apply to all of a models histology but histologies are passage specific
-                // so I guess attach the comment to all image descriptions
-                if (comment != null && comment.trim().length() > 0) {
-                    String sep = "";
-                    if (desc != null && desc.trim().length() > 0) {
-                        sep = " : ";
-                    }
-                    desc = comment + sep + desc;
-                }
+            if(file.exists()){
+                try {
+                    JSONObject job = new JSONObject(parseFile(histologyFile));
+                    JSONArray jarray = job.getJSONObject("pdxHistology").getJSONArray("Graphics");
+                    String comment = job.getJSONObject("pdxHistology").getString("Comment");
 
-                String url = job.getString("URL");
-                Image img = new Image();
-                img.setDescription(desc);
-                img.setUrl(url);
-                if (desc.startsWith("Patient") || desc.startsWith("Primary")) {
-                    map.put("Patient", img);
-                } else {
-                    String[] parts = desc.split(" ");
-                    if (parts[0].startsWith("P")) {
-                        try {
-                            String passage = new Integer(parts[0].replace("P", "")).toString();
-                            map.put(passage, img);
-                        } catch (Exception e) {
-                            log.info("Can't extract passage from description " + desc);
+                    for (int i = 0; i < jarray.length(); i++) {
+                        job = jarray.getJSONObject(i);
+                        String desc = job.getString("Description");
+
+                        // comments apply to all of a models histology but histologies are passage specific
+                        // so I guess attach the comment to all image descriptions
+                        if (comment != null && comment.trim().length() > 0) {
+                            String sep = "";
+                            if (desc != null && desc.trim().length() > 0) {
+                                sep = " : ";
+                            }
+                            desc = comment + sep + desc;
+                        }
+
+                        String url = job.getString("URL");
+                        Image img = new Image();
+                        img.setDescription(desc);
+                        img.setUrl(url);
+                        if (desc.startsWith("Patient") || desc.startsWith("Primary")) {
+                            map.put("Patient", img);
+                        } else {
+                            String[] parts = desc.split(" ");
+                            if (parts[0].startsWith("P")) {
+                                try {
+                                    String passage = new Integer(parts[0].replace("P", "")).toString();
+                                    map.put(passage, img);
+                                } catch (Exception e) {
+                                    log.info("Can't extract passage from description " + desc);
+                                }
+                            }
                         }
                     }
+
+                } catch (Exception e) {
+                    log.error("Error getting histology for model " + id, e);
                 }
+
             }
 
-        } catch (Exception e) {
-            log.error("Error getting histology for model " + id, e);
-        }
+
+
 
         return map;
     }

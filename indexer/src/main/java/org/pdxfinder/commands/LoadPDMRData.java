@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -34,7 +35,7 @@ import java.util.stream.Stream;
  * Load PDMR data
  */
 @Component
-@Order(value = 0)
+@Order(value = -16)
 public class LoadPDMRData implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadPDMRData.class);
@@ -69,17 +70,6 @@ public class LoadPDMRData implements CommandLineRunner {
     private DataImportService dataImportService;
     private Session session;
 
-    @Value("${pdmrpdx.file}")
-    private String file;
-
-    @Value("${pdmrpdx.url}")
-    private String urlStr;
-
-    @Value("${pdmrpdx.variation.url}")
-    private String variationURL;
-
-    @Value("${pdmrpdx.histology.url}")
-    private String histologyURL;
 
     @Value("${pdmrpdx.variation.max}")
     private int maxVariations;
@@ -87,8 +77,9 @@ public class LoadPDMRData implements CommandLineRunner {
     @Value("${pdmrpdx.ref.assembly}")
     private String refAssembly;
 
-    @Value("${pdmrpdx.mutations.file}")
-    private String mutationsFile;
+
+    @Value("${pdxfinder.data.root.dir}")
+    private String dataRootDir;
 
     HashMap<String, String> passageMap = null;
     HashMap<String, Image> histologyMap = null;
@@ -114,10 +105,12 @@ public class LoadPDMRData implements CommandLineRunner {
         if (options.has("loadPDMR") || options.has("loadALL")) {
 
             log.info("Loading PDMR PDX data.");
+            String fileStr = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
+            File file = new File(fileStr);
 
-            if (file != null) {
+            if (file.exists()) {
                 log.info("Loading from file " + file);
-                parseJSON(parseFile(file));
+                parseJSON(parseFile(fileStr));
 
                 //loadMutationData();
 
@@ -125,8 +118,10 @@ public class LoadPDMRData implements CommandLineRunner {
             } /* else if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
                 parseJSON(parseURL(urlStr));
-            } */else {
-                log.error("No pdmrpdx.file or pdmrpdx.url provided in properties");
+            } */
+            else{
+
+                log.info("No file found for "+DATASOURCE_ABBREVIATION+", skipping");
             }
         }
     }
@@ -343,6 +338,8 @@ public class LoadPDMRData implements CommandLineRunner {
         Map<String, MolecularCharacterization> molcharMap = new HashMap<>();
 
         Set<String> missingPatients = new HashSet<>();
+
+        String mutationsFile = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/mut/data.json";
         try {
             BufferedReader buf = new BufferedReader(new FileReader(mutationsFile));
 
@@ -495,8 +492,8 @@ public class LoadPDMRData implements CommandLineRunner {
 
             HashMap<String, HashMap<String, List<MarkerAssociation>>> sampleMap = new HashMap<>();
             HashMap<String, List<MarkerAssociation>> markerMap = new HashMap<>();
-
-            JSONObject job = new JSONObject(parseURL(this.variationURL + modelCreation.getSourcePdxId()));
+            String variationURL = "";
+            JSONObject job = new JSONObject(parseFile(variationURL + modelCreation.getSourcePdxId()));
             JSONArray jarray = job.getJSONArray("variation");
             String sample = null;
             String symbol, id, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency, altAllele = null;
@@ -650,7 +647,8 @@ public class LoadPDMRData implements CommandLineRunner {
     private HashMap<String, Image> getHistologyImageMap(String id) {
         HashMap<String, Image> map = new HashMap<>();
         try {
-            JSONObject job = new JSONObject(parseURL(this.histologyURL + id));
+            String histologyURL = "";
+            JSONObject job = new JSONObject(parseFile(histologyURL + id));
             JSONArray jarray = job.getJSONObject("pdxHistology").getJSONArray("Graphics");
             String comment = job.getJSONObject("pdxHistology").getString("Comment");
 

@@ -14,6 +14,7 @@ import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -21,16 +22,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Load data from WUSTL PDXNet.
  */
 @Component
-@Order(value = 0)
+@Order(value = -14)
 public class LoadWUSTL implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadWUSTL.class);
@@ -62,6 +68,9 @@ public class LoadWUSTL implements CommandLineRunner {
     private DataImportService dataImportService;
     private Session session;
 
+    @Value("${pdxfinder.data.root.dir}")
+    private String dataRootDir;
+
     public LoadWUSTL(DataImportService dataImportService) {
         this.dataImportService = dataImportService;
     }
@@ -76,7 +85,7 @@ public class LoadWUSTL implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        String[] urls = {"http://tumor.informatics.jax.org/PDXInfo/WUSTLBreast.json", "http://tumor.informatics.jax.org/PDXInfo/WUSTLSarcoma.json", "http://tumor.informatics.jax.org/PDXInfo/WUSTLPCMNew.json"};
+
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadWUSTL", "Load WUSTL PDX data");
@@ -88,12 +97,35 @@ public class LoadWUSTL implements CommandLineRunner {
 
             log.info("Loading WUSTL PDX data.");
 
-            for (String urlStr : urls) {
+            File folder = new File(dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/");
 
-                log.info("Loading from URL " + urlStr);
-                parseJSON(parseURL(urlStr));
+            if(folder.exists()){
+
+                File[] listOfFiles = folder.listFiles();
+
+                if(listOfFiles.length == 0){
+
+                    log.info("No file found for "+DATASOURCE_ABBREVIATION+", skipping");
+                }
+                else{
+
+                    for (int i = 0; i < listOfFiles.length; i++) {
+                        if (listOfFiles[i].isFile()) {
+                            String fileName = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/"+listOfFiles[i].getName();
+
+                            parseJSON(parseFile(fileName));
+
+                        }
+                    }
+
+                }
 
             }
+            else{
+                log.info(DATASOURCE_ABBREVIATION+" dir does not exist, skipping.");
+            }
+
+
         }
 
     }
@@ -272,6 +304,23 @@ public class LoadWUSTL implements CommandLineRunner {
             in.close();
         } catch (Exception e) {
             log.error("Unable to read from WUSTL JSON URL " + urlStr, e);
+        }
+        return sb.toString();
+    }
+
+    private String parseFile(String path) {
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            Stream<String> stream = Files.lines(Paths.get(path));
+
+            Iterator itr = stream.iterator();
+            while (itr.hasNext()) {
+                sb.append(itr.next());
+            }
+        } catch (Exception e) {
+            log.error("Failed to load file " + path, e);
         }
         return sb.toString();
     }
