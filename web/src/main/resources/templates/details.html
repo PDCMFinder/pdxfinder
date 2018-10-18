@@ -270,6 +270,7 @@
                             </div>
 
 
+
                             <div class="columns medium-12 small-12 margin-top-medium card-3">
                                 <div class="responsive-table top-space-20">
                                     <table class="datatable-pdx table-borderedPdx pdx-table head-left">
@@ -295,8 +296,8 @@
                                         </tbody>
                                     </table>
                                 </div>
-
                             </div>
+
 
                             <div class="columns medium-12 small-12 margin-top-medium card-3">
                                 <div class="responsive-table top-space-20">
@@ -304,7 +305,34 @@
                                     <table class="datatable-pdx pdx-table table-borderedPdx head-left">
                                         <thead>
                                         <tr>
-                                            <th colspan="3">Model quality control</th>
+                                            <th colspan="3">PDX model</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Strain</th>
+                                            <th>Engraftment Site</th>
+                                            <th>Implantation Material</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="pdxModel, iter : ${data.pdxModelList}">
+                                            <td th:text="${pdxModel.strain}"></td>
+                                            <td th:text="${pdxModel.engraftmentSite}"></td>
+                                            <td th:text="${pdxModel.sampleType}"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+
+                            <div class="columns medium-12 small-12 margin-top-medium card-3">
+                                <div class="responsive-table top-space-20">
+
+                                    <table class="datatable-pdx pdx-table table-borderedPdx head-left">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="3">Model Quality Control</th>
                                         </tr>
                                         <tr>
                                             <th>Technique</th>
