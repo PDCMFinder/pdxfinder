@@ -1,5 +1,8 @@
 package org.pdxfinder.services.dto;
 
+/*
+ * Created by abayomi on 21/09/2018.
+ */
 public class CollectionEventsDTO {
 
     private String age;

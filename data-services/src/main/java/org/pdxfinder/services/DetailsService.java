@@ -4,10 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
-import org.pdxfinder.services.dto.DetailsDTO;
-import org.pdxfinder.services.dto.DrugSummaryDTO;
-import org.pdxfinder.services.dto.PatientDTO;
-import org.pdxfinder.services.dto.VariationDataDTO;
+import org.pdxfinder.services.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -68,16 +65,16 @@ public class DetailsService {
 
 
     public DetailsService(SampleRepository sampleRepository,
-                         PatientRepository patientRepository,
-                         PatientSnapshotRepository patientSnapshotRepository,
-                         ModelCreationRepository modelCreationRepository,
-                         SpecimenRepository specimenRepository,
-                         MolecularCharacterizationRepository molecularCharacterizationRepository,
-                         PlatformRepository platformRepository,
-                         TreatmentSummaryRepository treatmentSummaryRepository,
-                         GraphService graphService,
-                         PlatformService platformService,
-                         DrugService drugService,
+                          PatientRepository patientRepository,
+                          PatientSnapshotRepository patientSnapshotRepository,
+                          ModelCreationRepository modelCreationRepository,
+                          SpecimenRepository specimenRepository,
+                          MolecularCharacterizationRepository molecularCharacterizationRepository,
+                          PlatformRepository platformRepository,
+                          TreatmentSummaryRepository treatmentSummaryRepository,
+                          GraphService graphService,
+                          PlatformService platformService,
+                          DrugService drugService,
                           PatientService patientService) {
 
         this.sampleRepository = sampleRepository;
@@ -279,13 +276,13 @@ public class DetailsService {
         if(pdx!= null && pdx.getSpecimens() != null){
 
             Set<Specimen> sp = pdx.getSpecimens();
-            List<Object> pdxModelList = new ArrayList<>();
+            Set<EngraftmentDataDTO> pdxModels = new LinkedHashSet<>();
 
 
             for(Specimen s:sp){
 
 
-                Map pdxModel = new HashMap();
+                EngraftmentDataDTO pdxModel = new EngraftmentDataDTO();
 
                 if (s.getHostStrain() != null) {
 
@@ -306,57 +303,85 @@ public class DetailsService {
                         hostStrainMap.put(hostStrain, "Not Specified");
                     }
 
+
+                    if (s.getHostStrain() != null) {
+                        pdxModel.setStrain(notEmpty(s.getHostStrain().getName()));
+                    } else {
+
+                        pdxModel.setStrain("Not Specified");
+                    }
+
                     //Set implantation site and type
                     if(s.getEngraftmentSite() != null){
-                        dto.setEngraftmentSite( notEmpty(s.getEngraftmentSite().getName()) );
-                        pdxModel.put("engraftmentSite", notEmpty(s.getEngraftmentSite().getName()));
+                        //dto.setEngraftmentSite( notEmpty(s.getEngraftmentSite().getName()) );
+                        pdxModel.setEngraftmentSite(notEmpty(s.getEngraftmentSite().getName()));
                     } else{
 
-                        dto.setEngraftmentSite("Not Specified");
-                        pdxModel.put("engraftmentSite", "Not Specified");
+                        //dto.setEngraftmentSite("Not Specified");
+                        pdxModel.setEngraftmentSite("Not Specified");
                     }
 
 
                     if(s.getEngraftmentType() != null){
-                        dto.setSampleType( notEmpty(s.getEngraftmentType().getName()) );
-                        pdxModel.put("sampleType", notEmpty(s.getEngraftmentType().getName()));
+                        //dto.setSampleType( notEmpty(s.getEngraftmentType().getName()) );
+                        pdxModel.setEngraftmentType(notEmpty(s.getEngraftmentType().getName()));
                     } else{
 
                         dto.setSampleType("Not Specified");
-                        pdxModel.put("sampleType", "Not Specified");
+                        pdxModel.setEngraftmentType("Not Specified");
+                    }
+
+
+                    if (s.getEngraftmentMaterial() != null) {
+                        //dto.setSampleType( notEmpty(s.getEngraftmentType().getName()) );
+                        pdxModel.setEngraftmentMaterial(notEmpty(s.getEngraftmentMaterial().getName()));
+                        pdxModel.setEngraftmentMaterialState(notEmpty(s.getEngraftmentMaterial().getState()));
+                    } else {
+
+                        //dto.setSampleType("Not Specified");
+                        pdxModel.setEngraftmentMaterial("Not Specified");
+                        pdxModel.setEngraftmentMaterialState("Not Specified");
+                    }
+
+
+                    if (s.getPassage() != null) {
+                        pdxModel.setPassage(notEmpty(s.getPassage()));
+                    } else {
+
+                        pdxModel.setPassage("Not Specified");
                     }
 
                 }
 
-
-                String composedStrain = "";
-
-                if (hostStrainMap.size() > 1) {
-
-                    composedStrain = hostStrainMap
-                            .keySet()
-                            .stream()
-                            .map(x -> getHostStrainString(x, hostStrainMap))
-                            .collect(Collectors.joining("; "));
-                } else if (hostStrainMap.size() == 1) {
-
-                    for (String key : hostStrainMap.keySet()) {
-                        composedStrain = key;
-                    }
-                } else {
-                    composedStrain = "Not Specified";
-                }
-
-                dto.setStrain(notEmpty(composedStrain));
-
-                pdxModel.put("strain", notEmpty(composedStrain));
-
-                pdxModelList.add(pdxModel);
+                pdxModels.add(pdxModel);
 
             }
 
-            dto.setPdxModelList(pdxModelList);
+            dto.setPdxModelList(pdxModels);
         }
+
+
+        // Unused Start:
+        String composedStrain = "";
+
+        if (hostStrainMap.size() > 1) {
+
+            composedStrain = hostStrainMap
+                    .keySet()
+                    .stream()
+                    .map(x -> getHostStrainString(x, hostStrainMap))
+                    .collect(Collectors.joining("; "));
+        } else if (hostStrainMap.size() == 1) {
+
+            for (String key : hostStrainMap.keySet()) {
+                composedStrain = key;
+            }
+        } else {
+            composedStrain = "Not Specified";
+        }
+
+        dto.setStrain(notEmpty(composedStrain));
+        // Unused Ends
 
 
 

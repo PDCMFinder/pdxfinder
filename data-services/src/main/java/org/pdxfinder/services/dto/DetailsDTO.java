@@ -34,11 +34,11 @@ public class DetailsDTO {
     private String stageClassification;
     private String gradeClassification;
 
-    private String sampleType; //Implantation Material
+    private String sampleType; //Engraftment Type
     private String strain;
     private String mouseSex;
     private String engraftmentSite; // Engraftment Site
-    private List pdxModelList;
+    private Set<EngraftmentDataDTO> pdxModelList;
 
     private String externalUrl;
     private String externalUrlText;
@@ -250,16 +250,16 @@ public class DetailsDTO {
         this.strain = strain;
     }
 
-    public List getPdxModelList() {
+    public String getMouseSex() {
+        return mouseSex;
+    }
+
+    public Set<EngraftmentDataDTO> getPdxModelList() {
         return pdxModelList;
     }
 
-    public void setPdxModelList(List pdxModelList) {
+    public void setPdxModelList(Set<EngraftmentDataDTO> pdxModelList) {
         this.pdxModelList = pdxModelList;
-    }
-
-    public String getMouseSex() {
-        return mouseSex;
     }
 
     public void setMouseSex(String mouseSex) {
