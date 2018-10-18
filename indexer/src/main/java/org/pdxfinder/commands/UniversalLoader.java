@@ -55,8 +55,8 @@ public class UniversalLoader implements CommandLineRunner {
     private Session session;
 
 
-    @Value("#{'${universal.template.files}'.split(',')}")
-    private List<String> templateFiles;
+    @Value("${pdxfinder.data.root.dir}")
+    private String dataRootDir;
 
     /**
      * Placeholder for the data stored in the "patient" tab
@@ -127,33 +127,65 @@ public class UniversalLoader implements CommandLineRunner {
 
         if (options.has("loadUniversal") || options.has("loadALL")) {
 
-            for(String fileName : templateFiles){
+            File folder = new File(dataRootDir + "UPDOG/");
 
-                log.info("******************************************************");
-                log.info("* Starting universal loader                          *");
-                log.info("******************************************************");
+            if (folder.exists()) {
 
-                if(!fileName.isEmpty()){
+                File[] updogDirs = folder.listFiles();
 
-                    FileInputStream excelFile = new FileInputStream(new File(fileName));
+                if (updogDirs.length == 0) {
 
-                    Workbook workbook = new XSSFWorkbook(excelFile);
-                    log.info("Loading template from "+fileName);
+                    log.warn("No subdirs found for the universal loader, skipping");
+                } else {
 
-                    initializeTemplateData(workbook);
+                    for (int i = 0; i < updogDirs.length; i++) {
 
-                    loadTemplateData();
+                        if (updogDirs[i].isDirectory()) {
 
-                    workbook.close();
-                    excelFile.close();
+                            String templateFileStr = dataRootDir + "UPDOG/" + updogDirs[i].getName() + "/template.xlsx";
 
+                            File template = new File(templateFileStr);
+
+                            //found the template, load it
+                            if (template.exists()) {
+
+                                log.info("******************************************************");
+                                log.info("* Starting universal loader                          *");
+                                log.info("******************************************************");
+
+
+                                FileInputStream excelFile = new FileInputStream(new File(templateFileStr));
+
+                                Workbook workbook = new XSSFWorkbook(excelFile);
+                                log.info("Loading template from " + templateFileStr);
+
+                                initializeTemplateData(workbook);
+
+                                loadTemplateData();
+
+                                workbook.close();
+                                excelFile.close();
+
+                                log.info("******************************************************");
+                                log.info("* Finished running universal loader                  *");
+                                log.info("******************************************************");
+
+                            } else {
+
+                                log.error("No template file found for universal loader in " + updogDirs[i]);
+                            }
+
+                        }
+                    }
                 }
 
-                log.info("******************************************************");
-                log.info("* Finished running universal loader                  *");
-                log.info("******************************************************");
-
             }
+            //NO UNIVERSAL TEMPLATES, SKIP
+            else {
+
+                log.warn("No UPDOG directory found. Who let the dog out?");
+            }
+
 
         }
     }
@@ -195,6 +227,7 @@ public class UniversalLoader implements CommandLineRunner {
 
     /**
      * Loads the data from a spreadsheet tab into a placeholder
+     *
      * @param sheet
      * @param sheetName
      */
@@ -240,38 +273,31 @@ public class UniversalLoader implements CommandLineRunner {
                 dataRow.add(value);
             }
             //check if there is some data in the row and they are not all nulls
-            if(dataRow.size() > 0 && !isRowOfNulls(dataRow)){
+            if (dataRow.size() > 0 && !isRowOfNulls(dataRow)) {
 
                 //insert the row to the appropriate placeholder
                 if (sheetName.equals("patientSheetData")) {
 
                     patientSheetData.add(dataRow);
-                }
-                else if (sheetName.equals("patientTumorSheetData")) {
+                } else if (sheetName.equals("patientTumorSheetData")) {
 
                     patientTumorSheetData.add(dataRow);
-                }
-                else if (sheetName.equals("patientTreatmentSheetData")) {
+                } else if (sheetName.equals("patientTreatmentSheetData")) {
 
                     patientTreatmentSheetData.add(dataRow);
-                }
-                else if (sheetName.equals("pdxModelSheetData")) {
+                } else if (sheetName.equals("pdxModelSheetData")) {
 
                     pdxModelSheetData.add(dataRow);
-                }
-                else if (sheetName.equals("pdxModelValidationSheetData")) {
+                } else if (sheetName.equals("pdxModelValidationSheetData")) {
 
                     pdxModelValidationSheetData.add(dataRow);
-                }
-                else if(sheetName.equals("derivedDatasetSheetData")){
+                } else if (sheetName.equals("derivedDatasetSheetData")) {
 
                     derivedDatasetSheetData.add(dataRow);
-                }
-                else if(sheetName.equals("sharingAndContactSheetData")){
+                } else if (sheetName.equals("sharingAndContactSheetData")) {
 
                     sharingAndContactSheetData.add(dataRow);
-                }
-                else if(sheetName.equals("loaderRelatedDataSheetData")){
+                } else if (sheetName.equals("loaderRelatedDataSheetData")) {
 
                     loaderRelatedDataSheetData.add(dataRow);
                 }
@@ -309,7 +335,7 @@ public class UniversalLoader implements CommandLineRunner {
         log.info("* Creating DataSource                                *");
         log.info("******************************************************");
 
-        if(loaderRelatedDataSheetData.size() != 1){
+        if (loaderRelatedDataSheetData.size() != 1) {
             stopLoading = true;
 
             log.error("Zero or multiple provider definitions! Loading process is terminated.");
@@ -320,7 +346,7 @@ public class UniversalLoader implements CommandLineRunner {
         String providerAbbreviation = loaderRelatedDataSheetData.get(0).get(1);
         String sourceUrl = loaderRelatedDataSheetData.get(0).get(2);
 
-        if(providerName.isEmpty() || providerAbbreviation.isEmpty()){
+        if (providerName.isEmpty() || providerAbbreviation.isEmpty()) {
             stopLoading = true;
 
             log.error("Missing provider name or abbreviation! Loading process is terminated!");
@@ -333,7 +359,7 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPatients() {
 
-        if(stopLoading) return;
+        if (stopLoading) return;
 
         log.info("******************************************************");
         log.info("* Creating Patients                                  *");
@@ -363,14 +389,14 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPatientTumors() {
 
-        if(stopLoading) return;
+        if (stopLoading) return;
 
         log.info("******************************************************");
         log.info("* Creating Patient samples and snapshots             *");
         log.info("******************************************************");
 
         int row = 6;
-        log.info("Tumor row number: "+patientTumorSheetData.size());
+        log.info("Tumor row number: " + patientTumorSheetData.size());
         for (List<String> patientTumorRow : patientTumorSheetData) {
 
             try {
@@ -397,7 +423,7 @@ public class UniversalLoader implements CommandLineRunner {
                 String treatmentNaive = patientTumorRow.get(16);
 
 
-                if(modelId.isEmpty()){
+                if (modelId.isEmpty()) {
                     log.error("Missing corresponding Model ID in row " + row);
                     continue;
                 }
@@ -415,9 +441,9 @@ public class UniversalLoader implements CommandLineRunner {
                 }
 
                 //need this trick to remove float values, ie: patient age = 30.0
-                if(!ageAtCollection.equals("Not Specified")){
-                    int ageAtColl = (int)Float.parseFloat(ageAtCollection);
-                    ageAtCollection = ageAtColl+"";
+                if (!ageAtCollection.equals("Not Specified")) {
+                    int ageAtColl = (int) Float.parseFloat(ageAtCollection);
+                    ageAtCollection = ageAtColl + "";
                 }
 
 
@@ -454,7 +480,7 @@ public class UniversalLoader implements CommandLineRunner {
                 row++;
 
             } catch (Exception e) {
-                log.error("Exception in row: "+row);
+                log.error("Exception in row: " + row);
                 e.printStackTrace();
 
             }
@@ -465,14 +491,14 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPatientTreatments() {
 
-        if(stopLoading) return;
+        if (stopLoading) return;
 
         log.info("******************************************************");
         log.info("* Creating Patient treatments                        *");
         log.info("******************************************************");
 
         int row = 6;
-        for(List<String> patientTreatmentRow : patientTreatmentSheetData){
+        for (List<String> patientTreatmentRow : patientTreatmentSheetData) {
 
             String patientId = patientTreatmentRow.get(0);
             String treatment = patientTreatmentRow.get(1);
@@ -482,27 +508,27 @@ public class UniversalLoader implements CommandLineRunner {
             String response = patientTreatmentRow.get(5);
             String responseClassification = patientTreatmentRow.get(6);
 
-            if(patientId.isEmpty() || treatment.isEmpty()){
+            if (patientId.isEmpty() || treatment.isEmpty()) {
 
-                log.error("Empty patient id or treatment in row "+row);
+                log.error("Empty patient id or treatment in row " + row);
                 continue;
             }
 
 
             Patient patient = dataImportService.findPatient(patientId, ds);
 
-            if(patient == null){
+            if (patient == null) {
 
-                log.error("Patient not found: "+patientId);
+                log.error("Patient not found: " + patientId);
                 continue;
             }
 
             PatientSnapshot ps = dataImportService.findLastPatientSnapshot(patientId, ds);
 
             //at this point a patient should have at least one snapshot, so if ps is null, thats an error
-            if(ps == null){
+            if (ps == null) {
 
-                log.error("No snapshot for patient: "+patientId);
+                log.error("No snapshot for patient: " + patientId);
                 continue;
             }
 
@@ -510,17 +536,17 @@ public class UniversalLoader implements CommandLineRunner {
 
             TreatmentSummary ts = dataImportService.findTreatmentSummaryByPatientSnapshot(ps);
 
-            if(ts == null){
+            if (ts == null) {
                 ts = new TreatmentSummary();
                 ts.setUrl(treatmentUrl);
             }
 
             TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatment, dose, response, responseClassification);
 
-            if(tp != null){
+            if (tp != null) {
 
                 //update treatment component type and duration
-                for(TreatmentComponent tc : tp.getComponents()){
+                for (TreatmentComponent tc : tp.getComponents()) {
 
                     tc.setDuration(duration);
                     //never control on humans!
@@ -539,9 +565,9 @@ public class UniversalLoader implements CommandLineRunner {
 
     }
 
-    private void createDerivedPatientModelDataset(){
+    private void createDerivedPatientModelDataset() {
 
-        if(stopLoading) return;
+        if (stopLoading) return;
 
         log.info("******************************************************");
         log.info("* Creating dataset derived from patients and models  *");
@@ -549,7 +575,7 @@ public class UniversalLoader implements CommandLineRunner {
 
         int row = 6;
 
-        for(List<String> derivedDatasetRow : derivedDatasetSheetData){
+        for (List<String> derivedDatasetRow : derivedDatasetSheetData) {
 
             String sampleId = derivedDatasetRow.get(0);
             String origin = derivedDatasetRow.get(1);
@@ -565,9 +591,9 @@ public class UniversalLoader implements CommandLineRunner {
 
             //check essential values
 
-            if(sampleId.isEmpty() || origin.isEmpty() || passage.isEmpty() || nomenclature.isEmpty() || modelId.isEmpty()
+            if (sampleId.isEmpty() || origin.isEmpty() || passage.isEmpty() || nomenclature.isEmpty() || modelId.isEmpty()
                     || molCharType.isEmpty() || platformName.isEmpty() || platformTechnology.isEmpty() || platformDescription.isEmpty()
-                    || analysisProtocol.isEmpty()){
+                    || analysisProtocol.isEmpty()) {
 
 
                 log.error("Missing essential value in row " + row);
@@ -576,7 +602,7 @@ public class UniversalLoader implements CommandLineRunner {
 
             //need this trick to get rid of 0.0 if there is any
             //if(passage.equals("0.0")) passage = "0";
-            int passageInt = (int)Float.parseFloat(passage);
+            int passageInt = (int) Float.parseFloat(passage);
             passage = String.valueOf(passageInt);
 
             ModelCreation model;
@@ -584,11 +610,11 @@ public class UniversalLoader implements CommandLineRunner {
             Platform platform;
 
             //patient sample
-            if(origin.toLowerCase().equals("patient")){
+            if (origin.toLowerCase().equals("patient")) {
 
                 sample = dataImportService.getHumanSample(sampleId, ds.getAbbreviation());
 
-                if(sample != null){
+                if (sample != null) {
 
                     platform = dataImportService.getPlatform(platformName, ds);
                     MolecularCharacterization mc = new MolecularCharacterization();
@@ -598,8 +624,7 @@ public class UniversalLoader implements CommandLineRunner {
                     sample.addMolecularCharacterization(mc);
                     dataImportService.saveSample(sample);
 
-                }
-                else{
+                } else {
 
                     log.error("Unknown human sample with id: " + sampleId);
                     continue;
@@ -608,11 +633,11 @@ public class UniversalLoader implements CommandLineRunner {
 
             }
             //xenograft sample
-            else if(origin.toLowerCase().equals("xenograft")){
+            else if (origin.toLowerCase().equals("xenograft")) {
 
                 model = dataImportService.findModelByIdAndDataSourceWithSpecimens(modelId, ds.getAbbreviation());
 
-                if(model != null){
+                if (model != null) {
 
                     Specimen specimen = dataImportService.getSpecimen(model,
                             sampleId, ds.getAbbreviation(), passage);
@@ -636,32 +661,27 @@ public class UniversalLoader implements CommandLineRunner {
 
                     dataImportService.saveModelCreation(model);
                     dataImportService.saveSample(sample);
-                }
-                else{
+                } else {
 
                     log.error("Model not found with id: " + modelId);
                     continue;
                 }
 
-            }
-            else{
+            } else {
 
-                log.error("Unknown sample origin in row " +row);
+                log.error("Unknown sample origin in row " + row);
                 continue;
             }
 
 
-
-
         }
-
 
 
     }
 
     private void createPdxModelDetails() {
 
-        if(stopLoading) return;
+        if (stopLoading) return;
 
         log.info("******************************************************");
         log.info("* Creating Model details                             *");
@@ -669,7 +689,7 @@ public class UniversalLoader implements CommandLineRunner {
 
         int row = 6;
 
-        for(List<String> modelDetailsRow : pdxModelSheetData){
+        for (List<String> modelDetailsRow : pdxModelSheetData) {
 
             String modelId = modelDetailsRow.get(0);
             String hostStrainName = modelDetailsRow.get(1);
@@ -683,10 +703,10 @@ public class UniversalLoader implements CommandLineRunner {
 
 
             //check if essential values are not empty
-            if(modelId.isEmpty() || hostStrainName.isEmpty() || hostStrainNomenclature.isEmpty() ||
-                    engraftmentSite.isEmpty() || engraftmentType.isEmpty() || engraftmentMaterial.isEmpty()){
+            if (modelId.isEmpty() || hostStrainName.isEmpty() || hostStrainNomenclature.isEmpty() ||
+                    engraftmentSite.isEmpty() || engraftmentType.isEmpty() || engraftmentMaterial.isEmpty()) {
 
-                log.error("Missing essential value in row: "+row);
+                log.error("Missing essential value in row: " + row);
                 row++;
                 continue;
 
@@ -696,9 +716,9 @@ public class UniversalLoader implements CommandLineRunner {
 
             ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
 
-            if(model == null){
+            if (model == null) {
 
-                log.error("Missing model, cannot add details: "+modelId);
+                log.error("Missing model, cannot add details: " + modelId);
                 row++;
                 continue;
             }
@@ -711,12 +731,12 @@ public class UniversalLoader implements CommandLineRunner {
             HostStrain hostStrain = dataImportService.getHostStrain(hostStrainName, hostStrainNomenclature, "", "");
 
             //passage = all
-            if(passage.toLowerCase().trim().equals("all")){
+            if (passage.toLowerCase().trim().equals("all")) {
 
                 //update all specimens with the same site, type etc.
                 List<Specimen> specimens = dataImportService.getAllSpecimenByModel(modelId, ds.getAbbreviation());
 
-                for(Specimen specimen :specimens){
+                for (Specimen specimen : specimens) {
 
                     specimen.setEngraftmentSite(es);
                     specimen.setEngraftmentType(et);
@@ -726,14 +746,14 @@ public class UniversalLoader implements CommandLineRunner {
                 }
             }
             // passage = 1,3,5
-            else if(passage.contains(",")){
+            else if (passage.contains(",")) {
 
                 String[] passageArr = passage.split(",");
 
-                for(int i = 0; i<passageArr.length; i++){
+                for (int i = 0; i < passageArr.length; i++) {
 
                     List<Specimen> specimens = dataImportService.findSpecimenByPassage(model, passageArr[i]);
-                    for(Specimen specimen : specimens){
+                    for (Specimen specimen : specimens) {
 
                         specimen.setEngraftmentSite(es);
                         specimen.setEngraftmentType(et);
@@ -745,14 +765,14 @@ public class UniversalLoader implements CommandLineRunner {
                 }
             }
             //the passage is a single number
-            else if(passage.matches("\\d+")){
+            else if (passage.matches("\\d+")) {
 
                 //need this trick to get rid of fractures if there is any
                 int passageInt = Integer.parseInt(passage);
                 passage = String.valueOf(passageInt);
 
                 List<Specimen> specimens = dataImportService.findSpecimenByPassage(model, passage);
-                for(Specimen specimen : specimens){
+                for (Specimen specimen : specimens) {
 
                     specimen.setEngraftmentSite(es);
                     specimen.setEngraftmentType(et);
@@ -761,30 +781,29 @@ public class UniversalLoader implements CommandLineRunner {
                     dataImportService.saveSpecimen(specimen);
                 }
 
-            }
-            else{
+            } else {
 
-                log.error("Not supported value("+ passage +") for passage at row " +row);
+                log.error("Not supported value(" + passage + ") for passage at row " + row);
             }
 
             //CREATE PUBLICATION GROUPS
 
             //check if pubmed id is in the right format, ie id starts with PMID
-            if(!pubmedIdString.isEmpty() && pubmedIdString.toLowerCase().contains("pmid")){
+            if (!pubmedIdString.isEmpty() && pubmedIdString.toLowerCase().contains("pmid")) {
 
                 // pubmed ids separated with a comma, create multiple groups
-                if(pubmedIdString.contains(",")){
+                if (pubmedIdString.contains(",")) {
 
                     String[] pubmedArr = pubmedIdString.split(",");
 
-                    for(int i=0; i<pubmedArr.length; i++){
+                    for (int i = 0; i < pubmedArr.length; i++) {
 
                         Group g = dataImportService.getPublicationGroup(pubmedArr[i].trim());
                         model.addGroup(g);
                     }
                 }
                 //single publication, create one group only
-                else{
+                else {
 
                     Group g = dataImportService.getPublicationGroup(pubmedIdString.trim());
                     model.addGroup(g);
@@ -800,7 +819,7 @@ public class UniversalLoader implements CommandLineRunner {
 
     private void createPdxModelValidations() {
 
-        if(stopLoading) return;
+        if (stopLoading) return;
 
         log.info("******************************************************");
         log.info("* Creating Model validations                         *");
@@ -808,8 +827,7 @@ public class UniversalLoader implements CommandLineRunner {
 
         int row = 6;
 
-        for(List<String> pdxModelValidationRow : pdxModelValidationSheetData){
-
+        for (List<String> pdxModelValidationRow : pdxModelValidationSheetData) {
 
 
             String modelId = pdxModelValidationRow.get(0);
@@ -818,9 +836,9 @@ public class UniversalLoader implements CommandLineRunner {
             String passages = pdxModelValidationRow.get(3);
             String validationHostStrain = pdxModelValidationRow.get(4);
 
-            if(modelId.isEmpty() || validationTechnique.isEmpty()){
+            if (modelId.isEmpty() || validationTechnique.isEmpty()) {
 
-                log.error("Empty essential value in row: " +row);
+                log.error("Empty essential value in row: " + row);
                 row++;
                 continue;
             }
@@ -829,9 +847,9 @@ public class UniversalLoader implements CommandLineRunner {
             //at this point the corresponding pdx model node should be created and available for lookup
             ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
 
-            if(model == null){
+            if (model == null) {
 
-                log.error("Missing model, cannot add validation: "+modelId);
+                log.error("Missing model, cannot add validation: " + modelId);
                 row++;
                 continue;
             }
@@ -840,9 +858,9 @@ public class UniversalLoader implements CommandLineRunner {
             String[] passageArr = passages.split(",");
             passages = "";
 
-            for(int i=0; i<passageArr.length; i++){
+            for (int i = 0; i < passageArr.length; i++) {
 
-                int passageInt = (int)Float.parseFloat(passageArr[i]);
+                int passageInt = (int) Float.parseFloat(passageArr[i]);
                 passages += String.valueOf(passageInt) + ",";
             }
             //remove that last comma
@@ -859,9 +877,9 @@ public class UniversalLoader implements CommandLineRunner {
         }
     }
 
-    private void createSharingAndContacts(){
+    private void createSharingAndContacts() {
 
-        if(stopLoading) return;
+        if (stopLoading) return;
 
         log.info("******************************************************");
         log.info("* Creating Sharing and contact info                  *");
@@ -869,7 +887,7 @@ public class UniversalLoader implements CommandLineRunner {
 
         int row = 6;
 
-        for(List<String> sharingAndContactRow : sharingAndContactSheetData){
+        for (List<String> sharingAndContactRow : sharingAndContactSheetData) {
 
             String modelId = sharingAndContactRow.get(0);
             String dataProviderType = sharingAndContactRow.get(1);
@@ -881,9 +899,9 @@ public class UniversalLoader implements CommandLineRunner {
             String providerAbbreviation = sharingAndContactRow.get(9);
             String projectName = sharingAndContactRow.get(10);
 
-            if(modelId.isEmpty()){
+            if (modelId.isEmpty()) {
 
-                log.error("Model id is empty in row: " +row);
+                log.error("Model id is empty in row: " + row);
                 row++;
                 continue;
             }
@@ -892,9 +910,9 @@ public class UniversalLoader implements CommandLineRunner {
 
             ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
 
-            if(model == null){
+            if (model == null) {
 
-                log.error("Missing model, cannot add sharing and contact info: "+modelId);
+                log.error("Missing model, cannot add sharing and contact info: " + modelId);
                 row++;
                 continue;
             }
@@ -906,7 +924,7 @@ public class UniversalLoader implements CommandLineRunner {
             model.setExternalUrls(externalUrls);
 
 
-            if(!projectName.isEmpty()){
+            if (!projectName.isEmpty()) {
 
                 Group project = dataImportService.getProjectGroup(projectName);
                 model.addGroup(project);
@@ -928,11 +946,12 @@ public class UniversalLoader implements CommandLineRunner {
 
     /**
      * Checks if a list consists of nulls only
+     *
      * @param list
      */
-    boolean isRowOfNulls(List list){
-        for(Object o: list)
-            if(!(o == null))
+    boolean isRowOfNulls(List list) {
+        for (Object o : list)
+            if (!(o == null))
                 return false;
         return true;
     }
