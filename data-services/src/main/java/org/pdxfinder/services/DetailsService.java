@@ -385,8 +385,16 @@ public class DetailsService {
                         // Update the Passage of this existing engraftment data (and ensure no duplicate)
                         String newPassage = edto.getPassage().contains(pdxModel.getPassage()) ? edto.getPassage() : edto.getPassage() + "," + pdxModel.getPassage();
 
+                        String[] passageArr = newPassage.split(",");
+                        List<String> passages = new ArrayList<>(Arrays.asList(passageArr));
+                        //order the passages:
+                        Collections.sort(passages);
+                        String passageString = StringUtils.join(passages, ',');
                         //Save the passage in the existing engraftment data AND update the Map
-                        edto.setPassage(newPassage);
+                        if(passageString.isEmpty()){
+                            passageString = "";
+                        }
+                        edto.setPassage(passageString);
                         EngraftmentDataMap.put(dataKey, edto);
                     } else {
 
