@@ -490,7 +490,7 @@
                                         <li class="tabs-title is-active"><a href="#initialDiagnosis"
                                                                             aria-selected="true"
                                                                             style="font-size: 15px; padding: 15px;">
-                                            Patient Collection Events </a></li>
+                                            Patient Tumor Collection For PDX Model </a></li>
                                     </ul>
                                 </div>
 
@@ -511,10 +511,11 @@
                                                                   th:each="event, iter : ${data.patient.collectionEvents}">
 
                                                             <th th:if="${event.pdxMouse != data.modelId}"
-                                                                th:text="${'Collection Event '} ">Collection
+                                                                th:text="${'Collection '} + ${' (Other Model)'}">
+                                                                Collection
                                                             </th>
                                                             <th th:if="${event.pdxMouse == data.modelId}"
-                                                                th:text="${'Collection Event '} + ${' (Current)'}">
+                                                                th:text="${'Collection '} + ${' (Current Model)'}">
                                                                 Collection
                                                             </th>
 
