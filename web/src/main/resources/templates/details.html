@@ -883,6 +883,7 @@
 
                                                         <td>
                                                             <a th:href="@{'#'+${dataSummary.platformUsed}}"
+                                                               style="color: #06369d;"
                                                                data-th-attr="data-tabs-target=${dataSummary.platformUsed},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
                                                                th:text="${dataSummary.platformUsed}+' Platform'"
                                                                th:onclick="'showTabs('+${iter.index}+')'">
@@ -890,7 +891,7 @@
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <a target="_blank"
+                                                            <a target="_blank" style="color: #06369d;"
                                                                th:text="${dataSummary.platformUsed}"
                                                                th:onclick="'window.open(\''+${data.platformsAndUrls[dataSummary.platformUsed]}+'\')'">
                                                                 ...
