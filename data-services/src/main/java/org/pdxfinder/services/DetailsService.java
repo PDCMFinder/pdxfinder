@@ -114,8 +114,8 @@ public class DetailsService {
         VariationDataDTO variationDataDTO = variationDataByPlatform(dataSrc,modelId,technology,passage,page,size,filter,draw,sortCol,sortDir);
         for (String[] dData : variationDataDTO.moreData())
         {
-            dData[2] = WordUtils.capitalize(diagnosis);   //Histology
-            dData[3] = "Engrafted Tumo Tumor";                //Tumor type
+            dData[2] = WordUtils.capitalize(diagnosis);     //Histology
+            dData[3] = "Engrafted Tumor";                   //Tumor type
             variationDataDTOSet.add(dData);
         }
 
@@ -276,9 +276,10 @@ public class DetailsService {
         if(pdx!= null && pdx.getSpecimens() != null){
 
             Set<Specimen> sp = pdx.getSpecimens();
-            Set<EngraftmentDataDTO> pdxModels = new LinkedHashSet<>();
+            Map<String, EngraftmentDataDTO> EngraftmentDataMap = new HashMap<>();
 
 
+            // AGGREGATE THE ENGRAFTMENT DATA WITH CORRESPONDING PASSAGES
             for(Specimen s:sp){
 
 
@@ -304,6 +305,7 @@ public class DetailsService {
                     }
 
 
+                    /*
                     if (s.getHostStrain() != null) {
                         pdxModel.setStrain(notEmpty(s.getHostStrain().getName()));
                     } else {
@@ -312,20 +314,17 @@ public class DetailsService {
                     }
 
                     //Set implantation site and type
-                    if(s.getEngraftmentSite() != null){
-                        //dto.setEngraftmentSite( notEmpty(s.getEngraftmentSite().getName()) );
-                        pdxModel.setEngraftmentSite(notEmpty(s.getEngraftmentSite().getName()));
-                    } else{
+                    if (s.getEngraftmentSite() != null) {
+                        dto.setEngraftmentSite( notEmpty(s.getEngraftmentSite().getName()) );
+                    } else {
 
-                        //dto.setEngraftmentSite("Not Specified");
-                        pdxModel.setEngraftmentSite("Not Specified");
+                        dto.setEngraftmentSite("Not Specified");
                     }
 
 
-                    if(s.getEngraftmentType() != null){
-                        //dto.setSampleType( notEmpty(s.getEngraftmentType().getName()) );
-                        pdxModel.setEngraftmentType(notEmpty(s.getEngraftmentType().getName()));
-                    } else{
+                    if (s.getEngraftmentType() != null) {
+                        dto.setSampleType( notEmpty(s.getEngraftmentType().getName()) );
+                    } else {
 
                         dto.setSampleType("Not Specified");
                         pdxModel.setEngraftmentType("Not Specified");
@@ -333,14 +332,10 @@ public class DetailsService {
 
 
                     if (s.getEngraftmentMaterial() != null) {
-                        //dto.setSampleType( notEmpty(s.getEngraftmentType().getName()) );
-                        pdxModel.setEngraftmentMaterial(notEmpty(s.getEngraftmentMaterial().getName()));
-                        pdxModel.setEngraftmentMaterialState(notEmpty(s.getEngraftmentMaterial().getState()));
+                        dto.setSampleType( notEmpty(s.getEngraftmentType().getName()) );
                     } else {
 
-                        //dto.setSampleType("Not Specified");
-                        pdxModel.setEngraftmentMaterial("Not Specified");
-                        pdxModel.setEngraftmentMaterialState("Not Specified");
+                        dto.setSampleType("Not Specified");
                     }
 
 
@@ -350,11 +345,71 @@ public class DetailsService {
 
                         pdxModel.setPassage("Not Specified");
                     }
+                    */
+
+
+                    pdxModel.setStrain(
+                            (s.getHostStrain() != null) ? notEmpty(s.getHostStrain().getName()) : "Not Specified"
+                    );
+
+                    pdxModel.setEngraftmentSite(
+                            (s.getEngraftmentSite() != null) ? notEmpty(s.getEngraftmentSite().getName()) : "Not Specified"
+                    );
+
+                    pdxModel.setEngraftmentType(
+                            (s.getEngraftmentType() != null) ? notEmpty(s.getEngraftmentType().getName()) : "Not Specified"
+                    );
+
+                    pdxModel.setEngraftmentMaterial(
+                            (s.getEngraftmentMaterial() != null) ? notEmpty(s.getEngraftmentMaterial().getName()) : "Not Specified"
+                    );
+
+                    pdxModel.setEngraftmentMaterialState(
+                            (s.getEngraftmentMaterial() != null) ? notEmpty(s.getEngraftmentMaterial().getState()) : "Not Specified"
+                    );
+
+
+                    pdxModel.setPassage(
+                            (s.getPassage() != null) ? notEmpty(s.getPassage()) : "Not Specified"
+                    );
+
+                    String dataKey = pdxModel.getStrain() + pdxModel.getEngraftmentSite() + pdxModel.getEngraftmentType() + pdxModel.getEngraftmentMaterial() + pdxModel.getEngraftmentMaterialState();
+
+
+                    //if the datakey combination is found, then don't add new Engraftment data, but rather uodate the passage accordingly
+                    if (EngraftmentDataMap.containsKey(dataKey)) {
+
+                        // Retrieve the existing Engraftment data fromthe Map
+                        EngraftmentDataDTO edto = EngraftmentDataMap.get(dataKey);
+
+                        // Update the Passage of this existing engraftment data (and ensure no duplicate)
+                        String newPassage = edto.getPassage().contains(pdxModel.getPassage()) ? edto.getPassage() : edto.getPassage() + "," + pdxModel.getPassage();
+
+                        String[] passageArr = newPassage.split(",");
+                        List<String> passages = new ArrayList<>(Arrays.asList(passageArr));
+                        //order the passages:
+                        Collections.sort(passages);
+                        String passageString = StringUtils.join(passages, ',');
+                        //Save the passage in the existing engraftment data AND update the Map
+                        if(passageString.isEmpty()){
+                            passageString = "";
+                        }
+                        edto.setPassage(passageString);
+                        EngraftmentDataMap.put(dataKey, edto);
+                    } else {
+
+                        // If new, save in the Map
+                        EngraftmentDataMap.put(dataKey, pdxModel);
+                    }
+
 
                 }
+            }
 
-                pdxModels.add(pdxModel);
-
+            // ITERATE THE "Map<String, EngraftmentDataDTO> EngraftmentDataMap" MAP TO RETRIEVE THE EngraftmentDataDTO(s) into a Set
+            Set<EngraftmentDataDTO> pdxModels = new LinkedHashSet<>();
+            for (String key : EngraftmentDataMap.keySet()) {
+                pdxModels.add(EngraftmentDataMap.get(key));
             }
 
             dto.setPdxModelList(pdxModels);

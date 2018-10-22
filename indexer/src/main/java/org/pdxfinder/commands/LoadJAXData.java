@@ -353,6 +353,12 @@ public class LoadJAXData implements CommandLineRunner {
                     alleleFrequency = j.getString("allele frequency");
                     altAllele = j.getString("alt allele");
 
+                    //skip loading fish!
+                    if(technology.equals("Other:_FISH")){
+                        i++;
+                        continue;
+                    }
+
                     passageMap.put(sample, j.getString("passage num"));
 
                     // since there are 8 fields assume (incorrectly?) all MAs are unique
