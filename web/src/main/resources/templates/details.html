@@ -490,7 +490,7 @@
                                         <li class="tabs-title is-active"><a href="#initialDiagnosis"
                                                                             aria-selected="true"
                                                                             style="font-size: 15px; padding: 15px;">
-                                            Patient Collection Events </a></li>
+                                            Patient Tumor Collection For PDX Model </a></li>
                                     </ul>
                                 </div>
 
@@ -511,10 +511,11 @@
                                                                   th:each="event, iter : ${data.patient.collectionEvents}">
 
                                                             <th th:if="${event.pdxMouse != data.modelId}"
-                                                                th:text="${'Collection Event '} ">Collection
+                                                                th:text="${'Collection '} + ${' (Other Model)'}">
+                                                                Collection
                                                             </th>
                                                             <th th:if="${event.pdxMouse == data.modelId}"
-                                                                th:text="${'Collection Event '} + ${' (Current)'}">
+                                                                th:text="${'Collection '} + ${' (Current Model)'}">
                                                                 Collection
                                                             </th>
 
@@ -882,6 +883,7 @@
 
                                                         <td>
                                                             <a th:href="@{'#'+${dataSummary.platformUsed}}"
+                                                               style="color: #06369d; text-decoration: none;"
                                                                data-th-attr="data-tabs-target=${dataSummary.platformUsed},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
                                                                th:text="${dataSummary.platformUsed}+' Platform'"
                                                                th:onclick="'showTabs('+${iter.index}+')'">
@@ -890,6 +892,7 @@
                                                         </td>
                                                         <td>
                                                             <a target="_blank"
+                                                               style="color: #06369d; text-decoration: none;"
                                                                th:text="${dataSummary.platformUsed}"
                                                                th:onclick="'window.open(\''+${data.platformsAndUrls[dataSummary.platformUsed]}+'\')'">
                                                                 ...
