@@ -22,16 +22,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Load models from WISTAR
  */
 @Component
-@Order(value = 0)
+@Order(value = -15)
 public class LoadWISTAR implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadWISTAR.class);
@@ -62,8 +67,9 @@ public class LoadWISTAR implements CommandLineRunner {
     private DataImportService dataImportService;
     private Session session;
 
-    @Value("${wistarpdx.url}")
-    private String urlStr;
+
+    @Value("${pdxfinder.data.root.dir}")
+    private String dataRootDir;
 
     @PostConstruct
     public void init() {
@@ -85,8 +91,20 @@ public class LoadWISTAR implements CommandLineRunner {
 
         if (options.has("loadWISTAR") || options.has("loadALL")) {
 
-            log.info("Loading WISTAR PDX data from URL " + urlStr);
-            parseJSON(parseURL(urlStr));
+
+            String urlStr = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
+            File file = new File(urlStr);
+            if(file.exists()){
+
+                log.info("Loading WISTAR PDX data from URL " + urlStr);
+                parseJSON(parseFile(urlStr));
+            }
+            else{
+
+                log.info("No file found for "+DATASOURCE_ABBREVIATION+", skipping");
+            }
+
+
 
         }
 
@@ -247,6 +265,23 @@ public class LoadWISTAR implements CommandLineRunner {
             in.close();
         } catch (Exception e) {
             log.error("Unable to read from MD Anderson JSON URL " + urlStr, e);
+        }
+        return sb.toString();
+    }
+
+    private String parseFile(String path) {
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            Stream<String> stream = Files.lines(Paths.get(path));
+
+            Iterator itr = stream.iterator();
+            while (itr.hasNext()) {
+                sb.append(itr.next());
+            }
+        } catch (Exception e) {
+            log.error("Failed to load file " + path, e);
         }
         return sb.toString();
     }

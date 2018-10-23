@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
-@Order(value = -100)
+@Order(value = 1)
 public class LoadNCIT implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadNCIT.class);

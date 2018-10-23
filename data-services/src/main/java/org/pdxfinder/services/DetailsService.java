@@ -4,10 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
-import org.pdxfinder.services.dto.DetailsDTO;
-import org.pdxfinder.services.dto.DrugSummaryDTO;
-import org.pdxfinder.services.dto.PatientDTO;
-import org.pdxfinder.services.dto.VariationDataDTO;
+import org.pdxfinder.services.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -68,16 +65,16 @@ public class DetailsService {
 
 
     public DetailsService(SampleRepository sampleRepository,
-                         PatientRepository patientRepository,
-                         PatientSnapshotRepository patientSnapshotRepository,
-                         ModelCreationRepository modelCreationRepository,
-                         SpecimenRepository specimenRepository,
-                         MolecularCharacterizationRepository molecularCharacterizationRepository,
-                         PlatformRepository platformRepository,
-                         TreatmentSummaryRepository treatmentSummaryRepository,
-                         GraphService graphService,
-                         PlatformService platformService,
-                         DrugService drugService,
+                          PatientRepository patientRepository,
+                          PatientSnapshotRepository patientSnapshotRepository,
+                          ModelCreationRepository modelCreationRepository,
+                          SpecimenRepository specimenRepository,
+                          MolecularCharacterizationRepository molecularCharacterizationRepository,
+                          PlatformRepository platformRepository,
+                          TreatmentSummaryRepository treatmentSummaryRepository,
+                          GraphService graphService,
+                          PlatformService platformService,
+                          DrugService drugService,
                           PatientService patientService) {
 
         this.sampleRepository = sampleRepository;
@@ -117,8 +114,8 @@ public class DetailsService {
         VariationDataDTO variationDataDTO = variationDataByPlatform(dataSrc,modelId,technology,passage,page,size,filter,draw,sortCol,sortDir);
         for (String[] dData : variationDataDTO.moreData())
         {
-            dData[2] = WordUtils.capitalize(diagnosis);   //Histology
-            dData[3] = "Xenograft Tumor";                //Tumor type
+            dData[2] = WordUtils.capitalize(diagnosis);     //Histology
+            dData[3] = "Engrafted Tumor";                   //Tumor type
             variationDataDTOSet.add(dData);
         }
 
@@ -279,8 +276,14 @@ public class DetailsService {
         if(pdx!= null && pdx.getSpecimens() != null){
 
             Set<Specimen> sp = pdx.getSpecimens();
+            Map<String, EngraftmentDataDTO> EngraftmentDataMap = new HashMap<>();
 
+
+            // AGGREGATE THE ENGRAFTMENT DATA WITH CORRESPONDING PASSAGES
             for(Specimen s:sp){
+
+
+                EngraftmentDataDTO pdxModel = new EngraftmentDataDTO();
 
                 if (s.getHostStrain() != null) {
 
@@ -302,52 +305,141 @@ public class DetailsService {
                     }
 
 
-                    //Set implantation site and type
-                    if(s.getEngraftmentSite() != null){
-                        dto.setEngraftmentSite( notEmpty(s.getEngraftmentSite().getName()) );
+                    /*
+                    if (s.getHostStrain() != null) {
+                        pdxModel.setStrain(notEmpty(s.getHostStrain().getName()));
+                    } else {
+
+                        pdxModel.setStrain("Not Specified");
                     }
-                    else{
+
+                    //Set implantation site and type
+                    if (s.getEngraftmentSite() != null) {
+                        dto.setEngraftmentSite( notEmpty(s.getEngraftmentSite().getName()) );
+                    } else {
 
                         dto.setEngraftmentSite("Not Specified");
                     }
 
-                    if(s.getEngraftmentType() != null){
+
+                    if (s.getEngraftmentType() != null) {
                         dto.setSampleType( notEmpty(s.getEngraftmentType().getName()) );
+                    } else {
+
+                        dto.setSampleType("Not Specified");
+                        pdxModel.setEngraftmentType("Not Specified");
                     }
-                    else{
+
+
+                    if (s.getEngraftmentMaterial() != null) {
+                        dto.setSampleType( notEmpty(s.getEngraftmentType().getName()) );
+                    } else {
 
                         dto.setSampleType("Not Specified");
                     }
 
 
+                    if (s.getPassage() != null) {
+                        pdxModel.setPassage(notEmpty(s.getPassage()));
+                    } else {
+
+                        pdxModel.setPassage("Not Specified");
+                    }
+                    */
+
+
+                    pdxModel.setStrain(
+                            (s.getHostStrain() != null) ? notEmpty(s.getHostStrain().getName()) : "Not Specified"
+                    );
+
+                    pdxModel.setEngraftmentSite(
+                            (s.getEngraftmentSite() != null) ? notEmpty(s.getEngraftmentSite().getName()) : "Not Specified"
+                    );
+
+                    pdxModel.setEngraftmentType(
+                            (s.getEngraftmentType() != null) ? notEmpty(s.getEngraftmentType().getName()) : "Not Specified"
+                    );
+
+                    pdxModel.setEngraftmentMaterial(
+                            (s.getEngraftmentMaterial() != null) ? notEmpty(s.getEngraftmentMaterial().getName()) : "Not Specified"
+                    );
+
+                    pdxModel.setEngraftmentMaterialState(
+                            (s.getEngraftmentMaterial() != null) ? notEmpty(s.getEngraftmentMaterial().getState()) : "Not Specified"
+                    );
+
+
+                    pdxModel.setPassage(
+                            (s.getPassage() != null) ? notEmpty(s.getPassage()) : "Not Specified"
+                    );
+
+                    String dataKey = pdxModel.getStrain() + pdxModel.getEngraftmentSite() + pdxModel.getEngraftmentType() + pdxModel.getEngraftmentMaterial() + pdxModel.getEngraftmentMaterialState();
+
+
+                    //if the datakey combination is found, then don't add new Engraftment data, but rather uodate the passage accordingly
+                    if (EngraftmentDataMap.containsKey(dataKey)) {
+
+                        // Retrieve the existing Engraftment data fromthe Map
+                        EngraftmentDataDTO edto = EngraftmentDataMap.get(dataKey);
+
+                        // Update the Passage of this existing engraftment data (and ensure no duplicate)
+                        String newPassage = edto.getPassage().contains(pdxModel.getPassage()) ? edto.getPassage() : edto.getPassage() + "," + pdxModel.getPassage();
+
+                        String[] passageArr = newPassage.split(",");
+                        List<String> passages = new ArrayList<>(Arrays.asList(passageArr));
+                        //order the passages:
+                        Collections.sort(passages);
+                        String passageString = StringUtils.join(passages, ',');
+                        //Save the passage in the existing engraftment data AND update the Map
+                        if(passageString.isEmpty()){
+                            passageString = "";
+                        }
+                        edto.setPassage(passageString);
+                        EngraftmentDataMap.put(dataKey, edto);
+                    } else {
+
+                        // If new, save in the Map
+                        EngraftmentDataMap.put(dataKey, pdxModel);
+                    }
+
 
                 }
-
             }
 
+            // ITERATE THE "Map<String, EngraftmentDataDTO> EngraftmentDataMap" MAP TO RETRIEVE THE EngraftmentDataDTO(s) into a Set
+            Set<EngraftmentDataDTO> pdxModels = new LinkedHashSet<>();
+            for (String key : EngraftmentDataMap.keySet()) {
+                pdxModels.add(EngraftmentDataMap.get(key));
+            }
 
+            dto.setPdxModelList(pdxModels);
         }
 
+
+        // Unused Start:
         String composedStrain = "";
 
-        if(hostStrainMap.size() > 1){
+        if (hostStrainMap.size() > 1) {
 
             composedStrain = hostStrainMap
                     .keySet()
                     .stream()
                     .map(x -> getHostStrainString(x, hostStrainMap))
                     .collect(Collectors.joining("; "));
-        }
-        else if(hostStrainMap.size() == 1){
+        } else if (hostStrainMap.size() == 1) {
 
-            for(String key:hostStrainMap.keySet()){
+            for (String key : hostStrainMap.keySet()) {
                 composedStrain = key;
             }
-        }
-        else{
+        } else {
             composedStrain = "Not Specified";
         }
+
         dto.setStrain(notEmpty(composedStrain));
+        // Unused Ends
+
+
+
 
 
         if (sample != null && sample.getMolecularCharacterizations() != null) {
@@ -436,7 +528,7 @@ public class DetailsService {
                     Map<String, String> dataSummary = new HashMap<>();
 
                     dataSummary.put("sampleId", sampleID);
-                    dataSummary.put("sampleType","Xenograft");
+                    dataSummary.put("sampleType", "Engrafted Tumor");
                     dataSummary.put("xenograftPassage",dPassage);
                     dataSummary.put("dataAvailable","Mutation_"+tech);
                     dataSummary.put("platformUsed",tech);
@@ -448,7 +540,7 @@ public class DetailsService {
                 // Create a Key Value map of (Technology+Passage , sampleIDs) and Pass to DTO
                 techNPassToSampleId.put(tech + dPassage, StringUtils.stripEnd(sampleIDs, ","));
 
-                // SampleType - Xenograft
+                // SampleType - Engrafted Tumor
                 // XenograftPassage - dPassage
                 // DataAvailable -
                 // PlatformUsed - tech
