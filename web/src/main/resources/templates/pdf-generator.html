@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title> PDX MODEL </title>
+    <script type="text/javascript" th:src="@{/js/pdf/pdf.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/pdf/vfs_fonts.js}"></script>
+</head>
+<body>
+
+
+<script type="text/javascript" language="JavaScript" th:inline="javascript">
+
+
+    var dd = [[${report}]];
+
+
+    //pdfMake.createPdf(docDefinition).open({}, window);
+    //pdfMake.createPdf(dd).open();\
+    pdfMake.createPdf(dd).open({}, window);
+
+</script>
+
+
+</body>
+</html>
