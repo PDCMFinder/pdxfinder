@@ -3,7 +3,7 @@ package org.pdxfinder.web.controllers.pdf;
 /*
  * Created by abayomi on 31/10/2018.
  */
-public class Canvas {
+public class CanvasLine {
 
 
     private String type;
@@ -16,10 +16,10 @@ public class Canvas {
     private String lineCap;
 
 
-    public Canvas() {
+    public CanvasLine() {
     }
 
-    public Canvas(String type, int x1, int y1, int x2, int y2, String lineWidth, String lineColor, String lineCap) {
+    public CanvasLine(String type, int x1, int y1, int x2, int y2, String lineWidth, String lineColor, String lineCap) {
         this.type = type;
         this.x1 = x1;
         this.y1 = y1;

@@ -1,9 +1,6 @@
 package org.pdxfinder.web.controllers.pdf;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /*
  * Created by abayomi on 30/10/2018.
@@ -84,4 +81,57 @@ public class PdfHelper {
 
         return columnMap;
     }
+
+
+    public Column underLine(int lineWidth) {
+        return mainLine(lineWidth, "shiftUp");
+    }
+
+
+    public Column leftSpacedLine(int lineWidth) {
+        return mainLine(lineWidth, "left-spaced");
+    }
+
+
+    public Column mainLine(int lineWidth, String style) {
+
+        List<List<Object>> tableBody = new ArrayList();
+        Table table = new Table();
+
+        tableBody = Arrays.asList(Arrays.asList(""), Arrays.asList(""));
+        table = new Table(Arrays.asList(lineWidth), 0, tableBody, 1);
+
+        Column column = new Column();
+        column.setTable(table);
+        column.setLayout("headerLineOnly");
+        column.setStyle(style);
+
+        return column;
+
+    }
+
+
+    public Map canvasLine(int width, String color, String thickness) {
+
+        CanvasLine canvasLine = new CanvasLine();
+
+        canvasLine.setType("line");
+        canvasLine.setX1(0);
+        canvasLine.setY1(1);
+        canvasLine.setX2(width);
+        canvasLine.setY2(1);
+        canvasLine.setLineWidth(thickness);
+        canvasLine.setLineColor(color);
+
+        Map<String, List<Object>> line = new HashMap<>();
+
+        line.put("canvas", Arrays.asList(canvasLine));
+
+        return line;
+    }
+
+
+
+
+
 }
