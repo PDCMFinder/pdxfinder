@@ -5,6 +5,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.pdxfinder.services.DetailsService;
+import org.pdxfinder.services.PdfService;
+import org.pdxfinder.services.pdf.PdfHelper;
+import org.pdxfinder.services.pdf.Report;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +24,9 @@ public class DetailsController {
 
 
     private DetailsService detailsService;
+
+    @Autowired
+    PdfService pdfService;
 
 
     @Autowired
@@ -85,6 +91,21 @@ public class DetailsController {
         return output;
 
 
+    }
+
+
+    @GetMapping("/pdx/{dataSrc}/{modelId}/print")
+    public String pdfView(Model model) {
+
+        Report report = new Report();
+        PdfHelper pdfHelper = new PdfHelper();
+
+        report.setContent(pdfService.generatePdf());
+        report.setStyles(pdfHelper.getStyles());
+
+        model.addAttribute("report", report);
+
+        return "pdf-generator";
     }
 
 
