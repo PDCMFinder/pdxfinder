@@ -1,4 +1,4 @@
-package org.pdxfinder.web.controllers.pdf;
+package org.pdxfinder.services.pdf;
 
 /*
  * Created by abayomi on 31/10/2018.

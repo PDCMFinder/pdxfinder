@@ -1,4 +1,4 @@
-package org.pdxfinder.web.controllers.pdf;
+package org.pdxfinder.services.pdf;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
