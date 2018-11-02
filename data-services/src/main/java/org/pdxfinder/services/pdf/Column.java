@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
 
-
 /*
  * Created by abayomi on 30/10/2018.
  */
@@ -92,7 +91,3 @@ public class Column {
         return text;
     }
 }
-
-
-
-

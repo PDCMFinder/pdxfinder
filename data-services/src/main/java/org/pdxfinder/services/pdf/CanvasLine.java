@@ -1,8 +1,13 @@
 package org.pdxfinder.services.pdf;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /*
  * Created by abayomi on 31/10/2018.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CanvasLine {
 
 

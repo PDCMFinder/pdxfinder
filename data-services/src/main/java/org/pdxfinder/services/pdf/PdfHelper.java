@@ -1,6 +1,5 @@
 package org.pdxfinder.services.pdf;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -383,7 +382,7 @@ public class PdfHelper {
 
     public Map canvasLine(int width, String color, String thickness) {
 
-        Canvas canvas = new Canvas();
+        CanvasLine canvas = new CanvasLine();
 
         canvas.setType("line");
         canvas.setX1(0);
@@ -403,7 +402,7 @@ public class PdfHelper {
 
     public Map tinLine(int width, String color) {
 
-        Canvas canvas = new Canvas();
+        CanvasLine canvas = new CanvasLine();
 
         canvas.setType("line");
         canvas.setX1(0);

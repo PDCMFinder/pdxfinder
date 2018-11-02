@@ -21,11 +21,19 @@ public class Text {
     private List<Integer> margin;
     private String color;
     private Boolean italics;
+    private String fillColor;
+    private String colSpan;
+    private List<Boolean> border;
+    private String link;
 
     public Text() {
     }
 
-    public Text(String text, String style, String fontSize, String alignment, Boolean bold, List<Integer> margin, String color, Boolean italics) {
+    public Text(String text, String style, String fontSize, String alignment,
+                Boolean bold, List<Integer> margin, String color,
+                Boolean italics, String fillColor, String colSpan,
+                List<Boolean> border, String link
+    ) {
         this.text = text;
         this.style = style;
         this.fontSize = fontSize;
@@ -34,6 +42,10 @@ public class Text {
         this.margin = margin;
         this.color = color;
         this.italics = italics;
+        this.fillColor = fillColor;
+        this.colSpan = colSpan;
+        this.border = border;
+        this.link = link;
     }
 
     public Text(String text, String fontSize, String alignment, Boolean bold, List<Integer> margin) {
@@ -128,5 +140,37 @@ public class Text {
 
     public void setItalics(Boolean italics) {
         this.italics = italics;
+    }
+
+    public void setFillColor(String fillColor) {
+        this.fillColor = fillColor;
+    }
+
+    public String getFillColor() {
+        return fillColor;
+    }
+
+    public String getColSpan() {
+        return colSpan;
+    }
+
+    public void setColSpan(String colSpan) {
+        this.colSpan = colSpan;
+    }
+
+    public List<Boolean> getBorder() {
+        return border;
+    }
+
+    public void setBorder(List<Boolean> border) {
+        this.border = border;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 }
