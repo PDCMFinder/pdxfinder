@@ -94,7 +94,7 @@ public class DetailsController {
     }
 
 
-    @GetMapping("/pdx/{dataSrc}/{modelId}/print")
+    @GetMapping("/pdx/{dataSrc}/{modelId}/print-pdf")
     public String pdfView(Model model) {
 
         Report report = new Report();
