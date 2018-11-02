@@ -189,14 +189,14 @@ public class PdfService {
     public Map<String, Object> logoHeaderDesign(String modelID, String qrCodeData) {
 
 
-        String qrCodePath = pdf.generateQRCode(modelID, qrCodeData);
+        //String qrCodePath = pdf.generateQRCode(modelID, qrCodeData);
 
         String base64Image = pdf.base64EncodeToString(pdf.imageToByteRemote(logoURL));
 
-        String qrCodeImage = pdf.base64EncodeToString(pdf.imageToByteLocal(qrCodePath));
+        String qrCodeImage = pdf.base64EncodeToString(pdf.generateQRCode(modelID, qrCodeData));
 
         // delete the qrCode File:
-        pdf.deleteFile(qrCodePath);
+        //pdf.deleteFile(qrCodePath);
 
         List<Object> content = new ArrayList();
         Map<Object, Object> dataHolder = new HashMap<>();

@@ -7,6 +7,8 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -640,21 +642,22 @@ public class PdfHelper {
     }
 
 
-    public String generateQRCode(String modelID, String qrCodeData) {
+    public byte[] generateQRCode(String modelID, String qrCodeData) {
 
-        String filePath = "";
+        // String filePath = "";
+        byte[] imageInByte = null;
 
         try {
 
-            String pdxTempFolder = System.getProperty("user.home") + "/PDX_TEMP/";
+        /*String pdxTempFolder = System.getProperty("user.home") + "/PDX_TEMP/";
 
-            filePath = pdxTempFolder + modelID + ".png";
+        filePath = pdxTempFolder + modelID + ".png";
 
-            // Create directory if it not exists.
-            File uploadRootDir = new File(pdxTempFolder);
-            if (!uploadRootDir.exists()) {
-                uploadRootDir.mkdirs();
-            }
+        // Create directory if it not exists.
+        File uploadRootDir = new File(pdxTempFolder);
+        if (!uploadRootDir.exists()) {
+            uploadRootDir.mkdirs();
+        }*/
 
             String charset = "ISO-8859-1"; //"UTF-8"; // or
 
@@ -664,7 +667,17 @@ public class PdfHelper {
             BitMatrix matrix =
                     new MultiFormatWriter().encode(new String(qrCodeData.getBytes(charset), charset),
                             BarcodeFormat.QR_CODE, 200, 200, hintMap);
-            MatrixToImageWriter.writeToFile(matrix, filePath.substring(filePath.lastIndexOf('.') + 1), new File(filePath));
+
+            //MatrixToImageWriter.writeToFile(matrix, filePath.substring(filePath.lastIndexOf('.') + 1), new File(filePath));
+
+
+            BufferedImage originalImage = MatrixToImageWriter.toBufferedImage(matrix);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(originalImage, "png", baos);
+            baos.flush();
+            imageInByte = baos.toByteArray();
+            baos.close();
+
 
             System.out.println("QR Code image created successfully!");
 
@@ -673,7 +686,7 @@ public class PdfHelper {
             System.err.println(e);
         }
 
-        return filePath;
+        return imageInByte;
     }
 
 
