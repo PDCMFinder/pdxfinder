@@ -8,6 +8,8 @@ import org.pdxfinder.services.dto.CountDTO;
 import org.pdxfinder.services.dto.DataAvailableDTO;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
+import org.pdxfinder.services.pdf.PdfHelper;
+import org.pdxfinder.services.pdf.Report;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
@@ -30,6 +32,8 @@ public class AjaxController {
     private DrugService drugService;
     private GraphService graphService;
 
+    @Autowired
+    PdfService pdfService;
 
     @Autowired
     public AjaxController(AutoCompleteService autoCompleteService,
@@ -239,5 +243,19 @@ public class AjaxController {
         tableColumns.put("10","mAss.rsVariants");
 
         return tableColumns.get(sortcolumn);
+    }
+
+
+    @GetMapping("/pdf-data")
+    public Report pdfView() {
+
+        Report report = new Report();
+        PdfHelper pdfHelper = new PdfHelper();
+
+        report.setContent(pdfService.generatePdf());
+        report.setStyles(pdfHelper.getStyles());
+
+
+        return report;
     }
 }

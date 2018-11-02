@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import java.util.Map;
 
+/*
+ * Created by abayomi on 01/11/2018.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
