@@ -571,7 +571,7 @@ public class PdfHelper {
     }
 
 
-    private static byte[] imageToByteRemote(String stringURL) {
+    public static byte[] imageToByteRemote(String stringURL) {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
