@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.pdxfinder.services.DetailsService;
 import org.pdxfinder.services.PdfService;
+import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.pdf.PdfHelper;
 import org.pdxfinder.services.pdf.Report;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Set;
 
@@ -94,13 +96,22 @@ public class DetailsController {
     }
 
 
-    @GetMapping("/pdx/{dataSrc}/{modelId}/print-pdf")
-    public String pdfView(Model model) {
+    @GetMapping("/pdx/{dataSrc}/{modelId:.+}/print-pdf")
+    public String pdfView(Model model, HttpServletRequest request,
+                          @PathVariable String dataSrc,
+                          @PathVariable String modelId,
+                          @RequestParam(value = "page", defaultValue = "0") Integer page,
+                          @RequestParam(value = "size", defaultValue = "15000") Integer size) {
 
         Report report = new Report();
         PdfHelper pdfHelper = new PdfHelper();
 
-        report.setContent(pdfService.generatePdf());
+        DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", "");
+
+        String modelUrl = request.getRequestURL().toString();
+        modelUrl = modelUrl.substring(0, modelUrl.length() - 10);
+
+        report.setContent(pdfService.generatePdf(detailsDTO, modelUrl));
         report.setStyles(pdfHelper.getStyles());
 
         model.addAttribute("report", report);

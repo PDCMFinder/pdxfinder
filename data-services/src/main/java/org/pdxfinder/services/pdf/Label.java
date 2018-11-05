@@ -1,5 +1,8 @@
 package org.pdxfinder.services.pdf;
 
+import java.util.Arrays;
+import java.util.List;
+
 /*
  * Created by abayomi on 31/10/2018.
  */
@@ -13,6 +16,10 @@ public enum Label {
     public static String STYLE_BODY_TEXT3 = "bodyText3";
     public static String STYLE_TABLE_H3 = "tableH3";
     public static String STYLE_TD = "tdStyle";
+    public static String STYLE_TABLE2 = "tableExample2";
+
+    //COLORS
+    public static String COLOR_PDX_SECONDARY = "#00b2d5";
 
 
     //TEXT LABELS
@@ -37,6 +44,30 @@ public enum Label {
     public static String NULL = null;
     public static Boolean TRUE = true;
     public static Boolean FALSE = false;
+
+
+    public static String TXT_PATIENT = "PATIENT";
+    public static String TXT_PATIENT_TUMOR = "PATIENT TUMOR";
+    public static String TXT_ENGRAFTMENT = "PDX MODEL ENGRAFTMENT ";
+    public static List<String> TXT_ENGRAFTMENT_TABLE_HEAD = Arrays.asList("HOST STRAIN NAME", "SITE", "TYPE", "MATERIAL", "MATERIAL STATUS", "PASSAGE");
+    public static String TXT_QC = "MODEL QUALITY CONTROL";
+    public static List<String> TXT_QC_TABLE_HEAD = Arrays.asList("TECHNIQUE", "DESCRIPTION", "PASSAGE");
+
+
+    // TEXT DESCRIPTIONS
+    public static String TXT_SEX = "Sex";
+    public static String TXT_COLLECTION_AGE = "Age at Collection Time";
+    public static String TXT_RACE = "Race / Ethnicity";
+
+
+    public static String TXT_HISTOLOGY = "Histology";
+    public static String TXT_TISSUE = "Primary Tissue";
+    public static String TXT_SITE = "Collection Site";
+    public static String TXT_TUMOR = "Tumor Type";
+    public static String TXT_GRADE = "Grade";
+    public static String TXT_STAGE = "Stage";
+
+
 
 
     private String value;

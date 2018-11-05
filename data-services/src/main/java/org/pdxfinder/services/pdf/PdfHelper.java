@@ -449,15 +449,13 @@ public class PdfHelper {
     }
 
 
-    public Object pdxFinderTable(List<Map<String, String>> listOfMaps, String tableHead) {
+    public Object pdxFinderTable(List<Map<String, String>> listOfMaps, List<String> tHead, List<Integer> colWidths) {
 
 
         List<Boolean> leftDataBorder = Arrays.asList(true, true, false, false);
         List<Boolean> midDataBorder = Arrays.asList(false, true, false, false);
         List<Boolean> rightDataBorder = Arrays.asList(false, true, true, false);
 
-        List<Integer> colWidths = Arrays.asList(90, 90, 90, 90, 73, 70);
-        List<String> tHead = Arrays.asList("HOST STRAIN NAME", "SITE", "TYPE", "MATERIAL", "MATERIAL STATUS", "PASSAGE");
         int columnCount = listOfMaps.get(0).size();
 
         List<List<Object>> tableBody = new ArrayList();

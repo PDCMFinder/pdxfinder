@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -246,15 +247,23 @@ public class AjaxController {
     }
 
 
-    @GetMapping("/pdf-data")
-    public Report pdfView() {
+    @GetMapping("/pdx/{dataSrc}/{modelId:.+}/pdf-data")
+    public Report pdfView(HttpServletRequest request,
+                          @PathVariable String dataSrc,
+                          @PathVariable String modelId,
+                          @RequestParam(value = "page", defaultValue = "0") Integer page,
+                          @RequestParam(value = "size", defaultValue = "15000") Integer size) {
 
         Report report = new Report();
         PdfHelper pdfHelper = new PdfHelper();
 
-        report.setContent(pdfService.generatePdf());
-        report.setStyles(pdfHelper.getStyles());
+        DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", "");
 
+        String modelUrl = request.getRequestURL().toString();
+        modelUrl = modelUrl.substring(0, modelUrl.length() - 10);
+
+        report.setContent(pdfService.generatePdf(detailsDTO, modelUrl));
+        report.setStyles(pdfHelper.getStyles());
 
         return report;
     }
