@@ -96,7 +96,7 @@ public class DetailsController {
     }
 
 
-    @GetMapping("/pdx/{dataSrc}/{modelId:.+}/print-pdf")
+    @GetMapping("/pdx/{dataSrc}/{modelId:.+}/pdf")
     public String pdfView(Model model, HttpServletRequest request,
                           @PathVariable String dataSrc,
                           @PathVariable String modelId,
