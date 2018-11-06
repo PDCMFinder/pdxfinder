@@ -230,7 +230,7 @@ public class PdfService {
         td.add(pdf.plainText(Label.DATA_PROVIDER, Label.STYLE_TABLE_H3, Label.TRUE));
         td.add(
                 pdf.listText(
-                        Arrays.asList(pdf.plainText(data.getDataSource(), Label.NULL, Label.FALSE)),
+                        Arrays.asList(pdf.plainText(data.getSourceDescription(), Label.NULL, Label.FALSE)),
                         Label.STYLE_BODY_TEXT3,
                         Label.TYPE_SQUARE
                 )
@@ -254,14 +254,36 @@ public class PdfService {
                 )
         );
 
+
+        List<Text> contactLinks = new ArrayList<>();
+        contactLinks.add(
+                pdf.linkedText(Label.PDX_LABEL, Label.STYLE_TD, "http://" + modelUrl)
+        );
+
+        if (data.getContacts().contains("http")) {
+            contactLinks.add(
+                    pdf.linkedText(Label.CONTACT_PROVIDER, Label.STYLE_TD, data.getContacts())
+            );
+        }
+
+        if (data.getContacts().contains("@")) {
+            contactLinks.add(
+                    pdf.linkedText(Label.CONTACT_PROVIDER, Label.STYLE_TD, "mailto:" + data.getContacts() + "?subject=" + data.getModelId())
+            );
+        }
+
+        if (data.getExternalUrl().contains("http")) {
+            contactLinks.add(
+                    pdf.linkedText("View on " + data.getDataSource(), Label.STYLE_TD, data.getExternalUrl())
+            );
+        }
+
+        //
+
         td.add(pdf.plainText(Label.LINKS, Label.STYLE_TABLE_H3, Label.TRUE));
         td.add(
                 pdf.listText(
-                        Arrays.asList(
-                                pdf.linkedText(Label.PDX_LABEL, Label.STYLE_TD, Label.JAX_URL),
-                                pdf.linkedText(Label.JAX_LABEL, Label.STYLE_TD, Label.JAX_URL),
-                                pdf.linkedText(Label.CONTACT_PROVIDER, Label.STYLE_TD, Label.JAX_URL)
-                        ),
+                        contactLinks,
                         Label.STYLE_BODY_TEXT3,
                         Label.TYPE_SQUARE
                 )
