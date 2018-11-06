@@ -6,6 +6,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import org.apache.commons.lang3.text.WordUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -155,7 +156,7 @@ public class PdfHelper {
 
     public Object tableHelper(
             List<List<Object>> tableBody,
-            List<Integer> widths,
+            List<Object> widths,
             int heights,
             String tableStyle,
             Object tableLayout
@@ -174,7 +175,7 @@ public class PdfHelper {
     }
 
 
-    public Object tabularData(List<List<Object>> tableBody, List<Integer> widths) {
+    public Object tabularData(List<List<Object>> tableBody, List<Object> widths) {
 
         //Generate a Table
         Table table = new Table(widths, tableBody);
@@ -449,7 +450,7 @@ public class PdfHelper {
     }
 
 
-    public Object pdxFinderTable(List<Map<String, String>> listOfMaps, List<String> tHead, List<Integer> colWidths) {
+    public Object pdxFinderTable(List<Map<String, String>> listOfMaps, List<String> tHead, List<Object> colWidths) {
 
 
         List<Boolean> leftDataBorder = Arrays.asList(true, true, false, false);
@@ -488,11 +489,14 @@ public class PdfHelper {
                 }
 
                 if (mapCounter == 1) {
-                    row.add(tdText(entry.getValue(), false, null, leftDataBorder));
+
+                    row.add(tdText(WordUtils.capitalize(entry.getValue()), false, null, leftDataBorder));
                 } else if (mapCounter < columnCount) {
-                    row.add(tdText(entry.getValue(), false, null, midDataBorder));
+
+                    row.add(tdText(WordUtils.capitalize(entry.getValue()), false, null, midDataBorder));
                 } else {
-                    row.add(tdText(entry.getValue(), false, null, rightDataBorder));
+
+                    row.add(tdText(WordUtils.capitalize(entry.getValue()), false, null, rightDataBorder));
                 }
 
             }
@@ -569,6 +573,31 @@ public class PdfHelper {
 
         return tableData;
 
+    }
+
+
+    public List<Object> dynamicColumnWidth(int width, int offset, int size) {
+
+        // Adjust width for table:
+        width = width - 10 * size;
+
+        List<Object> widthList = new ArrayList<>();
+        widthList.add(offset);
+
+        int single = (width - offset) / size;
+
+        int remainder = (width - offset) - (single * size);
+
+        for (int i = 0; i < size; i++) {
+
+            if (i == (size - 1)) {
+                single += remainder;
+            }
+            widthList.add(single);
+
+        }
+
+        return widthList;
     }
 
 
@@ -677,7 +706,7 @@ public class PdfHelper {
             baos.close();
 
 
-            System.out.println("QR Code image created successfully!");
+            System.out.println("QR Code image created successfully! for " + qrCodeData);
 
         } catch (Exception e) {
 

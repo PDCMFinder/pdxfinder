@@ -14,7 +14,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Table {
 
-    private List<Integer> widths;
+    private List<Object> widths;
     private int heights;
     private List<List<Object>> body;
     private int headerRows;
@@ -22,18 +22,18 @@ public class Table {
     public Table() {
     }
 
-    public Table(List<Integer> widths, int heights, List<List<Object>> body) {
+    public Table(List<Object> widths, int heights, List<List<Object>> body) {
         this.widths = widths;
         this.heights = heights;
         this.body = body;
     }
 
-    public Table(List<Integer> widths, List<List<Object>> body) {
+    public Table(List<Object> widths, List<List<Object>> body) {
         this.widths = widths;
         this.body = body;
     }
 
-    public Table(List<Integer> widths, int heights, List<List<Object>> body, int headerRows) {
+    public Table(List<Object> widths, int heights, List<List<Object>> body, int headerRows) {
         this.widths = widths;
         this.heights = heights;
         this.body = body;
@@ -45,11 +45,11 @@ public class Table {
     }
 
 
-    public List<Integer> getWidths() {
+    public List<Object> getWidths() {
         return widths;
     }
 
-    public void setWidths(List<Integer> widths) {
+    public void setWidths(List<Object> widths) {
         this.widths = widths;
     }
 

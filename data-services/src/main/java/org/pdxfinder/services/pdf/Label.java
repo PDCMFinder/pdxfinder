@@ -51,6 +51,7 @@ public enum Label {
     public static String TXT_ENGRAFTMENT = "PDX MODEL ENGRAFTMENT ";
     public static List<String> TXT_ENGRAFTMENT_TABLE_HEAD = Arrays.asList("HOST STRAIN NAME", "SITE", "TYPE", "MATERIAL", "MATERIAL STATUS", "PASSAGE");
     public static String TXT_QC = "MODEL QUALITY CONTROL";
+    public static String TXT_PATIENT_COLLECTION = "PATIENT TUMOR COLLECTION FOR PDX MODEL";
     public static List<String> TXT_QC_TABLE_HEAD = Arrays.asList("TECHNIQUE", "DESCRIPTION", "PASSAGE");
 
 
@@ -66,6 +67,11 @@ public enum Label {
     public static String TXT_TUMOR = "Tumor Type";
     public static String TXT_GRADE = "Grade";
     public static String TXT_STAGE = "Stage";
+
+    public static String TXT_AGE = "Age";
+    public static String TXT_DIAGNOSIS = "Diagnosis";
+    public static String TXT_MOUSE = "Pdx Mouse";
+    public static String TXT_TUMOR_TYPE = "Type";
 
 
 

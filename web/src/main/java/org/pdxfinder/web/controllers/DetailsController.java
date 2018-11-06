@@ -109,7 +109,7 @@ public class DetailsController {
         DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", "");
 
         String modelUrl = request.getRequestURL().toString();
-        modelUrl = modelUrl.substring(0, modelUrl.length() - 10);
+        modelUrl = modelUrl.substring(0, modelUrl.length() - 4);
 
         report.setContent(pdfService.generatePdf(detailsDTO, modelUrl));
         report.setStyles(pdfHelper.getStyles());
