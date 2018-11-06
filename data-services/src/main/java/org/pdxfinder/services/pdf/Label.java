@@ -24,7 +24,7 @@ public enum Label {
 
     //TEXT LABELS
     public static String DATA_PROVIDER = "Data Provider";
-    public static String INFO = "PDX FINDER INFO";
+    public static String INFO = "PDX MODEL INFO";
     public static String JAX = "Jackson Laboratory";
     public static String JAX_URL = "http://www.jax.org";
     public static String SUBMIT = "Submit Models";

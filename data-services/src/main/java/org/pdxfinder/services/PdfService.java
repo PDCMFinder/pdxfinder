@@ -189,8 +189,6 @@ public class PdfService {
         int size = data.getPatient().getCollectionEvents().size();
         List<Object> widthList = pdf.dynamicColumnWidth(tableWidth, firstColumnWidth, size);
 
-        logger.info(widthList + " AAAA");
-
         row1Column1Contents.add(pdf.pdxFinderTable(
                 dataList,
                 tumorCollectionHeader,
@@ -232,7 +230,7 @@ public class PdfService {
         td.add(pdf.plainText(Label.DATA_PROVIDER, Label.STYLE_TABLE_H3, Label.TRUE));
         td.add(
                 pdf.listText(
-                        Arrays.asList(pdf.plainText(Label.JAX, Label.NULL, Label.FALSE)),
+                        Arrays.asList(pdf.plainText(data.getDataSource(), Label.NULL, Label.FALSE)),
                         Label.STYLE_BODY_TEXT3,
                         Label.TYPE_SQUARE
                 )

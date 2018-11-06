@@ -259,8 +259,8 @@ public class AjaxController {
 
         DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", "");
 
-        String modelUrl = request.getRequestURL().toString();
-        modelUrl = modelUrl.substring(0, modelUrl.length() - 10);
+        String modelUrl = request.getServerName() + request.getRequestURI();
+        modelUrl = modelUrl.substring(0, modelUrl.length() - 9);
 
         report.setContent(pdfService.generatePdf(detailsDTO, modelUrl));
         report.setStyles(pdfHelper.getStyles());
