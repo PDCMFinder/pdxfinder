@@ -741,7 +741,11 @@ public class UniversalLoader implements CommandLineRunner {
                     specimen.setEngraftmentSite(es);
                     specimen.setEngraftmentType(et);
                     specimen.setEngraftmentMaterial(em);
-                    specimen.setHostStrain(hostStrain);
+
+                    if(specimen.getHostStrain() == null){
+                        specimen.setHostStrain(hostStrain);
+                    }
+
                     dataImportService.saveSpecimen(specimen);
                 }
             }
@@ -758,7 +762,10 @@ public class UniversalLoader implements CommandLineRunner {
                         specimen.setEngraftmentSite(es);
                         specimen.setEngraftmentType(et);
                         specimen.setEngraftmentMaterial(em);
-                        specimen.setHostStrain(hostStrain);
+
+                        if(specimen.getHostStrain() == null){
+                            specimen.setHostStrain(hostStrain);
+                        }
                         dataImportService.saveSpecimen(specimen);
                     }
 
@@ -777,7 +784,10 @@ public class UniversalLoader implements CommandLineRunner {
                     specimen.setEngraftmentSite(es);
                     specimen.setEngraftmentType(et);
                     specimen.setEngraftmentMaterial(em);
-                    specimen.setHostStrain(hostStrain);
+
+                    if(specimen.getHostStrain() == null){
+                        specimen.setHostStrain(hostStrain);
+                    }
                     dataImportService.saveSpecimen(specimen);
                 }
 
