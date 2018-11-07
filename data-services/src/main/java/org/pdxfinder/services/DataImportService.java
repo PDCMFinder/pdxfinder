@@ -727,7 +727,7 @@ public class DataImportService {
 
     public List<Specimen> getAllSpecimenByModel(String modelId, String dataSource){
 
-        return specimenRepository.getByModelIdAndDataSource(modelId, dataSource);
+        return specimenRepository.findByModelIdAndDataSource(modelId, dataSource);
     }
 
     public void saveSpecimen(Specimen specimen){

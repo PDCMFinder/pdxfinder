@@ -67,6 +67,18 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
 
 
+    @Query("MATCH (mod:ModelCreation)-[spr:SPECIMENS]-(sp:Specimen) " +
+            "WHERE  mod.dataSource = {dataSource}  " +
+            "AND    mod.sourcePdxId = {modelId}  " +
+            "WITH sp " +
+            "OPTIONAL MATCH (sp)-[etr:ENGRAFTMENT_TYPE]-(et:EngraftmentType) " +
+            "OPTIONAL MATCH (sp)-[esr:ENGRAFTMENT_SITE]-(es:EngraftmentSite) " +
+            "OPTIONAL MATCH (sp)-[emr:ENGRAFTMENT_MATERIAL]-(em:EngraftmentMaterial) " +
+            "OPTIONAL MATCH (sp)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
+            "RETURN sp, etr, et, esr, es, emr, em, hsr, hs")
+    List<Specimen> findByDataSourceAndModelId(@Param("dataSource") String dataSource,
+                                              @Param("modelId") String modelId);
+
     @Query("MATCH (mod:ModelCreation)-[sp:SPECIMENS]-(spec:Specimen)-[sfrm:SAMPLED_FROM]-(msamp:Sample) " +
             "            -[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization) " +
             "            WITH mod, spec, sp, sfrm,msamp, char,molchar " +
@@ -122,6 +134,6 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
 
     @Query("MATCH (mod:ModelCreation)--(sp:Specimen) WHERE mod.sourcePdxId = {modelId} AND mod.dataSource = {dataSource} RETURN sp")
-    List<Specimen> getByModelIdAndDataSource( @Param("modelId") String modelId, @Param("dataSource") String dataSource);
+    List<Specimen> findByModelIdAndDataSource(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
 
 }
