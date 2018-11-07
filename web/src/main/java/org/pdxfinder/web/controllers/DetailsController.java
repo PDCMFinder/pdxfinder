@@ -113,6 +113,7 @@ public class DetailsController {
 
         modelUrl = modelUrl.substring(0, modelUrl.length() - 4);
 
+        report.setFooter(pdfService.generateFooter());
         report.setContent(pdfService.generatePdf(detailsDTO, modelUrl));
         report.setStyles(pdfHelper.getStyles());
 

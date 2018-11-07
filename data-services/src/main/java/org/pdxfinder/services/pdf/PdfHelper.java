@@ -147,6 +147,12 @@ public class PdfHelper {
         style.setLineHeight("1.3");
         styles.put("textSmall", style);
 
+        style = new Style();
+        style.setFontSize(7);
+        style.setColor("#aaa");
+        style.setLineHeight("1.3");
+        styles.put("footerText", style);
+
 
         return styles;
 
@@ -413,6 +419,26 @@ public class PdfHelper {
         canvas.setY1(-1);
         canvas.setX2(width);
         canvas.setY2(-1);
+        canvas.setLineWidth("1");
+        canvas.setLineColor(color);
+
+        Map<String, List<Object>> line = new HashMap<>();
+
+        line.put("canvas", Arrays.asList(canvas));
+
+        return line;
+    }
+
+
+    public Map tinLine(int start, int width, int yPos, String color) {
+
+        CanvasLine canvas = new CanvasLine();
+
+        canvas.setType("line");
+        canvas.setX1(start);
+        canvas.setY1(yPos);
+        canvas.setX2(width);
+        canvas.setY2(yPos);
         canvas.setLineWidth("1");
         canvas.setLineColor(color);
 
