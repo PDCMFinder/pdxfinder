@@ -101,13 +101,12 @@ public class DetailsController {
     public String pdfView(Model model, HttpServletRequest request,
                           @PathVariable String dataSrc,
                           @PathVariable String modelId,
-                          @RequestParam(value = "page", defaultValue = "0") Integer page,
-                          @RequestParam(value = "size", defaultValue = "15000") Integer size) {
+                          @RequestParam(value = "option", defaultValue = "view") String option) {
 
         Report report = new Report();
         PdfHelper pdfHelper = new PdfHelper();
 
-        DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", "");
+        DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId);
 
         String modelUrl = Label.WEBSITE + request.getRequestURI();
 
@@ -118,6 +117,8 @@ public class DetailsController {
         report.setStyles(pdfHelper.getStyles());
 
         model.addAttribute("report", report);
+        model.addAttribute("option", option);
+        model.addAttribute("modelId", detailsDTO.getModelId());
 
         return "pdf-generator";
     }
