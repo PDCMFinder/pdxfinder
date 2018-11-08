@@ -728,8 +728,14 @@ public class UniversalLoader implements CommandLineRunner {
             EngraftmentSite es = dataImportService.getImplantationSite(engraftmentSite);
             EngraftmentType et = dataImportService.getImplantationType(engraftmentType);
             EngraftmentMaterial em = dataImportService.createEngraftmentMaterial(engraftmentMaterial, engraftmentMaterialStatus);
-            HostStrain hostStrain = dataImportService.getHostStrain(hostStrainName, hostStrainNomenclature, "", "");
 
+            HostStrain hostStrain = null;
+            try{
+                hostStrain = dataImportService.getHostStrain(hostStrainName, hostStrainNomenclature, "", "");
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
             //passage = all
             if (passage.toLowerCase().trim().equals("all")) {
 

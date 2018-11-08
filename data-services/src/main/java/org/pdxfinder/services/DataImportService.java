@@ -6,6 +6,7 @@
 package org.pdxfinder.services;
 
 //import org.apache.commons.cli.Option;
+import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.ds.Standardizer;
@@ -630,14 +631,28 @@ public class DataImportService {
         return tumorType;
     }
 
-    public HostStrain getHostStrain(String name, String symbol, String url, String description) {
+    public HostStrain getHostStrain(String name, String symbol, String url, String description) throws Exception{
+
+        if(name == null || symbol == null || symbol.isEmpty()) throw new Exception("Symbol or name is null");
 
         HostStrain hostStrain = hostStrainRepository.findBySymbol(symbol);
+
+
 
         if (hostStrain == null) {
             log.info("Background Strain '{}' not found. Creating", name);
             hostStrain = new HostStrain(name, symbol, description, url);
             hostStrainRepository.save(hostStrain);
+        }
+        else {
+            //if the saved hoststrain's name is empty update the name
+            if(!StringUtils.equals(hostStrain.getName(), name) ){
+
+                hostStrain.setName(name);
+                hostStrainRepository.save(hostStrain);
+
+            }
+
         }
         return hostStrain;
     }
