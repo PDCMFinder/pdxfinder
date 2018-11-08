@@ -124,6 +124,10 @@ public class DetailsService {
     }
 
 
+    public DetailsDTO getModelDetails(String dataSource, String modelId) {
+
+        return getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
+    }
 
 
     public DetailsDTO getModelDetails(String dataSource, String modelId, int page, int size, String technology, String passage, String searchFilter) {

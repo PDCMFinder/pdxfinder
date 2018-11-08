@@ -8,6 +8,7 @@ import org.pdxfinder.services.dto.CountDTO;
 import org.pdxfinder.services.dto.DataAvailableDTO;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
+import org.pdxfinder.services.pdf.Label;
 import org.pdxfinder.services.pdf.PdfHelper;
 import org.pdxfinder.services.pdf.Report;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -259,9 +260,10 @@ public class AjaxController {
 
         DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", "");
 
-        String modelUrl = request.getServerName() + request.getRequestURI();
+        String modelUrl = Label.WEBSITE + request.getRequestURI();
         modelUrl = modelUrl.substring(0, modelUrl.length() - 9);
 
+        report.setFooter(pdfService.generateFooter());
         report.setContent(pdfService.generatePdf(detailsDTO, modelUrl));
         report.setStyles(pdfHelper.getStyles());
 

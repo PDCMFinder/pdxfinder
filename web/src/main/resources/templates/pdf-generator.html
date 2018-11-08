@@ -14,10 +14,32 @@
 
     var dd = [[${report}]];
 
+    var option = [[${option}]];
+
+    var modelId = [[${modelId}]];
 
     //pdfMake.createPdf(docDefinition).open({}, window);
-    //pdfMake.createPdf(dd).open();\
-    pdfMake.createPdf(dd).open({}, window);
+    //pdfMake.createPdf(dd).open();
+
+    if (option == "view") {
+
+        //Open PDF inside Browser
+        pdfMake.createPdf(dd).open({}, window);
+    }
+    else if (option == "print") {
+
+        // print the PDF
+        pdfMake.createPdf(dd).print();
+    }
+    else {
+
+        // download the PDF
+        pdfMake.createPdf(dd).download(modelId + '.pdf');
+    }
+
+
+
+
 
 </script>
 

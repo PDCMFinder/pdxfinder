@@ -7,6 +7,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.pdxfinder.services.DetailsService;
 import org.pdxfinder.services.PdfService;
 import org.pdxfinder.services.dto.DetailsDTO;
+import org.pdxfinder.services.pdf.Label;
 import org.pdxfinder.services.pdf.PdfHelper;
 import org.pdxfinder.services.pdf.Report;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,22 +101,24 @@ public class DetailsController {
     public String pdfView(Model model, HttpServletRequest request,
                           @PathVariable String dataSrc,
                           @PathVariable String modelId,
-                          @RequestParam(value = "page", defaultValue = "0") Integer page,
-                          @RequestParam(value = "size", defaultValue = "15000") Integer size) {
+                          @RequestParam(value = "option", defaultValue = "view") String option) {
 
         Report report = new Report();
         PdfHelper pdfHelper = new PdfHelper();
 
-        DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", "");
+        DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId);
 
-        String modelUrl = request.getServerName() + request.getRequestURI();
+        String modelUrl = Label.WEBSITE + request.getRequestURI();
 
         modelUrl = modelUrl.substring(0, modelUrl.length() - 4);
 
+        report.setFooter(pdfService.generateFooter());
         report.setContent(pdfService.generatePdf(detailsDTO, modelUrl));
         report.setStyles(pdfHelper.getStyles());
 
         model.addAttribute("report", report);
+        model.addAttribute("option", option);
+        model.addAttribute("modelId", detailsDTO.getModelId());
 
         return "pdf-generator";
     }

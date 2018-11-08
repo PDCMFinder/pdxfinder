@@ -14,6 +14,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Report {
 
+    private Object footer;
     private List<Object> content;
     private Map<String, Style> styles;
 
@@ -34,5 +35,13 @@ public class Report {
 
     public void setStyles(Map<String, Style> styles) {
         this.styles = styles;
+    }
+
+    public Object getFooter() {
+        return footer;
+    }
+
+    public void setFooter(Object footer) {
+        this.footer = footer;
     }
 }
