@@ -313,37 +313,6 @@ public class PdfService {
 
 
 
-        /*
-
-                                                    <tr th:each="dataSummary,iter : ${data.dataSummary}"
-                                                        class="tabs-title" style="float:none; text-transform: capitalize;" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
-
-                                                        <td th:text="${dataSummary.sampleId}"> ... </td>
-                                                        <td th:text="${dataSummary.sampleType}"> ... </td>
-                                                        <td th:text="${'Passage '+dataSummary.xenograftPassage}"> ... </td>
-
-
-                                                        <td>
-                                                            <a th:href="@{'#'+${dataSummary.platformUsed}}"
-                                                               style="color: #06369d; text-decoration: none;"
-                                                               data-th-attr="data-tabs-target=${dataSummary.platformUsed},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
-                                                               th:text="${dataSummary.platformUsed}+' Platform'"
-                                                               th:onclick="'showTabs('+${iter.index}+')'">
-                                                                TAB TITLES
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            <a target="_blank"
-                                                               style="color: #06369d; text-decoration: none;"
-                                                               th:text="${dataSummary.platformUsed}"
-                                                               th:onclick="'window.open(\''+${data.platformsAndUrls[dataSummary.platformUsed]}+'\')'">
-                                                                ...
-                                                            </a>
-                                                        </td>
-                                                        <td th:text="${dataSummary.rawData}"></td>
-                                                    </tr>
-         */
-
 
         // PATIENT THERAPIES AND RESPONSE TABLE
         Boolean treatmentExists = data.getPatient().getTreatmentExists();
