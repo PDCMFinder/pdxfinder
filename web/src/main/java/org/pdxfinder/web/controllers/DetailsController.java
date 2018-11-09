@@ -101,7 +101,7 @@ public class DetailsController {
     public String pdfView(Model model, HttpServletRequest request,
                           @PathVariable String dataSrc,
                           @PathVariable String modelId,
-                          @RequestParam(value = "option", defaultValue = "view") String option) {
+                          @RequestParam(value = "option", defaultValue = "download") String option) {
 
         Report report = new Report();
         PdfHelper pdfHelper = new PdfHelper();
