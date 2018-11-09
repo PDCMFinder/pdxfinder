@@ -5,6 +5,7 @@ import org.pdxfinder.dao.QualityAssurance;
 import org.pdxfinder.services.dto.CollectionEventsDTO;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.EngraftmentDataDTO;
+import org.pdxfinder.services.dto.TreatmentSummaryDTO;
 import org.pdxfinder.services.pdf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,7 +142,7 @@ public class PdfService {
             row1Column1Contents.add(pdf.emptyContentTable(
                     Label.TXT_EMPTY,
                     Label.TXT_QC_TABLE_HEAD,
-                    Arrays.asList(90, 90, 90, 90, 73, 70))
+                    Arrays.asList(170, 250, 110))
             );
         }
 
@@ -223,6 +224,70 @@ public class PdfService {
                 widthList
                 )
         );
+
+
+
+
+
+        // PATIENT THERAPIES AND RESPONSE TABLE
+        Boolean treatmentExists = data.getPatient().getTreatmentExists();
+        if (treatmentExists){
+
+
+           row1Column1Contents.add(
+                            pdf.headTitle(Label.TXT_THERAPY, Arrays.asList(0, 15, 0, 5))
+                    );
+            row1Column1Contents.add(
+                    pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
+            );
+
+
+            dataList = new ArrayList<>();
+            try{
+
+                List<TreatmentSummaryDTO> tsList = data.getPatient().getTreatmentSummaries();
+                for (TreatmentSummaryDTO ts : tsList) {
+
+                    Map<String, String> tsMap = mapper.convertValue(ts, Map.class);
+                    tsMap.remove("current");
+                    dataList.add(tsMap);
+                }
+
+                row1Column1Contents.add(pdf.pdxFinderTable(
+                        dataList,
+                        Label.TXT_THERAPY_TABLE_HEAD,
+                        Arrays.asList(60, 130, 140, 90, 90))
+                );
+
+            }catch (Exception e){
+
+                row1Column1Contents.add(pdf.emptyContentTable(
+                        Label.TXT_EMPTY,
+                        Label.TXT_THERAPY_TABLE_HEAD,
+                        Arrays.asList(90, 90, 90, 90, 143))
+                );
+            }
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

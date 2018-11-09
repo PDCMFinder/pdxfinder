@@ -53,6 +53,9 @@ public enum Label {
     public static String TXT_QC = "MODEL QUALITY CONTROL";
     public static String TXT_PATIENT_COLLECTION = "PATIENT TUMOR COLLECTION FOR PDX MODEL";
     public static List<String> TXT_QC_TABLE_HEAD = Arrays.asList("TECHNIQUE", "DESCRIPTION", "PASSAGE");
+    public static String TXT_THERAPY = "PATIENT THERAPIES AND RESPONSE";
+    public static List<String> TXT_THERAPY_TABLE_HEAD = Arrays.asList("Date Started", "Regimen", "Dose", "Best Response", "Duration (Months)");
+
 
 
     // TEXT DESCRIPTIONS
