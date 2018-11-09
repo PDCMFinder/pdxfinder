@@ -86,14 +86,21 @@ public class PdfService {
         for (EngraftmentDataDTO edto : edtoSet) {
 
             Map<String, String> edtoMap = mapper.convertValue(edto, Map.class);
+            edtoMap.remove("strainSymbol");
+
             dataList.add(edtoMap);
         }
+
+
+        logger.info(dataList.toString());
 
         row1Column1Contents.add(pdf.pdxFinderTable(
                 dataList,
                 Label.TXT_ENGRAFTMENT_TABLE_HEAD,
                 Arrays.asList(90, 90, 90, 90, 73, 70))
         );
+
+
 
 
         row1Column1Contents.add(
@@ -195,6 +202,7 @@ public class PdfService {
                 widthList
                 )
         );
+
 
 
 
