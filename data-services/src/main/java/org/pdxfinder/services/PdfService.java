@@ -80,25 +80,34 @@ public class PdfService {
                 pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
         );
 
-        Set<EngraftmentDataDTO> edtoSet = data.getPdxModelList();
-
         List<Map<String, String>> dataList = new ArrayList<>();
-        for (EngraftmentDataDTO edto : edtoSet) {
+        try{
+            Set<EngraftmentDataDTO> edtoSet = data.getPdxModelList();
 
-            Map<String, String> edtoMap = mapper.convertValue(edto, Map.class);
-            edtoMap.remove("strainSymbol");
+            for (EngraftmentDataDTO edto : edtoSet) {
 
-            dataList.add(edtoMap);
+                Map<String, String> edtoMap = mapper.convertValue(edto, Map.class);
+                edtoMap.remove("strainSymbol");
+
+                dataList.add(edtoMap);
+            }
+
+            row1Column1Contents.add(pdf.pdxFinderTable(
+                    dataList,
+                    Label.TXT_ENGRAFTMENT_TABLE_HEAD,
+                    Arrays.asList(90, 90, 90, 90, 73, 70))
+            );
+        }catch (Exception e){
+
+            row1Column1Contents.add(pdf.emptyContentTable(
+                    Label.TXT_EMPTY,
+                    Label.TXT_ENGRAFTMENT_TABLE_HEAD,
+                    Arrays.asList(90, 90, 90, 90, 73, 70))
+            );
         }
 
 
-        logger.info(dataList.toString());
 
-        row1Column1Contents.add(pdf.pdxFinderTable(
-                dataList,
-                Label.TXT_ENGRAFTMENT_TABLE_HEAD,
-                Arrays.asList(90, 90, 90, 90, 73, 70))
-        );
 
 
 
@@ -110,21 +119,33 @@ public class PdfService {
                 pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
         );
 
-        List<QualityAssurance> qaList = data.getQualityAssurances();
-
         dataList = new ArrayList<>();
-        for (QualityAssurance qa : qaList) {
+        try{
 
-            Map<String, String> qaMap = mapper.convertValue(qa, Map.class);
-            qaMap.remove("validationHostStrain");
-            dataList.add(qaMap);
+            List<QualityAssurance> qaList = data.getQualityAssurances();
+            for (QualityAssurance qa : qaList) {
+
+                Map<String, String> qaMap = mapper.convertValue(qa, Map.class);
+                qaMap.remove("validationHostStrain");
+                dataList.add(qaMap);
+            }
+
+            row1Column1Contents.add(pdf.pdxFinderTable(
+                    dataList,
+                    Label.TXT_QC_TABLE_HEAD,
+                    Arrays.asList(170, 250, 110))
+            );
+
+        }catch (Exception e){
+
+            row1Column1Contents.add(pdf.emptyContentTable(
+                    Label.TXT_EMPTY,
+                    Label.TXT_QC_TABLE_HEAD,
+                    Arrays.asList(90, 90, 90, 90, 73, 70))
+            );
         }
 
-        row1Column1Contents.add(pdf.pdxFinderTable(
-                dataList,
-                Label.TXT_QC_TABLE_HEAD,
-                Arrays.asList(170, 250, 110))
-        );
+
 
 
         // Generate Patients Tumor Collection For PDX Model TABLE
@@ -206,10 +227,6 @@ public class PdfService {
 
 
 
-
-        //row1Column1Contents.add(pdf.pdxFinderTable(dataList, "MODEL QUALITY CONTROL"));
-
-
         // PDX MODEL INFO [RIGHT COLUMN, BLUE BACKGROUND]
         List<Object> row1Column2Contents = new ArrayList<>();
         List<Object> td = new ArrayList<>();
@@ -218,10 +235,12 @@ public class PdfService {
         td.add(pdf.canvasLine(160, "#00b2d5", "1"));
 
 
+        String dataSource = (data.getSourceDescription() != null) ? data.getSourceDescription() : "Not Specified";
+
         td.add(pdf.plainText(Label.DATA_PROVIDER, Label.STYLE_TABLE_H3, Label.TRUE));
         td.add(
                 pdf.listText(
-                        Arrays.asList(pdf.plainText(data.getSourceDescription(), Label.NULL, Label.FALSE)),
+                        Arrays.asList(pdf.plainText(dataSource, Label.NULL, Label.FALSE)),
                         Label.STYLE_BODY_TEXT3,
                         Label.TYPE_SQUARE
                 )
@@ -251,21 +270,27 @@ public class PdfService {
                 pdf.linkedText(Label.PDX_LABEL, Label.STYLE_TD, "http://" + modelUrl)
         );
 
-        if (data.getContacts().contains("http")) {
+
+
+        String contact = (data.getContacts() != null) ? data.getContacts() : "Not Specified";
+        String externalURL = (data.getExternalUrl() != null) ? data.getExternalUrl() : "Not Specified";
+
+
+        if (contact.contains("http")) {
             contactLinks.add(
-                    pdf.linkedText(Label.CONTACT_PROVIDER, Label.STYLE_TD, data.getContacts())
+                    pdf.linkedText(Label.CONTACT_PROVIDER, Label.STYLE_TD, contact)
             );
         }
 
-        if (data.getContacts().contains("@")) {
+        if (contact.contains("@")) {
             contactLinks.add(
-                    pdf.linkedText(Label.CONTACT_PROVIDER, Label.STYLE_TD, "mailto:" + data.getContacts() + "?subject=" + data.getModelId())
+                    pdf.linkedText(Label.CONTACT_PROVIDER, Label.STYLE_TD, "mailto:" + contact + "?subject=" + data.getModelId())
             );
         }
 
-        if (data.getExternalUrl().contains("http")) {
+        if (externalURL.contains("http")) {
             contactLinks.add(
-                    pdf.linkedText("View on " + data.getDataSource(), Label.STYLE_TD, data.getExternalUrl())
+                    pdf.linkedText("View on " + data.getDataSource(), Label.STYLE_TD, externalURL)
             );
         }
 
@@ -287,6 +312,7 @@ public class PdfService {
         TableLayout tableLayout = new TableLayout();
         tableLayout.setDefaultBorder(false);
 
+        logger.info(tableBody.toString()+ " AAAAAA");
         row1Column2Contents.add(pdf.tableHelper(tableBody, widths, heights, Label.STYLE_TABLE2, tableLayout));
 
 

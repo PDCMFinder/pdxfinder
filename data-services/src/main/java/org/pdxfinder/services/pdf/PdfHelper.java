@@ -567,7 +567,7 @@ public class PdfHelper {
 
 
 
-    public Object emptyContentTable(List<String> tHead, List<Object> colWidths) {
+    public Object emptyContentTable(String textContent,List<String> tHead, List<Object> colWidths) {
 
 
         List<Boolean> leftDataBorder = Arrays.asList(true, true, false, false);
@@ -588,7 +588,7 @@ public class PdfHelper {
 
         // Add Empty row with relevant colspan to the table
         row = new ArrayList<>();
-        row.add(tdText("No Data", String.valueOf(tHead.size()),false,"center"));
+        row.add(tdText(textContent, String.valueOf(tHead.size()),false,"center"));
         tableBody.add(row);
 
 

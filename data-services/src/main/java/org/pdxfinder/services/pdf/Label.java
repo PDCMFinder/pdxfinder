@@ -28,7 +28,7 @@ public enum Label {
     public static String JAX = "Jackson Laboratory";
     public static String JAX_URL = "http://www.jax.org";
     public static String SUBMIT = "Submit Models";
-    public static String HELP_DESK = "Submit Models";
+    public static String HELP_DESK = "Help Desk";
     public static String HELP_DESK_MAIL = "helpdesk@pdxfnder.org";
     public static String SUBMISSION_MAIL = "submissions@pdxfnder.org";
     public static String LINKS = "Important Links";
@@ -72,6 +72,7 @@ public enum Label {
     public static String TXT_DIAGNOSIS = "Diagnosis";
     public static String TXT_MOUSE = "Pdx Mouse";
     public static String TXT_TUMOR_TYPE = "Type";
+    public static String TXT_EMPTY = "No Data";
 
 
 
