@@ -55,6 +55,8 @@ public enum Label {
     public static List<String> TXT_QC_TABLE_HEAD = Arrays.asList("TECHNIQUE", "DESCRIPTION", "PASSAGE");
     public static String TXT_THERAPY = "PATIENT THERAPIES AND RESPONSE";
     public static List<String> TXT_THERAPY_TABLE_HEAD = Arrays.asList("Date Started", "Regimen", "Dose", "Best Response", "Duration (Months)");
+    public static String TXT_DOSING = "DOSING STUDY";
+    public static List<String> TXT_DOSING_TABLE_HEAD = Arrays.asList("DRUD", "DOSE", "RESPONSE");
 
 
 

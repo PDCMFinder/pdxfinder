@@ -2,10 +2,7 @@ package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pdxfinder.dao.QualityAssurance;
-import org.pdxfinder.services.dto.CollectionEventsDTO;
-import org.pdxfinder.services.dto.DetailsDTO;
-import org.pdxfinder.services.dto.EngraftmentDataDTO;
-import org.pdxfinder.services.dto.TreatmentSummaryDTO;
+import org.pdxfinder.services.dto.*;
 import org.pdxfinder.services.pdf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,6 +226,49 @@ public class PdfService {
 
 
 
+
+        // DOSING STUDY TABLE
+        row1Column1Contents.add(
+                pdf.headTitle(Label.TXT_DOSING, Arrays.asList(0, 15, 0, 5))
+        );
+        row1Column1Contents.add(
+                pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
+        );
+
+
+        dataList = new ArrayList<>();
+        try {
+
+            List<DrugSummaryDTO> dsList = data.getDrugSummary();
+            for (DrugSummaryDTO ds : dsList) {
+
+                Map<String, String> dsMap = mapper.convertValue(ds, Map.class);
+                dsMap.remove("duration");
+                dataList.add(dsMap);
+            }
+
+            row1Column1Contents.add(pdf.pdxFinderTable(
+                    dataList,
+                    Label.TXT_DOSING_TABLE_HEAD,
+                    Arrays.asList(200, 140, 190))
+            );
+
+        } catch (Exception e) {
+
+            row1Column1Contents.add(pdf.emptyContentTable(
+                    Label.TXT_EMPTY,
+                    Label.TXT_DOSING_TABLE_HEAD,
+                    Arrays.asList(150, 220, 140))
+            );
+        }
+
+
+
+
+
+
+
+
         // PATIENT THERAPIES AND RESPONSE TABLE
         Boolean treatmentExists = data.getPatient().getTreatmentExists();
         if (treatmentExists){
@@ -264,11 +304,19 @@ public class PdfService {
                 row1Column1Contents.add(pdf.emptyContentTable(
                         Label.TXT_EMPTY,
                         Label.TXT_THERAPY_TABLE_HEAD,
-                        Arrays.asList(90, 90, 90, 90, 143))
+                        Arrays.asList(60, 130, 140, 90, 90))
                 );
             }
 
         }
+
+
+
+
+
+
+
+
 
 
 
