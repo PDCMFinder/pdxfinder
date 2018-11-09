@@ -476,6 +476,20 @@ public class PdfHelper {
     }
 
 
+    public Text tdText(String dText, String colSpan, Boolean bold,String align) {
+
+        Text text = new Text();
+        text.setText(dText);
+        text.setStyle("tdStyle");
+        text.setColor("#000");
+        text.setColSpan(colSpan);
+        text.setBold(bold);
+        text.setAlignment(align);
+
+        return text;
+    }
+
+
     public Object pdxFinderTable(List<Map<String, String>> listOfMaps, List<String> tHead, List<Object> colWidths) {
 
 
@@ -548,6 +562,54 @@ public class PdfHelper {
         return tableData;
 
     }
+
+
+
+
+
+    public Object emptyContentTable(List<String> tHead, List<Object> colWidths) {
+
+
+        List<Boolean> leftDataBorder = Arrays.asList(true, true, false, false);
+        List<Boolean> midDataBorder = Arrays.asList(false, true, false, false);
+        List<Boolean> rightDataBorder = Arrays.asList(false, true, true, false);
+
+        List<List<Object>> tableBody = new ArrayList();
+
+        // Add columns to the row
+        List<Object> row = new ArrayList<>();
+
+        for (String head : tHead) {
+            row.add(thText(head, "1"));
+        }
+
+        // Add Col Headers to table
+        tableBody.add(row);
+
+        // Add Empty row with relevant colspan to the table
+        row = new ArrayList<>();
+        row.add(tdText("No Data", String.valueOf(tHead.size()),false,"center"));
+        tableBody.add(row);
+
+
+        //Generate a Table specifying width and body
+        Table table = new Table(
+                colWidths,
+                tableBody
+        );
+
+        Map<String, Object> tableData = new HashMap<>();
+        tableData.put("style", "tableText");
+        tableData.put("table", table);
+
+        TableLayout layout = new TableLayout(true, "#ccc", "#ccc");
+        tableData.put("layout", layout);
+
+        return tableData;
+
+    }
+
+
 
 
     public Object pdxFinderTable(Map<String, String> data, String tableHead) {
