@@ -225,8 +225,6 @@ public class PdfService {
 
 
 
-
-
         // DOSING STUDY TABLE
         row1Column1Contents.add(
                 pdf.headTitle(Label.TXT_DOSING, Arrays.asList(0, 15, 0, 5))
@@ -258,7 +256,7 @@ public class PdfService {
             row1Column1Contents.add(pdf.emptyContentTable(
                     Label.TXT_EMPTY,
                     Label.TXT_DOSING_TABLE_HEAD,
-                    Arrays.asList(150, 220, 140))
+                    Arrays.asList(200, 140, 190))
             );
         }
 
@@ -267,6 +265,84 @@ public class PdfService {
 
 
 
+
+        // MOLECULAR DATA TABLE
+        row1Column1Contents.add(
+                pdf.headTitle(Label.TXT_MOLECULAR_DATA, Arrays.asList(0, 75, 0, 5))
+        );
+        row1Column1Contents.add(
+                pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
+        );
+
+
+        dataList = new ArrayList<>();
+        try {
+
+            List<Map> molDataList = data.getDataSummary();
+            for (Map molData : molDataList) {
+
+               // Map<String, String> molDataMap = mapper.convertValue(molData, LinkedHashMap.class);
+
+                Map<String, String> molDataMap = new LinkedHashMap<>();
+                molDataMap.put("sampleId",molData.get("sampleId").toString());
+                molDataMap.put("sampleType",molData.get("sampleType").toString());
+                molDataMap.put("xenograftPassage",molData.get("xenograftPassage").toString());
+                molDataMap.put("dataAvailable",molData.get("dataAvailable").toString());
+                molDataMap.put("platformUsed",molData.get("platformUsed").toString());
+                molDataMap.put("rawData",molData.get("rawData").toString());
+
+                dataList.add(molDataMap);
+            }
+
+            row1Column1Contents.add(pdf.pdxFinderTable(
+                    dataList,
+                    Label.TXT_MOLECULAR_DATA_TABLE_HEAD,
+                    Arrays.asList(90, 90, 90, 90, 73, 70))
+            );
+
+        } catch (Exception e) {
+
+            row1Column1Contents.add(pdf.emptyContentTable(
+                    Label.TXT_EMPTY,
+                    Label.TXT_MOLECULAR_DATA_TABLE_HEAD,
+                    Arrays.asList(90, 90, 90, 90, 73, 70))
+            );
+        }
+
+
+
+
+
+        /*
+
+                                                    <tr th:each="dataSummary,iter : ${data.dataSummary}"
+                                                        class="tabs-title" style="float:none; text-transform: capitalize;" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
+
+                                                        <td th:text="${dataSummary.sampleId}"> ... </td>
+                                                        <td th:text="${dataSummary.sampleType}"> ... </td>
+                                                        <td th:text="${'Passage '+dataSummary.xenograftPassage}"> ... </td>
+
+
+                                                        <td>
+                                                            <a th:href="@{'#'+${dataSummary.platformUsed}}"
+                                                               style="color: #06369d; text-decoration: none;"
+                                                               data-th-attr="data-tabs-target=${dataSummary.platformUsed},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
+                                                               th:text="${dataSummary.platformUsed}+' Platform'"
+                                                               th:onclick="'showTabs('+${iter.index}+')'">
+                                                                TAB TITLES
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <a target="_blank"
+                                                               style="color: #06369d; text-decoration: none;"
+                                                               th:text="${dataSummary.platformUsed}"
+                                                               th:onclick="'window.open(\''+${data.platformsAndUrls[dataSummary.platformUsed]}+'\')'">
+                                                                ...
+                                                            </a>
+                                                        </td>
+                                                        <td th:text="${dataSummary.rawData}"></td>
+                                                    </tr>
+         */
 
 
         // PATIENT THERAPIES AND RESPONSE TABLE
@@ -309,17 +385,6 @@ public class PdfService {
             }
 
         }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

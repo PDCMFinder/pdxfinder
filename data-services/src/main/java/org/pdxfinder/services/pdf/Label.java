@@ -54,11 +54,11 @@ public enum Label {
     public static String TXT_PATIENT_COLLECTION = "PATIENT TUMOR COLLECTION FOR PDX MODEL";
     public static List<String> TXT_QC_TABLE_HEAD = Arrays.asList("TECHNIQUE", "DESCRIPTION", "PASSAGE");
     public static String TXT_THERAPY = "PATIENT THERAPIES AND RESPONSE";
-    public static List<String> TXT_THERAPY_TABLE_HEAD = Arrays.asList("Date Started", "Regimen", "Dose", "Best Response", "Duration (Months)");
+    public static List<String> TXT_THERAPY_TABLE_HEAD = Arrays.asList("DATE STARTED", "REGIMEN", "DOSE", "BEST RESPONSE", "DURATION (MONTHS)");
     public static String TXT_DOSING = "DOSING STUDY";
-    public static List<String> TXT_DOSING_TABLE_HEAD = Arrays.asList("DRUD", "DOSE", "RESPONSE");
-
-
+    public static List<String> TXT_DOSING_TABLE_HEAD = Arrays.asList("DRUG", "DOSE", "RESPONSE");
+    public static String TXT_MOLECULAR_DATA = "MOLECULAR DATA";
+    public static List<String> TXT_MOLECULAR_DATA_TABLE_HEAD = Arrays.asList("SAMPLE ID", "SAMPLE TYPE", "TUMOR PASSAGE","DATA AVAILABLE","PLATFORM USED","RAW DATA");
 
     // TEXT DESCRIPTIONS
     public static String TXT_SEX = "Sex";
@@ -77,7 +77,7 @@ public enum Label {
     public static String TXT_DIAGNOSIS = "Diagnosis";
     public static String TXT_MOUSE = "Pdx Mouse";
     public static String TXT_TUMOR_TYPE = "Type";
-    public static String TXT_EMPTY = "No Data";
+    public static String TXT_EMPTY = "Not Available";
 
 
 
