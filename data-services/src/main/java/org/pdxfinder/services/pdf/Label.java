@@ -77,7 +77,7 @@ public enum Label {
     public static String TXT_DIAGNOSIS = "Diagnosis";
     public static String TXT_MOUSE = "Pdx Mouse";
     public static String TXT_TUMOR_TYPE = "Type";
-    public static String TXT_EMPTY = "Not Available";
+    public static String TXT_EMPTY = "No Data Available";
 
 
 
