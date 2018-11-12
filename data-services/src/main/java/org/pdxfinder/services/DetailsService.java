@@ -213,7 +213,7 @@ public class DetailsService {
 
         if (patient != null && patient.getProviderGroup() != null) {
             //dto.setContacts(patient.getExternalDataSource().getContact());
-            dto.setExternalDataSourceDesc(patient.getProviderGroup().getName());
+            dto.setSourceName(patient.getProviderGroup().getName());
         }
 
 
