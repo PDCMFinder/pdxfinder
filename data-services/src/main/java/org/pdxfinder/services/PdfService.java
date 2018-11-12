@@ -185,7 +185,7 @@ public class PdfService {
 
 
         // Add data for other columns
-
+        // PATIENT TUMOR COLECTION DATA TABLE
         for (CollectionEventsDTO event : data.getPatient().getCollectionEvents()) {
 
             if (event.getPdxMouse().equals(data.getModelId())) {
@@ -225,41 +225,48 @@ public class PdfService {
 
 
 
-        // DOSING STUDY TABLE
-        row1Column1Contents.add(
-                pdf.headTitle(Label.TXT_DOSING, Arrays.asList(0, 15, 0, 5))
-        );
-        row1Column1Contents.add(
-                pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
-        );
 
 
-        dataList = new ArrayList<>();
-        try {
+        // PATIENT THERAPIES AND RESPONSE TABLE
+        Boolean treatmentExists = data.getPatient().getTreatmentExists();
+        if (treatmentExists){
 
-            List<DrugSummaryDTO> dsList = data.getDrugSummary();
-            for (DrugSummaryDTO ds : dsList) {
 
-                Map<String, String> dsMap = mapper.convertValue(ds, Map.class);
-                dsMap.remove("duration");
-                dataList.add(dsMap);
+            row1Column1Contents.add(
+                    pdf.headTitle(Label.TXT_THERAPY, Arrays.asList(0, 15, 0, 5))
+            );
+            row1Column1Contents.add(
+                    pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
+            );
+
+
+            dataList = new ArrayList<>();
+            try{
+
+                List<TreatmentSummaryDTO> tsList = data.getPatient().getTreatmentSummaries();
+                for (TreatmentSummaryDTO ts : tsList) {
+
+                    Map<String, String> tsMap = mapper.convertValue(ts, Map.class);
+                    tsMap.remove("current");
+                    dataList.add(tsMap);
+                }
+
+                row1Column1Contents.add(pdf.pdxFinderTable(
+                        dataList,
+                        Label.TXT_THERAPY_TABLE_HEAD,
+                        Arrays.asList(60, 130, 140, 90, 90))
+                );
+
+            }catch (Exception e){
+
+                row1Column1Contents.add(pdf.emptyContentTable(
+                        Label.TXT_EMPTY,
+                        Label.TXT_THERAPY_TABLE_HEAD,
+                        Arrays.asList(60, 130, 140, 90, 90))
+                );
             }
 
-            row1Column1Contents.add(pdf.pdxFinderTable(
-                    dataList,
-                    Label.TXT_DOSING_TABLE_HEAD,
-                    Arrays.asList(200, 140, 190))
-            );
-
-        } catch (Exception e) {
-
-            row1Column1Contents.add(pdf.emptyContentTable(
-                    Label.TXT_EMPTY,
-                    Label.TXT_DOSING_TABLE_HEAD,
-                    Arrays.asList(200, 140, 190))
-            );
         }
-
 
 
 
@@ -268,7 +275,7 @@ public class PdfService {
 
         // MOLECULAR DATA TABLE
         row1Column1Contents.add(
-                pdf.headTitle(Label.TXT_MOLECULAR_DATA, Arrays.asList(0, 75, 0, 5))
+                pdf.headTitle(Label.TXT_MOLECULAR_DATA, Arrays.asList(0, 15, 0, 5))
         );
         row1Column1Contents.add(
                 pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
@@ -314,51 +321,43 @@ public class PdfService {
 
 
 
-        // PATIENT THERAPIES AND RESPONSE TABLE
-        Boolean treatmentExists = data.getPatient().getTreatmentExists();
-        if (treatmentExists){
 
 
-           row1Column1Contents.add(
-                            pdf.headTitle(Label.TXT_THERAPY, Arrays.asList(0, 15, 0, 5))
-                    );
-            row1Column1Contents.add(
-                    pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
-            );
+
+        // DOSING STUDY TABLE
+        row1Column1Contents.add(
+                pdf.headTitle(Label.TXT_DOSING, Arrays.asList(0, 15, 0, 5))
+        );
+        row1Column1Contents.add(
+                pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
+        );
 
 
-            dataList = new ArrayList<>();
-            try{
+        dataList = new ArrayList<>();
+        try {
 
-                List<TreatmentSummaryDTO> tsList = data.getPatient().getTreatmentSummaries();
-                for (TreatmentSummaryDTO ts : tsList) {
+            List<DrugSummaryDTO> dsList = data.getDrugSummary();
+            for (DrugSummaryDTO ds : dsList) {
 
-                    Map<String, String> tsMap = mapper.convertValue(ts, Map.class);
-                    tsMap.remove("current");
-                    dataList.add(tsMap);
-                }
-
-                row1Column1Contents.add(pdf.pdxFinderTable(
-                        dataList,
-                        Label.TXT_THERAPY_TABLE_HEAD,
-                        Arrays.asList(60, 130, 140, 90, 90))
-                );
-
-            }catch (Exception e){
-
-                row1Column1Contents.add(pdf.emptyContentTable(
-                        Label.TXT_EMPTY,
-                        Label.TXT_THERAPY_TABLE_HEAD,
-                        Arrays.asList(60, 130, 140, 90, 90))
-                );
+                Map<String, String> dsMap = mapper.convertValue(ds, Map.class);
+                dsMap.remove("duration");
+                dataList.add(dsMap);
             }
 
+            row1Column1Contents.add(pdf.pdxFinderTable(
+                    dataList,
+                    Label.TXT_DOSING_TABLE_HEAD,
+                    Arrays.asList(200, 140, 190))
+            );
+
+        } catch (Exception e) {
+
+            row1Column1Contents.add(pdf.emptyContentTable(
+                    Label.TXT_EMPTY,
+                    Label.TXT_DOSING_TABLE_HEAD,
+                    Arrays.asList(200, 140, 190))
+            );
         }
-
-
-
-
-
 
 
 
@@ -382,45 +381,16 @@ public class PdfService {
         td.add(pdf.canvasLine(160, "#00b2d5", "1"));
 
 
-        String dataSource = (data.getSourceDescription() != null) ? data.getSourceDescription() : "Not Specified";
 
-        td.add(pdf.plainText(Label.DATA_PROVIDER, Label.STYLE_TABLE_H3, Label.TRUE));
-        td.add(
-                pdf.listText(
-                        Arrays.asList(pdf.plainText(dataSource, Label.NULL, Label.FALSE)),
-                        Label.STYLE_BODY_TEXT3,
-                        Label.TYPE_SQUARE
-                )
-        );
+        String contact = (data.getContacts() != null) ? data.getContacts() : "Not Specified";
+        String externalURL = (data.getExternalUrl() != null) ? data.getExternalUrl() : "Not Specified";
 
-        td.add(pdf.plainText(Label.SUBMIT, Label.STYLE_TABLE_H3, Label.TRUE));
-        td.add(
-                pdf.listText(
-                        Arrays.asList(pdf.plainText(Label.SUBMISSION_MAIL, Label.NULL, Label.FALSE)),
-                        Label.STYLE_BODY_TEXT3,
-                        Label.TYPE_SQUARE
-                )
-        );
-
-        td.add(pdf.plainText(Label.HELP_DESK, Label.STYLE_TABLE_H3, Label.TRUE));
-        td.add(
-                pdf.listText(
-                        Arrays.asList(pdf.plainText(Label.HELP_DESK_MAIL, Label.NULL, Label.FALSE)),
-                        Label.STYLE_BODY_TEXT3,
-                        Label.TYPE_SQUARE
-                )
-        );
 
 
         List<Text> contactLinks = new ArrayList<>();
         contactLinks.add(
                 pdf.linkedText(Label.PDX_LABEL, Label.STYLE_TD, "http://" + modelUrl)
         );
-
-
-
-        String contact = (data.getContacts() != null) ? data.getContacts() : "Not Specified";
-        String externalURL = (data.getExternalUrl() != null) ? data.getExternalUrl() : "Not Specified";
 
 
         if (contact.contains("http")) {
@@ -443,7 +413,7 @@ public class PdfService {
 
 
 
-        td.add(pdf.plainText(Label.LINKS, Label.STYLE_TABLE_H3, Label.TRUE));
+        td.add(pdf.plainText(Label.TXT_ABOUT_MODEL, Label.STYLE_TABLE_H3, Label.TRUE));
         td.add(
                 pdf.listText(
                         contactLinks,
@@ -451,6 +421,40 @@ public class PdfService {
                         Label.TYPE_SQUARE
                 )
         );
+
+
+
+
+        String dataSource = (data.getSourceName() != null) ? data.getSourceName() : "Not Specified";
+
+        td.add(pdf.plainText(Label.DATA_PROVIDER, Label.STYLE_TABLE_H3, Label.TRUE));
+        td.add(
+                pdf.listText(
+                        Arrays.asList(pdf.plainText(dataSource, Label.NULL, Label.FALSE)),
+                        Label.STYLE_BODY_TEXT3,
+                        Label.TYPE_SQUARE
+                )
+        );
+
+        /*td.add(pdf.plainText(Label.SUBMIT, Label.STYLE_TABLE_H3, Label.TRUE));
+        td.add(
+                pdf.listText(
+                        Arrays.asList(pdf.plainText(Label.SUBMISSION_MAIL, Label.NULL, Label.FALSE)),
+                        Label.STYLE_BODY_TEXT3,
+                        Label.TYPE_SQUARE
+                )
+        );
+
+        td.add(pdf.plainText(Label.HELP_DESK, Label.STYLE_TABLE_H3, Label.TRUE));
+        td.add(
+                pdf.listText(
+                        Arrays.asList(pdf.plainText(Label.HELP_DESK_MAIL, Label.NULL, Label.FALSE)),
+                        Label.STYLE_BODY_TEXT3,
+                        Label.TYPE_SQUARE
+                )
+        );*/
+
+
 
 
         tableBody = Arrays.asList(Arrays.asList(td));
@@ -530,7 +534,7 @@ public class PdfService {
         tableBody.add(tableRow);
 
         // create row 2 and add to table body
-        text = new Text(data.getMappedOntology()+"\n"+data.getDataSource(), "h2");
+        text = new Text(data.getMappedOntology()+"\n"+data.getSourceName(), "h2");
         text.setAlignment("center");
         tableRow = Arrays.asList(text);
         tableBody.add(tableRow);

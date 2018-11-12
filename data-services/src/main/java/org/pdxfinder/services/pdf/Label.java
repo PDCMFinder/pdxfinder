@@ -24,14 +24,14 @@ public enum Label {
 
     //TEXT LABELS
     public static String DATA_PROVIDER = "Data Provider";
-    public static String INFO = "PDX MODEL INFO";
+    public static String INFO = "LINKS AND CONTACTS";
     public static String JAX = "Jackson Laboratory";
     public static String JAX_URL = "http://www.jax.org";
     public static String SUBMIT = "Submit Models";
     public static String HELP_DESK = "Help Desk";
     public static String HELP_DESK_MAIL = "helpdesk@pdxfnder.org";
     public static String SUBMISSION_MAIL = "submissions@pdxfnder.org";
-    public static String LINKS = "Important Links";
+    public static String TXT_ABOUT_MODEL = "About this Model";
     public static String PDX_LABEL = "View on PDX Finder";
     public static String JAX_LABEL = "View on JAX";
     public static String CONTACT_PROVIDER = "Contact Provider for this PDX Model";
