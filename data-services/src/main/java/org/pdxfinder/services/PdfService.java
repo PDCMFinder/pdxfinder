@@ -246,10 +246,6 @@ public class PdfService {
 
 
 
-        row1Column1Contents.add(
-                pdf.goToNewPage()
-        );
-
 
 
 
@@ -257,20 +253,16 @@ public class PdfService {
 
 
         // PATIENT THERAPIES AND RESPONSE TABLE
-        row1Column1Contents.add(
-                pdf.doubleTableHead(Label.TXT_THERAPY, 5, Arrays.asList(60, 130, 140, 90, 90), Arrays.asList(0, 7, 0, -6))
-        );
         Boolean treatmentExists = data.getPatient().getTreatmentExists();
         if (treatmentExists){
 
 
-            /*row1Column1Contents.add(
-                    pdf.headTitle(Label.TXT_THERAPY, Arrays.asList(0, 15, 0, 5))
+            row1Column1Contents.add(
+                    pdf.goToNewPage()
             );
             row1Column1Contents.add(
-                    pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
-            );*/
-
+                    pdf.doubleTableHead(Label.TXT_THERAPY, 5, Arrays.asList(60, 130, 140, 90, 90), Arrays.asList(0, 7, 0, -6))
+            );
 
             dataList = new ArrayList<>();
             try{
@@ -300,10 +292,17 @@ public class PdfService {
 
         }else {
 
+            row1Column1Contents.add(
+                    pdf.doubleTableHead(Label.TXT_THERAPY, 5, Arrays.asList(60, 130, 140, 90, 90), Arrays.asList(0, 7, 0, -6))
+            );
             row1Column1Contents.add(pdf.emptyContentTable(
                     Label.TXT_EMPTY,
                     Label.TXT_THERAPY_TABLE_HEAD,
                     Arrays.asList(60, 130, 140, 90, 90))
+            );
+
+            row1Column1Contents.add(
+                    pdf.goToNewPage()
             );
         }
 
