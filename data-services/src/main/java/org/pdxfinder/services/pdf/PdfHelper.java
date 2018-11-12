@@ -271,6 +271,15 @@ public class PdfHelper {
         return text;
     }
 
+    public Text goToNewPage() {
+
+        Text text = new Text();
+        text.setText("");
+        text.setPageBreak("before");
+
+        return text;
+    }
+
     public Text plainText(String dText, String style, Boolean italics) {
 
         Text text = new Text();
@@ -462,6 +471,22 @@ public class PdfHelper {
         return text;
     }
 
+
+
+    public Text thTextSingleContent(String dText, String colSpan, Boolean bold,String align) {
+
+        Text text = new Text();
+        text.setText(dText);
+        text.setStyle("thStyle");
+        text.setFillColor("#D8E2F3");
+        text.setColSpan(colSpan);
+        text.setBold(bold);
+        text.setAlignment(align);
+
+        return text;
+    }
+
+
     public Text tdText(String dText, Boolean bold, String link, List<Boolean> border) {
 
         Text text = new Text();
@@ -607,6 +632,34 @@ public class PdfHelper {
 
         return tableData;
 
+    }
+
+
+
+    public Object doubleTableHead(String content, int colspan, List<Object> colWidths, List<Integer> margin){
+
+        List<List<Object>> tableBody = new ArrayList();
+
+        // Add columns to the row
+        List<Object> row = new ArrayList<>();
+        row.add(thText(content, String.valueOf(colspan)));
+        tableBody.add(row);
+
+
+        //Generate a Table specifying width and body
+        Table table = new Table(
+                colWidths,
+                tableBody
+        );
+
+        Map<String, Object> tableData = new HashMap<>();
+        tableData.put("style", "tableText");
+        tableData.put("table", table);
+        TableLayout layout = new TableLayout(true, "#ccc", "#ccc");
+        tableData.put("layout", layout);
+        tableData.put("margin", margin);
+
+        return tableData;
     }
 
 

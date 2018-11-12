@@ -68,14 +68,20 @@ public class PdfService {
         patientTumor.put(Label.TXT_GRADE, data.getGrade());  /////
         patientTumor.put(Label.TXT_STAGE, data.getStage());  //////
 
-        row1Column1Contents.add(pdf.pdxFinderTable(patientTumor, Label.TXT_PATIENT_TUMOR));
-
-
         row1Column1Contents.add(
+                pdf.pdxFinderTable(patientTumor, Label.TXT_PATIENT_TUMOR)
+        );
+
+
+        /*row1Column1Contents.add(
                 pdf.headTitle(Label.TXT_ENGRAFTMENT, Arrays.asList(0, 15, 0, 5))
         );
         row1Column1Contents.add(
                 pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
+        );*/
+
+        row1Column1Contents.add(
+                pdf.doubleTableHead(Label.TXT_ENGRAFTMENT, 6, Arrays.asList(90, 90, 90, 90, 73, 70), Arrays.asList(0, 7, 0, -6))
         );
 
         List<Map<String, String>> dataList = new ArrayList<>();
@@ -95,6 +101,7 @@ public class PdfService {
                     Label.TXT_ENGRAFTMENT_TABLE_HEAD,
                     Arrays.asList(90, 90, 90, 90, 73, 70))
             );
+
         }catch (Exception e){
 
             row1Column1Contents.add(pdf.emptyContentTable(
@@ -110,11 +117,17 @@ public class PdfService {
 
 
 
-        row1Column1Contents.add(
+        /*row1Column1Contents.add(
                 pdf.headTitle(Label.TXT_QC, Arrays.asList(0, 15, 0, 5))
         );
         row1Column1Contents.add(
                 pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
+        );*/
+
+
+
+        row1Column1Contents.add(
+                pdf.doubleTableHead(Label.TXT_QC, 3, Arrays.asList(170, 250, 110), Arrays.asList(0, 7, 0, -6))
         );
 
         dataList = new ArrayList<>();
@@ -146,11 +159,11 @@ public class PdfService {
 
 
 
-        // Generate Patients Tumor Collection For PDX Model TABLE
 
-        // Section Title
+
+        // Generate Patients Tumor Collection For PDX Model TABLE
         row1Column1Contents.add(
-                pdf.headTitle(Label.TXT_PATIENT_COLLECTION, Arrays.asList(0, 15, 0, 5))
+                pdf.headTitle(Label.TXT_PATIENT, Arrays.asList(0, 25, 0, 5))
         );
         // Horizontal Line
         row1Column1Contents.add(pdf.tinLine(560, Label.COLOR_PDX_SECONDARY));
@@ -184,6 +197,11 @@ public class PdfService {
         columnWidths.add(80);
 
 
+
+
+
+
+
         // Add data for other columns
         // PATIENT TUMOR COLECTION DATA TABLE
         for (CollectionEventsDTO event : data.getPatient().getCollectionEvents()) {
@@ -215,12 +233,23 @@ public class PdfService {
         int size = data.getPatient().getCollectionEvents().size();
         List<Object> widthList = pdf.dynamicColumnWidth(tableWidth, firstColumnWidth, size);
 
+
+        row1Column1Contents.add(
+                pdf.doubleTableHead(Label.TXT_PATIENT_COLLECTION, widthList.size(), widthList, Arrays.asList(0, 7, 0, -6))
+        );
         row1Column1Contents.add(pdf.pdxFinderTable(
                 dataList,
                 tumorCollectionHeader,
                 widthList
                 )
         );
+
+
+
+        row1Column1Contents.add(
+                pdf.goToNewPage()
+        );
+
 
 
 
@@ -232,11 +261,15 @@ public class PdfService {
         if (treatmentExists){
 
 
-            row1Column1Contents.add(
+            /*row1Column1Contents.add(
                     pdf.headTitle(Label.TXT_THERAPY, Arrays.asList(0, 15, 0, 5))
             );
             row1Column1Contents.add(
                     pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
+            );*/
+
+            row1Column1Contents.add(
+                    pdf.doubleTableHead(Label.TXT_THERAPY, 5, Arrays.asList(60, 130, 140, 90, 90), Arrays.asList(0, 7, 0, -6))
             );
 
 
@@ -275,7 +308,7 @@ public class PdfService {
 
         // MOLECULAR DATA TABLE
         row1Column1Contents.add(
-                pdf.headTitle(Label.TXT_MOLECULAR_DATA, Arrays.asList(0, 15, 0, 5))
+                pdf.headTitle(Label.TXT_MOLECULAR_DATA, Arrays.asList(0, 25, 0, 5))
         );
         row1Column1Contents.add(
                 pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
@@ -326,7 +359,7 @@ public class PdfService {
 
         // DOSING STUDY TABLE
         row1Column1Contents.add(
-                pdf.headTitle(Label.TXT_DOSING, Arrays.asList(0, 15, 0, 5))
+                pdf.headTitle(Label.TXT_DOSING, Arrays.asList(0, 25, 0, 5))
         );
         row1Column1Contents.add(
                 pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")

@@ -25,6 +25,8 @@ public class Text {
     private String colSpan;
     private List<Boolean> border;
     private String link;
+    private String pageBreak;
+
 
     public Text() {
     }
@@ -172,5 +174,13 @@ public class Text {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public void setPageBreak(String pageBreak) {
+        this.pageBreak = pageBreak;
+    }
+
+    public String getPageBreak() {
+        return pageBreak;
     }
 }
