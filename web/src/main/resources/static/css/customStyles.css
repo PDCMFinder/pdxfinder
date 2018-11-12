@@ -300,7 +300,10 @@ h5{
 
 .minwidth300{
     min-width: 300px;
+    font-size: 13px;
+    float: right;
 }
+
 
 .margin-vertical-20{margin-top:20px;margin-bottom:20px}
 
@@ -1343,4 +1346,9 @@ hr .line_v2 {
 
 .capt-text {
     text-transform: capitalize;
+}
+
+
+.small-tabs{
+    font-size: 15px; padding: 15px;
 }

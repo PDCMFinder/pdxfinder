@@ -90,7 +90,7 @@
                         </h4>
                     </div>
 
-                    <div class="columns medium-4 small-12 margin-top-10">
+                    <div class="columns medium-4 small-12 shiftUp20">
 
                         <a th:href="@{'mailto:'+${data.contacts+'?subject='+data.modelId}}"
                            th:if="${#strings.contains(data.contacts,'@')}">
@@ -117,6 +117,12 @@
                                 th:text="${data.externalUrlText}">View at Provider</h4>
                         </a>
 
+                        <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/pdf'}"
+                           th:target="_blank"
+                           class="button outline uppercase margin-top-large minwidth300 shiftUp10">
+                            <span> Download PDF <i class="icon icon-functional" data-icon="="></i> </span>
+                        </a>
+
                     </div>
                 </div>
             </section>
@@ -130,23 +136,23 @@
                     <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
 
                         <li class="tabs-title is-active">
-                            <a href="#summary" aria-selected="true" > PDX Model </a>
+                            <a href="#summary" aria-selected="true" style="font-size: 15px; padding: 15px;"> PDX Model </a>
                         </li>
 
 
                         <li class="tabs-title">
-                            <a href="#patients"> Patient </a>
+                            <a href="#patients" style="font-size: 15px; padding: 15px;"> Patient </a>
                         </li>
 
                         <li th:if="${#lists.isEmpty(data.dataSummary)}"
                             class="tabs-title ">
-                            <a href="#variation" id="variation_data_link" onclick="initTabs('0')">
+                            <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link" onclick="initTabs('0')">
                                 Molecular Data (0)
                             </a>
                         </li>
                         <li th:if="${not #lists.isEmpty(data.dataSummary)}"
                             class="tabs-title ">
-                            <a href="#variation" id="variation_data_link" onclick="initTabs('0')">
+                            <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link" onclick="initTabs('0')">
                                 Molecular Data
                                 (<span th:text="${#lists.size(data.dataSummary)}"> ... </span>)
                             </a>
@@ -154,15 +160,16 @@
 
 
                         <li th:if="${data.drugSummaryRowNumber} == 0" class="tabs-title">
-                            <a href="#dosing_studies">Dosing study (0)</a>
+                            <a href="#dosing_studies" style="font-size: 15px; padding: 15px;">Dosing study (0)</a>
                         </li>
 
 
                         <li th:if="${data.drugSummaryRowNumber} > 0" class="tabs-title">
-                            <a href="#dosing_studies">Dosing study (1)</a>
+                            <a href="#dosing_studies" style="font-size: 15px; padding: 15px;">Dosing study (1)</a>
                         </li>
 
                     </ul>
+
                 </div>
 
                 <div class="tabs-content style-2" data-tabs-content="example2-tabs">
@@ -305,14 +312,14 @@
                                     <table class="datatable-pdx pdx-table table-borderedPdx head-left">
                                         <thead>
                                         <tr>
-                                            <th colspan="6">PDX model</th>
+                                            <th colspan="6">PDX model Engraftment</th>
                                         </tr>
                                         <tr>
-                                            <th>Engraftment Host Strain Name</th>
-                                            <th> Engraftment Site</th>
-                                            <th> Engraftment Type</th>
-                                            <th> Engraftment Material</th>
-                                            <th> Engraftment Material Status</th>
+                                            <th> Host Strain Name</th>
+                                            <th>  Site</th>
+                                            <th>  Type</th>
+                                            <th>  Material</th>
+                                            <th>  Material Status</th>
                                             <th>Passage</th>
                                         </tr>
                                         </thead>
@@ -917,16 +924,13 @@
                                             <li class="tabs-title is-active">
                                                 <a href="#initialDiagnosis"
                                                    aria-selected="true"
-                                                   style="font-size: 15px;
-                                                       padding: 15px;">
+                                                   style="font-size: 15px; padding: 15px;">
                                                     Genomic Data (<span th:text="${data.variationDataCount}"></span>)
                                                 </a>
                                             </li>
                                         </ul>
                                     </div>
                                     <div class="columns medium-12 small-12 card-3" style="padding: 15px;">
-
-
 
                                         <div id="sizeSwitch" style="float: right; margin-top:-65px;">
                                             <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"

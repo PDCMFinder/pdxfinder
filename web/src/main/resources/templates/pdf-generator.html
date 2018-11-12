@@ -35,9 +35,12 @@
 
         // download the PDF
         pdfMake.createPdf(dd).download(modelId + '.pdf');
+
+
+        setTimeout(function(){
+            window.close();
+        }, 250);
     }
-
-
 
 
 

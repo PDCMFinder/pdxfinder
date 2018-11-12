@@ -98,7 +98,7 @@ public class DetailsController {
 
 
     @GetMapping("/pdx/{dataSrc}/{modelId:.+}/pdf")
-    public String pdfView(Model model, HttpServletRequest request,
+    public String pdfView(Model model, HttpServletResponse response,HttpServletRequest request,
                           @PathVariable String dataSrc,
                           @PathVariable String modelId,
                           @RequestParam(value = "option", defaultValue = "download") String option) {
