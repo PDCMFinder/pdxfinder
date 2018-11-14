@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.poi.ss.usermodel.*;
 
@@ -318,10 +319,12 @@ public class UniversalLoader implements CommandLineRunner {
         createPatientTumors();
         createPatientTreatments();
 
-        createDerivedPatientModelDataset();
+
 
         createPdxModelDetails();
         createPdxModelValidations();
+
+        createDerivedPatientModelDataset();
 
         createSharingAndContacts();
 
@@ -565,6 +568,195 @@ public class UniversalLoader implements CommandLineRunner {
 
     }
 
+    private void createPdxModelDetails() {
+
+        if (stopLoading) return;
+
+        log.info("******************************************************");
+        log.info("* Creating Model details                             *");
+        log.info("******************************************************");
+
+        int row = 6;
+
+        for (List<String> modelDetailsRow : pdxModelSheetData) {
+
+            String modelId = modelDetailsRow.get(0);
+            String hostStrainName = modelDetailsRow.get(1);
+            String hostStrainNomenclature = modelDetailsRow.get(2);
+            String engraftmentSite = modelDetailsRow.get(3);
+            String engraftmentType = modelDetailsRow.get(4);
+            String engraftmentMaterial = modelDetailsRow.get(5);
+            String engraftmentMaterialStatus = modelDetailsRow.get(6);
+            String passage = modelDetailsRow.get(7);
+            String pubmedIdString = modelDetailsRow.get(8);
+
+
+            //check if essential values are not empty
+            if (modelId.isEmpty() || hostStrainName.isEmpty() || hostStrainNomenclature.isEmpty() ||
+                    engraftmentSite.isEmpty() || engraftmentType.isEmpty() || engraftmentMaterial.isEmpty()) {
+
+                log.error("Missing essential value in row: " + row);
+                row++;
+                continue;
+
+            }
+
+            //at this point the corresponding pdx model node should be created and linked to a human sample
+
+            ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
+
+            if (model == null) {
+
+                log.error("Missing model, cannot add details: " + modelId);
+                row++;
+                continue;
+            }
+
+            //CREATING SPECIMENS: engraftment site, type and material
+
+            EngraftmentSite es = dataImportService.getImplantationSite(engraftmentSite);
+            EngraftmentType et = dataImportService.getImplantationType(engraftmentType);
+            EngraftmentMaterial em = dataImportService.createEngraftmentMaterial(engraftmentMaterial, engraftmentMaterialStatus);
+
+            HostStrain hostStrain = null;
+            try{
+                hostStrain = dataImportService.getHostStrain(hostStrainName, hostStrainNomenclature, "", "");
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+
+            // passage = 1,3,5
+            if (passage.contains(",")) {
+
+                String[] passageArr = passage.split(",");
+
+                for (int i = 0; i < passageArr.length; i++) {
+
+                    //create specimens with engraftment data
+                    Specimen specimen = new Specimen();
+                    specimen.setPassage(passageArr[i]);
+                    specimen.setEngraftmentSite(es);
+                    specimen.setEngraftmentType(et);
+                    specimen.setEngraftmentMaterial(em);
+                    specimen.setHostStrain(hostStrain);
+
+                    model.addSpecimen(specimen);
+                }
+            }
+            //the passage is a single number
+            else if (passage.matches("\\d+")) {
+
+                //need this trick to get rid of fractures if there is any
+                int passageInt = Integer.parseInt(passage);
+                passage = String.valueOf(passageInt);
+
+                //create specimens with engraftment data
+                Specimen specimen = new Specimen();
+                specimen.setPassage(passage);
+                specimen.setEngraftmentSite(es);
+                specimen.setEngraftmentType(et);
+                specimen.setEngraftmentMaterial(em);
+                specimen.setHostStrain(hostStrain);
+
+                model.addSpecimen(specimen);
+
+            }
+            else {
+
+                log.error("Not supported value(" + passage + ") for passage at row " + row);
+            }
+
+            //CREATE PUBLICATION GROUPS
+
+            //check if pubmed id is in the right format, ie id starts with PMID
+            if (!pubmedIdString.isEmpty() && pubmedIdString.toLowerCase().contains("pmid")) {
+
+                // pubmed ids separated with a comma, create multiple groups
+                if (pubmedIdString.contains(",")) {
+
+                    String[] pubmedArr = pubmedIdString.split(",");
+
+                    for (int i = 0; i < pubmedArr.length; i++) {
+
+                        Group g = dataImportService.getPublicationGroup(pubmedArr[i].trim());
+                        model.addGroup(g);
+                    }
+                }
+                //single publication, create one group only
+                else {
+
+                    Group g = dataImportService.getPublicationGroup(pubmedIdString.trim());
+                    model.addGroup(g);
+                }
+
+            }
+
+            dataImportService.saveModelCreation(model);
+            row++;
+        }
+    }
+
+    private void createPdxModelValidations() {
+
+        if (stopLoading) return;
+
+        log.info("******************************************************");
+        log.info("* Creating Model validations                         *");
+        log.info("******************************************************");
+
+        int row = 6;
+
+        for (List<String> pdxModelValidationRow : pdxModelValidationSheetData) {
+
+
+            String modelId = pdxModelValidationRow.get(0);
+            String validationTechnique = pdxModelValidationRow.get(1);
+            String validationDescription = pdxModelValidationRow.get(2);
+            String passages = pdxModelValidationRow.get(3);
+            String validationHostStrain = pdxModelValidationRow.get(4);
+
+            if (modelId.isEmpty() || validationTechnique.isEmpty()) {
+
+                log.error("Empty essential value in row: " + row);
+                row++;
+                continue;
+            }
+
+
+            //at this point the corresponding pdx model node should be created and available for lookup
+            ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
+
+            if (model == null) {
+
+                log.error("Missing model, cannot add validation: " + modelId);
+                row++;
+                continue;
+            }
+
+            //need this trick to get rid of 0.0 if there is any
+            String[] passageArr = passages.split(",");
+            passages = "";
+
+            for (int i = 0; i < passageArr.length; i++) {
+
+                int passageInt = (int) Float.parseFloat(passageArr[i]);
+                passages += String.valueOf(passageInt) + ",";
+            }
+            //remove that last comma
+            passages = passages.substring(0, passages.length() - 1);
+
+            QualityAssurance qa = new QualityAssurance();
+            qa.setTechnology(validationTechnique);
+            qa.setDescription(validationDescription);
+            qa.setPassages(passages);
+
+            model.addQualityAssurance(qa);
+            dataImportService.saveModelCreation(model);
+
+        }
+    }
+
     private void createDerivedPatientModelDataset() {
 
         if (stopLoading) return;
@@ -633,19 +825,23 @@ public class UniversalLoader implements CommandLineRunner {
 
             }
             //xenograft sample
+            //specimen should have been created before
             else if (origin.toLowerCase().equals("xenograft")) {
 
-                model = dataImportService.findModelByIdAndDataSourceWithSpecimens(modelId, ds.getAbbreviation());
+                model = dataImportService.findModelByIdAndDataSourceWithSpecimensAndHostStrain(modelId, ds.getAbbreviation());
 
-                if (model != null) {
+                //this specimen should have the appropriate hoststrain, too!
+                Specimen specimen = dataImportService.findSpecimenByModelAndPassageAndNomenclature(model, passage, nomenclature);
 
-                    Specimen specimen = dataImportService.getSpecimen(model,
-                            sampleId, ds.getAbbreviation(), passage);
+                if(specimen != null){
 
-                    sample = dataImportService.getMouseSample(model, sampleId, ds.getAbbreviation(), passage, sampleId);
+                    sample = specimen.getSample();
 
-                    //create molchar, get platform
+                    if(sample == null) {
 
+                        sample = new Sample();
+
+                    }
 
                     platform = dataImportService.getPlatform(platformName, ds);
                     MolecularCharacterization mc = new MolecularCharacterization();
@@ -661,237 +857,27 @@ public class UniversalLoader implements CommandLineRunner {
 
                     dataImportService.saveModelCreation(model);
                     dataImportService.saveSample(sample);
-                } else {
-
-                    log.error("Model not found with id: " + modelId);
-                    continue;
-                }
-
-            } else {
-
-                log.error("Unknown sample origin in row " + row);
-                continue;
-            }
-
-
-        }
-
-
-    }
-
-    private void createPdxModelDetails() {
-
-        if (stopLoading) return;
-
-        log.info("******************************************************");
-        log.info("* Creating Model details                             *");
-        log.info("******************************************************");
-
-        int row = 6;
-
-        for (List<String> modelDetailsRow : pdxModelSheetData) {
-
-            String modelId = modelDetailsRow.get(0);
-            String hostStrainName = modelDetailsRow.get(1);
-            String hostStrainNomenclature = modelDetailsRow.get(2);
-            String engraftmentSite = modelDetailsRow.get(3);
-            String engraftmentType = modelDetailsRow.get(4);
-            String engraftmentMaterial = modelDetailsRow.get(5);
-            String engraftmentMaterialStatus = modelDetailsRow.get(6);
-            String passage = modelDetailsRow.get(7);
-            String pubmedIdString = modelDetailsRow.get(8);
-
-
-            //check if essential values are not empty
-            if (modelId.isEmpty() || hostStrainName.isEmpty() || hostStrainNomenclature.isEmpty() ||
-                    engraftmentSite.isEmpty() || engraftmentType.isEmpty() || engraftmentMaterial.isEmpty()) {
-
-                log.error("Missing essential value in row: " + row);
-                row++;
-                continue;
-
-            }
-
-            //at this point the corresponding pdx model node should be created and linked to a human sample
-
-            ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
-
-            if (model == null) {
-
-                log.error("Missing model, cannot add details: " + modelId);
-                row++;
-                continue;
-            }
-
-            //UPDATING SPECIMENS: engraftment site, type and material
-
-            EngraftmentSite es = dataImportService.getImplantationSite(engraftmentSite);
-            EngraftmentType et = dataImportService.getImplantationType(engraftmentType);
-            EngraftmentMaterial em = dataImportService.createEngraftmentMaterial(engraftmentMaterial, engraftmentMaterialStatus);
-
-            HostStrain hostStrain = null;
-            try{
-                hostStrain = dataImportService.getHostStrain(hostStrainName, hostStrainNomenclature, "", "");
-            }
-            catch(Exception e){
-                e.printStackTrace();
-            }
-            //passage = all
-            if (passage.toLowerCase().trim().equals("all")) {
-
-                //update all specimens with the same site, type etc.
-                List<Specimen> specimens = dataImportService.getAllSpecimenByModel(modelId, ds.getAbbreviation());
-
-                for (Specimen specimen : specimens) {
-
-                    specimen.setEngraftmentSite(es);
-                    specimen.setEngraftmentType(et);
-                    specimen.setEngraftmentMaterial(em);
-
-                    if(specimen.getHostStrain() == null){
-                        specimen.setHostStrain(hostStrain);
-                    }
-
-                    dataImportService.saveSpecimen(specimen);
-                }
-            }
-            // passage = 1,3,5
-            else if (passage.contains(",")) {
-
-                String[] passageArr = passage.split(",");
-
-                for (int i = 0; i < passageArr.length; i++) {
-
-                    List<Specimen> specimens = dataImportService.findSpecimenByPassage(model, passageArr[i]);
-                    for (Specimen specimen : specimens) {
-
-                        specimen.setEngraftmentSite(es);
-                        specimen.setEngraftmentType(et);
-                        specimen.setEngraftmentMaterial(em);
-
-                        if(specimen.getHostStrain() == null){
-                            specimen.setHostStrain(hostStrain);
-                        }
-                        dataImportService.saveSpecimen(specimen);
-                    }
 
                 }
-            }
-            //the passage is a single number
-            else if (passage.matches("\\d+")) {
-
-                //need this trick to get rid of fractures if there is any
-                int passageInt = Integer.parseInt(passage);
-                passage = String.valueOf(passageInt);
-
-                List<Specimen> specimens = dataImportService.findSpecimenByPassage(model, passage);
-                for (Specimen specimen : specimens) {
-
-                    specimen.setEngraftmentSite(es);
-                    specimen.setEngraftmentType(et);
-                    specimen.setEngraftmentMaterial(em);
-
-                    if(specimen.getHostStrain() == null){
-                        specimen.setHostStrain(hostStrain);
-                    }
-                    dataImportService.saveSpecimen(specimen);
+                else{
+                    // either specimen with passage or the host strain nomenclature was not created
+                    log.error("Cannot find specimen with the following details: "+modelId+" "+passage+" "+nomenclature+ " in row: "+row);
                 }
 
-            } else {
 
-                log.error("Not supported value(" + passage + ") for passage at row " + row);
             }
-
-            //CREATE PUBLICATION GROUPS
-
-            //check if pubmed id is in the right format, ie id starts with PMID
-            if (!pubmedIdString.isEmpty() && pubmedIdString.toLowerCase().contains("pmid")) {
-
-                // pubmed ids separated with a comma, create multiple groups
-                if (pubmedIdString.contains(",")) {
-
-                    String[] pubmedArr = pubmedIdString.split(",");
-
-                    for (int i = 0; i < pubmedArr.length; i++) {
-
-                        Group g = dataImportService.getPublicationGroup(pubmedArr[i].trim());
-                        model.addGroup(g);
-                    }
-                }
-                //single publication, create one group only
-                else {
-
-                    Group g = dataImportService.getPublicationGroup(pubmedIdString.trim());
-                    model.addGroup(g);
-                }
-
-                dataImportService.saveModelCreation(model);
+            else{
+                //origin is not patient nor xenograft
+                log.error("Unknown sample origin in row "+row);
             }
-
 
             row++;
         }
+
+
+
     }
 
-    private void createPdxModelValidations() {
-
-        if (stopLoading) return;
-
-        log.info("******************************************************");
-        log.info("* Creating Model validations                         *");
-        log.info("******************************************************");
-
-        int row = 6;
-
-        for (List<String> pdxModelValidationRow : pdxModelValidationSheetData) {
-
-
-            String modelId = pdxModelValidationRow.get(0);
-            String validationTechnique = pdxModelValidationRow.get(1);
-            String validationDescription = pdxModelValidationRow.get(2);
-            String passages = pdxModelValidationRow.get(3);
-            String validationHostStrain = pdxModelValidationRow.get(4);
-
-            if (modelId.isEmpty() || validationTechnique.isEmpty()) {
-
-                log.error("Empty essential value in row: " + row);
-                row++;
-                continue;
-            }
-
-
-            //at this point the corresponding pdx model node should be created and available for lookup
-            ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
-
-            if (model == null) {
-
-                log.error("Missing model, cannot add validation: " + modelId);
-                row++;
-                continue;
-            }
-
-            //need this trick to get rid of 0.0 if there is any
-            String[] passageArr = passages.split(",");
-            passages = "";
-
-            for (int i = 0; i < passageArr.length; i++) {
-
-                int passageInt = (int) Float.parseFloat(passageArr[i]);
-                passages += String.valueOf(passageInt) + ",";
-            }
-            //remove that last comma
-            passages = passages.substring(0, passages.length() - 1);
-
-            QualityAssurance qa = new QualityAssurance();
-            qa.setTechnology(validationTechnique);
-            qa.setDescription(validationDescription);
-            qa.setPassages(passages);
-
-            model.addQualityAssurance(qa);
-            dataImportService.saveModelCreation(model);
-
-        }
-    }
 
     private void createSharingAndContacts() {
 
