@@ -279,9 +279,9 @@ public class DataImportService {
         return modelCreationRepository.findBySourcePdxIdAndDataSource(modelId, dataSource);
     }
 
-    public ModelCreation findModelByIdAndDataSourceWithSpecimens(String modelId, String dataSource){
+    public ModelCreation findModelByIdAndDataSourceWithSpecimensAndHostStrain(String modelId, String dataSource){
 
-        return modelCreationRepository.findBySourcePdxIdAndDataSourceWithSpecimens(modelId, dataSource);
+        return modelCreationRepository.findBySourcePdxIdAndDataSourceWithSpecimensAndHostStrain(modelId, dataSource);
     }
 
 
@@ -526,6 +526,9 @@ public class DataImportService {
         return sample;
     }
 
+    //public findSampleWithMolcharBySpecimen
+
+
     public Sample findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(String modelId, String dataSource, String sampleId){
 
         return sampleRepository.findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(modelId, dataSource, sampleId);
@@ -739,6 +742,13 @@ public class DataImportService {
         return specimen;
 
     }
+
+
+    public Specimen findSpecimenByModelAndPassageAndNomenclature(ModelCreation modelCreation, String passage, String nomenclature){
+
+        return specimenRepository.findByModelAndPassageAndNomenClature(modelCreation, passage, nomenclature);
+    }
+
 
     public List<Specimen> getAllSpecimenByModel(String modelId, String dataSource){
 
