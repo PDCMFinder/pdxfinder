@@ -360,7 +360,7 @@ public class DataImportService {
             }
         }
         if (patientSnapshot == null) {
-            log.info("PatientSnapshot for patient '{}' at age '{}' not found. Creating", patient.getExternalId(), age);
+            //log.info("PatientSnapshot for patient '{}' at age '{}' not found. Creating", patient.getExternalId(), age);
             patientSnapshot = new PatientSnapshot(patient, age);
             patientSnapshotRepository.save(patientSnapshot);
         }
@@ -672,7 +672,7 @@ public class DataImportService {
             marker = markerRepository.findBySymbol(symbol);
         }
         if (marker == null) {
-            log.info("Marker '{}' not found. Creating", name);
+            //log.info("Marker '{}' not found. Creating", name);
             marker = new Marker(symbol, name);
             marker = markerRepository.save(marker);
         }
