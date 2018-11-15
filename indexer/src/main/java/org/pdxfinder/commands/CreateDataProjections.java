@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  * Created by csaba on 09/03/2018.
  */
 @Component
-@Order(value = 99)
+@Order(value = 90)
 public class CreateDataProjections implements CommandLineRunner{
 
     private final static Logger log = LoggerFactory.getLogger(CreateDataProjections.class);
