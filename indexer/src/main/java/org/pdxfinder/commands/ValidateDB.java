@@ -93,16 +93,17 @@ public class ValidateDB implements CommandLineRunner{
 
 
         //check if there is any patient with multiple treatment summaries
+        log.info("Looking for patients with multiple treatment summaries");
         Set<Object> patientsWithMultipleSummaries = dataImportService.findPatientsWithMultipleSummaries();
 
         if(patientsWithMultipleSummaries.size() > 0){
             isDBValid = false;
 
-            log.error("Found patients with multiple treatmentsummaries!");
+            log.error("Found patients with multiple treatment summaries!");
         }
 
         //check if there is any platform without url
-
+        log.info("Validating platforms");
         Set<Object> platformsWithoutUrl = dataImportService.findPlatformsWithoutUrl();
 
         if(platformsWithoutUrl.size() > 0){
