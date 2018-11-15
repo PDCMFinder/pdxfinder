@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
-@Order(value = 95)
+@Order(value = 92)
 public class ValidateDB implements CommandLineRunner{
 
     private final static Logger log = LoggerFactory.getLogger(ValidateDB.class);

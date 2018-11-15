@@ -31,7 +31,7 @@ import java.util.stream.Stream;
  * Created by csaba on 24/08/2017.
  */
 @Component
-@Order(value = 95)
+@Order(value = 80)
 public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
 
