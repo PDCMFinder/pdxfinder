@@ -225,7 +225,15 @@ public class LoadWUSTL implements CommandLineRunner {
                 NOT_SPECIFIED, qaPassage);
         dataImportService.saveQualityAssurance(qa);
         String strain = j.getString("Strain");
+
+
+        if(strain == null || strain.isEmpty()){
+
+            strain = NOT_SPECIFIED;
+        }
+
         HostStrain bs = dataImportService.getHostStrain("", strain, "", "");
+
 
         String engraftmentSite = Standardizer.getValue("Engraftment Site", j);
 
