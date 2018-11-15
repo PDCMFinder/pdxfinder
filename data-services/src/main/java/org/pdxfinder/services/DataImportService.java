@@ -1118,4 +1118,13 @@ public class DataImportService {
         return treatmentSummaryRepository.findByPatientSnapshot(ps);
 
     }
+
+
+
+
+
+    public Set<Object> findUnlinkedNodes(){
+
+        return dataProjectionRepository.findUnlinkedNodes();
+    }
 }
