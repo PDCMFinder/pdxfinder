@@ -15,11 +15,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Component
-@Order(value = 0)
+@Order(value = 95)
 public class ValidateDB implements CommandLineRunner{
 
     private final static Logger log = LoggerFactory.getLogger(ValidateDB.class);
@@ -55,6 +54,18 @@ public class ValidateDB implements CommandLineRunner{
 
     private void runValidationChecks(){
 
+
+        /*
+            Scenarios when DB is invalid:
+            - Missing DataProjection nodes
+
+            Scenarios when DB is valid with warnings:
+            - Found nodes without relationships and they are not DataProjections
+         */
+
+
+
+
         boolean isDBValid = true;
         boolean noWarnings = true;
 
@@ -73,18 +84,13 @@ public class ValidateDB implements CommandLineRunner{
 
                 if(!(node instanceof DataProjection)){
                     //Uh-oh! We found a lonely node that is not DataProjection!!!
-
                     unlinkedNodeTypeSet.add(node.getClass().getSimpleName());
                 }
-
             }
-
         }
 
         //TODO: Check if DataProjection nodes are there
         //TODO: Define additional db checks!
-
-
 
 
 
@@ -118,8 +124,5 @@ public class ValidateDB implements CommandLineRunner{
 
 
     }
-
-
-
 
 }
