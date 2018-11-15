@@ -58,9 +58,11 @@ public class ValidateDB implements CommandLineRunner{
         /*
             Scenarios when DB is invalid:
             - Missing DataProjection nodes
+            - Patients with multiple treatmentsummaries
 
             Scenarios when DB is valid with warnings:
             - Found nodes without relationships and they are not DataProjections
+            - Platforms without url attribute value
          */
 
 
@@ -88,6 +90,28 @@ public class ValidateDB implements CommandLineRunner{
                 }
             }
         }
+
+
+        //check if there is any patient with multiple treatment summaries
+        Set<Object> patientsWithMultipleSummaries = dataImportService.findPatientsWithMultipleSummaries();
+
+        if(patientsWithMultipleSummaries.size() > 0){
+            isDBValid = false;
+
+            log.error("Found patients with multiple treatmentsummaries!");
+        }
+
+        //check if there is any platform without url
+
+        Set<Object> platformsWithoutUrl = dataImportService.findPlatformsWithoutUrl();
+
+        if(platformsWithoutUrl.size() > 0){
+
+            noWarnings = false;
+            log.warn("Found Platforms without url: "+ platformsWithoutUrl.toString());
+        }
+
+
 
         //TODO: Check if DataProjection nodes are there
         //TODO: Define additional db checks!

@@ -1127,4 +1127,15 @@ public class DataImportService {
 
         return dataProjectionRepository.findUnlinkedNodes();
     }
+
+    public Set<Object> findPatientsWithMultipleSummaries(){
+
+        return dataProjectionRepository.findPatientsWithMultipleTreatmentSummaries();
+    }
+
+    public Set<Object> findPlatformsWithoutUrl(){
+
+        return dataProjectionRepository.findPlatformsWithoutUrl();
+    }
+
 }
