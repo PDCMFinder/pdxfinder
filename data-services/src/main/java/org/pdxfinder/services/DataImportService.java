@@ -981,6 +981,9 @@ public class DataImportService {
      *
      * Creates a (tp:TreatmentProtocol)--(tc:TreatmentComponent)--(d:Drug)
      *           (tp)--(r:Response) node
+     *
+     * If drug names are separated with + it will create multiple components to represent drug combos
+     * Doses should be separated with either + or ;
      */
     public TreatmentProtocol getTreatmentProtocol(String drugString, String doseString, String response, String responseClassification){
 
