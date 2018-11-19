@@ -1,6 +1,6 @@
 package org.pdxfinder.services;
 
-import org.apache.lucene.util.automaton.LevenshteinAutomata;
+import com.google.gson.Gson;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -43,6 +46,14 @@ public class MappingService {
         this.sampleRepository = sampleRepository;
 
 
+    }
+
+    public String getSavedDiagnosisMappingsFile() {
+        return savedDiagnosisMappingsFile;
+    }
+
+    public void setSavedDiagnosisMappingsFile(String savedDiagnosisMappingsFile) {
+        this.savedDiagnosisMappingsFile = savedDiagnosisMappingsFile;
     }
 
 
@@ -104,7 +115,7 @@ public class MappingService {
                     mappingValues.put("TumorType", tumorType);
 
                     MappingEntity me = new MappingEntity(new Long(i+1), "DIAGNOSIS", getDiagnosisMappingLabels(), mappingValues);
-                    me.setMappedTerm(ontologyTerm);
+                    me.setMappedTermLabel(ontologyTerm);
                     me.setMapType(mapType);
                     me.setJustification(justification);
 
@@ -145,6 +156,28 @@ public class MappingService {
     return mc;
     }
 
+
+    public void saveMappingsToFile(String fileName, Collection<MappingEntity> maprules){
+
+        Map<String, Collection<MappingEntity>> mappings = new HashMap<>();
+        mappings.put("row", maprules);
+
+        Gson gson = new Gson();
+        String json = gson.toJson(mappings);
+
+
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
+
+            writer.append(json);
+            writer.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     public MappingContainer getMissingDiagnosisMappings(String ds){
 
@@ -377,5 +410,6 @@ public class MappingService {
 
         return dla.execute(key1, key2);
     }
+
 
 }
