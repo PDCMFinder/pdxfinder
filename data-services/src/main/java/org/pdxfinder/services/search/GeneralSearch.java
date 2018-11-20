@@ -1,20 +1,18 @@
 package org.pdxfinder.services.search;
 
 /*
- * Created by csaba on 19/11/2018.
+ * Created by csaba on 20/11/2018.
  */
-public abstract class GeneralFilter {
+public abstract class GeneralSearch {
 
+    private String name;
+    private String urlParam;
 
-
-    public String name;
-
-    public String urlParam;
-
-    public GeneralFilter(String name, String urlParam) {
+    public GeneralSearch(String name, String urlParam) {
         this.name = name;
         this.urlParam = urlParam;
     }
+
 
     public String getName() {
         return name;

@@ -13,8 +13,8 @@ public class OneParamFilter extends GeneralFilter{
     private List<String> selected;
 
 
-    public OneParamFilter(String name, List<String> options, List<String> selected) {
-        super(name);
+    public OneParamFilter(String name, String urlParam, List<String> options, List<String> selected) {
+        super(name, urlParam);
         this.options = options;
         this.selected = selected;
     }
