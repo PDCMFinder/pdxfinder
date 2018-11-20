@@ -9,6 +9,10 @@ import org.pdxfinder.dao.DataProjection;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.repositories.DataProjectionRepository;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
+import org.pdxfinder.services.search.GeneralFilter;
+import org.pdxfinder.services.search.OneParamFilter;
+import org.pdxfinder.services.search.ThreeParamFilter;
+import org.pdxfinder.services.search.TwoParamUnlinkedFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -38,6 +42,188 @@ public class SearchDS {
 
     private Set<ModelForQuery> models;
 
+
+    private List<GeneralFilter> filterList;
+
+
+
+    private void init(){
+
+
+        //INITIALIZE MODEL FOR QUERY OBJECTS FIRST
+        initializeModels();
+        //now we can use MFQ objects to get additional values for filters
+
+
+        /****************************************************************
+         *            INITIALIZE FILTER OPTIONS                         *
+         ****************************************************************/
+
+
+        filterList = new ArrayList<>();
+
+        //cancer by system filter def
+        OneParamFilter cancerBySystem = new OneParamFilter("CANCER BY SYSTEM", "cancer_system",
+                Arrays.asList(
+                        "Breast Cancer",
+                        "Cardiovascular Cancer",
+                        "Connective and Soft Tissue Cancer",
+                        "Digestive System Cancer",
+                        "Endocrine Cancer",
+                        "Eye Cancer",
+                        "Head and Neck Cancer",
+                        "Hematopoietic and Lymphoid System Cancer",
+                        "Nervous System Cancer",
+                        "Peritoneal and Retroperitoneal Cancer",
+                        "Reproductive System Cancer",
+                        "Respiratory Tract Cancer",
+                        "Thoracic Cancer",
+                        "Skin Cancer",
+                        "Urinary System Cancer",
+                        "Unclassified"),
+                new ArrayList<>());
+        filterList.add(cancerBySystem);
+
+
+        //tumor type filter def
+        OneParamFilter tumorType = new OneParamFilter("TUMOR_TYPE", "sample_tumor_type",
+                Arrays.asList(
+                        "Primary",
+                        "Metastatic",
+                        "Recurrent",
+                        "Refractory",
+                        "Not Specified"
+                ),
+                new ArrayList<>());
+        filterList.add(tumorType);
+
+
+        //sex filter def
+        OneParamFilter sex = new OneParamFilter("SEX", "patient_gender",
+                Arrays.asList(
+                        "Male",
+                        "Female",
+                        "Not Specified"
+                ),
+                new ArrayList<>());
+        filterList.add(sex);
+
+
+        //age filter def
+        OneParamFilter age = new OneParamFilter("AGE", "patient_age",
+                Arrays.asList(
+                        "0-9",
+                        "10-19",
+                        "20-29",
+                        "30-39",
+                        "40-49",
+                        "50-59",
+                        "60-69",
+                        "70-79",
+                        "80-89",
+                        "90",
+                        "Not Specified"
+                ),
+                new ArrayList<>());
+        filterList.add(age);
+
+
+        //datasource filter def
+        Set<String> datasourceSet = models.stream()
+                .map(ModelForQuery::getDatasource)
+                .collect(Collectors.toSet());
+
+        List<String> datasourceList = new ArrayList<>();
+        datasourceList.addAll(datasourceSet);
+        Collections.sort(datasourceList);
+
+        OneParamFilter datasource = new OneParamFilter("DATASOURCE", "datasource", datasourceList, new ArrayList<>());
+        filterList.add(datasource);
+
+
+        //project filter def
+        Set<String> projectsSet = new HashSet<>();
+        for(ModelForQuery mfk : models){
+
+            if(mfk.getProjects() != null){
+                for(String s: mfk.getProjects()){
+                    projectsSet.add(s);
+                }
+            }
+        }
+        List<String> projectList = new ArrayList<>(projectsSet);
+        Collections.sort(projectList);
+
+        //TODO: skip filter if no projects were defined?
+
+        OneParamFilter projects = new OneParamFilter("PROJECT", "project", projectList, new ArrayList<>());
+        filterList.add(projects);
+
+
+        //dataset available filter def
+        OneParamFilter datasetAvailable = new OneParamFilter("DATASET AVAILABLE", "data_available",
+                Arrays.asList(
+                        "Gene Mutation",
+                        "Dosing Studies",
+                        "Patient Treatment"),
+                new ArrayList<>());
+
+        filterList.add(datasetAvailable);
+
+
+        //gene mutation filter def
+        //TODO: look up platforms, genes and variants
+        ThreeParamFilter geneMutation = new ThreeParamFilter("GENE MUTATION", "mutation", new HashMap<>(), new HashMap<>());
+
+
+
+        //model dosing study def
+
+        Map<String, Map<String, Set<Long>>> modelDrugResponses = getModelDrugResponses();
+        List<String> drugNames = new ArrayList<>(modelDrugResponses.keySet());
+
+        TwoParamUnlinkedFilter modelDosingStudy = new TwoParamUnlinkedFilter("MODEL DOSING STUDY", "drug", drugNames, Arrays.asList(
+                "Complete Response",
+                "Partial Response",
+                "Progressive Disease",
+                "Stable Disease",
+                "Stable Disease And Complete Response"
+        ), new HashMap<>());
+        filterList.add(modelDosingStudy);
+
+
+
+        /****************************************************************
+         *            INITIALIZE SEARCH OBJECTS                         *
+         ****************************************************************/
+
+
+
+
+
+
+
+
+
+
+
+        INITIALIZED = true;
+    }
+
+
+
+
+
+    public Set<ModelForQuery> search(){
+
+        return new HashSet<>();
+    }
+
+
+
+
+
+
     /*
      * DYNAMIC FACETS
      */
@@ -48,79 +234,9 @@ public class SearchDS {
     Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<String, Map<String, Map<String, Set<Long>>>>();
 
     //"drugname"=>"response"=>"set of model ids"
-    private Map<String, Map<String, Set<Long>>> modelDrugResponses = new HashMap<>();
+    //private Map<String, Map<String, Set<Long>>> modelDrugResponses = new HashMap<>();
 
     private List<String> projectOptions = new ArrayList<>();
-
-
-    /*
-     * STATIC FACETS
-     */
-
-    public static List<String> PATIENT_AGE_OPTIONS = Arrays.asList(
-            "0-9",
-            "10-19",
-            "20-29",
-            "30-39",
-            "40-49",
-            "50-59",
-            "60-69",
-            "70-79",
-            "80-89",
-            "90",
-            "Not Specified"
-    );
-    public static List<String> DATASOURCE_OPTIONS = Arrays.asList(
-            "JAX",
-            "IRCC-CRC",
-            "PDMR",
-            "PDXNet-HCI-BCM",
-            "PDXNet-MDAnderson",
-            "PDXNet-WUSTL",
-            "PDXNet-Wistar-MDAnderson-Penn",
-            "TRACE"
-    );
-    public static List<String> PATIENT_GENDERS = Arrays.asList(
-            "Male",
-            "Female",
-            "Not Specified"
-    );
-
-
-    public static List<String> CANCERS_BY_SYSTEM_OPTIONS = Arrays.asList(
-            "Breast Cancer",
-            "Cardiovascular Cancer",
-            "Connective and Soft Tissue Cancer",
-            "Digestive System Cancer",
-            "Endocrine Cancer",
-            "Eye Cancer",
-            "Head and Neck Cancer",
-            "Hematopoietic and Lymphoid System Cancer",
-            "Nervous System Cancer",
-            "Peritoneal and Retroperitoneal Cancer",
-            "Reproductive System Cancer",
-            "Respiratory Tract Cancer",
-            "Thoracic Cancer",
-            "Skin Cancer",
-            "Urinary System Cancer",
-            "Unclassified"
-    );
-
-    public static List<String> SAMPLE_TUMOR_TYPE_OPTIONS = Arrays.asList(
-            "Primary",
-            "Metastatic",
-            "Recurrent",
-            "Refractory",
-            "Not Specified"
-    );
-
-
-
-    public static List<String> DATA_AVAILABLE_OPTIONS = Arrays.asList(
-            "Gene Mutation",
-            "Dosing Studies",
-            "Patient Treatment"
-    );
 
 
     /**
@@ -133,6 +249,7 @@ public class SearchDS {
         this.models = new HashSet<>();
     }
 
+    /*
     void initialize() {
 
 
@@ -156,65 +273,12 @@ public class SearchDS {
 
 
 
-        //
-        // Filter out all options that have no models for that option
-        //
-        PATIENT_AGE_OPTIONS = PATIENT_AGE_OPTIONS
-                .stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getPatientAge)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
-
-        DATASOURCE_OPTIONS = DATASOURCE_OPTIONS
-                .stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getDatasource)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
-
-
-        CANCERS_BY_SYSTEM_OPTIONS = CANCERS_BY_SYSTEM_OPTIONS
-                .stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getCancerSystem)
-                        .flatMap(Collection::stream)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
-
-        PATIENT_GENDERS = PATIENT_GENDERS
-                .stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getPatientGender)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
-
-        SAMPLE_TUMOR_TYPE_OPTIONS = SAMPLE_TUMOR_TYPE_OPTIONS
-                .stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getSampleTumorType)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
-
-
-
-
         //PROJECT_OPTIONS =new ArrayList<>(models.stream().map(model -> model.getProjects()).flatMap(Collection::stream).collect(Collectors.toSet()));
 
         INITIALIZED = true;
 
     }
-
+/*
     /**
      * Recursively get all ancestors starting from the supplied ontology term
      *
@@ -247,7 +311,7 @@ public class SearchDS {
 
         synchronized (this){
             if(! INITIALIZED ) {
-                initialize();
+                init();
             }
         }
 
@@ -376,9 +440,11 @@ public class SearchDS {
     }
 
 
-    void initializeModelDrugResponses(){
+    Map<String, Map<String, Set<Long>>> getModelDrugResponses(){
 
         log.info("Initializing model drug responses");
+
+        Map<String, Map<String, Set<Long>>> modelDrugResponses = new HashMap<>();
 
         DataProjection dataProjection = dataProjectionRepository.findByLabel("ModelDrugData");
         String responses = "{}";
@@ -401,6 +467,8 @@ public class SearchDS {
 
             e.printStackTrace();
         }
+
+        return modelDrugResponses;
     }
 
 
@@ -492,7 +560,7 @@ public class SearchDS {
     }
 
 
-
+/*
     private void getModelsByDrugAndResponse(String drug, String response, Map<Long, Set<String>> previouslyFoundModels,
                                             Map<Long, List<DrugSummaryDTO>> modelsDrugSummary){
 
@@ -708,7 +776,7 @@ public class SearchDS {
 
 
     }
-
+*/
 
     public void initializeAdditionalOptions(){
 
@@ -750,11 +818,13 @@ public class SearchDS {
      * @return set of models derived from filtering the complete set according to the
      * filters passed in as arguments
      */
+
+    /*
     public Set<ModelForQuery> search(Map<SearchFacetName, List<String>> filters) {
 
         synchronized (this){
             if(! INITIALIZED ) {
-                initialize();
+                init();
             }
         }
 
@@ -992,6 +1062,7 @@ public class SearchDS {
         return result;
     }
 
+    */
 
     /**
      * getExactMatchDisjunctionPredicate returns a composed predicate with all the supplied filters "OR"ed together
