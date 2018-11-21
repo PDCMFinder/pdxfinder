@@ -3,32 +3,26 @@ package org.pdxfinder.services.search;
 import org.pdxfinder.services.ds.ModelForQuery;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 /*
  * Created by csaba on 20/11/2018.
  */
 public class OneParamSearch extends GeneralSearch{
 
+    //static Function a = ModelForQuery::getPatientAge;
 
-    Set<ModelForQuery> models;
 
-    public OneParamSearch(String name, String urlParam, Set<ModelForQuery> models) {
+
+    public OneParamSearch(String name, String urlParam) {
         super(name, urlParam);
-        this.models = models;
-    }
-
-    public Set<ModelForQuery> getModels() {
-        return models;
-    }
-
-    public void setModels(Set<ModelForQuery> models) {
-        this.models = models;
     }
 
 
 
-    public Set<Long> search(String param1){
+    public Set<ModelForQuery> search(List<String> param, List<ModelForQuery> mfq, Function searchFunc){
 
         //TODO: Implement search logic on single selected parameter
         return new HashSet<>();
