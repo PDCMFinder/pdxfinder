@@ -215,15 +215,15 @@ public class UniversalLoader implements CommandLineRunner {
         sharingAndContactSheetData = new ArrayList<>();
         loaderRelatedDataSheetData = new ArrayList<>();
 
-        initializeSheetData(workbook.getSheetAt(1), "patientSheetData");
-        initializeSheetData(workbook.getSheetAt(2), "patientTumorSheetData");
-        initializeSheetData(workbook.getSheetAt(3), "patientTreatmentSheetData");
-        initializeSheetData(workbook.getSheetAt(4), "pdxModelSheetData");
-        initializeSheetData(workbook.getSheetAt(5), "pdxModelValidationSheetData");
-        initializeSheetData(workbook.getSheetAt(6), "derivedDatasetSheetData");
-        initializeSheetData(workbook.getSheetAt(7), "sharingAndContactSheetData");
+        initializeSheetData(workbook.getSheetAt(1), patientSheetData);
+        initializeSheetData(workbook.getSheetAt(2), patientTumorSheetData);
+        initializeSheetData(workbook.getSheetAt(3), patientTreatmentSheetData);
+        initializeSheetData(workbook.getSheetAt(4), pdxModelSheetData);
+        initializeSheetData(workbook.getSheetAt(5), pdxModelValidationSheetData);
+        initializeSheetData(workbook.getSheetAt(6), derivedDatasetSheetData);
+        initializeSheetData(workbook.getSheetAt(7), sharingAndContactSheetData);
 
-        initializeSheetData(workbook.getSheetAt(9), "loaderRelatedDataSheetData");
+        initializeSheetData(workbook.getSheetAt(9), loaderRelatedDataSheetData);
     }
 
     /**
@@ -232,7 +232,7 @@ public class UniversalLoader implements CommandLineRunner {
      * @param sheet
      * @param sheetName
      */
-    private void initializeSheetData(Sheet sheet, String sheetName) {
+    private void initializeSheetData(Sheet sheet, List<List<String>> sheetData) {
 
         Iterator<Row> iterator = sheet.iterator();
         int rowCounter = 0;
@@ -276,32 +276,8 @@ public class UniversalLoader implements CommandLineRunner {
             //check if there is some data in the row and they are not all nulls
             if (dataRow.size() > 0 && !isRowOfNulls(dataRow)) {
 
-                //insert the row to the appropriate placeholder
-                if (sheetName.equals("patientSheetData")) {
-
-                    patientSheetData.add(dataRow);
-                } else if (sheetName.equals("patientTumorSheetData")) {
-
-                    patientTumorSheetData.add(dataRow);
-                } else if (sheetName.equals("patientTreatmentSheetData")) {
-
-                    patientTreatmentSheetData.add(dataRow);
-                } else if (sheetName.equals("pdxModelSheetData")) {
-
-                    pdxModelSheetData.add(dataRow);
-                } else if (sheetName.equals("pdxModelValidationSheetData")) {
-
-                    pdxModelValidationSheetData.add(dataRow);
-                } else if (sheetName.equals("derivedDatasetSheetData")) {
-
-                    derivedDatasetSheetData.add(dataRow);
-                } else if (sheetName.equals("sharingAndContactSheetData")) {
-
-                    sharingAndContactSheetData.add(dataRow);
-                } else if (sheetName.equals("loaderRelatedDataSheetData")) {
-
-                    loaderRelatedDataSheetData.add(dataRow);
-                }
+               sheetData.add(dataRow);
+                
 
             }
 
