@@ -199,7 +199,7 @@ public class SearchDS {
 
 
 
-
+        //Question: For one parameter search is it better to have one object that deals with multiple parameters or separate objects for the different parameters?
 
 
 
