@@ -421,4 +421,9 @@ public class ModelForQuery {
     public void setPatientEthnicity(String patientEthnicity) {
         this.patientEthnicity = patientEthnicity;
     }
+
+    public String toString(){
+
+        return "{model:"+modelId+"DS:"+datasource+ "}";
+    }
 }

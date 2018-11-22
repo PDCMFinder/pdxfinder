@@ -9,10 +9,7 @@ import org.pdxfinder.dao.DataProjection;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.repositories.DataProjectionRepository;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
-import org.pdxfinder.services.search.GeneralFilter;
-import org.pdxfinder.services.search.OneParamFilter;
-import org.pdxfinder.services.search.ThreeParamFilter;
-import org.pdxfinder.services.search.TwoParamUnlinkedFilter;
+import org.pdxfinder.services.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -47,7 +44,7 @@ public class SearchDS {
 
 
 
-    private void init(){
+    public void init(){
 
 
         //INITIALIZE MODEL FOR QUERY OBJECTS FIRST
@@ -201,9 +198,14 @@ public class SearchDS {
 
         //Question: For one parameter search is it better to have one object that deals with multiple parameters or separate objects for the different parameters?
 
+        OneParamSearch dsSearch = new OneParamSearch("DataSource", "datasource");
 
+        List dsTestList = new ArrayList();
+        dsTestList.add("JAX");
+        Set<ModelForQuery> results = dsSearch.search(Arrays.asList("JAX"), models, ModelForQuery::getDatasource);
 
-
+        log.info("Searching for JAX DS");
+        log.info(results.toString());
 
 
 
@@ -219,7 +221,10 @@ public class SearchDS {
         return new HashSet<>();
     }
 
+    public Set<ModelForQuery> search(Map<SearchFacetName, List<String>> configuredFacets){
 
+        return new HashSet<>();
+    }
 
 
 
@@ -247,6 +252,7 @@ public class SearchDS {
 
         this.dataProjectionRepository = dataProjectionRepository;
         this.models = new HashSet<>();
+        init();
     }
 
     /*

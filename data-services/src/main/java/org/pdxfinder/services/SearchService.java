@@ -40,12 +40,12 @@ public class SearchService {
 
     private SearchDS searchDS;
 
-    List<String> patientAgeOptions = SearchDS.PATIENT_AGE_OPTIONS;
-    List<String> datasourceOptions = SearchDS.DATASOURCE_OPTIONS;
-    List<String> cancerBySystemOptions = SearchDS.CANCERS_BY_SYSTEM_OPTIONS;
-    List<String> patientGenderOptions = SearchDS.PATIENT_GENDERS;
-    List<String> sampleTumorTypeOptions = SearchDS.SAMPLE_TUMOR_TYPE_OPTIONS;
-    List<String> dataAvailableOptions = SearchDS.DATA_AVAILABLE_OPTIONS;
+    List<String> patientAgeOptions = new ArrayList<>();
+    List<String> datasourceOptions = new ArrayList<>();
+    List<String> cancerBySystemOptions = new ArrayList<>();
+    List<String> patientGenderOptions = new ArrayList<>();
+    List<String> sampleTumorTypeOptions = new ArrayList<>();
+    List<String> dataAvailableOptions = new ArrayList<>();
 
 
 
