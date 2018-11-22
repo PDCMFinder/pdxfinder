@@ -12,20 +12,26 @@ import java.util.function.Function;
  */
 public class OneParamSearch extends GeneralSearch{
 
-    //static Function a = ModelForQuery::getPatientAge;
-
-
-
     public OneParamSearch(String name, String urlParam) {
         super(name, urlParam);
     }
 
 
+    public Set<ModelForQuery> search(List<String> searchParams, Set<ModelForQuery> mfqSet, Function<ModelForQuery, String> searchFunc){
 
-    public Set<ModelForQuery> search(List<String> param, List<ModelForQuery> mfq, Function searchFunc){
+        Set<ModelForQuery> results = new HashSet<>();
 
-        //TODO: Implement search logic on single selected parameter
-        return new HashSet<>();
+        for(ModelForQuery mfq: mfqSet){
+
+            String mfqValue = searchFunc.apply(mfq);
+
+            if(searchParams.contains(mfqValue)){
+                results.add(mfq);
+            }
+
+        }
+
+        return results;
     }
 
 
