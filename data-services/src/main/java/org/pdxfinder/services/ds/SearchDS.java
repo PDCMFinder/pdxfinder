@@ -8,7 +8,8 @@ import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.DataProjection;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.repositories.DataProjectionRepository;
-import org.pdxfinder.services.dto.DrugSummaryDTO;
+import org.pdxfinder.services.search.WebFacetSection;
+import org.pdxfinder.services.search.WebFacetContainer;
 import org.pdxfinder.services.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,17 +33,54 @@ import static java.lang.Long.parseLong;
 public class SearchDS {
 
     private final static Logger log = LoggerFactory.getLogger(SearchDS.class);
-
     private DataProjectionRepository dataProjectionRepository;
 
+    /**
+     * The DS is initialized if all filters and search objects are initialized
+     */
     private boolean INITIALIZED = false;
 
+
+    /**
+     * A set of MFQ objects. These objects are being returned after performing a search.
+     */
     private Set<ModelForQuery> models;
 
 
-    private List<GeneralFilter> filterList;
+    /**
+     * This container has the definition of the structure and the content of the filters as well as has info on what filter is selected
+     */
+    private WebFacetContainer webFacetContainer;
 
 
+    // SEARCH OBJECTS:
+
+
+    /**
+     * A general one param search object that is being used when search is performed on a MFQ object field
+     */
+    private OneParamSearch oneParamSearch;
+
+    /**
+     * Three param search object for performing a search on gene mutations
+     */
+    private ThreeParamSearch geneMutationSearch;
+
+    /**
+     * Two param search object for performing a search on dosing studies
+     */
+    private TwoParamUnlinkedSearch dosingStudySearch;
+
+
+
+
+
+    public SearchDS(DataProjectionRepository dataProjectionRepository) {
+        Assert.notNull(dataProjectionRepository, "Data projection repository cannot be null");
+
+        this.dataProjectionRepository = dataProjectionRepository;
+        this.models = new HashSet<>();
+    }
 
     public void init(){
 
@@ -53,11 +91,22 @@ public class SearchDS {
 
 
         /****************************************************************
-         *            INITIALIZE FILTER OPTIONS                         *
+         *     INITIALIZE FILTER OPTIONS AND FILTER STRUCTURE           *
          ****************************************************************/
 
+        webFacetContainer = new WebFacetContainer();
 
-        filterList = new ArrayList<>();
+        WebFacetSection patientTumorSection = new WebFacetSection();
+        patientTumorSection.setName("PATIENT / TUMOR");
+
+        WebFacetSection pdxModelSection = new WebFacetSection();
+        pdxModelSection.setName("PDX MODEL");
+
+        WebFacetSection molecularDataSection = new WebFacetSection();
+        molecularDataSection.setName("MOLECULAR DATA");
+
+        WebFacetSection treatmentInfoSection = new WebFacetSection();
+        treatmentInfoSection.setName("TREATMENT INFORMATION");
 
         //cancer by system filter def
         OneParamFilter cancerBySystem = new OneParamFilter("CANCER BY SYSTEM", "cancer_system",
@@ -79,7 +128,7 @@ public class SearchDS {
                         "Urinary System Cancer",
                         "Unclassified"),
                 new ArrayList<>());
-        filterList.add(cancerBySystem);
+        patientTumorSection.addComponent(cancerBySystem);
 
 
         //tumor type filter def
@@ -92,7 +141,7 @@ public class SearchDS {
                         "Not Specified"
                 ),
                 new ArrayList<>());
-        filterList.add(tumorType);
+        patientTumorSection.addComponent(tumorType);
 
 
         //sex filter def
@@ -103,7 +152,7 @@ public class SearchDS {
                         "Not Specified"
                 ),
                 new ArrayList<>());
-        filterList.add(sex);
+        patientTumorSection.addComponent(sex);
 
 
         //age filter def
@@ -122,7 +171,7 @@ public class SearchDS {
                         "Not Specified"
                 ),
                 new ArrayList<>());
-        filterList.add(age);
+        patientTumorSection.addComponent(age);
 
 
         //datasource filter def
@@ -135,7 +184,7 @@ public class SearchDS {
         Collections.sort(datasourceList);
 
         OneParamFilter datasource = new OneParamFilter("DATASOURCE", "datasource", datasourceList, new ArrayList<>());
-        filterList.add(datasource);
+        pdxModelSection.addComponent(datasource);
 
 
         //project filter def
@@ -154,7 +203,7 @@ public class SearchDS {
         //TODO: skip filter if no projects were defined?
 
         OneParamFilter projects = new OneParamFilter("PROJECT", "project", projectList, new ArrayList<>());
-        filterList.add(projects);
+        pdxModelSection.addComponent(projects);
 
 
         //dataset available filter def
@@ -165,18 +214,19 @@ public class SearchDS {
                         "Patient Treatment"),
                 new ArrayList<>());
 
-        filterList.add(datasetAvailable);
+        pdxModelSection.addComponent(datasetAvailable);
 
 
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
         ThreeParamFilter geneMutation = new ThreeParamFilter("GENE MUTATION", "mutation", new HashMap<>(), new HashMap<>());
 
+        molecularDataSection.addComponent(geneMutation);
 
 
         //model dosing study def
 
-        Map<String, Map<String, Set<Long>>> modelDrugResponses = getModelDrugResponses();
+        Map<String, Map<String, Set<Long>>> modelDrugResponses = getModelDrugResponsesFromDP();
         List<String> drugNames = new ArrayList<>(modelDrugResponses.keySet());
 
         TwoParamUnlinkedFilter modelDosingStudy = new TwoParamUnlinkedFilter("MODEL DOSING STUDY", "drug", drugNames, Arrays.asList(
@@ -186,26 +236,39 @@ public class SearchDS {
                 "Stable Disease",
                 "Stable Disease And Complete Response"
         ), new HashMap<>());
-        filterList.add(modelDosingStudy);
+        treatmentInfoSection.addComponent(modelDosingStudy);
 
 
+        webFacetContainer.addSection(patientTumorSection);
+        webFacetContainer.addSection(pdxModelSection);
+        webFacetContainer.addSection(molecularDataSection);
+        webFacetContainer.addSection(treatmentInfoSection);
 
         /****************************************************************
          *            INITIALIZE SEARCH OBJECTS                         *
          ****************************************************************/
 
 
+        //one general search object for searching on MFQ object fields
+        oneParamSearch = new OneParamSearch(null, null);
 
-        //Question: For one parameter search is it better to have one object that deals with multiple parameters or separate objects for the different parameters?
+        //drug search
+        dosingStudySearch = new TwoParamUnlinkedSearch();
+        dosingStudySearch.setData(getModelDrugResponsesFromDP());
 
-        OneParamSearch dsSearch = new OneParamSearch("DataSource", "datasource");
+        //gene mutation search
+        geneMutationSearch = new ThreeParamSearch("geneMutation", "mutation");
+        geneMutationSearch.setData(getMutationsFromDP());
 
+        /*
         List dsTestList = new ArrayList();
         dsTestList.add("JAX");
-        Set<ModelForQuery> results = dsSearch.search(Arrays.asList("JAX"), models, ModelForQuery::getDatasource);
+        Set<ModelForQuery> results = oneParamSearch.searchOnString(Arrays.asList("JAX"), models, ModelForQuery::getDatasource);
 
         log.info("Searching for JAX DS");
         log.info(results.toString());
+        */
+
 
 
 
@@ -213,15 +276,79 @@ public class SearchDS {
     }
 
 
+    public void updateSelectedFilters(SearchFacetName facetName, List<String> filters){
 
+        for(WebFacetSection wfs :webFacetContainer.getWebFacetSections()){
+            for(GeneralFilter filter: wfs.getFilterComponents()){
 
+                if(filter.getUrlParam().equals(facetName.getName())){
 
-    public Set<ModelForQuery> search(){
+                    if(filter instanceof OneParamFilter){
 
-        return new HashSet<>();
+                        OneParamFilter f = (OneParamFilter)filter;
+                        f.setSelected(filters);
+
+                    }
+                    else if(filter instanceof TwoParamUnlinkedFilter){
+
+                        TwoParamUnlinkedFilter f = (TwoParamUnlinkedFilter) filter;
+                        //TODO: Implement updating two and three parameter filters
+
+                    }
+
+                }
+
+            }
+        }
     }
 
-    public Set<ModelForQuery> search(Map<SearchFacetName, List<String>> configuredFacets){
+
+
+    public Set<ModelForQuery> search(Map<SearchFacetName, List<String>> filters){
+
+        synchronized (this){
+            if(! INITIALIZED ) {
+                init();
+            }
+        }
+
+        Set<ModelForQuery> result = new HashSet<>(models);
+
+        //empty previously set variants
+        result.forEach(x -> x.setMutatedVariants(new ArrayList<>()));
+
+        //empty previously set drugs
+        result.forEach(x -> x.setDrugData(new ArrayList<>()));
+
+        // If no filters have been specified, return the complete set
+        if (filters == null) {
+            return result;
+        }
+
+        OneParamSearch oneParamSearch = new OneParamSearch("search","search");
+
+        for (SearchFacetName facet : filters.keySet()) {
+
+
+            switch(facet){
+
+                case query:
+                    //List<String> searchParams, Set<ModelForQuery> mfqSet, Function<ModelForQuery, List<String>> searchFunc
+                    List<String> ancestors = new ArrayList<>();
+                    result = oneParamSearch.searchOnCollection(filters.get(SearchFacetName.query), result, ModelForQuery::getAllOntologyTermAncestors);
+                    break;
+
+
+
+
+
+            }
+
+
+
+        }
+
+
 
         return new HashSet<>();
     }
@@ -233,27 +360,21 @@ public class SearchDS {
      * DYNAMIC FACETS
      */
 
-    private Map<String, String> cancerSystemMap = new HashMap<>();
+    //private Map<String, String> cancerSystemMap = new HashMap<>();
 
     //platform=> marker=> variant=>{set of model ids}
-    Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<String, Map<String, Map<String, Set<Long>>>>();
+    //Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<String, Map<String, Map<String, Set<Long>>>>();
 
     //"drugname"=>"response"=>"set of model ids"
     //private Map<String, Map<String, Set<Long>>> modelDrugResponses = new HashMap<>();
 
-    private List<String> projectOptions = new ArrayList<>();
+    //private List<String> projectOptions = new ArrayList<>();
 
 
     /**
      * Populate the complete set of models for searching when this object is instantiated
      */
-    public SearchDS(DataProjectionRepository dataProjectionRepository) {
-        Assert.notNull(dataProjectionRepository, "Data projection repository cannot be null");
 
-        this.dataProjectionRepository = dataProjectionRepository;
-        this.models = new HashSet<>();
-        init();
-    }
 
     /*
     void initialize() {
@@ -329,9 +450,7 @@ public class SearchDS {
     }
 
 
-    public List<String> getProjectOptions() {
-        return projectOptions;
-    }
+
 
     /**
      * This method loads the ModelForQuery Data Projection object and initializes the models
@@ -423,9 +542,11 @@ public class SearchDS {
     }
 
 
-    void initializeMutations(){
+    private Map<String, Map<String, Map<String, Set<Long>>>> getMutationsFromDP(){
 
         log.info("Initializing mutations");
+        //platform=> marker=> variant=>{set of model ids}
+        Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<>();
 
         String mut = dataProjectionRepository.findByLabel("PlatformMarkerVariantModel").getValue();
 
@@ -443,10 +564,11 @@ public class SearchDS {
             e.printStackTrace();
         }
 
+        return mutations;
     }
 
 
-    Map<String, Map<String, Set<Long>>> getModelDrugResponses(){
+    Map<String, Map<String, Set<Long>>> getModelDrugResponsesFromDP(){
 
         log.info("Initializing model drug responses");
 
@@ -479,15 +601,17 @@ public class SearchDS {
 
 
 
-    /**
-     * Takes a marker and a variant. Looks up these variants in mutation.
-     * Then creates a hashmap with modelids as keys and platform+marker+mutation as values
-     *
-     *
-     * @param marker
-     * @param variant
-     * @return
-     */
+        /**
+         * Takes a marker and a variant. Looks up these variants in mutation.
+         * Then creates a hashmap with modelids as keys and platform+marker+mutation as values
+         *
+         *
+         * @param marker
+         * @param variant
+         * @return
+         */
+
+  /*
     private void getModelsByMutatedMarkerAndVariant(String marker, String variant, Map<Long, Set<String>> previouslyFoundModels){
 
         //platform=> marker=> variant=>{set of model ids}
@@ -566,7 +690,7 @@ public class SearchDS {
     }
 
 
-/*
+
     private void getModelsByDrugAndResponse(String drug, String response, Map<Long, Set<String>> previouslyFoundModels,
                                             Map<Long, List<DrugSummaryDTO>> modelsDrugSummary){
 
@@ -783,28 +907,6 @@ public class SearchDS {
 
     }
 */
-
-    public void initializeAdditionalOptions(){
-
-
-        log.info("Models: "+models.size());
-
-        Set<String> projectsSet = new HashSet<>();
-        for(ModelForQuery mfk : models){
-
-            if(mfk.getProjects() != null){
-                for(String s: mfk.getProjects()){
-                    projectsSet.add(s);
-                }
-            }
-        }
-
-        projectOptions = new ArrayList<>(projectsSet);
-
-
-    }
-
-
 
 
     /**
