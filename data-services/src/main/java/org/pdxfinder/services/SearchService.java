@@ -13,10 +13,7 @@ import org.pdxfinder.services.ds.FacetOption;
 import org.pdxfinder.services.ds.ModelForQuery;
 import org.pdxfinder.services.ds.SearchDS;
 import org.pdxfinder.services.ds.SearchFacetName;
-import org.pdxfinder.services.dto.DrugSummaryDTO;
-import org.pdxfinder.services.dto.ExportDTO;
-import org.pdxfinder.services.dto.SearchDTO;
-import org.pdxfinder.services.dto.WebSearchDTO;
+import org.pdxfinder.services.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -116,27 +113,13 @@ public class SearchService {
         WebSearchDTO wsDTO = new WebSearchDTO();
 
 
+        //UPDATE SEARCH FILTERS (what is selected)
+
+
+
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
 
 
-        List<FacetOption> patientAgeSelected = searchDS.getFacetOptions(SearchFacetName.patient_age, patientAgeOptions, results, patient_age.orElse(null));
-        List<FacetOption> patientGenderSelected = searchDS.getFacetOptions(SearchFacetName.patient_gender, patientGenderOptions, results, patient_gender.orElse(null));
-        List<FacetOption> datasourceSelected = searchDS.getFacetOptions(SearchFacetName.datasource, datasourceOptions, results, datasource.orElse(null));
-        List<FacetOption> cancerSystemSelected = searchDS.getFacetOptions(SearchFacetName.cancer_system, cancerBySystemOptions, results, cancer_system.orElse(null));
-        List<FacetOption> sampleTumorTypeSelected = searchDS.getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
-        List<FacetOption> mutationSelected = searchDS.getFacetOptions(SearchFacetName.mutation, null, results, mutation.orElse(null));
-        List<FacetOption> drugSelected = searchDS.getFacetOptions(SearchFacetName.drug, null, results, drug.orElse(null));
-        List<FacetOption> projectSelected = searchDS.getFacetOptions(SearchFacetName.project, null, results, project.orElse(null));
-        List<FacetOption> dataAvailableSelected = searchDS.getFacetOptions(SearchFacetName.data_available, dataAvailableOptions, configuredFacets);
-
-        wsDTO.setPatientAgeSelected(patientAgeSelected);
-        wsDTO.setPatientGenderSelected(patientGenderSelected);
-        wsDTO.setDatasourceSelected(datasourceSelected);
-        wsDTO.setCancerSystemSelected(cancerSystemSelected);
-        wsDTO.setSampleTumorTypeSelected(sampleTumorTypeSelected);
-        wsDTO.setMutationSelected(mutationSelected);
-        wsDTO.setProjectSelected(projectSelected);
-        wsDTO.setDataAvailableSelected(dataAvailableSelected);
 
 
 
