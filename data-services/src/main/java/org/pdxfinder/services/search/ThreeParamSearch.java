@@ -1,7 +1,7 @@
 package org.pdxfinder.services.search;
 
-import java.util.HashSet;
-import java.util.List;
+import org.pdxfinder.services.ds.ModelForQuery;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +12,9 @@ public class ThreeParamSearch extends GeneralSearch{
 
     private Map<String, Map<String, Map<String, Set<Long>>>> data;
 
+    public ThreeParamSearch(String name, String urlParam) {
+        super(name, urlParam);
+    }
 
     public ThreeParamSearch(String name, String urlParam, Map<String, Map<String, Map<String, Set<Long>>>> data) {
         super(name, urlParam);
@@ -27,10 +30,10 @@ public class ThreeParamSearch extends GeneralSearch{
     }
 
 
-    public Set<Long> search(String param1, String param2, String param3){
+    public Set<ModelForQuery> search(Map<String, Map<String, String>> filters, Set<ModelForQuery> models){
 
         //TODO: Implement actual search on data
-        return new HashSet<>();
+        return models;
     }
 
 
