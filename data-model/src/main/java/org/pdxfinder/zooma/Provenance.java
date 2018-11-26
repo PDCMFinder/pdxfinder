@@ -14,16 +14,23 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class Provenance {
 
-    @JsonProperty("source")
     private Source source;
-    @JsonProperty("evidence")
     private String evidence;
-    @JsonProperty("accuracy")
     private String accuracy;
-    @JsonProperty("annotator")
     private String annotator;
-    @JsonProperty("annotatedDate")
     private String annotatedDate;
+
+
+    public Provenance() {
+    }
+
+    public Provenance(Source source, String evidence, String accuracy, String annotator, String annotatedDate) {
+        this.source = source;
+        this.evidence = evidence;
+        this.accuracy = accuracy;
+        this.annotator = annotator;
+        this.annotatedDate = annotatedDate;
+    }
 
     @JsonProperty("source")
     public Source getSource() {

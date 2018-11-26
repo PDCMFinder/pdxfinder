@@ -12,12 +12,19 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class BiologicalEntities {
 
-    @JsonProperty("bioEntity")
     private String bioEntity;
-    @JsonProperty("studies")
     private Studies studies;
-    @JsonProperty("bioEntityUri")
     private Object bioEntityUri;
+
+
+    public BiologicalEntities() {
+    }
+
+    public BiologicalEntities(String bioEntity, Studies studies, Object bioEntityUri) {
+        this.bioEntity = bioEntity;
+        this.studies = studies;
+        this.bioEntityUri = bioEntityUri;
+    }
 
     @JsonProperty("bioEntity")
     public String getBioEntity() {

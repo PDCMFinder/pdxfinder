@@ -14,14 +14,21 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class Zooma {
 
-    @JsonProperty("biologicalEntities")
     private BiologicalEntities biologicalEntities;
-    @JsonProperty("property")
     private Property property;
-    @JsonProperty("semanticTag")
     private List<String> semanticTag = null;
-    @JsonProperty("provenance")
     private Provenance provenance;
+
+
+    public Zooma() {
+    }
+
+    public Zooma(BiologicalEntities biologicalEntities, Property property, List<String> semanticTag, Provenance provenance) {
+        this.biologicalEntities = biologicalEntities;
+        this.property = property;
+        this.semanticTag = semanticTag;
+        this.provenance = provenance;
+    }
 
     @JsonProperty("biologicalEntities")
     public BiologicalEntities getBiologicalEntities() {

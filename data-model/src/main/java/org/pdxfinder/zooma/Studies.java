@@ -11,11 +11,17 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class Studies {
 
-    @JsonProperty("study")
     private String study;
-    @JsonProperty("studyUri")
     private Object studyUri;
 
+
+    public Studies() {
+    }
+
+    public Studies(String study, Object studyUri) {
+        this.study = study;
+        this.studyUri = studyUri;
+    }
 
     @JsonProperty("study")
     public String getStudy() {

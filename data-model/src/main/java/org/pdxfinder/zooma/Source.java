@@ -14,14 +14,20 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class Source {
 
-    @JsonProperty("uri")
     private String uri;
-    @JsonProperty("name")
     private String name;
-    @JsonProperty("topic")
     private List<String> topic = null;
-    @JsonProperty("type")
     private String type;
+
+    public Source() {
+    }
+
+    public Source(String uri, String name, List<String> topic, String type) {
+        this.uri = uri;
+        this.name = name;
+        this.topic = topic;
+        this.type = type;
+    }
 
     @JsonProperty("uri")
     public String getUri() {
