@@ -24,6 +24,9 @@ public class Transformer {
             options.addOption(tranOpt);
 
             formatter.printHelp("Application", options);
+
+            SpringApplication.run(Transformer.class, args);
+
         } else {
             SpringApplication.run(Transformer.class, args);
         }

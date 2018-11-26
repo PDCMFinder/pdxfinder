@@ -1,4 +1,4 @@
-package org.pdxfinder.zooma;
+package org.pdxfinder.admin.zooma;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,3 +44,30 @@ public class Studies {
     }
 
 }
+
+
+/*
+
+{
+        "entityId": 1,
+        "entityType": "DIAGNOSIS",
+        "mappingLabels": [
+        "DataSource",
+        "SampleDiagnosis",
+        "OriginTissue",
+        "TumorType"
+        ],
+        "mappingValues": {
+        "OriginTissue": "blood",
+        "TumorType": "primary",
+        "SampleDiagnosis": "acute myeloid leukemia",
+        "DataSource": "jax"
+        },
+        "mappedTermLabel": "Acute Myeloid Leukemia",
+        "mappedTermUrl": "http://purl.obolibrary.org/obo/NCIT_C3171",
+        "mapType": "direct",
+        "justification": "0",
+        "status": "Created",
+        "suggestedMappings": []
+        }
+ */

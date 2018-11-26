@@ -1,4 +1,4 @@
-package org.pdxfinder.zooma;
+package org.pdxfinder.admin.zooma;
 
 import java.util.HashMap;
 import java.util.Map;

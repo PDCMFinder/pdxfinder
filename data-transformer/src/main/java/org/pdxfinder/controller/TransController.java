@@ -1,11 +1,14 @@
 package org.pdxfinder.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pdxfinder.transcommands.DataTransformerService;
+import org.pdxfinder.transcommands.ZoomaTransform;
 import org.pdxfinder.transdatamodel.PdmrPdxInfo;
 import org.pdxfinder.transdatamodel.PdxInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,8 +70,16 @@ public class TransController {
     private String priorTherapyUrl;
 
 
+    @Value("${mydatasource.mappedTermUrl}")
+    private String mappedTermUrl;
+
+
+
     private final static Logger log = LoggerFactory.getLogger(TransController.class);
 
+
+    @Autowired
+    private ZoomaTransform zoomaTransform;
 
     public TransController(DataTransformerService dataTransformerService){
         this.dataTransformerService = dataTransformerService;
@@ -95,6 +106,15 @@ public class TransController {
                 implantationSitesUrl, tissueTypeUrl, histologyUrl, tumorGradeUrl, samplesUrl,
                 currentTherapyUrl, standardRegimensUrl, clinicalResponseUrl, priorTherapyUrl);
         return "success";
+
+    }
+
+
+
+    @GetMapping("/transform-mappings")
+    public List<Object> transformMappingsForZooma(){
+
+        return zoomaTransform.transforMappingsForZooma(mappedTermUrl);
 
     }
 

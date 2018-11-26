@@ -1,4 +1,4 @@
-package org.pdxfinder.zooma;
+package org.pdxfinder.admin.zooma;
 
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "semanticTag",
         "provenance"
 })
-public class Zooma {
+public class ZoomaEntity {
 
     private BiologicalEntities biologicalEntities;
     private Property property;
@@ -20,10 +20,10 @@ public class Zooma {
     private Provenance provenance;
 
 
-    public Zooma() {
+    public ZoomaEntity() {
     }
 
-    public Zooma(BiologicalEntities biologicalEntities, Property property, List<String> semanticTag, Provenance provenance) {
+    public ZoomaEntity(BiologicalEntities biologicalEntities, Property property, List<String> semanticTag, Provenance provenance) {
         this.biologicalEntities = biologicalEntities;
         this.property = property;
         this.semanticTag = semanticTag;
