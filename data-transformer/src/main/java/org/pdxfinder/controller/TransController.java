@@ -2,6 +2,7 @@ package org.pdxfinder.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.pdxfinder.admin.zooma.ZoomaEntity;
 import org.pdxfinder.transcommands.DataTransformerService;
 import org.pdxfinder.transcommands.ZoomaTransform;
 import org.pdxfinder.transdatamodel.PdmrPdxInfo;
@@ -112,7 +113,7 @@ public class TransController {
 
 
     @GetMapping("/transform-mappings")
-    public List<Object> transformMappingsForZooma(){
+    public List<ZoomaEntity> transformMappingsForZooma(){
 
         return zoomaTransform.transforMappingsForZooma(mappedTermUrl);
 
