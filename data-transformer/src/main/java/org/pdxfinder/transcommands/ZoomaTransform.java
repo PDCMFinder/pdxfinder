@@ -7,7 +7,6 @@ import org.pdxfinder.admin.zooma.Studies;
 import org.pdxfinder.admin.zooma.ZoomaEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.jvm.hotspot.debugger.cdbg.LoadObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +16,7 @@ import java.util.Map;
 public class ZoomaTransform {
 
 
-    private ObjectMapper mapper = new ObjectMapper();
-
+    ObjectMapper mapper = new ObjectMapper();
     @Autowired
     DataTransformerService transformerService;
 
@@ -28,15 +26,13 @@ public class ZoomaTransform {
 
     public List<ZoomaEntity> transforMappingsForZooma(String knowledgBaseURL){
 
+        JsonNode mappingRow = transformerService.connectToJSON(knowledgBaseURL);
+
+        Map<String, List<MappingEntity>> dMappingRow = mapper.convertValue(mappingRow, Map.class);
+
         List<ZoomaEntity> zoomaEntities = new ArrayList<>();
 
-        Map<String, List<Map>> dMappingRow = mapper.convertValue(transformerService.connectToJSON(knowledgBaseURL), Map.class);
-
-        List<Map> data = dMappingRow.get("row");
-
-        for (Map dMapping : data){
-
-            MappingEntity mapping = mapper.convertValue(dMapping, MappingEntity.class);
+        for (MappingEntity mapping : dMappingRow.get("row")){
 
             Map<String,String> mappingValues = mapping.getMappingValues();
 
@@ -51,7 +47,9 @@ public class ZoomaTransform {
 
             ZoomaEntity zoomaEntity = new ZoomaEntity();
 
+
             Studies studies = new Studies(dataSource,null);
+
 
         }
 
