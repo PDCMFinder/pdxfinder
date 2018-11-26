@@ -50,7 +50,6 @@ public class ZoomaTransform {
 
             ZoomaEntity zoomaEntity = new ZoomaEntity();
 
-
             Studies studies = new Studies(dataSource,null);
 
         }
