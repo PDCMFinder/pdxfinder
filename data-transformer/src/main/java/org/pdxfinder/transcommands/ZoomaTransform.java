@@ -18,7 +18,6 @@ public class ZoomaTransform {
 
 
     private ObjectMapper mapper = new ObjectMapper();
-    private List<ZoomaEntity> zoomaEntities = new ArrayList<>();
 
     @Autowired
     DataTransformerService transformerService;
@@ -28,6 +27,8 @@ public class ZoomaTransform {
 
 
     public List<ZoomaEntity> transforMappingsForZooma(String knowledgBaseURL){
+
+        List<ZoomaEntity> zoomaEntities = new ArrayList<>();
 
         Map<String, List<Map>> dMappingRow = mapper.convertValue(transformerService.connectToJSON(knowledgBaseURL), Map.class);
 
