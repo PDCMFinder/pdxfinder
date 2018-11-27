@@ -36,7 +36,7 @@ public class ZoomaTransform {
     }
 
 
-    public List<ZoomaEntity> transforMappingsForZooma(String knowledgBaseURL){
+    public List<ZoomaEntity> transformMappingsForZooma(String knowledgBaseURL){
 
         JsonNode mappingRow = transformerService.connectToJSON(knowledgBaseURL);
 

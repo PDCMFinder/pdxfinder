@@ -11,12 +11,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 
 @RestController
@@ -25,8 +30,12 @@ public class TransController {
 
 
     private RestTemplate restTemplate = new RestTemplate();
-    ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = new ObjectMapper();
     private DataTransformerService dataTransformerService;
+
+    private final static Logger log = LoggerFactory.getLogger(TransController.class);
+
+    private final String ZOOMA_URL = "http://scrappy.ebi.ac.uk:8080/annotations";
 
     @Value("${mydatasource.specimenSearchUrl}")
     private String specimenSearchUrl;
@@ -75,15 +84,12 @@ public class TransController {
     private String mappedTermUrl;
 
 
-
-    private final static Logger log = LoggerFactory.getLogger(TransController.class);
-
-
     @Autowired
     private ZoomaTransform zoomaTransform;
 
-    public TransController(DataTransformerService dataTransformerService){
+    public TransController(DataTransformerService dataTransformerService, RestTemplateBuilder restTemplateBuilder){
         this.dataTransformerService = dataTransformerService;
+        this.restTemplate = restTemplateBuilder.build();
     }
 
 
@@ -100,7 +106,7 @@ public class TransController {
 
 
 
-    @GetMapping("/load-data")
+    @GetMapping("/transform-pdmr-data")
     public String connectPdmr(){
 
         dataTransformerService.transformDataAndSave(specimenSearchUrl, specimenUrl, tissueOriginsUrl, tumoGradeStateTypesUrl, mouseStrainsUrl,
@@ -113,14 +119,29 @@ public class TransController {
 
 
     @GetMapping("/transform-mappings")
-    public List<ZoomaEntity> transformMappingsForZooma(){
+    public ResponseEntity<?> transformMappingsForZooma(){
 
-        return zoomaTransform.transforMappingsForZooma(mappedTermUrl);
+        List<ZoomaEntity> zoomaEntities = zoomaTransform.transformMappingsForZooma(mappedTermUrl);
 
+        ZoomaEntity zoomaEntity = zoomaEntities.get(0);
+        HttpEntity<String> entity = BuildHttpHeader();
+        HttpEntity<Object> req = new HttpEntity<>(zoomaEntity, entity.getHeaders());
+
+        ResponseEntity<ZoomaEntity> result = restTemplate.postForObject(ZOOMA_URL, req, ResponseEntity.class);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 
+    public HttpEntity<String> BuildHttpHeader(){
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.add("Content-Type", "application/json");
+        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+
+        return  entity;
+    }
 
 
 
