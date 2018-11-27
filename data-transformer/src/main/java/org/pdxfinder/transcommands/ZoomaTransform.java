@@ -73,10 +73,6 @@ public class ZoomaTransform {
             );
             BiologicalEntities biologicalEntities = new BiologicalEntities(bioEntity.toUpperCase(),studies,null);
 
-
-            /* ZOOMA PROPERTY DATA */
-            Property property = new Property(mappingLabels.get(0),mappingValues.get(mappingLabels.get(0)).toUpperCase());
-
             /* ZOOMA SEMANTIC-TAG DATA */
             List<String> semanticTag = Arrays.asList(mappedTermUrl);
 
@@ -90,14 +86,19 @@ public class ZoomaTransform {
                     "2018-11-01 10:48"
             );
 
-            ZoomaEntity zoomaEntity = new ZoomaEntity(
-                    biologicalEntities,
-                    property,
-                    semanticTag,
-                    provenance
-            );
+            for (String mappingLabel : mappingLabels){
 
-            zoomaEntities.add(zoomaEntity);
+                /* ZOOMA PROPERTY DATA */
+                Property property = new Property(mappingLabel,StringUtils.upperCase(mappingValues.get(mappingLabel)) );
+                ZoomaEntity zoomaEntity = new ZoomaEntity(
+                        biologicalEntities,
+                        property,
+                        semanticTag,
+                        provenance
+                );
+                zoomaEntities.add(zoomaEntity);
+            }
+
 
         }
 
