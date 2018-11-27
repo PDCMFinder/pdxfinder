@@ -9,19 +9,22 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "propertyType",
         "propertyValue"
 })
 public class Property {
 
-    @JsonProperty("propertyType")
     private String propertyType;
-    @JsonProperty("propertyValue")
     private String propertyValue;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+    public Property() {
+    }
+
+    public Property(String propertyType, String propertyValue) {
+        this.propertyType = propertyType;
+        this.propertyValue = propertyValue;
+    }
 
     @JsonProperty("propertyType")
     public String getPropertyType() {
@@ -41,16 +44,6 @@ public class Property {
     @JsonProperty("propertyValue")
     public void setPropertyValue(String propertyValue) {
         this.propertyValue = propertyValue;
-    }
-
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
     }
 
 }
