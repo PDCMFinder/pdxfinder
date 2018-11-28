@@ -8,15 +8,15 @@ import java.util.Set;
 /*
  * Created by csaba on 20/11/2018.
  */
-public class ThreeParamSearch extends GeneralSearch{
+public class ThreeParamLinkedSearch extends GeneralSearch{
 
     private Map<String, Map<String, Map<String, Set<Long>>>> data;
 
-    public ThreeParamSearch(String name, String urlParam) {
+    public ThreeParamLinkedSearch(String name, String urlParam) {
         super(name, urlParam);
     }
 
-    public ThreeParamSearch(String name, String urlParam, Map<String, Map<String, Map<String, Set<Long>>>> data) {
+    public ThreeParamLinkedSearch(String name, String urlParam, Map<String, Map<String, Map<String, Set<Long>>>> data) {
         super(name, urlParam);
         this.data = data;
     }

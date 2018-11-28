@@ -6,14 +6,14 @@ import java.util.Map;
 /*
  * Created by csaba on 19/11/2018.
  */
-public class ThreeParamFilter extends GeneralFilter{
+public class ThreeParamLinkedFilter extends GeneralFilter{
 
     private Map<String, Map<String, List<String>>> options;
 
     private Map<String, Map<String, List<String>>> selected;
 
 
-    public ThreeParamFilter(String name, String urlParam, Map<String, Map<String, List<String>>> options, Map<String, Map<String, List<String>>> selected) {
+    public ThreeParamLinkedFilter(String name, String urlParam, Map<String, Map<String, List<String>>> options, Map<String, Map<String, List<String>>> selected) {
         super(name, urlParam);
         this.options = options;
         this.selected = selected;
