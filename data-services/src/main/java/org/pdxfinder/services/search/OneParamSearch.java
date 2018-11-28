@@ -23,7 +23,7 @@ public class OneParamSearch extends GeneralSearch{
      * @param searchParams A list of values that we are matching in the given MFQ object field
      * @param mfqSet A set of MFQ objects that we perform the search on
      * @param searchFunc the method to be called on the MFQ objects (what are you filtering on)
-     * @return
+     * @return a set of models after the search was performed
      */
     public Set<ModelForQuery> searchOnString(List<String> searchParams, Set<ModelForQuery> mfqSet, Function<ModelForQuery, String> searchFunc){
 
@@ -49,7 +49,7 @@ public class OneParamSearch extends GeneralSearch{
      * @param searchParams A list of values that we are matching in the given MFQ object field
      * @param mfqSet A set of MFQ objects that we perform the search on
      * @param searchFunc the method to be called on the MFQ objects (what are you filtering on)
-     * @return
+     * @return a set of models after the search was performed
      */
     public Set<ModelForQuery> searchOnCollection(List<String> searchParams, Set<ModelForQuery> mfqSet, Function<ModelForQuery, Collection<String>> searchFunc){
 
@@ -59,12 +59,16 @@ public class OneParamSearch extends GeneralSearch{
 
             Collection<String> mfqValues = searchFunc.apply(mfq);
 
-            for(String mfqValue : mfqValues){
+            if(mfqValues != null){
 
-                if(searchParams.contains(mfqValue)){
-                    results.add(mfq);
+                for(String mfqValue : mfqValues){
+
+                    if(searchParams.contains(mfqValue)){
+                        results.add(mfq);
+                    }
                 }
             }
+
         }
 
         return results;
