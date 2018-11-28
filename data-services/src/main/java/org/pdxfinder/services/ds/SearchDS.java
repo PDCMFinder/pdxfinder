@@ -6,7 +6,6 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.DataProjection;
-import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.repositories.DataProjectionRepository;
 import org.pdxfinder.services.search.WebFacetSection;
 import org.pdxfinder.services.search.WebFacetContainer;
@@ -62,9 +61,9 @@ public class SearchDS {
     private OneParamSearch oneParamSearch;
 
     /**
-     * Three param search object for performing a search on gene mutations
+     * Four param search object for performing a search on gene mutations
      */
-    private ThreeParamSearch geneMutationSearch;
+    private FourParamLinkedSearch geneMutationSearch;
 
     /**
      * Two param search object for performing a search on dosing studies
@@ -219,7 +218,7 @@ public class SearchDS {
 
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
-        ThreeParamFilter geneMutation = new ThreeParamFilter("GENE MUTATION", "mutation", new HashMap<>(), new HashMap<>());
+        ThreeParamLinkedFilter geneMutation = new ThreeParamLinkedFilter("GENE MUTATION", "mutation", new HashMap<>(), new HashMap<>());
 
         molecularDataSection.addComponent(geneMutation);
 
@@ -257,7 +256,9 @@ public class SearchDS {
         dosingStudySearch.setData(getModelDrugResponsesFromDP());
 
         //gene mutation search
-        geneMutationSearch = new ThreeParamSearch("geneMutation", "mutation");
+        //the gene mutation is a ThreeParamFilter component, but a FourParamLinkedSearch must be used because of the hidden platform value
+        geneMutationSearch = new FourParamLinkedSearch("geneMutation", "mutation");
+
         geneMutationSearch.setData(getMutationsFromDP());
 
         /*
@@ -348,6 +349,7 @@ public class SearchDS {
 
         for (SearchFacetName facet : filters.keySet()) {
 
+            log.info("Models:"+result.size()+" before applying filter: "+facet.getName());
 
             switch(facet){
 
@@ -436,13 +438,13 @@ public class SearchDS {
 
             }
 
-
+            log.info("After applying filter: "+result.size());
 
         }
 
 
 
-        return new HashSet<>();
+        return result;
     }
 
 
@@ -554,11 +556,11 @@ public class SearchDS {
     }
 
 
-    private Map<String, Map<String, Map<String, Set<Long>>>> getMutationsFromDP(){
+    private Map<String, Map<String, Map<String, Map<String, Set<Long>>>>> getMutationsFromDP(){
 
         log.info("Initializing mutations");
         //platform=> marker=> variant=>{set of model ids}
-        Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<>();
+        Map<String, Map<String, Map<String, Map<String, Set<Long>>>>> mutations = new HashMap<>();
 
         String mut = dataProjectionRepository.findByLabel("PlatformMarkerVariantModel").getValue();
 
@@ -566,7 +568,7 @@ public class SearchDS {
 
             ObjectMapper mapper = new ObjectMapper();
 
-            mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<Long>>>>>(){});
+            mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Map<String, Set<Long>>>>>>(){});
 
             //log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
 

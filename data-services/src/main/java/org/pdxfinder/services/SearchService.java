@@ -113,11 +113,12 @@ public class SearchService {
         WebSearchDTO wsDTO = new WebSearchDTO();
 
 
+        Set<ModelForQuery> results = searchDS.search(configuredFacets);
+
+
         //UPDATE SEARCH FILTERS (what is selected)
         wsDTO.setWebFacetsContainer(searchDS.getUpdatedSelectedFilters(configuredFacets));
 
-
-        Set<ModelForQuery> results = searchDS.search(configuredFacets);
 
         String facetString = getFacetString(configuredFacets);
         wsDTO.setFacetString(facetString);
