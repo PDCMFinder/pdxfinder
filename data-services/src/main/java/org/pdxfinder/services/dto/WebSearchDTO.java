@@ -22,6 +22,8 @@ public class WebSearchDTO {
     private boolean isMutationSelected;
     private boolean isDrugSelected;
 
+    private String facetString;
+    private String textSearchDescription;
 
     private String query;
 
@@ -137,5 +139,21 @@ public class WebSearchDTO {
 
     public void setResults(List<ModelForQuery> results) {
         this.results = results;
+    }
+
+    public String getFacetString() {
+        return facetString;
+    }
+
+    public void setFacetString(String facetString) {
+        this.facetString = facetString;
+    }
+
+    public String getTextSearchDescription() {
+        return textSearchDescription;
+    }
+
+    public void setTextSearchDescription(String textSearchDescription) {
+        this.textSearchDescription = textSearchDescription;
     }
 }
