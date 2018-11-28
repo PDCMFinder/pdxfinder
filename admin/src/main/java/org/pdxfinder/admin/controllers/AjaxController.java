@@ -98,27 +98,41 @@ public class AjaxController {
     @GetMapping("/zooma")
     public ResponseEntity<?> writeAllAnnotationsToZooma(){
 
+        Map result = new HashMap();
         List<ZoomaEntity> zoomaEntities = mappingService.transformMappingsForZooma();
 
-        ZoomaEntity zoomaEntity = zoomaEntities.get(0);
-        HttpEntity<String> entity = BuildHttpHeader();
-        HttpEntity<Object> req = new HttpEntity<>(zoomaEntity, entity.getHeaders());
+        ZoomaEntity zoomaEntity = zoomaEntities.get(21);
+        String entity = zoomaEntity.getBiologicalEntities().getBioEntity();
 
-        ResponseEntity<ZoomaEntity> result =  null;
-
-        try{
-            result = restTemplate.postForObject(ZOOMA_URL, req, ResponseEntity.class);
-
-        }catch (Exception e){
-
-            return new ResponseEntity<>(
-                    new HashMap(){{put("message", e.getCause().getMessage());}}, HttpStatus.NOT_FOUND
-            );
+        if (writeToZooma(zoomaEntity)){
+            result.put(entity,"SUCCESS WRITE");
+        }else{
+            result.put(entity, "ANNOTATION ALREADY EXIST IN ZOOMA");
         }
 
         return new ResponseEntity<>(result, HttpStatus.OK);
-
     }
+
+
+
+    public Boolean writeToZooma(ZoomaEntity zoomaEntity){
+
+        HttpEntity<String> entity = BuildHttpHeader();
+        HttpEntity<Object> req = new HttpEntity<>(zoomaEntity, entity.getHeaders());
+        Map result =  new HashMap();
+
+        Boolean report = false;
+        try{
+            result = restTemplate.postForObject(ZOOMA_URL, req, Map.class);
+            report = true;
+        }catch (Exception e){
+            result = new HashMap(){{put("message", "CONFLICT");}};
+        }
+
+        return report;
+    }
+
+
 
 
 

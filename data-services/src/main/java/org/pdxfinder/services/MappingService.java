@@ -43,6 +43,7 @@ public class MappingService {
     private static final List<String> TOPIC = Arrays.asList("PDXFinder");
     private static final String TYPE = "DATABASE";
     private static final String EVIDENCE = "SUBMITTER_PROVIDED";
+    private static final String ACCURACY = "PRECISE";
     private static final String ANNOTATOR = "Nathalie Conte";
 
     @Value("${mappings.diagnosis.file}")
@@ -476,7 +477,7 @@ public class MappingService {
             Provenance provenance = new Provenance(
                     source,
                     EVIDENCE,
-                    mapType.toUpperCase(),
+                    ACCURACY,
                     ANNOTATOR,
                     "2018-11-01 10:48"
             );
@@ -501,6 +502,7 @@ public class MappingService {
         return zoomaEntities;
 
     }
+
 
 
 
