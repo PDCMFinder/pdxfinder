@@ -114,119 +114,13 @@ public class SearchService {
 
 
         //UPDATE SEARCH FILTERS (what is selected)
-
+        wsDTO.setWebFacetsContainer(searchDS.getUpdatedSelectedFilters(configuredFacets));
 
 
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
 
-
-
-
-
-
-        // Only add diagnosisSelected if diagnosis has actually been specified
-        List<FacetOption> diagnosisSelected = null;
-        if (diagnosis.isPresent()) {
-            diagnosisSelected = searchDS.getFacetOptions(SearchFacetName.diagnosis, null, results, diagnosis.orElse(null));
-        }
-
-        // Ensure to add the facet options to this list so the URL encoding retains the configured options
-        String facetString = getFacetString(
-                new HashSet<>(
-                        Arrays.asList(
-                                patientAgeSelected,
-                                patientGenderSelected,
-                                datasourceSelected,
-                                cancerSystemSelected,
-                                sampleTumorTypeSelected,
-                                mutationSelected,
-                                drugSelected,
-                                projectSelected
-
-                        )
-                )
-        );
-
-        // If there is a query, append the query parameter to any configured facet string
-        if (query.isPresent() && !query.get().isEmpty()) {
-            facetString = StringUtils.join(Arrays.asList("query=" + query.get(), facetString), "&");
-        }
-
-        // If there is a diagnosis, append the diagnosis parameters to any configured facet string
-        if (diagnosis.isPresent() && !diagnosis.get().isEmpty()) {
-            for (String diag : diagnosis.get()) {
-                facetString = StringUtils.join(Arrays.asList("diagnosis=" + diag, facetString), "&");
-            }
-        }
-
-
-        if (mutation.isPresent() && !mutation.get().isEmpty()) {
-            List<String> mutList = new ArrayList<>();
-            for (String mut : mutation.get()) {
-                mutList.add("mutation=" + mut);
-            }
-
-            if (facetString.length() != 0 && !facetString.endsWith("&")) {
-                facetString += "&";
-            }
-            for (String mut : mutList) {
-                facetString += mut + "&";
-            }
-
-        }
-
-
-        if (drug.isPresent() && !drug.get().isEmpty()) {
-            List<String> drugList = new ArrayList<>();
-            for (String d : drug.get()) {
-                drugList.add("drug=" + d);
-            }
-
-            if (facetString.length() != 0 && !facetString.endsWith("&")) {
-                facetString += "&";
-            }
-            for (String d : drugList) {
-                facetString += d + "&";
-            }
-
-        }
-
-        if(project.isPresent() && !project.get().isEmpty()){
-
-            List<String> projectList = new ArrayList<>();
-            for(String p : project.get()){
-                projectList.add("project=" + p);
-            }
-
-            if (facetString.length() != 0 && !facetString.endsWith("&")) {
-                facetString += "&";
-            }
-            for (String p : projectList) {
-                facetString += p + "&";
-            }
-
-
-        }
-        if(data_available.isPresent() && !data_available.get().isEmpty()){
-
-            List<String> dataAvList = new ArrayList<>();
-            for(String p : data_available.get()){
-                dataAvList.add("data_available=" + p);
-            }
-
-            if (facetString.length() != 0 && !facetString.endsWith("&")) {
-                facetString += "&";
-            }
-            for (String p : dataAvList) {
-                facetString += p + "&";
-            }
-
-
-        }
-
-
+        String facetString = getFacetString(configuredFacets);
         wsDTO.setFacetString(facetString);
-
 
 
         // Num pages is converted to an int using this formula int n = a / b + (a % b == 0) ? 0 : 1;
@@ -249,12 +143,14 @@ public class SearchService {
         int end = Math.min(begin + 7, numPages);
         wsDTO.setEndIndex(end);
 
-        String mutatedMarkers = molCharService.getMutatedMarkersAndVariants();
-        wsDTO.setMutatedMarkersAndVariants(mutatedMarkers);
 
-        String textSearchDescription = getTextualDescription(facetString, results);
+        String textSearchDescription = getTextualDescription("", results);
         wsDTO.setTextSearchDescription(textSearchDescription);
 
+
+        //TODO: Deal with updated result columns here.... good luck!
+
+        /*
         boolean mutSelected = false;
         boolean drSelected = false;
         boolean dataAvailablePresent = true;
@@ -269,135 +165,7 @@ public class SearchService {
             dataAvailablePresent = false;
         }
 
-        wsDTO.setAutoCompleteOptions(autoCompleteService.getAutoSuggestions());
-        List<ModelForQuery> resultSet = new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size()));
-
-        wsDTO.setSearchResults(resultSet);
-        wsDTO.setPlatformsAndUrls(platformService.getPlatformsWithUrls());
-
-        if (mutSelected == true){
-            wsDTO.setPlatformMap(getPlatformOrMutationFromMutatedVariants(resultSet,"platformMap"));
-            wsDTO.setMutationMap(getPlatformOrMutationFromMutatedVariants(resultSet,"mutationMap"));
-        }
-
-        if(drSelected){
-
-
-        }
-
-        wsDTO.setDataAvailableColumnPresent(dataAvailablePresent);
-        wsDTO.setIsMutationSelected(mutSelected);
-        wsDTO.setIsDrugSelected(drSelected);
-        wsDTO.setQuery(query.orElse(""));
-        wsDTO.setTotalResults(results.size());
-        wsDTO.setPage(page);
-        wsDTO.setSize(size);
-        wsDTO.setDiagnosisSelected(diagnosisSelected);
-        wsDTO.setProjectSelected(projectSelected);
-        wsDTO.setFacetOptions(facets);
-
-
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, List<String>> mapObject = new HashMap<>();
-        try{
-            mapObject = mapper.readValue(mutatedMarkers, Map.class);
-        }catch (Exception e){}
-
-
-        String done = "";
-        Map<String, List<String>> userChoice = new HashMap<>();
-        Map<String, Set<String>> allVariants = new LinkedHashMap<>();
-
-        try {
-            for (String markerReq : mutation.get()) {
-                String marka = markerReq.split("___")[0];
-                List<String> variantList = new ArrayList<>();
-                String variant = "";
-
-                if (!done.contains(marka)) { // New Marker
-                    for (String markerReq2 : mutation.get()) {
-                        if (marka.equals(markerReq2.split("___")[0])){
-                            variant = markerReq2.split("___")[2];
-                            if (variant.equals("ALL")){
-                                variantList = mapObject.get(marka);
-                            }
-                            else {
-                                variantList.add(variant);
-                            }
-                        }
-                    }
-                    userChoice.put(marka,variantList);
-
-                    Set<String> sortedVariantList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-                    sortedVariantList.addAll(mapObject.get(marka));
-
-                    allVariants.put(marka,sortedVariantList);
-                }
-
-                done += marka;
-            }
-        }catch (Exception e){}
-
-        wsDTO.setMarkerMap(userChoice);
-        wsDTO.setMarkerMapWithAllVariants(allVariants);
-
-
-
-
-
-        List<String> drugResponses = drugService.getSpecimenDrugResponseOptions();
-
-        // Capitalize and Remove duplicates from drugResponses
-        drugResponses = drugResponses.stream().map(WordUtils::capitalize).collect(Collectors.toList());
-        drugResponses = drugResponses.stream().distinct().collect(Collectors.toList());
-
-
-        done = "";
-        Map<String, List<String>> drugResponseChoice = new HashMap<>();
-        Map<String, Set<String>> allDrugResponses = new LinkedHashMap<>();
-
-        try {
-
-            for (String drugReq : drug.get()) {
-                String disDrug = drugReq.split("___")[0];
-                List<String> userDrugResponseList = new ArrayList<>();
-                String drugResponse = "";
-
-
-                if ( !done.contains(disDrug)  || disDrug.isEmpty() ) {
-
-                    for (String drugReq2 : drug.get()) {
-
-                        if (disDrug.equals(drugReq2.split("___")[0])){
-                            drugResponse = drugReq2.split("___")[1];
-                            if (drugResponse.equals("ALL")){
-                                userDrugResponseList = drugResponses;
-                            }
-                            else {
-                                userDrugResponseList.add(drugResponse);
-                            }
-                        }
-                    }
-
-                    Set<String> sortedDrugResponseList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-                    sortedDrugResponseList.addAll(drugResponses);
-
-                    drugResponseChoice.put(disDrug,userDrugResponseList);
-                    allDrugResponses.put(disDrug,sortedDrugResponseList);
-                }
-
-                done += disDrug;
-            }
-        }catch (Exception e){      }
-
-        wsDTO.setDrugMap(drugResponseChoice);
-        wsDTO.setDrugMapWithAllResponses(allDrugResponses);
-
-
-        wsDTO.setDrugNames(drugService.getDrugNames());
-        wsDTO.setDrugResponses(drugResponses);
-
-        wsDTO.setProjects(searchDS.getProjectOptions());
+        */
 
         return wsDTO;
     }
@@ -441,6 +209,8 @@ public class SearchService {
 
         return eDTO;
     }
+
+
 
     private Map<SearchFacetName, List<String>> getFacetMap(
             Optional<String> query,
@@ -560,14 +330,17 @@ public class SearchService {
      * @param allSelectedFacetOptions
      * @return
      */
-    private String getFacetString(Set<List<FacetOption>> allSelectedFacetOptions) {
+    private String getFacetString(Map<SearchFacetName, List<String>> allSelectedFacetOptions) {
+
         List<String> pieces = new ArrayList<>();
-        for (List<FacetOption> facetOptions : allSelectedFacetOptions) {
-            pieces.add(facetOptions.stream()
-                    .filter(x -> x.getSelected() != null)
-                    .filter(FacetOption::getSelected)
-                    .map(x -> x.getFacetType() + "=" + x.getName())
-                    .collect(Collectors.joining("&")));
+
+        for (Map.Entry<SearchFacetName,List<String>> facet : allSelectedFacetOptions.entrySet()) {
+
+            for(String filterVal : facet.getValue()){
+
+                pieces.add(facet.getKey().getName() + "=" +filterVal);
+            }
+
         }
         return pieces.stream().filter(x -> !x.isEmpty()).collect(Collectors.joining("&"));
     }
