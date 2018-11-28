@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 
 /*
@@ -25,7 +26,7 @@ public class AjaxController {
     private MappingService mappingService;
     private final static Logger log = LoggerFactory.getLogger(AjaxController.class);
 
-    private RestTemplate restTemplate = new RestTemplate();
+    private RestTemplate restTemplate;
     private final String ZOOMA_URL = "http://scrappy.ebi.ac.uk:8080/annotations";
 
 
@@ -98,19 +99,21 @@ public class AjaxController {
     @GetMapping("/zooma")
     public ResponseEntity<?> writeAllAnnotationsToZooma(){
 
-        Map result = new HashMap();
+        Map report = new LinkedHashMap();
         List<ZoomaEntity> zoomaEntities = mappingService.transformMappingsForZooma();
 
-        ZoomaEntity zoomaEntity = zoomaEntities.get(21);
-        String entity = zoomaEntity.getBiologicalEntities().getBioEntity();
+        int count = 0;
+        for (ZoomaEntity zoomaEntity : zoomaEntities){
 
-        if (writeToZooma(zoomaEntity)){
-            result.put(entity,"SUCCESS WRITE");
-        }else{
-            result.put(entity, "ANNOTATION ALREADY EXIST IN ZOOMA");
+            String entity = zoomaEntity.getBiologicalEntities().getBioEntity()+"__"+count++;
+            if (writeToZooma(zoomaEntity)){
+                report.put(entity,"SUCCESS WRITE");
+            }else{
+                report.put(entity, "ANNOTATION ALREADY EXIST IN ZOOMA");
+            }
         }
 
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(report, HttpStatus.OK);
     }
 
 
