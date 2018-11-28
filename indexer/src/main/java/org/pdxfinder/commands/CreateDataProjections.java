@@ -36,8 +36,8 @@ public class CreateDataProjections implements CommandLineRunner{
     @Value("${user.home}")
     String homeDir;
 
-    //"platform"=>"marker"=>"variant"=>"set of model ids"
-    private Map<String, Map<String, Map<String, Set<Long>>>> mutatedPlatformMarkerVariantModelDP = new HashMap<>();
+    //"platform"=>"marker"=>"type"=>"variant"=>"set of model ids"
+    private Map<String, Map<String, Map<String, Map<String, Set<Long>>>>> mutatedPlatformMarkerVariantModelDP = new HashMap<>();
 
     //"marker"=>"set of variants"
     private Map<String, Set<String>> mutatedMarkerVariantDP = new HashMap<>();
@@ -134,8 +134,10 @@ public class CreateDataProjections implements CommandLineRunner{
                         if(variantName != null && !variantName.isEmpty() && markerName != null && !markerName.isEmpty()){
 
 
-                            addToMutatedPlatformMarkerVariantModelDP(platformName, markerName, variantName, modelId);
+
                             addToMutatedMarkerVariantDP(markerName, variantName);
+
+                            addToFourParamDP(mutatedPlatformMarkerVariantModelDP, platformName, markerName,"MUT", variantName, modelId);
 
                         }
 
@@ -150,61 +152,70 @@ public class CreateDataProjections implements CommandLineRunner{
         }
     }
 
-    /**
-     *
-     * Adds platforms, markers, variants and models to a nested structure
-     * "platform"=>"marker"=>"variation"=>"set of model ids"
-     * Map<String, Map<String, Map<String, Set<String>>>>
-     *
-     * @param platformName
-     * @param markerName
-     * @param variantName
-     * @param modelId
-     */
-    private void addToMutatedPlatformMarkerVariantModelDP(String platformName, String markerName, String variantName, Long modelId){
 
-        if(variantName == null || variantName.length()<3) variantName = "Not applicable";
 
-        if(this.mutatedPlatformMarkerVariantModelDP.containsKey(platformName)){
+    private void addToFourParamDP(Map<String, Map<String, Map<String, Map<String, Set<Long>>>>> collection, String key1, String key2, String key3, String key4, Long modelId){
 
-            if(this.mutatedPlatformMarkerVariantModelDP.get(platformName).containsKey(markerName)){
+        if(collection.containsKey(key1)){
 
-                if(this.mutatedPlatformMarkerVariantModelDP.get(platformName).get(markerName).containsKey(variantName)){
+            if(collection.get(key1).containsKey(key2)){
 
-                    this.mutatedPlatformMarkerVariantModelDP.get(platformName).get(markerName).get(variantName).add(modelId);
+                if(collection.get(key1).get(key2).containsKey(key3)){
+
+                    if(collection.get(key1).get(key2).get(key3).containsKey(key4)){
+
+                        collection.get(key1).get(key2).get(key3).get(key4).add(modelId);
+                    }
+                    else{
+
+                        Set<Long> models = new HashSet<>(Arrays.asList(modelId));
+
+                        collection.get(key1).get(key2).get(key3).put(key4, models);
+                    }
+
                 }
-                //platform and marker is there, variant is missing
                 else{
 
                     Set<Long> models = new HashSet<>(Arrays.asList(modelId));
 
-                    this.mutatedPlatformMarkerVariantModelDP.get(platformName).get(markerName).put(variantName, models);
+                    Map<String, Set<Long>> map4 = new HashMap();
+                    map4.put(key4, models);
+
+                    collection.get(key1).get(key2).put(key3, map4);
                 }
+
             }
-            //platform is there, marker is missing
             else{
 
                 Set<Long> models = new HashSet<>(Arrays.asList(modelId));
 
-                Map<String, Set<Long>> variants = new HashMap<>();
-                variants.put(variantName, models);
+                Map<String, Set<Long>> map4 = new HashMap();
+                map4.put(key4, models);
 
-                this.mutatedPlatformMarkerVariantModelDP.get(platformName).put(markerName, variants);
+                Map map3 = new HashMap();
+                map3.put(key3, map4);
+
+                collection.get(key1).put(key2, map3);
             }
+
+
         }
-        //if the platform is missing, combine all keys
         else{
 
             Set<Long> models = new HashSet<>(Arrays.asList(modelId));
 
-            Map<String, Set<Long>> variants = new HashMap<>();
-            variants.put(variantName, models);
+            Map<String, Set<Long>> map4 = new HashMap();
+            map4.put(key4, models);
 
-            Map<String, Map<String, Set<Long>>> markers = new HashMap<>();
-            markers.put(markerName, variants);
+            Map map3 = new HashMap();
+            map3.put(key3, map4);
 
-            this.mutatedPlatformMarkerVariantModelDP.put(platformName, markers);
+            Map map2 = new HashMap();
+            map2.put(key2, map3);
+
+            collection.put(key1, map2);
         }
+
 
     }
 
