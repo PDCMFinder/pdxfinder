@@ -26,43 +26,6 @@ public class TransformPDMR implements CommandLineRunner {
     @Value("${mydatasource.specimenUrl}")
     private String specimenUrl;
 
-    @Value("${mydatasource.tissueOriginsUrl}")
-    private String tissueOriginsUrl;
-
-    @Value("${mydatasource.tumoGradeStateTypesUrl}")
-    private String tumoGradeStateTypesUrl;
-
-    @Value("${mydatasource.mouseStrainsUrl}")
-    private String mouseStrainsUrl;
-
-    @Value("${mydatasource.implantationSitesUrl}")
-    private String implantationSitesUrl;
-
-    @Value("${mydatasource.tissueTypeUrl}")
-    private String tissueTypeUrl;
-
-    @Value("${mydatasource.histologyUrl}")
-    private String histologyUrl;
-
-    @Value("${mydatasource.tumorGradeUrl}")
-    private String tumorGradeUrl;
-
-    @Value("${mydatasource.samplesUrl}")
-    private String samplesUrl;
-
-    @Value("${mydatasource.currentTherapyUrl}")
-    private String currentTherapyUrl;
-
-    @Value("${mydatasource.standardRegimensUrl}")
-    private String standardRegimensUrl;
-
-    @Value("${mydatasource.clinicalResponseUrl}")
-    private String clinicalResponseUrl;
-
-    @Value("${mydatasource.priorTherapyUrl}")
-    private String priorTherapyUrl;
-
-
 
 
     @Autowired
@@ -87,9 +50,7 @@ public class TransformPDMR implements CommandLineRunner {
                 log.info("Loading from URL " + specimenSearchUrl);
                 log.info("Loading from URL " + specimenUrl);
 
-                dataTransformerService.transformDataAndSave(specimenSearchUrl, specimenUrl, tissueOriginsUrl, tumoGradeStateTypesUrl, mouseStrainsUrl,
-                        implantationSitesUrl, tissueTypeUrl, histologyUrl, tumorGradeUrl, samplesUrl,
-                        currentTherapyUrl, standardRegimensUrl, clinicalResponseUrl, priorTherapyUrl);
+                dataTransformerService.transformDataAndSave();
             } else {
                 log.error("No mydatasource.url1 or mydatasource.url2 provided in properties");
             }
