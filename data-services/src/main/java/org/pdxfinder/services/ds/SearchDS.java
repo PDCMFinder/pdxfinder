@@ -422,7 +422,7 @@ public class SearchDS {
                     break;
 
                 case mutation:
-                    //result = geneMutationSearch.search(filters.get(SearchFacetName.mutation), result);
+                    result = geneMutationSearch.search(filters.get(SearchFacetName.mutation), result, ModelForQuery::addMutatedVariant);
                     break;
 
                 case drug:

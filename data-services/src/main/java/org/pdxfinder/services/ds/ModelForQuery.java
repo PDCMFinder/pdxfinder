@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -392,5 +393,13 @@ public class ModelForQuery {
         }
 
         this.drugWithResponse.add(drugWithResponse);
+    }
+
+    public void addMutatedVariant(String s){
+
+        if(mutatedVariants == null){
+            mutatedVariants = new ArrayList<>();
+        }
+        mutatedVariants.add(s);
     }
 }

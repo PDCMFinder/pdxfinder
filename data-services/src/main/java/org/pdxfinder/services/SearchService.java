@@ -297,7 +297,7 @@ public class SearchService {
         if (mutation.isPresent() && !mutation.get().isEmpty()) {
             configuredFacets.put(SearchFacetName.mutation, new ArrayList<>());
             for (String s : mutation.get()) {
-                configuredFacets.get(SearchFacetName.mutation).add(s);
+                configuredFacets.get(SearchFacetName.mutation).add("ALL___"+s);
             }
         }
 
