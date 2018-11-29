@@ -4,51 +4,6 @@ package org.pdxfinder.services.ds;
  * Created by csaba on 19/01/2018.
  */
 
-
-
-
-/*
-
-Patient/tumour
-
-    cancer categories/classification – higher category  - by organ (breast, lung, colon), system (digestive system) or cell type (adenocarcinoma)
-    cancer histology - granular
-    type- met primary other
-    age – bin?
-    gender
-    Patient treatment naïve, pretreated, unknown
-
-if not naive – being more granular on treatment if possible
-PDX model
-
-    host strain
-    mouse humanization
-    site of graft - back, right flank
-    type of graft - ortho or SC
-    validation : yes/no, method
-
- */
-
-/*
-FACET OPTIONS:
-
-patientAge
-patientTreatmentStatus
-patientGender
-
-sampleOriginTissue
-sampleSampleSite
-sampleExtractionMethod
-sampleClassification
-sampleTumorType
-
-modelImplantationSite
-modelImplantationType
-modelHostStrain
-
-*/
-
-
 import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
 
@@ -85,7 +40,7 @@ public class ModelForQuery {
     private Set<String> allOntologyTermAncestors;
     private Set<String> queryMatch;
 
-    private List<DrugSummaryDTO> drugData;
+
 
     private List<String> drugWithResponse;
 
@@ -397,13 +352,6 @@ public class ModelForQuery {
         return null;
     }
 
-    public List<DrugSummaryDTO> getDrugData() {
-        return drugData;
-    }
-
-    public void setDrugData(List<DrugSummaryDTO> drugData) {
-        this.drugData = drugData;
-    }
 
 
     public void addProject(String project){

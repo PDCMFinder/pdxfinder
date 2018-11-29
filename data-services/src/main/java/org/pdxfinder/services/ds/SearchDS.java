@@ -338,7 +338,7 @@ public class SearchDS {
         result.forEach(x -> x.setMutatedVariants(new ArrayList<>()));
 
         //empty previously set drugs
-        result.forEach(x -> x.setDrugData(new ArrayList<>()));
+        result.forEach(x -> x.setDrugWithResponse(new ArrayList<>()));
 
         // If no filters have been specified, return the complete set
         if (filters == null) {

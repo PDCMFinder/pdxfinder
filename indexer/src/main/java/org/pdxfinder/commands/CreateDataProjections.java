@@ -131,9 +131,10 @@ public class CreateDataProjections implements CommandLineRunner{
                         String variantName = ma.getAminoAcidChange();
                         String markerName = m.getName();
 
-                        if(variantName != null && !variantName.isEmpty() && markerName != null && !markerName.isEmpty()){
+                        if(variantName != null && !variantName.isEmpty()  && markerName != null && !markerName.isEmpty()){
 
-
+                            //this was needed to avoid issues with variants where the value was a single space " "
+                            if(variantName.length()<3) variantName = "Not applicable";
 
                             addToMutatedMarkerVariantDP(markerName, variantName);
 
