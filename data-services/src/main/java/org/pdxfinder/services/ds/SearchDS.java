@@ -425,7 +425,8 @@ public class SearchDS {
                     //result = geneMutationSearch.search(filters.get(SearchFacetName.mutation), result);
                     break;
 
-
+                case drug:
+                    result = dosingStudySearch.search(filters.get(SearchFacetName.drug), result, ModelForQuery::addDrugWithResponse);
 
 
 
@@ -568,7 +569,7 @@ public class SearchDS {
 
             ObjectMapper mapper = new ObjectMapper();
 
-            mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Map<String, Set<Long>>>>>>(){});
+            //mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Map<String, Set<Long>>>>>>(){});
 
             //log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
 

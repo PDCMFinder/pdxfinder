@@ -87,6 +87,8 @@ public class ModelForQuery {
 
     private List<DrugSummaryDTO> drugData;
 
+    private List<String> drugWithResponse;
+
     private List<String> projects;
     private List<String> publications;
 
@@ -425,5 +427,22 @@ public class ModelForQuery {
     public String toString(){
 
         return "{model:"+modelId+"DS:"+datasource+ "}";
+    }
+
+    public List<String> getDrugWithResponse() {
+        return drugWithResponse;
+    }
+
+    public void setDrugWithResponse(List<String> drugWithResponse) {
+        this.drugWithResponse = drugWithResponse;
+    }
+
+    public void addDrugWithResponse(String drugWithResponse){
+
+        if(this.drugWithResponse == null){
+            this.drugWithResponse = new ArrayList<>();
+        }
+
+        this.drugWithResponse.add(drugWithResponse);
     }
 }
