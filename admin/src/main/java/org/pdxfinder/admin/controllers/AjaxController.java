@@ -1,8 +1,10 @@
 package org.pdxfinder.admin.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pdxfinder.admin.pojos.MappingEntity;
 import org.pdxfinder.admin.zooma.ZoomaEntity;
 import org.pdxfinder.services.MappingService;
+import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +25,17 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/api")
 public class AjaxController {
 
-    private MappingService mappingService;
     private final static Logger log = LoggerFactory.getLogger(AjaxController.class);
-
+    private ObjectMapper mapper = new ObjectMapper();
     private RestTemplate restTemplate;
-    private final String ZOOMA_URL = "http://scrappy.ebi.ac.uk:8080/annotations";
+
+    private final String ZOOMA_URL = "http://scrappy.ebi.ac.uk:8080/annotationsXX";
+    private String errReport = "";
 
 
+    @Autowired
+    private UtilityService utilityService;
+    private MappingService mappingService;
 
     @Autowired
     public AjaxController(MappingService mappingService, RestTemplateBuilder restTemplateBuilder) {
@@ -103,18 +109,33 @@ public class AjaxController {
         List<ZoomaEntity> zoomaEntities = mappingService.transformMappingsForZooma();
 
         int count = 0;
+        List<ZoomaEntity> failedList = new ArrayList<>();
         for (ZoomaEntity zoomaEntity : zoomaEntities){
 
             String entity = zoomaEntity.getBiologicalEntities().getBioEntity()+"__"+count++;
             if (writeToZooma(zoomaEntity)){
+
                 report.put(entity,"SUCCESS WRITE");
             }else{
-                report.put(entity, "ANNOTATION ALREADY EXIST IN ZOOMA");
+
+                report.put(entity, "THIS ANNOTATION WAS NOT WRITTEN TO ZOOMA");
+                failedList.add(zoomaEntity);
             }
         }
 
+        /* LOG FAILED OBJECTS TO FILE */
+        String failedReport = "";
+        try{
+            failedReport = mapper.writeValueAsString(failedList);
+        }catch (Exception e){}
+
+        utilityService.writeToFile(failedReport,(new Date())+"_failed.json");
+        utilityService.writeToFile(this.errReport,(new Date())+"_error.txt");
+
         return new ResponseEntity<>(report, HttpStatus.OK);
     }
+
+
 
 
 
@@ -129,11 +150,13 @@ public class AjaxController {
             result = restTemplate.postForObject(ZOOMA_URL, req, Map.class);
             report = true;
         }catch (Exception e){
-            result = new HashMap(){{put("message", "CONFLICT");}};
+
+            this.errReport += "\n\n ************************ NEW ERROR LOG "+(new Date())+" *********************** \n"+e;
         }
 
         return report;
     }
+
 
 
 

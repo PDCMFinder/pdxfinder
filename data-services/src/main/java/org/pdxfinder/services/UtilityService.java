@@ -4,18 +4,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Date;
 
 @Service
 public class UtilityService {
 
 
+    private String homeDir = System.getProperty("user.home");
 
     public JsonNode readJsonURL(String apiLink) {
 
@@ -47,6 +50,40 @@ public class UtilityService {
         return jsonNode;
 
     }
+
+
+    public void writeToFile(String data, String name){
+
+        String fileName = homeDir+"/Documents/"+name;
+
+        // Write to the file using BufferedReader and FileWriter
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
+            writer.append(data);
+            writer.close();
+
+        } catch (Exception e) {}
+
+    }
+
+
+    public Boolean deleteFile(String name) {
+
+        String fileURL = homeDir+"/Documents/"+name;
+
+        Boolean report = false;
+        try {
+
+            Path path = Paths.get(fileURL);
+            Files.deleteIfExists(path);
+
+            report = true;
+        } catch (Exception e) {
+        }
+
+        return report;
+    }
+
 
 
 }

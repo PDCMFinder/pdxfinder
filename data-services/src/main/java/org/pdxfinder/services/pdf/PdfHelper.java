@@ -784,23 +784,6 @@ public class PdfHelper {
         return imageData;
     }
 
-
-    public Boolean deleteFile(String fileURL) {
-
-        Boolean report = false;
-        try {
-
-            Path path = Paths.get(fileURL);
-            Files.deleteIfExists(path);
-
-            report = true;
-        } catch (Exception e) {
-        }
-
-        return report;
-    }
-
-
     public static String base64EncodeToString(byte imageData[]) {
 
         String base64Image = "";
