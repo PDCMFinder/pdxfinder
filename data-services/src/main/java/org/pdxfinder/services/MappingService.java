@@ -479,17 +479,24 @@ public class MappingService {
                     EVIDENCE,
                     ACCURACY,
                     ANNOTATOR,
-                    "2018-11-01 10:48"
+                    "2018-11-30 10:48"
             );
 
             for (String mappingLabel : mappingLabels){
 
                 /* ZOOMA PROPERTY DATA */
                 Property property = new Property(mappingLabel,StringUtils.upperCase(mappingValues.get(mappingLabel)) );
+
+                List<String> annotations = new ArrayList<>();
+
+                if (mappingLabel.equals("SampleDiagnosis")){
+                    annotations = semanticTag;
+                }
+
                 ZoomaEntity zoomaEntity = new ZoomaEntity(
                         biologicalEntities,
                         property,
-                        semanticTag,
+                        annotations,
                         provenance
                 );
                 zoomaEntities.add(zoomaEntity);
