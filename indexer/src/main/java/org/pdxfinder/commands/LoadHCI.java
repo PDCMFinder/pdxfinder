@@ -370,7 +370,7 @@ public class LoadHCI implements CommandLineRunner {
                             String samleId = row[1];
                             String marker = row[2];
                             String result = row[3];
-                            System.out.println(modelId);
+                            //System.out.println(modelId);
 
                             if(modelId.isEmpty() || samleId.isEmpty() || marker.isEmpty() || result.isEmpty()) continue;
 
@@ -412,7 +412,7 @@ public class LoadHCI implements CommandLineRunner {
                 System.out.println(currentLineCounter + " " +currentLine.toString());
             }
 
-            System.out.println(molCharMap.toString());
+            //System.out.println(molCharMap.toString());
 
             for (Map.Entry<String, MolecularCharacterization> entry : molCharMap.entrySet()) {
                 String key = entry.getKey();
