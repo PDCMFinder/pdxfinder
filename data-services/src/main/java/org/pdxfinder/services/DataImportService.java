@@ -534,6 +534,11 @@ public class DataImportService {
         return sampleRepository.findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(modelId, dataSource, sampleId);
     }
 
+    public Sample findHumanSampleWithMolcharByModelIdAndDataSource(String modelId, String dataSource){
+
+        return sampleRepository.findHumanSampleWithMolcharByModelIdAndDataSource(modelId, dataSource);
+    }
+
     public Sample getHumanSample(String sampleId, String dataSource){
 
 
