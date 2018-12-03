@@ -164,509 +164,42 @@
                     <ul class="accordion pdx-accordion-1" data-accordion data-multi-expand="true"
                         data-allow-all-closed="true">
 
-                        <li class="accordion-item is-active" data-accordion-item>
-                            <!-- Accordion tab title -->
-                            <a href="#" class="accordion-title">Patient / Tumor</a>
+                        <li class="accordion-item is-active" data-accordion-item th:each="section:${websearch.webFacetsContainer.webFacetSections}">
 
-                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
-                            <div class="accordion-content" data-tab-content>
+                            <a href="#" class="accordion-title" th:text = "${section.name}"></a>
 
+                            <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
+                                data-allow-all-closed="true">
 
-                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
-                                    data-allow-all-closed="true">
-                                    <li class="accordion-item" data-accordion-item id="cancer_system_filter">
-                                        <a href="#" class="accordion-title">Cancer by system</a>
+                                <li class="accordion-item" data-accordion-item id="datasource_filter" th:each="filterComponent:${section.filterComponents}">
+                                    <a href="#" class="accordion-title" th:text="${filterComponent.name}"></a>
 
-
-                                        <div class="accordion-content" data-tab-content>
-
-                                            <div class="large-form">
-
-                                                <div class="checkbox-item"
-                                                     th:each="instance:${websearch.facetOptions['cancer_system_options']}">
-                                                    <input th:id="'cancer_system__' + ${#strings.replace(instance, ' ', '_')}"
-                                                           type="checkbox" class="cancer_system filter"/>
-                                                    <label th:attr="for='cancer_system__'+${#strings.replace(instance, ' ', '_')}"><span
-                                                            th:text="${instance}"></span></label>
-                                                </div>
-
-
+                                    <div class="accordion-content" data-tab-content>
+                                        <div class="large-form">
+                                            <!-- Check what kind of component is it, not all components have options-->
+                                            <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamFilter)}">
+                                            <div class="checkbox-item"
+                                                 th:each="option:${filterComponent.options}">
+                                                <input type="checkbox"
+                                                       class="datasource filter"/>
+                                                <label th:attr="for=${option}"><span
+                                                        th:text="${option}"></span></label>
                                             </div>
+                                            </span>
                                         </div>
-                                    </li>
-                                </ul>
+                                    </div>
 
+                                </li>
 
-                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
-                                    data-allow-all-closed="true">
-                                    <li class="accordion-item" data-accordion-item id="tumor_type_filter">
-                                        <a href="#" class="accordion-title">Tumor type</a>
-
-
-                                        <div class="accordion-content" data-tab-content>
-
-                                            <div class="large-form">
-
-                                                <div class="checkbox-item"
-                                                     th:each="instance:${websearch.facetOptions['sample_tumor_type_options']}">
-                                                    <input th:id="'sample_tumor_type__' + ${#strings.replace(instance, ' ', '_')}"
-                                                           type="checkbox" class="tumor_type filter"/>
-                                                    <label th:attr="for='sample_tumor_type__'+${#strings.replace(instance, ' ', '_')}"><span
-                                                            th:text="${instance}"></span></label>
-                                                </div>
-
-
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-
-
-                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
-                                    data-allow-all-closed="true">
-                                    <li class="accordion-item" data-accordion-item id="gender_filter">
-                                        <a href="#" class="accordion-title">Sex</a>
-
-                                        <div class="accordion-content" data-tab-content>
-                                            <div class="large-form">
-                                                <div class="checkbox-item"
-                                                     th:each="instance:${websearch.facetOptions['patient_gender_options']}">
-                                                    <input th:id="'patient_gender__' + ${#strings.replace(instance, ' ', '_')}"
-                                                           type="checkbox" class="gender filter"/>
-                                                    <label th:attr="for='patient_gender__'+${#strings.replace(instance, ' ', '_')}">
-                                                        <span th:text="${instance}"></span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-
-
-                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
-                                    data-allow-all-closed="true">
-                                    <li class="accordion-item" data-accordion-item id="age_filter">
-                                        <a href="#" class="accordion-title">Age</a>
-                                        <div class="accordion-content" data-tab-content>
-
-                                            <div class="large-form">
-
-                                                <div class="checkbox-item"
-                                                     th:each="instance:${websearch.facetOptions['patient_age_options']}">
-                                                    <input th:id="'patient_age__' + ${#strings.replace(instance, ' ', '_')}"
-                                                           type="checkbox" class="age filter"/>
-                                                    <label th:attr="for='patient_age__'+${#strings.replace(instance, ' ', '_')}"><span
-                                                            th:text="${instance}"></span></label>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-
-
-                            </div>
-                        </li>
-
-                        <li class="accordion-item is-active" data-accordion-item>
-                            <!-- Accordion tab title -->
-                            <a href="#" class="accordion-title">PDX model</a>
-
-                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
-                            <div class="accordion-content" data-tab-content>
-
-
-                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
-                                    data-allow-all-closed="true">
-                                    <li class="accordion-item" data-accordion-item id="datasource_filter">
-                                        <a href="#" class="accordion-title">Datasource</a>
-                                        <div class="accordion-content" data-tab-content>
-                                            <div class="large-form">
-                                                <div class="checkbox-item"
-                                                     th:each="instance:${websearch.facetOptions['datasource_options']}">
-                                                    <input th:id="'datasource__' + ${instance}" type="checkbox"
-                                                           class="datasource filter"/>
-                                                    <label th:attr="for='datasource__'+${instance}"><span
-                                                            th:text="${instance}"></span></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-
-
-                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
-                                    data-allow-all-closed="true">
-                                    <li class="accordion-item" data-accordion-item id="project_filter">
-                                        <a href="#" class="accordion-title">Project</a>
-                                        <div class="accordion-content" data-tab-content>
-                                            <div class="large-form">
-                                                <div class="checkbox-item"
-                                                     th:each="instance:${websearch.projects}">
-                                                    <input th:id="'project__' + ${instance}" type="checkbox"
-                                                           class="project filter"/>
-                                                    <label th:attr="for='project__'+${instance}"><span
-                                                            th:text="${instance}"></span></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-
-
-                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
-                                    data-allow-all-closed="true">
-                                    <li class="accordion-item" data-accordion-item id="data_available_filter">
-                                        <a href="#" class="accordion-title">DATASET AVAILABLE</a>
-
-                                        <div class="accordion-content" data-tab-content>
-                                            <div class="large-form">
-                                                <div class="checkbox-item"
-                                                     th:each="instance:${websearch.facetOptions['data_available_options']}">
-                                                    <input th:id="'data_available__' + ${#strings.replace(instance, ' ', '_')}"
-                                                           type="checkbox" class="data_available filter"/>
-                                                    <label th:attr="for='data_available__'+${#strings.replace(instance, ' ', '_')}"><span
-                                                            th:text="${instance}"></span></label>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </li>
-                                </ul>
-
-
-                            </div>
-
+                            </ul>
 
                         </li>
 
 
-                        <li class="accordion-item is-active" data-accordion-item>
-                            <!-- Accordion tab title -->
-                            <a href="#" class="accordion-title"> MOLECULAR DATA </a>
-
-                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
-                            <div class="accordion-content" data-tab-content>
-                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
-                                    data-allow-all-closed="true">
-                                    <li class="accordion-item" data-accordion-item id="marker_filter">
-                                        <a href="#" class="accordion-title"> GENE MUTATION </a>
-                                        <div class="accordion-content" data-tab-content>
-                                            <div class="light-grey-bg-box">
-                                                <div class="checkbox-item">
-
-                                                      <span th:if="${#lists.isEmpty(param.mutation) || #strings.length(param.mutation[0]) == 0 }">
-                                                        <div class="row topSace10">
-                                                            <div class="columns nospace small-4 large-4 adjusti"> GENE </div>
-                                                            <div class="columns nospace small-3 large-3 adjusti"> TYPE </div>
-                                                            <div class="columns nospace small-5 large-5 adjusti"> VARIANT </div>
-                                                        </div>
-                                                        <div class="row topSace10">
-                                                            <div class="columns nospace small-4 large-4"> <input
-                                                                    type="text" id="geneFilter1"
-                                                                    onblur="loadVariants(this,'1')" class="fullWidth"/> </div>
-                                                            <div class="columns nospace small-3 large-3"> <input
-                                                                    type="text" value="MUT" readonly="readonly"/></div>
-
-                                                            <div id="filterOptions1"
-                                                                 class="columns nospace small-5 large-5 topSpace3">
-                                                                <select id='variantFilter1'
-                                                                        multiple='multiple'
-                                                                        th:classappend="( ${not #lists.isEmpty(param.mutation) } ) ? 'width40' : '' ">
-                                                                </select>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row">
-                                                            <div class="row hidden"
-                                                                 th:each="i: ${#numbers.sequence(2, 20)}"
-                                                                 th:classappend="'geneticVar'+${i}">
-                                                                <div class="columns nospace small-4 large-4">
-                                                                    <input th:onblur="'loadVariants(this,'+${i}+')'"
-                                                                           type="text" th:id="'geneFilter'+${i}"
-                                                                           class="fullWidth"/>
-                                                                </div>
-                                                                <div class="columns nospace small-3 large-3"><input
-                                                                        type="text" value="MUT"
-                                                                        readonly="readonly"/></div>
-
-                                                                <div th:id="'filterOptions'+${i}"
-                                                                     class="columns nospace small-5 large-5 topSpace3">
-                                                                    <select th:id="'variantFilter'+${i}"
-                                                                            multiple='multiple'> </select>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </span>
-
-
-                                                    <span th:if="${not #lists.isEmpty(param.mutation)  &&  #strings.length(param.mutation[0]) > 0 }">
-                                                            <div class="row topSace10">
-                                                                <div class="columns nospace small-4 large-4 adjusti"> GENE </div>
-                                                                <div class="columns nospace small-3 large-3 adjusti"> TYPE </div>
-                                                                <div class="columns nospace small-5 large-5 adjusti"> VARIANT </div>
-                                                            </div>
-
-
-                                                        <span th:each="eachMarker,iter :${websearch.markerMapWithAllVariants}">
-                                                            <div class="row large-12 medium-12 expanded topSace10"
-                                                                 th:classappend="'geneticVar'+${iter.index+1}">
-
-                                                                <div class="columns nospace small-4 large-4">
-                                                                    <input th:value="${eachMarker.key}"
-                                                                           th:onblur="'loadVariants(this,'+${iter.index+1}+')'"
-                                                                           type="text"
-                                                                           th:id="'geneFilter'+${iter.index+1}"
-                                                                           class="fullWidth"/>
-                                                                </div>
-                                                                <div class="columns nospace small-3 large-3"><input
-                                                                        type="text" value="MUT"
-                                                                        readonly="readonly"/></div>
-
-                                                                <div class="columns nospace small-5 large-5 topSpace3"
-                                                                     th:id="'filterOptions'+${iter.index+1}">
-                                                                    <select th:id="'variantFilter'+${iter.index+1}"
-                                                                            class="width40" multiple='multiple'>
-
-                                                                        <option th:each="variant :${eachMarker.value}"
-                                                                                th:value="${variant}"
-                                                                                th:text="${variant}"
-                                                                                th:selected="( ${#lists.contains(websearch.markerMap.get(eachMarker.key), variant)} ) ? 'true' : 'false' "> ... </option>
-
-                                                                    </select>
-                                                                </div>
-
-                                                            </div>
-                                                        </span>
-
-
-
-
-                                                        <span th:if="${not #lists.isEmpty(param.mutation)  &&  #strings.length(param.mutation[0]) > 0 }">
-                                                            <span th:each="i: ${#numbers.sequence(#maps.size(websearch.markerMap)+1, 20)}">
-
-                                                                <div class="row hidden"
-                                                                     th:classappend="'geneticVar'+${i}">
-                                                                    <div class="columns nospace small-4 large-4">
-                                                                        <input th:onblur="'loadVariants(this,'+${i}+')'"
-                                                                               type="text" th:id="'geneFilter'+${i}"
-                                                                               class="fullWidth"/>
-                                                                    </div>
-                                                                    <div class="columns nospace small-3 large-3"><input
-                                                                            type="text" value="MUT"
-                                                                            readonly="readonly"/></div>
-
-                                                                    <div class="columns nospace small-5 large-5 topSpace3"
-                                                                         th:id="'filterOptions'+${i}">
-                                                                        <select th:id="'variantFilter'+${i}"
-                                                                                multiple='multiple'> </select>
-                                                                    </div>
-                                                                </div>
-
-                                                            </span>
-                                                        </span>
-
-                                                    </span>
-
-                                                </div>
-
-
-                                                <div class="checkbox-item height70px"
-                                                     th:if="${#lists.isEmpty(param.mutation) || #strings.length(param.mutation[0]) == 0 }">
-                                                    <button id="markerFilter" href="#"
-                                                            class="button primary columns large-3 white-text-right-float topSpace4">
-                                                        <i class="icon icon-functional" data-icon="1"></i></button>
-                                                    <button onclick="addMarkerAndVariants('OR',2)"
-                                                            href="#" class="icoButn columns large-2"> OR
-                                                    </button>
-                                                </div>
-
-                                                <div class="checkbox-item height70px"
-                                                     th:if="${not #lists.isEmpty(param.mutation)   &&  #strings.length(param.mutation[0]) > 0 }">
-                                                    <button id="markerFilter" href="#"
-                                                            class="button primary columns large-3 white-text-right-float topSpace4">
-                                                        <i
-                                                                class="icon icon-functional" data-icon="1"></i></button>
-                                                    <button onclick="addMarkerAndVariants('OR',4)"
-                                                            href="#" class="icoButn columns large-2"> OR
-                                                    </button>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-
-
-                        <li class="accordion-item is-active" data-accordion-item>
-                            <!-- Accordion tab title -->
-                            <a href="#" class="accordion-title"> TREATMENT INFORMATION </a>
-
-                            <!-- Accordion tab content: it would start in the open state due to using the `is-active` state class. -->
-                            <div class="accordion-content" data-tab-content>
-                                <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
-                                    data-allow-all-closed="true">
-                                    <li class="accordion-item" data-accordion-item id="drug_filter">
-                                        <a href="#" class="accordion-title"> Model Dosing Study </a>
-                                        <div class="accordion-content" data-tab-content>
-                                            <div class="light-grey-bg-box">
-                                                <div class="checkbox-item">
-
-                                                    <span th:if="${#lists.isEmpty(param.drug) || #strings.length(param.drug[0]) == 0 }">
-                                                        <div class="row topSace10">
-                                                            <div class="columns nospace small-12 large-6 adjusti"> DRUG </div>
-                                                            <div class="columns nospace small-12 large-6 adjusti"> RESPONSE </div>
-                                                        </div>
-                                                        <div class="row topSace10">
-
-                                                            <div class="columns nospace small-12 large-6">
-                                                                <input onblur="loadDrugResponse('1')" type="text"
-                                                                       id="drugFilter1" class="fullWidth"/> </div>
-                                                            <div id="drugResponseOptions1"
-                                                                 class="columns nospace small-12 large-6 topSpace3">
-                                                                <select id='responseFilter1' multiple='multiple'
-
-                                                                        th:classappend="( ${not #lists.isEmpty(param.drug) } ) ? 'width50' : '' ">
-
-                                                                        <option th:each="disResponse :${websearch.drugResponses}"
-                                                                                th:value="${disResponse}"
-                                                                                th:text="${disResponse}"> ... </option>
-
-                                                                </select>
-                                                            </div>
-
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="row hidden"
-                                                                 th:each="i: ${#numbers.sequence(2, 20)}"
-                                                                 th:classappend="'dosingStudy'+${i}">
-                                                                <div class="columns nospace small-12 large-6">
-                                                                    <input type="text" value="NULL"
-                                                                           th:id="'drugFilter'+${i}"
-                                                                           class="fullWidth"/>
-                                                                </div>
-
-                                                                <div th:id="'drugResponseOptions'+${i}"
-                                                                     class="columns nospace small-12 large-6 topSpace3">
-                                                                    <select th:id="'responseFilter'+${i}"
-                                                                            multiple='multiple'>
-
-                                                                        <option th:each="disResponse :${websearch.drugResponses}"
-                                                                                th:value="${disResponse}"
-                                                                                th:text="${disResponse}"
-                                                                                th:selected="true"> ... </option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </span>
-
-
-                                                    <span th:if="${not #lists.isEmpty(param.drug) && #strings.length(param.drug[0]) > 0 }">
-                                                            <div class="row topSace10">
-                                                                <div class="columns nospace small-12 large-6 adjusti"> DRUG </div>
-                                                                <div class="columns nospace small-12 large-6 adjusti"> RESPONSE </div>
-                                                            </div>
-                                                        <span th:each="eachDrug,iter :${websearch.drugMapWithAllResponses}">
-                                                            <div class="row large-12 medium-12 expanded topSace10"
-                                                                 th:classappend="'dosingStudy'+${iter.index+1}">
-
-                                                                <div class="columns nospace small-12 large-6">
-                                                                    <input th:value="${eachDrug.key}"
-                                                                           th:onblur="'loadDrugResponse(this,'+${iter.index+1}+')'"
-                                                                           type="text"
-                                                                           th:id="'drugFilter'+${iter.index+1}"
-                                                                           class="fullWidth"/>
-                                                                </div>
-
-                                                                <div class="columns nospace small-12 large-6 topSpace3"
-                                                                     th:id="'filterOptions'+${iter.index+1}">
-                                                                    <select th:id="'responseFilter'+${iter.index+1}"
-                                                                            class="width50" multiple='multiple'>
-
-                                                                        <option th:each="disResponse :${eachDrug.value}"
-                                                                                th:value="${disResponse}"
-                                                                                th:text="${disResponse}"
-                                                                                th:selected="( ${#lists.contains(websearch.drugMap.get(eachDrug.key), disResponse)} ) ? 'true' : 'false' "> ... </option>
-
-                                                                    </select>
-                                                                </div>
-
-                                                            </div>
-                                                        </span>
-
-
-
-                                                        <span th:if="${not #lists.isEmpty(param.drug) && #strings.length(param.drug[0]) > 0 }">
-                                                            <span th:each="i: ${#numbers.sequence(#maps.size(websearch.drugMap)+1, 20)}">
-
-                                                                <div class="row hidden"
-                                                                     th:classappend="'dosingStudy'+${i}">
-                                                                    <div class="columns nospace small-12 large-6">
-                                                                        <input type="text" value="NULL"
-                                                                               th:id="'drugFilter'+${i}"
-                                                                               class="fullWidth"/>
-                                                                    </div>
-
-                                                                    <div class="columns nospace small-12 large-6 topSpace3"
-                                                                         th:id="'filterOptions'+${i}">
-                                                                        <select th:id="'responseFilter'+${i}"
-                                                                                multiple='multiple'>
-
-
-                                                                        <option th:each="disResponse :${websearch.drugResponses}"
-                                                                                th:value="${disResponse}"
-                                                                                th:text="${disResponse}"
-                                                                                th:selected="true"> ... </option>
-                                                                        </select>
-                                                                    </div>
-                                                                </div>
-
-                                                            </span>
-                                                        </span>
-
-                                                    </span>
-
-                                                </div>
-
-
-                                                <div class="checkbox-item height70px"
-                                                     th:if="${#lists.isEmpty(param.drug) || #strings.length(param.drug[0]) == 0 }">
-                                                    <button id="drugFilterButton" href="#"
-                                                            class="button primary columns large-3 white-text-right-float topSpace4">
-                                                        <i class="icon icon-functional" data-icon="1"></i></button>
-                                                    <button onclick="addDrugAndResponse('OR',2)"
-                                                            href="#" class="icoButn columns large-2"> OR
-                                                    </button>
-                                                </div>
-
-                                                <div class="checkbox-item height70px"
-                                                     th:if="${not #lists.isEmpty(param.drug) && #strings.length(param.drug[0]) > 0 }">
-                                                    <button id="drugFilterButton" href="#"
-                                                            class="button primary columns large-3 white-text-right-float topSpace4">
-                                                        <i class="icon icon-functional" data-icon="1"></i></button>
-                                                    <button onclick="addDrugAndResponse('OR',4)"
-                                                            href="#" class="icoButn columns large-2"> OR
-                                                    </button>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
 
                     </ul>
 
-                    <span th:each="instance:${websearch.diagnosisSelected}">
-                            <input th:id="'diagnosis__' + ${#strings.replace(instance.name, ' ', '_')}" type="hidden"
-                                   class="diagnosis filter"/>
-                        </span>
+
 
                 </div>
 
@@ -686,15 +219,17 @@
                                 <th>Age</th>
                                 <th>Sex</th>
                                 <th>Data Available</th>
+                                <!--
                                 <th th:if="${websearch.isMutationSelected} == true">Mutations</th>
                                 <th th:if="${websearch.isMutationSelected} == true">Platform</th>
                                 <th th:if="${websearch.isDrugSelected} == true">Drug</th>
                                 <th th:if="${websearch.isDrugSelected} == true">Response</th>
+                                -->
 
                             </tr>
                             </thead>
                             <tbody>
-                            <tr th:each="model, iter : ${websearch.searchResults}">
+                            <tr th:each="model, iter : ${websearch.results}">
                                 <td><a th:text="${model.externalId}"
                                        th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}}"></a><br/><span
                                         class="small" th:text="${model.datasource}">center</span></td>
@@ -724,6 +259,7 @@
                                     </th:block>
                                 </td>
 
+                                <!--
                                 <td th:if="${websearch.isMutationSelected} == true">
                                     <th:block th:each="dMutations : ${websearch.mutationMap.get(model.externalId)}">
                                         <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'?marker='+${dMutations}+'#variation' }"
@@ -766,7 +302,7 @@
                                            th:utext="${drugData.response}"></a>
                                     </div>
                                 </td>
-
+                                -->
 
                             </tr>
 
@@ -844,19 +380,19 @@
 
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
-    var searchOptions = [[${websearch.autoCompleteOptions}]];
+    var searchOptions = [[${websearch.mainSearchFieldOptions}]];
     var searchStates = [];
     for (var i = 0; i < searchOptions.length; i++) {
         searchStates.push(searchOptions[i].value);
     }
-    var ageFilters = [[${websearch.patientAgeSelected}]];
-    var dsFilters = [[${websearch.datasourceSelected}]];
-    var projectFilters = [[${websearch.projectSelected}]];
-    var cancerSystemFilters = [[${websearch.cancerSystemSelected}]];
-    var sampleTumorTypeFilters = [[${websearch.sampleTumorTypeSelected}]];
-    var genderFilters = [[${websearch.patientGenderSelected}]];
-    var mutationFilters = [[${websearch.mutationSelected}]];
-    var dataAvailableFilters = [[${websearch.dataAvailableSelected}]];
+    var ageFilters = [];
+    var dsFilters = [];
+    var projectFilters = [];
+    var cancerSystemFilters = [];
+    var sampleTumorTypeFilters = [];
+    var genderFilters = [];
+    var mutationFilters = [];
+    var dataAvailableFilters = [];
     function constructSearchOptions(data) {
         var newOptions = [];
         for (var i = 0; i < data.length; i++) {
@@ -957,10 +493,10 @@
             redirectPage();
         });
     });
-    var incomingString = [[${websearch.mutatedMarkersAndVariants}]];
+    var incomingString = [];
     var mutatedMarkersAndVariants = JSON.parse(incomingString);
-    var drugsList = [[${websearch.drugNames}]];
-    var drugResponseList = [[${websearch.drugResponses}]];
+    var drugsList = [];
+    var drugResponseList = [];
     jQuery(document).ready(function () {
         loadGeneTextFields();
         loadDrugTextFields();
