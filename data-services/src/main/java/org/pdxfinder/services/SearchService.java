@@ -115,7 +115,6 @@ public class SearchService {
 
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
 
-
         //UPDATE SEARCH FILTERS (what is selected)
         wsDTO.setWebFacetsContainer(searchDS.getUpdatedSelectedFilters(configuredFacets));
 
@@ -148,6 +147,11 @@ public class SearchService {
         String textSearchDescription = getTextualDescription("", results);
         wsDTO.setTextSearchDescription(textSearchDescription);
 
+        wsDTO.setMainSearchFieldOptions(autoCompleteService.getAutoSuggestions());
+
+        List<ModelForQuery> resultSet = new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size()));
+
+        wsDTO.setResults(resultSet);
 
         //TODO: Deal with updated result columns here.... good luck!
 

@@ -30,6 +30,8 @@ public class WebSearchDTO {
     //the facets menu with their possible options, including what options are selected
     private WebFacetContainer webFacetsContainer;
 
+    private List<String> mainSearchFieldOptions;
+
     private List<ModelForQuery> results;
 
 
@@ -155,5 +157,13 @@ public class WebSearchDTO {
 
     public void setTextSearchDescription(String textSearchDescription) {
         this.textSearchDescription = textSearchDescription;
+    }
+
+    public List<String> getMainSearchFieldOptions() {
+        return mainSearchFieldOptions;
+    }
+
+    public void setMainSearchFieldOptions(List<String> mainSearchFieldOptions) {
+        this.mainSearchFieldOptions = mainSearchFieldOptions;
     }
 }
