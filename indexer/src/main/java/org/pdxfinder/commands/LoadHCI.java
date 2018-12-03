@@ -422,7 +422,8 @@ public class LoadHCI implements CommandLineRunner {
                 String modelId = modAndSamp[0];
                 String sampleId = modAndSamp[1];
 
-                Sample sample = dataImportService.findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(modelId, hciDS.getAbbreviation(), sampleId);
+                //Sample sample = dataImportService.findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(modelId, hciDS.getAbbreviation(), sampleId);
+                Sample sample = dataImportService.findHumanSampleWithMolcharByModelIdAndDataSource(modelId, hciDS.getAbbreviation());
 
                 if(sample == null) {
                     log.warn("Missing model or sample: "+modelId +" "+sampleId);
