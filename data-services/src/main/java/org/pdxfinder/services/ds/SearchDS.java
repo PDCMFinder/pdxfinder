@@ -223,6 +223,20 @@ public class SearchDS {
         molecularDataSection.addComponent(geneMutation);
 
 
+        //Breast cancer markers
+
+        OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_marker",new ArrayList<>(Arrays.asList(
+                "HER+ PR+ ER+",
+                "HER+ PR+ ER-",
+                "HER+ PR- ER+",
+                "HER+ PR- ER-",
+                "HER- PR+ ER+",
+                "HER- PR+ ER-",
+                "HER- PR- ER+",
+                "HER- PR- ER-")),
+                new ArrayList<>());
+        molecularDataSection.addComponent(breastCancerMarkers);
+
         //model dosing study def
 
         Map<String, Map<String, Set<Long>>> modelDrugResponses = getModelDrugResponsesFromDP();

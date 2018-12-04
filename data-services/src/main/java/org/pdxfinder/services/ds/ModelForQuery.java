@@ -39,6 +39,8 @@ public class ModelForQuery {
     private List<String> mutatedVariants;
     private List<String> dataAvailable;
     private Set<String> allOntologyTermAncestors;
+
+    private List<String> breastCancerMarkers;
     private Set<String> queryMatch;
 
 
@@ -401,5 +403,13 @@ public class ModelForQuery {
             mutatedVariants = new ArrayList<>();
         }
         mutatedVariants.add(s);
+    }
+
+    public List<String> getBreastCancerMarkers() {
+        return breastCancerMarkers;
+    }
+
+    public void setBreastCancerMarkers(List<String> breastCancerMarkers) {
+        this.breastCancerMarkers = breastCancerMarkers;
     }
 }
