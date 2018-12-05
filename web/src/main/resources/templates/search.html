@@ -116,10 +116,10 @@
                                 <div class="columns small-1 medium-push-2 small-push-3 margin-bottom-none ">
                                     <input id="search_submit"
                                            class="button icon icon-functional margin-bottom-none line-height8"
-                                           tabindex="3" name="submit1" type="submit" value="1">
+                                           tabindex="3" name="submit1" type="submit" labelId="1">
                                 </div>
-                                <!-- <input id="allebi" type="hidden" name="db" value="allebi" checked="checked" /> -->
-                                <input type="hidden" name="requestFrom" value="ebi_index">
+                                <!-- <input id="allebi" type="hidden" name="db" labelId="allebi" checked="checked" /> -->
+                                <input type="hidden" name="requestFrom" labelId="ebi_index">
                             </div>
                         </fieldset>
                         <fieldset>
@@ -180,10 +180,12 @@
                                             <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamFilter)}">
                                             <div class="checkbox-item"
                                                  th:each="option:${filterComponent.options}">
+
+
                                                 <input type="checkbox"
-                                                       class="datasource filter"/>
+                                                       class="filter" th:checked="${#lists.contains(filterComponent.selected, option.labelId)}"/>
                                                 <label th:attr="for=${option}"><span
-                                                        th:text="${option}"></span></label>
+                                                        th:text="${option.label}"></span></label>
                                             </div>
                                             </span>
                                         </div>
@@ -383,7 +385,7 @@
     var searchOptions = [[${websearch.mainSearchFieldOptions}]];
     var searchStates = [];
     for (var i = 0; i < searchOptions.length; i++) {
-        searchStates.push(searchOptions[i].value);
+        searchStates.push(searchOptions[i].labelId);
     }
     var ageFilters = [];
     var dsFilters = [];
@@ -396,7 +398,7 @@
     function constructSearchOptions(data) {
         var newOptions = [];
         for (var i = 0; i < data.length; i++) {
-            newOptions.push({'value': data[i], 'label': data[i], selected: false, disabled: false})
+            newOptions.push({'labelId': data[i], 'label': data[i], selected: false, disabled: false})
         }
         return newOptions;
     }

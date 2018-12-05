@@ -51,6 +51,8 @@ public class SearchDS {
      */
     private WebFacetContainer webFacetContainer;
 
+    //facet key => option
+    private Map<String, List<FacetOption>> facetOptionMap;
 
     // SEARCH OBJECTS:
 
@@ -94,6 +96,7 @@ public class SearchDS {
          ****************************************************************/
 
         webFacetContainer = new WebFacetContainer();
+        facetOptionMap = new HashMap<>();
 
         WebFacetSection patientTumorSection = new WebFacetSection();
         patientTumorSection.setName("PATIENT / TUMOR");
@@ -108,70 +111,70 @@ public class SearchDS {
         treatmentInfoSection.setName("TREATMENT INFORMATION");
 
         //cancer by system filter def
-        OneParamFilter cancerBySystem = new OneParamFilter("CANCER BY SYSTEM", "cancer_system",
-                Arrays.asList(
-                        "Breast Cancer",
-                        "Cardiovascular Cancer",
-                        "Connective and Soft Tissue Cancer",
-                        "Digestive System Cancer",
-                        "Endocrine Cancer",
-                        "Eye Cancer",
-                        "Head and Neck Cancer",
-                        "Hematopoietic and Lymphoid System Cancer",
-                        "Nervous System Cancer",
-                        "Peritoneal and Retroperitoneal Cancer",
-                        "Reproductive System Cancer",
-                        "Respiratory Tract Cancer",
-                        "Thoracic Cancer",
-                        "Skin Cancer",
-                        "Urinary System Cancer",
-                        "Unclassified"),
-                new ArrayList<>());
-        patientTumorSection.addComponent(cancerBySystem);
+        List<FacetOption> cancerBySystemOptions = new ArrayList<>();
+        cancerBySystemOptions.add(new FacetOption("Breast Cancer", "Breast_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Cardiovascular Cancer", "Cardiovascular_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Connective and Soft Tissue Cancer", "Connective_and_Soft_Tissue_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Digestive System Cancer", "Digestive_System_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Endocrine Cancer", "Endocrine_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Eye Cancer", "Eye_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Head and Neck Cancer", "Head_and_Neck_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Hematopoietic and Lymphoid System Cancer", "Hematopoietic_and_Lymphoid_System_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Nervous System Cancer", "Nervous_System_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Peritoneal and Retroperitoneal Cancer", "Peritoneal_and_Retroperitoneal_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Reproductive System Cancer", "Reproductive_System_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Respiratory Tract Cancer", "Respiratory_Tract_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Thoracic Cancer", "Thoracic_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Skin Cancer", "Skin_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Urinary System Cancer", "Urinary_System_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Unclassified", "Unclassified"));
 
+        OneParamFilter cancerBySystem = new OneParamFilter("CANCER BY SYSTEM", "cancer_system",
+                cancerBySystemOptions, new ArrayList<>());
+        patientTumorSection.addComponent(cancerBySystem);
+        facetOptionMap.put("cancer_system", cancerBySystemOptions);
 
         //tumor type filter def
-        OneParamFilter tumorType = new OneParamFilter("TUMOR_TYPE", "sample_tumor_type",
-                Arrays.asList(
-                        "Primary",
-                        "Metastatic",
-                        "Recurrent",
-                        "Refractory",
-                        "Not Specified"
-                ),
-                new ArrayList<>());
-        patientTumorSection.addComponent(tumorType);
+        List<FacetOption> tumorTypeOptions = new ArrayList<>();
+        tumorTypeOptions.add(new FacetOption("Primary", "Primary"));
+        tumorTypeOptions.add(new FacetOption("Metastatic", "Metastatic"));
+        tumorTypeOptions.add(new FacetOption("Recurrent", "Recurrent"));
+        tumorTypeOptions.add(new FacetOption("Refractory", "Refractory"));
+        tumorTypeOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
+        OneParamFilter tumorType = new OneParamFilter("TUMOR_TYPE", "sample_tumor_type",
+              tumorTypeOptions, new ArrayList<>());
+        patientTumorSection.addComponent(tumorType);
+        facetOptionMap.put("sample_tumor_type", tumorTypeOptions);
 
         //sex filter def
+        List<FacetOption> patientSexOptions = new ArrayList<>();
+        patientSexOptions.add(new FacetOption("Male", "Male"));
+        patientSexOptions.add(new FacetOption("Female", "Female"));
+        patientSexOptions.add(new FacetOption("Not Specified", "Not_Specified"));
         OneParamFilter sex = new OneParamFilter("SEX", "patient_gender",
-                Arrays.asList(
-                        "Male",
-                        "Female",
-                        "Not Specified"
-                ),
-                new ArrayList<>());
+        patientSexOptions, new ArrayList<>());
         patientTumorSection.addComponent(sex);
-
+        facetOptionMap.put("patient_gender", patientSexOptions);
 
         //age filter def
-        OneParamFilter age = new OneParamFilter("AGE", "patient_age",
-                Arrays.asList(
-                        "0-9",
-                        "10-19",
-                        "20-29",
-                        "30-39",
-                        "40-49",
-                        "50-59",
-                        "60-69",
-                        "70-79",
-                        "80-89",
-                        "90",
-                        "Not Specified"
-                ),
-                new ArrayList<>());
-        patientTumorSection.addComponent(age);
+        List<FacetOption> ageOptions = new ArrayList<>();
+        ageOptions.add(new FacetOption("0-9", "0-9"));
+        ageOptions.add(new FacetOption("10-19", "10-19"));
+        ageOptions.add(new FacetOption("20-29", "20-29"));
+        ageOptions.add(new FacetOption("30-39", "30-39"));
+        ageOptions.add(new FacetOption("40-49", "40-49"));
+        ageOptions.add(new FacetOption("50-59", "50-59"));
+        ageOptions.add(new FacetOption("60-69", "60-69"));
+        ageOptions.add(new FacetOption("70-79", "70-79"));
+        ageOptions.add(new FacetOption("80-89", "80-89"));
+        ageOptions.add(new FacetOption("90", "90"));
+        ageOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
+        OneParamFilter age = new OneParamFilter("AGE", "patient_age",
+        ageOptions, new ArrayList<>());
+        patientTumorSection.addComponent(age);
+        facetOptionMap.put("patient_age",ageOptions);
 
         //datasource filter def
         Set<String> datasourceSet = models.stream()
@@ -182,9 +185,14 @@ public class SearchDS {
         datasourceList.addAll(datasourceSet);
         Collections.sort(datasourceList);
 
-        OneParamFilter datasource = new OneParamFilter("DATASOURCE", "datasource", datasourceList, new ArrayList<>());
-        pdxModelSection.addComponent(datasource);
+        List<FacetOption> datasourceOptions = new ArrayList<>();
+        for(String ds : datasourceList){
+            datasourceOptions.add(new FacetOption(ds, ds));
+        }
 
+        OneParamFilter datasource = new OneParamFilter("DATASOURCE", "datasource", datasourceOptions, new ArrayList<>());
+        pdxModelSection.addComponent(datasource);
+        facetOptionMap.put("datasource", datasourceOptions);
 
         //project filter def
         Set<String> projectsSet = new HashSet<>();
@@ -201,20 +209,26 @@ public class SearchDS {
 
         //TODO: skip filter if no projects were defined?
 
-        OneParamFilter projects = new OneParamFilter("PROJECT", "project", projectList, new ArrayList<>());
-        pdxModelSection.addComponent(projects);
+        List<FacetOption> projectOptions = new ArrayList<>();
 
+        for(String p: projectList){
+            projectOptions.add(new FacetOption(p, p));
+        }
+        OneParamFilter projects = new OneParamFilter("PROJECT", "project", projectOptions, new ArrayList<>());
+        pdxModelSection.addComponent(projects);
+        facetOptionMap.put("project", projectOptions);
 
         //dataset available filter def
+        List<FacetOption> datasetAvailableOptions = new ArrayList<>();
+        datasetAvailableOptions.add(new FacetOption("Gene Mutation", "Gene_Mutation"));
+        datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
+        datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
+
         OneParamFilter datasetAvailable = new OneParamFilter("DATASET AVAILABLE", "data_available",
-                Arrays.asList(
-                        "Gene Mutation",
-                        "Dosing Studies",
-                        "Patient Treatment"),
-                new ArrayList<>());
+        datasetAvailableOptions, new ArrayList<>());
 
         pdxModelSection.addComponent(datasetAvailable);
-
+        facetOptionMap.put("data_available", datasetAvailableOptions);
 
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
@@ -224,18 +238,21 @@ public class SearchDS {
 
 
         //Breast cancer markers
+        List<FacetOption> breastCancerMarkerOptions = new ArrayList<>();
+        breastCancerMarkerOptions.add(new FacetOption("HER+ PR+ ER+", "HERpos_PRneg_ERneg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER+ PR+ ER-", "HERpos_PRpos_ERneg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER+ PR- ER+", "HERpos_PRneg_ERpos"));
+        breastCancerMarkerOptions.add(new FacetOption("HER+ PR- ER-", "HERpos_PRneg_ERneg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER- PR+ ER+", "HERneg_PRpos_ERpos"));
+        breastCancerMarkerOptions.add(new FacetOption("HER- PR+ ER-", "HERneg_PRpos_ERneg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER- PR- ER+", "HERneg_PRneg_ERpos"));
+        breastCancerMarkerOptions.add(new FacetOption("HER- PR- ER-", "HERneg_PRneg_ERneg"));
 
-        OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_marker",new ArrayList<>(Arrays.asList(
-                "HER+ PR+ ER+",
-                "HER+ PR+ ER-",
-                "HER+ PR- ER+",
-                "HER+ PR- ER-",
-                "HER- PR+ ER+",
-                "HER- PR+ ER-",
-                "HER- PR- ER+",
-                "HER- PR- ER-")),
-                new ArrayList<>());
+        OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_marker",
+                breastCancerMarkerOptions, new ArrayList<>());
         molecularDataSection.addComponent(breastCancerMarkers);
+        facetOptionMap.put("breast_cancer_marker",breastCancerMarkerOptions);
+
 
         //model dosing study def
 
@@ -270,7 +287,7 @@ public class SearchDS {
         dosingStudySearch.setData(getModelDrugResponsesFromDP());
 
         //gene mutation search
-        //the gene mutation is a ThreeParamFilter component, but a FourParamLinkedSearch must be used because of the hidden platform value
+        //the gene mutation is a ThreeParamFilter component, but a FourParamLinkedSearch must be used because of the hidden platform labelId
         geneMutationSearch = new FourParamLinkedSearch("geneMutation", "mutation");
 
         geneMutationSearch.setData(getMutationsFromDP());
@@ -305,6 +322,21 @@ public class SearchDS {
             String facetName = facet.getKey().getName();
             List<String> selected = facet.getValue();
 
+            List<String> decodedSelected = new ArrayList<>();
+            //if there is an overwrite rule for the filter, replace the selected values with the replacement
+            if(facetOptionMap.get(facetName) != null){
+
+                for(FacetOption fo: facetOptionMap.get(facetName)){
+
+                    if(selected.contains(fo.getLabelId()))
+                    decodedSelected.add(fo.getLabelId());
+                }
+            }
+            //no overwrite rule
+            else{
+                decodedSelected = selected;
+            }
+
 
             for(WebFacetSection wfs :webFacetContainerClone.getWebFacetSections()){
                 for(GeneralFilter filter: wfs.getFilterComponents()){
@@ -315,7 +347,7 @@ public class SearchDS {
                         if(filter instanceof OneParamFilter){
 
                             OneParamFilter f = (OneParamFilter)filter;
-                            f.setSelected(selected);
+                            f.setSelected(decodedSelected);
 
                         }
                         else if(filter instanceof TwoParamUnlinkedFilter){
@@ -369,70 +401,70 @@ public class SearchDS {
 
                 case query:
                     //List<String> searchParams, Set<ModelForQuery> mfqSet, Function<ModelForQuery, List<String>> searchFunc
-                    result = oneParamSearch.searchOnCollection(filters.get(SearchFacetName.query), result, ModelForQuery::getAllOntologyTermAncestors);
+                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("query"), filters.get(SearchFacetName.query), result, ModelForQuery::getAllOntologyTermAncestors);
                     break;
 
                 case datasource:
-                    result = oneParamSearch.searchOnString(filters.get(SearchFacetName.datasource), result, ModelForQuery::getDatasource);
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("datasource"), filters.get(SearchFacetName.datasource), result, ModelForQuery::getDatasource);
                     break;
 
                 case diagnosis:
-                    result = oneParamSearch.searchOnString(filters.get(SearchFacetName.diagnosis), result, ModelForQuery::getMappedOntologyTerm);
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("diagnosis"), filters.get(SearchFacetName.diagnosis), result, ModelForQuery::getMappedOntologyTerm);
                     break;
 
                 case patient_age:
-                    result = oneParamSearch.searchOnString(filters.get(SearchFacetName.patient_age), result, ModelForQuery::getPatientAge);
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("patient_age"), filters.get(SearchFacetName.patient_age), result, ModelForQuery::getPatientAge);
                     break;
                 case patient_treatment_status:
-                    result = oneParamSearch.searchOnString(filters.get(SearchFacetName.patient_treatment_status), result, ModelForQuery::getPatientTreatmentStatus);
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("patient_treatment_status"), filters.get(SearchFacetName.patient_treatment_status), result, ModelForQuery::getPatientTreatmentStatus);
                     break;
 
                 case patient_gender:
-                    result = oneParamSearch.searchOnString(filters.get(SearchFacetName.patient_gender), result, ModelForQuery::getPatientGender);
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("patient_gender"), filters.get(SearchFacetName.patient_gender), result, ModelForQuery::getPatientGender);
                     break;
 
                 case sample_origin_tissue:
-                    result = oneParamSearch.searchOnString(filters.get(SearchFacetName.sample_origin_tissue), result, ModelForQuery::getSampleOriginTissue);
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("sample_origin_tissue"), filters.get(SearchFacetName.sample_origin_tissue), result, ModelForQuery::getSampleOriginTissue);
                     break;
 
                 case sample_classification:
-                    result = oneParamSearch.searchOnString(filters.get(SearchFacetName.sample_classification), result, ModelForQuery::getSampleClassification);
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("sample_classification"), filters.get(SearchFacetName.sample_classification), result, ModelForQuery::getSampleClassification);
                     break;
 
                 case sample_tumor_type:
-                    result = oneParamSearch.searchOnString(filters.get(SearchFacetName.sample_tumor_type), result, ModelForQuery::getSampleTumorType);
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("sample_tumor_type"), filters.get(SearchFacetName.sample_tumor_type), result, ModelForQuery::getSampleTumorType);
                     break;
 
                 case model_implantation_site:
-                    result = oneParamSearch.searchOnString(filters.get(SearchFacetName.model_implantation_site), result, ModelForQuery::getModelImplantationSite);
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("model_implantation_site"), filters.get(SearchFacetName.model_implantation_site), result, ModelForQuery::getModelImplantationSite);
                     break;
 
                 case model_implantation_type:
-                    result = oneParamSearch.searchOnString(filters.get(SearchFacetName.model_implantation_site), result, ModelForQuery::getModelImplantationSite);
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("model_implantation_type"), filters.get(SearchFacetName.model_implantation_type), result, ModelForQuery::getModelImplantationSite);
                     break;
 
                 case model_host_strain:
-                    result = oneParamSearch.searchOnCollection(filters.get(SearchFacetName.model_host_strain), result, ModelForQuery::getModelHostStrain);
+                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("model_host_strain"), filters.get(SearchFacetName.model_host_strain), result, ModelForQuery::getModelHostStrain);
                     break;
 
                 case cancer_system:
-                    result = oneParamSearch.searchOnCollection(filters.get(SearchFacetName.cancer_system), result, ModelForQuery::getCancerSystem);
+                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("cancer_system"), filters.get(SearchFacetName.cancer_system), result, ModelForQuery::getCancerSystem);
                     break;
 
                 case organ:
-                    result = oneParamSearch.searchOnString(filters.get(SearchFacetName.organ), result, ModelForQuery::getCancerOrgan);
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("organ"), filters.get(SearchFacetName.organ), result, ModelForQuery::getCancerOrgan);
                     break;
 
                 case cell_type:
-                    result = oneParamSearch.searchOnString(filters.get(SearchFacetName.cell_type), result, ModelForQuery::getCancerCellType);
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("cell_type"), filters.get(SearchFacetName.cell_type), result, ModelForQuery::getCancerCellType);
                     break;
 
                 case project:
-                    result = oneParamSearch.searchOnCollection(filters.get(SearchFacetName.project), result, ModelForQuery::getProjects);
+                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("project"), filters.get(SearchFacetName.project), result, ModelForQuery::getProjects);
                     break;
 
                 case data_available:
-                    result = oneParamSearch.searchOnCollection(filters.get(SearchFacetName.data_available), result, ModelForQuery::getDataAvailable);
+                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("data_available"), filters.get(SearchFacetName.data_available), result, ModelForQuery::getDataAvailable);
                     break;
 
                 case mutation:
@@ -687,7 +719,7 @@ public class SearchDS {
         return preds.stream().reduce(Predicate::or).orElse(x -> false);
     }
 
-
+/*
     public List<FacetOption> getFacetOptions(SearchFacetName facet,List<String> options, Map<SearchFacetName, List<String>> configuredFacets){
 
         List<FacetOption> facetOptions = new ArrayList<>();
@@ -719,96 +751,7 @@ public class SearchDS {
         return facetOptions;
     }
 
-
-    /**
-     * Get the count of models for a supplied facet.
-     * <p>
-     * This method will return counts of facet options for the supplied facet
-     *
-     * @param facet    the facet to count
-     * @param results  set of models already filtered
-     * @param selected what facets have been filtered already
-     * @return a list of {@link FacetOption} indicating counts and selected state
-     */
-    @Cacheable("facet_counts")
-    public List<FacetOption> getFacetOptions(SearchFacetName facet, List<String> options, Set<ModelForQuery> results, List<String> selected) {
-
-
-        Set<ModelForQuery> allResults = models;
-
-        List<FacetOption> map = new ArrayList<>();
-
-        // Initialise all facet option counts to 0 and set selected attribute on all options that the user has chosen
-        if (options != null) {
-            for (String option : options) {
-                Long count = allResults
-                        .stream()
-                        .filter(x ->
-                                Stream.of(x.getBy(facet).split("::"))
-                                        .collect(Collectors.toSet())
-                                        .contains(option))
-                        .count();
-                map.add(new FacetOption(option, selected != null ? 0 : count.intValue(), count.intValue(), selected != null && selected.contains(option) ? Boolean.TRUE : Boolean.FALSE, facet));
-            }
-        }
-
-        // We want the counts on the facets to look something like:
-        // Gender
-        //   [ ] Male (1005 of 1005)
-        //   [ ] Female (840 of 840)
-        //   [ ] Not specified (31 of 31)
-        // Then when a facet is clicked:
-        // Gender
-        //   [X] Male (1005 of (1005)
-        //   [ ] Female (0 of 840)
-        //   [ ] Not specified (2 of 31)
-        //
-
-
-        // Iterate through results adding count to the appropriate option
-        for (ModelForQuery mfq : results) {
-
-            String s = mfq.getBy(facet);
-
-            // Skip empty facets
-            if (s == null || s.equals("")) {
-                continue;
-            }
-
-            // List of ontology terms may come from the service.  These will by separated by "::" delimiter
-            if (s.contains("::")) {
-
-                for (String ss : s.split("::")) {
-
-                    // There should be only one element per facet name
-                    map.forEach(x -> {
-                        if (x.getName().equals(ss)) {
-                            x.increment();
-                        }
-                    });
-                }
-
-            } else {
-
-                // Initialise on the first time we see this facet name
-                if (map.stream().noneMatch(x -> x.getName().equals(s))) {
-                    map.add(new FacetOption(s, 0, 0, selected != null && selected.contains(s) ? Boolean.TRUE : Boolean.FALSE, facet));
-                }
-
-                // There should be only one element per facet name
-                map.forEach(x -> {
-                    if (x.getName().equals(s)) {
-                        x.increment();
-                    }
-                });
-            }
-        }
-
-
-//        Collections.sort(map);
-
-        return map;
-    }
+*/
 
 
     /**

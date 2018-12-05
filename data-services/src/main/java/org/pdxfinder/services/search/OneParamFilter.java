@@ -1,5 +1,7 @@
 package org.pdxfinder.services.search;
 
+import org.pdxfinder.services.ds.FacetOption;
+
 import java.util.List;
 
 /*
@@ -8,22 +10,22 @@ import java.util.List;
 public class OneParamFilter extends GeneralFilter{
 
 
-    private List<String> options;
+    private List<FacetOption> options;
 
     private List<String> selected;
 
 
-    public OneParamFilter(String name, String urlParam, List<String> options, List<String> selected) {
+    public OneParamFilter(String name, String urlParam, List<FacetOption> options, List<String> selected) {
         super(name, urlParam);
         this.options = options;
         this.selected = selected;
     }
 
-    public List<String> getOptions() {
+    public List<FacetOption> getOptions() {
         return options;
     }
 
-    public void setOptions(List<String> options) {
+    public void setOptions(List<FacetOption> options) {
         this.options = options;
     }
 

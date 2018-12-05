@@ -1,11 +1,9 @@
 package org.pdxfinder.services.search;
 
+import org.pdxfinder.services.ds.FacetOption;
 import org.pdxfinder.services.ds.ModelForQuery;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /*
@@ -20,12 +18,29 @@ public class OneParamSearch extends GeneralSearch{
 
     /**
      * Performs a search on a ModelForQuery field that's type is a String
+     * @param replacementStrings a list of FacetOptions to be able to decode the labelIds to labels
      * @param searchParams A list of values that we are matching in the given MFQ object field
      * @param mfqSet A set of MFQ objects that we perform the search on
      * @param searchFunc the method to be called on the MFQ objects (what are you filtering on)
      * @return a set of models after the search was performed
      */
-    public Set<ModelForQuery> searchOnString(List<String> searchParams, Set<ModelForQuery> mfqSet, Function<ModelForQuery, String> searchFunc){
+    public Set<ModelForQuery> searchOnString(List<FacetOption> replacementStrings, List<String> searchParams, Set<ModelForQuery> mfqSet, Function<ModelForQuery, String> searchFunc){
+
+        List<String> decodedSearchParams = new ArrayList<>();
+        if(replacementStrings == null){
+            decodedSearchParams = searchParams;
+        }
+        else{
+
+            for(String param: searchParams){
+                for(FacetOption fo :replacementStrings){
+                    if(param.equals(fo.getLabelId())){
+                        decodedSearchParams.add(fo.getLabel());
+                    }
+                }
+            }
+        }
+
 
         Set<ModelForQuery> results = new HashSet<>();
 
@@ -33,7 +48,7 @@ public class OneParamSearch extends GeneralSearch{
 
             String mfqValue = searchFunc.apply(mfq);
 
-            if(searchParams.contains(mfqValue)){
+            if(decodedSearchParams.contains(mfqValue)){
                 results.add(mfq);
             }
 
@@ -51,7 +66,24 @@ public class OneParamSearch extends GeneralSearch{
      * @param searchFunc the method to be called on the MFQ objects (what are you filtering on)
      * @return a set of models after the search was performed
      */
-    public Set<ModelForQuery> searchOnCollection(List<String> searchParams, Set<ModelForQuery> mfqSet, Function<ModelForQuery, Collection<String>> searchFunc){
+    public Set<ModelForQuery> searchOnCollection(List<FacetOption> replacementStrings, List<String> searchParams, Set<ModelForQuery> mfqSet, Function<ModelForQuery, Collection<String>> searchFunc){
+
+        List<String> decodedSearchParams = new ArrayList<>();
+
+        if(replacementStrings == null){
+            decodedSearchParams = searchParams;
+        }
+        else{
+
+            for(String param: searchParams){
+                for(FacetOption fo :replacementStrings){
+                    if(param.equals(fo.getLabelId())){
+                        decodedSearchParams.add(fo.getLabel());
+                    }
+                }
+            }
+        }
+
 
         Set<ModelForQuery> results = new HashSet<>();
 
@@ -63,7 +95,7 @@ public class OneParamSearch extends GeneralSearch{
 
                 for(String mfqValue : mfqValues){
 
-                    if(searchParams.contains(mfqValue)){
+                    if(decodedSearchParams.contains(mfqValue)){
                         results.add(mfq);
                     }
                 }
