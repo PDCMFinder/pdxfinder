@@ -144,7 +144,11 @@ public class SearchService {
         wsDTO.setEndIndex(end);
 
 
-        String textSearchDescription = getTextualDescription("", results);
+        String textSearchDescription = getTextualDescription(facetString, results);
+
+        if(textSearchDescription == null){
+            textSearchDescription = "PDXFinder contains "+searchDS.getModels().size()+" models";
+        }
         wsDTO.setTextSearchDescription(textSearchDescription);
 
         wsDTO.setMainSearchFieldOptions(autoCompleteService.getAutoSuggestions());
