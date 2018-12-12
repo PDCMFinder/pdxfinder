@@ -65,7 +65,7 @@ public class SearchDS {
     /**
      * Four param search object for performing a search on gene mutations
      */
-    private FourParamLinkedSearch geneMutationSearch;
+    private ThreeParamLinkedSearch geneMutationSearch;
 
     /**
      * Two param search object for performing a search on dosing studies
@@ -232,7 +232,8 @@ public class SearchDS {
 
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
-        ThreeParamLinkedFilter geneMutation = new ThreeParamLinkedFilter("GENE MUTATION", "mutation", false, new HashMap<>(), new HashMap<>());
+        ThreeParamLinkedFilter geneMutation = new ThreeParamLinkedFilter("GENE MUTATION", "mutation", false,
+                "GENE", "TYPE", "VARIANT", new HashMap<>(), new HashMap<>());
 
         molecularDataSection.addComponent(geneMutation);
 
@@ -288,7 +289,7 @@ public class SearchDS {
 
         //gene mutation search
         //the gene mutation is a ThreeParamFilter component, but a FourParamLinkedSearch must be used because of the hidden platform labelId
-        geneMutationSearch = new FourParamLinkedSearch("geneMutation", "mutation");
+        geneMutationSearch = new ThreeParamLinkedSearch("geneMutation", "mutation");
 
         geneMutationSearch.setData(getMutationsFromDP());
 
@@ -604,11 +605,11 @@ public class SearchDS {
     }
 
 
-    private Map<String, Map<String, Map<String, Map<String, Set<Long>>>>> getMutationsFromDP(){
+    private Map<String, Map<String, Map<String, Set<Long>>>> getMutationsFromDP(){
 
         log.info("Initializing mutations");
         //platform=> marker=> variant=>{set of model ids}
-        Map<String, Map<String, Map<String, Map<String, Set<Long>>>>> mutations = new HashMap<>();
+        Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<>();
 
         String mut = dataProjectionRepository.findByLabel("PlatformMarkerVariantModel").getValue();
 
@@ -616,7 +617,7 @@ public class SearchDS {
 
             ObjectMapper mapper = new ObjectMapper();
 
-            //mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Map<String, Set<Long>>>>>>(){});
+            mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<Long>>>>>(){});
 
             //log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
 
