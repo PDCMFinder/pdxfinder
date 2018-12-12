@@ -8,33 +8,39 @@ import java.util.Map;
  */
 public class TwoParamUnlinkedFilter extends GeneralFilter{
 
-    private List<String> param1;
-    private List<String> param2;
+    private String param1Name;
+    private String param2Name;
 
+    private List<String> options1;
+    private List<String> options2;
+
+    //"option1"=>"option2"
     private Map<String, List<String>> selected;
 
 
-    public TwoParamUnlinkedFilter(String name, String urlParam, List<String> param1, List<String> param2, Map<String, List<String>> selected) {
-        super(name, urlParam);
-        this.param1 = param1;
-        this.param2 = param2;
+    public TwoParamUnlinkedFilter(String name, String urlParam, Boolean isActive, String param1Name, String param2Name, List<String> options1, List<String> options2, Map<String, List<String>> selected) {
+        super(name, urlParam, isActive);
+        this.param1Name = param1Name;
+        this.param2Name = param2Name;
+        this.options1 = options1;
+        this.options2 = options2;
         this.selected = selected;
     }
 
-    public List<String> getParam1() {
-        return param1;
+    public List<String> getOptions1() {
+        return options1;
     }
 
-    public void setParam1(List<String> param1) {
-        this.param1 = param1;
+    public void setOptions1(List<String> options1) {
+        this.options1 = options1;
     }
 
-    public List<String> getParam2() {
-        return param2;
+    public List<String> getOptions2() {
+        return options2;
     }
 
-    public void setParam2(List<String> param2) {
-        this.param2 = param2;
+    public void setOptions2(List<String> options2) {
+        this.options2 = options2;
     }
 
     public Map<String, List<String>> getSelected() {
@@ -45,6 +51,19 @@ public class TwoParamUnlinkedFilter extends GeneralFilter{
         this.selected = selected;
     }
 
+    public String getParam1Name() {
+        return param1Name;
+    }
 
+    public void setParam1Name(String param1Name) {
+        this.param1Name = param1Name;
+    }
 
+    public String getParam2Name() {
+        return param2Name;
+    }
+
+    public void setParam2Name(String param2Name) {
+        this.param2Name = param2Name;
+    }
 }

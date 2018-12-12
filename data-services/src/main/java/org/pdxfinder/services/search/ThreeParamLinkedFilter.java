@@ -13,8 +13,8 @@ public class ThreeParamLinkedFilter extends GeneralFilter{
     private Map<String, Map<String, List<String>>> selected;
 
 
-    public ThreeParamLinkedFilter(String name, String urlParam, Map<String, Map<String, List<String>>> options, Map<String, Map<String, List<String>>> selected) {
-        super(name, urlParam);
+    public ThreeParamLinkedFilter(String name, String urlParam, Boolean isActive, Map<String, Map<String, List<String>>> options, Map<String, Map<String, List<String>>> selected) {
+        super(name, urlParam, isActive);
         this.options = options;
         this.selected = selected;
     }

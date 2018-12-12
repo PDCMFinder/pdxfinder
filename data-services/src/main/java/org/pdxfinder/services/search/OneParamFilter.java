@@ -15,8 +15,8 @@ public class OneParamFilter extends GeneralFilter{
     private List<String> selected;
 
 
-    public OneParamFilter(String name, String urlParam, List<FacetOption> options, List<String> selected) {
-        super(name, urlParam);
+    public OneParamFilter(String name, String urlParam, Boolean isActive, List<FacetOption> options, List<String> selected) {
+        super(name, urlParam, isActive);
         this.options = options;
         this.selected = selected;
     }

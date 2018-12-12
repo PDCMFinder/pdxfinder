@@ -11,9 +11,12 @@ public abstract class GeneralFilter {
 
     public String urlParam;
 
-    public GeneralFilter(String name, String urlParam) {
+    public Boolean isActive;
+
+    public GeneralFilter(String name, String urlParam, Boolean isActive) {
         this.name = name;
         this.urlParam = urlParam;
+        this.isActive = isActive;
     }
 
     public String getName() {
@@ -30,5 +33,13 @@ public abstract class GeneralFilter {
 
     public void setUrlParam(String urlParam) {
         this.urlParam = urlParam;
+    }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
     }
 }

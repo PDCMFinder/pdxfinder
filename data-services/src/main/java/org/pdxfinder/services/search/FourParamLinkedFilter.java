@@ -14,11 +14,11 @@ public class FourParamLinkedFilter extends GeneralFilter{
 
 
     public FourParamLinkedFilter(String name, String urlParam) {
-        super(name, urlParam);
+        super(name, urlParam, false);
     }
 
     public FourParamLinkedFilter(String name, String urlParam, Map<String, Map<String, Map<String, List<String>>>> options, Map<Map, Map<String, Map<String, List<String>>>> selected) {
-        super(name, urlParam);
+        super(name, urlParam, false);
         this.options = options;
         this.selected = selected;
     }

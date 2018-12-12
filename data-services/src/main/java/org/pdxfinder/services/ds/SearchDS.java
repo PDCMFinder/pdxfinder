@@ -129,7 +129,7 @@ public class SearchDS {
         cancerBySystemOptions.add(new FacetOption("Urinary System Cancer", "Urinary_System_Cancer"));
         cancerBySystemOptions.add(new FacetOption("Unclassified", "Unclassified"));
 
-        OneParamFilter cancerBySystem = new OneParamFilter("CANCER BY SYSTEM", "cancer_system",
+        OneParamFilter cancerBySystem = new OneParamFilter("CANCER BY SYSTEM", "cancer_system", false,
                 cancerBySystemOptions, new ArrayList<>());
         patientTumorSection.addComponent(cancerBySystem);
         facetOptionMap.put("cancer_system", cancerBySystemOptions);
@@ -142,7 +142,7 @@ public class SearchDS {
         tumorTypeOptions.add(new FacetOption("Refractory", "Refractory"));
         tumorTypeOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
-        OneParamFilter tumorType = new OneParamFilter("TUMOR_TYPE", "sample_tumor_type",
+        OneParamFilter tumorType = new OneParamFilter("TUMOR_TYPE", "sample_tumor_type", false,
               tumorTypeOptions, new ArrayList<>());
         patientTumorSection.addComponent(tumorType);
         facetOptionMap.put("sample_tumor_type", tumorTypeOptions);
@@ -152,7 +152,7 @@ public class SearchDS {
         patientSexOptions.add(new FacetOption("Male", "Male"));
         patientSexOptions.add(new FacetOption("Female", "Female"));
         patientSexOptions.add(new FacetOption("Not Specified", "Not_Specified"));
-        OneParamFilter sex = new OneParamFilter("SEX", "patient_gender",
+        OneParamFilter sex = new OneParamFilter("SEX", "patient_gender", false,
         patientSexOptions, new ArrayList<>());
         patientTumorSection.addComponent(sex);
         facetOptionMap.put("patient_gender", patientSexOptions);
@@ -171,7 +171,7 @@ public class SearchDS {
         ageOptions.add(new FacetOption("90", "90"));
         ageOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
-        OneParamFilter age = new OneParamFilter("AGE", "patient_age",
+        OneParamFilter age = new OneParamFilter("AGE", "patient_age", false,
         ageOptions, new ArrayList<>());
         patientTumorSection.addComponent(age);
         facetOptionMap.put("patient_age",ageOptions);
@@ -190,7 +190,7 @@ public class SearchDS {
             datasourceOptions.add(new FacetOption(ds, ds));
         }
 
-        OneParamFilter datasource = new OneParamFilter("DATASOURCE", "datasource", datasourceOptions, new ArrayList<>());
+        OneParamFilter datasource = new OneParamFilter("DATASOURCE", "datasource", false, datasourceOptions, new ArrayList<>());
         pdxModelSection.addComponent(datasource);
         facetOptionMap.put("datasource", datasourceOptions);
 
@@ -214,7 +214,7 @@ public class SearchDS {
         for(String p: projectList){
             projectOptions.add(new FacetOption(p, p));
         }
-        OneParamFilter projects = new OneParamFilter("PROJECT", "project", projectOptions, new ArrayList<>());
+        OneParamFilter projects = new OneParamFilter("PROJECT", "project", false, projectOptions, new ArrayList<>());
         pdxModelSection.addComponent(projects);
         facetOptionMap.put("project", projectOptions);
 
@@ -224,7 +224,7 @@ public class SearchDS {
         datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
         datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
 
-        OneParamFilter datasetAvailable = new OneParamFilter("DATASET AVAILABLE", "data_available",
+        OneParamFilter datasetAvailable = new OneParamFilter("DATASET AVAILABLE", "data_available", false,
         datasetAvailableOptions, new ArrayList<>());
 
         pdxModelSection.addComponent(datasetAvailable);
@@ -232,7 +232,7 @@ public class SearchDS {
 
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
-        ThreeParamLinkedFilter geneMutation = new ThreeParamLinkedFilter("GENE MUTATION", "mutation", new HashMap<>(), new HashMap<>());
+        ThreeParamLinkedFilter geneMutation = new ThreeParamLinkedFilter("GENE MUTATION", "mutation", false, new HashMap<>(), new HashMap<>());
 
         molecularDataSection.addComponent(geneMutation);
 
@@ -248,7 +248,7 @@ public class SearchDS {
         breastCancerMarkerOptions.add(new FacetOption("HER- PR- ER+", "HERneg_PRneg_ERpos"));
         breastCancerMarkerOptions.add(new FacetOption("HER- PR- ER-", "HERneg_PRneg_ERneg"));
 
-        OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_marker",
+        OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_marker", false,
                 breastCancerMarkerOptions, new ArrayList<>());
         molecularDataSection.addComponent(breastCancerMarkers);
         facetOptionMap.put("breast_cancer_marker",breastCancerMarkerOptions);
@@ -259,7 +259,7 @@ public class SearchDS {
         Map<String, Map<String, Set<Long>>> modelDrugResponses = getModelDrugResponsesFromDP();
         List<String> drugNames = new ArrayList<>(modelDrugResponses.keySet());
 
-        TwoParamUnlinkedFilter modelDosingStudy = new TwoParamUnlinkedFilter("MODEL DOSING STUDY", "drug", drugNames, Arrays.asList(
+        TwoParamUnlinkedFilter modelDosingStudy = new TwoParamUnlinkedFilter("MODEL DOSING STUDY", "drug", false, "DRUG", "RESPONSE", drugNames, Arrays.asList(
                 "Complete Response",
                 "Partial Response",
                 "Progressive Disease",
@@ -343,6 +343,7 @@ public class SearchDS {
 
 
                     if(filter.getUrlParam().equals(facetName)){
+                        filter.setActive(true);
 
                         if(filter instanceof OneParamFilter){
 

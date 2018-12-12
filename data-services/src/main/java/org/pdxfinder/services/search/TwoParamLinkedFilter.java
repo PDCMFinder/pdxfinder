@@ -13,8 +13,8 @@ public class TwoParamLinkedFilter extends GeneralFilter{
     private Map<String, List<String>> selected;
 
 
-    public TwoParamLinkedFilter(String name, String urlParam, Map<String, List<String>> options, Map<String, List<String>> selected) {
-        super(name, urlParam);
+    public TwoParamLinkedFilter(String name, String urlParam, Boolean isActive, Map<String, List<String>> options, Map<String, List<String>> selected) {
+        super(name, urlParam, isActive);
         this.options = options;
         this.selected = selected;
     }
