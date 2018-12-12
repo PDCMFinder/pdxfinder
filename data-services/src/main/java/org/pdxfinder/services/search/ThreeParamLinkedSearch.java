@@ -42,9 +42,21 @@ public class ThreeParamLinkedSearch extends GeneralSearch{
 
             String[] paramArr = paramString.split("___");
 
-            String key1 = paramArr[0];
-            String key2 = paramArr[1];
-            String key3 = paramArr[2];
+            String key1, key2, key3;
+            //it is possible that the first parameter is missing, assume it is ALL and shift the rest of the params by one
+            if(paramArr.length == 2){
+
+                key1 = "ALL";
+                key2 = paramArr[0];
+                key3 = paramArr[1];
+            }
+            else{
+                //assume all parameters were passed in order
+                key1 = paramArr[0];
+                key2 = paramArr[1];
+                key3 = paramArr[2];
+            }
+
 
             if(key1.toLowerCase().equals("all")){
 
@@ -61,6 +73,7 @@ public class ThreeParamLinkedSearch extends GeneralSearch{
                                 String datakey3 = arr3.getKey();
 
                                 Set<Long> foundModelIDs = arr3.getValue();
+                                modelsToKeep.addAll(foundModelIDs);
 
                                 updateModelForQuery(foundModelIDs, models, datakey1+":"+key2+" "+datakey3, setter);
                             }
@@ -70,6 +83,7 @@ public class ThreeParamLinkedSearch extends GeneralSearch{
 
                             Set<Long> foundModelIDs = arr.getValue().get(key2).get(key3);
                             updateModelForQuery(foundModelIDs, models, datakey1+":"+key2+" "+key3, setter);
+                            modelsToKeep.addAll(foundModelIDs);
                         }
 
 

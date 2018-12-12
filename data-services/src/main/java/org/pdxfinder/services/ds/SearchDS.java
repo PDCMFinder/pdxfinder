@@ -232,8 +232,8 @@ public class SearchDS {
 
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
-        ThreeParamLinkedFilter geneMutation = new ThreeParamLinkedFilter("GENE MUTATION", "mutation", false,
-                "GENE", "TYPE", "VARIANT", new HashMap<>(), new HashMap<>());
+        TwoParamLinkedFilter geneMutation = new TwoParamLinkedFilter("GENE MUTATION", "mutation", false,
+                 "GENE", "VARIANT", new HashMap<>(), new HashMap<>());
 
         molecularDataSection.addComponent(geneMutation);
 
@@ -619,7 +619,7 @@ public class SearchDS {
 
             mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<Long>>>>>(){});
 
-            //log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
+            log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
 
         }
         catch(Exception e){

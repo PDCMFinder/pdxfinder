@@ -8,16 +8,21 @@ import java.util.Map;
  */
 public class TwoParamLinkedFilter extends GeneralFilter{
 
+    private String param1Name;
+    private String param2Name;
+
     private Map<String, List<String>> options;
 
     private Map<String, List<String>> selected;
 
-
-    public TwoParamLinkedFilter(String name, String urlParam, Boolean isActive, Map<String, List<String>> options, Map<String, List<String>> selected) {
+    public TwoParamLinkedFilter(String name, String urlParam, Boolean isActive, String param1Name, String param2Name, Map<String, List<String>> options, Map<String, List<String>> selected) {
         super(name, urlParam, isActive);
+        this.param1Name = param1Name;
+        this.param2Name = param2Name;
         this.options = options;
         this.selected = selected;
     }
+
 
     public Map<String, List<String>> getOptions() {
         return options;
@@ -33,5 +38,21 @@ public class TwoParamLinkedFilter extends GeneralFilter{
 
     public void setSelected(Map<String, List<String>> selected) {
         this.selected = selected;
+    }
+
+    public String getParam1Name() {
+        return param1Name;
+    }
+
+    public void setParam1Name(String param1Name) {
+        this.param1Name = param1Name;
+    }
+
+    public String getParam2Name() {
+        return param2Name;
+    }
+
+    public void setParam2Name(String param2Name) {
+        this.param2Name = param2Name;
     }
 }
