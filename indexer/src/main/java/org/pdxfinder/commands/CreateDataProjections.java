@@ -36,8 +36,8 @@ public class CreateDataProjections implements CommandLineRunner{
     @Value("${user.home}")
     String homeDir;
 
-    //"platform"=>"marker"=>"type"=>"variant"=>"set of model ids"
-    private Map<String, Map<String, Map<String, Map<String, Set<Long>>>>> mutatedPlatformMarkerVariantModelDP = new HashMap<>();
+    //"platform"=>"marker"=>"variant"=>"set of model ids"
+    private Map<String, Map<String, Map<String, Set<Long>>>> mutatedPlatformMarkerVariantModelDP = new HashMap<>();
 
     //"marker"=>"set of variants"
     private Map<String, Set<String>> mutatedMarkerVariantDP = new HashMap<>();
@@ -138,7 +138,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
                             addToMutatedMarkerVariantDP(markerName, variantName);
 
-                            addToFourParamDP(mutatedPlatformMarkerVariantModelDP, platformName, markerName,"MUT", variantName, modelId);
+                            addToThreeParamDP(mutatedPlatformMarkerVariantModelDP, platformName, markerName, variantName, modelId);
 
                         }
 
@@ -153,7 +153,52 @@ public class CreateDataProjections implements CommandLineRunner{
         }
     }
 
+    private void addToThreeParamDP(Map<String, Map<String, Map<String, Set<Long>>>> collection, String key1, String key2, String key3, Long modelId){
 
+        if(collection.containsKey(key1)){
+
+            if(collection.get(key1).containsKey(key2)){
+
+                if(collection.get(key1).get(key2).containsKey(key3)){
+
+                    collection.get(key1).get(key2).get(key3).add(modelId);
+                }
+                else{
+
+                    Set<Long> models = new HashSet<>(Arrays.asList(modelId));
+                    collection.get(key1).get(key2).put(key3,models);
+                }
+
+            }
+            else{
+
+                Set<Long> models = new HashSet<>(Arrays.asList(modelId));
+
+                Map<String, Set<Long>> map3 = new HashMap();
+                map3.put(key3,models);
+
+                collection.get(key1).put(key2, map3);
+
+            }
+
+
+
+        }
+        else{
+
+            Set<Long> models = new HashSet<>(Arrays.asList(modelId));
+
+            Map<String, Set<Long>> map3 = new HashMap();
+            map3.put(key3,models);
+
+            Map map2 = new HashMap();
+            map2.put(key2, map3);
+
+            collection.put(key1, map2);
+        }
+
+
+    }
 
     private void addToFourParamDP(Map<String, Map<String, Map<String, Map<String, Set<Long>>>>> collection, String key1, String key2, String key3, String key4, Long modelId){
 
