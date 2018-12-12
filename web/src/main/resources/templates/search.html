@@ -171,12 +171,13 @@
                             <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
                                 data-allow-all-closed="true">
 
-                                <li class="accordion-item" data-accordion-item id="datasource_filter" th:each="filterComponent:${section.filterComponents}">
-                                    <a href="#" class="accordion-title" th:text="${filterComponent.name}"></a>
+                                <li class="accordion-item" data-accordion-item th:classappend="${filterComponent.isActive} ? is-active : not-active" th:each="filterComponent:${section.filterComponents}">
+                                    <a href="#" class="accordion-title" th:text="${filterComponent.name}" ></a>
 
                                     <div class="accordion-content" data-tab-content>
                                         <div class="large-form">
                                             <!-- Check what kind of component is it, not all components have options-->
+                                            <!-- OneParamFilter -->
                                             <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamFilter)}">
                                             <div class="checkbox-item"
                                                  th:each="option:${filterComponent.options}">
@@ -188,6 +189,39 @@
                                                         th:text="${option.label}"></span></label>
                                             </div>
                                             </span>
+                                            <!-- TwoParamUnlinkedFilter-->
+                                            <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamUnlinkedFilter)}">
+
+                                                <div class="row topSace10">
+                                                    <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
+                                                    <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param2Name}">  </div>
+                                                </div>
+                                                <div class="row topSace10">
+                                                    <div class="columns nospace small-12 large-6">
+                                                        <input type="text" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}" class="fullWidth"/>
+                                                    </div>
+                                                    <div class="columns nospace small-12 large-6 topSpace3">
+                                                        <select multiple='multiple' th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}">
+                                                            <option value="ALL">ALL</option>
+                                                            <option th:each="option :${filterComponent.options2}"
+                                                                    th:value="${option}"
+                                                                    th:text="${option}"> ...
+                                                            </option>
+
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="checkbox-item height70px">
+                                                        <button href="#"
+                                                            class="button primary columns large-3 white-text-right-float topSpace4 searchButton">
+                                                        <i class="icon icon-functional" data-icon="1"></i></button>
+                                                        <button href="#" class="icoButn columns large-2 ORButton" > OR </button>
+                                                    </div>
+                                                </div>
+
+                                            </span>
+
+
                                         </div>
                                     </div>
 
