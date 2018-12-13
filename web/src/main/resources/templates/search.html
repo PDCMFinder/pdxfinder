@@ -184,8 +184,8 @@
 
 
                                                 <input type="checkbox"
-                                                       class="filter" th:checked="${#lists.contains(filterComponent.selected, option.labelId)}" th:id="${option.labelId}"/>
-                                                <label th:attr="for=${option.label}"><span
+                                                       class="filter" th:checked="${#lists.contains(filterComponent.selected, option.labelId)}" th:id="${filterComponent.urlParam} +'__'+${option.labelId}"/>
+                                                <label th:attr="for=${option.labelId}"><span
                                                         th:text="${option.label}"></span></label>
                                             </div>
                                             </span>

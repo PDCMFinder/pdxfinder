@@ -317,7 +317,28 @@ public class SearchDS {
         List<WebFacetSection> sections = new ArrayList<>(webFacetContainer.getWebFacetSections());
         webFacetContainerClone.setWebFacetSections(sections);
 
+        //reset all previously selected fields and make the component inactive
+        for(WebFacetSection wfs :webFacetContainerClone.getWebFacetSections()){
+            for(GeneralFilter filter: wfs.getFilterComponents()){
+                filter.setActive(false);
 
+                if(filter instanceof OneParamFilter){
+
+                    OneParamFilter f = (OneParamFilter)filter;
+                    f.setSelected(new ArrayList<>());
+
+                }
+                else if(filter instanceof TwoParamUnlinkedFilter){
+
+                    TwoParamUnlinkedFilter f = (TwoParamUnlinkedFilter) filter;
+                    //TODO: Implement updating two and three parameter filters
+
+                }
+            }
+        }
+
+
+        //loop through the selected filters, make them active and initialize their selected list/map
         for(Map.Entry<SearchFacetName, List<String>> facet: filters.entrySet()){
 
             String facetName = facet.getKey().getName();
@@ -360,6 +381,7 @@ public class SearchDS {
                         }
 
                     }
+
 
                 }
             }
