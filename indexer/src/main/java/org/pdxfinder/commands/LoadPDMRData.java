@@ -93,6 +93,8 @@ public class LoadPDMRData implements CommandLineRunner {
         this.dataImportService = dataImportService;
     }
 
+
+
     @Override
     public void run(String... args) throws Exception {
 
@@ -112,8 +114,7 @@ public class LoadPDMRData implements CommandLineRunner {
                 log.info("Loading from file " + file);
                 parseJSON(parseFile(fileStr));
 
-                //loadMutationData();
-
+               // loadMutationData();
 
             } /* else if (urlStr != null) {
                 log.info("Loading from URL " + urlStr);
@@ -125,6 +126,11 @@ public class LoadPDMRData implements CommandLineRunner {
             }
         }
     }
+
+
+
+
+
 
     //JSON Fields {"Model ID","Gender","Age","Race","Ethnicity","Specimen Site","Primary Site","Initial Diagnosis","Clinical Diagnosis",
     //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
@@ -155,6 +161,9 @@ public class LoadPDMRData implements CommandLineRunner {
 
         }
     }
+
+
+
 
 
     @Transactional
@@ -271,9 +280,7 @@ public class LoadPDMRData implements CommandLineRunner {
         }
 
 
-
-        //load patient treatment
-
+        // Load patient treatment
         TreatmentSummary ts;
 
         //Disable loading treatment temporarily, drug names are not harmonized!
@@ -319,10 +326,10 @@ public class LoadPDMRData implements CommandLineRunner {
             dataImportService.savePatientSnapshot(pSnap);
         }
 
-
         //loadVariationData(mc);
         dataImportService.saveModelCreation(modelCreation);
     }
+
 
 
 
@@ -343,7 +350,7 @@ public class LoadPDMRData implements CommandLineRunner {
 
         Set<String> missingPatients = new HashSet<>();
 
-        String mutationsFile = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/mut/data.json";
+        String mutationsFile = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.csv";
         try {
             BufferedReader buf = new BufferedReader(new FileReader(mutationsFile));
 

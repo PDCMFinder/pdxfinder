@@ -49,7 +49,7 @@ public class DataTransformerService {
     private String DATASOURCE_URL_PREFIX = "https://pdmdb.cancer.gov/pls/apex/f?p=101:4:0::NO:4:P4_SPECIMENSEQNBR:";
 
     @Value("${pdxfinder.data.root.dir}")
-    private String dataRootDir = System.getProperty("user.home")+"/data";
+    private String dataRootDir = System.getProperty("user.home")+"/PDXFinder/data";
 
 
     private final static String DATASOURCE_ABBREVIATION = "/PDMR";
