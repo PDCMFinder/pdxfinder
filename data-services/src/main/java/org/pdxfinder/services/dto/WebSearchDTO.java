@@ -3,6 +3,7 @@ package org.pdxfinder.services.dto;
 import org.pdxfinder.services.ds.ModelForQuery;
 import org.pdxfinder.services.search.WebFacetContainer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -31,6 +32,8 @@ public class WebSearchDTO {
     private WebFacetContainer webFacetsContainer;
 
     private List<String> mainSearchFieldOptions;
+
+    private List<String> additionalResultTableHeaders;
 
     private List<ModelForQuery> results;
 
@@ -165,5 +168,22 @@ public class WebSearchDTO {
 
     public void setMainSearchFieldOptions(List<String> mainSearchFieldOptions) {
         this.mainSearchFieldOptions = mainSearchFieldOptions;
+    }
+
+    public List<String> getAdditionalResultTableHeaders() {
+        return additionalResultTableHeaders;
+    }
+
+    public void setAdditionalResultTableHeaders(List<String> additionalResultTableHeaders) {
+        this.additionalResultTableHeaders = additionalResultTableHeaders;
+    }
+
+    public void addResultTableHeader(String header){
+
+        if(additionalResultTableHeaders == null){
+            additionalResultTableHeaders = new ArrayList<>();
+        }
+
+        additionalResultTableHeaders.add(header);
     }
 }

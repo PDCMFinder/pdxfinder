@@ -159,6 +159,8 @@ public class SearchService {
 
         //TODO: Deal with updated result columns here.... good luck!
 
+        wsDTO.setAdditionalResultTableHeaders(getNewResultHeaders(configuredFacets));
+
         /*
         boolean mutSelected = false;
         boolean drSelected = false;
@@ -405,6 +407,33 @@ public class SearchService {
     }
 
 
+
+    public List<String> getNewResultHeaders(Map<SearchFacetName, List<String>> filters){
+
+        List<String> headers= new ArrayList<>();
+
+        for (SearchFacetName facet : filters.keySet()) {
+
+
+            switch(facet){
+
+                case mutation:
+                    headers.add("MUTATIONS");
+                    break;
+
+                case drug:
+                    headers.add("DRUG AND RESPONSE");
+
+            }
+
+        }
+
+        if(headers.isEmpty()){
+            headers.add("DATA AVAILABLE");
+        }
+
+        return headers;
+    }
 
 
     public int modelCount() {

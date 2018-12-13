@@ -221,7 +221,7 @@
 
                                             </span>
 
-                                            <!-- ThreeParamLinkedFilter-->
+                                            <!-- TWoParamLinkedFilter-->
                                             <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamLinkedFilter)}">
                                             <div class="row topSace10">
                                                 <div th:if="${filterComponent.param1Name != null}" class="columns nospace small-6 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
@@ -270,13 +270,9 @@
                                 <th>Type</th>
                                 <th>Age</th>
                                 <th>Sex</th>
-                                <th>Data Available</th>
-                                <!--
-                                <th th:if="${websearch.isMutationSelected} == true">Mutations</th>
-                                <th th:if="${websearch.isMutationSelected} == true">Platform</th>
-                                <th th:if="${websearch.isDrugSelected} == true">Drug</th>
-                                <th th:if="${websearch.isDrugSelected} == true">Response</th>
-                                -->
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DATA AVAILABLE')}">Data Available</th>
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'MUTATIONS')}">MUTATIONS</th>
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DRUG AND RESPONSE')}">DRUG AND RESPONSE</th>
 
                             </tr>
                             </thead>
@@ -293,7 +289,7 @@
                                 <td th:text="${model.patientAge}">Age</td>
                                 <td th:text="${model.patientGender}">Sex</td>
 
-                                <td>
+                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DATA AVAILABLE')}">
                                     <th:block th:each="dataavailable : ${model.dataAvailable}">
 
                                         <a th:if="${#strings.equals(dataavailable, 'Dosing Studies')}"
@@ -311,50 +307,24 @@
                                     </th:block>
                                 </td>
 
-                                <!--
-                                <td th:if="${websearch.isMutationSelected} == true">
-                                    <th:block th:each="dMutations : ${websearch.mutationMap.get(model.externalId)}">
-                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'?marker='+${dMutations}+'#variation' }"
+
+                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'MUTATIONS')}">
+                                    <th:block th:each="dMutations : ${model.mutatedVariants}">
+                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation' }"
                                            class="size12" th:utext="${dMutations} + '<br />'">dMutations</a>
                                     </th:block>
                                 </td>
 
 
-                                <td th:if="${websearch.isMutationSelected} == true">
-                                    <th:block th:each="platform : ${websearch.platformMap.get(model.externalId)}">
 
-                                        <div th:if="${not #lists.isEmpty(websearch.platformsAndUrls[__${platform}__])}">
-                                            <a th:href="${websearch.platformsAndUrls[__${platform}__]}"
-                                               th:text="${platform}"
-                                               class="size12"></a>
-                                        </div>
-
-                                        <div th:if="${#lists.isEmpty(websearch.platformsAndUrls[__${platform}__])}"
-                                             th:text="${technology?.key}" class="size12">
-
-                                        </div>
-
-                                    </th:block>
-                                </td>
-
-                                <td th:if="${websearch.isDrugSelected} == true">
+                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DRUG AND RESPONSE')}">
 
 
-                                    <div th:each="drugData : ${model.drugData}">
+                                    <div th:each="drugData : ${model.drugWithResponse}">
                                         <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#dosing_studies'}"
-                                           th:utext="${drugData.drugName}"></a>
+                                           th:utext="${drugData}"></a>
                                     </div>
                                 </td>
-
-                                <td th:if="${websearch.isDrugSelected} == true">
-
-
-                                    <div th:each="drugData : ${model.drugData}">
-                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#dosing_studies'}"
-                                           th:utext="${drugData.response}"></a>
-                                    </div>
-                                </td>
-                                -->
 
                             </tr>
 
