@@ -145,6 +145,8 @@ public class SearchService {
         int end = Math.min(begin + 7, numPages);
         wsDTO.setEndIndex(end);
 
+        wsDTO.setPage(page);
+        wsDTO.setSize(size);
 
         String textSearchDescription = getTextualDescription(facetString, results);
 
