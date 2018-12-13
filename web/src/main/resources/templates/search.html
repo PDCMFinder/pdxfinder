@@ -171,8 +171,8 @@
                             <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
                                 data-allow-all-closed="true">
 
-                                <li class="accordion-item" data-accordion-item th:classappend="${filterComponent.isActive} ? is-active : not-active" th:each="filterComponent:${section.filterComponents}">
-                                    <a href="#" class="accordion-title" th:text="${filterComponent.name}" ></a>
+                                <li class="accordion-item filterComponent" data-accordion-item th:classappend="${filterComponent.isActive} ? is-active : not-active" th:each="filterComponent:${section.filterComponents}" th:id="${filterComponent.urlParam}">
+                                    <a href="#" class="accordion-title" th:text="${filterComponent.name}"></a>
 
                                     <div class="accordion-content" data-tab-content>
                                         <div class="large-form">
@@ -184,8 +184,8 @@
 
 
                                                 <input type="checkbox"
-                                                       class="filter" th:checked="${#lists.contains(filterComponent.selected, option.labelId)}"/>
-                                                <label th:attr="for=${option}"><span
+                                                       class="filter" th:checked="${#lists.contains(filterComponent.selected, option.labelId)}" th:id="${option.labelId}"/>
+                                                <label th:attr="for=${option.label}"><span
                                                         th:text="${option.label}"></span></label>
                                             </div>
                                             </span>
