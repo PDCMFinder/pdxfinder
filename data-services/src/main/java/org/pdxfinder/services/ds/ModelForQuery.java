@@ -412,4 +412,13 @@ public class ModelForQuery {
     public void setBreastCancerMarkers(List<String> breastCancerMarkers) {
         this.breastCancerMarkers = breastCancerMarkers;
     }
+
+
+    public void addBreastCancerMarkers(String m){
+
+        if(breastCancerMarkers == null){
+            breastCancerMarkers = new ArrayList<>();
+        }
+        breastCancerMarkers.add(m);
+    }
 }

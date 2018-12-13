@@ -191,11 +191,14 @@ public class CreateDataProjections implements CommandLineRunner{
 
                         String ihcResult = ma.getImmunoHistoChemistryResult();
                         String markerName = m.getName();
-                        log.info(ihcResult + markerName);
+                        //log.info(ihcResult + markerName);
                         if(ihcResult != null && !ihcResult.isEmpty()  && markerName != null && !markerName.isEmpty()){
 
                             //this was needed to avoid issues with variants where the value was a single space " "
                             if(ihcResult.length()<3) ihcResult = "Not applicable";
+                            if(ihcResult.toLowerCase().startsWith("pos")) ihcResult = "pos";
+                            if(ihcResult.toLowerCase().startsWith("neg")) ihcResult = "neg";
+
                             markerList.add(markerName+ihcResult);
 
                         }
@@ -208,11 +211,7 @@ public class CreateDataProjections implements CommandLineRunner{
                 Collections.sort(markerList);
                 String markerResultCombo = markerList.stream().collect(Collectors.joining("_"));
 
-                //replace positive with pos, negative with neg
-                markerResultCombo.replace("positive", "pos");
-                markerResultCombo.replace("negative", "neg");
-
-                log.info("Entry: "+platformName + markerResultCombo + modelId);
+                //log.info("Entry: "+platformName + markerResultCombo + modelId);
                 addToTwoParamDP(immunoHistoChemistryDP, platformName, markerResultCombo, modelId);
 
             }
@@ -220,7 +219,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
         }
 
-        log.info(immunoHistoChemistryDP.toString());
+        //log.info(immunoHistoChemistryDP.toString());
     }
 
 

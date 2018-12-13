@@ -19,7 +19,7 @@ import org.springframework.util.Assert;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 import static java.lang.Long.parseLong;
 
@@ -63,7 +63,7 @@ public class SearchDS {
     private OneParamSearch oneParamSearch;
 
     /**
-     * Four param search object for performing a search on gene mutations
+     * Three param search object for performing a search on gene mutations
      */
     private ThreeParamLinkedSearch geneMutationSearch;
 
@@ -73,7 +73,10 @@ public class SearchDS {
     private TwoParamUnlinkedSearch dosingStudySearch;
 
 
-
+    /**
+     * Two param linked search to perform search on breastCancerBioMarkers
+     */
+    private TwoParamLinkedSearch breastCancerMarkersSearch;
 
 
     public SearchDS(DataProjectionRepository dataProjectionRepository) {
@@ -83,6 +86,9 @@ public class SearchDS {
         this.models = new HashSet<>();
     }
 
+    /**
+     * Initializes the searchDS, creates filter structure and links search objects to them
+     */
     public void init(){
 
 
@@ -240,19 +246,19 @@ public class SearchDS {
 
         //Breast cancer markers
         List<FacetOption> breastCancerMarkerOptions = new ArrayList<>();
-        breastCancerMarkerOptions.add(new FacetOption("HER+ PR+ ER+", "HERpos_PRneg_ERneg"));
-        breastCancerMarkerOptions.add(new FacetOption("HER+ PR+ ER-", "HERpos_PRpos_ERneg"));
-        breastCancerMarkerOptions.add(new FacetOption("HER+ PR- ER+", "HERpos_PRneg_ERpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER+ PR- ER-", "HERpos_PRneg_ERneg"));
-        breastCancerMarkerOptions.add(new FacetOption("HER- PR+ ER+", "HERneg_PRpos_ERpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER- PR+ ER-", "HERneg_PRpos_ERneg"));
-        breastCancerMarkerOptions.add(new FacetOption("HER- PR- ER+", "HERneg_PRneg_ERpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER- PR- ER-", "HERneg_PRneg_ERneg"));
+        breastCancerMarkerOptions.add(new FacetOption("ER+ HER2+ PR+", "ERpos_HER2pos_PRpos"));
+        breastCancerMarkerOptions.add(new FacetOption("ER- HER2+ PR+", "ERneg_HER2pos_PRpos"));
+        breastCancerMarkerOptions.add(new FacetOption("ER+ HER2+ PR-", "ERpos_HER2pos_PRneg"));
+        breastCancerMarkerOptions.add(new FacetOption("ER- HER2+ PR-", "ERneg_HER2pos_PRneg"));
+        breastCancerMarkerOptions.add(new FacetOption("ER+ HER2- PR+", "ERpos_HER2neg_PRpos"));
+        breastCancerMarkerOptions.add(new FacetOption("ER- HER2- PR+", "ERneg_HER2neg_PRpos"));
+        breastCancerMarkerOptions.add(new FacetOption("ER+ HER2- PR-", "ERpos_HER2neg_PRneg"));
+        breastCancerMarkerOptions.add(new FacetOption("ER- HER2- PR-", "ERneg_HER2neg_PRneg"));
 
-        OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_marker", false,
+        OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_markers", false,
                 breastCancerMarkerOptions, new ArrayList<>());
         molecularDataSection.addComponent(breastCancerMarkers);
-        facetOptionMap.put("breast_cancer_marker",breastCancerMarkerOptions);
+        facetOptionMap.put("breast_cancer_markers",breastCancerMarkerOptions);
 
 
         //model dosing study def
@@ -293,16 +299,10 @@ public class SearchDS {
 
         geneMutationSearch.setData(getMutationsFromDP());
 
-        /*
-        List dsTestList = new ArrayList();
-        dsTestList.add("JAX");
-        Set<ModelForQuery> results = oneParamSearch.searchOnString(Arrays.asList("JAX"), models, ModelForQuery::getDatasource);
 
-        log.info("Searching for JAX DS");
-        log.info(results.toString());
-        */
-
-
+        //breast cancer markers search initialization
+        breastCancerMarkersSearch = new TwoParamLinkedSearch("breastCancerMarkers", "breast_cancer_markers");
+        breastCancerMarkersSearch.setData(getBreastCancerMarkersFromDP());
 
 
         INITIALIZED = true;
@@ -475,9 +475,11 @@ public class SearchDS {
 
                 case drug:
                     result = dosingStudySearch.search(filters.get(SearchFacetName.drug), result, ModelForQuery::addDrugWithResponse);
+                    break;
 
-
-
+                case breast_cancer_markers:
+                    result = breastCancerMarkersSearch.search(filters.get(SearchFacetName.breast_cancer_markers), result, ModelForQuery::addBreastCancerMarkers);
+                    break;
 
                 default:
                     //undexpected filter option
@@ -663,7 +665,35 @@ public class SearchDS {
     }
 
 
+    private Map<String, Map<String, Set<Long>>> getBreastCancerMarkersFromDP(){
 
+        log.info("Initializing breast cancer markers ");
+
+        Map<String, Map<String, Set<Long>>> data = new HashMap<>();
+
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("IHC");
+        String responses = "{}";
+
+        if(dataProjection != null){
+
+            responses = dataProjection.getValue();
+        }
+
+        try{
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            data = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
+
+
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
+
+        return data;
+    }
 
 
 

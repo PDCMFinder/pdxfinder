@@ -90,6 +90,7 @@ public class SearchService {
                                   Optional<List<String>> drug,
                                   Optional<List<String>> project,
                                   Optional<List<String>> data_available,
+                                  Optional<List<String>> breast_cancer_markers,
                                   Integer page,
                                   Integer size){
 
@@ -107,18 +108,19 @@ public class SearchService {
                 mutation,
                 drug,
                 project,
-                data_available
+                data_available,
+                breast_cancer_markers
         );
 
         WebSearchDTO wsDTO = new WebSearchDTO();
 
-
+        //PERFORM SEARCH
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
 
         //UPDATE SEARCH FILTERS (what is selected)
         wsDTO.setWebFacetsContainer(searchDS.getUpdatedSelectedFilters(configuredFacets));
 
-
+        //UPDATE FACET STRING
         String facetString = getFacetString(configuredFacets);
         wsDTO.setFacetString(facetString);
 
@@ -157,26 +159,9 @@ public class SearchService {
 
         wsDTO.setResults(resultSet);
 
-        //TODO: Deal with updated result columns here.... good luck!
-
+        //Update results table headers
         wsDTO.setAdditionalResultTableHeaders(getNewResultHeaders(configuredFacets));
 
-        /*
-        boolean mutSelected = false;
-        boolean drSelected = false;
-        boolean dataAvailablePresent = true;
-
-        if(mutation.isPresent() && !mutation.get().isEmpty()){
-            mutSelected = true;
-            dataAvailablePresent = false;
-        }
-
-        if(drug.isPresent() && !drug.get().isEmpty()){
-            drSelected = true;
-            dataAvailablePresent = false;
-        }
-
-        */
 
         return wsDTO;
     }
@@ -195,7 +180,8 @@ public class SearchService {
                             Optional<List<String>> mutation,
                             Optional<List<String>> drug,
                             Optional<List<String>> project,
-                            Optional<List<String>> data_available){
+                            Optional<List<String>> data_available,
+                            Optional<List<String>> breast_cancer_markers){
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
                 query,
@@ -210,7 +196,8 @@ public class SearchService {
                 mutation,
                 drug,
                 project,
-                data_available
+                data_available,
+                breast_cancer_markers
 
         );
 
@@ -236,7 +223,8 @@ public class SearchService {
             Optional<List<String>> mutation,
             Optional<List<String>> drug,
             Optional<List<String>> project,
-            Optional<List<String>> data_available
+            Optional<List<String>> data_available,
+            Optional<List<String>> breast_cancer_markers
 
 
             ) {
@@ -332,6 +320,13 @@ public class SearchService {
             }
         }
 
+        if (breast_cancer_markers.isPresent() && !breast_cancer_markers.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.breast_cancer_markers, new ArrayList<>());
+            for (String s : breast_cancer_markers.get()) {
+                configuredFacets.get(SearchFacetName.breast_cancer_markers).add(s);
+            }
+        }
+
         return configuredFacets;
     }
 
@@ -423,7 +418,11 @@ public class SearchService {
 
                 case drug:
                     headers.add("DRUG AND RESPONSE");
+                    break;
 
+                case breast_cancer_markers:
+                    headers.add("BREAST CANCER MARKERS");
+                    break;
             }
 
         }

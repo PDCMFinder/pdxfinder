@@ -46,13 +46,14 @@ public class SearchController {
                   @RequestParam("mutation") Optional<List<String>> mutation,
                   @RequestParam("drug") Optional<List<String>> drug,
                   @RequestParam("project") Optional<List<String>> project,
-                  @RequestParam("data_available") Optional<List<String>> data_available
+                  @RequestParam("data_available") Optional<List<String>> data_available,
+                  @RequestParam("breast_cancer_markers") Optional<List<String>> breast_cancer_markers
     ) {
 
 
         ExportDTO eDTO = searchService.export(query, datasource,
                 diagnosis, patient_age, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
-                sample_tumor_type, mutation, drug, project, data_available);
+                sample_tumor_type, mutation, drug, project, data_available, breast_cancer_markers);
 
         Set<ModelForQueryExport> exportResults = eDTO.getResults().stream().map(ModelForQueryExport::new).collect(Collectors.toSet());
 
@@ -95,12 +96,13 @@ public class SearchController {
                    @RequestParam("drug") Optional<List<String>> drug,
                    @RequestParam("project") Optional<List<String>> project,
                    @RequestParam("data_available") Optional<List<String>> data_available,
+                   @RequestParam("breast_cancer_markers") Optional<List<String>> breast_cancer_markers,
                    @RequestParam(value = "page", defaultValue = "1") Integer page,
                    @RequestParam(value = "size", defaultValue = "10") Integer size){
 
         model.addAttribute("websearch", searchService.webSearch(query, datasource,
                 diagnosis, patient_age, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
-                sample_tumor_type, mutation, drug, project, data_available, page, size));
+                sample_tumor_type, mutation, drug, project, data_available, breast_cancer_markers, page, size));
 
         return "search";
     }
