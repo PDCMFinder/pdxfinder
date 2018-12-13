@@ -388,6 +388,9 @@ public class SearchDS {
         //empty previously set drugs
         result.forEach(x -> x.setDrugWithResponse(new ArrayList<>()));
 
+        //reset breast cancer markers
+        result.forEach(x ->x.setBreastCancerMarkers(new ArrayList<>()));
+
         // If no filters have been specified, return the complete set
         if (filters == null) {
             return result;
