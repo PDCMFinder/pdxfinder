@@ -2,6 +2,7 @@ package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.neo4j.ogm.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -50,6 +51,25 @@ public class UtilityService {
         return jsonNode;
 
     }
+
+
+
+    public JsonNode readJsonLocal(String jsonFileLink) {
+
+        JsonNode jsonNode = null;
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+
+            BufferedReader br = new BufferedReader(new FileReader(jsonFileLink));
+            jsonNode = mapper.readTree(br);
+
+        }catch (Exception e) {}
+
+        return jsonNode;
+    }
+
+
 
 
     public void writeToFile(String data, String name){
