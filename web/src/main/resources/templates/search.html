@@ -273,7 +273,7 @@
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DATA AVAILABLE')}">Data Available</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'MUTATIONS')}">MUTATIONS</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DRUG AND RESPONSE')}">DRUG AND RESPONSE</th>
-
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'BREAST CANCER MARKERS')}">BREAST CANCER MARKERS</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -318,11 +318,16 @@
 
 
                                 <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DRUG AND RESPONSE')}">
-
-
                                     <div th:each="drugData : ${model.drugWithResponse}">
                                         <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#dosing_studies'}"
                                            th:utext="${drugData}"></a>
+                                    </div>
+                                </td>
+
+                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'BREAST CANCER MARKERS')}">
+                                    <div th:each="bcMarker : ${model.breastCancerMarkers}">
+                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation'}"
+                                           th:utext="${bcMarker}"></a>
                                     </div>
                                 </td>
 
