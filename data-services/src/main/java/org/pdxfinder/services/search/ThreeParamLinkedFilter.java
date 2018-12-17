@@ -17,7 +17,7 @@ public class ThreeParamLinkedFilter extends GeneralFilter{
 
     private Map<String, Map<String, List<String>>> selected;
 
-    public ThreeParamLinkedFilter(String name, String urlParam, Boolean isActive, FilterType type, String param1Name, String param2Name, String param3Name, Map<String, Map<String, List<String>>> options, Map<String, Map<String, List<String>>> selected) {
+    public ThreeParamLinkedFilter(String name, String urlParam, Boolean isActive, String type, String param1Name, String param2Name, String param3Name, Map<String, Map<String, List<String>>> options, Map<String, Map<String, List<String>>> selected) {
         super(name, urlParam, isActive, type);
         this.param1Name = param1Name;
         this.param2Name = param2Name;

@@ -497,16 +497,18 @@ function getVariantSize(selectedMarker) {
 /* Drug Response region */
 var dosingStudy = 1;
 var dosingStudyCount = 1;
-function loadDrugTextFields(){
 
-    var drugs = drugsList.sort();
-    $('#drugFilter1').autocomplete({
-        source: [drugs]
+function twoParamUnlinkedFilterOptionOneList(dataList, componentId){
+
+    dataList = dataList.sort();
+
+    $('#'+componentId).autocomplete({
+        source: [dataList]
     });
 
     for (var i = 2; i <= 20; i++) {
         $('#drugFilter' + i).autocomplete({
-            source: [drugs]
+            source: [dataList]
         });
     }
 }

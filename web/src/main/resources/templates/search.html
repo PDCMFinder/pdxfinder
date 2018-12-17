@@ -173,7 +173,6 @@
 
                                 <li class="accordion-item filterComponent" data-accordion-item
                                     th:classappend="${filterComponent.isActive} ? is-active : not-active"
-
                                     th:each="filterComponent:${section.filterComponents}" th:id="${filterComponent.urlParam}">
 
                                     <a href="#" class="accordion-title" th:text="${filterComponent.name}"></a>
@@ -181,8 +180,10 @@
                                     <div class="accordion-content" data-tab-content>
                                         <div class="large-form">
                                             <!-- Check what kind of component is it, not all components have options-->
+
+
                                             <!-- OneParamFilter -->
-                                            <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamFilter)}">
+                                            <span th:if="${filterComponent.type == 'OneParamFilter' }">
                                             <div class="checkbox-item"
                                                  th:each="option:${filterComponent.options}">
 
@@ -195,8 +196,9 @@
                                             </span>
 
 
+
                                             <!-- TwoParamUnlinkedFilter-->
-                                            <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamUnlinkedFilter)}">
+                                            <span th:if="${filterComponent.type == 'TwoParamUnlinkedFilter' }">
 
                                                 <div class="row topSace10">
                                                     <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
@@ -207,16 +209,8 @@
                                                         <input type="text" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}" class="fullWidth"/>
                                                     </div>
 
-                                                    <span th:each="optionKey :${filterComponent.options1}" th:text="${optionKey}">
 
-                                                    </span>
-
-                                                    <script type="text/javascript" language="javascript" th:inline="javascript">
-                                                            loadJSList([[${filterComponent.options1}]]);
-                                                    </script>
-
-
-                                                    <div class="columns nospace small-12 large-6 topSpace3">
+                                                    <!--<div class="columns nospace small-12 large-6 topSpace3">
                                                         <select multiple='multiple' th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}">
                                                             <option value="ALL">ALL</option>
                                                             <option th:each="option :${filterComponent.options2}"
@@ -225,7 +219,26 @@
                                                             </option>
 
                                                         </select>
-                                                    </div>
+                                                    </div>-->
+
+
+
+                                                    <div id="drugResponseOptions1"
+                                                         class="columns nospace small-12 large-6 topSpace3">
+                                                                <select id='responseFilter1' multiple='multiple'>
+
+                                                                        <option value="Stable Disease">Stable Disease</option>
+
+                                                                        <option value="Progressive Disease">Progressive Disease</option>
+
+                                                                        <option value="Stable Disease And Complete Response">Stable Disease And Complete Response</option>
+
+                                                                        <option value="Partial Response">Partial Response</option>
+
+                                                                        <option value="Complete Response">Complete Response</option>
+
+                                                                </select>
+                                                            </div>
 
                                                     <div class="checkbox-item height70px">
                                                         <button href="#"
@@ -237,8 +250,9 @@
 
                                             </span>
 
+
                                             <!-- TWoParamLinkedFilter-->
-                                            <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamLinkedFilter)}">
+                                            <span th:if="${filterComponent.type == 'TwoParamLinkedFilter' }">
                                             <div class="row topSace10">
                                                 <div th:if="${filterComponent.param1Name != null}" class="columns nospace small-6 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
                                                 <div th:if="${filterComponent.param2Name != null}" class="columns nospace small-6 large-6 adjusti" th:text="${filterComponent.param2Name}">  </div>
@@ -425,11 +439,6 @@
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
 
-    function loadJSList(dData){
-
-        console.log(dData);
-
-    }
 
     var searchOptions = [[${websearch.mainSearchFieldOptions}]];
     var searchStates = [];
@@ -444,6 +453,89 @@
     var genderFilters = [];
     var mutationFilters = [];
     var dataAvailableFilters = [];
+
+
+
+
+
+
+
+    var incomingString = [];
+    var mutatedMarkersAndVariants = []; //TODO: RESTORE - JSON.parse(incomingString);
+    var drugsList = [];
+
+
+
+    var drugResponseList = [];
+    jQuery(document).ready(function () {
+
+        var webFacetSections = [[${websearch.webFacetsContainer.webFacetSections}]];
+        webFacetSections.forEach(manageGeneralFilter);
+
+
+        function manageGeneralFilter (webFacetSection, index) {
+
+
+            var filterComponents = webFacetSection.filterComponents;
+
+            // Retrieve All the FilterComponents and their contents
+            filterComponents.forEach(function(filterComponent){
+
+                if (filterComponent.type === 'TwoParamUnlinkedFilter'){
+
+                    dataList = filterComponent.options1;
+                    componentId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
+
+                    twoParamUnlinkedFilterOptionOneList(dataList, componentId);
+                }
+
+            });
+
+        }
+
+        loadGeneTextFields();
+
+
+
+
+
+
+
+        $('#variantFilter1').change(function () {
+            console.log($(this).val());
+        }).multipleSelect({
+            placeholder: "Variants"
+        });
+        for (var i = 2; i <= 20; i++) {
+            $('#variantFilter' + i).change(function () {
+                console.log($(this).val());
+            }).multipleSelect({
+                placeholder: "Variants"
+            });
+        }
+        $('#responseFilter1').change(function () {
+            console.log($(this).val());
+        }).multipleSelect({
+            placeholder: "Responses"
+        });
+        for (var i = 2; i <= 20; i++) {
+            $('#responseFilter' + i).change(function () {
+                console.log($(this).val());
+            }).multipleSelect({
+                placeholder: "Responses"
+            });
+        }
+    });
+
+
+
+
+
+
+
+
+
+
     function constructSearchOptions(data) {
         var newOptions = [];
         for (var i = 0; i < data.length; i++) {
@@ -545,38 +637,10 @@
             redirectPage();
         });
     });
-    var incomingString = [];
-    var mutatedMarkersAndVariants = JSON.parse(incomingString);
-    var drugsList = [];
-    var drugResponseList = [];
-    jQuery(document).ready(function () {
-        loadGeneTextFields();
-        loadDrugTextFields();
-        $('#variantFilter1').change(function () {
-            console.log($(this).val());
-        }).multipleSelect({
-            placeholder: "Variants"
-        });
-        for (var i = 2; i <= 20; i++) {
-            $('#variantFilter' + i).change(function () {
-                console.log($(this).val());
-            }).multipleSelect({
-                placeholder: "Variants"
-            });
-        }
-        $('#responseFilter1').change(function () {
-            console.log($(this).val());
-        }).multipleSelect({
-            placeholder: "Responses"
-        });
-        for (var i = 2; i <= 20; i++) {
-            $('#responseFilter' + i).change(function () {
-                console.log($(this).val());
-            }).multipleSelect({
-                placeholder: "Responses"
-            });
-        }
-    });
+
+
+
+
 </script>
 
 
