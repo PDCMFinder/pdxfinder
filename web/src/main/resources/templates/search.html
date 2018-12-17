@@ -171,7 +171,11 @@
                             <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
                                 data-allow-all-closed="true">
 
-                                <li class="accordion-item filterComponent" data-accordion-item th:classappend="${filterComponent.isActive} ? is-active : not-active" th:each="filterComponent:${section.filterComponents}" th:id="${filterComponent.urlParam}">
+                                <li class="accordion-item filterComponent" data-accordion-item
+                                    th:classappend="${filterComponent.isActive} ? is-active : not-active"
+
+                                    th:each="filterComponent:${section.filterComponents}" th:id="${filterComponent.urlParam}">
+
                                     <a href="#" class="accordion-title" th:text="${filterComponent.name}"></a>
 
                                     <div class="accordion-content" data-tab-content>
@@ -189,6 +193,8 @@
                                                         th:text="${option.label}"></span></label>
                                             </div>
                                             </span>
+
+
                                             <!-- TwoParamUnlinkedFilter-->
                                             <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamUnlinkedFilter)}">
 
@@ -200,6 +206,16 @@
                                                     <div class="columns nospace small-12 large-6">
                                                         <input type="text" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}" class="fullWidth"/>
                                                     </div>
+
+                                                    <span th:each="optionKey :${filterComponent.options1}" th:text="${optionKey}">
+
+                                                    </span>
+
+                                                    <script type="text/javascript" language="javascript" th:inline="javascript">
+                                                            loadJSList([[${filterComponent.options1}]]);
+                                                    </script>
+
+
                                                     <div class="columns nospace small-12 large-6 topSpace3">
                                                         <select multiple='multiple' th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}">
                                                             <option value="ALL">ALL</option>
@@ -407,7 +423,14 @@
 
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
-    console.log("JS starts");
+
+
+    function loadJSList(dData){
+
+        console.log(dData);
+
+    }
+
     var searchOptions = [[${websearch.mainSearchFieldOptions}]];
     var searchStates = [];
     for (var i = 0; i < searchOptions.length; i++) {
