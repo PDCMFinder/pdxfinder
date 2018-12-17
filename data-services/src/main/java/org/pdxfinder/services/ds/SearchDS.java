@@ -239,7 +239,7 @@ public class SearchDS {
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
         TwoParamLinkedFilter geneMutation = new TwoParamLinkedFilter("GENE MUTATION", "mutation", false, "TwoParamLinkedFilter",
-                 "GENE", "VARIANT", new HashMap<>(), new HashMap<>());
+                 "GENE", "VARIANT", getMutationOptionsFromDP(), new HashMap<>());
 
         molecularDataSection.addComponent(geneMutation);
 
@@ -657,6 +657,44 @@ public class SearchDS {
         return mutations;
     }
 
+    private Map<String, List<String>> getMutationOptionsFromDP(){
+
+        Map<String, Map<String, Map<String, Set<Long>>>> mutations = getMutationsFromDP();
+
+        Map<String,Set<String>> tempResults = new HashMap<>();
+
+        for(Map.Entry<String, Map<String, Map<String, Set<Long>>>> platform:mutations.entrySet()){
+
+            for(Map.Entry<String, Map<String, Set<Long>>> marker:platform.getValue().entrySet()){
+
+                for(Map.Entry<String, Set<Long>> variant:marker.getValue().entrySet()){
+
+                    String m = marker.getKey();
+                    String v = variant.getKey();
+
+                    if(tempResults.containsKey(m)){
+                        tempResults.get(m).add(v);
+                    }
+                    else{
+                        Set<String> set = new HashSet<>();
+                        set.add(v);
+                        tempResults.put(m, set);
+
+                    }
+
+                }
+            }
+        }
+
+        Map<String, List<String>> resultMap = new HashMap<>();
+
+        for(Map.Entry<String, Set<String>> entry : tempResults.entrySet()){
+
+            resultMap.put(entry.getKey(), new ArrayList<>(new TreeSet<>(entry.getValue())));
+        }
+
+        return resultMap;
+    }
 
     private Map<String, Map<String, Set<Long>>> getModelDrugResponsesFromDP(){
 
