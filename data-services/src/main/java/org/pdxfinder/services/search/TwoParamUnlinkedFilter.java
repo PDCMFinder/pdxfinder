@@ -18,7 +18,7 @@ public class TwoParamUnlinkedFilter extends GeneralFilter{
     private Map<String, List<String>> selected;
 
 
-    public TwoParamUnlinkedFilter(String name, String urlParam, Boolean isActive, String type, String param1Name, String param2Name, List<String> options1, List<String> options2, Map<String, List<String>> selected) {
+    public TwoParamUnlinkedFilter(String name, String urlParam, Boolean isActive, FilterType type, String param1Name, String param2Name, List<String> options1, List<String> options2, Map<String, List<String>> selected) {
         super(name, urlParam, isActive, type);
         this.param1Name = param1Name;
         this.param2Name = param2Name;

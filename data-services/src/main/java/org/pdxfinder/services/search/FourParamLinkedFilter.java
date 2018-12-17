@@ -13,7 +13,7 @@ public class FourParamLinkedFilter extends GeneralFilter{
     private Map<Map,Map<String, Map<String, List<String>>>> selected;
 
 
-    public FourParamLinkedFilter(String name, String urlParam, Boolean isActive, String type, Map<String, Map<String, Map<String, List<String>>>> options, Map<Map, Map<String, Map<String, List<String>>>> selected) {
+    public FourParamLinkedFilter(String name, String urlParam, Boolean isActive, FilterType type, Map<String, Map<String, Map<String, List<String>>>> options, Map<Map, Map<String, Map<String, List<String>>>> selected) {
         super(name, urlParam, isActive, type);
         this.options = options;
         this.selected = selected;
