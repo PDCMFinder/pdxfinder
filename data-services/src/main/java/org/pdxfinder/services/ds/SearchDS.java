@@ -331,8 +331,12 @@ public class SearchDS {
                 else if(filter instanceof TwoParamUnlinkedFilter){
 
                     TwoParamUnlinkedFilter f = (TwoParamUnlinkedFilter) filter;
-                    //TODO: Implement updating two and three parameter filters
+                    f.setSelected(new HashMap<>());
 
+                }
+                else if(filter instanceof TwoParamLinkedFilter){
+                    TwoParamLinkedFilter f = (TwoParamLinkedFilter) filter;
+                    f.setSelected(new HashMap<>());
                 }
             }
         }
@@ -376,8 +380,50 @@ public class SearchDS {
                         else if(filter instanceof TwoParamUnlinkedFilter){
 
                             TwoParamUnlinkedFilter f = (TwoParamUnlinkedFilter) filter;
-                            //TODO: Implement updating two and three parameter filters
 
+                            Map<String,List<String>> selectedMap = new HashMap<>();
+
+                            for(String opt:decodedSelected){
+
+                                String[] optArr = opt.split("___");
+
+                                if(selectedMap.containsKey(optArr[0])){
+                                    selectedMap.get(optArr[0]).add(optArr[1]);
+                                }
+                                else{
+                                    List<String> arrList = new ArrayList<>();
+                                    arrList.add(optArr[1]);
+                                    selectedMap.put(optArr[0], arrList);
+
+                                }
+
+                            }
+
+                            f.setSelected(selectedMap);
+
+                        }
+                        else if(filter instanceof TwoParamLinkedFilter){
+                            TwoParamLinkedFilter f = (TwoParamLinkedFilter) filter;
+
+                            Map<String,List<String>> selectedMap = new HashMap<>();
+
+                            for(String opt:decodedSelected){
+
+                                String[] optArr = opt.split("___");
+
+                                if(selectedMap.containsKey(optArr[0])){
+                                    selectedMap.get(optArr[0]).add(optArr[1]);
+                                }
+                                else{
+                                    List<String> arrList = new ArrayList<>();
+                                    arrList.add(optArr[1]);
+                                    selectedMap.put(optArr[0], arrList);
+
+                                }
+
+                            }
+
+                            f.setSelected(selectedMap);
                         }
 
                     }
