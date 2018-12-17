@@ -185,7 +185,7 @@
 
                                                 <input type="checkbox"
                                                        class="filter" th:checked="${#lists.contains(filterComponent.selected, option.labelId)}" th:id="${filterComponent.urlParam} +'__'+${option.labelId}"/>
-                                                <label th:attr="for=${option.labelId}"><span
+                                                <label th:attr="for=${filterComponent.urlParam} +'__'+${option.labelId}"><span
                                                         th:text="${option.label}"></span></label>
                                             </div>
                                             </span>
@@ -407,6 +407,7 @@
 
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
+    console.log("JS starts");
     var searchOptions = [[${websearch.mainSearchFieldOptions}]];
     var searchStates = [];
     for (var i = 0; i < searchOptions.length; i++) {
@@ -427,6 +428,7 @@
         }
         return newOptions;
     }
+    console.log("Before choices");
     // Test choices integration
     const mainSearch = new Choices('#query', {
         choices: constructSearchOptions(searchStates),
@@ -502,7 +504,7 @@
     }, false);
     console.log("before updating");
     jQuery(document).ready(function () {
-        updateFilters(ageFilters, genderFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters, projectFilters, dataAvailableFilters);
+        //updateFilters(ageFilters, genderFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters, projectFilters, dataAvailableFilters);
         console.log("updated");
         //Add eventlistener to fields with filter class
         jQuery('.filter').change(function () {
