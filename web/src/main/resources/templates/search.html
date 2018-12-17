@@ -167,6 +167,9 @@
                         <li class="accordion-item is-active" data-accordion-item th:each="section:${websearch.webFacetsContainer.webFacetSections}">
 
                             <a href="#" class="accordion-title" th:text = "${section.name}"></a>
+                            <div class="accordion-content" data-tab-content>
+
+
 
                             <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
                                 data-allow-all-closed="true">
@@ -177,8 +180,9 @@
                                     <div class="accordion-content" data-tab-content>
                                         <div class="large-form">
                                             <!-- Check what kind of component is it, not all components have options-->
-                                            <!-- OneParamFilter -->
+
                                             <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamFilter)}">
+                                                <!-- OneParamFilter -->
                                             <div class="checkbox-item"
                                                  th:each="option:${filterComponent.options}">
 
@@ -189,9 +193,9 @@
                                                         th:text="${option.label}"></span></label>
                                             </div>
                                             </span>
-                                            <!-- TwoParamUnlinkedFilter-->
-                                            <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamUnlinkedFilter)}">
 
+                                            <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamUnlinkedFilter)}">
+                                                <!-- TwoParamUnlinkedFilter-->
                                                 <div class="row topSace10">
                                                     <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
                                                     <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param2Name}">  </div>
@@ -221,8 +225,9 @@
 
                                             </span>
 
-                                            <!-- TWoParamLinkedFilter-->
+
                                             <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamLinkedFilter)}">
+                                            <!-- TWoParamLinkedFilter-->
                                             <div class="row topSace10">
                                                 <div th:if="${filterComponent.param1Name != null}" class="columns nospace small-6 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
                                                 <div th:if="${filterComponent.param2Name != null}" class="columns nospace small-6 large-6 adjusti" th:text="${filterComponent.param2Name}">  </div>
@@ -244,7 +249,7 @@
                                 </li>
 
                             </ul>
-
+                            </div>
                         </li>
 
 
@@ -411,8 +416,9 @@
     var searchOptions = [[${websearch.mainSearchFieldOptions}]];
     var searchStates = [];
     for (var i = 0; i < searchOptions.length; i++) {
-        searchStates.push(searchOptions[i].labelId);
+        searchStates.push(searchOptions[i]);
     }
+
     var ageFilters = [];
     var dsFilters = [];
     var projectFilters = [];
@@ -430,6 +436,7 @@
     }
     console.log("Before choices");
     // Test choices integration
+
     const mainSearch = new Choices('#query', {
         choices: constructSearchOptions(searchStates),
         removeItemButton: true,
@@ -447,6 +454,8 @@
             distance: 1000
         }
     });
+
+    console.log("After choices");
     function conditionallyShowDropdown(str) {
         if (str.length < 1) {
             mainSearch.hideDropdown();
@@ -502,6 +511,7 @@
     mainSearch.passedElement.addEventListener('addItem', function (event) {
         jQuery("form.main-search").submit();
     }, false);
+
     console.log("before updating");
     jQuery(document).ready(function () {
         //updateFilters(ageFilters, genderFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters, projectFilters, dataAvailableFilters);
@@ -523,7 +533,8 @@
         });
     });
     var incomingString = [];
-    var mutatedMarkersAndVariants = JSON.parse(incomingString);
+    //var mutatedMarkersAndVariants = JSON.parse(incomingString);
+    var mutatedMarkersAndVariants = [];
     var drugsList = [];
     var drugResponseList = [];
     jQuery(document).ready(function () {
