@@ -14,6 +14,7 @@
  */
 function updateFilters(ages, genders, cancersystem, datasources, tumortype, projects, dataAvailable) {
 
+
     console.log("updating filters!");
     //characters we want to see as values
     var reg = /[^A-Za-z0-9 _-]/;
