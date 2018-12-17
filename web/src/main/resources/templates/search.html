@@ -429,7 +429,7 @@
     function constructSearchOptions(data) {
         var newOptions = [];
         for (var i = 0; i < data.length; i++) {
-            newOptions.push({'labelId': data[i], 'label': data[i], selected: false, disabled: false})
+            newOptions.push({'value': data[i], 'label': data[i], selected: false, disabled: false})
         }
         return newOptions;
     }
@@ -437,7 +437,7 @@
     // Test choices integration
 
     const mainSearch = new Choices('#query', {
-        choices: constructSearchOptions(searchStates),
+        choices: constructSearchOptions(searchOptions),
         removeItemButton: true,
         // placeholder: false,
         // placeholderValue: 'This is a placeholder',
