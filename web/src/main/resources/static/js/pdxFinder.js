@@ -186,7 +186,7 @@ function getVariantSize(selectedMarker) {
 
 
 
-/* Drug Response region */
+
 var dosingStudy = 1;
 var dosingStudyCount = 1;
 
@@ -199,15 +199,13 @@ function twoParamUnlinkedFilterOptionOneList(dataList, componentId){
     });
 
     for (var i = 2; i <= 20; i++) {
-        $('#drugFilter' + i).autocomplete({
+        $('#'+componentId + i).autocomplete({
             source: [dataList]
         });
     }
 }
 
 function twoParamUnlinkedFilterOptionTwoList(componentId){
-
-    dataList = dataList.sort();
 
     $('#'+componentId).change(function () {
         console.log($(this).val());
@@ -223,6 +221,28 @@ function twoParamUnlinkedFilterOptionTwoList(componentId){
         });
     }
 }
+
+function displayMore(divId) {
+
+    for (var i = 2; i <= 20; i++) {
+
+        var parentDiv = divId+'_parent'+i;
+        var textComponentId = divId+i;
+
+        var parentDivDOM = document.getElementById(parentDiv);
+        var textComponentDOM = document.getElementById(textComponentId);
+
+        if (parentDivDOM.style.display === "none"){
+
+            parentDivDOM.style.display = "block";
+            textComponentDOM.value = "";
+
+            break;
+        }
+
+    }
+}
+
 
 
 
@@ -246,7 +266,7 @@ function loadDrugResponse(compNumber) {
 
 
 
-function addDrugAndResponse(param, startIndex) {
+function addDrugAndResponse2(param, startIndex) {
     if (startIndex != 2 && dosingStudyCount == 1) {
         dosingStudy = startIndex;
     }
@@ -259,6 +279,7 @@ function addDrugAndResponse(param, startIndex) {
         }
     }
 }
+
 
 function clearFacet() {
     document.getElementById("pdxFinderFacet").reset();

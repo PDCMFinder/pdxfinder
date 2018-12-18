@@ -189,32 +189,54 @@
 
 
                                         <div class="light-grey-bg-box" th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamUnlinkedFilter)}">
-                                                <!-- TwoParamUnlinkedFilter-->
-                                                <div class="row topSace10">
-                                                    <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
-                                                    <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param2Name}">  </div>
+
+                                            <!-- TwoParamUnlinkedFilter-->
+                                            <div class="row topSace10">
+                                                <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
+                                                <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param2Name}">  </div>
+                                            </div>
+                                            <div class="row topSace10">
+                                                <div class="columns nospace small-12 large-6">
+                                                    <input type="text" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}" class="fullWidth"/>
                                                 </div>
-                                                <div class="row topSace10">
+
+                                                <div class="columns nospace small-12 large-6 topSpace3">
+                                                    <select multiple='multiple' th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}">
+                                                        <option th:each="option :${filterComponent.options2}"
+                                                                th:value="${option}"
+                                                                th:text="${option}"> ...
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- TwoParamUnlinkedFilter Hidden Fields Trigger on Click "OR" Button-->
+                                            <div class="row" th:each="i: ${#numbers.sequence(2, 20)}" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_parent'}+${i}" style="display:none">
                                                     <div class="columns nospace small-12 large-6">
-                                                        <input type="text" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}" class="fullWidth"/>
+                                                        <input type="text" value="NULL" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${i}" class="fullWidth"/>
                                                     </div>
 
                                                     <div class="columns nospace small-12 large-6 topSpace3">
-                                                        <select multiple='multiple' th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}">
+                                                        <select multiple='multiple' th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}+${i}">
+
                                                             <option th:each="option :${filterComponent.options2}"
                                                                     th:value="${option}"
-                                                                    th:text="${option}"> ...
-                                                            </option>
+                                                                    th:text="${option}"
+                                                                    th:selected="true"> ... </option>
                                                         </select>
                                                     </div>
+                                            </div>
 
-                                                    <div class="checkbox-item height70px">
-                                                        <button href="#"
-                                                            class="button primary columns large-3 white-text-right-float topSpace4 searchButton">
-                                                        <i class="icon icon-functional" data-icon="1"></i></button>
-                                                        <button href="#" class="icoButn columns large-2 ORButton" > OR </button>
-                                                    </div>
-                                                </div>
+                                            <!-- TwoParamUnlinkedFilter Action Buttons -->
+                                            <div class="checkbox-item height70px">
+                                                <button href="#"
+                                                        class="button primary columns large-3 white-text-right-float topSpace4 searchButton">
+                                                    <i class="icon icon-functional" data-icon="1"></i></button>
+
+                                                <button href="#" class="icoButn columns large-2 ORButton"
+                                                        th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}')|"> OR </button>
+                                            </div>
+
                                         </div>
 
 
@@ -577,7 +599,6 @@
         }
 
         loadGeneTextFields();
-
 
 
         $('#variantFilter1').change(function () {
