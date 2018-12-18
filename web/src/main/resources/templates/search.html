@@ -17,8 +17,7 @@
     <link rel="icon" type="image/png" sizes="16x16"
           href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon-16x16.png?v=1">
     <link rel="manifest" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/manifest.json?v=1">
-    <link rel="mask-icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/safari-pinned-tab.svg?v=1"
-          color="#0032a0">
+    <link rel="mask-icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/safari-pinned-tab.svg?v=1">
     <link rel="shortcut icon" href="https://ebiwd.github.io/pdx-visual-framework/images/favicons/favicon.ico?v=1">
     <meta name="apple-mobile-web-app-title" content="PDX Finder">
     <meta name="application-name" content="PDX Finder">
@@ -96,11 +95,11 @@
 
                                 <div class="columns small-7 medium-push-2 small-push-3  margin-bottom-none search-text-wrapper">
 
-                                    <select class="form-control" id="query" name="query" type="text" tabindex="2"
+                                    <select class="form-control" id="query" name="query" tabindex="2"
                                             th:if="${websearch.query == null || websearch.query == ''}"
                                             placeholder="Search (e.g., Melanoma)" multiple></select>
 
-                                    <select class="form-control" id="query" name="query" type="text" tabindex="2"
+                                    <select class="form-control" id="query" name="query" tabindex="2"
                                             th:if="${websearch.query != null && websearch.query != ''}" multiple>
 
                                         <option th:if="${websearch.query != null && websearch.query != ''}"
@@ -118,8 +117,8 @@
                                            class="button icon icon-functional margin-bottom-none line-height8"
                                            tabindex="3" name="submit1" type="submit" value="1">
                                 </div>
-                                <!-- <input id="allebi" type="hidden" name="db" labelId="allebi" checked="checked" /> -->
-                                <input type="hidden" name="requestFrom" labelId="ebi_index">
+                                <!-- <input id="allebi" type="hidden" name="db" labelId="allebi" checked="checked" />
+                                <input type="hidden" name="requestFrom" labelId="ebi_index"> -->
                             </div>
                         </fieldset>
                         <fieldset>
@@ -169,7 +168,6 @@
                             <a href="#" class="accordion-title" th:text = "${section.name}"></a>
                             <div class="accordion-content" data-tab-content>
 
-
                             <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
                                 data-allow-all-closed="true">
 
@@ -177,23 +175,20 @@
                                     <a href="#" class="accordion-title" th:text="${filterComponent.name}"></a>
 
                                     <div class="accordion-content" data-tab-content>
-                                        <div class="large-form">
+
                                             <!-- Check what kind of component is it, not all components have options-->
 
-                                            <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamFilter)}">
-                                                <!-- OneParamFilter -->
-                                            <div class="checkbox-item"
-                                                 th:each="option:${filterComponent.options}">
+                                        <!-- OneParamFilter -->
+                                        <div class="large-form" th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamFilter)}">
+                                            <div class="checkbox-item" th:each="option:${filterComponent.options}">
 
-
-                                                <input type="checkbox"
-                                                       class="filter" th:checked="${#lists.contains(filterComponent.selected, option.labelId)}" th:id="${filterComponent.urlParam} +'__'+${option.labelId}"/>
-                                                <label th:attr="for=${filterComponent.urlParam} +'__'+${option.labelId}"><span
-                                                        th:text="${option.label}"></span></label>
+                                                <input type="checkbox" class="filter" th:checked="${#lists.contains(filterComponent.selected, option.labelId)}" th:id="${filterComponent.urlParam} +'__'+${option.labelId}"/>
+                                                <label th:attr="for=${filterComponent.urlParam} +'__'+${option.labelId}"><span th:text="${option.label}"></span></label>
                                             </div>
-                                            </span>
+                                        </div>
 
-                                            <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamUnlinkedFilter)}">
+
+                                        <div class="light-grey-bg-box" th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamUnlinkedFilter)}">
                                                 <!-- TwoParamUnlinkedFilter-->
                                                 <div class="row topSace10">
                                                     <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
@@ -203,6 +198,23 @@
                                                     <div class="columns nospace small-12 large-6">
                                                         <input type="text" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}" class="fullWidth"/>
                                                     </div>
+
+                                                    <div id="drugResponseOptions1"  class="columns nospace small-12 large-6 topSpace3">
+                                                        <select id='responseFilter1' multiple='multiple'>
+
+                                                            <option value="Stable Disease">Stable Disease</option>
+
+                                                            <option value="Progressive Disease">Progressive Disease</option>
+
+                                                            <option value="Stable Disease And Complete Response">Stable Disease And Complete Response</option>
+
+                                                            <option value="Partial Response">Partial Response</option>
+
+                                                            <option value="Complete Response">Complete Response</option>
+
+                                                        </select>
+                                                    </div>
+                                                    <!--
                                                     <div class="columns nospace small-12 large-6 topSpace3">
                                                         <select multiple='multiple' th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}">
                                                             <option value="ALL">ALL</option>
@@ -212,7 +224,7 @@
                                                             </option>
 
                                                         </select>
-                                                    </div>
+                                                    </div>-->
 
                                                     <div class="checkbox-item height70px">
                                                         <button href="#"
@@ -222,35 +234,36 @@
                                                     </div>
                                                 </div>
 
-                                            </span>
-
-
-                                            <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamLinkedFilter)}">
-                                            <!-- TWoParamLinkedFilter-->
-                                            <div class="row topSace10">
-                                                <div th:if="${filterComponent.param1Name != null}" class="columns nospace small-6 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
-                                                <div th:if="${filterComponent.param2Name != null}" class="columns nospace small-6 large-6 adjusti" th:text="${filterComponent.param2Name}">  </div>
-                                            </div>
-                                            <div class="row topSace10">
-                                                <div class="columns nospace small-4 large-4"> <input type="text" class="fullWidth"/> </div>
-                                                <div class="columns nospace small-5 large-5 topSpace3"><select multiple='multiple' th:classappend="( ${not #lists.isEmpty(param.mutation) } ) ? 'width40' : '' "></select></div>
-                                            </div>
-
-                                            <div class="checkbox-item height70px">
-                                                <button href="#" class="button primary columns large-3 white-text-right-float topSpace4 searchButton">
-                                                    <i class="icon icon-functional" data-icon="1"></i></button>
-                                                <button href="#" class="icoButn columns large-2 ORButton" > OR </button>
-                                            </div>
-                                            </span>
                                         </div>
+
+
+                                        <div class="large-form" th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamLinkedFilter)}">
+                                                <!-- TWoParamLinkedFilter-->
+                                                <div class="row topSace10">
+                                                    <div th:if="${filterComponent.param1Name != null}" class="columns nospace small-6 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
+                                                    <div th:if="${filterComponent.param2Name != null}" class="columns nospace small-6 large-6 adjusti" th:text="${filterComponent.param2Name}">  </div>
+                                                </div>
+                                                <div class="row topSace10">
+                                                    <div class="columns nospace small-4 large-4"> <input type="text" class="fullWidth"/> </div>
+                                                    <div class="columns nospace small-5 large-5 topSpace3"><select multiple='multiple' th:classappend="( ${not #lists.isEmpty(param.mutation) } ) ? 'width40' : '' "></select></div>
+                                                </div>
+
+                                                <div class="checkbox-item height70px">
+                                                    <button href="#" class="button primary columns large-3 white-text-right-float topSpace4 searchButton">
+                                                        <i class="icon icon-functional" data-icon="1"></i></button>
+                                                    <button href="#" class="icoButn columns large-2 ORButton" > OR </button>
+                                                </div>
+                                        </div>
+
+
                                     </div>
 
                                 </li>
 
                             </ul>
                             </div>
-                        </li>
 
+                        </li>
 
 
                     </ul>
@@ -261,6 +274,7 @@
 
 
                 <div class="columns medium-9">
+
 
                     <div class="responsive-table">
                         <table id="search-datatable" class="stripe display datatable-pdx sticky-header" cellspacing="0"
@@ -411,7 +425,16 @@
 
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
-    console.log("JS starts");
+
+
+    $(function() {
+        $('#ms').change(function() {
+            console.log($(this).val());
+        }).multipleSelect({
+            width: '100%'
+        });
+    });
+
     var searchOptions = [[${websearch.mainSearchFieldOptions}]];
     var searchStates = [];
     for (var i = 0; i < searchOptions.length; i++) {
@@ -433,7 +456,7 @@
         }
         return newOptions;
     }
-    console.log("Before choices");
+
     // Test choices integration
 
     const mainSearch = new Choices('#query', {
@@ -454,7 +477,7 @@
         }
     });
 
-    console.log("After choices");
+
     function conditionallyShowDropdown(str) {
         if (str.length < 1) {
             mainSearch.hideDropdown();
@@ -511,7 +534,7 @@
         jQuery("form.main-search").submit();
     }, false);
 
-    console.log("before updating");
+
     jQuery(document).ready(function () {
         //updateFilters(ageFilters, genderFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters, projectFilters, dataAvailableFilters);
         console.log("updated");
@@ -531,14 +554,48 @@
             redirectPage();
         });
     });
+
+
+
     var incomingString = [];
     //var mutatedMarkersAndVariants = JSON.parse(incomingString);
     var mutatedMarkersAndVariants = [];
     var drugsList = [];
     var drugResponseList = [];
+
+
     jQuery(document).ready(function () {
+
+
+
+        var webFacetSections = [[${websearch.webFacetsContainer.webFacetSections}]];
+        webFacetSections.forEach(manageGeneralFilter);
+
+
+        function manageGeneralFilter (webFacetSection, index) {
+
+
+            var filterComponents = webFacetSection.filterComponents;
+
+            // Retrieve All the FilterComponents and their contents
+            filterComponents.forEach(function(filterComponent){
+
+                if (filterComponent.type === 'TwoParamUnlinkedFilter'){
+
+                    dataList = filterComponent.options1;
+                    componentId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
+
+                    twoParamUnlinkedFilterOptionOneList(dataList, componentId);
+                }
+
+            });
+
+        }
+
+        // Thanks my brother. We are doing fine. I
+
         loadGeneTextFields();
-        loadDrugTextFields();
+
         $('#variantFilter1').change(function () {
             console.log($(this).val());
         }).multipleSelect({
