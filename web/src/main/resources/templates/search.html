@@ -116,7 +116,7 @@
                                 <div class="columns small-1 medium-push-2 small-push-3 margin-bottom-none ">
                                     <input id="search_submit"
                                            class="button icon icon-functional margin-bottom-none line-height8"
-                                           tabindex="3" name="submit1" type="submit" labelId="1">
+                                           tabindex="3" name="submit1" type="submit" value="1">
                                 </div>
                                 <!-- <input id="allebi" type="hidden" name="db" labelId="allebi" checked="checked" /> -->
                                 <input type="hidden" name="requestFrom" labelId="ebi_index">
@@ -167,23 +167,21 @@
                         <li class="accordion-item is-active" data-accordion-item th:each="section:${websearch.webFacetsContainer.webFacetSections}">
 
                             <a href="#" class="accordion-title" th:text = "${section.name}"></a>
+                            <div class="accordion-content" data-tab-content>
+
 
                             <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
                                 data-allow-all-closed="true">
 
-                                <li class="accordion-item filterComponent" data-accordion-item
-                                    th:classappend="${filterComponent.isActive} ? is-active : not-active"
-                                    th:each="filterComponent:${section.filterComponents}" th:id="${filterComponent.urlParam}">
-
+                                <li class="accordion-item filterComponent" data-accordion-item th:classappend="${filterComponent.isActive} ? is-active : not-active" th:each="filterComponent:${section.filterComponents}" th:id="${filterComponent.urlParam}">
                                     <a href="#" class="accordion-title" th:text="${filterComponent.name}"></a>
 
                                     <div class="accordion-content" data-tab-content>
                                         <div class="large-form">
                                             <!-- Check what kind of component is it, not all components have options-->
 
-
-                                            <!-- OneParamFilter -->
-                                            <span th:if="${filterComponent.type == 'OneParamFilter' }">
+                                            <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamFilter)}">
+                                                <!-- OneParamFilter -->
                                             <div class="checkbox-item"
                                                  th:each="option:${filterComponent.options}">
 
@@ -195,11 +193,8 @@
                                             </div>
                                             </span>
 
-
-
-                                            <!-- TwoParamUnlinkedFilter-->
-                                            <span th:if="${filterComponent.type == 'TwoParamUnlinkedFilter' }">
-
+                                            <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamUnlinkedFilter)}">
+                                                <!-- TwoParamUnlinkedFilter-->
                                                 <div class="row topSace10">
                                                     <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
                                                     <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param2Name}">  </div>
@@ -208,9 +203,7 @@
                                                     <div class="columns nospace small-12 large-6">
                                                         <input type="text" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}" class="fullWidth"/>
                                                     </div>
-
-
-                                                    <!--<div class="columns nospace small-12 large-6 topSpace3">
+                                                    <div class="columns nospace small-12 large-6 topSpace3">
                                                         <select multiple='multiple' th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}">
                                                             <option value="ALL">ALL</option>
                                                             <option th:each="option :${filterComponent.options2}"
@@ -219,26 +212,7 @@
                                                             </option>
 
                                                         </select>
-                                                    </div>-->
-
-
-
-                                                    <div id="drugResponseOptions1"
-                                                         class="columns nospace small-12 large-6 topSpace3">
-                                                                <select id='responseFilter1' multiple='multiple'>
-
-                                                                        <option value="Stable Disease">Stable Disease</option>
-
-                                                                        <option value="Progressive Disease">Progressive Disease</option>
-
-                                                                        <option value="Stable Disease And Complete Response">Stable Disease And Complete Response</option>
-
-                                                                        <option value="Partial Response">Partial Response</option>
-
-                                                                        <option value="Complete Response">Complete Response</option>
-
-                                                                </select>
-                                                            </div>
+                                                    </div>
 
                                                     <div class="checkbox-item height70px">
                                                         <button href="#"
@@ -251,8 +225,8 @@
                                             </span>
 
 
+                                            <span th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamLinkedFilter)}">
                                             <!-- TWoParamLinkedFilter-->
-                                            <span th:if="${filterComponent.type == 'TwoParamLinkedFilter' }">
                                             <div class="row topSace10">
                                                 <div th:if="${filterComponent.param1Name != null}" class="columns nospace small-6 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
                                                 <div th:if="${filterComponent.param2Name != null}" class="columns nospace small-6 large-6 adjusti" th:text="${filterComponent.param2Name}">  </div>
@@ -274,7 +248,7 @@
                                 </li>
 
                             </ul>
-
+                            </div>
                         </li>
 
 
@@ -437,14 +411,13 @@
 
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
-
-
-
+    console.log("JS starts");
     var searchOptions = [[${websearch.mainSearchFieldOptions}]];
     var searchStates = [];
     for (var i = 0; i < searchOptions.length; i++) {
-        searchStates.push(searchOptions[i].labelId);
+        searchStates.push(searchOptions[i]);
     }
+
     var ageFilters = [];
     var dsFilters = [];
     var projectFilters = [];
@@ -453,100 +426,18 @@
     var genderFilters = [];
     var mutationFilters = [];
     var dataAvailableFilters = [];
-
-
-
-
-
-
-
-    var incomingString = [];
-    var mutatedMarkersAndVariants = []; //TODO: RESTORE - JSON.parse(incomingString);
-    var drugsList = [];
-
-
-
-    var drugResponseList = [];
-    jQuery(document).ready(function () {
-
-        var webFacetSections = [[${websearch.webFacetsContainer.webFacetSections}]];
-        webFacetSections.forEach(manageGeneralFilter);
-
-
-        function manageGeneralFilter (webFacetSection, index) {
-
-
-            var filterComponents = webFacetSection.filterComponents;
-
-            // Retrieve All the FilterComponents and their contents
-            filterComponents.forEach(function(filterComponent){
-
-                if (filterComponent.type === 'TwoParamUnlinkedFilter'){
-
-                    dataList = filterComponent.options1;
-                    componentId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
-
-                    twoParamUnlinkedFilterOptionOneList(dataList, componentId);
-                }
-
-            });
-
-        }
-
-        loadGeneTextFields();
-
-
-
-
-
-
-
-        $('#variantFilter1').change(function () {
-            console.log($(this).val());
-        }).multipleSelect({
-            placeholder: "Variants"
-        });
-        for (var i = 2; i <= 20; i++) {
-            $('#variantFilter' + i).change(function () {
-                console.log($(this).val());
-            }).multipleSelect({
-                placeholder: "Variants"
-            });
-        }
-        $('#responseFilter1').change(function () {
-            console.log($(this).val());
-        }).multipleSelect({
-            placeholder: "Responses"
-        });
-        for (var i = 2; i <= 20; i++) {
-            $('#responseFilter' + i).change(function () {
-                console.log($(this).val());
-            }).multipleSelect({
-                placeholder: "Responses"
-            });
-        }
-    });
-
-
-
-
-
-
-
-
-
-
     function constructSearchOptions(data) {
         var newOptions = [];
         for (var i = 0; i < data.length; i++) {
-            newOptions.push({'labelId': data[i], 'label': data[i], selected: false, disabled: false})
+            newOptions.push({'value': data[i], 'label': data[i], selected: false, disabled: false})
         }
         return newOptions;
     }
     console.log("Before choices");
     // Test choices integration
+
     const mainSearch = new Choices('#query', {
-        choices: constructSearchOptions(searchStates),
+        choices: constructSearchOptions(searchOptions),
         removeItemButton: true,
         // placeholder: false,
         // placeholderValue: 'This is a placeholder',
@@ -562,6 +453,8 @@
             distance: 1000
         }
     });
+
+    console.log("After choices");
     function conditionallyShowDropdown(str) {
         if (str.length < 1) {
             mainSearch.hideDropdown();
@@ -617,6 +510,7 @@
     mainSearch.passedElement.addEventListener('addItem', function (event) {
         jQuery("form.main-search").submit();
     }, false);
+
     console.log("before updating");
     jQuery(document).ready(function () {
         //updateFilters(ageFilters, genderFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters, projectFilters, dataAvailableFilters);
@@ -637,10 +531,39 @@
             redirectPage();
         });
     });
-
-
-
-
+    var incomingString = [];
+    //var mutatedMarkersAndVariants = JSON.parse(incomingString);
+    var mutatedMarkersAndVariants = [];
+    var drugsList = [];
+    var drugResponseList = [];
+    jQuery(document).ready(function () {
+        loadGeneTextFields();
+        loadDrugTextFields();
+        $('#variantFilter1').change(function () {
+            console.log($(this).val());
+        }).multipleSelect({
+            placeholder: "Variants"
+        });
+        for (var i = 2; i <= 20; i++) {
+            $('#variantFilter' + i).change(function () {
+                console.log($(this).val());
+            }).multipleSelect({
+                placeholder: "Variants"
+            });
+        }
+        $('#responseFilter1').change(function () {
+            console.log($(this).val());
+        }).multipleSelect({
+            placeholder: "Responses"
+        });
+        for (var i = 2; i <= 20; i++) {
+            $('#responseFilter' + i).change(function () {
+                console.log($(this).val());
+            }).multipleSelect({
+                placeholder: "Responses"
+            });
+        }
+    });
 </script>
 
 

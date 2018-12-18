@@ -3,330 +3,48 @@
  */
 
 
-/** This function updates the UI filter based on latest changes in USER CHOICE
- *
- * @param ages : A list of patients age selected by the user
- * @param genders : A list of patient genders/sex selected by the user
- * @param cancersystem : A list of cancer systems selected by the user
- * @param datasources : A list of data sources selced by the user
- * @param tumortype : A list of tumour types selected by the user
- *
+/**
+ * Checks the filters and collects the parameters that are selected, t
+ * hen constructs the url and redirects the user to that url
  */
-function updateFilters(ages, genders, cancersystem, datasources, tumortype, projects, dataAvailable) {
-
-
-    console.log("updating filters!");
-    //characters we want to see as values
-    var reg = /[^A-Za-z0-9 _-]/;
-
-    var openAgeFacet = false;
-    var openGenderFacet = false;
-    var openDatasourceFacet = false;
-    var openCancerBySystem = false;
-    var openTumorTypeFacet = false;
-    var openProjectsFacet = false;
-    var openDatAvailable = false;
-
-    var node = "";
-    var disURLRequest = "";
-    node = window.location.search;
-    try {
-        disURLRequest = node.split("?")[1].split("=")[0];
-    } catch (e) {
-    }
-
-
-
-    //check selected age bins
-    if (ages != null && ages.length > 0) {
-
-        jQuery.each(ages, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(" ", "_");
-            var selected = value.selected;
-
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#patient_age__" + id).prop('checked', true);
-                jQuery("#patient_age__" + id).siblings("label").find("span").addClass("selected");
-                openAgeFacet = true;
-            }
-
-            //Add a plus to patient age 90
-            if (id == '90') {
-                jQuery("#patient_age__" + id).siblings("label").find("span").append("+");
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#patient_age__"+id).siblings("label").find("span").append(count);
-
-
-        });
-
-        if (openAgeFacet || disURLRequest == "patient_age") {
-            var ageFilterField = jQuery("li#age_filter > a.accordion-title");
-            ageFilterField.click();
-        }
-    }
-
-
-    //check selected gender options
-    if (genders != null && genders.length > 0) {
-
-
-        jQuery.each(genders, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(" ", "_");
-            var selected = value.selected;
-
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#patient_gender__" + id).prop('checked', true);
-                jQuery("#patient_gender__" + id).siblings("label").find("span").addClass("selected");
-                openGenderFacet = true;
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#patient_gender__"+id).siblings("label").find("span").append(count);
-
-        });
-
-        if (openGenderFacet || disURLRequest == "patient_gender") {
-            var genderFilterField = jQuery("li#gender_filter > a.accordion-title");
-            genderFilterField.click();
-        }
-    }
-
-
-    //check selected cancer systems
-    if (cancersystem != null && cancersystem.length > 0) {
-
-        jQuery.each(cancersystem, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(/ /g, "_");
-            var selected = value.selected;
-
-            console.log("system id:" + id);
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#cancer_system__" + id).prop('checked', true);
-                jQuery("#cancer_system__" + id).siblings("label").find("span").addClass("selected");
-                openCancerBySystem = true;
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#cancer_system__"+id).siblings("label").find("span").append(count);
-
-        });
-
-        if (openCancerBySystem || disURLRequest == "cancer_system") {
-            var cancerSystemFilterField = jQuery("li#cancer_system_filter > a.accordion-title");
-            cancerSystemFilterField.click();
-        }
-    }
-
-
-    //check selected datasources
-    if (datasources != null && datasources.length > 0) {
-
-        jQuery.each(datasources, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(" ", "_");
-            var selected = value.selected;
-
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#datasource__" + id).prop('checked', true);
-                jQuery("#datasource__" + id).siblings("label").find("span").addClass("selected");
-                openDatasourceFacet = true;
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#datasource__" + id).siblings("label").find("span").append(count);
-
-        });
-
-        if (openDatasourceFacet || disURLRequest == "datasource") {
-            var dsFilterField = jQuery("li#datasource_filter > a.accordion-title");
-            dsFilterField.click();
-        }
-
-
-    }
-
-
-
-
-
-    //check selected projects
-    if (projects != null && projects.length > 0) {
-
-        jQuery.each(projects, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(" ", "_");
-            var selected = value.selected;
-
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#project__" + id).prop('checked', true);
-                jQuery("#project__" + id).siblings("label").find("span").addClass("selected");
-                openProjectsFacet = true;
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#datasource__" + id).siblings("label").find("span").append(count);
-
-        });
-
-        if (openProjectsFacet || disURLRequest == "project") {
-            var projectFilterField = jQuery("li#project_filter > a.accordion-title");
-            projectFilterField.click();
-        }
-
-
-    }
-
-
-
-
-
-
-
-    //check selected Data Avaiable Options
-    if (dataAvailable != null && dataAvailable.length > 0) {
-
-        jQuery.each(dataAvailable, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(/ /g, "_");
-            var selected = value.selected;
-
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#data_available__" + id).prop('checked', true);
-                jQuery("#data_available__" + id).siblings("label").find("span").addClass("selected");
-                openDatAvailable = true;
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#data_available__"+id).siblings("label").find("span").append(count);
-
-        });
-
-        if (openDatAvailable || disURLRequest == "data_available") {
-            var dataAvailableFilterField = jQuery("li#data_available_filter > a.accordion-title");
-            dataAvailableFilterField.click();
-        }
-    }
-
-
-
-
-
-
-
-
-    //check selected tumorTypes
-    if (tumortype != null && tumortype.length > 0) {
-
-        jQuery.each(tumortype, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(" ", "_");
-            var selected = value.selected;
-
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#sample_tumor_type__" + id).prop('checked', true);
-                jQuery("#sample_tumor_type__" + id).siblings("label").find("span").addClass("selected");
-                openTumorTypeFacet = true;
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#sample_tumor_type__" + id).siblings("label").find("span").append(count);
-
-        });
-
-        if (openTumorTypeFacet || disURLRequest == "sample_tumor_type") {
-            var ttFilterField = jQuery("li#tumor_type_filter > a.accordion-title");
-            ttFilterField.click();
-        }
-
-
-    }
-
-    // Check selected Molechular Characterization:
-    var urlParams = new URLSearchParams(window.location.search);
-    var dURLString = urlParams.toString();
-    var openMarkerFacet = dURLString.search("mutation");
-
-    if (disURLRequest == "mutation") {   // openMarkerFacet != -1  ||
-        jQuery("li#marker_filter > a.accordion-title").click();
-    }
-
-    // Check if Dosing Study was selected
-    var openDrugFacet = dURLString.search("drug");
-    if (openDrugFacet != -1 || disURLRequest == "drug") {
-        jQuery("li#drug_filter > a.accordion-title").click();
-    }
-
-}
-/* End updateFilters function */
-
-
-
-
 function redirectPage(){
 
     var no_parameters = true;
     var url = "?"
 
     var searchField = jQuery("#query");
-
+    //check if main search field has anything
     if (searchField.val() != null && searchField.val() != "") {
         url+="query="+searchField.val();
         no_parameters = false;
     }
+
+    //check elements with filter class
+
+    jQuery(".filter").each(function(){
+        var id = jQuery(this).attr("id");
+
+        //characters we want to see as values
+        var reg = /[^A-Za-z0-9 _-]/;
+
+        if (jQuery(this).is(':checked')){
+
+            var res = id.split("__");
+
+            if(!no_parameters){
+                url = url+"&";
+            }
+
+            url = url+res[0]+"="+res[1];
+            no_parameters = false;
+
+        }
+        else if(jQuery(this).is("input:text")){
+            return;
+        }
+    });
+
+    //TODO: deal with two and three param filters here
 
 
     for (var i=1; i<20; i++){
@@ -402,32 +120,6 @@ function redirectPage(){
         }
     });
 
-
-    //get all filters with values
-    jQuery(".filter").each(function(){
-        var id = jQuery(this).attr("id");
-
-        //characters we want to see as values
-        var reg = /[^A-Za-z0-9 _-]/;
-
-        if (jQuery(this).is(':checked')){
-
-            var res = id.split("__");
-
-            if(!no_parameters){
-                url = url+"&";
-            }
-
-            if( ! reg.test(res[1])){
-                url = url+res[0]+"="+encodeURIComponent(res[1].replace(/_/g, ' '));
-                no_parameters = false;
-
-            }
-        }
-        else if(jQuery(this).is("input:text")){
-            return;
-        }
-    });
     window.location.replace(url);
 }
 
