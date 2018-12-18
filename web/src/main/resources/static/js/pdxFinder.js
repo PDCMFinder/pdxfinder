@@ -205,6 +205,26 @@ function twoParamUnlinkedFilterOptionOneList(dataList, componentId){
     }
 }
 
+function twoParamUnlinkedFilterOptionTwoList(componentId){
+
+    dataList = dataList.sort();
+
+    $('#'+componentId).change(function () {
+        console.log($(this).val());
+    }).multipleSelect({
+        placeholder: "Responses"
+    });
+
+    for (var i = 2; i <= 20; i++) {
+        $('#'+componentId+ i).change(function () {
+            console.log($(this).val());
+        }).multipleSelect({
+            placeholder: "Responses"
+        });
+    }
+}
+
+
 
 function loadDrugResponse(compNumber) {
 

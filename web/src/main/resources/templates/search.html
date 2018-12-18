@@ -199,32 +199,14 @@
                                                         <input type="text" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}" class="fullWidth"/>
                                                     </div>
 
-                                                    <div id="drugResponseOptions1"  class="columns nospace small-12 large-6 topSpace3">
-                                                        <select id='responseFilter1' multiple='multiple'>
-
-                                                            <option value="Stable Disease">Stable Disease</option>
-
-                                                            <option value="Progressive Disease">Progressive Disease</option>
-
-                                                            <option value="Stable Disease And Complete Response">Stable Disease And Complete Response</option>
-
-                                                            <option value="Partial Response">Partial Response</option>
-
-                                                            <option value="Complete Response">Complete Response</option>
-
-                                                        </select>
-                                                    </div>
-                                                    <!--
                                                     <div class="columns nospace small-12 large-6 topSpace3">
                                                         <select multiple='multiple' th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}">
-                                                            <option value="ALL">ALL</option>
                                                             <option th:each="option :${filterComponent.options2}"
                                                                     th:value="${option}"
                                                                     th:text="${option}"> ...
                                                             </option>
-
                                                         </select>
-                                                    </div>-->
+                                                    </div>
 
                                                     <div class="checkbox-item height70px">
                                                         <button href="#"
@@ -233,7 +215,6 @@
                                                         <button href="#" class="icoButn columns large-2 ORButton" > OR </button>
                                                     </div>
                                                 </div>
-
                                         </div>
 
 
@@ -583,18 +564,21 @@
                 if (filterComponent.type === 'TwoParamUnlinkedFilter'){
 
                     dataList = filterComponent.options1;
-                    componentId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
+                    componentId1 = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
+                    componentId2 = filterComponent.urlParam+"_"+(filterComponent.param2Name).toLowerCase();
 
-                    twoParamUnlinkedFilterOptionOneList(dataList, componentId);
+                    twoParamUnlinkedFilterOptionOneList(dataList, componentId1);
+                    twoParamUnlinkedFilterOptionTwoList(componentId2);
+
                 }
 
             });
 
         }
 
-        // Thanks my brother. We are doing fine. I
-
         loadGeneTextFields();
+
+
 
         $('#variantFilter1').change(function () {
             console.log($(this).val());
@@ -608,18 +592,8 @@
                 placeholder: "Variants"
             });
         }
-        $('#responseFilter1').change(function () {
-            console.log($(this).val());
-        }).multipleSelect({
-            placeholder: "Responses"
-        });
-        for (var i = 2; i <= 20; i++) {
-            $('#responseFilter' + i).change(function () {
-                console.log($(this).val());
-            }).multipleSelect({
-                placeholder: "Responses"
-            });
-        }
+
+
     });
 </script>
 
