@@ -18,7 +18,6 @@ import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
 
@@ -136,7 +135,7 @@ public class SearchDS {
         cancerBySystemOptions.add(new FacetOption("Urinary System Cancer", "Urinary_System_Cancer"));
         cancerBySystemOptions.add(new FacetOption("Unclassified", "Unclassified"));
 
-        OneParamFilter cancerBySystem = new OneParamFilter("CANCER BY SYSTEM", "cancer_system", false, FilterType.OneParamFilter.get(),
+        OneParamFilter cancerBySystem = new OneParamFilter("CANCER BY SYSTEM", "cancer_system", false, "OneParamFilter",
                 cancerBySystemOptions, new ArrayList<>());
         patientTumorSection.addComponent(cancerBySystem);
         facetOptionMap.put("cancer_system", cancerBySystemOptions);
@@ -149,7 +148,7 @@ public class SearchDS {
         tumorTypeOptions.add(new FacetOption("Refractory", "Refractory"));
         tumorTypeOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
-        OneParamFilter tumorType = new OneParamFilter("TUMOR_TYPE", "sample_tumor_type", false, FilterType.OneParamFilter.get(),
+        OneParamFilter tumorType = new OneParamFilter("TUMOR_TYPE", "sample_tumor_type", false, "OneParamFilter",
               tumorTypeOptions, new ArrayList<>());
         patientTumorSection.addComponent(tumorType);
         facetOptionMap.put("sample_tumor_type", tumorTypeOptions);
@@ -159,7 +158,7 @@ public class SearchDS {
         patientSexOptions.add(new FacetOption("Male", "Male"));
         patientSexOptions.add(new FacetOption("Female", "Female"));
         patientSexOptions.add(new FacetOption("Not Specified", "Not_Specified"));
-        OneParamFilter sex = new OneParamFilter("SEX", "patient_gender", false, FilterType.OneParamFilter.get(),
+        OneParamFilter sex = new OneParamFilter("SEX", "patient_gender", false, "OneParamFilter",
         patientSexOptions, new ArrayList<>());
         patientTumorSection.addComponent(sex);
         facetOptionMap.put("patient_gender", patientSexOptions);
@@ -178,7 +177,7 @@ public class SearchDS {
         ageOptions.add(new FacetOption("90", "90"));
         ageOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
-        OneParamFilter age = new OneParamFilter("AGE", "patient_age", false, FilterType.OneParamFilter.get(),
+        OneParamFilter age = new OneParamFilter("AGE", "patient_age", false, "OneParamFilter",
         ageOptions, new ArrayList<>());
         patientTumorSection.addComponent(age);
         facetOptionMap.put("patient_age",ageOptions);
@@ -197,7 +196,7 @@ public class SearchDS {
             datasourceOptions.add(new FacetOption(ds, ds));
         }
 
-        OneParamFilter datasource = new OneParamFilter("DATASOURCE", "datasource", false, FilterType.OneParamFilter.get(), datasourceOptions, new ArrayList<>());
+        OneParamFilter datasource = new OneParamFilter("DATASOURCE", "datasource", false, "OneParamFilter", datasourceOptions, new ArrayList<>());
         pdxModelSection.addComponent(datasource);
         facetOptionMap.put("datasource", datasourceOptions);
 
@@ -221,7 +220,7 @@ public class SearchDS {
         for(String p: projectList){
             projectOptions.add(new FacetOption(p, p));
         }
-        OneParamFilter projects = new OneParamFilter("PROJECT", "project", false, FilterType.OneParamFilter.get(), projectOptions, new ArrayList<>());
+        OneParamFilter projects = new OneParamFilter("PROJECT", "project", false, "OneParamFilter", projectOptions, new ArrayList<>());
         pdxModelSection.addComponent(projects);
         facetOptionMap.put("project", projectOptions);
 
@@ -231,7 +230,7 @@ public class SearchDS {
         datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
         datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
 
-        OneParamFilter datasetAvailable = new OneParamFilter("DATASET AVAILABLE", "data_available", false, FilterType.OneParamFilter.get(),
+        OneParamFilter datasetAvailable = new OneParamFilter("DATASET AVAILABLE", "data_available", false, "OneParamFilter",
         datasetAvailableOptions, new ArrayList<>());
 
         pdxModelSection.addComponent(datasetAvailable);
@@ -239,8 +238,8 @@ public class SearchDS {
 
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
-        TwoParamLinkedFilter geneMutation = new TwoParamLinkedFilter("GENE MUTATION", "mutation", false, FilterType.TwoParamLinkedFilter.get(),
-                 "GENE", "VARIANT", new HashMap<>(), new HashMap<>());
+        TwoParamLinkedFilter geneMutation = new TwoParamLinkedFilter("GENE MUTATION", "mutation", false, "TwoParamLinkedFilter",
+                 "GENE", "VARIANT", getMutationOptionsFromDP(), new HashMap<>());
 
         molecularDataSection.addComponent(geneMutation);
 
@@ -256,7 +255,7 @@ public class SearchDS {
         breastCancerMarkerOptions.add(new FacetOption("ER+ HER2- PR-", "ERpos_HER2neg_PRneg"));
         breastCancerMarkerOptions.add(new FacetOption("ER- HER2- PR-", "ERneg_HER2neg_PRneg"));
 
-        OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_markers", false, FilterType.OneParamFilter.get(),
+        OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_markers", false, "OneParamFilter",
                 breastCancerMarkerOptions, new ArrayList<>());
         molecularDataSection.addComponent(breastCancerMarkers);
         facetOptionMap.put("breast_cancer_markers",breastCancerMarkerOptions);
@@ -267,7 +266,7 @@ public class SearchDS {
         Map<String, Map<String, Set<Long>>> modelDrugResponses = getModelDrugResponsesFromDP();
         List<String> drugNames = new ArrayList<>(modelDrugResponses.keySet());
 
-        TwoParamUnlinkedFilter modelDosingStudy = new TwoParamUnlinkedFilter("MODEL DOSING STUDY", "drug", false, FilterType.TwoParamUnlinkedFilter.get(), "DRUG", "RESPONSE", drugNames, Arrays.asList(
+        TwoParamUnlinkedFilter modelDosingStudy = new TwoParamUnlinkedFilter("MODEL DOSING STUDY", "drug", false, "TwoParamUnlinkedFilter", "DRUG", "RESPONSE", drugNames, Arrays.asList(
                 "Complete Response",
                 "Partial Response",
                 "Progressive Disease",
@@ -332,8 +331,12 @@ public class SearchDS {
                 else if(filter instanceof TwoParamUnlinkedFilter){
 
                     TwoParamUnlinkedFilter f = (TwoParamUnlinkedFilter) filter;
-                    //TODO: Implement updating two and three parameter filters
+                    f.setSelected(new HashMap<>());
 
+                }
+                else if(filter instanceof TwoParamLinkedFilter){
+                    TwoParamLinkedFilter f = (TwoParamLinkedFilter) filter;
+                    f.setSelected(new HashMap<>());
                 }
             }
         }
@@ -377,8 +380,50 @@ public class SearchDS {
                         else if(filter instanceof TwoParamUnlinkedFilter){
 
                             TwoParamUnlinkedFilter f = (TwoParamUnlinkedFilter) filter;
-                            //TODO: Implement updating two and three parameter filters
 
+                            Map<String,List<String>> selectedMap = new HashMap<>();
+
+                            for(String opt:decodedSelected){
+
+                                String[] optArr = opt.split("___");
+
+                                if(selectedMap.containsKey(optArr[0])){
+                                    selectedMap.get(optArr[0]).add(optArr[1]);
+                                }
+                                else{
+                                    List<String> arrList = new ArrayList<>();
+                                    arrList.add(optArr[1]);
+                                    selectedMap.put(optArr[0], arrList);
+
+                                }
+
+                            }
+
+                            f.setSelected(selectedMap);
+
+                        }
+                        else if(filter instanceof TwoParamLinkedFilter){
+                            TwoParamLinkedFilter f = (TwoParamLinkedFilter) filter;
+
+                            Map<String,List<String>> selectedMap = new HashMap<>();
+
+                            for(String opt:decodedSelected){
+
+                                String[] optArr = opt.split("___");
+
+                                if(selectedMap.containsKey(optArr[0])){
+                                    selectedMap.get(optArr[0]).add(optArr[1]);
+                                }
+                                else{
+                                    List<String> arrList = new ArrayList<>();
+                                    arrList.add(optArr[1]);
+                                    selectedMap.put(optArr[0], arrList);
+
+                                }
+
+                            }
+
+                            f.setSelected(selectedMap);
                         }
 
                     }
@@ -658,6 +703,44 @@ public class SearchDS {
         return mutations;
     }
 
+    private Map<String, List<String>> getMutationOptionsFromDP(){
+
+        Map<String, Map<String, Map<String, Set<Long>>>> mutations = getMutationsFromDP();
+
+        Map<String,Set<String>> tempResults = new HashMap<>();
+
+        for(Map.Entry<String, Map<String, Map<String, Set<Long>>>> platform:mutations.entrySet()){
+
+            for(Map.Entry<String, Map<String, Set<Long>>> marker:platform.getValue().entrySet()){
+
+                for(Map.Entry<String, Set<Long>> variant:marker.getValue().entrySet()){
+
+                    String m = marker.getKey();
+                    String v = variant.getKey();
+
+                    if(tempResults.containsKey(m)){
+                        tempResults.get(m).add(v);
+                    }
+                    else{
+                        Set<String> set = new HashSet<>();
+                        set.add(v);
+                        tempResults.put(m, set);
+
+                    }
+
+                }
+            }
+        }
+
+        Map<String, List<String>> resultMap = new HashMap<>();
+
+        for(Map.Entry<String, Set<String>> entry : tempResults.entrySet()){
+
+            resultMap.put(entry.getKey(), new ArrayList<>(new TreeSet<>(entry.getValue())));
+        }
+
+        return resultMap;
+    }
 
     private Map<String, Map<String, Set<Long>>> getModelDrugResponsesFromDP(){
 
