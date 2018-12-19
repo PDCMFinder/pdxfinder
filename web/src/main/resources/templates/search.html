@@ -197,11 +197,12 @@
                                             </div>
                                             <div class="row topSace10">
                                                 <div class="columns nospace small-12 large-6">
-                                                    <input type="text" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}" class="fullWidth"/>
+                                                    <input type="text" class="fullWidth"
+                                                           th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'1'}" />
                                                 </div>
 
                                                 <div class="columns nospace small-12 large-6 topSpace3">
-                                                    <select multiple='multiple' th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}">
+                                                    <select multiple='multiple' th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)+'1'}">
                                                         <option th:each="option :${filterComponent.options2}"
                                                                 th:value="${option}"
                                                                 th:text="${option}"> ...
@@ -211,7 +212,7 @@
                                             </div>
 
                                             <!-- TwoParamUnlinkedFilter Hidden Fields Trigger on Click "OR" Button-->
-                                            <div class="row" th:each="i: ${#numbers.sequence(2, 20)}" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_parent'}+${i}" style="display:none">
+                                            <div class="row" th:each="i: ${#numbers.sequence(2, 20)}" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_hidden'}+${i}" style="display:none">
                                                     <div class="columns nospace small-12 large-6">
                                                         <input type="text" value="NULL" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${i}" class="fullWidth"/>
                                                     </div>
@@ -229,15 +230,19 @@
 
                                             <!-- TwoParamUnlinkedFilter Action Buttons -->
                                             <div class="checkbox-item height70px">
-                                                <button href="#"
-                                                        class="button primary columns large-3 white-text-right-float topSpace4 searchButton">
-                                                    <i class="icon icon-functional" data-icon="1"></i></button>
+                                                <button href="#" class="button primary columns large-3 white-text-right-float topSpace4 searchButton"
+                                                        th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_button'}">
+                                                    <i class="icon icon-functional" data-icon="1"></i>
+                                                </button>
 
                                                 <button href="#" class="icoButn columns large-2 ORButton"
-                                                        th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}')|"> OR </button>
+                                                        th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}')|">
+                                                    OR
+                                                </button>
                                             </div>
 
                                         </div>
+
 
 
                                         <div class="large-form" th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamLinkedFilter)}">
@@ -253,14 +258,16 @@
 
                                                 <div class="checkbox-item height70px">
                                                     <button href="#" class="button primary columns large-3 white-text-right-float topSpace4 searchButton">
-                                                        <i class="icon icon-functional" data-icon="1"></i></button>
-                                                    <button href="#" class="icoButn columns large-2 ORButton" > OR </button>
+                                                        <i class="icon icon-functional" data-icon="1"></i>
+                                                    </button>
+
+                                                    <button href="#" class="icoButn columns large-2 ORButton" >
+                                                        OR
+                                                    </button>
                                                 </div>
                                         </div>
 
-
                                     </div>
-
                                 </li>
 
                             </ul>
@@ -429,17 +436,20 @@
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
-
-    $(function() {
-        $('#ms').change(function() {
-            console.log($(this).val());
-        }).multipleSelect({
-            width: '100%'
-        });
-    });
-
+    var webFacetSections = [[${websearch.webFacetsContainer.webFacetSections}]];
     var searchOptions = [[${websearch.mainSearchFieldOptions}]];
     var searchStates = [];
+
+
+    var incomingString = [];
+    //var mutatedMarkersAndVariants = JSON.parse(incomingString);
+    var mutatedMarkersAndVariants = [];
+    var drugsList = [];
+    var drugResponseList = [];
+
+
+
+
     for (var i = 0; i < searchOptions.length; i++) {
         searchStates.push(searchOptions[i]);
     }
@@ -538,45 +548,16 @@
     }, false);
 
 
-    jQuery(document).ready(function () {
-        //updateFilters(ageFilters, genderFilters, cancerSystemFilters, dsFilters, sampleTumorTypeFilters, projectFilters, dataAvailableFilters);
-        console.log("updated");
-        //Add eventlistener to fields with filter class
-        jQuery('.filter').change(function () {
-            redirectPage();
-        });
-        //Add eventlistener to fields with filter class
-        jQuery('#markerFilter').click(function () {
-            redirectPage();
-        });
-        jQuery('#drugFilterButton').click(function () {
-            redirectPage();
-        });
-        //Add eventlistener to search field's button
-        jQuery('#search_submit').click(function () {
-            redirectPage();
-        });
-    });
-
-
-
-    var incomingString = [];
-    //var mutatedMarkersAndVariants = JSON.parse(incomingString);
-    var mutatedMarkersAndVariants = [];
-    var drugsList = [];
-    var drugResponseList = [];
 
 
     jQuery(document).ready(function () {
 
 
 
-        var webFacetSections = [[${websearch.webFacetsContainer.webFacetSections}]];
+
         webFacetSections.forEach(manageGeneralFilter);
 
-
-        function manageGeneralFilter (webFacetSection, index) {
-
+        function manageGeneralFilter(webFacetSection, index) {
 
             var filterComponents = webFacetSection.filterComponents;
 
@@ -588,19 +569,21 @@
                     dataList = filterComponent.options1;
                     componentId1 = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
                     componentId2 = filterComponent.urlParam+"_"+(filterComponent.param2Name).toLowerCase();
+                    filterButton = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase()+'_button';
 
-                    twoParamUnlinkedFilterOptionOneList(dataList, componentId1);
-                    twoParamUnlinkedFilterOptionTwoList(componentId2);
+                    intializeTwoParamUnlinkedFilterOptionOneList(dataList, componentId1);
+                    intializeTwoParamUnlinkedFilterOptionTwoList(componentId2);
 
+                    //Add eventlistener to each TwoParamUnlinkedFilter filter class
+                    jQuery('#'+filterButton).click(function () {
+                        redirectPage(webFacetSections);
+                    });
                 }
-
             });
-
         }
 
+
         loadGeneTextFields();
-
-
         $('#variantFilter1').change(function () {
             console.log($(this).val());
         }).multipleSelect({
@@ -615,8 +598,37 @@
         }
 
 
+
+
+
+
+        //Add eventlistener to fields with filter class
+        jQuery('.filter').change(function () {
+            redirectPage(webFacetSections);
+        });
+
+        //Add eventlistener to fields with filter class
+        jQuery('#markerFilter').click(function () {
+            redirectPage(webFacetSections);
+        });
+
+        //Add eventlistener to search field's button
+        jQuery('#search_submit').click(function () {
+            redirectPage(webFacetSections);
+        });
     });
+
+
 </script>
+
+
+
+
+
+
+
+
+
 
 
 <script type="application/ld+json">

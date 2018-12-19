@@ -7,7 +7,7 @@
  * Checks the filters and collects the parameters that are selected, t
  * hen constructs the url and redirects the user to that url
  */
-function redirectPage(){
+function redirectPage(webFacetSections){
 
     var no_parameters = true;
     var url = "?"
@@ -44,7 +44,80 @@ function redirectPage(){
         }
     });
 
-    //TODO: deal with two and three param filters here
+
+
+
+
+
+
+    webFacetSections.forEach(buildURL);
+
+    function buildURL(webFacetSection, index) {
+
+        var filterComponents = webFacetSection.filterComponents;
+
+        // Retrieve All the FilterComponents and their contents
+        filterComponents.forEach(function(filterComponent){
+
+            if (filterComponent.type === 'TwoParamUnlinkedFilter'){
+
+                options1List = filterComponent.options1;
+                options2List = filterComponent.options2;
+                componentId1 = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
+                componentId2 = filterComponent.urlParam+"_"+(filterComponent.param2Name).toLowerCase();
+                urlKey = filterComponent.urlParam;
+
+                intializeTwoParamUnlinkedFilterOptionOneList(dataList, componentId1);
+                intializeTwoParamUnlinkedFilterOptionTwoList(componentId2);
+
+
+
+                for (var i=1; i<20; i++){
+
+                    var component1Choice = jQuery("#"+componentId1+i);
+                    var component2Choices = jQuery("#"+componentId2+i);
+
+                    if (component1Choice.val() != null && component1Choice.val() != "NULL")
+                    {
+
+                        for (var j=0; j<component2Choices.val().length; j++){
+
+                            if (!no_parameters) {
+                                url = url + "&";
+                            }
+
+                            if(options2List.length == component2Choices.val().length){
+
+                                url += urlKey+"=" + component1Choice.val() + "___ALL";
+                                no_parameters = false;
+                                break;
+                            }else{
+                                url += urlKey+"=" + component1Choice.val() + "___"+component2Choices.val()[j];
+                                no_parameters = false;
+
+                            }
+                        }
+                    }
+
+                }
+
+
+            }
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     for (var i=1; i<20; i++){
@@ -74,32 +147,6 @@ function redirectPage(){
     }
 
 
-    for (var i=1; i<20; i++){
-
-        var drugFilter = jQuery("#drugFilter"+i);
-        var responseFilter = jQuery("#responseFilter"+i);
-
-        if (drugFilter.val() != null && drugFilter.val() != "NULL")
-        {
-            var allResponses = drugResponseList;
-            for (var j=0; j<responseFilter.val().length; j++){
-                if (!no_parameters) {
-                    url = url + "&";
-                }
-                if(allResponses.length == responseFilter.val().length){
-                    url += "drug=" + drugFilter.val() + "___ALL";
-                    no_parameters = false;
-                    break;
-                }else{
-                    url += "drug=" + drugFilter.val() + "___"+responseFilter.val()[j];
-                    no_parameters = false;
-
-                }
-            }
-        }
-
-    }
-
 
     // Add all diagnosis filters to the URL
     jQuery(".diagnosis").each(function () {
@@ -122,6 +169,91 @@ function redirectPage(){
 
     window.location.replace(url);
 }
+
+
+
+
+
+
+
+function intializeTwoParamUnlinkedFilterOptionOneList(dataList, componentId){
+
+    dataList = dataList.sort();
+
+    /*$('#'+componentId).autocomplete({
+        source: [dataList]
+    });*/
+
+    for (var i = 1; i <= 20; i++) {
+        $('#'+componentId + i).autocomplete({
+            source: [dataList]
+        });
+    }
+}
+
+function intializeTwoParamUnlinkedFilterOptionTwoList(componentId){
+
+    /*$('#'+componentId).change(function () {
+        //console.log($(this).val());
+    }).multipleSelect({
+        placeholder: "Responses"
+    });*/
+
+    for (var i = 1; i <= 20; i++) {
+        $('#'+componentId+ i).change(function () {
+            //console.log($(this).val());
+        }).multipleSelect({
+            placeholder: "Responses"
+        });
+    }
+}
+
+function displayMore(divId) {
+
+    for (var i = 2; i <= 20; i++) {
+
+        var hiddenDiv = divId+'_hidden'+i;
+        var textComponentId = divId+i;
+
+        var hiddenDivDOM = document.getElementById(hiddenDiv);
+        var textComponentDOM = document.getElementById(textComponentId);
+
+        if (hiddenDivDOM.style.display === "none"){
+
+            hiddenDivDOM.style.display = "block";
+            textComponentDOM.value = "";
+            break;
+        }
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -187,98 +319,7 @@ function getVariantSize(selectedMarker) {
 
 
 
-var dosingStudy = 1;
-var dosingStudyCount = 1;
 
-function twoParamUnlinkedFilterOptionOneList(dataList, componentId){
-
-    dataList = dataList.sort();
-
-    $('#'+componentId).autocomplete({
-        source: [dataList]
-    });
-
-    for (var i = 2; i <= 20; i++) {
-        $('#'+componentId + i).autocomplete({
-            source: [dataList]
-        });
-    }
-}
-
-function twoParamUnlinkedFilterOptionTwoList(componentId){
-
-    $('#'+componentId).change(function () {
-        console.log($(this).val());
-    }).multipleSelect({
-        placeholder: "Responses"
-    });
-
-    for (var i = 2; i <= 20; i++) {
-        $('#'+componentId+ i).change(function () {
-            console.log($(this).val());
-        }).multipleSelect({
-            placeholder: "Responses"
-        });
-    }
-}
-
-function displayMore(divId) {
-
-    for (var i = 2; i <= 20; i++) {
-
-        var parentDiv = divId+'_parent'+i;
-        var textComponentId = divId+i;
-
-        var parentDivDOM = document.getElementById(parentDiv);
-        var textComponentDOM = document.getElementById(textComponentId);
-
-        if (parentDivDOM.style.display === "none"){
-
-            parentDivDOM.style.display = "block";
-            textComponentDOM.value = "";
-
-            break;
-        }
-
-    }
-}
-
-
-
-
-function loadDrugResponse(compNumber) {
-
-    var drugResponses = drugResponseList.sort();
-    var newOptions = "";
-    for (var i = 0; i < drugResponses.length; i++) {
-        newOptions += "<option value='" + drugResponses[i] + "' selected>" + drugResponses[i] + "</option>";
-    }
-    var select = $('#responseFilter' + compNumber);
-    select.empty().append(newOptions);
-    $(function () {
-        $('#responseFilter' + compNumber).change(function () {
-            console.log($(this).val());
-        }).multipleSelect({
-            placeholder: " Responses"
-        });
-    });
-}
-
-
-
-function addDrugAndResponse2(param, startIndex) {
-    if (startIndex != 2 && dosingStudyCount == 1) {
-        dosingStudy = startIndex;
-    }
-    dosingStudy++;
-    dosingStudyCount++;
-    for (var i = startIndex; i <= 20; i++) {
-        if ((param == 'AND' || param == 'OR') && dosingStudy == i) {
-            document.getElementsByClassName("dosingStudy" + i)[0].style.display = "block";
-            $("#drugFilter"+i).val ("");
-        }
-    }
-}
 
 
 function clearFacet() {
