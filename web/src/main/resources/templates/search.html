@@ -553,35 +553,7 @@
 
     jQuery(document).ready(function () {
 
-
-
-
-        webFacetSections.forEach(manageGeneralFilter);
-
-        function manageGeneralFilter(webFacetSection, index) {
-
-            var filterComponents = webFacetSection.filterComponents;
-
-            // Retrieve All the FilterComponents and their contents
-            filterComponents.forEach(function(filterComponent){
-
-                if (filterComponent.type === 'TwoParamUnlinkedFilter'){
-
-                    dataList = filterComponent.options1;
-                    componentId1 = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
-                    componentId2 = filterComponent.urlParam+"_"+(filterComponent.param2Name).toLowerCase();
-                    filterButton = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase()+'_button';
-
-                    intializeTwoParamUnlinkedFilterOptionOneList(dataList, componentId1);
-                    intializeTwoParamUnlinkedFilterOptionTwoList(componentId2);
-
-                    //Add eventlistener to each TwoParamUnlinkedFilter filter class
-                    jQuery('#'+filterButton).click(function () {
-                        redirectPage(webFacetSections);
-                    });
-                }
-            });
-        }
+        webFacetSections.forEach(intializeFilters);
 
 
         loadGeneTextFields();
