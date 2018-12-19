@@ -208,6 +208,37 @@ function intializeTwoParamUnlinkedFilterOptionTwoList(componentId){
     }
 }
 
+
+
+function selectAllOptionsInMyComponent2(myComponent2Id,options2List) {
+
+    var newOptions = "";
+
+    // Remove the opening and closing square brackets
+    options2List = options2List.substr(1).slice(0, -1);
+
+    // Convert the resulting string array type
+    options2List = options2List.split(",");
+
+    //Build a new Select > Option content with selected attribute
+    for (var i = 0; i < options2List.length; i++) {
+        newOptions += "<option value='" + options2List[i] + "' selected>" + options2List[i] + "</option>";
+    }
+
+    // Empty and reload the select Box with the selected options
+    var select = $('#'+myComponent2Id);
+    select.empty().append(newOptions);
+
+    $(function () {
+        $('#' + myComponent2Id).change(function () {
+            //console.log($(this).val());
+        }).multipleSelect({
+            placeholder: ""
+        });
+    });
+}
+
+
 function displayMore(divId) {
 
     for (var i = 2; i <= 20; i++) {
