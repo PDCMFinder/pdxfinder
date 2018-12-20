@@ -19,7 +19,7 @@
         <div class="row topSace10">
             <div class="columns nospace small-12 large-6">
                 <input type="text" class="fullWidth"
-                       th:onblur="|selectAllOptionsInMyComponent2('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+'1'}','${filterComponent.options2}')|"
+                       th:onblur="|selectAllOptionsInMyComponent2(this,'${filterComponent.type}','${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+'1'}','${filterComponent.options2}')|"
                        th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'1'}" />
             </div>
 

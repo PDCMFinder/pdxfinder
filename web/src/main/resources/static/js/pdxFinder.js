@@ -46,7 +46,7 @@ function redirectPage(webFacetSections) {
 
 
 
-    var twoParamUnlinkedFilters = getComponentsFromWebFacetSection(webFacetSections, 'TwoParamUnlinkedFilter');
+    var twoParamUnlinkedFilters = getFiltersFromWebFacetSection(webFacetSections, 'TwoParamUnlinkedFilter');
     twoParamUnlinkedFilters.forEach(function (filterComponent) {
 
             options2List = filterComponent.options2;
@@ -151,7 +151,7 @@ function redirectPage(webFacetSections) {
  ****************************************************************/
 
 
-function getComponentsFromWebFacetSection(webFacetSections, desiredFilterType) {
+function getFiltersFromWebFacetSection(webFacetSections, desiredFilterType) {
 
     filterComponentsArray = [];
     webFacetSections.forEach(getFilterComponents);
@@ -176,12 +176,30 @@ function getComponentsFromWebFacetSection(webFacetSections, desiredFilterType) {
 
 
 
+
+
 function intializeFilters(webFacetSection, index) {
 
     var filterComponents = webFacetSection.filterComponents;
 
     // Retrieve All the FilterComponents and their contents
     filterComponents.forEach(function(filterComponent){
+
+        if (filterComponent.type === 'TwoParamLinkedFilter'){
+
+            dataList = filterComponent.options1;
+            componentOneId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
+            componentTwoId = filterComponent.urlParam+"_"+(filterComponent.param2Name).toLowerCase();
+            filterButton = componentOneId+'_button';
+
+            initializeTwoParamLinkedFilterComponents(dataList, componentOneId, componentTwoId);
+
+            //Add event listener to each TwoParamUnlinkedFilter filter class
+            jQuery('#'+filterButton).click(function () {
+                redirectPage(webFacetSections);
+            });
+        }
+
 
         if (filterComponent.type === 'TwoParamUnlinkedFilter'){
 
@@ -190,9 +208,9 @@ function intializeFilters(webFacetSection, index) {
             componentTwoId = filterComponent.urlParam+"_"+(filterComponent.param2Name).toLowerCase();
             filterButton = componentOneId+'_button';
 
-            intializeTwoParamUnlinkedFilterComponents(dataList, componentOneId, componentTwoId);
+            initializeTwoParamUnlinkedFilterComponents(dataList, componentOneId, componentTwoId);
 
-            //Add eventlistener to each TwoParamUnlinkedFilter filter class
+            //Add event listener to each TwoParamUnlinkedFilter filter class
             jQuery('#'+filterButton).click(function () {
                 redirectPage(webFacetSections);
             });
@@ -201,7 +219,28 @@ function intializeFilters(webFacetSection, index) {
 }
 
 
-function intializeTwoParamUnlinkedFilterComponents(dataList, componentOneId, componentTwoId) {
+
+function initializeTwoParamLinkedFilterComponents(dataList, componentOneId, componentTwoId) {
+
+    dataList = dataList.sort();
+
+    for (var i = 1; i <= 20; i++) {
+
+        $('#' + componentOneId + i).autocomplete({
+            source: [dataList]
+        });
+
+        $('#' + componentTwoId + i).change(function () {
+            //console.log($(this).val());
+        }).multipleSelect({
+            placeholder: "Variants"
+        });
+    }
+}
+
+
+
+function initializeTwoParamUnlinkedFilterComponents(dataList, componentOneId, componentTwoId) {
 
     dataList = dataList.sort();
 
@@ -217,20 +256,56 @@ function intializeTwoParamUnlinkedFilterComponents(dataList, componentOneId, com
             placeholder: "Responses"
         });
     }
-
-
 }
 
 
-function selectAllOptionsInMyComponent2(myComponent2Id, options2List) {
+
+function getOptions2FromWebFacetSection(filterType, filterUrlParam) {
+
+    options2List = [];
+    webFacetSections.forEach(getOptions2List);
+
+    function getOptions2List(webFacetSection, index) {
+
+        var filterComponents = webFacetSection.filterComponents;
+
+        // Retrieve the specific optionList and their contents
+        filterComponents.forEach(function(filterComponent) {
+
+            if (filterComponent.type === filterType) {
+
+                if (filterComponent.urlParam === filterUrlParam){
+
+                    options2List = filterComponent.options2;
+                }
+            }
+
+        });
+    }
+    return options2List;
+}
+
+
+
+function selectAllOptionsInMyComponent2(myContent, filterType, myComponent2Id,  options2List) {
 
     var newOptions = "";
 
-    // Remove the opening and closing square brackets
-    options2List = options2List.substr(1).slice(0, -1);
+    if (filterType === 'TwoParamLinkedFilter'){
 
-    // Convert the resulting string array type
-    options2List = options2List.split(",");
+        filterUrlParam = myComponent2Id.split('_')[0];
+        options2Lista = getOptions2FromWebFacetSection(filterType, filterUrlParam);
+
+        options2List = options2Lista[myContent.value];
+
+    }else{
+
+        // Remove the opening and closing square brackets
+        options2List = options2List.substr(1).slice(0, -1);
+
+        // Convert the resulting string array type
+        options2List = options2List.split(",");
+    }
 
     //Build a new Select > Option content with selected attribute
     for (var i = 0; i < options2List.length; i++) {
