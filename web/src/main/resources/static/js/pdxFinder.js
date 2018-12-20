@@ -251,9 +251,10 @@ function selectAllOptionsInMyComponent2(myComponent2Id, options2List) {
 }
 
 
-function displayMore(divId) {
+function displayMore(divId, startIndex) {
 
-    for (var i = 2; i <= 20; i++) {
+
+    for (var i = startIndex; i <= 20; i++) {
 
         var hiddenDiv = divId + '_hidden' + i;
         var textComponentId = divId + i;
