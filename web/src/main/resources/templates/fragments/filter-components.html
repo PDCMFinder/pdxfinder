@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en"></head>
+<body>
+
+
+
+<!-- Two Param Unlinked Filter Component Generator -->
+<div th:fragment="twoParamUnlinkedFilter(filterComponent)">
+
+    <div class="row topSace10">
+        <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
+        <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param2Name}">  </div>
+    </div>
+
+
+    <th:block th:if="${filterComponent.active}">
+        <div class="row topSace10" th:each="activeComponent, iter : ${filterComponent.selected}">
+
+            <div class="columns nospace small-12 large-6">
+
+                <input th:value="${activeComponent.key}"
+                       type="text"
+                       class="fullWidth"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${iter.index+1}" />
+            </div>
+
+            <div class="columns nospace small-12 large-6 topSpace3">
+
+                <select multiple='multiple'
+                        class="width50"
+                        th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}+${iter.index+1}">
+
+                    <option th:each="option : ${filterComponent.options2}"
+                            th:value="${option}"
+                            th:text="${option}"
+                            th:selected="( ${#lists.contains(filterComponent.selected.get(activeComponent.key), option)} ) ? 'true' : 'false' "> ... </option>
+                </select>
+            </div>
+
+        </div>
+    </th:block>
+
+
+
+    <th:block th:unless="${filterComponent.active}">
+        <div class="row topSace10">
+            <div class="columns nospace small-12 large-6">
+                <input type="text" class="fullWidth"
+                       th:onblur="|selectAllOptionsInMyComponent2('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+'1'}','${filterComponent.options2}')|"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'1'}" />
+            </div>
+
+            <div class="columns nospace small-12 large-6 topSpace3">
+                <select multiple='multiple' th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)+'1'}">
+                    <option th:each="option :${filterComponent.options2}"
+                            th:value="${option}"
+                            th:text="${option}"> ...
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <!-- TwoParamUnlinkedFilter Hidden Fields Triggered after Clicking "OR" Button-->
+        <div class="row" th:each="i: ${#numbers.sequence(2, 20)}" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_hidden'}+${i}" style="display:none">
+            <div class="columns nospace small-12 large-6">
+                <input type="text" value="NULL" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${i}" class="fullWidth"/>
+            </div>
+
+            <div class="columns nospace small-12 large-6 topSpace3">
+                <select multiple='multiple' th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}+${i}">
+
+                    <option th:each="option :${filterComponent.options2}"
+                            th:value="${option}"
+                            th:text="${option}"
+                            th:selected="true"> ... </option>
+                </select>
+            </div>
+        </div>
+
+
+    </th:block>
+
+
+    <!-- TwoParamUnlinkedFilter Action Buttons -->
+    <div class="checkbox-item height70px">
+        <button href="#" class="button primary columns large-3 white-text-right-float topSpace4 searchButton"
+                th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_button'}">
+            <i class="icon icon-functional" data-icon="1"></i>
+        </button>
+
+        <button href="#" class="icoButn columns large-2 ORButton"
+                th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}')|">
+            OR
+        </button>
+    </div>
+
+</div>
+
+
+
+
+
+</body>
+</html>
+
+
+
+

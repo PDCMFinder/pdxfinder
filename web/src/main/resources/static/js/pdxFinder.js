@@ -49,7 +49,6 @@ function redirectPage(webFacetSections) {
     var twoParamUnlinkedFilters = getComponentsFromWebFacetSection(webFacetSections, 'TwoParamUnlinkedFilter');
     twoParamUnlinkedFilters.forEach(function (filterComponent) {
 
-            options1List = filterComponent.options1;
             options2List = filterComponent.options2;
             componentId1 = filterComponent.urlParam + "_" + (filterComponent.param1Name).toLowerCase();
             componentId2 = filterComponent.urlParam + "_" + (filterComponent.param2Name).toLowerCase();
@@ -189,7 +188,7 @@ function intializeFilters(webFacetSection, index) {
             dataList = filterComponent.options1;
             componentOneId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
             componentTwoId = filterComponent.urlParam+"_"+(filterComponent.param2Name).toLowerCase();
-            filterButton = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase()+'_button';
+            filterButton = componentOneId+'_button';
 
             intializeTwoParamUnlinkedFilterComponents(dataList, componentOneId, componentTwoId);
 
