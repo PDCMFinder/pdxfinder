@@ -11,25 +11,34 @@ public class TwoParamLinkedFilter extends GeneralFilter{
     private String param1Name;
     private String param2Name;
 
-    private Map<String, List<String>> options;
+    private List<String> options1;
+    private Map<String, List<String>> options2;
 
     private Map<String, List<String>> selected;
 
-    public TwoParamLinkedFilter(String name, String urlParam, Boolean isActive, String type, String param1Name, String param2Name, Map<String, List<String>> options, Map<String, List<String>> selected) {
+    public TwoParamLinkedFilter(String name, String urlParam, Boolean isActive, String type, String param1Name, String param2Name, List<String>  options1, Map<String, List<String>> options2, Map<String, List<String>> selected) {
         super(name, urlParam, isActive, type);
         this.param1Name = param1Name;
         this.param2Name = param2Name;
-        this.options = options;
+        this.options1 = options1;
+        this.options2 = options2;
         this.selected = selected;
     }
 
-
-    public Map<String, List<String>> getOptions() {
-        return options;
+    public List<String> getOptions1() {
+        return options1;
     }
 
-    public void setOptions(Map<String, List<String>> options) {
-        this.options = options;
+    public void setOptions1(List<String> options1) {
+        this.options1 = options1;
+    }
+
+    public Map<String, List<String>> getOptions2() {
+        return options2;
+    }
+
+    public void setOptions2(Map<String, List<String>> options2) {
+        this.options2 = options2;
     }
 
     public Map<String, List<String>> getSelected() {

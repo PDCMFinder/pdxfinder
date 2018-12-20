@@ -239,7 +239,7 @@ public class SearchDS {
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
         TwoParamLinkedFilter geneMutation = new TwoParamLinkedFilter("GENE MUTATION", "mutation", false, FilterType.TwoParamLinkedFilter.get(),
-                 "GENE", "VARIANT", getMutationOptionsFromDP(), new HashMap<>());
+                 "GENE", "VARIANT",getMutationOptions(), getMutationAndVariantOptions(), new HashMap<>());
 
         molecularDataSection.addComponent(geneMutation);
 
@@ -703,7 +703,38 @@ public class SearchDS {
         return mutations;
     }
 
-    private Map<String, List<String>> getMutationOptionsFromDP(){
+    private Map<String, List<String>> getMutationAndVariantOptions(){
+
+        Map<String,Set<String>> tempResults = getMutationOptionsFromDP();
+
+        Map<String, List<String>> resultMap = new HashMap<>();
+
+        for(Map.Entry<String, Set<String>> entry : tempResults.entrySet()){
+
+            resultMap.put(entry.getKey(), new ArrayList<>(new TreeSet<>(entry.getValue())));
+        }
+
+        return resultMap;
+    }
+
+
+    private List<String> getMutationOptions(){
+
+        Map<String,Set<String>> tempResults = getMutationOptionsFromDP();
+
+        List<String> resultList = new ArrayList<>();
+
+        for(Map.Entry<String, Set<String>> entry : tempResults.entrySet()){
+
+            resultList.add(entry.getKey());
+        }
+
+        return resultList;
+    }
+
+
+
+    private Map<String, Set<String>> getMutationOptionsFromDP(){
 
         Map<String, Map<String, Map<String, Set<Long>>>> mutations = getMutationsFromDP();
 
@@ -732,15 +763,10 @@ public class SearchDS {
             }
         }
 
-        Map<String, List<String>> resultMap = new HashMap<>();
-
-        for(Map.Entry<String, Set<String>> entry : tempResults.entrySet()){
-
-            resultMap.put(entry.getKey(), new ArrayList<>(new TreeSet<>(entry.getValue())));
-        }
-
-        return resultMap;
+        return tempResults;
     }
+
+
 
     private Map<String, Map<String, Set<Long>>> getModelDrugResponsesFromDP(){
 
