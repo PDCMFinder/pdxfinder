@@ -147,8 +147,53 @@ function redirectPage(webFacetSections) {
 
 
 /****************************************************************
- *         TWO PARAM UNLINKED FILTER SECTION STARTS             *
+ *         MULTI PARAM  FILTER SECTION STARTS             *
  ****************************************************************/
+
+
+function intializeFilters(webFacetSection, index) {
+
+    var filterComponents = webFacetSection.filterComponents;
+
+    // Retrieve All the FilterComponents and their contents
+    filterComponents.forEach(function(filterComponent){
+
+        if (filterComponent.type === 'TwoParamLinkedFilter' || filterComponent.type === 'TwoParamUnlinkedFilter'){
+
+            dataList = filterComponent.options1;
+            componentOneId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
+            componentTwoId = filterComponent.urlParam+"_"+(filterComponent.param2Name).toLowerCase();
+            filterButton = componentOneId+'_button';
+
+            initializeTwoParamFilterComponents(dataList, componentOneId, componentTwoId);
+
+            //Add event listener to each TwoParamUnlinkedFilter filter class
+            jQuery('#'+filterButton).click(function () {
+                redirectPage(webFacetSections);
+            });
+        }
+    });
+}
+
+
+function initializeTwoParamFilterComponents(dataList, componentOneId, componentTwoId) {
+
+    dataList = dataList.sort();
+
+    for (var i = 1; i <= 20; i++) {
+
+        $('#' + componentOneId + i).autocomplete({
+            source: [dataList]
+        });
+
+        $('#' + componentTwoId + i).change(function () {
+            //console.log($(this).val());
+        }).multipleSelect({
+            placeholder: "Variants"
+        });
+    }
+}
+
 
 
 function getFiltersFromWebFacetSection(webFacetSections, desiredFilterType) {
@@ -171,93 +216,6 @@ function getFiltersFromWebFacetSection(webFacetSections, desiredFilterType) {
 
     return filterComponentsArray;
 }
-
-
-
-
-
-
-
-function intializeFilters(webFacetSection, index) {
-
-    var filterComponents = webFacetSection.filterComponents;
-
-    // Retrieve All the FilterComponents and their contents
-    filterComponents.forEach(function(filterComponent){
-
-        if (filterComponent.type === 'TwoParamLinkedFilter'){
-
-            dataList = filterComponent.options1;
-            componentOneId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
-            componentTwoId = filterComponent.urlParam+"_"+(filterComponent.param2Name).toLowerCase();
-            filterButton = componentOneId+'_button';
-
-            initializeTwoParamLinkedFilterComponents(dataList, componentOneId, componentTwoId);
-
-            //Add event listener to each TwoParamUnlinkedFilter filter class
-            jQuery('#'+filterButton).click(function () {
-                redirectPage(webFacetSections);
-            });
-        }
-
-
-        if (filterComponent.type === 'TwoParamUnlinkedFilter'){
-
-            dataList = filterComponent.options1;
-            componentOneId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
-            componentTwoId = filterComponent.urlParam+"_"+(filterComponent.param2Name).toLowerCase();
-            filterButton = componentOneId+'_button';
-
-            initializeTwoParamUnlinkedFilterComponents(dataList, componentOneId, componentTwoId);
-
-            //Add event listener to each TwoParamUnlinkedFilter filter class
-            jQuery('#'+filterButton).click(function () {
-                redirectPage(webFacetSections);
-            });
-        }
-    });
-}
-
-
-
-function initializeTwoParamLinkedFilterComponents(dataList, componentOneId, componentTwoId) {
-
-    dataList = dataList.sort();
-
-    for (var i = 1; i <= 20; i++) {
-
-        $('#' + componentOneId + i).autocomplete({
-            source: [dataList]
-        });
-
-        $('#' + componentTwoId + i).change(function () {
-            //console.log($(this).val());
-        }).multipleSelect({
-            placeholder: "Variants"
-        });
-    }
-}
-
-
-
-function initializeTwoParamUnlinkedFilterComponents(dataList, componentOneId, componentTwoId) {
-
-    dataList = dataList.sort();
-
-    for (var i = 1; i <= 20; i++) {
-
-        $('#' + componentOneId + i).autocomplete({
-            source: [dataList]
-        });
-
-        $('#' + componentTwoId + i).change(function () {
-            //console.log($(this).val());
-        }).multipleSelect({
-            placeholder: "Responses"
-        });
-    }
-}
-
 
 
 function getOptions2FromWebFacetSection(filterType, filterUrlParam) {
@@ -349,7 +307,7 @@ function displayMore(divId, startIndex) {
 
 
 /****************************************************************
- *         TWO PARAM UNLINKED FILTER SECTION ENDS             *
+ *         MULTI PARAM FILTER SECTION ENDS             *
  ****************************************************************/
 
 
