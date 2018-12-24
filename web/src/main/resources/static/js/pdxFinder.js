@@ -112,6 +112,7 @@ function redirectPage(webFacetSections) {
 
     }
 
+    
 
     // Add all diagnosis filters to the URL
     jQuery(".diagnosis").each(function () {
@@ -174,6 +175,7 @@ function intializeFilters(webFacetSection, index) {
         }
     });
 }
+
 
 
 function initializeTwoParamFilterComponents(dataList, componentOneId, componentTwoId) {

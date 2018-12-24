@@ -439,28 +439,11 @@
     var searchOptions = [[${websearch.mainSearchFieldOptions}]];
     var searchStates = [];
 
-
-    var incomingString = [];
-    //var mutatedMarkersAndVariants = JSON.parse(incomingString);
-    var mutatedMarkersAndVariants = [];
-    var drugsList = [];
-    var drugResponseList = [];
-
-
-
-
     for (var i = 0; i < searchOptions.length; i++) {
         searchStates.push(searchOptions[i]);
     }
 
-    var ageFilters = [];
-    var dsFilters = [];
-    var projectFilters = [];
-    var cancerSystemFilters = [];
-    var sampleTumorTypeFilters = [];
-    var genderFilters = [];
-    var mutationFilters = [];
-    var dataAvailableFilters = [];
+
     function constructSearchOptions(data) {
         var newOptions = [];
         for (var i = 0; i < data.length; i++) {
@@ -552,25 +535,6 @@
     jQuery(document).ready(function () {
 
         webFacetSections.forEach(intializeFilters);
-
-        loadGeneTextFields();
-        $('#variantFilter1').change(function () {
-            console.log($(this).val());
-        }).multipleSelect({
-            placeholder: "Variants"
-        });
-        for (var i = 2; i <= 20; i++) {
-            $('#variantFilter' + i).change(function () {
-                console.log($(this).val());
-            }).multipleSelect({
-                placeholder: "Variants"
-            });
-        }
-
-
-
-
-
 
         //Add eventlistener to fields with filter class
         jQuery('.filter').change(function () {
