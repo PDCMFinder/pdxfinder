@@ -54,7 +54,7 @@ function redirectPage(webFacetSections) {
             componentId2 = filterComponent.urlParam + "_" + (filterComponent.param2Name).toLowerCase();
             urlKey = filterComponent.urlParam;
 
-            for (var i = 1; i < 20; i++) {
+            for (var i = 0; i < 19; i++) {
 
                 var component1Choice = jQuery("#" + componentId1 + i);
                 var component2Choices = jQuery("#" + componentId2 + i);
@@ -87,7 +87,7 @@ function redirectPage(webFacetSections) {
 
 
 
-    for (var i = 1; i < 20; i++) {
+    for (var i = 0; i < 19; i++) {
 
         var geneFilter = jQuery("#geneFilter" + i);
         var variantFilter = jQuery("#variantFilter" + i);
@@ -148,7 +148,7 @@ function redirectPage(webFacetSections) {
 
 
 /****************************************************************
- *         MULTI PARAM  FILTER SECTION STARTS             *
+ *         MULTI PARAM  FILTER SECTION STARTS                   *
  ****************************************************************/
 
 
@@ -182,7 +182,7 @@ function initializeTwoParamFilterComponents(dataList, componentOneId, componentT
 
     dataList = dataList.sort();
 
-    for (var i = 1; i <= 20; i++) {
+    for (var i = 0; i <= 19; i++) {
 
         $('#' + componentOneId + i).autocomplete({
             source: [dataList]
@@ -289,7 +289,7 @@ function selectAllOptionsInMyComponent2(myContent, filterType, myComponent2Id,  
 function displayMore(divId, startIndex) {
 
 
-    for (var i = startIndex; i <= 20; i++) {
+    for (var i = startIndex; i <= 19; i++) {
 
         var hiddenDiv = divId + '_hidden' + i;
         var textComponentId = divId + i;
@@ -335,7 +335,7 @@ function loadGeneTextFields() {
         source: [keysAreMarkers]
     });
 
-    for (var i = 2; i <= 20; i++) {
+    for (var i = 1; i <= 19; i++) {
         $('#geneFilter' + i).autocomplete({
             source: [keysAreMarkers]
         });
