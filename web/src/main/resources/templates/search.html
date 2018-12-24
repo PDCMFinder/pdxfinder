@@ -174,144 +174,49 @@
 
                                 <li class="accordion-item filterComponent" data-accordion-item
                                     th:classappend="${filterComponent.isActive} ? is-active : not-active"
-                                    th:each="filterComponent:${section.filterComponents}" th:id="${filterComponent.urlParam}">
+                                    th:each="filterComponent:${section.filterComponents}"
+                                    th:id="${filterComponent.urlParam}">
 
                                     <a href="#" class="accordion-title" th:text="${filterComponent.name}"></a>
 
                                     <div class="accordion-content" data-tab-content>
 
-                                            <!-- Check what kind of component is it, not all components have options-->
+                                        <!-- Check what kind of component is it, not all components have options-->
 
                                         <!-- OneParamFilter -->
-                                        <div class="large-form" th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamFilter)}">
-                                                <div class="checkbox-item" th:each="option:${filterComponent.options}">
+                                        <div class="large-form"
+                                             th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamFilter)}">
+                                            <div class="checkbox-item" th:each="option:${filterComponent.options}">
 
-                                                    <input type="checkbox" class="filter" th:checked="${#lists.contains(filterComponent.selected, option.labelId)}" th:id="${filterComponent.urlParam} +'__'+${option.labelId}"/>
-                                                    <label th:attr="for=${filterComponent.urlParam} +'__'+${option.labelId}"><span th:text="${option.label}"></span></label>
-                                                </div>
-                                        </div>
-
-
-                                        <div class="light-grey-bg-box" th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamUnlinkedFilter)}">
-
-                                                <!-- TwoParamUnlinkedFilter-->
-                                                <th:block th:include="fragments/filter-components :: twoParamUnlinkedFilter(filterComponent=${filterComponent})"></th:block>
-
-                                        </div>
-
-
-
-                                        <div class="light-grey-bg-box" th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamLinkedFilter)}">
-
-                                                <!-- TWoParamLinkedFilter-->
-                                                <div class="row topSace10">
-                                                    <div th:if="${filterComponent.param1Name != null}" class="columns nospace small-6 large-6 adjusti" th:text="${filterComponent.param1Name}">  </div>
-                                                    <div th:if="${filterComponent.param2Name != null}" class="columns nospace small-6 large-6 adjusti" th:text="${filterComponent.param2Name}">  </div>
-                                                </div>
-
-
-
-                                            <!-- New TwoParamLinkedFilter Search -->
-                                            <th:block th:unless="${filterComponent.active}">
-                                                <div class="row topSace10">
-                                                    <div class="columns nospace small-12 large-6">
-                                                        <input type="text" class="fullWidth"
-                                                               th:onblur="|selectAllOptionsInMyComponent2(this,'${filterComponent.type}','${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+'0'}','')|"
-                                                               th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'0'}" />
-                                                    </div>
-
-                                                    <div class="columns nospace small-12 large-6 topSpace3">
-                                                        <select multiple='multiple'
-                                                                th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)+'0'}">
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                                <!-- TwoParamLinkedFilter Hidden Fields Triggered after Clicking "OR" Button -->
-                                                <div class="row" th:each="i: ${#numbers.sequence(1, 19)}" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_hidden'}+${i}" style="display:none">
-                                                    <div class="columns nospace small-12 large-6">
-                                                        <input type="text"
-                                                               th:onblur="|selectAllOptionsInMyComponent2(this,'${filterComponent.type}','${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+i}','')|"
-                                                               th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${i}" class="fullWidth"/>
-                                                    </div>
-
-                                                    <div class="columns nospace small-12 large-6 topSpace3">
-                                                        <select multiple='multiple'
-                                                                th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}+${i}">
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                            </th:block>
-
-
-
-                                            <!-- After a Search was done -->
-                                            <th:block th:if="${filterComponent.active}">
-                                                <div class="row topSace10" th:each="activeComponent, iter : ${filterComponent.selected}">
-
-                                                    <div class="columns nospace small-12 large-6">
-                                                        <input th:value="${activeComponent.key}"
-                                                               type="text"
-                                                               th:onblur="|selectAllOptionsInMyComponent2(this,'${filterComponent.type}','${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+iter.index}','')|"
-                                                               th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${iter.index}" class="fullWidth"/>
-                                                    </div>
-
-                                                    <div class="columns nospace small-12 large-6 topSpace3">
-                                                        <select multiple='multiple'
-                                                                class="width50"
-                                                                th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}+${iter.index}">
-
-                                                            <option th:each="option : ${filterComponent.options2.get(activeComponent.key)}"
-                                                                    th:value="${option}"
-                                                                    th:text="${option}"
-                                                                    th:selected="( ${#lists.contains(filterComponent.selected.get(activeComponent.key), option)} ) ? 'true' : 'false' "> ... </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-
-                                                <!-- Hidden Fields Triggered after Clicking "OR" Button -->
-                                                <div class="row" th:each="i: ${#numbers.sequence(#maps.size(filterComponent.selected), 19)}"
-                                                     th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_hidden'}+${i}"
-                                                     style="display:none">
-
-                                                    <div class="columns nospace small-12 large-6">
-                                                        <input type="text"
-                                                               th:onblur="|selectAllOptionsInMyComponent2(this,'${filterComponent.type}','${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+i}','')|"
-                                                               th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${i}" class="fullWidth"/>
-                                                    </div>
-
-                                                    <div class="columns nospace small-12 large-6 topSpace3">
-                                                        <select multiple='multiple'
-                                                                th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}+${i}">
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                            </th:block>
-
-
-
-
-                                            <!-- TwoParamLinkedFilter Action Buttons -->
-                                            <div class="checkbox-item height70px">
-                                                <button href="#" class="button primary columns large-3 white-text-right-float topSpace4 searchButton"
-                                                        th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_button'}">
-                                                    <i class="icon icon-functional" data-icon="1"></i>
-                                                </button>
-
-                                                <button th:unless="${filterComponent.active}"
-                                                        href="#" class="icoButn columns large-2 ORButton"
-                                                        th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','1')|">  OR
-                                                </button>
-
-                                                <button th:if="${filterComponent.active}"
-                                                        href="#" class="icoButn columns large-2 ORButton"
-                                                        th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','${#maps.size(filterComponent.selected)}')|">  OR
-                                                </button>
+                                                <input type="checkbox" class="filter"
+                                                       th:checked="${#lists.contains(filterComponent.selected, option.labelId)}"
+                                                       th:id="${filterComponent.urlParam} +'__'+${option.labelId}"/>
+                                                <label th:attr="for=${filterComponent.urlParam} +'__'+${option.labelId}"><span
+                                                        th:text="${option.label}"></span></label>
                                             </div>
+                                        </div>
 
+
+                                        <div class="light-grey-bg-box"
+                                             th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamUnlinkedFilter)}">
+
+                                            <!-- TwoParamUnlinkedFilter-->
+                                            <th:block
+                                                    th:include="fragments/filter-components :: twoParamUnlinkedFilter(filterComponent=${filterComponent})">
+                                                ...
+                                            </th:block>
+
+                                        </div>
+
+
+                                        <div class="light-grey-bg-box"
+                                             th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamLinkedFilter)}">
+
+                                            <!-- TwoParamUnlinkedFilter-->
+                                            <th:block
+                                                    th:include="fragments/filter-components :: twoParamLinkedFilter(filterComponent=${filterComponent})">
+                                                ...
+                                            </th:block>
 
                                         </div>
 
