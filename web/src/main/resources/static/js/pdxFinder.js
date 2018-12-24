@@ -87,6 +87,50 @@ function redirectPage(webFacetSections) {
 
 
 
+
+    var twoParamLinkedFilters = getFiltersFromWebFacetSection(webFacetSections, 'TwoParamLinkedFilter');
+    twoParamLinkedFilters.forEach(function (filterComponent) {
+
+        options2ListMap = filterComponent.options2;
+        componentId1 = filterComponent.urlParam + "_" + (filterComponent.param1Name).toLowerCase();
+        componentId2 = filterComponent.urlParam + "_" + (filterComponent.param2Name).toLowerCase();
+        urlKey = filterComponent.urlParam;
+
+        for (var i = 0; i < 19; i++) {
+
+            var component1Choice = jQuery("#" + componentId1 + i);
+            var component2Choices = jQuery("#" + componentId2 + i);
+
+            if (component1Choice.val() != null && component1Choice.val() != "") {
+
+                options2List = options2ListMap[component1Choice.val()];
+
+                for (var j = 0; j < component2Choices.val().length; j++) {
+
+                    if (!no_parameters) {
+                        url = url + "&";
+                    }
+
+                    if (options2List.length == component2Choices.val().length) {
+
+                        url += urlKey + "=" + component1Choice.val() + "___ALL";
+                        no_parameters = false;
+                        break;
+                    } else {
+                        url += urlKey + "=" + component1Choice.val() + "___" + component2Choices.val()[j];
+                        no_parameters = false;
+
+                    }
+                }
+            }
+
+        }
+    });
+
+
+
+
+
     for (var i = 0; i < 19; i++) {
 
         var geneFilter = jQuery("#geneFilter" + i);
@@ -311,80 +355,5 @@ function displayMore(divId, startIndex) {
 /****************************************************************
  *         MULTI PARAM FILTER SECTION ENDS             *
  ****************************************************************/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var geneticVar = 1;
-var counter = 1;
-
-function loadGeneTextFields() {
-
-    var keysAreMarkers = Object.keys(mutatedMarkersAndVariants);
-    $('#geneFilter1').autocomplete({
-        source: [keysAreMarkers]
-    });
-
-    for (var i = 1; i <= 19; i++) {
-        $('#geneFilter' + i).autocomplete({
-            source: [keysAreMarkers]
-        });
-    }
-}
-
-function loadVariants(selectedMarker, compNumber) {
-    var marker = selectedMarker.value;
-    var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker.value].sort();
-    //alert(marker+"\n"+typeof valuesAreVariants);
-    var newOptions = "";
-    for (var i = 0; i < valuesAreVariants.length; i++) {
-        newOptions += "<option value='" + valuesAreVariants[i] + "' selected>" + valuesAreVariants[i] + "</option>";
-    }
-    var select = $('#variantFilter' + compNumber);
-    select.empty().append(newOptions);
-    $(function () {
-        $('#variantFilter' + compNumber).change(function () {
-            console.log($(this).val());
-        }).multipleSelect({
-            placeholder: " variants"
-        });
-    });
-}
-
-
-function addMarkerAndVariants(param, startIndex) {
-    if (startIndex != 2 && counter == 1) {
-        geneticVar = startIndex;
-    }
-    geneticVar++;
-    counter++;
-    for (var i = startIndex; i <= 20; i++) {
-        if ((param == 'AND' || param == 'OR') && geneticVar == i) {
-            //$("#geneticVar"+i).show();
-            document.getElementsByClassName("geneticVar" + i)[0].style.display = "block";
-        }
-    }
-}
-
-
-function getVariantSize(selectedMarker) {
-    var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker];
-    return valuesAreVariants;
-}
-
-
-function clearFacet() {
-    document.getElementById("pdxFinderFacet").reset();
-}
 
 

@@ -216,19 +216,19 @@
                                                 <div class="row topSace10">
                                                     <div class="columns nospace small-12 large-6">
                                                         <input type="text" class="fullWidth"
-                                                               th:onblur="|selectAllOptionsInMyComponent2(this,'${filterComponent.type}','${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+'1'}','')|"
-                                                               th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'1'}" />
+                                                               th:onblur="|selectAllOptionsInMyComponent2(this,'${filterComponent.type}','${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+'0'}','')|"
+                                                               th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'0'}" />
                                                     </div>
 
                                                     <div class="columns nospace small-12 large-6 topSpace3">
                                                         <select multiple='multiple'
-                                                                th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)+'1'}">
+                                                                th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)+'0'}">
                                                         </select>
                                                     </div>
                                                 </div>
 
                                                 <!-- TwoParamLinkedFilter Hidden Fields Triggered after Clicking "OR" Button -->
-                                                <div class="row" th:each="i: ${#numbers.sequence(2, 20)}" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_hidden'}+${i}" style="display:none">
+                                                <div class="row" th:each="i: ${#numbers.sequence(1, 19)}" th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_hidden'}+${i}" style="display:none">
                                                     <div class="columns nospace small-12 large-6">
                                                         <input type="text"
                                                                th:onblur="|selectAllOptionsInMyComponent2(this,'${filterComponent.type}','${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+i}','')|"
@@ -294,7 +294,7 @@
 
 
 
-                                            <!-- TwoParamUnlinkedFilter Action Buttons -->
+                                            <!-- TwoParamLinkedFilter Action Buttons -->
                                             <div class="checkbox-item height70px">
                                                 <button href="#" class="button primary columns large-3 white-text-right-float topSpace4 searchButton"
                                                         th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_button'}">
