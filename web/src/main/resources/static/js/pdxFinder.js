@@ -131,7 +131,7 @@ function redirectPage(webFacetSections) {
 
 
 
-    for (var i = 0; i < 19; i++) {
+    /*for (var i = 0; i < 19; i++) {
 
         var geneFilter = jQuery("#geneFilter" + i);
         var variantFilter = jQuery("#variantFilter" + i);
@@ -154,7 +154,7 @@ function redirectPage(webFacetSections) {
             }
         }
 
-    }
+    }*/
 
     
 
@@ -210,7 +210,7 @@ function intializeFilters(webFacetSection, index) {
             componentTwoId = filterComponent.urlParam+"_"+(filterComponent.param2Name).toLowerCase();
             filterButton = componentOneId+'_button';
 
-            initializeTwoParamFilterComponents(dataList, componentOneId, componentTwoId);
+            initializeTwoParamFilterComponents(dataList, componentOneId, componentTwoId,filterComponent.param2Name);
 
             //Add event listener to each TwoParamUnlinkedFilter filter class
             jQuery('#'+filterButton).click(function () {
@@ -222,9 +222,11 @@ function intializeFilters(webFacetSection, index) {
 
 
 
-function initializeTwoParamFilterComponents(dataList, componentOneId, componentTwoId) {
+function initializeTwoParamFilterComponents(dataList, componentOneId, componentTwoId, placeHolderText) {
 
     dataList = dataList.sort();
+
+    placeHolderText = placeHolderText.charAt(0).toUpperCase() + placeHolderText.substr(1).toLowerCase()+"s";
 
     for (var i = 0; i <= 19; i++) {
 
@@ -235,7 +237,7 @@ function initializeTwoParamFilterComponents(dataList, componentOneId, componentT
         $('#' + componentTwoId + i).change(function () {
             //console.log($(this).val());
         }).multipleSelect({
-            placeholder: "Variants"
+            placeholder: placeHolderText
         });
     }
 }

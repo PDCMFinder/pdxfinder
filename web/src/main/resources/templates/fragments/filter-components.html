@@ -77,7 +77,7 @@
                     <option th:each="option : ${filterComponent.options2}"
                             th:value="${option}"
                             th:text="${option}"
-                            th:selected="( ${#lists.contains(filterComponent.selected.get(activeComponent.key), option)} ) ? 'true' : 'false' ">
+                            th:selected="( ${#lists.contains(filterComponent.selected.get(activeComponent.key), option) || #lists.contains(filterComponent.selected.get(activeComponent.key), 'ALL') } ) ? 'true' : 'false' ">
                         ...
                     </option>
                 </select>
@@ -207,7 +207,7 @@
                     <option th:each="option : ${filterComponent.options2.get(activeComponent.key)}"
                             th:value="${option}"
                             th:text="${option}"
-                            th:selected="( ${#lists.contains(filterComponent.selected.get(activeComponent.key), option)} ) ? 'true' : 'false' ">
+                            th:selected="( ${#lists.contains(filterComponent.selected.get(activeComponent.key), option) || #lists.contains(filterComponent.selected.get(activeComponent.key), 'ALL') } ) ? 'true' : 'false' ">
                         ...
                     </option>
                 </select>
