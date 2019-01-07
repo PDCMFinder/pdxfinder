@@ -214,6 +214,41 @@ public class LoadJAXData implements CommandLineRunner {
                 sampleSite, extractionMethod, false, stage, "", grade, "");
 
 
+        //create breast cancer markers manually if they are present
+        if(j.has("Model Tag")){
+
+            String tag = j.getString("Model Tag");
+
+            if(tag.equals("Triple Negative Breast Cancer (TNBC)")){
+
+                MolecularCharacterization mc = new MolecularCharacterization();
+                mc.setPlatform(dataImportService.getPlatform("Not Specified", jaxDS));
+                mc.setType("IHC");
+                Marker her2 = dataImportService.getMarker("HER2", "HER2");
+                Marker er = dataImportService.getMarker("ER", "ER");
+                Marker pr = dataImportService.getMarker("PR", "PR");
+
+                MarkerAssociation her2a = new MarkerAssociation();
+                her2a.setMarker(her2);
+                her2a.setImmunoHistoChemistryResult("negative");
+
+                MarkerAssociation era = new MarkerAssociation();
+                era.setMarker(er);
+                era.setImmunoHistoChemistryResult("negative");
+
+                MarkerAssociation pra = new MarkerAssociation();
+                pra.setMarker(pr);
+                pra.setImmunoHistoChemistryResult("negative");
+
+                mc.addMarkerAssociation(her2a);
+                mc.addMarkerAssociation(era);
+                mc.addMarkerAssociation(pra);
+
+                sample.addMolecularCharacterization(mc);
+            }
+        }
+
+
         List<ExternalUrl> externalUrls = new ArrayList<>();
         externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT+id));
         externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, DATASOURCE_URL+id));
