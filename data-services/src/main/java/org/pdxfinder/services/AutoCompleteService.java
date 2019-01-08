@@ -22,7 +22,7 @@ public class AutoCompleteService {
     }
 
 
-    public List<AutoCompleteOption> getAutoSuggestions(){
+    public List<String> getAutoSuggestions(){
 
         String[] doNotDisplay = {"Neoplasm by Morphology",
                 "Neoplasm by Site",
@@ -135,14 +135,15 @@ public class AutoCompleteService {
 
         Collection<OntologyTerm> ontologyTerms = ontologyTermRepository.findAllWithMappings();
 
-        List<AutoCompleteOption> autoSuggestList = new ArrayList<>();
+        List<String> autoSuggestList = new ArrayList<>();
 
         for (OntologyTerm ontologyTerm : ontologyTerms) {
             if (ontologyTerm.getLabel() != null) {
 
                 if(!termsToRemove.contains(ontologyTerm.getLabel()) || ontologyTerm.getDirectMappedSamplesNumber() > 0){
 
-                    autoSuggestList.add(new AutoCompleteOption(ontologyTerm.getLabel(), "OntologyTerm"));
+                    //autoSuggestList.add(new AutoCompleteOption(ontologyTerm.getLabel(), "OntologyTerm"));
+                    autoSuggestList.add(ontologyTerm.getLabel());
                 }
 
             }

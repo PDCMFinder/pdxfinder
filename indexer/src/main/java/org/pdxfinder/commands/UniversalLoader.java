@@ -759,19 +759,14 @@ public class UniversalLoader implements CommandLineRunner {
 
             //check essential values
 
-            if (sampleId.isEmpty() || origin.isEmpty() || passage.isEmpty() || nomenclature.isEmpty() || modelId.isEmpty()
+            if (sampleId.isEmpty() || origin.isEmpty() || nomenclature.isEmpty() || modelId.isEmpty()
                     || molCharType.isEmpty() || platformName.isEmpty() || platformTechnology.isEmpty() || platformDescription.isEmpty()
                     || analysisProtocol.isEmpty()) {
-
 
                 log.error("Missing essential value in row " + row);
                 continue;
             }
 
-            //need this trick to get rid of 0.0 if there is any
-            //if(passage.equals("0.0")) passage = "0";
-            int passageInt = (int) Float.parseFloat(passage);
-            passage = String.valueOf(passageInt);
 
             ModelCreation model;
             Sample sample;
@@ -800,9 +795,22 @@ public class UniversalLoader implements CommandLineRunner {
 
 
             }
+
+
             //xenograft sample
             //specimen should have been created before
             else if (origin.toLowerCase().equals("xenograft")) {
+
+                if (passage.isEmpty()) {
+
+                    log.error("Missing essential value Xenograft Passage in row " + row);
+                    continue;
+                }
+
+                //need this trick to get rid of 0.0 if there is any
+                //if(passage.equals("0.0")) passage = "0";
+                int passageInt = (int) Float.parseFloat(passage);
+                passage = String.valueOf(passageInt);
 
                 model = dataImportService.findModelByIdAndDataSourceWithSpecimensAndHostStrain(modelId, ds.getAbbreviation());
 

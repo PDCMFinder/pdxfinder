@@ -19,7 +19,8 @@ public enum SearchFacetName {
     mutation,
     drug,
     project,
-    data_available;
+    data_available,
+    breast_cancer_markers;
 
     public String getName() {
         return name();

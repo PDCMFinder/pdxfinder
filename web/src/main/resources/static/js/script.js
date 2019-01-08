@@ -2,7 +2,7 @@ $(document).foundation();
 
 $(document).ready(function () {
 
-
+/*
     // Datatable Initialize.
     $('#example-datatable').DataTable({
         columnDefs: [ {
@@ -17,16 +17,15 @@ $(document).ready(function () {
         } ]
     });
 
+*/
 
-
-    $(document).ready(function() {
         var table = $('#search-datatable').DataTable( {
             paging:   false,
             ordering: true,
             info:     false,
             searching: false
         } );
-    } );
+
 
 
 

@@ -705,6 +705,10 @@ public class DataImportService {
 
         return markerAssociationRepository.findByMolChar(mc);
     }
+    public Set<MarkerAssociation> findMutationByMolChar(MolecularCharacterization mc){
+
+        return markerAssociationRepository.findMutationByMolChar(mc);
+    }
 
     public void savePatientSnapshot(PatientSnapshot ps) {
         patientSnapshotRepository.save(ps);

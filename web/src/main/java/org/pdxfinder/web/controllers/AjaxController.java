@@ -72,9 +72,9 @@ public class AjaxController {
     }
 
     @RequestMapping(value = "/autosuggests")
-    List<AutoCompleteOption> getAutoSuggestList(){
+    List<String> getAutoSuggestList(){
 
-        List<AutoCompleteOption> autoSuggestions = autoCompleteService.getAutoSuggestions();
+        List<String> autoSuggestions = autoCompleteService.getAutoSuggestions();
         return autoSuggestions;
     }
 

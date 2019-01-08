@@ -3,384 +3,160 @@
  */
 
 
-/** This function updates the UI filter based on latest changes in USER CHOICE
- *
- * @param ages : A list of patients age selected by the user
- * @param genders : A list of patient genders/sex selected by the user
- * @param cancersystem : A list of cancer systems selected by the user
- * @param datasources : A list of data sources selced by the user
- * @param tumortype : A list of tumour types selected by the user
- *
+/**
+ * Checks the filters and collects the parameters that are selected, t
+ * hen constructs the url and redirects the user to that url
  */
-function updateFilters(ages, genders, cancersystem, datasources, tumortype, projects, dataAvailable) {
-
-    console.log("updating filters!");
-    //characters we want to see as values
-    var reg = /[^A-Za-z0-9 _-]/;
-
-    var openAgeFacet = false;
-    var openGenderFacet = false;
-    var openDatasourceFacet = false;
-    var openCancerBySystem = false;
-    var openTumorTypeFacet = false;
-    var openProjectsFacet = false;
-    var openDatAvailable = false;
-
-    var node = "";
-    var disURLRequest = "";
-    node = window.location.search;
-    try {
-        disURLRequest = node.split("?")[1].split("=")[0];
-    } catch (e) {
-    }
-
-
-
-    //check selected age bins
-    if (ages != null && ages.length > 0) {
-
-        jQuery.each(ages, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(" ", "_");
-            var selected = value.selected;
-
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#patient_age__" + id).prop('checked', true);
-                jQuery("#patient_age__" + id).siblings("label").find("span").addClass("selected");
-                openAgeFacet = true;
-            }
-
-            //Add a plus to patient age 90
-            if (id == '90') {
-                jQuery("#patient_age__" + id).siblings("label").find("span").append("+");
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#patient_age__"+id).siblings("label").find("span").append(count);
-
-
-        });
-
-        if (openAgeFacet || disURLRequest == "patient_age") {
-            var ageFilterField = jQuery("li#age_filter > a.accordion-title");
-            ageFilterField.click();
-        }
-    }
-
-
-    //check selected gender options
-    if (genders != null && genders.length > 0) {
-
-
-        jQuery.each(genders, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(" ", "_");
-            var selected = value.selected;
-
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#patient_gender__" + id).prop('checked', true);
-                jQuery("#patient_gender__" + id).siblings("label").find("span").addClass("selected");
-                openGenderFacet = true;
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#patient_gender__"+id).siblings("label").find("span").append(count);
-
-        });
-
-        if (openGenderFacet || disURLRequest == "patient_gender") {
-            var genderFilterField = jQuery("li#gender_filter > a.accordion-title");
-            genderFilterField.click();
-        }
-    }
-
-
-    //check selected cancer systems
-    if (cancersystem != null && cancersystem.length > 0) {
-
-        jQuery.each(cancersystem, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(/ /g, "_");
-            var selected = value.selected;
-
-            console.log("system id:" + id);
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#cancer_system__" + id).prop('checked', true);
-                jQuery("#cancer_system__" + id).siblings("label").find("span").addClass("selected");
-                openCancerBySystem = true;
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#cancer_system__"+id).siblings("label").find("span").append(count);
-
-        });
-
-        if (openCancerBySystem || disURLRequest == "cancer_system") {
-            var cancerSystemFilterField = jQuery("li#cancer_system_filter > a.accordion-title");
-            cancerSystemFilterField.click();
-        }
-    }
-
-
-    //check selected datasources
-    if (datasources != null && datasources.length > 0) {
-
-        jQuery.each(datasources, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(" ", "_");
-            var selected = value.selected;
-
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#datasource__" + id).prop('checked', true);
-                jQuery("#datasource__" + id).siblings("label").find("span").addClass("selected");
-                openDatasourceFacet = true;
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#datasource__" + id).siblings("label").find("span").append(count);
-
-        });
-
-        if (openDatasourceFacet || disURLRequest == "datasource") {
-            var dsFilterField = jQuery("li#datasource_filter > a.accordion-title");
-            dsFilterField.click();
-        }
-
-
-    }
-
-
-
-
-
-    //check selected projects
-    if (projects != null && projects.length > 0) {
-
-        jQuery.each(projects, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(" ", "_");
-            var selected = value.selected;
-
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#project__" + id).prop('checked', true);
-                jQuery("#project__" + id).siblings("label").find("span").addClass("selected");
-                openProjectsFacet = true;
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#datasource__" + id).siblings("label").find("span").append(count);
-
-        });
-
-        if (openProjectsFacet || disURLRequest == "project") {
-            var projectFilterField = jQuery("li#project_filter > a.accordion-title");
-            projectFilterField.click();
-        }
-
-
-    }
-
-
-
-
-
-
-
-    //check selected Data Avaiable Options
-    if (dataAvailable != null && dataAvailable.length > 0) {
-
-        jQuery.each(dataAvailable, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(/ /g, "_");
-            var selected = value.selected;
-
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#data_available__" + id).prop('checked', true);
-                jQuery("#data_available__" + id).siblings("label").find("span").addClass("selected");
-                openDatAvailable = true;
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#data_available__"+id).siblings("label").find("span").append(count);
-
-        });
-
-        if (openDatAvailable || disURLRequest == "data_available") {
-            var dataAvailableFilterField = jQuery("li#data_available_filter > a.accordion-title");
-            dataAvailableFilterField.click();
-        }
-    }
-
-
-
-
-
-
-
-
-    //check selected tumorTypes
-    if (tumortype != null && tumortype.length > 0) {
-
-        jQuery.each(tumortype, function (key, value) {
-
-            var id = value.name;
-            id = id.replace(" ", "_");
-            var selected = value.selected;
-
-            //testing id for invalid characters
-            if (reg.test(id)) {
-                console.log("skipping id: " + id);
-                return;
-            }
-
-            if (selected) {
-                jQuery("#sample_tumor_type__" + id).prop('checked', true);
-                jQuery("#sample_tumor_type__" + id).siblings("label").find("span").addClass("selected");
-                openTumorTypeFacet = true;
-            }
-
-            var count = " (" + value.count + " of " + value.totalCount + ")";
-            // jQuery("#sample_tumor_type__" + id).siblings("label").find("span").append(count);
-
-        });
-
-        if (openTumorTypeFacet || disURLRequest == "sample_tumor_type") {
-            var ttFilterField = jQuery("li#tumor_type_filter > a.accordion-title");
-            ttFilterField.click();
-        }
-
-
-    }
-
-    // Check selected Molechular Characterization:
-    var urlParams = new URLSearchParams(window.location.search);
-    var dURLString = urlParams.toString();
-    var openMarkerFacet = dURLString.search("mutation");
-
-    if (disURLRequest == "mutation") {   // openMarkerFacet != -1  ||
-        jQuery("li#marker_filter > a.accordion-title").click();
-    }
-
-    // Check if Dosing Study was selected
-    var openDrugFacet = dURLString.search("drug");
-    if (openDrugFacet != -1 || disURLRequest == "drug") {
-        jQuery("li#drug_filter > a.accordion-title").click();
-    }
-
-}
-/* End updateFilters function */
-
-
-
-
-function redirectPage(){
+function redirectPage(webFacetSections) {
 
     var no_parameters = true;
     var url = "?"
 
     var searchField = jQuery("#query");
-
+    //check if main search field has anything
     if (searchField.val() != null && searchField.val() != "") {
-        url+="query="+searchField.val();
+        url += "query=" + searchField.val();
         no_parameters = false;
     }
 
+    //check elements with filter class
 
-    for (var i=1; i<20; i++){
+    jQuery(".filter").each(function () {
+        var id = jQuery(this).attr("id");
 
-        var geneFilter = jQuery("#geneFilter"+i);
-        var variantFilter = jQuery("#variantFilter"+i);
+        //characters we want to see as values
+        var reg = /[^A-Za-z0-9 _-]/;
 
-        if (geneFilter.val() != null && geneFilter.val() != "")
-        {
+        if (jQuery(this).is(':checked')) {
+
+            var res = id.split("__");
+
+            if (!no_parameters) {
+                url = url + "&";
+            }
+
+            url = url + res[0] + "=" + res[1];
+            no_parameters = false;
+
+        }
+        else if (jQuery(this).is("input:text")) {
+            return;
+        }
+    });
+
+
+
+    var twoParamUnlinkedFilters = getFiltersFromWebFacetSection(webFacetSections, 'TwoParamUnlinkedFilter');
+    twoParamUnlinkedFilters.forEach(function (filterComponent) {
+
+            options2List = filterComponent.options2;
+            componentId1 = filterComponent.urlParam + "_" + (filterComponent.param1Name).toLowerCase();
+            componentId2 = filterComponent.urlParam + "_" + (filterComponent.param2Name).toLowerCase();
+            urlKey = filterComponent.urlParam;
+
+            for (var i = 0; i < 19; i++) {
+
+                var component1Choice = jQuery("#" + componentId1 + i);
+                var component2Choices = jQuery("#" + componentId2 + i);
+
+                if (component1Choice.val() != null && component1Choice.val() != "NULL") {
+
+                    for (var j = 0; j < component2Choices.val().length; j++) {
+
+                        if (!no_parameters) {
+                            url = url + "&";
+                        }
+
+                        if (options2List.length == component2Choices.val().length) {
+
+                            url += urlKey + "=" + component1Choice.val() + "___ALL";
+                            no_parameters = false;
+                            break;
+                        } else {
+                            url += urlKey + "=" + component1Choice.val() + "___" + component2Choices.val()[j];
+                            no_parameters = false;
+
+                        }
+                    }
+                }
+
+            }
+    });
+
+
+
+
+
+
+    var twoParamLinkedFilters = getFiltersFromWebFacetSection(webFacetSections, 'TwoParamLinkedFilter');
+    twoParamLinkedFilters.forEach(function (filterComponent) {
+
+        options2ListMap = filterComponent.options2;
+        componentId1 = filterComponent.urlParam + "_" + (filterComponent.param1Name).toLowerCase();
+        componentId2 = filterComponent.urlParam + "_" + (filterComponent.param2Name).toLowerCase();
+        urlKey = filterComponent.urlParam;
+
+        for (var i = 0; i < 19; i++) {
+
+            var component1Choice = jQuery("#" + componentId1 + i);
+            var component2Choices = jQuery("#" + componentId2 + i);
+
+            if (component1Choice.val() != null && component1Choice.val() != "") {
+
+                options2List = options2ListMap[component1Choice.val()];
+
+                for (var j = 0; j < component2Choices.val().length; j++) {
+
+                    if (!no_parameters) {
+                        url = url + "&";
+                    }
+
+                    if (options2List.length == component2Choices.val().length) {
+
+                        url += urlKey + "=" + component1Choice.val() + "___ALL";
+                        no_parameters = false;
+                        break;
+                    } else {
+                        url += urlKey + "=" + component1Choice.val() + "___" + component2Choices.val()[j];
+                        no_parameters = false;
+
+                    }
+                }
+            }
+
+        }
+    });
+
+
+
+
+
+    /*for (var i = 0; i < 19; i++) {
+
+        var geneFilter = jQuery("#geneFilter" + i);
+        var variantFilter = jQuery("#variantFilter" + i);
+
+        if (geneFilter.val() != null && geneFilter.val() != "") {
             var allVariants = getVariantSize(geneFilter.val());
-            for (var j=0; j<variantFilter.val().length; j++){
+            for (var j = 0; j < variantFilter.val().length; j++) {
                 if (!no_parameters) {
                     url = url + "&";
                 }
-                if(allVariants.length == variantFilter.val().length){
+                if (allVariants.length == variantFilter.val().length) {
                     url += "mutation=" + geneFilter.val() + "___MUT" + "___ALL";
                     no_parameters = false;
                     break;
-                }else{
-                    url += "mutation=" + geneFilter.val() + "___MUT" + "___"+variantFilter.val()[j];
+                } else {
+                    url += "mutation=" + geneFilter.val() + "___MUT" + "___" + variantFilter.val()[j];
                     no_parameters = false;
 
                 }
             }
         }
 
-    }
+    }*/
 
-
-    for (var i=1; i<20; i++){
-
-        var drugFilter = jQuery("#drugFilter"+i);
-        var responseFilter = jQuery("#responseFilter"+i);
-
-        if (drugFilter.val() != null && drugFilter.val() != "NULL")
-        {
-            var allResponses = drugResponseList;
-            for (var j=0; j<responseFilter.val().length; j++){
-                if (!no_parameters) {
-                    url = url + "&";
-                }
-                if(allResponses.length == responseFilter.val().length){
-                    url += "drug=" + drugFilter.val() + "___ALL";
-                    no_parameters = false;
-                    break;
-                }else{
-                    url += "drug=" + drugFilter.val() + "___"+responseFilter.val()[j];
-                    no_parameters = false;
-
-                }
-            }
-        }
-
-    }
-
+    
 
     // Add all diagnosis filters to the URL
     jQuery(".diagnosis").each(function () {
@@ -401,152 +177,185 @@ function redirectPage(){
         }
     });
 
-
-    //get all filters with values
-    jQuery(".filter").each(function(){
-        var id = jQuery(this).attr("id");
-
-        //characters we want to see as values
-        var reg = /[^A-Za-z0-9 _-]/;
-
-        if (jQuery(this).is(':checked')){
-
-            var res = id.split("__");
-
-            if(!no_parameters){
-                url = url+"&";
-            }
-
-            if( ! reg.test(res[1])){
-                url = url+res[0]+"="+encodeURIComponent(res[1].replace(/_/g, ' '));
-                no_parameters = false;
-
-            }
-        }
-        else if(jQuery(this).is("input:text")){
-            return;
-        }
-    });
     window.location.replace(url);
+
+
 }
 
 
 
-var geneticVar = 1;
-var counter = 1;
-
-function loadGeneTextFields(){
-
-    var keysAreMarkers = Object.keys(mutatedMarkersAndVariants);
-    $('#geneFilter1').autocomplete({
-        source: [keysAreMarkers]
-    });
-
-    for (var i = 2; i <= 20; i++) {
-        $('#geneFilter' + i).autocomplete({
-            source: [keysAreMarkers]
-        });
-    }
-}
-
-function loadVariants(selectedMarker, compNumber) {
-    var marker = selectedMarker.value;
-    var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker.value].sort();
-    //alert(marker+"\n"+typeof valuesAreVariants);
-    var newOptions = "";
-    for (var i = 0; i < valuesAreVariants.length; i++) {
-        newOptions += "<option value='" + valuesAreVariants[i] + "' selected>" + valuesAreVariants[i] + "</option>";
-    }
-    var select = $('#variantFilter' + compNumber);
-    select.empty().append(newOptions);
-    $(function () {
-        $('#variantFilter' + compNumber).change(function () {
-            console.log($(this).val());
-        }).multipleSelect({
-            placeholder: " variants"
-        });
-    });
-}
 
 
 
-function addMarkerAndVariants(param, startIndex) {
-    if (startIndex != 2 && counter == 1) {
-        geneticVar = startIndex;
-    }
-    geneticVar++;
-    counter++;
-    for (var i = startIndex; i <= 20; i++) {
-        if ((param == 'AND' || param == 'OR') && geneticVar == i) {
-            //$("#geneticVar"+i).show();
-            document.getElementsByClassName("geneticVar" + i)[0].style.display = "block";
+
+
+
+
+/****************************************************************
+ *         MULTI PARAM  FILTER SECTION STARTS                   *
+ ****************************************************************/
+
+
+function intializeFilters(webFacetSection, index) {
+
+    var filterComponents = webFacetSection.filterComponents;
+
+    // Retrieve All the FilterComponents and their contents
+    filterComponents.forEach(function(filterComponent){
+
+        if (filterComponent.type === 'TwoParamLinkedFilter' || filterComponent.type === 'TwoParamUnlinkedFilter'){
+
+            dataList = filterComponent.options1;
+            componentOneId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
+            componentTwoId = filterComponent.urlParam+"_"+(filterComponent.param2Name).toLowerCase();
+            filterButton = componentOneId+'_button';
+
+            initializeTwoParamFilterComponents(dataList, componentOneId, componentTwoId,filterComponent.param2Name);
+
+            //Add event listener to each TwoParamUnlinkedFilter filter class
+            jQuery('#'+filterButton).click(function () {
+                redirectPage(webFacetSections);
+            });
         }
-    }
-}
-
-
-function getVariantSize(selectedMarker) {
-    var valuesAreVariants = mutatedMarkersAndVariants[selectedMarker];
-    return valuesAreVariants;
-}
-
-
-
-
-/* Drug Response region */
-var dosingStudy = 1;
-var dosingStudyCount = 1;
-function loadDrugTextFields(){
-
-    var drugs = drugsList.sort();
-    $('#drugFilter1').autocomplete({
-        source: [drugs]
     });
-
-    for (var i = 2; i <= 20; i++) {
-        $('#drugFilter' + i).autocomplete({
-            source: [drugs]
-        });
-    }
 }
 
 
-function loadDrugResponse(compNumber) {
 
-    var drugResponses = drugResponseList.sort();
-    var newOptions = "";
-    for (var i = 0; i < drugResponses.length; i++) {
-        newOptions += "<option value='" + drugResponses[i] + "' selected>" + drugResponses[i] + "</option>";
-    }
-    var select = $('#responseFilter' + compNumber);
-    select.empty().append(newOptions);
-    $(function () {
-        $('#responseFilter' + compNumber).change(function () {
-            console.log($(this).val());
+function initializeTwoParamFilterComponents(dataList, componentOneId, componentTwoId, placeHolderText) {
+
+    dataList = dataList.sort();
+
+    placeHolderText = placeHolderText.charAt(0).toUpperCase() + placeHolderText.substr(1).toLowerCase()+"s";
+
+    for (var i = 0; i <= 19; i++) {
+
+        $('#' + componentOneId + i).autocomplete({
+            source: [dataList]
+        });
+
+        $('#' + componentTwoId + i).change(function () {
+            //console.log($(this).val());
         }).multipleSelect({
-            placeholder: " Responses"
+            placeholder: placeHolderText
+        });
+    }
+}
+
+
+
+function getFiltersFromWebFacetSection(webFacetSections, desiredFilterType) {
+
+    filterComponentsArray = [];
+    webFacetSections.forEach(getFilterComponents);
+
+    function getFilterComponents(webFacetSection, index) {
+
+        var filterComponents = webFacetSection.filterComponents;
+
+        // Retrieve All the FilterComponents and their contents
+        filterComponents.forEach(function(filterComponent) {
+
+            if (filterComponent.type === desiredFilterType) {
+                filterComponentsArray.push(filterComponent);
+            }
+        });
+    }
+
+    return filterComponentsArray;
+}
+
+
+function getOptions2FromWebFacetSection(filterType, filterUrlParam) {
+
+    options2List = [];
+    webFacetSections.forEach(getOptions2List);
+
+    function getOptions2List(webFacetSection, index) {
+
+        var filterComponents = webFacetSection.filterComponents;
+
+        // Retrieve the specific optionList and their contents
+        filterComponents.forEach(function(filterComponent) {
+
+            if (filterComponent.type === filterType) {
+
+                if (filterComponent.urlParam === filterUrlParam){
+
+                    options2List = filterComponent.options2;
+                }
+            }
+
+        });
+    }
+    return options2List;
+}
+
+
+
+function selectAllOptionsInMyComponent2(myContent, filterType, myComponent2Id,  options2List) {
+
+    var newOptions = "";
+
+    if (filterType === 'TwoParamLinkedFilter'){
+
+        filterUrlParam = myComponent2Id.split('_')[0];
+        options2Lista = getOptions2FromWebFacetSection(filterType, filterUrlParam);
+
+        options2List = options2Lista[myContent.value];
+
+    }else{
+
+        // Remove the opening and closing square brackets
+        options2List = options2List.substr(1).slice(0, -1);
+
+        // Convert the resulting string array type
+        options2List = options2List.split(",");
+    }
+
+    //Build a new Select > Option content with selected attribute
+    for (var i = 0; i < options2List.length; i++) {
+        newOptions += "<option value='" + options2List[i] + "' selected>" + options2List[i] + "</option>";
+    }
+
+    // Empty and reload the select Box with the selected options
+    var select = $('#' + myComponent2Id);
+    select.empty().append(newOptions);
+
+    $(function () {
+        $('#' + myComponent2Id).change(function () {
+            //console.log($(this).val());
+        }).multipleSelect({
+            placeholder: ""
         });
     });
 }
 
 
+function displayMore(divId, startIndex) {
 
-function addDrugAndResponse(param, startIndex) {
-    if (startIndex != 2 && dosingStudyCount == 1) {
-        dosingStudy = startIndex;
-    }
-    dosingStudy++;
-    dosingStudyCount++;
-    for (var i = startIndex; i <= 20; i++) {
-        if ((param == 'AND' || param == 'OR') && dosingStudy == i) {
-            document.getElementsByClassName("dosingStudy" + i)[0].style.display = "block";
-            $("#drugFilter"+i).val ("");
+
+    for (var i = startIndex; i <= 19; i++) {
+
+        var hiddenDiv = divId + '_hidden' + i;
+        var textComponentId = divId + i;
+
+        var hiddenDivDOM = document.getElementById(hiddenDiv);
+        var textComponentDOM = document.getElementById(textComponentId);
+
+        if (hiddenDivDOM.style.display === "none") {
+
+            hiddenDivDOM.style.display = "block";
+            textComponentDOM.value = "";
+            break;
         }
+
     }
 }
 
-function clearFacet() {
-    document.getElementById("pdxFinderFacet").reset();
-}
+
+/****************************************************************
+ *         MULTI PARAM FILTER SECTION ENDS             *
+ ****************************************************************/
 
 

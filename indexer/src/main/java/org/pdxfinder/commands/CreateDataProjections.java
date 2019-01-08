@@ -50,6 +50,8 @@ public class CreateDataProjections implements CommandLineRunner{
     //"drugname"=>"response"=>"set of model ids"
     private Map<String, Map<String, Set<Long>>> modelDrugResponseDP = new HashMap<>();
 
+    //"platform"=>"markercombos"=>"set of model ids"
+    private Map<String, Map<String, Set<Long>>> immunoHistoChemistryDP = new HashMap<>();
 
     @Autowired
     public CreateDataProjections(DataImportService dataImportService, DrugService drugService) {
@@ -79,6 +81,8 @@ public class CreateDataProjections implements CommandLineRunner{
             createModelForQueryDataProjection();
 
             createModelDrugResponseDataProjection();
+
+            createImmunoHistoChemistryDataProjection();
 
             saveDataProjections();
 
@@ -118,7 +122,7 @@ public class CreateDataProjections implements CommandLineRunner{
                 platformName = mc.getPlatform().getName();
             }
 
-            Set<MarkerAssociation> mas = dataImportService.findMarkerAssocsByMolChar(mc);
+            Set<MarkerAssociation> mas = dataImportService.findMutationByMolChar(mc);
 
             if(mas != null){
 
@@ -131,11 +135,14 @@ public class CreateDataProjections implements CommandLineRunner{
                         String variantName = ma.getAminoAcidChange();
                         String markerName = m.getName();
 
-                        if(variantName != null && !variantName.isEmpty() && markerName != null && !markerName.isEmpty()){
+                        if(variantName != null && !variantName.isEmpty()  && markerName != null && !markerName.isEmpty()){
 
+                            //this was needed to avoid issues with variants where the value was a single space " "
+                            if(variantName.length()<3) variantName = "Not applicable";
 
-                            addToMutatedPlatformMarkerVariantModelDP(platformName, markerName, variantName, modelId);
                             addToMutatedMarkerVariantDP(markerName, variantName);
+
+                            addToThreeParamDP(mutatedPlatformMarkerVariantModelDP, platformName, markerName, variantName, modelId);
 
                         }
 
@@ -150,61 +157,210 @@ public class CreateDataProjections implements CommandLineRunner{
         }
     }
 
-    /**
-     *
-     * Adds platforms, markers, variants and models to a nested structure
-     * "platform"=>"marker"=>"variation"=>"set of model ids"
-     * Map<String, Map<String, Map<String, Set<String>>>>
-     *
-     * @param platformName
-     * @param markerName
-     * @param variantName
-     * @param modelId
-     */
-    private void addToMutatedPlatformMarkerVariantModelDP(String platformName, String markerName, String variantName, Long modelId){
 
-        if(variantName == null || variantName.length()<3) variantName = "Not applicable";
+    private void createImmunoHistoChemistryDataProjection(){
 
-        if(this.mutatedPlatformMarkerVariantModelDP.containsKey(platformName)){
+        Collection<MolecularCharacterization> ihcMolchars = dataImportService.findMolCharsByType("IHC");
+        log.info("Looking at "+ihcMolchars.size()+" IHC MolChar objects. This may take a while folks...");
+        int count = 0;
 
-            if(this.mutatedPlatformMarkerVariantModelDP.get(platformName).containsKey(markerName)){
+        for(MolecularCharacterization mc:ihcMolchars){
 
-                if(this.mutatedPlatformMarkerVariantModelDP.get(platformName).get(markerName).containsKey(variantName)){
+            ModelCreation model = dataImportService.findModelByMolChar(mc);
 
-                    this.mutatedPlatformMarkerVariantModelDP.get(platformName).get(markerName).get(variantName).add(modelId);
+            Long modelId = model.getId();
+
+            String platformName = "Not Specified";
+
+            if(mc.getPlatform() != null && mc.getPlatform().getName() != null && !mc.getPlatform().getName().isEmpty()){
+
+                platformName = mc.getPlatform().getName();
+            }
+
+            Set<MarkerAssociation> mas = dataImportService.findMarkerAssocsByMolChar(mc);
+
+            List<String> markerList = new ArrayList<>();
+
+            if(mas != null){
+
+                for(MarkerAssociation ma: mas){
+
+                    Marker m = ma.getMarker();
+
+                    if(m != null){
+
+                        String ihcResult = ma.getImmunoHistoChemistryResult();
+                        String markerName = m.getName();
+                        //log.info(ihcResult + markerName);
+                        if(ihcResult != null && !ihcResult.isEmpty()  && markerName != null && !markerName.isEmpty()){
+
+                            //this was needed to avoid issues with variants where the value was a single space " "
+                            if(ihcResult.length()<3) ihcResult = "Not applicable";
+                            if(ihcResult.toLowerCase().startsWith("pos")) ihcResult = "pos";
+                            if(ihcResult.toLowerCase().startsWith("neg")) ihcResult = "neg";
+
+                            markerList.add(markerName+ihcResult);
+
+                        }
+                    }
+                    count++;
+                    if(count%10000 == 0) {log.info("Processed "+count+" MA objects");}
+                    //if (count > 40000) break;
                 }
-                //platform and marker is there, variant is missing
+
+                Collections.sort(markerList);
+                String markerResultCombo = markerList.stream().collect(Collectors.joining("_"));
+
+                //log.info("Entry: "+platformName + markerResultCombo + modelId);
+                addToTwoParamDP(immunoHistoChemistryDP, platformName, markerResultCombo, modelId);
+
+            }
+
+
+        }
+
+        //log.info(immunoHistoChemistryDP.toString());
+    }
+
+
+    private void addToTwoParamDP(Map<String, Map<String, Set<Long>>> collection, String key1, String key2, Long modelId){
+
+        if(collection.containsKey(key1)){
+
+            if(collection.get(key1).containsKey(key2)){
+             collection.get(key1).get(key2).add(modelId);
+
+            }
+            else{
+
+                Set<Long> set = new HashSet<>();
+                set.add(modelId);
+                collection.get(key1).put(key2, set);
+            }
+        }
+        else{
+
+            Set<Long> set = new HashSet<>();
+            set.add(modelId);
+
+            Map<String, Set<Long>> map = new HashMap<>();
+            map.put(key2, set);
+
+            collection.put(key1, map);
+        }
+
+    }
+
+
+    private void addToThreeParamDP(Map<String, Map<String, Map<String, Set<Long>>>> collection, String key1, String key2, String key3, Long modelId){
+
+        if(collection.containsKey(key1)){
+
+            if(collection.get(key1).containsKey(key2)){
+
+                if(collection.get(key1).get(key2).containsKey(key3)){
+
+                    collection.get(key1).get(key2).get(key3).add(modelId);
+                }
                 else{
 
                     Set<Long> models = new HashSet<>(Arrays.asList(modelId));
-
-                    this.mutatedPlatformMarkerVariantModelDP.get(platformName).get(markerName).put(variantName, models);
+                    collection.get(key1).get(key2).put(key3,models);
                 }
+
             }
-            //platform is there, marker is missing
             else{
 
                 Set<Long> models = new HashSet<>(Arrays.asList(modelId));
 
-                Map<String, Set<Long>> variants = new HashMap<>();
-                variants.put(variantName, models);
+                Map<String, Set<Long>> map3 = new HashMap();
+                map3.put(key3,models);
 
-                this.mutatedPlatformMarkerVariantModelDP.get(platformName).put(markerName, variants);
+                collection.get(key1).put(key2, map3);
+
             }
+
+
+
         }
-        //if the platform is missing, combine all keys
         else{
 
             Set<Long> models = new HashSet<>(Arrays.asList(modelId));
 
-            Map<String, Set<Long>> variants = new HashMap<>();
-            variants.put(variantName, models);
+            Map<String, Set<Long>> map3 = new HashMap();
+            map3.put(key3,models);
 
-            Map<String, Map<String, Set<Long>>> markers = new HashMap<>();
-            markers.put(markerName, variants);
+            Map map2 = new HashMap();
+            map2.put(key2, map3);
 
-            this.mutatedPlatformMarkerVariantModelDP.put(platformName, markers);
+            collection.put(key1, map2);
         }
+
+
+    }
+
+    private void addToFourParamDP(Map<String, Map<String, Map<String, Map<String, Set<Long>>>>> collection, String key1, String key2, String key3, String key4, Long modelId){
+
+        if(collection.containsKey(key1)){
+
+            if(collection.get(key1).containsKey(key2)){
+
+                if(collection.get(key1).get(key2).containsKey(key3)){
+
+                    if(collection.get(key1).get(key2).get(key3).containsKey(key4)){
+
+                        collection.get(key1).get(key2).get(key3).get(key4).add(modelId);
+                    }
+                    else{
+
+                        Set<Long> models = new HashSet<>(Arrays.asList(modelId));
+
+                        collection.get(key1).get(key2).get(key3).put(key4, models);
+                    }
+
+                }
+                else{
+
+                    Set<Long> models = new HashSet<>(Arrays.asList(modelId));
+
+                    Map<String, Set<Long>> map4 = new HashMap();
+                    map4.put(key4, models);
+
+                    collection.get(key1).get(key2).put(key3, map4);
+                }
+
+            }
+            else{
+
+                Set<Long> models = new HashSet<>(Arrays.asList(modelId));
+
+                Map<String, Set<Long>> map4 = new HashMap();
+                map4.put(key4, models);
+
+                Map map3 = new HashMap();
+                map3.put(key3, map4);
+
+                collection.get(key1).put(key2, map3);
+            }
+
+
+        }
+        else{
+
+            Set<Long> models = new HashSet<>(Arrays.asList(modelId));
+
+            Map<String, Set<Long>> map4 = new HashMap();
+            map4.put(key4, models);
+
+            Map map3 = new HashMap();
+            map3.put(key3, map4);
+
+            Map map2 = new HashMap();
+            map2.put(key2, map3);
+
+            collection.put(key1, map2);
+        }
+
 
     }
 
@@ -651,19 +807,27 @@ public class CreateDataProjections implements CommandLineRunner{
             drugDP.setLabel("ModelDrugData");
         }
 
+        DataProjection ihcDP = dataImportService.findDataProjectionByLabel("IHC");
+
+        if(ihcDP == null){
+            ihcDP = new DataProjection();
+            ihcDP.setLabel("IHC");
+        }
 
 
-        JSONObject j1 ,j2, j3;
+        JSONObject j1 ,j2, j3, j4;
 
         try{
 
             j1 = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
             j2 = new JSONObject(mutatedMarkerVariantDP.toString());
             j3 = new JSONObject(modelDrugResponseDP.toString());
+            j4 = new JSONObject(immunoHistoChemistryDP.toString());
 
             pmvmDP.setValue(j1.toString());
             mvDP.setValue(j2.toString());
             drugDP.setValue(j3.toString());
+            ihcDP.setValue(j4.toString());
 
         }
         catch(Exception e){
@@ -676,6 +840,7 @@ public class CreateDataProjections implements CommandLineRunner{
         dataImportService.saveDataProjection(pmvmDP);
         dataImportService.saveDataProjection(mvDP);
         dataImportService.saveDataProjection(drugDP);
+        dataImportService.saveDataProjection(ihcDP);
 
     }
 
