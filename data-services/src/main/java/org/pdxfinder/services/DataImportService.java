@@ -534,6 +534,11 @@ public class DataImportService {
         return sampleRepository.findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(modelId, dataSource, sampleId);
     }
 
+    public Sample findHumanSampleWithMolcharByModelIdAndDataSource(String modelId, String dataSource){
+
+        return sampleRepository.findHumanSampleWithMolcharByModelIdAndDataSource(modelId, dataSource);
+    }
+
     public Sample getHumanSample(String sampleId, String dataSource){
 
 
@@ -699,6 +704,10 @@ public class DataImportService {
     public Set<MarkerAssociation> findMarkerAssocsByMolChar(MolecularCharacterization mc){
 
         return markerAssociationRepository.findByMolChar(mc);
+    }
+    public Set<MarkerAssociation> findMutationByMolChar(MolecularCharacterization mc){
+
+        return markerAssociationRepository.findMutationByMolChar(mc);
     }
 
     public void savePatientSnapshot(PatientSnapshot ps) {

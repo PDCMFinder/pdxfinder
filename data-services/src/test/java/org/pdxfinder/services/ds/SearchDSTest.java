@@ -128,7 +128,7 @@ public class SearchDSTest extends BaseTest {
 
     @Test
     public void testGetDiagnosisCounts() {
-        searchDS.initialize();
+        searchDS.init();
         Map<String, Integer> diagnosisCounts = searchDS.getDiagnosisCounts();
         System.out.println(diagnosisCounts);
         assertThat(diagnosisCounts.get("Adenocarcinoma"), is(2));

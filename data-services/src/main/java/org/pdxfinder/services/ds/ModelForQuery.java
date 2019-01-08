@@ -4,55 +4,11 @@ package org.pdxfinder.services.ds;
  * Created by csaba on 19/01/2018.
  */
 
-
-
-
-/*
-
-Patient/tumour
-
-    cancer categories/classification – higher category  - by organ (breast, lung, colon), system (digestive system) or cell type (adenocarcinoma)
-    cancer histology - granular
-    type- met primary other
-    age – bin?
-    gender
-    Patient treatment naïve, pretreated, unknown
-
-if not naive – being more granular on treatment if possible
-PDX model
-
-    host strain
-    mouse humanization
-    site of graft - back, right flank
-    type of graft - ortho or SC
-    validation : yes/no, method
-
- */
-
-/*
-FACET OPTIONS:
-
-patientAge
-patientTreatmentStatus
-patientGender
-
-sampleOriginTissue
-sampleSampleSite
-sampleExtractionMethod
-sampleClassification
-sampleTumorType
-
-modelImplantationSite
-modelImplantationType
-modelHostStrain
-
-*/
-
-
 import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.services.dto.DrugSummaryDTO;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -83,9 +39,13 @@ public class ModelForQuery {
     private List<String> mutatedVariants;
     private List<String> dataAvailable;
     private Set<String> allOntologyTermAncestors;
+
+    private List<String> breastCancerMarkers;
     private Set<String> queryMatch;
 
-    private List<DrugSummaryDTO> drugData;
+
+
+    private List<String> drugWithResponse;
 
     private List<String> projects;
     private List<String> publications;
@@ -395,13 +355,6 @@ public class ModelForQuery {
         return null;
     }
 
-    public List<DrugSummaryDTO> getDrugData() {
-        return drugData;
-    }
-
-    public void setDrugData(List<DrugSummaryDTO> drugData) {
-        this.drugData = drugData;
-    }
 
 
     public void addProject(String project){
@@ -420,5 +373,52 @@ public class ModelForQuery {
 
     public void setPatientEthnicity(String patientEthnicity) {
         this.patientEthnicity = patientEthnicity;
+    }
+
+    public String toString(){
+
+        return "{model:"+modelId+"DS:"+datasource+ "}";
+    }
+
+    public List<String> getDrugWithResponse() {
+        return drugWithResponse;
+    }
+
+    public void setDrugWithResponse(List<String> drugWithResponse) {
+        this.drugWithResponse = drugWithResponse;
+    }
+
+    public void addDrugWithResponse(String drugWithResponse){
+
+        if(this.drugWithResponse == null){
+            this.drugWithResponse = new ArrayList<>();
+        }
+
+        this.drugWithResponse.add(drugWithResponse);
+    }
+
+    public void addMutatedVariant(String s){
+
+        if(mutatedVariants == null){
+            mutatedVariants = new ArrayList<>();
+        }
+        mutatedVariants.add(s);
+    }
+
+    public List<String> getBreastCancerMarkers() {
+        return breastCancerMarkers;
+    }
+
+    public void setBreastCancerMarkers(List<String> breastCancerMarkers) {
+        this.breastCancerMarkers = breastCancerMarkers;
+    }
+
+
+    public void addBreastCancerMarkers(String m){
+
+        if(breastCancerMarkers == null){
+            breastCancerMarkers = new ArrayList<>();
+        }
+        breastCancerMarkers.add(m);
     }
 }

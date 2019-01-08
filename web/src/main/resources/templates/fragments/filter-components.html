@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en"></head>
+<body>
+
+
+<!-- Two Param Unlinked Filter Component Generator -->
+<div th:fragment="twoParamUnlinkedFilter(filterComponent)">
+
+    <div class="row topSace10">
+        <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param1Name}"></div>
+        <div class="columns nospace small-12 large-6 adjusti" th:text="${filterComponent.param2Name}"></div>
+    </div>
+
+
+    <!-- New Filter Search -->
+    <th:block th:unless="${filterComponent.active}">
+        <div class="row topSace10">
+            <div class="columns nospace small-12 large-6">
+                <input type="text" class="fullWidth"
+                       th:onblur="|selectAllOptionsInMyComponent2(this,'${filterComponent.type}','${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+'0'}','${filterComponent.options2}')|"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'0'}"/>
+            </div>
+
+            <div class="columns nospace small-12 large-6 topSpace3">
+                <select multiple='multiple'
+                        th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)+'0'}">
+                    <option th:each="option :${filterComponent.options2}"
+                            th:value="${option}"
+                            th:text="${option}"> ...
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <!-- TwoParamUnlinkedFilter Hidden Fields Triggered after Clicking "OR" Button-->
+        <div class="row" th:each="i: ${#numbers.sequence(1, 19)}"
+             th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_hidden'}+${i}"
+             style="display:none">
+            <div class="columns nospace small-12 large-6">
+                <input type="text" value="NULL"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${i}"
+                       class="fullWidth"/>
+            </div>
+
+            <div class="columns nospace small-12 large-6 topSpace3">
+                <select multiple='multiple'
+                        th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}+${i}">
+
+                    <option th:each="option :${filterComponent.options2}"
+                            th:value="${option}"
+                            th:text="${option}"
+                            th:selected="true"> ...
+                    </option>
+                </select>
+            </div>
+        </div>
+    </th:block>
+
+
+    <!-- After a Search was done -->
+    <th:block th:if="${filterComponent.active}">
+        <div class="row topSace10" th:each="activeComponent, iter : ${filterComponent.selected}">
+
+            <div class="columns nospace small-12 large-6">
+                <input th:value="${activeComponent.key}"
+                       type="text"
+                       class="fullWidth"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${iter.index}"/>
+            </div>
+
+            <div class="columns nospace small-12 large-6 topSpace3">
+                <select multiple='multiple'
+                        class="width50"
+                        th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}+${iter.index}">
+
+                    <option th:each="option : ${filterComponent.options2}"
+                            th:value="${option}"
+                            th:text="${option}"
+                            th:selected="( ${#lists.contains(filterComponent.selected.get(activeComponent.key), option) || #lists.contains(filterComponent.selected.get(activeComponent.key), 'ALL') } ) ? 'true' : 'false' ">
+                        ...
+                    </option>
+                </select>
+            </div>
+        </div>
+
+
+        <!-- Hidden Fields Triggered after Clicking "OR" Button-->
+        <div class="row" th:each="i: ${#numbers.sequence(#maps.size(filterComponent.selected), 19)}"
+             th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_hidden'}+${i}"
+             style="display:none">
+
+            <div class="columns nospace small-12 large-6">
+                <input type="text" value="NULL"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${i}"
+                       class="fullWidth"/>
+            </div>
+
+            <div class="columns nospace small-12 large-6 topSpace3">
+                <select multiple='multiple'
+                        th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}+${i}">
+
+                    <option th:each="option :${filterComponent.options2}"
+                            th:value="${option}"
+                            th:text="${option}"
+                            th:selected="true"> ...
+                    </option>
+                </select>
+            </div>
+        </div>
+
+    </th:block>
+
+
+    <!-- TwoParamUnlinkedFilter Action Buttons -->
+    <div class="checkbox-item height70px">
+        <button href="#" class="button primary columns large-3 white-text-right-float topSpace4 searchButton"
+                th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_button'}">
+            <i class="icon icon-functional" data-icon="1"></i>
+        </button>
+
+        <button th:unless="${filterComponent.active}"
+                href="#" class="icoButn columns large-2 ORButton"
+                th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','1')|">
+            OR
+        </button>
+
+        <button th:if="${filterComponent.active}"
+                href="#" class="icoButn columns large-2 ORButton"
+                th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','${#maps.size(filterComponent.selected)}')|">
+            OR
+        </button>
+    </div>
+
+</div>
+
+
+
+
+
+<!-- Two Param Linked Filter Component Generator -->
+<div th:fragment="twoParamLinkedFilter(filterComponent)">
+
+
+    <div class="row topSace10">
+        <div th:if="${filterComponent.param1Name != null}" class="columns nospace small-6 large-6 adjusti"
+             th:text="${filterComponent.param1Name}"></div>
+        <div th:if="${filterComponent.param2Name != null}" class="columns nospace small-6 large-6 adjusti"
+             th:text="${filterComponent.param2Name}"></div>
+    </div>
+
+
+    <!-- New TwoParamLinkedFilter Search -->
+    <th:block th:unless="${filterComponent.active}">
+        <div class="row topSace10">
+            <div class="columns nospace small-12 large-6">
+                <input type="text" class="fullWidth"
+                       th:onblur="|selectAllOptionsInMyComponent2(this,'${filterComponent.type}','${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+'0'}','')|"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'0'}"/>
+            </div>
+
+            <div class="columns nospace small-12 large-6 topSpace3">
+                <select multiple='multiple'
+                        th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)+'0'}">
+                </select>
+            </div>
+        </div>
+
+        <!-- TwoParamLinkedFilter Hidden Fields Triggered after Clicking "OR" Button -->
+        <div class="row" th:each="i: ${#numbers.sequence(1, 19)}"
+             th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_hidden'}+${i}"
+             style="display:none">
+            <div class="columns nospace small-12 large-6">
+                <input type="text"
+                       th:onblur="|selectAllOptionsInMyComponent2(this,'${filterComponent.type}','${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+i}','')|"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${i}"
+                       class="fullWidth"/>
+            </div>
+
+            <div class="columns nospace small-12 large-6 topSpace3">
+                <select multiple='multiple'
+                        th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}+${i}">
+                </select>
+            </div>
+        </div>
+
+    </th:block>
+
+
+    <!-- After a Search was done -->
+    <th:block th:if="${filterComponent.active}">
+        <div class="row topSace10" th:each="activeComponent, iter : ${filterComponent.selected}">
+
+            <div class="columns nospace small-12 large-6">
+                <input th:value="${activeComponent.key}"
+                       type="text"
+                       th:onblur="|selectAllOptionsInMyComponent2(this,'${filterComponent.type}','${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+iter.index}','')|"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${iter.index}"
+                       class="fullWidth"/>
+            </div>
+
+            <div class="columns nospace small-12 large-6 topSpace3">
+                <select multiple='multiple'
+                        class="width50"
+                        th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}+${iter.index}">
+
+                    <option th:each="option : ${filterComponent.options2.get(activeComponent.key)}"
+                            th:value="${option}"
+                            th:text="${option}"
+                            th:selected="( ${#lists.contains(filterComponent.selected.get(activeComponent.key), option) || #lists.contains(filterComponent.selected.get(activeComponent.key), 'ALL') } ) ? 'true' : 'false' ">
+                        ...
+                    </option>
+                </select>
+            </div>
+        </div>
+
+
+        <!-- Hidden Fields Triggered after Clicking "OR" Button -->
+        <div class="row" th:each="i: ${#numbers.sequence(#maps.size(filterComponent.selected), 19)}"
+             th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_hidden'}+${i}"
+             style="display:none">
+
+            <div class="columns nospace small-12 large-6">
+                <input type="text"
+                       th:onblur="|selectAllOptionsInMyComponent2(this,'${filterComponent.type}','${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param2Name)+i}','')|"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${i}"
+                       class="fullWidth"/>
+            </div>
+
+            <div class="columns nospace small-12 large-6 topSpace3">
+                <select multiple='multiple'
+                        th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param2Name)}+${i}">
+                </select>
+            </div>
+        </div>
+
+    </th:block>
+
+
+    <!-- TwoParamLinkedFilter Action Buttons -->
+    <div class="checkbox-item height70px">
+        <button href="#" class="button primary columns large-3 white-text-right-float topSpace4 searchButton"
+                th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_button'}">
+            <i class="icon icon-functional" data-icon="1"></i>
+        </button>
+
+        <button th:unless="${filterComponent.active}"
+                href="#" class="icoButn columns large-2 ORButton"
+                th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','1')|">
+            OR
+        </button>
+
+        <button th:if="${filterComponent.active}"
+                href="#" class="icoButn columns large-2 ORButton"
+                th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','${#maps.size(filterComponent.selected)}')|">
+            OR
+        </button>
+    </div>
+
+</div>
+
+
+</body>
+</html>
+
+
+
+

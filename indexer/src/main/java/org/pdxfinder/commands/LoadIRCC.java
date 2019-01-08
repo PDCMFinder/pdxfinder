@@ -364,7 +364,9 @@ public class LoadIRCC implements CommandLineRunner {
             //STEP 3: assemble MolecularCharacterization objects for samples
 
             //sampleId = > molchar
-            HashMap<String, MolecularCharacterization> sampleMolCharMap = new HashMap();
+            HashMap<String, MolecularCharacterization> xenoSampleMolCharMap = new HashMap();
+            HashMap<String, MolecularCharacterization> humanSampleMolCharMap = new HashMap();
+
 
             for (int i = 0; i < jarray.length(); i++) {
                 if (i == variationMax) {
@@ -374,6 +376,7 @@ public class LoadIRCC implements CommandLineRunner {
 
                 JSONObject variation = jarray.getJSONObject(i);
 
+                String modelId = variation.getString("Model ID");
                 String sample = variation.getString("Sample ID");
                 String specimen = variation.getString("Specimen ID");
 
@@ -400,27 +403,54 @@ public class LoadIRCC implements CommandLineRunner {
                 ma.setAlleleFrequency(variation.getString("VAF"));
                 ma.setRsVariants(variation.getString("avsnp147"));
 
+                // STEP 4: Determine if sample is human or xenograft
+                if(specimen.startsWith(modelId+"H")){
+
+                    if(humanSampleMolCharMap.containsKey(sampleId)){
+                        humanSampleMolCharMap.get(sampleId).addMarkerAssociation(ma);
+                    }
+                    else{
+                        MolecularCharacterization mcNew = new MolecularCharacterization();
+                        mcNew.setPlatform(platform);
+                        mcNew.setType(molcharType);
+                        mcNew.addMarkerAssociation(ma);
 
 
-                if(sampleMolCharMap.containsKey(sampleId)){
-                    sampleMolCharMap.get(sampleId).addMarkerAssociation(ma);
+                        humanSampleMolCharMap.put(modelId,mcNew);
+
+                    }
+
+                }
+                else if(specimen.startsWith(modelId+"X")){
+
+
+                    if(xenoSampleMolCharMap.containsKey(sampleId)){
+                        xenoSampleMolCharMap.get(sampleId).addMarkerAssociation(ma);
+                    }
+                    else{
+                        MolecularCharacterization mcNew = new MolecularCharacterization();
+                        mcNew.setPlatform(platform);
+                        mcNew.setType(molcharType);
+                        mcNew.addMarkerAssociation(ma);
+
+
+                        xenoSampleMolCharMap.put(sampleId,mcNew);
+
+                    }
                 }
                 else{
-                    MolecularCharacterization mcNew = new MolecularCharacterization();
-                    mcNew.setPlatform(platform);
-                    mcNew.setType(molcharType);
-                    mcNew.addMarkerAssociation(ma);
 
-
-                    sampleMolCharMap.put(sampleId,mcNew);
-
+                    //something is not right
+                    log.error("Cannot determine if sample human or xeno for:"+specimen);
                 }
+
+
 
             }
 
 
-            //STEP 3: loop through sampleMolCharMap to hook mc objects to proper samples then save the graph
-            for (Map.Entry<String, MolecularCharacterization> entry : sampleMolCharMap.entrySet()) {
+            //STEP 5: loop through xenoSampleMolCharMap and humanSampleMolCharMap to hook mc objects to proper samples then save the graph
+            for (Map.Entry<String, MolecularCharacterization> entry : xenoSampleMolCharMap.entrySet()) {
                 String sampleId = entry.getKey();
                 MolecularCharacterization mc = entry.getValue();
                 try{
@@ -442,6 +472,33 @@ public class LoadIRCC implements CommandLineRunner {
                 }
 
             }
+
+            for (Map.Entry<String, MolecularCharacterization> entry : humanSampleMolCharMap.entrySet()) {
+                String modelId = entry.getKey();
+                MolecularCharacterization mc = entry.getValue();
+                try{
+
+
+                    Sample s = dataImportService.findHumanSample(modelId, irccDS.getAbbreviation());
+
+                    if(s == null){
+                        log.error("Human sample not found for model: "+modelId);
+                    }
+                    else{
+                        s.addMolecularCharacterization(mc);
+                        dataImportService.saveSample(s);
+                        log.info("Saving molchar for human sample: "+modelId);
+                    }
+                }
+                catch(Exception e1){
+
+                    e1.printStackTrace();
+                }
+
+            }
+
+
+
 
         }
         catch (Exception e){
@@ -474,6 +531,7 @@ public class LoadIRCC implements CommandLineRunner {
 
                 JSONObject variation = jarray.getJSONObject(i);
 
+                String modelId = variation.getString("Model ID");
                 String sample = variation.getString("Sample ID");
                 String specimen = variation.getString("Specimen ID");
                 

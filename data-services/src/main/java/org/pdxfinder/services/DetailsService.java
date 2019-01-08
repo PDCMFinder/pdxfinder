@@ -451,6 +451,22 @@ public class DetailsService {
         Map<String, String> techNPassToSampleId = new HashMap<>();
         List<Map> dataSummaryList = new ArrayList<>();
 
+
+
+        //add patient samples first - if any
+        for(Map.Entry<String, String> entry: patientTech.entrySet()){
+            Map<String, String> dataSummary = new HashMap<>();
+            dataSummary.put("sampleId", "Patient Sample");
+            dataSummary.put("sampleType", "Patient Sample");
+            dataSummary.put("xenograftPassage","NA");
+            dataSummary.put("dataAvailable","Mutation_"+entry.getValue());
+            dataSummary.put("platformUsed",entry.getValue());
+            dataSummary.put("rawData","Not Available");
+
+            dataSummaryList.add(dataSummary);
+
+        }
+
         for (String tech : modelTechAndPassages.keySet()) {
 
             //Retrieve the passages:
