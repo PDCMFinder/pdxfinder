@@ -26,10 +26,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.poi.ss.usermodel.*;
 
@@ -96,6 +93,12 @@ public class UniversalLoader implements CommandLineRunner {
      * Placeholder for the data stored in the "sharing and contact" tab
      */
     private List<List<String>> sharingAndContactSheetData;
+
+
+    /**
+     * Placeholder for the data stored in the "breast and or colorectal diagno" tab
+     */
+    private List<List<String>> breastAndOrColorectalDiagnoSheetData;
 
 
     /**
@@ -212,6 +215,7 @@ public class UniversalLoader implements CommandLineRunner {
         pdxModelSheetData = new ArrayList<>();
         pdxModelValidationSheetData = new ArrayList<>();
         derivedDatasetSheetData = new ArrayList<>();
+        breastAndOrColorectalDiagnoSheetData = new ArrayList<>();
         sharingAndContactSheetData = new ArrayList<>();
         loaderRelatedDataSheetData = new ArrayList<>();
 
@@ -222,7 +226,7 @@ public class UniversalLoader implements CommandLineRunner {
         initializeSheetData(workbook.getSheetAt(5), pdxModelValidationSheetData);
         initializeSheetData(workbook.getSheetAt(6), derivedDatasetSheetData);
         initializeSheetData(workbook.getSheetAt(7), sharingAndContactSheetData);
-
+        initializeSheetData(workbook.getSheetAt(8), breastAndOrColorectalDiagnoSheetData);
         initializeSheetData(workbook.getSheetAt(9), loaderRelatedDataSheetData);
     }
 
@@ -230,7 +234,7 @@ public class UniversalLoader implements CommandLineRunner {
      * Loads the data from a spreadsheet tab into a placeholder
      *
      * @param sheet
-     * @param sheetName
+     * @param sheetData
      */
     private void initializeSheetData(Sheet sheet, List<List<String>> sheetData) {
 
@@ -303,6 +307,8 @@ public class UniversalLoader implements CommandLineRunner {
         createDerivedPatientModelDataset();
 
         createSharingAndContacts();
+
+        createBreastAndOrColorectalData();
 
     }
 
@@ -929,6 +935,186 @@ public class UniversalLoader implements CommandLineRunner {
 
     }
 
+
+    private void createBreastAndOrColorectalData(){
+
+        if (stopLoading) return;
+
+        log.info("******************************************************");
+        log.info("* Creating breast and or colorectal markers          *");
+        log.info("******************************************************");
+
+        int row = 6;
+
+        Map<String, MolecularCharacterization> patientMolChars = new HashMap<>();
+        Map<String, MolecularCharacterization> xenoMolChars = new HashMap<>();
+
+        //TODO: At some point deal with microsatelite instability. Currently those rows are skipped. We don't want instability in our lives just yet.
+
+        //first get all markers for the individual molchar objects
+        for (List<String> dataRow : breastAndOrColorectalDiagnoSheetData) {
+
+            String sampleId = dataRow.get(0);
+            String origin = dataRow.get(1);
+            String passage = dataRow.get(2);
+            String nomenclature = dataRow.get(3);
+            String modelId = dataRow.get(4);
+            String marker = dataRow.get(5);
+            String markerStatus = dataRow.get(6);
+            String techique = dataRow.get(8);
+            String platform = dataRow.get(9);
+
+            if(origin.isEmpty() || modelId.isEmpty() || marker.isEmpty() || markerStatus.isEmpty() || techique.isEmpty() || platform.isEmpty()){
+                log.error("Missing essential value in row " + row);
+                continue;
+            }
+
+            MolecularCharacterization mc;
+            Platform pl;
+
+            if(origin.toLowerCase().equals("patient")){
+
+                //for patient related molchars it is sufficient to use the model id as the key
+                String mapKey = modelId;
+
+                if(patientMolChars.containsKey(mapKey)) {
+                    //get a previously created mc object = platform and type are already set
+                    mc = patientMolChars.get(mapKey);
+                }
+
+                else {
+                    //new mc object, need to set the platform, too
+                    pl = dataImportService.getPlatform(platform, ds);
+
+                    mc = new MolecularCharacterization();
+                    mc.setPlatform(pl);
+
+                    if(techique.toLowerCase().equals("immunohistochemistry")){
+                        mc.setType("IHC");
+                    }
+                }
+
+                Marker m = dataImportService.getMarker(marker, marker);
+                MarkerAssociation ma = new MarkerAssociation();
+                ma.setMarker(m);
+
+                if(techique.toLowerCase().equals("immunohistochemistry")){
+
+                    ma.setImmunoHistoChemistryResult(markerStatus);
+                }
+                //what if it is not ihc?
+
+                mc.addMarkerAssociation(ma);
+
+                //put molchar in the map if it was just created
+                if(!patientMolChars.containsKey(mapKey)){
+                    patientMolChars.put(mapKey, mc);
+                }
+
+
+            }
+            else if(origin.toLowerCase().equals("xenograft")){
+
+                //need this trick to get rid of 0.0 if there is any
+                int passageInt = (int) Float.parseFloat(passage);
+                passage = String.valueOf(passageInt);
+
+                //for xenograft molchars use the combination of the modelid, nomenclature and passage as the key
+                String mapKey = modelId + "___" + nomenclature + "___" + passage;
+
+                if(xenoMolChars.containsKey(mapKey)) {
+                    //get a previously created mc object = platform and type are already set
+                    mc = xenoMolChars.get(mapKey);
+                }
+                else {
+                    //new mc object, need to set the platform, too
+                    pl = dataImportService.getPlatform(platform, ds);
+
+                    mc = new MolecularCharacterization();
+                    mc.setPlatform(pl);
+
+                    if(techique.toLowerCase().equals("immunohistochemistry")){
+                        mc.setType("IHC");
+                    }
+                }
+
+                Marker m = dataImportService.getMarker(marker, marker);
+                MarkerAssociation ma = new MarkerAssociation();
+                ma.setMarker(m);
+
+                if(techique.toLowerCase().equals("immunohistochemistry")){
+
+                    ma.setImmunoHistoChemistryResult(markerStatus);
+                }
+                //what if it is not ihc?
+
+                mc.addMarkerAssociation(ma);
+
+                if(!xenoMolChars.containsKey(mapKey)){
+                    xenoMolChars.put(mapKey, mc);
+                }
+
+            }
+
+
+
+            row++;
+        }
+
+
+        //get the corresponding samples for the molchar objects, link them and save them.
+        //patient samples
+        for(Map.Entry<String, MolecularCharacterization> entry:patientMolChars.entrySet()){
+            //key = model ID
+            String key = entry.getKey();
+            MolecularCharacterization mc = entry.getValue();
+
+            Sample patientSample = dataImportService.findHumanSample(key, ds.getAbbreviation());
+
+            if(patientSample != null){
+
+                patientSample.addMolecularCharacterization(mc);
+                dataImportService.saveSample(patientSample);
+            }
+            else{
+
+                log.error("Failed to create molchar for patient sample! Model:"+key);
+            }
+
+        }
+
+        //xeno samples
+        for(Map.Entry<String, MolecularCharacterization> entry:xenoMolChars.entrySet()){
+            //key =  modelId + "___" + nomenclature + "___" + passage
+
+            MolecularCharacterization mc = entry.getValue();
+            String[] keyArr = entry.getKey().split("___");
+
+            String modelId = keyArr[0];
+            String nomenclature = keyArr[1];
+            String passage = keyArr[2];
+
+
+
+            Sample xenoSample = dataImportService.findXenograftSample(modelId, ds.getAbbreviation(), passage, nomenclature);
+
+            if(xenoSample != null){
+
+                xenoSample.addMolecularCharacterization(mc);
+                dataImportService.saveSample(xenoSample);
+            }
+            else{
+
+                log.error("Failed to create molchar for xeno sample! Model:"+modelId +" Passage: "+passage +" Nomenclature: "+nomenclature);
+            }
+
+        }
+
+        log.info("******************************************************");
+        log.info("* Finished creating breast and or colorectal markers *");
+        log.info("******************************************************");
+
+    }
 
     /**
      * Checks if a list consists of nulls only

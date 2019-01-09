@@ -556,6 +556,12 @@ public class DataImportService {
         return sampleRepository.findMouseSampleByModelIdAndDataSourceAndSpecimenId(modelId, dataSource, specimenId);
     }
 
+    public Sample findXenograftSample(String modelId, String dataSource, String passage, String nomenclature){
+
+
+        return sampleRepository.findMouseSampleByModelIdAndDataSourceAndPassageAndNomenclature(modelId, dataSource, passage, nomenclature);
+    }
+
 
     public int getHumanSamplesNumber(){
 
@@ -865,7 +871,7 @@ public class DataImportService {
             p = new Platform();
             p.setName(name);
             p.setGroup(group);
-      //      platformRepository.save(p);
+            platformRepository.save(p);
         }
 
         return p;
