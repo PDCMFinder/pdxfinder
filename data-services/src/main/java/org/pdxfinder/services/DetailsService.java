@@ -806,6 +806,8 @@ public class DetailsService {
 
         result = result.length() == 0 ? "Not Specified" : result;
 
+        result = StringUtils.isEmpty(incoming) ? "Not Specified" : result;
+
         result = result.equals("Unknown") ? "Not Specified" : result;
 
         return result;
