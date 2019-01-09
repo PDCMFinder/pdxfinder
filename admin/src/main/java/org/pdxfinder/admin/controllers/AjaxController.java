@@ -29,7 +29,7 @@ public class AjaxController {
     private ObjectMapper mapper = new ObjectMapper();
     private RestTemplate restTemplate;
 
-    private final String ZOOMA_URL = "http://scrappy.ebi.ac.uk:8080/annotationsXX";
+    private final String ZOOMA_URL = "http://scrappy.ebi.ac.uk:8080/annotations";
     private String errReport = "";
 
 

@@ -20,11 +20,8 @@ public class TransformPDMR implements CommandLineRunner {
     private CommandLineParser parser;
     private DataTransformerService dataTransformerService;
 
-    @Value("${mydatasource.specimenSearchUrl}")
-    private String specimenSearchUrl;
-
-    @Value("${mydatasource.specimenUrl}")
-    private String specimenUrl;
+    @Value("${pdxfinder.data.root.dir}")
+    private String dataRootDir;
 
 
 
@@ -46,9 +43,8 @@ public class TransformPDMR implements CommandLineRunner {
 
             log.info("Loading PDMR PDX data.");
 
-            if (specimenSearchUrl != null && specimenUrl != null) {
-                log.info("Loading from URL " + specimenSearchUrl);
-                log.info("Loading from URL " + specimenUrl);
+            if (dataRootDir != null) {
+                log.info("Loading from URL " + dataRootDir);
 
                 dataTransformerService.transformDataAndSave();
             } else {

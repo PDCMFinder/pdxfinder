@@ -93,17 +93,18 @@
                     <div class="columns medium-4 small-12 shiftUp20">
 
                         <a th:href="@{'mailto:'+${data.contacts+'?subject='+data.modelId}}"
-                           th:if="${#strings.contains(data.contacts,'@')}">
+                           th:if="${ data.contacts != null && #strings.contains(data.contacts,'@')}">
                             <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
                         </a>
 
+
                         <a th:href="@{'mailto:'+${data.externalUrl+'?subject='+data.modelId}}"
-                           th:if="${#strings.contains(data.externalUrl,'@')}">
+                           th:if="${data.externalUrl != null &&  #strings.contains(data.externalUrl,'@')}">
                             <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
                         </a>
 
                         <a th:href="@{${data.contacts}}" th:target="_blank"
-                           th:if="${#strings.contains(data.contacts,'http') }">
+                           th:if="${data.contacts != null && #strings.contains(data.contacts,'http') }">
                             <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
                         </a>
 
@@ -112,7 +113,8 @@
                             <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
                         </a> -->
 
-                        <a th:href="@{${data.externalUrl}}" th:target="_blank" th:if="${#strings.contains(data.externalUrl,'http')}">
+                        <a th:href="@{${data.externalUrl}}" th:target="_blank"
+                           th:if="${data.externalUrl != null && #strings.contains(data.externalUrl,'http')}">
                             <h4 class="button outline uppercase margin-top-large minwidth300 shiftUp10 card-3b"
                                 th:text="${data.externalUrlText}">View at Provider</h4>
                         </a>
