@@ -781,7 +781,7 @@ public class UniversalLoader implements CommandLineRunner {
             //patient sample
             if (origin.toLowerCase().equals("patient")) {
 
-                sample = dataImportService.getHumanSample(sampleId, ds.getAbbreviation());
+                sample = dataImportService.findHumanSample(modelId, ds.getAbbreviation());
 
                 if (sample != null) {
 
@@ -1006,8 +1006,8 @@ public class UniversalLoader implements CommandLineRunner {
 
                 mc.addMarkerAssociation(ma);
 
-                //put molchar in the map if it was just created
-                if(!patientMolChars.containsKey(mapKey)){
+                //put molchar in the map if it was just created, but don't store molchars without type
+                if(!patientMolChars.containsKey(mapKey) && mc.getType()!= null){
                     patientMolChars.put(mapKey, mc);
                 }
 
@@ -1049,8 +1049,8 @@ public class UniversalLoader implements CommandLineRunner {
                 //what if it is not ihc?
 
                 mc.addMarkerAssociation(ma);
-
-                if(!xenoMolChars.containsKey(mapKey)){
+                //but don't store molchars without type
+                if(!xenoMolChars.containsKey(mapKey) && mc.getType()!= null){
                     xenoMolChars.put(mapKey, mc);
                 }
 
@@ -1094,19 +1094,29 @@ public class UniversalLoader implements CommandLineRunner {
             String nomenclature = keyArr[1];
             String passage = keyArr[2];
 
+            ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
+            Specimen specimen = dataImportService.findSpecimenByModelAndPassageAndNomenclature(model, passage, nomenclature);
 
+            if(specimen != null){
 
-            Sample xenoSample = dataImportService.findXenograftSample(modelId, ds.getAbbreviation(), passage, nomenclature);
+                Sample xenoSample = specimen.getSample();
 
-            if(xenoSample != null){
+                if(xenoSample == null){
+                    xenoSample = new Sample();
+
+                }
 
                 xenoSample.addMolecularCharacterization(mc);
-                dataImportService.saveSample(xenoSample);
+                specimen.setSample(xenoSample);
+                dataImportService.saveSpecimen(specimen);
+
             }
             else{
-
-                log.error("Failed to create molchar for xeno sample! Model:"+modelId +" Passage: "+passage +" Nomenclature: "+nomenclature);
+                log.error("Specimen not found. Model:"+modelId +" Passage: "+passage +" Nomenclature: "+nomenclature);
             }
+
+
+
 
         }
 

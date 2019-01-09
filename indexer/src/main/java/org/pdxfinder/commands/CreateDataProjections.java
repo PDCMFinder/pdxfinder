@@ -412,33 +412,31 @@ public class CreateDataProjections implements CommandLineRunner{
 
                         for(MolecularCharacterization molc : s.getMolecularCharacterizations()){
 
-                            if(molc.getPlatform() != null){
-                                String platformName = molc.getPlatform().getName();
+                                if (molc.getPlatform() != null && !molc.getType().isEmpty()) {
+                                    String platformName = molc.getPlatform().getName();
 
-                                if(dataImportService.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), mc.getDataSource(), platformName) > 0){
+                                    if (dataImportService.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), mc.getDataSource(), platformName) > 0) {
 
-                                    if(molc.getType().toLowerCase().equals("mutation")){
+                                        if (molc.getType().toLowerCase().equals("mutation")) {
 
-                                        if (!mutationPlatformsByModel.containsKey(mc.getId())) {
-                                            mutationPlatformsByModel.put(mc.getId(), new ArrayList<>());
+                                            if (!mutationPlatformsByModel.containsKey(mc.getId())) {
+                                                mutationPlatformsByModel.put(mc.getId(), new ArrayList<>());
+                                            }
+
+                                            mutationPlatformsByModel.get(mc.getId()).add(platformName);
+                                        } else if (molc.getType().toLowerCase().equals("copy number alteration")) {
+
+                                            if (!cnaPlatformsByModel.containsKey(mc.getId())) {
+
+                                                cnaPlatformsByModel.put(mc.getId(), new ArrayList<>());
+                                            }
+
+                                            cnaPlatformsByModel.get(mc.getId()).add(platformName);
                                         }
 
-                                        mutationPlatformsByModel.get(mc.getId()).add(platformName);
-                                    }
-                                    else if(molc.getType().toLowerCase().equals("copy number alteration")){
-
-                                        if(!cnaPlatformsByModel.containsKey(mc.getId())){
-
-                                            cnaPlatformsByModel.put(mc.getId(), new ArrayList<>());
-                                        }
-
-                                        cnaPlatformsByModel.get(mc.getId()).add(platformName);
                                     }
 
                                 }
-
-                            }
-
 
                         }
 
