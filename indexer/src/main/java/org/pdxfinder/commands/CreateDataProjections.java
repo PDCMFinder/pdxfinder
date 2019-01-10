@@ -199,8 +199,10 @@ public class CreateDataProjections implements CommandLineRunner{
                             if(ihcResult.toLowerCase().startsWith("pos")) ihcResult = "pos";
                             if(ihcResult.toLowerCase().startsWith("neg")) ihcResult = "neg";
 
-                            markerList.add(markerName+ihcResult);
-
+                            //discard markers that are not ER, HER2 or PR
+                            if(markerName.toLowerCase().equals("er") || markerName.toLowerCase().equals("her2") || markerName.toLowerCase().equals("pr")) {
+                                markerList.add(markerName + ihcResult);
+                            }
                         }
                     }
                     count++;
@@ -865,7 +867,7 @@ public class CreateDataProjections implements CommandLineRunner{
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
 
-            writer.append(mutatedPlatformMarkerVariantModelDP.toString());
+            writer.append(immunoHistoChemistryDP.toString());
             writer.close();
 
         } catch (IOException e) {
