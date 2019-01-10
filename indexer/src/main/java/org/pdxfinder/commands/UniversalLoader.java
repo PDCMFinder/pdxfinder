@@ -844,7 +844,7 @@ public class UniversalLoader implements CommandLineRunner {
                     specimen.setSample(sample);
 
                     model.addSpecimen(specimen);
-
+                    model.addRelatedSample(sample);
                     dataImportService.saveModelCreation(model);
                     dataImportService.saveSample(sample);
 
@@ -1108,7 +1108,9 @@ public class UniversalLoader implements CommandLineRunner {
 
                 xenoSample.addMolecularCharacterization(mc);
                 specimen.setSample(xenoSample);
+                model.addRelatedSample(xenoSample);
                 dataImportService.saveSpecimen(specimen);
+                dataImportService.saveModelCreation(model);
 
             }
             else{
