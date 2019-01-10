@@ -95,7 +95,7 @@ public class DetailsDTO {
         this.stage = "";
         this.grade = "";
         this.stageClassification = "";
-        this.gradeClassification = "";
+        this.gradeClassification = "Not Specified";
 
         this.originTissue = "";
         this.sampleSite = "";
