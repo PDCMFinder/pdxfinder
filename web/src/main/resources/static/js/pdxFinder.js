@@ -127,35 +127,6 @@ function redirectPage(webFacetSections) {
         }
     });
 
-
-
-
-
-    /*for (var i = 0; i < 19; i++) {
-
-        var geneFilter = jQuery("#geneFilter" + i);
-        var variantFilter = jQuery("#variantFilter" + i);
-
-        if (geneFilter.val() != null && geneFilter.val() != "") {
-            var allVariants = getVariantSize(geneFilter.val());
-            for (var j = 0; j < variantFilter.val().length; j++) {
-                if (!no_parameters) {
-                    url = url + "&";
-                }
-                if (allVariants.length == variantFilter.val().length) {
-                    url += "mutation=" + geneFilter.val() + "___MUT" + "___ALL";
-                    no_parameters = false;
-                    break;
-                } else {
-                    url += "mutation=" + geneFilter.val() + "___MUT" + "___" + variantFilter.val()[j];
-                    no_parameters = false;
-
-                }
-            }
-        }
-
-    }*/
-
     
 
     // Add all diagnosis filters to the URL
