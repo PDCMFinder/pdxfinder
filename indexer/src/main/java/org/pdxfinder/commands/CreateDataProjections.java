@@ -826,22 +826,38 @@ public class CreateDataProjections implements CommandLineRunner{
         JSONObject j1 ,j2, j3, j4;
 
         try{
-
             j1 = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
-            j2 = new JSONObject(mutatedMarkerVariantDP.toString());
-            j3 = new JSONObject(modelDrugResponseDP.toString());
-            j4 = new JSONObject(immunoHistoChemistryDP.toString());
-
             pmvmDP.setValue(j1.toString());
-            mvDP.setValue(j2.toString());
-            drugDP.setValue(j3.toString());
-            ihcDP.setValue(j4.toString());
-
         }
         catch(Exception e){
 
             e.printStackTrace();
-            //dumpDataToFile();
+            log.error(mutatedPlatformMarkerVariantModelDP.toString());
+        }
+
+        try{
+            j2 = new JSONObject(mutatedMarkerVariantDP.toString());
+            mvDP.setValue(j2.toString());
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(mutatedMarkerVariantDP.toString());
+        }
+        try{
+            j3 = new JSONObject(modelDrugResponseDP.toString());
+            drugDP.setValue(j3.toString());
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(modelDrugResponseDP.toString());
+        }
+
+        try{
+            j4 = new JSONObject(immunoHistoChemistryDP.toString());
+            ihcDP.setValue(j4.toString());
+        }
+        catch(Exception e){
+            e.printStackTrace();
             log.error(immunoHistoChemistryDP.toString());
         }
 
