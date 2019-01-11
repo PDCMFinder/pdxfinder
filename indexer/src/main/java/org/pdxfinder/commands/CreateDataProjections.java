@@ -196,13 +196,21 @@ public class CreateDataProjections implements CommandLineRunner{
 
                             //this was needed to avoid issues with variants where the value was a single space " "
                             if(ihcResult.length()<3) ihcResult = "Not applicable";
-                            if(ihcResult.toLowerCase().startsWith("pos")) ihcResult = "pos";
-                            if(ihcResult.toLowerCase().startsWith("neg")) ihcResult = "neg";
+                            if(ihcResult.toLowerCase().contains("posi")) ihcResult = "pos";
+                            if(ihcResult.toLowerCase().contains("nega")) ihcResult = "neg";
 
-                            //discard markers that are not ER, HER2 or PR
-                            if(markerName.toLowerCase().equals("er") || markerName.toLowerCase().equals("her2") || markerName.toLowerCase().equals("pr")) {
-                                markerList.add(markerName + ihcResult);
+                            if(ihcResult.equals("pos") || ihcResult.equals("neg") || ihcResult.equals("Not applicable")){
+
+                                //discard markers that are not ER, HER2 or PR
+                                if(markerName.toLowerCase().equals("er") || markerName.toLowerCase().equals("her2") || markerName.toLowerCase().equals("pr")) {
+                                    markerList.add(markerName + ihcResult);
+                                }
                             }
+                            else{
+                                log.error("Found invalid ihcResult, skipping: "+ihcResult);
+                            }
+
+
                         }
                     }
                     count++;
