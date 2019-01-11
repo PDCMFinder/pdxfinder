@@ -834,6 +834,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
             e.printStackTrace();
             //dumpDataToFile();
+            log.error(immunoHistoChemistryDP.toString());
         }
 
 
