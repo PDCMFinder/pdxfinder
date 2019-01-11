@@ -222,7 +222,7 @@ public class CreateDataProjections implements CommandLineRunner{
                 String markerResultCombo = markerList.stream().collect(Collectors.joining("_"));
 
                 //log.info("Entry: "+platformName + markerResultCombo + modelId);
-                if(markerResultCombo.split("-").length == 3){
+                if(markerResultCombo.split("_").length == 3){
                     addToTwoParamDP(immunoHistoChemistryDP, platformName, markerResultCombo, modelId);
                 }
                 else{
