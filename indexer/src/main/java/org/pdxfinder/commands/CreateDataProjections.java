@@ -196,10 +196,20 @@ public class CreateDataProjections implements CommandLineRunner{
 
                             //this was needed to avoid issues with variants where the value was a single space " "
                             if(ihcResult.length()<3) ihcResult = "Not applicable";
-                            if(ihcResult.toLowerCase().startsWith("pos")) ihcResult = "pos";
-                            if(ihcResult.toLowerCase().startsWith("neg")) ihcResult = "neg";
+                            if(ihcResult.toLowerCase().contains("pos")) ihcResult = "pos";
+                            if(ihcResult.toLowerCase().contains("neg")) ihcResult = "neg";
 
-                            markerList.add(markerName+ihcResult);
+                            if(ihcResult.equals("pos") || ihcResult.equals("neg") || ihcResult.equals("Not applicable")){
+
+                                //discard markers that are not ER, HER2 or PR
+                                if(markerName.toLowerCase().equals("er") || markerName.toLowerCase().equals("her2") || markerName.toLowerCase().equals("pr")) {
+                                    markerList.add(markerName + ihcResult);
+                                }
+                            }
+                            else{
+                                log.error("Found invalid ihcResult, skipping: "+ihcResult);
+                            }
+
 
                         }
                     }
@@ -212,7 +222,13 @@ public class CreateDataProjections implements CommandLineRunner{
                 String markerResultCombo = markerList.stream().collect(Collectors.joining("_"));
 
                 //log.info("Entry: "+platformName + markerResultCombo + modelId);
-                addToTwoParamDP(immunoHistoChemistryDP, platformName, markerResultCombo, modelId);
+                if(markerResultCombo.split("-").length == 3){
+                    addToTwoParamDP(immunoHistoChemistryDP, platformName, markerResultCombo, modelId);
+                }
+                else{
+                    log.warn("Skipping "+markerResultCombo +". This is not a valid combination for the DP.");
+                }
+
 
             }
 
@@ -816,22 +832,39 @@ public class CreateDataProjections implements CommandLineRunner{
         JSONObject j1 ,j2, j3, j4;
 
         try{
-
             j1 = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
-            j2 = new JSONObject(mutatedMarkerVariantDP.toString());
-            j3 = new JSONObject(modelDrugResponseDP.toString());
-            j4 = new JSONObject(immunoHistoChemistryDP.toString());
-
             pmvmDP.setValue(j1.toString());
-            mvDP.setValue(j2.toString());
-            drugDP.setValue(j3.toString());
-            ihcDP.setValue(j4.toString());
-
         }
         catch(Exception e){
 
             e.printStackTrace();
-            //dumpDataToFile();
+            log.error(mutatedPlatformMarkerVariantModelDP.toString());
+        }
+
+        try{
+            j2 = new JSONObject(mutatedMarkerVariantDP.toString());
+            mvDP.setValue(j2.toString());
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(mutatedMarkerVariantDP.toString());
+        }
+        try{
+            j3 = new JSONObject(modelDrugResponseDP.toString());
+            drugDP.setValue(j3.toString());
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(modelDrugResponseDP.toString());
+        }
+
+        try{
+            j4 = new JSONObject(immunoHistoChemistryDP.toString());
+            ihcDP.setValue(j4.toString());
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(immunoHistoChemistryDP.toString());
         }
 
 
@@ -865,7 +898,7 @@ public class CreateDataProjections implements CommandLineRunner{
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
 
-            writer.append(mutatedPlatformMarkerVariantModelDP.toString());
+            writer.append(immunoHistoChemistryDP.toString());
             writer.close();
 
         } catch (IOException e) {
