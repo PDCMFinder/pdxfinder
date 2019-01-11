@@ -196,8 +196,8 @@ public class CreateDataProjections implements CommandLineRunner{
 
                             //this was needed to avoid issues with variants where the value was a single space " "
                             if(ihcResult.length()<3) ihcResult = "Not applicable";
-                            if(ihcResult.toLowerCase().contains("posi")) ihcResult = "pos";
-                            if(ihcResult.toLowerCase().contains("nega")) ihcResult = "neg";
+                            if(ihcResult.toLowerCase().contains("pos")) ihcResult = "pos";
+                            if(ihcResult.toLowerCase().contains("neg")) ihcResult = "neg";
 
                             if(ihcResult.equals("pos") || ihcResult.equals("neg") || ihcResult.equals("Not applicable")){
 
@@ -222,7 +222,13 @@ public class CreateDataProjections implements CommandLineRunner{
                 String markerResultCombo = markerList.stream().collect(Collectors.joining("_"));
 
                 //log.info("Entry: "+platformName + markerResultCombo + modelId);
-                addToTwoParamDP(immunoHistoChemistryDP, platformName, markerResultCombo, modelId);
+                if(markerResultCombo.split("-").length == 3){
+                    addToTwoParamDP(immunoHistoChemistryDP, platformName, markerResultCombo, modelId);
+                }
+                else{
+                    log.warn("Skipping "+markerResultCombo +". This is not a valid combination for the DP.");
+                }
+
 
             }
 
