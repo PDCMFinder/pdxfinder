@@ -550,23 +550,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
             mfq.setDataAvailable(new ArrayList<>(dataAvailable));
 
-            if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
-                String treatmentNaive = mc.getSample().getPatientSnapshot().getTreatmentNaive();
 
-                if(treatmentNaive.isEmpty()){
-
-                    mfq.setTreatmentNaive("Not Specified");
-                }
-                else if(treatmentNaive.toLowerCase().contains("not")){
-                    mfq.setTreatmentNaive("No");
-                }
-                else{
-                    mfq.setTreatmentNaive("Yes");
-                }
-
-            } else {
-                mfq.setTreatmentHistory("Not Specified");
-            }
 
             if (mc.getSample().getSampleSite() != null) {
                 mfq.setSampleSampleSite(mc.getSample().getSampleSite().getName());
@@ -594,8 +578,23 @@ public class CreateDataProjections implements CommandLineRunner{
             mfq.setMappedOntologyTerm(mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
 
             if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
-                mfq.setPatientTreatmentStatus(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());
+                String treatmentNaive = mc.getSample().getPatientSnapshot().getTreatmentNaive();
+
+                if(treatmentNaive.isEmpty()){
+
+                    mfq.setPatientTreatmentStatus("Not Specified");
+                }
+                else if(treatmentNaive.toLowerCase().contains("not")){
+                    mfq.setPatientTreatmentStatus("Not Treatment Naive");
+                }
+                else{
+                    mfq.setPatientTreatmentStatus("Treatment Naive");
+                }
+
+            } else {
+                mfq.setPatientTreatmentStatus("Not Specified");
             }
+
 
             // Sample information
             mfq.setSampleExtractionMethod(mc.getSample().getExtractionMethod());

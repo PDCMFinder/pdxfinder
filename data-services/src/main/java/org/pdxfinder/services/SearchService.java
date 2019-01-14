@@ -425,6 +425,9 @@ public class SearchService {
                 case breast_cancer_markers:
                     headers.add("BREAST CANCER MARKERS");
                     break;
+
+                case patient_treatment_status:
+                    headers.add("PATIENT TREATMENT STATUS");
             }
 
         }
