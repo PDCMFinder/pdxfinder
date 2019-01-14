@@ -637,7 +637,11 @@ public class SearchDS {
                 mfq.setSampleTumorType(j.getString("sampleTumorType"));
                 mfq.setDiagnosis(j.getString("diagnosis"));
                 mfq.setMappedOntologyTerm(j.getString("mappedOntologyTerm"));
-                mfq.setPatientTreatmentStatus(j.getString("patientTreatmentStatus"));
+
+                if(j.has("patientTreatmentStatus")){
+                    mfq.setPatientTreatmentStatus(j.getString("patientTreatmentStatus"));
+                }
+
 
 
                 JSONArray ja = j.getJSONArray("cancerSystem");
