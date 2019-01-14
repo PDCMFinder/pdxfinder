@@ -307,8 +307,7 @@
 
                                 <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'BREAST CANCER MARKERS')}">
                                     <div th:each="bcMarker : ${model.breastCancerMarkers}">
-                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation'}"
-                                           th:utext="${bcMarker}"></a>
+                                        <span th:text="${bcMarker}"></span>
                                     </div>
                                 </td>
 
