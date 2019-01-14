@@ -259,15 +259,18 @@ public class SearchDS {
         //Breast cancer markers
         //labelIDs should be alphabetically ordered(ER, HER, PR) as per dataprojection requirement
         List<FacetOption> breastCancerMarkerOptions = new ArrayList<>();
-        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR+", "ERpos_HER2pos_PRpos"));
 
-        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR+", "ERneg_HER2pos_PRpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR-", "ERpos_HER2pos_PRneg"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR-", "ERneg_HER2pos_PRneg"));
         breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR+", "ERpos_HER2neg_PRpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR+", "ERneg_HER2neg_PRpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR-", "ERpos_HER2neg_PRneg"));
         breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR-", "ERneg_HER2neg_PRneg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR-", "ERpos_HER2neg_PRneg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR+", "ERpos_HER2pos_PRpos"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR-", "ERneg_HER2pos_PRneg"));
+
+        //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR+", "ERneg_HER2pos_PRpos"));
+        //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR-", "ERpos_HER2pos_PRneg"));
+        //breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR+", "ERneg_HER2neg_PRpos"));
+
+
 
         OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_markers", false, FilterType.OneParamFilter.get(),
                 breastCancerMarkerOptions, new ArrayList<>());
