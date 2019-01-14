@@ -961,10 +961,10 @@ public class UniversalLoader implements CommandLineRunner {
             String modelId = dataRow.get(4);
             String marker = dataRow.get(5);
             String markerStatus = dataRow.get(6);
-            String techique = dataRow.get(8);
+            String technique = dataRow.get(8);
             String platform = dataRow.get(9);
 
-            if(origin.isEmpty() || modelId.isEmpty() || marker.isEmpty() || markerStatus.isEmpty() || techique.isEmpty() || platform.isEmpty()){
+            if(origin.isEmpty() || modelId.isEmpty() || marker.isEmpty() || markerStatus.isEmpty() || technique.isEmpty() || platform.isEmpty()){
                 log.error("Missing essential value in row " + row);
                 continue;
             }
@@ -984,12 +984,12 @@ public class UniversalLoader implements CommandLineRunner {
 
                 else {
                     //new mc object, need to set the platform, too
-                    pl = dataImportService.getPlatform(platform, ds);
+                    pl = dataImportService.getPlatform(technique, ds);
 
                     mc = new MolecularCharacterization();
                     mc.setPlatform(pl);
 
-                    if(techique.toLowerCase().equals("immunohistochemistry")){
+                    if(technique.toLowerCase().equals("immunohistochemistry")){
                         mc.setType("IHC");
                     }
                 }
@@ -998,7 +998,7 @@ public class UniversalLoader implements CommandLineRunner {
                 MarkerAssociation ma = new MarkerAssociation();
                 ma.setMarker(m);
 
-                if(techique.toLowerCase().equals("immunohistochemistry")){
+                if(technique.toLowerCase().equals("immunohistochemistry")){
 
                     ma.setImmunoHistoChemistryResult(markerStatus);
                 }
@@ -1028,12 +1028,12 @@ public class UniversalLoader implements CommandLineRunner {
                 }
                 else {
                     //new mc object, need to set the platform, too
-                    pl = dataImportService.getPlatform(platform, ds);
+                    pl = dataImportService.getPlatform(technique, ds);
 
                     mc = new MolecularCharacterization();
                     mc.setPlatform(pl);
 
-                    if(techique.toLowerCase().equals("immunohistochemistry")){
+                    if(technique.toLowerCase().equals("immunohistochemistry")){
                         mc.setType("IHC");
                     }
                 }
@@ -1042,7 +1042,7 @@ public class UniversalLoader implements CommandLineRunner {
                 MarkerAssociation ma = new MarkerAssociation();
                 ma.setMarker(m);
 
-                if(techique.toLowerCase().equals("immunohistochemistry")){
+                if(technique.toLowerCase().equals("immunohistochemistry")){
 
                     ma.setImmunoHistoChemistryResult(markerStatus);
                 }
