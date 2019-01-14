@@ -551,7 +551,19 @@ public class CreateDataProjections implements CommandLineRunner{
             mfq.setDataAvailable(new ArrayList<>(dataAvailable));
 
             if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
-                mfq.setTreatmentHistory(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());
+                String treatmentNaive = mc.getSample().getPatientSnapshot().getTreatmentNaive();
+
+                if(treatmentNaive.isEmpty()){
+
+                    mfq.setTreatmentNaive("Not Specified");
+                }
+                else if(treatmentNaive.toLowerCase().contains("not")){
+                    mfq.setTreatmentNaive("No");
+                }
+                else{
+                    mfq.setTreatmentNaive("Yes");
+                }
+
             } else {
                 mfq.setTreatmentHistory("Not Specified");
             }
