@@ -3,6 +3,7 @@ package org.pdxfinder.transcommands;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pdxfinder.controller.TransController;
+import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.transdatamodel.PdmrPdxInfo;
 import org.pdxfinder.transdatamodel.Sample;
 import org.pdxfinder.transdatamodel.Treatment;
@@ -13,6 +14,8 @@ import org.pdxfinder.transrepository.TransTreatmentRepository;
 import org.pdxfinder.transrepository.TransValidationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -32,15 +35,55 @@ import java.util.Map;
 @Service
 public class DataTransformerService {
 
+
+    private final static Logger log = LoggerFactory.getLogger(TransController.class);
     ObjectMapper mapper = new ObjectMapper();
     private TransPdxInfoRepository transPdxInfoRepository;
     private TransTreatmentRepository transTreatmentRepository;
     private TransValidationRepository transValidationRepository;
     private TransSampleRepository transSampleRepository;
 
+    @Autowired
+    private UtilityService util;
+
     private String DATASOURCE_URL_PREFIX = "https://pdmdb.cancer.gov/pls/apex/f?p=101:4:0::NO:4:P4_SPECIMENSEQNBR:";
 
-    private final static Logger log = LoggerFactory.getLogger(TransController.class);
+    @Value("${pdxfinder.data.root.dir}")
+    private String dataRootDir = System.getProperty("user.home")+"/PDXFinder/data";
+
+
+    private final static String DATASOURCE_ABBREVIATION = "/PDMR";
+
+    private String RAW_DATA_URL = dataRootDir+DATASOURCE_ABBREVIATION+"/raw";
+
+    private String specimenSearchUrl = RAW_DATA_URL+"/PDMR_SPECIMENSEARCH.json";
+
+    private String specimenUrl = RAW_DATA_URL+"/PDMR_SPECIMEN.json";
+
+    private String tissueOriginsUrl = RAW_DATA_URL+"/PDMR_PROVIDEDTISSUEORIGINS.json";
+
+    private String tumoGradeStateTypesUrl = RAW_DATA_URL+"/PDMR_TUMORGRADESTAGETYPES.json";
+
+    private String mouseStrainsUrl = RAW_DATA_URL+"/PDMR_MOUSESTRAINS.json";
+
+    private String implantationSitesUrl = RAW_DATA_URL+"/PDMR_IMPLANTATIONSITES.json";
+
+    private String tissueTypeUrl = RAW_DATA_URL+"/PDMR_TISSUETYPES.json";
+
+    private String histologyUrl = RAW_DATA_URL+"/PDMR_HISTOLOGY.json";
+
+    private String tumorGradeUrl = RAW_DATA_URL+"/PDMR_TUMORGRADES.json";
+
+    private String samplesUrl = RAW_DATA_URL+"/PDMR_SAMPLE.json";
+
+    private String currentTherapyUrl = RAW_DATA_URL+"/PDMR_CURRENTTHERAPY.json";
+
+    private String standardRegimensUrl = RAW_DATA_URL+"/PDMR_STANDARDIZEDREGIMENS.json";
+
+    private String clinicalResponseUrl = RAW_DATA_URL+"/PDMR_CLINICALRESPONSES.json";
+
+    private String priorTherapyUrl = RAW_DATA_URL+"/PDMR_PRIORTHERAPIES.json";
+
 
     public DataTransformerService(TransPdxInfoRepository transPdxInfoRepository,
                                   TransTreatmentRepository transTreatmentRepository,
@@ -53,20 +96,7 @@ public class DataTransformerService {
     }
 
     //Transformation rule as specified here: https://docs.google.com/spreadsheets/d/1buUu5yj3Xq8tbEtL1l2UILV9kLnouGqF0vIjFlGGbEE
-    public JsonNode transformDataAndSave(String specimenSearchUrl,
-                                         String specimenUrl,
-                                         String tissueOriginsUrl,
-                                         String tumoGradeStateTypesUrl,
-                                         String mouseStrainsUrl,
-                                         String implantationSitesUrl,
-                                         String tissueTypeUrl,
-                                         String histologyUrl,
-                                         String tumorGradeUrl,
-                                         String samplesUrl,
-                                         String currentTherapyUrl,
-                                         String standardRegimensUrl,
-                                         String clinicalResponseUrl,
-                                         String priorTherapyUrl) {
+    public JsonNode transformDataAndSave() {
 
         String unKnown = "Not Specified";
         String modelID = "";
@@ -111,37 +141,36 @@ public class DataTransformerService {
 
         String report = "";
 
-
         //If seqnumber is ) input in finder "Heterotopic" else if (1,2,3,4,5,6) put "Orthotopic" else(99) put not specified
 
-        // Read the whole JSOn as a JsonNode type & Retrieve each specimen search record as a Map (key value type) type
-        JsonNode rootArray = connectToJSON(specimenSearchUrl);
+        // Read the whole JSON as a JsonNode type & Retrieve each specimen search record as a Map (key value type) type
+        JsonNode rootArray = util.readJsonLocal(specimenSearchUrl);
 
-        JsonNode pdmrSpecimenData = connectToJSON(specimenUrl);
+        JsonNode pdmrSpecimenData = util.readJsonLocal(specimenUrl);
 
-        JsonNode tissueOrigins = connectToJSON(tissueOriginsUrl);
+        JsonNode tissueOrigins = util.readJsonLocal(tissueOriginsUrl);
 
-        JsonNode tumorGradeStageTypes = connectToJSON(tumoGradeStateTypesUrl);
+        JsonNode tumorGradeStageTypes = util.readJsonLocal(tumoGradeStateTypesUrl);
 
-        JsonNode mouseStrains = connectToJSON(mouseStrainsUrl);
+        JsonNode mouseStrains = util.readJsonLocal(mouseStrainsUrl);
 
-        JsonNode impantationSites = connectToJSON(implantationSitesUrl);
+        JsonNode impantationSites = util.readJsonLocal(implantationSitesUrl);
 
-        JsonNode tissueTypes = connectToJSON(tissueTypeUrl);
+        JsonNode tissueTypes = util.readJsonLocal(tissueTypeUrl);
 
-        JsonNode samples = connectToJSON(samplesUrl);
+        JsonNode samples = util.readJsonLocal(samplesUrl);
 
-        JsonNode histologies = connectToJSON(histologyUrl);
+        JsonNode histologies = util.readJsonLocal(histologyUrl);
 
-        JsonNode tumorGrades = connectToJSON(tumorGradeUrl);
+        JsonNode tumorGrades = util.readJsonLocal(tumorGradeUrl);
 
-        JsonNode currentTherapies = connectToJSON(currentTherapyUrl);
+        JsonNode currentTherapies = util.readJsonLocal(currentTherapyUrl);
 
-        JsonNode standardRegimens = connectToJSON(standardRegimensUrl);
+        JsonNode standardRegimens = util.readJsonLocal(standardRegimensUrl);
 
-        JsonNode clinicalResponses = connectToJSON(clinicalResponseUrl);
+        JsonNode clinicalResponses = util.readJsonLocal(clinicalResponseUrl);
 
-        JsonNode priorTherapies = connectToJSON(priorTherapyUrl);
+        JsonNode priorTherapies = util.readJsonLocal(priorTherapyUrl);
 
 
         //engraftmentType
@@ -294,7 +323,7 @@ public class DataTransformerService {
                         }
                     }
                     treatments.add(new Treatment(drug,null,null,null,duration,null,
-                                                null,response,null,startingDate,null));
+                            null,response,null,startingDate,null));
 
                     drug=""; duration = unKnown; response=""; startingDate = "";
                 }
@@ -334,7 +363,7 @@ public class DataTransformerService {
                         }
                     }
                     treatments.add(new Treatment(null,drug,null,null,duration,null,
-                                                null,response,null,null,priorDate));
+                            null,response,null,null,priorDate));
 
                     drug=""; duration = unKnown; response=""; priorDate = "";
                 }
@@ -411,7 +440,7 @@ public class DataTransformerService {
                         if (specimen.get("IMPLANTATIONSITESEQNBR").equals(dImpantationSites.get("IMPLANTATIONSITESEQNBR"))) {
                             engraftmentSite = dImpantationSites.get("IMPLANTATIONSITEDESCRIPTION") + "";
                         }
-                            /* with the number to to table IMPLANTATIONSITES, key is IMPLANTATIONSITESEQNBR, value in finde should be IMPLANTATIONSITEDESCRIPTION */
+                        /* with the number to to table IMPLANTATIONSITES, key is IMPLANTATIONSITESEQNBR, value in finde should be IMPLANTATIONSITEDESCRIPTION */
                     }
 
                     if (specimen.get("IMPLANTATIONSITESEQNBR").toString().equals("0")) {
@@ -484,7 +513,7 @@ public class DataTransformerService {
 
             report += "Loaded Record for Patient " + specimenSearch.get("PATIENTID") + "<br>";
 
-           // if (count == 40){ break; }
+            // if (count == 40){ break; }
         }
 
         return rootArray;
@@ -492,39 +521,6 @@ public class DataTransformerService {
 
     }
 
-
-
-
-    public JsonNode connectToJSON(String apiLink) {
-
-        JsonNode rootArray = null;
-        ObjectMapper mapper = new ObjectMapper();
-
-        try {
-
-            URL url = new URL(apiLink);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
-
-            if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
-            }
-
-            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-
-            rootArray = mapper.readTree(br);
-            conn.disconnect();
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return rootArray;
-
-    }
 
 
     public List<PdmrPdxInfo> getAllPdmr() {

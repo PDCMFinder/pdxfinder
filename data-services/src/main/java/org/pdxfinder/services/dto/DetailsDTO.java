@@ -15,6 +15,7 @@ public class DetailsDTO {
     private String externalId;
     private String dataSource;
     private String sourceDescription;
+    private String sourceName;
     private String patientId;
     private String gender;
     private String ageAtCollection;
@@ -94,7 +95,7 @@ public class DetailsDTO {
         this.stage = "";
         this.grade = "";
         this.stageClassification = "";
-        this.gradeClassification = "";
+        this.gradeClassification = "Not Specified";
 
         this.originTissue = "";
         this.sampleSite = "";
@@ -505,5 +506,13 @@ public class DetailsDTO {
 
     public PatientDTO getPatient() {
         return patient;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
     }
 }

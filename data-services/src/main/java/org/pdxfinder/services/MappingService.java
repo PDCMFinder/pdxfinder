@@ -1,11 +1,15 @@
 package org.pdxfinder.services;
 
-import org.apache.lucene.util.automaton.LevenshteinAutomata;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.admin.pojos.MappingContainer;
 import org.pdxfinder.admin.pojos.MappingEntity;
+import org.pdxfinder.admin.zooma.*;
 import org.pdxfinder.dao.Sample;
 import org.pdxfinder.repositories.SampleRepository;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
@@ -15,6 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -28,14 +36,28 @@ import java.util.stream.Stream;
 public class MappingService {
 
     private final static Logger log = LoggerFactory.getLogger(MappingService.class);
+    private ObjectMapper mapper = new ObjectMapper();
 
+    public static final String URI = "http://www.pdxfinder.org/";
+    private static final String NAME = "pdx-finder";
+    private static final List<String> TOPIC = Arrays.asList("PDXFinder");
+    private static final String TYPE = "DATABASE";
+    private static final String EVIDENCE = "SUBMITTER_PROVIDED";
+    private static final String ACCURACY = "PRECISE";
+    private static final String ANNOTATOR = "Nathalie Conte";
 
     @Value("${mappings.diagnosis.file}")
     private String savedDiagnosisMappingsFile;
 
+    @Value("${mappings.mappedTermUrl}")
+    private String knowledgBaseURL;
+
     private SampleRepository sampleRepository;
 
     private MappingContainer existingDiagnosisMappings;
+
+    @Autowired
+    private UtilityService utilityService;
 
     @Autowired
     public MappingService(SampleRepository sampleRepository) {
@@ -43,6 +65,14 @@ public class MappingService {
         this.sampleRepository = sampleRepository;
 
 
+    }
+
+    public String getSavedDiagnosisMappingsFile() {
+        return savedDiagnosisMappingsFile;
+    }
+
+    public void setSavedDiagnosisMappingsFile(String savedDiagnosisMappingsFile) {
+        this.savedDiagnosisMappingsFile = savedDiagnosisMappingsFile;
     }
 
 
@@ -104,7 +134,7 @@ public class MappingService {
                     mappingValues.put("TumorType", tumorType);
 
                     MappingEntity me = new MappingEntity(new Long(i+1), "DIAGNOSIS", getDiagnosisMappingLabels(), mappingValues);
-                    me.setMappedTerm(ontologyTerm);
+                    me.setMappedTermLabel(ontologyTerm);
                     me.setMapType(mapType);
                     me.setJustification(justification);
 
@@ -145,6 +175,28 @@ public class MappingService {
     return mc;
     }
 
+
+    public void saveMappingsToFile(String fileName, Collection<MappingEntity> maprules){
+
+        Map<String, Collection<MappingEntity>> mappings = new HashMap<>();
+        mappings.put("row", maprules);
+
+        Gson gson = new Gson();
+        String json = gson.toJson(mappings);
+
+
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
+
+            writer.append(json);
+            writer.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     public MappingContainer getMissingDiagnosisMappings(String ds){
 
@@ -377,5 +429,88 @@ public class MappingService {
 
         return dla.execute(key1, key2);
     }
+
+
+
+    public List<ZoomaEntity> transformMappingsForZooma(){
+
+        JsonNode mappingRow = utilityService.readJsonURL(knowledgBaseURL);
+
+        Map<String, List<Object>> dMappingRow = mapper.convertValue(mappingRow, Map.class);
+
+        List<ZoomaEntity> zoomaEntities = new ArrayList<>();
+
+        for (Object data : dMappingRow.get("row")) {
+
+            MappingEntity mappingEntity = mapper.convertValue(data, MappingEntity.class);
+
+            /* RETRIEVE DATA FROM MAPPING ENTITY */
+            Long entityId = mappingEntity.getEntityId();
+            String entityType = mappingEntity.getEntityType();
+            List<String> mappingLabels = mappingEntity.getMappingLabels();
+
+            Map<String, String> mappingValues = mappingEntity.getMappingValues();
+            String originTissue = mappingValues.get("OriginTissue");
+            String tumorType = mappingValues.get("TumorType");
+            String sampleDiagnosis = mappingValues.get("SampleDiagnosis");
+            String dataSource = mappingValues.get("DataSource");
+
+            String mappedTermLabel = mappingEntity.getMappedTermLabel();
+            String mappedTermUrl = mappingEntity.getMappedTermUrl();
+            String mapType = mappingEntity.getMapType();
+            String justification = mappingEntity.getJustification();
+            String status = mappingEntity.getStatus();
+
+
+            /* ZOOMA BIOLOGICAL-ENTITY DATA */
+            Studies studies = new Studies(dataSource.toUpperCase(), null);
+            String bioEntity = StringUtils.join(
+                    Arrays.asList(dataSource, sampleDiagnosis, originTissue, tumorType), "__"
+            );
+            BiologicalEntities biologicalEntities = new BiologicalEntities(bioEntity.toUpperCase(),studies,null);
+
+            /* ZOOMA SEMANTIC-TAG DATA */
+            List<String> semanticTag = Arrays.asList(mappedTermUrl);
+
+            /* ZOOMA PROVENANCE DATA */
+            Source source  = new Source(URI,NAME,TOPIC,TYPE);
+            Provenance provenance = new Provenance(
+                    source,
+                    EVIDENCE,
+                    ACCURACY,
+                    ANNOTATOR,
+                    "2018-11-30 10:48"
+            );
+
+            for (String mappingLabel : mappingLabels){
+
+                /* ZOOMA PROPERTY DATA */
+                Property property = new Property(mappingLabel,StringUtils.upperCase(mappingValues.get(mappingLabel)) );
+
+                List<String> annotations = new ArrayList<>();
+
+                if (mappingLabel.equals("SampleDiagnosis")){
+                    annotations = semanticTag;
+                }
+
+                ZoomaEntity zoomaEntity = new ZoomaEntity(
+                        biologicalEntities,
+                        property,
+                        annotations,
+                        provenance
+                );
+                zoomaEntities.add(zoomaEntity);
+            }
+
+
+        }
+
+
+        return zoomaEntities;
+
+    }
+
+
+
 
 }

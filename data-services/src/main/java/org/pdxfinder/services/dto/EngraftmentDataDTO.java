@@ -6,7 +6,8 @@ package org.pdxfinder.services.dto;
  */
 public class EngraftmentDataDTO {
 
-    private String strain;
+    private String strainName;
+    private String strainSymbol;
     private String engraftmentSite;
     private String engraftmentType;
     private String engraftmentMaterial;
@@ -16,13 +17,15 @@ public class EngraftmentDataDTO {
     public EngraftmentDataDTO() {
     }
 
-    public EngraftmentDataDTO(String strain,
+    public EngraftmentDataDTO(String strainName,
+                              String strainSymbol,
                               String engraftmentSite,
                               String engraftmentType,
                               String engraftmentMaterial,
                               String engraftmentMaterialState,
                               String passage) {
-        this.strain = strain;
+        this.strainName = strainName;
+        this.strainSymbol = strainSymbol;
         this.engraftmentSite = engraftmentSite;
         this.engraftmentType = engraftmentType;
         this.engraftmentMaterial = engraftmentMaterial;
@@ -31,12 +34,20 @@ public class EngraftmentDataDTO {
     }
 
 
-    public String getStrain() {
-        return strain;
+    public String getStrainName() {
+        return strainName;
     }
 
-    public void setStrain(String strain) {
-        this.strain = strain;
+    public void setStrainName(String strainName) {
+        this.strainName = strainName;
+    }
+
+    public String getStrainSymbol() {
+        return strainSymbol;
+    }
+
+    public void setStrainSymbol(String strainSymbol) {
+        this.strainSymbol = strainSymbol;
     }
 
     public String getEngraftmentSite() {

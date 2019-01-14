@@ -131,7 +131,12 @@ public class LoadJAXData implements CommandLineRunner {
         jaxDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
                 DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
-        nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
+        try {
+            nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
         try {
             JSONObject job = new JSONObject(json);
@@ -207,6 +212,41 @@ public class LoadJAXData implements CommandLineRunner {
         // String grade, String gradeClassification
         Sample sample = dataImportService.getSample(id, jaxDS.getAbbreviation(), tumorType, diagnosis, primarySite,
                 sampleSite, extractionMethod, false, stage, "", grade, "");
+
+
+        //create breast cancer markers manually if they are present
+        if(j.has("Model Tag")){
+
+            String tag = j.getString("Model Tag");
+
+            if(tag.equals("Triple Negative Breast Cancer (TNBC)")){
+
+                MolecularCharacterization mc = new MolecularCharacterization();
+                mc.setPlatform(dataImportService.getPlatform("Not Specified", jaxDS));
+                mc.setType("IHC");
+                Marker her2 = dataImportService.getMarker("HER2", "HER2");
+                Marker er = dataImportService.getMarker("ER", "ER");
+                Marker pr = dataImportService.getMarker("PR", "PR");
+
+                MarkerAssociation her2a = new MarkerAssociation();
+                her2a.setMarker(her2);
+                her2a.setImmunoHistoChemistryResult("negative");
+
+                MarkerAssociation era = new MarkerAssociation();
+                era.setMarker(er);
+                era.setImmunoHistoChemistryResult("negative");
+
+                MarkerAssociation pra = new MarkerAssociation();
+                pra.setMarker(pr);
+                pra.setImmunoHistoChemistryResult("negative");
+
+                mc.addMarkerAssociation(her2a);
+                mc.addMarkerAssociation(era);
+                mc.addMarkerAssociation(pra);
+
+                sample.addMolecularCharacterization(mc);
+            }
+        }
 
 
         List<ExternalUrl> externalUrls = new ArrayList<>();

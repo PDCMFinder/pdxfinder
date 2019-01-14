@@ -124,6 +124,10 @@ public class DetailsService {
     }
 
 
+    public DetailsDTO getModelDetails(String dataSource, String modelId) {
+
+        return getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
+    }
 
 
     public DetailsDTO getModelDetails(String dataSource, String modelId, int page, int size, String technology, String passage, String searchFilter) {
@@ -132,6 +136,8 @@ public class DetailsService {
         Sample sample = sampleRepository.findByDataSourceAndPdxId(dataSource,modelId);
         Patient patient = patientRepository.findByDataSourceAndModelId(dataSource,modelId);
         ModelCreation pdx = modelCreationRepository.findByDataSourceAndSourcePdxId(dataSource, modelId);
+
+        List<Specimen> modelSpecimens = specimenRepository.findByDataSourceAndModelId(dataSource, modelId);
 
         List<QualityAssurance> qa = pdx.getQualityAssurance();
 
@@ -207,7 +213,7 @@ public class DetailsService {
 
         if (patient != null && patient.getProviderGroup() != null) {
             //dto.setContacts(patient.getExternalDataSource().getContact());
-            dto.setExternalDataSourceDesc(patient.getProviderGroup().getDescription());
+            dto.setSourceName(patient.getProviderGroup().getName());
         }
 
 
@@ -276,7 +282,7 @@ public class DetailsService {
         if(pdx!= null && pdx.getSpecimens() != null){
 
             Set<Specimen> sp = pdx.getSpecimens();
-            Map<String, EngraftmentDataDTO> EngraftmentDataMap = new HashMap<>();
+            Map<String, EngraftmentDataDTO> engraftmentDataMap = new HashMap<>();
 
 
             // AGGREGATE THE ENGRAFTMENT DATA WITH CORRESPONDING PASSAGES
@@ -287,68 +293,9 @@ public class DetailsService {
 
                 if (s.getHostStrain() != null) {
 
-                    String hostStrain = s.getHostStrain().getName();
-                    String p = s.getPassage();
-
-                    // If the passage information is provided, associate it to the host strain
-                    if (p != null) {
-                        if (hostStrainMap.containsKey(hostStrain)) {
-                            String composedPassage = hostStrainMap.get(hostStrain);
-                            composedPassage += ", P" + p;
-                            hostStrainMap.put(hostStrain, composedPassage);
-
-                        } else {
-                            hostStrainMap.put(hostStrain, "P" + p);
-                        }
-                    } else {
-                        hostStrainMap.put(hostStrain, "Not Specified");
-                    }
 
 
-                    /*
-                    if (s.getHostStrain() != null) {
-                        pdxModel.setStrain(notEmpty(s.getHostStrain().getName()));
-                    } else {
-
-                        pdxModel.setStrain("Not Specified");
-                    }
-
-                    //Set implantation site and type
-                    if (s.getEngraftmentSite() != null) {
-                        dto.setEngraftmentSite( notEmpty(s.getEngraftmentSite().getName()) );
-                    } else {
-
-                        dto.setEngraftmentSite("Not Specified");
-                    }
-
-
-                    if (s.getEngraftmentType() != null) {
-                        dto.setSampleType( notEmpty(s.getEngraftmentType().getName()) );
-                    } else {
-
-                        dto.setSampleType("Not Specified");
-                        pdxModel.setEngraftmentType("Not Specified");
-                    }
-
-
-                    if (s.getEngraftmentMaterial() != null) {
-                        dto.setSampleType( notEmpty(s.getEngraftmentType().getName()) );
-                    } else {
-
-                        dto.setSampleType("Not Specified");
-                    }
-
-
-                    if (s.getPassage() != null) {
-                        pdxModel.setPassage(notEmpty(s.getPassage()));
-                    } else {
-
-                        pdxModel.setPassage("Not Specified");
-                    }
-                    */
-
-
-                    pdxModel.setStrain(
+                    pdxModel.setStrainName(
                             (s.getHostStrain() != null) ? notEmpty(s.getHostStrain().getName()) : "Not Specified"
                     );
 
@@ -373,14 +320,14 @@ public class DetailsService {
                             (s.getPassage() != null) ? notEmpty(s.getPassage()) : "Not Specified"
                     );
 
-                    String dataKey = pdxModel.getStrain() + pdxModel.getEngraftmentSite() + pdxModel.getEngraftmentType() + pdxModel.getEngraftmentMaterial() + pdxModel.getEngraftmentMaterialState();
+                    String dataKey = pdxModel.getStrainName() + pdxModel.getEngraftmentSite() + pdxModel.getEngraftmentType() + pdxModel.getEngraftmentMaterial() + pdxModel.getEngraftmentMaterialState();
 
 
                     //if the datakey combination is found, then don't add new Engraftment data, but rather uodate the passage accordingly
-                    if (EngraftmentDataMap.containsKey(dataKey)) {
+                    if (engraftmentDataMap.containsKey(dataKey)) {
 
                         // Retrieve the existing Engraftment data fromthe Map
-                        EngraftmentDataDTO edto = EngraftmentDataMap.get(dataKey);
+                        EngraftmentDataDTO edto = engraftmentDataMap.get(dataKey);
 
                         // Update the Passage of this existing engraftment data (and ensure no duplicate)
                         String newPassage = edto.getPassage().contains(pdxModel.getPassage()) ? edto.getPassage() : edto.getPassage() + "," + pdxModel.getPassage();
@@ -395,21 +342,21 @@ public class DetailsService {
                             passageString = "";
                         }
                         edto.setPassage(passageString);
-                        EngraftmentDataMap.put(dataKey, edto);
+                        engraftmentDataMap.put(dataKey, edto);
                     } else {
 
                         // If new, save in the Map
-                        EngraftmentDataMap.put(dataKey, pdxModel);
+                        engraftmentDataMap.put(dataKey, pdxModel);
                     }
 
 
                 }
             }
 
-            // ITERATE THE "Map<String, EngraftmentDataDTO> EngraftmentDataMap" MAP TO RETRIEVE THE EngraftmentDataDTO(s) into a Set
+            // ITERATE THE "Map<String, EngraftmentDataDTO> engraftmentDataMap" MAP TO RETRIEVE THE EngraftmentDataDTO(s) into a Set
             Set<EngraftmentDataDTO> pdxModels = new LinkedHashSet<>();
-            for (String key : EngraftmentDataMap.keySet()) {
-                pdxModels.add(EngraftmentDataMap.get(key));
+            for (String key : engraftmentDataMap.keySet()) {
+                pdxModels.add(engraftmentDataMap.get(key));
             }
 
             dto.setPdxModelList(pdxModels);
@@ -503,6 +450,22 @@ public class DetailsService {
 
         Map<String, String> techNPassToSampleId = new HashMap<>();
         List<Map> dataSummaryList = new ArrayList<>();
+
+
+
+        //add patient samples first - if any
+        for(Map.Entry<String, String> entry: patientTech.entrySet()){
+            Map<String, String> dataSummary = new HashMap<>();
+            dataSummary.put("sampleId", "Patient Sample");
+            dataSummary.put("sampleType", "Patient Sample");
+            dataSummary.put("xenograftPassage","NA");
+            dataSummary.put("dataAvailable","Mutation_"+entry.getValue());
+            dataSummary.put("platformUsed",entry.getValue());
+            dataSummary.put("rawData","Not Available");
+
+            dataSummaryList.add(dataSummary);
+
+        }
 
         for (String tech : modelTechAndPassages.keySet()) {
 
@@ -842,6 +805,8 @@ public class DetailsService {
         result = result.equals("null") ? "Not Specified" : result;
 
         result = result.length() == 0 ? "Not Specified" : result;
+
+        result = StringUtils.isEmpty(incoming) ? "Not Specified" : result;
 
         result = result.equals("Unknown") ? "Not Specified" : result;
 

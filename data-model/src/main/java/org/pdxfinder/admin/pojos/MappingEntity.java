@@ -40,8 +40,14 @@ public class MappingEntity {
      * The term that the entity is mapped to. The value of this attribute should be either null (indicating that the
      * entity is not mapped to anything yet) or an existing ontology term.
      */
-    private String mappedTerm;
+    private String mappedTermLabel;
 
+
+    /**
+     * The term url that the entity is mapped to. The value of this attribute should be either null (indicating that the
+     * entity is not mapped to anything yet) or an existing ontology term url.
+     */
+    private String mappedTermUrl;
 
     /**
      * Describes whether the mapping rule is direct or inferred
@@ -64,7 +70,7 @@ public class MappingEntity {
 
 
     /**
-     * A list of entities that are similar to the current entity. This list is empty if the entity's mappedTerm is not null.
+     * A list of entities that are similar to the current entity. This list is empty if the entity's mappedTermLabel is not null.
      */
     private List<MappingEntity> suggestedMappings;
 
@@ -89,7 +95,7 @@ public class MappingEntity {
         this.entityType = entityType;
         this.mappingLabels = mappingLabels;
         this.mappingValues = mappingValues;
-        this.mappedTerm = null;
+        this.mappedTermLabel = null;
         this.status = "Created";
         this.suggestedMappings = new ArrayList<>();
         //TODO: get current date, specify date format
@@ -99,14 +105,14 @@ public class MappingEntity {
     }
 
     public MappingEntity(Long entityId, String entityType, List<String> mappingLabels, Map<String, String> mappingValues,
-                         String mappedTerm, String status, List<MappingEntity> suggestedMappings, Date dateCreated,
+                         String mappedTermLabel, String status, List<MappingEntity> suggestedMappings, Date dateCreated,
                          Date dateUpdated) {
 
         this.entityId = entityId;
         this.entityType = entityType;
         this.mappingLabels = mappingLabels;
         this.mappingValues = mappingValues;
-        this.mappedTerm = mappedTerm;
+        this.mappedTermLabel = mappedTermLabel;
         this.status = status;
         this.suggestedMappings = suggestedMappings;
         this.dateCreated = dateCreated;
@@ -146,12 +152,12 @@ public class MappingEntity {
         this.mappingValues = mappingValues;
     }
 
-    public String getMappedTerm() {
-        return mappedTerm;
+    public String getMappedTermLabel() {
+        return mappedTermLabel;
     }
 
-    public void setMappedTerm(String mappedTerm) {
-        this.mappedTerm = mappedTerm;
+    public void setMappedTermLabel(String mappedTermLabel) {
+        this.mappedTermLabel = mappedTermLabel;
     }
 
     public String getMapType() {
@@ -202,4 +208,11 @@ public class MappingEntity {
         this.dateUpdated = dateUpdated;
     }
 
+    public String getMappedTermUrl() {
+        return mappedTermUrl;
+    }
+
+    public void setMappedTermUrl(String mappedTermUrl) {
+        this.mappedTermUrl = mappedTermUrl;
+    }
 }

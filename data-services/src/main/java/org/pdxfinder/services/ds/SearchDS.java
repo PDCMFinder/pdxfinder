@@ -6,19 +6,21 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.DataProjection;
-import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.repositories.DataProjectionRepository;
-import org.pdxfinder.services.dto.DrugSummaryDTO;
+import org.pdxfinder.services.search.WebFacetSection;
+import org.pdxfinder.services.search.WebFacetContainer;
+import org.pdxfinder.services.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 import static java.lang.Long.parseLong;
 
@@ -31,101 +33,53 @@ import static java.lang.Long.parseLong;
 public class SearchDS {
 
     private final static Logger log = LoggerFactory.getLogger(SearchDS.class);
-
     private DataProjectionRepository dataProjectionRepository;
 
+    /**
+     * The DS is initialized if all filters and search objects are initialized
+     */
     private boolean INITIALIZED = false;
-
-    private Set<ModelForQuery> models;
-
-    /*
-     * DYNAMIC FACETS
-     */
-
-    private Map<String, String> cancerSystemMap = new HashMap<>();
-
-    //platform=> marker=> variant=>{set of model ids}
-    Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<String, Map<String, Map<String, Set<Long>>>>();
-
-    //"drugname"=>"response"=>"set of model ids"
-    private Map<String, Map<String, Set<Long>>> modelDrugResponses = new HashMap<>();
-
-    private List<String> projectOptions = new ArrayList<>();
-
-
-    /*
-     * STATIC FACETS
-     */
-
-    public static List<String> PATIENT_AGE_OPTIONS = Arrays.asList(
-            "0-9",
-            "10-19",
-            "20-29",
-            "30-39",
-            "40-49",
-            "50-59",
-            "60-69",
-            "70-79",
-            "80-89",
-            "90",
-            "Not Specified"
-    );
-    public static List<String> DATASOURCE_OPTIONS = Arrays.asList(
-            "JAX",
-            "IRCC-CRC",
-            "PDMR",
-            "PDXNet-HCI-BCM",
-            "PDXNet-MDAnderson",
-            "PDXNet-WUSTL",
-            "PDXNet-Wistar-MDAnderson-Penn",
-            "TRACE"
-    );
-    public static List<String> PATIENT_GENDERS = Arrays.asList(
-            "Male",
-            "Female",
-            "Not Specified"
-    );
-
-
-    public static List<String> CANCERS_BY_SYSTEM_OPTIONS = Arrays.asList(
-            "Breast Cancer",
-            "Cardiovascular Cancer",
-            "Connective and Soft Tissue Cancer",
-            "Digestive System Cancer",
-            "Endocrine Cancer",
-            "Eye Cancer",
-            "Head and Neck Cancer",
-            "Hematopoietic and Lymphoid System Cancer",
-            "Nervous System Cancer",
-            "Peritoneal and Retroperitoneal Cancer",
-            "Reproductive System Cancer",
-            "Respiratory Tract Cancer",
-            "Thoracic Cancer",
-            "Skin Cancer",
-            "Urinary System Cancer",
-            "Unclassified"
-    );
-
-    public static List<String> SAMPLE_TUMOR_TYPE_OPTIONS = Arrays.asList(
-            "Primary",
-            "Metastatic",
-            "Recurrent",
-            "Refractory",
-            "Not Specified"
-    );
-
-
-
-    public static List<String> DATA_AVAILABLE_OPTIONS = Arrays.asList(
-            "Gene Mutation",
-            "Dosing Studies",
-            "Patient Treatment"
-    );
 
 
     /**
-     * Populate the complete set of models for searching when this object is instantiated
+     * A set of MFQ objects. These objects are being returned after performing a search.
      */
+    private Set<ModelForQuery> models;
+
+
+    /**
+     * This container has the definition of the structure and the content of the filters as well as has info on what filter is selected
+     */
+    private WebFacetContainer webFacetContainer;
+
+    //facet key => option
+    private Map<String, List<FacetOption>> facetOptionMap;
+
+    // SEARCH OBJECTS:
+
+
+    /**
+     * A general one param search object that is being used when search is performed on a MFQ object field
+     */
+    private OneParamSearch oneParamSearch;
+
+    /**
+     * Three param search object for performing a search on gene mutations
+     */
+    private ThreeParamLinkedSearch geneMutationSearch;
+
+    /**
+     * Two param search object for performing a search on dosing studies
+     */
+    private TwoParamUnlinkedSearch dosingStudySearch;
+
+
+    /**
+     * Two param linked search to perform search on breastCancerBioMarkers
+     */
+    private TwoParamLinkedSearch breastCancerMarkersSearch;
+
+
     public SearchDS(DataProjectionRepository dataProjectionRepository) {
         Assert.notNull(dataProjectionRepository, "Data projection repository cannot be null");
 
@@ -133,121 +87,512 @@ public class SearchDS {
         this.models = new HashSet<>();
     }
 
-    void initialize() {
+    /**
+     * Initializes the searchDS, creates filter structure and links search objects to them
+     */
+    public void init(){
 
 
-        //this method loads the ModelForQuery Data Projection object and
+        //INITIALIZE MODEL FOR QUERY OBJECTS FIRST
         initializeModels();
-
-        //loads the mutation map from Data Projection
-        initializeMutations();
+        //now we can use MFQ objects to get additional values for filters
 
 
-        //loads model drug response from Data Projection
-        initializeModelDrugResponses();
+        /****************************************************************
+         *     INITIALIZE FILTER OPTIONS AND FILTER STRUCTURE           *
+         ****************************************************************/
 
-        //loads projects
-        initializeAdditionalOptions();
+        webFacetContainer = new WebFacetContainer();
+        facetOptionMap = new HashMap<>();
+
+        WebFacetSection patientTumorSection = new WebFacetSection();
+        patientTumorSection.setName("PATIENT / TUMOR");
+
+        WebFacetSection pdxModelSection = new WebFacetSection();
+        pdxModelSection.setName("PDX MODEL");
+
+        WebFacetSection molecularDataSection = new WebFacetSection();
+        molecularDataSection.setName("MOLECULAR DATA");
+
+        WebFacetSection treatmentInfoSection = new WebFacetSection();
+        treatmentInfoSection.setName("TREATMENT INFORMATION");
+
+        //cancer by system filter def
+        List<FacetOption> cancerBySystemOptions = new ArrayList<>();
+        cancerBySystemOptions.add(new FacetOption("Breast Cancer", "Breast_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Cardiovascular Cancer", "Cardiovascular_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Connective and Soft Tissue Cancer", "Connective_and_Soft_Tissue_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Digestive System Cancer", "Digestive_System_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Endocrine Cancer", "Endocrine_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Eye Cancer", "Eye_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Head and Neck Cancer", "Head_and_Neck_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Hematopoietic and Lymphoid System Cancer", "Hematopoietic_and_Lymphoid_System_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Nervous System Cancer", "Nervous_System_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Peritoneal and Retroperitoneal Cancer", "Peritoneal_and_Retroperitoneal_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Reproductive System Cancer", "Reproductive_System_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Respiratory Tract Cancer", "Respiratory_Tract_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Thoracic Cancer", "Thoracic_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Skin Cancer", "Skin_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Urinary System Cancer", "Urinary_System_Cancer"));
+        cancerBySystemOptions.add(new FacetOption("Unclassified", "Unclassified"));
+
+        OneParamFilter cancerBySystem = new OneParamFilter("CANCER BY SYSTEM", "cancer_system", false, FilterType.OneParamFilter.get(),
+                cancerBySystemOptions, new ArrayList<>());
+        patientTumorSection.addComponent(cancerBySystem);
+        facetOptionMap.put("cancer_system", cancerBySystemOptions);
+
+        //tumor type filter def
+        List<FacetOption> tumorTypeOptions = new ArrayList<>();
+        tumorTypeOptions.add(new FacetOption("Primary", "Primary"));
+        tumorTypeOptions.add(new FacetOption("Metastatic", "Metastatic"));
+        tumorTypeOptions.add(new FacetOption("Recurrent", "Recurrent"));
+        tumorTypeOptions.add(new FacetOption("Refractory", "Refractory"));
+        tumorTypeOptions.add(new FacetOption("Not Specified", "Not_Specified"));
+
+        OneParamFilter tumorType = new OneParamFilter("TUMOR_TYPE", "sample_tumor_type", false, FilterType.OneParamFilter.get(),
+              tumorTypeOptions, new ArrayList<>());
+        patientTumorSection.addComponent(tumorType);
+        facetOptionMap.put("sample_tumor_type", tumorTypeOptions);
+
+        //sex filter def
+        List<FacetOption> patientSexOptions = new ArrayList<>();
+        patientSexOptions.add(new FacetOption("Male", "Male"));
+        patientSexOptions.add(new FacetOption("Female", "Female"));
+        patientSexOptions.add(new FacetOption("Not Specified", "Not_Specified"));
+        OneParamFilter sex = new OneParamFilter("SEX", "patient_gender", false, FilterType.OneParamFilter.get(),
+        patientSexOptions, new ArrayList<>());
+        patientTumorSection.addComponent(sex);
+        facetOptionMap.put("patient_gender", patientSexOptions);
+
+        //age filter def
+        List<FacetOption> ageOptions = new ArrayList<>();
+        ageOptions.add(new FacetOption("0-9", "0-9"));
+        ageOptions.add(new FacetOption("10-19", "10-19"));
+        ageOptions.add(new FacetOption("20-29", "20-29"));
+        ageOptions.add(new FacetOption("30-39", "30-39"));
+        ageOptions.add(new FacetOption("40-49", "40-49"));
+        ageOptions.add(new FacetOption("50-59", "50-59"));
+        ageOptions.add(new FacetOption("60-69", "60-69"));
+        ageOptions.add(new FacetOption("70-79", "70-79"));
+        ageOptions.add(new FacetOption("80-89", "80-89"));
+        ageOptions.add(new FacetOption("90", "90"));
+        ageOptions.add(new FacetOption("Not Specified", "Not_Specified"));
+
+        OneParamFilter age = new OneParamFilter("AGE", "patient_age", false, FilterType.OneParamFilter.get(),
+        ageOptions, new ArrayList<>());
+        patientTumorSection.addComponent(age);
+        facetOptionMap.put("patient_age",ageOptions);
+
+        //treatment status filter
+        List<FacetOption> patientTreatmentStatusOptions = new ArrayList<>();
+        patientTreatmentStatusOptions.add(new FacetOption("Treatment Naive", "treatment_naive"));
+        patientTreatmentStatusOptions.add(new FacetOption("Not Treatment Naive", "not_treatment_naive"));
+        patientTreatmentStatusOptions.add(new FacetOption("Not Specified", "Not_Specified"));
+
+        OneParamFilter patientTreatmentStatus = new OneParamFilter("TREATMENT STATUS", "patient_treatment_status", false,
+                FilterType.OneParamFilter.get(), patientTreatmentStatusOptions, new ArrayList<>());
+        patientTumorSection.addComponent(patientTreatmentStatus);
+        facetOptionMap.put("patient_treatment_status", patientTreatmentStatusOptions);
+
+        //datasource filter def
+        Set<String> datasourceSet = models.stream()
+                .map(ModelForQuery::getDatasource)
+                .collect(Collectors.toSet());
+
+        List<String> datasourceList = new ArrayList<>();
+        datasourceList.addAll(datasourceSet);
+        Collections.sort(datasourceList);
+
+        List<FacetOption> datasourceOptions = new ArrayList<>();
+        for(String ds : datasourceList){
+            datasourceOptions.add(new FacetOption(ds, ds));
+        }
+
+        OneParamFilter datasource = new OneParamFilter("DATASOURCE", "datasource", false, FilterType.OneParamFilter.get(), datasourceOptions, new ArrayList<>());
+        pdxModelSection.addComponent(datasource);
+        facetOptionMap.put("datasource", datasourceOptions);
+
+        //project filter def
+        Set<String> projectsSet = new HashSet<>();
+        for(ModelForQuery mfk : models){
+
+            if(mfk.getProjects() != null){
+                for(String s: mfk.getProjects()){
+                    projectsSet.add(s);
+                }
+            }
+        }
+        List<String> projectList = new ArrayList<>(projectsSet);
+        Collections.sort(projectList);
+
+        //TODO: skip filter if no projects were defined?
+
+        List<FacetOption> projectOptions = new ArrayList<>();
+
+        for(String p: projectList){
+            projectOptions.add(new FacetOption(p, p));
+        }
+        OneParamFilter projects = new OneParamFilter("PROJECT", "project", false, FilterType.OneParamFilter.get(), projectOptions, new ArrayList<>());
+        pdxModelSection.addComponent(projects);
+        facetOptionMap.put("project", projectOptions);
+
+        //dataset available filter def
+        List<FacetOption> datasetAvailableOptions = new ArrayList<>();
+        datasetAvailableOptions.add(new FacetOption("Gene Mutation", "Gene_Mutation"));
+        datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
+        datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
+
+        OneParamFilter datasetAvailable = new OneParamFilter("DATASET AVAILABLE", "data_available", false, FilterType.OneParamFilter.get(),
+        datasetAvailableOptions, new ArrayList<>());
+
+        pdxModelSection.addComponent(datasetAvailable);
+        facetOptionMap.put("data_available", datasetAvailableOptions);
+
+        //gene mutation filter def
+        //TODO: look up platforms, genes and variants
+        TwoParamLinkedFilter geneMutation = new TwoParamLinkedFilter("GENE MUTATION", "mutation", false, FilterType.TwoParamLinkedFilter.get(),
+                 "GENE", "VARIANT",getMutationOptions(), getMutationAndVariantOptions(), new HashMap<>());
+
+        molecularDataSection.addComponent(geneMutation);
 
 
-        List<String> padding = new ArrayList<>();
-        padding.add("NO DATA");
+        //Breast cancer markers
+        //labelIDs should be alphabetically ordered(ER, HER, PR) as per dataprojection requirement
+        List<FacetOption> breastCancerMarkerOptions = new ArrayList<>();
+
+        breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR+", "ERpos_HER2neg_PRpos"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR-", "ERneg_HER2neg_PRneg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR-", "ERpos_HER2neg_PRneg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR+", "ERpos_HER2pos_PRpos"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR-", "ERneg_HER2pos_PRneg"));
+
+        //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR+", "ERneg_HER2pos_PRpos"));
+        //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR-", "ERpos_HER2pos_PRneg"));
+        //breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR+", "ERneg_HER2neg_PRpos"));
 
 
 
-
-        //
-        // Filter out all options that have no models for that option
-        //
-        PATIENT_AGE_OPTIONS = PATIENT_AGE_OPTIONS
-                .stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getPatientAge)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
-
-        DATASOURCE_OPTIONS = DATASOURCE_OPTIONS
-                .stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getDatasource)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
+        OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_markers", false, FilterType.OneParamFilter.get(),
+                breastCancerMarkerOptions, new ArrayList<>());
+        molecularDataSection.addComponent(breastCancerMarkers);
+        facetOptionMap.put("breast_cancer_markers",breastCancerMarkerOptions);
 
 
-        CANCERS_BY_SYSTEM_OPTIONS = CANCERS_BY_SYSTEM_OPTIONS
-                .stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getCancerSystem)
-                        .flatMap(Collection::stream)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
+        //model dosing study def
 
-        PATIENT_GENDERS = PATIENT_GENDERS
-                .stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getPatientGender)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
+        Map<String, Map<String, Set<Long>>> modelDrugResponses = getModelDrugResponsesFromDP();
+        List<String> drugNames = new ArrayList<>(modelDrugResponses.keySet());
 
-        SAMPLE_TUMOR_TYPE_OPTIONS = SAMPLE_TUMOR_TYPE_OPTIONS
-                .stream()
-                .filter(x -> models
-                        .stream()
-                        .map(ModelForQuery::getSampleTumorType)
-                        .collect(Collectors.toSet())
-                        .contains(x))
-                .collect(Collectors.toList());
+        TwoParamUnlinkedFilter modelDosingStudy = new TwoParamUnlinkedFilter("MODEL DOSING STUDY", "drug", false, FilterType.TwoParamUnlinkedFilter.get(), "DRUG", "RESPONSE", drugNames, Arrays.asList(
+                "Complete Response",
+                "Partial Response",
+                "Progressive Disease",
+                "Stable Disease",
+                "Stable Disease And Complete Response"
+        ), new HashMap<>());
+        treatmentInfoSection.addComponent(modelDosingStudy);
 
 
+        webFacetContainer.addSection(patientTumorSection);
+        webFacetContainer.addSection(pdxModelSection);
+        webFacetContainer.addSection(molecularDataSection);
+        webFacetContainer.addSection(treatmentInfoSection);
+
+        /****************************************************************
+         *            INITIALIZE SEARCH OBJECTS                         *
+         ****************************************************************/
 
 
-        //PROJECT_OPTIONS =new ArrayList<>(models.stream().map(model -> model.getProjects()).flatMap(Collection::stream).collect(Collectors.toSet()));
+        //one general search object for searching on MFQ object fields
+        oneParamSearch = new OneParamSearch(null, null);
+
+        //drug search
+        dosingStudySearch = new TwoParamUnlinkedSearch();
+        dosingStudySearch.setData(getModelDrugResponsesFromDP());
+
+        //gene mutation search
+        //the gene mutation is a ThreeParamFilter component, but a FourParamLinkedSearch must be used because of the hidden platform labelId
+        geneMutationSearch = new ThreeParamLinkedSearch("geneMutation", "mutation");
+
+        geneMutationSearch.setData(getMutationsFromDP());
+
+
+        //breast cancer markers search initialization
+        breastCancerMarkersSearch = new TwoParamLinkedSearch("breastCancerMarkers", "breast_cancer_markers");
+        breastCancerMarkersSearch.setData(getBreastCancerMarkersFromDP());
+
 
         INITIALIZED = true;
-
     }
 
-    /**
-     * Recursively get all ancestors starting from the supplied ontology term
-     *
-     * @param t the starting term in the ontology
-     * @return a set of ontology terms corresponding to the ancestors of the term supplied
-     */
-    public Set<OntologyTerm> getAllAncestors(OntologyTerm t) {
 
-        Set<OntologyTerm> retSet = new HashSet<>();
+    public WebFacetContainer getUpdatedSelectedFilters(Map<SearchFacetName, List<String>> filters){
 
-        // Store this ontology term in the set
-        retSet.add(t);
 
-        // If this term has parent terms
-        if (t.getSubclassOf() != null && t.getSubclassOf().size() > 0) {
+        //use a clone to avoid keeping filters from previous iterations
+        WebFacetContainer webFacetContainerClone = new WebFacetContainer();
+        List<WebFacetSection> sections = new ArrayList<>(webFacetContainer.getWebFacetSections());
+        webFacetContainerClone.setWebFacetSections(sections);
 
-            // For each parent term
-            for (OntologyTerm st : t.getSubclassOf()) {
+        //reset all previously selected fields and make the component inactive
+        for(WebFacetSection wfs :webFacetContainerClone.getWebFacetSections()){
+            for(GeneralFilter filter: wfs.getFilterComponents()){
+                filter.setActive(false);
 
-                // Recurse and add all ancestor terms to the set
-                retSet.addAll(getAllAncestors(st));
+                if(filter instanceof OneParamFilter){
+
+                    OneParamFilter f = (OneParamFilter)filter;
+                    f.setSelected(new ArrayList<>());
+
+                }
+                else if(filter instanceof TwoParamUnlinkedFilter){
+
+                    TwoParamUnlinkedFilter f = (TwoParamUnlinkedFilter) filter;
+                    f.setSelected(new HashMap<>());
+
+                }
+                else if(filter instanceof TwoParamLinkedFilter){
+                    TwoParamLinkedFilter f = (TwoParamLinkedFilter) filter;
+                    f.setSelected(new HashMap<>());
+                }
             }
         }
 
-        // Return the full set
-        return retSet;
+
+        //loop through the selected filters, make them active and initialize their selected list/map
+        for(Map.Entry<SearchFacetName, List<String>> facet: filters.entrySet()){
+
+            String facetName = facet.getKey().getName();
+            List<String> selected = facet.getValue();
+
+            List<String> decodedSelected = new ArrayList<>();
+            //if there is an overwrite rule for the filter, replace the selected values with the replacement
+            if(facetOptionMap.get(facetName) != null){
+
+                for(FacetOption fo: facetOptionMap.get(facetName)){
+
+                    if(selected.contains(fo.getLabelId()))
+                    decodedSelected.add(fo.getLabelId());
+                }
+            }
+            //no overwrite rule
+            else{
+                decodedSelected = selected;
+            }
+
+
+            for(WebFacetSection wfs :webFacetContainerClone.getWebFacetSections()){
+                for(GeneralFilter filter: wfs.getFilterComponents()){
+
+
+                    if(filter.getUrlParam().equals(facetName)){
+                        filter.setActive(true);
+
+                        if(filter instanceof OneParamFilter){
+
+                            OneParamFilter f = (OneParamFilter)filter;
+                            f.setSelected(decodedSelected);
+
+                        }
+                        else if(filter instanceof TwoParamUnlinkedFilter){
+
+                            TwoParamUnlinkedFilter f = (TwoParamUnlinkedFilter) filter;
+
+                            Map<String,List<String>> selectedMap = new HashMap<>();
+
+                            for(String opt:decodedSelected){
+
+                                String[] optArr = opt.split("___");
+
+                                if(selectedMap.containsKey(optArr[0])){
+                                    selectedMap.get(optArr[0]).add(optArr[1]);
+                                }
+                                else{
+                                    List<String> arrList = new ArrayList<>();
+                                    arrList.add(optArr[1]);
+                                    selectedMap.put(optArr[0], arrList);
+
+                                }
+
+                            }
+
+                            f.setSelected(selectedMap);
+
+                        }
+                        else if(filter instanceof TwoParamLinkedFilter){
+                            TwoParamLinkedFilter f = (TwoParamLinkedFilter) filter;
+
+                            Map<String,List<String>> selectedMap = new HashMap<>();
+
+                            for(String opt:decodedSelected){
+
+                                String[] optArr = opt.split("___");
+
+                                if(selectedMap.containsKey(optArr[0])){
+                                    selectedMap.get(optArr[0]).add(optArr[1]);
+                                }
+                                else{
+                                    List<String> arrList = new ArrayList<>();
+                                    arrList.add(optArr[1]);
+                                    selectedMap.put(optArr[0], arrList);
+
+                                }
+
+                            }
+
+                            f.setSelected(selectedMap);
+                        }
+
+                    }
+
+
+                }
+            }
+
+
+        }
+
+        return webFacetContainerClone;
     }
+
+
+
+    public Set<ModelForQuery> search(Map<SearchFacetName, List<String>> filters){
+
+        synchronized (this){
+            if(! INITIALIZED ) {
+                init();
+            }
+        }
+
+        Set<ModelForQuery> result = new HashSet<>(models);
+
+        //empty previously set variants
+        result.forEach(x -> x.setMutatedVariants(new ArrayList<>()));
+
+        //empty previously set drugs
+        result.forEach(x -> x.setDrugWithResponse(new ArrayList<>()));
+
+        //reset breast cancer markers
+        result.forEach(x ->x.setBreastCancerMarkers(new ArrayList<>()));
+
+        // If no filters have been specified, return the complete set
+        if (filters == null) {
+            return result;
+        }
+
+        OneParamSearch oneParamSearch = new OneParamSearch("search","search");
+
+        for (SearchFacetName facet : filters.keySet()) {
+
+            log.info("Models:"+result.size()+" before applying filter: "+facet.getName());
+
+            switch(facet){
+
+                case query:
+                    //List<String> searchParams, Set<ModelForQuery> mfqSet, Function<ModelForQuery, List<String>> searchFunc
+                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("query"), filters.get(SearchFacetName.query), result, ModelForQuery::getAllOntologyTermAncestors);
+                    break;
+
+                case datasource:
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("datasource"), filters.get(SearchFacetName.datasource), result, ModelForQuery::getDatasource);
+                    break;
+
+                case diagnosis:
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("diagnosis"), filters.get(SearchFacetName.diagnosis), result, ModelForQuery::getMappedOntologyTerm);
+                    break;
+
+                case patient_age:
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("patient_age"), filters.get(SearchFacetName.patient_age), result, ModelForQuery::getPatientAge);
+                    break;
+                case patient_treatment_status:
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("patient_treatment_status"), filters.get(SearchFacetName.patient_treatment_status), result, ModelForQuery::getPatientTreatmentStatus);
+                    break;
+
+                case patient_gender:
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("patient_gender"), filters.get(SearchFacetName.patient_gender), result, ModelForQuery::getPatientGender);
+                    break;
+
+                case sample_origin_tissue:
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("sample_origin_tissue"), filters.get(SearchFacetName.sample_origin_tissue), result, ModelForQuery::getSampleOriginTissue);
+                    break;
+
+                case sample_classification:
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("sample_classification"), filters.get(SearchFacetName.sample_classification), result, ModelForQuery::getSampleClassification);
+                    break;
+
+                case sample_tumor_type:
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("sample_tumor_type"), filters.get(SearchFacetName.sample_tumor_type), result, ModelForQuery::getSampleTumorType);
+                    break;
+
+                case model_implantation_site:
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("model_implantation_site"), filters.get(SearchFacetName.model_implantation_site), result, ModelForQuery::getModelImplantationSite);
+                    break;
+
+                case model_implantation_type:
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("model_implantation_type"), filters.get(SearchFacetName.model_implantation_type), result, ModelForQuery::getModelImplantationSite);
+                    break;
+
+                case model_host_strain:
+                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("model_host_strain"), filters.get(SearchFacetName.model_host_strain), result, ModelForQuery::getModelHostStrain);
+                    break;
+
+                case cancer_system:
+                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("cancer_system"), filters.get(SearchFacetName.cancer_system), result, ModelForQuery::getCancerSystem);
+                    break;
+
+                case organ:
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("organ"), filters.get(SearchFacetName.organ), result, ModelForQuery::getCancerOrgan);
+                    break;
+
+                case cell_type:
+                    result = oneParamSearch.searchOnString(facetOptionMap.get("cell_type"), filters.get(SearchFacetName.cell_type), result, ModelForQuery::getCancerCellType);
+                    break;
+
+                case project:
+                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("project"), filters.get(SearchFacetName.project), result, ModelForQuery::getProjects);
+                    break;
+
+                case data_available:
+                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("data_available"), filters.get(SearchFacetName.data_available), result, ModelForQuery::getDataAvailable);
+                    break;
+
+                case mutation:
+                    result = geneMutationSearch.search(filters.get(SearchFacetName.mutation), result, ModelForQuery::addMutatedVariant);
+                    break;
+
+                case drug:
+                    result = dosingStudySearch.search(filters.get(SearchFacetName.drug), result, ModelForQuery::addDrugWithResponse);
+                    break;
+
+                case breast_cancer_markers:
+                    result = breastCancerMarkersSearch.search(filters.get(SearchFacetName.breast_cancer_markers), result, ModelForQuery::addBreastCancerMarkers);
+                    break;
+
+
+                default:
+                    //undexpected filter option
+                    log.warn("Unrecognised facet {} passed to search, skipping", facet.getName());
+                    break;
+
+
+            }
+
+            log.info("After applying filter: "+result.size());
+
+        }
+
+
+
+        return result;
+    }
+
 
     public Set<ModelForQuery> getModels() {
 
         synchronized (this){
             if(! INITIALIZED ) {
-                initialize();
+                init();
             }
         }
 
@@ -259,14 +604,12 @@ public class SearchDS {
     }
 
 
-    public List<String> getProjectOptions() {
-        return projectOptions;
-    }
+
 
     /**
      * This method loads the ModelForQuery Data Projection object and initializes the models
      */
-    void initializeModels() {
+    private void initializeModels() {
 
 
         String modelJson = dataProjectionRepository.findByLabel("ModelForQuery").getValue();
@@ -297,7 +640,11 @@ public class SearchDS {
                 mfq.setSampleTumorType(j.getString("sampleTumorType"));
                 mfq.setDiagnosis(j.getString("diagnosis"));
                 mfq.setMappedOntologyTerm(j.getString("mappedOntologyTerm"));
-                mfq.setTreatmentHistory(j.getString("treatmentHistory"));
+
+                if(j.has("patientTreatmentStatus")){
+                    mfq.setPatientTreatmentStatus(j.getString("patientTreatmentStatus"));
+                }
+
 
 
                 JSONArray ja = j.getJSONArray("cancerSystem");
@@ -353,9 +700,11 @@ public class SearchDS {
     }
 
 
-    void initializeMutations(){
+    private Map<String, Map<String, Map<String, Set<Long>>>> getMutationsFromDP(){
 
         log.info("Initializing mutations");
+        //platform=> marker=> variant=>{set of model ids}
+        Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<>();
 
         String mut = dataProjectionRepository.findByLabel("PlatformMarkerVariantModel").getValue();
 
@@ -365,7 +714,7 @@ public class SearchDS {
 
             mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<Long>>>>>(){});
 
-            //log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
+            log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
 
         }
         catch(Exception e){
@@ -373,12 +722,79 @@ public class SearchDS {
             e.printStackTrace();
         }
 
+        return mutations;
+    }
+
+    private Map<String, List<String>> getMutationAndVariantOptions(){
+
+        Map<String,Set<String>> tempResults = getMutationOptionsFromDP();
+
+        Map<String, List<String>> resultMap = new HashMap<>();
+
+        for(Map.Entry<String, Set<String>> entry : tempResults.entrySet()){
+
+            resultMap.put(entry.getKey(), new ArrayList<>(new TreeSet<>(entry.getValue())));
+        }
+
+        return resultMap;
     }
 
 
-    void initializeModelDrugResponses(){
+    private List<String> getMutationOptions(){
+
+        Map<String,Set<String>> tempResults = getMutationOptionsFromDP();
+
+        List<String> resultList = new ArrayList<>();
+
+        for(Map.Entry<String, Set<String>> entry : tempResults.entrySet()){
+
+            resultList.add(entry.getKey());
+        }
+
+        return resultList;
+    }
+
+
+
+    private Map<String, Set<String>> getMutationOptionsFromDP(){
+
+        Map<String, Map<String, Map<String, Set<Long>>>> mutations = getMutationsFromDP();
+
+        Map<String,Set<String>> tempResults = new HashMap<>();
+
+        for(Map.Entry<String, Map<String, Map<String, Set<Long>>>> platform:mutations.entrySet()){
+
+            for(Map.Entry<String, Map<String, Set<Long>>> marker:platform.getValue().entrySet()){
+
+                for(Map.Entry<String, Set<Long>> variant:marker.getValue().entrySet()){
+
+                    String m = marker.getKey();
+                    String v = variant.getKey();
+
+                    if(tempResults.containsKey(m)){
+                        tempResults.get(m).add(v);
+                    }
+                    else{
+                        Set<String> set = new HashSet<>();
+                        set.add(v);
+                        tempResults.put(m, set);
+
+                    }
+
+                }
+            }
+        }
+
+        return tempResults;
+    }
+
+
+
+    private Map<String, Map<String, Set<Long>>> getModelDrugResponsesFromDP(){
 
         log.info("Initializing model drug responses");
+
+        Map<String, Map<String, Set<Long>>> modelDrugResponses = new HashMap<>();
 
         DataProjection dataProjection = dataProjectionRepository.findByLabel("ModelDrugData");
         String responses = "{}";
@@ -401,596 +817,43 @@ public class SearchDS {
 
             e.printStackTrace();
         }
+
+        return modelDrugResponses;
+    }
+
+
+    private Map<String, Map<String, Set<Long>>> getBreastCancerMarkersFromDP(){
+
+        log.info("Initializing breast cancer markers ");
+
+        Map<String, Map<String, Set<Long>>> data = new HashMap<>();
+
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("IHC");
+        String responses = "{}";
+
+        if(dataProjection != null){
+
+            responses = dataProjection.getValue();
+        }
+
+        try{
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            data = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
+
+
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
+
+        return data;
     }
 
 
 
-    /**
-     * Takes a marker and a variant. Looks up these variants in mutation.
-     * Then creates a hashmap with modelids as keys and platform+marker+mutation as values
-     *
-     *
-     * @param marker
-     * @param variant
-     * @return
-     */
-    private void getModelsByMutatedMarkerAndVariant(String marker, String variant, Map<Long, Set<String>> previouslyFoundModels){
-
-        //platform=> marker=> variant=>{set of model ids}
-
-        //marker with ALL variants
-        if(variant.toLowerCase().equals("all")){
-
-            for(Map.Entry<String, Map<String, Map<String, Set<Long>>>> platformEntry : mutations.entrySet()){
-
-                String platformName = platformEntry.getKey();
-
-                if(platformEntry.getValue().containsKey(marker)){
-
-                    for(Map.Entry<String, Set<Long>> markerVariants : platformEntry.getValue().get(marker).entrySet()){
-
-                        String variantName = markerVariants.getKey();
-                        Set<Long> foundModels = markerVariants.getValue();
-
-                        for(Long modelId : foundModels){
-
-                            if(previouslyFoundModels.containsKey(modelId)){
-
-                                previouslyFoundModels.get(modelId).add(platformName+" "+marker+" "+variantName);
-                            }
-                            else{
-
-                                Set<String>  newSet = new HashSet<>();
-                                newSet.add(platformName+" "+marker+" "+variantName);
-                                previouslyFoundModels.put(modelId, newSet);
-                            }
-
-                        }
-
-                    }
-
-
-                }
-
-            }
-
-
-        }
-        //a marker and a variant is given
-        else{
-
-            for(Map.Entry<String, Map<String, Map<String, Set<Long>>>> platformEntry : mutations.entrySet()){
-
-                String platformName = platformEntry.getKey();
-
-                if(platformEntry.getValue().containsKey(marker)){
-
-                    if(platformEntry.getValue().get(marker).containsKey(variant)){
-
-                        Set<Long> foundModels = platformEntry.getValue().get(marker).get(variant);
-
-                        for(Long modelId : foundModels){
-
-                            if(previouslyFoundModels.containsKey(modelId)){
-
-                                previouslyFoundModels.get(modelId).add(platformName+" "+marker+" "+variant);
-                            }
-                            else{
-
-                                Set<String>  newSet = new HashSet<>();
-                                newSet.add(platformName+" "+marker+" "+variant);
-                                previouslyFoundModels.put(modelId, newSet);
-                            }
-
-                        }
-
-                    }
-                }
-            }
-        }
-
-    }
-
-
-
-    private void getModelsByDrugAndResponse(String drug, String response, Map<Long, Set<String>> previouslyFoundModels,
-                                            Map<Long, List<DrugSummaryDTO>> modelsDrugSummary){
-
-        //drug => response => set of model ids
-
-        //Cases
-        //1. drug + no response selected
-        //2. drug + ALL response
-        //3. drug + one response selected
-        //4. no drug + one response selected
-        //5. no drug + ALL response
-
-
-        //1. = 2.
-        if(drug != null && response.toLowerCase().equals("all")){
-
-            if(modelDrugResponses.containsKey(drug)){
-
-                for(Map.Entry<String, Set<Long>> currResp: modelDrugResponses.get(drug).entrySet()){
-
-                    String resp = currResp.getKey();
-                    Set<Long> foundModels = currResp.getValue();
-
-                    for(Long modelId: foundModels){
-
-                        if(previouslyFoundModels.containsKey(modelId)){
-
-                            previouslyFoundModels.get(modelId).add(drug+" "+response);
-
-                            if(modelsDrugSummary.containsKey(modelId)){
-
-                                modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drug, resp));
-                            }
-                            else{
-                                List dr = new ArrayList();
-                                dr.add(new DrugSummaryDTO(drug, resp));
-                                modelsDrugSummary.put(modelId, dr);
-                            }
-
-                        }
-                        else{
-
-                            Set<String>  newSet = new HashSet<>();
-                            newSet.add(drug+" "+response);
-                            previouslyFoundModels.put(modelId, newSet);
-
-                            if(modelsDrugSummary.containsKey(modelId)){
-
-                                modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drug, resp));
-                            }
-                            else{
-                                List dr = new ArrayList();
-                                dr.add(new DrugSummaryDTO(drug, resp));
-                                modelsDrugSummary.put(modelId, dr);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        //3.
-        else if(drug != null && response != null){
-
-            if(modelDrugResponses.containsKey(drug)){
-
-                if(modelDrugResponses.get(drug).containsKey(response)){
-
-                    Set<Long> foundModels = modelDrugResponses.get(drug).get(response);
-
-                    for(Long modelId: foundModels){
-
-                        if(previouslyFoundModels.containsKey(modelId)){
-
-                            previouslyFoundModels.get(modelId).add(drug+" "+response);
-
-                            if(modelsDrugSummary.containsKey(modelId)){
-
-                                modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drug, response));
-                            }
-                            else{
-                                List dr = new ArrayList();
-                                dr.add(new DrugSummaryDTO(drug, response));
-                                modelsDrugSummary.put(modelId, dr);
-                            }
-                        }
-                        else{
-
-                            Set<String>  newSet = new HashSet<>();
-                            newSet.add(drug+" "+response);
-                            previouslyFoundModels.put(modelId, newSet);
-
-                            if(modelsDrugSummary.containsKey(modelId)){
-
-                                modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drug, response));
-                            }
-                            else{
-                                List dr = new ArrayList();
-                                dr.add(new DrugSummaryDTO(drug, response));
-                                modelsDrugSummary.put(modelId, dr);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        //4. 5.
-        else if(drug == null && response != null){
-
-            if(response.equals("ALL")){
-
-                for(Map.Entry<String, Map<String, Set<Long>>> currDrug: modelDrugResponses.entrySet()){
-
-                    String drugName = currDrug.getKey();
-
-                    for(Map.Entry<String, Set<Long>> responses : currDrug.getValue().entrySet()){
-
-                        String currResp = responses.getKey();
-                        Set<Long> foundModels = responses.getValue();
-
-                        for(Long modelId: foundModels){
-
-                            if(previouslyFoundModels.containsKey(modelId)){
-
-                                previouslyFoundModels.get(modelId).add(drugName+" "+currResp);
-
-                                if(modelsDrugSummary.containsKey(modelId)){
-
-                                    modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drugName, currResp));
-                                }
-                                else{
-                                    List dr = new ArrayList();
-                                    dr.add(new DrugSummaryDTO(drugName, currResp));
-                                    modelsDrugSummary.put(modelId, dr);
-                                }
-                            }
-                            else{
-
-                                Set<String>  newSet = new HashSet<>();
-                                newSet.add(drugName+" "+currResp);
-                                previouslyFoundModels.put(modelId, newSet);
-
-                                if(modelsDrugSummary.containsKey(modelId)){
-
-                                    modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drugName, currResp));
-                                }
-                                else{
-                                    List dr = new ArrayList();
-                                    dr.add(new DrugSummaryDTO(drugName, currResp));
-                                    modelsDrugSummary.put(modelId, dr);
-                                }
-                            }
-                        }
-
-                    }
-                }
-
-
-            }
-            else{
-
-                for(Map.Entry<String, Map<String, Set<Long>>> drugs : modelDrugResponses.entrySet()){
-
-                    String drugName = drugs.getKey();
-
-                    if(drugs.getValue().containsKey(response)){
-
-                        Set<Long> foundModels = drugs.getValue().get(response);
-
-                        for(Long modelId: foundModels){
-
-                            if(previouslyFoundModels.containsKey(modelId)){
-
-                                previouslyFoundModels.get(modelId).add(drugName+" "+response);
-
-                                if(modelsDrugSummary.containsKey(modelId)){
-
-                                    modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drugName, response));
-                                }
-                                else{
-                                    List dr = new ArrayList();
-                                    dr.add(new DrugSummaryDTO(drugName, response));
-                                    modelsDrugSummary.put(modelId, dr);
-                                }
-                            }
-                            else{
-
-                                Set<String>  newSet = new HashSet<>();
-                                newSet.add(drugName+" "+response);
-                                previouslyFoundModels.put(modelId, newSet);
-
-                                if(modelsDrugSummary.containsKey(modelId)){
-
-                                    modelsDrugSummary.get(modelId).add(new DrugSummaryDTO(drugName, response));
-                                }
-                                else{
-                                    List dr = new ArrayList();
-                                    dr.add(new DrugSummaryDTO(drugName, response));
-                                    modelsDrugSummary.put(modelId, dr);
-                                }
-                            }
-                        }
-                    }
-                }
-
-            }
-
-
-
-
-        }
-
-
-
-    }
-
-
-    public void initializeAdditionalOptions(){
-
-
-        log.info("Models: "+models.size());
-
-        Set<String> projectsSet = new HashSet<>();
-        for(ModelForQuery mfk : models){
-
-            if(mfk.getProjects() != null){
-                for(String s: mfk.getProjects()){
-                    projectsSet.add(s);
-                }
-            }
-        }
-
-        projectOptions = new ArrayList<>(projectsSet);
-
-
-    }
-
-
-
-
-    /**
-     * Search function accespts a Map of key value pairs
-     * key = what facet to search
-     * list of values = what values to filter on (using OR)
-     * <p>
-     * EX of expected data structure:
-     * <p>
-     * patient_age -> { 5-10, 20-40 },
-     * patient_gender -> { Male },
-     * sample_origin_tissue -> { Lung, Liver }
-     * <p>
-     * would yield results for male patients between 5-10 OR between 20-40 AND that had cancers in the lung OR liver
-     *
-     * @param filters
-     * @return set of models derived from filtering the complete set according to the
-     * filters passed in as arguments
-     */
-    public Set<ModelForQuery> search(Map<SearchFacetName, List<String>> filters) {
-
-        synchronized (this){
-            if(! INITIALIZED ) {
-                initialize();
-            }
-        }
-
-        Set<ModelForQuery> result = new HashSet<>(models);
-
-        //empty previously set variants
-        result.forEach(x -> x.setMutatedVariants(new ArrayList<>()));
-
-        //empty previously set drugs
-        result.forEach(x -> x.setDrugData(new ArrayList<>()));
-
-        // If no filters have been specified, return the complete set
-        if (filters == null) {
-            return result;
-        }
-
-        for (SearchFacetName facet : filters.keySet()) {
-
-            Predicate predicate;
-
-            switch (facet) {
-
-                case query:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.query));
-
-                    Set<ModelForQuery> accumulate = new HashSet<>();
-                    for (ModelForQuery r : result) {
-
-                        Set<String> i = r.getAllOntologyTermAncestors().stream().filter(x -> predicate.test(x)).collect(Collectors.toSet());
-                        if (i != null && i.size() > 0) {
-                            r.setQueryMatch(i);
-                            accumulate.add(r);
-                        }
-
-                    }
-
-                    result = accumulate;
-                    break;
-
-                case datasource:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.datasource));
-                    result = result.stream().filter(x -> predicate.test(x.getDatasource())).collect(Collectors.toSet());
-                    break;
-
-                case diagnosis:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.diagnosis));
-                    result = result.stream().filter(x -> predicate.test(x.getMappedOntologyTerm())).collect(Collectors.toSet());
-                    break;
-
-                case patient_age:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.patient_age));
-                    result = result.stream().filter(x -> predicate.test(x.getPatientAge())).collect(Collectors.toSet());
-                    break;
-
-                case patient_treatment_status:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.patient_treatment_status));
-                    result = result.stream().filter(x -> predicate.test(x.getPatientTreatmentStatus())).collect(Collectors.toSet());
-                    break;
-
-                case patient_gender:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.patient_gender));
-                    result = result.stream().filter(x -> predicate.test(x.getPatientGender())).collect(Collectors.toSet());
-                    break;
-
-                case sample_origin_tissue:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.sample_origin_tissue));
-                    result = result.stream().filter(x -> predicate.test(x.getSampleOriginTissue())).collect(Collectors.toSet());
-                    break;
-
-                case sample_classification:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.sample_classification));
-                    result = result.stream().filter(x -> predicate.test(x.getSampleClassification())).collect(Collectors.toSet());
-                    break;
-
-                case sample_tumor_type:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.sample_tumor_type));
-                    result = result.stream().filter(x -> predicate.test(x.getSampleTumorType())).collect(Collectors.toSet());
-                    break;
-
-                case model_implantation_site:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.model_implantation_site));
-                    result = result.stream().filter(x -> predicate.test(x.getModelImplantationSite())).collect(Collectors.toSet());
-                    break;
-
-                case model_implantation_type:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.model_implantation_type));
-                    result = result.stream().filter(x -> predicate.test(x.getModelImplantationType())).collect(Collectors.toSet());
-                    break;
-
-                case model_host_strain:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.model_host_strain));
-                    result = result.stream().filter(x -> predicate.test(x.getModelHostStrain())).collect(Collectors.toSet());
-                    break;
-
-                case cancer_system:
-
-                    Set<ModelForQuery> toRemove = new HashSet<>();
-                    for (ModelForQuery res : result) {
-                        Boolean keep = Boolean.FALSE;
-                        for (String s : filters.get(SearchFacetName.cancer_system)) {
-                            if (res.getCancerSystem().contains(s)) {
-                                keep = Boolean.TRUE;
-                            }
-                        }
-                        if (!keep) {
-                            toRemove.add(res);
-                        }
-                    }
-
-                    result.removeAll(toRemove);
-                    break;
-
-                case organ:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.organ));
-                    result = result.stream().filter(x -> predicate.test(x.getCancerOrgan())).collect(Collectors.toSet());
-                    break;
-
-                case cell_type:
-
-                    predicate = getExactMatchDisjunctionPredicate(filters.get(SearchFacetName.cell_type));
-                    result = result.stream().filter(x -> predicate.test(x.getCancerCellType())).collect(Collectors.toSet());
-                    break;
-
-                case mutation:
-                    // mutation=KRAS___MUT___V600E, mutation=NRAS___WT
-                    // if the String has ___ (three underscores) twice, it is mutated, if it has only one, it is WT
-
-                    Map<Long, Set<String>> modelsWithMutatedMarkerAndVariant = new HashMap<>();
-
-                    for(String mutation: filters.get(SearchFacetName.mutation)){
-
-                        if(mutation.split("___").length == 3){
-
-                            String[] mut = mutation.split("___");
-                            String marker = mut[0];
-                            String variant = mut[2];
-                            getModelsByMutatedMarkerAndVariant(marker, variant, modelsWithMutatedMarkerAndVariant);
-
-                        }
-                        else if(mutation.split("___").length == 2){
-
-                            //TODO: add wt lookup when we have data
-
-                        }
-                    }
-                    // applies the mutation filters
-                    result = result.stream().filter(x -> modelsWithMutatedMarkerAndVariant.containsKey(x.getModelId())).collect(Collectors.toSet());
-                    // updates the remaining modelforquery objects with platform+marker+variant info
-                    result.forEach(x -> x.setMutatedVariants(new ArrayList<>(modelsWithMutatedMarkerAndVariant.get(x.getModelId()))));
-                    break;
-
-                case drug:
-                    Map<Long, Set<String>> modelsWithDrug = new HashMap<>();
-                    Map<Long, List<DrugSummaryDTO>> modelsDrugSummary = new HashMap<>();
-
-                    for(String filt : filters.get(SearchFacetName.drug)){
-
-                        String[] drugAndResponse = filt.split("___");
-                        String drug = drugAndResponse[0];
-                        String response = drugAndResponse[1];
-
-                        if(drug.isEmpty()) drug = null;
-                        getModelsByDrugAndResponse(drug,response, modelsWithDrug, modelsDrugSummary);
-                    }
-
-                    result = result.stream().filter(x -> modelsWithDrug.containsKey(x.getModelId())).collect(Collectors.toSet());
-                    // updates the remaining modelforquery objects with drug and response info
-
-                    //result.forEach(x -> x.setMutatedVariants(new ArrayList<>(modelsWithDrug.get(x.getModelId()))));
-                    result.forEach(x -> x.setDrugData(modelsDrugSummary.get(x.getModelId())));
-                    break;
-
-                case project:
-                    Set<ModelForQuery> projectsToRemove = new HashSet<>();
-                    for (ModelForQuery res : result) {
-                        Boolean keep = Boolean.FALSE;
-                        for (String s : filters.get(SearchFacetName.project)) {
-                            try{
-                                if (res.getProjects() != null && res.getProjects().contains(s)) {
-                                    keep = Boolean.TRUE;
-                                }
-                            } catch(Exception e){
-                                e.printStackTrace();
-                            }
-                        }
-                        if (!keep) {
-                            projectsToRemove.add(res);
-                        }
-                    }
-
-                    result.removeAll(projectsToRemove);
-                    break;
-                case data_available:
-                    Set<ModelForQuery> mfqToRemove = new HashSet<>();
-                    for (ModelForQuery res : result) {
-                        Boolean keep = Boolean.FALSE;
-                        for (String s : filters.get(SearchFacetName.data_available)) {
-                            try{
-                                if (res.getDataAvailable() != null && res.getDataAvailable().contains(s)) {
-                                    keep = Boolean.TRUE;
-                                }
-                            } catch(Exception e){
-                                e.printStackTrace();
-                            }
-                        }
-                        if (!keep) {
-                            mfqToRemove.add(res);
-                        }
-                    }
-
-                    result.removeAll(mfqToRemove);
-                    break;
-
-                default:
-                    // default case is an unexpected filter option
-                    // Do not filter anything
-                    log.info("Unrecognised facet {} passed to search, skipping.", facet);
-                    break;
-            }
-        }
-
-        return result;
-    }
 
 
     /**
@@ -1045,7 +908,7 @@ public class SearchDS {
         return preds.stream().reduce(Predicate::or).orElse(x -> false);
     }
 
-
+/*
     public List<FacetOption> getFacetOptions(SearchFacetName facet,List<String> options, Map<SearchFacetName, List<String>> configuredFacets){
 
         List<FacetOption> facetOptions = new ArrayList<>();
@@ -1077,96 +940,7 @@ public class SearchDS {
         return facetOptions;
     }
 
-
-    /**
-     * Get the count of models for a supplied facet.
-     * <p>
-     * This method will return counts of facet options for the supplied facet
-     *
-     * @param facet    the facet to count
-     * @param results  set of models already filtered
-     * @param selected what facets have been filtered already
-     * @return a list of {@link FacetOption} indicating counts and selected state
-     */
-    @Cacheable("facet_counts")
-    public List<FacetOption> getFacetOptions(SearchFacetName facet, List<String> options, Set<ModelForQuery> results, List<String> selected) {
-
-
-        Set<ModelForQuery> allResults = models;
-
-        List<FacetOption> map = new ArrayList<>();
-
-        // Initialise all facet option counts to 0 and set selected attribute on all options that the user has chosen
-        if (options != null) {
-            for (String option : options) {
-                Long count = allResults
-                        .stream()
-                        .filter(x ->
-                                Stream.of(x.getBy(facet).split("::"))
-                                        .collect(Collectors.toSet())
-                                        .contains(option))
-                        .count();
-                map.add(new FacetOption(option, selected != null ? 0 : count.intValue(), count.intValue(), selected != null && selected.contains(option) ? Boolean.TRUE : Boolean.FALSE, facet));
-            }
-        }
-
-        // We want the counts on the facets to look something like:
-        // Gender
-        //   [ ] Male (1005 of 1005)
-        //   [ ] Female (840 of 840)
-        //   [ ] Not specified (31 of 31)
-        // Then when a facet is clicked:
-        // Gender
-        //   [X] Male (1005 of (1005)
-        //   [ ] Female (0 of 840)
-        //   [ ] Not specified (2 of 31)
-        //
-
-
-        // Iterate through results adding count to the appropriate option
-        for (ModelForQuery mfq : results) {
-
-            String s = mfq.getBy(facet);
-
-            // Skip empty facets
-            if (s == null || s.equals("")) {
-                continue;
-            }
-
-            // List of ontology terms may come from the service.  These will by separated by "::" delimiter
-            if (s.contains("::")) {
-
-                for (String ss : s.split("::")) {
-
-                    // There should be only one element per facet name
-                    map.forEach(x -> {
-                        if (x.getName().equals(ss)) {
-                            x.increment();
-                        }
-                    });
-                }
-
-            } else {
-
-                // Initialise on the first time we see this facet name
-                if (map.stream().noneMatch(x -> x.getName().equals(s))) {
-                    map.add(new FacetOption(s, 0, 0, selected != null && selected.contains(s) ? Boolean.TRUE : Boolean.FALSE, facet));
-                }
-
-                // There should be only one element per facet name
-                map.forEach(x -> {
-                    if (x.getName().equals(s)) {
-                        x.increment();
-                    }
-                });
-            }
-        }
-
-
-//        Collections.sort(map);
-
-        return map;
-    }
+*/
 
 
     /**

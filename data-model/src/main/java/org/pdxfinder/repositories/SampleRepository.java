@@ -133,4 +133,25 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
     )
     Sample findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(@Param("modelId") String modelId, @Param("ds") String ds, @Param("sampleId") String sampleId);
 
+
+    @Query("MATCH (mod:ModelCreation)--(s:Sample)--(ps:PatientSnapshot) " +
+            "WHERE mod.sourcePdxId = {modelId} " +
+            "AND mod.dataSource = {ds} " +
+            "WITH s " +
+            "OPTIONAL MATCH (s)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization) " +
+            "RETURN s, cb, mc"
+    )
+    Sample findHumanSampleWithMolcharByModelIdAndDataSource(@Param("modelId") String modelId, @Param("ds") String ds);
+
+
+    @Query("MATCH (mod:ModelCreation)--(sp:Specimen)--(hs:HostStrain) " +
+            "WHERE mod.sourcePdxId = {modelId} " +
+            "AND mod.dataSource = {ds} " +
+            "AND hs.symbol = {nomenclature} " +
+            "AND sp.passage = {passage}" +
+            "WITH sp " +
+            "MATCH (sp)--(s:Sample) " +
+            "RETURN s")
+    Sample findMouseSampleByModelIdAndDataSourceAndPassageAndNomenclature(@Param("modelId") String modelId, @Param("ds") String dataSource, @Param("passage") String passage, @Param("nomenclature") String nomenclature);
+
 }

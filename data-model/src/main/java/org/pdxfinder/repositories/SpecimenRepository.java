@@ -1,5 +1,6 @@
 package org.pdxfinder.repositories;
 
+import org.pdxfinder.dao.ModelCreation;
 import org.pdxfinder.dao.Specimen;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +25,10 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
             "AND mod.sourcePdxId = {modelId} " +
             "AND spec.passage = {passage} " +
             "AND spec.externalId = {specimenId} " +
-            "RETURN spec")
+            "WITH spec " +
+            "OPTIONAL MATCH (spec)-[sfr:SAMPLED_FROM]-(s:Sample) " +
+
+            "RETURN spec, sfr, s")
     Specimen findByModelIdAndDataSourceAndSpecimenIdAndPassage(
             @Param("modelId") String modelId,
             @Param("dataSource") String dataSource,
@@ -66,6 +70,18 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
 
 
+
+    @Query("MATCH (mod:ModelCreation)-[spr:SPECIMENS]-(sp:Specimen) " +
+            "WHERE  mod.dataSource = {dataSource}  " +
+            "AND    mod.sourcePdxId = {modelId}  " +
+            "WITH sp " +
+            "OPTIONAL MATCH (sp)-[etr:ENGRAFTMENT_TYPE]-(et:EngraftmentType) " +
+            "OPTIONAL MATCH (sp)-[esr:ENGRAFTMENT_SITE]-(es:EngraftmentSite) " +
+            "OPTIONAL MATCH (sp)-[emr:ENGRAFTMENT_MATERIAL]-(em:EngraftmentMaterial) " +
+            "OPTIONAL MATCH (sp)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
+            "RETURN sp, etr, et, esr, es, emr, em, hsr, hs")
+    List<Specimen> findByDataSourceAndModelId(@Param("dataSource") String dataSource,
+                                              @Param("modelId") String modelId);
 
     @Query("MATCH (mod:ModelCreation)-[sp:SPECIMENS]-(spec:Specimen)-[sfrm:SAMPLED_FROM]-(msamp:Sample) " +
             "            -[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization) " +
@@ -122,6 +138,18 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
 
     @Query("MATCH (mod:ModelCreation)--(sp:Specimen) WHERE mod.sourcePdxId = {modelId} AND mod.dataSource = {dataSource} RETURN sp")
-    List<Specimen> getByModelIdAndDataSource( @Param("modelId") String modelId, @Param("dataSource") String dataSource);
+    List<Specimen> findByModelIdAndDataSource(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
+
+
+
+
+    @Query("MATCH (mod:ModelCreation)--(sp:Specimen)--(hs:HostStrain) " +
+            "WHERE id(mod) = {model} " +
+            "AND sp.passage = {passage} " +
+            "AND hs.symbol = {symbol}" +
+            "WITH sp " +
+            "OPTIONAL MATCH (sp)-[sfr:SAMPLED_FROM]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[pur:PLATFORM_USED]-(pl:Platform) " +
+            "RETURN sp, sfr, s, cbr, mc, pur, pl")
+    Specimen findByModelAndPassageAndNomenClature(@Param("model") ModelCreation modelCreation, @Param("passage") String passage, @Param("symbol") String nomenclature);
 
 }
