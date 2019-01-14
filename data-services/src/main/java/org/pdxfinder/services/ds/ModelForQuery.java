@@ -36,6 +36,7 @@ public class ModelForQuery {
     private String diagnosis;
     private String mappedOntologyTerm;
     private String treatmentHistory;
+    private String treatmentNaive;
     private List<String> mutatedVariants;
     private List<String> dataAvailable;
     private Set<String> allOntologyTermAncestors;
@@ -420,5 +421,13 @@ public class ModelForQuery {
             breastCancerMarkers = new ArrayList<>();
         }
         breastCancerMarkers.add(m);
+    }
+
+    public String getTreatmentNaive() {
+        return treatmentNaive;
+    }
+
+    public void setTreatmentNaive(String treatmentNaive) {
+        this.treatmentNaive = treatmentNaive;
     }
 }

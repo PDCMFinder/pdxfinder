@@ -248,6 +248,7 @@ public class SearchDS {
         //labelIDs should be alphabetically ordered(ER, HER, PR) as per dataprojection requirement
         List<FacetOption> breastCancerMarkerOptions = new ArrayList<>();
         breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR+", "ERpos_HER2pos_PRpos"));
+
         breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR+", "ERneg_HER2pos_PRpos"));
         breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR-", "ERpos_HER2pos_PRneg"));
         breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR-", "ERneg_HER2pos_PRneg"));
