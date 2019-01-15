@@ -179,7 +179,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
             Set<MarkerAssociation> mas = dataImportService.findMarkerAssocsByMolChar(mc);
 
-            List<String> markerList = new ArrayList<>();
+            Set<String> markerSet = new HashSet<>();
 
             if(mas != null){
 
@@ -203,7 +203,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
                                 //discard markers that are not ER, HER2 or PR
                                 if(markerName.toLowerCase().equals("er") || markerName.toLowerCase().equals("her2") || markerName.toLowerCase().equals("pr")) {
-                                    markerList.add(markerName + ihcResult);
+                                    markerSet.add(markerName + ihcResult);
                                 }
                             }
                             else{
@@ -217,12 +217,12 @@ public class CreateDataProjections implements CommandLineRunner{
                     if(count%10000 == 0) {log.info("Processed "+count+" MA objects");}
                     //if (count > 40000) break;
                 }
-
+                List<String> markerList = new ArrayList<>(markerSet);
                 Collections.sort(markerList);
                 String markerResultCombo = markerList.stream().collect(Collectors.joining("_"));
 
                 //log.info("Entry: "+platformName + markerResultCombo + modelId);
-                if(markerResultCombo.split("-").length == 3){
+                if(markerResultCombo.split("_").length == 3){
                     addToTwoParamDP(immunoHistoChemistryDP, platformName, markerResultCombo, modelId);
                 }
                 else{
@@ -550,11 +550,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
             mfq.setDataAvailable(new ArrayList<>(dataAvailable));
 
-            if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
-                mfq.setTreatmentHistory(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());
-            } else {
-                mfq.setTreatmentHistory("Not Specified");
-            }
+
 
             if (mc.getSample().getSampleSite() != null) {
                 mfq.setSampleSampleSite(mc.getSample().getSampleSite().getName());
@@ -582,8 +578,23 @@ public class CreateDataProjections implements CommandLineRunner{
             mfq.setMappedOntologyTerm(mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
 
             if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
-                mfq.setPatientTreatmentStatus(mc.getSample().getPatientSnapshot().getTreatmentNaive().toString());
+                String treatmentNaive = mc.getSample().getPatientSnapshot().getTreatmentNaive();
+
+                if(treatmentNaive.isEmpty()){
+
+                    mfq.setPatientTreatmentStatus("Not Specified");
+                }
+                else if(treatmentNaive.toLowerCase().contains("not")){
+                    mfq.setPatientTreatmentStatus("Not Treatment Naive");
+                }
+                else{
+                    mfq.setPatientTreatmentStatus("Treatment Naive");
+                }
+
+            } else {
+                mfq.setPatientTreatmentStatus("Not Specified");
             }
+
 
             // Sample information
             mfq.setSampleExtractionMethod(mc.getSample().getExtractionMethod());

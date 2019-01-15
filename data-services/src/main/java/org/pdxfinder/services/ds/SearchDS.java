@@ -16,6 +16,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -182,6 +183,17 @@ public class SearchDS {
         patientTumorSection.addComponent(age);
         facetOptionMap.put("patient_age",ageOptions);
 
+        //treatment status filter
+        List<FacetOption> patientTreatmentStatusOptions = new ArrayList<>();
+        patientTreatmentStatusOptions.add(new FacetOption("Treatment Naive", "treatment_naive"));
+        patientTreatmentStatusOptions.add(new FacetOption("Not Treatment Naive", "not_treatment_naive"));
+        patientTreatmentStatusOptions.add(new FacetOption("Not Specified", "Not_Specified"));
+
+        OneParamFilter patientTreatmentStatus = new OneParamFilter("TREATMENT STATUS", "patient_treatment_status", false,
+                FilterType.OneParamFilter.get(), patientTreatmentStatusOptions, new ArrayList<>());
+        patientTumorSection.addComponent(patientTreatmentStatus);
+        facetOptionMap.put("patient_treatment_status", patientTreatmentStatusOptions);
+
         //datasource filter def
         Set<String> datasourceSet = models.stream()
                 .map(ModelForQuery::getDatasource)
@@ -247,14 +259,18 @@ public class SearchDS {
         //Breast cancer markers
         //labelIDs should be alphabetically ordered(ER, HER, PR) as per dataprojection requirement
         List<FacetOption> breastCancerMarkerOptions = new ArrayList<>();
-        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR+", "ERpos_HER2pos_PRpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR+", "ERneg_HER2pos_PRpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR-", "ERpos_HER2pos_PRneg"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR-", "ERneg_HER2pos_PRneg"));
+
         breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR+", "ERpos_HER2neg_PRpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR+", "ERneg_HER2neg_PRpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR-", "ERpos_HER2neg_PRneg"));
         breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR-", "ERneg_HER2neg_PRneg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR-", "ERpos_HER2neg_PRneg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR+", "ERpos_HER2pos_PRpos"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR-", "ERneg_HER2pos_PRneg"));
+
+        //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR+", "ERneg_HER2pos_PRpos"));
+        //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR-", "ERpos_HER2pos_PRneg"));
+        //breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR+", "ERneg_HER2neg_PRpos"));
+
+
 
         OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_markers", false, FilterType.OneParamFilter.get(),
                 breastCancerMarkerOptions, new ArrayList<>());
@@ -553,6 +569,7 @@ public class SearchDS {
                     result = breastCancerMarkersSearch.search(filters.get(SearchFacetName.breast_cancer_markers), result, ModelForQuery::addBreastCancerMarkers);
                     break;
 
+
                 default:
                     //undexpected filter option
                     log.warn("Unrecognised facet {} passed to search, skipping", facet.getName());
@@ -623,7 +640,11 @@ public class SearchDS {
                 mfq.setSampleTumorType(j.getString("sampleTumorType"));
                 mfq.setDiagnosis(j.getString("diagnosis"));
                 mfq.setMappedOntologyTerm(j.getString("mappedOntologyTerm"));
-                mfq.setTreatmentHistory(j.getString("treatmentHistory"));
+
+                if(j.has("patientTreatmentStatus")){
+                    mfq.setPatientTreatmentStatus(j.getString("patientTreatmentStatus"));
+                }
+
 
 
                 JSONArray ja = j.getJSONArray("cancerSystem");
