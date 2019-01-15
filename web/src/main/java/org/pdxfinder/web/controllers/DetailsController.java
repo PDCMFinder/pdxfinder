@@ -22,7 +22,7 @@ import java.util.Set;
 /*
  * Created by abayomi on 09/05/2018.
  */
-@RestController
+@Controller
 public class DetailsController {
 
 
@@ -39,14 +39,14 @@ public class DetailsController {
 
 
     @RequestMapping(value = "/pdx/{dataSrc}/{modelId:.+}")
-    public DetailsDTO details(Model model,
+    public String details(Model model,
                           @PathVariable String dataSrc,
                           @PathVariable String modelId,
                           @RequestParam(value = "page", defaultValue = "0") Integer page,
                           @RequestParam(value = "size", defaultValue = "15000") Integer size) {
 
-       // model.addAttribute("data", detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", ""));
-        return detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", ""); //"details";
+        model.addAttribute("data", detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", ""));
+        return "details";
     }
 
 
