@@ -913,7 +913,7 @@ public class UniversalLoader implements CommandLineRunner {
 
             //Add contact provider and view data
             List<ExternalUrl> externalUrls = new ArrayList<>();
-            externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contactFormLink));
+            externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contactEmail));
             externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, modelLinkToDB));
             model.setExternalUrls(externalUrls);
 
