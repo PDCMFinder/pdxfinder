@@ -35,7 +35,7 @@ import org.apache.poi.ss.usermodel.*;
  */
 
 @Component
-@Order(value = -120)
+@Order(value = 0)
 /**
  *
  * aka UPDOG: Universal PdxData tO Graph

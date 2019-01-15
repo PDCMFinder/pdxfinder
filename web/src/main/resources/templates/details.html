@@ -146,13 +146,14 @@
                             <a href="#patients" style="font-size: 15px; padding: 15px;"> Patient </a>
                         </li>
 
-                        <li th:if="${#lists.isEmpty(data.dataSummary)}"
+                        <li th:if="${ #lists.isEmpty(data.dataSummary) && data.modelTechAndPassages.size() == 0 }"
                             class="tabs-title ">
                             <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link" onclick="initTabs('0')">
                                 Molecular Data (0)
                             </a>
                         </li>
-                        <li th:if="${not #lists.isEmpty(data.dataSummary)}"
+
+                        <li th:if="${ not #lists.isEmpty(data.dataSummary)  && data.modelTechAndPassages.size() != 0 }"
                             class="tabs-title ">
                             <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link" onclick="initTabs('0')">
                                 Molecular Data
