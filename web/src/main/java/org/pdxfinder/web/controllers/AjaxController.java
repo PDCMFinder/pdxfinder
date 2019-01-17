@@ -8,11 +8,15 @@ import org.pdxfinder.services.dto.CountDTO;
 import org.pdxfinder.services.dto.DataAvailableDTO;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.dto.VariationDataDTO;
+import org.pdxfinder.services.pdf.Label;
+import org.pdxfinder.services.pdf.PdfHelper;
+import org.pdxfinder.services.pdf.Report;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +34,8 @@ public class AjaxController {
     private DrugService drugService;
     private GraphService graphService;
 
+    @Autowired
+    PdfService pdfService;
 
     @Autowired
     public AjaxController(AutoCompleteService autoCompleteService,
@@ -66,9 +72,9 @@ public class AjaxController {
     }
 
     @RequestMapping(value = "/autosuggests")
-    List<AutoCompleteOption> getAutoSuggestList(){
+    List<String> getAutoSuggestList(){
 
-        List<AutoCompleteOption> autoSuggestions = autoCompleteService.getAutoSuggestions();
+        List<String> autoSuggestions = autoCompleteService.getAutoSuggestions();
         return autoSuggestions;
     }
 
@@ -239,5 +245,28 @@ public class AjaxController {
         tableColumns.put("10","mAss.rsVariants");
 
         return tableColumns.get(sortcolumn);
+    }
+
+
+    @GetMapping("/pdx/{dataSrc}/{modelId:.+}/pdf-data")
+    public Report pdfView(HttpServletRequest request,
+                          @PathVariable String dataSrc,
+                          @PathVariable String modelId,
+                          @RequestParam(value = "page", defaultValue = "0") Integer page,
+                          @RequestParam(value = "size", defaultValue = "15000") Integer size) {
+
+        Report report = new Report();
+        PdfHelper pdfHelper = new PdfHelper();
+
+        DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", "");
+
+        String modelUrl = Label.WEBSITE + request.getRequestURI();
+        modelUrl = modelUrl.substring(0, modelUrl.length() - 9);
+
+        report.setFooter(pdfService.generateFooter());
+        report.setContent(pdfService.generatePdf(detailsDTO, modelUrl));
+        report.setStyles(pdfHelper.getStyles());
+
+        return report;
     }
 }

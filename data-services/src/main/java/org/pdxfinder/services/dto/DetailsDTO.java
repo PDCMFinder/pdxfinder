@@ -15,6 +15,7 @@ public class DetailsDTO {
     private String externalId;
     private String dataSource;
     private String sourceDescription;
+    private String sourceName;
     private String patientId;
     private String gender;
     private String ageAtCollection;
@@ -72,6 +73,8 @@ public class DetailsDTO {
     private Set<String> autoSuggestList;
     private Map<String, String> platformsAndUrls;
     private List<Map> dataSummary;
+    private int patientDataSize;
+    private int xenograftDataSize;
 
 
 
@@ -94,7 +97,7 @@ public class DetailsDTO {
         this.stage = "";
         this.grade = "";
         this.stageClassification = "";
-        this.gradeClassification = "";
+        this.gradeClassification = "Not Specified";
 
         this.originTissue = "";
         this.sampleSite = "";
@@ -505,5 +508,29 @@ public class DetailsDTO {
 
     public PatientDTO getPatient() {
         return patient;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
+    }
+
+    public int getPatientDataSize() {
+        return patientDataSize;
+    }
+
+    public void setPatientDataSize(int patientDataSize) {
+        this.patientDataSize = patientDataSize;
+    }
+
+    public int getXenograftDataSize() {
+        return xenograftDataSize;
+    }
+
+    public void setXenograftDataSize(int xenograftDataSize) {
+        this.xenograftDataSize = xenograftDataSize;
     }
 }

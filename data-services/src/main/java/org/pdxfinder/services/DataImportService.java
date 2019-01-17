@@ -6,6 +6,7 @@
 package org.pdxfinder.services;
 
 //import org.apache.commons.cli.Option;
+import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.repositories.*;
 import org.pdxfinder.services.ds.Standardizer;
@@ -278,9 +279,9 @@ public class DataImportService {
         return modelCreationRepository.findBySourcePdxIdAndDataSource(modelId, dataSource);
     }
 
-    public ModelCreation findModelByIdAndDataSourceWithSpecimens(String modelId, String dataSource){
+    public ModelCreation findModelByIdAndDataSourceWithSpecimensAndHostStrain(String modelId, String dataSource){
 
-        return modelCreationRepository.findBySourcePdxIdAndDataSourceWithSpecimens(modelId, dataSource);
+        return modelCreationRepository.findBySourcePdxIdAndDataSourceWithSpecimensAndHostStrain(modelId, dataSource);
     }
 
 
@@ -359,7 +360,7 @@ public class DataImportService {
             }
         }
         if (patientSnapshot == null) {
-            log.info("PatientSnapshot for patient '{}' at age '{}' not found. Creating", patient.getExternalId(), age);
+            //log.info("PatientSnapshot for patient '{}' at age '{}' not found. Creating", patient.getExternalId(), age);
             patientSnapshot = new PatientSnapshot(patient, age);
             patientSnapshotRepository.save(patientSnapshot);
         }
@@ -525,9 +526,17 @@ public class DataImportService {
         return sample;
     }
 
+    //public findSampleWithMolcharBySpecimen
+
+
     public Sample findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(String modelId, String dataSource, String sampleId){
 
         return sampleRepository.findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(modelId, dataSource, sampleId);
+    }
+
+    public Sample findHumanSampleWithMolcharByModelIdAndDataSource(String modelId, String dataSource){
+
+        return sampleRepository.findHumanSampleWithMolcharByModelIdAndDataSource(modelId, dataSource);
     }
 
     public Sample getHumanSample(String sampleId, String dataSource){
@@ -545,6 +554,12 @@ public class DataImportService {
     public Sample findXenograftSample(String modelId, String dataSource, String specimenId){
 
         return sampleRepository.findMouseSampleByModelIdAndDataSourceAndSpecimenId(modelId, dataSource, specimenId);
+    }
+
+    public Sample findXenograftSample(String modelId, String dataSource, String passage, String nomenclature){
+
+
+        return sampleRepository.findMouseSampleByModelIdAndDataSourceAndPassageAndNomenclature(modelId, dataSource, passage, nomenclature);
     }
 
 
@@ -630,14 +645,28 @@ public class DataImportService {
         return tumorType;
     }
 
-    public HostStrain getHostStrain(String name, String symbol, String url, String description) {
+    public HostStrain getHostStrain(String name, String symbol, String url, String description) throws Exception{
+
+        if(name == null || symbol == null || symbol.isEmpty()) throw new Exception("Symbol or name is null");
 
         HostStrain hostStrain = hostStrainRepository.findBySymbol(symbol);
+
+
 
         if (hostStrain == null) {
             log.info("Background Strain '{}' not found. Creating", name);
             hostStrain = new HostStrain(name, symbol, description, url);
             hostStrainRepository.save(hostStrain);
+        }
+        else {
+            //if the saved hoststrain's name is empty update the name
+            if(!StringUtils.equals(hostStrain.getName(), name) ){
+
+                hostStrain.setName(name);
+                hostStrainRepository.save(hostStrain);
+
+            }
+
         }
         return hostStrain;
     }
@@ -654,7 +683,7 @@ public class DataImportService {
             marker = markerRepository.findBySymbol(symbol);
         }
         if (marker == null) {
-            log.info("Marker '{}' not found. Creating", name);
+            //log.info("Marker '{}' not found. Creating", name);
             marker = new Marker(symbol, name);
             marker = markerRepository.save(marker);
         }
@@ -681,6 +710,10 @@ public class DataImportService {
     public Set<MarkerAssociation> findMarkerAssocsByMolChar(MolecularCharacterization mc){
 
         return markerAssociationRepository.findByMolChar(mc);
+    }
+    public Set<MarkerAssociation> findMutationByMolChar(MolecularCharacterization mc){
+
+        return markerAssociationRepository.findMutationByMolChar(mc);
     }
 
     public void savePatientSnapshot(PatientSnapshot ps) {
@@ -725,9 +758,16 @@ public class DataImportService {
 
     }
 
+
+    public Specimen findSpecimenByModelAndPassageAndNomenclature(ModelCreation modelCreation, String passage, String nomenclature){
+
+        return specimenRepository.findByModelAndPassageAndNomenClature(modelCreation, passage, nomenclature);
+    }
+
+
     public List<Specimen> getAllSpecimenByModel(String modelId, String dataSource){
 
-        return specimenRepository.getByModelIdAndDataSource(modelId, dataSource);
+        return specimenRepository.findByModelIdAndDataSource(modelId, dataSource);
     }
 
     public void saveSpecimen(Specimen specimen){
@@ -831,7 +871,7 @@ public class DataImportService {
             p = new Platform();
             p.setName(name);
             p.setGroup(group);
-      //      platformRepository.save(p);
+            platformRepository.save(p);
         }
 
         return p;
@@ -956,6 +996,9 @@ public class DataImportService {
      *
      * Creates a (tp:TreatmentProtocol)--(tc:TreatmentComponent)--(d:Drug)
      *           (tp)--(r:Response) node
+     *
+     * If drug names are separated with + it will create multiple components to represent drug combos
+     * Doses should be separated with either + or ;
      */
     public TreatmentProtocol getTreatmentProtocol(String drugString, String doseString, String response, String responseClassification){
 
@@ -1090,4 +1133,24 @@ public class DataImportService {
         return treatmentSummaryRepository.findByPatientSnapshot(ps);
 
     }
+
+
+
+
+
+    public Set<Object> findUnlinkedNodes(){
+
+        return dataProjectionRepository.findUnlinkedNodes();
+    }
+
+    public Set<Object> findPatientsWithMultipleSummaries(){
+
+        return dataProjectionRepository.findPatientsWithMultipleTreatmentSummaries();
+    }
+
+    public Set<Object> findPlatformsWithoutUrl(){
+
+        return dataProjectionRepository.findPlatformsWithoutUrl();
+    }
+
 }

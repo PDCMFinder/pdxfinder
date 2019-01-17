@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title> PDX MODEL </title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.38/pdfmake.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.38/vfs_fonts.js"></script>
+</head>
+<body>
+
+
+<script type="text/javascript" language="JavaScript" th:inline="javascript">
+
+
+    var dd = [[${report}]];
+
+    var option = [[${option}]];
+
+    var modelId = [[${modelId}]];
+
+    //pdfMake.createPdf(docDefinition).open({}, window);
+    //pdfMake.createPdf(dd).open();
+
+    if (option == "view") {
+
+        //Open PDF inside Browser
+        pdfMake.createPdf(dd).open({}, window);
+    }
+    else if (option == "print") {
+
+        // print the PDF
+        pdfMake.createPdf(dd).print();
+    }
+    else {
+
+        // download the PDF
+        pdfMake.createPdf(dd).download(modelId + '.pdf');
+
+
+        setTimeout(function(){
+            window.close();
+        }, 250);
+    }
+
+
+
+</script>
+
+
+</body>
+</html>

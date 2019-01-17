@@ -26,9 +26,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.apache.poi.ss.usermodel.*;
 
@@ -45,6 +43,8 @@ import org.apache.poi.ss.usermodel.*;
 public class UniversalLoader implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(UniversalLoader.class);
+
+    Logger logger = LoggerFactory.getLogger(UniversalLoader.class);
 
     private Options options;
     private CommandLineParser parser;
@@ -95,6 +95,12 @@ public class UniversalLoader implements CommandLineRunner {
      * Placeholder for the data stored in the "sharing and contact" tab
      */
     private List<List<String>> sharingAndContactSheetData;
+
+
+    /**
+     * Placeholder for the data stored in the "breast and or colorectal diagno" tab
+     */
+    private List<List<String>> breastAndOrColorectalDiagnoSheetData;
 
 
     /**
@@ -211,27 +217,28 @@ public class UniversalLoader implements CommandLineRunner {
         pdxModelSheetData = new ArrayList<>();
         pdxModelValidationSheetData = new ArrayList<>();
         derivedDatasetSheetData = new ArrayList<>();
+        breastAndOrColorectalDiagnoSheetData = new ArrayList<>();
         sharingAndContactSheetData = new ArrayList<>();
         loaderRelatedDataSheetData = new ArrayList<>();
 
-        initializeSheetData(workbook.getSheetAt(1), "patientSheetData");
-        initializeSheetData(workbook.getSheetAt(2), "patientTumorSheetData");
-        initializeSheetData(workbook.getSheetAt(3), "patientTreatmentSheetData");
-        initializeSheetData(workbook.getSheetAt(4), "pdxModelSheetData");
-        initializeSheetData(workbook.getSheetAt(5), "pdxModelValidationSheetData");
-        initializeSheetData(workbook.getSheetAt(6), "derivedDatasetSheetData");
-        initializeSheetData(workbook.getSheetAt(7), "sharingAndContactSheetData");
-
-        initializeSheetData(workbook.getSheetAt(9), "loaderRelatedDataSheetData");
+        initializeSheetData(workbook.getSheetAt(1), patientSheetData);
+        initializeSheetData(workbook.getSheetAt(2), patientTumorSheetData);
+        initializeSheetData(workbook.getSheetAt(3), patientTreatmentSheetData);
+        initializeSheetData(workbook.getSheetAt(4), pdxModelSheetData);
+        initializeSheetData(workbook.getSheetAt(5), pdxModelValidationSheetData);
+        initializeSheetData(workbook.getSheetAt(6), derivedDatasetSheetData);
+        initializeSheetData(workbook.getSheetAt(7), sharingAndContactSheetData);
+        initializeSheetData(workbook.getSheetAt(8), breastAndOrColorectalDiagnoSheetData);
+        initializeSheetData(workbook.getSheetAt(9), loaderRelatedDataSheetData);
     }
 
     /**
      * Loads the data from a spreadsheet tab into a placeholder
      *
      * @param sheet
-     * @param sheetName
+     * @param sheetData
      */
-    private void initializeSheetData(Sheet sheet, String sheetName) {
+    private void initializeSheetData(Sheet sheet, List<List<String>> sheetData) {
 
         Iterator<Row> iterator = sheet.iterator();
         int rowCounter = 0;
@@ -275,32 +282,8 @@ public class UniversalLoader implements CommandLineRunner {
             //check if there is some data in the row and they are not all nulls
             if (dataRow.size() > 0 && !isRowOfNulls(dataRow)) {
 
-                //insert the row to the appropriate placeholder
-                if (sheetName.equals("patientSheetData")) {
-
-                    patientSheetData.add(dataRow);
-                } else if (sheetName.equals("patientTumorSheetData")) {
-
-                    patientTumorSheetData.add(dataRow);
-                } else if (sheetName.equals("patientTreatmentSheetData")) {
-
-                    patientTreatmentSheetData.add(dataRow);
-                } else if (sheetName.equals("pdxModelSheetData")) {
-
-                    pdxModelSheetData.add(dataRow);
-                } else if (sheetName.equals("pdxModelValidationSheetData")) {
-
-                    pdxModelValidationSheetData.add(dataRow);
-                } else if (sheetName.equals("derivedDatasetSheetData")) {
-
-                    derivedDatasetSheetData.add(dataRow);
-                } else if (sheetName.equals("sharingAndContactSheetData")) {
-
-                    sharingAndContactSheetData.add(dataRow);
-                } else if (sheetName.equals("loaderRelatedDataSheetData")) {
-
-                    loaderRelatedDataSheetData.add(dataRow);
-                }
+               sheetData.add(dataRow);
+                
 
             }
 
@@ -318,12 +301,16 @@ public class UniversalLoader implements CommandLineRunner {
         createPatientTumors();
         createPatientTreatments();
 
-        createDerivedPatientModelDataset();
+
 
         createPdxModelDetails();
         createPdxModelValidations();
 
+        createDerivedPatientModelDataset();
+
         createSharingAndContacts();
+
+        createBreastAndOrColorectalData();
 
     }
 
@@ -565,120 +552,6 @@ public class UniversalLoader implements CommandLineRunner {
 
     }
 
-    private void createDerivedPatientModelDataset() {
-
-        if (stopLoading) return;
-
-        log.info("******************************************************");
-        log.info("* Creating dataset derived from patients and models  *");
-        log.info("******************************************************");
-
-        int row = 6;
-
-        for (List<String> derivedDatasetRow : derivedDatasetSheetData) {
-
-            String sampleId = derivedDatasetRow.get(0);
-            String origin = derivedDatasetRow.get(1);
-            String passage = derivedDatasetRow.get(2);
-            String nomenclature = derivedDatasetRow.get(3);
-            String modelId = derivedDatasetRow.get(4);
-            String molCharType = derivedDatasetRow.get(5);
-            String platformName = derivedDatasetRow.get(6);
-            String platformTechnology = derivedDatasetRow.get(7);
-            String platformDescription = derivedDatasetRow.get(8);
-            String analysisProtocol = derivedDatasetRow.get(9);
-            //TODO: get additional fields from the sheet
-
-            //check essential values
-
-            if (sampleId.isEmpty() || origin.isEmpty() || passage.isEmpty() || nomenclature.isEmpty() || modelId.isEmpty()
-                    || molCharType.isEmpty() || platformName.isEmpty() || platformTechnology.isEmpty() || platformDescription.isEmpty()
-                    || analysisProtocol.isEmpty()) {
-
-
-                log.error("Missing essential value in row " + row);
-                continue;
-            }
-
-            //need this trick to get rid of 0.0 if there is any
-            //if(passage.equals("0.0")) passage = "0";
-            int passageInt = (int) Float.parseFloat(passage);
-            passage = String.valueOf(passageInt);
-
-            ModelCreation model;
-            Sample sample;
-            Platform platform;
-
-            //patient sample
-            if (origin.toLowerCase().equals("patient")) {
-
-                sample = dataImportService.getHumanSample(sampleId, ds.getAbbreviation());
-
-                if (sample != null) {
-
-                    platform = dataImportService.getPlatform(platformName, ds);
-                    MolecularCharacterization mc = new MolecularCharacterization();
-                    mc.setPlatform(platform);
-                    mc.setType(molCharType);
-                    mc.setTechnology(platformTechnology);
-                    sample.addMolecularCharacterization(mc);
-                    dataImportService.saveSample(sample);
-
-                } else {
-
-                    log.error("Unknown human sample with id: " + sampleId);
-                    continue;
-                }
-
-
-            }
-            //xenograft sample
-            else if (origin.toLowerCase().equals("xenograft")) {
-
-                model = dataImportService.findModelByIdAndDataSourceWithSpecimens(modelId, ds.getAbbreviation());
-
-                if (model != null) {
-
-                    Specimen specimen = dataImportService.getSpecimen(model,
-                            sampleId, ds.getAbbreviation(), passage);
-
-                    sample = dataImportService.getMouseSample(model, sampleId, ds.getAbbreviation(), passage, sampleId);
-
-                    //create molchar, get platform
-
-
-                    platform = dataImportService.getPlatform(platformName, ds);
-                    MolecularCharacterization mc = new MolecularCharacterization();
-                    mc.setPlatform(platform);
-                    mc.setType(molCharType);
-                    mc.setTechnology(platformTechnology);
-                    sample.addMolecularCharacterization(mc);
-                    model.addRelatedSample(sample);
-
-                    specimen.setSample(sample);
-
-                    model.addSpecimen(specimen);
-
-                    dataImportService.saveModelCreation(model);
-                    dataImportService.saveSample(sample);
-                } else {
-
-                    log.error("Model not found with id: " + modelId);
-                    continue;
-                }
-
-            } else {
-
-                log.error("Unknown sample origin in row " + row);
-                continue;
-            }
-
-
-        }
-
-
-    }
-
     private void createPdxModelDetails() {
 
         if (stopLoading) return;
@@ -723,45 +596,36 @@ public class UniversalLoader implements CommandLineRunner {
                 continue;
             }
 
-            //UPDATING SPECIMENS: engraftment site, type and material
+            //CREATING SPECIMENS: engraftment site, type and material
 
             EngraftmentSite es = dataImportService.getImplantationSite(engraftmentSite);
             EngraftmentType et = dataImportService.getImplantationType(engraftmentType);
             EngraftmentMaterial em = dataImportService.createEngraftmentMaterial(engraftmentMaterial, engraftmentMaterialStatus);
-            HostStrain hostStrain = dataImportService.getHostStrain(hostStrainName, hostStrainNomenclature, "", "");
 
-            //passage = all
-            if (passage.toLowerCase().trim().equals("all")) {
-
-                //update all specimens with the same site, type etc.
-                List<Specimen> specimens = dataImportService.getAllSpecimenByModel(modelId, ds.getAbbreviation());
-
-                for (Specimen specimen : specimens) {
-
-                    specimen.setEngraftmentSite(es);
-                    specimen.setEngraftmentType(et);
-                    specimen.setEngraftmentMaterial(em);
-                    specimen.setHostStrain(hostStrain);
-                    dataImportService.saveSpecimen(specimen);
-                }
+            HostStrain hostStrain = null;
+            try{
+                hostStrain = dataImportService.getHostStrain(hostStrainName, hostStrainNomenclature, "", "");
             }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+
             // passage = 1,3,5
-            else if (passage.contains(",")) {
+            if (passage.contains(",")) {
 
                 String[] passageArr = passage.split(",");
 
                 for (int i = 0; i < passageArr.length; i++) {
 
-                    List<Specimen> specimens = dataImportService.findSpecimenByPassage(model, passageArr[i]);
-                    for (Specimen specimen : specimens) {
+                    //create specimens with engraftment data
+                    Specimen specimen = new Specimen();
+                    specimen.setPassage(passageArr[i]);
+                    specimen.setEngraftmentSite(es);
+                    specimen.setEngraftmentType(et);
+                    specimen.setEngraftmentMaterial(em);
+                    specimen.setHostStrain(hostStrain);
 
-                        specimen.setEngraftmentSite(es);
-                        specimen.setEngraftmentType(et);
-                        specimen.setEngraftmentMaterial(em);
-                        specimen.setHostStrain(hostStrain);
-                        dataImportService.saveSpecimen(specimen);
-                    }
-
+                    model.addSpecimen(specimen);
                 }
             }
             //the passage is a single number
@@ -771,17 +635,18 @@ public class UniversalLoader implements CommandLineRunner {
                 int passageInt = Integer.parseInt(passage);
                 passage = String.valueOf(passageInt);
 
-                List<Specimen> specimens = dataImportService.findSpecimenByPassage(model, passage);
-                for (Specimen specimen : specimens) {
+                //create specimens with engraftment data
+                Specimen specimen = new Specimen();
+                specimen.setPassage(passage);
+                specimen.setEngraftmentSite(es);
+                specimen.setEngraftmentType(et);
+                specimen.setEngraftmentMaterial(em);
+                specimen.setHostStrain(hostStrain);
 
-                    specimen.setEngraftmentSite(es);
-                    specimen.setEngraftmentType(et);
-                    specimen.setEngraftmentMaterial(em);
-                    specimen.setHostStrain(hostStrain);
-                    dataImportService.saveSpecimen(specimen);
-                }
+                model.addSpecimen(specimen);
 
-            } else {
+            }
+            else {
 
                 log.error("Not supported value(" + passage + ") for passage at row " + row);
             }
@@ -809,10 +674,9 @@ public class UniversalLoader implements CommandLineRunner {
                     model.addGroup(g);
                 }
 
-                dataImportService.saveModelCreation(model);
             }
 
-
+            dataImportService.saveModelCreation(model);
             row++;
         }
     }
@@ -877,6 +741,136 @@ public class UniversalLoader implements CommandLineRunner {
         }
     }
 
+    private void createDerivedPatientModelDataset() {
+
+        if (stopLoading) return;
+
+        log.info("******************************************************");
+        log.info("* Creating dataset derived from patients and models  *");
+        log.info("******************************************************");
+
+        int row = 6;
+
+        for (List<String> derivedDatasetRow : derivedDatasetSheetData) {
+
+            String sampleId = derivedDatasetRow.get(0);
+            String origin = derivedDatasetRow.get(1);
+            String passage = derivedDatasetRow.get(2);
+            String nomenclature = derivedDatasetRow.get(3);
+            String modelId = derivedDatasetRow.get(4);
+            String molCharType = derivedDatasetRow.get(5);
+            String platformName = derivedDatasetRow.get(6);
+            String platformTechnology = derivedDatasetRow.get(7);
+            String platformDescription = derivedDatasetRow.get(8);
+            String analysisProtocol = derivedDatasetRow.get(9);
+            //TODO: get additional fields from the sheet
+
+            //check essential values
+
+            if (sampleId.isEmpty() || origin.isEmpty() || nomenclature.isEmpty() || modelId.isEmpty()
+                    || molCharType.isEmpty() || platformName.isEmpty() || platformTechnology.isEmpty() || platformDescription.isEmpty()
+                    || analysisProtocol.isEmpty()) {
+
+                log.error("Missing essential value in row " + row);
+                continue;
+            }
+
+
+            ModelCreation model;
+            Sample sample;
+            Platform platform;
+
+            //patient sample
+            if (origin.toLowerCase().equals("patient")) {
+
+                sample = dataImportService.findHumanSample(modelId, ds.getAbbreviation());
+
+                if (sample != null) {
+
+                    platform = dataImportService.getPlatform(platformName, ds);
+                    MolecularCharacterization mc = new MolecularCharacterization();
+                    mc.setPlatform(platform);
+                    mc.setType(molCharType);
+                    mc.setTechnology(platformTechnology);
+                    sample.addMolecularCharacterization(mc);
+                    dataImportService.saveSample(sample);
+
+                } else {
+
+                    log.error("Unknown human sample with id: " + sampleId);
+                    continue;
+                }
+
+
+            }
+
+
+            //xenograft sample
+            //specimen should have been created before
+            else if (origin.toLowerCase().equals("xenograft")) {
+
+                if (passage.isEmpty()) {
+
+                    log.error("Missing essential value Xenograft Passage in row " + row);
+                    continue;
+                }
+
+                //need this trick to get rid of 0.0 if there is any
+                //if(passage.equals("0.0")) passage = "0";
+                int passageInt = (int) Float.parseFloat(passage);
+                passage = String.valueOf(passageInt);
+
+                model = dataImportService.findModelByIdAndDataSourceWithSpecimensAndHostStrain(modelId, ds.getAbbreviation());
+
+                //this specimen should have the appropriate hoststrain, too!
+                Specimen specimen = dataImportService.findSpecimenByModelAndPassageAndNomenclature(model, passage, nomenclature);
+
+                if(specimen != null){
+
+                    sample = specimen.getSample();
+
+                    if(sample == null) {
+
+                        sample = new Sample();
+
+                    }
+
+                    platform = dataImportService.getPlatform(platformName, ds);
+                    MolecularCharacterization mc = new MolecularCharacterization();
+                    mc.setPlatform(platform);
+                    mc.setType(molCharType);
+                    mc.setTechnology(platformTechnology);
+                    sample.addMolecularCharacterization(mc);
+                    model.addRelatedSample(sample);
+
+                    specimen.setSample(sample);
+
+                    model.addSpecimen(specimen);
+                    model.addRelatedSample(sample);
+                    dataImportService.saveModelCreation(model);
+                    dataImportService.saveSample(sample);
+
+                }
+                else{
+                    // either specimen with passage or the host strain nomenclature was not created
+                    log.error("Cannot find specimen with the following details: "+modelId+" "+passage+" "+nomenclature+ " in row: "+row);
+                }
+
+
+            }
+            else{
+                //origin is not patient nor xenograft
+                log.error("Unknown sample origin in row "+row);
+            }
+
+            row++;
+        }
+
+
+
+    }
+
+
     private void createSharingAndContacts() {
 
         if (stopLoading) return;
@@ -894,7 +888,7 @@ public class UniversalLoader implements CommandLineRunner {
             String modelAccessibility = sharingAndContactRow.get(2);
             String accessModalities = sharingAndContactRow.get(3);
             String contactEmail = sharingAndContactRow.get(4);
-            String contanctFormLink = sharingAndContactRow.get(6);
+            String contactFormLink = sharingAndContactRow.get(6);
             String modelLinkToDB = sharingAndContactRow.get(7);
             String providerAbbreviation = sharingAndContactRow.get(9);
             String projectName = sharingAndContactRow.get(10);
@@ -919,7 +913,7 @@ public class UniversalLoader implements CommandLineRunner {
 
             //Add contact provider and view data
             List<ExternalUrl> externalUrls = new ArrayList<>();
-            externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contanctFormLink));
+            externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contactEmail));
             externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, modelLinkToDB));
             model.setExternalUrls(externalUrls);
 
@@ -936,6 +930,8 @@ public class UniversalLoader implements CommandLineRunner {
             ds.setProviderType(dataProviderType);
             ds.setAccessibility(modelAccessibility);
             ds.setAccessModalities(accessModalities);
+            ds.setContact(contactEmail);
+
 
         }
 
@@ -943,6 +939,198 @@ public class UniversalLoader implements CommandLineRunner {
 
     }
 
+
+    private void createBreastAndOrColorectalData(){
+
+        if (stopLoading) return;
+
+        log.info("******************************************************");
+        log.info("* Creating breast and or colorectal markers          *");
+        log.info("******************************************************");
+
+        int row = 6;
+
+        Map<String, MolecularCharacterization> patientMolChars = new HashMap<>();
+        Map<String, MolecularCharacterization> xenoMolChars = new HashMap<>();
+
+        //TODO: At some point deal with micro-satelite instability. Currently those rows are skipped. We don't want instability in our lives just yet.
+
+        //first get all markers for the individual molchar objects
+        for (List<String> dataRow : breastAndOrColorectalDiagnoSheetData) {
+
+            String sampleId = dataRow.get(0);
+            String origin = dataRow.get(1);
+            String passage = dataRow.get(2);
+            String nomenclature = dataRow.get(3);
+            String modelId = dataRow.get(4);
+            String marker = dataRow.get(5);
+            String markerStatus = dataRow.get(6);
+            String technique = dataRow.get(8);
+            String platform = dataRow.get(9);
+
+            if(origin.isEmpty() || modelId.isEmpty() || marker.isEmpty() || markerStatus.isEmpty() || technique.isEmpty() || platform.isEmpty()){
+                log.error("Missing essential value in row " + row);
+                continue;
+            }
+
+            MolecularCharacterization mc;
+            Platform pl;
+
+            if(origin.toLowerCase().equals("patient")){
+
+                //for patient related molchars it is sufficient to use the model id as the key
+                String mapKey = modelId;
+
+                if(patientMolChars.containsKey(mapKey)) {
+                    //get a previously created mc object = platform and type are already set
+                    mc = patientMolChars.get(mapKey);
+                }
+
+                else {
+                    //new mc object, need to set the platform, too
+                    pl = dataImportService.getPlatform(technique, ds);
+
+                    mc = new MolecularCharacterization();
+                    mc.setPlatform(pl);
+
+                    if(technique.toLowerCase().equals("immunohistochemistry")){
+                        mc.setType("IHC");
+                    }
+                }
+
+                Marker m = dataImportService.getMarker(marker, marker);
+                MarkerAssociation ma = new MarkerAssociation();
+                ma.setMarker(m);
+
+                if(technique.toLowerCase().equals("immunohistochemistry")){
+
+                    ma.setImmunoHistoChemistryResult(markerStatus);
+                }
+                //what if it is not ihc?
+
+                mc.addMarkerAssociation(ma);
+
+                //put molchar in the map if it was just created, but don't store molchars without type
+                if(!patientMolChars.containsKey(mapKey) && mc.getType()!= null){
+                    patientMolChars.put(mapKey, mc);
+                }
+
+
+            }
+            else if(origin.toLowerCase().equals("xenograft")){
+
+                //need this trick to get rid of 0.0 if there is any
+                int passageInt = (int) Float.parseFloat(passage);
+                passage = String.valueOf(passageInt);
+
+                //for xenograft molchars use the combination of the modelid, nomenclature and passage as the key
+                String mapKey = modelId + "___" + nomenclature + "___" + passage;
+
+                if(xenoMolChars.containsKey(mapKey)) {
+                    //get a previously created mc object = platform and type are already set
+                    mc = xenoMolChars.get(mapKey);
+                }
+                else {
+                    //new mc object, need to set the platform, too
+                    pl = dataImportService.getPlatform(technique, ds);
+
+                    mc = new MolecularCharacterization();
+                    mc.setPlatform(pl);
+
+                    if(technique.toLowerCase().equals("immunohistochemistry")){
+                        mc.setType("IHC");
+                    }
+                }
+
+                Marker m = dataImportService.getMarker(marker, marker);
+                MarkerAssociation ma = new MarkerAssociation();
+                ma.setMarker(m);
+
+                if(technique.toLowerCase().equals("immunohistochemistry")){
+
+                    ma.setImmunoHistoChemistryResult(markerStatus);
+                }
+                //what if it is not ihc?
+
+                mc.addMarkerAssociation(ma);
+                //but don't store molchars without type
+                if(!xenoMolChars.containsKey(mapKey) && mc.getType()!= null){
+                    xenoMolChars.put(mapKey, mc);
+                }
+
+            }
+
+
+
+            row++;
+        }
+
+
+        //get the corresponding samples for the molchar objects, link them and save them.
+        //patient samples
+        for(Map.Entry<String, MolecularCharacterization> entry:patientMolChars.entrySet()){
+            //key = model ID
+            String key = entry.getKey();
+            MolecularCharacterization mc = entry.getValue();
+
+            Sample patientSample = dataImportService.findHumanSample(key, ds.getAbbreviation());
+
+            if(patientSample != null){
+
+                patientSample.addMolecularCharacterization(mc);
+                dataImportService.saveSample(patientSample);
+            }
+            else{
+
+                log.error("Failed to create molchar for patient sample! Model:"+key);
+            }
+
+        }
+
+        //xeno samples
+        for(Map.Entry<String, MolecularCharacterization> entry:xenoMolChars.entrySet()){
+            //key =  modelId + "___" + nomenclature + "___" + passage
+
+            MolecularCharacterization mc = entry.getValue();
+            String[] keyArr = entry.getKey().split("___");
+
+            String modelId = keyArr[0];
+            String nomenclature = keyArr[1];
+            String passage = keyArr[2];
+
+            ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
+            Specimen specimen = dataImportService.findSpecimenByModelAndPassageAndNomenclature(model, passage, nomenclature);
+
+            if(specimen != null){
+
+                Sample xenoSample = specimen.getSample();
+
+                if(xenoSample == null){
+                    xenoSample = new Sample();
+
+                }
+
+                xenoSample.addMolecularCharacterization(mc);
+                specimen.setSample(xenoSample);
+                model.addRelatedSample(xenoSample);
+                dataImportService.saveSpecimen(specimen);
+                dataImportService.saveModelCreation(model);
+
+            }
+            else{
+                log.error("Specimen not found. Model:"+modelId +" Passage: "+passage +" Nomenclature: "+nomenclature);
+            }
+
+
+
+
+        }
+
+        log.info("******************************************************");
+        log.info("* Finished creating breast and or colorectal markers *");
+        log.info("******************************************************");
+
+    }
 
     /**
      * Checks if a list consists of nulls only

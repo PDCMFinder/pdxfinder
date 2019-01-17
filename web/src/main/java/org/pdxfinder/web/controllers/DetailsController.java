@@ -5,11 +5,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.pdxfinder.services.DetailsService;
+import org.pdxfinder.services.PdfService;
+import org.pdxfinder.services.dto.DetailsDTO;
+import org.pdxfinder.services.pdf.Label;
+import org.pdxfinder.services.pdf.PdfHelper;
+import org.pdxfinder.services.pdf.Report;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Set;
 
@@ -21,6 +27,9 @@ public class DetailsController {
 
 
     private DetailsService detailsService;
+
+    @Autowired
+    PdfService pdfService;
 
 
     @Autowired
@@ -85,6 +94,33 @@ public class DetailsController {
         return output;
 
 
+    }
+
+
+    @GetMapping("/pdx/{dataSrc}/{modelId:.+}/pdf")
+    public String pdfView(Model model, HttpServletResponse response,HttpServletRequest request,
+                          @PathVariable String dataSrc,
+                          @PathVariable String modelId,
+                          @RequestParam(value = "option", defaultValue = "download") String option) {
+
+        Report report = new Report();
+        PdfHelper pdfHelper = new PdfHelper();
+
+        DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId);
+
+        String modelUrl = Label.WEBSITE + request.getRequestURI();
+
+        modelUrl = modelUrl.substring(0, modelUrl.length() - 4);
+
+        report.setFooter(pdfService.generateFooter());
+        report.setContent(pdfService.generatePdf(detailsDTO, modelUrl));
+        report.setStyles(pdfHelper.getStyles());
+
+        model.addAttribute("report", report);
+        model.addAttribute("option", option);
+        model.addAttribute("modelId", detailsDTO.getModelId());
+
+        return "pdf-generator";
     }
 
 

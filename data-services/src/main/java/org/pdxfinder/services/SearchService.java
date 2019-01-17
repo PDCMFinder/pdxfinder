@@ -13,10 +13,7 @@ import org.pdxfinder.services.ds.FacetOption;
 import org.pdxfinder.services.ds.ModelForQuery;
 import org.pdxfinder.services.ds.SearchDS;
 import org.pdxfinder.services.ds.SearchFacetName;
-import org.pdxfinder.services.dto.DrugSummaryDTO;
-import org.pdxfinder.services.dto.ExportDTO;
-import org.pdxfinder.services.dto.SearchDTO;
-import org.pdxfinder.services.dto.WebSearchDTO;
+import org.pdxfinder.services.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -40,12 +37,12 @@ public class SearchService {
 
     private SearchDS searchDS;
 
-    List<String> patientAgeOptions = SearchDS.PATIENT_AGE_OPTIONS;
-    List<String> datasourceOptions = SearchDS.DATASOURCE_OPTIONS;
-    List<String> cancerBySystemOptions = SearchDS.CANCERS_BY_SYSTEM_OPTIONS;
-    List<String> patientGenderOptions = SearchDS.PATIENT_GENDERS;
-    List<String> sampleTumorTypeOptions = SearchDS.SAMPLE_TUMOR_TYPE_OPTIONS;
-    List<String> dataAvailableOptions = SearchDS.DATA_AVAILABLE_OPTIONS;
+    List<String> patientAgeOptions = new ArrayList<>();
+    List<String> datasourceOptions = new ArrayList<>();
+    List<String> cancerBySystemOptions = new ArrayList<>();
+    List<String> patientGenderOptions = new ArrayList<>();
+    List<String> sampleTumorTypeOptions = new ArrayList<>();
+    List<String> dataAvailableOptions = new ArrayList<>();
 
 
 
@@ -93,6 +90,7 @@ public class SearchService {
                                   Optional<List<String>> drug,
                                   Optional<List<String>> project,
                                   Optional<List<String>> data_available,
+                                  Optional<List<String>> breast_cancer_markers,
                                   Integer page,
                                   Integer size){
 
@@ -110,140 +108,21 @@ public class SearchService {
                 mutation,
                 drug,
                 project,
-                data_available
+                data_available,
+                breast_cancer_markers
         );
 
         WebSearchDTO wsDTO = new WebSearchDTO();
 
-
+        //PERFORM SEARCH
         Set<ModelForQuery> results = searchDS.search(configuredFacets);
 
+        //UPDATE SEARCH FILTERS (what is selected)
+        wsDTO.setWebFacetsContainer(searchDS.getUpdatedSelectedFilters(configuredFacets));
 
-        List<FacetOption> patientAgeSelected = searchDS.getFacetOptions(SearchFacetName.patient_age, patientAgeOptions, results, patient_age.orElse(null));
-        List<FacetOption> patientGenderSelected = searchDS.getFacetOptions(SearchFacetName.patient_gender, patientGenderOptions, results, patient_gender.orElse(null));
-        List<FacetOption> datasourceSelected = searchDS.getFacetOptions(SearchFacetName.datasource, datasourceOptions, results, datasource.orElse(null));
-        List<FacetOption> cancerSystemSelected = searchDS.getFacetOptions(SearchFacetName.cancer_system, cancerBySystemOptions, results, cancer_system.orElse(null));
-        List<FacetOption> sampleTumorTypeSelected = searchDS.getFacetOptions(SearchFacetName.sample_tumor_type, sampleTumorTypeOptions, results, sample_tumor_type.orElse(null));
-        List<FacetOption> mutationSelected = searchDS.getFacetOptions(SearchFacetName.mutation, null, results, mutation.orElse(null));
-        List<FacetOption> drugSelected = searchDS.getFacetOptions(SearchFacetName.drug, null, results, drug.orElse(null));
-        List<FacetOption> projectSelected = searchDS.getFacetOptions(SearchFacetName.project, null, results, project.orElse(null));
-        List<FacetOption> dataAvailableSelected = searchDS.getFacetOptions(SearchFacetName.data_available, dataAvailableOptions, configuredFacets);
-
-        wsDTO.setPatientAgeSelected(patientAgeSelected);
-        wsDTO.setPatientGenderSelected(patientGenderSelected);
-        wsDTO.setDatasourceSelected(datasourceSelected);
-        wsDTO.setCancerSystemSelected(cancerSystemSelected);
-        wsDTO.setSampleTumorTypeSelected(sampleTumorTypeSelected);
-        wsDTO.setMutationSelected(mutationSelected);
-        wsDTO.setProjectSelected(projectSelected);
-        wsDTO.setDataAvailableSelected(dataAvailableSelected);
-
-
-
-
-        // Only add diagnosisSelected if diagnosis has actually been specified
-        List<FacetOption> diagnosisSelected = null;
-        if (diagnosis.isPresent()) {
-            diagnosisSelected = searchDS.getFacetOptions(SearchFacetName.diagnosis, null, results, diagnosis.orElse(null));
-        }
-
-        // Ensure to add the facet options to this list so the URL encoding retains the configured options
-        String facetString = getFacetString(
-                new HashSet<>(
-                        Arrays.asList(
-                                patientAgeSelected,
-                                patientGenderSelected,
-                                datasourceSelected,
-                                cancerSystemSelected,
-                                sampleTumorTypeSelected,
-                                mutationSelected,
-                                drugSelected,
-                                projectSelected
-
-                        )
-                )
-        );
-
-        // If there is a query, append the query parameter to any configured facet string
-        if (query.isPresent() && !query.get().isEmpty()) {
-            facetString = StringUtils.join(Arrays.asList("query=" + query.get(), facetString), "&");
-        }
-
-        // If there is a diagnosis, append the diagnosis parameters to any configured facet string
-        if (diagnosis.isPresent() && !diagnosis.get().isEmpty()) {
-            for (String diag : diagnosis.get()) {
-                facetString = StringUtils.join(Arrays.asList("diagnosis=" + diag, facetString), "&");
-            }
-        }
-
-
-        if (mutation.isPresent() && !mutation.get().isEmpty()) {
-            List<String> mutList = new ArrayList<>();
-            for (String mut : mutation.get()) {
-                mutList.add("mutation=" + mut);
-            }
-
-            if (facetString.length() != 0 && !facetString.endsWith("&")) {
-                facetString += "&";
-            }
-            for (String mut : mutList) {
-                facetString += mut + "&";
-            }
-
-        }
-
-
-        if (drug.isPresent() && !drug.get().isEmpty()) {
-            List<String> drugList = new ArrayList<>();
-            for (String d : drug.get()) {
-                drugList.add("drug=" + d);
-            }
-
-            if (facetString.length() != 0 && !facetString.endsWith("&")) {
-                facetString += "&";
-            }
-            for (String d : drugList) {
-                facetString += d + "&";
-            }
-
-        }
-
-        if(project.isPresent() && !project.get().isEmpty()){
-
-            List<String> projectList = new ArrayList<>();
-            for(String p : project.get()){
-                projectList.add("project=" + p);
-            }
-
-            if (facetString.length() != 0 && !facetString.endsWith("&")) {
-                facetString += "&";
-            }
-            for (String p : projectList) {
-                facetString += p + "&";
-            }
-
-
-        }
-        if(data_available.isPresent() && !data_available.get().isEmpty()){
-
-            List<String> dataAvList = new ArrayList<>();
-            for(String p : data_available.get()){
-                dataAvList.add("data_available=" + p);
-            }
-
-            if (facetString.length() != 0 && !facetString.endsWith("&")) {
-                facetString += "&";
-            }
-            for (String p : dataAvList) {
-                facetString += p + "&";
-            }
-
-
-        }
-
-
+        //UPDATE FACET STRING
+        String facetString = getFacetString(configuredFacets);
         wsDTO.setFacetString(facetString);
-
 
 
         // Num pages is converted to an int using this formula int n = a / b + (a % b == 0) ? 0 : 1;
@@ -266,155 +145,25 @@ public class SearchService {
         int end = Math.min(begin + 7, numPages);
         wsDTO.setEndIndex(end);
 
-        String mutatedMarkers = molCharService.getMutatedMarkersAndVariants();
-        wsDTO.setMutatedMarkersAndVariants(mutatedMarkers);
-
-        String textSearchDescription = getTextualDescription(facetString, results);
-        wsDTO.setTextSearchDescription(textSearchDescription);
-
-        boolean mutSelected = false;
-        boolean drSelected = false;
-        boolean dataAvailablePresent = true;
-
-        if(mutation.isPresent() && !mutation.get().isEmpty()){
-            mutSelected = true;
-            dataAvailablePresent = false;
-        }
-
-        if(drug.isPresent() && !drug.get().isEmpty()){
-            drSelected = true;
-            dataAvailablePresent = false;
-        }
-
-        wsDTO.setAutoCompleteOptions(autoCompleteService.getAutoSuggestions());
-        List<ModelForQuery> resultSet = new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size()));
-
-        wsDTO.setSearchResults(resultSet);
-        wsDTO.setPlatformsAndUrls(platformService.getPlatformsWithUrls());
-
-        if (mutSelected == true){
-            wsDTO.setPlatformMap(getPlatformOrMutationFromMutatedVariants(resultSet,"platformMap"));
-            wsDTO.setMutationMap(getPlatformOrMutationFromMutatedVariants(resultSet,"mutationMap"));
-        }
-
-        if(drSelected){
-
-
-        }
-
-        wsDTO.setDataAvailableColumnPresent(dataAvailablePresent);
-        wsDTO.setIsMutationSelected(mutSelected);
-        wsDTO.setIsDrugSelected(drSelected);
-        wsDTO.setQuery(query.orElse(""));
-        wsDTO.setTotalResults(results.size());
         wsDTO.setPage(page);
         wsDTO.setSize(size);
-        wsDTO.setDiagnosisSelected(diagnosisSelected);
-        wsDTO.setProjectSelected(projectSelected);
-        wsDTO.setFacetOptions(facets);
 
+        String textSearchDescription = getTextualDescription(facetString, results);
 
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, List<String>> mapObject = new HashMap<>();
-        try{
-            mapObject = mapper.readValue(mutatedMarkers, Map.class);
-        }catch (Exception e){}
+        if(textSearchDescription == null){
+            textSearchDescription = "PDXFinder contains "+searchDS.getModels().size()+" models";
+        }
+        wsDTO.setTextSearchDescription(textSearchDescription);
 
+        wsDTO.setMainSearchFieldOptions(autoCompleteService.getAutoSuggestions());
 
-        String done = "";
-        Map<String, List<String>> userChoice = new HashMap<>();
-        Map<String, Set<String>> allVariants = new LinkedHashMap<>();
+        List<ModelForQuery> resultSet = new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size()));
 
-        try {
-            for (String markerReq : mutation.get()) {
-                String marka = markerReq.split("___")[0];
-                List<String> variantList = new ArrayList<>();
-                String variant = "";
+        wsDTO.setResults(resultSet);
 
-                if (!done.contains(marka)) { // New Marker
-                    for (String markerReq2 : mutation.get()) {
-                        if (marka.equals(markerReq2.split("___")[0])){
-                            variant = markerReq2.split("___")[2];
-                            if (variant.equals("ALL")){
-                                variantList = mapObject.get(marka);
-                            }
-                            else {
-                                variantList.add(variant);
-                            }
-                        }
-                    }
-                    userChoice.put(marka,variantList);
+        //Update results table headers
+        wsDTO.setAdditionalResultTableHeaders(getNewResultHeaders(configuredFacets));
 
-                    Set<String> sortedVariantList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-                    sortedVariantList.addAll(mapObject.get(marka));
-
-                    allVariants.put(marka,sortedVariantList);
-                }
-
-                done += marka;
-            }
-        }catch (Exception e){}
-
-        wsDTO.setMarkerMap(userChoice);
-        wsDTO.setMarkerMapWithAllVariants(allVariants);
-
-
-
-
-
-        List<String> drugResponses = drugService.getSpecimenDrugResponseOptions();
-
-        // Capitalize and Remove duplicates from drugResponses
-        drugResponses = drugResponses.stream().map(WordUtils::capitalize).collect(Collectors.toList());
-        drugResponses = drugResponses.stream().distinct().collect(Collectors.toList());
-
-
-        done = "";
-        Map<String, List<String>> drugResponseChoice = new HashMap<>();
-        Map<String, Set<String>> allDrugResponses = new LinkedHashMap<>();
-
-        try {
-
-            for (String drugReq : drug.get()) {
-                String disDrug = drugReq.split("___")[0];
-                List<String> userDrugResponseList = new ArrayList<>();
-                String drugResponse = "";
-
-
-                if ( !done.contains(disDrug)  || disDrug.isEmpty() ) {
-
-                    for (String drugReq2 : drug.get()) {
-
-                        if (disDrug.equals(drugReq2.split("___")[0])){
-                            drugResponse = drugReq2.split("___")[1];
-                            if (drugResponse.equals("ALL")){
-                                userDrugResponseList = drugResponses;
-                            }
-                            else {
-                                userDrugResponseList.add(drugResponse);
-                            }
-                        }
-                    }
-
-                    Set<String> sortedDrugResponseList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-                    sortedDrugResponseList.addAll(drugResponses);
-
-                    drugResponseChoice.put(disDrug,userDrugResponseList);
-                    allDrugResponses.put(disDrug,sortedDrugResponseList);
-                }
-
-                done += disDrug;
-            }
-        }catch (Exception e){      }
-
-        wsDTO.setDrugMap(drugResponseChoice);
-        wsDTO.setDrugMapWithAllResponses(allDrugResponses);
-
-
-        wsDTO.setDrugNames(drugService.getDrugNames());
-        wsDTO.setDrugResponses(drugResponses);
-
-        wsDTO.setProjects(searchDS.getProjectOptions());
 
         return wsDTO;
     }
@@ -433,7 +182,8 @@ public class SearchService {
                             Optional<List<String>> mutation,
                             Optional<List<String>> drug,
                             Optional<List<String>> project,
-                            Optional<List<String>> data_available){
+                            Optional<List<String>> data_available,
+                            Optional<List<String>> breast_cancer_markers){
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
                 query,
@@ -448,7 +198,8 @@ public class SearchService {
                 mutation,
                 drug,
                 project,
-                data_available
+                data_available,
+                breast_cancer_markers
 
         );
 
@@ -458,6 +209,8 @@ public class SearchService {
 
         return eDTO;
     }
+
+
 
     private Map<SearchFacetName, List<String>> getFacetMap(
             Optional<String> query,
@@ -472,7 +225,8 @@ public class SearchService {
             Optional<List<String>> mutation,
             Optional<List<String>> drug,
             Optional<List<String>> project,
-            Optional<List<String>> data_available
+            Optional<List<String>> data_available,
+            Optional<List<String>> breast_cancer_markers
 
 
             ) {
@@ -568,6 +322,13 @@ public class SearchService {
             }
         }
 
+        if (breast_cancer_markers.isPresent() && !breast_cancer_markers.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.breast_cancer_markers, new ArrayList<>());
+            for (String s : breast_cancer_markers.get()) {
+                configuredFacets.get(SearchFacetName.breast_cancer_markers).add(s);
+            }
+        }
+
         return configuredFacets;
     }
 
@@ -577,14 +338,17 @@ public class SearchService {
      * @param allSelectedFacetOptions
      * @return
      */
-    private String getFacetString(Set<List<FacetOption>> allSelectedFacetOptions) {
+    private String getFacetString(Map<SearchFacetName, List<String>> allSelectedFacetOptions) {
+
         List<String> pieces = new ArrayList<>();
-        for (List<FacetOption> facetOptions : allSelectedFacetOptions) {
-            pieces.add(facetOptions.stream()
-                    .filter(x -> x.getSelected() != null)
-                    .filter(FacetOption::getSelected)
-                    .map(x -> x.getFacetType() + "=" + x.getName())
-                    .collect(Collectors.joining("&")));
+
+        for (Map.Entry<SearchFacetName,List<String>> facet : allSelectedFacetOptions.entrySet()) {
+
+            for(String filterVal : facet.getValue()){
+
+                pieces.add(facet.getKey().getName() + "=" +filterVal);
+            }
+
         }
         return pieces.stream().filter(x -> !x.isEmpty()).collect(Collectors.joining("&"));
     }
@@ -640,6 +404,40 @@ public class SearchService {
     }
 
 
+
+    public List<String> getNewResultHeaders(Map<SearchFacetName, List<String>> filters){
+
+        List<String> headers= new ArrayList<>();
+
+        for (SearchFacetName facet : filters.keySet()) {
+
+
+            switch(facet){
+
+                case mutation:
+                    headers.add("MUTATIONS");
+                    break;
+
+                case drug:
+                    headers.add("DRUG AND RESPONSE");
+                    break;
+
+                case breast_cancer_markers:
+                    headers.add("BREAST CANCER MARKERS");
+                    break;
+
+                case patient_treatment_status:
+                    headers.add("PATIENT TREATMENT STATUS");
+            }
+
+        }
+
+        if(headers.isEmpty()){
+            headers.add("DATA AVAILABLE");
+        }
+
+        return headers;
+    }
 
 
     public int modelCount() {

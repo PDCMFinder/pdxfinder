@@ -1,96 +1,30 @@
 package org.pdxfinder.services.ds;
 
-import java.util.Objects;
+public class FacetOption{
 
-public class FacetOption implements Comparable {
+    //an option that is being displayed on the screen
+    String label;
+    //an url safe equivalent that can be used for html ids
+    String labelId;
 
-    String name;
-    Integer count;
-    Integer totalCount;
-    Boolean selected;
-    SearchFacetName facetType;
-
-    public FacetOption(String name, Integer count) {
-        this.name = name;
-        this.count = count;
+    public FacetOption(String label, String labelId) {
+        this.label = label;
+        this.labelId = labelId;
     }
 
-    public FacetOption(String name, Integer count, Boolean selected) {
-        this.name = name;
-        this.count = count;
-        this.selected = selected;
+    public String getLabel() {
+        return label;
     }
 
-    public FacetOption(String name, Integer count, Integer totalCount, Boolean selected, SearchFacetName facetType) {
-        this.name = name;
-        this.count = count;
-        this.totalCount = totalCount;
-        this.selected = selected;
-        this.facetType = facetType;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
-
-    public void increment() {
-        this.count += 1;
+    public String getLabelId() {
+        return labelId;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getCount() {
-        return count;
-    }
-
-    public void setCount(Integer count) {
-        this.count = count;
-    }
-
-    public Boolean getSelected() {
-        return selected;
-    }
-
-    public void setSelected(Boolean selected) {
-        this.selected = selected;
-    }
-
-    public SearchFacetName getFacetType() {
-        return facetType;
-    }
-
-    public void setFacetType(SearchFacetName facetType) {
-        this.facetType = facetType;
-    }
-
-    public Integer getTotalCount() {
-        return totalCount;
-    }
-
-    public void setTotalCount(Integer totalCount) {
-        this.totalCount = totalCount;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        FacetOption that = (FacetOption) o;
-        return Objects.equals(name, that.name) &&
-                facetType == that.facetType;
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(name, facetType);
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        return this.name.compareTo(((FacetOption) o).getName());
+    public void setLabelId(String labelId) {
+        this.labelId = labelId;
     }
 }

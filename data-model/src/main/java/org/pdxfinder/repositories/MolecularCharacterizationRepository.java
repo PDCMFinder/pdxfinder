@@ -22,8 +22,8 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
             "WHERE mod.sourcePdxId = {modelId} " +
             "AND mod.dataSource = {dataSource} " +
             "WITH samp " +
-            "MATCH (samp)--(molch:MolecularCharacterization)--(pl:Platform) " +
-            "RETURN distinct molch  ")
+            "MATCH (samp)--(molch:MolecularCharacterization)-[plr:PLATFORM_USED]-(pl:Platform) " +
+            "RETURN distinct molch, plr, pl  ")
     List<MolecularCharacterization> findPatientPlatformByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
 
