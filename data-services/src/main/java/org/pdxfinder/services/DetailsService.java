@@ -1,5 +1,6 @@
 package org.pdxfinder.services;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.dao.*;
@@ -449,7 +450,8 @@ public class DetailsService {
 
 
         Map<String, String> techNPassToSampleId = new HashMap<>();
-        List<Map> dataSummaryList = new ArrayList<>();
+        List<Map> patientDataSummaryList = new ArrayList<>();
+        List<Map> xenograftDataSummaryList = new ArrayList<>();
 
 
 
@@ -463,9 +465,10 @@ public class DetailsService {
             dataSummary.put("platformUsed",entry.getValue());
             dataSummary.put("rawData","Not Available");
 
-            dataSummaryList.add(dataSummary);
+            patientDataSummaryList.add(dataSummary);
 
         }
+
 
         for (String tech : modelTechAndPassages.keySet()) {
 
@@ -497,7 +500,7 @@ public class DetailsService {
                     dataSummary.put("platformUsed",tech);
                     dataSummary.put("rawData","Not Available");
 
-                    dataSummaryList.add(dataSummary);
+                    xenograftDataSummaryList.add(dataSummary);
                 }
 
                 // Create a Key Value map of (Technology+Passage , sampleIDs) and Pass to DTO
@@ -510,7 +513,13 @@ public class DetailsService {
                 // RawData -
             }
         }
+
+        List<Map> dataSummaryList = ListUtils.union(patientDataSummaryList, xenograftDataSummaryList);
+
         dto.setDataSummary(dataSummaryList);
+        dto.setPatientDataSize(patientDataSummaryList.size());
+        dto.setXenograftDataSize(xenograftDataSummaryList.size());
+
         dto.setTechNPassToSampleId(techNPassToSampleId);
 
         Set<String> autoSuggestList = graphService.getMappedNCITTerms();

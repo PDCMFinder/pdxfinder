@@ -44,6 +44,8 @@ public class UniversalLoader implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(UniversalLoader.class);
 
+    Logger logger = LoggerFactory.getLogger(UniversalLoader.class);
+
     private Options options;
     private CommandLineParser parser;
     private CommandLine cmd;
@@ -886,7 +888,7 @@ public class UniversalLoader implements CommandLineRunner {
             String modelAccessibility = sharingAndContactRow.get(2);
             String accessModalities = sharingAndContactRow.get(3);
             String contactEmail = sharingAndContactRow.get(4);
-            String contanctFormLink = sharingAndContactRow.get(6);
+            String contactFormLink = sharingAndContactRow.get(6);
             String modelLinkToDB = sharingAndContactRow.get(7);
             String providerAbbreviation = sharingAndContactRow.get(9);
             String projectName = sharingAndContactRow.get(10);
@@ -911,7 +913,7 @@ public class UniversalLoader implements CommandLineRunner {
 
             //Add contact provider and view data
             List<ExternalUrl> externalUrls = new ArrayList<>();
-            externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contanctFormLink));
+            externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contactEmail));
             externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, modelLinkToDB));
             model.setExternalUrls(externalUrls);
 
@@ -928,6 +930,8 @@ public class UniversalLoader implements CommandLineRunner {
             ds.setProviderType(dataProviderType);
             ds.setAccessibility(modelAccessibility);
             ds.setAccessModalities(accessModalities);
+            ds.setContact(contactEmail);
+
 
         }
 
@@ -949,7 +953,7 @@ public class UniversalLoader implements CommandLineRunner {
         Map<String, MolecularCharacterization> patientMolChars = new HashMap<>();
         Map<String, MolecularCharacterization> xenoMolChars = new HashMap<>();
 
-        //TODO: At some point deal with microsatelite instability. Currently those rows are skipped. We don't want instability in our lives just yet.
+        //TODO: At some point deal with micro-satelite instability. Currently those rows are skipped. We don't want instability in our lives just yet.
 
         //first get all markers for the individual molchar objects
         for (List<String> dataRow : breastAndOrColorectalDiagnoSheetData) {

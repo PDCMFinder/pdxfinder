@@ -27,7 +27,7 @@ public interface PlatformRepository extends PagingAndSortingRepository<Platform,
 
 
     @Query("MATCH (mod:ModelCreation)--(spec:Specimen)--(msamp:Sample)--(molchar:MolecularCharacterization)-->(plat:Platform) " +
-            "WHERE mod.dataSource = {dataSource} AND mod.sourcePdxId={modelId} " +
+            "WHERE mod.dataSource = {dataSource} AND mod.sourcePdxId={modelId}  AND molchar.type='mutation' " +
             "RETURN distinct plat")
     List<Platform> findModelPlatformByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 

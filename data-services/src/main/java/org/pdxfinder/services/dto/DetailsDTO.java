@@ -73,6 +73,8 @@ public class DetailsDTO {
     private Set<String> autoSuggestList;
     private Map<String, String> platformsAndUrls;
     private List<Map> dataSummary;
+    private int patientDataSize;
+    private int xenograftDataSize;
 
 
 
@@ -514,5 +516,21 @@ public class DetailsDTO {
 
     public void setSourceName(String sourceName) {
         this.sourceName = sourceName;
+    }
+
+    public int getPatientDataSize() {
+        return patientDataSize;
+    }
+
+    public void setPatientDataSize(int patientDataSize) {
+        this.patientDataSize = patientDataSize;
+    }
+
+    public int getXenograftDataSize() {
+        return xenograftDataSize;
+    }
+
+    public void setXenograftDataSize(int xenograftDataSize) {
+        this.xenograftDataSize = xenograftDataSize;
     }
 }
