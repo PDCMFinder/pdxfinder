@@ -456,7 +456,7 @@ public class DetailsService {
 
 
         //add patient samples first - if any
-        for(Map.Entry<String, String> entry: patientTech.entrySet()){
+        /*for(Map.Entry<String, String> entry: patientTech.entrySet()){
             Map<String, String> dataSummary = new HashMap<>();
             dataSummary.put("sampleId", "Patient Sample");
             dataSummary.put("sampleType", "Patient Sample");
@@ -467,7 +467,7 @@ public class DetailsService {
 
             patientDataSummaryList.add(dataSummary);
 
-        }
+        }*/
 
 
         for (String tech : modelTechAndPassages.keySet()) {
