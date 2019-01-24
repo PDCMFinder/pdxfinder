@@ -978,8 +978,8 @@ public class UniversalLoader implements CommandLineRunner {
 
             if(origin.toLowerCase().equals("patient")){
 
-                //for patient related molchars it is sufficient to use the model id as the key
-                String mapKey = modelId;
+                //for patient related molchars it is sufficient to use the model + platform as the key
+                String mapKey = modelId + "___" + technique;
 
                 if(patientMolChars.containsKey(mapKey)) {
                     //get a previously created mc object = platform and type are already set
@@ -992,17 +992,14 @@ public class UniversalLoader implements CommandLineRunner {
 
                     mc = new MolecularCharacterization();
                     mc.setPlatform(pl);
-
-                    if(technique.toLowerCase().equals("immunohistochemistry")){
-                        mc.setType("IHC");
-                    }
+                    mc.setType(getMolcharType(technique));
                 }
 
                 Marker m = dataImportService.getMarker(marker, marker);
                 MarkerAssociation ma = new MarkerAssociation();
                 ma.setMarker(m);
 
-                if(technique.toLowerCase().equals("immunohistochemistry")){
+                if(technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")){
 
                     ma.setImmunoHistoChemistryResult(markerStatus);
                 }
@@ -1023,8 +1020,8 @@ public class UniversalLoader implements CommandLineRunner {
                 int passageInt = (int) Float.parseFloat(passage);
                 passage = String.valueOf(passageInt);
 
-                //for xenograft molchars use the combination of the modelid, nomenclature and passage as the key
-                String mapKey = modelId + "___" + nomenclature + "___" + passage;
+                //for xenograft molchars use the combination of the modelid, nomenclature, passage and technique as the key
+                String mapKey = modelId + "___" + nomenclature + "___" + passage + "___" + technique;
 
                 if(xenoMolChars.containsKey(mapKey)) {
                     //get a previously created mc object = platform and type are already set
@@ -1036,17 +1033,15 @@ public class UniversalLoader implements CommandLineRunner {
 
                     mc = new MolecularCharacterization();
                     mc.setPlatform(pl);
+                    mc.setType(getMolcharType(technique));
 
-                    if(technique.toLowerCase().equals("immunohistochemistry")){
-                        mc.setType("IHC");
-                    }
                 }
 
                 Marker m = dataImportService.getMarker(marker, marker);
                 MarkerAssociation ma = new MarkerAssociation();
                 ma.setMarker(m);
 
-                if(technique.toLowerCase().equals("immunohistochemistry")){
+                if(technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")){
 
                     ma.setImmunoHistoChemistryResult(markerStatus);
                 }
@@ -1069,8 +1064,10 @@ public class UniversalLoader implements CommandLineRunner {
         //get the corresponding samples for the molchar objects, link them and save them.
         //patient samples
         for(Map.Entry<String, MolecularCharacterization> entry:patientMolChars.entrySet()){
-            //key = model ID
-            String key = entry.getKey();
+            //key = model ID + "___" + platform
+            String[] keyArr = entry.getKey().split("___");
+            String key = keyArr[0];
+
             MolecularCharacterization mc = entry.getValue();
 
             Sample patientSample = dataImportService.findHumanSample(key, ds.getAbbreviation());
@@ -1089,7 +1086,7 @@ public class UniversalLoader implements CommandLineRunner {
 
         //xeno samples
         for(Map.Entry<String, MolecularCharacterization> entry:xenoMolChars.entrySet()){
-            //key =  modelId + "___" + nomenclature + "___" + passage
+            //key =  modelId + "___" + nomenclature + "___" + passage + "___" + platform
 
             MolecularCharacterization mc = entry.getValue();
             String[] keyArr = entry.getKey().split("___");
@@ -1142,6 +1139,19 @@ public class UniversalLoader implements CommandLineRunner {
             if (!(o == null))
                 return false;
         return true;
+    }
+
+
+    private String getMolcharType(String technique){
+
+        if(technique.toLowerCase().equals("immunohistochemistry")){
+            return "IHC";
+        }
+        else if(technique.toLowerCase().equals("fish")){
+            return "IHC";
+        }
+
+        return null;
     }
 
 }
