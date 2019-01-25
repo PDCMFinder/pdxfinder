@@ -164,11 +164,32 @@ public class CreateDataProjections implements CommandLineRunner{
         log.info("Looking at "+ihcMolchars.size()+" IHC MolChar objects. This may take a while folks...");
         int count = 0;
 
+        //modelid+ "___" + passage => marker => ihcresult
+        // 23432___patient => HER2 => {pos, neg}
+        Map<String, Map<String, Set<String>>> modelMarkerMap = new HashMap<>();
+
         for(MolecularCharacterization mc:ihcMolchars){
 
-            ModelCreation model = dataImportService.findModelByMolChar(mc);
-
+            ModelCreation model = dataImportService.findModelWithSampleByMolChar(mc);
             Long modelId = model.getId();
+
+            //the findModelWithSampleByMolchar should return exactly one sample object
+            List<Sample> sampleList = new ArrayList<>(model.getRelatedSamples());
+            Sample sample = sampleList.get(0);
+
+            String samplePassage = "patient";
+            Specimen specimen = dataImportService.findSpecimenByMolChar(mc);
+
+            if(specimen != null){
+
+                if(!specimen.getPassage().isEmpty()){
+                    samplePassage = specimen.getPassage();
+                }
+                else{
+                    samplePassage = "xeno";
+                }
+
+            }
 
             String platformName = "Not Specified";
 
@@ -203,7 +224,22 @@ public class CreateDataProjections implements CommandLineRunner{
 
                                 //discard markers that are not ER, HER2 or PR
                                 if(markerName.toLowerCase().equals("er") || markerName.toLowerCase().equals("her2") || markerName.toLowerCase().equals("pr")) {
-                                    markerSet.add(markerName + ihcResult);
+
+
+                                    String key = modelId+"___"+samplePassage;
+
+                                    if(!modelMarkerMap.containsKey(key)){
+
+                                        TreeMap markerMap = new TreeMap();
+                                        markerMap.put("HER2", new HashSet<>());
+                                        markerMap.put("ER", new HashSet<>());
+                                        markerMap.put("PR", new HashSet<>());
+                                        modelMarkerMap.put(key, markerMap);
+
+                                    }
+
+                                    modelMarkerMap.get(key).get(markerName).add(ihcResult);
+
                                 }
                             }
                             else{
@@ -217,23 +253,39 @@ public class CreateDataProjections implements CommandLineRunner{
                     if(count%10000 == 0) {log.info("Processed "+count+" MA objects");}
                     //if (count > 40000) break;
                 }
-                List<String> markerList = new ArrayList<>(markerSet);
-                Collections.sort(markerList);
-                String markerResultCombo = markerList.stream().collect(Collectors.joining("_"));
-
-                //log.info("Entry: "+platformName + markerResultCombo + modelId);
-                if(markerResultCombo.split("_").length == 3){
-                    addToTwoParamDP(immunoHistoChemistryDP, platformName, markerResultCombo, modelId);
-                }
-                else{
-                    log.warn("Skipping "+markerResultCombo +". This is not a valid combination for the DP.");
-                }
-
 
             }
+        }
 
+
+        for(Map.Entry<String, Map<String, Set<String>>> model: modelMarkerMap.entrySet()){
+            //modelid+ "___" + passage => marker => ihcresult
+            // 23432___patient => HER2 => {pos, neg}
+
+            String[] idcomp = model.getKey().split("___");
+            Long modelId = Long.valueOf(idcomp[0]);
+            Map<String, Set<String>> markers = model.getValue();
+            String markerResultCombo = null;
+
+            for(Map.Entry<String, Set<String>> marker : markers.entrySet()){
+
+                String markerName = marker.getKey();
+
+                for(String result : marker.getValue()) {
+
+                    if(markerResultCombo == null){
+                        markerResultCombo = markerName+result;
+                    }
+                    else{
+                        markerResultCombo += "_" + markerName + result;
+                    }
+                }
+            }
+
+            addToTwoParamDP(immunoHistoChemistryDP, "Not specified", markerResultCombo, modelId);
 
         }
+
 
         //log.info(immunoHistoChemistryDP.toString());
     }

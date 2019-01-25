@@ -150,6 +150,10 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN model")
     ModelCreation findByMolChar(@Param("mc") MolecularCharacterization mc);
 
+    @Query("MATCH (model:ModelCreation)-[sr:MODEL_SAMPLE_RELATION]-(s:Sample)--(molch:MolecularCharacterization) " +
+            "WHERE id(molch) = {mc} " +
+            "RETURN model, sr, s")
+    ModelCreation findModelWithSampleByMolChar(@Param("mc") MolecularCharacterization mc);
 
     @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource}) " +
             "WITH mod " +
