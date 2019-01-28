@@ -1,6 +1,7 @@
 package org.pdxfinder.repositories;
 
 import org.pdxfinder.dao.ModelCreation;
+import org.pdxfinder.dao.MolecularCharacterization;
 import org.pdxfinder.dao.Specimen;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -151,5 +152,11 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
             "OPTIONAL MATCH (sp)-[sfr:SAMPLED_FROM]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[pur:PLATFORM_USED]-(pl:Platform) " +
             "RETURN sp, sfr, s, cbr, mc, pur, pl")
     Specimen findByModelAndPassageAndNomenClature(@Param("model") ModelCreation modelCreation, @Param("passage") String passage, @Param("symbol") String nomenclature);
+
+
+    @Query("MATCH (sp:Specimen)--(s:Sample)--(mc:MolecularCharacterization) " +
+            "WHERE id(mc) = {mc} " +
+            "RETURN sp")
+    Specimen findByMolChar(@Param("mc")MolecularCharacterization mc);
 
 }
