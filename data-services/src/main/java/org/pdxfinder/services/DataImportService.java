@@ -295,6 +295,11 @@ public class DataImportService {
         return modelCreationRepository.findByMolChar(mc);
     }
 
+    public ModelCreation findModelWithSampleByMolChar(MolecularCharacterization mc){
+
+        return modelCreationRepository.findModelWithSampleByMolChar(mc);
+    }
+
     public Patient createPatient(String patientId, Group dataSource, String sex, String race, String ethnicity){
 
         Patient patient = findPatient(patientId, dataSource);
@@ -539,6 +544,7 @@ public class DataImportService {
         return sampleRepository.findHumanSampleWithMolcharByModelIdAndDataSource(modelId, dataSource);
     }
 
+
     public Sample getHumanSample(String sampleId, String dataSource){
 
 
@@ -768,6 +774,12 @@ public class DataImportService {
     public List<Specimen> getAllSpecimenByModel(String modelId, String dataSource){
 
         return specimenRepository.findByModelIdAndDataSource(modelId, dataSource);
+    }
+
+
+    public Specimen findSpecimenByMolChar(MolecularCharacterization mc){
+
+        return specimenRepository.findByMolChar(mc);
     }
 
     public void saveSpecimen(Specimen specimen){
