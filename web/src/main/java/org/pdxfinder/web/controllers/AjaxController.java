@@ -17,6 +17,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,10 +73,16 @@ public class AjaxController {
     }
 
     @RequestMapping(value = "/autosuggests")
-    List<String> getAutoSuggestList(){
+    List<AutoCompleteOption> getAutoSuggestList(){
 
         List<String> autoSuggestions = autoCompleteService.getAutoSuggestions();
-        return autoSuggestions;
+        List<AutoCompleteOption> suggestions = new ArrayList<>();
+
+        for(String s : autoSuggestions){
+            suggestions.add(new AutoCompleteOption(s, "OntologyTerm"));
+        }
+
+        return suggestions;
     }
 
 

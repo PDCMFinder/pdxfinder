@@ -148,6 +148,10 @@ public class SearchService {
         wsDTO.setPage(page);
         wsDTO.setSize(size);
 
+        if(query.isPresent()){
+            wsDTO.setQuery(query.get());
+        }
+
         String textSearchDescription = getTextualDescription(facetString, results);
 
         if(textSearchDescription == null){
