@@ -811,6 +811,11 @@ public class DataImportService {
         return ot;
     }
 
+    public OntologyTerm findOntologyTermByUrl(String url){
+
+        return ontologyTermRepository.findByUrl(url);
+    }
+
     public Collection<OntologyTerm> getAllOntologyTerms() {
 
         return ontologyTermRepository.findAll();

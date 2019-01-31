@@ -179,7 +179,7 @@ public class MappingService {
     public void saveMappingsToFile(String fileName, Collection<MappingEntity> maprules){
 
         Map<String, Collection<MappingEntity>> mappings = new HashMap<>();
-        mappings.put("row", maprules);
+        mappings.put("mappings", maprules);
 
         Gson gson = new Gson();
         String json = gson.toJson(mappings);
