@@ -24,9 +24,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Mosaku Abayomi on 12/12/2017.
@@ -84,6 +82,8 @@ public class DataTransformerService {
 
     private String priorTherapyUrl = RAW_DATA_URL+"/PDMR_PRIORTHERAPIES.json";
 
+    private String patientInfoUrl = RAW_DATA_URL+"/PDMR_PATIENTINFO.json";
+
 
     public DataTransformerService(TransPdxInfoRepository transPdxInfoRepository,
                                   TransTreatmentRepository transTreatmentRepository,
@@ -96,7 +96,7 @@ public class DataTransformerService {
     }
 
     //Transformation rule as specified here: https://docs.google.com/spreadsheets/d/1buUu5yj3Xq8tbEtL1l2UILV9kLnouGqF0vIjFlGGbEE
-    public JsonNode transformDataAndSave() {
+    public Set<PdmrPdxInfo> transformDataAndSave() {
 
         String unKnown = "Not Specified";
         String modelID = "";
@@ -172,9 +172,13 @@ public class DataTransformerService {
 
         JsonNode priorTherapies = util.readJsonLocal(priorTherapyUrl);
 
+        JsonNode patientInfo = util.readJsonLocal(patientInfoUrl);
+        List<Map<String, Object>> patientList = mapper.convertValue(patientInfo, List.class);
+
 
         //engraftmentType
         int count = 0;
+        Set<PdmrPdxInfo> pdmrPdxInfoList = new HashSet<>();
 
         for (JsonNode node : rootArray) {
 
@@ -194,7 +198,6 @@ public class DataTransformerService {
 
             primarySite = specimenSearch.get("DISEASELOCATIONDESCRIPTION") + "";
             initialDiagnosis = "";
-            clinicalDiagnosis = specimenSearch.get("MEDDRADESCRIPTION") + "";
             tumorType = "";
             stageClassification = "";
             stageValue = unKnown;
@@ -214,6 +217,32 @@ public class DataTransformerService {
             specimenSite = "";
 
 
+            clinicalDiagnosis = specimenSearch.get("MEDDRADESCRIPTION") + "";
+
+            for (Map patient : patientList) {
+
+                if (specimenSearch.get("PATIENTSEQNBR").equals(patient.get("PATIENTSEQNBR"))) {
+
+                    // Retrieve Diagnosis Subtype data
+                    if (patient.get("DIAGNOSISSUBTYPE") != null){
+                        clinicalDiagnosis += " | "+patient.get("DIAGNOSISSUBTYPE");
+                    }
+
+                    // Retrieve Additional Medical History data
+                    if (patient.get("ADDITIONALMEDICALHISTORY") != null){
+                        clinicalDiagnosis += " | "+patient.get("ADDITIONALMEDICALHISTORY");
+                    }
+
+                    // Retrieve Notes data
+                    if (patient.get("NOTES") != null){
+                        clinicalDiagnosis += " | "+patient.get("NOTES");
+                    }
+
+                }
+
+               // index++;
+            }
+
             // Treatment naive
             /*try {
                 if (specimenSearch.get("CURRENTREGIMEN").toString().equalsIgnoreCase("Treatment naive")) {
@@ -227,6 +256,7 @@ public class DataTransformerService {
             // Look SAMPLE table for key SPECIMENSEQNBR and retrieve the SAMPLESEQNBR column
             // Look HISTOLOGY table for key SAMPLESEQNBR and retrieve TUMORGRADESEQNBR
             // Look TumorGrade  table for key TUMORGRADESEQNBR and set Grade as retrieved TUMORGRADESHORTNAME
+
 
             List<Sample> sampleList = new ArrayList<>();
 
@@ -485,6 +515,7 @@ public class DataTransformerService {
                         clinicalDiagnosis, tumorType, stageClassification, stageValue, gradeClassification, gradeValue, sampleType, strain, mouseSex,
                         treatmentNaive, engraftmentSite, engraftmentType, sourceUrl, extractionMethod, dateAtCollection, accessibility,treatments,validations, sampleList);
 
+                //pdmrPdxInfoList.add(pdmrPdxInfo);
                 transPdxInfoRepository.save(pdmrPdxInfo);
 
                 // Update the Foreign Key pdxinfo_id for the corresponding treatments
@@ -516,7 +547,7 @@ public class DataTransformerService {
             // if (count == 40){ break; }
         }
 
-        return rootArray;
+        return pdmrPdxInfoList;
 
 
     }

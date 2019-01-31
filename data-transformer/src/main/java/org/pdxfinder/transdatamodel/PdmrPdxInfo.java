@@ -61,7 +61,10 @@ public class PdmrPdxInfo {
     private String specimenSite;
     private String primarySite;
     private String initialDiagnosis;
+
+    @Column(columnDefinition="Text")
     private String clinicalDiagnosis;
+
     private String tumorType;
 
     private String stageClassification;
