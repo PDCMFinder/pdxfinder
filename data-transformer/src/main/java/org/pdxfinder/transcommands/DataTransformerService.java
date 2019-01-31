@@ -96,7 +96,7 @@ public class DataTransformerService {
     }
 
     //Transformation rule as specified here: https://docs.google.com/spreadsheets/d/1buUu5yj3Xq8tbEtL1l2UILV9kLnouGqF0vIjFlGGbEE
-    public Set<PdmrPdxInfo> transformDataAndSave() {
+    public List<String> transformDataAndSave() {
 
         String unKnown = "Not Specified";
         String modelID = "";
@@ -180,6 +180,8 @@ public class DataTransformerService {
         int count = 0;
         Set<PdmrPdxInfo> pdmrPdxInfoList = new HashSet<>();
 
+        List<String> modelIDList = new ArrayList<>();
+
         for (JsonNode node : rootArray) {
 
             count++;
@@ -187,6 +189,21 @@ public class DataTransformerService {
             Map<String, Object> specimenSearch = mapper.convertValue(node, Map.class);
 
             modelID = specimenSearch.get("PATIENTID") + "-" + specimenSearch.get("SPECIMENID");
+
+            // PDMTYPEDESCRIPTION
+
+            // TISSUETYPEDESCRIPTION
+
+            // CHECK IF THIS MODEL HAS BEEN TREATED :
+            String checkIfExist = modelID;
+            Boolean done = modelIDList.stream().anyMatch(str -> str.equals(checkIfExist));
+
+            if (done) {
+                continue;
+            }else{
+                modelIDList.add(modelID);
+            }
+
             patientID = specimenSearch.get("PATIENTID") + "";
             gender = specimenSearch.get("GENDER").toString().equals("M") ? "Male" : "Female";
 
@@ -237,7 +254,6 @@ public class DataTransformerService {
                     if (patient.get("NOTES") != null){
                         clinicalDiagnosis += " | "+patient.get("NOTES");
                     }
-
                 }
 
                // index++;
@@ -250,7 +266,6 @@ public class DataTransformerService {
                 }
             } catch (Exception e) {
             }*/
-
 
             // From specimensearch table - pick SPECIMENSEQNBR column
             // Look SAMPLE table for key SPECIMENSEQNBR and retrieve the SAMPLESEQNBR column
@@ -547,7 +562,7 @@ public class DataTransformerService {
             // if (count == 40){ break; }
         }
 
-        return pdmrPdxInfoList;
+        return modelIDList;
 
 
     }

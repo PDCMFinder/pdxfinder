@@ -55,9 +55,9 @@ public class TransController {
 
 
     @GetMapping("/transform-pdmr-data")
-    public Set<PdmrPdxInfo> connectPdmr(){
+    public List<String> connectPdmr(){
 
-        Set<PdmrPdxInfo> pdmrPdxInfoList = dataTransformerService.transformDataAndSave();
+        List<String> pdmrPdxInfoList = dataTransformerService.transformDataAndSave();
         return pdmrPdxInfoList;
 
     }
