@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -55,10 +56,10 @@ public class TransController {
 
 
     @GetMapping("/transform-pdmr-data")
-    public List<String> connectPdmr(){
+    public List<Map> connectPdmr(){
 
-        List<String> pdmrPdxInfoList = dataTransformerService.transformDataAndSave();
-        return pdmrPdxInfoList;
+        List<Map> mappingList = dataTransformerService.transformDataAndSave();
+        return mappingList;
 
     }
 

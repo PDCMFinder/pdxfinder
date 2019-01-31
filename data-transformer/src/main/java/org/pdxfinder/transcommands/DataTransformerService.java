@@ -96,7 +96,7 @@ public class DataTransformerService {
     }
 
     //Transformation rule as specified here: https://docs.google.com/spreadsheets/d/1buUu5yj3Xq8tbEtL1l2UILV9kLnouGqF0vIjFlGGbEE
-    public List<String> transformDataAndSave() {
+    public List<Map> transformDataAndSave() {
 
         String unKnown = "Not Specified";
         String modelID = "";
@@ -181,6 +181,7 @@ public class DataTransformerService {
         Set<PdmrPdxInfo> pdmrPdxInfoList = new HashSet<>();
 
         List<String> modelIDList = new ArrayList<>();
+        List<Map> mappingList = new ArrayList<>();
 
         for (JsonNode node : rootArray) {
 
@@ -188,11 +189,15 @@ public class DataTransformerService {
 
             Map<String, Object> specimenSearch = mapper.convertValue(node, Map.class);
 
-            modelID = specimenSearch.get("PATIENTID") + "-" + specimenSearch.get("SPECIMENID");
+            Object pdmTypeDesc = specimenSearch.get("PDMTYPEDESCRIPTION");
+            Object tissueTypeDesc = specimenSearch.get("TISSUETYPEDESCRIPTION");
 
-            // PDMTYPEDESCRIPTION
+            if ( (pdmTypeDesc.equals("PDX") || pdmTypeDesc.equals("Patient/Originator Specimen")) && (tissueTypeDesc.equals("Resection") || tissueTypeDesc.equals("Tumor Biopsy")) ){
 
-            // TISSUETYPEDESCRIPTION
+                modelID = specimenSearch.get("PATIENTID") + "-" + specimenSearch.get("SPECIMENID");
+            }else {
+                continue;
+            }
 
             // CHECK IF THIS MODEL HAS BEEN TREATED :
             String checkIfExist = modelID;
@@ -292,6 +297,8 @@ public class DataTransformerService {
                         sampleTumorType = "Xenograft Tumor";
                     }
 
+
+
                     if (sampleId.equals("ORIGINATOR")){
                         samplePassage = null;
                     }else {
@@ -325,7 +332,12 @@ public class DataTransformerService {
 
 
 
-
+                    /*
+                        model ID - mpdelID
+                        diagnosis - clinicalDiagnosis
+                        primary tissue - primarySite
+                        tumour type - tumorType
+                     */
 
             // From specimensearch table - pick PATIENTSEQNBR column
             //Look CURRENTTHERAPY table for key PATIENTSEQNBR and retrieve the STANDARDIZEDREGIMENSEQNBR column
@@ -530,7 +542,14 @@ public class DataTransformerService {
                         clinicalDiagnosis, tumorType, stageClassification, stageValue, gradeClassification, gradeValue, sampleType, strain, mouseSex,
                         treatmentNaive, engraftmentSite, engraftmentType, sourceUrl, extractionMethod, dateAtCollection, accessibility,treatments,validations, sampleList);
 
-                //pdmrPdxInfoList.add(pdmrPdxInfo);
+                // GENERATE DATA FOR MAPPING
+                Map mappingData = new LinkedHashMap();
+                mappingData.put("MODEL ID",modelID);
+                mappingData.put("DIAGNOSIS", clinicalDiagnosis);
+                mappingData.put("PRIMARY TISSUE", primarySite);
+                mappingData.put("TUMOR TYPE", tumorType);
+                mappingList.add(mappingData);
+
                 transPdxInfoRepository.save(pdmrPdxInfo);
 
                 // Update the Foreign Key pdxinfo_id for the corresponding treatments
@@ -562,7 +581,7 @@ public class DataTransformerService {
             // if (count == 40){ break; }
         }
 
-        return modelIDList;
+        return mappingList;
 
 
     }
