@@ -17,10 +17,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /*
  * Created by csaba on 16/11/2018.
@@ -79,6 +76,7 @@ public class UpdateMappings implements CommandLineRunner {
         MappingContainer mcont = mappingService.getSavedDiagnosisMappings(null);
 
         TreeMap<Long, MappingEntity> mappings = mcont.getMappings();
+        List<MappingEntity> updatedMappings = new ArrayList<>();
 
         for(Map.Entry<Long,MappingEntity> entry: mappings.entrySet()){
 
@@ -87,6 +85,7 @@ public class UpdateMappings implements CommandLineRunner {
             if(ot != null){
                 me.setMappedTermUrl(ot.getUrl());
                 //log.info("Updating "+me.getMappedTermLabel());
+                updatedMappings.add(me);
             }
             else{
                 log.error("Term not found for: "+me.getMappedTermLabel());
@@ -98,7 +97,7 @@ public class UpdateMappings implements CommandLineRunner {
         log.info("Saving file");
         //save mappings to file
         //temporary solution so we don't overwrite existing file
-        mappingService.saveMappingsToFile(savedDiagnosisMappingsFile2, (Collection<MappingEntity>) mappings);
+        mappingService.saveMappingsToFile(savedDiagnosisMappingsFile2, updatedMappings);
 
     }
 }

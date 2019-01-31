@@ -5,6 +5,7 @@ import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.admin.pojos.MappingEntity;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.dao.Sample;
 import org.pdxfinder.dao.SampleToOntologyRelationShip;
@@ -44,7 +45,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
     private Map<String, Set<MissingMapping>> missingMappings;
     private Set<String> missingTerms;
 
-    private Map<String, MappingRule> mappingRules;
+    private Map<String, MappingEntity> mappingRules;
 
     @Autowired
     public LinkSamplesToNCITTerms(DataImportService dataImportService) {
@@ -107,34 +108,28 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
         try {
             JSONObject job = new JSONObject(json);
-            if (job.has("rows")) {
-                JSONArray rows = job.getJSONArray("rows");
+            if (job.has("mappings")) {
+                JSONArray rows = job.getJSONArray("mappings");
 
 
                 for (int i = 0; i < rows.length(); i++) {
                     JSONObject row = rows.getJSONObject(i);
 
-                    String dataSource = row.getString("datasource");
-                    String sampleDiagnosis = row.getString("samplediagnosis").toLowerCase();
-                    String originTissue = row.getString("origintissue");
-                    String tumorType = row.getString("tumortype");
-                    String ontologyTerm = row.getString("ontologyterm");
-                    String mapType = row.getString("maptype");
+                    JSONObject mappingValues = row.getJSONObject("mappingValues");
+
+                    String dataSource = mappingValues.getString("DataSource");
+                    String sampleDiagnosis = mappingValues.getString("SampleDiagnosis").toLowerCase();
+                    String originTissue = mappingValues.getString("OriginTissue");
+                    String tumorType = mappingValues.getString("TumorType");
+                    String ontologyTerm = row.getString("mappedTermLabel");
+                    String ontologyTermUrl = row.getString("mappedTermUrl");
+
+                    String mapType = row.getString("mapType");
                     String justification = row.getString("justification");
 
                     if (ontologyTerm.equals("") || ontologyTerm == null) continue;
                     if (sampleDiagnosis.equals("") || sampleDiagnosis == null) continue;
 
-                    String updatedDiagnosis = sampleDiagnosis;
-                    String pattern = "(.*)Malignant(.*)Neoplasm(.*)";
-
-                    if (sampleDiagnosis.matches(pattern)) {
-                        updatedDiagnosis = (sampleDiagnosis.replaceAll(pattern, "\t$1$2Cancer$3")).trim();
-                        log.info("Updating label from mapping service of diagnosis '{}' with '{}'", sampleDiagnosis, updatedDiagnosis);
-                    }
-
-                    // Remove commas from diagnosis
-                    sampleDiagnosis = updatedDiagnosis.replaceAll(",", "");
 
                     //DO not ask, I know it looks horrible...
                     if (originTissue == null || originTissue.equals("null")) originTissue = "";
@@ -166,12 +161,14 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
                      */
 
-                    MappingRule rule = new MappingRule();
-                    rule.setOntologyTerm(ontologyTerm);
-                    rule.setMapType(mapType);
-                    rule.setJustification(justification);
+                    MappingEntity me = new MappingEntity();
+                    me.setMappedTermUrl(ontologyTermUrl);
+                    me.setMappedTermLabel(ontologyTerm);
+                    me.setMapType(mapType);
+                    me.setJustification(justification);
 
-                    this.mappingRules.put(dataSource + sampleDiagnosis + originTissue + tumorType, rule);
+
+                    this.mappingRules.put(dataSource + sampleDiagnosis + originTissue + tumorType, me);
                 }
             }
 
@@ -182,12 +179,12 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
     }
 
 
-    private MappingRule getMappingForSample(String dataSource, String diagnosis, String originTissue, String tumorType) {
+    private MappingEntity getMappingForSample(String dataSource, String diagnosis, String originTissue, String tumorType) {
 
-        MappingRule mr = new MappingRule();
+        MappingEntity me = new MappingEntity();
 
         //0. if diagnosis is empty return empty object
-        if (diagnosis.equals("") || diagnosis == null) return mr;
+        if (diagnosis.equals("") || diagnosis == null) return me;
 
         if (dataSource == null) dataSource = "";
         if (originTissue == null) originTissue = "";
@@ -218,7 +215,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
         //else return empty object
         //log.warn("No mapping for "+dataSource.toLowerCase() + diagnosis.toLowerCase() + originTissue.toLowerCase() + tumorType.toLowerCase());
-        return mr;
+        return me;
     }
 
     private void mapSamplesToTerms() {
@@ -271,26 +268,26 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                 }
 
 
-                MappingRule mappingRule = getMappingForSample(dataSource, updatedDiagnosis, originTissue, tumorType);
+                MappingEntity me = getMappingForSample(dataSource, updatedDiagnosis, originTissue, tumorType);
 
                 //deal with empty mapping rules here!
-                if (mappingRule.getOntologyTerm() == null || mappingRule.getOntologyTerm().equals("")) {
+                if (me.getMappedTermLabel() == null || me.getMappedTermLabel().equals("")) {
 
                     MissingMapping mm = new MissingMapping(dataSource, updatedDiagnosis, originTissue, tumorType);
                     insertMissingMapping(updatedDiagnosis, mm);
 
                 } else {
 
-                    OntologyTerm ot = dataImportService.findOntologyTermByLabel(mappingRule.getOntologyTerm());
+                    OntologyTerm ot = dataImportService.findOntologyTermByUrl(me.getMappedTermUrl());
 
 
                     if (ot == null) {
 
-                        log.warn("Missing ontology term: " + mappingRule.getOntologyTerm());
-                        this.missingTerms.add(mappingRule.getOntologyTerm());
+                        log.warn("Missing ontology term: " + me.getMappedTermLabel());
+                        this.missingTerms.add(me.getMappedTermLabel());
                     } else {
                         ot.setDirectMappedSamplesNumber(ot.getDirectMappedSamplesNumber() + 1);
-                        SampleToOntologyRelationShip r = new SampleToOntologyRelationShip(mappingRule.getMapType(), mappingRule.getJustification(), sample, ot);
+                        SampleToOntologyRelationShip r = new SampleToOntologyRelationShip(me.getMapType(), me.getJustification(), sample, ot);
                         sample.setSampleToOntologyRelationShip(r);
                         ot.setMappedTo(r);
                         dataImportService.saveSample(sample);
