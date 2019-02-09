@@ -10,6 +10,7 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,9 @@ public class LoadNCIT implements CommandLineRunner {
     private String ncitFile;
 
     private DataImportService dataImportService;
+
+    @Autowired
+    private UtilityService utilityService;
 
     @Autowired
     public LoadNCIT(DataImportService dataImportService) {
@@ -133,7 +137,7 @@ public class LoadNCIT implements CommandLineRunner {
 
             log.debug("Getting data from "+url);
 
-            String json = parseURL(url);
+            String json = utilityService.parseURL(url);
             requestCounter++;
 
             if(requestCounter%200 == 0){
@@ -263,7 +267,7 @@ public class LoadNCIT implements CommandLineRunner {
 
             log.debug("Getting data from "+url);
 
-            String json = parseURL(url);
+            String json = utilityService.parseURL(url);
 
             try {
                 JSONObject job = new JSONObject(json);
@@ -372,6 +376,10 @@ public class LoadNCIT implements CommandLineRunner {
 
 
     }
+
+
+}
+
 
 /*
 
@@ -511,26 +519,3 @@ private void loadDO(){
 
 }
 */
-
-    private String parseURL(String urlStr) {
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            URL url = new URL(urlStr);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(url.openStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine);
-            }
-            in.close();
-        } catch (Exception e) {
-            log.error("Unable to read from URL " + urlStr, e);
-        }
-        return sb.toString();
-    }
-
-
-
-
-}

@@ -11,9 +11,11 @@ import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -70,6 +72,9 @@ public class LoadPDMRData implements CommandLineRunner {
     private DataImportService dataImportService;
     private Session session;
 
+    @Autowired
+    private UtilityService utilityService;
+
 
     @Value("${pdmrpdx.variation.max}")
     private int maxVariations;
@@ -112,7 +117,7 @@ public class LoadPDMRData implements CommandLineRunner {
 
             if (file.exists()) {
                 log.info("Loading from file " + file);
-                parseJSON(parseFile(fileStr));
+                parseJSON(utilityService.parseFile(fileStr));
 
                // loadMutationData();
 
@@ -504,7 +509,7 @@ public class LoadPDMRData implements CommandLineRunner {
             HashMap<String, HashMap<String, List<MarkerAssociation>>> sampleMap = new HashMap<>();
             HashMap<String, List<MarkerAssociation>> markerMap = new HashMap<>();
             String variationURL = "";
-            JSONObject job = new JSONObject(parseFile(variationURL + modelCreation.getSourcePdxId()));
+            JSONObject job = new JSONObject(utilityService.parseFile(variationURL + modelCreation.getSourcePdxId()));
             JSONArray jarray = job.getJSONArray("variation");
             String sample = null;
             String symbol, id, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency, altAllele = null;
@@ -659,7 +664,7 @@ public class LoadPDMRData implements CommandLineRunner {
         HashMap<String, Image> map = new HashMap<>();
         try {
             String histologyURL = "";
-            JSONObject job = new JSONObject(parseFile(histologyURL + id));
+            JSONObject job = new JSONObject(utilityService.parseFile(histologyURL + id));
             JSONArray jarray = job.getJSONObject("pdxHistology").getJSONArray("Graphics");
             String comment = job.getJSONObject("pdxHistology").getString("Comment");
 
@@ -701,41 +706,6 @@ public class LoadPDMRData implements CommandLineRunner {
         }
 
         return map;
-    }
-
-    private String parseURL(String urlStr) {
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            URL url = new URL(urlStr);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(url.openStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine);
-            }
-            in.close();
-        } catch (Exception e) {
-            log.error("Unable to read from URL " + urlStr, e);
-        }
-        return sb.toString();
-    }
-
-    private String parseFile(String path) {
-
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            Stream<String> stream = Files.lines(Paths.get(path));
-
-            Iterator itr = stream.iterator();
-            while (itr.hasNext()) {
-                sb.append(itr.next());
-            }
-        } catch (Exception e) {
-            log.error("Failed to load file " + path, e);
-        }
-        return sb.toString();
     }
 
 }

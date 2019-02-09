@@ -4,8 +4,10 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -84,6 +86,8 @@ public class CreateLocalFeeds implements CommandLineRunner {
     @Value("#{'${wustl.urls}'.split(',')}")
     private List<String> wustlUrlsStr;
 
+    @Autowired
+    private UtilityService utilityService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -125,7 +129,7 @@ public class CreateLocalFeeds implements CommandLineRunner {
     private void createJAXFeeds(){
 
         log.info("Creating JAX feeds");
-        String jsonString = parseURL(jaxUrlStr);
+        String jsonString = utilityService.parseURL(jaxUrlStr);
 
         saveFile(dataRootDir+"JAX/pdx/", "models.json", jsonString);
 
@@ -138,10 +142,10 @@ public class CreateLocalFeeds implements CommandLineRunner {
                 JSONObject j = jarray.getJSONObject(i);
                 String modelId = j.getString("Model ID");
 
-                String mutation = parseURL(jaxVariationURL + modelId);
+                String mutation = utilityService.parseURL(jaxVariationURL + modelId);
                 saveFile(dataRootDir+"JAX/mut/", modelId+".json", mutation);
 
-                String histology = parseURL(jaxHistologyURL + modelId);
+                String histology = utilityService.parseURL(jaxHistologyURL + modelId);
                 saveFile(dataRootDir+"JAX/hist/", modelId+".json", histology);
 
             }
@@ -157,11 +161,11 @@ public class CreateLocalFeeds implements CommandLineRunner {
     private void createIRCCFeeds(){
 
         log.info("Creating IRCC-CRC feeds");
-        String jsonString = parseURL(irccUrlStr);
+        String jsonString = utilityService.parseURL(irccUrlStr);
 
         saveFile(dataRootDir+"IRCC-CRC/pdx/", "models.json", jsonString);
 
-        String mutation = parseURL(irccVariationURLStr);
+        String mutation = utilityService.parseURL(irccVariationURLStr);
         saveFile(dataRootDir+"IRCC-CRC/mut/", "data.json", mutation);
 
     }
@@ -170,7 +174,7 @@ public class CreateLocalFeeds implements CommandLineRunner {
     private void createHCIFeeds(){
 
         log.info("Creating HCI feeds");
-        String jsonString = parseURL(hciUrlStr);
+        String jsonString = utilityService.parseURL(hciUrlStr);
 
         saveFile(dataRootDir+"PDXNet-HCI-BCM/pdx/", "models.json", jsonString);
 
@@ -187,7 +191,7 @@ public class CreateLocalFeeds implements CommandLineRunner {
         String fileName;
         for(String url : mdaUrlsStr){
 
-            String jsonString = parseURL(url);
+            String jsonString = utilityService.parseURL(url);
             if(counter == 1){
 
                 fileName = "models.json";
@@ -205,7 +209,7 @@ public class CreateLocalFeeds implements CommandLineRunner {
     private void createWistarFeeds(){
 
         log.info("Creating WISTAR feeds");
-        String jsonString = parseURL(wistarUrlStr);
+        String jsonString = utilityService.parseURL(wistarUrlStr);
 
         saveFile(dataRootDir+"PDXNet-Wistar-MDAnderson-Penn/pdx/", "models.json", jsonString);
 
@@ -217,7 +221,7 @@ public class CreateLocalFeeds implements CommandLineRunner {
         String fileName;
         for(String url : wustlUrlsStr){
 
-            String jsonString = parseURL(url);
+            String jsonString = utilityService.parseURL(url);
             if(counter == 1){
 
                 fileName = "models.json";
@@ -254,23 +258,5 @@ public class CreateLocalFeeds implements CommandLineRunner {
         }
     }
 
-
-    private String parseURL(String urlStr) {
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            URL url = new URL(urlStr);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(url.openStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine);
-            }
-            in.close();
-        } catch (Exception e) {
-            log.error("Unable to read from URL " + urlStr, e);
-        }
-        return sb.toString();
-    }
 
 }

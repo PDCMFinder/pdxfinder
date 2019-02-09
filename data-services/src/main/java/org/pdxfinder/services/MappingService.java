@@ -78,7 +78,7 @@ public class MappingService {
 
     private void loadSavedDiagnosisMappings(){
 
-        String json = parseFile(savedDiagnosisMappingsFile);
+        String json = utilityService.parseFile(savedDiagnosisMappingsFile);
         existingDiagnosisMappings = new MappingContainer();
 
 
@@ -332,25 +332,6 @@ public class MappingService {
         //return the first 10 suggestions
 
         return resultList;
-    }
-
-
-
-    private String parseFile(String path) {
-
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            Stream<String> stream = Files.lines(Paths.get(path));
-
-            Iterator itr = stream.iterator();
-            while (itr.hasNext()) {
-                sb.append(itr.next());
-            }
-        } catch (Exception e) {
-            log.error("Failed to load file " + path, e);
-        }
-        return sb.toString();
     }
 
 

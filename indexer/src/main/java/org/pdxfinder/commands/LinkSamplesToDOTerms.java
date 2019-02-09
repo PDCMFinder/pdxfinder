@@ -4,6 +4,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.pdxfinder.dao.OntologyTerm;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,25 +80,6 @@ public class LinkSamplesToDOTerms implements CommandLineRunner{
         }
 
 
-    }
-
-
-    private String parseURL(String urlStr) {
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            URL url = new URL(urlStr);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(url.openStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine);
-            }
-            in.close();
-        } catch (Exception e) {
-            log.error("Unable to read from URL " + urlStr, e);
-        }
-        return sb.toString();
     }
 
 }

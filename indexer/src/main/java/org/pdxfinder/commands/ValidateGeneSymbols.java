@@ -8,6 +8,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.accessionidtatamodel.AccessionData;
 import org.pdxfinder.dao.ModelCreation;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ public class ValidateGeneSymbols implements CommandLineRunner{
     private Set<String> rnaseqSymbols;
     private List<String> cnvSymbolsWithIssues;
     private List<String> rnaseqSymbolsWithIssues;
+
+    @Autowired
+    private UtilityService utilityService;
 
     @Value("${jaxpdx.cnv.url}")
     private String cnvURL;
@@ -192,7 +196,7 @@ public class ValidateGeneSymbols implements CommandLineRunner{
 
     private void getCnvDataFromURL(String modelId){
 
-        String json = parseURL(cnvURL+modelId);
+        String json = utilityService.parseURL(cnvURL+modelId);
 
         JSONObject job = null;
         try {
@@ -222,7 +226,7 @@ public class ValidateGeneSymbols implements CommandLineRunner{
 
     private void getRnaSeqDataFromURL(String modelId){
 
-        String json = parseURL(rnaSeqURL+modelId);
+        String json = utilityService.parseURL(rnaSeqURL+modelId);
 
         JSONObject job = null;
         try {
@@ -309,23 +313,5 @@ public class ValidateGeneSymbols implements CommandLineRunner{
 
     }
 
-
-    private String parseURL(String urlStr) {
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            URL url = new URL(urlStr);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(url.openStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine);
-            }
-            in.close();
-        } catch (Exception e) {
-            log.error("Unable to read from URL " + urlStr, e);
-        }
-        return sb.toString();
-    }
 
 }

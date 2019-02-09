@@ -1,5 +1,6 @@
 package org.pdxfinder.commands;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
@@ -12,6 +13,7 @@ import org.pdxfinder.dao.SampleToOntologyRelationShip;
 import org.pdxfinder.ontologymapping.MappingRule;
 import org.pdxfinder.ontologymapping.MissingMapping;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +22,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Stream;
 
 /*
  * Created by csaba on 24/08/2017.
@@ -41,6 +37,9 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LinkSamplesToNCITTerms.class);
     private DataImportService dataImportService;
+
+    @Autowired
+    private UtilityService utilityService;
 
     private Map<String, Set<MissingMapping>> missingMappings;
     private Set<String> missingTerms;
@@ -101,7 +100,8 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
     private void loadMappingRules() {
 
-        String json = parseFile(diagnosisMappingsFile);
+        String json = utilityService.parseFile(diagnosisMappingsFile);
+
         log.info("Fetching mapping rules from " + diagnosisMappingsFile);
 
         this.mappingRules = new HashMap<>();
@@ -121,6 +121,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                     String sampleDiagnosis = mappingValues.getString("SampleDiagnosis").toLowerCase();
                     String originTissue = mappingValues.getString("OriginTissue");
                     String tumorType = mappingValues.getString("TumorType");
+
                     String ontologyTerm = row.getString("mappedTermLabel");
                     String ontologyTermUrl = row.getString("mappedTermUrl");
 
@@ -383,41 +384,5 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
         dataImportService.deleteOntologyTermsWithoutMapping();
     }
 
-
-    private String parseURL(String urlStr) {
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            URL url = new URL(urlStr);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(url.openStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine);
-            }
-            in.close();
-        } catch (Exception e) {
-            log.error("Unable to read from URL " + urlStr, e);
-        }
-        return sb.toString();
-    }
-
-
-    private String parseFile(String path) {
-
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            Stream<String> stream = Files.lines(Paths.get(path));
-
-            Iterator itr = stream.iterator();
-            while (itr.hasNext()) {
-                sb.append(itr.next());
-            }
-        } catch (Exception e) {
-            log.error("Failed to load file " + path, e);
-        }
-        return sb.toString();
-    }
 
 }

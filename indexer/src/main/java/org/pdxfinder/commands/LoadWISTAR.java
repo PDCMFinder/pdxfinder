@@ -11,9 +11,11 @@ import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.dao.*;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -67,6 +69,9 @@ public class LoadWISTAR implements CommandLineRunner {
     private DataImportService dataImportService;
     private Session session;
 
+    @Autowired
+    private UtilityService utilityService;
+
 
     @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
@@ -97,7 +102,7 @@ public class LoadWISTAR implements CommandLineRunner {
             if(file.exists()){
 
                 log.info("Loading WISTAR PDX data from URL " + urlStr);
-                parseJSON(parseFile(urlStr));
+                parseJSON(utilityService.parseFile(urlStr));
             }
             else{
 
@@ -249,41 +254,5 @@ public class LoadWISTAR implements CommandLineRunner {
 
     }
 
-
-
-    private String parseURL(String urlStr) {
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            URL url = new URL(urlStr);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(url.openStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine);
-            }
-            in.close();
-        } catch (Exception e) {
-            log.error("Unable to read from MD Anderson JSON URL " + urlStr, e);
-        }
-        return sb.toString();
-    }
-
-    private String parseFile(String path) {
-
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            Stream<String> stream = Files.lines(Paths.get(path));
-
-            Iterator itr = stream.iterator();
-            while (itr.hasNext()) {
-                sb.append(itr.next());
-            }
-        } catch (Exception e) {
-            log.error("Failed to load file " + path, e);
-        }
-        return sb.toString();
-    }
 
 }
