@@ -735,7 +735,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
 
 
-        log.info("Saving ModelForQuery DataProjection");
+        log.info("Saving ModelForQuery DataProjection. Have "+modelForQueryDP.size() + " MFQ objects.");
 
         DataProjection mfqDP = dataImportService.findDataProjectionByLabel("ModelForQuery");
 
