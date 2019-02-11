@@ -76,7 +76,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
             loadMappingRules();
             mapSamplesToTerms();
             updateIndirectMappingData();
-            //deleteTermsWithoutMapping();
+            deleteTermsWithoutMapping();
 
         } else if (options.has("linkSamplesToNCITTerms")) {
 
