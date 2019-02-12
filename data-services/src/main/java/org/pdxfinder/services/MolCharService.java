@@ -4,11 +4,11 @@ package org.pdxfinder.services;
  * Created by csaba on 06/03/2018.
  */
 
-import org.pdxfinder.dao.DataProjection;
-import org.pdxfinder.repositories.DataProjectionRepository;
-import org.pdxfinder.repositories.MarkerAssociationRepository;
-import org.pdxfinder.repositories.MarkerRepository;
-import org.pdxfinder.repositories.MolecularCharacterizationRepository;
+import org.pdxfinder.graph.dao.DataProjection;
+import org.pdxfinder.graph.repositories.DataProjectionRepository;
+import org.pdxfinder.graph.repositories.MarkerAssociationRepository;
+import org.pdxfinder.graph.repositories.MarkerRepository;
+import org.pdxfinder.graph.repositories.MolecularCharacterizationRepository;
 import org.springframework.stereotype.Service;
 
 /**

@@ -1,6 +1,6 @@
 package org.pdxfinder.services.dto;
 
-import org.pdxfinder.dao.*;
+import org.pdxfinder.graph.dao.*;
 
 import java.util.List;
 import java.util.Map;

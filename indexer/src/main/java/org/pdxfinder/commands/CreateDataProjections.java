@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.dao.*;
+import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.DrugService;
 import org.pdxfinder.services.ds.ModelForQuery;

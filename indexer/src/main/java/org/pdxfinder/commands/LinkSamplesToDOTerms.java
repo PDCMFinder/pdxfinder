@@ -2,7 +2,7 @@ package org.pdxfinder.commands;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.pdxfinder.dao.OntologyTerm;
+import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;

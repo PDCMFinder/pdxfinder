@@ -1,11 +1,11 @@
 package org.pdxfinder.services;
 
-import org.pdxfinder.dao.ModelCreation;
-import org.pdxfinder.dao.MolecularCharacterization;
-import org.pdxfinder.dao.Platform;
-import org.pdxfinder.dao.Sample;
-import org.pdxfinder.repositories.ModelCreationRepository;
-import org.pdxfinder.repositories.PlatformRepository;
+import org.pdxfinder.graph.dao.ModelCreation;
+import org.pdxfinder.graph.dao.MolecularCharacterization;
+import org.pdxfinder.graph.dao.Platform;
+import org.pdxfinder.graph.dao.Sample;
+import org.pdxfinder.graph.repositories.ModelCreationRepository;
+import org.pdxfinder.graph.repositories.PlatformRepository;
 import org.pdxfinder.services.dto.DataAvailableDTO;
 import org.springframework.stereotype.Service;
 

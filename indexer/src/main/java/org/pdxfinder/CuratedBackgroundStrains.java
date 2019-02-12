@@ -1,6 +1,6 @@
 package org.pdxfinder;
 
-import org.pdxfinder.dao.HostStrain;
+import org.pdxfinder.graph.dao.HostStrain;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 

@@ -11,7 +11,7 @@ import org.apache.commons.cli.Options;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.neo4j.ogm.session.Session;
 
-import org.pdxfinder.dao.*;
+import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 
 import org.pdxfinder.services.ds.Standardizer;

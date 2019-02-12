@@ -6,7 +6,7 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.accessionidtatamodel.AccessionData;
-import org.pdxfinder.dao.ModelCreation;
+import org.pdxfinder.graph.dao.ModelCreation;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;

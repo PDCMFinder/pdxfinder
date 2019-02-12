@@ -1,6 +1,6 @@
 package org.pdxfinder.web.controllers;
 
-import org.pdxfinder.dao.Group;
+import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.ds.ModelForQuery;
 import org.pdxfinder.services.ds.SearchDS;

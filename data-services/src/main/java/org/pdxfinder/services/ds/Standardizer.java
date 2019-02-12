@@ -5,10 +5,10 @@
  */
 package org.pdxfinder.services.ds;
 import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.dao.Drug;
-import org.pdxfinder.dao.Response;
-import org.pdxfinder.dao.TreatmentComponent;
-import org.pdxfinder.dao.TreatmentProtocol;
+import org.pdxfinder.graph.dao.Drug;
+import org.pdxfinder.graph.dao.Response;
+import org.pdxfinder.graph.dao.TreatmentComponent;
+import org.pdxfinder.graph.dao.TreatmentProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

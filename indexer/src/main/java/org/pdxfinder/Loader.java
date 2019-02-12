@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableNeo4jRepositories
+
 @EnableTransactionManagement
 public class Loader {
 

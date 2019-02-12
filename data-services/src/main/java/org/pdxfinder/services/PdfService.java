@@ -1,7 +1,7 @@
 package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.pdxfinder.dao.QualityAssurance;
+import org.pdxfinder.graph.dao.QualityAssurance;
 import org.pdxfinder.services.dto.*;
 import org.pdxfinder.services.pdf.*;
 import org.slf4j.Logger;

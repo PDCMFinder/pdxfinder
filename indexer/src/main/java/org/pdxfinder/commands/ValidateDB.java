@@ -6,7 +6,7 @@ package org.pdxfinder.commands;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.pdxfinder.dao.DataProjection;
+import org.pdxfinder.graph.dao.DataProjection;
 import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

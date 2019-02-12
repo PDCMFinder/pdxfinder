@@ -4,7 +4,7 @@ package org.pdxfinder.commands;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.pdxfinder.accessionidtatamodel.AccessionData;
-import org.pdxfinder.dao.Marker;
+import org.pdxfinder.graph.dao.Marker;
 import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

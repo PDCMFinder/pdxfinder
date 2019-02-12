@@ -1,7 +1,7 @@
 package org.pdxfinder.services;
 
-import org.pdxfinder.dao.*;
-import org.pdxfinder.repositories.PatientRepository;
+import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.graph.repositories.PatientRepository;
 import org.pdxfinder.services.dto.CollectionEventsDTO;
 import org.pdxfinder.services.dto.PatientDTO;
 import org.pdxfinder.services.dto.TreatmentSummaryDTO;
