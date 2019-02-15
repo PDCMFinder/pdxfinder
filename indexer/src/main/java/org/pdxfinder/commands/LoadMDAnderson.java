@@ -13,6 +13,7 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
+import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,8 @@ import java.util.stream.Stream;
 /**
  * Load data from University of Texas MD Anderson PDXNet.
  */
-@Component
-@Order(value = -17)
+//@Component
+//@Order(value = -17)
 public class LoadMDAnderson implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadMDAnderson.class);
@@ -98,26 +99,23 @@ public class LoadMDAnderson implements CommandLineRunner {
 
             log.info("Loading MDAnderson PDX data.");
 
-            File folder = new File(dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/");
-            if(folder.exists()){
+            File folder = new File(dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/");
+            if (folder.exists()) {
                 File[] listOfFiles = folder.listFiles();
 
                 for (int i = 0; i < listOfFiles.length; i++) {
                     if (listOfFiles[i].isFile()) {
-                        String fileName = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/"+listOfFiles[i].getName();
+                        String fileName = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/" + listOfFiles[i].getName();
 
                         parseJSON(utilityService.parseFile(fileName));
 
                     }
                 }
 
-            }
-            else{
+            } else {
 
                 log.info("MDA directory not found");
             }
-
-
 
 
             log.info("Finished loading MDAnderson PDX data.");
@@ -152,155 +150,26 @@ public class LoadMDAnderson implements CommandLineRunner {
 
     @Transactional
     void createGraphObjects(JSONObject j) throws Exception {
-        String id = j.getString("Model ID");
 
-        // the preference is for histology
-        String diagnosis = j.getString("Clinical Diagnosis");
-        String histology = j.getString("Histology");
-        if (histology.trim().length() > 0) {
-            if ("ACA".equals(histology)) {
-                diagnosis = "Adenocarcinoma";
-            } else {
-                diagnosis = histology;
-            }
-        }
+        // RETRIEVE THE METADATA:
+        LoaderDTO dto = dataImportService.getMetadata(j, DATASOURCE_ABBREVIATION);
 
-        String classification = j.getString("Stage") + "/" + j.getString("Grades");
-        String stage = j.getString("Stage");
-        String grade = j.getString("Grades");
-        String ethnicity = Standardizer.getValue("Race",j);
+        dto = dataImportService.loaderFirstStep(dto, mdaDS, DATASOURCE_CONTACT);
 
-        try {
-            if (j.getString("Ethnicity").trim().length() > 0) {
-                ethnicity = j.getString("Ethnicity");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        String age = Standardizer.getAge(j.getString("Age"));
-        String gender = Standardizer.getGender(j.getString("Gender"));
+        PatientSnapshot pSnap = dto.getPatientSnapshot();
+        pSnap.addSample(dto.getSample());
 
+        dto.setProjectGroup(projectGroup);
+        dto.setProviderGroup(mdaDS);
 
-        String sampleSite = Standardizer.getValue("Sample Site",j);
+        // CREATE MODEL-CREATION
+        dto.setModelCreation(
+                dataImportService.createModelCreation(dto.getModelID(), mdaDS.getAbbreviation(), dto.getSample(), dto.getQualityAssurance(), dto.getExternalUrls())
+        );
 
-        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
-        String patientId = j.getString("Patient ID");
-        String primarySite = j.getString("Primary Site");
-        String extractionMethod = j.getString("Sample Type");
+        dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
 
-
-        Patient patient = dataImportService.getPatientWithSnapshots(patientId, mdaDS);
-
-        if(patient == null){
-
-            patient = dataImportService.createPatient(patientId, mdaDS, gender, "", Standardizer.getEthnicity(ethnicity));
-        }
-
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
-
-
-        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
-        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
-        // String grade, String gradeClassification
-        Sample sample = dataImportService.getSample(id, mdaDS.getAbbreviation(), tumorType, diagnosis, primarySite,
-                sampleSite, extractionMethod, false, stage, "", grade, "");
-
-
-        pSnap.addSample(sample);
-
-        List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
-
-        String qaType = NOT_SPECIFIED;
-        try {
-            qaType = j.getString("QA") + " on passage " + j.getString("QA Passage");
-        } catch (Exception e) {
-            // not all groups supplied QA
-        }
-
-        String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
-        
-        QualityAssurance qa = new QualityAssurance(qaType,
-                NOT_SPECIFIED, qaPassage);
-        dataImportService.saveQualityAssurance(qa);
-        String strain = j.getString("Strain");
-        HostStrain bs = dataImportService.getHostStrain("", strain, "", "");
-
-        String engraftmentSite = Standardizer.getValue("Engraftment Site",j);
-        
-        String tumorPrep = Standardizer.getValue("Tumor Prep",j);
-
-        ModelCreation modelCreation = dataImportService.createModelCreation(id, mdaDS.getAbbreviation(), sample, qa, externalUrls);
-        modelCreation.addRelatedSample(sample);
-        modelCreation.addGroup(projectGroup);
-
-        boolean human = false;
-        
-        String markerPlatform = NOT_SPECIFIED;
-        try {
-            markerPlatform = j.getString("Marker Platform");
-            if ("CMS50".equals(markerPlatform) || "CMS400".equals(markerPlatform)) {
-                human = true;
-            }
-        } catch (Exception e) {
-            // this is for the FANG data and we don't really care about markers at this point anyway
-        }
-
-        String markerStr = j.getString("Markers");
-
-        String[] markers = markerStr.split(";");
-        if (markerStr.trim().length() > 0) {
-            Platform pl = dataImportService.getPlatform(markerPlatform, mdaDS);
-            MolecularCharacterization molC = new MolecularCharacterization();
-            molC.setType("mutation");
-            molC.setPlatform(pl);
-            List<MarkerAssociation> markerAssocs = new ArrayList<>();
-
-            for (int i = 0; i < markers.length; i++) {
-                Marker m = dataImportService.getMarker(markers[i], markers[i]);
-                MarkerAssociation ma = new MarkerAssociation();
-                ma.setMarker(m);
-                markerAssocs.add(ma);
-            }
-            molC.setMarkerAssociations(markerAssocs);
-            Set<MolecularCharacterization> mcs = new HashSet<>();
-            mcs.add(molC);
-
-            //sample.setMolecularCharacterizations(mcs);
-
-            if (human) {
-                pSnap.addSample(sample);
-
-            } else {
-
-                String passage = "0";
-                try {
-                    passage = j.getString("QA Passage").replaceAll("P", "");
-                } catch (Exception e) {
-                    // default is 0
-                }
-                Specimen specimen = dataImportService.getSpecimen(modelCreation,
-                        modelCreation.getSourcePdxId(), mdaDS.getAbbreviation(), passage);
-                
-                specimen.setHostStrain(bs);
-                
-                EngraftmentSite is = dataImportService.getImplantationSite(engraftmentSite);
-                specimen.setEngraftmentSite(is);
-                
-                EngraftmentType it = dataImportService.getImplantationType(tumorPrep);
-                specimen.setEngraftmentType(it);
-                  
-                specimen.setSample(sample);
-
-                dataImportService.saveSpecimen(specimen);
-
-            }
-        }
-
-        dataImportService.saveSample(sample);
-        dataImportService.saveModelCreation(modelCreation);
-        dataImportService.savePatientSnapshot(pSnap);
     }
+
 
 }
