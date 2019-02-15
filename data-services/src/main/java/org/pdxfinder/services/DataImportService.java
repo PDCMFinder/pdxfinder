@@ -7,17 +7,18 @@ package org.pdxfinder.services;
 
 //import org.apache.commons.cli.Option;
 import org.apache.commons.lang3.StringUtils;
+import org.neo4j.ogm.json.JSONArray;
+import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.repositories.*;
 import org.pdxfinder.services.ds.Standardizer;
+import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The hope was to put a lot of reused repository actions into one place ie find
@@ -30,7 +31,7 @@ import java.util.Set;
 public class DataImportService {
 
     //public static Option loadAll = new Option("LoadAll", false, "Load all PDX Finder data");
-    
+
     private TumorTypeRepository tumorTypeRepository;
     private HostStrainRepository hostStrainRepository;
     private EngraftmentTypeRepository engraftmentTypeRepository;
@@ -438,7 +439,7 @@ public class DataImportService {
 
         return patient;
     }
-    
+
 
     public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, String dataSource) {
 
@@ -939,9 +940,9 @@ public class DataImportService {
 
         return pa;
     }
-    
+
     public void savePlatformAssociation(PlatformAssociation pa){
-            platformAssociationRepository.save(pa);
+        platformAssociationRepository.save(pa);
     }
 
     public void saveDataProjection(DataProjection dp){
@@ -1144,6 +1145,7 @@ public class DataImportService {
 
 
 
+
     public TreatmentSummary findTreatmentSummaryByPatientSnapshot(PatientSnapshot ps){
 
         return treatmentSummaryRepository.findByPatientSnapshot(ps);
@@ -1168,5 +1170,393 @@ public class DataImportService {
 
         return dataProjectionRepository.findPlatformsWithoutUrl();
     }
+
+
+    String hci = "PDXNet-HCI-BCM";
+    String mdAnderson = "PDXNet-MDAnderson";
+
+    public LoaderDTO getMetadata(JSONObject data, String ds) throws Exception {
+
+        String modelID = data.getString("Model ID");
+        String sampleID = getSampleID(data,ds);
+        String diagnosis = getDiagnosis(data,ds);
+        String patientId = data.getString("Patient ID");
+
+        String ethnicity = getEthnicity(data,ds);
+
+        String stage = data.getString("Stage");
+        String grade = data.getString("Grades");
+
+
+        String classification = getClassification(data,ds);
+
+        String age = Standardizer.getAge(data.getString("Age"));
+        String gender = Standardizer.getGender(data.getString("Gender"));
+        String tumorType = Standardizer.getTumorType(data.getString("Tumor Type"));
+        String sampleSite = Standardizer.getValue("Sample Site",data);
+        String primarySite = data.getString("Primary Site");
+        String extractionMethod = data.getString("Sample Type");
+        String strain = data.getString("Strain");
+
+
+
+
+        String implantationTypeStr = getImplantationType(data,ds);
+        String implantationSiteStr = getEngraftmentSite(data,ds);
+        QualityAssurance qa = getQualityAssurance(data,ds);
+
+        String markerPlatform = getMarkerPlatform(data,ds);
+        String markerStr = getMarkerStr(data,ds);
+        String passage = getQAPassage(data,ds);
+
+
+        LoaderDTO dto = new LoaderDTO();
+
+        dto.setModelID(modelID);
+        dto.setSampleID(sampleID);
+        dto.setDiagnosis(diagnosis);
+        dto.setPatientId(patientId);
+        dto.setEthnicity(ethnicity);
+        dto.setStage(stage);
+        dto.setGrade(grade);
+        dto.setClassification(classification);
+        dto.setAge(age);
+        dto.setGender(gender);
+        dto.setTumorType(tumorType);
+        dto.setSampleSite(sampleSite);
+        dto.setPrimarySite(primarySite);
+        dto.setExtractionMethod(extractionMethod);
+        dto.setStrain(strain);
+        dto.setMarkerPlatform(markerPlatform);
+        dto.setMarkerStr(markerStr);
+        dto.setQaPassage(passage);
+
+        dto.setQualityAssurance(qa);
+        dto.setImplantationtypeStr(implantationTypeStr);
+        dto.setImplantationSiteStr(implantationSiteStr);
+
+
+        return dto;
+
+    }
+
+
+    private String getSampleID(JSONObject data,String ds) throws Exception {
+        String sampleID = "";
+        if (ds.equals(hci)){
+            sampleID = data.getString("Sample ID");
+        }
+        return sampleID;
+    }
+
+    private String getDiagnosis(JSONObject data,String ds) throws Exception {
+        String diagnosis = data.getString("Clinical Diagnosis");
+
+        if (ds.equals(mdAnderson)){
+            // mdAnderson preference is for histology
+            String histology = data.getString("Histology");
+            if (histology.trim().length() > 0) {
+                if ("ACA".equals(histology)) {
+                    diagnosis = "Adenocarcinoma";
+                } else {
+                    diagnosis = histology;
+                }
+            }
+        }
+
+        return diagnosis;
+    }
+
+    private String getEthnicity(JSONObject data,String ds) throws Exception {
+        String ethnicity = "";
+
+        if (ds.equals(hci)) {
+            ethnicity = data.getString("Ethnicity");
+        }
+
+        if (ds.equals(mdAnderson)){
+            ethnicity = Standardizer.getValue("Race",data);
+            try {
+                if (data.getString("Ethnicity").trim().length() > 0) {
+                    ethnicity = data.getString("Ethnicity");
+                }
+            } catch (Exception e) {}
+        }
+        return ethnicity;
+    }
+
+
+    private String getClassification(JSONObject data,String ds) throws Exception {
+        String classification = "";
+
+        if (ds.equals(mdAnderson)){
+            classification = data.getString("Stage") + "/" + data.getString("Grades");
+        }
+        return classification;
+    }
+
+
+
+
+    private String getImplantationType(JSONObject data,String ds) throws Exception {
+        String implantationTypeStr = "";
+
+        if (ds.equals(hci)){
+            implantationTypeStr = Standardizer.getValue("Implantation Type", data);
+        }
+
+        if (ds.equals(mdAnderson)){
+            implantationTypeStr =  Standardizer.getValue("Tumor Prep",data);
+        }
+
+        return implantationTypeStr;
+    }
+
+
+    private String getEngraftmentSite(JSONObject data,String ds) throws Exception {
+        String implantationSite = "";
+
+        if (ds.equals(hci)){
+            implantationSite = Standardizer.getValue("Engraftment Site", data);
+        }
+
+        if (ds.equals(mdAnderson)){
+            implantationSite  = Standardizer.getValue("Engraftment Site",data);
+        }
+
+        return implantationSite;
+    }
+
+    private String getMarkerPlatform(JSONObject data,String ds) throws Exception {
+        String markerPlatform = "";
+        if (ds.equals(mdAnderson)){
+            markerPlatform = data.getString("Marker Platform");
+        }
+        return markerPlatform;
+    }
+
+
+    private String getMarkerStr(JSONObject data,String ds) throws Exception {
+        String markerStr = "";
+        if (ds.equals(mdAnderson)){
+            markerStr = data.getString("Markers");
+        }
+        return markerStr;
+    }
+
+
+    private String getQAPassage(JSONObject data,String ds) throws Exception {
+        String passage = "";
+        if (ds.equals(mdAnderson)){
+            passage = data.getString("QA Passage").replaceAll("P", "");
+        }
+        return passage;
+    }
+
+
+
+
+
+
+
+
+
+    private QualityAssurance getQualityAssurance(JSONObject j,String ds)  throws Exception{
+
+        QualityAssurance qa = new QualityAssurance();
+
+        if (ds.equals(hci)){
+
+            // This multiple QA approach only works because Note and Passage are the same for all QAs
+            qa = new QualityAssurance(Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED);
+
+            StringBuilder technology = new StringBuilder();
+            if(j.has("QA")){
+                JSONArray qas = j.getJSONArray("QA");
+                for (int i = 0; i < qas.length(); i++) {
+                    if (qas.getJSONObject(i).getString("Technology").equalsIgnoreCase("histology")) {
+                        qa.setTechnology(qas.getJSONObject(i).getString("Technology"));
+                        qa.setDescription(qas.getJSONObject(i).getString("Note"));
+                        qa.setPassages(qas.getJSONObject(i).getString("Passage"));
+                    }
+                }
+            }
+
+        }
+
+        if (ds.equals(mdAnderson)){
+
+            String qaType = Standardizer.NOT_SPECIFIED;
+            try {
+                qaType = j.getString("QA") + " on passage " + j.getString("QA Passage");
+            } catch (Exception e) {
+                // not all groups supplied QA
+            }
+
+            String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
+            qa = new QualityAssurance(qaType, Standardizer.NOT_SPECIFIED, qaPassage);
+            saveQualityAssurance(qa);
+        }
+
+        return qa;
+    }
+
+
+
+    /*************************************************************************************************************
+     *     CREATE PATIENT, PATIENT-SNAPSHOT, SAMPLE, & EXTERNAL-URL        *
+     *********************************************************************/
+
+    public LoaderDTO loaderFirstStep(LoaderDTO dto, Group hciDS, String dataSourceContact){
+
+        Patient patient = getPatientWithSnapshots(dto.getPatientId(), hciDS);
+
+        if(patient == null){
+            patient = createPatient(dto.getPatientId(), hciDS, dto.getGender(), "", Standardizer.getEthnicity(dto.getEthnicity()));
+        }
+
+        PatientSnapshot pSnap = getPatientSnapshot(patient, dto.getAge(), "", "", "");
+        dto.setPatientSnapshot(pSnap);
+
+        Sample sample = getSample(dto.getSampleID(), hciDS.getAbbreviation(), dto.getTumorType(), dto.getDiagnosis(), dto.getPrimarySite(),
+                dto.getSampleSite(), dto.getExtractionMethod(), false, dto.getStage(), "", dto.getGrade(), "");
+        dto.setSample(sample);
+
+        List<ExternalUrl> externalUrls = new ArrayList<>();
+        externalUrls.add(getExternalUrl(ExternalUrl.Type.CONTACT, dataSourceContact));
+        dto.setExternalUrls(externalUrls);
+
+        return dto;
+
+    }
+
+
+
+
+    /*************************************************************************************************************
+     *     CREATE IMPLANTATION-SITE, IMPLANTATION-TYPE, SPECIMEN, UPDATE MODEL-CREATION         *
+     ******************************************************************************************/
+
+    public LoaderDTO loaderSecondStep(LoaderDTO dto, PatientSnapshot pSnap, String ds)  throws Exception{
+
+
+        saveSample(dto.getSample());
+        savePatientSnapshot(pSnap);
+
+        dto.getModelCreation().addRelatedSample(dto.getSample());
+        dto.getModelCreation().addGroup(dto.getProjectGroup());
+
+        if (ds.equals(hci)){
+
+            EngraftmentSite engraftmentSite = getImplantationSite(dto.getImplantationSiteStr());
+            EngraftmentType engraftmentType = getImplantationType(dto.getImplantationtypeStr());
+
+            // uggh parse strains
+            ArrayList<HostStrain> strainList= new ArrayList();
+            if(dto.getStrain().contains(" and ")){
+                strainList.add(dto.getNodScidGamma());
+                strainList.add(dto.getNodScid());
+            }
+            else if(dto.getStrain().contains("gamma")){
+                strainList.add(dto.getNodScid());
+            }
+            else{
+                strainList.add(dto.getNodScid());
+            }
+
+            int count = 0;
+            for(HostStrain strain : strainList){
+                count++;
+                Specimen specimen = new Specimen();
+                specimen.setExternalId(dto.getModelID()+"-"+count);
+                specimen.setEngraftmentSite(engraftmentSite);
+                specimen.setEngraftmentType(engraftmentType);
+                specimen.setHostStrain(strain);
+
+                Sample specSample = new Sample();
+                specSample.setSourceSampleId(dto.getModelID()+"-"+count);
+                specimen.setSample(specSample);
+
+                dto.getModelCreation().addSpecimen(specimen);
+                dto.getModelCreation().addRelatedSample(specSample);
+                saveSpecimen(specimen);
+            }
+            saveModelCreation(dto.getModelCreation()); // confirm mc is updated
+
+        }
+
+
+
+        if (ds.equals(mdAnderson)){
+
+            HostStrain bs = getHostStrain("", dto.getStrain(), "", "");
+            boolean human = false;
+            String markerPlatform = Standardizer.NOT_SPECIFIED;
+            String markerStr = dto.getMarkerStr();
+
+            try {
+                if ("CMS50".equals(markerPlatform) || "CMS400".equals(dto.getMarkerPlatform())) {
+                    human = true;
+                }
+            } catch (Exception e) { /* this is for the FANG data and we don't really care about markers at this point anyway */ }
+
+
+            String[] markers = markerStr.split(";");
+            if (markerStr.trim().length() > 0) {
+                Platform pl = getPlatform(markerPlatform, dto.getProviderGroup());
+                MolecularCharacterization molC = new MolecularCharacterization();
+                molC.setType("mutation");
+                molC.setPlatform(pl);
+                List<MarkerAssociation> markerAssocs = new ArrayList<>();
+
+                for (int i = 0; i < markers.length; i++) {
+                    Marker m = getMarker(markers[i], markers[i]);
+                    MarkerAssociation ma = new MarkerAssociation();
+                    ma.setMarker(m);
+                    markerAssocs.add(ma);
+                }
+                molC.setMarkerAssociations(markerAssocs);
+                Set<MolecularCharacterization> mcs = new HashSet<>();
+                mcs.add(molC);
+
+
+                //sample.setMolecularCharacterizations(mcs);
+
+                if (human) {
+                    pSnap.addSample(dto.getSample());
+
+                } else {
+
+                    String passage = "0";
+                    try {
+                        passage = dto.getQaPassage().replaceAll("P", "");
+                    } catch (Exception e) {
+                        // default is 0
+                    }
+                    Specimen specimen = getSpecimen(dto.getModelCreation(), dto.getModelCreation().getSourcePdxId(), dto.getProviderGroup().getAbbreviation(), passage);
+
+                    specimen.setHostStrain(bs);
+
+                    EngraftmentSite is = getImplantationSite(dto.getImplantationSiteStr());
+                    specimen.setEngraftmentSite(is);
+
+                    EngraftmentType it = getImplantationType(dto.getImplantationtypeStr());
+                    specimen.setEngraftmentType(it);
+
+                    specimen.setSample(dto.getSample());
+                    saveSpecimen(specimen);
+                }
+            }
+            saveModelCreation(dto.getModelCreation());
+        }
+
+        return dto;
+
+    }
+
+
+
+
+
 
 }
