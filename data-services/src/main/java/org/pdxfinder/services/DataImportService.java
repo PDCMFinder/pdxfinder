@@ -1177,6 +1177,7 @@ public class DataImportService {
     String hci = "PDXNet-HCI-BCM";
     String mdAnderson = "PDXNet-MDAnderson";
     String irccCrc = "IRCC-CRC";
+    String wustl = "PDXNet-WUSTL";
 
     public LoaderDTO getMetadata(JSONObject data, String ds) throws Exception {
 
@@ -1303,6 +1304,14 @@ public class DataImportService {
             }
         }
 
+        if (ds.equals(wustl)){
+            // Preference is for Histology
+            String histology = data.getString("Histology");
+            if (histology.trim().length() > 0) {
+                diagnosis = histology;
+            }
+        }
+
         return diagnosis;
     }
 
@@ -1313,7 +1322,7 @@ public class DataImportService {
             ethnicity = data.getString("Ethnicity");
         }
 
-        if (ds.equals(mdAnderson)){
+        if (ds.equals(mdAnderson) || ds.equals(wustl)){
             ethnicity = Standardizer.getValue("Race",data);
             try {
                 if (data.getString("Ethnicity").trim().length() > 0) {
@@ -1328,11 +1337,11 @@ public class DataImportService {
     private String getClassification(JSONObject data,String ds) throws Exception {
         String classification = "";
 
-        if (ds.equals(mdAnderson)){
+        if (ds.equals(mdAnderson) || ds.equals(wustl)){
             classification = data.getString("Stage") + "/" + data.getString("Grades");
         }
 
-        if (ds.equals(irccCrc)){
+        if (ds.equals(irccCrc) || ds.equals(wustl)){
             classification = data.getString("Stage");
         }
 
@@ -1349,7 +1358,7 @@ public class DataImportService {
             implantationTypeStr = Standardizer.getValue("Implantation Type", data);
         }
 
-        if (ds.equals(mdAnderson)){
+        if (ds.equals(mdAnderson) || ds.equals(wustl)){
             implantationTypeStr =  Standardizer.getValue("Tumor Prep",data);
         }
 
@@ -1364,7 +1373,7 @@ public class DataImportService {
             implantationSite = Standardizer.getValue("Engraftment Site", data);
         }
 
-        if (ds.equals(mdAnderson)){
+        if (ds.equals(mdAnderson) || ds.equals(wustl)){
             implantationSite  = Standardizer.getValue("Engraftment Site",data);
         }
 
@@ -1373,7 +1382,7 @@ public class DataImportService {
 
     private String getMarkerPlatform(JSONObject data,String ds) throws Exception {
         String markerPlatform = "";
-        if (ds.equals(mdAnderson)){
+        if (ds.equals(mdAnderson) || ds.equals(wustl)){
             markerPlatform = data.getString("Marker Platform");
         }
         return markerPlatform;
@@ -1382,9 +1391,11 @@ public class DataImportService {
 
     private String getMarkerStr(JSONObject data,String ds) throws Exception {
         String markerStr = "";
+
         if (ds.equals(mdAnderson)){
             markerStr = data.getString("Markers");
         }
+
         return markerStr;
     }
 
@@ -1408,6 +1419,7 @@ public class DataImportService {
     private QualityAssurance getQualityAssurance(JSONObject data,String ds)  throws Exception{
 
         QualityAssurance qa = new QualityAssurance();
+        String qaType = Standardizer.NOT_SPECIFIED;
 
         if (ds.equals(hci)){
 
@@ -1428,9 +1440,10 @@ public class DataImportService {
 
         }
 
-        if (ds.equals(mdAnderson)) {
 
-            String qaType = Standardizer.NOT_SPECIFIED;
+
+        if (ds.equals(mdAnderson) || ds.equals(wustl)) {
+
             try {
                 qaType = data.getString("QA") + " on passage " + data.getString("QA Passage");
             } catch (Exception e) {
@@ -1480,15 +1493,15 @@ public class DataImportService {
 
 
     /*************************************************************************************************************
-     *     CREATE PATIENT, PATIENT-SNAPSHOT, SAMPLE, & EXTERNAL-URL        *
+     *     CREATE PATIENT, PATIENT-SNAPSHOT, PATIENT SAMPLE, & EXTERNAL-URL        *
      *********************************************************************/
 
-    public LoaderDTO loaderFirstStep(LoaderDTO dto, Group hciDS, String dataSourceContact){
+    public LoaderDTO loaderFirstStep(LoaderDTO dto, Group dataSource, String dataSourceContact){
 
-        Patient patient = getPatientWithSnapshots(dto.getPatientId(), hciDS);
+        Patient patient = getPatientWithSnapshots(dto.getPatientId(), dataSource);
 
         if(patient == null){
-            patient = createPatient(dto.getPatientId(), hciDS, dto.getGender(), "", Standardizer.getEthnicity(dto.getEthnicity()));
+            patient = createPatient(dto.getPatientId(), dataSource, dto.getGender(), "", Standardizer.getEthnicity(dto.getEthnicity()));
         }
         dto.setPatient(patient);
 
@@ -1496,11 +1509,10 @@ public class DataImportService {
         PatientSnapshot pSnap = getPatientSnapshot(patient, dto.getAge(), "", "", "");
         dto.setPatientSnapshot(pSnap);
 
-        Sample sample = getSample(dto.getSampleID(), hciDS.getAbbreviation(), dto.getTumorType(), dto.getDiagnosis(), dto.getPrimarySite(),
+        Sample patientSample = getSample(dto.getSampleID(), dataSource.getAbbreviation(), dto.getTumorType(), dto.getDiagnosis(), dto.getPrimarySite(),
                 dto.getSampleSite(), dto.getExtractionMethod(), false, dto.getStage(), "", dto.getGrade(), "");
 
-
-        dto.setPatientSample(sample);
+        dto.setPatientSample(patientSample);
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
         externalUrls.add(getExternalUrl(ExternalUrl.Type.CONTACT, dataSourceContact));
@@ -1519,9 +1531,6 @@ public class DataImportService {
 
     public LoaderDTO loaderSecondStep(LoaderDTO dto, PatientSnapshot pSnap, String ds)  throws Exception{
 
-
-        saveSample(dto.getPatientSample());
-        savePatientSnapshot(pSnap);
 
         dto.getModelCreation().addRelatedSample(dto.getPatientSample());
         dto.getModelCreation().addGroup(dto.getProjectGroup());
@@ -1566,68 +1575,93 @@ public class DataImportService {
         }
 
 
-
-        if (ds.equals(mdAnderson)){
+        if (ds.equals(mdAnderson) || ds.equals(wustl)) {
 
             HostStrain bs = getHostStrain("", dto.getStrain(), "", "");
             boolean human = false;
             String markerPlatform = Standardizer.NOT_SPECIFIED;
-            String markerStr = dto.getMarkerStr();
 
             try {
+                markerPlatform = dto.getMarkerPlatform();
                 if ("CMS50".equals(markerPlatform) || "CMS400".equals(dto.getMarkerPlatform())) {
                     human = true;
                 }
             } catch (Exception e) { /* this is for the FANG data and we don't really care about markers at this point anyway */ }
 
 
-            String[] markers = markerStr.split(";");
-            if (markerStr.trim().length() > 0) {
-                Platform pl = getPlatform(markerPlatform, dto.getProviderGroup());
-                MolecularCharacterization molC = new MolecularCharacterization();
-                molC.setType("mutation");
-                molC.setPlatform(pl);
-                List<MarkerAssociation> markerAssocs = new ArrayList<>();
+            if (ds.equals(mdAnderson)) {
+                String markerStr = dto.getMarkerStr();
+                String[] markers = markerStr.split(";");
+                if (markerStr.trim().length() > 0) {
+                    Platform pl = getPlatform(markerPlatform, dto.getProviderGroup());
+                    MolecularCharacterization molC = new MolecularCharacterization();
+                    molC.setType("mutation");
+                    molC.setPlatform(pl);
+                    List<MarkerAssociation> markerAssocs = new ArrayList<>();
 
-                for (int i = 0; i < markers.length; i++) {
-                    Marker m = getMarker(markers[i], markers[i]);
-                    MarkerAssociation ma = new MarkerAssociation();
-                    ma.setMarker(m);
-                    markerAssocs.add(ma);
-                }
-                molC.setMarkerAssociations(markerAssocs);
-                Set<MolecularCharacterization> mcs = new HashSet<>();
-                mcs.add(molC);
-
-
-                //sample.setMolecularCharacterizations(mcs);
-
-                if (human) {
-                    pSnap.addSample(dto.getPatientSample());
-
-                } else {
-
-                    String passage = "0";
-                    try {
-                        passage = dto.getQaPassage().replaceAll("P", "");
-                    } catch (Exception e) {
-                        // default is 0
+                    for (int i = 0; i < markers.length; i++) {
+                        Marker m = getMarker(markers[i], markers[i]);
+                        MarkerAssociation ma = new MarkerAssociation();
+                        ma.setMarker(m);
+                        markerAssocs.add(ma);
                     }
-                    Specimen specimen = getSpecimen(dto.getModelCreation(), dto.getModelCreation().getSourcePdxId(), dto.getProviderGroup().getAbbreviation(), passage);
+                    molC.setMarkerAssociations(markerAssocs);
+                    Set<MolecularCharacterization> mcs = new HashSet<>();
+                    mcs.add(molC);
 
-                    specimen.setHostStrain(bs);
+                    //sample.setMolecularCharacterizations(mcs);
+                }
+            }
 
-                    EngraftmentSite is = getImplantationSite(dto.getImplantationSiteStr());
-                    specimen.setEngraftmentSite(is);
 
-                    EngraftmentType it = getImplantationType(dto.getImplantationtypeStr());
-                    specimen.setEngraftmentType(it);
+            if (human) {
+                pSnap.addSample(dto.getPatientSample());
 
+            } else {
+
+                String passage = "0";
+                try {
+                    passage = dto.getQaPassage().replaceAll("P", "");
+                } catch (Exception e) {
+                    // default is 0
+                }
+                Specimen specimen = getSpecimen(dto.getModelCreation(), dto.getModelCreation().getSourcePdxId(), dto.getProviderGroup().getAbbreviation(), passage);
+                specimen.setHostStrain(bs);
+
+                if (ds.equals(wustl)){
+                    Sample mouseSample = new Sample();
+                    specimen.setSample(mouseSample);
+                    dto.getModelCreation().addRelatedSample(mouseSample);
+
+                    if (dto.getImplantationSiteStr().contains(";")) {
+                        String[] parts = dto.getImplantationSiteStr().split(";");
+                        dto.setImplantationSiteStr(parts[1].trim());
+                        dto.setImplantationtypeStr(parts[0].trim());
+                    }
+
+                }
+
+                EngraftmentSite is = getImplantationSite(dto.getImplantationSiteStr());
+                specimen.setEngraftmentSite(is);
+
+                EngraftmentType it = getImplantationType(dto.getImplantationtypeStr());
+                specimen.setEngraftmentType(it);
+
+
+                if (ds.equals(wustl)){
+                    dto.getModelCreation().addSpecimen(specimen);
+                }
+
+                if (ds.equals(mdAnderson)) {
                     specimen.setSample(dto.getPatientSample());
                     saveSpecimen(specimen);
                 }
+
             }
+
+            saveSample(dto.getPatientSample());  // TODO: This was not be implemented for wustl, find out why
             saveModelCreation(dto.getModelCreation());
+            savePatientSnapshot(pSnap);
         }
 
 

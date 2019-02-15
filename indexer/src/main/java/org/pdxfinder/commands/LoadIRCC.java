@@ -190,6 +190,9 @@ public class LoadIRCC implements CommandLineRunner {
         // RETRIEVE THE METADATA:
         LoaderDTO dto = dataImportService.getMetadata(job, DATASOURCE_ABBREVIATION);
 
+        dto = dataImportService.loaderFirstStep(dto, irccDS, DATASOURCE_CONTACT);
+
+
         PatientSnapshot pSnap = dto.getPatientSnapshot();
         pSnap.addSample(dto.getPatientSample());
 
