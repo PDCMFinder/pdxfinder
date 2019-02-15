@@ -19,6 +19,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The hope was to put a lot of reused repository actions into one place ie find
@@ -1174,6 +1176,7 @@ public class DataImportService {
 
     String hci = "PDXNet-HCI-BCM";
     String mdAnderson = "PDXNet-MDAnderson";
+    String irccCrc = "IRCC-CRC";
 
     public LoaderDTO getMetadata(JSONObject data, String ds) throws Exception {
 
@@ -1197,6 +1200,7 @@ public class DataImportService {
         String primarySite = data.getString("Primary Site");
         String extractionMethod = data.getString("Sample Type");
         String strain = data.getString("Strain");
+        String fingerprinting = getFingerprinting(data, ds);
 
 
 
@@ -1208,6 +1212,9 @@ public class DataImportService {
         String markerPlatform = getMarkerPlatform(data,ds);
         String markerStr = getMarkerStr(data,ds);
         String passage = getQAPassage(data,ds);
+
+        JSONArray specimens = getSpecimens(data,ds);
+
 
 
         LoaderDTO dto = new LoaderDTO();
@@ -1235,17 +1242,49 @@ public class DataImportService {
         dto.setImplantationtypeStr(implantationTypeStr);
         dto.setImplantationSiteStr(implantationSiteStr);
 
+        dto.setFingerprinting(fingerprinting);
+        dto.setSpecimens(specimens);
+
 
         return dto;
 
     }
 
 
+
+
+    private JSONArray getSpecimens(JSONObject data,String ds) throws Exception {
+
+        JSONArray specimens = new JSONArray();
+
+        if (ds.equals(irccCrc)){
+            specimens = data.getJSONArray("Specimens");
+        }
+        return specimens;
+    }
+
+
+    private String getFingerprinting(JSONObject data,String ds) throws Exception {
+        String fingerprinting = "";
+
+        if (ds.equals(irccCrc)){
+            fingerprinting = data.getString("Fingerprinting");
+        }
+        return fingerprinting;
+    }
+
+
     private String getSampleID(JSONObject data,String ds) throws Exception {
         String sampleID = "";
+
         if (ds.equals(hci)){
             sampleID = data.getString("Sample ID");
         }
+
+        if (ds.equals(irccCrc) || ds.equals(mdAnderson)){
+            sampleID = data.getString("Model ID");
+        }
+
         return sampleID;
     }
 
@@ -1292,6 +1331,11 @@ public class DataImportService {
         if (ds.equals(mdAnderson)){
             classification = data.getString("Stage") + "/" + data.getString("Grades");
         }
+
+        if (ds.equals(irccCrc)){
+            classification = data.getString("Stage");
+        }
+
         return classification;
     }
 
@@ -1361,7 +1405,7 @@ public class DataImportService {
 
 
 
-    private QualityAssurance getQualityAssurance(JSONObject j,String ds)  throws Exception{
+    private QualityAssurance getQualityAssurance(JSONObject data,String ds)  throws Exception{
 
         QualityAssurance qa = new QualityAssurance();
 
@@ -1371,8 +1415,8 @@ public class DataImportService {
             qa = new QualityAssurance(Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED);
 
             StringBuilder technology = new StringBuilder();
-            if(j.has("QA")){
-                JSONArray qas = j.getJSONArray("QA");
+            if(data.has("QA")){
+                JSONArray qas = data.getJSONArray("QA");
                 for (int i = 0; i < qas.length(); i++) {
                     if (qas.getJSONObject(i).getString("Technology").equalsIgnoreCase("histology")) {
                         qa.setTechnology(qas.getJSONObject(i).getString("Technology"));
@@ -1384,19 +1428,51 @@ public class DataImportService {
 
         }
 
-        if (ds.equals(mdAnderson)){
+        if (ds.equals(mdAnderson)) {
 
             String qaType = Standardizer.NOT_SPECIFIED;
             try {
-                qaType = j.getString("QA") + " on passage " + j.getString("QA Passage");
+                qaType = data.getString("QA") + " on passage " + data.getString("QA Passage");
             } catch (Exception e) {
                 // not all groups supplied QA
             }
 
-            String qaPassage = j.has("QA Passage") ? j.getString("QA Passage") : null;
+            String qaPassage = data.has("QA Passage") ? data.getString("QA Passage") : null;
             qa = new QualityAssurance(qaType, Standardizer.NOT_SPECIFIED, qaPassage);
             saveQualityAssurance(qa);
         }
+
+
+        if (ds.equals(irccCrc)) {
+
+            String FINGERPRINT_DESCRIPTION = "Model validated against patient germline.";
+
+            if ("TRUE".equals(data.getString("Fingerprinting").toUpperCase())) {
+                qa.setTechnology("Fingerprint");
+                qa.setDescription(FINGERPRINT_DESCRIPTION);
+
+                // If the model includes which passages have had QA performed, set the passages on the QA node
+                if (data.has("QA Passage") && !data.getString("QA Passage").isEmpty()) {
+
+                    List<String> passages = Stream.of(data.getString("QA Passage").split(","))
+                            .map(String::trim)
+                            .distinct()
+                            .collect(Collectors.toList());
+                    List<Integer> passageInts = new ArrayList<>();
+
+                    // NOTE:  IRCC uses passage 0 to mean Patient Tumor, so we need to harmonize according to the other
+                    // sources.  Subtract 1 from every passage.
+                    for (String p : passages) {
+                        Integer intPassage = Integer.parseInt(p);
+                        passageInts.add(intPassage - 1);
+                    }
+
+                    qa.setPassages(StringUtils.join(passageInts, ", "));
+                }
+            }
+
+        }
+
 
         return qa;
     }
@@ -1414,13 +1490,17 @@ public class DataImportService {
         if(patient == null){
             patient = createPatient(dto.getPatientId(), hciDS, dto.getGender(), "", Standardizer.getEthnicity(dto.getEthnicity()));
         }
+        dto.setPatient(patient);
+
 
         PatientSnapshot pSnap = getPatientSnapshot(patient, dto.getAge(), "", "", "");
         dto.setPatientSnapshot(pSnap);
 
         Sample sample = getSample(dto.getSampleID(), hciDS.getAbbreviation(), dto.getTumorType(), dto.getDiagnosis(), dto.getPrimarySite(),
                 dto.getSampleSite(), dto.getExtractionMethod(), false, dto.getStage(), "", dto.getGrade(), "");
-        dto.setSample(sample);
+
+
+        dto.setPatientSample(sample);
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
         externalUrls.add(getExternalUrl(ExternalUrl.Type.CONTACT, dataSourceContact));
@@ -1440,10 +1520,10 @@ public class DataImportService {
     public LoaderDTO loaderSecondStep(LoaderDTO dto, PatientSnapshot pSnap, String ds)  throws Exception{
 
 
-        saveSample(dto.getSample());
+        saveSample(dto.getPatientSample());
         savePatientSnapshot(pSnap);
 
-        dto.getModelCreation().addRelatedSample(dto.getSample());
+        dto.getModelCreation().addRelatedSample(dto.getPatientSample());
         dto.getModelCreation().addGroup(dto.getProjectGroup());
 
         if (ds.equals(hci)){
@@ -1523,7 +1603,7 @@ public class DataImportService {
                 //sample.setMolecularCharacterizations(mcs);
 
                 if (human) {
-                    pSnap.addSample(dto.getSample());
+                    pSnap.addSample(dto.getPatientSample());
 
                 } else {
 
@@ -1543,11 +1623,46 @@ public class DataImportService {
                     EngraftmentType it = getImplantationType(dto.getImplantationtypeStr());
                     specimen.setEngraftmentType(it);
 
-                    specimen.setSample(dto.getSample());
+                    specimen.setSample(dto.getPatientSample());
                     saveSpecimen(specimen);
                 }
             }
             saveModelCreation(dto.getModelCreation());
+        }
+
+
+        if (ds.equals(irccCrc)){
+
+            JSONArray specimens = dto.getSpecimens();
+
+            for (int i = 0; i < specimens.length(); i++) {
+                JSONObject specimenJSON = specimens.getJSONObject(i);
+
+                String specimenId = specimenJSON.getString("Specimen ID");
+
+                Specimen specimen = getSpecimen(dto.getModelCreation(),
+                        specimenId, dto.getProviderGroup().getAbbreviation(), specimenJSON.getString("Passage"));
+
+                specimen.setHostStrain(dto.getNodScidGamma());
+
+                EngraftmentSite is = getImplantationSite(specimenJSON.getString("Engraftment Site"));
+                specimen.setEngraftmentSite(is);
+
+                EngraftmentType it = getImplantationType(specimenJSON.getString("Engraftment Type"));
+                specimen.setEngraftmentType(it);
+
+                Sample specSample = new Sample();
+
+                specSample.setSourceSampleId(specimenId);
+                specSample.setDataSource(dto.getProviderGroup().getAbbreviation());
+
+                specimen.setSample(specSample);
+
+                dto.getModelCreation().addSpecimen(specimen);
+                dto.getModelCreation().addRelatedSample(specSample);
+
+            }
+
         }
 
         return dto;

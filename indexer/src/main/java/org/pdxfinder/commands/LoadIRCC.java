@@ -14,6 +14,7 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
+import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,105 +187,26 @@ public class LoadIRCC implements CommandLineRunner {
         if(loadedModelHashes.contains(job.toString().hashCode())) return;
         loadedModelHashes.add(job.toString().hashCode());
 
-        String id = job.getString("Model ID");
+        // RETRIEVE THE METADATA:
+        LoaderDTO dto = dataImportService.getMetadata(job, DATASOURCE_ABBREVIATION);
 
-        // the preference is for histology
-        String diagnosis = job.getString("Clinical Diagnosis");
+        PatientSnapshot pSnap = dto.getPatientSnapshot();
+        pSnap.addSample(dto.getPatientSample());
 
-        String classification = job.getString("Stage");
-        String stage = job.getString("Stage");
-        String age = Standardizer.getAge(job.getString("Age"));
-        String gender = Standardizer.getGender(job.getString("Gender"));
-        String patientId = job.getString("Patient ID");
+        dto.setNodScidGamma(nsgBS);
+        dto.setProjectGroup(projectGroup);
+        dto.setProviderGroup(irccDS);
 
-        String tumorType = Standardizer.getTumorType(job.getString("Tumor Type"));
-        String primarySite = job.getString("Primary Site");
-        String sampleSite = job.getString("Sample Site");
+        // CREATE MODEL-CREATION
+        dto.setModelCreation(
+                dataImportService.createModelCreation(dto.getModelID(), this.irccDS.getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls())
+        );
 
-        Patient patient = dataImportService.getPatientWithSnapshots(patientId, irccDS);
-
-        if(patient == null){
-
-            patient = dataImportService.createPatient(patientId, irccDS, gender, "", NOT_SPECIFIED);
-        }
-
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
+        dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
 
 
-        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
-        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
-        // String grade, String gradeClassification
-        Sample ptSample = dataImportService.getSample(id, irccDS.getAbbreviation(), tumorType, diagnosis, primarySite,
-                sampleSite, NOT_SPECIFIED, false, stage, "", "", "");
 
-        pSnap.addSample(ptSample);
 
-        dataImportService.saveSample(ptSample);
-        dataImportService.savePatientSnapshot(pSnap);
-
-        List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
-
-        QualityAssurance qa = new QualityAssurance();
-
-        if ("TRUE".equals(job.getString("Fingerprinting").toUpperCase())) {
-            qa.setTechnology("Fingerprint");
-            qa.setDescription(FINGERPRINT_DESCRIPTION);
-
-            // If the model includes which passages have had QA performed, set the passages on the QA node
-            if (job.has("QA Passage") && !job.getString("QA Passage").isEmpty()) {
-
-                List<String> passages = Stream.of(job.getString("QA Passage").split(","))
-                        .map(String::trim)
-                        .distinct()
-                        .collect(Collectors.toList());
-                List<Integer> passageInts = new ArrayList<>();
-
-                // NOTE:  IRCC uses passage 0 to mean Patient Tumor, so we need to harmonize according to the other
-                // sources.  Subtract 1 from every passage.
-                for (String p : passages) {
-                    Integer intPassage = Integer.parseInt(p);
-                    passageInts.add(intPassage - 1);
-                }
-
-                qa.setPassages(StringUtils.join(passageInts, ", "));
-
-            }
-
-        }
-
-        ModelCreation modelCreation = dataImportService.createModelCreation(id, this.irccDS.getAbbreviation(), ptSample, qa, externalUrls);
-
-        modelCreation.addGroup(projectGroup);
-
-        JSONArray specimens = job.getJSONArray("Specimens");
-        for (int i = 0; i < specimens.length(); i++) {
-            JSONObject specimenJSON = specimens.getJSONObject(i);
-
-            String specimenId = specimenJSON.getString("Specimen ID");
-            
-            Specimen specimen = dataImportService.getSpecimen(modelCreation,
-                    specimenId, irccDS.getAbbreviation(), specimenJSON.getString("Passage"));
-
-            specimen.setHostStrain(this.nsgBS);
-
-            EngraftmentSite is = dataImportService.getImplantationSite(specimenJSON.getString("Engraftment Site"));
-            specimen.setEngraftmentSite(is);
-
-            EngraftmentType it = dataImportService.getImplantationType(specimenJSON.getString("Engraftment Type"));
-            specimen.setEngraftmentType(it);
-
-            Sample specSample = new Sample();
-
-            specSample.setSourceSampleId(specimenId);
-            specSample.setDataSource(irccDS.getAbbreviation());
-
-            specimen.setSample(specSample);
-
-            modelCreation.addSpecimen(specimen);
-            modelCreation.addRelatedSample(specSample);
-
-        }
 
         //Create Treatment summary without linking TreatmentProtocols to specimens
         TreatmentSummary ts;
@@ -314,8 +236,8 @@ public class LoadIRCC implements CommandLineRunner {
                             }
                         }
 
-                        ts.setModelCreation(modelCreation);
-                        modelCreation.setTreatmentSummary(ts);
+                        ts.setModelCreation(dto.getModelCreation());
+                        dto.getModelCreation().setTreatmentSummary(ts);
                     }
                 }
 
@@ -328,9 +250,8 @@ public class LoadIRCC implements CommandLineRunner {
             e.printStackTrace();
         }
 
-        dataImportService.savePatient(patient);
-        dataImportService.savePatientSnapshot(pSnap);
-        dataImportService.saveModelCreation(modelCreation);
+        dataImportService.savePatient(dto.getPatient());
+        dataImportService.saveModelCreation(dto.getModelCreation());
         
     }
 

@@ -161,7 +161,7 @@ public class LoadHCI implements CommandLineRunner {
         dto = dataImportService.loaderFirstStep(dto, hciDS, DATASOURCE_CONTACT);
 
         PatientSnapshot pSnap = dto.getPatientSnapshot();
-        pSnap.addSample(dto.getSample());
+        pSnap.addSample(dto.getPatientSample());
 
         dto.setNodScidGamma(nsgBS);
         dto.setNodScid(nsBS);
@@ -169,10 +169,13 @@ public class LoadHCI implements CommandLineRunner {
         dto.setProviderGroup(hciDS);
 
         dto.setModelCreation(
-                dataImportService.createModelCreation(dto.getModelID(), this.hciDS.getAbbreviation(), dto.getSample(), dto.getQualityAssurance(), dto.getExternalUrls())
+                dataImportService.createModelCreation(dto.getModelID(), this.hciDS.getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls())
         );
 
         dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
+
+
+
 
 
         TreatmentSummary ts;

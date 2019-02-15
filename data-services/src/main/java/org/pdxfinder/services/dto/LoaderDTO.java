@@ -1,5 +1,6 @@
 package org.pdxfinder.services.dto;
 
+import org.neo4j.ogm.json.JSONArray;
 import org.pdxfinder.graph.dao.*;
 
 import java.util.List;
@@ -28,8 +29,9 @@ public class LoaderDTO {
     private String markerPlatform;
     private String markerStr;
     private String qaPassage;
+    private String fingerprinting;
 
-    private Sample sample;
+    private Sample patientSample;
     private PatientSnapshot patientSnapshot;
     private QualityAssurance qualityAssurance;
     private List<ExternalUrl> externalUrls;
@@ -44,6 +46,9 @@ public class LoaderDTO {
     private Group providerGroup;
 
     private ModelCreation modelCreation;
+    private Patient patient;
+
+    private JSONArray specimens;
 
 
     public LoaderDTO() {
@@ -209,12 +214,12 @@ public class LoaderDTO {
         this.qaPassage = qaPassage;
     }
 
-    public Sample getSample() {
-        return sample;
+    public Sample getPatientSample() {
+        return patientSample;
     }
 
-    public void setSample(Sample sample) {
-        this.sample = sample;
+    public void setPatientSample(Sample patientSample) {
+        this.patientSample = patientSample;
     }
 
     public PatientSnapshot getPatientSnapshot() {
@@ -295,5 +300,29 @@ public class LoaderDTO {
 
     public void setModelCreation(ModelCreation modelCreation) {
         this.modelCreation = modelCreation;
+    }
+
+    public String getFingerprinting() {
+        return fingerprinting;
+    }
+
+    public void setFingerprinting(String fingerprinting) {
+        this.fingerprinting = fingerprinting;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
+
+    public JSONArray getSpecimens() {
+        return specimens;
+    }
+
+    public void setSpecimens(JSONArray specimens) {
+        this.specimens = specimens;
     }
 }
