@@ -1,0 +1,299 @@
+package org.pdxfinder.services.dto;
+
+import org.pdxfinder.graph.dao.*;
+
+import java.util.List;
+
+public class LoaderDTO {
+
+    private String modelID;
+    private String sampleID;
+    private String diagnosis;
+    private String patientId;
+    private String ethnicity;
+    private String stage;
+    private String grade;
+    private String classification;
+    private String age;
+    private String gender;
+    private String tumorType;
+    private String sampleSite;
+    private String primarySite;
+    private String extractionMethod;
+
+    private String implantationtypeStr;
+    private String implantationSiteStr;
+    private String strain;
+
+    private String markerPlatform;
+    private String markerStr;
+    private String qaPassage;
+
+    private Sample sample;
+    private PatientSnapshot patientSnapshot;
+    private QualityAssurance qualityAssurance;
+    private List<ExternalUrl> externalUrls;
+
+    private EngraftmentSite engraftmentSite;
+    private EngraftmentType engraftmentType;
+
+    private HostStrain nodScidGamma;
+    private HostStrain nodScid;
+
+    private Group projectGroup;
+    private Group providerGroup;
+
+    private ModelCreation modelCreation;
+
+
+    public LoaderDTO() {
+    }
+
+    public String getModelID() {
+        return modelID;
+    }
+
+    public void setModelID(String modelID) {
+        this.modelID = modelID;
+    }
+
+    public String getSampleID() {
+        return sampleID;
+    }
+
+    public void setSampleID(String sampleID) {
+        this.sampleID = sampleID;
+    }
+
+    public String getDiagnosis() {
+        return diagnosis;
+    }
+
+    public void setDiagnosis(String diagnosis) {
+        this.diagnosis = diagnosis;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    public String getEthnicity() {
+        return ethnicity;
+    }
+
+    public void setEthnicity(String ethnicity) {
+        this.ethnicity = ethnicity;
+    }
+
+    public String getStage() {
+        return stage;
+    }
+
+    public void setStage(String stage) {
+        this.stage = stage;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
+    public String getClassification() {
+        return classification;
+    }
+
+    public void setClassification(String classification) {
+        this.classification = classification;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getTumorType() {
+        return tumorType;
+    }
+
+    public void setTumorType(String tumorType) {
+        this.tumorType = tumorType;
+    }
+
+    public String getSampleSite() {
+        return sampleSite;
+    }
+
+    public void setSampleSite(String sampleSite) {
+        this.sampleSite = sampleSite;
+    }
+
+    public String getPrimarySite() {
+        return primarySite;
+    }
+
+    public void setPrimarySite(String primarySite) {
+        this.primarySite = primarySite;
+    }
+
+    public String getExtractionMethod() {
+        return extractionMethod;
+    }
+
+    public void setExtractionMethod(String extractionMethod) {
+        this.extractionMethod = extractionMethod;
+    }
+
+    public String getImplantationtypeStr() {
+        return implantationtypeStr;
+    }
+
+    public void setImplantationtypeStr(String implantationtypeStr) {
+        this.implantationtypeStr = implantationtypeStr;
+    }
+
+    public String getImplantationSiteStr() {
+        return implantationSiteStr;
+    }
+
+    public void setImplantationSiteStr(String implantationSiteStr) {
+        this.implantationSiteStr = implantationSiteStr;
+    }
+
+    public String getStrain() {
+        return strain;
+    }
+
+    public void setStrain(String strain) {
+        this.strain = strain;
+    }
+
+    public String getMarkerPlatform() {
+        return markerPlatform;
+    }
+
+    public void setMarkerPlatform(String markerPlatform) {
+        this.markerPlatform = markerPlatform;
+    }
+
+    public String getMarkerStr() {
+        return markerStr;
+    }
+
+    public void setMarkerStr(String markerStr) {
+        this.markerStr = markerStr;
+    }
+
+    public String getQaPassage() {
+        return qaPassage;
+    }
+
+    public void setQaPassage(String qaPassage) {
+        this.qaPassage = qaPassage;
+    }
+
+    public Sample getSample() {
+        return sample;
+    }
+
+    public void setSample(Sample sample) {
+        this.sample = sample;
+    }
+
+    public PatientSnapshot getPatientSnapshot() {
+        return patientSnapshot;
+    }
+
+    public void setPatientSnapshot(PatientSnapshot patientSnapshot) {
+        this.patientSnapshot = patientSnapshot;
+    }
+
+    public QualityAssurance getQualityAssurance() {
+        return qualityAssurance;
+    }
+
+    public void setQualityAssurance(QualityAssurance qualityAssurance) {
+        this.qualityAssurance = qualityAssurance;
+    }
+
+    public List<ExternalUrl> getExternalUrls() {
+        return externalUrls;
+    }
+
+    public void setExternalUrls(List<ExternalUrl> externalUrls) {
+        this.externalUrls = externalUrls;
+    }
+
+    public EngraftmentSite getEngraftmentSite() {
+        return engraftmentSite;
+    }
+
+    public void setEngraftmentSite(EngraftmentSite engraftmentSite) {
+        this.engraftmentSite = engraftmentSite;
+    }
+
+    public EngraftmentType getEngraftmentType() {
+        return engraftmentType;
+    }
+
+    public void setEngraftmentType(EngraftmentType engraftmentType) {
+        this.engraftmentType = engraftmentType;
+    }
+
+    public HostStrain getNodScidGamma() {
+        return nodScidGamma;
+    }
+
+    public void setNodScidGamma(HostStrain nodScidGamma) {
+        this.nodScidGamma = nodScidGamma;
+    }
+
+    public HostStrain getNodScid() {
+        return nodScid;
+    }
+
+    public void setNodScid(HostStrain nodScid) {
+        this.nodScid = nodScid;
+    }
+
+    public Group getProjectGroup() {
+        return projectGroup;
+    }
+
+    public void setProjectGroup(Group projectGroup) {
+        this.projectGroup = projectGroup;
+    }
+
+    public Group getProviderGroup() {
+        return providerGroup;
+    }
+
+    public void setProviderGroup(Group providerGroup) {
+        this.providerGroup = providerGroup;
+    }
+
+    public ModelCreation getModelCreation() {
+        return modelCreation;
+    }
+
+    public void setModelCreation(ModelCreation modelCreation) {
+        this.modelCreation = modelCreation;
+    }
+}
