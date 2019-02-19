@@ -66,10 +66,6 @@ public class LoadHCI implements CommandLineRunner {
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
-    private HostStrain nsgBS, nsBS;
-    private Group hciDS;
-    private Group projectGroup;
-
     private Options options;
     private CommandLineParser parser;
     private CommandLine cmd;
@@ -106,124 +102,60 @@ public class LoadHCI implements CommandLineRunner {
 
             log.info("Loading Huntsman PDX data.");
 
-            String modelJson = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/models.json";
+            String fileStr = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/models.json";
 
-            File file = new File(modelJson);
-            if (file.exists()) {
+            String metaDataJSON = dataImportService.stageOneGetMetaDataFile(fileStr, DATASOURCE_ABBREVIATION);
 
-                parseJSON(utilityService.parseFile(modelJson));
-            } else {
-                log.info("No file found for " + DATASOURCE_ABBREVIATION + ", skipping");
+            if (!metaDataJSON.equals("NOT FOUND")){
+                parseJSONandCreateGraphObjects(metaDataJSON);
             }
-
-
         }
     }
 
-    private void parseJSON(String json) {
 
-        hciDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
-                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+    private void parseJSONandCreateGraphObjects(String json) throws Exception {
 
-        try {
-            nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
-            nsBS = dataImportService.getHostStrain(NS_BS_NAME, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        projectGroup = dataImportService.getProjectGroup("PDXNet");
+        LoaderDTO dto = new LoaderDTO();
 
-        try {
-            JSONObject job = new JSONObject(json);
-            JSONArray jarray = job.getJSONArray("HCI");
+        dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
+                PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
-            for (int i = 0; i < jarray.length(); i++) {
+        dto = dataImportService.stageThreeCreateNSGammaHostStrain(dto, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
-                JSONObject j = jarray.getJSONObject(i);
+        dto = dataImportService.stageFourCreateNSHostStrain(dto, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
 
-                createGraphObjects(j);
-            }
+        dto = dataImportService.stageFiveCreateProjectGroup(dto,"PDXNet");
 
-        } catch (Exception e) {
-            log.error("Error getting HCI PDX models", e);
-
-        }
-
-        loadImmunoHistoChemistry();
-
-    }
-
-    @Transactional
-    void createGraphObjects(JSONObject j) throws Exception {
-
-        LoaderDTO dto = dataImportService.getMetadata(j, DATASOURCE_ABBREVIATION);
-
-        dto = dataImportService.loaderFirstStep(dto, hciDS, DATASOURCE_CONTACT);
-
-        PatientSnapshot pSnap = dto.getPatientSnapshot();
-        pSnap.addSample(dto.getPatientSample());
-
-        dto.setNodScidGamma(nsgBS);
-        dto.setNodScid(nsBS);
-        dto.setProjectGroup(projectGroup);
-        dto.setProviderGroup(hciDS);
-
-        dto.setModelCreation(
-                dataImportService.createModelCreation(dto.getModelID(), this.hciDS.getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls())
-        );
-
-        dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
+        JSONArray jarray = dataImportService.stageSixGetPDXModels(json,"HCI");
 
 
+        for (int i = 0; i < jarray.length(); i++) {
 
+            JSONObject jsonData = jarray.getJSONObject(i);
 
+            dto = dataImportService.stageSevenGetMetadata(dto, jsonData, DATASOURCE_ABBREVIATION);
 
-        TreatmentSummary ts;
-        try {
-            if (j.has("Treatments")) {
-                JSONObject treatment = j.optJSONObject("Treatments");
-                //if the treatment attribute is not an object = it is an array
-                if (treatment == null && j.optJSONArray("Treatments") != null) {
+            dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
 
-                    JSONArray treatments = j.getJSONArray("Treatments");
+            PatientSnapshot pSnap = dto.getPatientSnapshot();
+            pSnap.addSample(dto.getPatientSample());
 
-                    if (treatments.length() > 0) {
+            dto = dataImportService.stageNineCreateModels(dto);
 
-                        //log.info("Treatments found for model "+mc.getSourcePdxId());
-                        ts = new TreatmentSummary();
-                        ts.setUrl(DOSING_STUDY_URL);
+            dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
 
-                        for (int t = 0; t < treatments.length(); t++) {
-                            JSONObject treatmentObject = treatments.getJSONObject(t);
+            dto = dataImportService.stepThreeCurrentTreatment(dto, DOSING_STUDY_URL);
 
-
-                            TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
-                                    treatmentObject.getString("Dose"), treatmentObject.getString("Response"), "");
-
-                            if (tp != null) {
-                                ts.addTreatmentProtocol(tp);
-                            }
-                        }
-
-                        ts.setModelCreation(dto.getModelCreation());
-                        dto.getModelCreation().setTreatmentSummary(ts);
-                    }
-                }
-
-            }
-
-            dataImportService.saveModelCreation(dto.getModelCreation());
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
         }
 
 
+        loadImmunoHistoChemistry(dto);
     }
 
 
-    private void loadImmunoHistoChemistry() {
+
+
+    private void loadImmunoHistoChemistry(LoaderDTO dto) {
 
 
         String ihcFileStr = dataRootDir + DATASOURCE_ABBREVIATION + "/ihc/ihc.txt";
@@ -232,7 +164,7 @@ public class LoadHCI implements CommandLineRunner {
 
         if (file.exists()) {
 
-            Platform pl = dataImportService.getPlatform("ImmunoHistoChemistry", hciDS);
+            Platform pl = dataImportService.getPlatform("ImmunoHistoChemistry", dto.getProviderGroup());
 
             String currentLine = "";
             int currentLineCounter = 1;
@@ -312,7 +244,7 @@ public class LoadHCI implements CommandLineRunner {
                 String sampleId = modAndSamp[1];
 
                 //Sample sample = dataImportService.findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(modelId, hciDS.getAbbreviation(), sampleId);
-                Sample sample = dataImportService.findHumanSampleWithMolcharByModelIdAndDataSource(modelId, hciDS.getAbbreviation());
+                Sample sample = dataImportService.findHumanSampleWithMolcharByModelIdAndDataSource(modelId, dto.getProviderGroup().getAbbreviation());
 
                 if (sample == null) {
                     log.warn("Missing model or sample: " + modelId + " " + sampleId);
