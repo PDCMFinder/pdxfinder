@@ -103,87 +103,54 @@ public class LoadWUSTL implements CommandLineRunner {
 
             log.info("Loading WUSTL PDX data.");
 
-            File folder = new File(dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/");
 
-            if(folder.exists()){
+            String directory = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/";
 
-                File[] listOfFiles = folder.listFiles();
+            File[] listOfFiles = dataImportService.stageZeroGetMetaDataFolder(directory,DATASOURCE_ABBREVIATION);
 
-                if(listOfFiles.length == 0){
+            for (int i = 0; i < listOfFiles.length; i++) {
+                if (listOfFiles[i].isFile()) {
 
-                    log.info("No file found for "+DATASOURCE_ABBREVIATION+", skipping");
+                    String fileName = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/" + listOfFiles[i].getName();
+                    String metaDataJSON = dataImportService.stageOneGetMetaDataFile(fileName, DATASOURCE_ABBREVIATION);
+
+                    parseJSONandCreateGraphObjects(metaDataJSON);
                 }
-                else{
-
-                    for (int i = 0; i < listOfFiles.length; i++) {
-                        if (listOfFiles[i].isFile()) {
-                            String fileName = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/"+listOfFiles[i].getName();
-
-                            parseJSON(utilityService.parseFile(fileName));
-
-                        }
-                    }
-
-                }
-
             }
-            else{
-                log.info(DATASOURCE_ABBREVIATION+" dir does not exist, skipping.");
-            }
-
 
         }
 
     }
 
-    private void parseJSON(String json) {
+    private void parseJSONandCreateGraphObjects(String json) throws Exception {
 
-        DS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
-                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+        LoaderDTO dto = new LoaderDTO();
 
-        //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
+                PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
-        projectGroup = dataImportService.getProjectGroup("PDXNet");
+        dto = dataImportService.stageFiveCreateProjectGroup(dto,"PDXNet");
 
-        try {
-            JSONObject job = new JSONObject(json);
-            JSONArray jarray = job.getJSONArray("WUSTL");
+        JSONArray jarray = dataImportService.stageSixGetPDXModels(json,"WUSTL");
 
-            for (int i = 0; i < jarray.length(); i++) {
 
-                JSONObject j = jarray.getJSONObject(i);
+        for (int i = 0; i < jarray.length(); i++) {
 
-                createGraphObjects(j);
-            }
+            JSONObject jsonData = jarray.getJSONObject(i);
 
-        } catch (Exception e) {
-            log.error("Error getting WUSTL PDX models", e);
+            dto = dataImportService.stageSevenGetMetadata(dto, jsonData, DATASOURCE_ABBREVIATION);
+
+            dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
+
+            PatientSnapshot pSnap = dto.getPatientSnapshot();
+            pSnap.addSample(dto.getPatientSample());
+
+            dto = dataImportService.stageNineCreateModels(dto);
+
+            dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
 
         }
-    }
 
-    @Transactional
-    void createGraphObjects(JSONObject j) throws Exception {
-
-
-        // RETRIEVE THE METADATA:
-        LoaderDTO dto = dataImportService.getMetadata(j, DATASOURCE_ABBREVIATION);
-
-        dto = dataImportService.loaderFirstStep(dto, DS, DATASOURCE_CONTACT);
-
-        PatientSnapshot pSnap = dto.getPatientSnapshot();
-        pSnap.addSample(dto.getPatientSample());
-
-        dto.setProjectGroup(projectGroup);
-        dto.setProviderGroup(DS);
-
-
-        // CREATE MODEL-CREATION
-        dto.setModelCreation(
-                dataImportService.createModelCreation(dto.getModelID(), DS.getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls())
-        );
-
-        dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
 
     }
 
