@@ -99,77 +99,59 @@ public class LoadMDAnderson implements CommandLineRunner {
 
             log.info("Loading MDAnderson PDX data.");
 
-            File folder = new File(dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/");
-            if (folder.exists()) {
-                File[] listOfFiles = folder.listFiles();
+            String directory = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/";
 
-                for (int i = 0; i < listOfFiles.length; i++) {
-                    if (listOfFiles[i].isFile()) {
-                        String fileName = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/" + listOfFiles[i].getName();
+            File[] listOfFiles = dataImportService.stageZeroGetMetaDataFolder(directory,DATASOURCE_ABBREVIATION);
 
-                        parseJSON(utilityService.parseFile(fileName));
+            for (int i = 0; i < listOfFiles.length; i++) {
+                if (listOfFiles[i].isFile()) {
 
+                    String fileName = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/" + listOfFiles[i].getName();
+                    String metaDataJSON = dataImportService.stageOneGetMetaDataFile(fileName, DATASOURCE_ABBREVIATION);
+
+                    if (!metaDataJSON.equals("NOT FOUND")) {
+                        parseJSONandCreateGraphObjects(metaDataJSON);
                     }
                 }
-
-            } else {
-
-                log.info("MDA directory not found");
             }
-
 
             log.info("Finished loading MDAnderson PDX data.");
         }
 
     }
 
-    private void parseJSON(String json) {
+    private void parseJSONandCreateGraphObjects(String json) throws Exception {
 
-        mdaDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
-                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
-        //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
+        LoaderDTO dto = new LoaderDTO();
 
-        projectGroup = dataImportService.getProjectGroup("PDXNet");
+        dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
+                PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
-        try {
-            JSONObject job = new JSONObject(json);
-            JSONArray jarray = job.getJSONArray("MDA");
+        dto = dataImportService.stageFiveCreateProjectGroup(dto,"PDXNet");
 
-            for (int i = 0; i < jarray.length(); i++) {
+        JSONArray jarray = dataImportService.stageSixGetPDXModels(json,"MDA");
 
-                JSONObject j = jarray.getJSONObject(i);
 
-                createGraphObjects(j);
-            }
+        for (int i = 0; i < jarray.length(); i++) {
 
-        } catch (Exception e) {
-            log.error("Error getting MDA PDX models", e);
+            JSONObject jsonData = jarray.getJSONObject(i);
+
+            dto = dataImportService.stageSevenGetMetadata(dto, jsonData, DATASOURCE_ABBREVIATION);
+
+            dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
+
+            PatientSnapshot pSnap = dto.getPatientSnapshot();
+            pSnap.addSample(dto.getPatientSample());
+
+            dto = dataImportService.stageNineCreateModels(dto);
+
+            dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
 
         }
-    }
 
-    @Transactional
-    void createGraphObjects(JSONObject j) throws Exception {
-
-        // RETRIEVE THE METADATA:
-        LoaderDTO dto = dataImportService.getMetadata(j, DATASOURCE_ABBREVIATION);
-
-        dto = dataImportService.loaderFirstStep(dto, mdaDS, DATASOURCE_CONTACT);
-
-        PatientSnapshot pSnap = dto.getPatientSnapshot();
-        pSnap.addSample(dto.getPatientSample());
-
-        dto.setProjectGroup(projectGroup);
-        dto.setProviderGroup(mdaDS);
-
-        // CREATE MODEL-CREATION
-        dto.setModelCreation(
-                dataImportService.createModelCreation(dto.getModelID(), mdaDS.getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls())
-        );
-
-        dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
 
     }
+
 
 
 }
