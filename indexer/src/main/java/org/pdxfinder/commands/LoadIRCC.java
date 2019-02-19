@@ -55,7 +55,7 @@ public class LoadIRCC implements CommandLineRunner {
     private final static String NSG_BS_NAME = "NOD scid gamma";
     private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
     private final static String NSG_BS_URL = "http://jax.org/strain/005557";
-    
+
     private final static String TECH = "MUT targeted NGS";
 
     private final static String DOSING_STUDY_URL = "/platform/ircc-dosing-studies/";
@@ -67,6 +67,8 @@ public class LoadIRCC implements CommandLineRunner {
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
     public static final String FINGERPRINT_DESCRIPTION = "Model validated against patient germline.";
+
+    private LoaderDTO dto = new LoaderDTO();
 
     private Options options;
     private CommandLineParser parser;
@@ -115,20 +117,31 @@ public class LoadIRCC implements CommandLineRunner {
 
             log.info("Loading IRCC PDX data.");
 
+
             String fileStr = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
 
             String metaDataJSON = dataImportService.stageOneGetMetaDataFile(fileStr, DATASOURCE_ABBREVIATION);
 
-            if (!metaDataJSON.equals("NOT FOUND")){
-                parseJSONandCreateGraphObjects(metaDataJSON);
-            }
 
+            if (!metaDataJSON.equals("NOT FOUND")){
+
+                parseJSONandCreateGraphObjects(metaDataJSON);
+
+
+                String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
+                File varFile = new File(variationURLStr);
+
+                if(varFile.exists()){
+
+                    if (variationURLStr != null && variationMax != 0) {
+                        loadVariants(variationURLStr, "TargetedNGS_MUT", "mutation");
+                    }
+                }
+            }
         }
     }
 
     private void parseJSONandCreateGraphObjects(String json) throws Exception {
-
-        LoaderDTO dto = new LoaderDTO();
 
         dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
                 PROVIDER_TYPE, ACCESSIBILITY, "transnational access", DATASOURCE_CONTACT, SOURCE_URL);
@@ -142,80 +155,9 @@ public class LoadIRCC implements CommandLineRunner {
 
         for (int i = 0; i < jarray.length(); i++) {
 
-            JSONObject jsonData = jarray.getJSONObject(i);
+            JSONObject job = jarray.getJSONObject(i);
 
-            if(loadedModelHashes.contains(jsonData.toString().hashCode())) return;
-            loadedModelHashes.add(jsonData.toString().hashCode());
-
-            dto = dataImportService.stageSevenGetMetadata(dto, jsonData, DATASOURCE_ABBREVIATION);
-
-            dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
-
-            PatientSnapshot pSnap = dto.getPatientSnapshot();
-            pSnap.addSample(dto.getPatientSample());
-
-            dto = dataImportService.stageNineCreateModels(dto);
-
-            dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
-
-            dataImportService.stepThreeCurrentTreatment(dto, DOSING_STUDY_URL);
-
-
-
-            //Create Treatment summary without linking TreatmentProtocols to specimens
-            TreatmentSummary ts;
-
-            try{
-                if(jsonData.has("Treatment")){
-                    JSONObject treatment = jsonData.optJSONObject("Treatment");
-                    //if the treatment attribute is not an object = it is an array
-                    if(treatment == null && jsonData.optJSONArray("Treatment") != null){
-
-                        JSONArray treatments = jsonData.getJSONArray("Treatment");
-
-                        if(treatments.length() > 0){
-                            //log.info("Treatments found for model "+mc.getSourcePdxId());
-                            ts = new TreatmentSummary();
-                            ts.setUrl(DOSING_STUDY_URL);
-                            for(int t = 0; t<treatments.length(); t++){
-                                JSONObject treatmentObject = treatments.getJSONObject(t);
-
-
-                                TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
-                                        treatmentObject.getString("Dose"), treatmentObject.getString("Response Class"), "");
-
-                                if(tp != null){
-                                    ts.addTreatmentProtocol(tp);
-                                }
-                            }
-
-                            ts.setModelCreation(dto.getModelCreation());
-                            dto.getModelCreation().setTreatmentSummary(ts);
-                        }
-                    }
-
-                }
-            }
-            catch(Exception e){e.printStackTrace(); }
-
-            dataImportService.savePatient(dto.getPatient());
-            dataImportService.saveModelCreation(dto.getModelCreation());
-
-
-
-
-            // VARIATION DATA:
-            String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
-            File varFile = new File(variationURLStr);
-
-            if(varFile.exists()){
-
-                if (variationURLStr != null && variationMax != 0) {
-                    loadVariants(dto, variationURLStr, "TargetedNGS_MUT", "mutation");
-                }
-            }
-
-
+            createGraphObjects(job);
         }
 
     }
@@ -224,8 +166,165 @@ public class LoadIRCC implements CommandLineRunner {
 
 
 
+
+
     @Transactional
-    public void loadVariants(LoaderDTO dto, String variationURLStr, String platformName, String molcharType){
+    void createGraphObjects(JSONObject job) throws Exception {
+
+        if(loadedModelHashes.contains(job.toString().hashCode())) return;
+        loadedModelHashes.add(job.toString().hashCode());
+
+        dto = dataImportService.stageSevenGetMetadata(dto, job, DATASOURCE_ABBREVIATION);
+
+        String id = dto.getModelID();
+
+        String diagnosis = dto.getDiagnosis();
+
+        String classification = dto.getClassification();
+        String stage = dto.getStage();
+        String age = dto.getAge();
+        String gender = dto.getGender();
+        String patientId = dto.getPatientId();
+
+        String tumorType = dto.getTumorType();
+        String primarySite = dto.getPrimarySite();
+        String sampleSite = dto.getSampleSite();
+
+        Patient patient = dataImportService.getPatientWithSnapshots(patientId, dto.getProviderGroup());
+
+        if(patient == null){
+
+            patient = dataImportService.createPatient(patientId, dto.getProviderGroup(), gender, "", NOT_SPECIFIED);
+        }
+
+        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
+
+
+        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
+        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
+        // String grade, String gradeClassification
+        Sample ptSample = dataImportService.getSample(id, dto.getProviderGroup().getAbbreviation(), tumorType, diagnosis, primarySite,
+                sampleSite, NOT_SPECIFIED, false, stage, "", "", "");
+
+        pSnap.addSample(ptSample);
+
+        dataImportService.saveSample(ptSample);
+        dataImportService.savePatientSnapshot(pSnap);
+
+        List<ExternalUrl> externalUrls = new ArrayList<>();
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
+
+        QualityAssurance qa = new QualityAssurance();
+
+        if ("TRUE".equals(job.getString("Fingerprinting").toUpperCase())) {
+            qa.setTechnology("Fingerprint");
+            qa.setDescription(FINGERPRINT_DESCRIPTION);
+
+            // If the model includes which passages have had QA performed, set the passages on the QA node
+            if (job.has("QA Passage") && !job.getString("QA Passage").isEmpty()) {
+
+                List<String> passages = Stream.of(job.getString("QA Passage").split(","))
+                        .map(String::trim)
+                        .distinct()
+                        .collect(Collectors.toList());
+                List<Integer> passageInts = new ArrayList<>();
+
+                // NOTE:  IRCC uses passage 0 to mean Patient Tumor, so we need to harmonize according to the other
+                // sources.  Subtract 1 from every passage.
+                for (String p : passages) {
+                    Integer intPassage = Integer.parseInt(p);
+                    passageInts.add(intPassage - 1);
+                }
+
+                qa.setPassages(StringUtils.join(passageInts, ", "));
+
+            }
+
+        }
+
+        ModelCreation modelCreation = dataImportService.createModelCreation(id, dto.getProviderGroup().getAbbreviation(), ptSample, qa, externalUrls);
+
+        modelCreation.addGroup(dto.getProjectGroup());
+
+        JSONArray specimens = job.getJSONArray("Specimens");
+        for (int i = 0; i < specimens.length(); i++) {
+            JSONObject specimenJSON = specimens.getJSONObject(i);
+
+            String specimenId = specimenJSON.getString("Specimen ID");
+
+            Specimen specimen = dataImportService.getSpecimen(modelCreation,
+                    specimenId, dto.getProviderGroup().getAbbreviation(), specimenJSON.getString("Passage"));
+
+            specimen.setHostStrain(dto.getNodScidGamma());
+
+            EngraftmentSite is = dataImportService.getImplantationSite(specimenJSON.getString("Engraftment Site"));
+            specimen.setEngraftmentSite(is);
+
+            EngraftmentType it = dataImportService.getImplantationType(specimenJSON.getString("Engraftment Type"));
+            specimen.setEngraftmentType(it);
+
+            Sample specSample = new Sample();
+
+            specSample.setSourceSampleId(specimenId);
+            specSample.setDataSource(dto.getProviderGroup().getAbbreviation());
+
+            specimen.setSample(specSample);
+
+            modelCreation.addSpecimen(specimen);
+            modelCreation.addRelatedSample(specSample);
+
+        }
+
+        //Create Treatment summary without linking TreatmentProtocols to specimens
+        TreatmentSummary ts;
+
+
+        try{
+            if(job.has("Treatment")){
+                JSONObject treatment = job.optJSONObject("Treatment");
+                //if the treatment attribute is not an object = it is an array
+                if(treatment == null && job.optJSONArray("Treatment") != null){
+
+                    JSONArray treatments = job.getJSONArray("Treatment");
+
+                    if(treatments.length() > 0){
+                        //log.info("Treatments found for model "+mc.getSourcePdxId());
+                        ts = new TreatmentSummary();
+                        ts.setUrl(DOSING_STUDY_URL);
+                        for(int t = 0; t<treatments.length(); t++){
+                            JSONObject treatmentObject = treatments.getJSONObject(t);
+
+
+                            TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
+                                    treatmentObject.getString("Dose"), treatmentObject.getString("Response Class"), "");
+
+                            if(tp != null){
+                                ts.addTreatmentProtocol(tp);
+                            }
+                        }
+
+                        ts.setModelCreation(modelCreation);
+                        modelCreation.setTreatmentSummary(ts);
+                    }
+                }
+
+            }
+
+
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
+
+        dataImportService.savePatient(patient);
+        dataImportService.savePatientSnapshot(pSnap);
+        dataImportService.saveModelCreation(modelCreation);
+
+    }
+
+    @Transactional
+    public void loadVariants(String variationURLStr, String platformName, String molcharType){
 
         log.info("Loading variation for platform "+platformName);
         //STEP 1: Save the platform
@@ -402,16 +501,16 @@ public class LoadIRCC implements CommandLineRunner {
         }
 
     }
-    
-    
-     @Transactional
-    public void loadVariantsBySpecimen(LoaderDTO dto) {
+
+
+    @Transactional
+    public void loadVariantsBySpecimen() {
 
         try {
             String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
             JSONObject job = new JSONObject(utilityService.parseFile(variationURLStr));
             JSONArray jarray = job.getJSONArray("IRCCVariation");
-         //   System.out.println("loading "+jarray.length()+" variant records");
+            //   System.out.println("loading "+jarray.length()+" variant records");
 
             Platform platform = dataImportService.getPlatform(TECH, dto.getProviderGroup(), TARGETEDNGS_PLATFORM_URL);
             platform.setGroup(dto.getProviderGroup());
@@ -429,9 +528,9 @@ public class LoadIRCC implements CommandLineRunner {
                 String modelId = variation.getString("Model ID");
                 String sample = variation.getString("Sample ID");
                 String specimen = variation.getString("Specimen ID");
-                
-               // System.out.println("specimen "+specimen+" has sample "+sample);
-                
+
+                // System.out.println("specimen "+specimen+" has sample "+sample);
+
                 if(specimenSamples.containsKey(specimen)){
                     specimenSamples.get(specimen).put(sample, sample);
                 }else{
@@ -439,15 +538,15 @@ public class LoadIRCC implements CommandLineRunner {
                     samples.put(sample,sample);
                     specimenSamples.put(specimen,samples);
                 }
-                        
-                
+
+
                 String gene = variation.getString("Gene");
                 String type = variation.getString("Type");
-                
+
                 Marker marker = dataImportService.getMarker(gene,gene);
-                
+
                 MarkerAssociation ma = new MarkerAssociation();
-                
+
                 ma.setMarker(marker);
                 ma.setType(type);
                 ma.setCdsChange(variation.getString("CDS"));
@@ -477,7 +576,7 @@ public class LoadIRCC implements CommandLineRunner {
             log.error("Unable to load variants");
             e.printStackTrace();
         }
-       
+
     }
 
 }

@@ -80,8 +80,6 @@ public class LoadHCI implements CommandLineRunner {
     @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
 
-    private LoaderDTO dto = new LoaderDTO();
-
     @PostConstruct
     public void init() {
         formatter = new HelpFormatter();
@@ -117,6 +115,8 @@ public class LoadHCI implements CommandLineRunner {
 
     private void parseJSONandCreateGraphObjects(String json) throws Exception {
 
+        LoaderDTO dto = new LoaderDTO();
+
         dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
                 PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
@@ -147,13 +147,13 @@ public class LoadHCI implements CommandLineRunner {
 
         }
 
-        loadImmunoHistoChemistry();
+        loadImmunoHistoChemistry(dto);
     }
 
 
 
 
-    private void loadImmunoHistoChemistry() {
+    private void loadImmunoHistoChemistry(LoaderDTO dto) {
 
 
         String ihcFileStr = dataRootDir + DATASOURCE_ABBREVIATION + "/ihc/ihc.txt";
