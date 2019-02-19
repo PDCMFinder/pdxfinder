@@ -80,6 +80,8 @@ public class LoadHCI implements CommandLineRunner {
     @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
 
+    private LoaderDTO dto = new LoaderDTO();
+
     @PostConstruct
     public void init() {
         formatter = new HelpFormatter();
@@ -115,8 +117,6 @@ public class LoadHCI implements CommandLineRunner {
 
     private void parseJSONandCreateGraphObjects(String json) throws Exception {
 
-        LoaderDTO dto = new LoaderDTO();
-
         dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
                 PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
 
@@ -137,25 +137,23 @@ public class LoadHCI implements CommandLineRunner {
 
             dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
 
-            PatientSnapshot pSnap = dto.getPatientSnapshot();
-            pSnap.addSample(dto.getPatientSample());
+            dto.getPatientSnapshot().addSample(dto.getPatientSample());
 
             dto = dataImportService.stageNineCreateModels(dto);
 
-            dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
+            dto = dataImportService.loaderSecondStep(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
 
             dto = dataImportService.stepThreeCurrentTreatment(dto, DOSING_STUDY_URL);
 
         }
 
-
-        loadImmunoHistoChemistry(dto);
+        loadImmunoHistoChemistry();
     }
 
 
 
 
-    private void loadImmunoHistoChemistry(LoaderDTO dto) {
+    private void loadImmunoHistoChemistry() {
 
 
         String ihcFileStr = dataRootDir + DATASOURCE_ABBREVIATION + "/ihc/ihc.txt";
