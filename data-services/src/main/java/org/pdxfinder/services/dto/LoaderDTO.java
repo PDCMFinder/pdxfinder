@@ -31,6 +31,8 @@ public class LoaderDTO {
     private String qaPassage;
     private String fingerprinting;
 
+    private JSONArray treatments;
+
     private Sample patientSample;
     private PatientSnapshot patientSnapshot;
     private QualityAssurance qualityAssurance;
@@ -214,6 +216,22 @@ public class LoaderDTO {
         this.qaPassage = qaPassage;
     }
 
+    public String getFingerprinting() {
+        return fingerprinting;
+    }
+
+    public void setFingerprinting(String fingerprinting) {
+        this.fingerprinting = fingerprinting;
+    }
+
+    public JSONArray getTreatments() {
+        return treatments;
+    }
+
+    public void setTreatments(JSONArray treatments) {
+        this.treatments = treatments;
+    }
+
     public Sample getPatientSample() {
         return patientSample;
     }
@@ -300,14 +318,6 @@ public class LoaderDTO {
 
     public void setModelCreation(ModelCreation modelCreation) {
         this.modelCreation = modelCreation;
-    }
-
-    public String getFingerprinting() {
-        return fingerprinting;
-    }
-
-    public void setFingerprinting(String fingerprinting) {
-        this.fingerprinting = fingerprinting;
     }
 
     public Patient getPatient() {
