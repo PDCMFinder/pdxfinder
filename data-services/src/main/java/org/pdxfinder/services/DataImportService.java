@@ -1401,19 +1401,21 @@ public class DataImportService {
 
         if (ds.equals(hci)){
 
+            saveSample(dto.getPatientSample());
+            savePatientSnapshot(dto.getPatientSnapshot());
+
             EngraftmentSite engraftmentSite = getImplantationSite(dto.getImplantationSiteStr());
             EngraftmentType engraftmentType = getImplantationType(dto.getImplantationtypeStr());
 
             // uggh parse strains
             ArrayList<HostStrain> strainList= new ArrayList();
-            if(dto.getStrain().contains(" and ")){
+            String strains = dto.getStrain();
+            if(strains.contains(" and ")){
                 strainList.add(dto.getNodScidGamma());
                 strainList.add(dto.getNodScid());
-            }
-            else if(dto.getStrain().contains("gamma")){
+            }else if(strains.contains("gamma")){
                 strainList.add(dto.getNodScid());
-            }
-            else{
+            }else{
                 strainList.add(dto.getNodScid());
             }
 
@@ -1434,7 +1436,7 @@ public class DataImportService {
                 dto.getModelCreation().addRelatedSample(specSample);
                 saveSpecimen(specimen);
             }
-            saveModelCreation(dto.getModelCreation()); // confirm mc is updated
+            saveModelCreation(dto.getModelCreation());
 
         }
 
@@ -1857,10 +1859,6 @@ public class DataImportService {
 
         return qa;
     }
-
-
-
-
 
 
 }
