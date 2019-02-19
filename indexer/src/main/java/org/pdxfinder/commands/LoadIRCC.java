@@ -68,11 +68,6 @@ public class LoadIRCC implements CommandLineRunner {
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
     public static final String FINGERPRINT_DESCRIPTION = "Model validated against patient germline.";
 
-    private HostStrain nsgBS;
-    private Group irccDS;
-
-    private Group projectGroup;
-
     private Options options;
     private CommandLineParser parser;
     private CommandLine cmd;
@@ -121,150 +116,121 @@ public class LoadIRCC implements CommandLineRunner {
             log.info("Loading IRCC PDX data.");
 
             String fileStr = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
-            File file = new File(fileStr);
 
-            if(file.exists()){
+            String metaDataJSON = dataImportService.stageOneGetMetaDataFile(fileStr, DATASOURCE_ABBREVIATION);
 
-                irccDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
-                        DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, "transnational access", DATASOURCE_CONTACT, SOURCE_URL);
-
-                try {
-                    nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
-                }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
-
-                projectGroup = dataImportService.getProjectGroup("EurOPDX");
-
-
-                parseModels(utilityService.parseFile(fileStr));
-
-                String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
-                File varFile = new File(variationURLStr);
-
-                if(varFile.exists()){
-
-                    if (variationURLStr != null && variationMax != 0) {
-                        loadVariants(variationURLStr, "TargetedNGS_MUT", "mutation");
-                    }
-                }
-
-
+            if (!metaDataJSON.equals("NOT FOUND")){
+                parseJSONandCreateGraphObjects(metaDataJSON);
             }
-            else{
-
-                log.info("No file found for "+DATASOURCE_ABBREVIATION+", skipping");
-            }
-
-
 
         }
     }
 
-    private void parseModels(String json) {
+    private void parseJSONandCreateGraphObjects(String json) throws Exception {
 
-        try {
-            JSONObject job = new JSONObject(json);
-            JSONArray jarray = job.getJSONArray("IRCC");
+        LoaderDTO dto = new LoaderDTO();
 
-            for (int i = 0; i < jarray.length(); i++) {
+        dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
+                PROVIDER_TYPE, ACCESSIBILITY, "transnational access", DATASOURCE_CONTACT, SOURCE_URL);
 
-                JSONObject j = jarray.getJSONObject(i);
+        dto = dataImportService.stageThreeCreateNSGammaHostStrain(dto, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
 
-                createGraphObjects(j);
-            }
+        dto = dataImportService.stageFiveCreateProjectGroup(dto,"EurOPDX");
 
-        } catch (Exception e) {
-            log.error("Error getting IRCC PDX models", e);
-
-        }
-    }
-
-    @Transactional
-    void createGraphObjects(JSONObject job) throws Exception {
-
-        if(loadedModelHashes.contains(job.toString().hashCode())) return;
-        loadedModelHashes.add(job.toString().hashCode());
-
-        // RETRIEVE THE METADATA:
-        LoaderDTO dto = dataImportService.getMetadata(job, DATASOURCE_ABBREVIATION);
-
-        dto = dataImportService.loaderFirstStep(dto, irccDS, DATASOURCE_CONTACT);
+        JSONArray jarray = dataImportService.stageSixGetPDXModels(json,"IRCC");
 
 
-        PatientSnapshot pSnap = dto.getPatientSnapshot();
-        pSnap.addSample(dto.getPatientSample());
+        for (int i = 0; i < jarray.length(); i++) {
 
-        dto.setNodScidGamma(nsgBS);
-        dto.setProjectGroup(projectGroup);
-        dto.setProviderGroup(irccDS);
+            JSONObject jsonData = jarray.getJSONObject(i);
 
-        // CREATE MODEL-CREATION
-        dto.setModelCreation(
-                dataImportService.createModelCreation(dto.getModelID(), this.irccDS.getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls())
-        );
+            if(loadedModelHashes.contains(jsonData.toString().hashCode())) return;
+            loadedModelHashes.add(jsonData.toString().hashCode());
 
-        dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
+            dto = dataImportService.stageSevenGetMetadata(dto, jsonData, DATASOURCE_ABBREVIATION);
+
+            dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
+
+            PatientSnapshot pSnap = dto.getPatientSnapshot();
+            pSnap.addSample(dto.getPatientSample());
+
+            dto = dataImportService.stageNineCreateModels(dto);
+
+            dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
+
+            dataImportService.stepThreeCurrentTreatment(dto, DOSING_STUDY_URL);
 
 
 
+            //Create Treatment summary without linking TreatmentProtocols to specimens
+            TreatmentSummary ts;
+
+            try{
+                if(jsonData.has("Treatment")){
+                    JSONObject treatment = jsonData.optJSONObject("Treatment");
+                    //if the treatment attribute is not an object = it is an array
+                    if(treatment == null && jsonData.optJSONArray("Treatment") != null){
+
+                        JSONArray treatments = jsonData.getJSONArray("Treatment");
+
+                        if(treatments.length() > 0){
+                            //log.info("Treatments found for model "+mc.getSourcePdxId());
+                            ts = new TreatmentSummary();
+                            ts.setUrl(DOSING_STUDY_URL);
+                            for(int t = 0; t<treatments.length(); t++){
+                                JSONObject treatmentObject = treatments.getJSONObject(t);
 
 
-        //Create Treatment summary without linking TreatmentProtocols to specimens
-        TreatmentSummary ts;
+                                TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
+                                        treatmentObject.getString("Dose"), treatmentObject.getString("Response Class"), "");
 
-
-        try{
-            if(job.has("Treatment")){
-                JSONObject treatment = job.optJSONObject("Treatment");
-                //if the treatment attribute is not an object = it is an array
-                if(treatment == null && job.optJSONArray("Treatment") != null){
-
-                    JSONArray treatments = job.getJSONArray("Treatment");
-
-                    if(treatments.length() > 0){
-                        //log.info("Treatments found for model "+mc.getSourcePdxId());
-                        ts = new TreatmentSummary();
-                        ts.setUrl(DOSING_STUDY_URL);
-                        for(int t = 0; t<treatments.length(); t++){
-                            JSONObject treatmentObject = treatments.getJSONObject(t);
-
-
-                            TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
-                                    treatmentObject.getString("Dose"), treatmentObject.getString("Response Class"), "");
-
-                            if(tp != null){
-                                ts.addTreatmentProtocol(tp);
+                                if(tp != null){
+                                    ts.addTreatmentProtocol(tp);
+                                }
                             }
+
+                            ts.setModelCreation(dto.getModelCreation());
+                            dto.getModelCreation().setTreatmentSummary(ts);
                         }
-
-                        ts.setModelCreation(dto.getModelCreation());
-                        dto.getModelCreation().setTreatmentSummary(ts);
                     }
-                }
 
+                }
+            }
+            catch(Exception e){e.printStackTrace(); }
+
+            dataImportService.savePatient(dto.getPatient());
+            dataImportService.saveModelCreation(dto.getModelCreation());
+
+
+
+
+            // VARIATION DATA:
+            String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
+            File varFile = new File(variationURLStr);
+
+            if(varFile.exists()){
+
+                if (variationURLStr != null && variationMax != 0) {
+                    loadVariants(dto, variationURLStr, "TargetedNGS_MUT", "mutation");
+                }
             }
 
 
         }
-        catch(Exception e){
 
-            e.printStackTrace();
-        }
-
-        dataImportService.savePatient(dto.getPatient());
-        dataImportService.saveModelCreation(dto.getModelCreation());
-        
     }
 
+
+
+
+
     @Transactional
-    public void loadVariants(String variationURLStr, String platformName, String molcharType){
+    public void loadVariants(LoaderDTO dto, String variationURLStr, String platformName, String molcharType){
 
         log.info("Loading variation for platform "+platformName);
         //STEP 1: Save the platform
-        Platform platform = dataImportService.getPlatform(platformName, this.irccDS);
-        platform.setGroup(irccDS);
+        Platform platform = dataImportService.getPlatform(platformName, dto.getProviderGroup());
+        platform.setGroup(dto.getProviderGroup());
         platform.setUrl(TARGETEDNGS_PLATFORM_URL);
         dataImportService.savePlatform(platform);
 
@@ -383,7 +349,7 @@ public class LoadIRCC implements CommandLineRunner {
                 String sampleId = entry.getKey();
                 MolecularCharacterization mc = entry.getValue();
                 try{
-                    Sample s = dataImportService.findSampleByDataSourceAndSourceSampleId(irccDS.getAbbreviation(), sampleId);
+                    Sample s = dataImportService.findSampleByDataSourceAndSourceSampleId(dto.getProviderGroup().getAbbreviation(), sampleId);
 
                     if(s == null){
                         log.error("Sample not found: "+sampleId);
@@ -408,7 +374,7 @@ public class LoadIRCC implements CommandLineRunner {
                 try{
 
 
-                    Sample s = dataImportService.findHumanSample(modelId, irccDS.getAbbreviation());
+                    Sample s = dataImportService.findHumanSample(modelId, dto.getProviderGroup().getAbbreviation());
 
                     if(s == null){
                         log.error("Human sample not found for model: "+modelId);
@@ -439,7 +405,7 @@ public class LoadIRCC implements CommandLineRunner {
     
     
      @Transactional
-    public void loadVariantsBySpecimen() {
+    public void loadVariantsBySpecimen(LoaderDTO dto) {
 
         try {
             String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
@@ -447,8 +413,8 @@ public class LoadIRCC implements CommandLineRunner {
             JSONArray jarray = job.getJSONArray("IRCCVariation");
          //   System.out.println("loading "+jarray.length()+" variant records");
 
-            Platform platform = dataImportService.getPlatform(TECH, this.irccDS, TARGETEDNGS_PLATFORM_URL);
-            platform.setGroup(irccDS);
+            Platform platform = dataImportService.getPlatform(TECH, dto.getProviderGroup(), TARGETEDNGS_PLATFORM_URL);
+            platform.setGroup(dto.getProviderGroup());
             dataImportService.savePlatform(platform);
 
 
