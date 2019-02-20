@@ -37,7 +37,7 @@ import java.util.stream.Stream;
  */
 @Component
 @Order(value = -20)
-public class LoadHCI implements CommandLineRunner {
+public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
 
     private final static Logger log = LoggerFactory.getLogger(LoadHCI.class);
@@ -66,16 +66,9 @@ public class LoadHCI implements CommandLineRunner {
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
-    private Options options;
-    private CommandLineParser parser;
-    private CommandLine cmd;
     private HelpFormatter formatter;
 
     private DataImportService dataImportService;
-    private Session session;
-
-    @Autowired
-    private UtilityService utilityService;
 
     @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
@@ -100,61 +93,151 @@ public class LoadHCI implements CommandLineRunner {
 
         if (options.has("loadHCI") || options.has("loadALL")) {
 
+
             log.info("Loading Huntsman PDX data.");
 
-            String fileStr = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/models.json";
+            jsonFile = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/models.json";
+            dataSource = DATASOURCE_ABBREVIATION;
 
-            String metaDataJSON = dataImportService.stageOneGetMetaDataFile(fileStr, DATASOURCE_ABBREVIATION);
+            loadData();
 
-            if (!metaDataJSON.equals("NOT FOUND")){
-                parseJSONandCreateGraphObjects(metaDataJSON);
+        }
+    }
+
+
+
+    @Override
+    protected void initMethod() {
+
+        dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
+        dataSourceContact = DATASOURCE_CONTACT;
+        dosingStudyURL = DOSING_STUDY_URL;
+    }
+
+    @Override
+    protected void step00GetMetaDataFolder() { }
+
+
+    @Override
+    protected void step02CreateProviderGroup() {
+
+        loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+    }
+
+
+    @Override
+    protected void step03CreateNSGammaHostStrain() {
+
+        loadNSGammaHostStrain(NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
+    }
+
+
+    @Override
+    protected void step04CreateNSHostStrain() {
+
+        loadNSHostStrain(NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
+    }
+
+
+    @Override
+    protected void step05CreateProjectGroup() {
+
+        loadProjectGroup("PDXNet");
+    }
+
+
+    @Override
+    protected void step06GetPDXModels() {
+
+        loadPDXModels(metaDataJSON,"HCI");
+    }
+
+
+
+    @Override
+    protected void step10CreateEngraftmentsAndSpecimen() {
+
+        dto.getModelCreation().addRelatedSample(dto.getPatientSample());
+        dto.getModelCreation().addGroup(dto.getProjectGroup());
+
+        dataImportService.saveSample(dto.getPatientSample());
+        dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
+
+        EngraftmentSite engraftmentSite = dataImportService.getImplantationSite(dto.getImplantationSiteStr());
+        EngraftmentType engraftmentType = dataImportService.getImplantationType(dto.getImplantationtypeStr());
+
+        // uggh parse strains
+        ArrayList<HostStrain> strainList= new ArrayList();
+        String strains = dto.getStrain();
+        if(strains.contains(" and ")){
+            strainList.add(dto.getNodScidGamma());
+            strainList.add(dto.getNodScid());
+        }else if(strains.contains("gamma")){
+            strainList.add(dto.getNodScid());
+        }else{
+            strainList.add(dto.getNodScid());
+        }
+
+        int count = 0;
+        for(HostStrain strain : strainList){
+            count++;
+            Specimen specimen = new Specimen();
+            specimen.setExternalId(dto.getModelID()+"-"+count);
+            specimen.setEngraftmentSite(engraftmentSite);
+            specimen.setEngraftmentType(engraftmentType);
+            specimen.setHostStrain(strain);
+
+            Sample specSample = new Sample();
+            specSample.setSourceSampleId(dto.getModelID()+"-"+count);
+            specimen.setSample(specSample);
+
+            dto.getModelCreation().addSpecimen(specimen);
+            dto.getModelCreation().addRelatedSample(specSample);
+            dataImportService.saveSpecimen(specimen);
+        }
+        dataImportService.saveModelCreation(dto.getModelCreation());
+    }
+
+
+
+
+    @Override
+    protected void step11CreateCurrentTreatment() {
+
+        TreatmentSummary ts;
+        try {
+
+            if (dto.getTreatments().length() > 0) {
+
+                ts = new TreatmentSummary();
+                ts.setUrl(DOSING_STUDY_URL);
+
+                for (int t = 0; t < dto.getTreatments().length(); t++) {
+
+                    JSONObject treatmentObject = dto.getTreatments().getJSONObject(t);
+
+                    TreatmentProtocol treatmentProtocol = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
+                            treatmentObject.getString("Dose"),
+                            treatmentObject.getString("Response"), "");
+
+                    if (treatmentProtocol != null) {
+                        ts.addTreatmentProtocol(treatmentProtocol);
+                    }
+                }
+                ts.setModelCreation(dto.getModelCreation());
+                dto.getModelCreation().setTreatmentSummary(ts);
             }
-        }
-    }
 
+            dataImportService.saveModelCreation(dto.getModelCreation());
 
-    private void parseJSONandCreateGraphObjects(String json) throws Exception {
-
-        LoaderDTO dto = new LoaderDTO();
-
-        dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
-                PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
-
-        dto = dataImportService.stageThreeCreateNSGammaHostStrain(dto, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
-
-        dto = dataImportService.stageFourCreateNSHostStrain(dto, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
-
-        dto = dataImportService.stageFiveCreateProjectGroup(dto,"PDXNet");
-
-        JSONArray jarray = dataImportService.stageSixGetPDXModels(json,"HCI");
-
-
-        for (int i = 0; i < jarray.length(); i++) {
-
-            JSONObject jsonData = jarray.getJSONObject(i);
-
-            dto = dataImportService.stageSevenGetMetadata(dto, jsonData, DATASOURCE_ABBREVIATION);
-
-            dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
-
-            dto.getPatientSnapshot().addSample(dto.getPatientSample());
-
-            dto = dataImportService.stageNineCreateModels(dto);
-
-            dto = dataImportService.loaderSecondStep(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
-
-            dto = dataImportService.stepThreeCurrentTreatment(dto, DOSING_STUDY_URL);
-
-        }
-
-        loadImmunoHistoChemistry(dto);
+        } catch (Exception e) { }
     }
 
 
 
 
-    private void loadImmunoHistoChemistry(LoaderDTO dto) {
-
+    @Override
+    protected void step12LoadImmunoHistoChemistry() {
 
         String ihcFileStr = dataRootDir + DATASOURCE_ABBREVIATION + "/ihc/ihc.txt";
 
@@ -259,7 +342,65 @@ public class LoadHCI implements CommandLineRunner {
             log.warn("Skipping loading IHC for HCI");
         }
 
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void parseJSONandCreateGraphObjects(String json) throws Exception {
+
+        JSONArray jarray = dataImportService.stageSixGetPDXModels(json,"HCI");
+
+
+        for (int i = 0; i < jarray.length(); i++) {
+
+            JSONObject jsonData = jarray.getJSONObject(i);
+
+            dto = dataImportService.stageSevenGetMetadata(dto, jsonData, DATASOURCE_ABBREVIATION);
+
+            dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
+
+            dto.getPatientSnapshot().addSample(dto.getPatientSample());
+
+            dto = dataImportService.stageNineCreateModels(dto);
+
+            dto = dataImportService.loaderSecondStep(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
+
+            dto = dataImportService.stepThreeCurrentTreatment(dto, DOSING_STUDY_URL,"Response");
+
+        }
+
+
+
+
+
+
+        /*
+
+        dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
+                PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+
+        dto = dataImportService.stageThreeCreateNSGammaHostStrain(dto, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
+
+        dto = dataImportService.stageFourCreateNSHostStrain(dto, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
+
+        dto = dataImportService.stageFiveCreateProjectGroup(dto,"PDXNet");
+
+        */
 
     }
+
+
+
+
 
 }
