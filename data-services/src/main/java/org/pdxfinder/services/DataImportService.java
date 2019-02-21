@@ -1218,7 +1218,8 @@ public class DataImportService {
     }
 
 
-    public LoaderDTO stagetwoCreateProviderGroup(LoaderDTO dto, String dsName, String dsAbbrev, String dsDesc,String providerType, String access,String modalities, String dsContact,String url){
+    public LoaderDTO stagetwoCreateProviderGroup(LoaderDTO dto, String dsName, String dsAbbrev, String dsDesc,
+                                                 String providerType, String access,String modalities, String dsContact,String url){
 
         Group providerDS = getProviderGroup(dsName, dsAbbrev, dsDesc, providerType, access, modalities, dsContact, url);
         dto.setProviderGroup(providerDS);
@@ -1396,10 +1397,10 @@ public class DataImportService {
     public LoaderDTO loaderSecondStep(LoaderDTO dto, PatientSnapshot pSnap, String ds)  throws Exception{
 
 
-        dto.getModelCreation().addRelatedSample(dto.getPatientSample());
-        dto.getModelCreation().addGroup(dto.getProjectGroup());
-
         if (ds.equals(hci)){
+
+            dto.getModelCreation().addRelatedSample(dto.getPatientSample());
+            dto.getModelCreation().addGroup(dto.getProjectGroup());
 
             saveSample(dto.getPatientSample());
             savePatientSnapshot(dto.getPatientSnapshot());
@@ -1533,6 +1534,8 @@ public class DataImportService {
 
         if (ds.equals(irccCrc)){
 
+            dto.getModelCreation().addGroup(dto.getProjectGroup());
+
             JSONArray specimens = dto.getSpecimens();
 
             for (int i = 0; i < specimens.length(); i++) {
@@ -1571,7 +1574,9 @@ public class DataImportService {
 
 
 
-    public LoaderDTO stepThreeCurrentTreatment(LoaderDTO dto, String DOSING_STUDY_URL){
+
+
+    public LoaderDTO stepThreeCurrentTreatment(LoaderDTO dto, String DOSING_STUDY_URL, String responsekey){
 
         TreatmentSummary ts;
         try {
@@ -1587,7 +1592,7 @@ public class DataImportService {
 
                     TreatmentProtocol treatmentProtocol = getTreatmentProtocol(treatmentObject.getString("Drug"),
                             treatmentObject.getString("Dose"),
-                            treatmentObject.getString("Response"), "");
+                            treatmentObject.getString(responsekey), "");
 
                     if (treatmentProtocol != null) {
                         ts.addTreatmentProtocol(treatmentProtocol);
@@ -1603,7 +1608,6 @@ public class DataImportService {
 
         return dto;
     }
-
 
 
     private JSONArray getTreament(JSONObject data, String ds) throws Exception {

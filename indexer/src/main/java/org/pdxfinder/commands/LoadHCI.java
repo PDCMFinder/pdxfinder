@@ -93,7 +93,6 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
         if (options.has("loadHCI") || options.has("loadALL")) {
 
-
             log.info("Loading Huntsman PDX data.");
 
             jsonFile = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/models.json";
@@ -346,58 +345,6 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
 
 
-
-
-
-
-
-
-
-
-
-
-    private void parseJSONandCreateGraphObjects(String json) throws Exception {
-
-        JSONArray jarray = dataImportService.stageSixGetPDXModels(json,"HCI");
-
-
-        for (int i = 0; i < jarray.length(); i++) {
-
-            JSONObject jsonData = jarray.getJSONObject(i);
-
-            dto = dataImportService.stageSevenGetMetadata(dto, jsonData, DATASOURCE_ABBREVIATION);
-
-            dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
-
-            dto.getPatientSnapshot().addSample(dto.getPatientSample());
-
-            dto = dataImportService.stageNineCreateModels(dto);
-
-            dto = dataImportService.loaderSecondStep(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
-
-            dto = dataImportService.stepThreeCurrentTreatment(dto, DOSING_STUDY_URL,"Response");
-
-        }
-
-
-
-
-
-
-        /*
-
-        dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
-                PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
-
-        dto = dataImportService.stageThreeCreateNSGammaHostStrain(dto, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
-
-        dto = dataImportService.stageFourCreateNSHostStrain(dto, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
-
-        dto = dataImportService.stageFiveCreateProjectGroup(dto,"PDXNet");
-
-        */
-
-    }
 
 
 

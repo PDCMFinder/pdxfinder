@@ -176,109 +176,22 @@ public class LoadIRCC implements CommandLineRunner {
 
         dto = dataImportService.stageSevenGetMetadata(dto, job, DATASOURCE_ABBREVIATION);
 
-        String id = dto.getModelID();
+        dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
 
-        String diagnosis = dto.getDiagnosis();
+        dto.getPatientSnapshot().addSample(dto.getPatientSample());
 
-        String classification = dto.getClassification();
-        String stage = dto.getStage();
-        String age = dto.getAge();
-        String gender = dto.getGender();
-        String patientId = dto.getPatientId();
+        dataImportService.saveSample(dto.getPatientSample());
+        dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
 
-        String tumorType = dto.getTumorType();
-        String primarySite = dto.getPrimarySite();
-        String sampleSite = dto.getSampleSite();
+        dto = dataImportService.stageNineCreateModels(dto);
 
-        Patient patient = dataImportService.getPatientWithSnapshots(patientId, dto.getProviderGroup());
-
-        if(patient == null){
-
-            patient = dataImportService.createPatient(patientId, dto.getProviderGroup(), gender, "", NOT_SPECIFIED);
-        }
-
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
+        dto = dataImportService.loaderSecondStep(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
 
 
-        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
-        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
-        // String grade, String gradeClassification
-        Sample ptSample = dataImportService.getSample(id, dto.getProviderGroup().getAbbreviation(), tumorType, diagnosis, primarySite,
-                sampleSite, NOT_SPECIFIED, false, stage, "", "", "");
-
-        pSnap.addSample(ptSample);
-
-        dataImportService.saveSample(ptSample);
-        dataImportService.savePatientSnapshot(pSnap);
-
-        List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT));
-
-        QualityAssurance qa = new QualityAssurance();
-
-        if ("TRUE".equals(job.getString("Fingerprinting").toUpperCase())) {
-            qa.setTechnology("Fingerprint");
-            qa.setDescription(FINGERPRINT_DESCRIPTION);
-
-            // If the model includes which passages have had QA performed, set the passages on the QA node
-            if (job.has("QA Passage") && !job.getString("QA Passage").isEmpty()) {
-
-                List<String> passages = Stream.of(job.getString("QA Passage").split(","))
-                        .map(String::trim)
-                        .distinct()
-                        .collect(Collectors.toList());
-                List<Integer> passageInts = new ArrayList<>();
-
-                // NOTE:  IRCC uses passage 0 to mean Patient Tumor, so we need to harmonize according to the other
-                // sources.  Subtract 1 from every passage.
-                for (String p : passages) {
-                    Integer intPassage = Integer.parseInt(p);
-                    passageInts.add(intPassage - 1);
-                }
-
-                qa.setPassages(StringUtils.join(passageInts, ", "));
-
-            }
-
-        }
-
-        ModelCreation modelCreation = dataImportService.createModelCreation(id, dto.getProviderGroup().getAbbreviation(), ptSample, qa, externalUrls);
-
-        modelCreation.addGroup(dto.getProjectGroup());
-
-        JSONArray specimens = job.getJSONArray("Specimens");
-        for (int i = 0; i < specimens.length(); i++) {
-            JSONObject specimenJSON = specimens.getJSONObject(i);
-
-            String specimenId = specimenJSON.getString("Specimen ID");
-
-            Specimen specimen = dataImportService.getSpecimen(modelCreation,
-                    specimenId, dto.getProviderGroup().getAbbreviation(), specimenJSON.getString("Passage"));
-
-            specimen.setHostStrain(dto.getNodScidGamma());
-
-            EngraftmentSite is = dataImportService.getImplantationSite(specimenJSON.getString("Engraftment Site"));
-            specimen.setEngraftmentSite(is);
-
-            EngraftmentType it = dataImportService.getImplantationType(specimenJSON.getString("Engraftment Type"));
-            specimen.setEngraftmentType(it);
-
-            Sample specSample = new Sample();
-
-            specSample.setSourceSampleId(specimenId);
-            specSample.setDataSource(dto.getProviderGroup().getAbbreviation());
-
-            specimen.setSample(specSample);
-
-            modelCreation.addSpecimen(specimen);
-            modelCreation.addRelatedSample(specSample);
-
-        }
+        dto = dataImportService.stepThreeCurrentTreatment(dto, DOSING_STUDY_URL,"Response Class");
 
         //Create Treatment summary without linking TreatmentProtocols to specimens
-        TreatmentSummary ts;
-
-
+        /*TreatmentSummary ts;
         try{
             if(job.has("Treatment")){
                 JSONObject treatment = job.optJSONObject("Treatment");
@@ -303,25 +216,25 @@ public class LoadIRCC implements CommandLineRunner {
                             }
                         }
 
-                        ts.setModelCreation(modelCreation);
-                        modelCreation.setTreatmentSummary(ts);
+                        ts.setModelCreation(dto.getModelCreation());
+                        dto.getModelCreation().setTreatmentSummary(ts);
                     }
                 }
 
             }
 
-
         }
-        catch(Exception e){
+        catch(Exception e){ e.printStackTrace(); } */
 
-            e.printStackTrace();
-        }
-
-        dataImportService.savePatient(patient);
-        dataImportService.savePatientSnapshot(pSnap);
-        dataImportService.saveModelCreation(modelCreation);
+        dataImportService.savePatient(dto.getPatient());
+        dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
+        dataImportService.saveModelCreation(dto.getModelCreation());
 
     }
+
+
+
+
 
     @Transactional
     public void loadVariants(String variationURLStr, String platformName, String molcharType){
