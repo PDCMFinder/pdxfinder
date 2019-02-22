@@ -1286,8 +1286,8 @@ public class DataImportService {
         dto.setDiagnosis(Hamonizer.getDiagnosis(data,ds));
         dto.setPatientId(Standardizer.getValue("Patient ID",data));
         dto.setEthnicity(Hamonizer.getEthnicity(data,ds));
-        dto.setStage(Standardizer.getValue("Stage",data));
-        dto.setGrade(Standardizer.getValue("Grades",data));
+        dto.setStage(Hamonizer.getStage(data,ds));
+        dto.setGrade(Hamonizer.getGrade(data,ds));
         dto.setClassification(Hamonizer.getClassification(data,ds));
 
         dto.setAge(Standardizer.getAge(data.getString("Age")));
@@ -1298,6 +1298,8 @@ public class DataImportService {
         dto.setExtractionMethod(Standardizer.getValue("Sample Type",data));
         dto.setStrain(Standardizer.getValue("Strain",data));
         dto.setModelTag(Standardizer.getValue("Model Tag",data));
+
+        dto.setSourceURL(Standardizer.getValue("Source url",data));
 
         dto.setMarkerPlatform(Hamonizer.getMarkerPlatform(data,ds));
         dto.setMarkerStr(Hamonizer.getMarkerStr(data,ds));
@@ -1347,23 +1349,21 @@ public class DataImportService {
         return dto;
     }
 
-    public LoaderDTO  step09LoadExternalURLs(LoaderDTO dto, String dataSourceContact){
+    public LoaderDTO  step09LoadExternalURLs(LoaderDTO dto, String dataSourceContact, String dataSourceURL){
 
         List<ExternalUrl> externalUrls = new ArrayList<>();
         externalUrls.add(getExternalUrl(ExternalUrl.Type.CONTACT, dataSourceContact));
+
+        if (!dataSourceURL.equals(Standardizer.NOT_SPECIFIED)){
+            externalUrls.add(getExternalUrl(ExternalUrl.Type.SOURCE, dataSourceURL));
+        }
+
         dto.setExternalUrls(externalUrls);
 
         return dto;
     }
 
-    public LoaderDTO  step09LoadExternalURLs2(LoaderDTO dto, String dataSourceContact, String dataSourceURL){
 
-        List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(getExternalUrl(ExternalUrl.Type.CONTACT, dataSourceContact+dto.getModelID()));
-        externalUrls.add(getExternalUrl(ExternalUrl.Type.SOURCE, dataSourceURL+dto.getModelID()));
-
-        return dto;
-    }
 
 
     public LoaderDTO step09BCreateBreastMarkers(LoaderDTO dto){
