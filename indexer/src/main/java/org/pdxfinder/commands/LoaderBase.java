@@ -21,9 +21,13 @@ public abstract class LoaderBase {
     private final static Logger log = LoggerFactory.getLogger(LoaderBase.class);
     String jsonFile;
     String dataSource;
+
+    File[] listOfFiles;
+
     String metaDataJSON = "NOT FOUND";
     JSONArray jsonArray;
 
+    String filesDirectory;
     String dataSourceAbbreviation;
     String dataSourceContact;
     String dosingStudyURL;
@@ -37,8 +41,11 @@ public abstract class LoaderBase {
     private DataImportService dataImportService;
 
 
-    /* The Template method */
-    public final void loadData() throws Exception  {
+    /*****************************************************************************************************
+     *     SINGLE FILE DATA TEMPLATE METHOD         *
+     **********************************************/
+
+    public final void loaderTemplate() throws Exception  {
 
         initMethod();
 
@@ -67,21 +74,41 @@ public abstract class LoaderBase {
 
             dto.getPatientSnapshot().addSample(dto.getPatientSample());
 
-            step09CreateModels();
+            step09LoadExternalURLs(dataSourceContact);
 
-            step10CreateEngraftmentsAndSpecimen();
+            step10CreateModels();
 
-            step11CreateCurrentTreatment();
+            step11CreateEngraftmentsAndSpecimen();
+
+            step12CreateCurrentTreatment();
         }
 
-        step12LoadImmunoHistoChemistry();
+        step13LoadImmunoHistoChemistry();
     }
+
+
+
+
 
 
 
     abstract void initMethod();
 
-    abstract void step00GetMetaDataFolder();
+
+    void step00GetMetaDataFolder(){
+
+        listOfFiles = new File[0];
+        File folder = new File(filesDirectory);
+
+        if(folder.exists()){
+            listOfFiles = folder.listFiles();
+            if(listOfFiles.length == 0){
+                log.info("No file found for "+dataSource+", skipping");
+            }
+        }
+        else{ log.info("Directory does not exist, skipping."); } // "+filesDirectory+"
+
+    }
 
 
     void step01GetMetaDataJSON(){
@@ -89,6 +116,8 @@ public abstract class LoaderBase {
         File file = new File(jsonFile);
 
         if (file.exists()) {
+
+            log.info("Loading from file " + jsonFile);
             this.metaDataJSON = utilityService.parseFile(jsonFile);
         } else {
             log.info("No file found for " + dataSource + ", skipping");
@@ -110,67 +139,32 @@ public abstract class LoaderBase {
 
     void step07GetMetaData(JSONObject data, String ds) throws Exception {
 
-        String modelID = data.getString("Model ID");
-        String sampleID = Hamonizer.getSampleID(data,ds);
-        String diagnosis = Hamonizer.getDiagnosis(data,ds);
-        String patientId = Standardizer.getValue("Patient ID",data);
+        dto.setModelID(data.getString("Model ID"));
+        dto.setSampleID(Hamonizer.getSampleID(data,ds));
+        dto.setDiagnosis(Hamonizer.getDiagnosis(data,ds));
+        dto.setPatientId(Standardizer.getValue("Patient ID",data));
+        dto.setEthnicity(Hamonizer.getEthnicity(data,ds));
+        dto.setStage(Standardizer.getValue("Stage",data));
+        dto.setGrade(Standardizer.getValue("Grades",data));
+        dto.setClassification(Hamonizer.getClassification(data,ds));
+        dto.setAge(Standardizer.getAge(data.getString("Age")));
+        dto.setGender(Standardizer.getGender(data.getString("Gender")));
+        dto.setTumorType(Standardizer.getTumorType(data.getString("Tumor Type")));
+        dto.setSampleSite(Standardizer.getValue("Sample Site",data));
+        dto.setPrimarySite(Standardizer.getValue("Primary Site",data));
+        dto.setExtractionMethod(Standardizer.getValue("Sample Type",data));
+        dto.setStrain(Standardizer.getValue("Strain",data));
+        dto.setMarkerPlatform(Hamonizer.getMarkerPlatform(data,ds));
+        dto.setMarkerStr(Hamonizer.getMarkerStr(data,ds));
+        dto.setQaPassage(Hamonizer.getQAPassage(data,ds));
 
-        String ethnicity = Hamonizer.getEthnicity(data,ds);
+        dto.setQualityAssurance(dataImportService.getQualityAssurance(data,ds));
+        dto.setImplantationtypeStr(Hamonizer.getImplantationType(data,ds));
+        dto.setImplantationSiteStr(Hamonizer.getEngraftmentSite(data,ds));
 
-        String stage = Standardizer.getValue("Stage",data);
-        String grade = Standardizer.getValue("Grades",data);
-
-        String classification = Hamonizer.getClassification(data,ds);
-
-        String age = Standardizer.getAge(data.getString("Age"));
-        String gender = Standardizer.getGender(data.getString("Gender"));
-        String tumorType = Standardizer.getTumorType(data.getString("Tumor Type"));
-        String sampleSite = Standardizer.getValue("Sample Site",data);
-        String primarySite = Standardizer.getValue("Primary Site",data);
-        String extractionMethod = Standardizer.getValue("Sample Type",data);
-        String strain = Standardizer.getValue("Strain",data);
-        String fingerprinting = Hamonizer.getFingerprinting(data, ds);
-
-
-
-
-        String implantationTypeStr = Hamonizer.getImplantationType(data,ds);
-        String implantationSiteStr = Hamonizer.getEngraftmentSite(data,ds);
-        QualityAssurance qa = Hamonizer.getQualityAssurance(data,ds);
-
-        String markerPlatform = Hamonizer.getMarkerPlatform(data,ds);
-        String markerStr = Hamonizer.getMarkerStr(data,ds);
-        String passage = Hamonizer.getQAPassage(data,ds);
-
-        JSONArray specimens = Hamonizer.getSpecimens(data,ds);
-        JSONArray treatments = Hamonizer.getTreament(data, ds);
-
-        dto.setModelID(modelID);
-        dto.setSampleID(sampleID);
-        dto.setDiagnosis(diagnosis);
-        dto.setPatientId(patientId);
-        dto.setEthnicity(ethnicity);
-        dto.setStage(stage);
-        dto.setGrade(grade);
-        dto.setClassification(classification);
-        dto.setAge(age);
-        dto.setGender(gender);
-        dto.setTumorType(tumorType);
-        dto.setSampleSite(sampleSite);
-        dto.setPrimarySite(primarySite);
-        dto.setExtractionMethod(extractionMethod);
-        dto.setStrain(strain);
-        dto.setMarkerPlatform(markerPlatform);
-        dto.setMarkerStr(markerStr);
-        dto.setQaPassage(passage);
-
-        dto.setQualityAssurance(qa);
-        dto.setImplantationtypeStr(implantationTypeStr);
-        dto.setImplantationSiteStr(implantationSiteStr);
-
-        dto.setFingerprinting(fingerprinting);
-        dto.setSpecimens(specimens);
-        dto.setTreatments(treatments);
+        dto.setFingerprinting(Hamonizer.getFingerprinting(data, ds));
+        dto.setSpecimens(Hamonizer.getSpecimens(data,ds));
+        dto.setTreatments(Hamonizer.getTreament(data, ds));
 
     }
 
@@ -194,6 +188,11 @@ public abstract class LoaderBase {
 
         dto.setPatientSample(patientSample);
 
+    }
+
+
+    void step09LoadExternalURLs(String dataSourceContact){
+
         List<ExternalUrl> externalUrls = new ArrayList<>();
         externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, dataSourceContact));
         dto.setExternalUrls(externalUrls);
@@ -201,18 +200,19 @@ public abstract class LoaderBase {
     }
 
 
-    void step09CreateModels(){
+
+    void step10CreateModels(){
 
         ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls());
         dto.setModelCreation(modelCreation);
 
     }
 
-    abstract void step10CreateEngraftmentsAndSpecimen();
+    abstract void step11CreateEngraftmentsAndSpecimen();
 
-    abstract void step11CreateCurrentTreatment();
+    abstract void step12CreateCurrentTreatment();
 
-    abstract void step12LoadImmunoHistoChemistry();
+    abstract void step13LoadImmunoHistoChemistry();
 
 
 
@@ -240,10 +240,10 @@ public abstract class LoaderBase {
     }
 
 
-    public void loadNSGammaHostStrain(String NSG_BS_SYMBOL,String  NSG_BS_URL,String NSG_BS_NAME) {
+    public void loadNSGammaHostStrain(String NSG_BS_SYMBOL,String  NSG_BS_URL,String NSG_BS_NAME, String NSG_BS_DESC) {
 
         try {
-            HostStrain nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
+            HostStrain nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
             dto.setNodScidGamma(nsgBS);
         } catch (Exception e) {}
     }

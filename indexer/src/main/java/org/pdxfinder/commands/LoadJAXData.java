@@ -13,6 +13,7 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
+import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,9 +67,6 @@ public class LoadJAXData implements CommandLineRunner {
     // for now all samples are of tumor tissue
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
-    private HostStrain nsgBS;
-    private Group jaxDS;
-
     private Options options;
     private CommandLineParser parser;
     private CommandLine cmd;
@@ -87,7 +85,8 @@ public class LoadJAXData implements CommandLineRunner {
     private String dataRootDir;
 
     HashMap<String, String> passageMap = null;
-    HashMap<String, Image> histologyMap = null;
+
+    private LoaderDTO dto = new LoaderDTO();
 
     @PostConstruct
     public void init() {
@@ -115,233 +114,94 @@ public class LoadJAXData implements CommandLineRunner {
 
             log.info("Loading JAX PDX data.");
 
-            String urlStr = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
-            File file = new File(urlStr);
+            String fileStr = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
 
-            if (file.exists()) {
-                log.info("Loading from file " + urlStr);
-                parseJSON(utilityService.parseFile(urlStr));
-            }
-            else{
+            String metaDataJSON = dataImportService.stageOneGetMetaDataFile(fileStr, DATASOURCE_ABBREVIATION);
 
-                log.info("No file found for "+DATASOURCE_ABBREVIATION+", skipping");
+            if (!metaDataJSON.equals("NOT FOUND")){
+
+                parseJSONandCreateGraphObjects(metaDataJSON);
             }
+
         }
     }
 
-    //JSON Fields {"Model ID","Gender","Age","Race","Ethnicity","Specimen Site","Primary Site","Initial Diagnosis","Clinical Diagnosis",
-    //  "Tumor Type","Grades","Tumor Stage","Markers","Sample Type","Strain","Mouse Sex","Engraftment Site"};
-    private void parseJSON(String json) {
 
-        jaxDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
-                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+    private void parseJSONandCreateGraphObjects(String json) throws Exception{
 
-        try {
-            nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
+        dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
+                PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+
+        dto = dataImportService.stageThreeCreateNSGammaHostStrain(dto, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
+
+        // SKIP FOR JAX - dto = dataImportService.stageFiveCreateProjectGroup(dto,"EurOPDX");
+
+        JSONArray jarray = dataImportService.stageSixGetPDXModels(json,"pdxInfo");
+
+        for (int i = 0; i < jarray.length(); i++) {
+
+            JSONObject job = jarray.getJSONObject(i);
+
+            createGraphObjects(job);
         }
-        catch (Exception e){
-            e.printStackTrace();
-        }
 
-        try {
-            JSONObject job = new JSONObject(json);
-            JSONArray jarray = job.getJSONArray("pdxInfo");
-
-            for (int i = 0; i < jarray.length(); i++) {
-
-                JSONObject j = jarray.getJSONObject(i);
-
-                createGraphObjects(j);
-            }
-
-        } catch (Exception e) {
-            log.error("Error getting JAX PDX models", e);
-
-        }
     }
+
+
+
 
     @Transactional
     void createGraphObjects(JSONObject j) throws Exception {
-        String id = j.getString("Model ID");
 
-        //Check if model exists in DB
-        ModelCreation existingModel = dataImportService.findModelByIdAndDataSource(id, DATASOURCE_ABBREVIATION);
-        //Do not load duplicates
+
+        dto = dataImportService.stageSevenGetMetadata(dto, j, DATASOURCE_ABBREVIATION);
+
+        /* JAX After metadata Uniqueness: */
+        dto.setHistologyMap(getHistologyImageMap(dto.getModelID()));
+        //Check if model exists in DB, if yes, do not load duplicates
+        ModelCreation existingModel = dataImportService.findModelByIdAndDataSource(dto.getModelID(), DATASOURCE_ABBREVIATION);
         if(existingModel != null) {
-            log.error("Skipping existing model "+id);
-            return;}
-
-        histologyMap = getHistologyImageMap(id);
-
-        // the preference is for clinical diagnosis but if not available use initial diagnosis
-        String diagnosis = j.getString("Clinical Diagnosis");
-        if (diagnosis.trim().length() == 0 || "Not specified".equals(diagnosis)) {
-            diagnosis = j.getString("Initial Diagnosis");
-
+            log.error("Skipping existing model "+dto.getModelID());
+            return;
         }
-        
         // if the diagnosis is still unknown don't load it
-        if(diagnosis.toLowerCase().contains("unknown") ||
-           diagnosis.toLowerCase().contains("not specified")){
-            System.out.println("Skipping model "+id+" with diagnosis:"+diagnosis);
+        if(dto.getDiagnosis().toLowerCase().contains("unknown") ||
+                dto.getDiagnosis().toLowerCase().contains("not specified")){
+            System.out.println("Skipping model "+dto.getModelID()+" with diagnosis:"+dto.getDiagnosis());
             return;
         }
 
-        String classification = j.getString("Tumor Stage") + "/" + j.getString("Grades");
-        String stage = j.getString("Tumor Stage");
-        String grade = j.getString("Grades");
-        String age = Standardizer.getAge(j.getString("Age"));
-        String gender = Standardizer.getGender(j.getString("Gender"));
-        
-        String race = Standardizer.fixNotString(j.getString("Race"));
-        String ethnicity = Standardizer.fixNotString(j.getString("Ethnicity"));
-        String patientId = j.getString("Patient ID");
+        dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
 
-        String tumorType = Standardizer.getTumorType(j.getString("Tumor Type"));
-        String primarySite = j.getString("Primary Site");
-        String sampleSite = j.getString("Specimen Site");
-        String extractionMethod = j.getString("Sample Type");
+        dto.getPatientSnapshot().addSample(dto.getPatientSample());
 
-        Patient patient = dataImportService.getPatientWithSnapshots(patientId, jaxDS);
+        dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
 
-        if(patient == null){
+        dto = dataImportService.step09LoadExternalURLs2(dto, DATASOURCE_CONTACT, DATASOURCE_URL); // JAX UNIQUELY OVERRIDE DEFAULT HERE
 
-            patient = dataImportService.createPatient(patientId, jaxDS, gender, "", Standardizer.getEthnicity(ethnicity));
-        }
-
-        PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, age, "", "", "");
+        dto = dataImportService.step09BCreateBreastMarkers(dto);
 
 
-        //String sourceSampleId, String dataSource,  String typeStr, String diagnosis, String originStr,
-        //String sampleSiteStr, String extractionMethod, Boolean normalTissue, String stage, String stageClassification,
-        // String grade, String gradeClassification
-        Sample sample = dataImportService.getSample(id, jaxDS.getAbbreviation(), tumorType, diagnosis, primarySite,
-                sampleSite, extractionMethod, false, stage, "", grade, "");
+        // JAX - Updates Patient Sample b4 model Creation
+        dto.getPatientSample().setExtractionMethod(dto.getExtractionMethod());
 
-
-        //create breast cancer markers manually if they are present
-        if(j.has("Model Tag")){
-
-            String tag = j.getString("Model Tag");
-
-            if(tag.equals("Triple Negative Breast Cancer (TNBC)")){
-
-                MolecularCharacterization mc = new MolecularCharacterization();
-                mc.setPlatform(dataImportService.getPlatform("Not Specified", jaxDS));
-                mc.setType("IHC");
-                Marker her2 = dataImportService.getMarker("HER2", "HER2");
-                Marker er = dataImportService.getMarker("ER", "ER");
-                Marker pr = dataImportService.getMarker("PR", "PR");
-
-                MarkerAssociation her2a = new MarkerAssociation();
-                her2a.setMarker(her2);
-                her2a.setImmunoHistoChemistryResult("negative");
-
-                MarkerAssociation era = new MarkerAssociation();
-                era.setMarker(er);
-                era.setImmunoHistoChemistryResult("negative");
-
-                MarkerAssociation pra = new MarkerAssociation();
-                pra.setMarker(pr);
-                pra.setImmunoHistoChemistryResult("negative");
-
-                mc.addMarkerAssociation(her2a);
-                mc.addMarkerAssociation(era);
-                mc.addMarkerAssociation(pra);
-
-                sample.addMolecularCharacterization(mc);
-            }
-        }
-
-
-        List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, DATASOURCE_CONTACT+id));
-        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, DATASOURCE_URL+id));
-
-        String extraction = j.getString("Sample Type");
-        sample.setExtractionMethod(extraction);
-
-        if (histologyMap.containsKey("Patient")) {
+        if (dto.getHistologyMap().containsKey("Patient")) {
             Histology histology = new Histology();
-            Image image = histologyMap.get("Patient");
+            Image image = dto.getHistologyMap().get("Patient");
             histology.addImage(image);
-            sample.addHistology(histology);
-
+            dto.getPatientSample().addHistology(histology);
         }
 
-        String qaPassages = Standardizer.NOT_SPECIFIED;
 
-        pSnap.addSample(sample);
-        dataImportService.savePatientSnapshot(pSnap);
-        
-         // Pending or Complete
-        String qc = j.getString("QC");
-        if("Pending".equals(qc)){
-            qc = Standardizer.NOT_SPECIFIED;
-        }else{
-            qc = "QC is "+qc;
-        }
-        
-        // the validation techniques are more than just fingerprint, we don't have a way to capture that
-        QualityAssurance qa = new QualityAssurance("Fingerprint", qc, qaPassages);
-        dataImportService.saveQualityAssurance(qa);
+        dto = dataImportService.stageNineCreateModels(dto);
 
-        ModelCreation mc = dataImportService.createModelCreation(id, jaxDS.getAbbreviation(), sample, qa, externalUrls);
-        mc.addRelatedSample(sample);
-
-        String implantationTypeStr = Standardizer.NOT_SPECIFIED;
-        String implantationSiteStr = j.getString("Engraftment Site");
-
-        Specimen specimen = dataImportService.getSpecimen(mc, id, jaxDS.getAbbreviation(), "");
-        specimen.setHostStrain(nsgBS);
-        EngraftmentSite engraftmentSite = dataImportService.getImplantationSite(implantationSiteStr);
-        EngraftmentType engraftmentType = dataImportService.getImplantationType(implantationTypeStr);
-        specimen.setEngraftmentSite(engraftmentSite);
-        specimen.setEngraftmentType(engraftmentType);
-
-        mc.addSpecimen(specimen);
+        dto = dataImportService.loaderSecondStep(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
 
         //Create Treatment summary without linking TreatmentProtocols to specimens
-        TreatmentSummary ts;
-
-        try{
-            if(j.has("Treatments")){
-                JSONArray treatments = j.getJSONArray("Treatments");
-
-                if(treatments.length() > 0){
-                    //log.info("Treatments found for model "+mc.getSourcePdxId());
-                    ts = new TreatmentSummary();
-                    ts.setUrl(DOSING_STUDY_URL);
-
-                    for(int t = 0; t<treatments.length(); t++){
-                        JSONObject treatmentObject = treatments.getJSONObject(t);
-
-                        TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
-                                treatmentObject.getString("Dose"),
-                                treatmentObject.getString("Response"), "");
-
-                        if(tp != null){
-                            ts.addTreatmentProtocol(tp);
-                        }
-
-                    }
-
-                    ts.setModelCreation(mc);
-                    mc.setTreatmentSummary(ts);
-                }
-            }
+        dto = dataImportService.stepThreeCurrentTreatment(dto, DOSING_STUDY_URL,"Response");
 
 
-        }
-        catch(Exception e){
-
-            e.printStackTrace();
-        }
-
-        
-        dataImportService.saveSpecimen(specimen);
-        //dataImportService.saveModelCreation(mc);
-        loadVariationData(mc, engraftmentSite, engraftmentType);
+        loadVariationData(dto.getModelCreation(), dto.getEngraftmentSite(), dto.getEngraftmentType());
 
     }
 
@@ -430,16 +290,16 @@ public class LoadJAXData implements CommandLineRunner {
                     Platform platform;
 
                     if(technology.equals("Truseq_JAX")){
-                        platform = dataImportService.getPlatform(technology, this.jaxDS, TRUSEQ_PLATFORM_URL);
+                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), TRUSEQ_PLATFORM_URL);
                     }
                     else if(technology.equals("Whole_Exome")){
-                        platform = dataImportService.getPlatform(technology, this.jaxDS, WHOLE_EXOME_URL);
+                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), WHOLE_EXOME_URL);
                     }
                     else if(technology.equals("CTP")){
-                        platform = dataImportService.getPlatform(technology, this.jaxDS, CTP_PLATFORM_URL);
+                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), CTP_PLATFORM_URL);
                     }
                     else{
-                        platform = dataImportService.getPlatform(technology, this.jaxDS, "");
+                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), "");
                     }
 
 
@@ -478,16 +338,16 @@ public class LoadJAXData implements CommandLineRunner {
                         Platform platform = null;
 
                         if(tech.equals("Truseq_JAX")){
-                            platform = dataImportService.getPlatform(tech, this.jaxDS, TRUSEQ_PLATFORM_URL);
+                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), TRUSEQ_PLATFORM_URL);
                         }
                         else if(tech.equals("Whole_Exome")){
-                            platform = dataImportService.getPlatform(tech, this.jaxDS, WHOLE_EXOME_URL);
+                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), WHOLE_EXOME_URL);
                         }
                         else if(tech.equals("CTP")){
-                            platform = dataImportService.getPlatform(tech, this.jaxDS, CTP_PLATFORM_URL);
+                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), CTP_PLATFORM_URL);
                         }
                         else{
-                            platform = dataImportService.getPlatform(tech, this.jaxDS, "");
+                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), "");
                         }
 
 
@@ -498,7 +358,7 @@ public class LoadJAXData implements CommandLineRunner {
                     }
 
 
-                    Specimen specimen = dataImportService.getSpecimen(modelCreation, sampleKey, this.jaxDS.getAbbreviation(), passage);
+                    Specimen specimen = dataImportService.getSpecimen(modelCreation, sampleKey, dto.getProviderGroup().getAbbreviation(), passage);
 
                     Sample specSample = new Sample();
                     specSample.setSourceSampleId(sampleKey);
@@ -506,9 +366,9 @@ public class LoadJAXData implements CommandLineRunner {
                     specSample.setMolecularCharacterizations(mcs);
 
 
-                    if (histologyMap.containsKey(passage)) {
+                    if (dto.getHistologyMap().containsKey(passage)) {
                         Histology histology = new Histology();
-                        Image image = histologyMap.get(passage);
+                        Image image = dto.getHistologyMap().get(passage);
                         histology.addImage(image);
                         specSample.addHistology(histology);
 
@@ -516,7 +376,7 @@ public class LoadJAXData implements CommandLineRunner {
 
 
                     // all JAX mice are NSG, even if not specified in feed
-                    specimen.setHostStrain(nsgBS);
+                    specimen.setHostStrain(dto.getNodScidGamma());
 
 
                     specimen.setEngraftmentSite(engraftmentSite);

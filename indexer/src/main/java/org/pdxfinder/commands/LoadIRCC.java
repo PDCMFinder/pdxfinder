@@ -146,7 +146,7 @@ public class LoadIRCC implements CommandLineRunner {
         dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
                 PROVIDER_TYPE, ACCESSIBILITY, "transnational access", DATASOURCE_CONTACT, SOURCE_URL);
 
-        dto = dataImportService.stageThreeCreateNSGammaHostStrain(dto, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
+        dto = dataImportService.stageThreeCreateNSGammaHostStrain(dto, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
 
         dto = dataImportService.stageFiveCreateProjectGroup(dto,"EurOPDX");
 
@@ -178,6 +178,8 @@ public class LoadIRCC implements CommandLineRunner {
 
         dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
 
+        dto = dataImportService.step09LoadExternalURLs(dto, DATASOURCE_CONTACT);
+
         dto.getPatientSnapshot().addSample(dto.getPatientSample());
 
         dataImportService.saveSample(dto.getPatientSample());
@@ -186,7 +188,6 @@ public class LoadIRCC implements CommandLineRunner {
         dto = dataImportService.stageNineCreateModels(dto);
 
         dto = dataImportService.loaderSecondStep(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
-
 
         dto = dataImportService.stepThreeCurrentTreatment(dto, DOSING_STUDY_URL,"Response Class");
 

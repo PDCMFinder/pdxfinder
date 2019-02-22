@@ -3,6 +3,7 @@ package org.pdxfinder.services.dto;
 import org.neo4j.ogm.json.JSONArray;
 import org.pdxfinder.graph.dao.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class LoaderDTO {
@@ -30,6 +31,7 @@ public class LoaderDTO {
     private String markerStr;
     private String qaPassage;
     private String fingerprinting;
+    private String modelTag;
 
     private JSONArray treatments;
 
@@ -51,6 +53,8 @@ public class LoaderDTO {
     private Patient patient;
 
     private JSONArray specimens;
+
+    private HashMap<String, Image> histologyMap;
 
 
     public LoaderDTO() {
@@ -334,5 +338,21 @@ public class LoaderDTO {
 
     public void setSpecimens(JSONArray specimens) {
         this.specimens = specimens;
+    }
+
+    public HashMap<String, Image> getHistologyMap() {
+        return histologyMap;
+    }
+
+    public void setHistologyMap(HashMap<String, Image> histologyMap) {
+        this.histologyMap = histologyMap;
+    }
+
+    public String getModelTag() {
+        return modelTag;
+    }
+
+    public void setModelTag(String modelTag) {
+        this.modelTag = modelTag;
     }
 }

@@ -142,6 +142,8 @@ public class LoadWUSTL implements CommandLineRunner {
 
             dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
 
+            dto = dataImportService.step09LoadExternalURLs(dto, DATASOURCE_CONTACT);
+
             PatientSnapshot pSnap = dto.getPatientSnapshot();
             pSnap.addSample(dto.getPatientSample());
 

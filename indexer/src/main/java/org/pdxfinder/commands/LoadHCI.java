@@ -93,12 +93,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
         if (options.has("loadHCI") || options.has("loadALL")) {
 
-            log.info("Loading Huntsman PDX data.");
-
-            jsonFile = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/models.json";
-            dataSource = DATASOURCE_ABBREVIATION;
-
-            loadData();
+            loaderTemplate();
 
         }
     }
@@ -108,6 +103,10 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     @Override
     protected void initMethod() {
 
+        log.info("Loading Huntsman PDX data.");
+        jsonFile = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/models.json";
+        dataSource = DATASOURCE_ABBREVIATION;
+        filesDirectory = "";
         dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
         dataSourceContact = DATASOURCE_CONTACT;
         dosingStudyURL = DOSING_STUDY_URL;
@@ -127,7 +126,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step03CreateNSGammaHostStrain() {
 
-        loadNSGammaHostStrain(NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME);
+        loadNSGammaHostStrain(NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
     }
 
 
@@ -152,9 +151,10 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     }
 
 
+    // HCI implement Steps 07,08,09,10 default
 
     @Override
-    protected void step10CreateEngraftmentsAndSpecimen() {
+    protected void step11CreateEngraftmentsAndSpecimen() {
 
         dto.getModelCreation().addRelatedSample(dto.getPatientSample());
         dto.getModelCreation().addGroup(dto.getProjectGroup());
@@ -201,7 +201,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step11CreateCurrentTreatment() {
+    protected void step12CreateCurrentTreatment() {
 
         TreatmentSummary ts;
         try {
@@ -236,7 +236,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step12LoadImmunoHistoChemistry() {
+    protected void step13LoadImmunoHistoChemistry() {
 
         String ihcFileStr = dataRootDir + DATASOURCE_ABBREVIATION + "/ihc/ihc.txt";
 

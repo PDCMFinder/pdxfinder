@@ -20,6 +20,7 @@ public class Hamonizer {
     static final String mdAnderson = "PDXNet-MDAnderson";
     static final String irccCrc = "IRCC-CRC";
     static final String wustl = "PDXNet-WUSTL";
+    static final String jax = "JAX";
 
     @Autowired
     private static DataImportService dataImportService;
@@ -47,6 +48,17 @@ public class Hamonizer {
 
 
 
+
+    public static String getStage(JSONObject data,String ds) throws Exception {
+        String tumorStage = Standardizer.NOT_SPECIFIED;
+
+        if (ds.equals(jax)) {
+            tumorStage = data.getString("Tumor Stage");
+        } else {
+            tumorStage = Standardizer.getValue("Stage", data);
+        }
+        return tumorStage;
+    }
 
     public static JSONArray getSpecimens(JSONObject data,String ds) throws Exception {
 
@@ -76,7 +88,7 @@ public class Hamonizer {
             sampleID = data.getString("Sample ID");
         }
 
-        if (ds.equals(irccCrc) || ds.equals(mdAnderson)){
+        if (ds.equals(irccCrc) || ds.equals(mdAnderson) || ds.equals(jax)){
             sampleID = data.getString("Model ID");
         }
 
@@ -106,14 +118,30 @@ public class Hamonizer {
             }
         }
 
+        if (ds.equals(jax)){
+            // the preference is for clinical diagnosis but if not available use initial diagnosis
+            if (diagnosis.trim().length() == 0 || "Not specified".equals(diagnosis)) {
+                diagnosis = data.getString("Initial Diagnosis");
+            }
+        }
+
+
+
+
+
         return diagnosis;
     }
+
 
     public static String getEthnicity(JSONObject data,String ds) throws Exception {
         String ethnicity = Standardizer.NOT_SPECIFIED;
 
         if (ds.equals(hci)) {
             ethnicity = data.getString("Ethnicity");
+        }
+
+        if (ds.equals(jax)) {
+            ethnicity = Standardizer.fixNotString(data.getString("Ethnicity"));
         }
 
         if (ds.equals(mdAnderson) || ds.equals(wustl)){
@@ -128,6 +156,7 @@ public class Hamonizer {
     }
 
 
+
     public static String getClassification(JSONObject data,String ds) throws Exception {
         String classification = Standardizer.NOT_SPECIFIED;
 
@@ -135,8 +164,12 @@ public class Hamonizer {
             classification = data.getString("Stage") + "/" + data.getString("Grades");
         }
 
-        if (ds.equals(irccCrc) || ds.equals(wustl)){
+        if (ds.equals(irccCrc)){
             classification = data.getString("Stage");
+        }
+
+        if (ds.equals(jax)){
+            classification = data.getString("Tumor Stage") + "/" + data.getString("Grades");
         }
 
         return classification;
@@ -204,79 +237,4 @@ public class Hamonizer {
 
 
 
-
-
-    public static QualityAssurance getQualityAssurance(JSONObject data, String ds)  throws Exception{
-
-        QualityAssurance qa = new QualityAssurance();
-        String qaType = Standardizer.NOT_SPECIFIED;
-
-        if (ds.equals(hci)){
-
-            // This multiple QA approach only works because Note and Passage are the same for all QAs
-            qa = new QualityAssurance(Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED);
-
-            StringBuilder technology = new StringBuilder();
-            if(data.has("QA")){
-                JSONArray qas = data.getJSONArray("QA");
-                for (int i = 0; i < qas.length(); i++) {
-                    if (qas.getJSONObject(i).getString("Technology").equalsIgnoreCase("histology")) {
-                        qa.setTechnology(qas.getJSONObject(i).getString("Technology"));
-                        qa.setDescription(qas.getJSONObject(i).getString("Note"));
-                        qa.setPassages(qas.getJSONObject(i).getString("Passage"));
-                    }
-                }
-            }
-
-        }
-
-
-
-        if (ds.equals(mdAnderson) || ds.equals(wustl)) {
-
-            try {
-                qaType = data.getString("QA") + " on passage " + data.getString("QA Passage");
-            } catch (Exception e) {
-                // not all groups supplied QA
-            }
-
-            String qaPassage = data.has("QA Passage") ? data.getString("QA Passage") : null;
-            qa = new QualityAssurance(qaType, Standardizer.NOT_SPECIFIED, qaPassage);
-            dataImportService.saveQualityAssurance(qa);
-        }
-
-
-        if (ds.equals(irccCrc)) {
-
-            String FINGERPRINT_DESCRIPTION = "Model validated against patient germline.";
-
-            if ("TRUE".equals(data.getString("Fingerprinting").toUpperCase())) {
-                qa.setTechnology("Fingerprint");
-                qa.setDescription(FINGERPRINT_DESCRIPTION);
-
-                // If the model includes which passages have had QA performed, set the passages on the QA node
-                if (data.has("QA Passage") && !data.getString("QA Passage").isEmpty()) {
-
-                    List<String> passages = Stream.of(data.getString("QA Passage").split(","))
-                            .map(String::trim)
-                            .distinct()
-                            .collect(Collectors.toList());
-                    List<Integer> passageInts = new ArrayList<>();
-
-                    // NOTE:  IRCC uses passage 0 to mean Patient Tumor, so we need to harmonize according to the other
-                    // sources.  Subtract 1 from every passage.
-                    for (String p : passages) {
-                        Integer intPassage = Integer.parseInt(p);
-                        passageInts.add(intPassage - 1);
-                    }
-
-                    qa.setPassages(StringUtils.join(passageInts, ", "));
-                }
-            }
-
-        }
-
-
-        return qa;
-    }
 }

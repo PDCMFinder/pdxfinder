@@ -140,12 +140,13 @@ public class LoadMDAnderson implements CommandLineRunner {
 
             dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
 
-            PatientSnapshot pSnap = dto.getPatientSnapshot();
-            pSnap.addSample(dto.getPatientSample());
+            dto = dataImportService.step09LoadExternalURLs(dto, DATASOURCE_CONTACT);
+
+            dto.getPatientSnapshot().addSample(dto.getPatientSample());
 
             dto = dataImportService.stageNineCreateModels(dto);
 
-            dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
+            dto = dataImportService.loaderSecondStep(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
 
         }
 
