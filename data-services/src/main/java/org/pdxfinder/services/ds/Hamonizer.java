@@ -241,7 +241,7 @@ public class Hamonizer {
     public static String getMarkerPlatform(JSONObject data,String ds) throws Exception {
         String markerPlatform = Standardizer.NOT_SPECIFIED;
         if (ds.equals(mdAnderson) || ds.equals(wustl)){
-            markerPlatform = data.getString("Marker Platform");
+            markerPlatform = Standardizer.getValue("Marker Platform", data);
         }
         return markerPlatform;
     }
@@ -251,7 +251,7 @@ public class Hamonizer {
         String markerStr = Standardizer.NOT_SPECIFIED;
 
         if (ds.equals(mdAnderson)){
-            markerStr = data.getString("Markers");
+            markerStr = Standardizer.getValue("Markers", data);
         }
 
         return markerStr;
