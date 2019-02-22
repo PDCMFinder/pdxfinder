@@ -21,19 +21,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Load data from WUSTL PDXNet.
@@ -149,7 +139,7 @@ public class LoadWUSTL implements CommandLineRunner {
 
             dto = dataImportService.stageNineCreateModels(dto);
 
-            dto = dataImportService.loaderSecondStep(dto, pSnap, DATASOURCE_ABBREVIATION);
+            dto = dataImportService.loadSpecimens(dto, pSnap, DATASOURCE_ABBREVIATION);
 
         }
 

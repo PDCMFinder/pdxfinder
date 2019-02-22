@@ -78,7 +78,7 @@ public abstract class LoaderBase {
 
             step10CreateModels();
 
-            step11CreateEngraftmentsAndSpecimen();
+            step11LoadSpecimens();
 
             step12CreateCurrentTreatment();
         }
@@ -201,7 +201,7 @@ public abstract class LoaderBase {
 
     }
 
-    abstract void step11CreateEngraftmentsAndSpecimen();
+    abstract void step11LoadSpecimens();
 
     abstract void step12CreateCurrentTreatment();
 

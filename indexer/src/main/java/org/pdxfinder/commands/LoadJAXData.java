@@ -12,7 +12,6 @@ import org.neo4j.ogm.session.Session;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
-import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,14 +23,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * Load data from JAX.
@@ -195,7 +188,7 @@ public class LoadJAXData implements CommandLineRunner {
 
         dto = dataImportService.stageNineCreateModels(dto);
 
-        dto = dataImportService.loaderSecondStep(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
+        dto = dataImportService.loadSpecimens(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
 
         //Create Treatment summary without linking TreatmentProtocols to specimens
         dto = dataImportService.stepThreeCurrentTreatment(dto, DOSING_STUDY_URL,"Response");

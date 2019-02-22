@@ -161,7 +161,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     // HCI implement Steps 07,08,10 default
 
     @Override
-    protected void step11CreateEngraftmentsAndSpecimen() {
+    protected void step11LoadSpecimens() {
 
         dto.getModelCreation().addRelatedSample(dto.getPatientSample());
         dto.getModelCreation().addGroup(dto.getProjectGroup());

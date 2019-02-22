@@ -32,8 +32,12 @@ public class LoaderDTO {
     private String qaPassage;
     private String fingerprinting;
     private String modelTag;
+    private String sourceURL;
 
+    private JSONArray specimens;
     private JSONArray treatments;
+    private JSONArray samplesArr;
+    private JSONArray ValidationsArr;
 
     private Sample patientSample;
     private PatientSnapshot patientSnapshot;
@@ -51,8 +55,6 @@ public class LoaderDTO {
 
     private ModelCreation modelCreation;
     private Patient patient;
-
-    private JSONArray specimens;
 
     private HashMap<String, Image> histologyMap;
 
@@ -354,5 +356,29 @@ public class LoaderDTO {
 
     public void setModelTag(String modelTag) {
         this.modelTag = modelTag;
+    }
+
+    public String getSourceURL() {
+        return sourceURL;
+    }
+
+    public void setSourceURL(String sourceURL) {
+        this.sourceURL = sourceURL;
+    }
+
+    public JSONArray getSamplesArr() {
+        return samplesArr;
+    }
+
+    public void setSamplesArr(JSONArray samplesArr) {
+        this.samplesArr = samplesArr;
+    }
+
+    public JSONArray getValidationsArr() {
+        return ValidationsArr;
+    }
+
+    public void setValidationsArr(JSONArray validationsArr) {
+        ValidationsArr = validationsArr;
     }
 }

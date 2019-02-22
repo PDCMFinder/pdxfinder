@@ -1184,6 +1184,7 @@ public class DataImportService {
     String irccCrc = "IRCC-CRC";
     String wustl = "PDXNet-WUSTL";
     String jax = "JAX";
+    String pdmr = "PDMR";
 
 
     public File[] stageZeroGetMetaDataFolder(String directory, String dataSource){
@@ -1312,6 +1313,8 @@ public class DataImportService {
         dto.setFingerprinting(Hamonizer.getFingerprinting(data, ds));
         dto.setSpecimens(Hamonizer.getSpecimens(data,ds));
         dto.setTreatments(Hamonizer.getTreament(data, ds));
+        dto.setSamplesArr(Hamonizer.getSamplesArr(data, ds));
+        dto.setValidationsArr(Hamonizer.getValidationsArr(data, ds));
 
         return dto;
 
@@ -1420,7 +1423,7 @@ public class DataImportService {
      *     CREATE IMPLANTATION-SITE, IMPLANTATION-TYPE, SPECIMEN, UPDATE MODEL-CREATION         *
      ******************************************************************************************/
 
-    public LoaderDTO loaderSecondStep(LoaderDTO dto, PatientSnapshot pSnap, String ds)  throws Exception{
+    public LoaderDTO loadSpecimens(LoaderDTO dto, PatientSnapshot pSnap, String ds)  throws Exception{
 
 
         if (ds.equals(jax)){
@@ -1437,6 +1440,48 @@ public class DataImportService {
 
             dto.setEngraftmentSite(engraftmentSite);
             dto.setEngraftmentType(engraftmentType);
+
+        }
+
+        if (ds.equals(pdmr)){
+
+            //load specimens
+            if(dto.getSamplesArr().length() > 0){
+                for(int i=0; i<dto.getSamplesArr().length();i++){
+
+                    JSONObject sampleObj = dto.getSamplesArr().getJSONObject(i);
+                    String sampleType = sampleObj.getString("Tumor Type");
+
+                    if(sampleType.equals("Xenograft Tumor")){
+
+                        String specimenId = sampleObj.getString("Sample ID");
+                        String passage = sampleObj.getString("Passage");
+
+                        Specimen specimen = getSpecimen(dto.getModelCreation(),
+                                specimenId, dto.getProviderGroup().getAbbreviation(), passage);
+
+                        specimen.setHostStrain(dto.getNodScidGamma());
+
+                        EngraftmentSite es = getImplantationSite(dto.getImplantationSiteStr());
+                        specimen.setEngraftmentSite(es);
+
+                        EngraftmentType et = getImplantationType(dto.getImplantationtypeStr());
+                        specimen.setEngraftmentType(et);
+
+                        Sample specSample = new Sample();
+
+                        specSample.setSourceSampleId(specimenId);
+                        specSample.setDataSource(dto.getProviderGroup().getAbbreviation());
+
+                        specimen.setSample(specSample);
+
+                        dto.getModelCreation().addSpecimen(specimen);
+                        dto.getModelCreation().addRelatedSample(specSample);
+
+                    }
+
+                }
+            }
 
         }
 
@@ -1615,7 +1660,6 @@ public class DataImportService {
 
         QualityAssurance qa = new QualityAssurance();
         String qaType = Standardizer.NOT_SPECIFIED;
-
 
         if (ds.equals(jax)){
 

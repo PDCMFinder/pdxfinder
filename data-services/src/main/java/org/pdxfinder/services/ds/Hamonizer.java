@@ -21,9 +21,32 @@ public class Hamonizer {
     static final String irccCrc = "IRCC-CRC";
     static final String wustl = "PDXNet-WUSTL";
     static final String jax = "JAX";
+    static final String pdmr = "PDMR";
 
     @Autowired
     private static DataImportService dataImportService;
+
+
+
+    public static JSONArray getValidationsArr(JSONObject data,String ds) throws Exception {
+
+        JSONArray ValidationsArr = new JSONArray();
+
+        if (ds.equals(pdmr)){
+            ValidationsArr = data.getJSONArray("Validations");
+        }
+        return ValidationsArr;
+    }
+
+    public static JSONArray getSamplesArr(JSONObject data,String ds) throws Exception {
+
+        JSONArray samples = new JSONArray();
+
+        if (ds.equals(pdmr)){
+            samples = data.getJSONArray("Samples");
+        }
+        return samples;
+    }
 
 
     public static JSONArray getTreament(JSONObject data, String ds) throws Exception {
@@ -46,18 +69,30 @@ public class Hamonizer {
     }
 
 
-
-
-
-    public static String getStage(JSONObject data,String ds) throws Exception {
+    public static String getStage(JSONObject data, String ds) throws Exception {
         String tumorStage = Standardizer.NOT_SPECIFIED;
 
         if (ds.equals(jax)) {
             tumorStage = data.getString("Tumor Stage");
+        } else if (ds.equals(pdmr)) {
+            tumorStage = data.getString("Stage Value");
         } else {
             tumorStage = Standardizer.getValue("Stage", data);
         }
         return tumorStage;
+    }
+
+
+    public static String getGrade(JSONObject data, String ds) throws Exception {
+        String grade = Standardizer.NOT_SPECIFIED;
+
+        if (ds.equals(pdmr)) {
+            grade = data.getString("Grade Value");
+        }
+        else {
+            grade = Standardizer.getValue("Grades",data);
+        }
+        return grade;
     }
 
     public static JSONArray getSpecimens(JSONObject data,String ds) throws Exception {
@@ -88,7 +123,7 @@ public class Hamonizer {
             sampleID = data.getString("Sample ID");
         }
 
-        if (ds.equals(irccCrc) || ds.equals(mdAnderson) || ds.equals(jax)){
+        if (ds.equals(irccCrc) || ds.equals(mdAnderson) || ds.equals(jax) || ds.equals(pdmr)){
             sampleID = data.getString("Model ID");
         }
 
@@ -118,16 +153,12 @@ public class Hamonizer {
             }
         }
 
-        if (ds.equals(jax)){
+        if (ds.equals(jax) || ds.equals(pdmr)){
             // the preference is for clinical diagnosis but if not available use initial diagnosis
             if (diagnosis.trim().length() == 0 || "Not specified".equals(diagnosis)) {
                 diagnosis = data.getString("Initial Diagnosis");
             }
         }
-
-
-
-
 
         return diagnosis;
     }
@@ -136,7 +167,7 @@ public class Hamonizer {
     public static String getEthnicity(JSONObject data,String ds) throws Exception {
         String ethnicity = Standardizer.NOT_SPECIFIED;
 
-        if (ds.equals(hci)) {
+        if (ds.equals(hci) || ds.equals(pdmr)) {
             ethnicity = data.getString("Ethnicity");
         }
 
@@ -189,6 +220,10 @@ public class Hamonizer {
             implantationTypeStr =  Standardizer.getValue("Tumor Prep",data);
         }
 
+        if (ds.equals(pdmr)){
+            implantationTypeStr = Standardizer.getValue("Engraftment Type", data);
+        }
+
         return implantationTypeStr;
     }
 
@@ -196,7 +231,7 @@ public class Hamonizer {
     public static String getEngraftmentSite(JSONObject data,String ds) throws Exception {
         String implantationSite = Standardizer.NOT_SPECIFIED;
 
-        if (ds.equals(hci) || ds.equals(mdAnderson) || ds.equals(wustl)){
+        if (ds.equals(hci) || ds.equals(mdAnderson) || ds.equals(wustl) || ds.equals(jax) || ds.equals(pdmr)){
             implantationSite = Standardizer.getValue("Engraftment Site", data);
         }
         return implantationSite;
