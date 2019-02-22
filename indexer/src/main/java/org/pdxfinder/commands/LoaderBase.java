@@ -74,7 +74,7 @@ public abstract class LoaderBase {
 
             dto.getPatientSnapshot().addSample(dto.getPatientSample());
 
-            step09LoadExternalURLs(dataSourceContact);
+            step09LoadExternalURLs();
 
             step10CreateModels();
 
@@ -191,14 +191,7 @@ public abstract class LoaderBase {
     }
 
 
-    void step09LoadExternalURLs(String dataSourceContact){
-
-        List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, dataSourceContact));
-        dto.setExternalUrls(externalUrls);
-
-    }
-
+    abstract void step09LoadExternalURLs();
 
 
     void step10CreateModels(){
@@ -273,6 +266,19 @@ public abstract class LoaderBase {
         } catch (Exception e) {
             log.error("Error getting "+key+" PDX models", e);
         }
+    }
+
+
+    public void loadExternalURLs(String dataSourceContact, String dataSourceURL){
+
+        List<ExternalUrl> externalUrls = new ArrayList<>();
+        externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, dataSourceContact));
+
+        if (!dataSourceURL.equals(Standardizer.NOT_SPECIFIED)){
+            externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, dataSourceURL));
+        }
+        dto.setExternalUrls(externalUrls);
+
     }
 
 

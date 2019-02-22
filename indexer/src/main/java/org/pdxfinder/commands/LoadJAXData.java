@@ -177,7 +177,7 @@ public class LoadJAXData implements CommandLineRunner {
 
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
 
-        dto = dataImportService.step09LoadExternalURLs2(dto, DATASOURCE_CONTACT, DATASOURCE_URL); // JAX UNIQUELY OVERRIDE DEFAULT HERE
+        dto = dataImportService.step09LoadExternalURLs(dto, DATASOURCE_CONTACT+dto.getModelID(), DATASOURCE_URL+dto.getModelID());
 
         dto = dataImportService.step09BCreateBreastMarkers(dto);
 

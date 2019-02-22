@@ -151,7 +151,14 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     }
 
 
-    // HCI implement Steps 07,08,09,10 default
+    @Override
+    protected void step09LoadExternalURLs() {
+
+        loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
+    }
+
+
+    // HCI implement Steps 07,08,10 default
 
     @Override
     protected void step11CreateEngraftmentsAndSpecimen() {
