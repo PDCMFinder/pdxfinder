@@ -150,6 +150,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
         loadPDXModels(metaDataJSON,"HCI");
     }
 
+    // HCI implement Steps step07GetMetaData,step08LoadPatientData default
 
     @Override
     protected void step09LoadExternalURLs() {
@@ -157,8 +158,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
         loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
     }
 
-
-    // HCI implement Steps 07,08,10 default
+    // HCI implement Step10CreateModels default
 
     @Override
     protected void step11LoadSpecimens() {
@@ -349,6 +349,11 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
         }
 
     }
+
+
+
+    @Override
+    protected void step14VariationData() { }
 
 
 

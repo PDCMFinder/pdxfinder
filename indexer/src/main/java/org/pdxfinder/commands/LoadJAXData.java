@@ -164,7 +164,7 @@ public class LoadJAXData implements CommandLineRunner {
             return;
         }
 
-        dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
+        dto = dataImportService.stageEightLoadPatientData(dto);
 
         dto.getPatientSnapshot().addSample(dto.getPatientSample());
 

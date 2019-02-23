@@ -130,7 +130,7 @@ public class LoadWUSTL implements CommandLineRunner {
 
             dto = dataImportService.stageSevenGetMetadata(dto, jsonData, DATASOURCE_ABBREVIATION);
 
-            dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
+            dto = dataImportService.stageEightLoadPatientData(dto);
 
             dto = dataImportService.step09LoadExternalURLs(dto, DATASOURCE_CONTACT, Standardizer.NOT_SPECIFIED);
 

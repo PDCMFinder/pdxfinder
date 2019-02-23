@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public abstract class LoaderBase {
@@ -45,7 +46,32 @@ public abstract class LoaderBase {
      *     SINGLE FILE DATA TEMPLATE METHOD         *
      **********************************************/
 
-    public final void loaderTemplate() throws Exception  {
+
+    public final void loaderTemplate() throws Exception {
+
+        templateParseJSON();
+
+        HashSet<Integer> done = new HashSet<>();
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+
+            JSONObject jsonData = jsonArray.getJSONObject(i);
+
+            if (done.contains(jsonData.toString().hashCode())) return;
+            done.add(jsonData.toString().hashCode());
+
+            step07GetMetaData(jsonData, dataSourceAbbreviation);
+
+            templateCreateGraphObjects();
+
+        }
+        step13LoadImmunoHistoChemistry();
+
+        step14VariationData();
+    }
+
+
+    public final void templateParseJSON(){
 
         initMethod();
 
@@ -62,32 +88,24 @@ public abstract class LoaderBase {
         step05CreateProjectGroup();
 
         step06GetPDXModels();
-
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-
-            JSONObject jsonData = jsonArray.getJSONObject(i);
-
-            step07GetMetaData(jsonData,dataSourceAbbreviation);
-
-            step08LoadPatientData(dataSourceContact);
-
-            dto.getPatientSnapshot().addSample(dto.getPatientSample());
-
-            step09LoadExternalURLs();
-
-            step10CreateModels();
-
-            step11LoadSpecimens();
-
-            step12CreateCurrentTreatment();
-        }
-
-        step13LoadImmunoHistoChemistry();
     }
 
 
 
+    public final void templateCreateGraphObjects() throws Exception  {
+
+        step08LoadPatientData();
+
+        dto.getPatientSnapshot().addSample(dto.getPatientSample());
+
+        step09LoadExternalURLs();
+
+        step10CreateModels();
+
+        step11LoadSpecimens();
+
+        step12CreateCurrentTreatment();
+    }
 
 
 
@@ -139,14 +157,16 @@ public abstract class LoaderBase {
 
     void step07GetMetaData(JSONObject data, String ds) throws Exception {
 
+
         dto.setModelID(data.getString("Model ID"));
         dto.setSampleID(Hamonizer.getSampleID(data,ds));
         dto.setDiagnosis(Hamonizer.getDiagnosis(data,ds));
         dto.setPatientId(Standardizer.getValue("Patient ID",data));
         dto.setEthnicity(Hamonizer.getEthnicity(data,ds));
-        dto.setStage(Standardizer.getValue("Stage",data));
-        dto.setGrade(Standardizer.getValue("Grades",data));
+        dto.setStage(Hamonizer.getStage(data,ds));
+        dto.setGrade(Hamonizer.getGrade(data,ds));
         dto.setClassification(Hamonizer.getClassification(data,ds));
+
         dto.setAge(Standardizer.getAge(data.getString("Age")));
         dto.setGender(Standardizer.getGender(data.getString("Gender")));
         dto.setTumorType(Standardizer.getTumorType(data.getString("Tumor Type")));
@@ -154,6 +174,10 @@ public abstract class LoaderBase {
         dto.setPrimarySite(Standardizer.getValue("Primary Site",data));
         dto.setExtractionMethod(Standardizer.getValue("Sample Type",data));
         dto.setStrain(Standardizer.getValue("Strain",data));
+        dto.setModelTag(Standardizer.getValue("Model Tag",data));
+
+        dto.setSourceURL(Standardizer.getValue("Source url",data));
+
         dto.setMarkerPlatform(Hamonizer.getMarkerPlatform(data,ds));
         dto.setMarkerStr(Hamonizer.getMarkerStr(data,ds));
         dto.setQaPassage(Hamonizer.getQAPassage(data,ds));
@@ -165,11 +189,13 @@ public abstract class LoaderBase {
         dto.setFingerprinting(Hamonizer.getFingerprinting(data, ds));
         dto.setSpecimens(Hamonizer.getSpecimens(data,ds));
         dto.setTreatments(Hamonizer.getTreament(data, ds));
+        dto.setSamplesArr(Hamonizer.getSamplesArr(data, ds));
+        dto.setValidationsArr(Hamonizer.getValidationsArr(data, ds));
 
     }
 
 
-    void step08LoadPatientData(String dataSourceContact){
+    void step08LoadPatientData(){
 
         Group dataSource = dto.getProviderGroup();
         Patient patient = dataImportService.getPatientWithSnapshots(dto.getPatientId(), dataSource);
@@ -201,11 +227,13 @@ public abstract class LoaderBase {
 
     }
 
-    abstract void step11LoadSpecimens();
+    abstract void step11LoadSpecimens() throws Exception;
 
     abstract void step12CreateCurrentTreatment();
 
     abstract void step13LoadImmunoHistoChemistry();
+
+    abstract void step14VariationData();
 
 
 

@@ -158,7 +158,7 @@ public class LoadPDMRData implements CommandLineRunner {
             //histologyMap = getHistologyImageMap(id);
             if (dataImportService.isExistingModel(dto.getProviderGroup().getAbbreviation(), dto.getModelID())) return;
 
-            dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
+            dto = dataImportService.stageEightLoadPatientData(dto);
 
             dto.getPatientSnapshot().addSample(dto.getPatientSample());
             dataImportService.savePatientSnapshot(dto.getPatientSnapshot());

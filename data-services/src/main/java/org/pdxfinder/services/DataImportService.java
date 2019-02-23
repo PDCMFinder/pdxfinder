@@ -1326,7 +1326,7 @@ public class DataImportService {
      *     CREATE PATIENT, PATIENT-SNAPSHOT, PATIENT SAMPLE, & EXTERNAL-URL        *
      *********************************************************************/
 
-    public LoaderDTO stageEightLoadPatientData(LoaderDTO dto, String dataSourceContact){
+    public LoaderDTO stageEightLoadPatientData(LoaderDTO dto){
 
         Group dataSource = dto.getProviderGroup();
         Patient patient = getPatientWithSnapshots(dto.getPatientId(), dataSource);
@@ -1344,10 +1344,6 @@ public class DataImportService {
                 dto.getSampleSite(), dto.getExtractionMethod(), false, dto.getStage(), "", dto.getGrade(), "");
 
         dto.setPatientSample(patientSample);
-
-        List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(getExternalUrl(ExternalUrl.Type.CONTACT, dataSourceContact));
-        dto.setExternalUrls(externalUrls);
 
         return dto;
     }
@@ -1578,37 +1574,6 @@ public class DataImportService {
 
         if (ds.equals(irccCrc)){
 
-            dto.getModelCreation().addGroup(dto.getProjectGroup());
-
-            JSONArray specimens = dto.getSpecimens();
-
-            for (int i = 0; i < specimens.length(); i++) {
-                JSONObject specimenJSON = specimens.getJSONObject(i);
-
-                String specimenId = specimenJSON.getString("Specimen ID");
-
-                Specimen specimen = getSpecimen(dto.getModelCreation(),
-                        specimenId, dto.getProviderGroup().getAbbreviation(), specimenJSON.getString("Passage"));
-
-                specimen.setHostStrain(dto.getNodScidGamma());
-
-                EngraftmentSite is = getImplantationSite(specimenJSON.getString("Engraftment Site"));
-                specimen.setEngraftmentSite(is);
-
-                EngraftmentType it = getImplantationType(specimenJSON.getString("Engraftment Type"));
-                specimen.setEngraftmentType(it);
-
-                Sample specSample = new Sample();
-
-                specSample.setSourceSampleId(specimenId);
-                specSample.setDataSource(dto.getProviderGroup().getAbbreviation());
-
-                specimen.setSample(specSample);
-
-                dto.getModelCreation().addSpecimen(specimen);
-                dto.getModelCreation().addRelatedSample(specSample);
-
-            }
 
         }
 

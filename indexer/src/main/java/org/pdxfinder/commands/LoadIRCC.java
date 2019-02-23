@@ -32,7 +32,7 @@ import java.util.*;
  */
 @Component
 @Order(value = -19)
-public class LoadIRCC implements CommandLineRunner {
+public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadIRCC.class);
 
@@ -59,8 +59,6 @@ public class LoadIRCC implements CommandLineRunner {
 
     private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
     public static final String FINGERPRINT_DESCRIPTION = "Model validated against patient germline.";
-
-    private LoaderDTO dto = new LoaderDTO();
 
     private Options options;
     private CommandLineParser parser;
@@ -107,306 +105,341 @@ public class LoadIRCC implements CommandLineRunner {
 
         if (options.has("loadIRCC") || options.has("loadALL")) {
 
-            log.info("Loading IRCC PDX data.");
+                loaderTemplate();
 
-
-            String fileStr = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
-
-            String metaDataJSON = dataImportService.stageOneGetMetaDataFile(fileStr, DATASOURCE_ABBREVIATION);
-
-
-            if (!metaDataJSON.equals("NOT FOUND")){
-
-                parseJSONandCreateGraphObjects(metaDataJSON);
-
-
-                String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
-                File varFile = new File(variationURLStr);
-
-                if(varFile.exists()){
-
-                    if (variationURLStr != null && variationMax != 0) {
-                        loadVariants(variationURLStr, "TargetedNGS_MUT", "mutation");
-                    }
-                }
-            }
         }
     }
 
-    private void parseJSONandCreateGraphObjects(String json) throws Exception {
 
-        dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
-                PROVIDER_TYPE, ACCESSIBILITY, "transnational access", DATASOURCE_CONTACT, SOURCE_URL);
+    @Override
+    protected void initMethod() {
 
-        dto = dataImportService.stageThreeCreateNSGammaHostStrain(dto, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
+        log.info("Loading IRCC PDX data.");
+        jsonFile = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
 
-        dto = dataImportService.stageFiveCreateProjectGroup(dto,"EurOPDX");
+        dataSource = DATASOURCE_ABBREVIATION;
+        filesDirectory = "";
+        dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
+        dataSourceContact = DATASOURCE_CONTACT;
+        dosingStudyURL = DOSING_STUDY_URL;
+    }
 
-        JSONArray jarray = dataImportService.stageSixGetPDXModels(json,"IRCC");
+    @Override
+    protected void step00GetMetaDataFolder() { }
 
 
-        for (int i = 0; i < jarray.length(); i++) {
+    @Override
+    protected void step02CreateProviderGroup() {
 
-            JSONObject job = jarray.getJSONObject(i);
+        loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, "transnational access", DATASOURCE_CONTACT, SOURCE_URL);
+    }
 
-            createGraphObjects(job);
-        }
+    @Override
+    protected void step03CreateNSGammaHostStrain() {
 
+        loadNSGammaHostStrain(NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
+    }
+
+    @Override
+    protected void step04CreateNSHostStrain() { }
+
+
+    @Override
+    protected void step05CreateProjectGroup() {
+
+        loadProjectGroup("EurOPDX");
     }
 
 
+    @Override
+    protected void step06GetPDXModels() {
 
+        loadPDXModels(metaDataJSON,"IRCC");
+    }
 
+    // HCI implement Steps step07GetMetaData,step08LoadPatientData default
 
+    @Override
+    protected void step09LoadExternalURLs() {
 
-
-    @Transactional
-    void createGraphObjects(JSONObject job) throws Exception {
-
-        if(loadedModelHashes.contains(job.toString().hashCode())) return;
-        loadedModelHashes.add(job.toString().hashCode());
-
-        dto = dataImportService.stageSevenGetMetadata(dto, job, DATASOURCE_ABBREVIATION);
-
-        dto = dataImportService.stageEightLoadPatientData(dto, DATASOURCE_CONTACT);
-
-        dto = dataImportService.step09LoadExternalURLs(dto, DATASOURCE_CONTACT, Standardizer.NOT_SPECIFIED);
-
-        dto.getPatientSnapshot().addSample(dto.getPatientSample());
+        loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
 
         dataImportService.saveSample(dto.getPatientSample());
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
+    }
 
-        dto = dataImportService.stageNineCreateModels(dto);
+    // HCI implement Step10CreateModels default
 
-        dto = dataImportService.loadSpecimens(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
+    @Override
+    protected void step11LoadSpecimens()throws Exception {
 
-        dto = dataImportService.stepThreeCurrentTreatment(dto, DOSING_STUDY_URL,"Response Class");
+        dto.getModelCreation().addGroup(dto.getProjectGroup());
 
-        //Create Treatment summary without linking TreatmentProtocols to specimens
-        /*TreatmentSummary ts;
-        try{
-            if(job.has("Treatment")){
-                JSONObject treatment = job.optJSONObject("Treatment");
-                //if the treatment attribute is not an object = it is an array
-                if(treatment == null && job.optJSONArray("Treatment") != null){
+        JSONArray specimens = dto.getSpecimens();
 
-                    JSONArray treatments = job.getJSONArray("Treatment");
+        for (int i = 0; i < specimens.length(); i++) {
+            JSONObject specimenJSON = specimens.getJSONObject(i);
 
-                    if(treatments.length() > 0){
-                        //log.info("Treatments found for model "+mc.getSourcePdxId());
-                        ts = new TreatmentSummary();
-                        ts.setUrl(DOSING_STUDY_URL);
-                        for(int t = 0; t<treatments.length(); t++){
-                            JSONObject treatmentObject = treatments.getJSONObject(t);
+            String specimenId = specimenJSON.getString("Specimen ID");
 
+            Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(),
+                    specimenId, dto.getProviderGroup().getAbbreviation(), specimenJSON.getString("Passage"));
 
-                            TreatmentProtocol tp = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
-                                    treatmentObject.getString("Dose"), treatmentObject.getString("Response Class"), "");
+            specimen.setHostStrain(dto.getNodScidGamma());
 
-                            if(tp != null){
-                                ts.addTreatmentProtocol(tp);
-                            }
-                        }
+            EngraftmentSite is = dataImportService.getImplantationSite(specimenJSON.getString("Engraftment Site"));
+            specimen.setEngraftmentSite(is);
 
-                        ts.setModelCreation(dto.getModelCreation());
-                        dto.getModelCreation().setTreatmentSummary(ts);
-                    }
-                }
+            EngraftmentType it = dataImportService.getImplantationType(specimenJSON.getString("Engraftment Type"));
+            specimen.setEngraftmentType(it);
 
-            }
+            Sample specSample = new Sample();
+
+            specSample.setSourceSampleId(specimenId);
+            specSample.setDataSource(dto.getProviderGroup().getAbbreviation());
+
+            specimen.setSample(specSample);
+
+            dto.getModelCreation().addSpecimen(specimen);
+            dto.getModelCreation().addRelatedSample(specSample);
 
         }
-        catch(Exception e){ e.printStackTrace(); } */
+    }
+
+
+
+    @Override
+    protected void step12CreateCurrentTreatment() {
+
+        TreatmentSummary ts;
+        try {
+
+            if (dto.getTreatments().length() > 0) {
+
+                ts = new TreatmentSummary();
+                ts.setUrl(DOSING_STUDY_URL);
+
+                for (int t = 0; t < dto.getTreatments().length(); t++) {
+
+                    JSONObject treatmentObject = dto.getTreatments().getJSONObject(t);
+
+                    TreatmentProtocol treatmentProtocol = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
+                            treatmentObject.getString("Dose"),
+                            treatmentObject.getString("Response Class"), "");
+
+                    if (treatmentProtocol != null) {
+                        ts.addTreatmentProtocol(treatmentProtocol);
+                    }
+                }
+                ts.setModelCreation(dto.getModelCreation());
+                dto.getModelCreation().setTreatmentSummary(ts);
+            }
+
+            dataImportService.saveModelCreation(dto.getModelCreation());
+
+        } catch (Exception e) { }
 
         dataImportService.savePatient(dto.getPatient());
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
         dataImportService.saveModelCreation(dto.getModelCreation());
+    }
+
+
+    @Override
+    protected void step13LoadImmunoHistoChemistry() {
 
     }
 
 
-
-
-
+    @Override
     @Transactional
-    public void loadVariants(String variationURLStr, String platformName, String molcharType){
+    protected void step14VariationData() {
 
-        log.info("Loading variation for platform "+platformName);
-        //STEP 1: Save the platform
-        Platform platform = dataImportService.getPlatform(platformName, dto.getProviderGroup());
-        platform.setGroup(dto.getProviderGroup());
-        platform.setUrl(TARGETEDNGS_PLATFORM_URL);
-        dataImportService.savePlatform(platform);
+        String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
+        String platformName = "TargetedNGS_MUT";
+        String molcharType = "mutation";
 
+        File varFile = new File(variationURLStr);
 
-        //STEP 2: get markers and save them with the platform linked
-        try{
+        if(varFile.exists()){
+            if (variationURLStr != null && variationMax != 0) {
 
-            JSONObject job = new JSONObject(utilityService.parseFile(variationURLStr));
-            JSONArray jarray = job.getJSONArray("IRCCVariation");
-            Set<String> markers = new HashSet<>();
-            log.info("Saving Markers to DB");
-            for (int i = 0; i < jarray.length(); i++) {
-                JSONObject variation = jarray.getJSONObject(i);
-                String gene = variation.getString("Gene");
-                markers.add(gene);
-            }
-
-            for(String m:markers){
-                Marker marker = dataImportService.getMarker(m, m);
-                //PlatformAssociation pa = loaderUtils.createPlatformAssociation(platform, marker);
-                //loaderUtils.savePlatformAssociation(pa);
-
-            }
-            log.info("Saved "+markers.size()+" to the DB.");
-
-            //STEP 3: assemble MolecularCharacterization objects for samples
-
-            //sampleId = > molchar
-            HashMap<String, MolecularCharacterization> xenoSampleMolCharMap = new HashMap();
-            HashMap<String, MolecularCharacterization> humanSampleMolCharMap = new HashMap();
+                log.info("Loading variation for platform "+platformName);
+                //STEP 1: Save the platform
+                Platform platform = dataImportService.getPlatform(platformName, dto.getProviderGroup());
+                platform.setGroup(dto.getProviderGroup());
+                platform.setUrl(TARGETEDNGS_PLATFORM_URL);
+                dataImportService.savePlatform(platform);
 
 
-            for (int i = 0; i < jarray.length(); i++) {
-                if (i == variationMax) {
-                    System.out.println("qutting after loading "+i+" variants");
-                    break;
-                }
-
-                JSONObject variation = jarray.getJSONObject(i);
-
-                String modelId = variation.getString("Model ID");
-                String sample = variation.getString("Sample ID");
-                String specimen = variation.getString("Specimen ID");
-
-                String sampleId = variation.getString("Specimen ID");
-                String samplePlatformId = sampleId+"____"+platformName;
-
-
-                String gene = variation.getString("Gene");
-                String type = variation.getString("Type");
-
-                Marker marker = dataImportService.getMarker(gene,gene);
-
-                MarkerAssociation ma = new MarkerAssociation();
-
-                ma.setMarker(marker);
-                ma.setType(type);
-                ma.setCdsChange(variation.getString("CDS"));
-                ma.setChromosome(variation.getString("Chrom"));
-                ma.setConsequence(variation.getString("Effect"));
-                ma.setSeqPosition(variation.getString("Pos"));
-                ma.setRefAllele(variation.getString("Ref"));
-                ma.setAltAllele(variation.getString("Alt"));
-                ma.setAminoAcidChange(variation.getString("Protein"));
-                ma.setAlleleFrequency(variation.getString("VAF"));
-                ma.setRsVariants(variation.getString("avsnp147"));
-
-                // STEP 4: Determine if sample is human or xenograft
-                if(specimen.startsWith(modelId+"H")){
-
-                    if(humanSampleMolCharMap.containsKey(sampleId)){
-                        humanSampleMolCharMap.get(sampleId).addMarkerAssociation(ma);
-                    }
-                    else{
-                        MolecularCharacterization mcNew = new MolecularCharacterization();
-                        mcNew.setPlatform(platform);
-                        mcNew.setType(molcharType);
-                        mcNew.addMarkerAssociation(ma);
-
-
-                        humanSampleMolCharMap.put(modelId,mcNew);
-
-                    }
-
-                }
-                else if(specimen.startsWith(modelId+"X")){
-
-
-                    if(xenoSampleMolCharMap.containsKey(sampleId)){
-                        xenoSampleMolCharMap.get(sampleId).addMarkerAssociation(ma);
-                    }
-                    else{
-                        MolecularCharacterization mcNew = new MolecularCharacterization();
-                        mcNew.setPlatform(platform);
-                        mcNew.setType(molcharType);
-                        mcNew.addMarkerAssociation(ma);
-
-
-                        xenoSampleMolCharMap.put(sampleId,mcNew);
-
-                    }
-                }
-                else{
-
-                    //something is not right
-                    log.error("Cannot determine if sample human or xeno for:"+specimen);
-                }
-
-
-
-            }
-
-
-            //STEP 5: loop through xenoSampleMolCharMap and humanSampleMolCharMap to hook mc objects to proper samples then save the graph
-            for (Map.Entry<String, MolecularCharacterization> entry : xenoSampleMolCharMap.entrySet()) {
-                String sampleId = entry.getKey();
-                MolecularCharacterization mc = entry.getValue();
-                try{
-                    Sample s = dataImportService.findSampleByDataSourceAndSourceSampleId(dto.getProviderGroup().getAbbreviation(), sampleId);
-
-                    if(s == null){
-                        log.error("Sample not found: "+sampleId);
-                    }
-                    else{
-                        s.addMolecularCharacterization(mc);
-                        dataImportService.saveSample(s);
-                        log.info("Saving molchar for sample: "+sampleId);
-                    }
-                }
-                catch(Exception e1){
-
-                    log.error(sampleId);
-                    e1.printStackTrace();
-                }
-
-            }
-
-            for (Map.Entry<String, MolecularCharacterization> entry : humanSampleMolCharMap.entrySet()) {
-                String modelId = entry.getKey();
-                MolecularCharacterization mc = entry.getValue();
+                //STEP 2: get markers and save them with the platform linked
                 try{
 
-
-                    Sample s = dataImportService.findHumanSample(modelId, dto.getProviderGroup().getAbbreviation());
-
-                    if(s == null){
-                        log.error("Human sample not found for model: "+modelId);
+                    JSONObject job = new JSONObject(utilityService.parseFile(variationURLStr));
+                    JSONArray jarray = job.getJSONArray("IRCCVariation");
+                    Set<String> markers = new HashSet<>();
+                    log.info("Saving Markers to DB");
+                    for (int i = 0; i < jarray.length(); i++) {
+                        JSONObject variation = jarray.getJSONObject(i);
+                        String gene = variation.getString("Gene");
+                        markers.add(gene);
                     }
-                    else{
-                        s.addMolecularCharacterization(mc);
-                        dataImportService.saveSample(s);
-                        log.info("Saving molchar for human sample: "+modelId);
+
+                    for(String m:markers){
+                        Marker marker = dataImportService.getMarker(m, m);
+                        //PlatformAssociation pa = loaderUtils.createPlatformAssociation(platform, marker);
+                        //loaderUtils.savePlatformAssociation(pa);
+
                     }
+                    log.info("Saved "+markers.size()+" to the DB.");
+
+                    //STEP 3: assemble MolecularCharacterization objects for samples
+
+                    //sampleId = > molchar
+                    HashMap<String, MolecularCharacterization> xenoSampleMolCharMap = new HashMap();
+                    HashMap<String, MolecularCharacterization> humanSampleMolCharMap = new HashMap();
+
+
+                    for (int i = 0; i < jarray.length(); i++) {
+                        if (i == variationMax) {
+                            System.out.println("qutting after loading "+i+" variants");
+                            break;
+                        }
+
+                        JSONObject variation = jarray.getJSONObject(i);
+
+                        String modelId = variation.getString("Model ID");
+                        String sample = variation.getString("Sample ID");
+                        String specimen = variation.getString("Specimen ID");
+
+                        String sampleId = variation.getString("Specimen ID");
+                        String samplePlatformId = sampleId+"____"+platformName;
+
+
+                        String gene = variation.getString("Gene");
+                        String type = variation.getString("Type");
+
+                        Marker marker = dataImportService.getMarker(gene,gene);
+
+                        MarkerAssociation ma = new MarkerAssociation();
+
+                        ma.setMarker(marker);
+                        ma.setType(type);
+                        ma.setCdsChange(variation.getString("CDS"));
+                        ma.setChromosome(variation.getString("Chrom"));
+                        ma.setConsequence(variation.getString("Effect"));
+                        ma.setSeqPosition(variation.getString("Pos"));
+                        ma.setRefAllele(variation.getString("Ref"));
+                        ma.setAltAllele(variation.getString("Alt"));
+                        ma.setAminoAcidChange(variation.getString("Protein"));
+                        ma.setAlleleFrequency(variation.getString("VAF"));
+                        ma.setRsVariants(variation.getString("avsnp147"));
+
+                        // STEP 4: Determine if sample is human or xenograft
+                        if(specimen.startsWith(modelId+"H")){
+
+                            if(humanSampleMolCharMap.containsKey(sampleId)){
+                                humanSampleMolCharMap.get(sampleId).addMarkerAssociation(ma);
+                            }
+                            else{
+                                MolecularCharacterization mcNew = new MolecularCharacterization();
+                                mcNew.setPlatform(platform);
+                                mcNew.setType(molcharType);
+                                mcNew.addMarkerAssociation(ma);
+
+                                humanSampleMolCharMap.put(modelId,mcNew);
+                            }
+
+                        }
+                        else if(specimen.startsWith(modelId+"X")){
+
+                            if(xenoSampleMolCharMap.containsKey(sampleId)){
+                                xenoSampleMolCharMap.get(sampleId).addMarkerAssociation(ma);
+                            }
+                            else{
+                                MolecularCharacterization mcNew = new MolecularCharacterization();
+                                mcNew.setPlatform(platform);
+                                mcNew.setType(molcharType);
+                                mcNew.addMarkerAssociation(ma);
+
+                                xenoSampleMolCharMap.put(sampleId,mcNew);
+                            }
+                        }
+                        else{
+
+                            //something is not right
+                            log.error("Cannot determine if sample human or xeno for:"+specimen);
+                        }
+
+
+
+                    }
+
+                    //STEP 5: loop through xenoSampleMolCharMap and humanSampleMolCharMap to hook mc objects to proper samples then save the graph
+                    for (Map.Entry<String, MolecularCharacterization> entry : xenoSampleMolCharMap.entrySet()) {
+                        String sampleId = entry.getKey();
+                        MolecularCharacterization mc = entry.getValue();
+                        try{
+                            Sample s = dataImportService.findSampleByDataSourceAndSourceSampleId(dto.getProviderGroup().getAbbreviation(), sampleId);
+
+                            if(s == null){
+                                log.error("Sample not found: "+sampleId);
+                            }
+                            else{
+                                s.addMolecularCharacterization(mc);
+                                dataImportService.saveSample(s);
+                                log.info("Saving molchar for sample: "+sampleId);
+                            }
+                        }
+                        catch(Exception e1){
+
+                            log.error(sampleId);
+                            e1.printStackTrace();
+                        }
+
+                    }
+
+                    for (Map.Entry<String, MolecularCharacterization> entry : humanSampleMolCharMap.entrySet()) {
+                        String modelId = entry.getKey();
+                        MolecularCharacterization mc = entry.getValue();
+                        try{
+
+                            Sample s = dataImportService.findHumanSample(modelId, dto.getProviderGroup().getAbbreviation());
+
+                            if(s == null){
+                                log.error("Human sample not found for model: "+modelId);
+                            }
+                            else{
+                                s.addMolecularCharacterization(mc);
+                                dataImportService.saveSample(s);
+                                log.info("Saving molchar for human sample: "+modelId);
+                            }
+                        }
+                        catch(Exception e1){
+
+                            e1.printStackTrace();
+                        }
+
+                    }
+
                 }
-                catch(Exception e1){
+                catch (Exception e){
 
-                    e1.printStackTrace();
+                    e.printStackTrace();
                 }
 
             }
-
-
-
-
         }
-        catch (Exception e){
 
-            e.printStackTrace();
-        }
 
     }
+
+
+
+
+
+
+
 
 
     @Transactional
