@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Hamonizer {
+public class Harmonizer {
 
 
     static final String hci = "PDXNet-HCI-BCM";
