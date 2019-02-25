@@ -30,7 +30,7 @@ import java.io.File;
  */
 @Component
 @Order(value = -14)
-public class LoadWUSTL implements CommandLineRunner {
+public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadWUSTL.class);
 
@@ -91,58 +91,90 @@ public class LoadWUSTL implements CommandLineRunner {
 
         if (options.has("loadWUSTL") || options.has("loadALL")) {
 
-            log.info("Loading WUSTL PDX data.");
-
-
-            String directory = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/";
-
-            File[] listOfFiles = dataImportService.stageZeroGetMetaDataFolder(directory,DATASOURCE_ABBREVIATION);
-
-            for (int i = 0; i < listOfFiles.length; i++) {
-                if (listOfFiles[i].isFile()) {
-
-                    String fileName = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/" + listOfFiles[i].getName();
-                    String metaDataJSON = dataImportService.stageOneGetMetaDataFile(fileName, DATASOURCE_ABBREVIATION);
-
-                    parseJSONandCreateGraphObjects(metaDataJSON);
-                }
-            }
+            loaderTemplate2();
 
         }
 
     }
 
-    private void parseJSONandCreateGraphObjects(String json) throws Exception {
-
-        LoaderDTO dto = new LoaderDTO();
-
-        dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
-                PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
-
-        dto = dataImportService.stageFiveCreateProjectGroup(dto,"PDXNet");
-
-        JSONArray jarray = dataImportService.stageSixGetPDXModels(json,"WUSTL");
 
 
-        for (int i = 0; i < jarray.length(); i++) {
+    @Override
+    protected void initMethod() {
 
-            JSONObject jsonData = jarray.getJSONObject(i);
+        log.info("Loading WUSTL PDX data.");
 
-            dto = dataImportService.stageSevenGetMetadata(dto, jsonData, DATASOURCE_ABBREVIATION);
+        dto = new LoaderDTO();
+        rootDataDirectory = dataRootDir;
+        dataSource = DATASOURCE_ABBREVIATION;
+        filesDirectory = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/";
+        dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
+        dataSourceContact = DATASOURCE_CONTACT;
+    }
 
-            dto = dataImportService.stageEightLoadPatientData(dto);
+    // MD ANDERSON uses default implementation Steps step00GetMetaDataFolder, step01GetMetaDataJSON
 
-            dto = dataImportService.step09LoadExternalURLs(dto, DATASOURCE_CONTACT, Standardizer.NOT_SPECIFIED);
+    @Override
+    protected void step02CreateProviderGroup() {
 
-            PatientSnapshot pSnap = dto.getPatientSnapshot();
-            pSnap.addSample(dto.getPatientSample());
+        loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+    }
 
-            dto = dataImportService.stageNineCreateModels(dto);
+    @Override
+    protected void step03CreateNSGammaHostStrain() {
 
-            dto = dataImportService.loadSpecimens(dto, pSnap, DATASOURCE_ABBREVIATION);
+    }
 
-        }
+    @Override
+    protected void step04CreateNSHostStrain() {
 
+    }
+
+    @Override
+    protected void step05CreateProjectGroup() {
+
+        loadProjectGroup("PDXNet");
+    }
+
+
+    @Override
+    protected void step06GetPDXModels() {
+
+        loadPDXModels(metaDataJSON,"WUSTL");
+    }
+
+    // MD ANDERSON uses default implementation Steps step07GetMetaData, step08LoadPatientData
+
+    @Override
+    protected void step09LoadExternalURLs() {
+
+        loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
+
+    }
+
+    // IRCC uses default implementation Steps Step10CreateModels default
+
+    @Override
+    protected void step11LoadSpecimens()throws Exception {
+
+        loadSpecimens("wustl");
+    }
+
+
+    @Override
+    protected void step12CreateCurrentTreatment() {
+
+    }
+
+
+    @Override
+    protected void step13LoadImmunoHistoChemistry() {
+
+    }
+
+
+    @Override
+    protected void step14VariationData() {
 
     }
 
