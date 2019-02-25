@@ -5,7 +5,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
-import org.pdxfinder.services.ds.Hamonizer;
+import org.pdxfinder.services.ds.Harmonizer;
 import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
@@ -167,13 +167,13 @@ public abstract class LoaderBase {
 
 
         dto.setModelID(data.getString("Model ID"));
-        dto.setSampleID(Hamonizer.getSampleID(data,ds));
-        dto.setDiagnosis(Hamonizer.getDiagnosis(data,ds));
+        dto.setSampleID(Harmonizer.getSampleID(data,ds));
+        dto.setDiagnosis(Harmonizer.getDiagnosis(data,ds));
         dto.setPatientId(Standardizer.getValue("Patient ID",data));
-        dto.setEthnicity(Hamonizer.getEthnicity(data,ds));
-        dto.setStage(Hamonizer.getStage(data,ds));
-        dto.setGrade(Hamonizer.getGrade(data,ds));
-        dto.setClassification(Hamonizer.getClassification(data,ds));
+        dto.setEthnicity(Harmonizer.getEthnicity(data,ds));
+        dto.setStage(Harmonizer.getStage(data,ds));
+        dto.setGrade(Harmonizer.getGrade(data,ds));
+        dto.setClassification(Harmonizer.getClassification(data,ds));
 
         dto.setAge(Standardizer.getAge(data.getString("Age")));
         dto.setGender(Standardizer.getGender(data.getString("Gender")));
@@ -186,19 +186,19 @@ public abstract class LoaderBase {
 
         dto.setSourceURL(Standardizer.getValue("Source url",data));
 
-        dto.setMarkerPlatform(Hamonizer.getMarkerPlatform(data,ds));
-        dto.setMarkerStr(Hamonizer.getMarkerStr(data,ds));
-        dto.setQaPassage(Hamonizer.getQAPassage(data,ds));
+        dto.setMarkerPlatform(Harmonizer.getMarkerPlatform(data,ds));
+        dto.setMarkerStr(Harmonizer.getMarkerStr(data,ds));
+        dto.setQaPassage(Harmonizer.getQAPassage(data,ds));
 
         dto.setQualityAssurance(dataImportService.getQualityAssurance(data,ds));
-        dto.setImplantationtypeStr(Hamonizer.getImplantationType(data,ds));
-        dto.setImplantationSiteStr(Hamonizer.getEngraftmentSite(data,ds));
+        dto.setImplantationtypeStr(Harmonizer.getImplantationType(data,ds));
+        dto.setImplantationSiteStr(Harmonizer.getEngraftmentSite(data,ds));
 
-        dto.setFingerprinting(Hamonizer.getFingerprinting(data, ds));
-        dto.setSpecimens(Hamonizer.getSpecimens(data,ds));
-        dto.setTreatments(Hamonizer.getTreament(data, ds));
-        dto.setSamplesArr(Hamonizer.getSamplesArr(data, ds));
-        dto.setValidationsArr(Hamonizer.getValidationsArr(data, ds));
+        dto.setFingerprinting(Harmonizer.getFingerprinting(data, ds));
+        dto.setSpecimens(Harmonizer.getSpecimens(data,ds));
+        dto.setTreatments(Harmonizer.getTreament(data, ds));
+        dto.setSamplesArr(Harmonizer.getSamplesArr(data, ds));
+        dto.setValidationsArr(Harmonizer.getValidationsArr(data, ds));
 
     }
 
