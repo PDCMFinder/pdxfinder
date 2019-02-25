@@ -19,16 +19,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Load data from University of Texas MD Anderson PDXNet.
  */
-//@Component
-//@Order(value = -17)
-public class LoadMDAnderson implements CommandLineRunner {
+@Component
+@Order(value = -17)
+public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadMDAnderson.class);
 
@@ -87,59 +93,94 @@ public class LoadMDAnderson implements CommandLineRunner {
 
         if (options.has("loadMDA") || options.has("loadALL")) {
 
-            log.info("Loading MDAnderson PDX data.");
-
-            String directory = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/";
-
-            File[] listOfFiles = dataImportService.stageZeroGetMetaDataFolder(directory,DATASOURCE_ABBREVIATION);
-
-            for (int i = 0; i < listOfFiles.length; i++) {
-                if (listOfFiles[i].isFile()) {
-
-                    String fileName = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/" + listOfFiles[i].getName();
-                    String metaDataJSON = dataImportService.stageOneGetMetaDataFile(fileName, DATASOURCE_ABBREVIATION);
-
-                    if (!metaDataJSON.equals("NOT FOUND")) {
-                        parseJSONandCreateGraphObjects(metaDataJSON);
-                    }
-                }
-            }
-
-            log.info("Finished loading MDAnderson PDX data.");
+            loaderTemplate2();
         }
 
     }
 
-    private void parseJSONandCreateGraphObjects(String json) throws Exception {
-
-        LoaderDTO dto = new LoaderDTO();
-
-        dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
-                PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
-
-        dto = dataImportService.stageFiveCreateProjectGroup(dto,"PDXNet");
-
-        JSONArray jarray = dataImportService.stageSixGetPDXModels(json,"MDA");
 
 
-        for (int i = 0; i < jarray.length(); i++) {
 
-            JSONObject jsonData = jarray.getJSONObject(i);
 
-            dto = dataImportService.stageSevenGetMetadata(dto, jsonData, DATASOURCE_ABBREVIATION);
 
-            dto = dataImportService.stageEightLoadPatientData(dto);
 
-            dto = dataImportService.step09LoadExternalURLs(dto, DATASOURCE_CONTACT, Standardizer.NOT_SPECIFIED);
+    @Override
+    protected void initMethod() {
 
-            dto.getPatientSnapshot().addSample(dto.getPatientSample());
+        log.info("Loading MDAnderson PDX data.");
 
-            dto = dataImportService.stageNineCreateModels(dto);
+        dto = new LoaderDTO();
+        rootDataDirectory = dataRootDir;
+        dataSource = DATASOURCE_ABBREVIATION;
+        filesDirectory = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/";
+        dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
+        dataSourceContact = DATASOURCE_CONTACT;
+    }
 
-            dto = dataImportService.loadSpecimens(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
+    // MD ANDERSON uses default implementation Steps step00GetMetaDataFolder, step01GetMetaDataJSON
 
-        }
+    @Override
+    protected void step02CreateProviderGroup() {
 
+        loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+    }
+
+    @Override
+    protected void step03CreateNSGammaHostStrain() {
+
+    }
+
+    @Override
+    protected void step04CreateNSHostStrain() {
+
+    }
+
+    @Override
+    protected void step05CreateProjectGroup() {
+
+        loadProjectGroup("PDXNet");
+    }
+
+
+    @Override
+    protected void step06GetPDXModels() {
+
+        loadPDXModels(metaDataJSON,"MDA");
+    }
+
+    // MD ANDERSON uses default implementation Steps step07GetMetaData, step08LoadPatientData
+
+    @Override
+    protected void step09LoadExternalURLs() {
+
+        loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
+
+    }
+
+    // IRCC uses default implementation Steps Step10CreateModels default
+
+    @Override
+    protected void step11LoadSpecimens()throws Exception {
+
+        loadSpecimens("mdAnderson");
+
+    }
+
+
+    @Override
+    protected void step12CreateCurrentTreatment() {
+
+    }
+
+
+    @Override
+    protected void step13LoadImmunoHistoChemistry() {
+
+    }
+
+
+    @Override
+    protected void step14VariationData() {
 
     }
 

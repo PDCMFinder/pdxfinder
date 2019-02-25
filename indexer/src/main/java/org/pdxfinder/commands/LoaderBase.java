@@ -16,12 +16,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class LoaderBase {
 
     private final static Logger log = LoggerFactory.getLogger(LoaderBase.class);
     String jsonFile;
     String dataSource;
+    String rootDataDirectory;
 
     File[] listOfFiles;
 
@@ -47,35 +49,29 @@ public abstract class LoaderBase {
      **********************************************/
 
 
-    public final void loaderTemplate() throws Exception {
-
-        templateParseJSON();
-
-        HashSet<Integer> done = new HashSet<>();
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-
-            JSONObject jsonData = jsonArray.getJSONObject(i);
-
-            if (done.contains(jsonData.toString().hashCode())) return;
-            done.add(jsonData.toString().hashCode());
-
-            step07GetMetaData(jsonData, dataSourceAbbreviation);
-
-            templateCreateGraphObjects();
-
-        }
-        step13LoadImmunoHistoChemistry();
-
-        step14VariationData();
-    }
-
-
-    public final void templateParseJSON(){
+    public final void loaderTemplate2() throws Exception {
 
         initMethod();
 
         step00GetMetaDataFolder();
+
+        for (int i = 0; i < listOfFiles.length; i++) {
+
+            if (listOfFiles[i].isFile()) {
+
+                this.jsonFile = rootDataDirectory + dataSourceAbbreviation+"/pdx/"+listOfFiles[i].getName();
+
+                loaderTemplate();
+
+            }
+        }
+
+        log.info("Finished loading "+dataSourceAbbreviation+" PDX data.");
+    }
+
+
+
+    public final void loaderTemplate() throws Exception {
 
         step01GetMetaDataJSON();
 
@@ -88,24 +84,36 @@ public abstract class LoaderBase {
         step05CreateProjectGroup();
 
         step06GetPDXModels();
+
+        HashSet<Integer> done = new HashSet<>();
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+
+            JSONObject jsonData = jsonArray.getJSONObject(i);
+
+           // if (done.contains(jsonData.toString().hashCode())) return;
+           // done.add(jsonData.toString().hashCode());
+
+            step07GetMetaData(jsonData, dataSourceAbbreviation);
+
+            step08LoadPatientData();
+
+            dto.getPatientSnapshot().addSample(dto.getPatientSample());
+
+            step09LoadExternalURLs();
+
+            step10CreateModels();
+
+            step11LoadSpecimens();
+
+            step12CreateCurrentTreatment();
+
+        }
+        step13LoadImmunoHistoChemistry();
+
+        step14VariationData();
     }
 
-
-
-    public final void templateCreateGraphObjects() throws Exception  {
-
-        step08LoadPatientData();
-
-        dto.getPatientSnapshot().addSample(dto.getPatientSample());
-
-        step09LoadExternalURLs();
-
-        step10CreateModels();
-
-        step11LoadSpecimens();
-
-        step12CreateCurrentTreatment();
-    }
 
 
 
@@ -306,6 +314,103 @@ public abstract class LoaderBase {
             externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, dataSourceURL));
         }
         dto.setExternalUrls(externalUrls);
+
+    }
+
+
+
+
+    public void loadSpecimens(String ds)  throws Exception{
+
+
+        if (ds.equals("mdAnderson") || ds.equals("wustl")) {
+
+            HostStrain bs = dataImportService.getHostStrain("", dto.getStrain(), "", "");
+            boolean human = false;
+            String markerPlatform = Standardizer.NOT_SPECIFIED;
+
+            try {
+                markerPlatform = dto.getMarkerPlatform();
+                if ("CMS50".equals(markerPlatform) || "CMS400".equals(dto.getMarkerPlatform())) {
+                    human = true;
+                }
+            } catch (Exception e) { /* this is for the FANG data and we don't really care about markers at this point anyway */ }
+
+
+            if (ds.equals("mdAnderson")) {
+                String markerStr = dto.getMarkerStr();
+                String[] markers = markerStr.split(";");
+                if (markerStr.trim().length() > 0) {
+                    Platform pl = dataImportService.getPlatform(markerPlatform, dto.getProviderGroup());
+                    MolecularCharacterization molC = new MolecularCharacterization();
+                    molC.setType("mutation");
+                    molC.setPlatform(pl);
+                    List<MarkerAssociation> markerAssocs = new ArrayList<>();
+
+                    for (int i = 0; i < markers.length; i++) {
+                        Marker m = dataImportService.getMarker(markers[i], markers[i]);
+                        MarkerAssociation ma = new MarkerAssociation();
+                        ma.setMarker(m);
+                        markerAssocs.add(ma);
+                    }
+                    molC.setMarkerAssociations(markerAssocs);
+                    Set<MolecularCharacterization> mcs = new HashSet<>();
+                    mcs.add(molC);
+
+                    //sample.setMolecularCharacterizations(mcs);
+                }
+            }
+
+
+            if (human) {
+                dto.getPatientSnapshot().addSample(dto.getPatientSample());
+
+            } else {
+
+                String passage = "0";
+                try {
+                    passage = dto.getQaPassage().replaceAll("P", "");
+                } catch (Exception e) {
+                    // default is 0
+                }
+                Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(), dto.getModelCreation().getSourcePdxId(), dto.getProviderGroup().getAbbreviation(), passage);
+                specimen.setHostStrain(bs);
+
+                if (ds.equals("wustl")){
+                    Sample mouseSample = new Sample();
+                    specimen.setSample(mouseSample);
+                    dto.getModelCreation().addRelatedSample(mouseSample);
+
+                    if (dto.getImplantationSiteStr().contains(";")) {
+                        String[] parts = dto.getImplantationSiteStr().split(";");
+                        dto.setImplantationSiteStr(parts[1].trim());
+                        dto.setImplantationtypeStr(parts[0].trim());
+                    }
+
+                }
+
+                EngraftmentSite is = dataImportService.getImplantationSite(dto.getImplantationSiteStr());
+                specimen.setEngraftmentSite(is);
+
+                EngraftmentType it = dataImportService.getImplantationType(dto.getImplantationtypeStr());
+                specimen.setEngraftmentType(it);
+
+
+                if (ds.equals("wustl")){
+                    dto.getModelCreation().addSpecimen(specimen);
+                }
+
+                if (ds.equals("mdAnderson")) {
+                    specimen.setSample(dto.getPatientSample());
+                    dataImportService.saveSpecimen(specimen);
+                }
+
+            }
+
+            dataImportService.saveSample(dto.getPatientSample());  // TODO: This was not be implemented for wustl, find out why
+            dataImportService.saveModelCreation(dto.getModelCreation());
+            dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
+        }
 
     }
 

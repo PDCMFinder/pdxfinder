@@ -105,7 +105,9 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
         if (options.has("loadIRCC") || options.has("loadALL")) {
 
-                loaderTemplate();
+            initMethod();
+
+            loaderTemplate();
 
         }
     }
@@ -157,7 +159,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
         loadPDXModels(metaDataJSON,"IRCC");
     }
 
-    // HCI implement Steps step07GetMetaData,step08LoadPatientData default
+    // IRCC uses default implementation Steps step07GetMetaData,step08LoadPatientData
 
     @Override
     protected void step09LoadExternalURLs() {
@@ -168,7 +170,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
     }
 
-    // HCI implement Step10CreateModels default
+    // IRCC uses default implementation Steps Step10CreateModels default
 
     @Override
     protected void step11LoadSpecimens()throws Exception {
@@ -255,6 +257,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     @Transactional
     protected void step14VariationData() {
 
+        log.info("VARIATION DATA LOADING");
         String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
         String platformName = "TargetedNGS_MUT";
         String molcharType = "mutation";
