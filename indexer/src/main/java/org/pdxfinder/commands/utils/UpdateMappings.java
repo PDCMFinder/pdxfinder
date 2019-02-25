@@ -1,8 +1,7 @@
-package org.pdxfinder.commands;
+package org.pdxfinder.commands.utils;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.apache.commons.cli.CommandLine;
 import org.pdxfinder.admin.pojos.MappingContainer;
 import org.pdxfinder.admin.pojos.MappingEntity;
 import org.pdxfinder.graph.dao.OntologyTerm;

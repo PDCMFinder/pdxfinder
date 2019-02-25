@@ -1,4 +1,4 @@
-package org.pdxfinder.commands;
+package org.pdxfinder.commands.dataloaders;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -23,16 +23,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Load models from WISTAR

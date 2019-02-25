@@ -1,4 +1,4 @@
-package org.pdxfinder.commands;
+package org.pdxfinder.commands.postload;
 
 /*
  * Created by csaba on 15/11/2018.

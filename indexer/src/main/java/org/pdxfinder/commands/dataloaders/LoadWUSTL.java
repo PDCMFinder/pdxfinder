@@ -1,4 +1,4 @@
-package org.pdxfinder.commands;
+package org.pdxfinder.commands.dataloaders;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -6,8 +6,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
@@ -23,26 +21,22 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
- * Load data from University of Texas MD Anderson PDXNet.
+ * Load data from WUSTL PDXNet.
  */
 @Component
-@Order(value = -17)
-public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
+@Order(value = -14)
+public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
-    private final static Logger log = LoggerFactory.getLogger(LoadMDAnderson.class);
+    private final static Logger log = LoggerFactory.getLogger(LoadWUSTL.class);
 
-    private final static String DATASOURCE_ABBREVIATION = "PDXNet-MDAnderson";
-    private final static String DATASOURCE_NAME = "MD Anderson Cancer Center";
-    private final static String DATASOURCE_DESCRIPTION = "University Texas MD Anderson PDX mouse models for PDXNet.";
-    private final static String DATASOURCE_CONTACT = "bfang@mdanderson.org";
+    private final static String DATASOURCE_ABBREVIATION = "PDXNet-WUSTL";
+    private final static String DATASOURCE_NAME = "Washington University in St. Louis";
+    private final static String DATASOURCE_DESCRIPTION = "Washington University St. Louis PDX mouse models for PDXNet.";
+    private final static String DATASOURCE_CONTACT = "bvantine@wustl.edu,rcfields@wustl.edu,jmudd@wustl.edu,sqli@wustl.edu,tprimeau@wustl.edu";
     private final static String SOURCE_URL = null;
+
 
     private final static String PROVIDER_TYPE = "";
     private final static String ACCESSIBILITY = "";
@@ -53,7 +47,7 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
     private final static Boolean NORMAL_TISSUE_FALSE = false;
 
     //   private HostStrain nsgBS;
-    private Group mdaDS;
+    private Group DS;
     private Group projectGroup;
 
     private Options options;
@@ -70,6 +64,10 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
     @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
 
+    public LoadWUSTL(DataImportService dataImportService) {
+        this.dataImportService = dataImportService;
+    }
+
     //   @Value("${mdapdx.url}")
     //   private String urlStr;
     @PostConstruct
@@ -77,34 +75,31 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadMDAnderson(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
-    }
-
     @Override
     public void run(String... args) throws Exception {
 
+
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("loadMDA", "Load MDAnderson PDX data");
+        parser.accepts("loadWUSTL", "Load WUSTL PDX data");
 
-        parser.accepts("loadALL", "Load all, including MDA PDX data");
+        parser.accepts("loadALL", "Load all, including WUSTL PDX data");
         OptionSet options = parser.parse(args);
 
-        if (options.has("loadMDA") || options.has("loadALL")) {
+        if (options.has("loadWUSTL") || options.has("loadALL")) {
 
             loaderTemplate2();
+
         }
 
     }
 
 
 
-
     @Override
     protected void initMethod() {
 
-        log.info("Loading MDAnderson PDX data.");
+        log.info("Loading WUSTL PDX data.");
 
         dto = new LoaderDTO();
         rootDataDirectory = dataRootDir;
@@ -142,7 +137,7 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step06GetPDXModels() {
 
-        loadPDXModels(metaDataJSON,"MDA");
+        loadPDXModels(metaDataJSON,"WUSTL");
     }
 
     // MD ANDERSON uses default implementation Steps step07GetMetaData, step08LoadPatientData
@@ -159,8 +154,7 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step11LoadSpecimens()throws Exception {
 
-        loadSpecimens("mdAnderson");
-
+        loadSpecimens("wustl");
     }
 
 
@@ -180,7 +174,6 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
     protected void step14VariationData() {
 
     }
-
 
 
 }

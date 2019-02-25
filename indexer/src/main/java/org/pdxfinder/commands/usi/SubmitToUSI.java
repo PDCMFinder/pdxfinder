@@ -1,4 +1,4 @@
-package org.pdxfinder.commands;
+package org.pdxfinder.commands.usi;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;

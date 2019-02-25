@@ -1,4 +1,4 @@
-package org.pdxfinder.commands;
+package org.pdxfinder.commands.utils;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -14,7 +14,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.net.URL;
 import java.util.List;
 
 
