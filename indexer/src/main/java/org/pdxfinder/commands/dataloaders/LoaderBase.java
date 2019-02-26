@@ -44,76 +44,6 @@ public abstract class LoaderBase {
     private DataImportService dataImportService;
 
 
-    /*****************************************************************************************************
-     *     SINGLE FILE DATA TEMPLATE METHOD         *
-     **********************************************/
-
-
-    public final void loaderTemplate2() throws Exception {
-
-        initMethod();
-
-        step00GetMetaDataFolder();
-
-        for (int i = 0; i < listOfFiles.length; i++) {
-
-            if (listOfFiles[i].isFile()) {
-
-                this.jsonFile = rootDataDirectory + dataSourceAbbreviation+"/pdx/"+listOfFiles[i].getName();
-
-                loaderTemplate();
-
-            }
-        }
-
-        log.info("Finished loading "+dataSourceAbbreviation+" PDX data.");
-    }
-
-
-
-    public final void loaderTemplate() throws Exception {
-
-        step01GetMetaDataJSON();
-
-        step02CreateProviderGroup();
-
-        step03CreateNSGammaHostStrain();
-
-        step04CreateNSHostStrain();
-
-        step05CreateProjectGroup();
-
-        step06GetPDXModels();
-
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-
-            JSONObject jsonData = jsonArray.getJSONObject(i);
-
-            step07GetMetaData(jsonData, dataSourceAbbreviation);
-
-            step08LoadPatientData();
-
-            dto.getPatientSnapshot().addSample(dto.getPatientSample());
-
-            step09LoadExternalURLs();
-
-            step10CreateModels();
-
-            step11LoadSpecimens();
-
-            step12CreateCurrentTreatment();
-
-        }
-        step13LoadImmunoHistoChemistry();
-
-        step14VariationData();
-    }
-
-
-
-
-
     abstract void initMethod();
 
 
@@ -240,6 +170,48 @@ public abstract class LoaderBase {
     abstract void step14VariationData();
 
 
+    /*****************************************************************************************************
+     *     SINGLE FILE DATA TEMPLATE METHOD         *
+     **********************************************/
+
+    public final void loaderTemplate() throws Exception {
+
+        step01GetMetaDataJSON();
+
+        step02CreateProviderGroup();
+
+        step03CreateNSGammaHostStrain();
+
+        step04CreateNSHostStrain();
+
+        step05CreateProjectGroup();
+
+        step06GetPDXModels();
+
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+
+            JSONObject jsonData = jsonArray.getJSONObject(i);
+
+            step07GetMetaData(jsonData, dataSourceAbbreviation);
+
+            step08LoadPatientData();
+
+            dto.getPatientSnapshot().addSample(dto.getPatientSample());
+
+            step09LoadExternalURLs();
+
+            step10CreateModels();
+
+            step11LoadSpecimens();
+
+            step12CreateCurrentTreatment();
+
+        }
+        step13LoadImmunoHistoChemistry();
+
+        step14VariationData();
+    }
 
 
 

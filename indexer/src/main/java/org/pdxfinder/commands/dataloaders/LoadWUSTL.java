@@ -88,12 +88,30 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
         if (options.has("loadWUSTL") || options.has("loadALL")) {
 
-            loaderTemplate2();
+            wustlAlgorithm();
 
         }
 
     }
 
+
+    public void wustlAlgorithm() throws Exception {
+
+        initMethod();
+
+        step00GetMetaDataFolder();
+
+        for (int i = 0; i < listOfFiles.length; i++) {
+
+            if (listOfFiles[i].isFile()) {
+
+                this.jsonFile = rootDataDirectory + dataSourceAbbreviation + "/pdx/" + listOfFiles[i].getName();
+                loaderTemplate();
+            }
+        }
+
+        log.info("Finished loading " + dataSourceAbbreviation + " PDX data.");
+    }
 
 
     @Override

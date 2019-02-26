@@ -86,12 +86,30 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
         if (options.has("loadMDA") || options.has("loadALL")) {
 
-            loaderTemplate2();
+            mdAndersonAlgorithm();
         }
 
     }
 
 
+    public void mdAndersonAlgorithm() throws Exception {
+
+        initMethod();
+
+        step00GetMetaDataFolder();
+
+        for (int i = 0; i < listOfFiles.length; i++) {
+
+            if (listOfFiles[i].isFile()) {
+
+                this.jsonFile = rootDataDirectory + dataSourceAbbreviation + "/pdx/" + listOfFiles[i].getName();
+
+                loaderTemplate();
+            }
+        }
+
+        log.info("Finished loading " + dataSourceAbbreviation + " PDX data.");
+    }
 
 
     @Override

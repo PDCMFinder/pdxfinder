@@ -101,20 +101,6 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
         parser.accepts("loadALL", "Load all, including PDMR PDX data");
         OptionSet options = parser.parse(args);
 
-        /*if (options.has("loadPDMR") || options.has("loadALL")) {
-
-            log.info("Loading PDMR PDX data.");
-            String fileStr = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
-
-            String metaDataJSON = dataImportService.stageOneGetMetaDataFile(fileStr, DATASOURCE_ABBREVIATION);
-
-            if (!metaDataJSON.equals("NOT FOUND")){
-
-                parseJSONandCreateGraphObjects(metaDataJSON);
-            }
-
-        } */
-
         initMethod();
 
         loaderTemplate();
