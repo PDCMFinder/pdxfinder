@@ -1,4 +1,4 @@
-package org.pdxfinder.commands;
+package org.pdxfinder.commands.postload;
 
 import com.google.gson.Gson;
 import joptsimple.OptionParser;
