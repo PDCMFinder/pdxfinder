@@ -113,6 +113,14 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     }
 
 
+    /*
+                HashSet<Integer> done = new HashSet<>();
+           // if (done.contains(jsonData.toString().hashCode())) return;
+           // done.add(jsonData.toString().hashCode());
+     */
+
+
+
     @Override
     protected void initMethod() {
 
@@ -159,7 +167,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
         loadPDXModels(metaDataJSON,"IRCC");
     }
 
-    // IRCC uses default implementation Steps step07GetMetaData,step08LoadPatientData
+    // IRCC uses default implementation Steps step07GetMetaData, step08LoadPatientData
 
     @Override
     protected void step09LoadExternalURLs() {

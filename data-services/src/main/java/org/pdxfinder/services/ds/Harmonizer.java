@@ -53,6 +53,10 @@ public class Harmonizer {
 
         JSONArray treatments = new JSONArray();
 
+        if (ds.equals(pdmr)){
+            treatments = data.getJSONArray("Treatments");
+        }
+
         if (ds.equals(hci)){
 
             try {

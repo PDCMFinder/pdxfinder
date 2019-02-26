@@ -112,7 +112,7 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
         dataSourceContact = DATASOURCE_CONTACT;
     }
 
-    // MD ANDERSON uses default implementation Steps step00GetMetaDataFolder, step01GetMetaDataJSON
+    // WUSTL uses default implementation Steps step00GetMetaDataFolder, step01GetMetaDataJSON
 
     @Override
     protected void step02CreateProviderGroup() {
@@ -143,7 +143,7 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
         loadPDXModels(metaDataJSON,"WUSTL");
     }
 
-    // MD ANDERSON uses default implementation Steps step07GetMetaData, step08LoadPatientData
+    // WUSTL uses default implementation Steps step07GetMetaData, step08LoadPatientData
 
     @Override
     protected void step09LoadExternalURLs() {
@@ -152,7 +152,7 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
     }
 
-    // IRCC uses default implementation Steps Step10CreateModels default
+    // WUSTL uses default implementation Steps Step10CreateModels default
 
     @Override
     protected void step11LoadSpecimens()throws Exception {
