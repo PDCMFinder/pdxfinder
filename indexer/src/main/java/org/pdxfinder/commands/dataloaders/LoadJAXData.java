@@ -293,37 +293,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step15VariationData() { }
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-    private void parseJSONandCreateGraphObjects(String json) throws Exception{
-
-        dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
-                PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
-
-        dto = dataImportService.stageThreeCreateNSGammaHostStrain(dto, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
-
-        // SKIP FOR JAX - dto = dataImportService.stageFiveCreateProjectGroup(dto,"EurOPDX");
-
-        JSONArray jarray = dataImportService.stageSixGetPDXModels(json,"pdxInfo");
-
-        for (int i = 0; i < jarray.length(); i++) {
-
-            JSONObject job = jarray.getJSONObject(i);
-
-            createGraphObjects(job);
-        }
+    protected void step15VariationData() {
 
     }
 
@@ -331,63 +301,9 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
 
 
-    @Transactional
-    void createGraphObjects(JSONObject j) throws Exception {
-
-
-        dto = dataImportService.stageSevenGetMetadata(dto, j, DATASOURCE_ABBREVIATION);
-
-        *//* JAX After metadata Uniqueness: *//*
-        dto.setHistologyMap(getHistologyImageMap(dto.getModelID()));
-        //Check if model exists in DB, if yes, do not load duplicates
-        ModelCreation existingModel = dataImportService.findModelByIdAndDataSource(dto.getModelID(), DATASOURCE_ABBREVIATION);
-        if(existingModel != null) {
-            log.error("Skipping existing model "+dto.getModelID());
-            return;
-        }
-        // if the diagnosis is still unknown don't load it
-        if(dto.getDiagnosis().toLowerCase().contains("unknown") ||
-                dto.getDiagnosis().toLowerCase().contains("not specified")){
-            System.out.println("Skipping model "+dto.getModelID()+" with diagnosis:"+dto.getDiagnosis());
-            return;
-        }
-
-        dto = dataImportService.stageEightLoadPatientData(dto);
-
-        dto.getPatientSnapshot().addSample(dto.getPatientSample());
-
-        dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
-
-        dto = dataImportService.step09LoadExternalURLs(dto, DATASOURCE_CONTACT+dto.getModelID(), DATASOURCE_URL+dto.getModelID());
-
-        dto = dataImportService.step09BCreateBreastMarkers(dto);
-
-
-        // JAX - Updates Patient Sample b4 model Creation
-        dto.getPatientSample().setExtractionMethod(dto.getExtractionMethod());
-
-        if (dto.getHistologyMap().containsKey("Patient")) {
-            Histology histology = new Histology();
-            Image image = dto.getHistologyMap().get("Patient");
-            histology.addImage(image);
-            dto.getPatientSample().addHistology(histology);
-        }
-
-
-        dto = dataImportService.stageNineCreateModels(dto);
 
 
 
-
-        dto = dataImportService.loadSpecimens(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
-
-        //Create Treatment summary without linking TreatmentProtocols to specimens
-        dto = dataImportService.stepThreeCurrentTreatment(dto, DOSING_STUDY_URL,"Response");
-
-
-        loadVariationData(dto.getModelCreation(), dto.getEngraftmentSite(), dto.getEngraftmentType());
-
-    }*/
 
 
 
