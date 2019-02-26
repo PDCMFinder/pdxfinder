@@ -174,7 +174,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
 
-        loadExternalURLs(DATASOURCE_CONTACT, Standardizer.NOT_SPECIFIED);
+        loadExternalURLs(DATASOURCE_CONTACT, dto.getSourceURL());
     }
 
 
