@@ -1364,46 +1364,6 @@ public class DataImportService {
 
 
 
-
-    public LoaderDTO step09BCreateBreastMarkers(LoaderDTO dto){
-
-        //create breast cancer markers manually if they are present
-        if(!dto.getModelTag().equals(Standardizer.NOT_SPECIFIED)){
-
-            if(dto.getModelTag().equals("Triple Negative Breast Cancer (TNBC)")){
-
-                MolecularCharacterization mc = new MolecularCharacterization();
-                mc.setPlatform(getPlatform("Not Specified", dto.getProviderGroup()));
-                mc.setType("IHC");
-                Marker her2 = getMarker("HER2", "HER2");
-                Marker er = getMarker("ER", "ER");
-                Marker pr = getMarker("PR", "PR");
-
-                MarkerAssociation her2a = new MarkerAssociation();
-                her2a.setMarker(her2);
-                her2a.setImmunoHistoChemistryResult("negative");
-
-                MarkerAssociation era = new MarkerAssociation();
-                era.setMarker(er);
-                era.setImmunoHistoChemistryResult("negative");
-
-                MarkerAssociation pra = new MarkerAssociation();
-                pra.setMarker(pr);
-                pra.setImmunoHistoChemistryResult("negative");
-
-                mc.addMarkerAssociation(her2a);
-                mc.addMarkerAssociation(era);
-                mc.addMarkerAssociation(pra);
-
-                dto.getPatientSample().addMolecularCharacterization(mc);
-            }
-        }
-
-        return dto;
-
-    }
-
-
     public LoaderDTO stageNineCreateModels(LoaderDTO dto){
 
         ModelCreation modelCreation = createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls());
@@ -1420,29 +1380,6 @@ public class DataImportService {
      ******************************************************************************************/
 
     public LoaderDTO loadSpecimens(LoaderDTO dto, PatientSnapshot pSnap, String ds)  throws Exception{
-
-
-        if (ds.equals(jax)){
-
-            Specimen specimen = getSpecimen(dto.getModelCreation(), dto.getModelID(), dto.getProviderGroup().getAbbreviation(), "");
-            specimen.setHostStrain(dto.getNodScidGamma());
-            EngraftmentSite engraftmentSite = getImplantationSite(dto.getImplantationSiteStr());
-            EngraftmentType engraftmentType = getImplantationType(Standardizer.NOT_SPECIFIED);
-            specimen.setEngraftmentSite(engraftmentSite);
-            specimen.setEngraftmentType(engraftmentType);
-
-            dto.getModelCreation().addSpecimen(specimen);
-            saveSpecimen(specimen);
-
-            dto.setEngraftmentSite(engraftmentSite);
-            dto.setEngraftmentType(engraftmentType);
-
-        }
-
-        if (ds.equals(pdmr)){
-
-
-        }
 
 
         return dto;

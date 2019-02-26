@@ -179,7 +179,14 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step10CreateModels() throws Exception {
+    protected void step10BLoadBreastMarkers() {
+
+    }
+
+
+
+    @Override
+    protected void step11CreateModels() throws Exception {
 
         List<QualityAssurance> validationList = new ArrayList<>();
         if(dto.getValidationsArr().length() > 0){
@@ -198,8 +205,9 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     }
 
 
+
     @Override
-    protected void step11LoadSpecimens()throws Exception {
+    protected void step12LoadSpecimens()throws Exception {
 
         //load specimens
         if(dto.getSamplesArr().length() > 0){
@@ -244,7 +252,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step12CreateCurrentTreatment() throws Exception {
+    protected void step13CreateCurrentTreatment() throws Exception {
 
         TreatmentSummary ts;
 
@@ -297,13 +305,13 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step13LoadImmunoHistoChemistry() {
+    protected void step14LoadImmunoHistoChemistry() {
 
     }
 
 
     @Override
-    protected void step14VariationData() {
+    protected void step15VariationData() {
 
     }
 

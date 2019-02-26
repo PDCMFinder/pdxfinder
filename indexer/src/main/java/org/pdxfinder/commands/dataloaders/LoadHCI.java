@@ -138,7 +138,9 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
         loadPDXModels(metaDataJSON,"HCI");
     }
 
+
     // HCI uses common implementation Steps s step07GetMetaData,step08LoadPatientData default
+
 
     @Override
     protected void step09LoadExternalURLs() {
@@ -146,10 +148,17 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
         loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
     }
 
-    // HCI uses common implementation Steps  Step10CreateModels default
 
     @Override
-    protected void step11LoadSpecimens() {
+    protected void step10BLoadBreastMarkers() {
+
+    }
+
+    // HCI uses common implementation Steps  step11CreateModels default
+
+
+    @Override
+    protected void step12LoadSpecimens() {
 
         dto.getModelCreation().addRelatedSample(dto.getPatientSample());
         dto.getModelCreation().addGroup(dto.getProjectGroup());
@@ -196,42 +205,17 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step12CreateCurrentTreatment() {
+    protected void step13CreateCurrentTreatment() {
 
-        TreatmentSummary ts;
-        try {
+        loadCurrentTreatment();
 
-            if (dto.getTreatments().length() > 0) {
-
-                ts = new TreatmentSummary();
-                ts.setUrl(DOSING_STUDY_URL);
-
-                for (int t = 0; t < dto.getTreatments().length(); t++) {
-
-                    JSONObject treatmentObject = dto.getTreatments().getJSONObject(t);
-
-                    TreatmentProtocol treatmentProtocol = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
-                            treatmentObject.getString("Dose"),
-                            treatmentObject.getString("Response"), "");
-
-                    if (treatmentProtocol != null) {
-                        ts.addTreatmentProtocol(treatmentProtocol);
-                    }
-                }
-                ts.setModelCreation(dto.getModelCreation());
-                dto.getModelCreation().setTreatmentSummary(ts);
-            }
-
-            dataImportService.saveModelCreation(dto.getModelCreation());
-
-        } catch (Exception e) { }
     }
 
 
 
 
     @Override
-    protected void step13LoadImmunoHistoChemistry() {
+    protected void step14LoadImmunoHistoChemistry() {
 
         String ihcFileStr = dataRootDir + DATASOURCE_ABBREVIATION + "/ihc/ihc.txt";
 
@@ -341,7 +325,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step14VariationData() { }
+    protected void step15VariationData() { }
 
 
 

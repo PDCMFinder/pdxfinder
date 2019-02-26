@@ -86,15 +86,16 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
         if (options.has("loadMDA") || options.has("loadALL")) {
 
+            initMethod();
+
             mdAndersonAlgorithm();
         }
 
     }
 
 
-    public void mdAndersonAlgorithm() throws Exception {
 
-        initMethod();
+    public void mdAndersonAlgorithm() throws Exception {
 
         step00GetMetaDataFolder();
 
@@ -103,13 +104,13 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
             if (listOfFiles[i].isFile()) {
 
                 this.jsonFile = rootDataDirectory + dataSourceAbbreviation + "/pdx/" + listOfFiles[i].getName();
-
                 loaderTemplate();
             }
         }
 
         log.info("Finished loading " + dataSourceAbbreviation + " PDX data.");
     }
+
 
 
     @Override
@@ -156,7 +157,9 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
         loadPDXModels(metaDataJSON,"MDA");
     }
 
+
     // MD ANDERSON uses default implementation Steps step07GetMetaData, step08LoadPatientData
+
 
     @Override
     protected void step09LoadExternalURLs() {
@@ -165,10 +168,18 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
     }
 
-    // IRCC uses default implementation Steps Step10CreateModels default
 
     @Override
-    protected void step11LoadSpecimens()throws Exception {
+    protected void step10BLoadBreastMarkers() {
+
+    }
+
+
+    // IRCC uses default implementation Steps Step11CreateModels default
+
+
+    @Override
+    protected void step12LoadSpecimens()throws Exception {
 
         loadSpecimens("mdAnderson");
 
@@ -176,19 +187,19 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step12CreateCurrentTreatment() {
+    protected void step13CreateCurrentTreatment() {
 
     }
 
 
     @Override
-    protected void step13LoadImmunoHistoChemistry() {
+    protected void step14LoadImmunoHistoChemistry() {
 
     }
 
 
     @Override
-    protected void step14VariationData() {
+    protected void step15VariationData() {
 
     }
 

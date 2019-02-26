@@ -88,6 +88,8 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
         if (options.has("loadWUSTL") || options.has("loadALL")) {
 
+            initMethod();
+
             wustlAlgorithm();
 
         }
@@ -96,8 +98,6 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
 
     public void wustlAlgorithm() throws Exception {
-
-        initMethod();
 
         step00GetMetaDataFolder();
 
@@ -109,7 +109,6 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
                 loaderTemplate();
             }
         }
-
         log.info("Finished loading " + dataSourceAbbreviation + " PDX data.");
     }
 
@@ -167,29 +166,34 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
     }
 
-    // WUSTL uses default implementation Steps Step10CreateModels default
+    @Override
+    protected void step10BLoadBreastMarkers() {
+
+    }
+
+    // WUSTL uses default implementation Steps step11CreateModels default
 
     @Override
-    protected void step11LoadSpecimens()throws Exception {
+    protected void step12LoadSpecimens()throws Exception {
 
         loadSpecimens("wustl");
     }
 
 
     @Override
-    protected void step12CreateCurrentTreatment() {
+    protected void step13CreateCurrentTreatment() {
 
     }
 
 
     @Override
-    protected void step13LoadImmunoHistoChemistry() {
+    protected void step14LoadImmunoHistoChemistry() {
 
     }
 
 
     @Override
-    protected void step14VariationData() {
+    protected void step15VariationData() {
 
     }
 

@@ -12,6 +12,7 @@ import org.neo4j.ogm.session.Session;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
+import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ import java.util.*;
  */
 @Component
 @Order(value = -18)
-public class LoadJAXData implements CommandLineRunner {
+public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadJAXData.class);
 
@@ -79,8 +80,6 @@ public class LoadJAXData implements CommandLineRunner {
 
     HashMap<String, String> passageMap = null;
 
-    private LoaderDTO dto = new LoaderDTO();
-
     @PostConstruct
     public void init() {
         formatter = new HelpFormatter();
@@ -105,20 +104,208 @@ public class LoadJAXData implements CommandLineRunner {
 
         if (options.has("loadJAX") || options.has("loadALL")  || options.has("loadSlim")) {
 
-            log.info("Loading JAX PDX data.");
+            initMethod();
 
-            String fileStr = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
-
-            String metaDataJSON = dataImportService.stageOneGetMetaDataFile(fileStr, DATASOURCE_ABBREVIATION);
-
-            if (!metaDataJSON.equals("NOT FOUND")){
-
-                parseJSONandCreateGraphObjects(metaDataJSON);
-            }
+            loaderTemplate();
 
         }
     }
 
+
+
+
+    @Override
+    protected void initMethod() {
+
+        log.info("Loading JAX PDX data.");
+
+        dto = new LoaderDTO();
+
+        jsonFile = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
+        dataSource = DATASOURCE_ABBREVIATION;
+        dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
+        dataSourceContact = DATASOURCE_CONTACT;
+    }
+
+
+    @Override
+    protected void step00GetMetaDataFolder() {
+
+    }
+
+    // JAX uses default implementation Steps step01GetMetaDataJSON
+
+
+    @Override
+    protected void step02CreateProviderGroup() {
+
+        loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+    }
+
+    @Override
+    protected void step03CreateNSGammaHostStrain() {
+
+        loadNSGammaHostStrain(NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
+    }
+
+    @Override
+    protected void step04CreateNSHostStrain() { }
+
+
+    @Override
+    protected void step05CreateProjectGroup() {
+
+    }
+
+
+    @Override
+    protected void step06GetPDXModels() {
+
+        loadPDXModels(metaDataJSON,"pdxInfo");
+    }
+
+    // PDMR uses default implementation Steps step07GetMetaData
+
+    @Override
+    protected void step08LoadPatientData() {
+
+        dto.setHistologyMap(getHistologyImageMap(dto.getModelID()));
+
+        //Check if model exists in DB, if yes, do not load duplicates
+        ModelCreation existingModel = dataImportService.findModelByIdAndDataSource(dto.getModelID(), DATASOURCE_ABBREVIATION);
+        if(existingModel != null) {
+            log.error("Skipping existing model "+dto.getModelID());
+            return;
+        }
+        // if the diagnosis is still unknown don't load it
+        if(dto.getDiagnosis().toLowerCase().contains("unknown") ||
+                dto.getDiagnosis().toLowerCase().contains("not specified")){
+            log.info("Skipping model "+dto.getModelID()+" with diagnosis:"+dto.getDiagnosis());
+            return;
+        }
+
+        super.step08LoadPatientData();
+    }
+
+
+    @Override
+    protected void step09LoadExternalURLs() {
+
+        dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
+
+        loadExternalURLs(DATASOURCE_CONTACT+dto.getModelID(), DATASOURCE_URL+dto.getModelID());
+    }
+
+
+    @Override
+    protected void step10BLoadBreastMarkers() {
+
+
+        //create breast cancer markers manually if they are present
+        if(!dto.getModelTag().equals(Standardizer.NOT_SPECIFIED)){
+
+            if(dto.getModelTag().equals("Triple Negative Breast Cancer (TNBC)")){
+
+                MolecularCharacterization mc = new MolecularCharacterization();
+                mc.setPlatform(dataImportService.getPlatform("Not Specified", dto.getProviderGroup()));
+                mc.setType("IHC");
+                Marker her2 = dataImportService.getMarker("HER2", "HER2");
+                Marker er = dataImportService.getMarker("ER", "ER");
+                Marker pr = dataImportService.getMarker("PR", "PR");
+
+                MarkerAssociation her2a = new MarkerAssociation();
+                her2a.setMarker(her2);
+                her2a.setImmunoHistoChemistryResult("negative");
+
+                MarkerAssociation era = new MarkerAssociation();
+                era.setMarker(er);
+                era.setImmunoHistoChemistryResult("negative");
+
+                MarkerAssociation pra = new MarkerAssociation();
+                pra.setMarker(pr);
+                pra.setImmunoHistoChemistryResult("negative");
+
+                mc.addMarkerAssociation(her2a);
+                mc.addMarkerAssociation(era);
+                mc.addMarkerAssociation(pra);
+
+                dto.getPatientSample().addMolecularCharacterization(mc);
+            }
+        }
+
+    }
+
+
+
+    @Override
+    protected void step11CreateModels() throws Exception  {
+
+        // JAX - Updates Patient Sample b4 model Creation
+        dto.getPatientSample().setExtractionMethod(dto.getExtractionMethod());
+
+        if (dto.getHistologyMap().containsKey("Patient")) {
+            Histology histology = new Histology();
+            Image image = dto.getHistologyMap().get("Patient");
+            histology.addImage(image);
+            dto.getPatientSample().addHistology(histology);
+        }
+
+        super.step11CreateModels();
+
+    }
+
+
+
+    @Override
+    protected void step12LoadSpecimens() {
+
+        Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(), dto.getModelID(), dto.getProviderGroup().getAbbreviation(), "");
+        specimen.setHostStrain(dto.getNodScidGamma());
+        EngraftmentSite engraftmentSite = dataImportService.getImplantationSite(dto.getImplantationSiteStr());
+        EngraftmentType engraftmentType = dataImportService.getImplantationType(Standardizer.NOT_SPECIFIED);
+        specimen.setEngraftmentSite(engraftmentSite);
+        specimen.setEngraftmentType(engraftmentType);
+
+        dto.getModelCreation().addSpecimen(specimen);
+        dataImportService.saveSpecimen(specimen);
+
+        dto.setEngraftmentSite(engraftmentSite);
+        dto.setEngraftmentType(engraftmentType);
+
+    }
+
+
+
+    @Override
+    protected void step13CreateCurrentTreatment() {
+
+        loadCurrentTreatment();
+
+        loadVariationData(dto.getModelCreation(), dto.getEngraftmentSite(), dto.getEngraftmentType());
+    }
+
+
+
+    @Override
+    protected void step14LoadImmunoHistoChemistry() {
+
+    }
+
+
+    @Override
+    protected void step15VariationData() { }
+
+
+
+
+
+
+
+
+
+
+
+/*
 
     private void parseJSONandCreateGraphObjects(String json) throws Exception{
 
@@ -143,13 +330,14 @@ public class LoadJAXData implements CommandLineRunner {
 
 
 
+
     @Transactional
     void createGraphObjects(JSONObject j) throws Exception {
 
 
         dto = dataImportService.stageSevenGetMetadata(dto, j, DATASOURCE_ABBREVIATION);
 
-        /* JAX After metadata Uniqueness: */
+        *//* JAX After metadata Uniqueness: *//*
         dto.setHistologyMap(getHistologyImageMap(dto.getModelID()));
         //Check if model exists in DB, if yes, do not load duplicates
         ModelCreation existingModel = dataImportService.findModelByIdAndDataSource(dto.getModelID(), DATASOURCE_ABBREVIATION);
@@ -188,6 +376,9 @@ public class LoadJAXData implements CommandLineRunner {
 
         dto = dataImportService.stageNineCreateModels(dto);
 
+
+
+
         dto = dataImportService.loadSpecimens(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
 
         //Create Treatment summary without linking TreatmentProtocols to specimens
@@ -196,7 +387,15 @@ public class LoadJAXData implements CommandLineRunner {
 
         loadVariationData(dto.getModelCreation(), dto.getEngraftmentSite(), dto.getEngraftmentType());
 
-    }
+    }*/
+
+
+
+
+
+
+
+
 
 
     /*

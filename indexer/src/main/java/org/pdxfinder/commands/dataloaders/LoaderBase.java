@@ -39,7 +39,6 @@ public abstract class LoaderBase {
 
     @Autowired
     private UtilityService utilityService;
-
     @Autowired
     private DataImportService dataImportService;
 
@@ -148,26 +147,30 @@ public abstract class LoaderBase {
 
         dto.setPatientSample(patientSample);
 
+        dto.getPatientSnapshot().addSample(dto.getPatientSample());
+
     }
 
 
     abstract void step09LoadExternalURLs();
 
+    abstract void step10BLoadBreastMarkers();
 
-    void step10CreateModels() throws Exception {
+
+    void step11CreateModels() throws Exception {
 
         ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls());
         dto.setModelCreation(modelCreation);
 
     }
 
-    abstract void step11LoadSpecimens() throws Exception;
+    abstract void step12LoadSpecimens() throws Exception;
 
-    abstract void step12CreateCurrentTreatment() throws Exception;
+    abstract void step13CreateCurrentTreatment() throws Exception;
 
-    abstract void step13LoadImmunoHistoChemistry();
+    abstract void step14LoadImmunoHistoChemistry();
 
-    abstract void step14VariationData();
+    abstract void step15VariationData();
 
 
     /*****************************************************************************************************
@@ -197,20 +200,20 @@ public abstract class LoaderBase {
 
             step08LoadPatientData();
 
-            dto.getPatientSnapshot().addSample(dto.getPatientSample());
-
             step09LoadExternalURLs();
 
-            step10CreateModels();
+            step10BLoadBreastMarkers();
 
-            step11LoadSpecimens();
+            step11CreateModels();
 
-            step12CreateCurrentTreatment();
+            step12LoadSpecimens();
+
+            step13CreateCurrentTreatment();
 
         }
-        step13LoadImmunoHistoChemistry();
+        step14LoadImmunoHistoChemistry();
 
-        step14VariationData();
+        step15VariationData();
     }
 
 
@@ -282,6 +285,40 @@ public abstract class LoaderBase {
             externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, dataSourceURL));
         }
         dto.setExternalUrls(externalUrls);
+
+    }
+
+
+
+    public void loadCurrentTreatment(){
+
+        TreatmentSummary ts;
+        try {
+
+            if (dto.getTreatments().length() > 0) {
+
+                ts = new TreatmentSummary();
+                ts.setUrl(dosingStudyURL);
+
+                for (int t = 0; t < dto.getTreatments().length(); t++) {
+
+                    JSONObject treatmentObject = dto.getTreatments().getJSONObject(t);
+
+                    TreatmentProtocol treatmentProtocol = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
+                            treatmentObject.getString("Dose"),
+                            treatmentObject.getString("Response"), "");
+
+                    if (treatmentProtocol != null) {
+                        ts.addTreatmentProtocol(treatmentProtocol);
+                    }
+                }
+                ts.setModelCreation(dto.getModelCreation());
+                dto.getModelCreation().setTreatmentSummary(ts);
+            }
+
+            dataImportService.saveModelCreation(dto.getModelCreation());
+
+        } catch (Exception e) { }
 
     }
 
