@@ -7,6 +7,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.ds.Standardizer;
+import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -92,6 +93,9 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     protected void initMethod() {
 
         log.info("Loading Huntsman PDX data.");
+
+        dto = new LoaderDTO();
+
         jsonFile = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/models.json";
         dataSource = DATASOURCE_ABBREVIATION;
         filesDirectory = "";

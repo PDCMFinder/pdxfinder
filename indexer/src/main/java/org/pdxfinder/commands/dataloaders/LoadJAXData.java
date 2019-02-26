@@ -125,6 +125,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         dataSource = DATASOURCE_ABBREVIATION;
         dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
         dataSourceContact = DATASOURCE_CONTACT;
+        dosingStudyURL = DOSING_STUDY_URL;
     }
 
 
@@ -174,7 +175,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
 
 
-    // PDMR uses default implementation Steps step07GetMetaData
+    // JAX uses default implementation Steps step07GetMetaData
 
 
 
