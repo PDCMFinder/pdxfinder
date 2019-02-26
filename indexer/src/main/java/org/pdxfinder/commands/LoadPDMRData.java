@@ -39,7 +39,7 @@ import java.util.stream.Stream;
  */
 @Component
 @Order(value = -16)
-public class LoadPDMRData implements CommandLineRunner {
+public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadPDMRData.class);
 
@@ -87,8 +87,6 @@ public class LoadPDMRData implements CommandLineRunner {
     HashMap<String, String> passageMap = null;
     HashMap<String, Image> histologyMap = null;
 
-    private LoaderDTO dto = new LoaderDTO();
-
     @PostConstruct
     public void init() {
         formatter = new HelpFormatter();
@@ -109,7 +107,7 @@ public class LoadPDMRData implements CommandLineRunner {
         parser.accepts("loadALL", "Load all, including PDMR PDX data");
         OptionSet options = parser.parse(args);
 
-        if (options.has("loadPDMR") || options.has("loadALL")) {
+        /*if (options.has("loadPDMR") || options.has("loadALL")) {
 
             log.info("Loading PDMR PDX data.");
             String fileStr = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
@@ -121,60 +119,94 @@ public class LoadPDMRData implements CommandLineRunner {
                 parseJSONandCreateGraphObjects(metaDataJSON);
             }
 
-        }
-    }
+        } */
 
+        initMethod();
 
-
-    private void parseJSONandCreateGraphObjects(String json) throws Exception {
-
-        dto = dataImportService.stagetwoCreateProviderGroup(dto, DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION,
-                PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
-
-        dto = dataImportService.stageThreeCreateNSGammaHostStrain(dto, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
-
-        // SKIP FOR PDMR - dto = dataImportService.stageFiveCreateProjectGroup(dto,"EurOPDX");
-
-        JSONArray jarray = dataImportService.stageSixGetPDXModels(json,"pdxInfo");
-
-        for (int i = 0; i < jarray.length(); i++) {
-
-            JSONObject job = jarray.getJSONObject(i);
-
-            createGraphObjects(job);
-        }
+        loaderTemplate();
 
     }
 
 
+    @Override
+    protected void initMethod() {
 
-    @Transactional
-    void createGraphObjects(JSONObject j) throws Exception {
+        log.info("Loading PDMR PDX data.");
 
-            dto = dataImportService.stageSevenGetMetadata(dto, j, DATASOURCE_ABBREVIATION);
+        dto = new LoaderDTO();
 
+        jsonFile = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
 
-            /* PDMR After metadata Uniqueness: */
-            //histologyMap = getHistologyImageMap(id);
-            if (dataImportService.isExistingModel(dto.getProviderGroup().getAbbreviation(), dto.getModelID())) return;
-
-            dto = dataImportService.stageEightLoadPatientData(dto);
-
-            dto.getPatientSnapshot().addSample(dto.getPatientSample());
-            dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
-
-            dto = dataImportService.step09LoadExternalURLs(dto, DATASOURCE_CONTACT, dto.getSourceURL());
+        dataSource = DATASOURCE_ABBREVIATION;
+        dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
+        dataSourceContact = DATASOURCE_CONTACT;
+    }
 
 
+    @Override
+    protected void step00GetMetaDataFolder() {
 
-        /* PDMR OVERWRITE TOTALLY  Start of void step10CreateModels()/stageNineCreateModel because it save list of QA instead of One Qa, so stores no QA in dto  */
+    }
+
+    // PDMR uses default implementation Steps step01GetMetaDataJSON
+
+
+    @Override
+    protected void step02CreateProviderGroup() {
+
+        loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+    }
+
+    @Override
+    protected void step03CreateNSGammaHostStrain() {
+
+        loadNSGammaHostStrain(NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
+    }
+
+    @Override
+    protected void step04CreateNSHostStrain() { }
+
+
+    @Override
+    protected void step05CreateProjectGroup() {
+
+    }
+
+
+    @Override
+    protected void step06GetPDXModels() {
+
+        loadPDXModels(metaDataJSON,"pdxInfo");
+    }
+
+    // PDMR uses default implementation Steps step07GetMetaData
+
+    @Override
+    protected void step08LoadPatientData() {
+
+        if (dataImportService.isExistingModel(dto.getProviderGroup().getAbbreviation(), dto.getModelID())) return;
+        super.step08LoadPatientData();
+    }
+
+
+    @Override
+    protected void step09LoadExternalURLs() {
+
+        dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
+
+        loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
+    }
+
+
+    @Override
+    protected void step10CreateModels() throws Exception {
 
         List<QualityAssurance> validationList = new ArrayList<>();
         if(dto.getValidationsArr().length() > 0){
 
-            for(int i=0; i<dto.getValidationsArr().length(); i++){
+            for(int k=0; k<dto.getValidationsArr().length(); k++){
 
-                JSONObject validationObj = dto.getValidationsArr().getJSONObject(i);
+                JSONObject validationObj = dto.getValidationsArr().getJSONObject(k);
                 QualityAssurance qa = new QualityAssurance(validationObj.getString("Technique"), validationObj.getString("Description"), validationObj.getString("Passage"));
                 validationList.add(qa);
             }
@@ -183,15 +215,57 @@ public class LoadPDMRData implements CommandLineRunner {
         ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), validationList, dto.getExternalUrls());
         modelCreation.addRelatedSample(dto.getPatientSample());
         dto.setModelCreation(modelCreation);
-
-        /* End of void step10CreateModels()  */
-
-        dto = dataImportService.loadSpecimens(dto, dto.getPatientSnapshot(), DATASOURCE_ABBREVIATION);
+    }
 
 
-        /* PDMR OVERWRITE TOTALLY  Start of void step12CreateCurrentTreatment()  */
+    @Override
+    protected void step11LoadSpecimens()throws Exception {
 
-        // Load patient treatment
+        //load specimens
+        if(dto.getSamplesArr().length() > 0){
+            for(int i=0; i<dto.getSamplesArr().length();i++){
+
+                JSONObject sampleObj = dto.getSamplesArr().getJSONObject(i);
+                String sampleType = sampleObj.getString("Tumor Type");
+
+                if(sampleType.equals("Xenograft Tumor")){
+
+                    String specimenId = sampleObj.getString("Sample ID");
+                    String passage = sampleObj.getString("Passage");
+
+                    Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(),
+                            specimenId, dto.getProviderGroup().getAbbreviation(), passage);
+
+                    specimen.setHostStrain(dto.getNodScidGamma());
+
+                    EngraftmentSite es = dataImportService.getImplantationSite(dto.getImplantationSiteStr());
+                    specimen.setEngraftmentSite(es);
+
+                    EngraftmentType et = dataImportService.getImplantationType(dto.getImplantationtypeStr());
+                    specimen.setEngraftmentType(et);
+
+                    Sample specSample = new Sample();
+
+                    specSample.setSourceSampleId(specimenId);
+                    specSample.setDataSource(dto.getProviderGroup().getAbbreviation());
+
+                    specimen.setSample(specSample);
+
+                    dto.getModelCreation().addSpecimen(specimen);
+                    dto.getModelCreation().addRelatedSample(specSample);
+
+                }
+
+            }
+        }
+    }
+
+
+
+
+    @Override
+    protected void step12CreateCurrentTreatment() throws Exception {
+
         TreatmentSummary ts;
 
         //Disable loading treatment temporarily, drug names are not harmonized!
@@ -200,7 +274,7 @@ public class LoadPDMRData implements CommandLineRunner {
         if(loadTreatment && dataImportService.findTreatmentSummaryByPatientSnapshot(dto.getPatientSnapshot()) == null){
             ts = new TreatmentSummary();
 
-            JSONArray treatmentArr = j.getJSONArray("Treatments");
+            JSONArray treatmentArr = dto.getTreatments();
 
             for(int k=0; k<treatmentArr.length();k++){
 
@@ -237,15 +311,24 @@ public class LoadPDMRData implements CommandLineRunner {
             dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
         }
         //loadVariationData(mc);
-        dataImportService.saveModelCreation(modelCreation);
-
-        /* PDMR OVERWRITE TOTALLY  End of void step12CreateCurrentTreatment()  */
-
-
-
-
+        dataImportService.saveModelCreation(dto.getModelCreation());
 
     }
+
+
+    @Override
+    protected void step13LoadImmunoHistoChemistry() {
+
+    }
+
+
+    @Override
+    protected void step14VariationData() {
+
+    }
+
+
+
 
 
 

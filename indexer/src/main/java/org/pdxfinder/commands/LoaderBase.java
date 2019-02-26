@@ -85,14 +85,10 @@ public abstract class LoaderBase {
 
         step06GetPDXModels();
 
-        HashSet<Integer> done = new HashSet<>();
 
         for (int i = 0; i < jsonArray.length(); i++) {
 
             JSONObject jsonData = jsonArray.getJSONObject(i);
-
-           // if (done.contains(jsonData.toString().hashCode())) return;
-           // done.add(jsonData.toString().hashCode());
 
             step07GetMetaData(jsonData, dataSourceAbbreviation);
 
@@ -228,7 +224,7 @@ public abstract class LoaderBase {
     abstract void step09LoadExternalURLs();
 
 
-    void step10CreateModels(){
+    void step10CreateModels() throws Exception {
 
         ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls());
         dto.setModelCreation(modelCreation);
@@ -237,7 +233,7 @@ public abstract class LoaderBase {
 
     abstract void step11LoadSpecimens() throws Exception;
 
-    abstract void step12CreateCurrentTreatment();
+    abstract void step12CreateCurrentTreatment() throws Exception;
 
     abstract void step13LoadImmunoHistoChemistry();
 

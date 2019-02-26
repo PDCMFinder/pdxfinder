@@ -1441,43 +1441,6 @@ public class DataImportService {
 
         if (ds.equals(pdmr)){
 
-            //load specimens
-            if(dto.getSamplesArr().length() > 0){
-                for(int i=0; i<dto.getSamplesArr().length();i++){
-
-                    JSONObject sampleObj = dto.getSamplesArr().getJSONObject(i);
-                    String sampleType = sampleObj.getString("Tumor Type");
-
-                    if(sampleType.equals("Xenograft Tumor")){
-
-                        String specimenId = sampleObj.getString("Sample ID");
-                        String passage = sampleObj.getString("Passage");
-
-                        Specimen specimen = getSpecimen(dto.getModelCreation(),
-                                specimenId, dto.getProviderGroup().getAbbreviation(), passage);
-
-                        specimen.setHostStrain(dto.getNodScidGamma());
-
-                        EngraftmentSite es = getImplantationSite(dto.getImplantationSiteStr());
-                        specimen.setEngraftmentSite(es);
-
-                        EngraftmentType et = getImplantationType(dto.getImplantationtypeStr());
-                        specimen.setEngraftmentType(et);
-
-                        Sample specSample = new Sample();
-
-                        specSample.setSourceSampleId(specimenId);
-                        specSample.setDataSource(dto.getProviderGroup().getAbbreviation());
-
-                        specimen.setSample(specSample);
-
-                        dto.getModelCreation().addSpecimen(specimen);
-                        dto.getModelCreation().addRelatedSample(specSample);
-
-                    }
-
-                }
-            }
 
         }
 
