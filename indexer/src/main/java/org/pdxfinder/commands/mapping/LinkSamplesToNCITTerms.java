@@ -1,6 +1,5 @@
-package org.pdxfinder.commands;
+package org.pdxfinder.commands.mapping;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
@@ -10,7 +9,6 @@ import org.pdxfinder.admin.pojos.MappingEntity;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.dao.SampleToOntologyRelationShip;
-import org.pdxfinder.ontologymapping.MappingRule;
 import org.pdxfinder.ontologymapping.MissingMapping;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;

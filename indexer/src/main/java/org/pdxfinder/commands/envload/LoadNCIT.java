@@ -1,4 +1,4 @@
-package org.pdxfinder.commands;
+package org.pdxfinder.commands.envload;
 
 /**
  * Created by csaba on 22/08/2017.
@@ -21,9 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.HashSet;

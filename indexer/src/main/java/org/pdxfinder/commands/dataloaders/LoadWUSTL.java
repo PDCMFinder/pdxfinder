@@ -1,4 +1,4 @@
-package org.pdxfinder.commands;
+package org.pdxfinder.commands.dataloaders;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -6,8 +6,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
@@ -23,7 +21,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 
 /**
  * Load data from WUSTL PDXNet.
