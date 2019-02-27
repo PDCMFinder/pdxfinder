@@ -44,6 +44,8 @@ import org.apache.poi.ss.usermodel.*;
 /**
  *
  * aka UPDOG: Universal PdxData tO Graph
+ *
+ * We should call it UPDOG. And it sets up a good joke. Any newcomer says "What's UPDOG?" we can say "Nothing much, what's up with you?"
  */
 public class UniversalLoader implements CommandLineRunner, ApplicationContextAware {
 
@@ -134,8 +136,8 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("loadUniversal", "Run universal loader");
-        parser.accepts("loadALL", "Load all, run universal data");
+        parser.accepts("loadUniversal", "Running universal loader (UPDOG)");
+        parser.accepts("loadALL", "Load all, running universal loader (UPDOG)");
         OptionSet options = parser.parse(args);
 
         if (options.has("loadUniversal") || options.has("loadALL")) {
