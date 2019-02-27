@@ -34,6 +34,7 @@ public abstract class LoaderBase {
     String dataSourceAbbreviation;
     String dataSourceContact;
     String dosingStudyURL;
+    JSONObject jsonData;
 
     LoaderDTO dto = new LoaderDTO();
 
@@ -88,7 +89,10 @@ public abstract class LoaderBase {
     abstract void step06GetPDXModels();
 
 
-    void step07GetMetaData(JSONObject data, String ds) throws Exception {
+    void step07GetMetaData() throws Exception {
+
+        JSONObject data = this.jsonData;
+        String ds = dataSourceAbbreviation;
 
         dto.setModelID(data.getString("Model ID"));
         dto.setSampleID(Harmonizer.getSampleID(data,ds));
@@ -193,9 +197,9 @@ public abstract class LoaderBase {
 
         for (int i = 0; i < jsonArray.length(); i++) {
 
-            JSONObject jsonData = jsonArray.getJSONObject(i);
+            this.jsonData = jsonArray.getJSONObject(i);
 
-            step07GetMetaData(jsonData, dataSourceAbbreviation);
+            step07GetMetaData();
 
             step08LoadPatientData();
 

@@ -129,12 +129,12 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
         for (int i = 0; i < jsonArray.length(); i++) {
 
-            JSONObject jsonData = jsonArray.getJSONObject(i);
+            this.jsonData = jsonArray.getJSONObject(i);
 
             if (loadedModelHashes.contains(jsonData.toString().hashCode())) continue;
             loadedModelHashes.add(jsonData.toString().hashCode());
 
-            step07GetMetaData(jsonData, dataSourceAbbreviation);
+            step07GetMetaData();
 
             step08LoadPatientData();
 
