@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Interface for Markers
@@ -47,10 +48,10 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
 
 
     @Query("MATCH (m:Marker) WHERE {synonym} IN m.synonyms RETURN m")
-    Marker findBySynonym(@Param("synonym") String synonym);
+    List<Marker> findBySynonym(@Param("synonym") String synonym);
 
     @Query("MATCH (m:Marker) WHERE {synonym} IN m.prevSymbols RETURN m")
-    Marker findByPrevSymbol(@Param("synonym") String synonym);
+    List<Marker> findByPrevSymbol(@Param("synonym") String synonym);
 
     @Query("MATCH (m:Marker) WHERE NOT (m)--() DELETE m")
     void deleteMarkersWithoutRelationships();
