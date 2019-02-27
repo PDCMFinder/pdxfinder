@@ -3,7 +3,6 @@ package org.pdxfinder.commands.dataloaders;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
-import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Harmonizer;
@@ -11,10 +10,7 @@ import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,7 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public abstract class LoaderBase implements ApplicationContextAware{
+public abstract class LoaderBase {
 
     private final static Logger log = LoggerFactory.getLogger(LoaderBase.class);
     String jsonFile;
@@ -39,92 +35,12 @@ public abstract class LoaderBase implements ApplicationContextAware{
     String dataSourceContact;
     String dosingStudyURL;
 
-
-
     LoaderDTO dto = new LoaderDTO();
 
     @Autowired
     private UtilityService utilityService;
-
     @Autowired
     private DataImportService dataImportService;
-
-
-    static ApplicationContext context;
-    ReportManager reportManager = (ReportManager) context.getBean("ReportManager");
-
-    /*****************************************************************************************************
-     *     SINGLE FILE DATA TEMPLATE METHOD         *
-     **********************************************/
-
-
-    public final void loaderTemplate2() throws Exception {
-
-        initMethod();
-
-        step00GetMetaDataFolder();
-
-        for (int i = 0; i < listOfFiles.length; i++) {
-
-            if (listOfFiles[i].isFile()) {
-
-                this.jsonFile = rootDataDirectory + dataSourceAbbreviation+"/pdx/"+listOfFiles[i].getName();
-
-                loaderTemplate();
-
-            }
-        }
-
-        log.info("Finished loading "+dataSourceAbbreviation+" PDX data.");
-    }
-
-
-
-    public final void loaderTemplate() throws Exception {
-
-        step01GetMetaDataJSON();
-
-        step02CreateProviderGroup();
-
-        step03CreateNSGammaHostStrain();
-
-        step04CreateNSHostStrain();
-
-        step05CreateProjectGroup();
-
-        step06GetPDXModels();
-
-        HashSet<Integer> done = new HashSet<>();
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-
-            JSONObject jsonData = jsonArray.getJSONObject(i);
-
-           // if (done.contains(jsonData.toString().hashCode())) return;
-           // done.add(jsonData.toString().hashCode());
-
-            step07GetMetaData(jsonData, dataSourceAbbreviation);
-
-            step08LoadPatientData();
-
-            dto.getPatientSnapshot().addSample(dto.getPatientSample());
-
-            step09LoadExternalURLs();
-
-            step10CreateModels();
-
-            step11LoadSpecimens();
-
-            step12CreateCurrentTreatment();
-
-        }
-        step13LoadImmunoHistoChemistry();
-
-        step14VariationData();
-    }
-
-
-
 
 
     abstract void initMethod();
@@ -231,28 +147,74 @@ public abstract class LoaderBase implements ApplicationContextAware{
 
         dto.setPatientSample(patientSample);
 
+        dto.getPatientSnapshot().addSample(dto.getPatientSample());
+
     }
 
 
     abstract void step09LoadExternalURLs();
 
+    abstract void step10BLoadBreastMarkers();
 
-    void step10CreateModels(){
+
+    void step11CreateModels() throws Exception {
 
         ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls());
         dto.setModelCreation(modelCreation);
 
     }
 
-    abstract void step11LoadSpecimens() throws Exception;
+    abstract void step12LoadSpecimens() throws Exception;
 
-    abstract void step12CreateCurrentTreatment();
+    abstract void step13CreateCurrentTreatment() throws Exception;
 
-    abstract void step13LoadImmunoHistoChemistry();
+    abstract void step14LoadImmunoHistoChemistry();
 
-    abstract void step14VariationData();
+    abstract void step15VariationData();
 
 
+    /*****************************************************************************************************
+     *     SINGLE FILE DATA TEMPLATE METHOD         *
+     **********************************************/
+
+    public final void loaderTemplate() throws Exception {
+
+        step01GetMetaDataJSON();
+
+        step02CreateProviderGroup();
+
+        step03CreateNSGammaHostStrain();
+
+        step04CreateNSHostStrain();
+
+        step05CreateProjectGroup();
+
+        step06GetPDXModels();
+
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+
+            JSONObject jsonData = jsonArray.getJSONObject(i);
+
+            step07GetMetaData(jsonData, dataSourceAbbreviation);
+
+            step08LoadPatientData();
+
+            step09LoadExternalURLs();
+
+            step10BLoadBreastMarkers();
+
+            step11CreateModels();
+
+            step12LoadSpecimens();
+
+            step13CreateCurrentTreatment();
+
+        }
+        step14LoadImmunoHistoChemistry();
+
+        step15VariationData();
+    }
 
 
 
@@ -323,6 +285,40 @@ public abstract class LoaderBase implements ApplicationContextAware{
             externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, dataSourceURL));
         }
         dto.setExternalUrls(externalUrls);
+
+    }
+
+
+
+    public void loadCurrentTreatment(){
+
+        TreatmentSummary ts;
+        try {
+
+            if (dto.getTreatments().length() > 0) {
+
+                ts = new TreatmentSummary();
+                ts.setUrl(dosingStudyURL);
+
+                for (int t = 0; t < dto.getTreatments().length(); t++) {
+
+                    JSONObject treatmentObject = dto.getTreatments().getJSONObject(t);
+
+                    TreatmentProtocol treatmentProtocol = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
+                            treatmentObject.getString("Dose"),
+                            treatmentObject.getString("Response"), "");
+
+                    if (treatmentProtocol != null) {
+                        ts.addTreatmentProtocol(treatmentProtocol);
+                    }
+                }
+                ts.setModelCreation(dto.getModelCreation());
+                dto.getModelCreation().setTreatmentSummary(ts);
+            }
+
+            dataImportService.saveModelCreation(dto.getModelCreation());
+
+        } catch (Exception e) { }
 
     }
 
@@ -424,9 +420,5 @@ public abstract class LoaderBase implements ApplicationContextAware{
     }
 
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        context = applicationContext;
-    }
 
 }

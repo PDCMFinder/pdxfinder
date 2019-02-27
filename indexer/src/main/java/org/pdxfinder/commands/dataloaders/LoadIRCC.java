@@ -112,6 +112,14 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     }
 
 
+    /*
+                HashSet<Integer> done = new HashSet<>();
+           // if (done.contains(jsonData.toString().hashCode())) return;
+           // done.add(jsonData.toString().hashCode());
+     */
+
+
+
     @Override
     protected void initMethod() {
 
@@ -158,7 +166,10 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
         loadPDXModels(metaDataJSON,"IRCC");
     }
 
-    // IRCC uses default implementation Steps step07GetMetaData,step08LoadPatientData
+
+
+    // IRCC uses default implementation Steps step07GetMetaData, step08LoadPatientData
+
 
     @Override
     protected void step09LoadExternalURLs() {
@@ -169,10 +180,18 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
     }
 
-    // IRCC uses default implementation Steps Step10CreateModels default
 
     @Override
-    protected void step11LoadSpecimens()throws Exception {
+    protected void step10BLoadBreastMarkers() {
+
+    }
+
+
+    // IRCC uses default implementation Steps Step11CreateModels default
+
+
+    @Override
+    protected void step12LoadSpecimens()throws Exception {
 
         dto.getModelCreation().addGroup(dto.getProjectGroup());
 
@@ -210,7 +229,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step12CreateCurrentTreatment() {
+    protected void step13CreateCurrentTreatment() {
 
         TreatmentSummary ts;
         try {
@@ -247,14 +266,14 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step13LoadImmunoHistoChemistry() {
+    protected void step14LoadImmunoHistoChemistry() {
 
     }
 
 
     @Override
     @Transactional
-    protected void step14VariationData() {
+    protected void step15VariationData() {
 
         log.info("VARIATION DATA LOADING");
         String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
