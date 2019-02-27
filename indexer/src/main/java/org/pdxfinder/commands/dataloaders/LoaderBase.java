@@ -169,11 +169,11 @@ public abstract class LoaderBase {
 
     abstract void step12LoadSpecimens() throws Exception;
 
-    abstract void step13CreateCurrentTreatment() throws Exception;
+    abstract void step13LoadCurrentTreatment() throws Exception;
 
     abstract void step14LoadImmunoHistoChemistry();
 
-    abstract void step15VariationData();
+    abstract void step15LoadVariationData();
 
 
     /*****************************************************************************************************
@@ -211,12 +211,12 @@ public abstract class LoaderBase {
 
             step12LoadSpecimens();
 
-            step13CreateCurrentTreatment();
+            step13LoadCurrentTreatment();
 
         }
         step14LoadImmunoHistoChemistry();
 
-        step15VariationData();
+        step15LoadVariationData();
     }
 
 

@@ -258,7 +258,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step13CreateCurrentTreatment() throws Exception {
+    protected void step13LoadCurrentTreatment() throws Exception {
 
         TreatmentSummary ts;
 
@@ -317,7 +317,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step15VariationData() {
+    protected void step15LoadVariationData() {
 
     }
 

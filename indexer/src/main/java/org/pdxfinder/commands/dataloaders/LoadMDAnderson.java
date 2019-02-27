@@ -187,7 +187,7 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step13CreateCurrentTreatment() {
+    protected void step13LoadCurrentTreatment() {
 
     }
 
@@ -199,7 +199,7 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step15VariationData() {
+    protected void step15LoadVariationData() {
 
     }
 

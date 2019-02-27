@@ -146,13 +146,13 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
             step12LoadSpecimens();
 
-            step13CreateCurrentTreatment();
+            step13LoadCurrentTreatment();
 
         }
 
         step14LoadImmunoHistoChemistry();
 
-        step15VariationData();
+        step15LoadVariationData();
     }
 
 
@@ -265,7 +265,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step13CreateCurrentTreatment() {
+    protected void step13LoadCurrentTreatment() {
 
         TreatmentSummary ts;
         try {
@@ -308,7 +308,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step15VariationData() {
+    protected void step15LoadVariationData() {
 
         log.info(" ********************  ******************** Loading VARIATION data. ********************  ******************** ");
 
