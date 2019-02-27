@@ -14,12 +14,16 @@ import org.pdxfinder.graph.repositories.*;
 import org.pdxfinder.services.ds.Harmonizer;
 import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
+import org.pdxfinder.services.dto.NodeSuggestionDTO;
+import org.pdxfinder.services.reporting.LogEntity;
+import org.pdxfinder.services.reporting.LogEntityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import org.springframework.cache.annotation.Cacheable;
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -64,6 +68,10 @@ public class DataImportService {
     private ExternalUrlRepository externalUrlRepository;
 
     private final static Logger log = LoggerFactory.getLogger(DataImportService.class);
+
+    private HashMap<String, Marker> markersBySymbol;
+    private HashMap<String, Marker> markersByPrevSymbol;
+    private HashMap<String, Marker> markersBySynonym;
 
     public DataImportService(TumorTypeRepository tumorTypeRepository,
                              HostStrainRepository hostStrainRepository,
@@ -130,6 +138,10 @@ public class DataImportService {
         this.treatmentProtocolRepository = treatmentProtocolRepository;
         this.currentTreatmentRepository = currentTreatmentRepository;
         this.externalUrlRepository = externalUrlRepository;
+
+        this.markersBySymbol = new HashMap<>();
+        this.markersByPrevSymbol = new HashMap<>();
+        this.markersBySynonym = new HashMap<>();
 
     }
 
@@ -1615,6 +1627,103 @@ public class DataImportService {
 
 
         return qa;
+    }
+
+    @Cacheable
+    public Marker getMarkerBySymbol(String symbol){
+
+        return markerRepository.findBySymbol(symbol);
+    }
+
+    @Cacheable
+    public Marker getMarkerByPrevSymbol(String symbol){
+
+        return markerRepository.findByPrevSymbol(symbol);
+    }
+
+    @Cacheable
+    public Marker getMarkerBySynonym(String symbol){
+
+        return markerRepository.findBySynonym(symbol);
+    }
+
+    public NodeSuggestionDTO getSuggestedMarker(String reporter, String dataSource, String modelId, String symbol){
+
+
+        NodeSuggestionDTO nsdto = new NodeSuggestionDTO();
+        LogEntity le;
+        Marker m;
+        boolean ready = false;
+
+        //check if marker is cached
+        if(markersBySymbol.containsKey(symbol)){
+            m = markersBySymbol.get(symbol);
+            nsdto.setNode(m);
+            ready = true;
+        }
+        else if(markersByPrevSymbol.containsKey(symbol)){
+
+            m = markersByPrevSymbol.get(symbol);
+            le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a previous symbol, using the approved one: "+m.getSymbol());
+            nsdto.setLogEntity(le);
+            ready = true;
+        }
+        else if(markersBySynonym.containsKey(symbol)){
+
+            m = markersBySynonym.get(symbol);
+            le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a synonym, using approved symbol: "+m.getSymbol());
+            nsdto.setLogEntity(le);
+            ready = true;
+        }
+
+        if(ready) return nsdto;
+
+        m = getMarkerBySymbol(symbol);
+
+        if(m != null){
+
+            //good, pass the marker
+            //no message
+            nsdto.setNode(m);
+            markersBySymbol.put(symbol, m);
+        }
+        else{
+
+            m = getMarkerByPrevSymbol(symbol);
+
+            if(m != null){
+
+                //symbol found in prev symbols
+                le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a previous symbol, using the approved one: "+m.getSymbol());
+                nsdto.setNode(m);
+                nsdto.setLogEntity(le);
+                markersByPrevSymbol.put(symbol, m);
+            }
+            else{
+
+                m = getMarkerBySynonym(symbol);
+
+                if(m != null){
+
+                    //symbol found in synonym
+                    le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a synonym, using approved symbol: "+m.getSymbol());
+                    nsdto.setNode(m);
+                    nsdto.setLogEntity(le);
+                    markersBySynonym.put(symbol, m);
+                }
+                else{
+
+                    //error, didn't find the symbol anywhere
+                    le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, "ERROR: "+symbol +" is an unrecognised symbol, skipping");
+                    nsdto.setLogEntity(le);
+                }
+            }
+
+        }
+
+
+
+        return nsdto;
     }
 
 
