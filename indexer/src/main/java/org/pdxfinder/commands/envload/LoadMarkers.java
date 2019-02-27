@@ -24,7 +24,7 @@ import java.util.HashSet;
  * Created by csaba on 26/02/2019.
  */
 @Component
-@Order(value = -80)
+@Order(value = -70)
 public class LoadMarkers implements CommandLineRunner{
 
 

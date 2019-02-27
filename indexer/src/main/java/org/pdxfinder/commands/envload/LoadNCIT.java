@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
-@Order(value = 1)
+@Order(value = -65)
 public class LoadNCIT implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadNCIT.class);
@@ -63,6 +63,7 @@ public class LoadNCIT implements CommandLineRunner {
         parser.accepts("loadNCITPreDef", "Load predefined NCIT ontology");
         parser.accepts("loadALL", "Load all, including NCiT ontology");
         parser.accepts("loadSlim", "Load slim, then link samples to NCIT terms");
+        parser.accepts("loadEssentials", "Loading essentials");
         OptionSet options = parser.parse(args);
 
         long startTime = System.currentTimeMillis();
@@ -72,7 +73,7 @@ public class LoadNCIT implements CommandLineRunner {
             log.warn("Select one or the other of: -loadNCIT, -loadNCITPreDef");
             log.warn("Not loading ", this.getClass().getName());
 
-        } else if (options.has("loadNCIT") || options.has("loadALL")  || options.has("loadSlim")) {
+        } else if (options.has("loadNCIT") || options.has("loadALL")  || options.has("loadSlim") || options.has("loadEssentials")) {
 
             log.info("Loading all Neoplasm subnodes.");
             loadNCIT();
