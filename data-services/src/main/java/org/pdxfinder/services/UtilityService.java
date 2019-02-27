@@ -148,5 +148,20 @@ public class UtilityService {
     }
 
 
+    public String splitText(String data, String delim, String seperator){
+
+        String result = "";
+
+        String[] splits = data.split(delim);
+
+        for (String split : splits){
+
+            result += split.trim()+seperator;
+        }
+
+        return result;
+    }
+
+
 
 }
