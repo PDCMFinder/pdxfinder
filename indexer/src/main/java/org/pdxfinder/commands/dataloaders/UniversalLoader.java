@@ -12,14 +12,19 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.neo4j.ogm.session.Session;
 
 import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 
 import org.pdxfinder.services.ds.Standardizer;
+import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +45,7 @@ import org.apache.poi.ss.usermodel.*;
  *
  * aka UPDOG: Universal PdxData tO Graph
  */
-public class UniversalLoader implements CommandLineRunner {
+public class UniversalLoader implements CommandLineRunner, ApplicationContextAware {
 
     private final static Logger log = LoggerFactory.getLogger(UniversalLoader.class);
 
@@ -54,6 +59,8 @@ public class UniversalLoader implements CommandLineRunner {
     private DataImportService dataImportService;
     private Session session;
 
+    static ApplicationContext context;
+    ReportManager reportManager;
 
     @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
@@ -132,6 +139,9 @@ public class UniversalLoader implements CommandLineRunner {
         OptionSet options = parser.parse(args);
 
         if (options.has("loadUniversal") || options.has("loadALL")) {
+
+            reportManager = (ReportManager) context.getBean("ReportManager");
+
 
             File folder = new File(dataRootDir + "UPDOG/");
 
@@ -963,97 +973,116 @@ public class UniversalLoader implements CommandLineRunner {
             String passage = dataRow.get(2);
             String nomenclature = dataRow.get(3);
             String modelId = dataRow.get(4);
-            String marker = dataRow.get(5);
+            String markerSymbol = dataRow.get(5);
             String markerStatus = dataRow.get(6);
             String technique = dataRow.get(8);
             String platform = dataRow.get(9);
 
-            if(origin.isEmpty() || modelId.isEmpty() || marker.isEmpty() || markerStatus.isEmpty() || technique.isEmpty() || platform.isEmpty()){
+            if(origin.isEmpty() || modelId.isEmpty() || markerSymbol.isEmpty() || markerStatus.isEmpty() || technique.isEmpty() || platform.isEmpty()){
                 log.error("Missing essential value in row " + row);
                 continue;
             }
 
             MolecularCharacterization mc;
             Platform pl;
+            Marker marker = null;
+            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), ds.getAbbreviation(), modelId, markerSymbol);
 
-            if(origin.toLowerCase().equals("patient")){
+            if(nsdto.getNode() == null){
 
-                //for patient related molchars it is sufficient to use the model + platform as the key
-                String mapKey = modelId + "___" + technique;
+                //uh oh, we found an unrecognised marker symbol, abort, abort!!!!
+                reportManager.addMessage(nsdto.getLogEntity());
+                continue;
+            }
+            else{
 
-                if(patientMolChars.containsKey(mapKey)) {
-                    //get a previously created mc object = platform and type are already set
-                    mc = patientMolChars.get(mapKey);
+                marker = (Marker) nsdto.getNode();
+
+                if(origin.toLowerCase().equals("patient")){
+
+                    //for patient related molchars it is sufficient to use the model + platform as the key
+                    String mapKey = modelId + "___" + technique;
+
+                    if(patientMolChars.containsKey(mapKey)) {
+                        //get a previously created mc object = platform and type are already set
+                        mc = patientMolChars.get(mapKey);
+                    }
+
+                    else {
+                        //new mc object, need to set the platform, too
+                        pl = dataImportService.getPlatform(technique, ds);
+
+                        mc = new MolecularCharacterization();
+                        mc.setPlatform(pl);
+                        mc.setType(getMolcharType(technique));
+                    }
+
+
+                    MarkerAssociation ma = new MarkerAssociation();
+                    ma.setMarker(marker);
+
+                    if(technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")){
+
+                        ma.setImmunoHistoChemistryResult(markerStatus);
+                    }
+                    //what if it is not ihc?
+
+                    mc.addMarkerAssociation(ma);
+
+                    //put molchar in the map if it was just created, but don't store molchars without type
+                    if(!patientMolChars.containsKey(mapKey) && mc.getType()!= null){
+                        patientMolChars.put(mapKey, mc);
+                    }
+
+
                 }
+                else if(origin.toLowerCase().equals("xenograft")){
 
-                else {
-                    //new mc object, need to set the platform, too
-                    pl = dataImportService.getPlatform(technique, ds);
+                    //need this trick to get rid of 0.0 if there is any
+                    int passageInt = (int) Float.parseFloat(passage);
+                    passage = String.valueOf(passageInt);
 
-                    mc = new MolecularCharacterization();
-                    mc.setPlatform(pl);
-                    mc.setType(getMolcharType(technique));
+                    //for xenograft molchars use the combination of the modelid, nomenclature, passage and technique as the key
+                    String mapKey = modelId + "___" + nomenclature + "___" + passage + "___" + technique;
+
+                    if(xenoMolChars.containsKey(mapKey)) {
+                        //get a previously created mc object = platform and type are already set
+                        mc = xenoMolChars.get(mapKey);
+                    }
+                    else {
+                        //new mc object, need to set the platform, too
+                        pl = dataImportService.getPlatform(technique, ds);
+
+                        mc = new MolecularCharacterization();
+                        mc.setPlatform(pl);
+                        mc.setType(getMolcharType(technique));
+
+                    }
+
+
+                    MarkerAssociation ma = new MarkerAssociation();
+                    ma.setMarker(marker);
+
+                    if(technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")){
+
+                        ma.setImmunoHistoChemistryResult(markerStatus);
+                    }
+                    //what if it is not ihc? Would our world collapse entirely?
+
+                    mc.addMarkerAssociation(ma);
+                    //but don't store molchars without type
+                    if(!xenoMolChars.containsKey(mapKey) && mc.getType()!= null){
+                        xenoMolChars.put(mapKey, mc);
+                    }
+
                 }
-
-                Marker m = dataImportService.getMarker(marker, marker);
-                MarkerAssociation ma = new MarkerAssociation();
-                ma.setMarker(m);
-
-                if(technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")){
-
-                    ma.setImmunoHistoChemistryResult(markerStatus);
-                }
-                //what if it is not ihc?
-
-                mc.addMarkerAssociation(ma);
-
-                //put molchar in the map if it was just created, but don't store molchars without type
-                if(!patientMolChars.containsKey(mapKey) && mc.getType()!= null){
-                    patientMolChars.put(mapKey, mc);
-                }
-
 
             }
-            else if(origin.toLowerCase().equals("xenograft")){
 
-                //need this trick to get rid of 0.0 if there is any
-                int passageInt = (int) Float.parseFloat(passage);
-                passage = String.valueOf(passageInt);
 
-                //for xenograft molchars use the combination of the modelid, nomenclature, passage and technique as the key
-                String mapKey = modelId + "___" + nomenclature + "___" + passage + "___" + technique;
 
-                if(xenoMolChars.containsKey(mapKey)) {
-                    //get a previously created mc object = platform and type are already set
-                    mc = xenoMolChars.get(mapKey);
-                }
-                else {
-                    //new mc object, need to set the platform, too
-                    pl = dataImportService.getPlatform(technique, ds);
 
-                    mc = new MolecularCharacterization();
-                    mc.setPlatform(pl);
-                    mc.setType(getMolcharType(technique));
 
-                }
-
-                Marker m = dataImportService.getMarker(marker, marker);
-                MarkerAssociation ma = new MarkerAssociation();
-                ma.setMarker(m);
-
-                if(technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")){
-
-                    ma.setImmunoHistoChemistryResult(markerStatus);
-                }
-                //what if it is not ihc?
-
-                mc.addMarkerAssociation(ma);
-                //but don't store molchars without type
-                if(!xenoMolChars.containsKey(mapKey) && mc.getType()!= null){
-                    xenoMolChars.put(mapKey, mc);
-                }
-
-            }
 
 
 
@@ -1152,6 +1181,11 @@ public class UniversalLoader implements CommandLineRunner {
         }
 
         return null;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        context = applicationContext;
     }
 
 }
