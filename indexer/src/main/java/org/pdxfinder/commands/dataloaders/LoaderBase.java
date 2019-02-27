@@ -3,6 +3,7 @@ package org.pdxfinder.commands.dataloaders;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Harmonizer;
@@ -10,7 +11,10 @@ import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,7 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public abstract class LoaderBase {
+public abstract class LoaderBase implements ApplicationContextAware{
 
     private final static Logger log = LoggerFactory.getLogger(LoaderBase.class);
     String jsonFile;
@@ -42,6 +46,8 @@ public abstract class LoaderBase {
     @Autowired
     private DataImportService dataImportService;
 
+    static ApplicationContext context;
+    ReportManager reportManager;
 
     abstract void initMethod();
 
@@ -419,6 +425,9 @@ public abstract class LoaderBase {
 
     }
 
-
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        context = applicationContext;
+    }
 
 }
