@@ -57,7 +57,7 @@ public abstract class LoaderBase {
                 log.info("No file found for "+dataSource+", skipping");
             }
         }
-        else{ log.info("Directory does not exist, skipping."); } // "+filesDirectory+"
+        else{ log.info("Directory does not exist, skipping."); }
 
     }
 
@@ -89,7 +89,6 @@ public abstract class LoaderBase {
 
 
     void step07GetMetaData(JSONObject data, String ds) throws Exception {
-
 
         dto.setModelID(data.getString("Model ID"));
         dto.setSampleID(Harmonizer.getSampleID(data,ds));
@@ -412,7 +411,7 @@ public abstract class LoaderBase {
 
             }
 
-            dataImportService.saveSample(dto.getPatientSample());  // TODO: This was not be implemented for wustl, find out why
+            dataImportService.saveSample(dto.getPatientSample());  // TODO: This was not be implemented for wustl
             dataImportService.saveModelCreation(dto.getModelCreation());
             dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
         }

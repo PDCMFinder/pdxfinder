@@ -1177,261 +1177,13 @@ public class DataImportService {
     }
 
 
-    @Autowired
-    private UtilityService utilityService;
-    String hci = "PDXNet-HCI-BCM";
-    String mdAnderson = "PDXNet-MDAnderson";
-    String irccCrc = "IRCC-CRC";
-    String wustl = "PDXNet-WUSTL";
-    String jax = "JAX";
-    String pdmr = "PDMR";
-
-
-    public File[] stageZeroGetMetaDataFolder(String directory, String dataSource){
-
-        File[] listOfFiles = new File[0];
-        File folder = new File(directory);
-
-        if(folder.exists()){
-            listOfFiles = folder.listFiles();
-
-            if(listOfFiles.length == 0){
-                log.info("No file found for "+dataSource+", skipping");
-            }
-        }
-        else{ log.info("Directory "+directory+" does not exist, skipping."); }
-
-        return listOfFiles;
-    }
-
-
-    public String stageOneGetMetaDataFile(String modelJson, String dataSource){
-
-        String metaDataString = "NOT FOUND";
-
-        File file = new File(modelJson);
-
-        if (file.exists()) {
-
-            log.info("Loading from file " + modelJson);
-            metaDataString = utilityService.parseFile(modelJson);
-        } else {
-            log.info("No file found for " + dataSource + ", skipping");
-        }
-
-        return metaDataString;
-    }
-
-
-    public LoaderDTO stagetwoCreateProviderGroup(LoaderDTO dto, String dsName, String dsAbbrev, String dsDesc,
-                                                 String providerType, String access,String modalities, String dsContact,String url){
-
-        Group providerDS = getProviderGroup(dsName, dsAbbrev, dsDesc, providerType, access, modalities, dsContact, url);
-        dto.setProviderGroup(providerDS);
-
-        return dto;
-    }
-
-
-    public LoaderDTO stageThreeCreateNSGammaHostStrain(LoaderDTO dto, String NSG_BS_SYMBOL,String  NSG_BS_URL,String NSG_BS_NAME, String NSG_BS_DESC) {
-
-        try {
-            HostStrain nsgBS = getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
-            dto.setNodScidGamma(nsgBS);
-        } catch (Exception e) {}
-
-        return dto;
-    }
-
-
-    public LoaderDTO stageFourCreateNSHostStrain(LoaderDTO dto, String NS_BS_SYMBOL,String  NS_BS_URL,String NS_BS_NAME) {
-
-        try {
-            HostStrain nsBS = getHostStrain(NS_BS_NAME, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
-            dto.setNodScid(nsBS);
-        } catch (Exception e) {}
-
-        return dto;
-    }
-
-
-    public LoaderDTO stageFiveCreateProjectGroup(LoaderDTO dto, String projectName) {
-
-        Group projectGroup = getProjectGroup(projectName);
-        dto.setProjectGroup(projectGroup);
-
-        return dto;
-    }
-
-
-    public JSONArray stageSixGetPDXModels(String jsonString,String key){
-
-        JSONArray jsonArray = new JSONArray();
-
-        try {
-            JSONObject job = new JSONObject(jsonString);
-            jsonArray = job.getJSONArray(key);
-        } catch (Exception e) {
-            log.error("Error getting "+key+" PDX models", e);
-        }
-
-        return jsonArray;
-    }
-
-
-
-    public LoaderDTO stageSevenGetMetadata(LoaderDTO dto ,JSONObject data, String ds) throws Exception {
-
-        dto.setModelID(data.getString("Model ID"));
-        dto.setSampleID(Harmonizer.getSampleID(data,ds));
-        dto.setDiagnosis(Harmonizer.getDiagnosis(data,ds));
-        dto.setPatientId(Standardizer.getValue("Patient ID",data));
-        dto.setEthnicity(Harmonizer.getEthnicity(data,ds));
-        dto.setStage(Harmonizer.getStage(data,ds));
-        dto.setGrade(Harmonizer.getGrade(data,ds));
-        dto.setClassification(Harmonizer.getClassification(data,ds));
-
-        dto.setAge(Standardizer.getAge(data.getString("Age")));
-        dto.setGender(Standardizer.getGender(data.getString("Gender")));
-        dto.setTumorType(Standardizer.getTumorType(data.getString("Tumor Type")));
-        dto.setSampleSite(Standardizer.getValue("Sample Site",data));
-        dto.setPrimarySite(Standardizer.getValue("Primary Site",data));
-        dto.setExtractionMethod(Standardizer.getValue("Sample Type",data));
-        dto.setStrain(Standardizer.getValue("Strain",data));
-        dto.setModelTag(Standardizer.getValue("Model Tag",data));
-
-        dto.setSourceURL(Standardizer.getValue("Source url",data));
-
-        dto.setMarkerPlatform(Harmonizer.getMarkerPlatform(data,ds));
-        dto.setMarkerStr(Harmonizer.getMarkerStr(data,ds));
-        dto.setQaPassage(Harmonizer.getQAPassage(data,ds));
-
-        dto.setQualityAssurance(getQualityAssurance(data,ds));
-        dto.setImplantationtypeStr(Harmonizer.getImplantationType(data,ds));
-        dto.setImplantationSiteStr(Harmonizer.getEngraftmentSite(data,ds));
-
-        dto.setFingerprinting(Harmonizer.getFingerprinting(data, ds));
-        dto.setSpecimens(Harmonizer.getSpecimens(data,ds));
-        dto.setTreatments(Harmonizer.getTreament(data, ds));
-        dto.setSamplesArr(Harmonizer.getSamplesArr(data, ds));
-        dto.setValidationsArr(Harmonizer.getValidationsArr(data, ds));
-
-        return dto;
-
-    }
-
-
-
-    /*************************************************************************************************************
-     *     CREATE PATIENT, PATIENT-SNAPSHOT, PATIENT SAMPLE, & EXTERNAL-URL        *
-     *********************************************************************/
-
-    public LoaderDTO stageEightLoadPatientData(LoaderDTO dto){
-
-        Group dataSource = dto.getProviderGroup();
-        Patient patient = getPatientWithSnapshots(dto.getPatientId(), dataSource);
-
-        if(patient == null){
-            patient = createPatient(dto.getPatientId(), dataSource, dto.getGender(), "", Standardizer.getEthnicity(dto.getEthnicity()));
-        }
-        dto.setPatient(patient);
-
-
-        PatientSnapshot pSnap = getPatientSnapshot(patient, dto.getAge(), "", "", "");
-        dto.setPatientSnapshot(pSnap);
-
-        Sample patientSample = getSample(dto.getSampleID(), dataSource.getAbbreviation(), dto.getTumorType(), dto.getDiagnosis(), dto.getPrimarySite(),
-                dto.getSampleSite(), dto.getExtractionMethod(), false, dto.getStage(), "", dto.getGrade(), "");
-
-        dto.setPatientSample(patientSample);
-
-        return dto;
-    }
-
-    public LoaderDTO  step09LoadExternalURLs(LoaderDTO dto, String dataSourceContact, String dataSourceURL){
-
-        List<ExternalUrl> externalUrls = new ArrayList<>();
-        externalUrls.add(getExternalUrl(ExternalUrl.Type.CONTACT, dataSourceContact));
-
-        if (!dataSourceURL.equals(Standardizer.NOT_SPECIFIED)){
-            externalUrls.add(getExternalUrl(ExternalUrl.Type.SOURCE, dataSourceURL));
-        }
-
-        dto.setExternalUrls(externalUrls);
-
-        return dto;
-    }
-
-
-
-    public LoaderDTO stageNineCreateModels(LoaderDTO dto){
-
-        ModelCreation modelCreation = createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls());
-        dto.setModelCreation(modelCreation);
-
-        return dto;
-    }
-
-
-
-
-    /*************************************************************************************************************
-     *     CREATE IMPLANTATION-SITE, IMPLANTATION-TYPE, SPECIMEN, UPDATE MODEL-CREATION         *
-     ******************************************************************************************/
-
-    public LoaderDTO loadSpecimens(LoaderDTO dto, PatientSnapshot pSnap, String ds)  throws Exception{
-
-
-        return dto;
-
-    }
-
-
-
-
-
-    public LoaderDTO stepThreeCurrentTreatment(LoaderDTO dto, String DOSING_STUDY_URL, String responsekey){
-
-        TreatmentSummary ts;
-        try {
-
-            if (dto.getTreatments().length() > 0) {
-
-                ts = new TreatmentSummary();
-                ts.setUrl(DOSING_STUDY_URL);
-
-                for (int t = 0; t < dto.getTreatments().length(); t++) {
-
-                    JSONObject treatmentObject = dto.getTreatments().getJSONObject(t);
-
-                    TreatmentProtocol treatmentProtocol = getTreatmentProtocol(treatmentObject.getString("Drug"),
-                            treatmentObject.getString("Dose"),
-                            treatmentObject.getString(responsekey), "");
-
-                    if (treatmentProtocol != null) {
-                        ts.addTreatmentProtocol(treatmentProtocol);
-                    }
-                }
-                ts.setModelCreation(dto.getModelCreation());
-                dto.getModelCreation().setTreatmentSummary(ts);
-            }
-
-            saveModelCreation(dto.getModelCreation());
-
-        } catch (Exception e) { }
-
-        return dto;
-    }
-
-
-
 
     public QualityAssurance getQualityAssurance(JSONObject data, String ds)  throws Exception{
 
         QualityAssurance qa = new QualityAssurance();
         String qaType = Standardizer.NOT_SPECIFIED;
 
-        if (ds.equals(jax)){
+        if (ds.equals("JAX")){
 
             String qaPassages = Standardizer.NOT_SPECIFIED;
 
@@ -1448,7 +1200,7 @@ public class DataImportService {
         }
 
 
-        if (ds.equals(hci)){
+        if (ds.equals("PDXNet-HCI-BCM")){
 
             // This multiple QA approach only works because Note and Passage are the same for all QAs
             qa = new QualityAssurance(Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED);
@@ -1469,7 +1221,7 @@ public class DataImportService {
 
 
 
-        if (ds.equals(mdAnderson) || ds.equals(wustl)) {
+        if (ds.equals("PDXNet-MDAnderson") || ds.equals("PDXNet-WUSTL")) {
 
             try {
                 qaType = data.getString("QA") + " on passage " + data.getString("QA Passage");
@@ -1483,7 +1235,7 @@ public class DataImportService {
         }
 
 
-        if (ds.equals(irccCrc)) {
+        if (ds.equals("IRCC-CRC")) {
 
             String FINGERPRINT_DESCRIPTION = "Model validated against patient germline.";
 

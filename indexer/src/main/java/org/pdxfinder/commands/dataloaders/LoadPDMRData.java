@@ -101,9 +101,15 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
         parser.accepts("loadALL", "Load all, including PDMR PDX data");
         OptionSet options = parser.parse(args);
 
-        initMethod();
 
-        loaderTemplate();
+        if (options.has("loadPDMR") || options.has("loadALL")) {
+
+            initMethod();
+
+            loaderTemplate();
+        }
+
+
 
     }
 

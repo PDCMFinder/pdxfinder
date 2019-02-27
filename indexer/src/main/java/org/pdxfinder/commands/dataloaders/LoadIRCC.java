@@ -106,18 +106,54 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
             initMethod();
 
-            loaderTemplate();
+            irccAlgorithm();
 
         }
     }
 
 
-    /*
-                HashSet<Integer> done = new HashSet<>();
-           // if (done.contains(jsonData.toString().hashCode())) return;
-           // done.add(jsonData.toString().hashCode());
-     */
+    public void irccAlgorithm() throws Exception {
 
+        step01GetMetaDataJSON();
+
+        step02CreateProviderGroup();
+
+        step03CreateNSGammaHostStrain();
+
+        step04CreateNSHostStrain();
+
+        step05CreateProjectGroup();
+
+        step06GetPDXModels();
+
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+
+            JSONObject jsonData = jsonArray.getJSONObject(i);
+
+            if (loadedModelHashes.contains(jsonData.toString().hashCode())) continue;
+            loadedModelHashes.add(jsonData.toString().hashCode());
+
+            step07GetMetaData(jsonData, dataSourceAbbreviation);
+
+            step08LoadPatientData();
+
+            step09LoadExternalURLs();
+
+            step10BLoadBreastMarkers();
+
+            step11CreateModels();
+
+            step12LoadSpecimens();
+
+            step13CreateCurrentTreatment();
+
+        }
+
+        step14LoadImmunoHistoChemistry();
+
+        step15VariationData();
+    }
 
 
     @Override
@@ -168,7 +204,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
 
-    // IRCC uses default implementation Steps step07GetMetaData, step08LoadPatientData
+    // IRCC uses default implementation of Steps step07GetMetaData, step08LoadPatientData
 
 
     @Override
@@ -272,10 +308,10 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    @Transactional
     protected void step15VariationData() {
 
-        log.info("VARIATION DATA LOADING");
+        log.info(" ********************  ******************** Loading VARIATION data. ********************  ******************** ");
+
         String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
         String platformName = "TargetedNGS_MUT";
         String molcharType = "mutation";
