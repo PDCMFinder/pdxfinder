@@ -95,5 +95,11 @@ public class Marker {
 
     }
 
+    public void setPrevSymbols(Set<String> prevSymbols) {
+        this.prevSymbols = prevSymbols;
+    }
 
+    public void setSynonyms(Set<String> synonyms) {
+        this.synonyms = synonyms;
+    }
 }

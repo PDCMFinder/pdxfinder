@@ -45,4 +45,14 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
             "ORDER BY number_of_models DESC")
     Result countModelsByMarker();
 
+
+    @Query("MATCH (m:Marker) WHERE {synonym} IN m.synonyms RETURN m")
+    Marker findBySynonym(@Param("synonym") String synonym);
+
+    @Query("MATCH (m:Marker) WHERE {synonym} IN m.prevSymbols RETURN m")
+    Marker findByPrevSymbol(@Param("synonym") String synonym);
+
+    @Query("MATCH (m:Marker) WHERE NOT (m)--() DELETE m")
+    void deleteMarkersWithoutRelationships();
+
 }
