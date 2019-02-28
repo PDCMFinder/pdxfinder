@@ -1553,7 +1553,7 @@ public class DataImportService {
         NodeSuggestionDTO nsdto = new NodeSuggestionDTO();
         LogEntity le;
         Marker m;
-        List<Marker> markerSuggestionList;
+        List<Marker> markerSuggestionList = null;
         boolean ready = false;
 
         //check if marker is cached
@@ -1592,12 +1592,12 @@ public class DataImportService {
 
             markerSuggestionList = getMarkerByPrevSymbol(symbol);
 
-            if(markerSuggestionList != null){
+            if(markerSuggestionList != null && markerSuggestionList.size() > 0){
 
                 if(markerSuggestionList.size() == 1){
                     //symbol found in prev symbols
-                    le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a previous symbol, using the approved one: "+m.getSymbol());
                     m = markerSuggestionList.get(0);
+                    le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a previous symbol, using the approved one: "+m.getSymbol());
                     nsdto.setNode(m);
                     nsdto.setLogEntity(le);
                     markersByPrevSymbol.put(symbol, m);
@@ -1614,13 +1614,14 @@ public class DataImportService {
 
                 markerSuggestionList = getMarkerBySynonym(symbol);
 
-                if(m != null){
+                if(markerSuggestionList != null && markerSuggestionList.size() > 0){
 
                     if(markerSuggestionList.size() == 1){
 
                         //symbol found in synonym
-                        le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a synonym, using approved symbol: "+m.getSymbol());
                         m = markerSuggestionList.get(0);
+                        le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a synonym, using approved symbol: "+m.getSymbol());
+
                         nsdto.setNode(m);
                         nsdto.setLogEntity(le);
                         markersBySynonym.put(symbol, m);
