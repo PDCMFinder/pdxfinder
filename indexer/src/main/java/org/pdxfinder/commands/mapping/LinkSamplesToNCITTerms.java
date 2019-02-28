@@ -26,7 +26,7 @@ import java.util.*;
  * Created by csaba on 24/08/2017.
  */
 @Component
-@Order(value = 80)
+@Order(value = 40)
 public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
 
@@ -58,6 +58,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
         parser.accepts("linkSamplesToNCITTermsWithCleanup", "Link samples to NCIT terms, then cleanup.");
         parser.accepts("loadALL", "Load all, including linking samples to NCIT terms");
         parser.accepts("loadSlim", "Load slim, then link samples to NCIT terms");
+        parser.accepts("loadEssentials", "Load essentials then link samples to terms");
 
         OptionSet options = parser.parse(args);
 
@@ -67,7 +68,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
             log.warn("Select one or the other of: -linkSamplesToNCITTerms, -linkSamplesToNCITTermsWithCleanup");
             log.warn("Not loading ", this.getClass().getName());
 
-        } else if (options.has("linkSamplesToNCITTermsWithCleanup") || options.has("loadALL")  || options.has("loadSlim")) {
+        } else if (options.has("linkSamplesToNCITTermsWithCleanup") || options.has("loadALL")  || options.has("loadSlim") || options.has("loadEssentials")) {
 
             log.info("Mapping samples to NCIT terms with cleanup.");
 

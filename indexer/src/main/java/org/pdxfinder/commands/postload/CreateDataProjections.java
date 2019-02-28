@@ -66,13 +66,14 @@ public class CreateDataProjections implements CommandLineRunner{
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("createDataProjections", "Creating data projections");
-        parser.accepts("loadALL", "Load all, including linking samples to NCIT terms");
-        parser.accepts("loadSlim", "Load slim, then link samples to NCIT terms");
+        parser.accepts("loadALL", "Load all, then create projections");
+        parser.accepts("loadSlim", "Load slim, then create projections");
+        parser.accepts("loadEssentials", "Load essentials then create projections");
 
         OptionSet options = parser.parse(args);
         long startTime = System.currentTimeMillis();
 
-        if (options.has("createDataProjections") || options.has("loadALL")  || options.has("loadSlim")) {
+        if (options.has("createDataProjections") || options.has("loadALL")  || options.has("loadSlim") || options.has("loadEssentials")) {
 
             log.info("Creating data projections");
 

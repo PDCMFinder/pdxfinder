@@ -1288,13 +1288,13 @@ public class DataImportService {
     }
 
     @Cacheable
-    public Marker getMarkerByPrevSymbol(String symbol){
+    public List<Marker> getMarkerByPrevSymbol(String symbol){
 
         return markerRepository.findByPrevSymbol(symbol);
     }
 
     @Cacheable
-    public Marker getMarkerBySynonym(String symbol){
+    public List<Marker> getMarkerBySynonym(String symbol){
 
         return markerRepository.findBySynonym(symbol);
     }
@@ -1305,6 +1305,7 @@ public class DataImportService {
         NodeSuggestionDTO nsdto = new NodeSuggestionDTO();
         LogEntity le;
         Marker m;
+        List<Marker> markerSuggestionList = null;
         boolean ready = false;
 
         //check if marker is cached
@@ -1341,27 +1342,48 @@ public class DataImportService {
         }
         else{
 
-            m = getMarkerByPrevSymbol(symbol);
+            markerSuggestionList = getMarkerByPrevSymbol(symbol);
 
-            if(m != null){
+            if(markerSuggestionList != null && markerSuggestionList.size() > 0){
 
-                //symbol found in prev symbols
-                le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a previous symbol, using the approved one: "+m.getSymbol());
-                nsdto.setNode(m);
-                nsdto.setLogEntity(le);
-                markersByPrevSymbol.put(symbol, m);
+                if(markerSuggestionList.size() == 1){
+                    //symbol found in prev symbols
+                    m = markerSuggestionList.get(0);
+                    le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a previous symbol, using the approved one: "+m.getSymbol());
+                    nsdto.setNode(m);
+                    nsdto.setLogEntity(le);
+                    markersByPrevSymbol.put(symbol, m);
+                }
+                else{
+
+                    le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, "ERROR: "+ symbol +" is a previous symbol of multiple nodes, skipping");
+                    nsdto.setNode(null);
+                    nsdto.setLogEntity(le);
+                }
+
             }
             else{
 
-                m = getMarkerBySynonym(symbol);
+                markerSuggestionList = getMarkerBySynonym(symbol);
 
-                if(m != null){
+                if(markerSuggestionList != null && markerSuggestionList.size() > 0){
 
-                    //symbol found in synonym
-                    le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a synonym, using approved symbol: "+m.getSymbol());
-                    nsdto.setNode(m);
-                    nsdto.setLogEntity(le);
-                    markersBySynonym.put(symbol, m);
+                    if(markerSuggestionList.size() == 1){
+
+                        //symbol found in synonym
+                        m = markerSuggestionList.get(0);
+                        le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a synonym, using approved symbol: "+m.getSymbol());
+
+                        nsdto.setNode(m);
+                        nsdto.setLogEntity(le);
+                        markersBySynonym.put(symbol, m);
+                    }
+                    else{
+                        le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, "ERROR: "+symbol +" is a synonym for multiple nodes, skipping");
+                        nsdto.setNode(null);
+                        nsdto.setLogEntity(le);
+                    }
+
                 }
                 else{
 

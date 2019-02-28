@@ -37,9 +37,10 @@ public class ValidateDB implements CommandLineRunner{
         parser.allowsUnrecognizedOptions();
         parser.accepts("validateDB", "Validating DB");
         parser.accepts("loadALL", "Validating DB");
+        parser.accepts("loadEssentials", "Load essentials validate");
         OptionSet options = parser.parse(args);
 
-        if (options.has("validateDB") || options.has("loadALL")) {
+        if (options.has("validateDB") || options.has("loadALL") || options.has("loadEssentials")) {
 
 
             log.info("******************************************************");
