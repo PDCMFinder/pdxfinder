@@ -101,9 +101,15 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
         parser.accepts("loadALL", "Load all, including PDMR PDX data");
         OptionSet options = parser.parse(args);
 
-        initMethod();
 
-        loaderTemplate();
+        if (options.has("loadPDMR") || options.has("loadALL")) {
+
+            initMethod();
+
+            loaderTemplate();
+        }
+
+
 
     }
 
@@ -179,7 +185,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step10BLoadBreastMarkers() {
+    protected void step10LoadBreastMarkers() {
 
     }
 
@@ -252,7 +258,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step13CreateCurrentTreatment() throws Exception {
+    protected void step13LoadCurrentTreatment() throws Exception {
 
         TreatmentSummary ts;
 
@@ -311,7 +317,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step15VariationData() {
+    protected void step15LoadVariationData() {
 
     }
 

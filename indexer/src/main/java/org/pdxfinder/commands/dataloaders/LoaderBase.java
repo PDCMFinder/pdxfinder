@@ -3,7 +3,6 @@ package org.pdxfinder.commands.dataloaders;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
-import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Harmonizer;
@@ -11,10 +10,7 @@ import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,7 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public abstract class LoaderBase implements ApplicationContextAware{
+public abstract class LoaderBase {
 
     private final static Logger log = LoggerFactory.getLogger(LoaderBase.class);
     String jsonFile;
@@ -38,6 +34,7 @@ public abstract class LoaderBase implements ApplicationContextAware{
     String dataSourceAbbreviation;
     String dataSourceContact;
     String dosingStudyURL;
+    JSONObject jsonData;
 
     LoaderDTO dto = new LoaderDTO();
 
@@ -46,12 +43,22 @@ public abstract class LoaderBase implements ApplicationContextAware{
     @Autowired
     private DataImportService dataImportService;
 
-    static ApplicationContext context;
-    ReportManager reportManager;
-
+    /**
+     * initMethod
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder method
+     */
     abstract void initMethod();
 
 
+    /**
+     * Step 00 GetMetaDataFolder
+     *
+     * This has Common Implementations: So it is fully implemented in the base class
+     * Concrete classes automatically inherits the default implementation or override it
+     * Concrete classes can also override and "call back to" this base class method at once using super.step00GetMetaDataFolder()
+     */
     void step00GetMetaDataFolder(){
 
         listOfFiles = new File[0];
@@ -63,11 +70,18 @@ public abstract class LoaderBase implements ApplicationContextAware{
                 log.info("No file found for "+dataSource+", skipping");
             }
         }
-        else{ log.info("Directory does not exist, skipping."); } // "+filesDirectory+"
+        else{ log.info("Directory does not exist, skipping."); }
 
     }
 
 
+    /**
+     * Step 01 GetMetaDataJSON
+     *
+     * This has Common Implementations: So it is fully implemented in the base class
+     * Concrete classes automatically inherits the default implementation or override it
+     * Concrete classes can also override and "call back to" this base class method at once using super.step01GetMetaDataJSON()
+     */
     void step01GetMetaDataJSON(){
 
         File file = new File(jsonFile);
@@ -79,23 +93,65 @@ public abstract class LoaderBase implements ApplicationContextAware{
         } else {
             log.info("No file found for " + dataSource + ", skipping");
         }
-
     }
 
 
+    /**
+     * Step 02 CreateProviderGroup
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder method as required
+     */
     abstract void step02CreateProviderGroup();
 
+
+    /**
+     * Step 03 CreateNSGammaHostStrain
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder method as required
+     */
     abstract void step03CreateNSGammaHostStrain();
 
+
+    /**
+     * Step 04 CreateNSHostStrain
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder method as required
+     */
     abstract void step04CreateNSHostStrain();
 
+
+    /**
+     * Step 05 CreateProjectGroup
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder method as required
+     */
     abstract void step05CreateProjectGroup();
 
+
+    /**
+     * Step 06 GetPDXModels
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder method as required
+     */
     abstract void step06GetPDXModels();
 
 
-    void step07GetMetaData(JSONObject data, String ds) throws Exception {
+    /**
+     * Step 07 GetMetaData
+     *
+     * Has Common Implementations: So they are fully implemented in the base class
+     * Concrete classes automatically inherits these implementations or can override implemented methods
+     * Concrete classes can also override and as well "call back to" these base class methods using super.step07GetMetaData() at once
+     */
+    void step07GetMetaData() throws Exception {
 
+        JSONObject data = this.jsonData;
+        String ds = dataSourceAbbreviation;
 
         dto.setModelID(data.getString("Model ID"));
         dto.setSampleID(Harmonizer.getSampleID(data,ds));
@@ -134,6 +190,14 @@ public abstract class LoaderBase implements ApplicationContextAware{
     }
 
 
+
+    /**
+     * Step 08 LoadPatientData
+     *
+     * Has Common Implementations: So they are fully implemented in the base class
+     * Concrete classes automatically inherits these implementations or can override implemented methods
+     * Concrete classes can also override and as well "call back to" this base class method using super.step08LoadPatientData() at once
+     */
     void step08LoadPatientData(){
 
         Group dataSource = dto.getProviderGroup();
@@ -158,11 +222,32 @@ public abstract class LoaderBase implements ApplicationContextAware{
     }
 
 
+    /**
+     * Step 06 LoadExternalURLs
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder methods as required
+     */
     abstract void step09LoadExternalURLs();
 
-    abstract void step10BLoadBreastMarkers();
 
 
+    /**
+     * Step 10 LoadBreastMarkers
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder methods as required
+     */
+    abstract void step10LoadBreastMarkers();
+
+
+    /**
+     * Step 11 CreateModels
+     *
+     * Has Common Implementations: So they are fully implemented in the base class
+     * Concrete classes automatically inherits these implementations or can override implemented methods
+     * Concrete classes can also override and as well "call back to" these base class methods using super.step11CreateModels() at once
+     */
     void step11CreateModels() throws Exception {
 
         ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls());
@@ -170,18 +255,44 @@ public abstract class LoaderBase implements ApplicationContextAware{
 
     }
 
+    /**
+     * Step 12 LoadSpecimens
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder methods as required
+     */
     abstract void step12LoadSpecimens() throws Exception;
 
-    abstract void step13CreateCurrentTreatment() throws Exception;
 
+    /**
+     * Step 13 LoadCurrentTreatment
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder methods as required
+     */
+    abstract void step13LoadCurrentTreatment() throws Exception;
+
+    /**
+     * Step 14 LoadImmunoHistoChemistry
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder methods as required
+     */
     abstract void step14LoadImmunoHistoChemistry();
 
-    abstract void step15VariationData();
+    /**
+     * Step 15 LoadVariationData
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder methods as required
+     */
+    abstract void step15LoadVariationData();
+
 
 
     /*****************************************************************************************************
-     *     SINGLE FILE DATA TEMPLATE METHOD         *
-     **********************************************/
+     *     SKELETON OF LOADING ALGORITHM STANDARDIZED IN A TEMPLATE METHOD        *
+     *******************************************************************************/
 
     public final void loaderTemplate() throws Exception {
 
@@ -200,26 +311,26 @@ public abstract class LoaderBase implements ApplicationContextAware{
 
         for (int i = 0; i < jsonArray.length(); i++) {
 
-            JSONObject jsonData = jsonArray.getJSONObject(i);
+            this.jsonData = jsonArray.getJSONObject(i);
 
-            step07GetMetaData(jsonData, dataSourceAbbreviation);
+            step07GetMetaData();
 
             step08LoadPatientData();
 
             step09LoadExternalURLs();
 
-            step10BLoadBreastMarkers();
+            step10LoadBreastMarkers();
 
             step11CreateModels();
 
             step12LoadSpecimens();
 
-            step13CreateCurrentTreatment();
+            step13LoadCurrentTreatment();
 
         }
         step14LoadImmunoHistoChemistry();
 
-        step15VariationData();
+        step15LoadVariationData();
     }
 
 
@@ -418,16 +529,13 @@ public abstract class LoaderBase implements ApplicationContextAware{
 
             }
 
-            dataImportService.saveSample(dto.getPatientSample());  // TODO: This was not be implemented for wustl, find out why
+            dataImportService.saveSample(dto.getPatientSample());  // TODO: This was not be implemented for wustl
             dataImportService.saveModelCreation(dto.getModelCreation());
             dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
         }
 
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        context = applicationContext;
-    }
+
 
 }

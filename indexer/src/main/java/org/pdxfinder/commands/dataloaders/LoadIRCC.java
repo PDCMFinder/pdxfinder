@@ -106,18 +106,54 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
             initMethod();
 
-            loaderTemplate();
+            irccAlgorithm();
 
         }
     }
 
 
-    /*
-                HashSet<Integer> done = new HashSet<>();
-           // if (done.contains(jsonData.toString().hashCode())) return;
-           // done.add(jsonData.toString().hashCode());
-     */
+    public void irccAlgorithm() throws Exception {
 
+        step01GetMetaDataJSON();
+
+        step02CreateProviderGroup();
+
+        step03CreateNSGammaHostStrain();
+
+        step04CreateNSHostStrain();
+
+        step05CreateProjectGroup();
+
+        step06GetPDXModels();
+
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+
+            this.jsonData = jsonArray.getJSONObject(i);
+
+            if (loadedModelHashes.contains(jsonData.toString().hashCode())) continue;
+            loadedModelHashes.add(jsonData.toString().hashCode());
+
+            step07GetMetaData();
+
+            step08LoadPatientData();
+
+            step09LoadExternalURLs();
+
+            step10LoadBreastMarkers();
+
+            step11CreateModels();
+
+            step12LoadSpecimens();
+
+            step13LoadCurrentTreatment();
+
+        }
+
+        step14LoadImmunoHistoChemistry();
+
+        step15LoadVariationData();
+    }
 
 
     @Override
@@ -168,7 +204,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
 
-    // IRCC uses default implementation Steps step07GetMetaData, step08LoadPatientData
+    // IRCC uses default implementation of Steps step07GetMetaData, step08LoadPatientData
 
 
     @Override
@@ -182,7 +218,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step10BLoadBreastMarkers() {
+    protected void step10LoadBreastMarkers() {
 
     }
 
@@ -229,7 +265,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step13CreateCurrentTreatment() {
+    protected void step13LoadCurrentTreatment() {
 
         TreatmentSummary ts;
         try {
@@ -272,10 +308,10 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    @Transactional
-    protected void step15VariationData() {
+    protected void step15LoadVariationData() {
 
-        log.info("VARIATION DATA LOADING");
+        log.info(" ********************  ******************** Loading VARIATION data. ********************  ******************** ");
+
         String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
         String platformName = "TargetedNGS_MUT";
         String molcharType = "mutation";

@@ -41,6 +41,7 @@ public class DataTransformerService {
     private TransValidationRepository transValidationRepository;
     private TransSampleRepository transSampleRepository;
 
+
     @Autowired
     private UtilityService util;
 
@@ -592,6 +593,33 @@ public class DataTransformerService {
         List<PdmrPdxInfo> pdmrPdxInfos = transPdxInfoRepository.findAll();
 
         return pdmrPdxInfos;
+    }
+
+
+    public String getDrugs(PdmrPdxInfo pdmrPdxInfo){
+
+        List<Treatment> treatments = pdmrPdxInfo.getTreatments();
+
+        String drugLista = "";
+
+        for (Treatment treatment : treatments){
+
+            try{
+                if (!treatment.getCurrentDrug().equals(null)){
+                    drugLista += util.splitText(treatment.getCurrentDrug(),"\\+","\n");
+                }
+            }catch (Exception e){}
+
+            try{
+                if (!treatment.getPriorDrug().equals(null)){
+                    drugLista += util.splitText(treatment.getPriorDrug(),"\\+","\n");
+                }
+            }catch (Exception e){}
+        }
+
+        util.writeToFile(drugLista,(new Date())+"_pdmrDrug.csv");
+
+        return drugLista.replace("\n","<br>");
     }
 
 }
