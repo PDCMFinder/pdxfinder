@@ -140,7 +140,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
             step09LoadExternalURLs();
 
-            step10BLoadBreastMarkers();
+            step10LoadBreastMarkers();
 
             step11CreateModels();
 
@@ -218,7 +218,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step10BLoadBreastMarkers() {
+    protected void step10LoadBreastMarkers() {
 
     }
 

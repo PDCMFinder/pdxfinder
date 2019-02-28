@@ -43,10 +43,22 @@ public abstract class LoaderBase {
     @Autowired
     private DataImportService dataImportService;
 
-
+    /**
+     * initMethod
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder method
+     */
     abstract void initMethod();
 
 
+    /**
+     * Step 00 GetMetaDataFolder
+     *
+     * This has Common Implementations: So it is fully implemented in the base class
+     * Concrete classes automatically inherits the default implementation or override it
+     * Concrete classes can also override and "call back to" this base class method at once using super.step00GetMetaDataFolder()
+     */
     void step00GetMetaDataFolder(){
 
         listOfFiles = new File[0];
@@ -63,6 +75,13 @@ public abstract class LoaderBase {
     }
 
 
+    /**
+     * Step 01 GetMetaDataJSON
+     *
+     * This has Common Implementations: So it is fully implemented in the base class
+     * Concrete classes automatically inherits the default implementation or override it
+     * Concrete classes can also override and "call back to" this base class method at once using super.step01GetMetaDataJSON()
+     */
     void step01GetMetaDataJSON(){
 
         File file = new File(jsonFile);
@@ -74,21 +93,61 @@ public abstract class LoaderBase {
         } else {
             log.info("No file found for " + dataSource + ", skipping");
         }
-
     }
 
 
+    /**
+     * Step 02 CreateProviderGroup
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder method as required
+     */
     abstract void step02CreateProviderGroup();
 
+
+    /**
+     * Step 03 CreateNSGammaHostStrain
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder method as required
+     */
     abstract void step03CreateNSGammaHostStrain();
 
+
+    /**
+     * Step 04 CreateNSHostStrain
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder method as required
+     */
     abstract void step04CreateNSHostStrain();
 
+
+    /**
+     * Step 05 CreateProjectGroup
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder method as required
+     */
     abstract void step05CreateProjectGroup();
 
+
+    /**
+     * Step 06 GetPDXModels
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder method as required
+     */
     abstract void step06GetPDXModels();
 
 
+    /**
+     * Step 07 GetMetaData
+     *
+     * Has Common Implementations: So they are fully implemented in the base class
+     * Concrete classes automatically inherits these implementations or can override implemented methods
+     * Concrete classes can also override and as well "call back to" these base class methods using super.step07GetMetaData() at once
+     */
     void step07GetMetaData() throws Exception {
 
         JSONObject data = this.jsonData;
@@ -131,6 +190,14 @@ public abstract class LoaderBase {
     }
 
 
+
+    /**
+     * Step 08 LoadPatientData
+     *
+     * Has Common Implementations: So they are fully implemented in the base class
+     * Concrete classes automatically inherits these implementations or can override implemented methods
+     * Concrete classes can also override and as well "call back to" this base class method using super.step08LoadPatientData() at once
+     */
     void step08LoadPatientData(){
 
         Group dataSource = dto.getProviderGroup();
@@ -155,11 +222,32 @@ public abstract class LoaderBase {
     }
 
 
+    /**
+     * Step 06 LoadExternalURLs
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder methods as required
+     */
     abstract void step09LoadExternalURLs();
 
-    abstract void step10BLoadBreastMarkers();
 
 
+    /**
+     * Step 10 LoadBreastMarkers
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder methods as required
+     */
+    abstract void step10LoadBreastMarkers();
+
+
+    /**
+     * Step 11 CreateModels
+     *
+     * Has Common Implementations: So they are fully implemented in the base class
+     * Concrete classes automatically inherits these implementations or can override implemented methods
+     * Concrete classes can also override and as well "call back to" these base class methods using super.step11CreateModels() at once
+     */
     void step11CreateModels() throws Exception {
 
         ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls());
@@ -167,18 +255,44 @@ public abstract class LoaderBase {
 
     }
 
+    /**
+     * Step 12 LoadSpecimens
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder methods as required
+     */
     abstract void step12LoadSpecimens() throws Exception;
 
+
+    /**
+     * Step 13 LoadCurrentTreatment
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder methods as required
+     */
     abstract void step13LoadCurrentTreatment() throws Exception;
 
+    /**
+     * Step 14 LoadImmunoHistoChemistry
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder methods as required
+     */
     abstract void step14LoadImmunoHistoChemistry();
 
+    /**
+     * Step 15 LoadVariationData
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder methods as required
+     */
     abstract void step15LoadVariationData();
 
 
+
     /*****************************************************************************************************
-     *     SINGLE FILE DATA TEMPLATE METHOD         *
-     **********************************************/
+     *     SKELETON OF LOADING ALGORITHM STANDARDIZED IN A TEMPLATE METHOD        *
+     *******************************************************************************/
 
     public final void loaderTemplate() throws Exception {
 
@@ -205,7 +319,7 @@ public abstract class LoaderBase {
 
             step09LoadExternalURLs();
 
-            step10BLoadBreastMarkers();
+            step10LoadBreastMarkers();
 
             step11CreateModels();
 

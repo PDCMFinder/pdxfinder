@@ -167,7 +167,7 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
     }
 
     @Override
-    protected void step10BLoadBreastMarkers() {
+    protected void step10LoadBreastMarkers() {
 
     }
 

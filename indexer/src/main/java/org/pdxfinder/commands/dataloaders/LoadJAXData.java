@@ -215,7 +215,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step10BLoadBreastMarkers() {
+    protected void step10LoadBreastMarkers() {
 
 
         //create breast cancer markers manually if they are present
