@@ -11,17 +11,11 @@ public class LogEntity {
     private String dataSource;
     private String model;
 
-    private LogEntityType type;
-
-    private String message;
-
-
-    public LogEntity(String reporter, String dataSource, String model, LogEntityType type, String message) {
+    public LogEntity(String reporter, String dataSource, String model) {
         this.reporter = reporter;
         this.dataSource = dataSource;
         this.model = model;
-        this.type = type;
-        this.message = message;
+
     }
 
     @Override
@@ -30,8 +24,6 @@ public class LogEntity {
                 "reporter='" + reporter + '\'' +
                 ", dataSource='" + dataSource + '\'' +
                 ", model='" + model + '\'' +
-                ", type=" + type.getName() +
-                ", message='" + message + '\'' +
                 '}';
     }
 
@@ -44,9 +36,7 @@ public class LogEntity {
 
         if (!reporter.equals(logEntity.reporter)) return false;
         if (!dataSource.equals(logEntity.dataSource)) return false;
-        if (!model.equals(logEntity.model)) return false;
-        if (type != logEntity.type) return false;
-        return message.equals(logEntity.message);
+        return model.equals(logEntity.model);
     }
 
     @Override
@@ -54,8 +44,6 @@ public class LogEntity {
         int result = reporter.hashCode();
         result = 31 * result + dataSource.hashCode();
         result = 31 * result + model.hashCode();
-        result = 31 * result + type.hashCode();
-        result = 31 * result + message.hashCode();
         return result;
     }
 
@@ -83,20 +71,6 @@ public class LogEntity {
         this.model = model;
     }
 
-    public LogEntityType getType() {
-        return type;
-    }
 
-    public void setType(LogEntityType type) {
-        this.type = type;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 
 }

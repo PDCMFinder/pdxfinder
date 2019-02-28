@@ -17,6 +17,7 @@ import org.pdxfinder.services.dto.LoaderDTO;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.pdxfinder.services.reporting.LogEntity;
 import org.pdxfinder.services.reporting.LogEntityType;
+import org.pdxfinder.services.reporting.MarkerLogEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1317,14 +1318,14 @@ public class DataImportService {
         else if(markersByPrevSymbol.containsKey(symbol)){
 
             m = markersByPrevSymbol.get(symbol);
-            le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a previous symbol, using the approved one: "+m.getSymbol());
+            le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, m.getSymbol(),"Previous symbol");
             nsdto.setLogEntity(le);
             ready = true;
         }
         else if(markersBySynonym.containsKey(symbol)){
 
             m = markersBySynonym.get(symbol);
-            le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a synonym, using approved symbol: "+m.getSymbol());
+            le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, m.getSymbol(),"Synonym");
             nsdto.setLogEntity(le);
             ready = true;
         }
@@ -1349,14 +1350,14 @@ public class DataImportService {
                 if(markerSuggestionList.size() == 1){
                     //symbol found in prev symbols
                     m = markerSuggestionList.get(0);
-                    le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a previous symbol, using the approved one: "+m.getSymbol());
+                    le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, m.getSymbol(),"Previous symbol");
                     nsdto.setNode(m);
                     nsdto.setLogEntity(le);
                     markersByPrevSymbol.put(symbol, m);
                 }
                 else{
 
-                    le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, "ERROR: "+ symbol +" is a previous symbol of multiple nodes, skipping");
+                    le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, "","ERROR: Previous symbol for multiple terms");
                     nsdto.setNode(null);
                     nsdto.setLogEntity(le);
                 }
@@ -1372,14 +1373,14 @@ public class DataImportService {
 
                         //symbol found in synonym
                         m = markerSuggestionList.get(0);
-                        le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, symbol +" is a synonym, using approved symbol: "+m.getSymbol());
+                        le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, m.getSymbol(),"Synonym");
 
                         nsdto.setNode(m);
                         nsdto.setLogEntity(le);
                         markersBySynonym.put(symbol, m);
                     }
                     else{
-                        le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, "ERROR: "+symbol +" is a synonym for multiple nodes, skipping");
+                        le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, m.getSymbol(),"ERROR: Synonym for multiple terms");
                         nsdto.setNode(null);
                         nsdto.setLogEntity(le);
                     }
@@ -1388,7 +1389,7 @@ public class DataImportService {
                 else{
 
                     //error, didn't find the symbol anywhere
-                    le = new LogEntity(reporter,dataSource, modelId, LogEntityType.marker, "ERROR: "+symbol +" is an unrecognised symbol, skipping");
+                    le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, m.getSymbol(),"ERROR: "+symbol +" is an unrecognised symbol, skipping");
                     nsdto.setLogEntity(le);
                 }
             }
