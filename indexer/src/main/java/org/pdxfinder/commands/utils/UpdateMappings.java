@@ -3,7 +3,7 @@ package org.pdxfinder.commands.utils;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.pdxfinder.admin.pojos.MappingContainer;
-import org.pdxfinder.admin.pojos.MappingEntity;
+import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.repositories.SampleRepository;
 import org.pdxfinder.services.DataImportService;

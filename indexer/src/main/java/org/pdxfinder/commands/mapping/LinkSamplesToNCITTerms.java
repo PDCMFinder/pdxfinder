@@ -5,7 +5,7 @@ import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.admin.pojos.MappingEntity;
+import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.dao.SampleToOntologyRelationShip;

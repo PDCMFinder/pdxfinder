@@ -1,5 +1,6 @@
-package org.pdxfinder.admin.pojos;
+package org.pdxfinder.rdbms.dao;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,11 +9,14 @@ import java.util.Map;
 /*
  * Created by csaba on 18/06/2018.
  */
+@Entity
 public class MappingEntity {
 
     /**
      * A Long number identifying the entity. This id is used for referring the entity.
      */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long entityId;
 
     /**
@@ -26,6 +30,9 @@ public class MappingEntity {
      * IE: ["diagnosis", "source", "primaryTissue", "tumorType"]
      * The elements of this list is used as headers when listing the mapping entities as well as keys to the mappingValues
      */
+    @ElementCollection
+    @CollectionTable(name="mapping_labels", joinColumns = @JoinColumn(name = "mapping_entity_id"))
+    @Column(name="mapping_labels")
     private List<String> mappingLabels;
 
 
@@ -33,6 +40,9 @@ public class MappingEntity {
      * The corresponding values for the mapping labels
      * IE: ["diagnosis"=>"Carcinoma", "source"=>"JAX"]
      */
+    @ElementCollection
+    @CollectionTable(name="mapping_values", joinColumns = @JoinColumn(name = "mapping_entity_id"))
+    @Column(name="mapping_values")
     private Map<String, String> mappingValues;
 
 
@@ -72,6 +82,9 @@ public class MappingEntity {
     /**
      * A list of entities that are similar to the current entity. This list is empty if the entity's mappedTermLabel is not null.
      */
+    @ElementCollection
+    @CollectionTable(name="mapping_suggest", joinColumns = @JoinColumn(name = "mapping_entity_id"))
+    @Column(name="mapping_values")
     private List<MappingEntity> suggestedMappings;
 
 
@@ -90,8 +103,8 @@ public class MappingEntity {
     public MappingEntity() {
     }
 
-    public MappingEntity(Long entityId, String entityType, List<String> mappingLabels, Map<String, String> mappingValues) {
-        this.entityId = entityId;
+    public MappingEntity(String entityType, List<String> mappingLabels, Map<String, String> mappingValues) {
+
         this.entityType = entityType;
         this.mappingLabels = mappingLabels;
         this.mappingValues = mappingValues;
@@ -104,11 +117,10 @@ public class MappingEntity {
 
     }
 
-    public MappingEntity(Long entityId, String entityType, List<String> mappingLabels, Map<String, String> mappingValues,
+    public MappingEntity(String entityType, List<String> mappingLabels, Map<String, String> mappingValues,
                          String mappedTermLabel, String status, List<MappingEntity> suggestedMappings, Date dateCreated,
                          Date dateUpdated) {
 
-        this.entityId = entityId;
         this.entityType = entityType;
         this.mappingLabels = mappingLabels;
         this.mappingValues = mappingValues;

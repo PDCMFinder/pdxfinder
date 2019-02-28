@@ -1,21 +1,19 @@
 package org.pdxfinder.admin.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.pdxfinder.admin.pojos.MappingEntity;
+import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.admin.zooma.ZoomaEntity;
 import org.pdxfinder.services.MappingService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 
 /*

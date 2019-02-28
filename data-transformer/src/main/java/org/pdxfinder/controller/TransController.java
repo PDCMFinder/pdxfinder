@@ -1,21 +1,16 @@
 package org.pdxfinder.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.neo4j.cypher.internal.frontend.v2_3.ast.functions.Str;
-import org.pdxfinder.admin.zooma.ZoomaEntity;
+import org.pdxfinder.rdbms.dao.MappingEntity;
+import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.transcommands.DataTransformerService;
 import org.pdxfinder.transdatamodel.PdmrPdxInfo;
 import org.pdxfinder.transdatamodel.PdxInfo;
-import org.pdxfinder.transdatamodel.Treatment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.*;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +30,8 @@ public class TransController {
     private DataTransformerService dataTransformerService;
     @Autowired
     private UtilityService utilityService;
+    @Autowired
+    private MappingEntityRepository mappingEntityRepository;
 
 
 
@@ -80,6 +77,47 @@ public class TransController {
         return mappingList;
 
     }
+
+    /*
+    Test Saving Mapping Entity in H2 Database
+
+    @GetMapping("/mapping")
+    public List<MappingEntity> saveMapping(){
+
+        ArrayList<String> mappingLabels = new ArrayList<>();
+        mappingLabels.add("DataSource");
+        mappingLabels.add("SampleDiagnosis");
+        mappingLabels.add("OriginTissue");
+        mappingLabels.add("TumorType");
+
+        Map mappingValues = new HashMap();
+        mappingValues.put("OriginTissue","blood");
+        mappingValues.put("TumorType","primary");
+        mappingValues.put("SampleDiagnosis","acute myeloid leukemia");
+        mappingValues.put("DataSource","jax");
+
+        MappingEntity mappingEntity = new MappingEntity("DIAGNOSIS", mappingLabels, mappingValues);
+
+        mappingEntity.setMappedTermLabel("Acute Myeloid Leukemia");
+        mappingEntity.setStatus("Created");
+        mappingEntity.setDateCreated(new Date());
+        mappingEntity.setMappedTermUrl("http://purl.obolibrary.org/obo/NCIT_C3171");
+        mappingEntity.setMapType("direct");
+        mappingEntity.setJustification("0");
+
+        mappingEntityRepository.save(mappingEntity);
+
+        return mappingEntityRepository.findAll();
+
+    }
+
+
+    @GetMapping("/get-mapping")
+    public List<MappingEntity> getMapping(){
+
+        return mappingEntityRepository.findAll();
+
+    }*/
 
 
 

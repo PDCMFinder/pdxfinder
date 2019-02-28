@@ -8,7 +8,7 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.admin.pojos.MappingContainer;
-import org.pdxfinder.admin.pojos.MappingEntity;
+import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.admin.zooma.*;
 import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.repositories.SampleRepository;
@@ -20,14 +20,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /*
  * Created by csaba on 09/07/2018.
@@ -133,7 +127,7 @@ public class MappingService {
                     mappingValues.put("OriginTissue", originTissue);
                     mappingValues.put("TumorType", tumorType);
 
-                    MappingEntity me = new MappingEntity(new Long(i+1), "DIAGNOSIS", getDiagnosisMappingLabels(), mappingValues);
+                    MappingEntity me = new MappingEntity("DIAGNOSIS", getDiagnosisMappingLabels(), mappingValues);
                     me.setMappedTermLabel(ontologyTerm);
                     me.setMapType(mapType);
                     me.setJustification(justification);
@@ -242,7 +236,7 @@ public class MappingService {
                 mappingValues.put("OriginTissue", originTissue);
                 mappingValues.put("TumorType", tumorType);
 
-                MappingEntity me = new MappingEntity(mc.getNextAvailableId(), "DIAGNOSIS", getDiagnosisMappingLabels(), mappingValues);
+                MappingEntity me = new MappingEntity( "DIAGNOSIS", getDiagnosisMappingLabels(), mappingValues);
 
                 //get suggestions for missing mapping
                 me.setSuggestedMappings(getSuggestionsForUnmappedEntity(me, getSavedDiagnosisMappings(null)));

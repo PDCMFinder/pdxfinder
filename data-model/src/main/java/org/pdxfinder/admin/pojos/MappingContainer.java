@@ -1,5 +1,7 @@
 package org.pdxfinder.admin.pojos;
 
+import org.pdxfinder.rdbms.dao.MappingEntity;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -310,8 +310,6 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step15LoadVariationData() {
 
-        log.info(" ********************  ******************** Loading VARIATION data. ********************  ******************** ");
-
         String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
         String platformName = "TargetedNGS_MUT";
         String molcharType = "mutation";
