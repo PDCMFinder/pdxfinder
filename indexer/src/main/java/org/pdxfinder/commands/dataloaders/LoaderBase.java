@@ -223,7 +223,7 @@ public abstract class LoaderBase {
 
 
     /**
-     * Step 06 LoadExternalURLs
+     * Step 09 LoadExternalURLs
      *
      * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
      * Concrete / Derived classes MUST override these placeholder methods as required
