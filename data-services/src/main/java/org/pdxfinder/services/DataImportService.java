@@ -1394,7 +1394,7 @@ public class DataImportService {
 
                     //error, didn't find the symbol anywhere
                     le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, "","");
-                    le.setMessage("ERROR: "+symbol +" is an unrecognised symbol, skipping");
+                    le.setMessage(symbol +" is an unrecognised symbol, skipping");
                     le.setType("ERROR");
                     nsdto.setLogEntity(le);
                 }
