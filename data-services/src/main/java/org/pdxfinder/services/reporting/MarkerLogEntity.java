@@ -38,13 +38,17 @@ public class MarkerLogEntity extends LogEntity{
         return result;
     }
 
-
     @Override
     public String toString() {
         return "MarkerLogEntity{" +
+                "type='" + super.getType() + '\'' +
+                ", reporter='" + super.getReporter() + '\'' +
+                ", dataSource='" + super.getDataSource() + '\'' +
+                ", model='" + super.getModel() + '\'' +
                 "usedMarkerSymbol='" + usedMarkerSymbol + '\'' +
                 ", suggestedMarkerSymbol='" + suggestedMarkerSymbol + '\'' +
                 ", reasonForChange='" + reasonForChange + '\'' +
+                ", message='" + super.getMessage() + '\'' +
                 '}';
     }
 }

@@ -1357,7 +1357,9 @@ public class DataImportService {
                 }
                 else{
 
-                    le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, "","ERROR: Previous symbol for multiple terms");
+                    le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, "","");
+                    le.setMessage("Previous symbol for multiple terms");
+                    le.setType("ERROR");
                     nsdto.setNode(null);
                     nsdto.setLogEntity(le);
                 }
@@ -1380,7 +1382,9 @@ public class DataImportService {
                         markersBySynonym.put(symbol, m);
                     }
                     else{
-                        le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, m.getSymbol(),"ERROR: Synonym for multiple terms");
+                        le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, "","");
+                        le.setMessage("Synonym for multiple terms");
+                        le.setType("ERROR");
                         nsdto.setNode(null);
                         nsdto.setLogEntity(le);
                     }
@@ -1389,7 +1393,9 @@ public class DataImportService {
                 else{
 
                     //error, didn't find the symbol anywhere
-                    le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, m.getSymbol(),"ERROR: "+symbol +" is an unrecognised symbol, skipping");
+                    le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, "","");
+                    le.setMessage("ERROR: "+symbol +" is an unrecognised symbol, skipping");
+                    le.setType("ERROR");
                     nsdto.setLogEntity(le);
                 }
             }
