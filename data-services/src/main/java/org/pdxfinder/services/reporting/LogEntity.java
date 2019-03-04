@@ -11,17 +11,26 @@ public class LogEntity {
     private String dataSource;
     private String model;
 
+    //EG: INFO, ERROR, etc
+    private String type;
+
+    //Additional message;
+    private String message;
+
     public LogEntity(String reporter, String dataSource, String model) {
         this.reporter = reporter;
         this.dataSource = dataSource;
         this.model = model;
+        this.type = "INFO";
+        this.message = "";
 
     }
 
     @Override
     public String toString() {
         return "{" +
-                "reporter='" + reporter + '\'' +
+                "type='" + type + '\'' +
+                ", reporter='" + reporter + '\'' +
                 ", dataSource='" + dataSource + '\'' +
                 ", model='" + model + '\'' +
                 '}';
@@ -71,6 +80,19 @@ public class LogEntity {
         this.model = model;
     }
 
+    public String getType() {
+        return type;
+    }
 
+    public void setType(String type) {
+        this.type = type;
+    }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }
