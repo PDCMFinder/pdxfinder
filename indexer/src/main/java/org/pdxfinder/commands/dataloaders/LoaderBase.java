@@ -3,6 +3,7 @@ package org.pdxfinder.commands.dataloaders;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Harmonizer;
@@ -10,7 +11,10 @@ import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,7 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public abstract class LoaderBase {
+public abstract class LoaderBase implements ApplicationContextAware{
 
     private final static Logger log = LoggerFactory.getLogger(LoaderBase.class);
     String jsonFile;
@@ -38,6 +42,9 @@ public abstract class LoaderBase {
 
     LoaderDTO dto = new LoaderDTO();
 
+    static ApplicationContext context;
+    ReportManager reportManager;
+
     @Autowired
     private UtilityService utilityService;
     @Autowired
@@ -51,15 +58,22 @@ public abstract class LoaderBase {
      */
     abstract void initMethod();
 
+    /**
+     * Initializes the report manager for the loader
+     */
+    void step00StartReportManager(){
+
+        reportManager = (ReportManager) context.getBean("ReportManager");
+    }
+
 
     /**
-     * Step 00 GetMetaDataFolder
      *
      * This has Common Implementations: So it is fully implemented in the base class
      * Concrete classes automatically inherits the default implementation or override it
-     * Concrete classes can also override and "call back to" this base class method at once using super.step00GetMetaDataFolder()
+     * Concrete classes can also override and "call back to" this base class method at once using super.step01GetMetaDataFolder()
      */
-    void step00GetMetaDataFolder(){
+    void step01GetMetaDataFolder(){
 
         listOfFiles = new File[0];
         File folder = new File(filesDirectory);
@@ -76,13 +90,12 @@ public abstract class LoaderBase {
 
 
     /**
-     * Step 01 GetMetaDataJSON
      *
      * This has Common Implementations: So it is fully implemented in the base class
      * Concrete classes automatically inherits the default implementation or override it
-     * Concrete classes can also override and "call back to" this base class method at once using super.step01GetMetaDataJSON()
+     * Concrete classes can also override and "call back to" this base class method at once using super.step02GetMetaDataJSON()
      */
-    void step01GetMetaDataJSON(){
+    void step02GetMetaDataJSON(){
 
         File file = new File(jsonFile);
 
@@ -97,58 +110,52 @@ public abstract class LoaderBase {
 
 
     /**
-     * Step 02 CreateProviderGroup
      *
      * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
      * Concrete / Derived classes MUST override these placeholder method as required
      */
-    abstract void step02CreateProviderGroup();
+    abstract void step03CreateProviderGroup();
 
 
     /**
-     * Step 03 CreateNSGammaHostStrain
      *
      * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
      * Concrete / Derived classes MUST override these placeholder method as required
      */
-    abstract void step03CreateNSGammaHostStrain();
+    abstract void step04CreateNSGammaHostStrain();
 
 
     /**
-     * Step 04 CreateNSHostStrain
      *
      * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
      * Concrete / Derived classes MUST override these placeholder method as required
      */
-    abstract void step04CreateNSHostStrain();
+    abstract void step05CreateNSHostStrain();
 
 
     /**
-     * Step 05 CreateProjectGroup
      *
      * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
      * Concrete / Derived classes MUST override these placeholder method as required
      */
-    abstract void step05CreateProjectGroup();
+    abstract void step06CreateProjectGroup();
 
 
     /**
-     * Step 06 GetPDXModels
      *
      * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
      * Concrete / Derived classes MUST override these placeholder method as required
      */
-    abstract void step06GetPDXModels();
+    abstract void step07GetPDXModels();
 
 
     /**
-     * Step 07 GetMetaData
      *
      * Has Common Implementations: So they are fully implemented in the base class
      * Concrete classes automatically inherits these implementations or can override implemented methods
-     * Concrete classes can also override and as well "call back to" these base class methods using super.step07GetMetaData() at once
+     * Concrete classes can also override and as well "call back to" these base class methods using super.step08GetMetaData() at once
      */
-    void step07GetMetaData() throws Exception {
+    void step08GetMetaData() throws Exception {
 
         JSONObject data = this.jsonData;
         String ds = dataSourceAbbreviation;
@@ -192,13 +199,12 @@ public abstract class LoaderBase {
 
 
     /**
-     * Step 08 LoadPatientData
      *
      * Has Common Implementations: So they are fully implemented in the base class
      * Concrete classes automatically inherits these implementations or can override implemented methods
-     * Concrete classes can also override and as well "call back to" this base class method using super.step08LoadPatientData() at once
+     * Concrete classes can also override and as well "call back to" this base class method using super.step09LoadPatientData() at once
      */
-    void step08LoadPatientData(){
+    void step09LoadPatientData(){
 
         Group dataSource = dto.getProviderGroup();
         Patient patient = dataImportService.getPatientWithSnapshots(dto.getPatientId(), dataSource);
@@ -223,32 +229,29 @@ public abstract class LoaderBase {
 
 
     /**
-     * Step 06 LoadExternalURLs
      *
      * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
      * Concrete / Derived classes MUST override these placeholder methods as required
      */
-    abstract void step09LoadExternalURLs();
+    abstract void step10LoadExternalURLs();
 
 
 
     /**
-     * Step 10 LoadBreastMarkers
      *
      * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
      * Concrete / Derived classes MUST override these placeholder methods as required
      */
-    abstract void step10LoadBreastMarkers();
+    abstract void step11LoadBreastMarkers();
 
 
     /**
-     * Step 11 CreateModels
      *
      * Has Common Implementations: So they are fully implemented in the base class
      * Concrete classes automatically inherits these implementations or can override implemented methods
-     * Concrete classes can also override and as well "call back to" these base class methods using super.step11CreateModels() at once
+     * Concrete classes can also override and as well "call back to" these base class methods using super.step12CreateModels() at once
      */
-    void step11CreateModels() throws Exception {
+    void step12CreateModels() throws Exception {
 
         ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls());
         dto.setModelCreation(modelCreation);
@@ -256,37 +259,33 @@ public abstract class LoaderBase {
     }
 
     /**
-     * Step 12 LoadSpecimens
      *
      * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
      * Concrete / Derived classes MUST override these placeholder methods as required
      */
-    abstract void step12LoadSpecimens() throws Exception;
+    abstract void step13LoadSpecimens() throws Exception;
 
 
     /**
-     * Step 13 LoadCurrentTreatment
      *
      * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
      * Concrete / Derived classes MUST override these placeholder methods as required
      */
-    abstract void step13LoadCurrentTreatment() throws Exception;
+    abstract void step14LoadCurrentTreatment() throws Exception;
 
     /**
-     * Step 14 LoadImmunoHistoChemistry
      *
      * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
      * Concrete / Derived classes MUST override these placeholder methods as required
      */
-    abstract void step14LoadImmunoHistoChemistry();
+    abstract void step15LoadImmunoHistoChemistry();
 
     /**
-     * Step 15 LoadVariationData
      *
      * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
      * Concrete / Derived classes MUST override these placeholder methods as required
      */
-    abstract void step15LoadVariationData();
+    abstract void step16LoadVariationData();
 
 
 
@@ -296,41 +295,45 @@ public abstract class LoaderBase {
 
     public final void loaderTemplate() throws Exception {
 
-        step01GetMetaDataJSON();
+        step00StartReportManager();
 
-        step02CreateProviderGroup();
+        step00StartReportManager();
 
-        step03CreateNSGammaHostStrain();
+        step02GetMetaDataJSON();
 
-        step04CreateNSHostStrain();
+        step03CreateProviderGroup();
 
-        step05CreateProjectGroup();
+        step04CreateNSGammaHostStrain();
 
-        step06GetPDXModels();
+        step05CreateNSHostStrain();
+
+        step06CreateProjectGroup();
+
+        step07GetPDXModels();
 
 
         for (int i = 0; i < jsonArray.length(); i++) {
 
             this.jsonData = jsonArray.getJSONObject(i);
 
-            step07GetMetaData();
+            step08GetMetaData();
 
-            step08LoadPatientData();
+            step09LoadPatientData();
 
-            step09LoadExternalURLs();
+            step10LoadExternalURLs();
 
-            step10LoadBreastMarkers();
+            step11LoadBreastMarkers();
 
-            step11CreateModels();
+            step12CreateModels();
 
-            step12LoadSpecimens();
+            step13LoadSpecimens();
 
-            step13LoadCurrentTreatment();
+            step14LoadCurrentTreatment();
 
         }
-        step14LoadImmunoHistoChemistry();
+        step15LoadImmunoHistoChemistry();
 
-        step15LoadVariationData();
+        step16LoadVariationData();
     }
 
 
@@ -536,6 +539,8 @@ public abstract class LoaderBase {
 
     }
 
-
-
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        context = applicationContext;
+    }
 }

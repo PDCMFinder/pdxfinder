@@ -114,17 +114,19 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
     public void irccAlgorithm() throws Exception {
 
-        step01GetMetaDataJSON();
+        step00StartReportManager();
 
-        step02CreateProviderGroup();
+        step02GetMetaDataJSON();
 
-        step03CreateNSGammaHostStrain();
+        step03CreateProviderGroup();
 
-        step04CreateNSHostStrain();
+        step04CreateNSGammaHostStrain();
 
-        step05CreateProjectGroup();
+        step05CreateNSHostStrain();
 
-        step06GetPDXModels();
+        step06CreateProjectGroup();
+
+        step07GetPDXModels();
 
 
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -134,25 +136,25 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
             if (loadedModelHashes.contains(jsonData.toString().hashCode())) continue;
             loadedModelHashes.add(jsonData.toString().hashCode());
 
-            step07GetMetaData();
+            step08GetMetaData();
 
-            step08LoadPatientData();
+            step09LoadPatientData();
 
-            step09LoadExternalURLs();
+            step10LoadExternalURLs();
 
-            step10LoadBreastMarkers();
+            step11LoadBreastMarkers();
 
-            step11CreateModels();
+            step12CreateModels();
 
-            step12LoadSpecimens();
+            step13LoadSpecimens();
 
-            step13LoadCurrentTreatment();
+            step14LoadCurrentTreatment();
 
         }
 
-        step14LoadImmunoHistoChemistry();
+        step15LoadImmunoHistoChemistry();
 
-        step15LoadVariationData();
+        step16LoadVariationData();
     }
 
 
@@ -169,46 +171,47 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
         dosingStudyURL = DOSING_STUDY_URL;
     }
 
+
     @Override
-    protected void step00GetMetaDataFolder() { }
+    protected void step01GetMetaDataFolder() { }
 
 
     @Override
-    protected void step02CreateProviderGroup() {
+    protected void step03CreateProviderGroup() {
 
         loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, "transnational access", DATASOURCE_CONTACT, SOURCE_URL);
     }
 
     @Override
-    protected void step03CreateNSGammaHostStrain() {
+    protected void step04CreateNSGammaHostStrain() {
 
         loadNSGammaHostStrain(NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
     }
 
     @Override
-    protected void step04CreateNSHostStrain() { }
+    protected void step05CreateNSHostStrain() { }
 
 
     @Override
-    protected void step05CreateProjectGroup() {
+    protected void step06CreateProjectGroup() {
 
         loadProjectGroup("EurOPDX");
     }
 
 
     @Override
-    protected void step06GetPDXModels() {
+    protected void step07GetPDXModels() {
 
         loadPDXModels(metaDataJSON,"IRCC");
     }
 
 
 
-    // IRCC uses default implementation of Steps step07GetMetaData, step08LoadPatientData
+    // IRCC uses default implementation of Steps step08GetMetaData, step09LoadPatientData
 
 
     @Override
-    protected void step09LoadExternalURLs() {
+    protected void step10LoadExternalURLs() {
 
         loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
 
@@ -218,7 +221,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step10LoadBreastMarkers() {
+    protected void step11LoadBreastMarkers() {
 
     }
 
@@ -227,7 +230,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step12LoadSpecimens()throws Exception {
+    protected void step13LoadSpecimens()throws Exception {
 
         dto.getModelCreation().addGroup(dto.getProjectGroup());
 
@@ -265,7 +268,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step13LoadCurrentTreatment() {
+    protected void step14LoadCurrentTreatment() {
 
         TreatmentSummary ts;
         try {
@@ -302,13 +305,13 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step14LoadImmunoHistoChemistry() {
+    protected void step15LoadImmunoHistoChemistry() {
 
     }
 
 
     @Override
-    protected void step15LoadVariationData() {
+    protected void step16LoadVariationData() {
 
         String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
         String platformName = "TargetedNGS_MUT";

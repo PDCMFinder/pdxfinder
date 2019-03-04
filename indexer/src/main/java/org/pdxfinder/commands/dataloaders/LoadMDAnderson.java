@@ -97,7 +97,9 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
     public void mdAndersonAlgorithm() throws Exception {
 
-        step00GetMetaDataFolder();
+        step00StartReportManager();
+
+        step01GetMetaDataFolder();
 
         for (int i = 0; i < listOfFiles.length; i++) {
 
@@ -126,43 +128,43 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
         dataSourceContact = DATASOURCE_CONTACT;
     }
 
-    // MD ANDERSON uses default implementation Steps step00GetMetaDataFolder, step01GetMetaDataJSON
+    // MD ANDERSON uses default implementation Steps step01GetMetaDataFolder, step02GetMetaDataJSON
 
     @Override
-    protected void step02CreateProviderGroup() {
+    protected void step03CreateProviderGroup() {
 
         loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
     }
 
     @Override
-    protected void step03CreateNSGammaHostStrain() {
+    protected void step04CreateNSGammaHostStrain() {
 
     }
 
     @Override
-    protected void step04CreateNSHostStrain() {
+    protected void step05CreateNSHostStrain() {
 
     }
 
     @Override
-    protected void step05CreateProjectGroup() {
+    protected void step06CreateProjectGroup() {
 
         loadProjectGroup("PDXNet");
     }
 
 
     @Override
-    protected void step06GetPDXModels() {
+    protected void step07GetPDXModels() {
 
         loadPDXModels(metaDataJSON,"MDA");
     }
 
 
-    // MD ANDERSON uses default implementation Steps step07GetMetaData, step08LoadPatientData
+    // MD ANDERSON uses default implementation Steps step08GetMetaData, step09LoadPatientData
 
 
     @Override
-    protected void step09LoadExternalURLs() {
+    protected void step10LoadExternalURLs() {
 
         loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
 
@@ -170,7 +172,7 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step10LoadBreastMarkers() {
+    protected void step11LoadBreastMarkers() {
 
     }
 
@@ -179,7 +181,7 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step12LoadSpecimens()throws Exception {
+    protected void step13LoadSpecimens()throws Exception {
 
         loadSpecimens("mdAnderson");
 
@@ -187,19 +189,19 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step13LoadCurrentTreatment() {
+    protected void step14LoadCurrentTreatment() {
 
     }
 
 
     @Override
-    protected void step14LoadImmunoHistoChemistry() {
+    protected void step15LoadImmunoHistoChemistry() {
 
     }
 
 
     @Override
-    protected void step15LoadVariationData() {
+    protected void step16LoadVariationData() {
 
     }
 

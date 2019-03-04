@@ -12,7 +12,6 @@ import org.neo4j.ogm.session.Session;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
-import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
@@ -130,53 +128,53 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step00GetMetaDataFolder() {
+    protected void step01GetMetaDataFolder() {
 
     }
 
-    // PDMR uses default implementation Steps step01GetMetaDataJSON
+    // PDMR uses default implementation Steps step02GetMetaDataJSON
 
 
     @Override
-    protected void step02CreateProviderGroup() {
+    protected void step03CreateProviderGroup() {
 
         loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
     }
 
     @Override
-    protected void step03CreateNSGammaHostStrain() {
+    protected void step04CreateNSGammaHostStrain() {
 
         loadNSGammaHostStrain(NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
     }
 
     @Override
-    protected void step04CreateNSHostStrain() { }
+    protected void step05CreateNSHostStrain() { }
 
 
     @Override
-    protected void step05CreateProjectGroup() {
+    protected void step06CreateProjectGroup() {
 
     }
 
 
     @Override
-    protected void step06GetPDXModels() {
+    protected void step07GetPDXModels() {
 
         loadPDXModels(metaDataJSON,"pdxInfo");
     }
 
-    // PDMR uses default implementation Steps step07GetMetaData
+    // PDMR uses default implementation Steps step08GetMetaData
 
     @Override
-    protected void step08LoadPatientData() {
+    protected void step09LoadPatientData() {
 
         if (dataImportService.isExistingModel(dto.getProviderGroup().getAbbreviation(), dto.getModelID())) return;
-        super.step08LoadPatientData();
+        super.step09LoadPatientData();
     }
 
 
     @Override
-    protected void step09LoadExternalURLs() {
+    protected void step10LoadExternalURLs() {
 
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
 
@@ -185,14 +183,14 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step10LoadBreastMarkers() {
+    protected void step11LoadBreastMarkers() {
 
     }
 
 
 
     @Override
-    protected void step11CreateModels() throws Exception {
+    protected void step12CreateModels() throws Exception {
 
         List<QualityAssurance> validationList = new ArrayList<>();
         if(dto.getValidationsArr().length() > 0){
@@ -213,7 +211,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step12LoadSpecimens()throws Exception {
+    protected void step13LoadSpecimens()throws Exception {
 
         //load specimens
         if(dto.getSamplesArr().length() > 0){
@@ -258,7 +256,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step13LoadCurrentTreatment() throws Exception {
+    protected void step14LoadCurrentTreatment() throws Exception {
 
         TreatmentSummary ts;
 
@@ -311,13 +309,13 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step14LoadImmunoHistoChemistry() {
+    protected void step15LoadImmunoHistoChemistry() {
 
     }
 
 
     @Override
-    protected void step15LoadVariationData() {
+    protected void step16LoadVariationData() {
 
     }
 
