@@ -99,7 +99,9 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
     public void wustlAlgorithm() throws Exception {
 
-        step00GetMetaDataFolder();
+        step00StartReportManager();
+
+        step01GetMetaDataFolder();
 
         for (int i = 0; i < listOfFiles.length; i++) {
 
@@ -126,74 +128,74 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
         dataSourceContact = DATASOURCE_CONTACT;
     }
 
-    // WUSTL uses default implementation Steps step00GetMetaDataFolder, step01GetMetaDataJSON
+    // WUSTL uses default implementation Steps step01GetMetaDataFolder, step02GetMetaDataJSON
 
     @Override
-    protected void step02CreateProviderGroup() {
+    protected void step03CreateProviderGroup() {
 
         loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
     }
 
     @Override
-    protected void step03CreateNSGammaHostStrain() {
+    protected void step04CreateNSGammaHostStrain() {
 
     }
 
     @Override
-    protected void step04CreateNSHostStrain() {
+    protected void step05CreateNSHostStrain() {
 
     }
 
     @Override
-    protected void step05CreateProjectGroup() {
+    protected void step06CreateProjectGroup() {
 
         loadProjectGroup("PDXNet");
     }
 
 
     @Override
-    protected void step06GetPDXModels() {
+    protected void step07GetPDXModels() {
 
         loadPDXModels(metaDataJSON,"WUSTL");
     }
 
-    // WUSTL uses default implementation Steps step07GetMetaData, step08LoadPatientData
+    // WUSTL uses default implementation Steps step08GetMetaData, step09LoadPatientData
 
     @Override
-    protected void step09LoadExternalURLs() {
+    protected void step10LoadExternalURLs() {
 
         loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
 
     }
 
     @Override
-    protected void step10LoadBreastMarkers() {
+    protected void step11LoadBreastMarkers() {
 
     }
 
-    // WUSTL uses default implementation Steps step11CreateModels default
+    // WUSTL uses default implementation Steps step12CreateModels default
 
     @Override
-    protected void step12LoadSpecimens()throws Exception {
+    protected void step13LoadSpecimens()throws Exception {
 
         loadSpecimens("wustl");
     }
 
 
     @Override
-    protected void step13LoadCurrentTreatment() {
+    protected void step14LoadCurrentTreatment() {
 
     }
 
 
     @Override
-    protected void step14LoadImmunoHistoChemistry() {
+    protected void step15LoadImmunoHistoChemistry() {
 
     }
 
 
     @Override
-    protected void step15LoadVariationData() {
+    protected void step16LoadVariationData() {
 
     }
 

@@ -8,6 +8,7 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
+import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -104,65 +105,67 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
         dosingStudyURL = DOSING_STUDY_URL;
     }
 
-    @Override
-    protected void step00GetMetaDataFolder() { }
 
 
     @Override
-    protected void step02CreateProviderGroup() {
+    protected void step01GetMetaDataFolder() { }
+
+
+    @Override
+    protected void step03CreateProviderGroup() {
 
         loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
     }
 
 
     @Override
-    protected void step03CreateNSGammaHostStrain() {
+    protected void step04CreateNSGammaHostStrain() {
 
         loadNSGammaHostStrain(NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
     }
 
 
     @Override
-    protected void step04CreateNSHostStrain() {
+    protected void step05CreateNSHostStrain() {
 
         loadNSHostStrain(NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
     }
 
 
     @Override
-    protected void step05CreateProjectGroup() {
+    protected void step06CreateProjectGroup() {
 
         loadProjectGroup("PDXNet");
     }
 
 
     @Override
-    protected void step06GetPDXModels() {
+    protected void step07GetPDXModels() {
 
         loadPDXModels(metaDataJSON,"HCI");
     }
 
 
-    // HCI uses common implementation Steps s step07GetMetaData,step08LoadPatientData default
+    // HCI uses common implementation Steps step08GetMetaData,step09LoadPatientData default
 
 
     @Override
-    protected void step09LoadExternalURLs() {
+    protected void step10LoadExternalURLs() {
 
         loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
     }
 
 
     @Override
-    protected void step10LoadBreastMarkers() {
+    protected void step11LoadBreastMarkers() {
 
     }
 
-    // HCI uses common implementation Steps  step11CreateModels default
+    // HCI uses common implementation Steps  step12CreateModels default
 
 
     @Override
-    protected void step12LoadSpecimens() {
+    protected void step13LoadSpecimens() {
 
         dto.getModelCreation().addRelatedSample(dto.getPatientSample());
         dto.getModelCreation().addGroup(dto.getProjectGroup());
@@ -209,7 +212,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step13LoadCurrentTreatment() {
+    protected void step14LoadCurrentTreatment() {
 
         loadCurrentTreatment();
 
@@ -219,7 +222,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step14LoadImmunoHistoChemistry() {
+    protected void step15LoadImmunoHistoChemistry() {
 
         String ihcFileStr = dataRootDir + DATASOURCE_ABBREVIATION + "/ihc/ihc.txt";
 
@@ -253,38 +256,64 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
                         if (row.length > 0) {
 
                             String modelId = row[0];
-                            String samleId = row[1];
-                            String marker = row[2];
+                            String sampleId = row[1];
+                            String markerSymbol = row[2];
                             String result = row[3];
                             //System.out.println(modelId);
 
-                            if (modelId.isEmpty() || samleId.isEmpty() || marker.isEmpty() || result.isEmpty())
+                            if (modelId.isEmpty() || sampleId.isEmpty() || markerSymbol.isEmpty() || result.isEmpty())
                                 continue;
 
-                            if (molCharMap.containsKey(modelId + "---" + samleId)) {
-
-                                MolecularCharacterization mc = molCharMap.get(modelId + "---" + samleId);
-                                Marker m = dataImportService.getMarker(marker);
-
-                                MarkerAssociation ma = new MarkerAssociation();
-                                ma.setImmunoHistoChemistryResult(result);
-                                ma.setMarker(m);
-                                mc.addMarkerAssociation(ma);
-                            } else {
-
-                                MolecularCharacterization mc = new MolecularCharacterization();
-                                mc.setType("IHC");
-                                mc.setPlatform(pl);
+                            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSource, modelId, markerSymbol);
+                            Marker marker = null;
 
 
-                                Marker m = dataImportService.getMarker(marker);
-                                MarkerAssociation ma = new MarkerAssociation();
-                                ma.setImmunoHistoChemistryResult(result);
-                                ma.setMarker(m);
-                                mc.addMarkerAssociation(ma);
+                            if(nsdto.getNode() == null){
 
-                                molCharMap.put(modelId + "---" + samleId, mc);
+                                //uh oh, we found an unrecognised marker symbol, abort, abort!!!!
+                                reportManager.addMessage(nsdto.getLogEntity());
+                                continue;
                             }
+                            else{
+
+                                //we have a marker node, check message
+
+                                marker = (Marker)nsdto.getNode();
+
+                                if(nsdto.getLogEntity() != null){
+                                    reportManager.addMessage(nsdto.getLogEntity());
+                                }
+
+
+                                if (molCharMap.containsKey(modelId + "---" + sampleId)) {
+
+                                    MolecularCharacterization mc = molCharMap.get(modelId + "---" + sampleId);
+
+
+                                    MarkerAssociation ma = new MarkerAssociation();
+                                    ma.setImmunoHistoChemistryResult(result);
+                                    ma.setMarker(marker);
+                                    mc.addMarkerAssociation(ma);
+                                }
+                                else {
+
+                                    MolecularCharacterization mc = new MolecularCharacterization();
+                                    mc.setType("IHC");
+                                    mc.setPlatform(pl);
+
+                                    MarkerAssociation ma = new MarkerAssociation();
+                                    ma.setImmunoHistoChemistryResult(result);
+                                    ma.setMarker(marker);
+                                    mc.addMarkerAssociation(ma);
+
+                                    molCharMap.put(modelId + "---" + sampleId, mc);
+                                }
+
+
+
+                            }
+
+
 
                         }
 
@@ -329,7 +358,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step15LoadVariationData() { }
+    protected void step16LoadVariationData() { }
 
 
 

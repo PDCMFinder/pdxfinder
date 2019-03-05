@@ -714,7 +714,7 @@ public class SearchDS {
 
             mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<Long>>>>>(){});
 
-            log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
+            //log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
 
         }
         catch(Exception e){

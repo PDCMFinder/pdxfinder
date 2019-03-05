@@ -746,11 +746,11 @@ public class CreateDataProjections implements CommandLineRunner{
             mfqDP.setLabel("ModelForQuery");
         }
 
-        log.info("MFQ value toString:"+modelForQueryDP.toString());
+        //log.info("MFQ value toString:"+modelForQueryDP.toString());
         Gson gson = new Gson();
         String jsonMfqDP = gson.toJson(this.modelForQueryDP);
         mfqDP.setValue(jsonMfqDP);
-        log.info("MFQ value:"+jsonMfqDP);
+        //log.info("MFQ value:"+jsonMfqDP);
         dataImportService.saveDataProjection(mfqDP);
 
 

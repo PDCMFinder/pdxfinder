@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -129,19 +128,20 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     }
 
 
+
     @Override
-    protected void step00GetMetaDataFolder() {
+    protected void step01GetMetaDataFolder() {
 
     }
 
 
 
-    // JAX uses default implementation Steps step01GetMetaDataJSON
+    // JAX uses default implementation Steps step02GetMetaDataJSON
 
 
 
     @Override
-    protected void step02CreateProviderGroup() {
+    protected void step03CreateProviderGroup() {
 
         loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
     }
@@ -149,38 +149,38 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step03CreateNSGammaHostStrain() {
+    protected void step04CreateNSGammaHostStrain() {
 
         loadNSGammaHostStrain(NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
     }
 
 
     @Override
-    protected void step04CreateNSHostStrain() {
+    protected void step05CreateNSHostStrain() {
 
     }
 
 
     @Override
-    protected void step05CreateProjectGroup() {
+    protected void step06CreateProjectGroup() {
 
     }
 
 
     @Override
-    protected void step06GetPDXModels() {
+    protected void step07GetPDXModels() {
 
         loadPDXModels(metaDataJSON,"pdxInfo");
     }
 
 
 
-    // JAX uses default implementation Steps step07GetMetaData
+    // JAX uses default implementation Steps step08GetMetaData
 
 
 
     @Override
-    protected void step08LoadPatientData() {
+    protected void step09LoadPatientData() {
 
         dto.setHistologyMap(getHistologyImageMap(dto.getModelID()));
 
@@ -197,14 +197,14 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
             return;
         }
 
-        super.step08LoadPatientData();
+        super.step09LoadPatientData();
     }
 
 
 
 
     @Override
-    protected void step09LoadExternalURLs() {
+    protected void step10LoadExternalURLs() {
 
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
 
@@ -215,7 +215,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step10LoadBreastMarkers() {
+    protected void step11LoadBreastMarkers() {
 
 
         //create breast cancer markers manually if they are present
@@ -256,7 +256,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step11CreateModels() throws Exception  {
+    protected void step12CreateModels() throws Exception  {
 
         // JAX - Updates Patient Sample b4 model Creation
         dto.getPatientSample().setExtractionMethod(dto.getExtractionMethod());
@@ -268,7 +268,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
             dto.getPatientSample().addHistology(histology);
         }
 
-        super.step11CreateModels();
+        super.step12CreateModels();
 
     }
 
@@ -277,7 +277,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step12LoadSpecimens() {
+    protected void step13LoadSpecimens() {
 
         Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(), dto.getModelID(), dto.getProviderGroup().getAbbreviation(), "");
         specimen.setHostStrain(dto.getNodScidGamma());
@@ -298,7 +298,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step13LoadCurrentTreatment() {
+    protected void step14LoadCurrentTreatment() {
 
         loadCurrentTreatment();
 
@@ -309,13 +309,13 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step14LoadImmunoHistoChemistry() {
+    protected void step15LoadImmunoHistoChemistry() {
 
     }
 
 
     @Override
-    protected void step15LoadVariationData() {
+    protected void step16LoadVariationData() {
 
     }
 
