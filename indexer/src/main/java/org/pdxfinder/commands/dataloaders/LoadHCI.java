@@ -8,6 +8,7 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
+import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -104,8 +105,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
         dosingStudyURL = DOSING_STUDY_URL;
     }
 
-    @Override
-    void step00StartReportManager() { }
+
 
     @Override
     protected void step01GetMetaDataFolder() { }
@@ -146,7 +146,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     }
 
 
-    // HCI uses common implementation Steps s step08GetMetaData,step09LoadPatientData default
+    // HCI uses common implementation Steps step08GetMetaData,step09LoadPatientData default
 
 
     @Override
@@ -256,38 +256,64 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
                         if (row.length > 0) {
 
                             String modelId = row[0];
-                            String samleId = row[1];
-                            String marker = row[2];
+                            String sampleId = row[1];
+                            String markerSymbol = row[2];
                             String result = row[3];
                             //System.out.println(modelId);
 
-                            if (modelId.isEmpty() || samleId.isEmpty() || marker.isEmpty() || result.isEmpty())
+                            if (modelId.isEmpty() || sampleId.isEmpty() || markerSymbol.isEmpty() || result.isEmpty())
                                 continue;
 
-                            if (molCharMap.containsKey(modelId + "---" + samleId)) {
-
-                                MolecularCharacterization mc = molCharMap.get(modelId + "---" + samleId);
-                                Marker m = dataImportService.getMarker(marker);
-
-                                MarkerAssociation ma = new MarkerAssociation();
-                                ma.setImmunoHistoChemistryResult(result);
-                                ma.setMarker(m);
-                                mc.addMarkerAssociation(ma);
-                            } else {
-
-                                MolecularCharacterization mc = new MolecularCharacterization();
-                                mc.setType("IHC");
-                                mc.setPlatform(pl);
+                            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSource, modelId, markerSymbol);
+                            Marker marker = null;
 
 
-                                Marker m = dataImportService.getMarker(marker);
-                                MarkerAssociation ma = new MarkerAssociation();
-                                ma.setImmunoHistoChemistryResult(result);
-                                ma.setMarker(m);
-                                mc.addMarkerAssociation(ma);
+                            if(nsdto.getNode() == null){
 
-                                molCharMap.put(modelId + "---" + samleId, mc);
+                                //uh oh, we found an unrecognised marker symbol, abort, abort!!!!
+                                reportManager.addMessage(nsdto.getLogEntity());
+                                continue;
                             }
+                            else{
+
+                                //we have a marker node, check message
+
+                                marker = (Marker)nsdto.getNode();
+
+                                if(nsdto.getLogEntity() != null){
+                                    reportManager.addMessage(nsdto.getLogEntity());
+                                }
+
+
+                                if (molCharMap.containsKey(modelId + "---" + sampleId)) {
+
+                                    MolecularCharacterization mc = molCharMap.get(modelId + "---" + sampleId);
+
+
+                                    MarkerAssociation ma = new MarkerAssociation();
+                                    ma.setImmunoHistoChemistryResult(result);
+                                    ma.setMarker(marker);
+                                    mc.addMarkerAssociation(ma);
+                                }
+                                else {
+
+                                    MolecularCharacterization mc = new MolecularCharacterization();
+                                    mc.setType("IHC");
+                                    mc.setPlatform(pl);
+
+                                    MarkerAssociation ma = new MarkerAssociation();
+                                    ma.setImmunoHistoChemistryResult(result);
+                                    ma.setMarker(marker);
+                                    mc.addMarkerAssociation(ma);
+
+                                    molCharMap.put(modelId + "---" + sampleId, mc);
+                                }
+
+
+
+                            }
+
+
 
                         }
 
