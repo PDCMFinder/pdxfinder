@@ -13,6 +13,7 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
+import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -306,7 +307,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
     @Override
     protected void step15LoadImmunoHistoChemistry() {
-
+        //no IHC data for IRCC
     }
 
 
@@ -336,20 +337,14 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
                     JSONObject job = new JSONObject(utilityService.parseFile(variationURLStr));
                     JSONArray jarray = job.getJSONArray("IRCCVariation");
                     Set<String> markers = new HashSet<>();
-                    log.info("Saving Markers to DB");
+
+
                     for (int i = 0; i < jarray.length(); i++) {
                         JSONObject variation = jarray.getJSONObject(i);
                         String gene = variation.getString("Gene");
                         markers.add(gene);
                     }
 
-                    for(String m:markers){
-                        Marker marker = dataImportService.getMarker(m, m);
-                        //PlatformAssociation pa = loaderUtils.createPlatformAssociation(platform, marker);
-                        //loaderUtils.savePlatformAssociation(pa);
-
-                    }
-                    log.info("Saved "+markers.size()+" to the DB.");
 
                     //STEP 3: assemble MolecularCharacterization objects for samples
 
@@ -360,7 +355,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
                     for (int i = 0; i < jarray.length(); i++) {
                         if (i == variationMax) {
-                            System.out.println("qutting after loading "+i+" variants");
+                            System.out.println("Qutting after loading "+i+" variants");
                             break;
                         }
 
@@ -373,64 +368,86 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
                         String sampleId = variation.getString("Specimen ID");
                         String samplePlatformId = sampleId+"____"+platformName;
 
-
                         String gene = variation.getString("Gene");
                         String type = variation.getString("Type");
 
-                        Marker marker = dataImportService.getMarker(gene,gene);
+                        NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSource, modelId, gene);
 
-                        MarkerAssociation ma = new MarkerAssociation();
+                        Marker marker = null;
 
-                        ma.setMarker(marker);
-                        ma.setType(type);
-                        ma.setCdsChange(variation.getString("CDS"));
-                        ma.setChromosome(variation.getString("Chrom"));
-                        ma.setConsequence(variation.getString("Effect"));
-                        ma.setSeqPosition(variation.getString("Pos"));
-                        ma.setRefAllele(variation.getString("Ref"));
-                        ma.setAltAllele(variation.getString("Alt"));
-                        ma.setAminoAcidChange(variation.getString("Protein"));
-                        ma.setAlleleFrequency(variation.getString("VAF"));
-                        ma.setRsVariants(variation.getString("avsnp147"));
 
-                        // STEP 4: Determine if sample is human or xenograft
-                        if(specimen.startsWith(modelId+"H")){
+                        if(nsdto.getNode() == null){
 
-                            if(humanSampleMolCharMap.containsKey(sampleId)){
-                                humanSampleMolCharMap.get(sampleId).addMarkerAssociation(ma);
-                            }
-                            else{
-                                MolecularCharacterization mcNew = new MolecularCharacterization();
-                                mcNew.setPlatform(platform);
-                                mcNew.setType(molcharType);
-                                mcNew.addMarkerAssociation(ma);
-
-                                humanSampleMolCharMap.put(modelId,mcNew);
-                            }
-
-                        }
-                        else if(specimen.startsWith(modelId+"X")){
-
-                            if(xenoSampleMolCharMap.containsKey(sampleId)){
-                                xenoSampleMolCharMap.get(sampleId).addMarkerAssociation(ma);
-                            }
-                            else{
-                                MolecularCharacterization mcNew = new MolecularCharacterization();
-                                mcNew.setPlatform(platform);
-                                mcNew.setType(molcharType);
-                                mcNew.addMarkerAssociation(ma);
-
-                                xenoSampleMolCharMap.put(sampleId,mcNew);
-                            }
+                            //uh oh, we found an unrecognised marker symbol, abort, abort!!!!
+                            reportManager.addMessage(nsdto.getLogEntity());
+                            continue;
                         }
                         else{
+                            //we have a marker object, yay!
 
-                            //something is not right
-                            log.error("Cannot determine if sample human or xeno for:"+specimen);
+                            marker = (Marker)nsdto.getNode();
+
+                            if(nsdto.getLogEntity() != null){
+                                reportManager.addMessage(nsdto.getLogEntity());
+                            }
+
+
+                            MarkerAssociation ma = new MarkerAssociation();
+
+                            ma.setMarker(marker);
+                            ma.setType(type);
+                            ma.setCdsChange(variation.getString("CDS"));
+                            ma.setChromosome(variation.getString("Chrom"));
+                            ma.setConsequence(variation.getString("Effect"));
+                            ma.setSeqPosition(variation.getString("Pos"));
+                            ma.setRefAllele(variation.getString("Ref"));
+                            ma.setAltAllele(variation.getString("Alt"));
+                            ma.setAminoAcidChange(variation.getString("Protein"));
+                            ma.setAlleleFrequency(variation.getString("VAF"));
+                            ma.setRsVariants(variation.getString("avsnp147"));
+
+                            // STEP 4: Determine if sample is human or xenograft
+                            if(specimen.startsWith(modelId+"H")){
+
+                                if(humanSampleMolCharMap.containsKey(sampleId)){
+                                    humanSampleMolCharMap.get(sampleId).addMarkerAssociation(ma);
+                                }
+                                else{
+                                    MolecularCharacterization mcNew = new MolecularCharacterization();
+                                    mcNew.setPlatform(platform);
+                                    mcNew.setType(molcharType);
+                                    mcNew.addMarkerAssociation(ma);
+
+                                    humanSampleMolCharMap.put(modelId,mcNew);
+                                }
+
+                            }
+                            else if(specimen.startsWith(modelId+"X")){
+
+                                if(xenoSampleMolCharMap.containsKey(sampleId)){
+                                    xenoSampleMolCharMap.get(sampleId).addMarkerAssociation(ma);
+                                }
+                                else{
+                                    MolecularCharacterization mcNew = new MolecularCharacterization();
+                                    mcNew.setPlatform(platform);
+                                    mcNew.setType(molcharType);
+                                    mcNew.addMarkerAssociation(ma);
+
+                                    xenoSampleMolCharMap.put(sampleId,mcNew);
+                                }
+                            }
+                            else{
+
+                                //something is not right
+                                log.error("Cannot determine if sample human or xeno for:"+specimen);
+                            }
+
                         }
 
 
 
+
+                        if(i!=0 && i%500==0) log.info("Loaded "+i+" variants.");
                     }
 
                     //STEP 5: loop through xenoSampleMolCharMap and humanSampleMolCharMap to hook mc objects to proper samples then save the graph
