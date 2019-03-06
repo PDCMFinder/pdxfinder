@@ -23,6 +23,10 @@ public class LoaderProperties {
     protected String sourceURL;
     protected String normalTissueFalse;
 
+    protected String targetedNgsPlatformURL;
+    protected String tech;
+    protected String fingerPrintDescription;
+
 
     public String getDataSourceAbbreviation() {
         return dataSourceAbbreviation;
@@ -144,4 +148,27 @@ public class LoaderProperties {
         this.normalTissueFalse = normalTissueFalse;
     }
 
+    public String getTargetedNgsPlatformURL() {
+        return targetedNgsPlatformURL;
+    }
+
+    public void setTargetedNgsPlatformURL(String targetedNgsPlatformURL) {
+        this.targetedNgsPlatformURL = targetedNgsPlatformURL;
+    }
+
+    public String getTech() {
+        return tech;
+    }
+
+    public void setTech(String tech) {
+        this.tech = tech;
+    }
+
+    public String getFingerPrintDescription() {
+        return fingerPrintDescription;
+    }
+
+    public void setFingerPrintDescription(String fingerPrintDescription) {
+        this.fingerPrintDescription = fingerPrintDescription;
+    }
 }
