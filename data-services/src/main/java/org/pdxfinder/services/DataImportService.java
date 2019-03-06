@@ -695,14 +695,15 @@ public class DataImportService {
         }
         return hostStrain;
     }
-
+/*
     // is this bad? ... probably..
     public Marker getMarker(String symbol) {
+        log.error("MARKER METHOD WAS CALLED!");
         return this.getMarker(symbol, symbol);
     }
 
     public Marker getMarker(String symbol, String name) {
-
+        log.error("MARKER METHOD WAS CALLED!");
         Marker marker = markerRepository.findByName(name);
         if (marker == null && symbol != null) {
             marker = markerRepository.findBySymbol(symbol);
@@ -731,7 +732,7 @@ public class DataImportService {
         return ma;
     }
 
-
+*/
     public Set<MarkerAssociation> findMarkerAssocsByMolChar(MolecularCharacterization mc){
 
         return markerAssociationRepository.findByMolChar(mc);

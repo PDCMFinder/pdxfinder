@@ -105,7 +105,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
             initMethod();
 
-            loaderTemplate();
+            jaxLoadingOrder();
 
         }
     }
@@ -127,6 +127,50 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         dosingStudyURL = DOSING_STUDY_URL;
     }
 
+    void jaxLoadingOrder() throws Exception {
+
+        step00StartReportManager();
+
+        step00StartReportManager();
+
+        step02GetMetaDataJSON();
+
+        step03CreateProviderGroup();
+
+        step04CreateNSGammaHostStrain();
+
+        step05CreateNSHostStrain();
+
+        step06CreateProjectGroup();
+
+        step07GetPDXModels();
+
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+
+            this.jsonData = jsonArray.getJSONObject(i);
+
+            step08GetMetaData();
+
+            step09LoadPatientData();
+
+            step10LoadExternalURLs();
+
+            step11LoadBreastMarkers();
+
+            step12CreateModels();
+
+            step13LoadSpecimens();
+
+            step14LoadCurrentTreatment();
+
+            step16LoadVariationData();
+
+        }
+        step15LoadImmunoHistoChemistry();
+
+
+    }
 
 
     @Override
@@ -226,9 +270,9 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                 MolecularCharacterization mc = new MolecularCharacterization();
                 mc.setPlatform(dataImportService.getPlatform("Not Specified", dto.getProviderGroup()));
                 mc.setType("IHC");
-                Marker her2 = dataImportService.getMarker("HER2", "HER2");
-                Marker er = dataImportService.getMarker("ER", "ER");
-                Marker pr = dataImportService.getMarker("PR", "PR");
+                Marker her2 = null; //dataImportService.getMarker("HER2", "HER2");
+                Marker er = null; //dataImportService.getMarker("ER", "ER");
+                Marker pr = null; //dataImportService.getMarker("PR", "PR");
 
                 MarkerAssociation her2a = new MarkerAssociation();
                 her2a.setMarker(her2);
@@ -302,7 +346,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
         loadCurrentTreatment();
 
-        loadVariationData(dto.getModelCreation(), dto.getEngraftmentSite(), dto.getEngraftmentType());
     }
 
 
@@ -316,7 +359,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     protected void step16LoadVariationData() {
-
+        loadVariationData(dto.getModelCreation(), dto.getEngraftmentSite(), dto.getEngraftmentType());
     }
 
 
@@ -412,7 +455,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                     ma.setSeqPosition(seqPosition);
                     ma.setReadDepth(readDepth);
 
-                    Marker marker = dataImportService.getMarker(symbol);
+                    Marker marker = null;
                     marker.setEntrezId(id);
 
                     ma.setMarker(marker);

@@ -9,6 +9,7 @@ import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Harmonizer;
 import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
+import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -473,10 +474,37 @@ public abstract class LoaderBase implements ApplicationContextAware{
                     List<MarkerAssociation> markerAssocs = new ArrayList<>();
 
                     for (int i = 0; i < markers.length; i++) {
-                        Marker m = dataImportService.getMarker(markers[i], markers[i]);
-                        MarkerAssociation ma = new MarkerAssociation();
-                        ma.setMarker(m);
-                        markerAssocs.add(ma);
+                        String markerSymbol = markers[i];
+
+
+                        NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), markerSymbol);
+
+                        Marker m;
+
+                        if(nsdto.getNode() == null){
+
+                            //uh oh, we found an unrecognised marker symbol, abort, abort!!!!
+                            reportManager.addMessage(nsdto.getLogEntity());
+                            continue;
+                        }
+                        else{
+
+                            m = (Marker)nsdto.getNode();
+
+                            if(nsdto.getLogEntity() != null){
+                                reportManager.addMessage(nsdto.getLogEntity());
+                            }
+
+
+
+                            MarkerAssociation ma = new MarkerAssociation();
+                            ma.setMarker(m);
+                            markerAssocs.add(ma);
+
+
+                        }
+
+
                     }
                     molC.setMarkerAssociations(markerAssocs);
                     Set<MolecularCharacterization> mcs = new HashSet<>();

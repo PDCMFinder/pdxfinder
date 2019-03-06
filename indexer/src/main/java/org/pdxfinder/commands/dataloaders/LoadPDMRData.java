@@ -13,6 +13,7 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.dto.LoaderDTO;
+import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -317,6 +318,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step16LoadVariationData() {
 
+        loadMutationData();
     }
 
 
@@ -424,25 +426,48 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
                         }
 
 
-                        Marker m = dataImportService.getMarker(markerSymbol);
-                        MarkerAssociation ma = new MarkerAssociation();
+                        Marker marker = null;
+                        NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSource, modelId, markerSymbol);
 
-                        ma.setMarker(m);
-                        ma.setAminoAcidChange(aaChange);
-                        ma.setChromosome(chromosome);
-                        ma.setSeqPosition(position);
-                        ma.setRefAllele(refAllele);
-                        ma.setAltAllele(altAllele);
-                        ma.setAlleleFrequency(alleleFreq);
-                        ma.setReadDepth(readDepth);
-                        ma.setConsequence(consequence);
-                        ma.setRsVariants(rsVariant);
+                        if(nsdto.getNode() == null){
+
+                            //uh oh, we found an unrecognised marker symbol, abort, abort!!!!
+                            reportManager.addMessage(nsdto.getLogEntity());
+                            continue;
+                        }
+                        else{
 
 
-                        mc.addMarkerAssociation(ma);
+                            marker = (Marker)nsdto.getNode();
 
-                        //put the updated mc back into the map
-                        molcharMap.put(modelId+sampleId, mc);
+                            if(nsdto.getLogEntity() != null){
+                                reportManager.addMessage(nsdto.getLogEntity());
+                            }
+
+                            MarkerAssociation ma = new MarkerAssociation();
+
+                            ma.setMarker(marker);
+                            ma.setAminoAcidChange(aaChange);
+                            ma.setChromosome(chromosome);
+                            ma.setSeqPosition(position);
+                            ma.setRefAllele(refAllele);
+                            ma.setAltAllele(altAllele);
+                            ma.setAlleleFrequency(alleleFreq);
+                            ma.setReadDepth(readDepth);
+                            ma.setConsequence(consequence);
+                            ma.setRsVariants(rsVariant);
+
+
+                            mc.addMarkerAssociation(ma);
+
+                            //put the updated mc back into the map
+                            molcharMap.put(modelId+sampleId, mc);
+
+
+                        }
+
+
+
 
                     }
 
