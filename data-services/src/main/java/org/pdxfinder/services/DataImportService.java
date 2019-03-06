@@ -73,6 +73,7 @@ public class DataImportService {
     private HashMap<String, Marker> markersBySymbol;
     private HashMap<String, Marker> markersByPrevSymbol;
     private HashMap<String, Marker> markersBySynonym;
+    private HashMap<String, NodeSuggestionDTO> notFoundMarkerSymbols;
 
     public DataImportService(TumorTypeRepository tumorTypeRepository,
                              HostStrainRepository hostStrainRepository,
@@ -143,6 +144,8 @@ public class DataImportService {
         this.markersBySymbol = new HashMap<>();
         this.markersByPrevSymbol = new HashMap<>();
         this.markersBySynonym = new HashMap<>();
+        this.notFoundMarkerSymbols = new HashMap<>();
+
 
     }
 
@@ -695,7 +698,7 @@ public class DataImportService {
         }
         return hostStrain;
     }
-/*
+
     // is this bad? ... probably..
     public Marker getMarker(String symbol) {
         log.error("MARKER METHOD WAS CALLED!");
@@ -732,7 +735,7 @@ public class DataImportService {
         return ma;
     }
 
-*/
+
     public Set<MarkerAssociation> findMarkerAssocsByMolChar(MolecularCharacterization mc){
 
         return markerAssociationRepository.findByMolChar(mc);
@@ -1303,6 +1306,9 @@ public class DataImportService {
 
     public NodeSuggestionDTO getSuggestedMarker(String reporter, String dataSource, String modelId, String symbol){
 
+        //not found key to avoid looking up not found symbols multiple times
+        //key: datasource + modelId + symbol
+        if(notFoundMarkerSymbols.containsKey(dataSource+modelId+symbol)) return notFoundMarkerSymbols.get(dataSource+modelId+symbol);
 
         NodeSuggestionDTO nsdto = new NodeSuggestionDTO();
         LogEntity le;
@@ -1398,6 +1404,7 @@ public class DataImportService {
                     le.setMessage(symbol +" is an unrecognised symbol, skipping");
                     le.setType("ERROR");
                     nsdto.setLogEntity(le);
+                    notFoundMarkerSymbols.put(dataSource+modelId+symbol, nsdto);
                 }
             }
 
