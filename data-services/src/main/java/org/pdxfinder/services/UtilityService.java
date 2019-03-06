@@ -14,9 +14,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Service
@@ -25,6 +23,106 @@ public class UtilityService {
 
     private String homeDir = System.getProperty("user.home");
     private final static Logger log = LoggerFactory.getLogger(UtilityService.class);
+
+
+    public List<Map<String, String>> serializeCSVToMaps(String csvFile) {
+
+        /*************************************************************************************************************
+         *     LOAD DATA FROM FILE          *
+         ***********************************/
+
+        FileInputStream fileStream = null;
+        try {
+            fileStream = new FileInputStream(csvFile);
+        } catch (Exception e) { }
+        DataInputStream csvData = new DataInputStream(fileStream);
+
+
+        /*************************************************************************************************************
+         *     INITIALIZE PARAMETERS         *
+         ************************************/
+
+        int row = 0;
+        String thisLine;
+        List<String> tableHead = new ArrayList<>();
+        List<Map<String, String>> csvMap = new ArrayList<>();
+
+
+        /*************************************************************************************************************
+         *    LOAD CSV FIRST ROW AS TABLE-HEAD, OTHER ROWS AS DATA, & LOAD TO MAP        *
+         *******************************************************************************/
+        try {
+
+            while ((thisLine = csvData.readLine()) != null) {
+                String rowDataArr[] = thisLine.split(",");
+                int column = 0;
+
+                if (row == 0) {
+
+                    for (column = 0; column < rowDataArr.length; column++) {
+
+                        tableHead.add(rowDataArr[column]);
+                    }
+                } else {
+
+                    Map<String, String> rowMap = new HashMap();
+                    for (String columnHead : tableHead) {
+
+                        rowMap.put(columnHead, rowDataArr[column]);
+                        column++;
+                    }
+                    csvMap.add(rowMap);
+                }
+                row++;
+            }
+        } catch (Exception e) { }
+
+        return csvMap;
+
+    }
+
+
+
+
+
+
+    public List<List<String>> serializeCSVToArrayList(String dataFile)
+    {
+
+        FileInputStream fileStream = null;
+        try{
+            fileStream = new FileInputStream(dataFile);
+        }catch (Exception e){}
+        DataInputStream myInput = new DataInputStream(fileStream);
+
+
+        String thisLine;
+        int i=0;
+        ArrayList lineList = null;
+        List<List<String>> dataArrayList = new ArrayList<>();
+
+        try {
+
+            while ((thisLine = myInput.readLine()) != null)
+            {
+                lineList = new ArrayList();
+                String strar[] = thisLine.split(",");
+                for(int j=0;j<strar.length;j++)
+                {
+                    lineList.add(strar[j]);
+                }
+                dataArrayList.add(lineList);
+                System.out.println();
+                i++;
+            }
+
+        }catch (Exception e){}
+
+
+        return dataArrayList;
+    }
+
+
 
     public JsonNode readJsonURL(String apiLink) {
 
