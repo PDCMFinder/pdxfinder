@@ -45,7 +45,7 @@ public class MarkerLogEntity extends LogEntity{
                 ", reporter='" + super.getReporter() + '\'' +
                 ", dataSource='" + super.getDataSource() + '\'' +
                 ", model='" + super.getModel() + '\'' +
-                "usedMarkerSymbol='" + usedMarkerSymbol + '\'' +
+                ", usedMarkerSymbol='" + usedMarkerSymbol + '\'' +
                 ", suggestedMarkerSymbol='" + suggestedMarkerSymbol + '\'' +
                 ", reasonForChange='" + reasonForChange + '\'' +
                 ", message='" + super.getMessage() + '\'' +
