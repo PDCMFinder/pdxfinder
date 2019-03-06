@@ -83,6 +83,47 @@ public class UtilityService {
 
 
 
+
+
+
+    public List<List<String>> serializeCSVToArrayList(String dataFile)
+    {
+
+        FileInputStream fileStream = null;
+        try{
+            fileStream = new FileInputStream(dataFile);
+        }catch (Exception e){}
+        DataInputStream myInput = new DataInputStream(fileStream);
+
+
+        String thisLine;
+        int i=0;
+        ArrayList lineList = null;
+        List<List<String>> dataArrayList = new ArrayList<>();
+
+        try {
+
+            while ((thisLine = myInput.readLine()) != null)
+            {
+                lineList = new ArrayList();
+                String strar[] = thisLine.split(",");
+                for(int j=0;j<strar.length;j++)
+                {
+                    lineList.add(strar[j]);
+                }
+                dataArrayList.add(lineList);
+                System.out.println();
+                i++;
+            }
+
+        }catch (Exception e){}
+
+
+        return dataArrayList;
+    }
+
+
+
     public JsonNode readJsonURL(String apiLink) {
 
         JsonNode jsonNode = null;
