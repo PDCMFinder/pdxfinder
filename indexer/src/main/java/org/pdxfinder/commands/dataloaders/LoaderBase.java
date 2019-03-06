@@ -25,25 +25,25 @@ import java.util.Set;
 public abstract class LoaderBase implements ApplicationContextAware{
 
     private final static Logger log = LoggerFactory.getLogger(LoaderBase.class);
-    String jsonFile;
-    String dataSource;
-    String rootDataDirectory;
+    protected String jsonFile;
+    protected String dataSource;
+    protected String rootDataDirectory;
 
-    File[] listOfFiles;
+    protected File[] listOfFiles;
 
-    String metaDataJSON = "NOT FOUND";
-    JSONArray jsonArray;
+    protected String metaDataJSON = "NOT FOUND";
+    protected JSONArray jsonArray;
 
-    String filesDirectory;
-    String dataSourceAbbreviation;
-    String dataSourceContact;
-    String dosingStudyURL;
-    JSONObject jsonData;
+    protected String filesDirectory;
+    protected String dataSourceAbbreviation;
+    protected String dataSourceContact;
+    protected String dosingStudyURL;
+    protected JSONObject jsonData;
 
-    LoaderDTO dto = new LoaderDTO();
+    protected LoaderDTO dto = new LoaderDTO();
 
-    static ApplicationContext context;
-    ReportManager reportManager;
+    protected static ApplicationContext context;
+    protected ReportManager reportManager;
 
     @Autowired
     private UtilityService utilityService;
