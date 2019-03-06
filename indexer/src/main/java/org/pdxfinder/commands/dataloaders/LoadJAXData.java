@@ -35,31 +35,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadJAXData.class);
 
-    private final static String DATASOURCE_ABBREVIATION = "JAX";
-    private final static String DATASOURCE_NAME = "The Jackson Laboratory";
-    private final static String DATASOURCE_DESCRIPTION = "The Jackson Laboratory PDX mouse models.";
-    private final static String DATASOURCE_CONTACT = "http://tumor.informatics.jax.org/mtbwi/pdxRequest.do?mice=";
-    private final static String DATASOURCE_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
-
-    private final static String PROVIDER_TYPE = "";
-    private final static String ACCESSIBILITY = "";
-
-    private final static String NSG_BS_NAME = "NOD scid gamma";
-    private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<scid> Il2rg<tm1Wjl>/SzJ";
-    private final static String NSG_BS_DESC = "";
-    private final static String NSG_BS_URL = "http://jax.org/strain/005557";
-
-    private final static String HISTOLOGY_NOTE = "Pathologist assessment of patient tumor and pdx model tumor histology slides.";
-
-    private final static String DOSING_STUDY_URL = "/platform/jax-drug-dosing/";
-    private final static String CTP_PLATFORM_URL = "/platform/jax-ctp/";
-    private final static String TRUSEQ_PLATFORM_URL = "/platform/jax-truseq/";
-    private final static String WHOLE_EXOME_URL = "/platform/jax-whole-exome/";
-    private final static String SOURCE_URL = "/source/jax/";
-
-    // for now all samples are of tumor tissue
-    private final static Boolean NORMAL_TISSUE_FALSE = false;
-
     private Options options;
     private CommandLineParser parser;
     private CommandLine cmd;
@@ -120,11 +95,8 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
         dto = new LoaderDTO();
 
-        jsonFile = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
-        dataSource = DATASOURCE_ABBREVIATION;
-        dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
-        dataSourceContact = DATASOURCE_CONTACT;
-        dosingStudyURL = DOSING_STUDY_URL;
+        jsonFile = dataRootDir+dataSourceAbbreviation+"/pdx/models.json";
+        dataSource = dataSourceAbbreviation;
     }
 
     void jaxLoadingOrder() throws Exception {
@@ -187,7 +159,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step03CreateProviderGroup() {
 
-        loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+        loadProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription, providerType, accessibility, null, dataSourceContact, sourceURL);
     }
 
 
@@ -195,7 +167,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step04CreateNSGammaHostStrain() {
 
-        loadNSGammaHostStrain(NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
+        loadNSGammaHostStrain(nsgBsSymbol, nsgbsURL, nsgBsName, nsgBsName);
     }
 
 
@@ -229,7 +201,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         dto.setHistologyMap(getHistologyImageMap(dto.getModelID()));
 
         //Check if model exists in DB, if yes, do not load duplicates
-        ModelCreation existingModel = dataImportService.findModelByIdAndDataSource(dto.getModelID(), DATASOURCE_ABBREVIATION);
+        ModelCreation existingModel = dataImportService.findModelByIdAndDataSource(dto.getModelID(), dataSourceAbbreviation);
         if(existingModel != null) {
             log.error("Skipping existing model "+dto.getModelID());
             return;
@@ -252,7 +224,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
 
-        loadExternalURLs(DATASOURCE_CONTACT+dto.getModelID(), DATASOURCE_URL+dto.getModelID());
+        loadExternalURLs(dataSourceContact+dto.getModelID(), dataSourceURL+dto.getModelID());
     }
 
 
@@ -397,7 +369,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
             HashMap<String, HashMap<String, List<MarkerAssociation>>> sampleMap = new HashMap<>();
             HashMap<String, List<MarkerAssociation>> markerMap = new HashMap<>();
 
-            String variationFile = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/" + modelCreation.getSourcePdxId()+".json";
+            String variationFile = dataRootDir+dataSourceAbbreviation+"/mut/" + modelCreation.getSourcePdxId()+".json";
             File file = new File(variationFile);
 
             if (file.exists()){
@@ -463,13 +435,13 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                     Platform platform;
 
                     if(technology.equals("Truseq_JAX")){
-                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), TRUSEQ_PLATFORM_URL);
+                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), truseqPlatformURL);
                     }
                     else if(technology.equals("Whole_Exome")){
-                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), WHOLE_EXOME_URL);
+                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), wholeExomeURL);
                     }
                     else if(technology.equals("CTP")){
-                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), CTP_PLATFORM_URL);
+                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), ctpPlatformURL);
                     }
                     else{
                         platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), "");
@@ -511,13 +483,13 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                         Platform platform = null;
 
                         if(tech.equals("Truseq_JAX")){
-                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), TRUSEQ_PLATFORM_URL);
+                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), truseqPlatformURL);
                         }
                         else if(tech.equals("Whole_Exome")){
-                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), WHOLE_EXOME_URL);
+                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), wholeExomeURL);
                         }
                         else if(tech.equals("CTP")){
-                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), CTP_PLATFORM_URL);
+                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), ctpPlatformURL);
                         }
                         else{
                             platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), "");
@@ -598,7 +570,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     private HashMap<String, Image> getHistologyImageMap(String id) {
         HashMap<String, Image> map = new HashMap<>();
 
-            String histologyFile = dataRootDir+DATASOURCE_ABBREVIATION+"/hist/"+id;
+            String histologyFile = dataRootDir+dataSourceAbbreviation+"/hist/"+id;
             File file = new File(histologyFile);
 
             if(file.exists()){

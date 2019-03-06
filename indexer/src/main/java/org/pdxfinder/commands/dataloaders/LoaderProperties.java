@@ -9,6 +9,7 @@ public class LoaderProperties {
     protected String dataSourceName;
     protected String dataSourceDescription;
     protected String dataSourceContact;
+    protected String dataSourceURL;
     protected String providerType;
     protected String accessibility;
 
@@ -26,6 +27,11 @@ public class LoaderProperties {
     protected String targetedNgsPlatformURL;
     protected String tech;
     protected String fingerPrintDescription;
+
+    protected String histologyNote;
+    protected String ctpPlatformURL;
+    protected String truseqPlatformURL;
+    protected String wholeExomeURL;
 
 
     public String getDataSourceAbbreviation() {
@@ -58,6 +64,14 @@ public class LoaderProperties {
 
     public void setDataSourceContact(String dataSourceContact) {
         this.dataSourceContact = dataSourceContact;
+    }
+
+    public String getDataSourceURL() {
+        return dataSourceURL;
+    }
+
+    public void setDataSourceURL(String dataSourceURL) {
+        this.dataSourceURL = dataSourceURL;
     }
 
     public String getProviderType() {
@@ -170,5 +184,37 @@ public class LoaderProperties {
 
     public void setFingerPrintDescription(String fingerPrintDescription) {
         this.fingerPrintDescription = fingerPrintDescription;
+    }
+
+    public String getHistologyNote() {
+        return histologyNote;
+    }
+
+    public void setHistologyNote(String histologyNote) {
+        this.histologyNote = histologyNote;
+    }
+
+    public String getCtpPlatformURL() {
+        return ctpPlatformURL;
+    }
+
+    public void setCtpPlatformURL(String ctpPlatformURL) {
+        this.ctpPlatformURL = ctpPlatformURL;
+    }
+
+    public String getTruseqPlatformURL() {
+        return truseqPlatformURL;
+    }
+
+    public void setTruseqPlatformURL(String truseqPlatformURL) {
+        this.truseqPlatformURL = truseqPlatformURL;
+    }
+
+    public String getWholeExomeURL() {
+        return wholeExomeURL;
+    }
+
+    public void setWholeExomeURL(String wholeExomeURL) {
+        this.wholeExomeURL = wholeExomeURL;
     }
 }
