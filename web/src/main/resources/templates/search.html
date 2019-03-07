@@ -249,8 +249,9 @@
                                 <th>Primary site</th>
                                 <th>Collection site</th>
                                 <th>Type</th>
-                                <th>Age</th>
-                                <th>Sex</th>
+
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'AGE')}">Age</th>
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'SEX')}">Sex</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DATA AVAILABLE')}">Data Available</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'MUTATIONS')}">MUTATIONS</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DRUG AND RESPONSE')}">DRUG AND RESPONSE</th>
@@ -268,8 +269,9 @@
                                 <td th:text="${model.sampleOriginTissue}">origin tissue</td>
                                 <td th:text="${model.sampleSampleSite}">sample site</td>
                                 <td th:text="${model.sampleTumorType}">Metastatic</td>
-                                <td th:text="${model.patientAge}">Age</td>
-                                <td th:text="${model.patientGender}">Sex</td>
+
+                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'AGE')}" th:text="${model.patientAge}"> Age </td>
+                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'SEX')}" th:text="${model.patientGender}">Sex</td>
 
                                 <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DATA AVAILABLE')}">
                                     <th:block th:each="dataavailable : ${model.dataAvailable}">

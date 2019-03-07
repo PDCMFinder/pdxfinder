@@ -432,6 +432,12 @@ public class SearchService {
 
                 case patient_treatment_status:
                     headers.add("PATIENT TREATMENT STATUS");
+
+                case patient_gender:
+                    headers.add("SEX");
+
+                case patient_age:
+                    headers.add("AGE");
             }
 
         }
