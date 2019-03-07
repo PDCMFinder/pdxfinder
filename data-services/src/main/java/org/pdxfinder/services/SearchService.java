@@ -158,6 +158,7 @@ public class SearchService {
             textSearchDescription = "PDXFinder contains "+searchDS.getModels().size()+" models";
         }
         wsDTO.setTextSearchDescription(textSearchDescription);
+        wsDTO.setTotalResults(searchDS.getModels().size());
 
         wsDTO.setMainSearchFieldOptions(autoCompleteService.getAutoSuggestions());
 

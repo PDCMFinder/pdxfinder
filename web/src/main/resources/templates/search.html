@@ -369,12 +369,11 @@
                                     <option th:value="'?'+${websearch.facetString} + '&size=10'">  10 Models Per Page </option>
                                     <option th:value="'?'+${websearch.facetString} + '&size=50'">  50 Models Per Page </option>
                                     <option th:value="'?'+${websearch.facetString} + '&size=200'">  200 Models Per Page </option>
-                                    <option th:value="'?'+${websearch.facetString} + '&size=2000'"> ALL Models </option>
+                                    <option th:value="'?'+${websearch.facetString} + '&size='+${websearch.totalResults}"> ALL Models </option>
                                 </select>
 
                             </div>
                         </div>
-
 
 
                     </div>
