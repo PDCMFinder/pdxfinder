@@ -427,7 +427,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
                         Marker marker = null;
-                        NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSource, modelId, markerSymbol);
+                        NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSource, modelId, markerSymbol, "mutation", dto.getMarkerPlatform());
 
                         if(nsdto.getNode() == null){
 

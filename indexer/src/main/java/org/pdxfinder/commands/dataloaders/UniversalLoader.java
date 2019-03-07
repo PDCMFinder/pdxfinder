@@ -988,7 +988,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             MolecularCharacterization mc;
             Platform pl;
             Marker marker = null;
-            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), ds.getAbbreviation(), modelId, markerSymbol);
+            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), ds.getAbbreviation(), modelId, markerSymbol, "IHC", "ImmunoHistoChemistry");
 
             if(nsdto.getNode() == null){
 

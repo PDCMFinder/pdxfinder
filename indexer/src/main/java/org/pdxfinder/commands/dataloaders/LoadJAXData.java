@@ -276,13 +276,13 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                 mc.setType("IHC");
 
                 //we know these markers exist so no need to check for null
-                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "ERBB2");
+                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "ERBB2", "IHC", "ImmunoHistoChemistry");
                 Marker her2 = (Marker) nsdto.getNode(); // ERBB2  dataImportService.getMarker("HER2", "HER2");
 
-                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "EREG");
+                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "EREG", "IHC", "ImmunoHistoChemistry");
                 Marker er = (Marker) nsdto.getNode(); //dataImportService.getMarker("ER", "ER");
 
-                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "PGR");
+                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "PGR", "IHC", "ImmunoHistoChemistry");
                 Marker pr = (Marker) nsdto.getNode(); //dataImportService.getMarker("PR", "PR");
 
                 MarkerAssociation her2a = new MarkerAssociation();
@@ -497,7 +497,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                     }
 
                     //step 3: get the marker suggestion from the service
-                    NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, modelCreation.getSourcePdxId(), symbol);
+                    NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, modelCreation.getSourcePdxId(), symbol, "mutation", technology);
 
                     Marker marker;
 

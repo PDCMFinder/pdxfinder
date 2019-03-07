@@ -473,7 +473,7 @@ public abstract class LoaderBase extends LoaderProperties implements Application
                         String markerSymbol = markers[i];
 
 
-                        NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), markerSymbol);
+                        NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), markerSymbol, "mutation", markerPlatform);
 
                         Marker m;
 

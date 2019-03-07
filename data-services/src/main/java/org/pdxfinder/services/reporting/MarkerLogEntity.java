@@ -5,12 +5,17 @@ package org.pdxfinder.services.reporting;
  */
 public class MarkerLogEntity extends LogEntity{
 
+    private String characterizationType;
+    private String platform;
     private String usedMarkerSymbol;
     private String suggestedMarkerSymbol;
     private String reasonForChange;
 
-    public MarkerLogEntity(String reporter, String dataSource, String model, String usedMarkerSymbol, String suggestedMarkerSymbol, String reasonForChange) {
+
+    public MarkerLogEntity(String reporter, String dataSource, String model, String characterizationType, String platform, String usedMarkerSymbol, String suggestedMarkerSymbol, String reasonForChange) {
         super(reporter, dataSource, model);
+        this.characterizationType = characterizationType;
+        this.platform = platform;
         this.usedMarkerSymbol = usedMarkerSymbol;
         this.suggestedMarkerSymbol = suggestedMarkerSymbol;
         this.reasonForChange = reasonForChange;
@@ -24,6 +29,8 @@ public class MarkerLogEntity extends LogEntity{
 
         MarkerLogEntity that = (MarkerLogEntity) o;
 
+        if (!characterizationType.equals(that.characterizationType)) return false;
+        if (!platform.equals(that.platform)) return false;
         if (!usedMarkerSymbol.equals(that.usedMarkerSymbol)) return false;
         if (!suggestedMarkerSymbol.equals(that.suggestedMarkerSymbol)) return false;
         return reasonForChange.equals(that.reasonForChange);
@@ -32,27 +39,30 @@ public class MarkerLogEntity extends LogEntity{
     @Override
     public int hashCode() {
         int result = super.hashCode();
+        result = 31 * result + characterizationType.hashCode();
+        result = 31 * result + platform.hashCode();
         result = 31 * result + usedMarkerSymbol.hashCode();
         result = 31 * result + suggestedMarkerSymbol.hashCode();
         result = 31 * result + reasonForChange.hashCode();
         return result;
     }
-/*
-    @Override
-    public String toString() {
-        return "MarkerLogEntity{" +
-                "type='" + super.getType() + '\'' +
-                ", reporter='" + super.getReporter() + '\'' +
-                ", dataSource='" + super.getDataSource() + '\'' +
-                ", model='" + super.getModel() + '\'' +
-                ", usedMarkerSymbol='" + usedMarkerSymbol + '\'' +
-                ", suggestedMarkerSymbol='" + suggestedMarkerSymbol + '\'' +
-                ", reasonForChange='" + reasonForChange + '\'' +
-                ", message='" + super.getMessage() + '\'' +
-                '}';
-    }
 
-   */
+    /*
+        @Override
+        public String toString() {
+            return "MarkerLogEntity{" +
+                    "type='" + super.getType() + '\'' +
+                    ", reporter='" + super.getReporter() + '\'' +
+                    ", dataSource='" + super.getDataSource() + '\'' +
+                    ", model='" + super.getModel() + '\'' +
+                    ", usedMarkerSymbol='" + usedMarkerSymbol + '\'' +
+                    ", suggestedMarkerSymbol='" + suggestedMarkerSymbol + '\'' +
+                    ", reasonForChange='" + reasonForChange + '\'' +
+                    ", message='" + super.getMessage() + '\'' +
+                    '}';
+        }
+
+       */
     @Override
     public String toString() {
         return
@@ -60,6 +70,8 @@ public class MarkerLogEntity extends LogEntity{
             ", " + super.getReporter() +
             ", " + super.getDataSource() +
             ", " + super.getModel() +
+            ", " + characterizationType +
+            ", " + platform +
             ", " + usedMarkerSymbol +
             ", " + suggestedMarkerSymbol +
             ", " + reasonForChange +

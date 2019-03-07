@@ -1304,7 +1304,8 @@ public class DataImportService {
         return markerRepository.findBySynonym(symbol);
     }
 
-    public NodeSuggestionDTO getSuggestedMarker(String reporter, String dataSource, String modelId, String symbol){
+    public NodeSuggestionDTO getSuggestedMarker(String reporter, String dataSource, String modelId, String symbol,
+                                                String characterizationType, String platform){
 
         //not found key to avoid looking up not found symbols multiple times
         //key: datasource + modelId + symbol
@@ -1325,14 +1326,14 @@ public class DataImportService {
         else if(markersByPrevSymbol.containsKey(symbol)){
 
             m = markersByPrevSymbol.get(symbol);
-            le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, m.getSymbol(),"Previous symbol");
+            le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getSymbol(),"Previous symbol");
             nsdto.setLogEntity(le);
             ready = true;
         }
         else if(markersBySynonym.containsKey(symbol)){
 
             m = markersBySynonym.get(symbol);
-            le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, m.getSymbol(),"Synonym");
+            le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getSymbol(),"Synonym");
             nsdto.setLogEntity(le);
             ready = true;
         }
@@ -1357,14 +1358,14 @@ public class DataImportService {
                 if(markerSuggestionList.size() == 1){
                     //symbol found in prev symbols
                     m = markerSuggestionList.get(0);
-                    le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, m.getSymbol(),"Previous symbol");
+                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getSymbol(),"Previous symbol");
                     nsdto.setNode(m);
                     nsdto.setLogEntity(le);
                     markersByPrevSymbol.put(symbol, m);
                 }
                 else{
 
-                    le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, "","");
+                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
                     String prevMarkers = markerSuggestionList.stream().map(Marker::getSymbol).collect(Collectors.joining(", "));
 
                     le.setMessage("Previous symbol for multiple approved markers: "+prevMarkers);
@@ -1386,14 +1387,14 @@ public class DataImportService {
 
                         //symbol found in synonym
                         m = markerSuggestionList.get(0);
-                        le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, m.getSymbol(),"Synonym");
+                        le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getSymbol(),"Synonym");
 
                         nsdto.setNode(m);
                         nsdto.setLogEntity(le);
                         markersBySynonym.put(symbol, m);
                     }
                     else{
-                        le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, "","");
+                        le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
                         String synonymMarkers = markerSuggestionList.stream().map(Marker::getSymbol).collect(Collectors.joining(", "));
                         le.setMessage("Synonym for multiple markers: "+synonymMarkers);
                         le.setType("ERROR");
@@ -1406,7 +1407,7 @@ public class DataImportService {
                 else{
 
                     //error, didn't find the symbol anywhere
-                    le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, "","");
+                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
                     le.setMessage(symbol +" is an unrecognised symbol");
                     le.setType("ERROR");
                     nsdto.setLogEntity(le);

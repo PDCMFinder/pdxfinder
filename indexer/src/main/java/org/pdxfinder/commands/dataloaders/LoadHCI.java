@@ -241,7 +241,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
                             if (modelId.isEmpty() || sampleId.isEmpty() || markerSymbol.isEmpty() || result.isEmpty())
                                 continue;
 
-                            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSource, modelId, markerSymbol);
+                            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSource, modelId, markerSymbol, "IHC","ImmunoHistoChemistry");
                             Marker marker = null;
 
 

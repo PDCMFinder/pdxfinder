@@ -348,7 +348,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
                         String gene = variation.getString("Gene");
                         String type = variation.getString("Type");
 
-                        NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSource, modelId, gene);
+                        NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSource, modelId, gene, "mutation", platformName);
 
                         Marker marker = null;
 
