@@ -37,7 +37,7 @@ public class MarkerLogEntity extends LogEntity{
         result = 31 * result + reasonForChange.hashCode();
         return result;
     }
-
+/*
     @Override
     public String toString() {
         return "MarkerLogEntity{" +
@@ -51,4 +51,19 @@ public class MarkerLogEntity extends LogEntity{
                 ", message='" + super.getMessage() + '\'' +
                 '}';
     }
+
+   */
+    @Override
+    public String toString() {
+        return
+            super.getType() +
+            ", " + super.getReporter() +
+            ", " + super.getDataSource() +
+            ", " + super.getModel() +
+            ", " + usedMarkerSymbol +
+            ", " + suggestedMarkerSymbol +
+            ", " + reasonForChange +
+            ", " + super.getMessage();
+    }
+
 }
