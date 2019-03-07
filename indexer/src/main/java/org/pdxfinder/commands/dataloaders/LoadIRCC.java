@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,33 +34,11 @@ import java.util.*;
  */
 @Component
 @Order(value = -19)
+@PropertySource("classpath:loader.properties")
+@ConfigurationProperties(prefix = "ircc")
 public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadIRCC.class);
-
-    private final static String DATASOURCE_ABBREVIATION = "IRCC-CRC";
-    private final static String DATASOURCE_NAME = "Candiolo Cancer Institute - Colorectal";
-    private final static String DATASOURCE_DESCRIPTION = "IRCC";
-    private final static String DATASOURCE_CONTACT = "andrea.bertotti@ircc.it";
-
-    private final static String PROVIDER_TYPE = "";
-    private final static String ACCESSIBILITY = "";
-
-    private final static String NSG_BS_NAME = "NOD scid gamma";
-    private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
-    private final static String NSG_BS_URL = "http://jax.org/strain/005557";
-
-    private final static String TECH = "MUT targeted NGS";
-
-    private final static String DOSING_STUDY_URL = "/platform/ircc-dosing-studies/";
-    private final static String TARGETEDNGS_PLATFORM_URL = "/platform/ircc-gene-panel/";
-    private final static String SOURCE_URL = "/source/ircc-crc/";
-
-    // for now all samples are of tumor tissue
-    private final static Boolean NORMAL_TISSUE_FALSE = false;
-
-    private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
-    public static final String FINGERPRINT_DESCRIPTION = "Model validated against patient germline.";
 
     private Options options;
     private CommandLineParser parser;
@@ -163,13 +143,10 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     protected void initMethod() {
 
         log.info("Loading IRCC PDX data.");
-        jsonFile = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
+        jsonFile = dataRootDir+dataSourceAbbreviation+"/pdx/models.json";
 
-        dataSource = DATASOURCE_ABBREVIATION;
+        dataSource = dataSourceAbbreviation;
         filesDirectory = "";
-        dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
-        dataSourceContact = DATASOURCE_CONTACT;
-        dosingStudyURL = DOSING_STUDY_URL;
     }
 
 
@@ -180,13 +157,13 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step03CreateProviderGroup() {
 
-        loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, "transnational access", DATASOURCE_CONTACT, SOURCE_URL);
+        loadProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription, providerType, accessibility, "transnational access", dataSourceContact, sourceURL);
     }
 
     @Override
     protected void step04CreateNSGammaHostStrain() {
 
-        loadNSGammaHostStrain(NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
+        loadNSGammaHostStrain(nsgBsSymbol, nsgbsURL, nsgBsName, nsgBsName);
     }
 
     @Override
@@ -214,7 +191,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step10LoadExternalURLs() {
 
-        loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
+        loadExternalURLs(dataSourceContact,Standardizer.NOT_SPECIFIED);
 
         dataImportService.saveSample(dto.getPatientSample());
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
@@ -277,7 +254,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
             if (dto.getTreatments().length() > 0) {
 
                 ts = new TreatmentSummary();
-                ts.setUrl(DOSING_STUDY_URL);
+                ts.setUrl(dosingStudyURL);
 
                 for (int t = 0; t < dto.getTreatments().length(); t++) {
 
@@ -314,7 +291,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step16LoadVariationData() {
 
-        String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
+        String variationURLStr = dataRootDir+dataSourceAbbreviation+"/mut/data.json";
         String platformName = "TargetedNGS_MUT";
         String molcharType = "mutation";
 
@@ -327,7 +304,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
                 //STEP 1: Save the platform
                 Platform platform = dataImportService.getPlatform(platformName, dto.getProviderGroup());
                 platform.setGroup(dto.getProviderGroup());
-                platform.setUrl(TARGETEDNGS_PLATFORM_URL);
+                platform.setUrl(targetedNgsPlatformURL);
                 dataImportService.savePlatform(platform);
 
 
@@ -521,12 +498,12 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     public void loadVariantsBySpecimen() {
 
         try {
-            String variationURLStr = dataRootDir+DATASOURCE_ABBREVIATION+"/mut/data.json";
+            String variationURLStr = dataRootDir+dataSourceAbbreviation+"/mut/data.json";
             JSONObject job = new JSONObject(utilityService.parseFile(variationURLStr));
             JSONArray jarray = job.getJSONArray("IRCCVariation");
             //   System.out.println("loading "+jarray.length()+" variant records");
 
-            Platform platform = dataImportService.getPlatform(TECH, dto.getProviderGroup(), TARGETEDNGS_PLATFORM_URL);
+            Platform platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), targetedNgsPlatformURL);
             platform.setGroup(dto.getProviderGroup());
             dataImportService.savePlatform(platform);
 

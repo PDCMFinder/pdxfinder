@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -25,34 +27,12 @@ import java.util.*;
  */
 @Component
 @Order(value = -20)
+@PropertySource("classpath:loader.properties")
+@ConfigurationProperties(prefix = "hci")
 public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
 
     private final static Logger log = LoggerFactory.getLogger(LoadHCI.class);
-
-    private final static String DATASOURCE_ABBREVIATION = "PDXNet-HCI-BCM";
-    private final static String DATASOURCE_NAME = "HCI-Baylor College of Medicine";
-    private final static String DATASOURCE_DESCRIPTION = "HCI BCM PDX mouse models for PDXNet.";
-    private final static String DATASOURCE_CONTACT = "Alana.Welm@hci.utah.edu";
-    private final static String PROVIDER_TYPE = "";
-    private final static String ACCESSIBILITY = "";
-
-    private final static String NSG_BS_NAME = "NOD scid gamma";
-    private final static String NSG_BS_SYMBOL = "NOD.Cg-Prkdc<sup>scid</sup> Il2rg<sup>tm1Wjl</sup>/SzJ"; //yay HTML in name
-    private final static String NSG_BS_URL = "http://jax.org/strain/005557";
-
-    private final static String NS_BS_NAME = "NOD scid";
-    private final static String NS_BS_SYMBOL = "NOD.CB17-Prkd<sup>cscid</sup>/J"; //yay HTML in name
-    private final static String NS_BS_URL = "https://www.jax.org/strain/001303";
-
-    private final static String DOSING_STUDY_URL = "/platform/hci-drug-dosing/";
-
-    private final static String SOURCE_URL = null;
-
-    // for now all samples are of tumor tissue
-    private final static Boolean NORMAL_TISSUE_FALSE = false;
-
-    private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
 
     private HelpFormatter formatter;
 
@@ -93,16 +73,13 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     @Override
     protected void initMethod() {
 
-        log.info("Loading Huntsman PDX data.");
+        log.info("Loading Huntsman PDX data. ");
 
         dto = new LoaderDTO();
 
-        jsonFile = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/models.json";
-        dataSource = DATASOURCE_ABBREVIATION;
+        jsonFile = dataRootDir + dataSourceAbbreviation + "/pdx/models.json";
+        dataSource = dataSourceAbbreviation;
         filesDirectory = "";
-        dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
-        dataSourceContact = DATASOURCE_CONTACT;
-        dosingStudyURL = DOSING_STUDY_URL;
     }
 
 
@@ -114,21 +91,21 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step03CreateProviderGroup() {
 
-        loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+        loadProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription, providerType, accessibility, null, dataSourceContact, sourceURL);
     }
 
 
     @Override
     protected void step04CreateNSGammaHostStrain() {
 
-        loadNSGammaHostStrain(NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_NAME, NSG_BS_NAME);
+        loadNSGammaHostStrain(nsgBsSymbol, nsgbsURL, nsgBsName, nsgBsName);
     }
 
 
     @Override
     protected void step05CreateNSHostStrain() {
 
-        loadNSHostStrain(NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
+        loadNSHostStrain(nsBsSymbol, nsBsURL, nsBsName);
     }
 
 
@@ -152,7 +129,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step10LoadExternalURLs() {
 
-        loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
+        loadExternalURLs(dataSourceContact,Standardizer.NOT_SPECIFIED);
     }
 
 
@@ -224,7 +201,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step15LoadImmunoHistoChemistry() {
 
-        String ihcFileStr = dataRootDir + DATASOURCE_ABBREVIATION + "/ihc/ihc.txt";
+        String ihcFileStr = dataRootDir + dataSourceAbbreviation + "/ihc/ihc.txt";
 
         File file = new File(ihcFileStr);
 

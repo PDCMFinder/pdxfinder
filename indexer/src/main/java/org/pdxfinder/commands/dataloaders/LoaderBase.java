@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public abstract class LoaderBase implements ApplicationContextAware{
+public abstract class LoaderBase extends LoaderProperties implements ApplicationContextAware{
 
     private final static Logger log = LoggerFactory.getLogger(LoaderBase.class);
     protected String jsonFile;
@@ -36,9 +36,6 @@ public abstract class LoaderBase implements ApplicationContextAware{
     protected JSONArray jsonArray;
 
     protected String filesDirectory;
-    protected String dataSourceAbbreviation;
-    protected String dataSourceContact;
-    protected String dosingStudyURL;
     protected JSONObject jsonData;
 
     protected LoaderDTO dto = new LoaderDTO();
@@ -75,6 +72,7 @@ public abstract class LoaderBase implements ApplicationContextAware{
      * Concrete classes can also override and "call back to" this base class method at once using super.step01GetMetaDataFolder()
      */
     void step01GetMetaDataFolder(){
+
 
         listOfFiles = new File[0];
         File folder = new File(filesDirectory);
