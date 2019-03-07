@@ -14,6 +14,7 @@ import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
+import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,8 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     HashMap<String, String> passageMap = null;
 
+    Map<String, Platform> platformMap = new HashMap<>();
+
     @PostConstruct
     public void init() {
         formatter = new HelpFormatter();
@@ -131,8 +134,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
         step00StartReportManager();
 
-        step00StartReportManager();
-
         step02GetMetaDataJSON();
 
         step03CreateProviderGroup();
@@ -151,6 +152,8 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
             this.jsonData = jsonArray.getJSONObject(i);
 
             step08GetMetaData();
+
+            //if(!dto.getModelID().equals("TM00016")) continue;
 
             step09LoadPatientData();
 
@@ -393,6 +396,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         try {
 
             passageMap = new HashMap<>();
+            Map<String, MolecularCharacterization> molcharMap = new HashMap<>();
 
             HashMap<String, HashMap<String, List<MarkerAssociation>>> sampleMap = new HashMap<>();
             HashMap<String, List<MarkerAssociation>> markerMap = new HashMap<>();
@@ -405,7 +409,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                 JSONObject job = new JSONObject(utilityService.parseFile(variationFile));
                 JSONArray jarray = job.getJSONArray("variation");
                 String sample = null;
-                String symbol, id, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency, altAllele = null;
+                String symbol, id, technology, aaChange, chromosome, seqPosition, refAllele, consequence, rsVariants, readDepth, alleleFrequency, altAllele, passage = null;
                 log.info(jarray.length() + " gene variants for model " + modelCreation.getSourcePdxId());
 
                 // configure the maximum variations to load in properties file
@@ -414,6 +418,8 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                 if (maxVariations > 0 && maxVariations < jarray.length()) {
                     stop = maxVariations;
                 }
+
+                //PHASE 1: assemble objects in memory, reducing db interactions as much as possible
                 for (int i = 0; i < stop;) {
                     JSONObject j = jarray.getJSONObject(i);
 
@@ -430,6 +436,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                     readDepth = j.getString("read depth");
                     alleleFrequency = j.getString("allele frequency");
                     altAllele = j.getString("alt allele");
+                    passage = j.getString("passage num");
 
                     //skip loading fish!
                     if(technology.equals("Other:_FISH")){
@@ -437,134 +444,153 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                         continue;
                     }
 
-                    passageMap.put(sample, j.getString("passage num"));
-
-                    // since there are 8 fields assume (incorrectly?) all MAs are unique
-                    // create a new one rather than look for exisitng one
-                    MarkerAssociation ma = new MarkerAssociation();
-
-                    ma.setAminoAcidChange(aaChange);
-                    ma.setConsequence(consequence);
-                    ma.setAlleleFrequency(alleleFrequency);
-                    ma.setChromosome(chromosome);
-                    ma.setReadDepth(readDepth);
-                    ma.setRefAllele(refAllele);
-                    ma.setAltAllele(altAllele);
-                    ma.setRefAssembly(refAssembly);
-                    ma.setRsVariants(rsVariants);
-                    ma.setSeqPosition(seqPosition);
-                    ma.setReadDepth(readDepth);
-
-                    Marker marker = null;
-                    marker.setEntrezId(id);
-
-                    ma.setMarker(marker);
-
+                    //step 1: Get the Platform and cache it like a boss
+                    //This is to reduce db interaction
                     Platform platform;
+                    if(platformMap.containsKey(technology)){
 
-                    if(technology.equals("Truseq_JAX")){
-                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), TRUSEQ_PLATFORM_URL);
-                    }
-                    else if(technology.equals("Whole_Exome")){
-                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), WHOLE_EXOME_URL);
-                    }
-                    else if(technology.equals("CTP")){
-                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), CTP_PLATFORM_URL);
+                        platform = platformMap.get(technology);
                     }
                     else{
-                        platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), "");
+
+                        if(technology.equals("Truseq_JAX")){
+                            platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), TRUSEQ_PLATFORM_URL);
+                        }
+                        else if(technology.equals("Whole_Exome")){
+                            platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), WHOLE_EXOME_URL);
+                        }
+                        else if(technology.equals("CTP")){
+                            platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), CTP_PLATFORM_URL);
+                        }
+                        else{
+                            platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), "");
+                        }
+
+                        platformMap.put(technology, platform);
                     }
 
 
-                    markerMap = sampleMap.get(sample);
-                    if (markerMap == null) {
-                        markerMap = new HashMap<>();
+
+                    // step 2: get the cached molchar object or create one if it does not exist in the map
+                    //key: sampleid + "__" + passage + "__" + platformtechnology
+                    MolecularCharacterization molecularCharacterization;
+                    String molcharKey = sample + "__" + passage + "__" + technology;
+
+                    if(molcharMap.containsKey(molcharKey)){
+
+                        molecularCharacterization = molcharMap.get(molcharKey);
+                    }
+                    else{
+
+                        molecularCharacterization = new MolecularCharacterization();
+                        molecularCharacterization.setType("mutation");
+                        molecularCharacterization.setPlatform(platform);
+                        molcharMap.put(molcharKey, molecularCharacterization);
                     }
 
-                    // make a map of markerAssociation collections keyed to technology
-                    if (markerMap.containsKey(technology)) {
-                        markerMap.get(technology).add(ma);
-                    } else {
-                        List<MarkerAssociation> list = new ArrayList<>();
-                        list.add(ma);
-                        markerMap.put(technology, list);
+                    //step 3: get the marker suggestion from the service
+                    NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, modelCreation.getSourcePdxId(), symbol);
+
+                    Marker marker;
+
+                    if(nsdto.getNode() == null){
+
+                        //uh oh, we found an unrecognised marker symbol, abort, abort!!!!
+                        reportManager.addMessage(nsdto.getLogEntity());
+                        i++;
+                        continue;
+                    }
+                    else{
+
+                        // step 4: assemble the MarkerAssoc object and add it to molchar
+                        marker = (Marker)nsdto.getNode();
+
+                        //if we have any message regarding the suggested marker, ie: prev symbol, synonym, etc, add it to the report
+                        if(nsdto.getLogEntity() != null){
+                            reportManager.addMessage(nsdto.getLogEntity());
+                        }
+
+                        MarkerAssociation ma = new MarkerAssociation();
+                        ma.setAminoAcidChange(aaChange);
+                        ma.setConsequence(consequence);
+                        ma.setAlleleFrequency(alleleFrequency);
+                        ma.setChromosome(chromosome);
+                        ma.setReadDepth(readDepth);
+                        ma.setRefAllele(refAllele);
+                        ma.setAltAllele(altAllele);
+                        ma.setRefAssembly(refAssembly);
+                        ma.setRsVariants(rsVariants);
+                        ma.setSeqPosition(seqPosition);
+                        ma.setReadDepth(readDepth);
+                        ma.setMarker(marker);
+
+                        molecularCharacterization.addMarkerAssociation(ma);
+
                     }
 
-                    sampleMap.put(sample, markerMap);
                     i++;
                     if (i % 100 == 0) {
                         System.out.println("loaded " + i + " markers");
                     }
                 }
+
                 System.out.println("loaded " + stop + " markers for " + modelCreation.getSourcePdxId());
 
-                for (String sampleKey : sampleMap.keySet()) {
+                //PHASE 2: get objects from cache and persist them
+                //assembled all mc objects for a particular model, time to link them to the corresponding samples
 
-                    String passage = getPassage(sampleKey);
-                    markerMap = sampleMap.get(sampleKey);
+                for(Map.Entry<String, MolecularCharacterization> mcEntry : molcharMap.entrySet()){
+                    //key: sampleid + "__" + passage + "__" + platformtechnology
+                    String mcKey = mcEntry.getKey();
+                    MolecularCharacterization mc = mcEntry.getValue();
 
-                    HashSet<MolecularCharacterization> mcs = new HashSet<>();
-                    for (String tech : markerMap.keySet()) {
-                        MolecularCharacterization mc = new MolecularCharacterization();
-                        mc.setType("mutation");
+                    String[] mcKeyArr = mcKey.split("__");
+                    String sampleId = mcKeyArr[0];
+                    String pass = getPassage(mcKeyArr[1]);
 
-                        Platform platform = null;
+                    boolean foundSpecimen = false;
+                    if(modelCreation.getSpecimens() != null){
 
-                        if(tech.equals("Truseq_JAX")){
-                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), TRUSEQ_PLATFORM_URL);
+                        for(Specimen specimen : modelCreation.getSpecimens()){
+
+                            if(specimen.getPassage().equals(pass)){
+
+                                if(specimen.getSample() != null){
+
+                                    Sample xenograftSample = specimen.getSample();
+                                    xenograftSample.addMolecularCharacterization(mc);
+                                }
+                                else{
+
+                                    Sample xenograftSample = new Sample();
+                                    xenograftSample.setSourceSampleId(sampleId);
+                                    xenograftSample.addMolecularCharacterization(mc);
+                                    specimen.setSample(xenograftSample);
+                                    modelCreation.addRelatedSample(xenograftSample);
+
+                                }
+                                foundSpecimen = true;
+                            }
+
                         }
-                        else if(tech.equals("Whole_Exome")){
-                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), WHOLE_EXOME_URL);
-                        }
-                        else if(tech.equals("CTP")){
-                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), CTP_PLATFORM_URL);
-                        }
-                        else{
-                            platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), "");
-                        }
-
-
-                        mc.setPlatform(platform);
-                        mc.setMarkerAssociations(markerMap.get(tech));
-                        mcs.add(mc);
 
                     }
+                    //this passage is not present yet, create a specimen with sample and link mc
+                    if(!foundSpecimen){
 
+                        Specimen specimen = new Specimen();
+                        specimen.setPassage(pass);
 
-                    Specimen specimen = dataImportService.getSpecimen(modelCreation, sampleKey, dto.getProviderGroup().getAbbreviation(), passage);
-
-                    Sample specSample = new Sample();
-                    specSample.setSourceSampleId(sampleKey);
-                    specimen.setSample(specSample);
-                    specSample.setMolecularCharacterizations(mcs);
-
-
-                    if (dto.getHistologyMap().containsKey(passage)) {
-                        Histology histology = new Histology();
-                        Image image = dto.getHistologyMap().get(passage);
-                        histology.addImage(image);
-                        specSample.addHistology(histology);
-
+                        Sample xenograftSample = new Sample();
+                        xenograftSample.setSourceSampleId(sampleId);
+                        xenograftSample.addMolecularCharacterization(mc);
+                        specimen.setSample(xenograftSample);
+                        modelCreation.addRelatedSample(xenograftSample);
+                        modelCreation.addSpecimen(specimen);
                     }
-
-
-                    // all JAX mice are NSG, even if not specified in feed
-                    specimen.setHostStrain(dto.getNodScidGamma());
-
-
-                    specimen.setEngraftmentSite(engraftmentSite);
-                    specimen.setEngraftmentType(engraftmentType);
-
-
-                    dataImportService.saveSpecimen(specimen);
-
-                    modelCreation.addSpecimen(specimen);
-                    modelCreation.addRelatedSample(specSample);
-
-
-                    System.out.println("saved passage " + passage + " for model " + modelCreation.getSourcePdxId() + " from sample " + sampleKey);
                 }
 
+                log.info("Saving molchars for model: "+modelCreation.getSourcePdxId());
                 dataImportService.saveModelCreation(modelCreation);
 
             }
@@ -581,15 +607,15 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     }
 
-    private String getPassage(String sample) {
+    private String getPassage(String passageString) {
         String p = "0";
+
         try {
-            p = passageMap.get(sample).replaceAll("P", "");
+           passageString.replace("P", "");
         } catch (Exception e) {
-            log.info("Unable to determine passage from sample name " + sample + ". Assuming 0");
+            log.info("Unable to determine passage from sample name " + passageString + ". Assuming 0");
         }
         return p;
-
     }
 
     /*
