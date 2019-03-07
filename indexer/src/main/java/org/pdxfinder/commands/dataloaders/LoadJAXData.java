@@ -269,13 +269,21 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         if(!dto.getModelTag().equals(Standardizer.NOT_SPECIFIED)){
 
             if(dto.getModelTag().equals("Triple Negative Breast Cancer (TNBC)")){
+                NodeSuggestionDTO nsdto;
 
                 MolecularCharacterization mc = new MolecularCharacterization();
                 mc.setPlatform(dataImportService.getPlatform("Not Specified", dto.getProviderGroup()));
                 mc.setType("IHC");
-                Marker her2 = null; //dataImportService.getMarker("HER2", "HER2");
-                Marker er = null; //dataImportService.getMarker("ER", "ER");
-                Marker pr = null; //dataImportService.getMarker("PR", "PR");
+
+                //we know these markers exist so no need to check for null
+                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "ERBB2");
+                Marker her2 = (Marker) nsdto.getNode(); // ERBB2  dataImportService.getMarker("HER2", "HER2");
+
+                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "EREG");
+                Marker er = (Marker) nsdto.getNode(); //dataImportService.getMarker("ER", "ER");
+
+                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "PGR");
+                Marker pr = (Marker) nsdto.getNode(); //dataImportService.getMarker("PR", "PR");
 
                 MarkerAssociation her2a = new MarkerAssociation();
                 her2a.setMarker(her2);
