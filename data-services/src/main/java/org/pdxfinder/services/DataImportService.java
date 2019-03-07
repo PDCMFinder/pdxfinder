@@ -1365,11 +1365,15 @@ public class DataImportService {
                 else{
 
                     le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, "","");
-                    le.setMessage("Previous symbol for multiple terms");
+                    String prevMarkers = markerSuggestionList.stream().map(Marker::getSymbol).collect(Collectors.joining(", "));
+
+                    le.setMessage("Previous symbol for multiple approved markers: "+prevMarkers);
                     le.setType("ERROR");
                     nsdto.setNode(null);
                     nsdto.setLogEntity(le);
                 }
+
+                return nsdto;
 
             }
             else{
@@ -1390,18 +1394,20 @@ public class DataImportService {
                     }
                     else{
                         le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, "","");
-                        le.setMessage("Synonym for multiple terms");
+                        String synonymMarkers = markerSuggestionList.stream().map(Marker::getSymbol).collect(Collectors.joining(", "));
+                        le.setMessage("Synonym for multiple markers: "+synonymMarkers);
                         le.setType("ERROR");
                         nsdto.setNode(null);
                         nsdto.setLogEntity(le);
                     }
 
+                    return nsdto;
                 }
                 else{
 
                     //error, didn't find the symbol anywhere
                     le = new MarkerLogEntity(reporter,dataSource, modelId, symbol, "","");
-                    le.setMessage(symbol +" is an unrecognised symbol, skipping");
+                    le.setMessage(symbol +" is an unrecognised symbol");
                     le.setType("ERROR");
                     nsdto.setLogEntity(le);
                     notFoundMarkerSymbols.put(dataSource+modelId+symbol, nsdto);
