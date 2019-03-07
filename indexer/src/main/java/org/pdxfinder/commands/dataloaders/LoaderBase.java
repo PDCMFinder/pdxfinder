@@ -462,7 +462,7 @@ public abstract class LoaderBase extends LoaderProperties implements Application
             if (ds.equals("mdAnderson")) {
                 String markerStr = dto.getMarkerStr();
                 String[] markers = markerStr.split(";");
-                if (markerStr.trim().length() > 0) {
+                if (markerStr.trim().length() > 0 && markers.length>0) {
                     Platform pl = dataImportService.getPlatform(markerPlatform, dto.getProviderGroup());
                     MolecularCharacterization molC = new MolecularCharacterization();
                     molC.setType("mutation");
