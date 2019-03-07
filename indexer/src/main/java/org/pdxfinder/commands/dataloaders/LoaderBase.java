@@ -298,8 +298,6 @@ public abstract class LoaderBase implements ApplicationContextAware{
 
         step00StartReportManager();
 
-        step00StartReportManager();
-
         step02GetMetaDataJSON();
 
         step03CreateProviderGroup();
