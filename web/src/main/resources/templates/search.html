@@ -239,6 +239,7 @@
                 <div class="columns medium-9">
 
 
+
                     <div class="responsive-table">
                         <table id="search-datatable" class="stripe display datatable-pdx sticky-header" cellspacing="0"
                                width="100%">
@@ -328,7 +329,7 @@
 
                     <div class="row topSpace50">
 
-                        <div class="columns medium-8 small-6 padding-vertical-10">
+                        <div class="columns medium-6 small-6 ">
                             <ul class="pagination pdx-pagination" role="navigation" aria-label="Pagination">
                                 <li class="pagination-previous"
                                     th:classappend="${#strings.equals(websearch.page, '1')} ? 'disabled'">
@@ -355,11 +356,27 @@
                             </ul>
                         </div>
 
-                        <div class="columns medium-4 small-6 text-right">
-                            <a th:href="@{'/search/export' + '?' + ${websearch.facetString}}"
-                               class="button outline secondary">Download Results <i class="icon icon-functional"
-                                                                                  data-icon="="></i> </a>
+                        <div class="columns medium-6 small-6 text-right">
+
+                            <div class="columns medium-7" style="padding: 0px;">
+                                <a  style="font-size: 13px;" th:href="@{'/search/export' + '?' + ${websearch.facetString}}"
+                                   class="button outline secondary">Download Results <i class="icon icon-functional"
+                                                                                        data-icon="="></i> </a>
+                            </div>
+
+                            <div class="columns medium-5 text-right">
+                                <select style="font-size: 12px;" onchange="window.open(this.options[this.selectedIndex].value,'_top')">
+                                    <option th:value="'?'+${websearch.facetString} + '&size=10'">  10 Models Per Page </option>
+                                    <option th:value="'?'+${websearch.facetString} + '&size=50'">  50 Models Per Page </option>
+                                    <option th:value="'?'+${websearch.facetString} + '&size=200'">  200 Models Per Page </option>
+                                    <option th:value="'?'+${websearch.facetString} + '&size=2000'"> ALL Models </option>
+                                </select>
+
+                            </div>
                         </div>
+
+
+
                     </div>
 
 

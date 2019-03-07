@@ -139,10 +139,10 @@ public class SearchService {
         wsDTO.setCurrentIndex(current);
 
 
-        int begin = Math.max(1, current - 4);
+        int begin = Math.max(1, current - 2);
         wsDTO.setBeginIndex(begin);
 
-        int end = Math.min(begin + 7, numPages);
+        int end = Math.min(begin + 4, numPages);
         wsDTO.setEndIndex(end);
 
         wsDTO.setPage(page);
