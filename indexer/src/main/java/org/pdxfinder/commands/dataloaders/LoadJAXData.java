@@ -538,7 +538,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
                     i++;
                     if (i % 100 == 0) {
-                        System.out.println("loaded " + i + " markers");
+                        System.out.println("loaded " + i + " variants");
                     }
                 }
 
@@ -552,53 +552,50 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                     String mcKey = mcEntry.getKey();
                     MolecularCharacterization mc = mcEntry.getValue();
 
+
                     String[] mcKeyArr = mcKey.split("__");
                     String sampleId = mcKeyArr[0];
                     String pass = getPassage(mcKeyArr[1]);
 
                     boolean foundSpecimen = false;
+
                     if(modelCreation.getSpecimens() != null){
 
                         for(Specimen specimen : modelCreation.getSpecimens()){
 
                             if(specimen.getPassage().equals(pass)){
 
-                                if(specimen.getSample() != null){
+                                if(specimen.getSample() != null && specimen.getSample().getSourceSampleId().equals(sampleId)){
 
                                     Sample xenograftSample = specimen.getSample();
                                     xenograftSample.addMolecularCharacterization(mc);
-                                }
-                                else{
 
-                                    Sample xenograftSample = new Sample();
-                                    xenograftSample.setSourceSampleId(sampleId);
-                                    xenograftSample.addMolecularCharacterization(mc);
-                                    specimen.setSample(xenograftSample);
-                                    modelCreation.addRelatedSample(xenograftSample);
+                                    foundSpecimen = true;
 
                                 }
-                                foundSpecimen = true;
                             }
 
                         }
 
                     }
-                    //this passage is not present yet, create a specimen with sample and link mc
+                    //this passage is either not present yet or the linked sample has a different ID, create a specimen with sample and link mc
                     if(!foundSpecimen){
-
-                        Specimen specimen = new Specimen();
-                        specimen.setPassage(pass);
+                        log.info("Creating new specimen for "+mcKey);
 
                         Sample xenograftSample = new Sample();
                         xenograftSample.setSourceSampleId(sampleId);
                         xenograftSample.addMolecularCharacterization(mc);
+
+                        Specimen specimen = new Specimen();
+                        specimen.setPassage(pass);
                         specimen.setSample(xenograftSample);
+
+
                         modelCreation.addRelatedSample(xenograftSample);
                         modelCreation.addSpecimen(specimen);
                     }
                 }
 
-                log.info("Saving molchars for model: "+modelCreation.getSourcePdxId());
                 dataImportService.saveModelCreation(modelCreation);
 
             }
@@ -616,14 +613,17 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     }
 
     private String getPassage(String passageString) {
-        String p = "0";
 
-        try {
-           passageString.replace("P", "");
-        } catch (Exception e) {
-            log.info("Unable to determine passage from sample name " + passageString + ". Assuming 0");
+        if(!passageString.isEmpty() && passageString.toUpperCase().contains("P")){
+
+            passageString = passageString.toUpperCase().replace("P", "");
         }
-        return p;
+        //does this string have digits only now?
+        if(passageString.matches("\\d+")) return passageString;
+
+        log.warn("Unable to determine passage from sample name " + passageString + ". Assuming 0");
+        return "0";
+
     }
 
     /*
