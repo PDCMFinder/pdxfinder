@@ -569,7 +569,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
                 ma.setReadDepth(readDepth);
 
                 Marker marker = dataImportService.getMarker(symbol);
-                marker.setEntrezId(id);
+                marker.setNcbiGeneId(id);
 
                 ma.setMarker(marker);
 

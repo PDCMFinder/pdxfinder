@@ -15,69 +15,79 @@ public class Marker {
     @GraphId
     Long id;
 
-    String symbol;
-    String name;
-    String hugoId;
-    String ensemblId;
-    String entrezId;
+    String hgncSymbol;              // This is the approved Symbol in HGNC - KRAS
+    String hgncName;                // This is the approved name in HGNC KRAS proto-oncogene, GTPase
+    String hgncId;                  // This is the hugo unique ID - e.g HGNC:6407
+    String ucscGeneId;              // This replaces entrez_id
+
+    String ensemblGeneId;
+    String ncbiGeneId;
+    String uniprotId;               // e.g For human KRAS : P01116
+
     Set<String> prevSymbols;
-    Set<String> synonyms;
+    Set<String> aliasSymbols;       // This was formerly called synonymns
+
+
 
     public Marker() {
     }
 
-    public Marker(String symbol, String name) {
-        this.symbol = symbol;
-        this.name = name;
+    public Marker(String hgncSymbol, String hgncName) {
+        this.hgncSymbol = hgncSymbol;
+        this.hgncName = hgncName;
 
     }
 
-    public String getSymbol() {
-        return symbol;
+    public String getHgncSymbol() {
+        return hgncSymbol;
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
+    public void setHgncSymbol(String hgncSymbol) {
+        this.hgncSymbol = hgncSymbol;
     }
 
-    public String getName() {
-        return name;
+    public String getHgncName() {
+        return hgncName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setHgncName(String hgncName) {
+        this.hgncName = hgncName;
     }
 
-    public String getHugoId() {
-        return hugoId;
+    public String getHgncId() {
+        return hgncId;
     }
 
-    public void setHugoId(String hugoId) {
-        this.hugoId = hugoId;
+    public void setHgncId(String hgncId) {
+        this.hgncId = hgncId;
     }
 
-    public String getEnsemblId() {
-        return ensemblId;
+    public String getEnsemblGeneId() {
+        return ensemblGeneId;
     }
 
-    public void setEnsemblId(String ensemblId) {
-        this.ensemblId = ensemblId;
+    public void setEnsemblGeneId(String ensemblGeneId) {
+        this.ensemblGeneId = ensemblGeneId;
     }
 
-    public String getEntrezId() {
-        return entrezId;
+    public String getNcbiGeneId() {
+        return ncbiGeneId;
     }
 
-    public void setEntrezId(String entrezId) {
-        this.entrezId = entrezId;
+    public void setNcbiGeneId(String ncbiGeneId) {
+        this.ncbiGeneId = ncbiGeneId;
     }
 
     public Set<String> getPrevSymbols() {
         return prevSymbols;
     }
 
-    public Set<String> getSynonyms() {
-        return synonyms;
+    public Set<String> getAliasSymbols() {
+        return aliasSymbols;
+    }
+
+    public void setAliasSymbols(Set<String> aliasSymbols) {
+        this.aliasSymbols = aliasSymbols;
     }
 
     public void addPrevSymbol(String s){
@@ -87,19 +97,15 @@ public class Marker {
         this.prevSymbols.add(s);
     }
 
-    public void addSynonym(String s){
-        if(this.synonyms == null){
-            this.synonyms = new HashSet<>();
+    public void addAliasSymbols(String s){
+        if(this.aliasSymbols == null){
+            this.aliasSymbols = new HashSet<>();
         }
-        this.synonyms.add(s);
+        this.aliasSymbols.add(s);
 
     }
 
     public void setPrevSymbols(Set<String> prevSymbols) {
         this.prevSymbols = prevSymbols;
-    }
-
-    public void setSynonyms(Set<String> synonyms) {
-        this.synonyms = synonyms;
     }
 }

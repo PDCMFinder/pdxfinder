@@ -158,18 +158,18 @@ public class LoadMarkers implements CommandLineRunner{
                     if(!symbol.isEmpty()){
 
                         Marker m = new Marker();
-                        m.setSymbol(symbol);
+                        m.setHgncSymbol(symbol);
 
                         if(!ensemblId.isEmpty()){
-                            m.setEnsemblId(ensemblId);
+                            m.setEnsemblGeneId(ensemblId);
                         }
                         if(!hgncId.isEmpty()){
-                            m.setHugoId(hgncId);
+                            m.setHgncId(hgncId);
                         }
 
                         if(synonyms.length>0){
 
-                            m.setSynonyms(new HashSet<>(Arrays.asList(synonyms)));
+                            m.setAliasSymbols(new HashSet<>(Arrays.asList(synonyms)));
                         }
 
                         if(prevSymbols.length>0){

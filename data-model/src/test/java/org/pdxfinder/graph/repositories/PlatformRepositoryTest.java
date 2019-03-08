@@ -59,7 +59,7 @@ public class PlatformRepositoryTest extends BaseTest {
 
         for (int i = 0; i < 10; i++) {
             Marker marker = new Marker();
-            marker.setName("Marker" + i);
+            marker.setHgncName("Marker" + i);
 
             PlatformAssociation p = new PlatformAssociation();
             p.setMarker(marker);

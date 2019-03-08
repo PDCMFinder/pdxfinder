@@ -190,12 +190,12 @@ private void updateMarkers(HashMap hmap){
     System.out.println(markers.size()+" markers were loaded from Neo4j.");
     for(Marker m:markers){
 
-        if(hmap.containsKey(m.getSymbol())){
-            AccessionData ad = (AccessionData) hmap.get(m.getSymbol());
+        if(hmap.containsKey(m.getHgncSymbol())){
+            AccessionData ad = (AccessionData) hmap.get(m.getHgncSymbol());
 
-            if(m.getEntrezId().equals(ad.getEntrezId()) ){
-                m.setHugoId(ad.getHgncId());
-                m.setEnsemblId(ad.getEnsemblId());
+            if(m.getNcbiGeneId().equals(ad.getEntrezId()) ){
+                m.setHgncId(ad.getHgncId());
+                m.setEnsemblGeneId(ad.getEnsemblId());
 
                 if(ad.getPrevSymbols().size()>0){
                     for(String ps:ad.getPrevSymbols()){
@@ -205,22 +205,22 @@ private void updateMarkers(HashMap hmap){
 
                 if(ad.getSynonyms().size()>0){
                     for(String s:ad.getSynonyms()){
-                        m.addSynonym(s);
+                        m.addAliasSymbols(s);
                     }
                 }
                 updatedMarkers++;
-                System.out.println("Updating marker:"+m.getSymbol());
+                System.out.println("Updating marker:"+m.getHgncSymbol());
                 dataImportService.saveMarker(m);
             }
             else{
-                entrezIdMismatch.add(m.getSymbol());
+                entrezIdMismatch.add(m.getHgncSymbol());
             }
 
 
 
         }
         else{
-            notUpdatedMarkers.add(m.getSymbol());
+            notUpdatedMarkers.add(m.getHgncSymbol());
         }
 
     }

@@ -134,7 +134,7 @@ public class CreateDataProjections implements CommandLineRunner{
                     if(m != null){
 
                         String variantName = ma.getAminoAcidChange();
-                        String markerName = m.getName();
+                        String markerName = m.getHgncName();
 
                         if(variantName != null && !variantName.isEmpty()  && markerName != null && !markerName.isEmpty()){
 
@@ -212,7 +212,7 @@ public class CreateDataProjections implements CommandLineRunner{
                     if(m != null){
 
                         String ihcResult = ma.getImmunoHistoChemistryResult();
-                        String markerName = m.getName();
+                        String markerName = m.getHgncName();
                         //log.info(ihcResult + markerName);
                         if(ihcResult != null && !ihcResult.isEmpty()  && markerName != null && !markerName.isEmpty()){
 

@@ -721,10 +721,10 @@ public class DataImportService {
 
     public MarkerAssociation getMarkerAssociation(String type, String markerSymbol, String markerName) {
         Marker m = this.getMarker(markerSymbol, markerName);
-        MarkerAssociation ma = markerAssociationRepository.findByTypeAndMarkerName(type, m.getName());
+        MarkerAssociation ma = markerAssociationRepository.findByTypeAndMarkerName(type, m.getHgncName());
 
-        if (ma == null && m.getSymbol() != null) {
-            ma = markerAssociationRepository.findByTypeAndMarkerSymbol(type, m.getSymbol());
+        if (ma == null && m.getHgncSymbol() != null) {
+            ma = markerAssociationRepository.findByTypeAndMarkerSymbol(type, m.getHgncSymbol());
         }
 
         if (ma == null) {
@@ -951,7 +951,7 @@ public class DataImportService {
         if (m == null) {
             System.out.println("Marker is null");
         }
-        PlatformAssociation pa = platformAssociationRepository.findByPlatformAndMarker(p.getName(), p.getGroup().getName(), m.getSymbol());
+        PlatformAssociation pa = platformAssociationRepository.findByPlatformAndMarker(p.getName(), p.getGroup().getName(), m.getHgncSymbol());
         if (pa == null) {
             pa = new PlatformAssociation();
             pa.setPlatform(p);
@@ -1326,14 +1326,14 @@ public class DataImportService {
         else if(markersByPrevSymbol.containsKey(symbol)){
 
             m = markersByPrevSymbol.get(symbol);
-            le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getSymbol(),"Previous symbol");
+            le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Previous symbol");
             nsdto.setLogEntity(le);
             ready = true;
         }
         else if(markersBySynonym.containsKey(symbol)){
 
             m = markersBySynonym.get(symbol);
-            le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getSymbol(),"Synonym");
+            le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Synonym");
             nsdto.setLogEntity(le);
             ready = true;
         }
@@ -1358,7 +1358,7 @@ public class DataImportService {
                 if(markerSuggestionList.size() == 1){
                     //symbol found in prev symbols
                     m = markerSuggestionList.get(0);
-                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getSymbol(),"Previous symbol");
+                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Previous symbol");
                     nsdto.setNode(m);
                     nsdto.setLogEntity(le);
                     markersByPrevSymbol.put(symbol, m);
@@ -1366,7 +1366,7 @@ public class DataImportService {
                 else{
 
                     le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
-                    String prevMarkers = markerSuggestionList.stream().map(Marker::getSymbol).collect(Collectors.joining(", "));
+                    String prevMarkers = markerSuggestionList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining(", "));
 
                     le.setMessage("Previous symbol for multiple approved markers: "+prevMarkers);
                     le.setType("ERROR");
@@ -1387,7 +1387,7 @@ public class DataImportService {
 
                         //symbol found in synonym
                         m = markerSuggestionList.get(0);
-                        le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getSymbol(),"Synonym");
+                        le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Synonym");
 
                         nsdto.setNode(m);
                         nsdto.setLogEntity(le);
@@ -1395,7 +1395,7 @@ public class DataImportService {
                     }
                     else{
                         le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
-                        String synonymMarkers = markerSuggestionList.stream().map(Marker::getSymbol).collect(Collectors.joining(", "));
+                        String synonymMarkers = markerSuggestionList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining(", "));
                         le.setMessage("Synonym for multiple markers: "+synonymMarkers);
                         le.setType("ERROR");
                         nsdto.setNode(null);

@@ -532,7 +532,7 @@ public class SearchService {
 
                 for (MolecularCharacterization mc : model.getSample().getMolecularCharacterizations()) {
                     for (MarkerAssociation ma : mc.getMarkerAssociations()) {
-                        markerSet.add(ma.getMarker().getName());
+                        markerSet.add(ma.getMarker().getHgncName());
                     }
                 }
                 sdto.setCancerGenomics(new ArrayList<>(markerSet));

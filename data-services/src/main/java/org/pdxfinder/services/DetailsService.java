@@ -770,11 +770,11 @@ public class DetailsService {
                     markerAssocArray[3] = markerAssoc.getRefAllele();
                     markerAssocArray[4] = markerAssoc.getAltAllele();
                     markerAssocArray[5] = markerAssoc.getConsequence();
-                    markerAssocArray[6] = markerAssoc.getMarker().getSymbol();
+                    markerAssocArray[6] = markerAssoc.getMarker().getHgncSymbol();
                     markerAssocArray[7] = markerAssoc.getAminoAcidChange();
                     markerAssocArray[8] = markerAssoc.getReadDepth();
                     markerAssocArray[9] = markerAssoc.getAlleleFrequency();
-                    markerAssocArray[10] = markerAssoc.getRsVariants();
+                    markerAssocArray[10] = markerAssoc.getRsIdVariants();
                     markerAssocArray[11] = dMolChar.getPlatform().getName();
                     markerAssocArray[12] = passage;
                     //markerAssocArray[13] = sample.getDiagnosis();
