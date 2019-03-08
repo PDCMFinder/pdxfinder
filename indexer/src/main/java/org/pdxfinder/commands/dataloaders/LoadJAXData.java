@@ -526,8 +526,8 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                         ma.setReadDepth(readDepth);
                         ma.setRefAllele(refAllele);
                         ma.setAltAllele(altAllele);
-                        ma.setRefAssembly(refAssembly);
-                        ma.setRsVariants(rsVariants);
+                        ma.setGenomeAssembly(refAssembly);
+                        ma.setRsIdVariants(rsVariants);
                         ma.setSeqPosition(seqPosition);
                         ma.setReadDepth(readDepth);
                         ma.setMarker(marker);
@@ -608,7 +608,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         } catch (Exception e) {
             log.error("", e);
         }
-        
+
 
     }
 

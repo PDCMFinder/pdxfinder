@@ -455,7 +455,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
                             ma.setAlleleFrequency(alleleFreq);
                             ma.setReadDepth(readDepth);
                             ma.setConsequence(consequence);
-                            ma.setRsVariants(rsVariant);
+                            ma.setRsIdVariants(rsVariant);
 
 
                             mc.addMarkerAssociation(ma);
@@ -563,8 +563,8 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
                 ma.setReadDepth(readDepth);
                 ma.setRefAllele(refAllele);
                 ma.setAltAllele(altAllele);
-                ma.setRefAssembly(refAssembly);
-                ma.setRsVariants(rsVariants);
+                ma.setGenomeAssembly(refAssembly);
+                ma.setRsIdVariants(rsVariants);
                 ma.setSeqPosition(seqPosition);
                 ma.setReadDepth(readDepth);
 

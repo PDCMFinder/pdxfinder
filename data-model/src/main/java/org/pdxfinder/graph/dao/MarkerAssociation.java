@@ -34,16 +34,20 @@ public class MarkerAssociation {
     private String seqPosition; //in jax use seqStartPosition instead of this
     private String refAllele;
     private String altAllele;
+    private String nucleotideChange;
     private String consequence; // variant_classification in ircc
     private String aminoAcidChange; //use hgvsp short, remove p. in ircc
-    private String rsVariants;
+    private String rsIdVariants;
     private String readDepth;
     private String alleleFrequency;
-    private String refAssembly; //NCBI_build in ircc
+    private String genomeAssembly; //NCBI_build in ircc
 
     private String seqStartPosition;
     private String seqEndPosition;
     private String strand;
+    private String ensemblTanscriptId;
+    private String ucscTanscriptId;
+    private String ncbiTanscriptId;
 
     private String cdsChange;
     private String type; //Substitution
@@ -157,17 +161,17 @@ public class MarkerAssociation {
     }
 
     /**
-     * @return the rsVariants
+     * @return the rsIdVariants
      */
-    public String getRsVariants() {
-        return rsVariants;
+    public String getRsIdVariants() {
+        return rsIdVariants;
     }
 
     /**
-     * @param rsVariants the rsVariants to set
+     * @param rsIdVariants the rsIdVariants to set
      */
-    public void setRsVariants(String rsVariants) {
-        this.rsVariants = rsVariants;
+    public void setRsIdVariants(String rsIdVariants) {
+        this.rsIdVariants = rsIdVariants;
     }
 
     /**
@@ -213,17 +217,17 @@ public class MarkerAssociation {
     }
 
     /**
-     * @return the refAssembly
+     * @return the genomeAssembly
      */
-    public String getRefAssembly() {
-        return refAssembly;
+    public String getGenomeAssembly() {
+        return genomeAssembly;
     }
 
     /**
-     * @param refAssembly the refAssembly to set
+     * @param genomeAssembly the refAssembly to set
      */
-    public void setRefAssembly(String refAssembly) {
-        this.refAssembly = refAssembly;
+    public void setGenomeAssembly(String genomeAssembly) {
+        this.genomeAssembly = genomeAssembly;
     }
 
     public String getSeqStartPosition() {
@@ -248,6 +252,30 @@ public class MarkerAssociation {
 
     public void setStrand(String strand) {
         this.strand = strand;
+    }
+
+    public String getEnsemblTanscriptId() {
+        return ensemblTanscriptId;
+    }
+
+    public void setEnsemblTanscriptId(String ensemblTanscriptId) {
+        this.ensemblTanscriptId = ensemblTanscriptId;
+    }
+
+    public String getUcscTanscriptId() {
+        return ucscTanscriptId;
+    }
+
+    public void setUcscTanscriptId(String ucscTanscriptId) {
+        this.ucscTanscriptId = ucscTanscriptId;
+    }
+
+    public String getNcbiTanscriptId() {
+        return ncbiTanscriptId;
+    }
+
+    public void setNcbiTanscriptId(String ncbiTanscriptId) {
+        this.ncbiTanscriptId = ncbiTanscriptId;
     }
 
     public String getCdsChange() {

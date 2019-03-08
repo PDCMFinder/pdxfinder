@@ -381,7 +381,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
                             ma.setAltAllele(variation.getString("Alt"));
                             ma.setAminoAcidChange(variation.getString("Protein"));
                             ma.setAlleleFrequency(variation.getString("VAF"));
-                            ma.setRsVariants(variation.getString("avsnp147"));
+                            ma.setRsIdVariants(variation.getString("avsnp147"));
 
                             // STEP 4: Determine if sample is human or xenograft
                             if(specimen.startsWith(modelId+"H")){
@@ -548,7 +548,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
                 ma.setAltAllele(variation.getString("Alt"));
                 ma.setAminoAcidChange(variation.getString("Protein"));
                 ma.setAlleleFrequency(variation.getString("VAF"));
-                ma.setRsVariants(variation.getString("avsnp147"));
+                ma.setRsIdVariants(variation.getString("avsnp147"));
 
                 PlatformAssociation pa = dataImportService.createPlatformAssociation(platform, marker);
                 dataImportService.savePlatformAssociation(pa);
