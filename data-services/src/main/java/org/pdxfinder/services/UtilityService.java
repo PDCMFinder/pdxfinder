@@ -23,6 +23,7 @@ public class UtilityService {
 
     private String homeDir = System.getProperty("user.home");
     private final static Logger log = LoggerFactory.getLogger(UtilityService.class);
+    private ObjectMapper mapper = new ObjectMapper();
 
 
     public List<Map<String, String>> serializeCSVToMaps(String csvFile) {
@@ -79,6 +80,33 @@ public class UtilityService {
 
         return csvMap;
 
+    }
+
+
+
+    public List<Map<String, String>> serializeJSONToMaps(String jsonFile,String jsonKey) {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        JsonNode node = readJsonLocal(jsonFile);
+
+        Map<String, Object> json = mapper.convertValue(node, Map.class);
+
+        List<Map<String, String>> data = (List) json.get(jsonKey);
+
+        return data;
+    }
+
+
+    public List<Map<String, String>> serializeJSONToMaps(String jsonFile) {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        JsonNode node = readJsonLocal(jsonFile);
+
+        List<Map<String, String>> data = mapper.convertValue(node, List.class);
+
+        return data;
     }
 
 

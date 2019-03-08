@@ -216,6 +216,14 @@ public class MarkerAssociation {
         this.altAllele = altAllele;
     }
 
+    public String getNucleotideChange() {
+        return nucleotideChange;
+    }
+
+    public void setNucleotideChange(String nucleotideChange) {
+        this.nucleotideChange = nucleotideChange;
+    }
+
     /**
      * @return the genomeAssembly
      */
