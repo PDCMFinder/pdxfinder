@@ -1366,7 +1366,7 @@ public class DataImportService {
                 else{
 
                     le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
-                    String prevMarkers = markerSuggestionList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining(", "));
+                    String prevMarkers = markerSuggestionList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
 
                     le.setMessage("Previous symbol for multiple approved markers: "+prevMarkers);
                     le.setType("ERROR");
@@ -1395,7 +1395,7 @@ public class DataImportService {
                     }
                     else{
                         le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
-                        String synonymMarkers = markerSuggestionList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining(", "));
+                        String synonymMarkers = markerSuggestionList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
                         le.setMessage("Synonym for multiple markers: "+synonymMarkers);
                         le.setType("ERROR");
                         nsdto.setNode(null);
