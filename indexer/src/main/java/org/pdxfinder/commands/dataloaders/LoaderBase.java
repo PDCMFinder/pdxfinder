@@ -458,6 +458,8 @@ public abstract class LoaderBase extends LoaderProperties implements Application
                 }
             } catch (Exception e) { /* this is for the FANG data and we don't really care about markers at this point anyway */ }
 
+            /*
+            //Disabling loading markers for MDA
 
             if (ds.equals("mdAnderson")) {
                 String markerStr = dto.getMarkerStr();
@@ -510,6 +512,7 @@ public abstract class LoaderBase extends LoaderProperties implements Application
                 }
             }
 
+            */
 
             if (human) {
                 dto.getPatientSnapshot().addSample(dto.getPatientSample());
