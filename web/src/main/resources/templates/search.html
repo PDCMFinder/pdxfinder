@@ -239,6 +239,7 @@
                 <div class="columns medium-9">
 
 
+
                     <div class="responsive-table">
                         <table id="search-datatable" class="stripe display datatable-pdx sticky-header" cellspacing="0"
                                width="100%">
@@ -246,11 +247,12 @@
                             <tr>
                                 <th>Model</th>
                                 <th>Histology</th>
-                                <th>Primary site</th>
-                                <th>Collection site</th>
+                                <th>Primary </th>
+                                <th>Collection </th>
                                 <th>Type</th>
-                                <th>Age</th>
-                                <th>Sex</th>
+
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'AGE')}">Age</th>
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'SEX')}">Sex</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DATA AVAILABLE')}">Data Available</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'MUTATIONS')}">MUTATIONS</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DRUG AND RESPONSE')}">DRUG AND RESPONSE</th>
@@ -268,8 +270,9 @@
                                 <td th:text="${model.sampleOriginTissue}">origin tissue</td>
                                 <td th:text="${model.sampleSampleSite}">sample site</td>
                                 <td th:text="${model.sampleTumorType}">Metastatic</td>
-                                <td th:text="${model.patientAge}">Age</td>
-                                <td th:text="${model.patientGender}">Sex</td>
+
+                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'AGE')}" th:text="${model.patientAge}"> Age </td>
+                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'SEX')}" th:text="${model.patientGender}">Sex</td>
 
                                 <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DATA AVAILABLE')}">
                                     <th:block th:each="dataavailable : ${model.dataAvailable}">
@@ -326,7 +329,7 @@
 
                     <div class="row topSpace50">
 
-                        <div class="columns medium-8 small-6 padding-vertical-10">
+                        <div class="columns medium-6 small-6 ">
                             <ul class="pagination pdx-pagination" role="navigation" aria-label="Pagination">
                                 <li class="pagination-previous"
                                     th:classappend="${#strings.equals(websearch.page, '1')} ? 'disabled'">
@@ -353,11 +356,26 @@
                             </ul>
                         </div>
 
-                        <div class="columns medium-4 small-6 text-right">
-                            <a th:href="@{'/search/export' + '?' + ${websearch.facetString}}"
-                               class="button outline secondary">Download Results <i class="icon icon-functional"
-                                                                                  data-icon="="></i> </a>
+                        <div class="columns medium-6 small-6 text-right">
+
+                            <div class="columns medium-7" style="padding: 0px;">
+                                <a  style="font-size: 13px;" th:href="@{'/search/export' + '?' + ${websearch.facetString}}"
+                                   class="button outline secondary">Download Results <i class="icon icon-functional"
+                                                                                        data-icon="="></i> </a>
+                            </div>
+
+                            <div class="columns medium-5 text-right">
+                                <select style="font-size: 12px;" onchange="window.open(this.options[this.selectedIndex].value,'_top')">
+                                    <option th:value="'?'+${websearch.facetString} + '&size=10'">  10 Models Per Page </option>
+                                    <option th:value="'?'+${websearch.facetString} + '&size=50'">  50 Models Per Page </option>
+                                    <option th:value="'?'+${websearch.facetString} + '&size=200'">  200 Models Per Page </option>
+                                    <option th:value="'?'+${websearch.facetString} + '&size='+${websearch.totalResults}"> ALL Models </option>
+                                </select>
+
+                            </div>
                         </div>
+
+
                     </div>
 
 

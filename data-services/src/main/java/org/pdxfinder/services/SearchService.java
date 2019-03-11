@@ -139,10 +139,10 @@ public class SearchService {
         wsDTO.setCurrentIndex(current);
 
 
-        int begin = Math.max(1, current - 4);
+        int begin = Math.max(1, current - 2);
         wsDTO.setBeginIndex(begin);
 
-        int end = Math.min(begin + 7, numPages);
+        int end = Math.min(begin + 4, numPages);
         wsDTO.setEndIndex(end);
 
         wsDTO.setPage(page);
@@ -158,6 +158,7 @@ public class SearchService {
             textSearchDescription = "PDXFinder contains "+searchDS.getModels().size()+" models";
         }
         wsDTO.setTextSearchDescription(textSearchDescription);
+        wsDTO.setTotalResults(searchDS.getModels().size());
 
         wsDTO.setMainSearchFieldOptions(autoCompleteService.getAutoSuggestions());
 
@@ -432,6 +433,12 @@ public class SearchService {
 
                 case patient_treatment_status:
                     headers.add("PATIENT TREATMENT STATUS");
+
+                case patient_gender:
+                    headers.add("SEX");
+
+                case patient_age:
+                    headers.add("AGE");
             }
 
         }

@@ -208,9 +208,22 @@ public class SearchDS {
             datasourceOptions.add(new FacetOption(ds, ds));
         }
 
+        //dataset available filter def
+        List<FacetOption> datasetAvailableOptions = new ArrayList<>();
+        datasetAvailableOptions.add(new FacetOption("Gene Mutation", "Gene_Mutation"));
+        datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
+        datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
+
+        OneParamFilter datasetAvailable = new OneParamFilter("DATASET AVAILABLE", "data_available", false, FilterType.OneParamFilter.get(),
+                datasetAvailableOptions, new ArrayList<>());
+
+        pdxModelSection.addComponent(datasetAvailable);
+        facetOptionMap.put("data_available", datasetAvailableOptions);
+
         OneParamFilter datasource = new OneParamFilter("DATASOURCE", "datasource", false, FilterType.OneParamFilter.get(), datasourceOptions, new ArrayList<>());
         pdxModelSection.addComponent(datasource);
         facetOptionMap.put("datasource", datasourceOptions);
+
 
         //project filter def
         Set<String> projectsSet = new HashSet<>();
@@ -235,18 +248,6 @@ public class SearchDS {
         OneParamFilter projects = new OneParamFilter("PROJECT", "project", false, FilterType.OneParamFilter.get(), projectOptions, new ArrayList<>());
         pdxModelSection.addComponent(projects);
         facetOptionMap.put("project", projectOptions);
-
-        //dataset available filter def
-        List<FacetOption> datasetAvailableOptions = new ArrayList<>();
-        datasetAvailableOptions.add(new FacetOption("Gene Mutation", "Gene_Mutation"));
-        datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
-        datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
-
-        OneParamFilter datasetAvailable = new OneParamFilter("DATASET AVAILABLE", "data_available", false, FilterType.OneParamFilter.get(),
-        datasetAvailableOptions, new ArrayList<>());
-
-        pdxModelSection.addComponent(datasetAvailable);
-        facetOptionMap.put("data_available", datasetAvailableOptions);
 
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
@@ -293,10 +294,10 @@ public class SearchDS {
         treatmentInfoSection.addComponent(modelDosingStudy);
 
 
-        webFacetContainer.addSection(patientTumorSection);
         webFacetContainer.addSection(pdxModelSection);
         webFacetContainer.addSection(molecularDataSection);
         webFacetContainer.addSection(treatmentInfoSection);
+        webFacetContainer.addSection(patientTumorSection);
 
         /****************************************************************
          *            INITIALIZE SEARCH OBJECTS                         *
