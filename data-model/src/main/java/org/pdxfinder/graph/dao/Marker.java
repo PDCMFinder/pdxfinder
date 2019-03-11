@@ -62,6 +62,22 @@ public class Marker {
         this.hgncId = hgncId;
     }
 
+    public String getUcscGeneId() {
+        return ucscGeneId;
+    }
+
+    public void setUcscGeneId(String ucscGeneId) {
+        this.ucscGeneId = ucscGeneId;
+    }
+
+    public String getUniprotId() {
+        return uniprotId;
+    }
+
+    public void setUniprotId(String uniprotId) {
+        this.uniprotId = uniprotId;
+    }
+
     public String getEnsemblGeneId() {
         return ensemblGeneId;
     }
