@@ -83,6 +83,36 @@ public class UtilityService {
     }
 
 
+    public Map<String, List<Map<String, String>> > serializeCombinedCSVToMapAndGroup(String csvFile, String groupColumn) {
+
+        List<Map<String, String>> csvMaps = serializeCSVToMaps(csvFile);
+
+        Map<String, List<Map<String, String>> > groupedMap = new HashMap<>();
+
+
+        for (Map<String, String> rowData : csvMaps){
+
+            List<Map<String, String>> tempList = new ArrayList<>();
+
+            String rowKey = rowData.get(groupColumn);
+
+            if (groupedMap.get(rowKey) == null) {
+
+                tempList.add(rowData);
+                groupedMap.put(rowKey, tempList);
+            } else {
+
+                tempList = groupedMap.get(rowKey);
+                tempList.add(rowData);
+
+                groupedMap.put(rowKey, tempList);
+            }
+
+        }
+        return groupedMap;
+    }
+
+
 
     public List<Map<String, String>> serializeJSONToMaps(String jsonFile,String jsonKey) {
 
