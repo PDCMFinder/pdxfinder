@@ -598,8 +598,15 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             }
 
             //at this point the corresponding pdx model node should be created and linked to a human sample
+            ModelCreation model = null;
+            try {
+                model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
 
-            ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
+            }
+            catch(Exception e){
+                log.error("Error with model: "+ modelId);
+                e.printStackTrace();
+            }
 
             if (model == null) {
 
@@ -779,7 +786,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
             //check essential values
 
-            if (sampleId.isEmpty() || origin.isEmpty() || nomenclature.isEmpty() || modelId.isEmpty()
+            if (sampleId.isEmpty() || origin.isEmpty() || modelId.isEmpty()
                     || molCharType.isEmpty() || platformName.isEmpty() || platformTechnology.isEmpty() || platformDescription.isEmpty()
                     || analysisProtocol.isEmpty()) {
 
@@ -821,9 +828,15 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             //specimen should have been created before
             else if (origin.toLowerCase().equals("xenograft")) {
 
-                if (passage.isEmpty()) {
+                if (passage == null || passage.isEmpty()) {
 
                     log.error("Missing essential value Xenograft Passage in row " + row);
+                    continue;
+                }
+
+                if (nomenclature == null || nomenclature.isEmpty()) {
+
+                    log.error("Missing essential value nomenclature in row " + row);
                     continue;
                 }
 
