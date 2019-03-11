@@ -45,9 +45,9 @@ public class MarkerAssociation {
     private String seqStartPosition;
     private String seqEndPosition;
     private String strand;
-    private String ensemblTanscriptId;
-    private String ucscTanscriptId;
-    private String ncbiTanscriptId;
+    private String ensemblTranscriptId;
+    private String ucscTranscriptId;
+    private String ncbiTranscriptId;
 
     private String cdsChange;
     private String type; //Substitution
@@ -262,28 +262,28 @@ public class MarkerAssociation {
         this.strand = strand;
     }
 
-    public String getEnsemblTanscriptId() {
-        return ensemblTanscriptId;
+    public String getEnsemblTranscriptId() {
+        return ensemblTranscriptId;
     }
 
-    public void setEnsemblTanscriptId(String ensemblTanscriptId) {
-        this.ensemblTanscriptId = ensemblTanscriptId;
+    public void setEnsemblTranscriptId(String ensemblTranscriptId) {
+        this.ensemblTranscriptId = ensemblTranscriptId;
     }
 
-    public String getUcscTanscriptId() {
-        return ucscTanscriptId;
+    public String getUcscTranscriptId() {
+        return ucscTranscriptId;
     }
 
-    public void setUcscTanscriptId(String ucscTanscriptId) {
-        this.ucscTanscriptId = ucscTanscriptId;
+    public void setUcscTranscriptId(String ucscTranscriptId) {
+        this.ucscTranscriptId = ucscTranscriptId;
     }
 
-    public String getNcbiTanscriptId() {
-        return ncbiTanscriptId;
+    public String getNcbiTranscriptId() {
+        return ncbiTranscriptId;
     }
 
-    public void setNcbiTanscriptId(String ncbiTanscriptId) {
-        this.ncbiTanscriptId = ncbiTanscriptId;
+    public void setNcbiTranscriptId(String ncbiTranscriptId) {
+        this.ncbiTranscriptId = ncbiTranscriptId;
     }
 
     public String getCdsChange() {
