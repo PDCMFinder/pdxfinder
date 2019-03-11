@@ -17,7 +17,7 @@ import java.util.List;
 @Repository
 public interface MarkerRepository extends PagingAndSortingRepository<Marker, Long> {
 
-    @Query("MATCH (t:Marker) WHERE t.symbol = {symbol} RETURN t")
+    @Query("MATCH (t:Marker) WHERE t.hgncSymbol = {symbol} RETURN t")
     Marker findBySymbol(@Param("symbol") String symbol);
 
     @Query("MATCH (t:Marker) WHERE t.name = {name} RETURN t")
@@ -47,7 +47,7 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
     Result countModelsByMarker();
 
 
-    @Query("MATCH (m:Marker) WHERE {synonym} IN m.synonyms RETURN m")
+    @Query("MATCH (m:Marker) WHERE {synonym} IN m.aliasSymbols RETURN m")
     List<Marker> findBySynonym(@Param("synonym") String synonym);
 
     @Query("MATCH (m:Marker) WHERE {synonym} IN m.prevSymbols RETURN m")
