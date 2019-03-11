@@ -69,7 +69,7 @@ public class UtilityService {
                     Map<String, String> rowMap = new HashMap();
                     for (String columnHead : tableHead) {
 
-                        rowMap.put(columnHead, rowDataArr[column]);
+                        rowMap.put(columnHead.trim(), rowDataArr[column].trim());
                         column++;
                     }
                     csvMap.add(rowMap);

@@ -441,13 +441,13 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                     else{
 
                         if(technology.equals("Truseq_JAX")){
-                            platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), truseqPlatformURL);
+                            platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), platformURL.get("Truseq_JAX"));
                         }
                         else if(technology.equals("Whole_Exome")){
-                            platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), wholeExomeURL);
+                            platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), platformURL.get("Whole_Exome"));
                         }
                         else if(technology.equals("CTP")){
-                            platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), ctpPlatformURL);
+                            platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), platformURL.get("CTP"));
                         }
                         else{
                             platform = dataImportService.getPlatform(technology, dto.getProviderGroup(), "");

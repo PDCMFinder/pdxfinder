@@ -1,10 +1,13 @@
 package org.pdxfinder.commands.dataloaders;
 
+import java.util.Map;
+
 /*
  * Created by abayomi on 06/03/2019.
  */
 public class LoaderProperties {
 
+    //  DATA SOURCE PROPERTIES
     protected String dataSourceAbbreviation;
     protected String dataSourceName;
     protected String dataSourceDescription;
@@ -12,26 +15,45 @@ public class LoaderProperties {
     protected String dataSourceURL;
     protected String providerType;
     protected String accessibility;
-
     protected String nsgBsName;
     protected String nsgBsSymbol;
     protected String nsgbsURL;
     protected String nsBsName;
     protected String nsBsSymbol;
     protected String nsBsURL;
-
     protected String dosingStudyURL;
     protected String sourceURL;
     protected String normalTissueFalse;
-
     protected String targetedNgsPlatformURL;
     protected String tech;
     protected String fingerPrintDescription;
-
     protected String histologyNote;
-    protected String ctpPlatformURL;
-    protected String truseqPlatformURL;
-    protected String wholeExomeURL;
+    protected Map<String, String> platformURL;
+
+
+    // OMIC DATA PROPERTIES
+    protected String omicDataSource;
+    protected String omicModelID;
+    protected String omicSampleID;
+    protected String omicSampleOrigin;
+    protected String omicPassage;
+    protected String omicHostStrainName;
+    protected String omicAminoAcidChange;
+    protected String omicNucleotideChange;
+    protected String omicConsequence;
+    protected String omicReadDepth;
+    protected String omicAlleleFrequency;
+    protected String omicChromosome;
+    protected String omicSeqStartPosition;
+    protected String omicRefAllele;
+    protected String omicAltAllele;
+    protected String omicUcscGeneId;
+    protected String omicNcbiGeneId;
+    protected String omicEnsemblGeneId;
+    protected String omicEnsemblTranscriptId;
+    protected String omicRsIdVariants;
+    protected String omicGenomeAssembly;
+    protected String omicPlatform;
 
 
     public String getDataSourceAbbreviation() {
@@ -194,27 +216,188 @@ public class LoaderProperties {
         this.histologyNote = histologyNote;
     }
 
-    public String getCtpPlatformURL() {
-        return ctpPlatformURL;
+    public Map<String, String> getPlatformURL() {
+        return platformURL;
     }
 
-    public void setCtpPlatformURL(String ctpPlatformURL) {
-        this.ctpPlatformURL = ctpPlatformURL;
+    public void setPlatformURL(Map<String, String> platformURL) {
+        this.platformURL = platformURL;
     }
 
-    public String getTruseqPlatformURL() {
-        return truseqPlatformURL;
+
+    public String getOmicDataSource() {
+        return omicDataSource;
     }
 
-    public void setTruseqPlatformURL(String truseqPlatformURL) {
-        this.truseqPlatformURL = truseqPlatformURL;
+    public void setOmicDataSource(String omicDataSource) {
+        this.omicDataSource = omicDataSource;
     }
 
-    public String getWholeExomeURL() {
-        return wholeExomeURL;
+    public String getOmicModelID() {
+        return omicModelID;
     }
 
-    public void setWholeExomeURL(String wholeExomeURL) {
-        this.wholeExomeURL = wholeExomeURL;
+    public void setOmicModelID(String omicModelID) {
+        this.omicModelID = omicModelID;
+    }
+
+    public String getOmicSampleID() {
+        return omicSampleID;
+    }
+
+    public void setOmicSampleID(String omicSampleID) {
+        this.omicSampleID = omicSampleID;
+    }
+
+    public String getOmicSampleOrigin() {
+        return omicSampleOrigin;
+    }
+
+    public void setOmicSampleOrigin(String omicSampleOrigin) {
+        this.omicSampleOrigin = omicSampleOrigin;
+    }
+
+    public String getOmicPassage() {
+        return omicPassage;
+    }
+
+    public void setOmicPassage(String omicPassage) {
+        this.omicPassage = omicPassage;
+    }
+
+    public String getOmicHostStrainName() {
+        return omicHostStrainName;
+    }
+
+    public void setOmicHostStrainName(String omicHostStrainName) {
+        this.omicHostStrainName = omicHostStrainName;
+    }
+
+    public String getOmicAminoAcidChange() {
+        return omicAminoAcidChange;
+    }
+
+    public void setOmicAminoAcidChange(String omicAminoAcidChange) {
+        this.omicAminoAcidChange = omicAminoAcidChange;
+    }
+
+    public String getOmicNucleotideChange() {
+        return omicNucleotideChange;
+    }
+
+    public void setOmicNucleotideChange(String omicNucleotideChange) {
+        this.omicNucleotideChange = omicNucleotideChange;
+    }
+
+    public String getOmicConsequence() {
+        return omicConsequence;
+    }
+
+    public void setOmicConsequence(String omicConsequence) {
+        this.omicConsequence = omicConsequence;
+    }
+
+    public String getOmicReadDepth() {
+        return omicReadDepth;
+    }
+
+    public void setOmicReadDepth(String omicReadDepth) {
+        this.omicReadDepth = omicReadDepth;
+    }
+
+    public String getOmicAlleleFrequency() {
+        return omicAlleleFrequency;
+    }
+
+    public void setOmicAlleleFrequency(String omicAlleleFrequency) {
+        this.omicAlleleFrequency = omicAlleleFrequency;
+    }
+
+    public String getOmicChromosome() {
+        return omicChromosome;
+    }
+
+    public void setOmicChromosome(String omicChromosome) {
+        this.omicChromosome = omicChromosome;
+    }
+
+    public String getOmicSeqStartPosition() {
+        return omicSeqStartPosition;
+    }
+
+    public void setOmicSeqStartPosition(String omicSeqStartPosition) {
+        this.omicSeqStartPosition = omicSeqStartPosition;
+    }
+
+    public String getOmicRefAllele() {
+        return omicRefAllele;
+    }
+
+    public void setOmicRefAllele(String omicRefAllele) {
+        this.omicRefAllele = omicRefAllele;
+    }
+
+    public String getOmicAltAllele() {
+        return omicAltAllele;
+    }
+
+    public void setOmicAltAllele(String omicAltAllele) {
+        this.omicAltAllele = omicAltAllele;
+    }
+
+    public String getOmicUcscGeneId() {
+        return omicUcscGeneId;
+    }
+
+    public void setOmicUcscGeneId(String omicUcscGeneId) {
+        this.omicUcscGeneId = omicUcscGeneId;
+    }
+
+    public String getOmicNcbiGeneId() {
+        return omicNcbiGeneId;
+    }
+
+    public void setOmicNcbiGeneId(String omicNcbiGeneId) {
+        this.omicNcbiGeneId = omicNcbiGeneId;
+    }
+
+    public String getOmicEnsemblGeneId() {
+        return omicEnsemblGeneId;
+    }
+
+    public void setOmicEnsemblGeneId(String omicEnsemblGeneId) {
+        this.omicEnsemblGeneId = omicEnsemblGeneId;
+    }
+
+    public String getOmicEnsemblTranscriptId() {
+        return omicEnsemblTranscriptId;
+    }
+
+    public void setOmicEnsemblTranscriptId(String omicEnsemblTranscriptId) {
+        this.omicEnsemblTranscriptId = omicEnsemblTranscriptId;
+    }
+
+    public String getOmicRsIdVariants() {
+        return omicRsIdVariants;
+    }
+
+    public void setOmicRsIdVariants(String omicRsIdVariants) {
+        this.omicRsIdVariants = omicRsIdVariants;
+    }
+
+    public String getOmicGenomeAssembly() {
+        return omicGenomeAssembly;
+    }
+
+    public void setOmicGenomeAssembly(String omicGenomeAssembly) {
+        this.omicGenomeAssembly = omicGenomeAssembly;
+    }
+
+    public String getOmicPlatform() {
+        return omicPlatform;
+    }
+
+    public void setOmicPlatform(String omicPlatform) {
+        this.omicPlatform = omicPlatform;
     }
 }
