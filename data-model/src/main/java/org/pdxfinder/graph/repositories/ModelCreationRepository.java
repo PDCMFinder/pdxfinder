@@ -179,4 +179,6 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     ModelCreation findBySourcePdxIdAndDataSourceWithSpecimensAndHostStrain(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
 
 
+    @Query("CREATE INDEX ON :ModelCreation(dataSource, sourcePdxId)")
+    void createIndex();
 }
