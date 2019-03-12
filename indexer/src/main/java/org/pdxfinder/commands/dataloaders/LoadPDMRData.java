@@ -318,7 +318,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step16LoadVariationData() {
 
-        loadMutationData();
+        //loadMutationData();
     }
 
 
