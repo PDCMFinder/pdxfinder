@@ -733,22 +733,6 @@ public class DataImportService {
         return marker;
     }
 
-    public MarkerAssociation getMarkerAssociation(String type, String markerSymbol, String markerName) {
-        Marker m = this.getMarker(markerSymbol, markerName);
-        MarkerAssociation ma = markerAssociationRepository.findByTypeAndMarkerName(type, m.getHgncName());
-
-        if (ma == null && m.getHgncSymbol() != null) {
-            ma = markerAssociationRepository.findByTypeAndMarkerSymbol(type, m.getHgncSymbol());
-        }
-
-        if (ma == null) {
-            ma = new MarkerAssociation(type, m);
-            markerAssociationRepository.save(ma);
-        }
-
-        return ma;
-    }
-
 
     public Set<MarkerAssociation> findMarkerAssocsByMolChar(MolecularCharacterization mc){
 
