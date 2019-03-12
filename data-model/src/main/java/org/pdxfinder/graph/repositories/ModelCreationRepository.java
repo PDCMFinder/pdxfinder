@@ -104,7 +104,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
 
             "            WHERE (pl.name = {tech}  OR {tech} = '' ) " +
 
-            "            OR toLower(m.symbol) CONTAINS toLower({search}) " +
+            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search}) " +
             "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
             "            RETURN count(*) ")
     Integer variationCountByDataSourceAndPdxIdAndPlatform(@Param("dataSource") String dataSource,
@@ -123,7 +123,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "            WHERE (pl.name = {tech}  OR {tech} = '' ) " +
 
 
-            "            OR toLower(m.symbol) CONTAINS toLower({search})" +
+            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search})" +
             "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
 
             "            RETURN mc,psamp,char,molch,mAss,m, pu, pl SKIP {skip} LIMIT {lim} ")
@@ -177,4 +177,6 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "OPTIONAL MATCH (sp)-[sfr:SAMPLED_FROM]-(s:Sample) " +
             "RETURN model, spr, sp, hsr, hs, sfr, s")
     ModelCreation findBySourcePdxIdAndDataSourceWithSpecimensAndHostStrain(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
+
+
 }
