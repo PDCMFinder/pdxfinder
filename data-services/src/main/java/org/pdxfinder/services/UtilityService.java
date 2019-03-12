@@ -2,7 +2,6 @@ package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.neo4j.ogm.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -83,12 +82,25 @@ public class UtilityService {
     }
 
 
-    public Map<String, List<Map<String, String>> > serializeCombinedCSVToMapAndGroup(String csvFile, String groupColumn) {
+    public Map<String, List<Map<String, String>> > serializeMergedData(String fileName, String groupColumn) {
 
-        List<Map<String, String>> csvMaps = serializeCSVToMaps(csvFile);
+
+        String fileExtension = getFileExtension(fileName);
+
+        List<Map<String, String>> csvMaps = new ArrayList<>();
+
+        switch (fileExtension){
+
+            case "csv":
+                csvMaps = serializeCSVToMaps(fileName);
+                break;
+
+            case "json":
+                csvMaps = serializeJSONToMaps(fileName);
+                break;
+        }
 
         Map<String, List<Map<String, String>> > groupedMap = new HashMap<>();
-
 
         for (Map<String, String> rowData : csvMaps){
 
@@ -316,6 +328,17 @@ public class UtilityService {
         }
 
         return result;
+    }
+
+
+
+
+    public String getFileExtension(String fileName){
+
+        String[] check = fileName.split("\\.");
+        String fileExtension = check[check.length-1];
+
+        return fileExtension;
     }
 
 
