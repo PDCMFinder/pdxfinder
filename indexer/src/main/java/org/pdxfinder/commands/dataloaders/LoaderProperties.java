@@ -29,6 +29,7 @@ public class LoaderProperties {
     protected String fingerPrintDescription;
     protected String histologyNote;
     protected Map<String, String> platformURL;
+    protected String dataRootDirectory;
 
 
     // OMIC DATA PROPERTIES
@@ -38,6 +39,7 @@ public class LoaderProperties {
     protected String omicSampleOrigin;
     protected String omicPassage;
     protected String omicHostStrainName;
+    protected String omicHgncSymbol;
     protected String omicAminoAcidChange;
     protected String omicNucleotideChange;
     protected String omicConsequence;
@@ -224,6 +226,13 @@ public class LoaderProperties {
         this.platformURL = platformURL;
     }
 
+    public String getDataRootDirectory() {
+        return dataRootDirectory;
+    }
+
+    public void setDataRootDirectory(String dataRootDirectory) {
+        this.dataRootDirectory = dataRootDirectory;
+    }
 
     public String getOmicDataSource() {
         return omicDataSource;
@@ -271,6 +280,14 @@ public class LoaderProperties {
 
     public void setOmicHostStrainName(String omicHostStrainName) {
         this.omicHostStrainName = omicHostStrainName;
+    }
+
+    public String getOmicHgncSymbol() {
+        return omicHgncSymbol;
+    }
+
+    public void setOmicHgncSymbol(String omicHgncSymbol) {
+        this.omicHgncSymbol = omicHgncSymbol;
     }
 
     public String getOmicAminoAcidChange() {
