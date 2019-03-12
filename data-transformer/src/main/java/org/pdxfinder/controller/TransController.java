@@ -79,7 +79,7 @@ public class TransController {
     }
 
     /*
-    Test Saving Mapping Entity in H2 Database
+    Test Saving Mapping Entity in H2 Database */
 
     @GetMapping("/mapping")
     public List<MappingEntity> saveMapping(){
@@ -117,7 +117,41 @@ public class TransController {
 
         return mappingEntityRepository.findAll();
 
-    }*/
+    }
+
+
+    private String omicFile= System.getProperty("user.home") + "/Downloads/NGS-LOADER/ncicancergenepaneldata_MARCH2019.csv";
+
+    @RequestMapping("/rewrite-omic-data")
+    public Object downloads() {
+
+        List<Map<String, String>> dataList = utilityService.serializeCSVToMaps(omicFile);
+
+
+        List<String> csvHead = Arrays.asList("datasource","Model_ID","Sample_ID","sample_origin","Passage","host_strain_name","hgnc_symbol","amino_acid_change","nucleotide_change",
+                "consequence","read_depth","Allele_frequency","chromosome","seq_start_position","ref_allele","alt_allele","ucsc_gene_id",
+                "ncbi_gene_id","ensembl_gene_id","ensembl_transcript_id","rs_id_Variant","genome_assembly","Platform");
+
+
+        for (Map<String, String> data : dataList) {
+
+            if ( !data.get("Sample_ID").equals("ORIGINATOR") ){
+
+                String modelID = data.get("Model_ID");
+                String sampleID = data.get("Sample_ID");
+
+                String passage = dataTransformerService.getPassageByModelIDAndSampleID(modelID, sampleID);
+
+                data.put("Passage", passage);
+            }
+
+        }
+
+
+        utilityService.writeCsvFile(dataList,csvHead, "data.csv");
+
+        return dataList;
+    }
 
 
 

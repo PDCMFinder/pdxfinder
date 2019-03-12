@@ -596,6 +596,38 @@ public class DataTransformerService {
     }
 
 
+
+
+    public String getPassageByModelIDAndSampleID(String modelID, String sampleID) {
+
+        PdmrPdxInfo pdmrPdxInfos = transPdxInfoRepository.findByModelID(modelID);
+
+        String passage = "XXXX";
+
+        try{
+
+            List<Sample> samples = pdmrPdxInfos.getSamples();
+            for (Sample sample : samples){
+
+                if (sampleID.equals(sample.getSampleID())){
+                    passage = sample.getPassage();
+                }
+            }
+        }catch (Exception e){
+
+            log.info("{} has no sample in the database", modelID);
+        }
+
+        return passage;
+    }
+
+
+
+
+
+
+
+
     public String getDrugs(PdmrPdxInfo pdmrPdxInfo){
 
         List<Treatment> treatments = pdmrPdxInfo.getTreatments();

@@ -25,6 +25,11 @@ public class UtilityService {
     private ObjectMapper mapper = new ObjectMapper();
 
 
+    //Delimiter used in CSV file
+    private static final String COMMA_DELIMITER = ",";
+    private static final String NEW_LINE_SEPARATOR = "\n";
+
+
     public List<Map<String, String>> serializeCSVToMaps(String csvFile) {
 
         /*************************************************************************************************************
@@ -191,6 +196,69 @@ public class UtilityService {
 
         return dataArrayList;
     }
+
+
+
+    public void writeCsvFile(List<Map<String, String>> dataList,  List<String> csvHead, String fileName) {
+
+        FileWriter fileWriter = null;
+
+        try {
+
+            String destination = homeDir+"/Downloads/"+fileName;
+            fileWriter = new FileWriter(destination);
+
+            //Write the CSV file header
+            fileWriter.append(String.join(COMMA_DELIMITER,csvHead));
+
+            //Add a new line separator after the header
+            fileWriter.append(NEW_LINE_SEPARATOR);
+
+
+            for (Map<String, String> data : dataList) {
+
+                for (String dKey : csvHead){
+
+                    fileWriter.append(String.valueOf(data.get(dKey)));
+                    fileWriter.append(COMMA_DELIMITER);
+                }
+                fileWriter.append(NEW_LINE_SEPARATOR);
+
+            }
+
+            log.info("CSV file was created successfully !!!");
+
+        } catch (Exception e) {
+            log.info("Error in CsvFileWriter !!!");
+            e.printStackTrace();
+        } finally {
+
+            try {
+                fileWriter.flush();
+                fileWriter.close();
+            } catch (IOException e) {
+                log.info("Error while flushing/closing fileWriter !!!");
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
