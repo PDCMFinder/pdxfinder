@@ -352,7 +352,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             return;
         }
 
-        ds = dataImportService.getProviderGroup(providerName, providerAbbreviation, "", "", "", "", "", sourceUrl);
+        ds = dataImportService.getProviderGroup(providerName, providerAbbreviation, "", "",  "", sourceUrl);
 
     }
 

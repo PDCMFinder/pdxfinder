@@ -164,15 +164,14 @@ public class DataImportService {
         return g;
     }
 
-    public Group getProviderGroup(String name, String abbrev, String description, String providerType, String accessibility,
-                                  String accessModalities, String contact, String url){
+    public Group getProviderGroup(String name, String abbrev, String description, String providerType, String contact, String url){
 
         Group g = groupRepository.findByNameAndType(name, "Provider");
 
         if(g == null){
             log.info("Provider group not found. Creating", name);
 
-            g = new Group(name, abbrev, description, providerType, accessibility, accessModalities, contact, url);
+            g = new Group(name, abbrev, description, providerType, contact, url);
             groupRepository.save(g);
 
         }
@@ -213,6 +212,21 @@ public class DataImportService {
         return g;
 
     }
+
+    public Group getAccessibilityGroup(String accessibility, String accessModalities){
+
+        Group g = groupRepository.findAccessGroupByAccessibilityAndAccessModalities(accessibility, accessModalities);
+
+        if(g == null){
+            log.info("Access group not found. Creating " + accessibility + " " + accessModalities);
+
+            g = new Group(accessibility, accessModalities);
+            groupRepository.save(g);
+
+        }
+        return g;
+    }
+
 
     public List<Group> getAllProviderGroups(){
 

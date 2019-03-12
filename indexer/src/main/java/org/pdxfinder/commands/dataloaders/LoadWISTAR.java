@@ -111,7 +111,7 @@ public class LoadWISTAR implements CommandLineRunner {
     private void parseJSON(String json) {
 
         wistarDS = dataImportService.getProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION,
-                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, ACCESSIBILITY, null, DATASOURCE_CONTACT, SOURCE_URL);
+                DATASOURCE_DESCRIPTION, PROVIDER_TYPE, DATASOURCE_CONTACT, SOURCE_URL);
 
         //      nsgBS = loaderUtils.getHostStrain(NSG_BS_SYMBOL, NSG_BS_NAME, NSG_BS_NAME, NSG_BS_URL);
 
