@@ -42,7 +42,7 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
 
 
     @Query("MATCH (mod:ModelCreation)--(spec:Specimen)--(msamp:Sample)--(molchar:MolecularCharacterization)-->(mAss:MarkerAssociation)--(marker:Marker) " +
-            "RETURN marker.name AS gene_name, COUNT(DISTINCT mod.sourcePdxId) as number_of_models " +
+            "RETURN marker.hgncSymbol AS gene_name, COUNT(DISTINCT mod.sourcePdxId) as number_of_models " +
             "ORDER BY number_of_models DESC")
     Result countModelsByMarker();
 
