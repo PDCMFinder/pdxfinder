@@ -89,4 +89,31 @@ public class EngraftmentDataDTO {
     public void setPassage(String passage) {
         this.passage = passage;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EngraftmentDataDTO that = (EngraftmentDataDTO) o;
+
+        if (strainName != null ? !strainName.equals(that.strainName) : that.strainName != null) return false;
+        if (engraftmentSite != null ? !engraftmentSite.equals(that.engraftmentSite) : that.engraftmentSite != null)
+            return false;
+        if (engraftmentType != null ? !engraftmentType.equals(that.engraftmentType) : that.engraftmentType != null)
+            return false;
+        if (engraftmentMaterial != null ? !engraftmentMaterial.equals(that.engraftmentMaterial) : that.engraftmentMaterial != null)
+            return false;
+        return engraftmentMaterialState != null ? engraftmentMaterialState.equals(that.engraftmentMaterialState) : that.engraftmentMaterialState == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = strainName != null ? strainName.hashCode() : 0;
+        result = 31 * result + (engraftmentSite != null ? engraftmentSite.hashCode() : 0);
+        result = 31 * result + (engraftmentType != null ? engraftmentType.hashCode() : 0);
+        result = 31 * result + (engraftmentMaterial != null ? engraftmentMaterial.hashCode() : 0);
+        result = 31 * result + (engraftmentMaterialState != null ? engraftmentMaterialState.hashCode() : 0);
+        return result;
+    }
 }
