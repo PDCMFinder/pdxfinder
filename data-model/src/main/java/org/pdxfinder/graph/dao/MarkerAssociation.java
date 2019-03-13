@@ -58,11 +58,13 @@ public class MarkerAssociation {
     private String microsatelliteResult;
 
 
-    private String cnaProbeIDAffymetrix;
+    private String probeIDAffymetrix;
+
     private String cnaLog10RCNA;
     private String cnaLog2RCNA;
     private String cnaCopyNumberStatus;
-    private String cnaGisticValueCNA;
+    private String cnaGisticValue;
+    private String cnaPicnicValue;
 
 
 
@@ -334,13 +336,12 @@ public class MarkerAssociation {
         this.microsatelliteResult = microsatelliteResult;
     }
 
-
-    public String getCnaProbeIDAffymetrix() {
-        return cnaProbeIDAffymetrix;
+    public String getProbeIDAffymetrix() {
+        return probeIDAffymetrix;
     }
 
-    public void setCnaProbeIDAffymetrix(String cnaProbeIDAffymetrix) {
-        this.cnaProbeIDAffymetrix = cnaProbeIDAffymetrix;
+    public void setProbeIDAffymetrix(String probeIDAffymetrix) {
+        this.probeIDAffymetrix = probeIDAffymetrix;
     }
 
     public String getCnaLog10RCNA() {
@@ -367,11 +368,19 @@ public class MarkerAssociation {
         this.cnaCopyNumberStatus = cnaCopyNumberStatus;
     }
 
-    public String getCnaGisticValueCNA() {
-        return cnaGisticValueCNA;
+    public String getCnaGisticValue() {
+        return cnaGisticValue;
     }
 
-    public void setCnaGisticValueCNA(String cnaGisticValueCNA) {
-        this.cnaGisticValueCNA = cnaGisticValueCNA;
+    public void setCnaGisticValue(String cnaGisticValue) {
+        this.cnaGisticValue = cnaGisticValue;
+    }
+
+    public String getCnaPicnicValue() {
+        return cnaPicnicValue;
+    }
+
+    public void setCnaPicnicValue(String cnaPicnicValue) {
+        this.cnaPicnicValue = cnaPicnicValue;
     }
 }
