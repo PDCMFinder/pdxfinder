@@ -159,4 +159,7 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
             "RETURN sp")
     Specimen findByMolChar(@Param("mc")MolecularCharacterization mc);
 
+
+
+
 }

@@ -154,4 +154,15 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "RETURN s")
     Sample findMouseSampleByModelIdAndDataSourceAndPassageAndNomenclature(@Param("modelId") String modelId, @Param("ds") String dataSource, @Param("passage") String passage, @Param("nomenclature") String nomenclature);
 
+@Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
+            "WHERE mod.sourcePdxId = {sourcePdxId} " +
+            "AND toLower(mod.dataSource) = toLower({dataSource}) " +
+            "WITH s " +
+            "OPTIONAL MATCH (s)-[o:ORIGIN_TISSUE]-(t:Tissue) " +
+            "OPTIONAL MATCH (s)-[ssr:SAMPLE_SITE]-(ss:Tissue) " +
+            "OPTIONAL MATCH (s)-[ot:OF_TYPE]-(tt:TumorType) " +
+            "OPTIONAL MATCH (s)-[mapped:MAPPED_TO]-(oterm:OntologyTerm) " +
+            "RETURN s, o, t, ssr, ss, ot, tt, mapped, oterm")
+    Sample findPatientSampleWithDetailsByDataSourceAndPdxId(@Param("dataSource") String dataSource, @Param("sourcePdxId") String sourcePdxId);
+
 }
