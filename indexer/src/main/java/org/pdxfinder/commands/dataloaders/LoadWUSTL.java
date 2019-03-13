@@ -108,7 +108,7 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
             if (listOfFiles[i].isFile()) {
 
                 this.jsonFile = rootDataDirectory + dataSourceAbbreviation + "/pdx/" + listOfFiles[i].getName();
-                loaderTemplate();
+                globalLoadingOrder();
             }
         }
         log.info("Finished loading " + dataSourceAbbreviation + " PDX data.");

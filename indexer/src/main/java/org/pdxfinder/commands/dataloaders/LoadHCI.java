@@ -3,7 +3,6 @@ package org.pdxfinder.commands.dataloaders;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.apache.commons.cli.HelpFormatter;
-import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.ds.Standardizer;
@@ -63,7 +62,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
             initMethod();
 
-            loaderTemplate();
+            globalLoadingOrder();
 
         }
     }

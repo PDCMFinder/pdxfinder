@@ -87,7 +87,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
             initMethod();
 
-            jaxLoadingOrder();
+            globalLoadingOrder();
 
         }
     }
@@ -107,50 +107,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     }
 
-    void jaxLoadingOrder() throws Exception {
-
-        step00StartReportManager();
-
-        step02GetMetaDataJSON();
-
-        step03CreateProviderGroup();
-
-        step04CreateNSGammaHostStrain();
-
-        step05CreateNSHostStrain();
-
-        step06CreateProjectGroup();
-
-        step07GetPDXModels();
-
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-
-            this.jsonData = jsonArray.getJSONObject(i);
-
-            step08GetMetaData();
-
-            //if(!dto.getModelID().equals("TM00016")) continue;
-
-            step09LoadPatientData();
-
-            step10LoadExternalURLs();
-
-            step11LoadBreastMarkers();
-
-            step12CreateModels();
-
-            step13LoadSpecimens();
-
-            step14LoadCurrentTreatment();
-
-            step16LoadVariationData();
-
-        }
-        step15LoadImmunoHistoChemistry();
-
-
-    }
 
 
     @Override
@@ -347,7 +303,12 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     protected void step16LoadVariationData() {
-        loadVariationData(dto.getModelCreation(), dto.getEngraftmentSite(), dto.getEngraftmentType());
+
+        log.info("Loading WGS for model " + dto.getModelCreation().getSourcePdxId());
+
+        loadOmicData(dto.getModelCreation(),"VARIATION");
+
+        //loadVariationData(dto.getModelCreation(), dto.getEngraftmentSite(), dto.getEngraftmentType());
     }
 
 
@@ -374,7 +335,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
      */
     private void loadVariationData(ModelCreation modelCreation, EngraftmentSite engraftmentSite, EngraftmentType engraftmentType) {
 
-        if (maxVariations == 0) {
+/*        if (maxVariations == 0) {
             return;
         }
 
@@ -582,24 +543,12 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
         } catch (Exception e) {
             log.error("", e);
-        }
+        }*/
 
 
     }
 
-    private String getPassage(String passageString) {
 
-        if(!passageString.isEmpty() && passageString.toUpperCase().contains("P")){
-
-            passageString = passageString.toUpperCase().replace("P", "");
-        }
-        //does this string have digits only now?
-        if(passageString.matches("\\d+")) return passageString;
-
-        log.warn("Unable to determine passage from sample name " + passageString + ". Assuming 0");
-        return "0";
-
-    }
 
     /*
     For a given model return a map of passage # or "Patient" -> histology image URL

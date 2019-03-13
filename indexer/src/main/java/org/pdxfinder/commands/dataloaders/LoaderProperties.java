@@ -56,6 +56,11 @@ public class LoaderProperties {
     protected String omicGenomeAssembly;
     protected String omicPlatform;
 
+    protected String omicDataFilesType;
+    protected String omicFileExtension;
+
+
+
 
     public String getDataSourceAbbreviation() {
         return dataSourceAbbreviation;
@@ -407,5 +412,21 @@ public class LoaderProperties {
 
     public void setOmicPlatform(String omicPlatform) {
         this.omicPlatform = omicPlatform;
+    }
+
+    public String getOmicDataFilesType() {
+        return omicDataFilesType;
+    }
+
+    public void setOmicDataFilesType(String omicDataFilesType) {
+        this.omicDataFilesType = omicDataFilesType;
+    }
+
+    public String getOmicFileExtension() {
+        return omicFileExtension;
+    }
+
+    public void setOmicFileExtension(String omicFileExtension) {
+        this.omicFileExtension = omicFileExtension;
     }
 }
