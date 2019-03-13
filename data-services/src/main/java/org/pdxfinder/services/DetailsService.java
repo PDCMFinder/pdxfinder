@@ -102,7 +102,8 @@ public class DetailsService {
         String technology = "", passage="", filter="", sortDir="", sortCol="mAss.seqPosition";
 
         //Retreive Diagnosis Information
-        String diagnosis = getModelDetails(dataSrc,modelId,page,size,technology,passage,filter).getDiagnosis();
+        //TODO: fix this
+        String diagnosis = ""; //getModelDetails(dataSrc,modelId,page,size,technology,passage,filter).getDiagnosis();
 
         // Retreive technology Information
         List platforms = new ArrayList();
@@ -127,10 +128,186 @@ public class DetailsService {
 
     public DetailsDTO getModelDetails(String dataSource, String modelId) {
 
-        return getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
+        DetailsDTO dto = new DetailsDTO();
+
+        Patient patient = patientRepository.findByDataSourceAndModelId(dataSource, modelId);
+        Group providerGroup = patient.getProviderGroup();
+        ModelCreation pdx = modelCreationRepository.findByDataSourceAndSourcePdxId(dataSource, modelId);
+        Sample patientSample = sampleRepository.findPatientSampleWithDetailsByDataSourceAndPdxId(dataSource, modelId);
+
+
+        dto.setPatientSex(patient.getSex());
+
+        PatientSnapshot currentPatientSnapshot = null;
+        //since there is only one element being returned in the set, this will give the current snapshot for the patient
+        for(PatientSnapshot ps: patient.getSnapshots()){
+            currentPatientSnapshot = ps;
+        }
+
+        if(currentPatientSnapshot != null && currentPatientSnapshot.getAgeAtCollection() != null){
+
+            dto.setAgeAtTimeOfCollection(currentPatientSnapshot.getAgeAtCollection());
+        }
+        else{
+
+            dto.setAgeAtTimeOfCollection("Not specified");
+        }
+
+        if(patient.getRace() != null && !patient.getRace().isEmpty()){
+
+            dto.setRaceOrEthnicity(patient.getRace() + " / " +patient.getEthnicity());
+        }
+        else{
+
+            dto.setRaceOrEthnicity(patient.getEthnicity());
+        }
+
+        dto.setMappedOntologyTermLabel(patientSample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
+        dto.setProviderName(providerGroup.getName());
+        dto.setContactProviderLabel(providerGroup.getAbbreviation());
+        dto.setContactProviderUrl(providerGroup.getContact());
+
+
+        if (pdx != null && pdx.getExternalUrls() != null) {
+
+            pdx.getExternalUrls().stream().forEach(extUrl ->{
+                if (extUrl.getType().equals(ExternalUrl.Type.SOURCE.getValue())){
+                    dto.setViewDataAtUrl(extUrl.getUrl());
+                }else{
+                    dto.setContactProviderUrl(extUrl.getUrl());
+                }
+            });
+
+            dto.setViewDataAtLabel("View Data at "+pdx.getDataSource());
+        }
+
+        else{
+            dto.setViewDataAtUrl("#");
+            dto.setViewDataAtLabel("Unknown source");
+        }
+
+
+        dto.setPatientSex(patient.getSex());
+
+        dto.setRelatedModels(getModelsOriginatedFromSamePatient(dataSource, modelId));
+
+        if(patientSample.getOriginTissue() != null){
+            dto.setPrimaryTissue(patientSample.getOriginTissue().getName());
+        }
+
+        if(patientSample.getSampleSite() != null){
+            dto.setCollectionSite(patientSample.getSampleSite().getName());
+        }
+
+        if(patientSample.getType() != null){
+            dto.setTumorType(patientSample.getType().getName());
+        }
+
+        if(patientSample.getStage() != null){
+            dto.setStage(patientSample.getStage());
+        }
+
+        if(patientSample.getStageClassification() != null){
+            dto.setStageClassification(patientSample.getStageClassification());
+        }
+
+        if(patientSample.getGrade() != null){
+            dto.setGrade(patientSample.getGrade());
+        }
+
+        if(patientSample.getGradeClassification() != null){
+            dto.setGradeClassification(patientSample.getGradeClassification());
+        }
+
+
+        //Assembling PDX MODEL ENGRAFTMENT DATA
+        Set<EngraftmentDataDTO> engraftmentData = new HashSet<>();
+        //engraftments >> passages[]
+        Map<EngraftmentDataDTO, Set<String>> engraftmentDataMap = new HashMap<>();
+
+        if(pdx.getSpecimens() != null){
+
+            for(Specimen sp: pdx.getSpecimens()){
+
+                if(sp.getHostStrain() != null){
+
+                    EngraftmentDataDTO edto = new EngraftmentDataDTO();
+
+                    edto.setStrainName(
+                            (sp.getHostStrain() != null) ? notEmpty(sp.getHostStrain().getName()) : "Not Specified"
+                    );
+
+                    edto.setEngraftmentSite(
+                            (sp.getEngraftmentSite() != null) ? notEmpty(sp.getEngraftmentSite().getName()) : "Not Specified"
+                    );
+
+                    edto.setEngraftmentType(
+                            (sp.getEngraftmentType() != null) ? notEmpty(sp.getEngraftmentType().getName()) : "Not Specified"
+                    );
+
+                    edto.setEngraftmentMaterial(
+                            (sp.getEngraftmentMaterial() != null) ? notEmpty(sp.getEngraftmentMaterial().getName()) : "Not Specified"
+                    );
+
+                    edto.setEngraftmentMaterialState(
+                            (sp.getEngraftmentMaterial() != null) ? notEmpty(sp.getEngraftmentMaterial().getState()) : "Not Specified"
+                    );
+
+                    String passage = (sp.getPassage() != null) ? notEmpty(sp.getPassage()) : "Not Specified";
+
+                    //if the datakey combination is found, then don't add new Engraftment data, but rather uodate the passage accordingly
+                    if (engraftmentDataMap.containsKey(edto)) {
+
+                        engraftmentDataMap.get(edto).add(passage);
+
+                    } else {
+
+                        // If new, save in the Map
+                        engraftmentDataMap.put(edto, new HashSet<>(Arrays.asList(passage)));
+                    }
+                }
+            }
+        }
+
+        for(Map.Entry<EngraftmentDataDTO, Set<String>> entry: engraftmentDataMap.entrySet()){
+
+            EngraftmentDataDTO edto = entry.getKey();
+            Set<String> passages = entry.getValue();
+            List<String> passageList = new ArrayList<>();
+            passageList.addAll(passages);
+
+            //order the passages:
+            Collections.sort(passageList);
+            edto.setPassage(StringUtils.join(passageList, ", "));
+            engraftmentData.add(edto);
+
+        }
+
+        dto.setPdxModelList(engraftmentData);
+
+
+        List<QualityAssurance> qaList = pdx.getQualityAssurance();
+
+        List<QualityControlDTO> qcontrolList = new ArrayList<>();
+        for(QualityAssurance qa: qaList){
+
+            QualityControlDTO qdto = new QualityControlDTO(qa.getTechnology(), qa.getDescription(), qa.getPassages());
+            qcontrolList.add(qdto);
+        }
+
+        dto.setModelQualityControl(qcontrolList);
+
+        PatientDTO patientDTO = patientService.getPatientDetails(dataSource, modelId);
+        dto.setPatient(patientDTO);
+
+
+
+
+        return dto;
+                //getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
     }
 
-
+/*
     public DetailsDTO getModelDetails(String dataSource, String modelId, int page, int size, String technology, String passage, String searchFilter) {
 
 
@@ -402,6 +579,9 @@ public class DetailsService {
                         markerList.add(ma.getMarker().getName() + " status: " + ma.getDescription());
                     }*/
 
+
+/*
+
                 }
             }
             Collections.sort(markerList);
@@ -469,7 +649,7 @@ public class DetailsService {
 
         }*/
 
-
+/*
         for (String tech : modelTechAndPassages.keySet()) {
 
             //Retrieve the passages:
@@ -551,7 +731,7 @@ public class DetailsService {
         return dto;
     }
 
-
+*/
 
 
     /**
