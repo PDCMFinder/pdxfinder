@@ -184,7 +184,7 @@ public class AjaxController {
 
         String viewPlatform = (platform == null) ? "" : platform;
 
-        DetailsDTO dto = detailsService.getModelDetails(dataSrc, modelId, page, size,viewPlatform,"","");
+        DetailsDTO dto = detailsService.getModelDetails(dataSrc, modelId);
 
         return  dto;
     }
@@ -265,7 +265,7 @@ public class AjaxController {
         Report report = new Report();
         PdfHelper pdfHelper = new PdfHelper();
 
-        DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", "");
+        DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId);
 
         String modelUrl = Label.WEBSITE + request.getRequestURI();
         modelUrl = modelUrl.substring(0, modelUrl.length() - 9);

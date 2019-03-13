@@ -45,7 +45,7 @@ public class DetailsController {
                           @RequestParam(value = "page", defaultValue = "0") Integer page,
                           @RequestParam(value = "size", defaultValue = "15000") Integer size) {
 
-        model.addAttribute("data", detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", ""));
+        model.addAttribute("data", detailsService.getModelDetails(dataSrc, modelId));
         return "details";
     }
 
