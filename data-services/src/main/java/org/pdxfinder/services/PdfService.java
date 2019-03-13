@@ -1,14 +1,12 @@
 package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.pdxfinder.graph.dao.QualityAssurance;
 import org.pdxfinder.services.dto.*;
 import org.pdxfinder.services.pdf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.DatatypeConverter;
 import java.util.*;
 
 /*
@@ -27,8 +25,9 @@ public class PdfService {
 
     private Logger logger = LoggerFactory.getLogger(PdfService.class);
 
-    public List<Object> generatePdf(DetailsDTO data, String modelUrl) {
 
+    public List<Object> generatePdf(DetailsDTO data, String modelUrl) {
+    /*
         List<Object> content = new ArrayList();
         Map<Object, Object> dataHolder = new HashMap<>();
         List<List<Object>> tableBody = new ArrayList();
@@ -51,9 +50,9 @@ public class PdfService {
 
         Map<String, String> patient = new LinkedHashMap<>();
 
-        patient.put(Label.TXT_SEX, data.getGender());
-        patient.put(Label.TXT_COLLECTION_AGE, data.getAgeAtCollection());
-        patient.put(Label.TXT_RACE, data.getRace() + "  " + data.getEthnicity());  /////
+        patient.put(Label.TXT_SEX, data.getPatientSex());
+        patient.put(Label.TXT_COLLECTION_AGE, data.getAgeAtTimeOfCollection());
+        patient.put(Label.TXT_RACE, data.getRaceOrEthnicity());  /////
 
         row1Column1Contents.add(
                 pdf.pdxFinderTable(patient, Label.TXT_PATIENT)
@@ -63,8 +62,8 @@ public class PdfService {
         Map<String, String> patientTumor = new LinkedHashMap<>();
 
         patientTumor.put(Label.TXT_HISTOLOGY, data.getMappedOntology());
-        patientTumor.put(Label.TXT_TISSUE, data.getOriginTissue());
-        patientTumor.put(Label.TXT_SITE, data.getSampleSite());
+        patientTumor.put(Label.TXT_TISSUE, data.getPrimaryTissue());
+        patientTumor.put(Label.TXT_SITE, data.getCollectionSite());
         patientTumor.put(Label.TXT_TUMOR, data.getTumorType());
         patientTumor.put(Label.TXT_GRADE, data.getGrade());  /////
         patientTumor.put(Label.TXT_STAGE, data.getStage());  //////
@@ -81,6 +80,7 @@ public class PdfService {
                 pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
         );*/
 
+    /*
         row1Column1Contents.add(
                 pdf.doubleTableHead(Label.TXT_ENGRAFTMENT, 6, Arrays.asList(90, 90, 90, 90, 73, 70), Arrays.asList(0, 7, 0, -6))
         );
@@ -126,7 +126,7 @@ public class PdfService {
         );*/
 
 
-
+/*
         row1Column1Contents.add(
                 pdf.doubleTableHead(Label.TXT_QC, 3, Arrays.asList(170, 250, 110), Arrays.asList(0, 7, 0, -6))
         );
@@ -134,8 +134,8 @@ public class PdfService {
         dataList = new ArrayList<>();
         try{
 
-            List<QualityAssurance> qaList = data.getQualityAssurances();
-            for (QualityAssurance qa : qaList) {
+            List<QualityControlDTO> qaList = data.getModelQualityControl();
+            for (QualityControlDTO qa : qaList) {
 
                 Map<String, String> qaMap = mapper.convertValue(qa, Map.class);
                 qaMap.remove("validationHostStrain");
@@ -495,7 +495,7 @@ public class PdfService {
 
 
 
-
+/*
         tableBody = Arrays.asList(Arrays.asList(td));
         List<Object> widths = Arrays.asList(169);
         int heights = 354;
@@ -521,8 +521,9 @@ public class PdfService {
 
         content.add(dataHolder);
 
-
-        return content;
+    */
+        //return content;
+        return null;
     }
 
 
@@ -573,7 +574,7 @@ public class PdfService {
         tableBody.add(tableRow);
 
         // create row 2 and add to table body
-        text = new Text(data.getMappedOntology()+"\n"+data.getSourceName(), "h2");
+        text = new Text(data.getMappedOntologyTermLabel()+"\n"+data.getDataSource(), "h2");
         text.setAlignment("center");
         tableRow = Arrays.asList(text);
         tableBody.add(tableRow);

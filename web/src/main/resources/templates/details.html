@@ -82,16 +82,16 @@
 
                     <div class="columns medium-4 small-12 margin-top-30">
                         <h4 class="pdxBig"><span class="float-left border-color-black"
-                                                 th:text="${data.modelId+': '+data.mappedOntology}"></span></h4>
+                                                 th:text="${data.modelId+': '+data.mappedOntologyTermLabel}"></span></h4>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-30">
-                        <h4 class="pdxBig black"><span class="float-left" th:text="${data.sourceName}"> The Jackson Laboratory </span>
+                        <h4 class="pdxBig black"><span class="float-left" th:text="${data.providerName}"> The Jackson Laboratory </span>
                         </h4>
                     </div>
 
                     <div class="columns medium-4 small-12 shiftUp20">
-
+<!--
                         <a th:href="@{'mailto:'+${data.contacts+'?subject='+data.modelId}}"
                            th:if="${ data.contacts != null && #strings.contains(data.contacts,'@')}">
                             <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
@@ -108,17 +108,14 @@
                             <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
                         </a>
 
-                        <!--<a th:href="@{${data.contacts}}" th:target="_blank"     && #strings.endsWith(data.contacts,'=')
-                           th:if="${#strings.contains(data.contacts,'http') && not #strings.endsWith(data.contacts,'=')}">
-                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
-                        </a> -->
+
 
                         <a th:href="@{${data.externalUrl}}" th:target="_blank"
                            th:if="${data.externalUrl != null && #strings.contains(data.externalUrl,'http')}">
                             <h4 class="button outline uppercase margin-top-large minwidth300 shiftUp10 card-3b"
                                 th:text="${data.externalUrlText}">View at Provider</h4>
                         </a>
-
+-->
                         <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/pdf'}"
                            th:target="_blank"
                            class="button outline uppercase margin-top-large minwidth300 shiftUp10 card-3b">
@@ -146,6 +143,7 @@
                             <a href="#patients" style="font-size: 15px; padding: 15px;"> Patient </a>
                         </li>
 
+                        <!--
                         <li th:if="${ #lists.isEmpty(data.dataSummary)}"
                             class="tabs-title ">
                             <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link" onclick="initTabs('0')">
@@ -157,7 +155,7 @@
                             class="tabs-title ">
                             <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link" onclick="initTabs('0')">
                                 Molecular Data
-                                (<span th:text="${data.xenograftDataSize}"> ... </span>) <!-- #lists.size(data.dataSummary) -->
+                                (<span th:text="${data.xenograftDataSize}"> ... </span>)
                             </a>
                         </li>
 
@@ -170,6 +168,8 @@
                         <li th:if="${data.drugSummaryRowNumber} > 0" class="tabs-title">
                             <a href="#dosing_studies" style="font-size: 15px; padding: 15px;">Dosing study (1)</a>
                         </li>
+
+                    -->
 
                     </ul>
 
@@ -195,18 +195,20 @@
 
                                         <tr>
                                             <th class="text-left medium-4">Sex</th>
-                                            <td th:text="${data.gender}"></td>
+                                            <td th:text="${data.patientSex}"></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left medium-4">Age at Time of Collection</th>
-                                            <td th:text="${data.ageAtCollection}"></td>
+                                            <td th:text="${data.ageAtTimeOfCollection}"></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left medium-4">Race / Ethnicity</th>
                                             <td>
-                                                <span th:text="${data.race}"></span>
-                                                <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
+                                                <span th:text="${data.raceOrEthnicity}"></span>
+                                          <!--      <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
                                                 <span th:text="${data.ethnicity}"></span>
+
+                                          -->
                                             </td>
                                         </tr>
                                         <tr th:if="${not #lists.isEmpty(data.relatedModels)}">
@@ -233,17 +235,17 @@
 
                                         <tr>
                                             <th class="text-left medium-4">Histology</th>
-                                            <td class="text-left"><span th:text="${data.mappedOntology}"></span></td>
+                                            <td class="text-left"><span th:text="${data.mappedOntologyTermLabel}"></span></td>
                                         </tr>
 
                                         <tr>
                                             <th class="text-left medium-4">Primary Tissue</th>
-                                            <td class="text-left" th:text="${data.originTissue}"></td>
+                                            <td class="text-left" th:text="${data.primaryTissue}"></td>
                                         </tr>
 
                                         <tr>
                                             <th class="text-left medium-4">Collection Site</th>
-                                            <td class="text-left" th:text="${data.sampleSite}"></td>
+                                            <td class="text-left" th:text="${data.collectionSite}"></td>
                                         </tr>
 
                                         <tr>
@@ -357,10 +359,10 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr th:each="qa, iter : ${data.qualityAssurances}">
-                                            <td th:text="${qa.technology}" class="capt-text"></td>
+                                        <tr th:each="qa, iter : ${data.modelQualityControl}">
+                                            <td th:text="${qa.technique}" class="capt-text"></td>
                                             <td th:text="${qa.description}" class="capt-text"></td>
-                                            <td th:text="${qa.passages}" class="capt-text"></td>
+                                            <td th:text="${qa.passage}" class="capt-text"></td>
                                         </tr>
                                         </tbody>
                                     </table>

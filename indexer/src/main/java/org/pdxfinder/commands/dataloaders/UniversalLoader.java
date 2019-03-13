@@ -352,7 +352,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             return;
         }
 
-        ds = dataImportService.getProviderGroup(providerName, providerAbbreviation, "", "", "", "", "", sourceUrl);
+        ds = dataImportService.getProviderGroup(providerName, providerAbbreviation, "", "",  "", sourceUrl);
 
     }
 
@@ -992,6 +992,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             String markerStatus = dataRow.get(6);
             String technique = dataRow.get(8);
             String platform = dataRow.get(9);
+            String characterizationType = "Unknown";
 
             if(origin.isEmpty() || modelId.isEmpty() || markerSymbol.isEmpty() || markerStatus.isEmpty() || technique.isEmpty() || platform.isEmpty()){
                 log.error("Missing essential value in row " + row);
@@ -1001,7 +1002,12 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             MolecularCharacterization mc;
             Platform pl;
             Marker marker = null;
-            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), ds.getAbbreviation(), modelId, markerSymbol, "IHC", "ImmunoHistoChemistry");
+
+            if(technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish") ){
+                characterizationType = "IHC";
+            }
+
+            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), ds.getAbbreviation(), modelId, markerSymbol, characterizationType, technique);
 
             if(nsdto.getNode() == null){
 

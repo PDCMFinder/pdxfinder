@@ -42,18 +42,22 @@ public class Group {
 
 
     //Special constructor for Provider Groups
-    public Group(String name, String abbrev, String description, String providerType, String accessibility,
-                 String accessModalities, String contact, String url){
+    public Group(String name, String abbrev, String description, String providerType, String contact, String url){
 
         this.name = name;
         this.abbreviation = abbrev;
         this.description = description;
         this.providerType = providerType;
-        this.accessibility = accessibility;
-        this.accessModalities = accessModalities;
         this.contact = contact;
         this.url = url;
         this.type = "Provider";
+    }
+
+    //Special constructor for Accessibility groups
+    public Group(String accessibility, String accessModalities) {
+        this.type = "Accessibility";
+        this.accessibility = accessibility;
+        this.accessModalities = accessModalities;
     }
 
     public String getName() {

@@ -157,7 +157,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step03CreateProviderGroup() {
 
-        loadProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription, providerType, accessibility, "transnational access", dataSourceContact, sourceURL);
+        loadProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription,  "", dataSourceContact, sourceURL);
     }
 
     @Override

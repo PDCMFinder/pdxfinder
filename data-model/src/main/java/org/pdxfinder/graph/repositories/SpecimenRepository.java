@@ -58,7 +58,7 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
             "            AND    (spec.passage = {passage} OR {passage} = '' )" +
 
             "            AND ( toLower(spec.externalId) CONTAINS toLower({search})" +
-            "            OR toLower(m.symbol) CONTAINS toLower({search})" +
+            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search})" +
             "            OR toLower(tech.name) CONTAINS toLower({search})" +
             "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) ) ) " +
 
@@ -110,7 +110,7 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
             "            AND    (spec.passage = {passage} OR {passage} = '' )" +
 
             "            AND ( toLower(spec.externalId) CONTAINS toLower({search})" +
-            "            OR toLower(m.symbol) CONTAINS toLower({search})" +
+            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search})" +
             "            OR toLower(tech.name) CONTAINS toLower({search})" +
             "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) ) ) " +
             "            RETURN count(*) ")
@@ -158,5 +158,8 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
             "WHERE id(mc) = {mc} " +
             "RETURN sp")
     Specimen findByMolChar(@Param("mc")MolecularCharacterization mc);
+
+
+
 
 }

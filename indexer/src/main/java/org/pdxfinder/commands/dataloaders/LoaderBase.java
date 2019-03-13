@@ -345,9 +345,9 @@ public abstract class LoaderBase extends LoaderProperties implements Application
 
 
     public void loadProviderGroup(String dsName, String dsAbbrev, String dsDesc,
-                                                 String providerType, String access,String modalities, String dsContact,String url){
+                                                 String providerType, String dsContact,String url){
 
-        Group providerDS = dataImportService.getProviderGroup(dsName, dsAbbrev, dsDesc, providerType, access, modalities, dsContact, url);
+        Group providerDS = dataImportService.getProviderGroup(dsName, dsAbbrev, dsDesc, providerType, dsContact, url);
         dto.setProviderGroup(providerDS);
     }
 

@@ -50,7 +50,7 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
             "            AND    (mc.technology = {tech}  OR {tech} = '' ) " +
 
 
-            "            OR toLower(m.symbol) CONTAINS toLower({search})" +
+            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search})" +
             "            OR toLower(mc.technology) CONTAINS toLower({search})" +
             "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
 
@@ -73,7 +73,7 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
             "            AND    mc.sourcePdxId = {modelId}  " +
             "            AND    (mc.technology = {tech}  OR {tech} = '' ) " +
 
-            "            OR toLower(m.symbol) CONTAINS toLower({search}) " +
+            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search}) " +
             "            OR toLower(mc.technology) CONTAINS toLower({search}) " +
             "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
             "            RETURN count(*) ")

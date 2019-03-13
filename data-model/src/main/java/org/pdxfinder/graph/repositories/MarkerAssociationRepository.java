@@ -16,7 +16,7 @@ import java.util.Set;
 public interface MarkerAssociationRepository extends PagingAndSortingRepository<MarkerAssociation, Long>{
 
     //TODO: Verify cypher
-    @Query("MATCH (n:MarkerAssociation)-[]-(m:Marker) where n.description = {type} and m.symbol={symbol} return n")
+    @Query("MATCH (n:MarkerAssociation)-[]-(m:Marker) where n.description = {type} and m.hgncSymbol={symbol} return n")
     MarkerAssociation findByTypeAndMarkerSymbol(@Param("type") String type, @Param("symbol") String symbol);
     
     @Query("MATCH (n:MarkerAssociation)-[]-(m:Marker) where n.description = {type} and m.name={name} return n")
