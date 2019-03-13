@@ -24,7 +24,6 @@ public class LoaderProperties {
     protected String dosingStudyURL;
     protected String sourceURL;
     protected String normalTissueFalse;
-    protected String targetedNgsPlatformURL;
     protected String tech;
     protected String fingerPrintDescription;
     protected String histologyNote;
@@ -184,14 +183,6 @@ public class LoaderProperties {
 
     public void setNormalTissueFalse(String normalTissueFalse) {
         this.normalTissueFalse = normalTissueFalse;
-    }
-
-    public String getTargetedNgsPlatformURL() {
-        return targetedNgsPlatformURL;
-    }
-
-    public void setTargetedNgsPlatformURL(String targetedNgsPlatformURL) {
-        this.targetedNgsPlatformURL = targetedNgsPlatformURL;
     }
 
     public String getTech() {

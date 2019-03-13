@@ -104,9 +104,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
         jsonFile = dataRootDir+dataSourceAbbreviation+"/pdx/models.json";
         dataSource = dataSourceAbbreviation;
-    /*  dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
-        dataSourceContact = DATASOURCE_CONTACT;
-        dosingStudyURL = DOSING_STUDY_URL;  */
+
     }
 
     void jaxLoadingOrder() throws Exception {
