@@ -133,6 +133,8 @@ public class TransController {
                 "ncbi_gene_id","ensembl_gene_id","ensembl_transcript_id","rs_id_Variant","genome_assembly","Platform");
 
 
+
+        List removedList = new ArrayList();
         for (Map<String, String> data : dataList) {
 
             if ( !data.get("Sample_ID").equals("ORIGINATOR") ){
@@ -143,9 +145,15 @@ public class TransController {
                 String passage = dataTransformerService.getPassageByModelIDAndSampleID(modelID, sampleID);
 
                 data.put("Passage", passage);
+
+                /*if (passage.equals("XXXX")){
+                    removedList.add(data);
+                }*/
             }
 
         }
+
+       // dataList.removeAll(removedList);
 
 
         utilityService.writeCsvFile(dataList,csvHead, "data.csv");
