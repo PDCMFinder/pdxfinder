@@ -1,14 +1,12 @@
 package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.pdxfinder.graph.dao.QualityAssurance;
 import org.pdxfinder.services.dto.*;
 import org.pdxfinder.services.pdf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.DatatypeConverter;
 import java.util.*;
 
 /*
@@ -576,7 +574,7 @@ public class PdfService {
         tableBody.add(tableRow);
 
         // create row 2 and add to table body
-        text = new Text(data.getMappedOntology()+"\n"+data.getDataSourceAbbrev(), "h2");
+        text = new Text(data.getMappedOntologyTermLabel()+"\n"+data.getDataSource(), "h2");
         text.setAlignment("center");
         tableRow = Arrays.asList(text);
         tableBody.add(tableRow);
