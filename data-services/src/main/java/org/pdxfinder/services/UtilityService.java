@@ -87,6 +87,19 @@ public class UtilityService {
     }
 
 
+
+
+    public List<Map<String, String>> serializeDataToMaps(String fileName) {
+
+
+        String fileExtension = getFileExtension(fileName);
+
+        List<Map<String, String>> csvMaps = (fileExtension.equals("csv")) ? serializeCSVToMaps(fileName) : serializeJSONToMaps(fileName);
+
+        return csvMaps;
+    }
+
+
     public Map<String, List<Map<String, String>> > serializeMergedData(String fileName, String groupColumn) {
 
 
@@ -145,13 +158,28 @@ public class UtilityService {
     }
 
 
+
     public List<Map<String, String>> serializeJSONToMaps(String jsonFile) {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        JsonNode node = readJsonLocal(jsonFile);
+        List<Map<String, String>> data;
 
-        List<Map<String, String>> data = mapper.convertValue(node, List.class);
+        JsonNode node = readJsonLocal(jsonFile);
+        try {
+            data = mapper.convertValue(node, List.class);
+
+        }catch (Exception e){
+
+            Map<String, Object> json = mapper.convertValue(node, Map.class);
+
+            String jsonKey = "";
+            for (Map.Entry<String, Object> entry : json.entrySet() ) {      // GET THE JSON KEY
+                jsonKey = entry.getKey();
+            }
+
+            data = (List) json.get(jsonKey);
+        }
 
         return data;
     }
