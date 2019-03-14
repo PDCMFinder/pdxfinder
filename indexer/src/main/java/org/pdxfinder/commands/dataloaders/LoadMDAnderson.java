@@ -106,7 +106,7 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
             if (listOfFiles[i].isFile()) {
 
                 this.jsonFile = rootDataDirectory + dataSourceAbbreviation + "/pdx/" + listOfFiles[i].getName();
-                loaderTemplate();
+                globalLoadingOrder();
             }
         }
 

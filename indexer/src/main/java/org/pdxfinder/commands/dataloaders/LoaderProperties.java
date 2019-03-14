@@ -24,11 +24,11 @@ public class LoaderProperties {
     protected String dosingStudyURL;
     protected String sourceURL;
     protected String normalTissueFalse;
-    protected String targetedNgsPlatformURL;
     protected String tech;
     protected String fingerPrintDescription;
     protected String histologyNote;
     protected Map<String, String> platformURL;
+    protected String dataRootDirectory;
 
 
     // OMIC DATA PROPERTIES
@@ -38,6 +38,7 @@ public class LoaderProperties {
     protected String omicSampleOrigin;
     protected String omicPassage;
     protected String omicHostStrainName;
+    protected String omicHgncSymbol;
     protected String omicAminoAcidChange;
     protected String omicNucleotideChange;
     protected String omicConsequence;
@@ -54,6 +55,11 @@ public class LoaderProperties {
     protected String omicRsIdVariants;
     protected String omicGenomeAssembly;
     protected String omicPlatform;
+
+    protected String omicDataFilesType;
+    protected String omicFileExtension;
+
+
 
 
     public String getDataSourceAbbreviation() {
@@ -184,14 +190,6 @@ public class LoaderProperties {
         this.normalTissueFalse = normalTissueFalse;
     }
 
-    public String getTargetedNgsPlatformURL() {
-        return targetedNgsPlatformURL;
-    }
-
-    public void setTargetedNgsPlatformURL(String targetedNgsPlatformURL) {
-        this.targetedNgsPlatformURL = targetedNgsPlatformURL;
-    }
-
     public String getTech() {
         return tech;
     }
@@ -224,6 +222,13 @@ public class LoaderProperties {
         this.platformURL = platformURL;
     }
 
+    public String getDataRootDirectory() {
+        return dataRootDirectory;
+    }
+
+    public void setDataRootDirectory(String dataRootDirectory) {
+        this.dataRootDirectory = dataRootDirectory;
+    }
 
     public String getOmicDataSource() {
         return omicDataSource;
@@ -271,6 +276,14 @@ public class LoaderProperties {
 
     public void setOmicHostStrainName(String omicHostStrainName) {
         this.omicHostStrainName = omicHostStrainName;
+    }
+
+    public String getOmicHgncSymbol() {
+        return omicHgncSymbol;
+    }
+
+    public void setOmicHgncSymbol(String omicHgncSymbol) {
+        this.omicHgncSymbol = omicHgncSymbol;
     }
 
     public String getOmicAminoAcidChange() {
@@ -399,5 +412,21 @@ public class LoaderProperties {
 
     public void setOmicPlatform(String omicPlatform) {
         this.omicPlatform = omicPlatform;
+    }
+
+    public String getOmicDataFilesType() {
+        return omicDataFilesType;
+    }
+
+    public void setOmicDataFilesType(String omicDataFilesType) {
+        this.omicDataFilesType = omicDataFilesType;
+    }
+
+    public String getOmicFileExtension() {
+        return omicFileExtension;
+    }
+
+    public void setOmicFileExtension(String omicFileExtension) {
+        this.omicFileExtension = omicFileExtension;
     }
 }

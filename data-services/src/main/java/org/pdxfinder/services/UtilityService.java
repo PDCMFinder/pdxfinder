@@ -2,7 +2,6 @@ package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.neo4j.ogm.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,6 +23,11 @@ public class UtilityService {
     private String homeDir = System.getProperty("user.home");
     private final static Logger log = LoggerFactory.getLogger(UtilityService.class);
     private ObjectMapper mapper = new ObjectMapper();
+
+
+    //Delimiter used in CSV file
+    private static final String COMMA_DELIMITER = ",";
+    private static final String NEW_LINE_SEPARATOR = "\n";
 
 
     public List<Map<String, String>> serializeCSVToMaps(String csvFile) {
@@ -83,12 +87,38 @@ public class UtilityService {
     }
 
 
-    public Map<String, List<Map<String, String>> > serializeCombinedCSVToMapAndGroup(String csvFile, String groupColumn) {
 
-        List<Map<String, String>> csvMaps = serializeCSVToMaps(csvFile);
+
+    public List<Map<String, String>> serializeDataToMaps(String fileName) {
+
+
+        String fileExtension = getFileExtension(fileName);
+
+        List<Map<String, String>> csvMaps = (fileExtension.equals("csv")) ? serializeCSVToMaps(fileName) : serializeJSONToMaps(fileName);
+
+        return csvMaps;
+    }
+
+
+    public Map<String, List<Map<String, String>> > serializeMergedData(String fileName, String groupColumn) {
+
+
+        String fileExtension = getFileExtension(fileName);
+
+        List<Map<String, String>> csvMaps = new ArrayList<>();
+
+        switch (fileExtension){
+
+            case "csv":
+                csvMaps = serializeCSVToMaps(fileName);
+                break;
+
+            case "json":
+                csvMaps = serializeJSONToMaps(fileName);
+                break;
+        }
 
         Map<String, List<Map<String, String>> > groupedMap = new HashMap<>();
-
 
         for (Map<String, String> rowData : csvMaps){
 
@@ -128,13 +158,28 @@ public class UtilityService {
     }
 
 
+
     public List<Map<String, String>> serializeJSONToMaps(String jsonFile) {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        JsonNode node = readJsonLocal(jsonFile);
+        List<Map<String, String>> data;
 
-        List<Map<String, String>> data = mapper.convertValue(node, List.class);
+        JsonNode node = readJsonLocal(jsonFile);
+        try {
+            data = mapper.convertValue(node, List.class);
+
+        }catch (Exception e){
+
+            Map<String, Object> json = mapper.convertValue(node, Map.class);
+
+            String jsonKey = "";
+            for (Map.Entry<String, Object> entry : json.entrySet() ) {      // GET THE JSON KEY
+                jsonKey = entry.getKey();
+            }
+
+            data = (List) json.get(jsonKey);
+        }
 
         return data;
     }
@@ -179,6 +224,69 @@ public class UtilityService {
 
         return dataArrayList;
     }
+
+
+
+    public void writeCsvFile(List<Map<String, String>> dataList,  List<String> csvHead, String fileName) {
+
+        FileWriter fileWriter = null;
+
+        try {
+
+            String destination = homeDir+"/Downloads/"+fileName;
+            fileWriter = new FileWriter(destination);
+
+            //Write the CSV file header
+            fileWriter.append(String.join(COMMA_DELIMITER,csvHead));
+
+            //Add a new line separator after the header
+            fileWriter.append(NEW_LINE_SEPARATOR);
+
+
+            for (Map<String, String> data : dataList) {
+
+                for (String dKey : csvHead){
+
+                    fileWriter.append(String.valueOf(data.get(dKey)));
+                    fileWriter.append(COMMA_DELIMITER);
+                }
+                fileWriter.append(NEW_LINE_SEPARATOR);
+
+            }
+
+            log.info("CSV file was created successfully !!!");
+
+        } catch (Exception e) {
+            log.info("Error in CsvFileWriter !!!");
+            e.printStackTrace();
+        } finally {
+
+            try {
+                fileWriter.flush();
+                fileWriter.close();
+            } catch (IOException e) {
+                log.info("Error while flushing/closing fileWriter !!!");
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -316,6 +424,17 @@ public class UtilityService {
         }
 
         return result;
+    }
+
+
+
+
+    public String getFileExtension(String fileName){
+
+        String[] check = fileName.split("\\.");
+        String fileExtension = check[check.length-1];
+
+        return fileExtension;
     }
 
 

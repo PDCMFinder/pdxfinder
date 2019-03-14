@@ -304,7 +304,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
                 //STEP 1: Save the platform
                 Platform platform = dataImportService.getPlatform(platformName, dto.getProviderGroup());
                 platform.setGroup(dto.getProviderGroup());
-                platform.setUrl(targetedNgsPlatformURL);
+                platform.setUrl(platformURL.get("targetedNgsPlatformURL"));
                 dataImportService.savePlatform(platform);
 
 
@@ -503,7 +503,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
             JSONArray jarray = job.getJSONArray("IRCCVariation");
             //   System.out.println("loading "+jarray.length()+" variant records");
 
-            Platform platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), targetedNgsPlatformURL);
+            Platform platform = dataImportService.getPlatform(tech, dto.getProviderGroup(), platformURL.get("targetedNgsPlatformURL"));
             platform.setGroup(dto.getProviderGroup());
             dataImportService.savePlatform(platform);
 
