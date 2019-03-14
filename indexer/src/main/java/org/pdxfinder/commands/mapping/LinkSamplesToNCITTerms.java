@@ -115,7 +115,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                     JSONObject row = rows.getJSONObject(i);
 
                     JSONObject mappingValues = row.getJSONObject("mappingValues");
-
+                    String mapId = row.getString("entityId");
                     String dataSource = mappingValues.getString("DataSource");
                     String sampleDiagnosis = mappingValues.getString("SampleDiagnosis").toLowerCase();
                     String originTissue = mappingValues.getString("OriginTissue");
@@ -167,8 +167,9 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                     me.setMapType(mapType);
                     me.setJustification(justification);
 
-
-                    this.mappingRules.put(dataSource + sampleDiagnosis + originTissue + tumorType, me);
+                    String key = dataSource + sampleDiagnosis + originTissue + tumorType;
+                    this.mappingRules.put(key, me);
+                    log.info("Adding mappingrule "+mapId + " "+key);
                 }
             }
 
@@ -271,7 +272,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                 MappingEntity me = getMappingForSample(dataSource, updatedDiagnosis, originTissue, tumorType);
 
                 //deal with empty mapping rules here!
-                if (me.getMappedTermLabel() == null || me.getMappedTermLabel().equals("")) {
+                if (me.getMappedTermUrl() == null || me.getMappedTermUrl().equals("")) {
 
                     MissingMapping mm = new MissingMapping(dataSource, updatedDiagnosis, originTissue, tumorType);
                     insertMissingMapping(updatedDiagnosis, mm);

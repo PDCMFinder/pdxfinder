@@ -132,7 +132,7 @@ public class LoadNCIT implements CommandLineRunner {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            String url = ontologyUrl+parentUrlEncoded+"/hierarchicalChildren?size=100";
+            String url = ontologyUrl+parentUrlEncoded+"/hierarchicalChildren?size=200";
 
             log.debug("Getting data from "+url);
 
