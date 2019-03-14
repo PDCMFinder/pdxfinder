@@ -31,7 +31,8 @@ public class DetailsDTO {
     //PATIENT
     private String patientSex;
     private String ageAtTimeOfCollection;
-    private String raceOrEthnicity;
+    private String race;
+    private String ethnicity;
     private List<String> relatedModels;
 
     //PATIENT TUMOR
@@ -70,6 +71,7 @@ public class DetailsDTO {
      ************************/
     private String dosingStudyProtocolUrl;
     private List<DrugSummaryDTO> dosingStudy;
+    private int dosingStudyNumbers;
 
 
 
@@ -229,12 +231,20 @@ public class DetailsDTO {
         this.ageAtTimeOfCollection = ageAtTimeOfCollection;
     }
 
-    public String getRaceOrEthnicity() {
-        return raceOrEthnicity;
+    public String getRace() {
+        return race;
     }
 
-    public void setRaceOrEthnicity(String raceOrEthnicity) {
-        this.raceOrEthnicity = raceOrEthnicity;
+    public void setRace(String race) {
+        this.race = race;
+    }
+
+    public String getEthnicity() {
+        return ethnicity;
+    }
+
+    public void setEthnicity(String ethnicity) {
+        this.ethnicity = ethnicity;
     }
 
     public List<String> getRelatedModels() {
@@ -347,5 +357,13 @@ public class DetailsDTO {
 
     public void setDosingStudy(List<DrugSummaryDTO> dosingStudy) {
         this.dosingStudy = dosingStudy;
+    }
+
+    public int getDosingStudyNumbers() {
+        return dosingStudyNumbers;
+    }
+
+    public void setDosingStudyNumbers(int dosingStudyNumbers) {
+        this.dosingStudyNumbers = dosingStudyNumbers;
     }
 }

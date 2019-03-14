@@ -135,7 +135,8 @@ public class DetailsService {
         ModelCreation pdx = modelCreationRepository.findByDataSourceAndSourcePdxId(dataSource, modelId);
         Sample patientSample = sampleRepository.findPatientSampleWithDetailsByDataSourceAndPdxId(dataSource, modelId);
 
-
+        dto.setModelId(pdx.getSourcePdxId());
+        dto.setDataSource(pdx.getDataSource());
         dto.setPatientSex(patient.getSex());
 
         PatientSnapshot currentPatientSnapshot = null;
@@ -155,11 +156,20 @@ public class DetailsService {
 
         if(patient.getRace() != null && !patient.getRace().isEmpty()){
 
-            dto.setRaceOrEthnicity(patient.getRace() + " / " +patient.getEthnicity());
+            dto.setRace(patient.getRace());
         }
         else{
 
-            dto.setRaceOrEthnicity(patient.getEthnicity());
+            dto.setRace("Not specified");
+        }
+
+        if(patient.getEthnicity() != null && !patient.getEthnicity().isEmpty()){
+
+            dto.setEthnicity(patient.getEthnicity());
+        }
+        else{
+
+            dto.setEthnicity("Not specified");
         }
 
         dto.setMappedOntologyTermLabel(patientSample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
@@ -300,7 +310,10 @@ public class DetailsService {
         PatientDTO patientDTO = patientService.getPatientDetails(dataSource, modelId);
         dto.setPatient(patientDTO);
 
-
+        List<DrugSummaryDTO> dosingStudies = getDrugSummary(dataSource, modelId);
+        dto.setDosingStudy(dosingStudies);
+        dto.setDosingStudyProtocolUrl(drugService.getPlatformUrlByDataSource(dataSource));
+        dto.setDosingStudyNumbers(dosingStudies.size());
 
 
         return dto;
