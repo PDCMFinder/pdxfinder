@@ -810,6 +810,7 @@
                                                 <th>Sample ID</th>
                                                 <th>Sample Type</th>
                                                 <th>Engrafted Tumor Passage</th>
+                                                <th>Data Type</th>
                                                 <th>Data Available</th>
                                                 <th>Platform Used</th>
                                                 <th>Raw Data</th>
@@ -823,13 +824,13 @@
                                                     <td th:text="${dataRow.sampleId}"> ... </td>
                                                     <td th:text="${dataRow.sampleType}"> ... </td>
                                                     <td th:text="${'Passage '+dataRow.engraftedTumorPassage}"> ... </td>
-
+                                                    <td th:text="${dataRow.molcharType}"> ... </td>
 
                                                     <td>
                                                         <a th:href="@{'#'+${dataRow.dataAvailableLabel}}"
                                                            style="color: #06369d; text-decoration: none;"
                                                            data-th-attr="data-tabs-target=${dataRow.dataAvailableLabel},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
-                                                           th:text="${dataRow.dataAvailableLabel}+' Platform'"
+                                                           th:text="'Show data'"
                                                            th:onclick="'showTabs('+${iter.index}+')'">
                                                             TAB TITLES
                                                         </a>

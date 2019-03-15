@@ -354,6 +354,7 @@ public class DetailsService {
                     mde.setSampleId(xenoSample.getSourceSampleId());
                     mde.setSampleType("Engrafted Tumor");
                     mde.setEngraftedTumorPassage(sp.getPassage());
+                    mde.setMolcharType(mc.getType());
                     mde.setDataAvailableLabel(mc.getPlatform().getName());
                     mde.setDataAvailableUrl("");
                     mde.setPlatformUsedLabel(mc.getPlatform().getName());
