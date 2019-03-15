@@ -145,23 +145,23 @@
                             <a href="#patients" style="font-size: 15px; padding: 15px;"> Patient </a>
                         </li>
 
-                        <!--
-                        <li th:if="${ #lists.isEmpty(data.dataSummary)}"
+
+                        <li th:if="${ #lists.isEmpty(data.molecularDataRows)}"
                             class="tabs-title ">
                             <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link" onclick="initTabs('0')">
                                 Molecular Data (0)
                             </a>
                         </li>
 
-                        <li th:if="${ not #lists.isEmpty(data.dataSummary) }"
+                        <li th:if="${ not #lists.isEmpty(data.molecularDataRows) }"
                             class="tabs-title ">
                             <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link" onclick="initTabs('0')">
                                 Molecular Data
-                                (<span th:text="${data.xenograftDataSize}"> ... </span>)
+                                (<span th:text="${data.molecularDataEntrySize}"> ... </span>)
                             </a>
                         </li>
 
- -->
+
                         <li th:if="${data.dosingStudyNumbers} == 0" class="tabs-title">
                             <a href="#dosing_studies" style="font-size: 15px; padding: 15px;">Dosing study (0)</a>
                         </li>
@@ -798,12 +798,66 @@
 
                         <div class="row large-12 medium-12 expanded" id="variationTableData">
 
-                            <!-- Start of Xenograft Variation data-->
+                            <div class="tab hideContent0" role="tabpanel" th:if="${data.molecularDataRows.size() > 0}">
+
+                                <div  th:if="${not #lists.isEmpty(data.molecularDataRows)}" class="row large-12 medium-12 expanded">
+
+                                    <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                        <div class="responsive-table" style="margin-top: 20px;">
+
+                                            <table class="datatable-pdx pdx-table table-borderedPdx head-left" data-tabs id="example-tabs">
+                                                <thead>
+                                                <th>Sample ID</th>
+                                                <th>Sample Type</th>
+                                                <th>Engrafted Tumor Passage</th>
+                                                <th>Data Available</th>
+                                                <th>Platform Used</th>
+                                                <th>Raw Data</th>
+                                                </thead>
+                                                <tbody>
+
+
+                                                <tr th:each="dataRow,iter : ${data.molecularDataRows}"
+                                                    class="tabs-title" style="float:none; text-transform: capitalize;" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
+
+                                                    <td th:text="${dataRow.sampleId}"> ... </td>
+                                                    <td th:text="${dataRow.sampleType}"> ... </td>
+                                                    <td th:text="${'Passage '+dataRow.engraftedTumorPassage}"> ... </td>
+
+
+                                                    <td>
+                                                        <a th:href="@{'#'+${dataRow.dataAvailableLabel}}"
+                                                           style="color: #06369d; text-decoration: none;"
+                                                           data-th-attr="data-tabs-target=${dataRow.dataAvailableLabel},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
+                                                           th:text="${dataRow.dataAvailableLabel}+' Platform'"
+                                                           th:onclick="'showTabs('+${iter.index}+')'">
+                                                            TAB TITLES
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a target="_blank"
+                                                           style="color: #06369d; text-decoration: none;"
+                                                           th:text="${dataRow.platformUsedLabel}"
+                                                           th:onclick="'window.open(\''+${dataRow.platformUsedUrl}+'\')'">
+                                                            ...
+                                                        </a>
+                                                    </td>
+                                                    <td th:text="${dataRow.rawDataLabel}"></td>
+                                                </tr>
+
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
 
 
 
                         </div>
-                        <!-- End of Xenograft Variation data -->
+
 
                     </div>
 
