@@ -18,6 +18,8 @@ public class MolecularDataEntryDTO {
     private String rawDataLabel;
     private String rawDataUrl;
 
+    private String molcharId;
+
     private String histology;
 
     public MolecularDataEntryDTO(String sampleId, String sampleType, String engraftedTumorPassage, String dataAvailableLabel,
@@ -124,5 +126,13 @@ public class MolecularDataEntryDTO {
 
     public void setMolcharType(String molcharType) {
         this.molcharType = molcharType;
+    }
+
+    public String getMolcharId() {
+        return molcharId;
+    }
+
+    public void setMolcharId(String molcharId) {
+        this.molcharId = molcharId;
     }
 }

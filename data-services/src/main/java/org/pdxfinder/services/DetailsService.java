@@ -360,6 +360,7 @@ public class DetailsService {
                     mde.setPlatformUsedLabel(mc.getPlatform().getName());
                     mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
                     mde.setRawDataLabel("");
+                    mde.setMolcharId(mc.getId().toString());
 
                     mdeDTO.add(mde);
 
@@ -378,6 +379,84 @@ public class DetailsService {
                 //getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
     }
 
+
+
+    public MolecularDataTableDTO getMolecularDataTable(String id){
+
+        MolecularCharacterization mc = molecularCharacterizationRepository.getMolecularDataById(id);
+
+        //first dinamically determine the headers of the table
+        Set<String> tableHeadersSet = new HashSet<>();
+        for(MarkerAssociation ma: mc.getMarkerAssociations()){
+
+            if(ma.getAminoAcidChange() != null && !ma.getAminoAcidChange().isEmpty()){
+                tableHeadersSet.add("Amino Acid Change");
+            }
+
+            if(ma.getChromosome() != null && !ma.getChromosome().isEmpty()){
+                tableHeadersSet.add("Chromosome");
+            }
+
+            if(ma.getSeqPosition() != null && !ma.getSeqPosition().isEmpty()){
+                tableHeadersSet.add("Seq. Position");
+            }
+
+            if(ma.getRefAllele() != null && !ma.getRefAllele().isEmpty()){
+                tableHeadersSet.add("Ref. Allele");
+            }
+
+            if(ma.getAltAllele() != null && !ma.getAltAllele().isEmpty()){
+                tableHeadersSet.add("Alt. Allele");
+            }
+
+
+
+
+
+        }
+
+
+        /*
+    private String chromosome;
+    private String seqPosition; //in jax use seqStartPosition instead of this
+    private String refAllele;
+    private String altAllele;
+    private String nucleotideChange;
+    private String consequence; // variant_classification in ircc
+    private String aminoAcidChange; //use hgvsp short, remove p. in ircc
+    private String rsIdVariants;
+    private String readDepth;
+    private String alleleFrequency;
+    private String genomeAssembly; //NCBI_build in ircc
+
+    private String seqStartPosition;
+    private String seqEndPosition;
+    private String strand;
+    private String ensemblTranscriptId;
+    private String ucscTranscriptId;
+    private String ncbiTranscriptId;
+
+    private String cdsChange;
+    private String type; //Substitution
+    private String annotation;
+
+    //maybe use marker status in the future to have a general approach?
+    private String immunoHistoChemistryResult;
+    private String microsatelliteResult;
+
+
+    private String probeIDAffymetrix;
+
+    private String cnaLog10RCNA;
+    private String cnaLog2RCNA;
+    private String cnaCopyNumberStatus;
+    private String cnaGisticValue;
+    private String cnaPicnicValue;
+
+         */
+
+        return new MolecularDataTableDTO();
+    }
 /*
     public DetailsDTO getModelDetails(String dataSource, String modelId, int page, int size, String technology, String passage, String searchFilter) {
 
