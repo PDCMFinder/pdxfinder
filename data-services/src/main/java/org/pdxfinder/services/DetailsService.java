@@ -316,6 +316,63 @@ public class DetailsService {
         dto.setDosingStudyNumbers(dosingStudies.size());
 
 
+        //MOLECULAR DATA TAB
+        List<MolecularDataEntryDTO> mdeDTO = new ArrayList<>();
+        //first add molchars linked to the patient sample
+        Collection<MolecularCharacterization> patientMCs = molecularCharacterizationRepository.findAllBySample(patientSample);
+        for(MolecularCharacterization mc : patientMCs){
+
+            MolecularDataEntryDTO mde = new MolecularDataEntryDTO();
+            mde.setSampleId(patientSample.getSourceSampleId());
+            mde.setSampleType("Patient Tumor");
+            mde.setEngraftedTumorPassage("NA");
+            mde.setDataAvailableLabel(mc.getPlatform().getName());
+            mde.setDataAvailableUrl("");
+            mde.setPlatformUsedLabel(mc.getPlatform().getName());
+            mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
+            mde.setRawDataLabel("");
+
+            mdeDTO.add(mde);
+        }
+
+        //then add molchars linked to the xenograft sample
+
+        List<Specimen> specimens = specimenRepository.findAllWithMolcharDataByModel(pdx);
+
+        for(Specimen sp: specimens){
+
+
+
+            if(sp.getSample() != null){
+
+                Sample xenoSample = sp.getSample();
+
+                for(MolecularCharacterization mc: xenoSample.getMolecularCharacterizations()){
+
+                    MolecularDataEntryDTO mde = new MolecularDataEntryDTO();
+
+                    mde.setSampleId(xenoSample.getSourceSampleId());
+                    mde.setSampleType("Engrafted Tumor");
+                    mde.setEngraftedTumorPassage(sp.getPassage());
+                    mde.setDataAvailableLabel(mc.getPlatform().getName());
+                    mde.setDataAvailableUrl("");
+                    mde.setPlatformUsedLabel(mc.getPlatform().getName());
+                    mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
+                    mde.setRawDataLabel("");
+
+                    mdeDTO.add(mde);
+
+                }
+
+
+            }
+
+
+
+        }
+
+        dto.setMolecularDataRows(mdeDTO);
+        dto.setMolecularDataEntrySize(mdeDTO.size());
         return dto;
                 //getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
     }

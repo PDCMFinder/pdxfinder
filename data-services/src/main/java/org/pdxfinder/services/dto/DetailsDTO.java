@@ -62,6 +62,7 @@ public class DetailsDTO {
      * MOLECULAR DATA TAB   *
      ************************/
     private List<MolecularDataEntryDTO> molecularDataRows;
+    private int molecularDataEntrySize;
 
 
 
@@ -365,5 +366,13 @@ public class DetailsDTO {
 
     public void setDosingStudyNumbers(int dosingStudyNumbers) {
         this.dosingStudyNumbers = dosingStudyNumbers;
+    }
+
+    public int getMolecularDataEntrySize() {
+        return molecularDataEntrySize;
+    }
+
+    public void setMolecularDataEntrySize(int molecularDataEntrySize) {
+        this.molecularDataEntrySize = molecularDataEntrySize;
     }
 }

@@ -159,6 +159,13 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
             "RETURN sp")
     Specimen findByMolChar(@Param("mc")MolecularCharacterization mc);
 
+    @Query("MATCH (mod:ModelCreation)--(sp:Specimen) " +
+            "WHERE id(mod) = {model} " +
+            "WITH sp " +
+            "OPTIONAL MATCH (sp)-[sfr:SAMPLED_FROM]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[pur:PLATFORM_USED]-(pl:Platform) " +
+            "RETURN sp, sfr, s, cbr, mc, pur, pl")
+    List<Specimen> findAllWithMolcharDataByModel(@Param("model") ModelCreation model);
+
 
 
 

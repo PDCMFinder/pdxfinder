@@ -1,6 +1,7 @@
 package org.pdxfinder.graph.repositories;
 
 
+import org.pdxfinder.graph.dao.ModelCreation;
 import org.pdxfinder.graph.dao.Sample;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -164,5 +165,9 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "OPTIONAL MATCH (s)-[mapped:MAPPED_TO]-(oterm:OntologyTerm) " +
             "RETURN s, o, t, ssr, ss, ot, tt, mapped, oterm")
     Sample findPatientSampleWithDetailsByDataSourceAndPdxId(@Param("dataSource") String dataSource, @Param("sourcePdxId") String sourcePdxId);
+
+
+    @Query()
+    Sample findPatientSampleByModel(@Param("model")ModelCreation model);
 
 }

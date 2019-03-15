@@ -2,6 +2,7 @@ package org.pdxfinder.graph.repositories;
 
 
 import org.pdxfinder.graph.dao.MolecularCharacterization;
+import org.pdxfinder.graph.dao.Sample;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -42,4 +43,9 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
             "OPTIONAL MATCH (molch)-[plr:PLATFORM_USED]-(pl:Platform) " +
             "RETURN molch, plr, pl")
     Collection<MolecularCharacterization> findAllByType(@Param("type") String type);
+
+    @Query("MATCH (pl:Platform)-[plr:PLATFORM_USED]-(mc:MolecularCharacterization)--(s:Sample) " +
+            "WHERE id(s) = {sample} " +
+            "RETURN mc, plr, pl")
+    Collection<MolecularCharacterization> findAllBySample(@Param("sample") Sample sample);
 }
