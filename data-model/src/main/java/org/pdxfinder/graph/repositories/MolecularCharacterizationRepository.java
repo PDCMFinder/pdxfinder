@@ -50,7 +50,7 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
     Collection<MolecularCharacterization> findAllBySample(@Param("sample") Sample sample);
 
     @Query("MATCH (pl:Platform)-[plr:PLATFORM_USED]-(mc:MolecularCharacterization)-[awr:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mr:MARKER]-(m:Marker) " +
-            "WHERE id(mc) = {id} " +
+            "WHERE ID(mc) = {id} " +
             "RETURN pl, plr, mc, awr, ma, mr, m")
-    MolecularCharacterization getMolecularDataById(@Param("id") String id);
+    MolecularCharacterization getMolecularDataById(@Param("id") Long id);
 }
