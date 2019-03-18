@@ -53,4 +53,7 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
             "WHERE ID(mc) = {id} " +
             "RETURN pl, plr, mc, awr, ma, mr, m")
     MolecularCharacterization getMolecularDataById(@Param("id") Long id);
+
+    @Query("MATCH (mc:MolecularCharacterization) RETURN ID(mc)")
+    List<Long> getAllMolCharIDs();
 }
