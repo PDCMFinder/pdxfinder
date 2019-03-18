@@ -829,7 +829,7 @@ public class SearchDS {
 
         Map<String, Map<String, Set<Long>>> data = new HashMap<>();
 
-        DataProjection dataProjection = dataProjectionRepository.findByLabel("IHC");
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("cytogenetics");
         String responses = "{}";
 
         if(dataProjection != null){

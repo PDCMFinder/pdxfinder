@@ -1004,7 +1004,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             Marker marker = null;
 
             if(technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish") ){
-                characterizationType = "IHC";
+                characterizationType = "cytogenetics";
             }
 
             NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), ds.getAbbreviation(), modelId, markerSymbol, characterizationType, technique);
@@ -1195,10 +1195,10 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
     private String getMolcharType(String technique){
 
         if(technique.toLowerCase().equals("immunohistochemistry")){
-            return "IHC";
+            return "cytogenetics";
         }
         else if(technique.toLowerCase().equals("fish")){
-            return "IHC";
+            return "cytogenetics";
         }
 
         return null;

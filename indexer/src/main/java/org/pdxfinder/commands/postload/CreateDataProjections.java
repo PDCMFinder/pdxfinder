@@ -161,7 +161,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
     private void createImmunoHistoChemistryDataProjection(){
 
-        Collection<MolecularCharacterization> ihcMolchars = dataImportService.findMolCharsByType("IHC");
+        Collection<MolecularCharacterization> ihcMolchars = dataImportService.findMolCharsByType("cytogenetics");
         log.info("Looking at "+ihcMolchars.size()+" IHC MolChar objects. This may take a while folks...");
         int count = 0;
 
@@ -886,11 +886,11 @@ public class CreateDataProjections implements CommandLineRunner{
             drugDP.setLabel("ModelDrugData");
         }
 
-        DataProjection ihcDP = dataImportService.findDataProjectionByLabel("IHC");
+        DataProjection ihcDP = dataImportService.findDataProjectionByLabel("cytogenetics");
 
         if(ihcDP == null){
             ihcDP = new DataProjection();
-            ihcDP.setLabel("IHC");
+            ihcDP.setLabel("cytogenetics");
         }
 
 

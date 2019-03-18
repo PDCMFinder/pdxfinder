@@ -206,16 +206,16 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
                 MolecularCharacterization mc = new MolecularCharacterization();
                 mc.setPlatform(dataImportService.getPlatform("Not Specified", dto.getProviderGroup()));
-                mc.setType("IHC");
+                mc.setType("cytogenetics");
 
                 //we know these markers exist so no need to check for null
-                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "ERBB2", "IHC", "ImmunoHistoChemistry");
+                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "ERBB2", "cytogenetics", "ImmunoHistoChemistry");
                 Marker her2 = (Marker) nsdto.getNode(); // ERBB2  dataImportService.getMarker("HER2", "HER2");
 
-                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "EREG", "IHC", "ImmunoHistoChemistry");
+                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "EREG", "cytogenetics", "ImmunoHistoChemistry");
                 Marker er = (Marker) nsdto.getNode(); //dataImportService.getMarker("ER", "ER");
 
-                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "PGR", "IHC", "ImmunoHistoChemistry");
+                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "PGR", "cytogenetics", "ImmunoHistoChemistry");
                 Marker pr = (Marker) nsdto.getNode(); //dataImportService.getMarker("PR", "PR");
 
                 MarkerAssociation her2a = new MarkerAssociation();

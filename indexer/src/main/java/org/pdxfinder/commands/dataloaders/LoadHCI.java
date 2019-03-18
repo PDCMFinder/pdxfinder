@@ -240,7 +240,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
                             if (modelId.isEmpty() || sampleId.isEmpty() || markerSymbol.isEmpty() || result.isEmpty())
                                 continue;
 
-                            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSource, modelId, markerSymbol, "IHC","ImmunoHistoChemistry");
+                            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSource, modelId, markerSymbol, "cytogenetics","ImmunoHistoChemistry");
                             Marker marker = null;
 
 
@@ -274,7 +274,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
                                 else {
 
                                     MolecularCharacterization mc = new MolecularCharacterization();
-                                    mc.setType("IHC");
+                                    mc.setType("cytogenetics");
                                     mc.setPlatform(pl);
 
                                     MarkerAssociation ma = new MarkerAssociation();
