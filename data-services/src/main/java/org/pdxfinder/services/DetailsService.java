@@ -532,6 +532,10 @@ public class DetailsService {
             tableHeaders.add("HGNC Symbol");
         }
 
+        if(tableHeadersSet.contains("aminoacidchange")){
+            tableHeaders.add("Amino Acid Change");
+        }
+
         if(tableHeadersSet.contains("consequence")){
             tableHeaders.add("Consequence");
         }
@@ -588,7 +592,7 @@ public class DetailsService {
             tableHeaders.add("Alt Allele");
         }
 
-        if(tableHeadersSet.contains("rsidvariant")){
+        if(tableHeadersSet.contains("rsidvariants")){
             tableHeaders.add("Rs Id Variant");
         }
 
@@ -632,6 +636,10 @@ public class DetailsService {
 
             if(tableHeadersSet.contains("hgncsymbol")){
                 row.add(ma.getMarker().getHgncSymbol());
+            }
+
+            if(tableHeadersSet.contains("aminoacidchange")){
+                row.add(ma.getAminoAcidChange() == null ? "" : ma.getAminoAcidChange());
             }
 
             if(tableHeadersSet.contains("consequence")){
@@ -690,7 +698,7 @@ public class DetailsService {
                 row.add((ma.getAltAllele() == null ? "" : ma.getAltAllele()));
             }
 
-            if(tableHeadersSet.contains("rsidvariant")){
+            if(tableHeadersSet.contains("rsidvariants")){
                 row.add((ma.getRsIdVariants() == null ? "" : ma.getRsIdVariants()));
             }
 
