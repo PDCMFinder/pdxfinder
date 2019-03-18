@@ -220,15 +220,15 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
                 MarkerAssociation her2a = new MarkerAssociation();
                 her2a.setMarker(her2);
-                her2a.setImmunoHistoChemistryResult("negative");
+                her2a.setCytogeneticsResult("negative");
 
                 MarkerAssociation era = new MarkerAssociation();
                 era.setMarker(er);
-                era.setImmunoHistoChemistryResult("negative");
+                era.setCytogeneticsResult("negative");
 
                 MarkerAssociation pra = new MarkerAssociation();
                 pra.setMarker(pr);
-                pra.setImmunoHistoChemistryResult("negative");
+                pra.setCytogeneticsResult("negative");
 
                 mc.addMarkerAssociation(her2a);
                 mc.addMarkerAssociation(era);

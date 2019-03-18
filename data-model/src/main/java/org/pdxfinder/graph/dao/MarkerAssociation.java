@@ -54,7 +54,7 @@ public class MarkerAssociation {
     private String annotation;
 
     //maybe use marker status in the future to have a general approach?
-    private String immunoHistoChemistryResult;
+    private String cytogeneticsResult;
     private String microsatelliteResult;
 
 
@@ -320,12 +320,12 @@ public class MarkerAssociation {
         this.annotation = annotation;
     }
 
-    public String getImmunoHistoChemistryResult() {
-        return immunoHistoChemistryResult;
+    public String getCytogeneticsResult() {
+        return cytogeneticsResult;
     }
 
-    public void setImmunoHistoChemistryResult(String immunoHistoChemistryResult) {
-        this.immunoHistoChemistryResult = immunoHistoChemistryResult;
+    public void setCytogeneticsResult(String cytogeneticsResult) {
+        this.cytogeneticsResult = cytogeneticsResult;
     }
 
     public String getMicrosatelliteResult() {

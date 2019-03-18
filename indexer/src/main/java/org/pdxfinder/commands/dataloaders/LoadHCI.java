@@ -267,7 +267,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
 
                                     MarkerAssociation ma = new MarkerAssociation();
-                                    ma.setImmunoHistoChemistryResult(result);
+                                    ma.setCytogeneticsResult(result);
                                     ma.setMarker(marker);
                                     mc.addMarkerAssociation(ma);
                                 }
@@ -278,7 +278,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
                                     mc.setPlatform(pl);
 
                                     MarkerAssociation ma = new MarkerAssociation();
-                                    ma.setImmunoHistoChemistryResult(result);
+                                    ma.setCytogeneticsResult(result);
                                     ma.setMarker(marker);
                                     mc.addMarkerAssociation(ma);
 

@@ -211,7 +211,7 @@ public class CreateDataProjections implements CommandLineRunner{
 
                     if(m != null){
 
-                        String ihcResult = ma.getImmunoHistoChemistryResult();
+                        String ihcResult = ma.getCytogeneticsResult();
                         String markerName = m.getHgncSymbol();
                         //log.info(ihcResult + markerName);
                         if(ihcResult != null && !ihcResult.isEmpty()  && markerName != null && !markerName.isEmpty()){

@@ -1044,7 +1044,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
                     if(technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")){
 
-                        ma.setImmunoHistoChemistryResult(markerStatus);
+                        ma.setCytogeneticsResult(markerStatus);
                     }
                     //what if it is not ihc?
 
@@ -1086,7 +1086,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
                     if(technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")){
 
-                        ma.setImmunoHistoChemistryResult(markerStatus);
+                        ma.setCytogeneticsResult(markerStatus);
                     }
                     //what if it is not ihc? Would our world collapse entirely?
 
