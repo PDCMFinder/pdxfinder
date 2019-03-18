@@ -167,7 +167,9 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
     Sample findPatientSampleWithDetailsByDataSourceAndPdxId(@Param("dataSource") String dataSource, @Param("sourcePdxId") String sourcePdxId);
 
 
-    @Query()
-    Sample findPatientSampleByModel(@Param("model")ModelCreation model);
+    @Query("MATCH (s:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization) " +
+            "WHERE id(mc)= {id} " +
+            "RETURN s")
+    Sample findSampleByMolcharId(@Param("id") Long id);
 
 }

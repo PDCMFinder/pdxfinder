@@ -388,11 +388,18 @@ public class DetailsService {
 
         MolecularCharacterization mc = molecularCharacterizationRepository.getMolecularDataById(Long.valueOf(id));
 
+        Sample sample = sampleRepository.findSampleByMolcharId(Long.valueOf(id));
+        String sampleId = sample.getSourceSampleId() == null ? "" : sample.getSourceSampleId();
+
         Set<String> tableHeadersSet = new HashSet<>();
         ArrayList<String> tableHeaders = new ArrayList<>();
         List<List<String>> tableRows = new ArrayList<>();
 
         MolecularDataTableDTO dto = new MolecularDataTableDTO();
+
+        //STEP 0: Add sampleid to table, we always display this
+        tableHeadersSet.add("sampleid");
+
 
         //STEP 1: dinamically determine the headers of the table
         for(MarkerAssociation ma: mc.getMarkerAssociations()){
@@ -631,7 +638,7 @@ public class DetailsService {
 
 
             if(tableHeadersSet.contains("sampleid")){
-                row.add("");
+                row.add(sampleId);
             }
 
             if(tableHeadersSet.contains("hgncsymbol")){
