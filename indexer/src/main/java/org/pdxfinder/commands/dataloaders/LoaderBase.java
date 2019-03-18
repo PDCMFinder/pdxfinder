@@ -509,7 +509,7 @@ public abstract class LoaderBase extends LoaderProperties implements Application
             MolecularCharacterization molecularCharacterization;
             String passage = (data.get(omicPassage) == null) ? "" : data.get(omicPassage);
 
-            String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform);
+            String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "__" + data.get(omicSampleOrigin);
 
             if(molcharMap.containsKey(molcharKey)){
 
@@ -550,10 +550,10 @@ public abstract class LoaderBase extends LoaderProperties implements Application
                 switch (dataType){
 
                     case "CNA":
-                        log.error("***** We are not loading CNA data yet *******");
+                        setCNAProperties(data, marker);
 
                     case "VARIATION":
-                        ma = setVariationMAColumns(data, marker);
+                        ma = setVariationProperties(data, marker);
                 }
 
                 molecularCharacterization.addMarkerAssociation(ma);
@@ -577,10 +577,11 @@ public abstract class LoaderBase extends LoaderProperties implements Application
             String[] mcKeyArr = mcKey.split("__");
             String sampleId = mcKeyArr[0];
             String pass = getPassage(mcKeyArr[1]);
+            String sampleOrigin = mcKeyArr[3];
 
             boolean foundSpecimen = false;
 
-            if(sampleId.toLowerCase().equals("originator")){
+            if(sampleOrigin.toLowerCase().equals("patient tumor")){
 
                 Sample patientSample = modelCreation.getSample();
                 patientSample.addMolecularCharacterization(mc);
@@ -631,7 +632,7 @@ public abstract class LoaderBase extends LoaderProperties implements Application
 
 
 
-    private MarkerAssociation setVariationMAColumns(Map<String,String> data, Marker marker){
+    private MarkerAssociation setVariationProperties(Map<String,String> data, Marker marker){
 
         MarkerAssociation ma = new MarkerAssociation();
         ma.setAminoAcidChange(data.get(omicAminoAcidChange));
@@ -643,12 +644,38 @@ public abstract class LoaderBase extends LoaderProperties implements Application
         ma.setAltAllele(data.get(omicAltAllele));
         ma.setGenomeAssembly(data.get(omicGenomeAssembly));
         ma.setRsIdVariants(data.get(omicRsIdVariants));
-        ma.setSeqPosition(data.get(omicSeqStartPosition));
+        ma.setSeqStartPosition(data.get(omicSeqStartPosition));
 
         ma.setEnsemblTranscriptId(data.get(omicEnsemblTranscriptId));
         ma.setNucleotideChange(data.get(omicNucleotideChange));
         ma.setMarker(marker);
 
+        return  ma;
+    }
+
+
+
+    private MarkerAssociation setCNAProperties(Map<String,String> data, Marker marker){
+
+        MarkerAssociation ma = new MarkerAssociation();
+
+        //setHostStrain Name
+        ma.setChromosome(data.get(omicChromosome));
+        ma.setSeqStartPosition(data.get(omicSeqStartPosition));
+        ma.setSeqEndPosition(data.get(omicSeqEndPosition));
+        ma.setCnaLog10RCNA(omicCnaLog10RCNA);
+        ma.setCnaLog2RCNA(omicCnaLog2RCNA);
+        ma.setCnaCopyNumberStatus(omicCnaCopyNumberStatus);
+        ma.setCnaGisticValue(omicCnaGisticvalue);
+        ma.setCnaPicnicValue(omicCnaPicnicValue);
+        ma.setGenomeAssembly(data.get(omicGenomeAssembly));
+
+        marker.setHgncSymbol(omicHgncSymbol);
+        marker.setUcscGeneId(omicUcscGeneId);
+        marker.setNcbiGeneId(omicNcbiGeneId);
+        marker.setEnsemblGeneId(omicEnsemblGeneId);
+
+        ma.setMarker(marker);
         return  ma;
     }
 

@@ -56,10 +56,15 @@ public class LoaderProperties {
     protected String omicGenomeAssembly;
     protected String omicPlatform;
 
+    protected String omicSeqEndPosition;
+    protected String omicCnaLog10RCNA;
+    protected String omicCnaLog2RCNA;
+    protected String omicCnaCopyNumberStatus;
+    protected String omicCnaGisticvalue;
+    protected String omicCnaPicnicValue;
+
     protected String omicDataFilesType;
     protected String omicFileExtension;
-
-
 
 
     public String getDataSourceAbbreviation() {
@@ -412,6 +417,55 @@ public class LoaderProperties {
 
     public void setOmicPlatform(String omicPlatform) {
         this.omicPlatform = omicPlatform;
+    }
+
+
+    public String getOmicSeqEndPosition() {
+        return omicSeqEndPosition;
+    }
+
+    public void setOmicSeqEndPosition(String omicSeqEndPosition) {
+        this.omicSeqEndPosition = omicSeqEndPosition;
+    }
+
+    public String getOmicCnaLog10RCNA() {
+        return omicCnaLog10RCNA;
+    }
+
+    public void setOmicCnaLog10RCNA(String omicCnaLog10RCNA) {
+        this.omicCnaLog10RCNA = omicCnaLog10RCNA;
+    }
+
+    public String getOmicCnaLog2RCNA() {
+        return omicCnaLog2RCNA;
+    }
+
+    public void setOmicCnaLog2RCNA(String omicCnaLog2RCNA) {
+        this.omicCnaLog2RCNA = omicCnaLog2RCNA;
+    }
+
+    public String getOmicCnaCopyNumberStatus() {
+        return omicCnaCopyNumberStatus;
+    }
+
+    public void setOmicCnaCopyNumberStatus(String omicCnaCopyNumberStatus) {
+        this.omicCnaCopyNumberStatus = omicCnaCopyNumberStatus;
+    }
+
+    public String getOmicCnaGisticvalue() {
+        return omicCnaGisticvalue;
+    }
+
+    public void setOmicCnaGisticvalue(String omicCnaGisticvalue) {
+        this.omicCnaGisticvalue = omicCnaGisticvalue;
+    }
+
+    public String getOmicCnaPicnicValue() {
+        return omicCnaPicnicValue;
+    }
+
+    public void setOmicCnaPicnicValue(String omicCnaPicnicValue) {
+        this.omicCnaPicnicValue = omicCnaPicnicValue;
     }
 
     public String getOmicDataFilesType() {
