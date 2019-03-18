@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.pdxfinder.services.*;
 import org.pdxfinder.services.ds.AutoCompleteOption;
-import org.pdxfinder.services.dto.CountDTO;
-import org.pdxfinder.services.dto.DataAvailableDTO;
-import org.pdxfinder.services.dto.DetailsDTO;
-import org.pdxfinder.services.dto.VariationDataDTO;
+import org.pdxfinder.services.dto.*;
 import org.pdxfinder.services.pdf.Label;
 import org.pdxfinder.services.pdf.PdfHelper;
 import org.pdxfinder.services.pdf.Report;
@@ -275,5 +272,12 @@ public class AjaxController {
         report.setStyles(pdfHelper.getStyles());
 
         return report;
+    }
+
+    @GetMapping("/getmoleculardata/{molcharId}")
+    public MolecularDataTableDTO getMolecularTableData(@PathVariable String molcharId){
+
+        return detailsService.getMolecularDataTable(molcharId);
+
     }
 }
