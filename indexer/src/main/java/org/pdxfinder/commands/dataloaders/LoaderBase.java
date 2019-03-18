@@ -580,6 +580,14 @@ public abstract class LoaderBase extends LoaderProperties implements Application
 
             boolean foundSpecimen = false;
 
+            if(sampleId.toLowerCase().equals("originator")){
+
+                Sample patientSample = modelCreation.getSample();
+                patientSample.addMolecularCharacterization(mc);
+                continue;
+
+            }
+
             if(modelCreation.getSpecimens() != null){
 
                 for(Specimen specimen : modelCreation.getSpecimens()){
