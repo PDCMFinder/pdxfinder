@@ -151,9 +151,17 @@ public class TransController {
                 }*/
             }
 
+
+            if ( data.get("hgnc_symbol").equals("None Found") ){
+
+                removedList.add(data);
+            }
+
+
+
         }
 
-       // dataList.removeAll(removedList);
+        dataList.removeAll(removedList);
 
 
         utilityService.writeCsvFile(dataList,csvHead, "data.csv");
