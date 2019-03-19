@@ -1,6 +1,7 @@
 package org.pdxfinder.graph.dao;
 
 import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import java.util.HashSet;
@@ -15,6 +16,7 @@ public class Marker {
     @GraphId
     Long id;
 
+    @Index
     String hgncSymbol;              // This is the approved Symbol in HGNC - KRAS
     String hgncName;                // This is the approved name in HGNC KRAS proto-oncogene, GTPase
     String hgncId;                  // This is the hugo unique ID - e.g HGNC:6407

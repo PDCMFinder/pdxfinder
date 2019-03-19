@@ -13,6 +13,7 @@ public class MarkerAssociation {
     Long id;
 
     String description;
+
     Marker marker;
     /*
     * IRCC NGS mapping (class attribute = file headers):
