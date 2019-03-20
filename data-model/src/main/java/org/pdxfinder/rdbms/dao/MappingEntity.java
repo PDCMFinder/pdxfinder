@@ -42,7 +42,7 @@ public class MappingEntity {
      */
     @ElementCollection
     @CollectionTable(name="mapping_values", joinColumns = @JoinColumn(name = "mapping_entity_id"))
-    @Column(name="mapping_values")
+    @Column(name="mapping_values", unique = true, nullable = false)
     private Map<String, String> mappingValues;
 
 
