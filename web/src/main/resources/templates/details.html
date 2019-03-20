@@ -148,14 +148,16 @@
 
                         <li th:if="${ #lists.isEmpty(data.molecularDataRows)}"
                             class="tabs-title ">
-                            <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link" onclick="initTabs('0')">
+                            <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link"
+                               onclick="initTabs('0')">
                                 Molecular Data (0)
                             </a>
                         </li>
 
                         <li th:if="${ not #lists.isEmpty(data.molecularDataRows) }"
                             class="tabs-title ">
-                            <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link" onclick="initTabs('0')">
+                            <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link"
+                               onclick="initTabs('0')">
                                 Molecular Data
                                 (<span th:text="${data.molecularDataEntrySize}"> ... </span>)
                             </a>
@@ -170,7 +172,6 @@
                         <li th:if="${data.dosingStudyNumbers} > 0" class="tabs-title">
                             <a href="#dosing_studies" style="font-size: 15px; padding: 15px;">Dosing study (1)</a>
                         </li>
-
 
 
                     </ul>
@@ -796,16 +797,18 @@
                     <div class="tabs-panel is-active" id="variation">
 
 
-                        <div class="row large-12 medium-12 expanded" id="variationTableData">
+                        <div class="row large-12 medium-12 expanded" id="variationTableSummary">
 
                             <div class="tab hideContent0" role="tabpanel" th:if="${data.molecularDataRows.size() > 0}">
 
-                                <div  th:if="${not #lists.isEmpty(data.molecularDataRows)}" class="row large-12 medium-12 expanded">
+                                <div th:if="${not #lists.isEmpty(data.molecularDataRows)}"
+                                     class="row large-12 medium-12 expanded">
 
                                     <div class="columns medium-12 small-12 margin-top-10 card-3">
                                         <div class="responsive-table" style="margin-top: 20px;">
 
-                                            <table class="datatable-pdx pdx-table table-borderedPdx head-left" data-tabs id="example-tabs">
+                                            <table class="datatable-pdx pdx-table table-borderedPdx head-left" data-tabs
+                                                   id="example-tabs">
                                                 <thead>
                                                 <th>Sample ID</th>
                                                 <th>Sample Type</th>
@@ -819,29 +822,31 @@
 
 
                                                 <tr th:each="dataRow,iter : ${data.molecularDataRows}"
-                                                    class="tabs-title" style="float:none; text-transform: capitalize;" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
+                                                    class="tabs-title" style="float:none; text-transform: capitalize;"
+                                                    th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
 
-                                                    <td th:text="${dataRow.sampleId}"> ... </td>
-                                                    <td th:text="${dataRow.sampleType}"> ... </td>
-                                                    <td th:text="${'Passage '+dataRow.engraftedTumorPassage}"> ... </td>
-                                                    <td th:text="${dataRow.molcharType}"> ... </td>
+                                                    <td th:text="${dataRow.sampleId}"> ...</td>
+                                                    <td th:text="${dataRow.sampleType}"> ...</td>
+                                                    <td th:text="${'Passage '+dataRow.engraftedTumorPassage}"> ...</td>
+                                                    <td th:text="${dataRow.molcharType}"> ...</td>
 
                                                     <td>
-                                                        <a th:href="@{'#'+${dataRow.dataAvailableLabel}}"
+                                                        <a class="molecularDataLink"
                                                            style="color: #06369d; text-decoration: none;"
                                                            data-th-attr="data-tabs-target=${dataRow.dataAvailableLabel},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
                                                            th:text="'View data'"
-                                                           th:onclick="'showTabs('+${iter.index}+')'">
-                                                            TAB TITLES
+                                                           th:id="'mc___'+${dataRow.molcharId}"
+                                                           TAB TITLES
                                                         </a>
                                                     </td>
                                                     <td>
-                                                        <a target="_blank"
+                                                        <a th:if="${dataRow.platformUsedUrl != null}" target="_blank"
                                                            style="color: #06369d; text-decoration: none;"
                                                            th:text="${dataRow.platformUsedLabel}"
                                                            th:onclick="'window.open(\''+${dataRow.platformUsedUrl}+'\')'">
                                                             ...
                                                         </a>
+                                                        <span th:if="${dataRow.platformUsedUrl == null}" th:text="${dataRow.platformUsedLabel}"></span>
                                                     </td>
                                                     <td th:text="${dataRow.rawDataLabel}"></td>
                                                 </tr>
@@ -854,60 +859,67 @@
 
                                 </div>
 
-
-
-
-                        </div>
-
-
-                    </div>
-
-                <div class="tabs-panel" id="dosing_studies">
-                    <div th:if="${not #lists.isEmpty(data.dosingStudy)}">
-
-                        <div class="columns medium-12 small-12 margin-top-10 card-3">
-                            <div class="responsive-table" style="margin-top: 20px;">
-
-                                <div th:if="${data.dosingStudyProtocolUrl} != null" class="drug_spacing">
-                                    <a th:href="${data.dosingStudyProtocolUrl}">Dosing study protocol</a>
-                                </div>
-
-                                <table class="datatable-pdx pdx-table table-borderedPdx head-left">
-                                    <thead>
-                                    <th>Drug</th>
-                                    <th>Dose</th>
-                                    <th>Response</th>
-                                    </thead>
-                                    <tbody>
-                                    <tr th:each="drugData, iter : ${data.dosingStudy}">
-                                        <td th:text="${drugData.drugName}"></td>
-                                        <td th:text="${drugData.dose}"></td>
-                                        <td th:text="${drugData.response}"></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-
                             </div>
+
+                        </div>
+
+                        <div class = "row large-12 medium-12 expanded" >
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;" id="variationTableData">
+
+                                </div>
+                            </div>
+
                         </div>
 
                     </div>
 
-                    <div th:if="${#lists.isEmpty(data.dosingStudy)}"></div>
+                    <div class="tabs-panel" id="dosing_studies">
+                        <div th:if="${not #lists.isEmpty(data.dosingStudy)}">
+
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;">
+
+                                    <div th:if="${data.dosingStudyProtocolUrl} != null" class="drug_spacing">
+                                        <a th:href="${data.dosingStudyProtocolUrl}">Dosing study protocol</a>
+                                    </div>
+
+                                    <table class="datatable-pdx pdx-table table-borderedPdx head-left">
+                                        <thead>
+                                        <th>Drug</th>
+                                        <th>Dose</th>
+                                        <th>Response</th>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="drugData, iter : ${data.dosingStudy}">
+                                            <td th:text="${drugData.drugName}"></td>
+                                            <td th:text="${drugData.dose}"></td>
+                                            <td th:text="${drugData.response}"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(data.dosingStudy)}"></div>
+                    </div>
+
                 </div>
 
+
+            </section>
+
+
+        </section>
+
     </div>
+    <!-- End suggested layout containers / #content -->
 
 
-    </section>
-
-
-    </section>
-
-</div>
-<!-- End suggested layout containers / #content -->
-
-
-<!--/*/ <th:block th:include="fragments/shared :: footer"></th:block> /*/-->
+    <!--/*/ <th:block th:include="fragments/shared :: footer"></th:block> /*/-->
 
 
 </div>
@@ -923,6 +935,7 @@
 <script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.highlightRegex/0.1.2/highlightRegex.min.js"></script>
 <script th:src="@{/js/script.js}"></script>
+<script th:src="@{/js/pdxFinder.js}"></script>
 <!--<script th:src="@{/js/main.js}"></script>-->
 
 
@@ -932,7 +945,12 @@
     var dataSrc = [[${data.dataSource}]];
     jQuery(document).ready(function () {
         console.log("ready");
+        console.log("Adding event listener to molchardatalink");
 
+        jQuery(".molecularDataLink").on("click", function () {
+
+            getMolecularDataTable(jQuery(this).attr("id"));
+        });
 
 
     });
@@ -1011,6 +1029,8 @@
 
     // Check if variation tab is deeplinked on page load:
     $(document).ready(function () {
+
+
         var hash = window.location.hash;
 
         if (hash == "#variation") {
@@ -1042,6 +1062,7 @@
     "dateModified": "2018",
     "citation": "https://doi.org/10.1101/291443",
 }
+
 
 </script>
 </body>
