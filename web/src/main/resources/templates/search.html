@@ -53,6 +53,7 @@
 
     <!--/*/ <th:block th:include="fragments/shared :: header"></th:block> /*/-->
 
+
 </head>
 
 <body class="level2">
@@ -133,7 +134,7 @@
 
             <!-- Search Result Message & Export Section -->
             <section class="row padding-vertical-30">
-                <div class="columns medium-12">
+                <div class="columns">
                     <span th:if="${#strings.isEmpty(websearch.textSearchDescription)}">
                         PDX Finder contains <span th:text="${websearch.totalResults}">a number of</span> model<span
                             th:if="${websearch.totalResults ne 1}">s</span>
@@ -153,9 +154,7 @@
 
                     <div class="column large-12 cl_filter">
                         <a href="/data/search" class="button outline secondary columns large-6 white-text-right-float">
-                            Reset <span class="hide-for-medium-only"> Filters   &nbsp; <i class="icon icon-functional"
-                                                                                          data-icon="x"
-                                                                                          style="font-size: 10px;"></i> </span>
+                            Reset <!--<span class="hide-for-medium-only"> Filters   &nbsp; --> <i class="icon icon-functional" data-icon="x" style="font-size: 10px;"></i> </span>
                         </a>
                     </div>
                     <h4 class="block-title clearfix"><span class="float-left">Filter By:</span></h4>
@@ -240,20 +239,21 @@
 
 
 
-                    <div class="responsive-table">
-                        <table id="search-datatable" class="stripe display datatable-pdx sticky-header" cellspacing="0"
-                               width="100%">
+                    <div class="responsive-table-2">
+
+                        <table id="search-datatable"><!--  class="sticky-header" -->
                             <thead>
                             <tr>
-                                <th>Model</th>
-                                <th>Histology</th>
-                                <th>Primary </th>
-                                <th>Collection </th>
-                                <th>Type</th>
+                                <th>MODEL</th>
+                                <th>HISTOLOGY</th>
+                                <th>PRIMARY </th>
+                                <th>COLLECTION </th>
+                                <th>TYPE</th>
 
-                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'AGE')}">Age</th>
-                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'SEX')}">Sex</th>
-                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DATA AVAILABLE')}">Data Available</th>
+
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'AGE')}">AGE</th>
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'SEX')}">SEX</th>
+                                <th style="white-space:nowrap;" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DATA AVAILABLE')}">DATA AVAILABLE</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'MUTATIONS')}">MUTATIONS</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DRUG AND RESPONSE')}">DRUG AND RESPONSE</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'BREAST CANCER MARKERS')}">BREAST CANCER MARKERS</th>
@@ -262,19 +262,20 @@
                             </thead>
                             <tbody>
                             <tr th:each="model, iter : ${websearch.results}">
-                                <td><a th:text="${model.externalId}"
-                                       th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}}"></a><br/><span
-                                        class="small" th:text="${model.datasource}">center</span></td>
-                                <td><span th:remove="tag" th:text="${model.mappedOntologyTerm}">ontology term</span>
+
+                                <th scope="row"><a th:text="${model.externalId}"
+                                       th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}}"></a> <br> <span class="small" th:text="${model.datasource}">center</span>
+                                </th>
+                                <td data-title="HISTOLOGY"><h1 th:remove="tag" th:text="${model.mappedOntologyTerm}">ontology term</h1>
                                 </td>
-                                <td th:text="${model.sampleOriginTissue}">origin tissue</td>
-                                <td th:text="${model.sampleSampleSite}">sample site</td>
-                                <td th:text="${model.sampleTumorType}">Metastatic</td>
+                                <td data-title="PRIMARY" th:text="${model.sampleOriginTissue}">origin tissue</td>
+                                <td data-title="COLLECTION" th:text="${model.sampleSampleSite}">sample site</td>
+                                <td data-title="TYPE" th:text="${model.sampleTumorType}">Metastatic</td>
 
-                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'AGE')}" th:text="${model.patientAge}"> Age </td>
-                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'SEX')}" th:text="${model.patientGender}">Sex</td>
+                                <td data-title="AGE" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'AGE')}" th:text="${model.patientAge}"> Age </td>
+                                <td data-title="SEX" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'SEX')}" th:text="${model.patientGender}">Sex</td>
 
-                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DATA AVAILABLE')}">
+                                <td data-title="DATA AVAILABLE" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DATA AVAILABLE')}">
                                     <th:block th:each="dataavailable : ${model.dataAvailable}">
 
                                         <a th:if="${#strings.equals(dataavailable, 'Dosing Studies')}"
@@ -293,7 +294,7 @@
                                 </td>
 
 
-                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'MUTATIONS')}">
+                                <td data-title="MUTATIONS" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'MUTATIONS')}">
                                     <th:block th:each="dMutations : ${model.mutatedVariants}">
                                         <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation' }"
                                            class="size12" th:utext="${dMutations} + '<br />'">dMutations</a>
@@ -302,20 +303,20 @@
 
 
 
-                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DRUG AND RESPONSE')}">
+                                <td data-title="DRUG AND RESPONSE" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DRUG AND RESPONSE')}">
                                     <div th:each="drugData : ${model.drugWithResponse}">
                                         <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#dosing_studies'}"
                                            th:utext="${drugData}"></a>
                                     </div>
                                 </td>
 
-                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'BREAST CANCER MARKERS')}">
+                                <td data-title="BREAST CANCER MARKERS" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'BREAST CANCER MARKERS')}">
                                     <div th:each="bcMarker : ${model.breastCancerMarkers}">
                                         <span th:text="${bcMarker}"></span>
                                     </div>
                                 </td>
 
-                                <td th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'PATIENT TREATMENT STATUS')}">
+                                <td data-title="PATIENT TREATMENT STATUS" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'PATIENT TREATMENT STATUS')}">
 
                                         <span th:text="${model.patientTreatmentStatus}"></span>
 
