@@ -2,6 +2,7 @@ package org.pdxfinder.commands.mapping;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
@@ -357,13 +358,24 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
         mappingEntity.setStatus("Created");
         mappingEntity.setDateCreated(new Date());
 
-        try {
+        String mappingKey = StringUtils.join(
+                Arrays.asList(dataSource, diagnosis, originTissue, tumorType), "__"
+        );
+        mappingEntity.setMappingKey(mappingKey);
+
+        MappingEntity entity = mappingEntityRepository.findByMappingKey(mappingKey);
+
+        if(entity == null){
 
             mappingEntityRepository.save(mappingEntity);
-        }catch (Exception e){
+
+        }else{
 
             log.warn("Missing Diagnosis Mapping {}_{}_{}_{} was found in the Database", dataSource, diagnosis, originTissue, tumorType);
+
         }
+
+
 
     }
 

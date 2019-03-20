@@ -11,5 +11,8 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
     MappingEntity findByMappingValues(Map<String, String> mappingValues);
 
 
+    MappingEntity findByMappingKey(String mappingKey);
+
+
 
 }

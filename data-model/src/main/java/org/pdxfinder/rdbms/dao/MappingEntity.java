@@ -42,7 +42,7 @@ public class MappingEntity {
      */
     @ElementCollection
     @CollectionTable(name="mapping_values", joinColumns = @JoinColumn(name = "mapping_entity_id"))
-    @Column(name="mapping_values", unique = true, nullable = false, columnDefinition="Text")
+    @Column(name="mapping_values", columnDefinition="Text")
     private Map<String, String> mappingValues;
 
 
@@ -98,6 +98,13 @@ public class MappingEntity {
      * The date when the entity was last updated.
      */
     private Date dateUpdated;
+
+
+    /**
+     * The unique String that identifies a Mapping
+     */
+    @Column(unique = true, nullable = false, columnDefinition="Text")
+    private String mappingKey;
 
 
     public MappingEntity() {
@@ -226,5 +233,13 @@ public class MappingEntity {
 
     public void setMappedTermUrl(String mappedTermUrl) {
         this.mappedTermUrl = mappedTermUrl;
+    }
+
+    public String getMappingKey() {
+        return mappingKey;
+    }
+
+    public void setMappingKey(String mappingKey) {
+        this.mappingKey = mappingKey;
     }
 }
