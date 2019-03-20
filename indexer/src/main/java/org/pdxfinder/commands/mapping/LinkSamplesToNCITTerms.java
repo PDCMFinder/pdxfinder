@@ -10,6 +10,7 @@ import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.dao.SampleToOntologyRelationShip;
 import org.pdxfinder.ontologymapping.MissingMapping;
+import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
@@ -43,6 +44,9 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
     private Set<String> missingTerms;
 
     private Map<String, MappingEntity> mappingRules;
+
+    @Autowired
+    private MappingEntityRepository mappingEntityRepository;
 
     @Autowired
     public LinkSamplesToNCITTerms(DataImportService dataImportService) {
@@ -302,7 +306,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
             startNode += batchSize;
         }
 
-        if (this.missingMappings.size() > 0) printMissingMappings();
+        if (this.missingMappings.size() > 0) printAndSaveMissingMappings();
     }
 
     private void insertMissingMapping(String id, MissingMapping mm) {
@@ -319,17 +323,51 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
     }
 
 
-    private void printMissingMappings() {
+    private void printAndSaveMissingMappings() {
 
         log.warn("Couldn't map samples with the following details(" + this.missingMappings.size() + "): ");
         for (Set<MissingMapping> mms : this.missingMappings.values()) {
 
             for (MissingMapping mm : mms) {
+
                 log.warn("Datasource: " + mm.getDataSource() + ", Diagnosis: " + mm.getDiagnosis() + ", Origin Tissue: " + mm.getOriginTissue() + ", Tumor Type: " + mm.getTumorType());
 
+                saveUnmappedDiagnosis(mm.getDataSource(), mm.getDiagnosis(), mm.getOriginTissue(), mm.getTumorType());
             }
         }
     }
+
+
+
+    public void saveUnmappedDiagnosis(String dataSource, String diagnosis, String originTissue, String tumorType){
+
+        ArrayList<String> mappingLabels = new ArrayList<>();
+        mappingLabels.add("DataSource");
+        mappingLabels.add("SampleDiagnosis");
+        mappingLabels.add("OriginTissue");
+        mappingLabels.add("TumorType");
+
+        Map mappingValues = new HashMap();
+        mappingValues.put("OriginTissue", originTissue);
+        mappingValues.put("DataSource", dataSource);
+        mappingValues.put("SampleDiagnosis", diagnosis);
+        mappingValues.put("TumorType", tumorType);
+
+        MappingEntity mappingEntity = new MappingEntity("DIAGNOSIS", mappingLabels, mappingValues);
+        mappingEntity.setStatus("Created");
+        mappingEntity.setDateCreated(new Date());
+
+        try {
+
+            mappingEntityRepository.save(mappingEntity);
+        }catch (Exception e){
+
+            log.warn("Missing Diagnosis Mapping {}_{}_{}_{} was found in the Database", dataSource, diagnosis, originTissue, tumorType);
+        }
+
+    }
+
+
 
     private void updateIndirectMappingData() {
 
