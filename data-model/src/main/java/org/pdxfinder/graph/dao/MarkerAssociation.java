@@ -66,6 +66,9 @@ public class MarkerAssociation {
     private String cnaGisticValue;
     private String cnaPicnicValue;
 
+    private String cytoGenFishResult;
+
+
 
 
     public MarkerAssociation() {
@@ -382,5 +385,14 @@ public class MarkerAssociation {
 
     public void setCnaPicnicValue(String cnaPicnicValue) {
         this.cnaPicnicValue = cnaPicnicValue;
+    }
+
+
+    public String getCytoGenFishResult() {
+        return cytoGenFishResult;
+    }
+
+    public void setCytoGenFishResult(String cytoGenFishResult) {
+        this.cytoGenFishResult = cytoGenFishResult;
     }
 }
