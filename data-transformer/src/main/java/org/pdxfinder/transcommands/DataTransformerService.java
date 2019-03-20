@@ -258,12 +258,15 @@ public class DataTransformerService {
 
                     // Retrieve Notes data
                     if (patient.get("NOTES") != null){
-                        clinicalDiagnosis += " | "+patient.get("NOTES");
+                        clinicalDiagnosis += " | "+ patient.get("NOTES");
                     }
                 }
 
-               // index++;
+               // index++; \r\n\r\n \"
             }
+            clinicalDiagnosis = clinicalDiagnosis.replaceAll("\\r|\\\"|\\n", "");
+
+            log.info(clinicalDiagnosis);
 
             // Treatment naive
             /*try {

@@ -518,14 +518,14 @@ public abstract class LoaderBase extends LoaderProperties implements Application
             else{
 
                 molecularCharacterization = new MolecularCharacterization();
-                molecularCharacterization.setType("mutation");
+                molecularCharacterization.setType(dataType);
                 molecularCharacterization.setPlatform(platform);
                 molcharMap.put(molcharKey, molecularCharacterization);
             }
 
 
             //step 3: get the marker suggestion from the service
-            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, modelCreation.getSourcePdxId(), data.get(omicHgncSymbol), "mutation", technology);
+            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, modelCreation.getSourcePdxId(), data.get(omicHgncSymbol), dataType, technology);
 
             Marker marker;
 
@@ -549,10 +549,10 @@ public abstract class LoaderBase extends LoaderProperties implements Application
                 MarkerAssociation ma = new MarkerAssociation();
                 switch (dataType){
 
-                    case "CNA":
+                    case "cna":
                         setCNAProperties(data, marker);
 
-                    case "VARIATION":
+                    case "mutation":
                         ma = setVariationProperties(data, marker);
                 }
 
@@ -562,7 +562,7 @@ public abstract class LoaderBase extends LoaderProperties implements Application
 
             count++;
             if (count % 100 == 0) {
-                System.out.println("loaded " + count + " variants");
+                log.info("loaded {} {} ", count, dataType);
             }
         }
         log.info("loaded " + totalData + " markers for " + modelID);
