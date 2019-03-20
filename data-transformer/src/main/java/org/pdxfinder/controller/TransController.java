@@ -87,8 +87,8 @@ public class TransController {
         ArrayList<String> mappingLabels = new ArrayList<>();
         mappingLabels.add("DataSource");
         mappingLabels.add("SampleDiagnosis");
-        mappingLabels.add("OriginTissue");
         mappingLabels.add("TumorType");
+        mappingLabels.add("OriginTissue");
 
         Map mappingValues = new HashMap();
         mappingValues.put("OriginTissue","blood");
@@ -105,7 +105,7 @@ public class TransController {
         mappingEntity.setMapType("direct");
         mappingEntity.setJustification("0");
 
-        mappingEntityRepository.save(mappingEntity);
+        //mappingEntityRepository.save(mappingEntity);
 
         return mappingEntityRepository.findAll();
 
