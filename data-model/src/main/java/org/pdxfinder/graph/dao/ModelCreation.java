@@ -1,6 +1,7 @@
 package org.pdxfinder.graph.dao;
 
 import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -19,7 +20,9 @@ public class ModelCreation {
     @GraphId
     private Long id;
 
+    @Index
     private String sourcePdxId;
+    @Index
     private String dataSource;
 
     private Boolean omicDataShareable;

@@ -2,6 +2,7 @@ package org.pdxfinder.graph.dao;
 
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
 /**
  * Created by csaba on 25/04/2017.
@@ -13,6 +14,8 @@ public class MarkerAssociation {
     Long id;
 
     String description;
+
+    @Relationship(type = "MARKER")
     Marker marker;
     /*
     * IRCC NGS mapping (class attribute = file headers):

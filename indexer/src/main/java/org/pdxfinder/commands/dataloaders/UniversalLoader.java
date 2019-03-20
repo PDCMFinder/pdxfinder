@@ -424,23 +424,34 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
                 if (modelId.isEmpty()) {
                     log.error("Missing corresponding Model ID in row " + row);
+                    row++;
                     continue;
                 }
 
+                if(dateOfCollection == null && collectionEvent == null && elapsedTime == null && ageAtCollection == null){
+                    log.error("Missing collection info  in row " + row);
+                    row++;
+                    continue;
+                }
 
                 //hack to avoid 0.0 values and negative numbers
-                elapsedTime = elapsedTime.replaceAll("[^0-9]", "");
+                if(elapsedTime != null){
+
+                    elapsedTime = elapsedTime.replaceAll("[^0-9]", "");
+                }
+
 
                 Patient patient = dataImportService.getPatientWithSnapshots(patientId, ds);
 
                 if (patient == null) {
 
                     log.error("Patient does not exist, can not create tumor for " + patientId);
+                    row++;
                     continue;
                 }
 
                 //need this trick to remove float values, ie: patient age = 30.0
-                if (!ageAtCollection.equals("Not Specified")) {
+                if (ageAtCollection != null && !ageAtCollection.equals("Not Specified")) {
                     int ageAtColl = (int) Float.parseFloat(ageAtCollection);
                     ageAtCollection = ageAtColl + "";
                 }
@@ -712,12 +723,24 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
         for (List<String> pdxModelValidationRow : pdxModelValidationSheetData) {
 
+            String modelId = "";
+            String validationTechnique = "";
+            String validationDescription = "";
+            String passages = "";
+            String validationHostStrain = "";
 
-            String modelId = pdxModelValidationRow.get(0);
-            String validationTechnique = pdxModelValidationRow.get(1);
-            String validationDescription = pdxModelValidationRow.get(2);
-            String passages = pdxModelValidationRow.get(3);
-            String validationHostStrain = pdxModelValidationRow.get(4);
+            try {
+                modelId = pdxModelValidationRow.get(0);
+                validationTechnique = pdxModelValidationRow.get(1);
+                validationDescription = pdxModelValidationRow.get(2);
+                passages = pdxModelValidationRow.get(3);
+                validationHostStrain = pdxModelValidationRow.get(4);
+            }
+            catch(Exception e){
+
+                log.error("Error in row: "+row);
+                e.printStackTrace();
+            }
 
             if (modelId.isEmpty() || validationTechnique.isEmpty()) {
 
@@ -994,8 +1017,9 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             String platform = dataRow.get(9);
             String characterizationType = "Unknown";
 
-            if(origin.isEmpty() || modelId.isEmpty() || markerSymbol.isEmpty() || markerStatus.isEmpty() || technique.isEmpty() || platform.isEmpty()){
+            if(origin == null || modelId == null || markerSymbol == null || markerStatus == null || technique == null){
                 log.error("Missing essential value in row " + row);
+                row++;
                 continue;
             }
 
