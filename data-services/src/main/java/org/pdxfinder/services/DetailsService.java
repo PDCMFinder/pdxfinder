@@ -324,11 +324,24 @@ public class DetailsService {
             mde.setSampleId(patientSample.getSourceSampleId());
             mde.setSampleType("Patient Tumor");
             mde.setEngraftedTumorPassage("NA");
+            mde.setMolcharType(mc.getType());
             mde.setDataAvailableLabel(mc.getPlatform().getName());
             mde.setDataAvailableUrl("");
             mde.setPlatformUsedLabel(mc.getPlatform().getName());
-            mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
-            mde.setRawDataLabel("");
+
+            if(mc.getPlatform().getName() == null || mc.getPlatform().getName().isEmpty() || mc.getPlatform().getName().toLowerCase().equals("not specified")
+                    || mc.getPlatform().getUrl() == null || mc.getPlatform().getUrl().isEmpty()){
+
+                mde.setPlatformUsedUrl(null);
+            }
+            else{
+
+                mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
+            }
+
+
+            mde.setRawDataLabel("Not available");
+            mde.setMolcharId(mc.getId().toString());
 
             mdeDTO.add(mde);
         }
@@ -357,7 +370,7 @@ public class DetailsService {
                     mde.setDataAvailableUrl("");
                     mde.setPlatformUsedLabel(mc.getPlatform().getName());
                     mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
-                    mde.setRawDataLabel("");
+                    mde.setRawDataLabel("Not available");
                     mde.setMolcharId(mc.getId().toString());
 
                     mdeDTO.add(mde);

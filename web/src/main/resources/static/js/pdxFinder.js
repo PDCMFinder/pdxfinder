@@ -330,3 +330,67 @@ function displayMore(divId, startIndex) {
  ****************************************************************/
 
 
+
+function getMolecularDataTable(clickedLink){
+
+
+    console.log(clickedLink);
+    var idcomp = clickedLink.split("___");
+    var id = idcomp[1];
+    var url = "/data/getmoleculardata/"+id;
+
+    var $targetDiv = jQuery('#variationTableData');
+    $targetDiv.empty();
+
+    fetch(url).then(response => response.json()).then(json => displayMolecularDataTable(json)).catch(error => console.log(error))
+
+}
+
+
+
+function displayMolecularDataTable(tableData){
+
+    console.log("Headers length:"+tableData["tableHeaders"].length);
+
+    var $targetDiv = jQuery('#variationTableData');
+
+    var $table = jQuery('<table id="molcharDataTable" class="datatable-pdx pdx-table table-borderedPdx head-left" data-tabs id="example-tabs"/>');
+    var $thead = jQuery('<thead/>');
+    var $theadRow = jQuery('<tr>');
+    var $tbody = jQuery('<tbody />');
+
+    //add headers to table
+    for(var i=0; i<tableData["tableHeaders"].length;i++){
+
+        var $th = jQuery('<th>'+tableData["tableHeaders"][i]+'</th>');
+        $theadRow.append($th);
+    }
+
+    
+    //add datarows to table
+
+
+    for(var j=0; j<tableData["tableRows"].length; j++){
+
+        $tr = jQuery('<tr class="tabs-title" style="float:none; text-transform: capitalize;">/');
+
+
+
+        for(var k=0; k<tableData["tableRows"][j].length; k++){
+            console.log("Rows "+tableData["tableRows"][j].length);
+            $tr.append("<td>"+tableData["tableRows"][j][k]+"</td>");
+        }
+        
+        $tbody.append($tr);
+    }
+    $thead.append($theadRow);
+    $table.append($thead);
+    $table.append($tbody);
+    $targetDiv.append($table);
+
+    jQuery('#molcharDataTable').DataTable();
+
+
+
+
+}
