@@ -212,7 +212,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                 nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "ERBB2", "cytogenetics", "ImmunoHistoChemistry");
                 Marker her2 = (Marker) nsdto.getNode(); // ERBB2  dataImportService.getMarker("HER2", "HER2");
 
-                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "EREG", "cytogenetics", "ImmunoHistoChemistry");
+                nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "ESR1", "cytogenetics", "ImmunoHistoChemistry");
                 Marker er = (Marker) nsdto.getNode(); //dataImportService.getMarker("ER", "ER");
 
                 nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "PGR", "cytogenetics", "ImmunoHistoChemistry");
