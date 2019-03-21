@@ -221,6 +221,7 @@ public class DataImportService {
             log.info("Access group not found. Creating " + accessibility + " " + accessModalities);
 
             g = new Group(accessibility, accessModalities);
+            g.setType("Accessibility");
             groupRepository.save(g);
 
         }

@@ -715,7 +715,7 @@ public class CreateDataProjections implements CommandLineRunner{
             // TODO: Complete the cell type options
             // TODO: Complete the patient treatment options
 
-            //ADD PROJECTS TO MFQ
+            //ADD PROJECTS AND ACCESSIBILITY TO MFQ
             if(mc.getGroups() != null){
 
                 for(Group g : mc.getGroups()){
@@ -723,6 +723,22 @@ public class CreateDataProjections implements CommandLineRunner{
                     if(g.getType().equals("Project")){
 
                         mfq.addProject(g.getName());
+                    }
+                    else if(g.getType().equals("Accessibility")){
+                        if(g.getAccessibility() == null){
+                            mfq.setModelAccessibility("");
+                        }
+                        else{
+                            mfq.setModelAccessibility(g.getAccessibility());
+                        }
+
+                        if(g.getAccessModalities() == null){
+                            mfq.setAccessModalities("");
+                        }
+                        else{
+                            mfq.setAccessModalities(g.getAccessModalities());
+                        }
+
                     }
 
                 }

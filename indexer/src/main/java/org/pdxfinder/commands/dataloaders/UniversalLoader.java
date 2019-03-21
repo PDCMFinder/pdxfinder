@@ -972,12 +972,16 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 model.addGroup(project);
             }
 
+            if(modelAccessibility != null || accessModalities != null){
+
+                Group access = dataImportService.getAccessibilityGroup(modelAccessibility, accessModalities);
+                model.addGroup(access);
+            }
+
             dataImportService.saveModelCreation(model);
 
             //Update datasource
             ds.setProviderType(dataProviderType);
-            ds.setAccessibility(modelAccessibility);
-            ds.setAccessModalities(accessModalities);
             ds.setContact(contactEmail);
 
 

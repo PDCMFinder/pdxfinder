@@ -49,6 +49,8 @@ public class ModelForQuery {
 
     private List<String> projects;
     private List<String> publications;
+    private String modelAccessibility;
+    private String accessModalities;
 
 
     public ModelForQuery() {
@@ -422,5 +424,19 @@ public class ModelForQuery {
         breastCancerMarkers.add(m);
     }
 
+    public String getModelAccessibility() {
+        return modelAccessibility;
+    }
 
+    public void setModelAccessibility(String modelAccessibility) {
+        this.modelAccessibility = modelAccessibility;
+    }
+
+    public String getAccessModalities() {
+        return accessModalities;
+    }
+
+    public void setAccessModalities(String accessModalities) {
+        this.accessModalities = accessModalities;
+    }
 }
