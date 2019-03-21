@@ -54,14 +54,13 @@ public class MappingService {
     @Autowired
     private UtilityService utilityService;
 
-    @Autowired
     private MappingEntityRepository mappingEntityRepository;
 
     @Autowired
-    public MappingService(SampleRepository sampleRepository) {
+    public MappingService(SampleRepository sampleRepository, MappingEntityRepository mappingEntityRepository) {
 
         this.sampleRepository = sampleRepository;
-
+        this.mappingEntityRepository = mappingEntityRepository;
 
     }
 
