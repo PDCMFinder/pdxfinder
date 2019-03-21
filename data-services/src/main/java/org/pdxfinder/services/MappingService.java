@@ -54,13 +54,12 @@ public class MappingService {
     @Autowired
     private UtilityService utilityService;
 
-    private MappingEntityRepository mappingEntityRepository;
-
     @Autowired
-    public MappingService(SampleRepository sampleRepository, MappingEntityRepository mappingEntityRepository) {
+    public MappingService(SampleRepository sampleRepository) {
 
         this.sampleRepository = sampleRepository;
-        this.mappingEntityRepository = mappingEntityRepository;
+
+
     }
 
     public String getSavedDiagnosisMappingsFile() {
@@ -201,7 +200,7 @@ public class MappingService {
 
         //List<MappingEntity> mappingEntities = mappingEntityRepository.findAll();
 
-        List<MappingEntity> mappingEntities = mappingEntityRepository.findByMappedTermLabel(null);
+        List<MappingEntity> mappingEntities = new ArrayList<>(); //mappingEntityRepository.findByMappedTermLabel(null);
 
         entityMap.put("mappings", mappingEntities);
 
