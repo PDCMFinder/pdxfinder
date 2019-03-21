@@ -6,6 +6,7 @@ import org.pdxfinder.admin.pojos.MappingContainer;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.repositories.SampleRepository;
+import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.MappingService;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ public class UpdateMappings implements CommandLineRunner {
     private final static Logger log = LoggerFactory.getLogger(UpdateMappings.class);
 
     private SampleRepository sampleRepository;
+    private MappingEntityRepository mappingEntityRepository;
     private DataImportService dataImportService;
 
 
@@ -39,9 +41,10 @@ public class UpdateMappings implements CommandLineRunner {
     private String savedDiagnosisMappingsFile2;
 
     @Autowired
-    public UpdateMappings(SampleRepository sampleRepository, DataImportService dataImportService) {
+    public UpdateMappings(SampleRepository sampleRepository, DataImportService dataImportService, MappingEntityRepository mappingEntityRepository) {
         this.sampleRepository = sampleRepository;
         this.dataImportService = dataImportService;
+        this.mappingEntityRepository = mappingEntityRepository;
     }
 
     @Override
@@ -69,7 +72,7 @@ public class UpdateMappings implements CommandLineRunner {
 
     private void updateMappings(){
 
-        MappingService mappingService = new MappingService(sampleRepository);
+        MappingService mappingService = new MappingService(sampleRepository, mappingEntityRepository);
 
         mappingService.setSavedDiagnosisMappingsFile(savedDiagnosisMappingsFile);
         MappingContainer mcont = mappingService.getSavedDiagnosisMappings(null);

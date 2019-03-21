@@ -61,7 +61,6 @@ public class MappingService {
 
         this.sampleRepository = sampleRepository;
         this.mappingEntityRepository = mappingEntityRepository;
-
     }
 
     public String getSavedDiagnosisMappingsFile() {
