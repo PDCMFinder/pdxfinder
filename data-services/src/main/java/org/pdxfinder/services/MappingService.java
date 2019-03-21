@@ -12,6 +12,7 @@ import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.admin.zooma.*;
 import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.repositories.SampleRepository;
+import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,9 @@ public class MappingService {
 
     @Autowired
     private UtilityService utilityService;
+
+    @Autowired
+    private MappingEntityRepository mappingEntityRepository;
 
     @Autowired
     public MappingService(SampleRepository sampleRepository) {
@@ -192,9 +196,22 @@ public class MappingService {
 
     }
 
-    public MappingContainer getMissingDiagnosisMappings(String ds){
+    public Map<String, List<MappingEntity>> getMissingDiagnosisMappings(String ds){
 
-        MappingContainer mc = new MappingContainer();
+
+        Map<String, List<MappingEntity>> entityMap = new HashMap<>();
+
+        //List<MappingEntity> mappingEntities = mappingEntityRepository.findAll();
+
+        List<MappingEntity> mappingEntities = mappingEntityRepository.findByMappedTermLabel(null);
+
+        entityMap.put("mappings", mappingEntities);
+
+        return entityMap;
+
+
+
+/*
 
         Collection<Sample> samplesWithoutMappedTerm;
         Set<String> existingCombinations = new HashSet<>();
@@ -246,10 +263,10 @@ public class MappingService {
             }
 
 
-        }
+        }*/
 
 
-        return mc;
+
     }
 
 

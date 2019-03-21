@@ -371,8 +371,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
         }else{
 
-            log.warn("Missing Diagnosis Mapping {}_{}_{}_{} was found in the Database", dataSource, diagnosis, originTissue, tumorType);
-
+            log.warn("NOT SAVED: {}_{}_{}_{} was found in the Database", dataSource, diagnosis, originTissue, tumorType);
         }
 
 
