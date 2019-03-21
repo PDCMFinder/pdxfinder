@@ -684,7 +684,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             //CREATE PUBLICATION GROUPS
 
             //check if pubmed id is in the right format, ie id starts with PMID
-            if (!pubmedIdString.isEmpty() && pubmedIdString.toLowerCase().contains("pmid")) {
+            if (pubmedIdString != null && !pubmedIdString.isEmpty() && pubmedIdString.toLowerCase().contains("pmid")) {
 
                 // pubmed ids separated with a comma, create multiple groups
                 if (pubmedIdString.contains(",")) {
@@ -809,9 +809,9 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
             //check essential values
 
-            if (sampleId.isEmpty() || origin.isEmpty() || modelId.isEmpty()
-                    || molCharType.isEmpty() || platformName.isEmpty() || platformTechnology.isEmpty() || platformDescription.isEmpty()
-                    || analysisProtocol.isEmpty()) {
+            if (sampleId == null || origin == null || modelId == null
+                    || molCharType == null || platformName == null || platformTechnology == null || platformDescription == null
+                    || analysisProtocol == null) {
 
                 log.error("Missing essential value in row " + row);
                 continue;
