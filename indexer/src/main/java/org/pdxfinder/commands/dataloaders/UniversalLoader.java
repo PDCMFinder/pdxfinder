@@ -395,21 +395,29 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
         log.info("******************************************************");
 
         int row = 6;
+
         log.info("Tumor row number: " + patientTumorSheetData.size());
         for (List<String> patientTumorRow : patientTumorSheetData) {
 
+            String patientId = null;
+            String modelId = null;
+            String dateOfCollection = null;
+            String ageAtCollection = null;
+            String collectionEvent = null;
+            String elapsedTime = null;
+
             try {
-                String patientId = patientTumorRow.get(0);
+                patientId = patientTumorRow.get(0);
                 String sampleId = patientTumorRow.get(1);
-                String modelId = patientTumorRow.get(19);
+                modelId = patientTumorRow.get(19);
 
                 //skip rows where patient, model or sample id is null
                 if (patientId == null || sampleId == null || modelId == null) continue;
 
-                String dateOfCollection = patientTumorRow.get(2);
-                String collectionEvent = patientTumorRow.get(3);
-                String elapsedTime = patientTumorRow.get(4);
-                String ageAtCollection = patientTumorRow.get(5);
+                dateOfCollection = patientTumorRow.get(2);
+                collectionEvent = patientTumorRow.get(3);
+                elapsedTime = patientTumorRow.get(4);
+                ageAtCollection = patientTumorRow.get(5);
                 String diagnosis = patientTumorRow.get(6);
                 String tumorType = patientTumorRow.get(7);
                 String originTissue = patientTumorRow.get(8);
@@ -422,7 +430,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 String treatmentNaive = patientTumorRow.get(16);
 
 
-                if (modelId.isEmpty()) {
+                if (modelId == null) {
                     log.error("Missing corresponding Model ID in row " + row);
                     row++;
                     continue;
@@ -490,7 +498,8 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 row++;
 
             } catch (Exception e) {
-                log.error("Exception in row: " + row);
+                log.error("Exception in row: " + row + " for model: " +modelId);
+                log.error("doc:"+dateOfCollection+" ce:"+ collectionEvent+" et:"+ elapsedTime+" aac:"+ ageAtCollection);
                 e.printStackTrace();
 
             }
