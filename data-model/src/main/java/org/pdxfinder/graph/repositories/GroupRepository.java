@@ -26,7 +26,7 @@ public interface GroupRepository extends PagingAndSortingRepository<Group, Long>
     @Query("MATCH (g:Group) WHERE g.type = {type} RETURN g")
     List<Group> findAllByType(@Param("type") String type);
 
-    @Query("MATCH (g:Group) WHERE g.type = 'Accessibility' AND g.accessibility = {accessibility} AND g.accessModalities = {accessModalities}")
+    @Query("MATCH (g:Group) WHERE g.type = 'Accessibility' AND g.accessibility = {accessibility} AND g.accessModalities = {accessModalities} RETURN g")
     Group findAccessGroupByAccessibilityAndAccessModalities(@Param("accessibility") String accessibility, @Param("accessModalities") String accessModalities);
 
 }
