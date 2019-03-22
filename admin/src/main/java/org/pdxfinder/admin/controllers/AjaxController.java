@@ -57,7 +57,7 @@ public class AjaxController {
             ds = dataSource.get();
         }
 
-        return mappingService.getMissingDiagnosisMappings(ds);
+        return mappingService.getMissingDiagnosisMappings(ds); //.getEntityList();
     }
 
 
