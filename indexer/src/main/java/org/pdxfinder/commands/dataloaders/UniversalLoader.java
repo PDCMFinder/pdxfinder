@@ -775,8 +775,17 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
             for (int i = 0; i < passageArr.length; i++) {
 
-                int passageInt = (int) Float.parseFloat(passageArr[i]);
-                passages += String.valueOf(passageInt) + ",";
+                String pass;
+                try{
+                    int passageInt = (int) Float.parseFloat(passageArr[i]);
+                    pass = String.valueOf(passageInt);
+                }
+                catch(NumberFormatException | NullPointerException nfe){
+
+                    pass = passageArr[i];
+                }
+
+                passages += pass + ",";
             }
             //remove that last comma
             passages = passages.substring(0, passages.length() - 1);
@@ -957,6 +966,9 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 continue;
             }
 
+            if(accessModalities == null) accessModalities = "";
+            if(modelAccessibility == null) modelAccessibility = "";
+
             //at this point the corresponding pdx model node should be created
 
             ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
@@ -981,7 +993,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 model.addGroup(project);
             }
 
-            if(modelAccessibility != null || accessModalities != null){
+            if(modelAccessibility != "" || accessModalities != ""){
 
                 Group access = dataImportService.getAccessibilityGroup(modelAccessibility, accessModalities);
                 model.addGroup(access);
