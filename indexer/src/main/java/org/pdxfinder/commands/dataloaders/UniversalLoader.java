@@ -658,7 +658,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
                     //create specimens with engraftment data
                     Specimen specimen = new Specimen();
-                    specimen.setPassage(passageArr[i]);
+                    specimen.setPassage(passageArr[i].trim());
                     specimen.setEngraftmentSite(es);
                     specimen.setEngraftmentType(et);
                     specimen.setEngraftmentMaterial(em);
@@ -668,7 +668,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 }
             }
             //the passage is a single number
-            else if (passage.matches("\\d+")) {
+            else if (passage.matches("\\d+") ) {
 
                 //need this trick to get rid of fractures if there is any
                 int passageInt = Integer.parseInt(passage);
@@ -684,6 +684,22 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
                 model.addSpecimen(specimen);
 
+            }
+            else if(passage.matches("[+-]?([0-9]*[.])?[0-9]+")){
+
+                //need this trick to get rid of fractures if there is any
+                double passageDouble = Double.parseDouble(passage);
+                passage = String.valueOf(passageDouble);
+
+                //create specimens with engraftment data
+                Specimen specimen = new Specimen();
+                specimen.setPassage(passage);
+                specimen.setEngraftmentSite(es);
+                specimen.setEngraftmentType(et);
+                specimen.setEngraftmentMaterial(em);
+                specimen.setHostStrain(hostStrain);
+
+                model.addSpecimen(specimen);
             }
             else {
 
