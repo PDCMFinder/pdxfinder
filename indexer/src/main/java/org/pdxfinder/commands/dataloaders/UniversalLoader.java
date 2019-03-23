@@ -1211,6 +1211,12 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             String passage = keyArr[2];
 
             ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
+            if(model == null){
+                log.error("Cannot load markers, model not found: "+modelId);
+                continue;
+
+            }
+
             Specimen specimen = dataImportService.findSpecimenByModelAndPassageAndNomenclature(model, passage, nomenclature);
 
             if(specimen != null){
