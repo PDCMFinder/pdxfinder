@@ -54,19 +54,20 @@ public class MappingService {
     @Autowired
     private UtilityService utilityService;
 
-    private MappingEntityRepository mappingEntityRepository;
+    MappingEntityRepository mappingEntityRepository;
 
     @Autowired
-    public MappingService(SampleRepository sampleRepository) {
+    public MappingService(SampleRepository sampleRepository, MappingEntityRepository mappingEntityRepository) {
 
         this.sampleRepository = sampleRepository;
+        this.savedDiagnosisMappingsFile = savedDiagnosisMappingsFile;
     }
 
     public String getSavedDiagnosisMappingsFile() {
         return savedDiagnosisMappingsFile;
     }
 
-    public void setSavedDiagnosisMappingsFile(String savedDiagnosisMappingsFile, MappingEntityRepository mappingEntityRepository) {
+    public void setSavedDiagnosisMappingsFile(String savedDiagnosisMappingsFile) {
         this.savedDiagnosisMappingsFile = savedDiagnosisMappingsFile;
     }
 
