@@ -54,13 +54,14 @@ public class MappingService {
     @Autowired
     private UtilityService utilityService;
 
-    MappingEntityRepository mappingEntityRepository;
+    //MappingEntityRepository mappingEntityRepository;
 
     @Autowired
-    public MappingService(SampleRepository sampleRepository, MappingEntityRepository mappingEntityRepository) {
+    public MappingService(SampleRepository sampleRepository) {
 
         this.sampleRepository = sampleRepository;
         this.savedDiagnosisMappingsFile = savedDiagnosisMappingsFile;
+        //this.mappingEntityRepository =  mappingEntityRepository;
     }
 
     public String getSavedDiagnosisMappingsFile() {
@@ -216,6 +217,7 @@ public class MappingService {
 
 
 
+/*
     public Map<String, List<MappingEntity>> getMissingDiagnosisMappings(String ds){
 
         MappingContainer mc = new MappingContainer();
@@ -239,6 +241,7 @@ public class MappingService {
         return entityMap;
 
     }
+*/
 
 
 

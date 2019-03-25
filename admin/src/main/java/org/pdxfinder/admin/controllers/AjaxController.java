@@ -48,6 +48,7 @@ public class AjaxController {
                          ****************************************************************/
 
 
+/*
     @RequestMapping(value = "/missingmapping/diagnosis")
     @ResponseBody
     public Map<String, List<MappingEntity>> getMissingMappings(@RequestParam("ds") Optional<String> dataSource){
@@ -59,6 +60,7 @@ public class AjaxController {
 
         return mappingService.getMissingDiagnosisMappings(ds); //.getEntityList();
     }
+*/
 
 
     @RequestMapping(value = "/mapping/diagnosis")
