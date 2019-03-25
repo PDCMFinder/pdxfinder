@@ -170,7 +170,13 @@ public class DetailsService {
             dto.setEthnicity("Not specified");
         }
 
-        dto.setMappedOntologyTermLabel(patientSample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
+        if(patientSample.getSampleToOntologyRelationShip() != null && patientSample.getSampleToOntologyRelationShip().getOntologyTerm()!=null){
+            dto.setMappedOntologyTermLabel(patientSample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
+        }
+        else{
+            dto.setMappedOntologyTermLabel("");
+        }
+
         dto.setProviderName(providerGroup.getName());
         dto.setContactProviderLabel(providerGroup.getAbbreviation());
         dto.setContactProviderUrl(providerGroup.getContact());
