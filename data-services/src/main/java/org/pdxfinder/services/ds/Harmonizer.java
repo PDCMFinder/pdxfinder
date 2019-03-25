@@ -49,7 +49,7 @@ public class Harmonizer {
     }
 
 
-    public static JSONArray getTreament(JSONObject data, String ds) throws Exception {
+    public static JSONArray getPatientTreaments(JSONObject data, String ds) throws Exception {
 
         JSONArray treatments = new JSONArray();
 
@@ -57,7 +57,15 @@ public class Harmonizer {
             treatments = data.getJSONArray("Treatments");
         }
 
-        if (ds.equals(hci)){
+        return treatments;
+    }
+
+
+    public static JSONArray getModelDosingStudies(JSONObject data, String ds) throws Exception {
+
+        JSONArray treatments = new JSONArray();
+
+        if (ds.equals(hci) || ds.equals(jax)){
 
             try {
                 if (data.has("Treatments")) {
@@ -67,11 +75,28 @@ public class Harmonizer {
                         treatments = data.getJSONArray("Treatments");
                     }
                 }
-            }catch (Exception e){}
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
+
+        else if(ds.equals(irccCrc)){
+            try {
+                if (data.has("Treatment")) {
+                    JSONObject treatmentObj = data.optJSONObject("Treatments");
+                    //if the treatment attribute is not an object = it is an array
+                    if (treatmentObj == null && data.optJSONArray("Treatments") != null) {
+                        treatments = data.getJSONArray("Treatments");
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+
         return treatments;
     }
-
 
     public static String getStage(JSONObject data, String ds) throws Exception {
         String tumorStage = Standardizer.NOT_SPECIFIED;
