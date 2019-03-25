@@ -1043,6 +1043,8 @@ public class DataImportService {
 
         TreatmentProtocol tp = new TreatmentProtocol();
 
+        if(doseString == null) doseString = "";
+
         //combination of drugs?
         if(drugString.contains("+") && doseString.contains(";")){
 
@@ -1067,8 +1069,24 @@ public class DataImportService {
 
             }
 
-            else{
-                //TODO: deal with the case when there are more drugs than doses or vice versa
+            else if (drugArray.length > 1 && doseArray.length == 1){
+
+                //use the same dosing for all drugs
+
+                for(int i=0;i<drugArray.length;i++){
+
+                    Drug d = getStandardizedDrug(drugArray[i].trim());
+                    TreatmentComponent tc = new TreatmentComponent();
+                    tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
+                    tc.setDose(doseArray[0].trim());
+                    //don't load unknown drugs
+                    if(!d.getName().equals("Not Specified")){
+                        tc.setDrug(d);
+                        tp.addTreatmentComponent(tc);
+                    }
+
+                }
+
             }
 
         }
@@ -1128,7 +1146,12 @@ public class DataImportService {
             TreatmentComponent tc = new TreatmentComponent();
             tc.setType(Standardizer.getTreatmentComponentType(drugString));
             tc.setDrug(d);
-            tc.setDose(doseString.trim());
+            if(doseString != null) {
+                tc.setDose(doseString.trim());
+            }
+            else{
+                tc.setDose("");
+            }
             //don't load unknown drugs
             if(!d.getName().equals("Not Specified")){
                 tc.setDrug(d);

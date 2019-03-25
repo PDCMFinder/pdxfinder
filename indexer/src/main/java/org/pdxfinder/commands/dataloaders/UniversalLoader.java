@@ -395,21 +395,29 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
         log.info("******************************************************");
 
         int row = 6;
+
         log.info("Tumor row number: " + patientTumorSheetData.size());
         for (List<String> patientTumorRow : patientTumorSheetData) {
 
+            String patientId = null;
+            String modelId = null;
+            String dateOfCollection = null;
+            String ageAtCollection = null;
+            String collectionEvent = null;
+            String elapsedTime = null;
+
             try {
-                String patientId = patientTumorRow.get(0);
+                patientId = patientTumorRow.get(0);
                 String sampleId = patientTumorRow.get(1);
-                String modelId = patientTumorRow.get(19);
+                modelId = patientTumorRow.get(19);
 
                 //skip rows where patient, model or sample id is null
                 if (patientId == null || sampleId == null || modelId == null) continue;
 
-                String dateOfCollection = patientTumorRow.get(2);
-                String collectionEvent = patientTumorRow.get(3);
-                String elapsedTime = patientTumorRow.get(4);
-                String ageAtCollection = patientTumorRow.get(5);
+                dateOfCollection = patientTumorRow.get(2);
+                collectionEvent = patientTumorRow.get(3);
+                elapsedTime = patientTumorRow.get(4);
+                ageAtCollection = patientTumorRow.get(5);
                 String diagnosis = patientTumorRow.get(6);
                 String tumorType = patientTumorRow.get(7);
                 String originTissue = patientTumorRow.get(8);
@@ -422,7 +430,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 String treatmentNaive = patientTumorRow.get(16);
 
 
-                if (modelId.isEmpty()) {
+                if (modelId == null) {
                     log.error("Missing corresponding Model ID in row " + row);
                     row++;
                     continue;
@@ -490,7 +498,8 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 row++;
 
             } catch (Exception e) {
-                log.error("Exception in row: " + row);
+                log.error("Exception in row: " + row + " for model: " +modelId);
+                log.error("doc:"+dateOfCollection+" ce:"+ collectionEvent+" et:"+ elapsedTime+" aac:"+ ageAtCollection);
                 e.printStackTrace();
 
             }
@@ -649,7 +658,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
                     //create specimens with engraftment data
                     Specimen specimen = new Specimen();
-                    specimen.setPassage(passageArr[i]);
+                    specimen.setPassage(passageArr[i].trim());
                     specimen.setEngraftmentSite(es);
                     specimen.setEngraftmentType(et);
                     specimen.setEngraftmentMaterial(em);
@@ -659,7 +668,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 }
             }
             //the passage is a single number
-            else if (passage.matches("\\d+")) {
+            else if (passage.matches("\\d+") ) {
 
                 //need this trick to get rid of fractures if there is any
                 int passageInt = Integer.parseInt(passage);
@@ -675,6 +684,22 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
                 model.addSpecimen(specimen);
 
+            }
+            else if(passage.matches("[+-]?([0-9]*[.])?[0-9]+")){
+
+                //need this trick to get rid of fractures if there is any
+                double passageDouble = Double.parseDouble(passage);
+                passage = String.valueOf(passageDouble);
+
+                //create specimens with engraftment data
+                Specimen specimen = new Specimen();
+                specimen.setPassage(passage);
+                specimen.setEngraftmentSite(es);
+                specimen.setEngraftmentType(et);
+                specimen.setEngraftmentMaterial(em);
+                specimen.setHostStrain(hostStrain);
+
+                model.addSpecimen(specimen);
             }
             else {
 
@@ -766,8 +791,17 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
             for (int i = 0; i < passageArr.length; i++) {
 
-                int passageInt = (int) Float.parseFloat(passageArr[i]);
-                passages += String.valueOf(passageInt) + ",";
+                String pass;
+                try{
+                    int passageInt = (int) Float.parseFloat(passageArr[i]);
+                    pass = String.valueOf(passageInt);
+                }
+                catch(NumberFormatException | NullPointerException nfe){
+
+                    pass = passageArr[i];
+                }
+
+                passages += pass + ",";
             }
             //remove that last comma
             passages = passages.substring(0, passages.length() - 1);
@@ -948,6 +982,9 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 continue;
             }
 
+            if(accessModalities == null) accessModalities = "";
+            if(modelAccessibility == null) modelAccessibility = "";
+
             //at this point the corresponding pdx model node should be created
 
             ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
@@ -972,7 +1009,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 model.addGroup(project);
             }
 
-            if(modelAccessibility != null || accessModalities != null){
+            if(modelAccessibility != "" || accessModalities != ""){
 
                 Group access = dataImportService.getAccessibilityGroup(modelAccessibility, accessModalities);
                 model.addGroup(access);
@@ -1174,6 +1211,12 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             String passage = keyArr[2];
 
             ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
+            if(model == null){
+                log.error("Cannot load markers, model not found: "+modelId);
+                continue;
+
+            }
+
             Specimen specimen = dataImportService.findSpecimenByModelAndPassageAndNomenclature(model, passage, nomenclature);
 
             if(specimen != null){
