@@ -54,8 +54,7 @@ public class MappingService {
     @Autowired
     private UtilityService utilityService;
 
-    @Autowired
-    MappingEntityRepository mappingEntityRepository;
+    private MappingEntityRepository mappingEntityRepository;
 
     @Autowired
     public MappingService(SampleRepository sampleRepository) {
@@ -67,7 +66,7 @@ public class MappingService {
         return savedDiagnosisMappingsFile;
     }
 
-    public void setSavedDiagnosisMappingsFile(String savedDiagnosisMappingsFile) {
+    public void setSavedDiagnosisMappingsFile(String savedDiagnosisMappingsFile, MappingEntityRepository mappingEntityRepository) {
         this.savedDiagnosisMappingsFile = savedDiagnosisMappingsFile;
     }
 
