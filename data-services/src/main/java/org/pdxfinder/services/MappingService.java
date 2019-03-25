@@ -72,11 +72,12 @@ public class MappingService {
     }
 
 
-    private void loadSavedDiagnosisMappings(){
+    public List<MappingEntity> loadSavedDiagnosisMappings(){
 
         String json = utilityService.parseFile(savedDiagnosisMappingsFile);
         existingDiagnosisMappings = new MappingContainer();
 
+        List<MappingEntity> mappingEntities = new ArrayList<>();
 
         try {
             JSONObject job = new JSONObject(json);
@@ -97,8 +98,12 @@ public class MappingService {
                     String ontologyTerm = row.getString("mappedTermLabel");
                     String mapType = row.getString("mapType");
                     String justification = row.getString("justification");
+                    String mappedTermUrl = row.getString("mappedTermUrl");
                     Long entityId = Long.parseLong(row.getString("entityId"));
 
+                    String mappingKey = StringUtils.join(
+                            Arrays.asList(dataSource, sampleDiagnosis, originTissue, tumorType), "__"
+                    );
 
                     //if(ds!= null && !ds.toLowerCase().equals(dataSource.toLowerCase())) continue;
 
@@ -139,6 +144,10 @@ public class MappingService {
                     me.setMapType(mapType);
                     me.setJustification(justification);
                     me.setEntityId(entityId);
+                    me.setMappedTermUrl(mappedTermUrl);
+                    me.setMappingKey(mappingKey);
+
+                    mappingEntities.add(me);
 
                     existingDiagnosisMappings.add(me);
                 }
@@ -149,6 +158,7 @@ public class MappingService {
         }
 
 
+        return mappingEntities;
 
 
     }
