@@ -1572,7 +1572,11 @@ th,td {
 }*/
 
 
-
+#preLoader{
+    display: none;
+    margin: 0 auto;
+    margin-top: 50px;
+}
 
 #spinner:not([hidden]) {
     position: fixed;
