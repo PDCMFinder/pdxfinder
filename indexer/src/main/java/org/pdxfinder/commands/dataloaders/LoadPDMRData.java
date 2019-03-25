@@ -234,7 +234,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step14LoadCurrentTreatment() throws Exception {
+    protected void step14LoadPatientTreatments() throws Exception {
 
         TreatmentSummary ts;
 
@@ -244,7 +244,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
         if(loadTreatment && dataImportService.findTreatmentSummaryByPatientSnapshot(dto.getPatientSnapshot()) == null){
             ts = new TreatmentSummary();
 
-            JSONArray treatmentArr = dto.getTreatments();
+            JSONArray treatmentArr = dto.getPatientTreatments();
 
             for(int k=0; k<treatmentArr.length();k++){
 
@@ -301,7 +301,10 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     }
 
 
+    @Override
+    void step17LoadModelDosingStudies() throws Exception {
 
+    }
 
 
 

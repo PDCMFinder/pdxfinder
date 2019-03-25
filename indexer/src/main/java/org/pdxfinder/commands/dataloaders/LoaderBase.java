@@ -186,7 +186,8 @@ public abstract class LoaderBase extends LoaderProperties implements Application
 
         dto.setFingerprinting(Harmonizer.getFingerprinting(data, ds));
         dto.setSpecimens(Harmonizer.getSpecimens(data,ds));
-        dto.setTreatments(Harmonizer.getTreament(data, ds));
+        dto.setPatientTreatments(Harmonizer.getPatientTreaments(data, ds));
+        dto.setModelDosingStudies(Harmonizer.getModelDosingStudies(data, ds));
         dto.setSamplesArr(Harmonizer.getSamplesArr(data, ds));
         dto.setValidationsArr(Harmonizer.getValidationsArr(data, ds));
 
@@ -267,7 +268,7 @@ public abstract class LoaderBase extends LoaderProperties implements Application
      * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
      * Concrete / Derived classes MUST override these placeholder methods as required
      */
-    abstract void step14LoadCurrentTreatment() throws Exception;
+    abstract void step14LoadPatientTreatments() throws Exception;
 
     /**
      *
@@ -282,6 +283,13 @@ public abstract class LoaderBase extends LoaderProperties implements Application
      * Concrete / Derived classes MUST override these placeholder methods as required
      */
     abstract void step16LoadVariationData();
+
+    /**
+     *
+     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
+     * Concrete / Derived classes MUST override these placeholder methods as required
+     */
+    abstract void step17LoadModelDosingStudies() throws Exception;
 
 
 
@@ -322,7 +330,9 @@ public abstract class LoaderBase extends LoaderProperties implements Application
 
             step13LoadSpecimens();
 
-            step14LoadCurrentTreatment();
+            step14LoadPatientTreatments();
+
+            step17LoadModelDosingStudies();
 
             step16LoadVariationData();
         }
@@ -402,19 +412,21 @@ public abstract class LoaderBase extends LoaderProperties implements Application
 
 
 
-    public void loadCurrentTreatment(){
+    public void loadModelDosingStudies(){
+
 
         TreatmentSummary ts;
         try {
-
-            if (dto.getTreatments().length() > 0) {
+            //log.info("Model dosing number for model "+dto.getModelID() + " is "+dto.getModelDosingStudies().length());
+            if (dto.getModelDosingStudies().length() > 0) {
 
                 ts = new TreatmentSummary();
                 ts.setUrl(dosingStudyURL);
 
-                for (int t = 0; t < dto.getTreatments().length(); t++) {
+                for (int t = 0; t < dto.getModelDosingStudies().length(); t++) {
 
-                    JSONObject treatmentObject = dto.getTreatments().getJSONObject(t);
+                    JSONObject treatmentObject = dto.getModelDosingStudies().getJSONObject(t);
+                    //log.info("Treatment: "+treatmentObject.getString("Drug"));
 
                     TreatmentProtocol treatmentProtocol = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
                             treatmentObject.getString("Dose"),
@@ -430,7 +442,9 @@ public abstract class LoaderBase extends LoaderProperties implements Application
 
             dataImportService.saveModelCreation(dto.getModelCreation());
 
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 

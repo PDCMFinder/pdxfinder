@@ -1064,6 +1064,10 @@ public class DataImportService {
                         tc.setDrug(d);
                         tp.addTreatmentComponent(tc);
                     }
+                    else{
+                        log.warn("Unrecognised drug name, skipping: "+drugString);
+
+                    }
 
                 }
 
@@ -1083,6 +1087,10 @@ public class DataImportService {
                     if(!d.getName().equals("Not Specified")){
                         tc.setDrug(d);
                         tp.addTreatmentComponent(tc);
+                    }
+                    else{
+                        log.warn("Unrecognised drug name, skipping: "+drugString);
+
                     }
 
                 }
@@ -1112,6 +1120,10 @@ public class DataImportService {
                             tc.setDrug(d);
                             tp.addTreatmentComponent(tc);
                         }
+                        else{
+                            log.warn("Unrecognised drug name, skipping: "+drugString);
+
+                        }
 
                     }
 
@@ -1135,6 +1147,10 @@ public class DataImportService {
                         tc.setDrug(d);
                         tp.addTreatmentComponent(tc);
                     }
+                    else{
+                        log.warn("Unrecognised drug name, skipping: "+drugString);
+
+                    }
                 }
             }
 
@@ -1156,6 +1172,10 @@ public class DataImportService {
             if(!d.getName().equals("Not Specified")){
                 tc.setDrug(d);
                 tp.addTreatmentComponent(tc);
+            }
+            else{
+                log.warn("Unrecognised drug name, skipping: "+drugString);
+
             }
         }
 
