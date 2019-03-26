@@ -845,7 +845,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
             if (sampleId == null || origin == null || modelId == null
                     || molCharType == null || platformName == null || platformTechnology == null || platformDescription == null
-                    || analysisProtocol == null) {
+                    ) {
 
                 log.error("Missing essential value in row " + row);
                 row++;
