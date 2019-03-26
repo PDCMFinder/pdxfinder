@@ -211,6 +211,7 @@ public class SearchDS {
         //dataset available filter def
         List<FacetOption> datasetAvailableOptions = new ArrayList<>();
         datasetAvailableOptions.add(new FacetOption("Gene Mutation", "Gene_Mutation"));
+        datasetAvailableOptions.add(new FacetOption("Cytogenetics", "Cytogenetics"));
         datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
         datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
 
