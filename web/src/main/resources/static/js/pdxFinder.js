@@ -372,7 +372,6 @@ function displayMolecularDataTable(tableData, clickedData){
         var $th = jQuery('<th>'+tableData["tableHeaders"][i]+'</th>');
         $theadRow.append($th);
     }
-
     
     //add datarows to table
     var rowCount = tableData["tableRows"].length;
@@ -393,8 +392,7 @@ function displayMolecularDataTable(tableData, clickedData){
     $table.append($tbody);
     $targetDiv.append($table);
 
-    jQuery('#molcharDataTable').DataTable();
-
+    customizeDatatable('molcharDataTable', clickedData[4]);
 
     $("#omicDataCount").html(rowCount);
     $("#clickedSampleId").html(clickedData[0]);
@@ -406,6 +404,39 @@ function displayMolecularDataTable(tableData, clickedData){
     $('#hrTitle').attr('data-content', clickedData[4]);
 
     $('#preLoader').hide();
+
+
+}
+
+
+
+function customizeDatatable(dTable, presentData){
+
+    $('#'+dTable).DataTable(
+        {
+            info:     false,
+            dom: '<"top"i>rt<"bottom"flp><"clear">',
+            language: {
+                lengthMenu: ' <select style="margin-top: 20px;">'+
+                    '<option value="10">10 Data Entries </option>'+
+                    '<option value="20">20 Data Entries </option>'+
+                    '<option value="30">30 Data Entries </option>'+
+                    '<option value="40">40 Data Entries </option>'+
+                    '<option value="50">50 Data Entries </option>'+
+                    '<option value="-1">Show All Entries </option>'+
+                    '</select>'
+            }
+        }
+    );
+
+    $(".dataTables_filter").hide();
+    $("#customSearch").html('<input type="text" id="omicSearch" placeholder="Search'+presentData+' ">');
+
+    oTable = $('#molcharDataTable').DataTable();
+    $('#omicSearch').keyup(function(){
+        oTable.search($(this).val()).draw();
+    })
+
 
 
 }
