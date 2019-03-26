@@ -106,6 +106,10 @@ h5{
     display: none;
 }
 
+#omicDataContainer {
+    display: none;
+}
+
 .hideContent0, .hideVariationData {
     position: absolute;
     top: -9999px;
@@ -1359,6 +1363,7 @@ hr .line_v2 {
 
 
 
+/*
 * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -1389,7 +1394,7 @@ hr .line_v2 {
 .responsive-table-2 thead {
     position: absolute;
     clip: rect(1px 1px 1px 1px);
-    /* IE6, IE7 */
+    !* IE6, IE7 *!
     padding: 0;
     border: 0;
     height: 1px;
@@ -1564,4 +1569,42 @@ th,td {
     overflow: hidden;
     text-overflow: ellipsis;
     resize: horizontal;
+}*/
+
+
+#preLoader{
+    display: none;
+    margin: 0 auto;
+    margin-top: 50px;
+}
+
+#spinner:not([hidden]) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#spinner::after {
+    content: "";
+    width: 80px;
+    height: 80px;
+    border: 2px solid #f3f3f3;
+    border-top: 3px solid #f25a41;
+    border-radius: 100%;
+    will-change: transform;
+    animation: spin 1s infinite linear
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }

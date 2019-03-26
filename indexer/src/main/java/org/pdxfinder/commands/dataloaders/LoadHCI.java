@@ -188,9 +188,8 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step14LoadCurrentTreatment() {
+    protected void step14LoadPatientTreatments() {
 
-        loadCurrentTreatment();
 
     }
 
@@ -337,7 +336,11 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     protected void step16LoadVariationData() { }
 
 
+    @Override
+    void step17LoadModelDosingStudies() throws Exception {
 
+        loadModelDosingStudies();
+    }
 
 
 

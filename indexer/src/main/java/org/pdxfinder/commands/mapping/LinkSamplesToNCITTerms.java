@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.admin.pojos.MappingContainer;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.dao.Sample;
@@ -13,6 +14,7 @@ import org.pdxfinder.graph.dao.SampleToOntologyRelationShip;
 import org.pdxfinder.ontologymapping.MissingMapping;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.MappingService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,21 +39,25 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LinkSamplesToNCITTerms.class);
     private DataImportService dataImportService;
-
-    @Autowired
     private UtilityService utilityService;
+    private MappingService mappingService;
 
     private Map<String, Set<MissingMapping>> missingMappings;
     private Set<String> missingTerms;
 
     private Map<String, MappingEntity> mappingRules;
 
-    @Autowired
     private MappingEntityRepository mappingEntityRepository;
 
     @Autowired
-    public LinkSamplesToNCITTerms(DataImportService dataImportService) {
+    public LinkSamplesToNCITTerms(DataImportService dataImportService,
+                                  UtilityService utilityService,
+                                  MappingService mappingService,
+                                  MappingEntityRepository mappingEntityRepository) {
         this.dataImportService = dataImportService;
+        this.utilityService = utilityService;
+        this.mappingService = mappingService;
+        this.mappingEntityRepository = mappingEntityRepository;
     }
 
     @Override
@@ -307,6 +313,8 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
             startNode += batchSize;
         }
 
+        saveMappedTerms();
+
         if (this.missingMappings.size() > 0) printAndSaveMissingMappings();
     }
 
@@ -336,6 +344,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                 saveUnmappedDiagnosis(mm.getDataSource(), mm.getDiagnosis(), mm.getOriginTissue(), mm.getTumorType());
             }
         }
+
     }
 
 
@@ -374,8 +383,29 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
             log.warn("NOT SAVED: {}_{}_{}_{} was found in the Database", dataSource, diagnosis, originTissue, tumorType);
         }
 
+    }
 
 
+    public void saveMappedTerms(){
+
+        List<MappingEntity> mappingEntities = mappingService.loadSavedDiagnosisMappings();
+
+        for (MappingEntity mappingEntity : mappingEntities){
+
+            mappingEntity.setEntityId(null);
+            String mappingKey = mappingEntity.getMappingKey();
+
+            MappingEntity entity = mappingEntityRepository.findByMappingKey(mappingKey);
+
+            if(entity == null){
+
+                mappingEntityRepository.save(mappingEntity);
+
+            }else{
+
+                log.warn("NOT SAVED: was found in the Database "+mappingKey);
+            }
+        }
     }
 
 

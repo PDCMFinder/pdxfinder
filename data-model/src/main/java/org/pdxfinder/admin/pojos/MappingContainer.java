@@ -53,7 +53,6 @@ public class MappingContainer {
 
     public Long getNextAvailableId(){
 
-
         return (long) size +1;
     }
 

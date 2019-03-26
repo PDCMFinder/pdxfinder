@@ -239,9 +239,10 @@
 
 
 
-                    <div class="responsive-table-2">
+                    <div class="responsive-table">
 
-                        <table id="search-datatable"><!--  class="sticky-header" -->
+                        <table id="search-datatable" class="stripe display datatable-pdx sticky-header" cellspacing="0"
+                               width="100%">
                             <thead>
                             <tr>
                                 <th>MODEL</th>
@@ -263,12 +264,12 @@
                             <tbody>
                             <tr th:each="model, iter : ${websearch.results}">
 
-                                <th scope="row"><a th:text="${model.externalId}"
+                                <td scope="row"><a th:text="${model.externalId}"
                                        th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}}"></a> <br> <span class="small" th:text="${model.datasource}">center</span>
-                                </th>
+                                </td>
                                 <td data-title="HISTOLOGY"><h1 th:remove="tag" th:text="${model.mappedOntologyTerm}">ontology term</h1>
                                 </td>
-                                <td data-title="PRIMARY" th:text="${model.sampleOriginTissue}">origin tissue</td>
+                                <td th:text="${model.sampleOriginTissue}">origin tissue</td>
                                 <td data-title="COLLECTION" th:text="${model.sampleSampleSite}">sample site</td>
                                 <td data-title="TYPE" th:text="${model.sampleTumorType}">Metastatic</td>
 

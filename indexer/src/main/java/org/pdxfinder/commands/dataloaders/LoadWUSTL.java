@@ -183,7 +183,7 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step14LoadCurrentTreatment() {
+    protected void step14LoadPatientTreatments() {
 
     }
 
@@ -199,5 +199,8 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
     }
 
+    @Override
+    void step17LoadModelDosingStudies() throws Exception {
 
+    }
 }

@@ -35,7 +35,8 @@ public class LoaderDTO {
     private String sourceURL;
 
     private JSONArray specimens;
-    private JSONArray treatments;
+    private JSONArray patientTreatments;
+    private JSONArray modelDosingStudies;
     private JSONArray samplesArr;
     private JSONArray ValidationsArr;
 
@@ -230,12 +231,12 @@ public class LoaderDTO {
         this.fingerprinting = fingerprinting;
     }
 
-    public JSONArray getTreatments() {
-        return treatments;
+    public JSONArray getPatientTreatments() {
+        return patientTreatments;
     }
 
-    public void setTreatments(JSONArray treatments) {
-        this.treatments = treatments;
+    public void setPatientTreatments(JSONArray patientTreatments) {
+        this.patientTreatments = patientTreatments;
     }
 
     public Sample getPatientSample() {
@@ -380,5 +381,13 @@ public class LoaderDTO {
 
     public void setValidationsArr(JSONArray validationsArr) {
         ValidationsArr = validationsArr;
+    }
+
+    public JSONArray getModelDosingStudies() {
+        return modelDosingStudies;
+    }
+
+    public void setModelDosingStudies(JSONArray modelDosingStudies) {
+        this.modelDosingStudies = modelDosingStudies;
     }
 }

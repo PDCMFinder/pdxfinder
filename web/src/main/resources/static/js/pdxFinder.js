@@ -405,24 +405,31 @@ function linkCivicdb(){
 }
 
 
-function getMolecularDataTable(clickedLink){
+function getMolecularDataTable(clickedLink, clickedData){
 
 
     console.log(clickedLink);
     var idcomp = clickedLink.split("___");
+    var titlecomp = clickedData.split("|");
     var id = idcomp[1];
+
     var url = "/data/getmoleculardata/"+id;
 
     var $targetDiv = jQuery('#variationTableData');
     $targetDiv.empty();
 
-    fetch(url).then(response => response.json()).then(json => displayMolecularDataTable(json)).catch(error => console.log(error))
+    $('#preLoader').show();
+
+    fetch(url)
+        .then(response => response.json())
+        .then(json => displayMolecularDataTable(json, titlecomp))
+        .catch(error => console.log(error))
 
 }
 
 
 
-function displayMolecularDataTable(tableData){
+function displayMolecularDataTable(tableData, clickedData){
 
     console.log("Headers length:"+tableData["tableHeaders"].length);
 
@@ -442,13 +449,11 @@ function displayMolecularDataTable(tableData){
 
     
     //add datarows to table
+    var rowCount = tableData["tableRows"].length;
 
-
-    for(var j=0; j<tableData["tableRows"].length; j++){
+    for(var j=0; j<rowCount; j++){
 
         $tr = jQuery('<tr class="tabs-title" style="float:none; text-transform: capitalize;">/');
-
-
 
         for(var k=0; k<tableData["tableRows"][j].length; k++){
             console.log("Rows "+tableData["tableRows"][j].length);
@@ -462,10 +467,21 @@ function displayMolecularDataTable(tableData){
     $table.append($tbody);
     $targetDiv.append($table);
 
-    var molDT = jQuery('#molcharDataTable').DataTable(
-        {
-            "drawCallback" : linkCivicdb()
-        },
-    );
+    jQuery('#molcharDataTable').DataTable(        {
+        "drawCallback" : linkCivicdb()
+    },);
+
+
+    $("#omicDataCount").html(rowCount);
+    $("#clickedSampleId").html(clickedData[0]);
+    $("#modelHistology").html(clickedData[1]);
+    $("#clickedTumorType").html(clickedData[2]);
+    $("#clickedPassage").html(clickedData[3]);
+    $("#clickedTech").html(clickedData[4]);
+
+    $('#hrTitle').attr('data-content', clickedData[4]);
+
+    $('#preLoader').hide();
+
 
 }

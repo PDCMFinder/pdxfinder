@@ -794,6 +794,14 @@
                     </div>
 
 
+
+
+
+
+
+
+
+
                     <div class="tabs-panel is-active" id="variation">
 
 
@@ -834,8 +842,9 @@
                                                         <a class="molecularDataLink"
                                                            style="color: #06369d; text-decoration: none;"
                                                            data-th-attr="data-tabs-target=${dataRow.dataAvailableLabel},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
+                                                           th:title="${dataRow.sampleId+' | '+data.mappedOntologyTermLabel+' | '+dataRow.sampleType+' | '+dataRow.engraftedTumorPassage+' | '+dataRow.platformUsedLabel}"
                                                            th:text="'View data'"
-                                                           th:id="'mc___'+${dataRow.molcharId}"
+                                                           th:id="${'mc___'+dataRow.molcharId}">
                                                            TAB TITLES
                                                         </a>
                                                     </td>
@@ -863,14 +872,87 @@
 
                         </div>
 
-                        <div class = "row large-12 medium-12 expanded" >
+
+
+                        <div id="omicDataContainer">
+                            <div class="row large-12 medium-12 expanded top-space-30 ">
+                                <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                                    <li class="tabs-title is-active">
+                                        <a href="#initialDiagnosis"
+                                           aria-selected="true"
+                                           style="font-size: 15px; padding: 15px;">
+                                            Genomic Data (<span id="omicDataCount"></span>) <!-- data.variationDataCount -->
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="columns medium-12 small-12 card-3" style="padding: 15px;">
+
+                                <div id="sizeSwitch" style="float: right; margin-top:-65px;">
+                                    <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"
+                                       class="button outline secondary">
+                                        Download Results
+                                        <i class="icon icon-functional" data-icon="="></i>
+                                    </a>
+                                </div>
+
+                                <div class="tabs-content" data-tabs-content="example-tabs">
+
+                                    <div class="tabs-panel is-active"
+                                         style="border-top: 1px solid #5ea88f; margin-top:20px;">
+
+                                        <hr id="hrTitle" class="hr-text" data-content="THE PLATFORM">
+
+                                        <div class="table-responsive">
+
+                                            <h4 class="bLine" th:classappend="( true ) ? '' : 'topSpace50' ">
+
+                                                <span class="hdc">Sample ID: </span>
+                                                <b class="black" id="clickedSampleId"></b>  &nbsp; &nbsp; <!-- data.techNPassToSampleId['__${technology.key}__'+'__${technology.value[num-1]}__'] -->
+
+                                                <span class="hdc">Histology:</span>
+                                                <b class="black" id="modelHistology"></b>  &nbsp; &nbsp; <!-- strings.capitalize(data.diagnosis) -->
+
+                                                <span class="hdc">Tumor Type: </span>
+                                                <b class="black" id="clickedTumorType">Engrafted Tumor</b>  &nbsp; &nbsp;
+
+                                                <span class="hdc">Passage: </span>
+                                                <b class="black" id="clickedPassage"></b>  &nbsp; &nbsp;
+
+                                                <span class="hdc">Platform: </span>
+                                                <b class="black" id="clickedTech"></b>   &nbsp; &nbsp;
+
+                                            </h4>
+
+
+
+                                            <div style="text-align: center;"> <img th:src="@{/images/loading2.gif}" id="preLoader"/> </div>
+                                            <div class="responsive-table" style="margin-top: 20px;" id="variationTableData">
+
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+<!--                        <div class = "row large-12 medium-12 expanded" >
                             <div class="columns medium-12 small-12 margin-top-10 card-3">
                                 <div class="responsive-table" style="margin-top: 20px;" id="variationTableData">
 
                                 </div>
                             </div>
 
-                        </div>
+                        </div>-->
+
+
+
 
                     </div>
 
@@ -949,7 +1031,9 @@
 
         jQuery(".molecularDataLink").on("click", function () {
 
-            getMolecularDataTable(jQuery(this).attr("id"));
+            $('#omicDataContainer').show();
+            getMolecularDataTable(jQuery(this).attr("id"), jQuery(this).attr("title"));
+
         });
 
 
@@ -995,7 +1079,15 @@
     }
 
 
-    function showTabs(cnt) {
+
+
+    function initTabs(cnt) {
+        for (var i = 0; i < 5; i++) {
+            document.getElementsByClassName("hideContent" + cnt)[i].style.position = "static";
+        }
+    }
+
+/*    function showTabs(cnt) {
         for (var i = 0; i < 5; i++) {
             var content = document.getElementsByClassName("hideContent" + cnt)[i];
             var variation = document.getElementsByClassName("hideVariationData")[0];
@@ -1011,12 +1103,6 @@
     }
 
 
-    function initTabs(cnt) {
-        for (var i = 0; i < 5; i++) {
-            document.getElementsByClassName("hideContent" + cnt)[i].style.position = "static";
-        }
-    }
-
     function revealVariationData() {
 
         // Activate the display of the vData
@@ -1024,7 +1110,7 @@
 
         // Open the corresponding tech Tab:
         // showTabs(cnt);
-    }
+    }*/
 
     // Check if variation tab is deeplinked on page load:
     $(document).ready(function () {

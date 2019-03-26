@@ -129,7 +129,9 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
             step13LoadSpecimens();
 
-            step14LoadCurrentTreatment();
+            step14LoadPatientTreatments();
+
+            step17LoadModelDosingStudies();
 
         }
 
@@ -246,39 +248,8 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step14LoadCurrentTreatment() {
+    protected void step14LoadPatientTreatments() {
 
-        TreatmentSummary ts;
-        try {
-
-            if (dto.getTreatments().length() > 0) {
-
-                ts = new TreatmentSummary();
-                ts.setUrl(dosingStudyURL);
-
-                for (int t = 0; t < dto.getTreatments().length(); t++) {
-
-                    JSONObject treatmentObject = dto.getTreatments().getJSONObject(t);
-
-                    TreatmentProtocol treatmentProtocol = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
-                            treatmentObject.getString("Dose"),
-                            treatmentObject.getString("Response Class"), "");
-
-                    if (treatmentProtocol != null) {
-                        ts.addTreatmentProtocol(treatmentProtocol);
-                    }
-                }
-                ts.setModelCreation(dto.getModelCreation());
-                dto.getModelCreation().setTreatmentSummary(ts);
-            }
-
-            dataImportService.saveModelCreation(dto.getModelCreation());
-
-        } catch (Exception e) { }
-
-        dataImportService.savePatient(dto.getPatient());
-        dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
-        dataImportService.saveModelCreation(dto.getModelCreation());
     }
 
 
@@ -487,7 +458,43 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     }
 
 
+    @Override
+    void step17LoadModelDosingStudies() throws Exception {
 
+
+        TreatmentSummary ts;
+        try {
+
+            if (dto.getModelDosingStudies().length() > 0) {
+
+                ts = new TreatmentSummary();
+                ts.setUrl(dosingStudyURL);
+
+                for (int t = 0; t < dto.getModelDosingStudies().length(); t++) {
+
+                    JSONObject treatmentObject = dto.getModelDosingStudies().getJSONObject(t);
+
+                    TreatmentProtocol treatmentProtocol = dataImportService.getTreatmentProtocol(treatmentObject.getString("Drug"),
+                            treatmentObject.getString("Dose"),
+                            treatmentObject.getString("Response Class"), "");
+
+                    if (treatmentProtocol != null) {
+                        ts.addTreatmentProtocol(treatmentProtocol);
+                    }
+                }
+                ts.setModelCreation(dto.getModelCreation());
+                dto.getModelCreation().setTreatmentSummary(ts);
+            }
+
+            dataImportService.saveModelCreation(dto.getModelCreation());
+
+        } catch (Exception e) { }
+
+        dataImportService.savePatient(dto.getPatient());
+        dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
+        dataImportService.saveModelCreation(dto.getModelCreation());
+
+    }
 
 
 
