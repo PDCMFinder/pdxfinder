@@ -848,6 +848,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                     || analysisProtocol == null) {
 
                 log.error("Missing essential value in row " + row);
+                row++;
                 continue;
             }
 
