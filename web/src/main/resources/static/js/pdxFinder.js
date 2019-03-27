@@ -467,9 +467,8 @@ function displayMolecularDataTable(tableData, clickedData){
     $table.append($tbody);
     $targetDiv.append($table);
 
-    jQuery('#molcharDataTable').DataTable(        {
-        "drawCallback" : linkCivicdb()
-    },);
+
+    customizeDatatable('molcharDataTable', clickedData[4]);
 
 
     $("#omicDataCount").html(rowCount);
@@ -483,5 +482,38 @@ function displayMolecularDataTable(tableData, clickedData){
 
     $('#preLoader').hide();
 
+
+}
+
+
+
+
+function customizeDatatable(dTable, presentData){
+
+    $('#'+dTable).DataTable(
+        {
+            drawCallback : linkCivicdb(),
+            info:     false,
+            dom: '<"top"i>rt<"bottom"flp><"clear">',
+            language: {
+                lengthMenu: ' <select style="margin-top: 20px;">'+
+                    '<option value="10">10 Data Entries </option>'+
+                    '<option value="20">20 Data Entries </option>'+
+                    '<option value="30">30 Data Entries </option>'+
+                    '<option value="40">40 Data Entries </option>'+
+                    '<option value="50">50 Data Entries </option>'+
+                    '<option value="-1">Show All Entries </option>'+
+                    '</select>'
+            }
+        }
+    );
+
+    $(".dataTables_filter").hide();
+    $("#customSearch").html('<input style="height: 41px;" type="text" id="omicSearch" placeholder="Search'+presentData+' data">');
+
+    oTable = $('#molcharDataTable').DataTable();
+    $('#omicSearch').keyup(function(){
+        oTable.search($(this).val()).draw();
+    })
 
 }

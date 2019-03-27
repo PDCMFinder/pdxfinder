@@ -264,7 +264,10 @@ public class DataTransformerService {
 
                // index++; \r\n\r\n \"
             }
-            clinicalDiagnosis = clinicalDiagnosis.replaceAll("\\r|\\\"|\\n", "");
+            //clinicalDiagnosis = clinicalDiagnosis.replaceAll("\\r|\\\"|\\n", "");
+
+            clinicalDiagnosis = clinicalDiagnosis.replaceAll("[^a-zA-Z,0-9 +_-]", "").trim();
+            clinicalDiagnosis = clinicalDiagnosis.replaceAll("\\s\\s", " ");
 
             log.info(clinicalDiagnosis);
 

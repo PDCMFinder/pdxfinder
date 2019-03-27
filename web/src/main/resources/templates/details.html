@@ -855,7 +855,14 @@
                                                            th:onclick="'window.open(\''+${dataRow.platformUsedUrl}+'\')'">
                                                             ...
                                                         </a>
-                                                        <span th:if="${dataRow.platformUsedUrl == null}" th:text="${dataRow.platformUsedLabel}"></span>
+                                                        <!-- TODO: Remove this quickFix in April -->
+                                                        <a th:if="${dataRow.platformUsedLabel == 'NCI cancer gene panel'}" target="_blank"
+                                                           style="color: #06369d; text-decoration: none;"
+                                                           th:text="${dataRow.platformUsedLabel}"
+                                                           th:onclick="'window.open(\''+${'https://pdmr.cancer.gov/content/docs/NCI_Cancer_Gene_Panel.pdf'}+'\')'">
+                                                            ...
+                                                        </a>
+                                                        <span th:if="${dataRow.platformUsedUrl == null && dataRow.platformUsedLabel != 'NCI cancer gene panel'}" th:text="${dataRow.platformUsedLabel}"></span>
                                                     </td>
                                                     <td th:text="${dataRow.rawDataLabel}"></td>
                                                 </tr>
@@ -886,14 +893,27 @@
                                     </li>
                                 </ul>
                             </div>
+
+
+
                             <div class="columns medium-12 small-12 card-3" style="padding: 15px;">
 
-                                <div id="sizeSwitch" style="float: right; margin-top:-65px;">
-                                    <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"
-                                       class="button outline secondary">
-                                        Download Results
-                                        <i class="icon icon-functional" data-icon="="></i>
-                                    </a>
+
+
+                                <div class="columns medium-6 small-12" id="sizeSwitch" style="float: right; margin-top:-65px; margin-right:-30px;">
+
+                                    <div id="customSearch" class="columns medium-7 small-12 text-right" style="padding: 0px;">
+                                        <!-- Datatable Search Box -->
+                                    </div>
+
+                                    <div class="columns medium-5 small-12 text-right" style="padding: 0px;">
+                                        <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"
+                                           class="button outline secondary">
+                                            Download Results
+                                            <i class="icon icon-functional" data-icon="="></i>
+                                        </a>
+                                    </div>
+
                                 </div>
 
                                 <div class="tabs-content" data-tabs-content="example-tabs">
@@ -924,15 +944,12 @@
 
                                             </h4>
 
-
-
                                             <div style="text-align: center;"> <img th:src="@{/images/loading2.gif}" id="preLoader"/> </div>
                                             <div class="responsive-table" style="margin-top: 20px;" id="variationTableData">
 
                                             </div>
 
                                         </div>
-
 
                                     </div>
                                 </div>
@@ -941,15 +958,6 @@
 
 
 
-
-<!--                        <div class = "row large-12 medium-12 expanded" >
-                            <div class="columns medium-12 small-12 margin-top-10 card-3">
-                                <div class="responsive-table" style="margin-top: 20px;" id="variationTableData">
-
-                                </div>
-                            </div>
-
-                        </div>-->
 
 
 
