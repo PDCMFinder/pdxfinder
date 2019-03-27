@@ -845,7 +845,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
             if (sampleId == null || origin == null || modelId == null
                     || molCharType == null || platformName == null || platformTechnology == null || platformDescription == null
-                    || analysisProtocol == null) {
+                    ) {
 
                 log.error("Missing essential value in row " + row);
                 row++;
@@ -886,15 +886,17 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             //specimen should have been created before
             else if (origin.toLowerCase().equals("xenograft")) {
 
-                if (passage == null || passage.isEmpty()) {
+                if (passage == null || passage.isEmpty() || passage.toLowerCase().equals("not specified")) {
 
                     log.error("Missing essential value Xenograft Passage in row " + row);
+                    row++;
                     continue;
                 }
 
                 if (nomenclature == null || nomenclature.isEmpty()) {
 
                     log.error("Missing essential value nomenclature in row " + row);
+                    row++;
                     continue;
                 }
 
@@ -904,6 +906,12 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 passage = String.valueOf(passageInt);
 
                 model = dataImportService.findModelByIdAndDataSourceWithSpecimensAndHostStrain(modelId, ds.getAbbreviation());
+
+                if(model == null){
+                    log.error("Model "+modelId + " not found, skipping");
+                    row++;
+                    continue;
+                }
 
                 //this specimen should have the appropriate hoststrain, too!
                 Specimen specimen = dataImportService.findSpecimenByModelAndPassageAndNomenclature(model, passage, nomenclature);

@@ -290,7 +290,9 @@
                                         <a th:if="${#strings.equals(dataavailable, 'Patient Treatment')}"
                                            th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#patients' }"
                                            class="size12" th:utext="${dataavailable} + '<br />'"></a> <!-- platform -->
-
+                                        <a th:if="${#strings.equals(dataavailable, 'Cytogenetics')}"
+                                           th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation' }"
+                                           class="size12" th:utext="${dataavailable} + '<br />'"></a> <!-- platform -->
                                     </th:block>
                                 </td>
 
