@@ -855,7 +855,14 @@
                                                            th:onclick="'window.open(\''+${dataRow.platformUsedUrl}+'\')'">
                                                             ...
                                                         </a>
-                                                        <span th:if="${dataRow.platformUsedUrl == null}" th:text="${dataRow.platformUsedLabel}"></span>
+                                                        <!-- TODO: Remove this quickFix in April -->
+                                                        <a th:if="${dataRow.platformUsedLabel == 'NCI cancer gene panel'}" target="_blank"
+                                                           style="color: #06369d; text-decoration: none;"
+                                                           th:text="${dataRow.platformUsedLabel}"
+                                                           th:onclick="'window.open(\''+${'https://pdmr.cancer.gov/content/docs/NCI_Cancer_Gene_Panel.pdf'}+'\')'">
+                                                            ...
+                                                        </a>
+                                                        <span th:if="${dataRow.platformUsedUrl == null && dataRow.platformUsedLabel != 'NCI cancer gene panel'}" th:text="${dataRow.platformUsedLabel}"></span>
                                                     </td>
                                                     <td th:text="${dataRow.rawDataLabel}"></td>
                                                 </tr>
@@ -937,15 +944,12 @@
 
                                             </h4>
 
-
-
                                             <div style="text-align: center;"> <img th:src="@{/images/loading2.gif}" id="preLoader"/> </div>
                                             <div class="responsive-table" style="margin-top: 20px;" id="variationTableData">
 
                                             </div>
 
                                         </div>
-
 
                                     </div>
                                 </div>
