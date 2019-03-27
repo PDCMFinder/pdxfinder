@@ -137,6 +137,26 @@ public class DetailsService {
         dto.setDataSource(pdx.getDataSource());
         dto.setPatientSex(patient.getSex());
 
+        if (pdx != null && pdx.getExternalUrls() != null) {
+
+            pdx.getExternalUrls().stream().forEach(extUrl ->{
+                if (extUrl.getType().equals(ExternalUrl.Type.SOURCE.getValue())){
+                    dto.setViewDataAtUrl(extUrl.getUrl());
+                }else{
+                    dto.setContactProviderUrl(extUrl.getUrl());
+                }
+            });
+
+            dto.setViewDataAtLabel("View Data at "+pdx.getDataSource());
+        }
+
+        else{
+            dto.setViewDataAtUrl("#");
+            dto.setViewDataAtLabel("Unknown source");
+        }
+
+
+
         PatientSnapshot currentPatientSnapshot = null;
         //since there is only one element being returned in the set, this will give the current snapshot for the patient
         for(PatientSnapshot ps: patient.getSnapshots()){
