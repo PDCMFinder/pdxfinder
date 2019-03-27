@@ -1,7 +1,6 @@
 package org.pdxfinder.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.pdxfinder.services.*;
 import org.pdxfinder.services.ds.AutoCompleteOption;
 import org.pdxfinder.services.dto.*;
@@ -206,17 +205,6 @@ public class AjaxController {
 
     @RequestMapping(value = "/getmutatedmarkerswithvariants")
     public Object getMutatedMarkersWithVariants(){
-
-        JSONObject j = new JSONObject();
-
-        try {
-            j = new JSONObject(molCharService.getMutatedMarkersAndVariants());
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
-
-        //ResponseEntity rEntity = new ResponseEntity(molCharService.getMutatedMarkersAndVariants(), HttpStatus.OK);
 
         ObjectMapper mapper = new ObjectMapper();
         Object object = Object.class;

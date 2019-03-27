@@ -330,6 +330,80 @@ function displayMore(divId, startIndex) {
  ****************************************************************/
 
 
+var civicDBGeneCache = {};
+var civicDBVariantCache = {};
+
+function formatCivicGeneLink(symbol, el, data) {
+    var gene_id = data.result[0].gene_id;
+    var civic_url = "https://civicdb.org/events/genes/" + gene_id + "/summary#gene";
+    $(el).html('<a target="_blank" href="' + civic_url + '">' + symbol + ' <i class="icon icon-generic" data-icon="x"> </i></a>');
+}
+
+// Create links to the CivicDB resource from all genes shown in the mol char table
+function linkGeneCivicdb(el, symbol) {
+    if (symbol in civicDBGeneCache) {
+        console.log("gene cache hit for " + symbol);
+        // In cache already
+        var data = civicDBGeneCache[symbol];
+        if (data.result.length > 0) {
+            formatCivicGeneLink(symbol, el, data);
+        }
+    } else {
+        $.ajax({
+            dataType: "json",
+            url: "https://civicdb.org/api/variants/typeahead_results?limit=1&query=" + symbol,
+            success: function (data) {
+                civicDBGeneCache[symbol] = data;
+                if (data.result.length > 0) {
+                    formatCivicGeneLink(symbol, el, data);
+                }
+            },
+            error: function () {
+                civicDBGeneCache[symbol] = {'result': []};
+            }
+        });
+    }
+}
+
+// Create links to the CivicDB resource from all variants shown in the mol char table
+function linkVariantCivicdb(el, symbol) {
+    $.ajax({
+        dataType: "json",
+        url: "https://civicdb.org/api/variants/typeahead_results?limit=1&query="+symbol,
+        success: function(data){
+            civicDBVariantCache[symbol] = data;
+            if (data.result.length > 0) {
+                var gene_id = data.result[0].gene_id;
+                var variant_id = data.result[0].variant_id;
+                var civic_url = "https://civicdb.org/events/genes/" + gene_id + "/summary/variants/" + variant_id + "/summary#variant";
+                $(el).html('<a target="_blank" href="' + civic_url + '">' + symbol + ' <i class="icon icon-generic" data-icon="x"> </i></a>');
+            }
+        },
+        error: function() {
+            civicDBVariantCache[symbol] = {'result':[]};
+        }
+    });
+}
+
+// Function to interrogate civicDB to create the gene and variant links
+function linkCivicdb(){
+    console.log("Re-establishing civic DB links")
+    var geneIndex = $('#molcharDataTable th:contains("HGNC Symbol")').index() + 1;
+    var variantIndex = $('#molcharDataTable th:contains("Amino Acid Change")').index() + 1;
+    var genes = $('#molcharDataTable tr td:nth-child(' + geneIndex + ')');
+    console.log("genes:" + genes)
+    var variants = $('#molcharDataTable tr td:nth-child(' + variantIndex + ')');
+    console.log("variants:" + variants)
+    genes.each(function() {
+        var symbol = $(this).html();
+        linkGeneCivicdb(this, symbol);
+    });
+    variants.each(function() {
+        var symbol = $(this).html();
+        linkVariantCivicdb(this, symbol);
+    });
+}
+
 
 function getMolecularDataTable(clickedLink, clickedData){
 
@@ -372,6 +446,7 @@ function displayMolecularDataTable(tableData, clickedData){
         var $th = jQuery('<th>'+tableData["tableHeaders"][i]+'</th>');
         $theadRow.append($th);
     }
+
     
     //add datarows to table
     var rowCount = tableData["tableRows"].length;
@@ -392,7 +467,9 @@ function displayMolecularDataTable(tableData, clickedData){
     $table.append($tbody);
     $targetDiv.append($table);
 
+
     customizeDatatable('molcharDataTable', clickedData[4]);
+
 
     $("#omicDataCount").html(rowCount);
     $("#clickedSampleId").html(clickedData[0]);
@@ -410,10 +487,12 @@ function displayMolecularDataTable(tableData, clickedData){
 
 
 
+
 function customizeDatatable(dTable, presentData){
 
     $('#'+dTable).DataTable(
         {
+            drawCallback : linkCivicdb(),
             info:     false,
             dom: '<"top"i>rt<"bottom"flp><"clear">',
             language: {
@@ -430,13 +509,11 @@ function customizeDatatable(dTable, presentData){
     );
 
     $(".dataTables_filter").hide();
-    $("#customSearch").html('<input type="text" id="omicSearch" placeholder="Search'+presentData+' ">');
+    $("#customSearch").html('<input style="height: 41px;" type="text" id="omicSearch" placeholder="Search'+presentData+' data">');
 
     oTable = $('#molcharDataTable').DataTable();
     $('#omicSearch').keyup(function(){
         oTable.search($(this).val()).draw();
     })
-
-
 
 }

@@ -466,6 +466,8 @@ public class CreateDataProjections implements CommandLineRunner{
         // Get out all platforms for all models and populate a map with the results
         Map<Long, List<String>> mutationPlatformsByModel = new HashMap<>();
         Map<Long, List<String>> cnaPlatformsByModel = new HashMap<>();
+        Map<Long, List<String>> cytogeneticsPlatformsByModel = new HashMap<>();
+
 
 
         Collection<ModelCreation> allModelsWithPlatforms = dataImportService.findAllModelsPlatforms();
@@ -501,6 +503,15 @@ public class CreateDataProjections implements CommandLineRunner{
                                             }
 
                                             cnaPlatformsByModel.get(mc.getId()).add(platformName);
+                                        }
+                                        else if (molc.getType().toLowerCase().equals("cytogenetics")) {
+
+                                            if (!cytogeneticsPlatformsByModel.containsKey(mc.getId())) {
+
+                                                cytogeneticsPlatformsByModel.put(mc.getId(), new ArrayList<>());
+                                            }
+
+                                            cytogeneticsPlatformsByModel.get(mc.getId()).add(platformName);
                                         }
 
                                     }
@@ -591,6 +602,11 @@ public class CreateDataProjections implements CommandLineRunner{
             if(dataImportService.isTreatmentSummaryAvailableOnModel(mc.getDataSource(), mc.getSourcePdxId())){
                 dataAvailable.add("Dosing Studies");
             }
+
+            if(cytogeneticsPlatformsByModel.containsKey(mc.getId())){
+                dataAvailable.add("Cytogenetics");
+            }
+
             try {
                 if (dataImportService.isTreatmentSummaryAvailableOnPatient(mc.getDataSource(), mc.getSourcePdxId())) {
                     dataAvailable.add("Patient Treatment");

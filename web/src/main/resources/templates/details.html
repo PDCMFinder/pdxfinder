@@ -893,17 +893,19 @@
 
 
 
-                                <div id="sizeSwitch" style="float: right; margin-top:-65px;">
+                                <div class="columns medium-6 small-12" id="sizeSwitch" style="float: right; margin-top:-65px; margin-right:-30px;">
 
-                                    <div id="customSearch" class="columns medium-6 small-6 text-right">
+                                    <div id="customSearch" class="columns medium-7 small-12 text-right" style="padding: 0px;">
                                         <!-- Datatable Search Box -->
                                     </div>
 
-                                    <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"
-                                       class="button outline secondary">
-                                        Download Results
-                                        <i class="icon icon-functional" data-icon="="></i>
-                                    </a>
+                                    <div class="columns medium-5 small-12 text-right" style="padding: 0px;">
+                                        <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"
+                                           class="button outline secondary">
+                                            Download Results
+                                            <i class="icon icon-functional" data-icon="="></i>
+                                        </a>
+                                    </div>
 
                                 </div>
 
@@ -1114,7 +1116,6 @@
         // showTabs(cnt);
     }*/
 
-
     // Check if variation tab is deeplinked on page load:
     $(document).ready(function () {
 
@@ -1131,6 +1132,7 @@
             }
         }
     });
+
 
 
 </script>
