@@ -628,7 +628,13 @@ public class SearchDS {
                 mfq.setModelId(parseLong(j.getString("modelId")));
                 mfq.setDatasource(j.getString("datasource"));
                 mfq.setExternalId(j.getString("externalId"));
-                mfq.setPatientAge(j.getString("patientAge"));
+                if(j.has("patientAge")){
+                    mfq.setPatientAge(j.getString("patientAge"));
+                }
+                else{
+                    mfq.setPatientAge("Not Specified");
+                }
+
                 mfq.setPatientGender(j.getString("patientGender"));
 
                 if(j.has("patientEthnicity")){

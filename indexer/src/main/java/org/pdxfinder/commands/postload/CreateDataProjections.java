@@ -583,8 +583,8 @@ public class CreateDataProjections implements CommandLineRunner{
         cancerSystemMap.put("Unclassified", "Unclassified");
 
         log.info("Creating ModelForQuery DataProjection");
-
-        for (ModelCreation mc : dataImportService.findModelsWithPatientData()) {
+        Collection<ModelCreation> modelsWitPatientData = dataImportService.findModelsWithPatientData();
+        for (ModelCreation mc : modelsWitPatientData) {
 
             ModelForQuery mfq = new ModelForQuery();
             mfq.setModelId(mc.getId());
