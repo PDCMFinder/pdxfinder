@@ -224,7 +224,7 @@ public class CreateDataProjections implements CommandLineRunner{
                             if(ihcResult.equals("pos") || ihcResult.equals("neg") || ihcResult.equals("Not applicable")){
 
                                 //discard markers that are not ER, HER2 or PR
-                                if(markerName.toLowerCase().equals("er") || markerName.toLowerCase().equals("her2") || markerName.toLowerCase().equals("pr")) {
+                                if(markerName.equals("ESR1") || markerName.equals("ERBB2") || markerName.equals("PGR")) {
 
 
                                     String key = modelId+"___"+samplePassage;
@@ -232,15 +232,20 @@ public class CreateDataProjections implements CommandLineRunner{
                                     if(!modelMarkerMap.containsKey(key)){
 
                                         TreeMap markerMap = new TreeMap();
-                                        markerMap.put("HER2", new HashSet<>());
-                                        markerMap.put("ER", new HashSet<>());
-                                        markerMap.put("PR", new HashSet<>());
+                                        markerMap.put("ERBB2", new HashSet<>());
+                                        markerMap.put("ESR1", new HashSet<>());
+                                        markerMap.put("PGR", new HashSet<>());
                                         modelMarkerMap.put(key, markerMap);
 
                                     }
 
-                                    modelMarkerMap.get(key).get(markerName).add(ihcResult);
-
+                                    try {
+                                        modelMarkerMap.get(key).get(markerName).add(ihcResult);
+                                    }
+                                    catch(Exception e){
+                                        e.printStackTrace();
+                                        log.error(key+" "+markerName+" "+ihcResult);
+                                    }
                                 }
                             }
                             else{
