@@ -179,6 +179,9 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                     me.setJustification(justification);
 
                     String key = dataSource + sampleDiagnosis + originTissue + tumorType;
+
+                    key = key.replaceAll("[^a-zA-Z0-9]","");
+
                     this.mappingRules.put(key, me);
                     log.info("Adding mappingrule "+mapId + " "+key);
                 }
@@ -219,10 +222,12 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
         6) ad -> adenocarcinoma
 
         */
+        String key = dataSource.toLowerCase() + diagnosis.toLowerCase() + originTissue.toLowerCase() + tumorType.toLowerCase();
+        key = key.replaceAll("[^a-zA-Z0-9]","");
 
-        if (this.mappingRules.containsKey(dataSource.toLowerCase() + diagnosis.toLowerCase() + originTissue.toLowerCase() + tumorType.toLowerCase())) {
+        if (this.mappingRules.containsKey(key)) {
 
-            return this.mappingRules.get(dataSource.toLowerCase() + diagnosis.toLowerCase() + originTissue.toLowerCase() + tumorType.toLowerCase());
+            return this.mappingRules.get(key);
         }
 
         //else return empty object
@@ -315,7 +320,12 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
         saveMappedTerms();
 
-        if (this.missingMappings.size() > 0) printAndSaveMissingMappings();
+        if (this.missingMappings.size() > 0) {
+            printAndSaveMissingMappings();
+        }
+        else{
+            log.info("YAY, we mapped all samples to an ontology term!");
+        }
     }
 
     private void insertMissingMapping(String id, MissingMapping mm) {
