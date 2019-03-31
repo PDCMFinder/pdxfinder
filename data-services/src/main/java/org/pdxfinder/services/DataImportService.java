@@ -1007,6 +1007,7 @@ public class DataImportService {
 
         Drug d = new Drug();
         d.setName(Standardizer.getDrugName(drugString));
+        if(d.getName().equals("Not Specified")) log.error("Unrecognised drug string: "+drugString);
 
         return d;
     }

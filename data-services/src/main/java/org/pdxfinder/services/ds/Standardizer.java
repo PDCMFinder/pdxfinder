@@ -262,6 +262,383 @@ public class Standardizer {
 
             return drug;
         }
+
+        else if(drug.equals("AZD1775")){
+            return "Adavosertib";
+        }
+        else if(drug.equals("MK1775")){
+            return "Adavosertib";
+        }
+        else if(drug.equals("MK-2206")){
+            return "Akt Inhibitor MK2206";
+        }
+        else if(drug.equals("Autologous Hematopoietic Stem Cell Transplantation")){
+            return "Autologous Hematopoietic Stem Cell Transplantation";
+        }
+        else if(drug.equals("Avastin")){
+            return "Avastin";
+        }
+        else if(drug.equals("5-Azacytidine")){
+            return "Azacitidine";
+        }
+        else if(drug.equals("BCG Vaccine")){
+            return "BCG Vaccine";
+        }
+        else if(drug.equals("BCG")){
+            return "BCG Vaccine";
+        }
+        else if(drug.equals("Bendamustine")){
+            return "Bendamustine";
+        }
+        else if(drug.equals("Bevacizumab")){
+            return "Bevacizumab";
+        }
+        else if(drug.equals("Bicalutamide")){
+            return "Bicalutamide";
+        }
+        else if(drug.equals("Biochemotherapy")){
+            return "Biochemotherapy";
+        }
+        else if(drug.equals("Cabazitaxel")){
+            return "Cabazitaxel";
+        }
+        else if(drug.equals("Cabozantinib")){
+            return "Cabozantinib";
+        }
+        else if(drug.equals("capecitabine")){
+            return "capecitabine";
+        }
+        else if(drug.equals("carboplatin")){
+            return "carboplatin";
+        }
+        else if(drug.equals("Celecoxib")){
+            return "Celecoxib";
+        }
+        else if(drug.equals("Cetuximab")){
+            return "Cetuximab";
+        }
+        else if(drug.equals("Undefined Chemoradiation")){
+            return "Chemoradiotherapy";
+        }
+        else if(drug.equals("Undefined Chemotherapy")){
+            return "Chemotherapy";
+        }
+        else if(drug.equals("chemotherapy ")){
+            return "chemotherapy ";
+        }
+        else if(drug.equals("chlorambucil")){
+            return "chlorambucil";
+        }
+        else if(drug.equals("Choline Kinase Alpha Inhibitor")){
+            return "Choline Kinase Alpha Inhibitor TCD-717";
+        }
+        else if(drug.equals("cisplatin")){
+            return "cisplatin";
+        }
+        else if(drug.equals("Cisplatin ")){
+            return "Cisplatin ";
+        }
+        else if(drug.equals("Undefined Clinical Trial")){
+            return "Clinical Trial";
+        }
+        else if(drug.equals("CAVATAK")){
+            return "Coxsackievirus A21";
+        }
+        else if(drug.equals("Cyclophosphamid ")){
+            return "Cyclophosphamid ";
+        }
+        else if(drug.equals("Cyclophosphamide")){
+            return "Cyclophosphamide";
+        }
+        else if(drug.equals("cytarabine")){
+            return "cytarabine";
+        }
+        else if(drug.equals("cytarabine ")){
+            return "cytarabine ";
+        }
+        else if(drug.equals("Dacarbazine")){
+            return "Dacarbazine";
+        }
+        else if(drug.equals("dacarbazine ")){
+            return "dacarbazine ";
+        }
+        else if(drug.equals("Dasatinib")){
+            return "Dasatinib";
+        }
+        else if(drug.equals("Decitabine")){
+            return "Decitabine";
+        }
+        else if(drug.equals("dexamethasone ")){
+            return "dexamethasone ";
+        }
+        else if(drug.equals("Docetaxel")){
+            return "Docetaxel";
+        }
+        else if(drug.equals("Doxorubicin Hcl Liposome Injection")){
+            return "Docetaxel/Doxorubicin HCl Liposome";
+        }
+        else if(drug.equals("doxorubicin")){
+            return "doxorubicin";
+        }
+        else if(drug.equals("doxorubicin ")){
+            return "doxorubicin ";
+        }
+        else if(drug.equals("elmustine")){
+        return "elmustine";
+    }
+else if(drug.equals("epirubicin")){
+            return "epirubicin";
+}
+else if(drug.equals("eribulin")){
+        return "eribulin";
+        }
+        else if(drug.equals("erlotinib")){
+        return "erlotinib";
+        }
+        else if(drug.equals("etoposide")){
+        return "etoposide";
+        }
+        else if(drug.equals("everolimus")){
+        return "everolimus";
+        }
+        else if(drug.equals("exemestane")){
+        return "exemestane";
+        }
+        else if(drug.equals("external Beam Radiation Therapy")){
+        return "external Beam Radiation Therapy ";
+        }
+        else if(drug.equals("Fluorouracil")){
+        return "Fluorouracil";
+        }
+        else if(drug.equals("5-Fluorouracil")){
+        return "Fluorouracil";
+        }
+        else if(drug.equals("Flutamide")){
+        return "Flutamide";
+        }
+        else if(drug.equals("Folic acid ")){
+        return "Folic acid ";
+        }
+        else if(drug.equals("Folinic acid")){
+        return "Folinic acid";
+        }
+        else if(drug.equals("Leucovorin")){
+        return "Folinic acid";
+        }
+        else if(drug.equals("folinic acid")){
+        return "folinic acid";
+        }
+        else if(drug.equals("FU-LV regimen")){
+        return "FU-LV regimen";
+        }
+        else if(drug.equals("Fulvestrant")){
+        return "Fulvestrant";
+        }
+        else if(drug.equals("Gemcitabine")){
+        return "Gemcitabine";
+        }
+        else if(drug.equals("ifosfamide")){
+        return "ifosfamide";
+        }
+        else if(drug.equals("Imatinib")){
+        return "Imatinib";
+        }
+        else if(drug.equals("Indimitecan")){
+        return "Indimitecan";
+        }
+        else if(drug.equals("Indotecan")){
+        return "Indotecan";
+        }
+        else if(drug.equals("Interferon")){
+        return "Interferon";
+        }
+        else if(drug.equals("Interferon Alpha")){
+        return "Interferon Alpha";
+        }
+        else if(drug.equals("Interleukin-2")){
+        return "Interleukin-2";
+        }
+        else if(drug.equals("Brachytherapy")){
+        return "Internal Radiation Therapy";
+        }
+        else if(drug.equals("Ipilimumab")){
+        return "Ipilimumab";
+        }
+        else if(drug.equals("irinotecan")){
+        return "irinotecan";
+        }
+        else if(drug.equals("Irinotecan")){
+        return "Irinotecan";
+        }
+        else if(drug.equals("Lenalidomide")){
+        return "Lenalidomide";
+        }
+        else if(drug.equals("Letrozole")){
+        return "Letrozole";
+        }
+        else if(drug.equals("Leuprolide")){
+        return "Leuprolide";
+        }
+        else if(drug.equals("leuvocorin")){
+        return "leuvocorin";
+        }
+        else if(drug.equals("Mesna")){
+        return "Mesna";
+        }
+        else if(drug.equals("methotrexate")){
+        return "methotrexate";
+        }
+        else if(drug.equals("TRC102")){
+        return "Methoxyamine";
+        }
+        else if(drug.equals("Mitomycin C")){
+        return "Mitomycin";
+        }
+        else if(drug.equals("mitoxantrone")){
+        return "mitoxantrone";
+        }
+        else if(drug.equals("nab-Paclitaxel")){
+        return "Nab-paclitaxel";
+        }
+        else if(drug.equals("Nivolumab")){
+        return "Nivolumab";
+        }
+        else if(drug.equals("Obinutuzumab")){
+        return "Obinutuzumab";
+        }
+        else if(drug.equals("Onalespib")){
+        return "Onalespib";
+        }
+        else if(drug.equals("oxaliplatin")){
+        return "oxaliplatin";
+        }
+        else if(drug.equals("Oxaliplatin ")){
+        return "Oxaliplatin ";
+        }
+        else if(drug.equals("Paclitaxel")){
+        return "Paclitaxel";
+        }
+        else if(drug.equals("Panitumumab")){
+        return "Panitumumab";
+        }
+        else if(drug.equals("pazopanib")){
+        return "pazopanib";
+        }
+        else if(drug.equals("Pazopanib hydrochloride")){
+        return "Pazopanib Hydrochloride";
+        }
+        else if(drug.equals("Pemetrexed")){
+        return "Pemetrexed";
+        }
+        else if(drug.equals("pimasertib")){
+        return "pimasertib";
+        }
+        else if(drug.equals("Pixantrone")){
+        return "Pixantrone";
+        }
+        else if(drug.equals("Prednisolone")){
+        return "Prednisolone";
+        }
+        else if(drug.equals("prednisolone ")){
+        return "prednisolone ";
+        }
+        else if(drug.equals("prednisone")){
+        return "prednisone";
+        }
+        else if(drug.equals("Procarbazine")){
+        return "Procarbazine";
+        }
+        else if(drug.equals("Radiation")){
+        return "Radiation Therapy";
+        }
+        else if(drug.equals("Radiotherapy")){
+        return "Radiotherapy";
+        }
+        else if(drug.equals("Regorafenib")){
+        return "Regorafenib";
+        }
+        else if(drug.equals("Rituximab")){
+        return "Rituximab";
+        }
+        else if(drug.equals("rituximab ")){
+        return "rituximab ";
+        }
+        else if(drug.equals("Romidepsin")){
+        return "Romidepsin";
+        }
+        else if(drug.equals("Selumetinib")){
+        return "Selumetinib";
+        }
+        else if(drug.equals("PX-866")){
+        return "Sonolisib";
+        }
+        else if(drug.equals("sorafenib")){
+        return "sorafenib";
+        }
+        else if(drug.equals("SUNITINIB MALATE")){
+        return "Sunitinib Malate";
+        }
+        else if(drug.equals("BMN-673")){
+        return "Talazoparib";
+        }
+        else if(drug.equals("TVEC")){
+        return "Talimogene Laherparepvec";
+        }
+        else if(drug.equals("Taxol")){
+        return "Taxol";
+        }
+        else if(drug.equals("Temozolomide")){
+        return "Temozolomide";
+        }
+        else if(drug.equals("Thiotepa")){
+        return "Thiotepa";
+        }
+        else if(drug.equals("Tipiracil hydrochloride")){
+        return "Tipiracil Hydrochloride";
+        }
+        else if(drug.equals("Titanium silicate")){
+        return "Titanium silicate";
+        }
+        else if(drug.equals("Tivantinib")){
+        return "Tivantinib";
+        }
+        else if(drug.equals("Topotecan")){
+        return "Topotecan";
+        }
+        else if(drug.equals("Trametinib")){
+        return "Trametinib";
+        }
+        else if(drug.equals("Trastuzumab")){
+        return "Trastuzumab";
+        }
+        else if(drug.equals("Trifluridine")){
+        return "Trifluridine";
+        }
+        else if(drug.equals("Vemurafenib")){
+        return "Vemurafenib";
+        }
+        else if(drug.equals("Vincristin")){
+        return "Vincristin";
+        }
+        else if(drug.equals("vincristine")){
+        return "vincristine";
+        }
+        else if(drug.equals("vincristine")){
+        return "vincristine";
+        }
+        else if(drug.equals("Vindesin ")){
+        return "Vindesin ";
+        }
+        else if(drug.equals("Vinorelbine")){
+        return "Vinorelbine";
+        }
+        else if(drug.equals("Ziv-Aflibercept")){
+        return "Ziv-Aflibercept";
+        }
+
+
+
+
         return "Not Specified";
     }
 
