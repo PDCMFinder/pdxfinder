@@ -4,8 +4,9 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.dao.OntologyTerm;
+import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ public class LoadDiseaseOntology implements CommandLineRunner {
     private static final String ontologyUrl = "http://www.ebi.ac.uk/ols/api/ontologies/doid/terms/";
 
     private DataImportService dataImportService;
+
+    @Autowired
+    private UtilityService utilityService;
 
     @Autowired
     public LoadDiseaseOntology(DataImportService dataImportService) {
@@ -107,7 +111,7 @@ public class LoadDiseaseOntology implements CommandLineRunner {
 
             System.out.println("Getting data from "+url);
 
-            String json = parseURL(url);
+            String json = utilityService.parseURL(url);
             requestCounter++;
             try {
                 JSONObject job = new JSONObject(json);
@@ -144,24 +148,6 @@ public class LoadDiseaseOntology implements CommandLineRunner {
 
         }
 
-    }
-
-    private String parseURL(String urlStr) {
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            URL url = new URL(urlStr);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(url.openStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine);
-            }
-            in.close();
-        } catch (Exception e) {
-            log.error("Unable to read from URL " + urlStr, e);
-        }
-        return sb.toString();
     }
 
 }

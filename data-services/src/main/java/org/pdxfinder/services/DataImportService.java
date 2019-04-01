@@ -7,17 +7,28 @@ package org.pdxfinder.services;
 
 //import org.apache.commons.cli.Option;
 import org.apache.commons.lang3.StringUtils;
-import org.pdxfinder.dao.*;
-import org.pdxfinder.repositories.*;
+import org.neo4j.ogm.json.JSONArray;
+import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.graph.repositories.*;
+import org.pdxfinder.services.ds.Harmonizer;
 import org.pdxfinder.services.ds.Standardizer;
+import org.pdxfinder.services.dto.LoaderDTO;
+import org.pdxfinder.services.dto.NodeSuggestionDTO;
+import org.pdxfinder.services.reporting.LogEntity;
+import org.pdxfinder.services.reporting.LogEntityType;
+import org.pdxfinder.services.reporting.MarkerLogEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import org.springframework.cache.annotation.Cacheable;
+import java.io.File;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The hope was to put a lot of reused repository actions into one place ie find
@@ -30,7 +41,7 @@ import java.util.Set;
 public class DataImportService {
 
     //public static Option loadAll = new Option("LoadAll", false, "Load all PDX Finder data");
-    
+
     private TumorTypeRepository tumorTypeRepository;
     private HostStrainRepository hostStrainRepository;
     private EngraftmentTypeRepository engraftmentTypeRepository;
@@ -58,6 +69,11 @@ public class DataImportService {
     private ExternalUrlRepository externalUrlRepository;
 
     private final static Logger log = LoggerFactory.getLogger(DataImportService.class);
+
+    private HashMap<String, Marker> markersBySymbol;
+    private HashMap<String, Marker> markersByPrevSymbol;
+    private HashMap<String, Marker> markersBySynonym;
+    private HashMap<String, NodeSuggestionDTO> notFoundMarkerSymbols;
 
     public DataImportService(TumorTypeRepository tumorTypeRepository,
                              HostStrainRepository hostStrainRepository,
@@ -125,6 +141,12 @@ public class DataImportService {
         this.currentTreatmentRepository = currentTreatmentRepository;
         this.externalUrlRepository = externalUrlRepository;
 
+        this.markersBySymbol = new HashMap<>();
+        this.markersByPrevSymbol = new HashMap<>();
+        this.markersBySynonym = new HashMap<>();
+        this.notFoundMarkerSymbols = new HashMap<>();
+
+
     }
 
     public Group getGroup(String name, String abbrev, String type){
@@ -142,15 +164,14 @@ public class DataImportService {
         return g;
     }
 
-    public Group getProviderGroup(String name, String abbrev, String description, String providerType, String accessibility,
-                                  String accessModalities, String contact, String url){
+    public Group getProviderGroup(String name, String abbrev, String description, String providerType, String contact, String url){
 
         Group g = groupRepository.findByNameAndType(name, "Provider");
 
         if(g == null){
             log.info("Provider group not found. Creating", name);
 
-            g = new Group(name, abbrev, description, providerType, accessibility, accessModalities, contact, url);
+            g = new Group(name, abbrev, description, providerType, contact, url);
             groupRepository.save(g);
 
         }
@@ -191,6 +212,22 @@ public class DataImportService {
         return g;
 
     }
+
+    public Group getAccessibilityGroup(String accessibility, String accessModalities){
+
+        Group g = groupRepository.findAccessGroupByAccessibilityAndAccessModalities(accessibility, accessModalities);
+
+        if(g == null){
+            log.info("Access group not found. Creating " + accessibility + " " + accessModalities);
+
+            g = new Group(accessibility, accessModalities);
+            g.setType("Accessibility");
+            groupRepository.save(g);
+
+        }
+        return g;
+    }
+
 
     public List<Group> getAllProviderGroups(){
 
@@ -438,7 +475,7 @@ public class DataImportService {
 
         return patient;
     }
-    
+
 
     public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, String dataSource) {
 
@@ -679,11 +716,12 @@ public class DataImportService {
 
     // is this bad? ... probably..
     public Marker getMarker(String symbol) {
+        log.error("MARKER METHOD WAS CALLED!");
         return this.getMarker(symbol, symbol);
     }
 
     public Marker getMarker(String symbol, String name) {
-
+        log.error("MARKER METHOD WAS CALLED!");
         Marker marker = markerRepository.findByName(name);
         if (marker == null && symbol != null) {
             marker = markerRepository.findBySymbol(symbol);
@@ -694,22 +732,6 @@ public class DataImportService {
             marker = markerRepository.save(marker);
         }
         return marker;
-    }
-
-    public MarkerAssociation getMarkerAssociation(String type, String markerSymbol, String markerName) {
-        Marker m = this.getMarker(markerSymbol, markerName);
-        MarkerAssociation ma = markerAssociationRepository.findByTypeAndMarkerName(type, m.getName());
-
-        if (ma == null && m.getSymbol() != null) {
-            ma = markerAssociationRepository.findByTypeAndMarkerSymbol(type, m.getSymbol());
-        }
-
-        if (ma == null) {
-            ma = new MarkerAssociation(type, m);
-            markerAssociationRepository.save(ma);
-        }
-
-        return ma;
     }
 
 
@@ -809,6 +831,11 @@ public class DataImportService {
 
         OntologyTerm ot = ontologyTermRepository.findByLabel(label);
         return ot;
+    }
+
+    public OntologyTerm findOntologyTermByUrl(String url){
+
+        return ontologyTermRepository.findByUrl(url);
     }
 
     public Collection<OntologyTerm> getAllOntologyTerms() {
@@ -923,7 +950,7 @@ public class DataImportService {
         if (m == null) {
             System.out.println("Marker is null");
         }
-        PlatformAssociation pa = platformAssociationRepository.findByPlatformAndMarker(p.getName(), p.getGroup().getName(), m.getSymbol());
+        PlatformAssociation pa = platformAssociationRepository.findByPlatformAndMarker(p.getName(), p.getGroup().getName(), m.getHgncSymbol());
         if (pa == null) {
             pa = new PlatformAssociation();
             pa.setPlatform(p);
@@ -934,9 +961,9 @@ public class DataImportService {
 
         return pa;
     }
-    
+
     public void savePlatformAssociation(PlatformAssociation pa){
-            platformAssociationRepository.save(pa);
+        platformAssociationRepository.save(pa);
     }
 
     public void saveDataProjection(DataProjection dp){
@@ -980,6 +1007,7 @@ public class DataImportService {
 
         Drug d = new Drug();
         d.setName(Standardizer.getDrugName(drugString));
+        if(d.getName().equals("Not Specified")) log.error("Unrecognised drug string: "+drugString);
 
         return d;
     }
@@ -1016,6 +1044,8 @@ public class DataImportService {
 
         TreatmentProtocol tp = new TreatmentProtocol();
 
+        if(doseString == null) doseString = "";
+
         //combination of drugs?
         if(drugString.contains("+") && doseString.contains(";")){
 
@@ -1035,13 +1065,37 @@ public class DataImportService {
                         tc.setDrug(d);
                         tp.addTreatmentComponent(tc);
                     }
+                    else{
+                        log.warn("Unrecognised drug name, skipping: "+drugString);
+
+                    }
 
                 }
 
             }
 
-            else{
-                //TODO: deal with the case when there are more drugs than doses or vice versa
+            else if (drugArray.length > 1 && doseArray.length == 1){
+
+                //use the same dosing for all drugs
+
+                for(int i=0;i<drugArray.length;i++){
+
+                    Drug d = getStandardizedDrug(drugArray[i].trim());
+                    TreatmentComponent tc = new TreatmentComponent();
+                    tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
+                    tc.setDose(doseArray[0].trim());
+                    //don't load unknown drugs
+                    if(!d.getName().equals("Not Specified")){
+                        tc.setDrug(d);
+                        tp.addTreatmentComponent(tc);
+                    }
+                    else{
+                        log.warn("Unrecognised drug name, skipping: "+drugString);
+
+                    }
+
+                }
+
             }
 
         }
@@ -1067,6 +1121,10 @@ public class DataImportService {
                             tc.setDrug(d);
                             tp.addTreatmentComponent(tc);
                         }
+                        else{
+                            log.warn("Unrecognised drug name, skipping: "+drugString);
+
+                        }
 
                     }
 
@@ -1090,6 +1148,10 @@ public class DataImportService {
                         tc.setDrug(d);
                         tp.addTreatmentComponent(tc);
                     }
+                    else{
+                        log.warn("Unrecognised drug name, skipping: "+drugString);
+
+                    }
                 }
             }
 
@@ -1101,11 +1163,20 @@ public class DataImportService {
             TreatmentComponent tc = new TreatmentComponent();
             tc.setType(Standardizer.getTreatmentComponentType(drugString));
             tc.setDrug(d);
-            tc.setDose(doseString.trim());
+            if(doseString != null) {
+                tc.setDose(doseString.trim());
+            }
+            else{
+                tc.setDose("");
+            }
             //don't load unknown drugs
             if(!d.getName().equals("Not Specified")){
                 tc.setDrug(d);
                 tp.addTreatmentComponent(tc);
+            }
+            else{
+                log.warn("Unrecognised drug name, skipping: "+drugString);
+
             }
         }
 
@@ -1164,5 +1235,235 @@ public class DataImportService {
 
         return dataProjectionRepository.findPlatformsWithoutUrl();
     }
+
+
+
+    public QualityAssurance getQualityAssurance(JSONObject data, String ds)  throws Exception{
+
+        QualityAssurance qa = new QualityAssurance();
+        String qaType = Standardizer.NOT_SPECIFIED;
+
+        if (ds.equals("JAX")){
+
+            String qaPassages = Standardizer.NOT_SPECIFIED;
+
+            // Pending or Complete
+            String qc = data.getString("QC");
+            if("Pending".equals(qc)){
+                qc = Standardizer.NOT_SPECIFIED;
+            }else{
+                qc = "QC is "+qc;
+            }
+            // the validation techniques are more than just fingerprint, we don't have a way to capture that
+            qa = new QualityAssurance("Fingerprint", qc, qaPassages);
+            saveQualityAssurance(qa);
+        }
+
+
+        if (ds.equals("PDXNet-HCI-BCM")){
+
+            // This multiple QA approach only works because Note and Passage are the same for all QAs
+            qa = new QualityAssurance(Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED,Standardizer.NOT_SPECIFIED);
+
+            StringBuilder technology = new StringBuilder();
+            if(data.has("QA")){
+                JSONArray qas = data.getJSONArray("QA");
+                for (int i = 0; i < qas.length(); i++) {
+                    if (qas.getJSONObject(i).getString("Technology").equalsIgnoreCase("histology")) {
+                        qa.setTechnology(qas.getJSONObject(i).getString("Technology"));
+                        qa.setDescription(qas.getJSONObject(i).getString("Note"));
+                        qa.setPassages(qas.getJSONObject(i).getString("Passage"));
+                    }
+                }
+            }
+
+        }
+
+
+
+        if (ds.equals("PDXNet-MDAnderson") || ds.equals("PDXNet-WUSTL")) {
+
+            try {
+                qaType = data.getString("QA") + " on passage " + data.getString("QA Passage");
+            } catch (Exception e) {
+                // not all groups supplied QA
+            }
+
+            String qaPassage = data.has("QA Passage") ? data.getString("QA Passage") : null;
+            qa = new QualityAssurance(qaType, Standardizer.NOT_SPECIFIED, qaPassage);
+            saveQualityAssurance(qa);
+        }
+
+
+        if (ds.equals("IRCC-CRC")) {
+
+            String FINGERPRINT_DESCRIPTION = "Model validated against patient germline.";
+
+            if ("TRUE".equals(data.getString("Fingerprinting").toUpperCase())) {
+                qa.setTechnology("Fingerprint");
+                qa.setDescription(FINGERPRINT_DESCRIPTION);
+
+                // If the model includes which passages have had QA performed, set the passages on the QA node
+                if (data.has("QA Passage") && !data.getString("QA Passage").isEmpty()) {
+
+                    List<String> passages = Stream.of(data.getString("QA Passage").split(","))
+                            .map(String::trim)
+                            .distinct()
+                            .collect(Collectors.toList());
+                    List<Integer> passageInts = new ArrayList<>();
+
+                    // NOTE:  IRCC uses passage 0 to mean Patient Tumor, so we need to harmonize according to the other
+                    // sources.  Subtract 1 from every passage.
+                    for (String p : passages) {
+                        Integer intPassage = Integer.parseInt(p);
+                        passageInts.add(intPassage - 1);
+                    }
+
+                    qa.setPassages(StringUtils.join(passageInts, ", "));
+                }
+            }
+
+        }
+
+
+        return qa;
+    }
+
+    @Cacheable
+    public Marker getMarkerBySymbol(String symbol){
+
+        return markerRepository.findBySymbol(symbol);
+    }
+
+    @Cacheable
+    public List<Marker> getMarkerByPrevSymbol(String symbol){
+
+        return markerRepository.findByPrevSymbol(symbol);
+    }
+
+    @Cacheable
+    public List<Marker> getMarkerBySynonym(String symbol){
+
+        return markerRepository.findBySynonym(symbol);
+    }
+
+    public NodeSuggestionDTO getSuggestedMarker(String reporter, String dataSource, String modelId, String symbol,
+                                                String characterizationType, String platform){
+
+        //not found key to avoid looking up not found symbols multiple times
+        //key: datasource + modelId + symbol
+        if(notFoundMarkerSymbols.containsKey(dataSource+modelId+symbol)) return notFoundMarkerSymbols.get(dataSource+modelId+symbol);
+
+        NodeSuggestionDTO nsdto = new NodeSuggestionDTO();
+        LogEntity le;
+        Marker m;
+        List<Marker> markerSuggestionList = null;
+        boolean ready = false;
+
+        //check if marker is cached
+        if(markersBySymbol.containsKey(symbol)){
+            m = markersBySymbol.get(symbol);
+            nsdto.setNode(m);
+            ready = true;
+        }
+        else if(markersByPrevSymbol.containsKey(symbol)){
+
+            m = markersByPrevSymbol.get(symbol);
+            le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Previous symbol");
+            nsdto.setLogEntity(le);
+            ready = true;
+        }
+        else if(markersBySynonym.containsKey(symbol)){
+
+            m = markersBySynonym.get(symbol);
+            le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Synonym");
+            nsdto.setLogEntity(le);
+            ready = true;
+        }
+
+        if(ready) return nsdto;
+
+        m = getMarkerBySymbol(symbol);
+
+        if(m != null){
+
+            //good, pass the marker
+            //no message
+            nsdto.setNode(m);
+            markersBySymbol.put(symbol, m);
+        }
+        else{
+
+            markerSuggestionList = getMarkerByPrevSymbol(symbol);
+
+            if(markerSuggestionList != null && markerSuggestionList.size() > 0){
+
+                if(markerSuggestionList.size() == 1){
+                    //symbol found in prev symbols
+                    m = markerSuggestionList.get(0);
+                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Previous symbol");
+                    nsdto.setNode(m);
+                    nsdto.setLogEntity(le);
+                    markersByPrevSymbol.put(symbol, m);
+                }
+                else{
+
+                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
+                    String prevMarkers = markerSuggestionList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
+
+                    le.setMessage("Previous symbol for multiple approved markers: "+prevMarkers);
+                    le.setType("ERROR");
+                    nsdto.setNode(null);
+                    nsdto.setLogEntity(le);
+                }
+
+                return nsdto;
+
+            }
+            else{
+
+                markerSuggestionList = getMarkerBySynonym(symbol);
+
+                if(markerSuggestionList != null && markerSuggestionList.size() > 0){
+
+                    if(markerSuggestionList.size() == 1){
+
+                        //symbol found in synonym
+                        m = markerSuggestionList.get(0);
+                        le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Synonym");
+
+                        nsdto.setNode(m);
+                        nsdto.setLogEntity(le);
+                        markersBySynonym.put(symbol, m);
+                    }
+                    else{
+                        le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
+                        String synonymMarkers = markerSuggestionList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
+                        le.setMessage("Synonym for multiple markers: "+synonymMarkers);
+                        le.setType("ERROR");
+                        nsdto.setNode(null);
+                        nsdto.setLogEntity(le);
+                    }
+
+                    return nsdto;
+                }
+                else{
+
+                    //error, didn't find the symbol anywhere
+                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
+                    le.setMessage(symbol +" is an unrecognised symbol");
+                    le.setType("ERROR");
+                    nsdto.setLogEntity(le);
+                    notFoundMarkerSymbols.put(dataSource+modelId+symbol, nsdto);
+                }
+            }
+
+        }
+
+
+
+        return nsdto;
+    }
+
 
 }

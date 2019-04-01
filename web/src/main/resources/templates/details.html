@@ -82,42 +82,40 @@
 
                     <div class="columns medium-4 small-12 margin-top-30">
                         <h4 class="pdxBig"><span class="float-left border-color-black"
-                                                 th:text="${data.modelId+': '+data.mappedOntology}"></span></h4>
+                                                 th:text="${data.modelId+': '+data.mappedOntologyTermLabel}"></span>
+                        </h4>
                     </div>
 
                     <div class="columns medium-4 small-12 margin-top-30">
-                        <h4 class="pdxBig black"><span class="float-left" th:text="${data.sourceName}"> The Jackson Laboratory </span>
+                        <h4 class="pdxBig black"><span class="float-left" th:text="${data.providerName}"> The Jackson Laboratory </span>
                         </h4>
                     </div>
 
                     <div class="columns medium-4 small-12 shiftUp20">
+                                                <!--
+                                                <a th:href="@{'mailto:'+${data.contactProviderUrl+'?subject='+data.modelId}}"
+                                                   th:if="${ data.contactProviderUrl != null && #strings.contains(data.contactProviderUrl,'@')}">
+                                                    <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
+                                                </a>
+                                                -->
 
-                        <a th:href="@{'mailto:'+${data.contacts+'?subject='+data.modelId}}"
-                           th:if="${ data.contacts != null && #strings.contains(data.contacts,'@')}">
-                            <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
-                        </a>
+                                                <a th:href="@{'mailto:'+${data.contactProviderUrl+'?subject='+data.modelId}}"
+                                                   th:if="${data.contactProviderUrl != null &&  #strings.contains(data.contactProviderUrl,'@')}">
+                                                    <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
+                                                </a>
+
+                                                <a th:href="@{${data.contactProviderUrl}}" th:target="_blank"
+                                                   th:if="${data.contactProviderUrl != null && #strings.contains(data.contactProviderUrl,'http') }">
+                                                    <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
+                                                </a>
 
 
-                        <a th:href="@{'mailto:'+${data.externalUrl+'?subject='+data.modelId}}"
-                           th:if="${data.externalUrl != null &&  #strings.contains(data.externalUrl,'@')}">
-                            <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
-                        </a>
 
-                        <a th:href="@{${data.contacts}}" th:target="_blank"
-                           th:if="${data.contacts != null && #strings.contains(data.contacts,'http') }">
-                            <h4 class="button more uppercase margin-top-large minwidth300 card-3b">Contact Provider</h4>
-                        </a>
-
-                        <!--<a th:href="@{${data.contacts}}" th:target="_blank"     && #strings.endsWith(data.contacts,'=')
-                           th:if="${#strings.contains(data.contacts,'http') && not #strings.endsWith(data.contacts,'=')}">
-                            <h4 class="button more uppercase margin-top-large minwidth300">Contact Provider</h4>
-                        </a> -->
-
-                        <a th:href="@{${data.externalUrl}}" th:target="_blank"
-                           th:if="${data.externalUrl != null && #strings.contains(data.externalUrl,'http')}">
-                            <h4 class="button outline uppercase margin-top-large minwidth300 shiftUp10 card-3b"
-                                th:text="${data.externalUrlText}">View at Provider</h4>
-                        </a>
+                                                <a th:href="@{${data.viewDataAtUrl}}" th:target="_blank"
+                                                   th:if="${data.viewDataAtUrl != null && #strings.contains(data.viewDataAtUrl,'http')}">
+                                                    <h4 class="button outline uppercase margin-top-large minwidth300 shiftUp10 card-3b"
+                                                        th:text="${data.viewDataAtLabel}">View at Provider</h4>
+                                                </a>
 
                         <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/pdf'}"
                            th:target="_blank"
@@ -135,10 +133,11 @@
             <section class="row large-10 medium-12 expanded" id="detailsData">
 
                 <div class="row large-12 medium-12 expanded">
-                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                    <ul class="tabs style-2" data-deep-link="true" data-tabs id="example2-tabs">
 
                         <li class="tabs-title is-active">
-                            <a href="#summary" aria-selected="true" style="font-size: 15px; padding: 15px;"> PDX Model </a>
+                            <a href="#summary" aria-selected="true" style="font-size: 15px; padding: 15px;"> PDX
+                                Model </a>
                         </li>
 
 
@@ -146,30 +145,34 @@
                             <a href="#patients" style="font-size: 15px; padding: 15px;"> Patient </a>
                         </li>
 
-                        <li th:if="${ #lists.isEmpty(data.dataSummary)}"
+
+                        <li th:if="${ #lists.isEmpty(data.molecularDataRows)}"
                             class="tabs-title ">
-                            <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link" onclick="initTabs('0')">
+                            <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link"
+                               onclick="initTabs('0')">
                                 Molecular Data (0)
                             </a>
                         </li>
 
-                        <li th:if="${ not #lists.isEmpty(data.dataSummary) }"
+                        <li th:if="${ not #lists.isEmpty(data.molecularDataRows) }"
                             class="tabs-title ">
-                            <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link" onclick="initTabs('0')">
+                            <a href="#variation" style="font-size: 15px; padding: 15px;" id="variation_data_link"
+                               onclick="initTabs('0')">
                                 Molecular Data
-                                (<span th:text="${data.xenograftDataSize}"> ... </span>) <!-- #lists.size(data.dataSummary) -->
+                                (<span th:text="${data.molecularDataEntrySize}"> ... </span>)
                             </a>
                         </li>
 
 
-                        <li th:if="${data.drugSummaryRowNumber} == 0" class="tabs-title">
+                        <li th:if="${data.dosingStudyNumbers} == 0" class="tabs-title">
                             <a href="#dosing_studies" style="font-size: 15px; padding: 15px;">Dosing study (0)</a>
                         </li>
 
 
-                        <li th:if="${data.drugSummaryRowNumber} > 0" class="tabs-title">
+                        <li th:if="${data.dosingStudyNumbers} > 0" class="tabs-title">
                             <a href="#dosing_studies" style="font-size: 15px; padding: 15px;">Dosing study (1)</a>
                         </li>
+
 
                     </ul>
 
@@ -195,18 +198,19 @@
 
                                         <tr>
                                             <th class="text-left medium-4">Sex</th>
-                                            <td th:text="${data.gender}"></td>
+                                            <td th:text="${data.patientSex}"></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left medium-4">Age at Time of Collection</th>
-                                            <td th:text="${data.ageAtCollection}"></td>
+                                            <td th:text="${data.ageAtTimeOfCollection}"></td>
                                         </tr>
                                         <tr>
                                             <th class="text-left medium-4">Race / Ethnicity</th>
                                             <td>
-                                                <span th:text="${data.race}"></span>
                                                 <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
                                                 <span th:text="${data.ethnicity}"></span>
+
+
                                             </td>
                                         </tr>
                                         <tr th:if="${not #lists.isEmpty(data.relatedModels)}">
@@ -233,17 +237,18 @@
 
                                         <tr>
                                             <th class="text-left medium-4">Histology</th>
-                                            <td class="text-left"><span th:text="${data.mappedOntology}"></span></td>
+                                            <td class="text-left"><span
+                                                    th:text="${data.mappedOntologyTermLabel}"></span></td>
                                         </tr>
 
                                         <tr>
                                             <th class="text-left medium-4">Primary Tissue</th>
-                                            <td class="text-left" th:text="${data.originTissue}"></td>
+                                            <td class="text-left" th:text="${data.primaryTissue}"></td>
                                         </tr>
 
                                         <tr>
                                             <th class="text-left medium-4">Collection Site</th>
-                                            <td class="text-left" th:text="${data.sampleSite}"></td>
+                                            <td class="text-left" th:text="${data.collectionSite}"></td>
                                         </tr>
 
                                         <tr>
@@ -319,10 +324,10 @@
                                         </tr>
                                         <tr>
                                             <th> Host Strain Name</th>
-                                            <th>  Site</th>
-                                            <th>  Type</th>
-                                            <th>  Material</th>
-                                            <th>  Material Status</th>
+                                            <th> Site</th>
+                                            <th> Type</th>
+                                            <th> Material</th>
+                                            <th> Material Status</th>
                                             <th>Passage</th>
                                         </tr>
                                         </thead>
@@ -357,10 +362,10 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr th:each="qa, iter : ${data.qualityAssurances}">
-                                            <td th:text="${qa.technology}" class="capt-text"></td>
+                                        <tr th:each="qa, iter : ${data.modelQualityControl}">
+                                            <td th:text="${qa.technique}" class="capt-text"></td>
                                             <td th:text="${qa.description}" class="capt-text"></td>
-                                            <td th:text="${qa.passages}" class="capt-text"></td>
+                                            <td th:text="${qa.passage}" class="capt-text"></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -374,76 +379,70 @@
                     </div>
 
 
-
-
-
-
-
-
                     <div class="tabs-panel" id="patients">
 
-                            <!-- Tabs Section
-                            <section class="row large-12 medium-12 expanded" id="detailsData">
-                                <div class="row large-12 medium-12 expanded">
-                                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
-                                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Patient at Tumor Collection </a></li>
-                                    </ul>
-                                </div>
+                        <!-- Tabs Section
+                        <section class="row large-12 medium-12 expanded" id="detailsData">
+                            <div class="row large-12 medium-12 expanded">
+                                <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                                    <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Patient at Tumor Collection </a></li>
+                                </ul>
+                            </div>
 
-                                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
-                                    <div class="tabs-panel is-active" id="summary">
+                            <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                                <div class="tabs-panel is-active" id="summary">
 
-                                        <div class="row large-12 medium-12 expanded">
+                                    <div class="row large-12 medium-12 expanded">
 
-                                            <div class="columns medium-12 small-12 margin-top-10 card-3">
-                                                <div class="responsive-table" style="margin-top: 20px;">
-                                                    <table class="pdx-table head-left">
-                                                        <tbody>
-                                                        <tr>
-                                                            <th class="text-left medium-4">Gender</th>
-                                                            <td th:text="${data.patient.gender}"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th class="text-left medium-4"> Age at Diagnosis</th>
-                                                            <td th:text="${data.patient.ageAtDiagnosis}"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th class="text-left medium-4">Disease Body Location</th>
-                                                            <td th:text="${data.patient.diseaseBodyLocation}"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th class="text-left medium-4">CTEP SDC Code</th>
-                                                            <td th:text="${data.patient.CTEPSDCCode}"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th class="text-left medium-4">Diagnosis Subtype</th>
-                                                            <td th:text="${data.patient.diagnosisSubtype}"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th class="text-left medium-4">Race / Ethnicity</th>
-                                                            <td th:text="${data.patient.raceAndEthnicity}"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th class="text-left medium-4">Sex</th>
-                                                            <td th:text="${data.patient.gender}"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th class="text-left medium-4">Race / Ethnicity</th>
-                                                            <td>
-                                                                <span th:text="${data.race}"></span>
-                                                                <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
-                                                                <span th:text="${data.ethnicity}"></span>
-                                                            </td>
-                                                        </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-
+                                        <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                            <div class="responsive-table" style="margin-top: 20px;">
+                                                <table class="pdx-table head-left">
+                                                    <tbody>
+                                                    <tr>
+                                                        <th class="text-left medium-4">Gender</th>
+                                                        <td th:text="${data.patient.gender}"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="text-left medium-4"> Age at Diagnosis</th>
+                                                        <td th:text="${data.patient.ageAtDiagnosis}"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="text-left medium-4">Disease Body Location</th>
+                                                        <td th:text="${data.patient.diseaseBodyLocation}"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="text-left medium-4">CTEP SDC Code</th>
+                                                        <td th:text="${data.patient.CTEPSDCCode}"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="text-left medium-4">Diagnosis Subtype</th>
+                                                        <td th:text="${data.patient.diagnosisSubtype}"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="text-left medium-4">Race / Ethnicity</th>
+                                                        <td th:text="${data.patient.raceAndEthnicity}"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="text-left medium-4">Sex</th>
+                                                        <td th:text="${data.patient.gender}"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="text-left medium-4">Race / Ethnicity</th>
+                                                        <td>
+                                                            <span th:text="${data.race}"></span>
+                                                            <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
+                                                            <span th:text="${data.ethnicity}"></span>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
-                            </section> -->
+                            </div>
+                        </section> -->
 
 
                         <!--
@@ -490,157 +489,160 @@
                             </section>-->
 
 
+                        <section class="row large-12 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+
+                            <div class="row large-12 medium-12 expanded">
+                                <ul class="tabs style-2" data-deep-link="true" data-tabs id="example2-tabs">
+                                    <li class="tabs-title is-active"><a href="#initialDiagnosis"
+                                                                        aria-selected="true"
+                                                                        style="font-size: 15px; padding: 15px;">
+                                        Patient Tumor Collection For PDX Model </a></li>
+                                </ul>
+                            </div>
 
 
+                            <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                                <div class="tabs-panel is-active" id="summary">
 
-                            <section class="row large-12 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
+                                    <div class="row large-12 medium-12 expanded">
 
-                                <div class="row large-12 medium-12 expanded">
-                                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
-                                        <li class="tabs-title is-active"><a href="#initialDiagnosis"
-                                                                            aria-selected="true"
-                                                                            style="font-size: 15px; padding: 15px;">
-                                            Patient Tumor Collection For PDX Model </a></li>
-                                    </ul>
-                                </div>
+                                        <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                            <div class="responsive-table" style="margin-top: 20px;">
+                                                <table class="pdx-table head-left">
+                                                    <thead>
+                                                    <th></th>
+                                                    <th:block
+                                                            th:if="${not #lists.isEmpty(data.patient.collectionEvents)}"
+                                                            th:each="event, iter : ${data.patient.collectionEvents}">
 
+                                                        <th th:if="${event.pdxMouse != data.modelId}"
+                                                            th:text="${'Collection '} + ${' (Other Model)'}">
+                                                            Collection
+                                                        </th>
+                                                        <th th:if="${event.pdxMouse == data.modelId}"
+                                                            th:text="${'Collection '} + ${' (Current Model)'}">
+                                                            Collection
+                                                        </th>
 
+                                                    </th:block>
+                                                    </thead>
+                                                    <tbody>
 
+                                                    <th:block
+                                                            th:if="${not #lists.isEmpty(data.patient.collectionEvents)}">
 
-                                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
-                                    <div class="tabs-panel is-active" id="summary">
+                                                        <tr>
+                                                            <th class="text-left medium-4">Age</th>
 
-                                        <div class="row large-12 medium-12 expanded">
+                                                            <th:block
+                                                                    th:each="event : ${data.patient.collectionEvents}">
+                                                                <td th:text="${event.age}"
+                                                                    th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
+                                                                    ... AGE ...
+                                                                </td>
+                                                            </th:block>
+                                                        </tr>
 
-                                            <div class="columns medium-12 small-12 margin-top-10 card-3">
-                                                <div class="responsive-table" style="margin-top: 20px;">
-                                                    <table class="pdx-table head-left">
-                                                        <thead>
-                                                        <th> </th>
-                                                        <th:block th:if="${not #lists.isEmpty(data.patient.collectionEvents)}"
-                                                                  th:each="event, iter : ${data.patient.collectionEvents}">
+                                                        <tr>
+                                                            <th class="text-left medium-4"> Diagnosis</th>
 
-                                                            <th th:if="${event.pdxMouse != data.modelId}"
-                                                                th:text="${'Collection '} + ${' (Other Model)'}">
-                                                                Collection
-                                                            </th>
-                                                            <th th:if="${event.pdxMouse == data.modelId}"
-                                                                th:text="${'Collection '} + ${' (Current Model)'}">
-                                                                Collection
-                                                            </th>
+                                                            <th:block
+                                                                    th:each="event : ${data.patient.collectionEvents}">
+                                                                <td th:text="${event.diagnosis}"
+                                                                    th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
+                                                                    ... DIAGNOSIS ...
+                                                                </td>
+                                                            </th:block>
+                                                        </tr>
 
-                                                        </th:block>
-                                                        </thead>
-                                                        <tbody>
+                                                        <tr>
+                                                            <th class="text-left medium-4"> Type</th>
 
-                                                        <th:block th:if="${not #lists.isEmpty(data.patient.collectionEvents)}">
+                                                            <th:block
+                                                                    th:each="event : ${data.patient.collectionEvents}">
+                                                                <td th:text="${event.type}"
+                                                                    th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
+                                                                    ... TYPE ...
+                                                                </td>
+                                                            </th:block>
+                                                        </tr>
 
-                                                            <tr>
-                                                                <th class="text-left medium-4">Age</th>
+                                                        <tr>
+                                                            <th class="text-left medium0-4"> PDX Mouse</th>
+                                                            <th:block
+                                                                    th:each="event : ${data.patient.collectionEvents}">
 
-                                                                <th:block th:each="event : ${data.patient.collectionEvents}">
-                                                                    <td th:text="${event.age}"
-                                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
-                                                                        ... AGE ...
-                                                                    </td>
-                                                                </th:block>
-                                                            </tr>
+                                                                <td th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
 
-                                                            <tr>
-                                                                <th class="text-left medium-4"> Diagnosis</th>
-
-                                                                <th:block th:each="event : ${data.patient.collectionEvents}">
-                                                                    <td th:text="${event.diagnosis}"
-                                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
-                                                                        ... DIAGNOSIS ...
-                                                                    </td>
-                                                                </th:block>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <th class="text-left medium-4"> Type </th>
-
-                                                                <th:block th:each="event : ${data.patient.collectionEvents}">
-                                                                    <td th:text="${event.type}"
-                                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
-                                                                        ... TYPE ...
-                                                                    </td>
-                                                                </th:block>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <th class="text-left medium0-4"> PDX Mouse</th>
-                                                                <th:block th:each="event : ${data.patient.collectionEvents}">
-
-                                                                    <td th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
-
-                                                                        <span th:if="${#strings.equals(event.pdxMouse, data.modelId) }" th:text="${event.pdxMouse}">
+                                                                        <span th:if="${#strings.equals(event.pdxMouse, data.modelId) }"
+                                                                              th:text="${event.pdxMouse}">
                                                                          ... MODELID ...
                                                                         </span>
 
-                                                                        <span th:if="${not #strings.equals(event.pdxMouse, data.modelId) }">
+                                                                    <span th:if="${not #strings.equals(event.pdxMouse, data.modelId) }">
                                                                             <a th:text="${event.pdxMouse}"
-                                                                               th:href="@{'/pdx/'+${data.dataSource}+'/'+${event.pdxMouse}}" target="_blank"> ... MODELID ... </a>
+                                                                               th:href="@{'/pdx/'+${data.dataSource}+'/'+${event.pdxMouse}}"
+                                                                               target="_blank"> ... MODELID ... </a>
                                                                         </span>
-                                                                    </td>
+                                                                </td>
 
-                                                                </th:block>
-                                                            </tr>
+                                                            </th:block>
+                                                        </tr>
 
-                                                            <tr>
-                                                                <th class="text-left medium-4">Collection Site</th>
+                                                        <tr>
+                                                            <th class="text-left medium-4">Collection Site</th>
 
-                                                                <th:block th:each="event : ${data.patient.collectionEvents}">
-                                                                    <td th:text="${event.collectionSite}"
-                                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
-                                                                        ... COLLECTION SITE ...
-                                                                    </td>
-                                                                </th:block>
-                                                            </tr>
-
-                                                            <!--<tr>
-                                                            <th class="text-left medium-4">Data</th>
-
-                                                            <th:block th:each="event : ${data.patient.collectionEvents}">
-                                                                <td th:text="${event.data}"
+                                                            <th:block
+                                                                    th:each="event : ${data.patient.collectionEvents}">
+                                                                <td th:text="${event.collectionSite}"
                                                                     th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
-                                                                    ... DATASET ...
+                                                                    ... COLLECTION SITE ...
                                                                 </td>
                                                             </th:block>
-                                                            </tr> -->
-
-
-                                                        </th:block>
-
-                                                        </tbody>
-                                                    </table>
-
-                                                    <table class="pdx-table head-left"  >
-                                                        <tbody>
-                                                        <tr>
-                                                            <th class="text-left medium-4">Sex</th>
-                                                            <td th:text="${data.patient.gender}"></td>
                                                         </tr>
-                                                        <tr>
-                                                            <th class="text-left medium-4">Race / Ethnicity</th>
-                                                            <td>
-                                                                <span th:text="${data.race}"></span>
-                                                                <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
-                                                                <span th:text="${data.ethnicity}"></span>
+
+                                                        <!--<tr>
+                                                        <th class="text-left medium-4">Data</th>
+
+                                                        <th:block th:each="event : ${data.patient.collectionEvents}">
+                                                            <td th:text="${event.data}"
+                                                                th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
+                                                                ... DATASET ...
                                                             </td>
-                                                        </tr>
-                                                        </tbody>
-                                                    </table>
-
-                                                </div>
+                                                        </th:block>
+                                                        </tr> -->
 
 
+                                                    </th:block>
+
+                                                    </tbody>
+                                                </table>
+
+                                                <table class="pdx-table head-left">
+                                                    <tbody>
+                                                    <tr>
+                                                        <th class="text-left medium-4">Sex</th>
+                                                        <td th:text="${data.patient.gender}"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="text-left medium-4">Race / Ethnicity</th>
+                                                        <td>
+                                                            <span th:text="${data.race}"></span>
+                                                            <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
+                                                            <span th:text="${data.ethnicity}"></span>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
 
                                             </div>
+
+
                                         </div>
                                     </div>
                                 </div>
-                            </section>
+                            </div>
+                        </section>
 
 
                         <!-- Disable Current Treatment Table
@@ -709,85 +711,92 @@
                                  th:if="${ #bools.isTrue(data.patient.treatmentExists) } ">
 
                             <div class="row large-12 medium-12 expanded">
-                                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
-                                        <li class="tabs-title is-active"><a href="#initialDiagnosis"
-                                                                            aria-selected="true"
-                                                                            style="font-size: 15px; padding: 15px;">
-                                            Patient Therapies & Response </a></li>
-                                    </ul>
-                                </div>
+                                <ul class="tabs style-2" data-deep-link="true" data-tabs id="example2-tabs">
+                                    <li class="tabs-title is-active"><a href="#initialDiagnosis"
+                                                                        aria-selected="true"
+                                                                        style="font-size: 15px; padding: 15px;">
+                                        Patient Therapies & Response </a></li>
+                                </ul>
+                            </div>
 
-                                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
-                                    <div class="tabs-panel is-active" id="summary">
+                            <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                                <div class="tabs-panel is-active" id="summary">
 
-                                        <!-- Summary first row -->
-                                        <div class="row large-12 medium-12 expanded">
+                                    <!-- Summary first row -->
+                                    <div class="row large-12 medium-12 expanded">
 
-                                            <div class="columns medium-12 small-12 margin-top-10 card-3">
-                                                <div class="responsive-table" style="margin-top: 20px;">
-                                                    <table class="pdx-table head-left">
-                                                        <thead>
-                                                        <th> Date Regimen Started </th>
-                                                        <th> Regimen </th>
-                                                        <th> Dose </th>
-                                                        <th> Best Response </th>
-                                                        <th> Duration (Months)</th>
-                                                        </thead>
-                                                        <tbody>
-
-
-                                                        <th:block th:if="${not #lists.isEmpty(data.patient.treatmentSummaries)}"
-                                                                  th:each="treatment : ${data.patient.treatmentSummaries}">
-
-                                                            <tr  th:if="${ #bools.isFalse(treatment.current) } ">
-
-                                                                <th class="text-left medium-4 capt-text"
-                                                                    th:text="${treatment.treatmentDate}"> ...DATE... </th>
-
-                                                                <td th:text="${treatment.drugNames}"></td>
-                                                                <td th:text="${treatment.dose}">  </td>
-                                                                <td th:text="${treatment.response}">  </td>
-                                                                <td th:text="${treatment.duration}"> </td>
-
-                                                            </tr>
-
-                                                        </th:block>
+                                        <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                            <div class="responsive-table" style="margin-top: 20px;">
+                                                <table class="pdx-table head-left">
+                                                    <thead>
+                                                    <th> Date Regimen Started</th>
+                                                    <th> Regimen</th>
+                                                    <th> Dose</th>
+                                                    <th> Best Response</th>
+                                                    <th> Duration (Months)</th>
+                                                    </thead>
+                                                    <tbody>
 
 
-                                                        <th:block
-                                                                th:if="${not #lists.isEmpty(data.patient.treatmentSummaries)}"
-                                                                th:each="treatment : ${data.patient.treatmentSummaries}">
+                                                    <th:block
+                                                            th:if="${not #lists.isEmpty(data.patient.treatmentSummaries)}"
+                                                            th:each="treatment : ${data.patient.treatmentSummaries}">
 
-                                                            <tr th:if="${ #bools.isTrue(treatment.current) } ">
+                                                        <tr th:if="${ #bools.isFalse(treatment.current) } ">
 
-                                                                <th class="text-left medium-4"
-                                                                    th:text="${treatment.treatmentDate+' (Current)'}">
-                                                                    ...DATE...
-                                                                </th>
+                                                            <th class="text-left medium-4 capt-text"
+                                                                th:text="${treatment.treatmentDate}"> ...DATE...
+                                                            </th>
 
-                                                                <td th:text="${treatment.drugNames}"></td>
-                                                                <td th:text="${treatment.dose}"></td>
+                                                            <td th:text="${treatment.drugNames}"></td>
+                                                            <td th:text="${treatment.dose}"></td>
+                                                            <td th:text="${treatment.response}"></td>
+                                                            <td th:text="${treatment.duration}"></td>
+
+                                                        </tr>
+
+                                                    </th:block>
 
 
-                                                                <td th:text="${treatment.response}"></td>
-                                                                <td th:text="${treatment.duration}"></td>
+                                                    <th:block
+                                                            th:if="${not #lists.isEmpty(data.patient.treatmentSummaries)}"
+                                                            th:each="treatment : ${data.patient.treatmentSummaries}">
 
-                                                            </tr>
+                                                        <tr th:if="${ #bools.isTrue(treatment.current) } ">
 
-                                                        </th:block>
+                                                            <th class="text-left medium-4"
+                                                                th:text="${treatment.treatmentDate+' (Current)'}">
+                                                                ...DATE...
+                                                            </th>
 
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                                            <td th:text="${treatment.drugNames}"></td>
+                                                            <td th:text="${treatment.dose}"></td>
 
+
+                                                            <td th:text="${treatment.response}"></td>
+                                                            <td th:text="${treatment.duration}"></td>
+
+                                                        </tr>
+
+                                                    </th:block>
+
+                                                    </tbody>
+                                                </table>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
-                            </section>
-                        
+                            </div>
+                        </section>
+
 
                     </div>
+
+
+
+
+
 
 
 
@@ -796,278 +805,199 @@
                     <div class="tabs-panel is-active" id="variation">
 
 
-                        <div class="row large-12 medium-12 expanded" id="variationTableData">
+                        <div class="row large-12 medium-12 expanded" id="variationTableSummary">
 
-                            <!-- Start of Patient variation data
-                            <div class="tab" role="tabpanel" th:if="${data.patientTech.size() > 0}">
+                            <div class="tab hideContent0" role="tabpanel" th:if="${data.molecularDataRows.size() > 0}">
 
-                                <ul class="nav nav-tabs" role="tablist">
-                                    <li th:each="technology,iter : ${data.patientTech}"
-                                        th:class="( ${iter.index} == 0 ) ? 'active' : '' "
-                                        role="presentation">
-
-                                        <a th:href="@{'#'+${technology.key}}"
-                                           th:text="${technology.key}+' Platform'" role="tab" data-toggle="tab"
-                                           th:onclick="'showTabs('+${iter.index}+')'"> TAB TITLES </a>
-
-                                    </li>
-                                </ul>
-
-
-
-
-                                <div class="tab-content">
-                                    <div th:each="technology,iter : ${data.patientTech}"
-                                         th:id="${technology.key}"
-                                         class="tab-pane active" role="tabpanel">
-
-
-                                                <span>
-                                                        <div class="table-responsive" th:classappend="( ${iter.index} == 0 ) ? 'hideContent' : 'hideContent' ">
-
-                                                            <b class="bLine">
-                                                                <span class="hdc">Tumor Type: </span>            <i>Patient Tumor</i>                  &nbsp; &nbsp;
-                                                                <span class="hdc">Histology:</span> <i
-                                                                    th:text="${#strings.capitalize(data.diagnosis)}"></i>     &nbsp; &nbsp;
-                                                                <span class="hdc">Grade: </span>  <i></i>
-                                                            </b>
-
-                                                            <table id="pdxFinder-grid"
-                                                                   class="unstriped pdx-table">
-
-                                                                <thead>
-                                                                <tr>
-                                                                    <th>Sample </th>
-                                                                    <th>Platform(s)</th>
-                                                                    <th>Chromosome</th>
-                                                                    <th>Seq. Position</th>
-                                                                    <th>Ref. Allele</th>
-                                                                    <th>Alt. Allele</th>
-                                                                    <th>Consequence</th>
-                                                                    <th>Gene</th>
-                                                                    <th>Amino Acid Change</th>
-                                                                    <th>Read Depth</th>
-                                                                    <th>Allele Freq.</th>
-                                                                    <th>RS Variants</th>
-                                                                </tr>
-                                                                </thead>
-                                                            </table>
-                                                        </div>
-
-                                                </span>
-
-                                    </div>
-                                </div>
-
-                            </div>
-                            End of Patient Variation Data -->
-
-
-                            <!-- Start of Xenograft Variation data-->
-                            <div class="tab hideContent0" role="tabpanel" th:if="${data.modelTechAndPassages.size() > 0}">
-
-                                <div  th:if="${not #lists.isEmpty(data.dataSummary)}" class="row large-12 medium-12 expanded">
+                                <div th:if="${not #lists.isEmpty(data.molecularDataRows)}"
+                                     class="row large-12 medium-12 expanded">
 
                                     <div class="columns medium-12 small-12 margin-top-10 card-3">
                                         <div class="responsive-table" style="margin-top: 20px;">
 
-                                                <table class="datatable-pdx pdx-table table-borderedPdx head-left" data-tabs id="example-tabs">
-                                                    <thead>
-                                                    <th>Sample ID</th>
-                                                    <th>Sample Type</th>
-                                                    <th>Engrafted Tumor Passage</th>
-                                                    <th>Data Available</th>
-                                                    <th>Platform Used</th>
-                                                    <th>Raw Data</th>
-                                                    </thead>
-                                                    <tbody>
+                                            <table class="datatable-pdx pdx-table table-borderedPdx head-left" data-tabs
+                                                   id="example-tabs">
+                                                <thead>
+                                                <th>Sample ID</th>
+                                                <th>Sample Type</th>
+                                                <th>Engrafted Tumor Passage</th>
+                                                <th>Data Type</th>
+                                                <th>Data Available</th>
+                                                <th>Platform Used</th>
+                                                <th>Raw Data</th>
+                                                </thead>
+                                                <tbody>
 
 
-                                                    <tr th:each="dataSummary,iter : ${data.dataSummary}"
-                                                        class="tabs-title" style="float:none; text-transform: capitalize;" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
+                                                <tr th:each="dataRow,iter : ${data.molecularDataRows}"
+                                                    class="tabs-title" style="float:none; text-transform: capitalize;"
+                                                    th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
 
-                                                        <td th:text="${dataSummary.sampleId}"> ... </td>
-                                                        <td th:text="${dataSummary.sampleType}"> ... </td>
-                                                        <td th:text="${'Passage '+dataSummary.xenograftPassage}"> ... </td>
+                                                    <td th:text="${dataRow.sampleId}"> ...</td>
+                                                    <td th:text="${dataRow.sampleType}"> ...</td>
+                                                    <td th:text="${'Passage '+dataRow.engraftedTumorPassage}"> ...</td>
+                                                    <td th:text="${dataRow.molcharType}"> ...</td>
 
+                                                    <td>
+                                                        <a class="molecularDataLink"
+                                                           style="color: #06369d; text-decoration: none;"
+                                                           data-th-attr="data-tabs-target=${dataRow.dataAvailableLabel},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
+                                                           th:title="${dataRow.sampleId+' | '+data.mappedOntologyTermLabel+' | '+dataRow.sampleType+' | '+dataRow.engraftedTumorPassage+' | '+dataRow.platformUsedLabel}"
+                                                           th:text="'View data'"
+                                                           th:id="${'mc___'+dataRow.molcharId}">
+                                                           TAB TITLES
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a th:if="${dataRow.platformUsedUrl != null}" target="_blank"
+                                                           style="color: #06369d; text-decoration: none;"
+                                                           th:text="${dataRow.platformUsedLabel}"
+                                                           th:onclick="'window.open(\''+${dataRow.platformUsedUrl}+'\')'">
+                                                            ...
+                                                        </a>
+                                                        <!-- TODO: Remove this quickFix in April -->
+                                                        <a th:if="${dataRow.platformUsedLabel == 'NCI cancer gene panel'}" target="_blank"
+                                                           style="color: #06369d; text-decoration: none;"
+                                                           th:text="${dataRow.platformUsedLabel}"
+                                                           th:onclick="'window.open(\''+${'https://pdmr.cancer.gov/content/docs/NCI_Cancer_Gene_Panel.pdf'}+'\')'">
+                                                            ...
+                                                        </a>
+                                                        <span th:if="${dataRow.platformUsedUrl == null && dataRow.platformUsedLabel != 'NCI cancer gene panel'}" th:text="${dataRow.platformUsedLabel}"></span>
+                                                    </td>
+                                                    <td th:text="${dataRow.rawDataLabel}"></td>
+                                                </tr>
 
-                                                        <td>
-                                                            <a th:href="@{'#'+${dataSummary.platformUsed}}"
-                                                               style="color: #06369d; text-decoration: none;"
-                                                               data-th-attr="data-tabs-target=${dataSummary.platformUsed},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
-                                                               th:text="${dataSummary.platformUsed}+' Platform'"
-                                                               th:onclick="'showTabs('+${iter.index}+')'">
-                                                                TAB TITLES
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            <a target="_blank"
-                                                               style="color: #06369d; text-decoration: none;"
-                                                               th:text="${dataSummary.platformUsed}"
-                                                               th:onclick="'window.open(\''+${data.platformsAndUrls[dataSummary.platformUsed]}+'\')'">
-                                                                ...
-                                                            </a>
-                                                        </td>
-                                                        <td th:text="${dataSummary.rawData}"></td>
-                                                    </tr>
+                                                </tbody>
+                                            </table>
 
-                                                    </tbody>
-                                                </table>
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-
-
-                                <div class="hideVariationData">
-                                    <div class="row large-12 medium-12 expanded top-space-30 ">
-                                        <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
-                                            <li class="tabs-title is-active">
-                                                <a href="#initialDiagnosis"
-                                                   aria-selected="true"
-                                                   style="font-size: 15px; padding: 15px;">
-                                                    Genomic Data (<span th:text="${data.variationDataCount}"></span>)
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="columns medium-12 small-12 card-3" style="padding: 15px;">
-
-                                        <div id="sizeSwitch" style="float: right; margin-top:-65px;">
-                                            <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"
-                                               class="button outline secondary">
-                                                Download Results
-                                                <i class="icon icon-functional" data-icon="="></i>
-                                            </a>
-                                        </div>
-
-                                        <div class="tabs-content" data-tabs-content="example-tabs">
-
-                                            <!--<ul class="tabs rem-side-borders" data-tabs id="example-tabs">
-                                                <li th:each="technology,iter : ${data.modelTechAndPassages}"
-                                                    class="tabs-title" th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
-
-                                                    <a th:href="@{'#'+${technology.key}}"
-                                                       data-th-attr="data-tabs-target=${technology.key},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
-                                                       th:text="${technology.key}+' Platform'" th:onclick="'showTabs('+${iter.index}+')'">
-                                                        TAB TITLES
-                                                    </a>
-                                                </li>
-                                            </ul>-->
-
-                                            <div th:each="technology,iter : ${data.modelTechAndPassages}"
-                                                 th:id="${technology.key}"
-                                                 class="tabs-panel is-active"
-                                                 th:classappend=" 'hideContent'+${iter.index} " style="border-top: 1px solid #5ea88f; margin-top:20px;">
-
-                                                <hr class="hr-text" th:attr="data-content=${technology.key+' PLATFORM '}">
-
-                                                        <span th:unless="${technology.value.size()<1}"
-                                                              th:each="num: ${#numbers.sequence(1,technology.value.size())}"> <!--/* Unable to capture index for inner loop so, this was used for innerloop : <tr th:each="passageList : ${technolog[y.value]}"> */-->
-
-
-
-                                                                <div class="table-responsive">
-
-                                                                    <h4 class="bLine"
-                                                                        th:classappend="( ${num} == 1 ) ? '' : 'topSpace50' ">
-
-                                                                        <span class="hdc">Sample ID: </span>
-
-                                                                        <b class="black"
-                                                                           th:text="${data.techNPassToSampleId['__${technology.key}__'+'__${technology.value[num-1]}__']}"></b>    &nbsp; &nbsp;
-
-                                                                        <span class="hdc">Histology:</span> <b class="black"
-                                                                                                               th:text="${#strings.capitalize(data.diagnosis)}"></b>     &nbsp; &nbsp;
-                                                                        <span class="hdc">Tumor Type: </span>
-                                                                        <b class="black">Engrafted Tumor</b>                  &nbsp; &nbsp;
-                                                                        <span class="hdc">Passage: </span>  <b class="black"
-                                                                                                               th:text="${technology.value[num-1]}"></b>     &nbsp; &nbsp;
-                                                                        <span class="hdc">Platform: </span>
-
-                                                                        <span th:if="${data.platformsAndUrls.containsKey(technology.key)}">
-                                                                                <a th:href="${data.platformsAndUrls[technology.key]}" th:text="${technology.key}"></a>
-                                                                            </span>
-
-                                                                        <span th:if="${not data.platformsAndUrls.containsKey(technology.key)}">
-                                                                                <b class="black" th:text="${technology.key}"></b>
-                                                                        </span>
-
-                                                                    </h4>
-
-                                                                    <table th:id="'pdxFinder-grid'+${#strings.replace(technology.key,' ','-')}+${num}"
-                                                                           id="example-datatable"
-                                                                           class="table display datatable-pdx table-borderedPdx"
-                                                                           th:height="50" width="100%">
-
-                                                                        <thead>
-                                                                        <tr>
-                                                                            <th>Sample </th>
-                                                                            <th>Chromosome</th>
-                                                                            <th>Seq. Position</th>
-                                                                            <th>Ref. Allele</th>
-                                                                            <th>Alt. Allele</th>
-                                                                            <th>Consequence</th>
-                                                                            <th>Gene</th>
-                                                                            <th>Amino Acid Change</th>
-                                                                            <th>Read Depth</th>
-                                                                            <th>Allele Freq.</th>
-                                                                            <th>RS Variants</th>
-                                                                        </tr>
-                                                                        </thead>
-                                                                    </table>
-                                                                </div>
-
-                                                        </span>
-
-                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
                                 </div>
-                                <!-- End of Xenograft Variation data -->
 
                             </div>
 
                         </div>
 
-                        <div class="tabs-panel" id="dosing_studies">
-                            <div th:if="${not #lists.isEmpty(data.drugSummary)}">
 
-                                <div class="columns medium-12 small-12 margin-top-10 card-3">
-                                    <div class="responsive-table" style="margin-top: 20px;">
 
-                                        <div th:if="${data.drugProtocolUrl} != null" class="drug_spacing">
-                                            <a th:href="${data.drugProtocolUrl}" >Dosing study protocol</a>
+                        <div id="omicDataContainer">
+                            <div class="row large-12 medium-12 expanded top-space-30 ">
+                                <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
+                                    <li class="tabs-title is-active">
+                                        <a href="#initialDiagnosis"
+                                           aria-selected="true"
+                                           style="font-size: 15px; padding: 15px;">
+                                            Genomic Data (<span id="omicDataCount"></span>) <!-- data.variationDataCount -->
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+
+
+                            <div class="columns medium-12 small-12 card-3" style="padding: 15px;">
+
+
+
+                                <div class="columns medium-6 small-12" id="sizeSwitch" style="float: right; margin-top:-65px; margin-right:-30px;">
+
+                                    <div id="customSearch" class="columns medium-7 small-12 text-right" style="padding: 0px;">
+                                        <!-- Datatable Search Box -->
+                                    </div>
+
+                                    <div class="columns medium-5 small-12 text-right" style="padding: 0px;">
+                                        <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"
+                                           class="button outline secondary">
+                                            Download Results
+                                            <i class="icon icon-functional" data-icon="="></i>
+                                        </a>
+                                    </div>
+
+                                </div>
+
+                                <div class="tabs-content" data-tabs-content="example-tabs">
+
+                                    <div class="tabs-panel is-active"
+                                         style="border-top: 1px solid #5ea88f; margin-top:20px;">
+
+                                        <hr id="hrTitle" class="hr-text" data-content="THE PLATFORM">
+
+                                        <div class="table-responsive">
+
+                                            <h4 class="bLine" th:classappend="( true ) ? '' : 'topSpace50' ">
+
+                                                <span class="hdc">Sample ID: </span>
+                                                <b class="black" id="clickedSampleId"></b>  &nbsp; &nbsp; <!-- data.techNPassToSampleId['__${technology.key}__'+'__${technology.value[num-1]}__'] -->
+
+                                                <span class="hdc">Histology:</span>
+                                                <b class="black" id="modelHistology"></b>  &nbsp; &nbsp; <!-- strings.capitalize(data.diagnosis) -->
+
+                                                <span class="hdc">Tumor Type: </span>
+                                                <b class="black" id="clickedTumorType">Engrafted Tumor</b>  &nbsp; &nbsp;
+
+                                                <span class="hdc">Passage: </span>
+                                                <b class="black" id="clickedPassage"></b>  &nbsp; &nbsp;
+
+                                                <span class="hdc">Platform: </span>
+                                                <b class="black" id="clickedTech"></b>   &nbsp; &nbsp;
+
+                                            </h4>
+
+                                            <div style="text-align: center;"> <img th:src="@{/images/loading2.gif}" id="preLoader"/> </div>
+                                            <div class="responsive-table" style="margin-top: 20px;" id="variationTableData">
+
+                                            </div>
+
                                         </div>
-
-                                        <table class="datatable-pdx pdx-table table-borderedPdx head-left">
-                                            <thead>
-                                            <th>Drug</th>
-                                            <th>Dose</th>
-                                            <th>Response</th>
-                                            </thead>
-                                            <tbody>
-                                            <tr th:each="drugData, iter : ${data.drugSummary}">
-                                                <td th:text="${drugData.drugName}"></td>
-                                                <td th:text="${drugData.dose}"></td>
-                                                <td th:text="${drugData.response}"></td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
 
                                     </div>
                                 </div>
-
                             </div>
-
-                            <div th:if="${#lists.isEmpty(data.drugSummary)}"></div>
                         </div>
+
+
+
+
+
+
 
                     </div>
+
+                    <div class="tabs-panel" id="dosing_studies">
+                        <div th:if="${not #lists.isEmpty(data.dosingStudy)}">
+
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table" style="margin-top: 20px;">
+
+                                    <div th:if="${data.dosingStudyProtocolUrl} != null" class="drug_spacing">
+                                        <a th:href="${data.dosingStudyProtocolUrl}">Dosing study protocol</a>
+                                    </div>
+
+                                    <table class="datatable-pdx pdx-table table-borderedPdx head-left">
+                                        <thead>
+                                        <th>Drug</th>
+                                        <th>Dose</th>
+                                        <th>Response</th>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="drugData, iter : ${data.dosingStudy}">
+                                            <td th:text="${drugData.drugName}"></td>
+                                            <td th:text="${drugData.dose}"></td>
+                                            <td th:text="${drugData.response}"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(data.dosingStudy)}"></div>
+                    </div>
+
+                </div>
 
 
             </section>
@@ -1085,7 +1015,7 @@
 </div>
 <!-- JavaScript -->
 
-<script  type='text/javascript' th:src="@{/js/banner-gdpr.js}"></script>
+<script type='text/javascript' th:src="@{/js/banner-gdpr.js}"></script>
 <div id="data-protection-message-configuration"
      data-message="Your message and links here."
      data-service-id="ebi" data-data-protection-version="0.1">
@@ -1095,6 +1025,7 @@
 <script src="https://ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/libraries/foundation-6/js/foundation.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.highlightRegex/0.1.2/highlightRegex.min.js"></script>
 <script th:src="@{/js/script.js}"></script>
+<script th:src="@{/js/pdxFinder.js}"></script>
 <!--<script th:src="@{/js/main.js}"></script>-->
 
 
@@ -1104,28 +1035,16 @@
     var dataSrc = [[${data.dataSource}]];
     jQuery(document).ready(function () {
         console.log("ready");
-        var modelInfo = [[${data.modelTechAndPassages}]];
-        var apiURL = "/data/patientdata/" + dataSrc + "/" + modelId;
+        console.log("Adding event listener to molchardatalink");
+
+        jQuery(".molecularDataLink").on("click", function () {
+
+            $('#omicDataContainer').show();
+            getMolecularDataTable(jQuery(this).attr("id"), jQuery(this).attr("title"));
+
+        });
 
 
-        drawTable("pdxFinder-grid", apiURL);
-        for (var tech in modelInfo) {
-            //console.log(tech);
-
-            var counter = 1;
-            for (var passage in modelInfo[tech]) {
-                //console.log(modelInfo[tech][passage]);
-                var dTech = tech.replace(" ", "-");
-                //console.log(dTech);
-                apiURL = "/data/modeldata/" + dataSrc + "/" + modelId + "?platform=" + tech + "&passage=" + modelInfo[tech][passage];
-                var tableId = "pdxFinder-grid" + dTech + counter;
-                drawTable(tableId, apiURL);
-                //console.log(tableId);
-                console.log(apiURL);
-                counter++;
-            }
-
-        }
     });
 
     // We define the function
@@ -1168,27 +1087,29 @@
     }
 
 
-    function showTabs(cnt) {
+
+
+    function initTabs(cnt) {
         for (var i = 0; i < 5; i++) {
-            var content = document.getElementsByClassName("hideContent"+cnt)[i];
+            document.getElementsByClassName("hideContent" + cnt)[i].style.position = "static";
+        }
+    }
+
+/*    function showTabs(cnt) {
+        for (var i = 0; i < 5; i++) {
+            var content = document.getElementsByClassName("hideContent" + cnt)[i];
             var variation = document.getElementsByClassName("hideVariationData")[0];
 
-            if(content !== undefined){
+            if (content !== undefined) {
                 content.style.position = "static";
             }
-            if (variation !== undefined){
+            if (variation !== undefined) {
                 variation.style.position = "static";
             }
 
         }
     }
 
-
-    function initTabs(cnt) {
-        for (var i = 0; i < 5; i++) {
-            document.getElementsByClassName("hideContent"+cnt)[i].style.position = "static";
-        }
-    }
 
     function revealVariationData() {
 
@@ -1197,25 +1118,24 @@
 
         // Open the corresponding tech Tab:
         // showTabs(cnt);
-    }
-
+    }*/
 
     // Check if variation tab is deeplinked on page load:
-    $(document).ready(function(){
+    $(document).ready(function () {
+
+
         var hash = window.location.hash;
 
-        if (hash == "#variation"){
+        if (hash == "#variation") {
             for (var i = 0; i < 5; i++) {
                 var content = document.getElementsByClassName("hideContent0")[i];
-                if (content !== undefined){
+                if (content !== undefined) {
                     content.style.position = "static";
                 }
 
             }
         }
     });
-
-
 
 
 
@@ -1236,6 +1156,8 @@
     "dateModified": "2018",
     "citation": "https://doi.org/10.1101/291443",
 }
+
+
 </script>
 </body>
 </html>

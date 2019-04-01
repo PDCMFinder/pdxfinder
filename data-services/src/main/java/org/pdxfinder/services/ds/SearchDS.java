@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.dao.DataProjection;
-import org.pdxfinder.repositories.DataProjectionRepository;
+import org.pdxfinder.graph.dao.DataProjection;
+import org.pdxfinder.graph.repositories.DataProjectionRepository;
 import org.pdxfinder.services.search.WebFacetSection;
 import org.pdxfinder.services.search.WebFacetContainer;
 import org.pdxfinder.services.search.*;
@@ -208,9 +208,23 @@ public class SearchDS {
             datasourceOptions.add(new FacetOption(ds, ds));
         }
 
+        //dataset available filter def
+        List<FacetOption> datasetAvailableOptions = new ArrayList<>();
+        datasetAvailableOptions.add(new FacetOption("Gene Mutation", "Gene_Mutation"));
+        datasetAvailableOptions.add(new FacetOption("Cytogenetics", "Cytogenetics"));
+        datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
+        datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
+
+        OneParamFilter datasetAvailable = new OneParamFilter("DATASET AVAILABLE", "data_available", false, FilterType.OneParamFilter.get(),
+                datasetAvailableOptions, new ArrayList<>());
+
+        pdxModelSection.addComponent(datasetAvailable);
+        facetOptionMap.put("data_available", datasetAvailableOptions);
+
         OneParamFilter datasource = new OneParamFilter("DATASOURCE", "datasource", false, FilterType.OneParamFilter.get(), datasourceOptions, new ArrayList<>());
         pdxModelSection.addComponent(datasource);
         facetOptionMap.put("datasource", datasourceOptions);
+
 
         //project filter def
         Set<String> projectsSet = new HashSet<>();
@@ -236,18 +250,6 @@ public class SearchDS {
         pdxModelSection.addComponent(projects);
         facetOptionMap.put("project", projectOptions);
 
-        //dataset available filter def
-        List<FacetOption> datasetAvailableOptions = new ArrayList<>();
-        datasetAvailableOptions.add(new FacetOption("Gene Mutation", "Gene_Mutation"));
-        datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
-        datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
-
-        OneParamFilter datasetAvailable = new OneParamFilter("DATASET AVAILABLE", "data_available", false, FilterType.OneParamFilter.get(),
-        datasetAvailableOptions, new ArrayList<>());
-
-        pdxModelSection.addComponent(datasetAvailable);
-        facetOptionMap.put("data_available", datasetAvailableOptions);
-
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
         TwoParamLinkedFilter geneMutation = new TwoParamLinkedFilter("GENE MUTATION", "mutation", false, FilterType.TwoParamLinkedFilter.get(),
@@ -259,12 +261,12 @@ public class SearchDS {
         //Breast cancer markers
         //labelIDs should be alphabetically ordered(ER, HER, PR) as per dataprojection requirement
         List<FacetOption> breastCancerMarkerOptions = new ArrayList<>();
-
-        breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR+", "ERpos_HER2neg_PRpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR-", "ERneg_HER2neg_PRneg"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR-", "ERpos_HER2neg_PRneg"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR+", "ERpos_HER2pos_PRpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR-", "ERneg_HER2pos_PRneg"));
+                                                                                    //DP> ERBB2(HER2)--ESR1(ER)--PRG(PR)
+        breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR+", "ERBB2neg_ESR1neg_PGRpos"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR-", "ERBB2neg_ESR1neg_PGRneg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR-", "ERBB2neg_ESR1pos_PGRneg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR+", "ERBB2pos_ESR1pos_PGRpos"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR-", "ERBB2pos_ESR1neg_PGRneg"));
 
         //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR+", "ERneg_HER2pos_PRpos"));
         //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR-", "ERpos_HER2pos_PRneg"));
@@ -293,10 +295,10 @@ public class SearchDS {
         treatmentInfoSection.addComponent(modelDosingStudy);
 
 
-        webFacetContainer.addSection(patientTumorSection);
         webFacetContainer.addSection(pdxModelSection);
         webFacetContainer.addSection(molecularDataSection);
         webFacetContainer.addSection(treatmentInfoSection);
+        webFacetContainer.addSection(patientTumorSection);
 
         /****************************************************************
          *            INITIALIZE SEARCH OBJECTS                         *
@@ -626,7 +628,13 @@ public class SearchDS {
                 mfq.setModelId(parseLong(j.getString("modelId")));
                 mfq.setDatasource(j.getString("datasource"));
                 mfq.setExternalId(j.getString("externalId"));
-                mfq.setPatientAge(j.getString("patientAge"));
+                if(j.has("patientAge")){
+                    mfq.setPatientAge(j.getString("patientAge"));
+                }
+                else{
+                    mfq.setPatientAge("Not Specified");
+                }
+
                 mfq.setPatientGender(j.getString("patientGender"));
 
                 if(j.has("patientEthnicity")){
@@ -714,7 +722,7 @@ public class SearchDS {
 
             mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<Long>>>>>(){});
 
-            log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
+            //log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
 
         }
         catch(Exception e){
@@ -828,7 +836,7 @@ public class SearchDS {
 
         Map<String, Map<String, Set<Long>>> data = new HashMap<>();
 
-        DataProjection dataProjection = dataProjectionRepository.findByLabel("IHC");
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("cytogenetics");
         String responses = "{}";
 
         if(dataProjection != null){

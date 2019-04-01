@@ -3,7 +3,7 @@ package org.pdxfinder.services;
 import org.junit.Before;
 import org.junit.Test;
 import org.pdxfinder.BaseTest;
-import org.pdxfinder.repositories.SampleRepository;
+import org.pdxfinder.graph.repositories.SampleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;

@@ -1,7 +1,7 @@
 package org.pdxfinder.services;
 
-import org.pdxfinder.dao.*;
-import org.pdxfinder.repositories.PatientRepository;
+import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.graph.repositories.PatientRepository;
 import org.pdxfinder.services.dto.CollectionEventsDTO;
 import org.pdxfinder.services.dto.PatientDTO;
 import org.pdxfinder.services.dto.TreatmentSummaryDTO;
@@ -87,7 +87,7 @@ public class PatientService {
                     try{
                         for (MolecularCharacterization molc : sample.getMolecularCharacterizations()){
                             for (MarkerAssociation mAssoc : molc.getMarkerAssociations() ){
-                                geneticMutations.add( mAssoc.getMarker().getName() );
+                                geneticMutations.add( mAssoc.getMarker().getHgncSymbol() );
                             }
                         }
                     }catch (Exception e) {}

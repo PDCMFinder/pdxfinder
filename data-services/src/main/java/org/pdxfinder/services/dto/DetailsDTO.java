@@ -1,9 +1,6 @@
 package org.pdxfinder.services.dto;
 
-import org.pdxfinder.dao.*;
-
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -11,7 +8,80 @@ import java.util.Set;
  */
 public class DetailsDTO {
 
+
+    /************************
+     * DETAILS PAGE HEADER  *
+     ************************/
+
+
     private String modelId;
+    private String dataSource;
+    private String mappedOntologyTermLabel;
+    private String providerName;
+    private String contactProviderLabel;
+    private String contactProviderUrl;
+    private String viewDataAtLabel;
+    private String viewDataAtUrl;
+
+
+    /************************
+     * PDX MODEL TAB        *
+     ************************/
+
+    //PATIENT
+    private String patientSex;
+    private String ageAtTimeOfCollection;
+    private String race;
+    private String ethnicity;
+    private List<String> relatedModels;
+
+    //PATIENT TUMOR
+    //private String histology; Use mappedOntologyTermLabel
+    private String primaryTissue;
+    private String collectionSite;
+    private String tumorType;
+    private String stage;
+    private String stageClassification;
+    private String grade;
+    private String gradeClassification;
+
+    //PDX MODEL ENGRAFTMENT
+    private Set<EngraftmentDataDTO> pdxModelList;
+
+    //MODEL QUALITY CONTROL
+    private List<QualityControlDTO> modelQualityControl;
+
+
+    /************************
+     * PATIENT TAB          *
+     ************************/
+    private PatientDTO patient;
+
+
+    /************************
+     * MOLECULAR DATA TAB   *
+     ************************/
+    private List<MolecularDataEntryDTO> molecularDataRows;
+    private int molecularDataEntrySize;
+
+
+
+
+    /************************
+     * DOSING STUDY TAB     *
+     ************************/
+    private String dosingStudyProtocolUrl;
+    private List<DrugSummaryDTO> dosingStudy;
+    private int dosingStudyNumbers;
+
+
+
+
+    /*
+    // Disabled fields
+
+
+
     private String externalId;
     private String dataSource;
     private String sourceDescription;
@@ -39,11 +109,11 @@ public class DetailsDTO {
     private String strain;
     private String mouseSex;
     private String engraftmentSite; // Engraftment Site
-    private Set<EngraftmentDataDTO> pdxModelList;
+
 
     private String externalUrl;
     private String externalUrlText;
-    private String mappedOntology;
+
 
     private String contacts;
     private String externalDataSourceDesc;
@@ -52,11 +122,10 @@ public class DetailsDTO {
     private int presentPage;
     private int variationDataCount;
     private int drugSummaryRowNumber;
-    private PatientDTO patient;
 
 
-    // Quality control information
-    private List<QualityAssurance> qualityAssurances;
+
+
 
     private List<String> cancerGenomics;
     private List<Specimen> specimens;
@@ -66,8 +135,7 @@ public class DetailsDTO {
 
     private Map<String, String> patientTech;
     private Map<String, Set<String>> modelTechAndPassages;
-    private List<String> relatedModels;
-    private List<DrugSummaryDTO> drugSummary;
+
     private List<VariationDataDTO> variationDataDTOList;
     private Map<String, String> techNPassToSampleId;
     private Set<String> autoSuggestList;
@@ -76,45 +144,12 @@ public class DetailsDTO {
     private int patientDataSize;
     private int xenograftDataSize;
 
-
+    */
 
 
     public DetailsDTO() {
-        this.modelId = "";
-        this.externalId = "";
-        this.dataSource = "";
-        this.sourceDescription = "";
-        this.patientId = "";
-        this.gender = "";
-        this.ageAtCollection = "";
-        this.race = "";
-        this.ethnicity = "";
 
-        this.diagnosis = "";
-        this.tumorType = "";
-        this.classification = "";
-
-        this.stage = "";
-        this.grade = "";
-        this.stageClassification = "";
-        this.gradeClassification = "Not Specified";
-
-        this.originTissue = "";
-        this.sampleSite = "";
-
-        this.sampleType = "";
-        this.strain = "";
-        this.mouseSex = "";
-        this.engraftmentSite = "";
-        this.externalUrl = "";
-        this.externalUrlText = "";
-        this.mappedOntology = "";
-
-        this.totalPages = 0;
-        this.contacts = "";
-        this.externalDataSourceDesc = "";
     }
-
 
 
     public String getModelId() {
@@ -125,14 +160,6 @@ public class DetailsDTO {
         this.modelId = modelId;
     }
 
-    public String getExternalId() {
-        return externalId;
-    }
-
-    public void setExternalId(String externalId) {
-        this.externalId = externalId;
-    }
-
     public String getDataSource() {
         return dataSource;
     }
@@ -141,36 +168,68 @@ public class DetailsDTO {
         this.dataSource = dataSource;
     }
 
-    public String getSourceDescription() {
-        return sourceDescription;
+    public String getMappedOntologyTermLabel() {
+        return mappedOntologyTermLabel;
     }
 
-    public void setSourceDescription(String sourceDescription) {
-        this.sourceDescription = sourceDescription;
+    public void setMappedOntologyTermLabel(String mappedOntologyTermLabel) {
+        this.mappedOntologyTermLabel = mappedOntologyTermLabel;
     }
 
-    public String getPatientId() {
-        return patientId;
+    public String getProviderName() {
+        return providerName;
     }
 
-    public void setPatientId(String patientId) {
-        this.patientId = patientId;
+    public void setProviderName(String providerName) {
+        this.providerName = providerName;
     }
 
-    public String getGender() {
-        return gender;
+    public String getContactProviderLabel() {
+        return contactProviderLabel;
     }
 
-    public void setGender(String gender) {
-        this.gender = gender;
+    public void setContactProviderLabel(String contactProviderLabel) {
+        this.contactProviderLabel = contactProviderLabel;
     }
 
-    public String getAgeAtCollection() {
-        return ageAtCollection;
+    public String getContactProviderUrl() {
+        return contactProviderUrl;
     }
 
-    public void setAgeAtCollection(String ageAtCollection) {
-        this.ageAtCollection = ageAtCollection;
+    public void setContactProviderUrl(String contactProviderUrl) {
+        this.contactProviderUrl = contactProviderUrl;
+    }
+
+    public String getViewDataAtLabel() {
+        return viewDataAtLabel;
+    }
+
+    public void setViewDataAtLabel(String viewDataAtLabel) {
+        this.viewDataAtLabel = viewDataAtLabel;
+    }
+
+    public String getViewDataAtUrl() {
+        return viewDataAtUrl;
+    }
+
+    public void setViewDataAtUrl(String viewDataAtUrl) {
+        this.viewDataAtUrl = viewDataAtUrl;
+    }
+
+    public String getPatientSex() {
+        return patientSex;
+    }
+
+    public void setPatientSex(String patientSex) {
+        this.patientSex = patientSex;
+    }
+
+    public String getAgeAtTimeOfCollection() {
+        return ageAtTimeOfCollection;
+    }
+
+    public void setAgeAtTimeOfCollection(String ageAtTimeOfCollection) {
+        this.ageAtTimeOfCollection = ageAtTimeOfCollection;
     }
 
     public String getRace() {
@@ -189,12 +248,28 @@ public class DetailsDTO {
         this.ethnicity = ethnicity;
     }
 
-    public String getDiagnosis() {
-        return diagnosis;
+    public List<String> getRelatedModels() {
+        return relatedModels;
     }
 
-    public void setDiagnosis(String diagnosis) {
-        this.diagnosis = diagnosis;
+    public void setRelatedModels(List<String> relatedModels) {
+        this.relatedModels = relatedModels;
+    }
+
+    public String getPrimaryTissue() {
+        return primaryTissue;
+    }
+
+    public void setPrimaryTissue(String primaryTissue) {
+        this.primaryTissue = primaryTissue;
+    }
+
+    public String getCollectionSite() {
+        return collectionSite;
+    }
+
+    public void setCollectionSite(String collectionSite) {
+        this.collectionSite = collectionSite;
     }
 
     public String getTumorType() {
@@ -205,285 +280,12 @@ public class DetailsDTO {
         this.tumorType = tumorType;
     }
 
-    public String getOriginTissue() {
-        return originTissue;
-    }
-
-    public void setOriginTissue(String originTissue) {
-        this.originTissue = originTissue;
-    }
-
-    public String getSampleSite() {
-        return sampleSite;
-    }
-
-    public void setSampleSite(String sampleSite) {
-        this.sampleSite = sampleSite;
-    }
-
-    public String getClassification() {
-        return classification;
-    }
-
-    public void setClassification(String classification) {
-        this.classification = classification;
-    }
-
-    public List<String> getCancerGenomics() {
-        return cancerGenomics;
-    }
-
-    public void setCancerGenomics(List<String> cancerGenomics) {
-        this.cancerGenomics = cancerGenomics;
-    }
-
-    public String getSampleType() {
-        return sampleType;
-    }
-
-    public void setSampleType(String sampleType) {
-        this.sampleType = sampleType;
-    }
-
-    public String getStrain() {
-        return strain;
-    }
-
-    public void setStrain(String strain) {
-        this.strain = strain;
-    }
-
-    public String getMouseSex() {
-        return mouseSex;
-    }
-
-    public Set<EngraftmentDataDTO> getPdxModelList() {
-        return pdxModelList;
-    }
-
-    public void setPdxModelList(Set<EngraftmentDataDTO> pdxModelList) {
-        this.pdxModelList = pdxModelList;
-    }
-
-    public void setMouseSex(String mouseSex) {
-        this.mouseSex = mouseSex;
-    }
-
-    public String getEngraftmentSite() {
-        return engraftmentSite;
-    }
-
-    public void setEngraftmentSite(String engraftmentSite) {
-        this.engraftmentSite = engraftmentSite;
-    }
-
-    public String getExternalUrl() {
-        return externalUrl;
-    }
-
-    public void setExternalUrl(String externalUrl) {
-        this.externalUrl = externalUrl;
-    }
-
-    public String getExternalUrlText() {
-        return externalUrlText;
-    }
-
-    public void setExternalUrlText(String externalUrlText) {
-        this.externalUrlText = externalUrlText;
-    }
-
-    public List<Specimen> getSpecimens() {
-        return specimens;
-    }
-
-    public void setMappedOntology(String mappedOntology) {
-        this.mappedOntology = mappedOntology;
-    }
-
-    public String getMappedOntology() {
-        return mappedOntology;
-    }
-
-    public void setSpecimens(List<Specimen> specimens) {
-        this.specimens = specimens;
-    }
-
-    public Set<Platform> getPlatforms() {
-        return platforms;
-    }
-
-    public void setPlatforms(Set<Platform> platforms) {
-        this.platforms = platforms;
-    }
-
-    public Set< List<MarkerAssociation> > getMarkerAssociations() {
-        return markerAssociations;
-    }
-
-    public void setMarkerAssociations(Set< List<MarkerAssociation> > markerAssociations) {
-        this.markerAssociations = markerAssociations;
-    }
-
-    public Set<MolecularCharacterization>  getMolecularCharacterizations() {
-
-        return molecularCharacterizations;
-    }
-
-    public void setMolecularCharacterizations(Set<MolecularCharacterization> molecularCharacterizations) {
-        this.molecularCharacterizations = molecularCharacterizations;
-    }
-
-    public int getTotalPages() {
-        return totalPages;
-    }
-
-    public void setTotalPages(int totalPages) {
-        this.totalPages = totalPages;
-    }
-
-    public int getPresentPage() {
-        return presentPage;
-    }
-
-    public void setPresentPage(int presentPage) {
-        this.presentPage = presentPage;
-    }
-
-    public int getVariationDataCount() {
-        return variationDataCount;
-    }
-
-    public void setVariationDataCount(int variationDataCount) {
-        this.variationDataCount = variationDataCount;
-    }
-
-    public String getContacts() {
-        return contacts;
-    }
-
-    public void setContacts(String contacts) {
-        this.contacts = contacts;
-    }
-
-    public String getExternalDataSourceDesc() {
-        return externalDataSourceDesc;
-    }
-
-    public void setExternalDataSourceDesc(String externalDataSourceDesc) {
-        this.externalDataSourceDesc = externalDataSourceDesc;
-    }
-
-    public List<QualityAssurance> getQualityAssurances() {
-        return qualityAssurances;
-    }
-
-    public void setQualityAssurances(List<QualityAssurance> qualityAssurances) {
-        this.qualityAssurances = qualityAssurances;
-    }
-
-    public String getDrugProtocolUrl() {
-        return drugProtocolUrl;
-    }
-
-    public void setDrugProtocolUrl(String drugProtocolUrl) {
-        this.drugProtocolUrl = drugProtocolUrl;
-    }
-
-    public Map<String, String> getPatientTech() {
-        return patientTech;
-    }
-
-    public void setPatientTech(Map<String, String> patientTech) {
-        this.patientTech = patientTech;
-    }
-
-    public Map<String, Set<String>> getModelTechAndPassages() {
-        return modelTechAndPassages;
-    }
-
-    public void setModelTechAndPassages(Map<String, Set<String>> modelTechAndPassages) {
-        this.modelTechAndPassages = modelTechAndPassages;
-    }
-
-    public List<String> getRelatedModels() {
-        return relatedModels;
-    }
-
-    public void setRelatedModels(List<String> relatedModels) {
-        this.relatedModels = relatedModels;
-    }
-
-    public List<DrugSummaryDTO> getDrugSummary() {
-        return drugSummary;
-    }
-
-    public void setDrugSummary(List<DrugSummaryDTO> drugSummary) {
-        this.drugSummary = drugSummary;
-    }
-
-    public int getDrugSummaryRowNumber() {
-        return drugSummaryRowNumber;
-    }
-
-    public void setDrugSummaryRowNumber(int drugSummaryRowNumber) {
-        this.drugSummaryRowNumber = drugSummaryRowNumber;
-    }
-
-    public List<VariationDataDTO> getVariationDataDTOList() {
-        return variationDataDTOList;
-    }
-
-    public void setVariationDataDTOList(List<VariationDataDTO> variationDataDTOList) {
-        this.variationDataDTOList = variationDataDTOList;
-    }
-
-    public Map<String, String> getTechNPassToSampleId() {
-        return techNPassToSampleId;
-    }
-
-    public void setTechNPassToSampleId(Map<String, String> techNPassToSampleId) {
-        this.techNPassToSampleId = techNPassToSampleId;
-    }
-
-    public Set<String> getAutoSuggestList() {
-        return autoSuggestList;
-    }
-
-    public void setAutoSuggestList(Set<String> autoSuggestList) {
-        this.autoSuggestList = autoSuggestList;
-    }
-
-    public Map<String, String> getPlatformsAndUrls() {
-        return platformsAndUrls;
-    }
-
-    public void setPlatformsAndUrls(Map<String, String> platformsAndUrls) {
-        this.platformsAndUrls = platformsAndUrls;
-    }
-
-    public void setDataSummary(List<Map> dataSummary) {
-        this.dataSummary = dataSummary;
-    }
-
-    public List<Map> getDataSummary() {
-        return dataSummary;
-    }
-
     public String getStage() {
         return stage;
     }
 
     public void setStage(String stage) {
         this.stage = stage;
-    }
-
-    public String getGrade() {
-        return grade;
-    }
-
-    public void setGrade(String grade) {
-        this.grade = grade;
     }
 
     public String getStageClassification() {
@@ -494,6 +296,14 @@ public class DetailsDTO {
         this.stageClassification = stageClassification;
     }
 
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
     public String getGradeClassification() {
         return gradeClassification;
     }
@@ -502,35 +312,67 @@ public class DetailsDTO {
         this.gradeClassification = gradeClassification;
     }
 
-    public void setPatient(PatientDTO patient) {
-        this.patient = patient;
+    public Set<EngraftmentDataDTO> getPdxModelList() {
+        return pdxModelList;
+    }
+
+    public void setPdxModelList(Set<EngraftmentDataDTO> pdxModelList) {
+        this.pdxModelList = pdxModelList;
+    }
+
+    public List<QualityControlDTO> getModelQualityControl() {
+        return modelQualityControl;
+    }
+
+    public void setModelQualityControl(List<QualityControlDTO> modelQualityControl) {
+        this.modelQualityControl = modelQualityControl;
     }
 
     public PatientDTO getPatient() {
         return patient;
     }
 
-    public String getSourceName() {
-        return sourceName;
+    public void setPatient(PatientDTO patient) {
+        this.patient = patient;
     }
 
-    public void setSourceName(String sourceName) {
-        this.sourceName = sourceName;
+    public List<MolecularDataEntryDTO> getMolecularDataRows() {
+        return molecularDataRows;
     }
 
-    public int getPatientDataSize() {
-        return patientDataSize;
+    public void setMolecularDataRows(List<MolecularDataEntryDTO> molecularDataRows) {
+        this.molecularDataRows = molecularDataRows;
     }
 
-    public void setPatientDataSize(int patientDataSize) {
-        this.patientDataSize = patientDataSize;
+    public String getDosingStudyProtocolUrl() {
+        return dosingStudyProtocolUrl;
     }
 
-    public int getXenograftDataSize() {
-        return xenograftDataSize;
+    public void setDosingStudyProtocolUrl(String dosingStudyProtocolUrl) {
+        this.dosingStudyProtocolUrl = dosingStudyProtocolUrl;
     }
 
-    public void setXenograftDataSize(int xenograftDataSize) {
-        this.xenograftDataSize = xenograftDataSize;
+    public List<DrugSummaryDTO> getDosingStudy() {
+        return dosingStudy;
+    }
+
+    public void setDosingStudy(List<DrugSummaryDTO> dosingStudy) {
+        this.dosingStudy = dosingStudy;
+    }
+
+    public int getDosingStudyNumbers() {
+        return dosingStudyNumbers;
+    }
+
+    public void setDosingStudyNumbers(int dosingStudyNumbers) {
+        this.dosingStudyNumbers = dosingStudyNumbers;
+    }
+
+    public int getMolecularDataEntrySize() {
+        return molecularDataEntrySize;
+    }
+
+    public void setMolecularDataEntrySize(int molecularDataEntrySize) {
+        this.molecularDataEntrySize = molecularDataEntrySize;
     }
 }
