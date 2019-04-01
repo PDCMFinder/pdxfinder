@@ -239,7 +239,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
         TreatmentSummary ts;
 
         //Disable loading treatment temporarily, drug names are not harmonized!
-        Boolean loadTreatment = false;
+        Boolean loadTreatment = true;
         //don't create two treatmentsummaries for the same snapshot
         if(loadTreatment && dataImportService.findTreatmentSummaryByPatientSnapshot(dto.getPatientSnapshot()) == null){
             ts = new TreatmentSummary();
