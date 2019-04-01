@@ -174,7 +174,7 @@ public class Standardizer {
 
             return "Erlotinib";
         }
-        else if(drug.equals("Avastin")){
+        else if(drug.toLowerCase().equals("avastin")){
 
             return "Bevacizumab";
         }

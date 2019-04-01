@@ -249,36 +249,53 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
             for(int k=0; k<treatmentArr.length();k++){
 
                 JSONObject treatmentObj = treatmentArr.getJSONObject(k);
-                TreatmentProtocol tp;
+                TreatmentProtocol tp = null;
 
-                String drugString;
-                String date;
+                String drugString = "";
+                String date = "";
                 String duration = treatmentObj.getString("Duration");
                 String response = treatmentObj.getString("Response");
-                //this is the current treatment
-                if(treatmentObj.has("Current Drug")){
+                Boolean currentTreatment = false;
 
-                    drugString = treatmentObj.getString("Current Drug");
-                    date = treatmentObj.getString("Starting Date");
-                    tp = dataImportService.getTreatmentProtocol(drugString, "", response, true);
+                try {
+                    //this is the current treatment
+                    if (treatmentObj.has("Current Drug")) {
+
+                        drugString = treatmentObj.getString("Current Drug");
+                        date = treatmentObj.getString("Starting Date");
+                        currentTreatment = true;
+
+                    }
+                    //not current treatment, create default TreatmentProtocol object
+                    else {
+
+                        drugString = treatmentObj.getString("Prior Drug");
+                        date = treatmentObj.getString("Prior Date");
+                        currentTreatment = false;
+
+                    }
+
+                    if (drugString.equals("Released at Trial Closure") || drugString.equals("No Current Therapy") || drugString.toLowerCase().equals("treatment naive")) continue;
+                    tp = dataImportService.getTreatmentProtocol(drugString, "", response, currentTreatment);
 
                 }
-                //not current treatment, create default TreatmentProtocol object
-                else{
-
-                    drugString = treatmentObj.getString("Prior Drug");
-                    date = treatmentObj.getString("Prior Date");
-                    tp = dataImportService.getTreatmentProtocol(drugString, "", response, false);
+                catch(Exception e){
+                    e.printStackTrace();
+                    log.error("Error loading treatment. Model: "+dto.getModelID() +" Drugstring: "+drugString);
                 }
-
-                tp.setTreatmentDate(date);
-                tp.addDurationForAllComponents(duration);
-                ts.addTreatmentProtocol(tp);
+                if(tp != null) {
+                    tp.setTreatmentDate(date);
+                    tp.addDurationForAllComponents(duration);
+                    ts.addTreatmentProtocol(tp);
+                }
             }
 
             //save summary on snapshot
-            dto.getPatientSnapshot().setTreatmentSummary(ts);
-            dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
+            if(ts.getTreatmentProtocols() != null && ts.getTreatmentProtocols().size() > 0){
+                dto.getPatientSnapshot().setTreatmentSummary(ts);
+                dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
+            }
+
         }
         //loadVariationData(mc);
         dataImportService.saveModelCreation(dto.getModelCreation());
