@@ -24,9 +24,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Mosaku Abayomi on 12/12/2017.
@@ -42,6 +40,7 @@ public class DataTransformerService {
     private TransTreatmentRepository transTreatmentRepository;
     private TransValidationRepository transValidationRepository;
     private TransSampleRepository transSampleRepository;
+
 
     @Autowired
     private UtilityService util;
@@ -84,6 +83,8 @@ public class DataTransformerService {
 
     private String priorTherapyUrl = RAW_DATA_URL+"/PDMR_PRIORTHERAPIES.json";
 
+    private String patientInfoUrl = RAW_DATA_URL+"/PDMR_PATIENTINFO.json";
+
 
     public DataTransformerService(TransPdxInfoRepository transPdxInfoRepository,
                                   TransTreatmentRepository transTreatmentRepository,
@@ -96,7 +97,7 @@ public class DataTransformerService {
     }
 
     //Transformation rule as specified here: https://docs.google.com/spreadsheets/d/1buUu5yj3Xq8tbEtL1l2UILV9kLnouGqF0vIjFlGGbEE
-    public JsonNode transformDataAndSave() {
+    public List<Map> transformDataAndSave() {
 
         String unKnown = "Not Specified";
         String modelID = "";
@@ -172,9 +173,16 @@ public class DataTransformerService {
 
         JsonNode priorTherapies = util.readJsonLocal(priorTherapyUrl);
 
+        JsonNode patientInfo = util.readJsonLocal(patientInfoUrl);
+        List<Map<String, Object>> patientList = mapper.convertValue(patientInfo, List.class);
+
 
         //engraftmentType
         int count = 0;
+        Set<PdmrPdxInfo> pdmrPdxInfoList = new HashSet<>();
+
+        List<String> modelIDList = new ArrayList<>();
+        List<Map> mappingList = new ArrayList<>();
 
         for (JsonNode node : rootArray) {
 
@@ -182,7 +190,26 @@ public class DataTransformerService {
 
             Map<String, Object> specimenSearch = mapper.convertValue(node, Map.class);
 
-            modelID = specimenSearch.get("PATIENTID") + "-" + specimenSearch.get("SPECIMENID");
+            Object pdmTypeDesc = specimenSearch.get("PDMTYPEDESCRIPTION");
+            Object tissueTypeDesc = specimenSearch.get("TISSUETYPEDESCRIPTION");
+
+            if ( (pdmTypeDesc.equals("PDX") || pdmTypeDesc.equals("Patient/Originator Specimen")) && (tissueTypeDesc.equals("Resection") || tissueTypeDesc.equals("Tumor Biopsy")) ){
+
+                modelID = specimenSearch.get("PATIENTID") + "-" + specimenSearch.get("SPECIMENID");
+            }else {
+                continue;
+            }
+
+            // CHECK IF THIS MODEL HAS BEEN TREATED :
+            String checkIfExist = modelID;
+            Boolean done = modelIDList.stream().anyMatch(str -> str.equals(checkIfExist));
+
+            if (done) {
+                continue;
+            }else{
+                modelIDList.add(modelID);
+            }
+
             patientID = specimenSearch.get("PATIENTID") + "";
             gender = specimenSearch.get("GENDER").toString().equals("M") ? "Male" : "Female";
 
@@ -194,7 +221,6 @@ public class DataTransformerService {
 
             primarySite = specimenSearch.get("DISEASELOCATIONDESCRIPTION") + "";
             initialDiagnosis = "";
-            clinicalDiagnosis = specimenSearch.get("MEDDRADESCRIPTION") + "";
             tumorType = "";
             stageClassification = "";
             stageValue = unKnown;
@@ -214,6 +240,37 @@ public class DataTransformerService {
             specimenSite = "";
 
 
+            clinicalDiagnosis = specimenSearch.get("MEDDRADESCRIPTION") + "";
+
+            for (Map patient : patientList) {
+
+                if (specimenSearch.get("PATIENTSEQNBR").equals(patient.get("PATIENTSEQNBR"))) {
+
+                    // Retrieve Diagnosis Subtype data
+                    if (patient.get("DIAGNOSISSUBTYPE") != null){
+                        clinicalDiagnosis += " | "+patient.get("DIAGNOSISSUBTYPE");
+                    }
+
+                    // Retrieve Additional Medical History data
+                    if (patient.get("ADDITIONALMEDICALHISTORY") != null){
+                        clinicalDiagnosis += " | "+patient.get("ADDITIONALMEDICALHISTORY");
+                    }
+
+                    // Retrieve Notes data
+                    if (patient.get("NOTES") != null){
+                        clinicalDiagnosis += " | "+ patient.get("NOTES");
+                    }
+                }
+
+               // index++; \r\n\r\n \"
+            }
+            //clinicalDiagnosis = clinicalDiagnosis.replaceAll("\\r|\\\"|\\n", "");
+
+            clinicalDiagnosis = clinicalDiagnosis.replaceAll("[^a-zA-Z,0-9 +_-]", "").trim();
+            clinicalDiagnosis = clinicalDiagnosis.replaceAll("\\s\\s", " ");
+
+            log.info(clinicalDiagnosis);
+
             // Treatment naive
             /*try {
                 if (specimenSearch.get("CURRENTREGIMEN").toString().equalsIgnoreCase("Treatment naive")) {
@@ -222,11 +279,11 @@ public class DataTransformerService {
             } catch (Exception e) {
             }*/
 
-
             // From specimensearch table - pick SPECIMENSEQNBR column
             // Look SAMPLE table for key SPECIMENSEQNBR and retrieve the SAMPLESEQNBR column
             // Look HISTOLOGY table for key SAMPLESEQNBR and retrieve TUMORGRADESEQNBR
             // Look TumorGrade  table for key TUMORGRADESEQNBR and set Grade as retrieved TUMORGRADESHORTNAME
+
 
             List<Sample> sampleList = new ArrayList<>();
 
@@ -246,6 +303,8 @@ public class DataTransformerService {
                     }else {
                         sampleTumorType = "Xenograft Tumor";
                     }
+
+
 
                     if (sampleId.equals("ORIGINATOR")){
                         samplePassage = null;
@@ -280,7 +339,12 @@ public class DataTransformerService {
 
 
 
-
+                    /*
+                        model ID - mpdelID
+                        diagnosis - clinicalDiagnosis
+                        primary tissue - primarySite
+                        tumour type - tumorType
+                     */
 
             // From specimensearch table - pick PATIENTSEQNBR column
             //Look CURRENTTHERAPY table for key PATIENTSEQNBR and retrieve the STANDARDIZEDREGIMENSEQNBR column
@@ -485,6 +549,14 @@ public class DataTransformerService {
                         clinicalDiagnosis, tumorType, stageClassification, stageValue, gradeClassification, gradeValue, sampleType, strain, mouseSex,
                         treatmentNaive, engraftmentSite, engraftmentType, sourceUrl, extractionMethod, dateAtCollection, accessibility,treatments,validations, sampleList);
 
+                // GENERATE DATA FOR MAPPING
+                Map mappingData = new LinkedHashMap();
+                mappingData.put("MODEL ID",modelID);
+                mappingData.put("DIAGNOSIS", clinicalDiagnosis);
+                mappingData.put("PRIMARY TISSUE", primarySite);
+                mappingData.put("TUMOR TYPE", tumorType);
+                mappingList.add(mappingData);
+
                 transPdxInfoRepository.save(pdmrPdxInfo);
 
                 // Update the Foreign Key pdxinfo_id for the corresponding treatments
@@ -516,7 +588,7 @@ public class DataTransformerService {
             // if (count == 40){ break; }
         }
 
-        return rootArray;
+        return mappingList;
 
 
     }
@@ -527,6 +599,65 @@ public class DataTransformerService {
         List<PdmrPdxInfo> pdmrPdxInfos = transPdxInfoRepository.findAll();
 
         return pdmrPdxInfos;
+    }
+
+
+
+
+    public String getPassageByModelIDAndSampleID(String modelID, String sampleID) {
+
+        PdmrPdxInfo pdmrPdxInfos = transPdxInfoRepository.findByModelID(modelID);
+
+        String passage = "XXXX";
+
+        try{
+
+            List<Sample> samples = pdmrPdxInfos.getSamples();
+            for (Sample sample : samples){
+
+                if (sampleID.equals(sample.getSampleID())){
+                    passage = sample.getPassage();
+                }
+            }
+        }catch (Exception e){
+
+            log.info("{} has no sample in the database", modelID);
+        }
+
+        return passage;
+    }
+
+
+
+
+
+
+
+
+    public String getDrugs(PdmrPdxInfo pdmrPdxInfo){
+
+        List<Treatment> treatments = pdmrPdxInfo.getTreatments();
+
+        String drugLista = "";
+
+        for (Treatment treatment : treatments){
+
+            try{
+                if (!treatment.getCurrentDrug().equals(null)){
+                    drugLista += util.splitText(treatment.getCurrentDrug(),"\\+","\n");
+                }
+            }catch (Exception e){}
+
+            try{
+                if (!treatment.getPriorDrug().equals(null)){
+                    drugLista += util.splitText(treatment.getPriorDrug(),"\\+","\n");
+                }
+            }catch (Exception e){}
+        }
+
+        util.writeToFile(drugLista,(new Date())+"_pdmrDrug.csv");
+
+        return drugLista.replace("\n","<br>");
     }
 
 }

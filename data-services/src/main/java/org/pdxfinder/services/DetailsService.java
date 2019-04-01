@@ -1,10 +1,9 @@
 package org.pdxfinder.services;
 
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
-import org.pdxfinder.dao.*;
-import org.pdxfinder.repositories.*;
+import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.graph.repositories.*;
 import org.pdxfinder.services.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /*
  * Created by abayomi on 09/05/2018.
@@ -102,7 +100,8 @@ public class DetailsService {
         String technology = "", passage="", filter="", sortDir="", sortCol="mAss.seqPosition";
 
         //Retreive Diagnosis Information
-        String diagnosis = getModelDetails(dataSrc,modelId,page,size,technology,passage,filter).getDiagnosis();
+        //TODO: fix this
+        String diagnosis = ""; //getModelDetails(dataSrc,modelId,page,size,technology,passage,filter).getDiagnosis();
 
         // Retreive technology Information
         List platforms = new ArrayList();
@@ -127,10 +126,665 @@ public class DetailsService {
 
     public DetailsDTO getModelDetails(String dataSource, String modelId) {
 
-        return getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
+        DetailsDTO dto = new DetailsDTO();
+
+        Patient patient = patientRepository.findByDataSourceAndModelId(dataSource, modelId);
+        Group providerGroup = patient.getProviderGroup();
+        ModelCreation pdx = modelCreationRepository.findByDataSourceAndSourcePdxId(dataSource, modelId);
+        Sample patientSample = sampleRepository.findPatientSampleWithDetailsByDataSourceAndPdxId(dataSource, modelId);
+
+        dto.setModelId(pdx.getSourcePdxId());
+        dto.setDataSource(pdx.getDataSource());
+        dto.setPatientSex(patient.getSex());
+
+        if (pdx != null && pdx.getExternalUrls() != null) {
+
+            pdx.getExternalUrls().stream().forEach(extUrl ->{
+                if (extUrl.getType().equals(ExternalUrl.Type.SOURCE.getValue())){
+                    dto.setViewDataAtUrl(extUrl.getUrl());
+                }else{
+                    dto.setContactProviderUrl(extUrl.getUrl());
+                }
+            });
+
+            dto.setViewDataAtLabel("View Data at "+pdx.getDataSource());
+        }
+
+        else{
+            dto.setViewDataAtUrl("#");
+            dto.setViewDataAtLabel("Unknown source");
+        }
+
+
+
+        PatientSnapshot currentPatientSnapshot = null;
+        //since there is only one element being returned in the set, this will give the current snapshot for the patient
+        for(PatientSnapshot ps: patient.getSnapshots()){
+            currentPatientSnapshot = ps;
+        }
+
+        if(currentPatientSnapshot != null && currentPatientSnapshot.getAgeAtCollection() != null){
+
+            dto.setAgeAtTimeOfCollection(currentPatientSnapshot.getAgeAtCollection());
+        }
+        else{
+
+            dto.setAgeAtTimeOfCollection("Not specified");
+        }
+
+        if(patient.getRace() != null && !patient.getRace().isEmpty()){
+
+            dto.setRace(patient.getRace());
+        }
+        else{
+
+            dto.setRace("Not specified");
+        }
+
+        if(patient.getEthnicity() != null && !patient.getEthnicity().isEmpty()){
+
+            dto.setEthnicity(patient.getEthnicity());
+        }
+        else{
+
+            dto.setEthnicity("Not specified");
+        }
+
+        if(patientSample.getSampleToOntologyRelationShip() != null && patientSample.getSampleToOntologyRelationShip().getOntologyTerm()!=null){
+            dto.setMappedOntologyTermLabel(patientSample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
+        }
+        else{
+            dto.setMappedOntologyTermLabel("");
+        }
+
+        dto.setProviderName(providerGroup.getName());
+        dto.setContactProviderLabel(providerGroup.getAbbreviation());
+        dto.setContactProviderUrl(providerGroup.getContact());
+
+
+        if (pdx != null && pdx.getExternalUrls() != null) {
+
+            pdx.getExternalUrls().stream().forEach(extUrl ->{
+                if (extUrl.getType().equals(ExternalUrl.Type.SOURCE.getValue())){
+                    dto.setViewDataAtUrl(extUrl.getUrl());
+                }else{
+                    dto.setContactProviderUrl(extUrl.getUrl());
+                }
+            });
+
+            dto.setViewDataAtLabel("View Data at "+pdx.getDataSource());
+        }
+
+        else{
+            dto.setViewDataAtUrl("#");
+            dto.setViewDataAtLabel("Unknown source");
+        }
+
+
+        dto.setPatientSex(patient.getSex());
+
+        dto.setRelatedModels(getModelsOriginatedFromSamePatient(dataSource, modelId));
+
+        if(patientSample.getOriginTissue() != null){
+            dto.setPrimaryTissue(patientSample.getOriginTissue().getName());
+        }
+
+        if(patientSample.getSampleSite() != null){
+            dto.setCollectionSite(patientSample.getSampleSite().getName());
+        }
+
+        if(patientSample.getType() != null){
+            dto.setTumorType(patientSample.getType().getName());
+        }
+
+        if(patientSample.getStage() != null){
+            dto.setStage(patientSample.getStage());
+        }
+
+        if(patientSample.getStageClassification() != null){
+            dto.setStageClassification(patientSample.getStageClassification());
+        }
+
+        if(patientSample.getGrade() != null){
+            dto.setGrade(patientSample.getGrade());
+        }
+
+        if(patientSample.getGradeClassification() != null){
+            dto.setGradeClassification(patientSample.getGradeClassification());
+        }
+
+
+        //Assembling PDX MODEL ENGRAFTMENT DATA
+        Set<EngraftmentDataDTO> engraftmentData = new HashSet<>();
+        //engraftments >> passages[]
+        Map<EngraftmentDataDTO, Set<String>> engraftmentDataMap = new HashMap<>();
+
+        if(pdx.getSpecimens() != null){
+
+            for(Specimen sp: pdx.getSpecimens()){
+
+                if(sp.getHostStrain() != null){
+
+                    EngraftmentDataDTO edto = new EngraftmentDataDTO();
+
+                    edto.setStrainName(
+                            (sp.getHostStrain() != null) ? notEmpty(sp.getHostStrain().getName()) : "Not Specified"
+                    );
+
+                    edto.setEngraftmentSite(
+                            (sp.getEngraftmentSite() != null) ? notEmpty(sp.getEngraftmentSite().getName()) : "Not Specified"
+                    );
+
+                    edto.setEngraftmentType(
+                            (sp.getEngraftmentType() != null) ? notEmpty(sp.getEngraftmentType().getName()) : "Not Specified"
+                    );
+
+                    edto.setEngraftmentMaterial(
+                            (sp.getEngraftmentMaterial() != null) ? notEmpty(sp.getEngraftmentMaterial().getName()) : "Not Specified"
+                    );
+
+                    edto.setEngraftmentMaterialState(
+                            (sp.getEngraftmentMaterial() != null) ? notEmpty(sp.getEngraftmentMaterial().getState()) : "Not Specified"
+                    );
+
+                    String passage = (sp.getPassage() != null) ? notEmpty(sp.getPassage()) : "Not Specified";
+
+                    //if the datakey combination is found, then don't add new Engraftment data, but rather uodate the passage accordingly
+                    if (engraftmentDataMap.containsKey(edto)) {
+
+                        engraftmentDataMap.get(edto).add(passage);
+
+                    } else {
+
+                        // If new, save in the Map
+                        engraftmentDataMap.put(edto, new HashSet<>(Arrays.asList(passage)));
+                    }
+                }
+            }
+        }
+
+        for(Map.Entry<EngraftmentDataDTO, Set<String>> entry: engraftmentDataMap.entrySet()){
+
+            EngraftmentDataDTO edto = entry.getKey();
+            Set<String> passages = entry.getValue();
+            List<String> passageList = new ArrayList<>();
+            passageList.addAll(passages);
+
+            //order the passages:
+            Collections.sort(passageList);
+            edto.setPassage(StringUtils.join(passageList, ", "));
+            engraftmentData.add(edto);
+
+        }
+
+        dto.setPdxModelList(engraftmentData);
+
+
+        List<QualityAssurance> qaList = pdx.getQualityAssurance();
+
+        List<QualityControlDTO> qcontrolList = new ArrayList<>();
+        for(QualityAssurance qa: qaList){
+
+            QualityControlDTO qdto = new QualityControlDTO(qa.getTechnology(), qa.getDescription(), qa.getPassages());
+            qcontrolList.add(qdto);
+        }
+
+        dto.setModelQualityControl(qcontrolList);
+
+        PatientDTO patientDTO = patientService.getPatientDetails(dataSource, modelId);
+        dto.setPatient(patientDTO);
+
+        List<DrugSummaryDTO> dosingStudies = getDrugSummary(dataSource, modelId);
+        dto.setDosingStudy(dosingStudies);
+        dto.setDosingStudyProtocolUrl(drugService.getPlatformUrlByDataSource(dataSource));
+        dto.setDosingStudyNumbers(dosingStudies.size());
+
+
+        //MOLECULAR DATA TAB
+        List<MolecularDataEntryDTO> mdeDTO = new ArrayList<>();
+        //first add molchars linked to the patient sample
+        Collection<MolecularCharacterization> patientMCs = molecularCharacterizationRepository.findAllBySample(patientSample);
+        for(MolecularCharacterization mc : patientMCs){
+
+            MolecularDataEntryDTO mde = new MolecularDataEntryDTO();
+            mde.setSampleId(patientSample.getSourceSampleId());
+            mde.setSampleType("Patient Tumor");
+            mde.setEngraftedTumorPassage("NA");
+            mde.setMolcharType(mc.getType());
+            mde.setDataAvailableLabel(mc.getPlatform().getName());
+            mde.setDataAvailableUrl("");
+            mde.setPlatformUsedLabel(mc.getPlatform().getName());
+
+            if(mc.getPlatform().getName() == null || mc.getPlatform().getName().isEmpty() || mc.getPlatform().getName().toLowerCase().equals("not specified")
+                    || mc.getPlatform().getUrl() == null || mc.getPlatform().getUrl().isEmpty()){
+
+                mde.setPlatformUsedUrl(null);
+            }
+            else{
+
+                mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
+            }
+
+
+            mde.setRawDataLabel("Not available");
+            mde.setMolcharId(mc.getId().toString());
+
+            mdeDTO.add(mde);
+        }
+
+        //then add molchars linked to the xenograft sample
+
+        List<Specimen> specimens = specimenRepository.findAllWithMolcharDataByModel(pdx);
+
+        for(Specimen sp: specimens){
+
+
+
+            if(sp.getSample() != null){
+
+                Sample xenoSample = sp.getSample();
+
+                for(MolecularCharacterization mc: xenoSample.getMolecularCharacterizations()){
+
+                    MolecularDataEntryDTO mde = new MolecularDataEntryDTO();
+
+                    mde.setSampleId(xenoSample.getSourceSampleId());
+                    mde.setSampleType("Engrafted Tumor");
+                    mde.setEngraftedTumorPassage(sp.getPassage());
+                    mde.setMolcharType(mc.getType());
+                    mde.setDataAvailableLabel(mc.getPlatform().getName());
+                    mde.setDataAvailableUrl("");
+                    mde.setPlatformUsedLabel(mc.getPlatform().getName());
+                    mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
+                    mde.setRawDataLabel("Not available");
+                    mde.setMolcharId(mc.getId().toString());
+
+                    mdeDTO.add(mde);
+
+                }
+
+
+            }
+
+
+
+        }
+
+        dto.setMolecularDataRows(mdeDTO);
+        dto.setMolecularDataEntrySize(mdeDTO.size());
+        return dto;
+                //getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
     }
 
 
+    /**
+     * Creates a table from a selected (molchar)--(massoc)--(marker) object
+     *
+     * @param id, that is the node id of the selected molchar object
+     * @return
+     */
+    public MolecularDataTableDTO getMolecularDataTable(String id){
+
+        MolecularCharacterization mc = molecularCharacterizationRepository.getMolecularDataById(Long.valueOf(id));
+
+        Sample sample = sampleRepository.findSampleByMolcharId(Long.valueOf(id));
+        String sampleId = sample.getSourceSampleId() == null ? "" : sample.getSourceSampleId();
+
+        Set<String> tableHeadersSet = new HashSet<>();
+        ArrayList<String> tableHeaders = new ArrayList<>();
+        List<List<String>> tableRows = new ArrayList<>();
+
+        MolecularDataTableDTO dto = new MolecularDataTableDTO();
+
+        //STEP 0: Add sampleid to table, we always display this
+        tableHeadersSet.add("sampleid");
+
+
+        //STEP 1: dinamically determine the headers of the table
+        for(MarkerAssociation ma: mc.getMarkerAssociations()){
+
+
+            if(ma.getChromosome() != null && !ma.getChromosome().isEmpty()){
+                tableHeadersSet.add("chromosome");
+            }
+
+            if(ma.getSeqPosition() != null && !ma.getSeqPosition().isEmpty()){
+                tableHeadersSet.add("seqposition");
+            }
+
+            if(ma.getRefAllele() != null && !ma.getRefAllele().isEmpty()){
+                tableHeadersSet.add("refallele");
+            }
+
+            if(ma.getAltAllele() != null && !ma.getAltAllele().isEmpty()){
+                tableHeadersSet.add("altallele");
+            }
+
+            if(ma.getConsequence() != null && !ma.getConsequence().isEmpty()){
+                tableHeadersSet.add("consequence");
+            }
+
+            if(ma.getMarker() != null){
+                tableHeadersSet.add("hgncsymbol");
+            }
+
+            if(ma.getAminoAcidChange() != null && !ma.getAminoAcidChange().isEmpty()){
+                tableHeadersSet.add("aminoacidchange");
+            }
+
+            if(ma.getReadDepth() != null && !ma.getReadDepth().isEmpty()){
+                tableHeadersSet.add("readdepth");
+            }
+
+            if(ma.getAlleleFrequency() != null && !ma.getAlleleFrequency().isEmpty()){
+                tableHeadersSet.add("allelefrequency");
+            }
+
+
+            if(ma.getRsIdVariants() != null && !ma.getRsIdVariants().isEmpty()){
+                tableHeadersSet.add("rsidvariants");
+            }
+
+            if(ma.getNucleotideChange() != null && !ma.getNucleotideChange().isEmpty()){
+                tableHeadersSet.add("nucleotidechange");
+            }
+
+            if(ma.getGenomeAssembly() != null && !ma.getGenomeAssembly().isEmpty()){
+                tableHeadersSet.add("genomeassembly");
+            }
+
+            if(ma.getSeqStartPosition() != null && !ma.getSeqStartPosition().isEmpty()){
+                tableHeadersSet.add("seqstartposition");
+            }
+
+            if(ma.getSeqEndPosition() != null && !ma.getSeqEndPosition().isEmpty()){
+                tableHeadersSet.add("seqendposition");
+            }
+
+            if(ma.getStrand() != null && !ma.getStrand().isEmpty()){
+                tableHeadersSet.add("strand");
+            }
+
+            if(ma.getEnsemblTranscriptId() != null && !ma.getEnsemblTranscriptId().isEmpty()){
+                tableHeadersSet.add("ensembltranscriptid");
+            }
+
+            if(ma.getUcscTranscriptId() != null && !ma.getUcscTranscriptId().isEmpty()){
+                tableHeadersSet.add("ucsctranscriptid");
+            }
+
+            if(ma.getNcbiTranscriptId() != null && !ma.getNcbiTranscriptId().isEmpty()){
+                tableHeadersSet.add("ncbitranscriptid");
+            }
+
+            if(ma.getCdsChange() != null && !ma.getCdsChange().isEmpty()){
+                tableHeadersSet.add("cdschange");
+            }
+
+            if(ma.getType() != null && !ma.getType().isEmpty()){
+                tableHeadersSet.add("type");
+            }
+
+            if(ma.getAnnotation() != null && !ma.getAnnotation().isEmpty()){
+                tableHeadersSet.add("annotation");
+            }
+
+            if(ma.getCytogeneticsResult() != null && !ma.getCytogeneticsResult().isEmpty()){
+                tableHeadersSet.add("cytogeneticsresult");
+            }
+
+            if(ma.getMicrosatelliteResult() != null && !ma.getMicrosatelliteResult().isEmpty()){
+                tableHeadersSet.add("microsateliteresult");
+            }
+
+            if(ma.getProbeIDAffymetrix() != null && !ma.getProbeIDAffymetrix().isEmpty()){
+                tableHeadersSet.add("probeidaffymetrix");
+            }
+
+            if(ma.getCnaLog2RCNA() != null && !ma.getCnaLog2RCNA().isEmpty()){
+                tableHeadersSet.add("cnalog2rcna");
+            }
+
+            if(ma.getCnaLog10RCNA() != null && !ma.getCnaLog10RCNA().isEmpty()){
+                tableHeadersSet.add("cnalog10rcna");
+            }
+
+            if(ma.getCnaCopyNumberStatus() != null && ma.getCnaCopyNumberStatus().isEmpty()){
+                tableHeadersSet.add("cnacopynumberstatus");
+            }
+
+            if(ma.getCnaGisticValue() != null && !ma.getCnaGisticValue().isEmpty()){
+                tableHeadersSet.add("cnagisticvalue");
+            }
+
+            if(ma.getCnaPicnicValue() != null && !ma.getCnaPicnicValue().isEmpty()){
+                tableHeadersSet.add("cnapicnicvalue");
+            }
+
+        }
+
+
+        //STEP 2: Determine table headers order
+        // DON'T CHANGE THE ORDER OF THESE CONDITIONS OR THE WORLD WILL TREMBLE!
+        // (But if you REALLY need to change the order, don't forget to change it at step 3, too!!!)
+
+
+
+        if(tableHeadersSet.contains("sampleid")){
+            tableHeaders.add("Sample Id");
+        }
+
+        if(tableHeadersSet.contains("hgncsymbol")){
+            tableHeaders.add("HGNC Symbol");
+        }
+
+        if(tableHeadersSet.contains("aminoacidchange")){
+            tableHeaders.add("Amino Acid Change");
+        }
+
+        if(tableHeadersSet.contains("consequence")){
+            tableHeaders.add("Consequence");
+        }
+
+        if(tableHeadersSet.contains("nucleotidechange")){
+            tableHeaders.add("Nucleotide Change");
+        }
+
+        if(tableHeadersSet.contains("readdepth")){
+            tableHeaders.add("Read Depth");
+        }
+
+        if(tableHeadersSet.contains("allelefrequency")){
+            tableHeaders.add("Allele Frequency");
+        }
+
+        if(tableHeadersSet.contains("probeidaffymetrix")){
+            tableHeaders.add("Probe Id Affymetrix");
+        }
+
+        if(tableHeadersSet.contains("cnalog10rcna")){
+            tableHeaders.add("Log10 Rcna");
+        }
+
+        if(tableHeadersSet.contains("cnalog2rcna")){
+            tableHeaders.add("Log2 Rcna");
+        }
+
+        if(tableHeadersSet.contains("cnacopynumberstatus")){
+            tableHeaders.add("Copy Number Status");
+        }
+
+        if(tableHeadersSet.contains("cnagisticvalue")){
+            tableHeaders.add("Gistic Value");
+        }
+
+        if(tableHeadersSet.contains("chromosome")){
+            tableHeaders.add("Chromosome");
+        }
+
+        if(tableHeadersSet.contains("seqstartposition")){
+            tableHeaders.add("Seq. Start Position");
+        }
+
+        if(tableHeadersSet.contains("seqendposition")){
+            tableHeaders.add("Seq. End Position");
+        }
+
+        if(tableHeadersSet.contains("refallele")){
+            tableHeaders.add("Ref. Allele");
+        }
+
+        if(tableHeadersSet.contains("altallele")){
+            tableHeaders.add("Alt Allele");
+        }
+
+        if(tableHeadersSet.contains("rsidvariants")){
+            tableHeaders.add("Rs Id Variant");
+        }
+
+        if(tableHeadersSet.contains("ensembltranscriptid")){
+            tableHeaders.add("Ensembl Transcript Id");
+        }
+
+        if(tableHeadersSet.contains("ensemblgeneid")){
+            tableHeaders.add("Ensembl Gene Id");
+        }
+
+        if(tableHeadersSet.contains("ucscgeneid")){
+            tableHeaders.add("Ucsc Gene Id");
+        }
+
+        if(tableHeadersSet.contains("ncbigeneid")){
+            tableHeaders.add("Ncbi Gene Id");
+        }
+
+        if(tableHeadersSet.contains("genomeassembly")){
+            tableHeaders.add("Genome Assembly");
+        }
+
+        if(tableHeadersSet.contains("cytogeneticsresult")){
+            tableHeaders.add("Result");
+        }
+
+
+
+        //STEP 3: Insert the rows of the table
+        // DON'T CHANGE THE ORDER OF THESE CONDITIONS OR THE WORLD WILL TREMBLE!
+        // (But if you REALLY need to change the order, don't forget to change it at step 2, too!!!)
+        for(MarkerAssociation ma: mc.getMarkerAssociations()){
+
+            List<String> row = new ArrayList<>();
+
+
+            if(tableHeadersSet.contains("sampleid")){
+                row.add(sampleId);
+            }
+
+            if(tableHeadersSet.contains("hgncsymbol")){
+                row.add(ma.getMarker().getHgncSymbol());
+            }
+
+            if(tableHeadersSet.contains("aminoacidchange")){
+                row.add(ma.getAminoAcidChange() == null ? "" : ma.getAminoAcidChange());
+            }
+
+            if(tableHeadersSet.contains("consequence")){
+                row.add((ma.getConsequence() == null ? "": ma.getConsequence()));
+            }
+
+            if(tableHeadersSet.contains("nucleotidechange")){
+                row.add((ma.getNucleotideChange() == null ? "":ma.getNucleotideChange()));
+            }
+
+            if(tableHeadersSet.contains("readdepth")){
+                row.add((ma.getReadDepth() == null ? "":ma.getReadDepth()));
+            }
+
+            if(tableHeadersSet.contains("allelefrequency")){
+                row.add((ma.getAlleleFrequency() == null? "":ma.getAlleleFrequency()));
+            }
+
+            if(tableHeadersSet.contains("probeidaffymetrix")){
+                row.add((ma.getProbeIDAffymetrix() == null ? "":ma.getProbeIDAffymetrix()));
+            }
+
+            if(tableHeadersSet.contains("cnalog10rcna")){
+                row.add((ma.getCnaLog10RCNA() == null ? "":ma.getCnaLog10RCNA()));
+            }
+
+            if(tableHeadersSet.contains("cnalog2rcna")){
+                row.add((ma.getCnaLog2RCNA() == null ? "":ma.getCnaLog2RCNA()));
+            }
+
+            if(tableHeadersSet.contains("cnacopynumberstatus")){
+                row.add((ma.getCnaCopyNumberStatus() == null ? "":ma.getCnaCopyNumberStatus()));
+            }
+
+            if(tableHeadersSet.contains("cnagisticvalue")){
+                row.add((ma.getCnaGisticValue() == null ? "" : ma.getCnaGisticValue()));
+            }
+
+            if(tableHeadersSet.contains("chromosome")){
+                row.add((ma.getChromosome() == null ? "" : ma.getChromosome()));
+            }
+
+            if(tableHeadersSet.contains("seqstartposition")){
+                row.add((ma.getSeqStartPosition() == null ? "" : ma.getSeqStartPosition()));
+            }
+
+            if(tableHeadersSet.contains("seqendposition")){
+                row.add((ma.getSeqEndPosition() == null ? "" : ma.getSeqEndPosition()));
+            }
+
+            if(tableHeadersSet.contains("refallele")){
+                row.add((ma.getRefAllele() == null ? "" : ma.getRefAllele()));
+            }
+
+            if(tableHeadersSet.contains("altallele")){
+                row.add((ma.getAltAllele() == null ? "" : ma.getAltAllele()));
+            }
+
+            if(tableHeadersSet.contains("rsidvariants")){
+                row.add((ma.getRsIdVariants() == null ? "" : ma.getRsIdVariants()));
+            }
+
+            if(tableHeadersSet.contains("ensembltranscriptid")){
+                row.add((ma.getEnsemblTranscriptId() == null ? "" : ma.getEnsemblTranscriptId()));
+            }
+
+            if(tableHeadersSet.contains("ensemblgeneid")){
+                row.add((ma.getMarker().getEnsemblGeneId() == null ? "": ma.getMarker().getEnsemblGeneId() ));
+            }
+
+            if(tableHeadersSet.contains("ucscgeneid")){
+                row.add((ma.getMarker().getUcscGeneId() == null ? "" : ma.getMarker().getUcscGeneId()));
+            }
+
+            if(tableHeadersSet.contains("ncbigeneid")){
+                row.add((ma.getMarker().getNcbiGeneId() == null ? "" : ma.getMarker().getNcbiGeneId()));
+            }
+
+            if(tableHeadersSet.contains("genomeassembly")){
+                row.add((ma.getGenomeAssembly() == null ? "" : ma.getGenomeAssembly()));
+            }
+
+            if(tableHeadersSet.contains("cytogeneticsresult")){
+                row.add(ma.getCytogeneticsResult() == null ? "" : ma.getCytogeneticsResult());
+            }
+
+
+            tableRows.add(row);
+
+        }
+
+
+        dto.setTableHeaders(tableHeaders);
+        dto.setTableRows(tableRows);
+
+
+        return dto;
+    }
+/*
     public DetailsDTO getModelDetails(String dataSource, String modelId, int page, int size, String technology, String passage, String searchFilter) {
 
 
@@ -402,6 +1056,9 @@ public class DetailsService {
                         markerList.add(ma.getMarker().getName() + " status: " + ma.getDescription());
                     }*/
 
+
+/*
+
                 }
             }
             Collections.sort(markerList);
@@ -469,7 +1126,7 @@ public class DetailsService {
 
         }*/
 
-
+/*
         for (String tech : modelTechAndPassages.keySet()) {
 
             //Retrieve the passages:
@@ -551,7 +1208,7 @@ public class DetailsService {
         return dto;
     }
 
-
+*/
 
 
     /**
@@ -770,11 +1427,11 @@ public class DetailsService {
                     markerAssocArray[3] = markerAssoc.getRefAllele();
                     markerAssocArray[4] = markerAssoc.getAltAllele();
                     markerAssocArray[5] = markerAssoc.getConsequence();
-                    markerAssocArray[6] = markerAssoc.getMarker().getSymbol();
+                    markerAssocArray[6] = markerAssoc.getMarker().getHgncSymbol();
                     markerAssocArray[7] = markerAssoc.getAminoAcidChange();
                     markerAssocArray[8] = markerAssoc.getReadDepth();
                     markerAssocArray[9] = markerAssoc.getAlleleFrequency();
-                    markerAssocArray[10] = markerAssoc.getRsVariants();
+                    markerAssocArray[10] = markerAssoc.getRsIdVariants();
                     markerAssocArray[11] = dMolChar.getPlatform().getName();
                     markerAssocArray[12] = passage;
                     //markerAssocArray[13] = sample.getDiagnosis();

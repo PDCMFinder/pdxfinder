@@ -1,7 +1,6 @@
 package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.pdxfinder.dao.QualityAssurance;
 import org.pdxfinder.services.dto.*;
 import org.pdxfinder.services.pdf.*;
 import org.slf4j.Logger;
@@ -25,6 +24,7 @@ public class PdfService {
 
 
     private Logger logger = LoggerFactory.getLogger(PdfService.class);
+
 
     public List<Object> generatePdf(DetailsDTO data, String modelUrl) {
 
@@ -50,9 +50,9 @@ public class PdfService {
 
         Map<String, String> patient = new LinkedHashMap<>();
 
-        patient.put(Label.TXT_SEX, data.getGender());
-        patient.put(Label.TXT_COLLECTION_AGE, data.getAgeAtCollection());
-        patient.put(Label.TXT_RACE, data.getRace() + "  " + data.getEthnicity());  /////
+        patient.put(Label.TXT_SEX, data.getPatientSex());
+        patient.put(Label.TXT_COLLECTION_AGE, data.getAgeAtTimeOfCollection());
+        patient.put(Label.TXT_RACE, data.getRace());  /////
 
         row1Column1Contents.add(
                 pdf.pdxFinderTable(patient, Label.TXT_PATIENT)
@@ -61,9 +61,9 @@ public class PdfService {
 
         Map<String, String> patientTumor = new LinkedHashMap<>();
 
-        patientTumor.put(Label.TXT_HISTOLOGY, data.getMappedOntology());
-        patientTumor.put(Label.TXT_TISSUE, data.getOriginTissue());
-        patientTumor.put(Label.TXT_SITE, data.getSampleSite());
+        patientTumor.put(Label.TXT_HISTOLOGY, data.getMappedOntologyTermLabel());
+        patientTumor.put(Label.TXT_TISSUE, data.getPrimaryTissue());
+        patientTumor.put(Label.TXT_SITE, data.getCollectionSite());
         patientTumor.put(Label.TXT_TUMOR, data.getTumorType());
         patientTumor.put(Label.TXT_GRADE, data.getGrade());  /////
         patientTumor.put(Label.TXT_STAGE, data.getStage());  //////
@@ -79,6 +79,7 @@ public class PdfService {
         row1Column1Contents.add(
                 pdf.canvasLine(560, Label.COLOR_PDX_SECONDARY, "1")
         );*/
+
 
         row1Column1Contents.add(
                 pdf.doubleTableHead(Label.TXT_ENGRAFTMENT, 6, Arrays.asList(90, 90, 90, 90, 73, 70), Arrays.asList(0, 7, 0, -6))
@@ -133,8 +134,8 @@ public class PdfService {
         dataList = new ArrayList<>();
         try{
 
-            List<QualityAssurance> qaList = data.getQualityAssurances();
-            for (QualityAssurance qa : qaList) {
+            List<QualityControlDTO> qaList = data.getModelQualityControl();
+            for (QualityControlDTO qa : qaList) {
 
                 Map<String, String> qaMap = mapper.convertValue(qa, Map.class);
                 qaMap.remove("validationHostStrain");
@@ -323,18 +324,18 @@ public class PdfService {
         dataList = new ArrayList<>();
         try {
 
-            List<Map> molDataList = data.getDataSummary();
-            for (Map molData : molDataList) {
+            List<MolecularDataEntryDTO> molDataList = data.getMolecularDataRows();
+            for (MolecularDataEntryDTO molData : molDataList) {
 
                // Map<String, String> molDataMap = mapper.convertValue(molData, LinkedHashMap.class);
 
                 Map<String, String> molDataMap = new LinkedHashMap<>();
-                molDataMap.put("sampleId",molData.get("sampleId").toString());
-                molDataMap.put("sampleType",molData.get("sampleType").toString());
-                molDataMap.put("xenograftPassage",molData.get("xenograftPassage").toString());
-                molDataMap.put("dataAvailable",molData.get("dataAvailable").toString());
-                molDataMap.put("platformUsed",molData.get("platformUsed").toString());
-                molDataMap.put("rawData",molData.get("rawData").toString());
+                molDataMap.put("sampleId",molData.getSampleId());
+                molDataMap.put("sampleType",molData.getSampleType());
+                molDataMap.put("xenograftPassage",molData.getEngraftedTumorPassage());
+                molDataMap.put("dataAvailable",molData.getDataAvailableLabel());
+                molDataMap.put("platformUsed",molData.getPlatformUsedLabel());
+                molDataMap.put("rawData",molData.getRawDataLabel());
 
                 dataList.add(molDataMap);
             }
@@ -374,7 +375,7 @@ public class PdfService {
         dataList = new ArrayList<>();
         try {
 
-            List<DrugSummaryDTO> dsList = data.getDrugSummary();
+            List<DrugSummaryDTO> dsList = data.getDosingStudy();
             for (DrugSummaryDTO ds : dsList) {
 
                 Map<String, String> dsMap = mapper.convertValue(ds, Map.class);
@@ -420,8 +421,8 @@ public class PdfService {
 
 
 
-        String contact = (data.getContacts() != null) ? data.getContacts() : "Not Specified";
-        String externalURL = (data.getExternalUrl() != null) ? data.getExternalUrl() : "Not Specified";
+        String contact = (data.getContactProviderUrl() != null) ? data.getContactProviderUrl() : "Not Specified";
+        String externalURL = (data.getViewDataAtUrl() != null) ? data.getViewDataAtUrl() : "Not Specified";
 
 
 
@@ -463,7 +464,7 @@ public class PdfService {
 
 
 
-        String dataSource = (data.getSourceName() != null) ? data.getSourceName() : "Not Specified";
+        String dataSource = (data.getProviderName() != null) ? data.getProviderName() : "Not Specified";
 
         td.add(pdf.plainText(Label.DATA_PROVIDER, Label.STYLE_TABLE_H3, Label.TRUE));
         td.add(
@@ -522,6 +523,7 @@ public class PdfService {
 
 
         return content;
+
     }
 
 
@@ -572,7 +574,7 @@ public class PdfService {
         tableBody.add(tableRow);
 
         // create row 2 and add to table body
-        text = new Text(data.getMappedOntology()+"\n"+data.getSourceName(), "h2");
+        text = new Text(data.getMappedOntologyTermLabel()+"\n"+data.getDataSource(), "h2");
         text.setAlignment("center");
         tableRow = Arrays.asList(text);
         tableBody.add(tableRow);

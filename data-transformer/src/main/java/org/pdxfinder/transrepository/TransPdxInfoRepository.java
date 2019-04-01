@@ -14,4 +14,7 @@ public interface TransPdxInfoRepository extends JpaRepository<PdmrPdxInfo, Long>
     @Query(value = "Select pdmr from PdmrPdxInfo pdmr GROUP BY pdmr.modelID ") //ORDER BY pdmr.clinicalDiagnosis ASC
     List<PdmrPdxInfo> findAllNoDuplicate();
 
+    PdmrPdxInfo findByModelID(String modelID);
+
+
 }

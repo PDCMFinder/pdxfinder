@@ -1,13 +1,9 @@
 package org.pdxfinder.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.pdxfinder.services.*;
 import org.pdxfinder.services.ds.AutoCompleteOption;
-import org.pdxfinder.services.dto.CountDTO;
-import org.pdxfinder.services.dto.DataAvailableDTO;
-import org.pdxfinder.services.dto.DetailsDTO;
-import org.pdxfinder.services.dto.VariationDataDTO;
+import org.pdxfinder.services.dto.*;
 import org.pdxfinder.services.pdf.Label;
 import org.pdxfinder.services.pdf.PdfHelper;
 import org.pdxfinder.services.pdf.Report;
@@ -184,7 +180,7 @@ public class AjaxController {
 
         String viewPlatform = (platform == null) ? "" : platform;
 
-        DetailsDTO dto = detailsService.getModelDetails(dataSrc, modelId, page, size,viewPlatform,"","");
+        DetailsDTO dto = detailsService.getModelDetails(dataSrc, modelId);
 
         return  dto;
     }
@@ -209,17 +205,6 @@ public class AjaxController {
 
     @RequestMapping(value = "/getmutatedmarkerswithvariants")
     public Object getMutatedMarkersWithVariants(){
-
-        JSONObject j = new JSONObject();
-
-        try {
-            j = new JSONObject(molCharService.getMutatedMarkersAndVariants());
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
-
-        //ResponseEntity rEntity = new ResponseEntity(molCharService.getMutatedMarkersAndVariants(), HttpStatus.OK);
 
         ObjectMapper mapper = new ObjectMapper();
         Object object = Object.class;
@@ -265,7 +250,7 @@ public class AjaxController {
         Report report = new Report();
         PdfHelper pdfHelper = new PdfHelper();
 
-        DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId, page, size, "", "", "");
+        DetailsDTO detailsDTO = detailsService.getModelDetails(dataSrc, modelId);
 
         String modelUrl = Label.WEBSITE + request.getRequestURI();
         modelUrl = modelUrl.substring(0, modelUrl.length() - 9);
@@ -275,5 +260,12 @@ public class AjaxController {
         report.setStyles(pdfHelper.getStyles());
 
         return report;
+    }
+
+    @GetMapping("/getmoleculardata/{molcharId}")
+    public MolecularDataTableDTO getMolecularTableData(@PathVariable String molcharId){
+
+        return detailsService.getMolecularDataTable(molcharId);
+
     }
 }

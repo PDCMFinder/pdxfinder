@@ -4,11 +4,11 @@ package org.pdxfinder.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
-import org.pdxfinder.dao.MarkerAssociation;
-import org.pdxfinder.dao.ModelCreation;
-import org.pdxfinder.dao.MolecularCharacterization;
-import org.pdxfinder.repositories.ModelCreationRepository;
-import org.pdxfinder.repositories.OntologyTermRepository;
+import org.pdxfinder.graph.dao.MarkerAssociation;
+import org.pdxfinder.graph.dao.ModelCreation;
+import org.pdxfinder.graph.dao.MolecularCharacterization;
+import org.pdxfinder.graph.repositories.ModelCreationRepository;
+import org.pdxfinder.graph.repositories.OntologyTermRepository;
 import org.pdxfinder.services.ds.FacetOption;
 import org.pdxfinder.services.ds.ModelForQuery;
 import org.pdxfinder.services.ds.SearchDS;
@@ -139,10 +139,10 @@ public class SearchService {
         wsDTO.setCurrentIndex(current);
 
 
-        int begin = Math.max(1, current - 4);
+        int begin = Math.max(1, current - 2);
         wsDTO.setBeginIndex(begin);
 
-        int end = Math.min(begin + 7, numPages);
+        int end = Math.min(begin + 4, numPages);
         wsDTO.setEndIndex(end);
 
         wsDTO.setPage(page);
@@ -158,6 +158,7 @@ public class SearchService {
             textSearchDescription = "PDXFinder contains "+searchDS.getModels().size()+" models";
         }
         wsDTO.setTextSearchDescription(textSearchDescription);
+        wsDTO.setTotalResults(searchDS.getModels().size());
 
         wsDTO.setMainSearchFieldOptions(autoCompleteService.getAutoSuggestions());
 
@@ -432,6 +433,12 @@ public class SearchService {
 
                 case patient_treatment_status:
                     headers.add("PATIENT TREATMENT STATUS");
+
+                case patient_gender:
+                    headers.add("SEX");
+
+                case patient_age:
+                    headers.add("AGE");
             }
 
         }
@@ -532,7 +539,7 @@ public class SearchService {
 
                 for (MolecularCharacterization mc : model.getSample().getMolecularCharacterizations()) {
                     for (MarkerAssociation ma : mc.getMarkerAssociations()) {
-                        markerSet.add(ma.getMarker().getName());
+                        markerSet.add(ma.getMarker().getHgncSymbol());
                     }
                 }
                 sdto.setCancerGenomics(new ArrayList<>(markerSet));

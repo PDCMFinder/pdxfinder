@@ -1,12 +1,12 @@
 package org.pdxfinder.services;
 
-import org.pdxfinder.dao.ModelCreation;
-import org.pdxfinder.dao.TreatmentProtocol;
-import org.pdxfinder.dao.TreatmentSummary;
-import org.pdxfinder.repositories.DrugRepository;
-import org.pdxfinder.repositories.ResponseRepository;
-import org.pdxfinder.repositories.TreatmentProtocolRepository;
-import org.pdxfinder.repositories.TreatmentSummaryRepository;
+import org.pdxfinder.graph.dao.ModelCreation;
+import org.pdxfinder.graph.dao.TreatmentProtocol;
+import org.pdxfinder.graph.dao.TreatmentSummary;
+import org.pdxfinder.graph.repositories.DrugRepository;
+import org.pdxfinder.graph.repositories.ResponseRepository;
+import org.pdxfinder.graph.repositories.TreatmentProtocolRepository;
+import org.pdxfinder.graph.repositories.TreatmentSummaryRepository;
 import org.pdxfinder.services.dto.CountDTO;
 import org.springframework.stereotype.Service;
 

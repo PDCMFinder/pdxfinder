@@ -1,7 +1,7 @@
 package org.pdxfinder.services;
 
-import org.pdxfinder.dao.OntologyTerm;
-import org.pdxfinder.repositories.OntologyTermRepository;
+import org.pdxfinder.graph.dao.OntologyTerm;
+import org.pdxfinder.graph.repositories.OntologyTermRepository;
 import org.pdxfinder.services.ds.AutoCompleteOption;
 import org.springframework.stereotype.Service;
 

@@ -1,8 +1,8 @@
 package org.pdxfinder.services;
 
-import org.pdxfinder.dao.OntologyTerm;
-import org.pdxfinder.dao.Sample;
-import org.pdxfinder.repositories.*;
+import org.pdxfinder.graph.dao.OntologyTerm;
+import org.pdxfinder.graph.dao.Sample;
+import org.pdxfinder.graph.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
