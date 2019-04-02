@@ -571,7 +571,6 @@ public class SearchDS {
                     result = breastCancerMarkersSearch.search(filters.get(SearchFacetName.breast_cancer_markers), result, ModelForQuery::addBreastCancerMarkers);
                     break;
 
-
                 default:
                     //undexpected filter option
                     log.warn("Unrecognised facet {} passed to search, skipping", facet.getName());
@@ -694,6 +693,13 @@ public class SearchDS {
                         mfq.addProject(ja.getString(k));
                     }
 
+                }
+
+                if(j.has("accessModalities")){
+                    mfq.setAccessModalities(j.getString("accessModalities"));
+                }
+                else{
+                    mfq.setAccessModalities("");
                 }
 
 
