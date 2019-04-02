@@ -12,6 +12,7 @@ import org.pdxfinder.graph.dao.TreatmentProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.spec.ECField;
 import java.util.ArrayList;
 
 /**
@@ -82,14 +83,20 @@ public class Standardizer {
 
     public static String getValue(String name, JSONObject j){
         String value = NOT_SPECIFIED;
-        try{
-            value = j.getString(name);
-            if(value.trim().length()==0){
-                value = NOT_SPECIFIED;
+
+        if(j.has(name)){
+            try {
+                value = j.getString(name);
+                if(value.trim().length()==0) {
+                    value = NOT_SPECIFIED;
+                }
             }
-        }catch(Exception e){
-            e.printStackTrace();
+            catch (Exception e){
+                e.printStackTrace();
+            }
+
         }
+
         return value;
     }
 
