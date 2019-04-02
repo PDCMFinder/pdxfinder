@@ -152,7 +152,7 @@ public class Harmonizer {
             sampleID = data.getString("Sample ID");
         }
 
-        if (ds.equals(irccCrc) || ds.equals(mdAnderson) || ds.equals(jax) || ds.equals(pdmr)){
+        if (ds.equals(irccCrc) || ds.equals(mdAnderson) || ds.equals(jax) || ds.equals(pdmr) || ds.equals(wustl)){
             sampleID = data.getString("Model ID");
         }
 

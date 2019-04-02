@@ -87,7 +87,9 @@ public class Standardizer {
             if(value.trim().length()==0){
                 value = NOT_SPECIFIED;
             }
-        }catch(Exception e){}
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         return value;
     }
 
