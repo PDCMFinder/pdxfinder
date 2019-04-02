@@ -20,7 +20,8 @@ public enum SearchFacetName {
     drug,
     project,
     data_available,
-    breast_cancer_markers;
+    breast_cancer_markers,
+    accessModalities;
 
     public String getName() {
         return name();
