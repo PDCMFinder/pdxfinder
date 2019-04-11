@@ -7,6 +7,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.graph.dao.MarkerAssociation;
 import org.pdxfinder.graph.dao.ModelCreation;
 import org.pdxfinder.graph.dao.MolecularCharacterization;
+import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.repositories.ModelCreationRepository;
 import org.pdxfinder.graph.repositories.OntologyTermRepository;
 import org.pdxfinder.services.ds.FacetOption;
@@ -588,6 +589,38 @@ public class SearchService {
         return new HashMap<>();
     }
 
+
+
+    public List<ModelCreation> findERRs() {
+
+        List<ModelCreation> models = modelCreationRepository.findTemp();
+
+        ModelCreation modelCreation = models.get(0);
+
+        logger.info(modelCreation.getDataSource()+" AAAA");
+
+
+        return models;
+
+
+
+
+
+
+/*        Sample sample = modelCreation.getSample();
+
+        logger.info(sample.getDiagnosis() + "XXXXX");
+
+        try {
+            for (MolecularCharacterization molecularCharacterization : sample.getMolecularCharacterizations()) {
+
+                logger.info(molecularCharacterization.getMarkerAssociations() + "XXXXX");
+            }
+        } catch (Exception e) {
+        }*/
+
+
+    }
 
 
 }

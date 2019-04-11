@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Interface describing operations for adding/finding/deleting PDX strain records
@@ -181,4 +182,27 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
 
     @Query("CREATE INDEX ON :ModelCreation(dataSource, sourcePdxId)")
     void createIndex();
+
+
+    @Query("MATCH (model:ModelCreation)-[msr:MODEL_SAMPLE_RELATION]-(samp:Sample)-[cby:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[asw:ASSOCIATED_WITH]-(massoc:MarkerAssociation)-[mark:MARKER]-(marker:Marker) WHERE molchar.type='cytogenetics' " +
+
+            "RETURN model, msr, samp, cby, molchar, asw, massoc, mark, marker")
+    List<ModelCreation> findTemp();
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

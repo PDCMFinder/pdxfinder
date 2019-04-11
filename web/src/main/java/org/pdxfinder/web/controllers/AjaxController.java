@@ -1,6 +1,7 @@
 package org.pdxfinder.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.*;
 import org.pdxfinder.services.ds.AutoCompleteOption;
 import org.pdxfinder.services.dto.*;
@@ -13,10 +14,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /*
  * Created by csaba on 03/05/2018.
@@ -35,6 +33,9 @@ public class AjaxController {
     PdfService pdfService;
 
     @Autowired
+    private SearchService searchService;
+
+    @Autowired
     public AjaxController(AutoCompleteService autoCompleteService,
                           PlatformService platformService,
                           MolCharService molCharService,
@@ -48,6 +49,51 @@ public class AjaxController {
         this.detailsService = detailsService;
         this.drugService = drugService;
         this.graphService = graphService;
+    }
+
+
+
+    @GetMapping("/test-data")
+    public String search2x(){
+
+
+        String modelID = "";
+        List<String> results = new ArrayList<>();
+
+        String rowData = "";
+
+        List<ModelCreation> models = searchService.findERRs();
+
+
+        for(ModelCreation modelCreation : models){
+
+            modelID = modelCreation.getSourcePdxId();
+
+            Set<Sample> samples = modelCreation.getRelatedSamples();
+
+            for (Sample sample : samples){
+
+                Set<MolecularCharacterization> molchars = sample.getMolecularCharacterizations();
+
+                for (MolecularCharacterization molchar : molchars){
+
+                    List<MarkerAssociation> markerAssocs = molchar.getMarkerAssociations();
+
+                    results = new ArrayList<>();
+
+                    for (MarkerAssociation mAssoc : markerAssocs){
+
+                        results.add(mAssoc.getMarker().getHgncSymbol()+" "+mAssoc.getCytogeneticsResult());
+                    }
+                }
+            }
+
+            rowData += modelID +" | "+results+"<br>";
+        }
+
+        return rowData;
+
+
     }
 
     @RequestMapping(value = "/drugnames")
