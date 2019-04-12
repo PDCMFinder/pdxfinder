@@ -591,35 +591,11 @@ public class SearchService {
 
 
 
-    public List<ModelCreation> findERRs() {
+    public List<ModelCreation> getModelsByMolcharType(String type) {
 
-        List<ModelCreation> models = modelCreationRepository.findTemp();
-
-        ModelCreation modelCreation = models.get(0);
-
-        logger.info(modelCreation.getDataSource()+" AAAA");
-
+        List<ModelCreation> models = modelCreationRepository.findByMolcharType(type);
 
         return models;
-
-
-
-
-
-
-/*        Sample sample = modelCreation.getSample();
-
-        logger.info(sample.getDiagnosis() + "XXXXX");
-
-        try {
-            for (MolecularCharacterization molecularCharacterization : sample.getMolecularCharacterizations()) {
-
-                logger.info(molecularCharacterization.getMarkerAssociations() + "XXXXX");
-            }
-        } catch (Exception e) {
-        }*/
-
-
     }
 
 

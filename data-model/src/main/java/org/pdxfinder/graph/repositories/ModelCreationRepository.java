@@ -184,11 +184,9 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     void createIndex();
 
 
-    @Query("MATCH (model:ModelCreation)-[msr:MODEL_SAMPLE_RELATION]-(samp:Sample)-[cby:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[asw:ASSOCIATED_WITH]-(massoc:MarkerAssociation)-[mark:MARKER]-(marker:Marker) WHERE molchar.type='cytogenetics' " +
-
+    @Query("MATCH (model:ModelCreation)-[msr:MODEL_SAMPLE_RELATION]-(samp:Sample)-[cby:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[asw:ASSOCIATED_WITH]-(massoc:MarkerAssociation)-[mark:MARKER]-(marker:Marker) WHERE molchar.type={molcharType} " +
             "RETURN model, msr, samp, cby, molchar, asw, massoc, mark, marker")
-    List<ModelCreation> findTemp();
-
+    List<ModelCreation> findByMolcharType(@Param("molcharType") String molcharType);
 
 
 }

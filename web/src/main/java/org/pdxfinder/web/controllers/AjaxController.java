@@ -53,17 +53,19 @@ public class AjaxController {
 
 
 
-    @GetMapping("/test-data")
-    public String search2x(){
+    // if(str.trim().toLowerCase().contains(search))
+
+    @GetMapping("/cytogenetics")
+    public String getCytogeneticsCombination(){
 
 
         String modelID = "";
         List<String> results = new ArrayList<>();
 
+
         String rowData = "";
 
-        List<ModelCreation> models = searchService.findERRs();
-
+        List<ModelCreation> models = searchService.getModelsByMolcharType("cytogenetics");
 
         for(ModelCreation modelCreation : models){
 
@@ -92,8 +94,6 @@ public class AjaxController {
         }
 
         return rowData;
-
-
     }
 
     @RequestMapping(value = "/drugnames")
