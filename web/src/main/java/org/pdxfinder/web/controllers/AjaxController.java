@@ -53,8 +53,6 @@ public class AjaxController {
 
 
 
-    // if(str.trim().toLowerCase().contains(search))
-
     @GetMapping("/cytogenetics")
     public String getCytogeneticsCombination(){
 

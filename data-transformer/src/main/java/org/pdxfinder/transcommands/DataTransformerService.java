@@ -386,7 +386,8 @@ public class DataTransformerService {
                             response = response.equals("<Unknown>") ? unKnown : response;
                         }
                     }
-                    treatments.add(new Treatment(drug,null,null,null,duration,null,
+
+                    treatments.add(new Treatment(cleanDrugs(drug),null,null,null,duration,null,
                             null,response,null,startingDate,null));
 
                     drug=""; duration = unKnown; response=""; startingDate = "";
@@ -426,7 +427,11 @@ public class DataTransformerService {
                             response = response.equals("<Unknown>") ? unKnown : response;
                         }
                     }
-                    treatments.add(new Treatment(null,drug,null,null,duration,null,
+
+
+
+
+                    treatments.add(new Treatment(null,cleanDrugs(drug),null,null,duration,null,
                             null,response,null,null,priorDate));
 
                     drug=""; duration = unKnown; response=""; priorDate = "";
@@ -591,6 +596,24 @@ public class DataTransformerService {
         return mappingList;
 
 
+    }
+
+
+    private String cleanDrugs(String drug){
+
+        String drugString = drug.contains("FOLFOX") ? drug.replace("FOLFOX","Fluorouracil + Leucovorin Calcium + Oxaliplatin") : drug;
+
+        // Always replace FOLFIRINOX before FOLFIRI
+        drugString = drugString.contains("FOLFIRINOX") ? drugString.replace("FOLFIRINOX","Fluorouracil + irinotecan + Leucovorin calcium + Oxaliplatin") : drugString;
+
+        drugString = drugString.contains("FOLFIRI") ? drugString.replace("FOLFIRI","Folinic acid + fluorouracil + Irinotecan") : drugString;
+
+        drugString = drugString.contains("MVAC") ? drugString.replace("MVAC","Cisplatin + Doxorubicin + Methotrexate + Vinblastine") : drugString;
+
+        drugString = drugString.contains("XELOX") ? drugString.replace("XELOX","Capecitabine + Oxaliplatin") : drugString;
+
+
+        return drugString;
     }
 
 
