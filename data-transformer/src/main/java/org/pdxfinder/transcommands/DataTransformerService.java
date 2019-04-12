@@ -606,12 +606,11 @@ public class DataTransformerService {
         // Always replace FOLFIRINOX before FOLFIRI
         drugString = drugString.contains("FOLFIRINOX") ? drugString.replace("FOLFIRINOX","Fluorouracil + irinotecan + Leucovorin calcium + Oxaliplatin") : drugString;
 
-        drugString = drugString.contains("FOLFIRI") ? drugString.replace("FOLFIRI","Folinic acid + fluorouracil + Irinotecan") : drugString;
+        drugString = drugString.contains("FOLFIRI") ? drugString.replace("FOLFIRI","Folinic acid + Fluorouracil + Irinotecan") : drugString;
 
         drugString = drugString.contains("MVAC") ? drugString.replace("MVAC","Cisplatin + Doxorubicin + Methotrexate + Vinblastine") : drugString;
 
         drugString = drugString.contains("XELOX") ? drugString.replace("XELOX","Capecitabine + Oxaliplatin") : drugString;
-
 
         return drugString;
     }

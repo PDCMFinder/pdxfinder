@@ -36,9 +36,9 @@ public class Standardizer {
 
     public static String getGender(String gender){
 
-        if(gender.toUpperCase().startsWith("F")){
+        if(gender.toUpperCase().startsWith("F".toLowerCase())){
             gender = FEMALE;
-        }else if(gender.toUpperCase().startsWith("M")){
+        }else if(gender.toUpperCase().startsWith("M".toLowerCase())){
             gender = MALE;
         }else {
             gender = NOT_SPECIFIED;
@@ -52,13 +52,13 @@ public class Standardizer {
         if(tumorType == null){
             tumorType = "";
         }
-        if(tumorType.toUpperCase().startsWith("PRI")){
+        if(tumorType.toUpperCase().startsWith("PRI".toLowerCase())){
             tumorType = PRIMARY;
-        }else if(tumorType.toUpperCase().startsWith("MET")){
+        }else if(tumorType.toUpperCase().startsWith("MET".toLowerCase())){
             tumorType = METASTATIC;
-        }else if(tumorType.toUpperCase().startsWith("REF")){
+        }else if(tumorType.toUpperCase().startsWith("REF".toLowerCase())){
             tumorType = REFRACTORY;
-        }else if(tumorType.toUpperCase().startsWith("REC")){
+        }else if(tumorType.toUpperCase().startsWith("REC".toLowerCase())){
             tumorType = RECURRENT;
         }else{
             tumorType = NOT_SPECIFIED;
@@ -101,7 +101,7 @@ public class Standardizer {
     }
 
     public static String fixNotString(String in){
-        if(in.toUpperCase().startsWith("Not")){
+        if(in.toUpperCase().startsWith("Not".toLowerCase())){
             in = Standardizer.NOT_SPECIFIED;
         }
         return in;
@@ -125,523 +125,522 @@ public class Standardizer {
 
     public static String getDrugName(String drug){
 
-        if(drug.toLowerCase().equals("doxorubicin")){
+        drug = drug.toLowerCase();
+        
+        if(drug.toLowerCase().equals("doxorubicin".toLowerCase())){
 
             return "Doxorubicin";
         }
-        else if(drug.toLowerCase().equals("cyclophosphamide")){
+        else if(drug.toLowerCase().equals("cyclophosphamide".toLowerCase())){
 
 
             return "Cyclophosphamide";
 
         }
-        else if(drug.toLowerCase().equals("paclitaxel")){
+        else if(drug.toLowerCase().equals("paclitaxel".toLowerCase())){
 
             return "Paclitaxel";
         }
-        else if(drug.toLowerCase().equals("tamoxifen")){
+        else if(drug.toLowerCase().equals("tamoxifen".toLowerCase())){
 
             return "Tamoxifen";
         }
-        else if(drug.toLowerCase().equals("trastuzumab")){
+        else if(drug.toLowerCase().equals("trastuzumab".toLowerCase())){
 
             return "Trastuzumab";
         }
-        else if(drug.equals("0.9% Solution of Sodium Chloride") || drug.equals("Saline")){
+        else if(drug.equals("0.9% Solution of Sodium Chloride".toLowerCase()) || drug.equals("Saline".toLowerCase())){
 
             return "Sodium chloride solution";
         }
-        else if(drug.equals("Erbitux, Cetuximab")){
+        else if(drug.equals("Erbitux, Cetuximab".toLowerCase())){
 
             return "Cetuximab";
         }
-        else if(drug.equals("DSW (control)")){
+        else if(drug.equals("DSW (control)".toLowerCase())){
 
             return "Dextrose solution";
         }
-        else if(drug.equals("D5W")){
+        else if(drug.equals("D5W".toLowerCase())){
 
             return "Dextrose solution";
         }
-        else if(drug.equals("CMC")){
+        else if(drug.equals("CMC".toLowerCase())){
 
             return "Carboxymethyl cellulose";
         }
-        else if(drug.equals("DMSO")){
+        else if(drug.equals("DMSO".toLowerCase())){
 
             return "Dimethyl sulfoxide";
         }
-        else if(drug.equals("Docetaxel")){
+        else if(drug.equals("Docetaxel".toLowerCase())){
 
             return "Docetaxel";
         }
-        else if(drug.equals("Trametinib")){
+        else if(drug.equals("Trametinib".toLowerCase())){
 
             return "Trametinib";
         }
-        else if(drug.equals("Erlotinib")){
+        else if(drug.equals("Erlotinib".toLowerCase())){
 
             return "Erlotinib";
         }
-        else if(drug.toLowerCase().equals("avastin")){
+        else if(drug.toLowerCase().equals("avastin".toLowerCase())){
 
             return "Bevacizumab";
         }
-        else if(drug.equals("Carboplatin")){
+        else if(drug.equals("Carboplatin".toLowerCase())){
 
             return "Carboplatin";
         }
-        else if(drug.equals("CMC")){
+        else if(drug.equals("CMC".toLowerCase())){
 
             return "Carboxymethyl cellulose";
         }
-        else if(drug.equals("Cisplatin")){
+        else if(drug.equals("Cisplatin".toLowerCase())){
 
             return "Cisplatin";
         }
-        else if(drug.equals("Etoposide")){
+        else if(drug.equals("Etoposide".toLowerCase())){
 
             return "Etoposide";
         }
-        else if(drug.equals("Gemcitabine")){
+        else if(drug.equals("Gemcitabine".toLowerCase())){
 
             return "Gemcitabine";
         }
-        else if(drug.equals("Crizotinib")){
+        else if(drug.equals("Crizotinib".toLowerCase())){
 
             return "Crizotinib";
         }
-        else if(drug.equals("Dabrafenib")){
+        else if(drug.equals("Dabrafenib".toLowerCase())){
 
             return "Dabrafenib";
         }
-        else if(drug.equals("Etoposide")){
+        else if(drug.equals("Etoposide".toLowerCase())){
 
             return "Etoposide";
         }
-        else if(drug.equals("Topotecan")){
+        else if(drug.equals("Topotecan".toLowerCase())){
             return drug;
         }
-        else if(drug.equals("5-FU") || drug.equals("5-Fluorouracil")){
+        else if(drug.equals("5-FU".toLowerCase()) || drug.equals("5-Fluorouracil".toLowerCase())){
 
             return "Fluorouracil";
         }
 
-        else if(drug.equals("Oxaliplatin")){
+        else if(drug.equals("Oxaliplatin".toLowerCase())){
 
             return "Oxaliplatin";
         }
-        else if(drug.equals("Rapamycin")){
+        else if(drug.equals("Rapamycin".toLowerCase())){
 
             return "Rapamycin";
         }
-        else if(drug.equals("Temozolomide")){
+        else if(drug.equals("Temozolomide".toLowerCase())){
 
             return "Temozolomide";
         }
-        else if(drug.equals("Trametinib")){
+        else if(drug.equals("Trametinib".toLowerCase())){
 
             return "Trametinib";
         }
-        else if(drug.equals("Valproic acid")){
+        else if(drug.equals("Valproic acid".toLowerCase())){
 
             return "Valproic Acid";
         }
-        else if(drug.equals("Epirubicin")){
+        else if(drug.equals("Epirubicin".toLowerCase())){
 
             return "Epirubicin";
         }
-        else if(drug.equals("Radiotherapy")){
+        else if(drug.equals("Radiotherapy".toLowerCase())){
 
             return drug;
         }
-        else if(drug.equals("Goserelin")){
+        else if(drug.equals("Goserelin".toLowerCase())){
 
             return drug;
         }
-        else if(drug.equals("Letrozole")){
+        else if(drug.equals("Letrozole".toLowerCase())){
 
             return drug;
         }
-        else if(drug.equals("Capecitabine")){
+        else if(drug.equals("Capecitabine".toLowerCase())){
 
             return drug;
         }
-        else if(drug.equals("Denosumab")){
+        else if(drug.equals("Denosumab".toLowerCase())){
 
             return drug;
         }
 
-        else if(drug.equals("AZD1775")){
+        else if(drug.equals("AZD1775".toLowerCase())){
             return "Adavosertib";
         }
-        else if(drug.equals("MK1775")){
+        else if(drug.equals("MK1775".toLowerCase())){
             return "Adavosertib";
         }
-        else if(drug.equals("MK-2206")){
+        else if(drug.equals("MK-2206".toLowerCase())){
             return "Akt Inhibitor MK2206";
         }
-        else if(drug.equals("Autologous Hematopoietic Stem Cell Transplantation")){
+        else if(drug.equals("Autologous Hematopoietic Stem Cell Transplantation".toLowerCase())){
             return "Autologous Hematopoietic Stem Cell Transplantation";
         }
-        else if(drug.equals("Avastin")){
+        else if(drug.equals("Avastin".toLowerCase())){
             return "Avastin";
         }
-        else if(drug.equals("5-Azacytidine")){
+        else if(drug.equals("5-Azacytidine".toLowerCase())){
             return "Azacitidine";
         }
-        else if(drug.equals("BCG Vaccine")){
+        else if(drug.equals("BCG Vaccine".toLowerCase())){
             return "BCG Vaccine";
         }
-        else if(drug.equals("BCG")){
+        else if(drug.equals("BCG".toLowerCase())){
             return "BCG Vaccine";
         }
-        else if(drug.equals("Bendamustine")){
+        else if(drug.equals("Bendamustine".toLowerCase())){
             return "Bendamustine";
         }
-        else if(drug.equals("Bevacizumab")){
+        else if(drug.equals("Bevacizumab".toLowerCase())){
             return "Bevacizumab";
         }
-        else if(drug.equals("Bicalutamide")){
+        else if(drug.equals("Bicalutamide".toLowerCase())){
             return "Bicalutamide";
         }
-        else if(drug.equals("Biochemotherapy")){
+        else if(drug.equals("Biochemotherapy".toLowerCase())){
             return "Biochemotherapy";
         }
-        else if(drug.equals("Cabazitaxel")){
+        else if(drug.equals("Cabazitaxel".toLowerCase())){
             return "Cabazitaxel";
         }
-        else if(drug.equals("Cabozantinib")){
+        else if(drug.equals("Cabozantinib".toLowerCase())){
             return "Cabozantinib";
         }
-        else if(drug.equals("capecitabine")){
+        else if(drug.equals("capecitabine".toLowerCase())){
             return "capecitabine";
         }
-        else if(drug.equals("carboplatin")){
+        else if(drug.equals("carboplatin".toLowerCase())){
             return "carboplatin";
         }
-        else if(drug.equals("Celecoxib")){
+        else if(drug.equals("Celecoxib".toLowerCase())){
             return "Celecoxib";
         }
-        else if(drug.equals("Cetuximab")){
+        else if(drug.equals("Cetuximab".toLowerCase())){
             return "Cetuximab";
         }
-        else if(drug.equals("Undefined Chemoradiation")){
+        else if(drug.equals("Undefined Chemoradiation".toLowerCase())){
             return "Chemoradiotherapy";
         }
-        else if(drug.equals("Undefined Chemotherapy")){
+        else if(drug.equals("Undefined Chemotherapy".toLowerCase())){
             return "Chemotherapy";
         }
-        else if(drug.equals("chemotherapy ")){
+        else if(drug.equals("chemotherapy ".toLowerCase())){
             return "chemotherapy ";
         }
-        else if(drug.equals("chlorambucil")){
+        else if(drug.equals("chlorambucil".toLowerCase())){
             return "chlorambucil";
         }
-        else if(drug.equals("Choline Kinase Alpha Inhibitor")){
+        else if(drug.equals("Choline Kinase Alpha Inhibitor".toLowerCase())){
             return "Choline Kinase Alpha Inhibitor TCD-717";
         }
-        else if(drug.equals("cisplatin")){
+        else if(drug.equals("cisplatin".toLowerCase())){
             return "cisplatin";
         }
-        else if(drug.equals("Cisplatin ")){
+        else if(drug.equals("Cisplatin ".toLowerCase())){
             return "Cisplatin ";
         }
-        else if(drug.equals("Undefined Clinical Trial")){
+        else if(drug.equals("Undefined Clinical Trial".toLowerCase())){
             return "Clinical Trial";
         }
-        else if(drug.equals("CAVATAK")){
+        else if(drug.equals("CAVATAK".toLowerCase())){
             return "Coxsackievirus A21";
         }
-        else if(drug.equals("Cyclophosphamid ")){
+        else if(drug.equals("Cyclophosphamid ".toLowerCase())){
             return "Cyclophosphamid ";
         }
-        else if(drug.equals("Cyclophosphamide")){
+        else if(drug.equals("Cyclophosphamide".toLowerCase())){
             return "Cyclophosphamide";
         }
-        else if(drug.equals("cytarabine")){
+        else if(drug.equals("cytarabine".toLowerCase())){
             return "cytarabine";
         }
-        else if(drug.equals("cytarabine ")){
+        else if(drug.equals("cytarabine ".toLowerCase())){
             return "cytarabine ";
         }
-        else if(drug.equals("Dacarbazine")){
+        else if(drug.equals("Dacarbazine".toLowerCase())){
             return "Dacarbazine";
         }
-        else if(drug.equals("dacarbazine ")){
+        else if(drug.equals("dacarbazine ".toLowerCase())){
             return "dacarbazine ";
         }
-        else if(drug.equals("Dasatinib")){
+        else if(drug.equals("Dasatinib".toLowerCase())){
             return "Dasatinib";
         }
-        else if(drug.equals("Decitabine")){
+        else if(drug.equals("Decitabine".toLowerCase())){
             return "Decitabine";
         }
-        else if(drug.equals("dexamethasone ")){
+        else if(drug.equals("dexamethasone ".toLowerCase())){
             return "dexamethasone ";
         }
-        else if(drug.equals("Docetaxel")){
+        else if(drug.equals("Docetaxel".toLowerCase())){
             return "Docetaxel";
-        }
-        else if(drug.equals("Doxorubicin Hcl Liposome Injection")){
+        } else if (drug.equals("Doxorubicin Hcl Liposome Injection".toLowerCase())) {
             return "Docetaxel/Doxorubicin HCl Liposome";
-        }
-        else if(drug.equals("doxorubicin")){
+        } else if (drug.equals("doxorubicin".toLowerCase())) {
             return "doxorubicin";
-        }
-        else if(drug.equals("doxorubicin ")){
+        } else if (drug.equals("doxorubicin ".toLowerCase())) {
             return "doxorubicin ";
-        }
-        else if(drug.equals("elmustine")){
-        return "elmustine";
-    }
-else if(drug.equals("epirubicin")){
+        } else if (drug.equals("elmustine".toLowerCase())) {
+            return "elmustine";
+        } else if (drug.equals("epirubicin".toLowerCase())) {
             return "epirubicin";
-}
-else if(drug.equals("eribulin")){
-        return "eribulin";
+        } else if (drug.equals("eribulin".toLowerCase())) {
+            return "eribulin";
         }
-        else if(drug.equals("erlotinib")){
+        else if(drug.equals("erlotinib".toLowerCase())){
         return "erlotinib";
         }
-        else if(drug.equals("etoposide")){
+        else if(drug.equals("etoposide".toLowerCase())){
         return "etoposide";
         }
-        else if(drug.equals("everolimus")){
+        else if(drug.equals("everolimus".toLowerCase())){
         return "everolimus";
         }
-        else if(drug.equals("exemestane")){
+        else if(drug.equals("exemestane".toLowerCase())){
         return "exemestane";
         }
-        else if(drug.equals("external Beam Radiation Therapy")){
+        else if(drug.equals("external Beam Radiation Therapy".toLowerCase())){
         return "external Beam Radiation Therapy ";
         }
-        else if(drug.equals("Fluorouracil")){
+        else if(drug.equals("Fluorouracil".toLowerCase())){
         return "Fluorouracil";
         }
-        else if(drug.equals("5-Fluorouracil")){
+        else if(drug.equals("5-Fluorouracil".toLowerCase())){
         return "Fluorouracil";
         }
-        else if(drug.equals("Flutamide")){
+        else if(drug.equals("Flutamide".toLowerCase())){
         return "Flutamide";
         }
-        else if(drug.equals("Folic acid ")){
+        else if(drug.equals("Folic acid ".toLowerCase())){
         return "Folic acid ";
         }
-        else if(drug.equals("Folinic acid")){
+        else if(drug.equals("Folinic acid".toLowerCase())){
         return "Folinic acid";
         }
-        else if(drug.equals("Leucovorin")){
+        else if(drug.equals("Leucovorin".toLowerCase()) || drug.equals("Leucovorin Calcium") ){
         return "Folinic acid";
         }
-        else if(drug.equals("folinic acid")){
+        else if(drug.equals("folinic acid".toLowerCase())){
         return "folinic acid";
         }
-        else if(drug.equals("FU-LV regimen")){
+        else if(drug.equals("FU-LV regimen".toLowerCase())){
         return "FU-LV regimen";
         }
-        else if(drug.equals("Fulvestrant")){
+        else if(drug.equals("Fulvestrant".toLowerCase())){
         return "Fulvestrant";
         }
-        else if(drug.equals("Gemcitabine")){
+        else if(drug.equals("Gemcitabine".toLowerCase())){
         return "Gemcitabine";
         }
-        else if(drug.equals("ifosfamide")){
+        else if(drug.equals("ifosfamide".toLowerCase())){
         return "ifosfamide";
         }
-        else if(drug.equals("Imatinib")){
+        else if(drug.equals("Imatinib".toLowerCase())){
         return "Imatinib";
         }
-        else if(drug.equals("Indimitecan")){
+        else if(drug.equals("Indimitecan".toLowerCase())){
         return "Indimitecan";
         }
-        else if(drug.equals("Indotecan")){
+        else if(drug.equals("Indotecan".toLowerCase())){
         return "Indotecan";
         }
-        else if(drug.equals("Interferon")){
+        else if(drug.equals("Interferon".toLowerCase())){
         return "Interferon";
         }
-        else if(drug.equals("Interferon Alpha")){
+        else if(drug.equals("Interferon Alpha".toLowerCase())){
         return "Interferon Alpha";
         }
-        else if(drug.equals("Interleukin-2")){
+        else if(drug.equals("Interleukin-2".toLowerCase())){
         return "Interleukin-2";
         }
-        else if(drug.equals("Brachytherapy")){
+        else if(drug.equals("Brachytherapy".toLowerCase())){
         return "Internal Radiation Therapy";
         }
-        else if(drug.equals("Ipilimumab")){
+        else if(drug.equals("Ipilimumab".toLowerCase())){
         return "Ipilimumab";
         }
-        else if(drug.equals("irinotecan")){
+        else if(drug.equals("irinotecan".toLowerCase())){
         return "irinotecan";
         }
-        else if(drug.equals("Irinotecan")){
+        else if(drug.equals("Irinotecan".toLowerCase())){
         return "Irinotecan";
         }
-        else if(drug.equals("Lenalidomide")){
+        else if(drug.equals("Lenalidomide".toLowerCase())){
         return "Lenalidomide";
         }
-        else if(drug.equals("Letrozole")){
+        else if(drug.equals("Letrozole".toLowerCase())){
         return "Letrozole";
         }
-        else if(drug.equals("Leuprolide")){
+        else if(drug.equals("Leuprolide".toLowerCase())){
         return "Leuprolide";
         }
-        else if(drug.equals("leuvocorin")){
+        else if(drug.equals("leuvocorin".toLowerCase())){
         return "leuvocorin";
         }
-        else if(drug.equals("Mesna")){
+        else if(drug.equals("Mesna".toLowerCase())){
         return "Mesna";
         }
-        else if(drug.equals("methotrexate")){
+        else if(drug.equals("methotrexate".toLowerCase())){
         return "methotrexate";
         }
-        else if(drug.equals("TRC102")){
-        return "Methoxyamine";
+        else if(drug.equalsIgnoreCase("TRC102".toLowerCase())){
+            return "Methoxyamine";
         }
-        else if(drug.equals("Mitomycin C")){
+        else if(drug.equalsIgnoreCase("Vinblastine".toLowerCase())){
+            return "Vinblastine";
+        }
+        else if(drug.equals("Mitomycin C".toLowerCase())){
         return "Mitomycin";
         }
-        else if(drug.equals("mitoxantrone")){
+        else if(drug.equals("mitoxantrone".toLowerCase())){
         return "mitoxantrone";
         }
-        else if(drug.equals("nab-Paclitaxel")){
+        else if(drug.equals("nab-Paclitaxel".toLowerCase())){
         return "Nab-paclitaxel";
         }
-        else if(drug.equals("Nivolumab")){
+        else if(drug.equals("Nivolumab".toLowerCase())){
         return "Nivolumab";
         }
-        else if(drug.equals("Obinutuzumab")){
+        else if(drug.equals("Obinutuzumab".toLowerCase())){
         return "Obinutuzumab";
         }
-        else if(drug.equals("Onalespib")){
+        else if(drug.equals("Onalespib".toLowerCase())){
         return "Onalespib";
         }
-        else if(drug.equals("oxaliplatin")){
+        else if(drug.equals("oxaliplatin".toLowerCase())){
         return "oxaliplatin";
         }
-        else if(drug.equals("Oxaliplatin ")){
+        else if(drug.equals("Oxaliplatin ".toLowerCase())){
         return "Oxaliplatin ";
         }
-        else if(drug.equals("Paclitaxel")){
+        else if(drug.equals("Paclitaxel".toLowerCase())){
         return "Paclitaxel";
         }
-        else if(drug.equals("Panitumumab")){
+        else if(drug.equals("Panitumumab".toLowerCase())){
         return "Panitumumab";
         }
-        else if(drug.equals("pazopanib")){
+        else if(drug.equals("pazopanib".toLowerCase())){
         return "pazopanib";
         }
-        else if(drug.equals("Pazopanib hydrochloride")){
+        else if(drug.equals("Pazopanib hydrochloride".toLowerCase())){
         return "Pazopanib Hydrochloride";
         }
-        else if(drug.equals("Pemetrexed")){
+        else if(drug.equals("Pemetrexed".toLowerCase())){
         return "Pemetrexed";
         }
-        else if(drug.equals("pimasertib")){
+        else if(drug.equals("pimasertib".toLowerCase())){
         return "pimasertib";
         }
-        else if(drug.equals("Pixantrone")){
+        else if(drug.equals("Pixantrone".toLowerCase())){
         return "Pixantrone";
         }
-        else if(drug.equals("Prednisolone")){
+        else if(drug.equals("Prednisolone".toLowerCase())){
         return "Prednisolone";
         }
-        else if(drug.equals("prednisolone ")){
+        else if(drug.equals("prednisolone ".toLowerCase())){
         return "prednisolone ";
         }
-        else if(drug.equals("prednisone")){
+        else if(drug.equals("prednisone".toLowerCase())){
         return "prednisone";
         }
-        else if(drug.equals("Procarbazine")){
+        else if(drug.equals("Procarbazine".toLowerCase())){
         return "Procarbazine";
         }
-        else if(drug.equals("Radiation")){
+        else if(drug.equals("Radiation".toLowerCase())){
         return "Radiation Therapy";
         }
-        else if(drug.equals("Radiotherapy")){
+        else if(drug.equals("Radiotherapy".toLowerCase())){
         return "Radiotherapy";
         }
-        else if(drug.equals("Regorafenib")){
+        else if(drug.equals("Regorafenib".toLowerCase())){
         return "Regorafenib";
         }
-        else if(drug.equals("Rituximab")){
+        else if(drug.equals("Rituximab".toLowerCase())){
         return "Rituximab";
         }
-        else if(drug.equals("rituximab ")){
+        else if(drug.equals("rituximab ".toLowerCase())){
         return "rituximab ";
         }
-        else if(drug.equals("Romidepsin")){
+        else if(drug.equals("Romidepsin".toLowerCase())){
         return "Romidepsin";
         }
-        else if(drug.equals("Selumetinib")){
+        else if(drug.equals("Selumetinib".toLowerCase())){
         return "Selumetinib";
         }
-        else if(drug.equals("PX-866")){
+        else if(drug.equals("PX-866".toLowerCase())){
         return "Sonolisib";
         }
-        else if(drug.equals("sorafenib")){
+        else if(drug.equals("sorafenib".toLowerCase())){
         return "sorafenib";
         }
-        else if(drug.equals("SUNITINIB MALATE")){
+        else if(drug.equals("SUNITINIB MALATE".toLowerCase())){
         return "Sunitinib Malate";
         }
-        else if(drug.equals("BMN-673")){
+        else if(drug.equals("BMN-673".toLowerCase())){
         return "Talazoparib";
         }
-        else if(drug.equals("TVEC")){
+        else if(drug.equals("TVEC".toLowerCase())){
         return "Talimogene Laherparepvec";
         }
-        else if(drug.equals("Taxol")){
+        else if(drug.equals("Taxol".toLowerCase())){
         return "Taxol";
         }
-        else if(drug.equals("Temozolomide")){
+        else if(drug.equals("Temozolomide".toLowerCase())){
         return "Temozolomide";
         }
-        else if(drug.equals("Thiotepa")){
+        else if(drug.equals("Thiotepa".toLowerCase())){
         return "Thiotepa";
         }
-        else if(drug.equals("Tipiracil hydrochloride")){
+        else if(drug.equals("Tipiracil hydrochloride".toLowerCase())){
         return "Tipiracil Hydrochloride";
         }
-        else if(drug.equals("Titanium silicate")){
+        else if(drug.equals("Titanium silicate".toLowerCase())){
         return "Titanium silicate";
         }
-        else if(drug.equals("Tivantinib")){
+        else if(drug.equals("Tivantinib".toLowerCase())){
         return "Tivantinib";
         }
-        else if(drug.equals("Topotecan")){
+        else if(drug.equals("Topotecan".toLowerCase())){
         return "Topotecan";
         }
-        else if(drug.equals("Trametinib")){
+        else if(drug.equals("Trametinib".toLowerCase())){
         return "Trametinib";
         }
-        else if(drug.equals("Trastuzumab")){
+        else if(drug.equals("Trastuzumab".toLowerCase())){
         return "Trastuzumab";
         }
-        else if(drug.equals("Trifluridine")){
+        else if(drug.equals("Trifluridine".toLowerCase())){
         return "Trifluridine";
         }
-        else if(drug.equals("Vemurafenib")){
+        else if(drug.equals("Vemurafenib".toLowerCase())){
         return "Vemurafenib";
         }
-        else if(drug.equals("Vincristin")){
+        else if(drug.equals("Vincristin".toLowerCase())){
         return "Vincristin";
         }
-        else if(drug.equals("vincristine")){
+        else if(drug.equals("vincristine".toLowerCase())){
         return "vincristine";
         }
-        else if(drug.equals("vincristine")){
+        else if(drug.equals("vincristine".toLowerCase())){
         return "vincristine";
         }
-        else if(drug.equals("Vindesin ")){
+        else if(drug.equals("Vindesin ".toLowerCase())){
         return "Vindesin ";
         }
-        else if(drug.equals("Vinorelbine")){
+        else if(drug.equals("Vinorelbine".toLowerCase())){
         return "Vinorelbine";
         }
-        else if(drug.equals("Ziv-Aflibercept")){
+        else if(drug.equals("Ziv-Aflibercept".toLowerCase())){
         return "Ziv-Aflibercept";
         }
 
