@@ -62,8 +62,9 @@ public class AjaxController {
         String modelID = "";
         List<String> results = new ArrayList<>();
 
-
         String rowData = "";
+
+        List<String> markerFilter = Arrays.asList("ERBB2","PGR","ESR1");
 
         List<ModelCreation> models = searchService.getModelsByMolcharType("cytogenetics");
 
@@ -85,12 +86,16 @@ public class AjaxController {
 
                     for (MarkerAssociation mAssoc : markerAssocs){
 
-                        results.add(mAssoc.getMarker().getHgncSymbol()+" "+mAssoc.getCytogeneticsResult());
+                        boolean inTheList = markerFilter.stream().anyMatch(str -> str.equals(mAssoc.getMarker().getHgncSymbol()));
+
+                        if (inTheList) {
+                            results.add(mAssoc.getMarker().getHgncSymbol() + " " + mAssoc.getCytogeneticsResult());
+                        }
                     }
                 }
             }
 
-            rowData += modelID +" | "+results+"<br>";
+            rowData += results+"<br>";
         }
 
         return rowData;
