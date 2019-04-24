@@ -212,7 +212,20 @@ public class MappingService {
                 for(String dataSource : ds){
 
                     if(dataSource.toLowerCase().equals(me.getMappingValues().get("DataSource").toLowerCase())){
-                        mc.add(me);
+                        //clone object but purge keys
+                        MappingEntity me2 = new MappingEntity();
+                        me2.setEntityId(me.getEntityId());
+                        me2.setEntityType(me.getEntityType());
+                        me2.setMappingLabels(me.getMappingLabels());
+                        me2.setMappingValues(me.getMappingValues());
+                        me2.setMappedTermUrl(me.getMappedTermUrl());
+                        me2.setMappedTermLabel(me.getMappedTermLabel());
+                        me2.setMapType(me.getMapType());
+                        me2.setJustification(me.getJustification());
+                        me2.setStatus(me.getStatus());
+                        me2.setSuggestedMappings(me.getSuggestedMappings());
+
+                        mc.add(me2);
                     }
                 }
             }
