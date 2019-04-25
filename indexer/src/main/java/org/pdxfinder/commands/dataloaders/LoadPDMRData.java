@@ -43,11 +43,9 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     private HelpFormatter formatter;
 
     private DataImportService dataImportService;
-    private Session session;
+    private UniversalLoaderOmic omicLoader;
 
-    @Autowired
-    private UtilityService utilityService;
-
+    /*private Session session;
 
     @Value("${pdmrpdx.variation.max}")
     private int maxVariations;
@@ -57,14 +55,16 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
     HashMap<String, String> passageMap = null;
     HashMap<String, Image> histologyMap = null;
+    */
 
     @PostConstruct
     public void init() {
         formatter = new HelpFormatter();
     }
 
-    public LoadPDMRData(DataImportService dataImportService) {
+    public LoadPDMRData(DataImportService dataImportService, UniversalLoaderOmic omicLoader) {
         this.dataImportService = dataImportService;
+        this.omicLoader = omicLoader;
     }
 
 
@@ -137,7 +137,6 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     protected void step10LoadExternalURLs() {
 
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
-
         loadExternalURLs(dataSourceContact, dto.getSourceURL());
     }
 
@@ -296,7 +295,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
         log.info("Loading NGS for model " + dto.getModelCreation().getSourcePdxId());
 
-        loadOmicData(dto.getModelCreation(),"mutation");
+        omicLoader.loadOmicData(dto.getModelCreation(), dto.getProviderGroup(), "mutation");
     }
 
 

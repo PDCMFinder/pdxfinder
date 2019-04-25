@@ -161,8 +161,6 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
     }
 
-
-
     // IRCC uses default implementation of Steps step08GetMetaData, step09LoadPatientData
 
 
