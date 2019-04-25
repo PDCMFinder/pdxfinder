@@ -121,14 +121,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step03CreateProviderGroup() {
-
-        loadProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription, providerType,  dataSourceContact, sourceURL);
-    }
-
-
-
-    @Override
     protected void step04CreateNSGammaHostStrain() {
 
         loadNSGammaHostStrain(nsgBsSymbol, nsgbsURL, nsgBsName, nsgBsName);

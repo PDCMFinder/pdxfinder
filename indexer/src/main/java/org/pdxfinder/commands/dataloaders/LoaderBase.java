@@ -105,12 +105,11 @@ public abstract class LoaderBase extends LoaderProperties implements Application
     }
 
 
-    /**
-     *
-     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
-     * Concrete / Derived classes MUST override these placeholder method as required
-     */
-    abstract void step03CreateProviderGroup();
+    void step03CreateProviderGroup(){
+
+        Group providerDS = dataImportService.getProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription, providerType, dataSourceContact, sourceURL);
+        dto.setProviderGroup(providerDS);
+    }
 
 
     /**
@@ -354,12 +353,6 @@ public abstract class LoaderBase extends LoaderProperties implements Application
 
 
 
-    public void loadProviderGroup(String dsName, String dsAbbrev, String dsDesc,
-                                                 String providerType, String dsContact,String url){
-
-        Group providerDS = dataImportService.getProviderGroup(dsName, dsAbbrev, dsDesc, providerType, dsContact, url);
-        dto.setProviderGroup(providerDS);
-    }
 
 
     public void loadNSGammaHostStrain(String NSG_BS_SYMBOL,String  NSG_BS_URL,String NSG_BS_NAME, String NSG_BS_DESC) {
