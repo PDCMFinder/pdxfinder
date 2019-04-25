@@ -23,6 +23,8 @@ public class MolecularCharacterization {
     @Index
     private String type;
 
+    private boolean isVisible;
+
     @Relationship(type = "PLATFORM_USED")
     Platform platform;
 
@@ -30,6 +32,7 @@ public class MolecularCharacterization {
     List<MarkerAssociation> markerAssociations;
 
     public MolecularCharacterization() {
+        isVisible = true;
     }
 
     public MolecularCharacterization(String technology) {
@@ -87,5 +90,13 @@ public class MolecularCharacterization {
         }
         this.markerAssociations.add(ma);
 
+    }
+
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
     }
 }
