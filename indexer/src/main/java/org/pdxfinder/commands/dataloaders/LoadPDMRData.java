@@ -113,12 +113,6 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     // PDMR uses default implementation Steps step02GetMetaDataJSON
 
     @Override
-    protected void step04CreateNSGammaHostStrain() {
-
-        loadNSGammaHostStrain(nsgBsSymbol, nsgbsURL, nsgBsName, nsgBsName);
-    }
-
-    @Override
     protected void step05CreateNSHostStrain() { }
 
 

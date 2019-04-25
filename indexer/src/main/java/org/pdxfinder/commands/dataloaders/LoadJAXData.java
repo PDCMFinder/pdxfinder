@@ -119,14 +119,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     // JAX uses default implementation Steps step02GetMetaDataJSON
 
 
-
-    @Override
-    protected void step04CreateNSGammaHostStrain() {
-
-        loadNSGammaHostStrain(nsgBsSymbol, nsgbsURL, nsgBsName, nsgBsName);
-    }
-
-
     @Override
     protected void step05CreateNSHostStrain() {
 

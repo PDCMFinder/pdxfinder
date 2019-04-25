@@ -157,12 +157,6 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step04CreateNSGammaHostStrain() {
-
-        loadNSGammaHostStrain(nsgBsSymbol, nsgbsURL, nsgBsName, nsgBsName);
-    }
-
-    @Override
     protected void step05CreateNSHostStrain() { }
 
 

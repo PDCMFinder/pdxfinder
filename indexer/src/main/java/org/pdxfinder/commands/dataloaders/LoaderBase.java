@@ -112,12 +112,13 @@ public abstract class LoaderBase extends LoaderProperties implements Application
     }
 
 
-    /**
-     *
-     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
-     * Concrete / Derived classes MUST override these placeholder method as required
-     */
-    abstract void step04CreateNSGammaHostStrain();
+    void step04CreateNSGammaHostStrain(){
+
+        try {
+            HostStrain nsgBS = dataImportService.getHostStrain(nsgBsName, nsgBsSymbol, nsgbsURL, nsgBsName);
+            dto.setNodScidGamma(nsgBS);
+        } catch (Exception e) {}
+    }
 
 
     /**
@@ -355,7 +356,7 @@ public abstract class LoaderBase extends LoaderProperties implements Application
 
 
 
-    public void loadNSGammaHostStrain(String NSG_BS_SYMBOL,String  NSG_BS_URL,String NSG_BS_NAME, String NSG_BS_DESC) {
+    public void loadNSGammaHostStrains(String NSG_BS_SYMBOL,String  NSG_BS_URL,String NSG_BS_NAME, String NSG_BS_DESC) {
 
         try {
             HostStrain nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
