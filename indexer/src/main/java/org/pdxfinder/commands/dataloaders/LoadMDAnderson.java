@@ -128,19 +128,6 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
     }
 
-    @Override
-    protected void step06CreateProjectGroup() {
-
-        loadProjectGroup("PDXNet");
-    }
-
-
-    @Override
-    protected void step07GetPDXModels() {
-
-        loadPDXModels(metaDataJSON,"MDA");
-    }
-
 
     // MD ANDERSON uses default implementation Steps step08GetMetaData, step09LoadPatientData
 

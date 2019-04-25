@@ -87,26 +87,6 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     protected void step01GetMetaDataFolder() { }
 
 
-    @Override
-    protected void step05CreateNSHostStrain() {
-
-        loadNSHostStrain(nsBsSymbol, nsBsURL, nsBsName);
-    }
-
-
-    @Override
-    protected void step06CreateProjectGroup() {
-
-        loadProjectGroup("PDXNet");
-    }
-
-
-    @Override
-    protected void step07GetPDXModels() {
-
-        loadPDXModels(metaDataJSON,"HCI");
-    }
-
 
     // HCI uses common implementation Steps step08GetMetaData,step09LoadPatientData default
 

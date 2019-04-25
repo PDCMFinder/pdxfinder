@@ -157,20 +157,8 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step05CreateNSHostStrain() { }
+    protected void step05CreateNSHostStrain() {
 
-
-    @Override
-    protected void step06CreateProjectGroup() {
-
-        loadProjectGroup("EurOPDX");
-    }
-
-
-    @Override
-    protected void step07GetPDXModels() {
-
-        loadPDXModels(metaDataJSON,"IRCC");
     }
 
 

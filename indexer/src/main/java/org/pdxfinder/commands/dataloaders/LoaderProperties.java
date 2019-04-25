@@ -8,6 +8,7 @@ import java.util.Map;
 public class LoaderProperties {
 
     //  DATA SOURCE PROPERTIES
+    protected String jsonKey;
     protected String dataSourceAbbreviation;
     protected String dataSourceName;
     protected String dataSourceDescription;
@@ -15,12 +16,15 @@ public class LoaderProperties {
     protected String dataSourceURL;
     protected String providerType;
     protected String accessibility;
+    protected String projectGroup;
+
     protected String nsgBsName;
     protected String nsgBsSymbol;
     protected String nsgbsURL;
     protected String nsBsName;
     protected String nsBsSymbol;
     protected String nsBsURL;
+
     protected String dosingStudyURL;
     protected String sourceURL;
     protected String normalTissueFalse;
@@ -66,6 +70,14 @@ public class LoaderProperties {
     protected String omicDataFilesType;
     protected String omicFileExtension;
 
+
+    public String getJsonKey() {
+        return jsonKey;
+    }
+
+    public void setJsonKey(String jsonKey) {
+        this.jsonKey = jsonKey;
+    }
 
     public String getDataSourceAbbreviation() {
         return dataSourceAbbreviation;
@@ -121,6 +133,14 @@ public class LoaderProperties {
 
     public void setAccessibility(String accessibility) {
         this.accessibility = accessibility;
+    }
+
+    public String getProjectGroup() {
+        return projectGroup;
+    }
+
+    public void setProjectGroup(String projectGroup) {
+        this.projectGroup = projectGroup;
     }
 
     public String getNsgBsName() {

@@ -121,28 +121,32 @@ public abstract class LoaderBase extends LoaderProperties implements Application
     }
 
 
-    /**
-     *
-     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
-     * Concrete / Derived classes MUST override these placeholder method as required
-     */
-    abstract void step05CreateNSHostStrain();
+    void step05CreateNSHostStrain(){
+
+        try {
+            HostStrain nsBS = dataImportService.getHostStrain(nsBsName, nsBsSymbol, nsBsURL, nsBsName);
+            dto.setNodScid(nsBS);
+        } catch (Exception e) {}
+    }
 
 
-    /**
-     *
-     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
-     * Concrete / Derived classes MUST override these placeholder method as required
-     */
-    abstract void step06CreateProjectGroup();
+    void step06CreateProjectGroup(){
+
+        Group group = dataImportService.getProjectGroup(projectGroup);
+        dto.setProjectGroup(group);
+    }
 
 
-    /**
-     *
-     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
-     * Concrete / Derived classes MUST override these placeholder method as required
-     */
-    abstract void step07GetPDXModels();
+
+    void step07GetPDXModels(){
+
+        try {
+            JSONObject job = new JSONObject(metaDataJSON);
+            jsonArray = job.getJSONArray(jsonKey);
+        } catch (Exception e) {
+            log.error("Error getting "+jsonKey+" PDX models", e);
+        }
+    }
 
 
     /**
@@ -349,47 +353,6 @@ public abstract class LoaderBase extends LoaderProperties implements Application
 
 
 
-
-
-
-
-
-
-
-    public void loadNSGammaHostStrains(String NSG_BS_SYMBOL,String  NSG_BS_URL,String NSG_BS_NAME, String NSG_BS_DESC) {
-
-        try {
-            HostStrain nsgBS = dataImportService.getHostStrain(NSG_BS_NAME, NSG_BS_SYMBOL, NSG_BS_URL, NSG_BS_DESC);
-            dto.setNodScidGamma(nsgBS);
-        } catch (Exception e) {}
-    }
-
-
-    public void loadNSHostStrain(String NS_BS_SYMBOL,String  NS_BS_URL,String NS_BS_NAME) {
-
-        try {
-            HostStrain nsBS = dataImportService.getHostStrain(NS_BS_NAME, NS_BS_SYMBOL, NS_BS_URL, NS_BS_NAME);
-            dto.setNodScid(nsBS);
-        } catch (Exception e) {}
-    }
-
-
-    public void loadProjectGroup(String projectName) {
-
-        Group projectGroup = dataImportService.getProjectGroup(projectName);
-        dto.setProjectGroup(projectGroup);
-    }
-
-
-    public void loadPDXModels(String jsonString, String key){
-
-        try {
-            JSONObject job = new JSONObject(jsonString);
-            jsonArray = job.getJSONArray(key);
-        } catch (Exception e) {
-            log.error("Error getting "+key+" PDX models", e);
-        }
-    }
 
 
     public void loadExternalURLs(String dataSourceContact, String dataSourceURL){
