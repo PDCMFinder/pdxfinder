@@ -425,16 +425,51 @@ public class DetailsService {
      */
     public MolecularDataTableDTO getMolecularDataTable(String id){
 
+        Set<String> tableHeadersSet = new HashSet<>();
+        ArrayList<String> tableHeaders = new ArrayList<>();
+        List<List<String>> tableRows = new ArrayList<>();
+        MolecularDataTableDTO dto = new MolecularDataTableDTO();
+
         MolecularCharacterization mc = molecularCharacterizationRepository.getMolecularDataById(Long.valueOf(id));
+
+        //check if molchar exists and if not, display an error message
+        if(mc == null){
+
+            tableHeaders.add("");
+
+            List<String> notVisibleDataRow = new ArrayList<>();
+            notVisibleDataRow.add("ERROR: This molecular characterization does not exist.");
+
+            tableRows.add(notVisibleDataRow);
+
+            dto.setTableHeaders(tableHeaders);
+            dto.setTableRows(tableRows);
+
+            return dto;
+        }
+
+
+        //check if data is visible and can be displayed
+        if(!mc.isVisible()){
+
+            tableHeaders.add("");
+
+            List<String> notVisibleDataRow = new ArrayList<>();
+            notVisibleDataRow.add("This data is only accessible through the provider website - please click there for access.");
+
+            tableRows.add(notVisibleDataRow);
+
+            dto.setTableHeaders(tableHeaders);
+            dto.setTableRows(tableRows);
+
+            return dto;
+        }
+
+
 
         Sample sample = sampleRepository.findSampleByMolcharId(Long.valueOf(id));
         String sampleId = sample.getSourceSampleId() == null ? "" : sample.getSourceSampleId();
 
-        Set<String> tableHeadersSet = new HashSet<>();
-        ArrayList<String> tableHeaders = new ArrayList<>();
-        List<List<String>> tableRows = new ArrayList<>();
-
-        MolecularDataTableDTO dto = new MolecularDataTableDTO();
 
         //STEP 0: Add sampleid to table, we always display this
         tableHeadersSet.add("sampleid");
