@@ -461,6 +461,7 @@ public class DetailsService {
 
             dto.setTableHeaders(tableHeaders);
             dto.setTableRows(tableRows);
+            dto.setVisible(false);
 
             return dto;
         }
