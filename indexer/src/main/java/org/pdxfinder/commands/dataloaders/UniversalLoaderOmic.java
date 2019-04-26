@@ -39,19 +39,24 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
         List<Map<String, String>> dataList;
 
+
         if (omicDataFilesType.equals("ONE_FILE_PER_MODEL")){
 
+            // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS 100s OF CSV/JSON WITH ONE_FILE_PER_MODEL
             String modelID = modelCreation.getSourcePdxId();
             dataList = utilityService.serializeDataToMaps(dataRootDirectory+dataSourceAbbreviation+"/mut/"+modelID+"."+omicFileExtension);
 
         }else {
 
+            // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS A SINGLE CSV/JSON WITH ALL_MODELS_IN_ONE_FILE
             String variationURLStr = dataRootDirectory+dataSourceAbbreviation+"/mut/data."+omicFileExtension;
 
             Map<String, List<Map<String, String>> > fullData = utilityService.serializeMergedData(variationURLStr,omicModelID);
 
             dataList = fullData.get(modelCreation.getSourcePdxId());
         }
+
+
 
         String modelID = modelCreation.getSourcePdxId();
         Map<String, Platform> platformMap = new HashMap<>();

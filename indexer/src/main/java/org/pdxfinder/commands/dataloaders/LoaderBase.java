@@ -20,7 +20,7 @@ import org.springframework.context.ApplicationContextAware;
 import java.io.File;
 import java.util.*;
 
-public abstract class LoaderBase extends LoaderProperties implements ApplicationContextAware{
+public abstract class LoaderBase extends UniversalLoaderOmic implements ApplicationContextAware{
 
     private final static Logger log = LoggerFactory.getLogger(LoaderBase.class);
     protected String jsonFile;

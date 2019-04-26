@@ -46,7 +46,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     private HelpFormatter formatter;
 
     private DataImportService dataImportService;
-    private UniversalLoaderOmic omicLoader;
 
     private Session session;
 
@@ -71,9 +70,8 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     @Autowired
     private UtilityService utilityService;
 
-    public LoadJAXData(DataImportService dataImportService, UniversalLoaderOmic omicLoader) {
+    public LoadJAXData(DataImportService dataImportService) {
         this.dataImportService = dataImportService;
-        this.omicLoader = omicLoader;
     }
 
     @Override
@@ -284,7 +282,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
         log.info("Loading WGS for model " + dto.getModelCreation().getSourcePdxId());
 
-        omicLoader.loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation");
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation");
 
     }
 

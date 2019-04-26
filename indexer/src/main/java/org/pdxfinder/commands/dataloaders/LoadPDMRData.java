@@ -43,7 +43,6 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     private HelpFormatter formatter;
 
     private DataImportService dataImportService;
-    private UniversalLoaderOmic omicLoader;
 
     /*private Session session;
 
@@ -62,9 +61,8 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadPDMRData(DataImportService dataImportService, UniversalLoaderOmic omicLoader) {
+    public LoadPDMRData(DataImportService dataImportService) {
         this.dataImportService = dataImportService;
-        this.omicLoader = omicLoader;
     }
 
 
@@ -295,7 +293,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
         log.info("Loading NGS for model " + dto.getModelCreation().getSourcePdxId());
 
-        omicLoader.loadOmicData(dto.getModelCreation(), dto.getProviderGroup(), "mutation");
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(), "mutation");
     }
 
 
