@@ -581,6 +581,10 @@ public class DataImportService {
         return sampleRepository.findHumanSampleWithMolcharByModelIdAndDataSource(modelId, dataSource);
     }
 
+    public List<MolecularCharacterization> findAllMolcharByDataSource(String dataSource){
+
+        return molecularCharacterizationRepository.findAllByDataSource(dataSource);
+    }
 
     public Sample getHumanSample(String sampleId, String dataSource){
 

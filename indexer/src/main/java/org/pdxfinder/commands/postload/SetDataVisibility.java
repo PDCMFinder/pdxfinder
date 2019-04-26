@@ -2,12 +2,16 @@ package org.pdxfinder.commands.postload;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.pdxfinder.graph.dao.MolecularCharacterization;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.dto.MolecularDataEntryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /*
  * Created by csaba on 25/04/2019.
@@ -60,6 +64,14 @@ public class SetDataVisibility implements CommandLineRunner{
 
     private void applyDataVisibilityRules(){
 
+        //get all charles river molchars
+        List<MolecularCharacterization> molChars = dataImportService.findAllMolcharByDataSource("CRL");
+
+        for(MolecularCharacterization mc:molChars){
+
+            mc.setVisible(false);
+            dataImportService.saveMolecularCharacterization(mc);
+        }
 
     }
 
