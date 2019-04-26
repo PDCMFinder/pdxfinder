@@ -268,27 +268,6 @@ public class AjaxController {
     }
 
 
-
-    //HELPER METHODS
-    public String getSortColumn(String sortcolumn){
-
-        Map<String, String> tableColumns = new HashMap<>();
-        tableColumns.put("0","msamp.sourceSampleId");
-        tableColumns.put("1","mAss.chromosome");
-        tableColumns.put("2","mAss.seqPosition");
-        tableColumns.put("3","mAss.refAllele");
-        tableColumns.put("4","mAss.altAllele");
-        tableColumns.put("5","mAss.consequence");
-        tableColumns.put("6","m.symbol");
-        tableColumns.put("7","mAss.aminoAcidChange");
-        tableColumns.put("8","mAss.aminoAcidChange");
-        tableColumns.put("9","mAss.alleleFrequency");
-        tableColumns.put("10","mAss.rsVariants");
-
-        return tableColumns.get(sortcolumn);
-    }
-
-
     @GetMapping("/pdx/{dataSrc}/{modelId:.+}/pdf-data")
     public Report pdfView(HttpServletRequest request,
                           @PathVariable String dataSrc,
@@ -317,4 +296,27 @@ public class AjaxController {
         return detailsService.getMolecularDataTable(molcharId);
 
     }
+
+    //HELPER METHODS
+    public String getSortColumn(String sortcolumn){
+
+        Map<String, String> tableColumns = new HashMap<>();
+        tableColumns.put("0","msamp.sourceSampleId");
+        tableColumns.put("1","mAss.chromosome");
+        tableColumns.put("2","mAss.seqPosition");
+        tableColumns.put("3","mAss.refAllele");
+        tableColumns.put("4","mAss.altAllele");
+        tableColumns.put("5","mAss.consequence");
+        tableColumns.put("6","m.symbol");
+        tableColumns.put("7","mAss.aminoAcidChange");
+        tableColumns.put("8","mAss.aminoAcidChange");
+        tableColumns.put("9","mAss.alleleFrequency");
+        tableColumns.put("10","mAss.rsVariants");
+
+        return tableColumns.get(sortcolumn);
+    }
+
+
+
+
 }

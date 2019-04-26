@@ -13,9 +13,12 @@ public class MolecularDataTableDTO {
 
     private List<List<String>> tableRows;
 
+    private boolean isVisible;
+
     public MolecularDataTableDTO() {
         tableHeaders = new ArrayList<>();
         tableRows = new ArrayList<>();
+        isVisible = true;
     }
 
 
@@ -33,5 +36,13 @@ public class MolecularDataTableDTO {
 
     public void setTableRows(List<List<String>> tableRows) {
         this.tableRows = tableRows;
+    }
+
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
     }
 }

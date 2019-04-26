@@ -56,4 +56,10 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
 
     @Query("MATCH (mc:MolecularCharacterization) RETURN ID(mc)")
     List<Long> getAllMolCharIDs();
+
+    @Query("MATCH (mc:MolecularCharacterization)-[cbr:CHARACTERIZED_BY]-(s:Sample)-[msr:MODEL_SAMPLE_RELATION]-(mod:ModelCreation) " +
+            "WHERE mod.dataSource = {ds} " +
+            "RETURN mc")
+    List<MolecularCharacterization> findAllByDataSource(@Param("ds") String dataSource);
+
 }
