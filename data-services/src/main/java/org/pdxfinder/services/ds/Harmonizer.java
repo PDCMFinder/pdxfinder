@@ -83,10 +83,10 @@ public class Harmonizer {
         else if(ds.equals(irccCrc)){
             try {
                 if (data.has("Treatment")) {
-                    JSONObject treatmentObj = data.optJSONObject("Treatments");
+                    JSONObject treatmentObj = data.optJSONObject("Treatment");
                     //if the treatment attribute is not an object = it is an array
-                    if (treatmentObj == null && data.optJSONArray("Treatments") != null) {
-                        treatments = data.getJSONArray("Treatments");
+                    if (treatmentObj == null && data.optJSONArray("Treatment") != null) {
+                        treatments = data.getJSONArray("Treatment");
                     }
                 }
             }catch (Exception e){
