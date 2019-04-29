@@ -899,11 +899,9 @@
                             <div class="columns medium-12 small-12 card-3" style="padding: 15px;">
 
 
+                                <div class="columns medium-6 small-12" id="download-data" style="float: right; margin-top:-65px; margin-right:-30px;">
 
-                                <div class="columns medium-6 small-12" id="sizeSwitch" style="float: right; margin-top:-65px; margin-right:-30px;">
-
-
-                                    <div id="download-data" class="columns medium-5 small-12 text-right" style="padding: 0px;">
+                                    <div class="columns medium-5 small-12 text-right" style="padding: 0px;">
                                         <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"
                                            class="button outline secondary">
                                             Download Results
@@ -911,8 +909,7 @@
                                         </a>
                                     </div>
 
-
-                                    <div id="customSearch" class="columns medium-6 small-12 text-right" style="padding: 0px;">
+                                    <div id="customSearch" class="columns medium-7 small-12 text-right" style="padding: 0px;">
                                         <!-- Datatable Search Box -->
                                     </div>
 

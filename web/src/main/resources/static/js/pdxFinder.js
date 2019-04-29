@@ -514,7 +514,7 @@ function customizeDatatable(dTable, presentData){
     );
 
     $(".dataTables_filter").hide();
-    $("#customSearch").html('<input style="height: 41px;" type="text" id="omicSearch" placeholder="Search'+presentData+' data">');
+    $("#customSearch").html('<input style="height: 41px; border-left: 0px;" type="text" id="omicSearch" placeholder="Search'+presentData+' data">');
 
     oTable = $('#molcharDataTable').DataTable();
     $('#omicSearch').keyup(function(){
