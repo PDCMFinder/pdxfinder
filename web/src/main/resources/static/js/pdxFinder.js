@@ -450,6 +450,7 @@ function displayMolecularDataTable(tableData, clickedData){
     
     //add datarows to table
     var rowCount = tableData["tableRows"].length;
+    var dataVisibility = tableData["visible"];
 
     for(var j=0; j<rowCount; j++){
 
@@ -481,6 +482,10 @@ function displayMolecularDataTable(tableData, clickedData){
     $('#hrTitle').attr('data-content', clickedData[4]);
 
     $('#preLoader').hide();
+
+    if (dataVisibility == false) {
+        $('#download-data').hide();
+    }
 
 
 }
