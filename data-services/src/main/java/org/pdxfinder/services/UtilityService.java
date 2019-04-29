@@ -2,6 +2,7 @@ package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
+
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 @Service
 public class UtilityService {
@@ -30,11 +33,93 @@ public class UtilityService {
     private static final String NEW_LINE_SEPARATOR = "\n";
 
 
-    public List<Map<String, String>> serializeCSVToMaps(String csvFile) {
+    /*************************************************************************************************************
+     *           EXCEL FILE SERIALIZER        *
+     *****************************************/
 
-        /*************************************************************************************************************
-         *     LOAD DATA FROM FILE          *
-         ***********************************/
+    public List<String> getXlsCellData(Iterator<Cell> cellIterator){
+
+        List<String> data = new ArrayList<>();
+
+        while (cellIterator.hasNext())
+        {
+            Cell cell = cellIterator.next();
+            if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
+                data.add(cell.getNumericCellValue() + "");
+            }else {
+                data.add(cell.getStringCellValue());
+            }
+        }
+        return data;
+    }
+
+
+    public Map<String, String> getXlsCellData(Iterator<Cell> cellIterator, List<String> tableHead){
+
+        Map<String, String> rowMap = new HashMap();
+
+        int column = 0;
+        while (cellIterator.hasNext())
+        {
+            Cell cell = cellIterator.next();
+
+            if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
+                rowMap.put(tableHead.get(column).trim(), cell.getNumericCellValue() + "");
+            }else {
+                rowMap.put(tableHead.get(column).trim(), cell.getStringCellValue() + "");
+            }
+            column++;
+        }
+        return rowMap;
+    }
+
+
+    public List<Map<String, String>> serializeExcelData(String excelURL) {
+
+        FileInputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(new File(excelURL));
+        }catch (Exception e) {
+            log.error("Data File "+excelURL+" Not Found");
+        }
+
+        int dataRow = 0;
+        List<String> tableHead = new ArrayList<>();
+        List<Map<String, String>> csvMap = new ArrayList<>();
+
+        try {
+            Row row;
+            Workbook workbook = WorkbookFactory.create(inputStream);
+            Sheet spreadsheet = workbook.getSheetAt(0);
+            Iterator<Row> rowIterator = spreadsheet.iterator();
+
+            while (rowIterator.hasNext()) // Read the rows
+            {
+                row = rowIterator.next();
+                Iterator<Cell> cellIterator = row.cellIterator();
+
+                if (dataRow == 0) {
+                    tableHead = getXlsCellData(cellIterator);
+
+                } else {
+                    Map<String, String> rowMap = getXlsCellData(cellIterator, tableHead);
+                    csvMap.add(rowMap);
+                }
+                dataRow++;
+            }
+
+            inputStream.close();
+        } catch (Exception ex) { }
+
+        return csvMap;
+    }
+
+
+
+    /*************************************************************************************************************
+     *           CSV FILE SERIALIZER        *
+     ************************************/
+    public List<Map<String, String>> serializeCSVToMaps(String csvFile) {
 
         FileInputStream fileStream = null;
         try {
@@ -43,19 +128,11 @@ public class UtilityService {
         DataInputStream csvData = new DataInputStream(fileStream);
 
 
-        /*************************************************************************************************************
-         *     INITIALIZE PARAMETERS         *
-         ************************************/
-
         int row = 0;
         String thisLine;
         List<String> tableHead = new ArrayList<>();
         List<Map<String, String>> csvMap = new ArrayList<>();
 
-
-        /*************************************************************************************************************
-         *    LOAD CSV FIRST ROW AS TABLE-HEAD, OTHER ROWS AS DATA, & LOAD TO MAP        *
-         *******************************************************************************/
         try {
 
             while ((thisLine = csvData.readLine()) != null) {
@@ -85,6 +162,57 @@ public class UtilityService {
         return csvMap;
 
     }
+
+
+    /*************************************************************************************************************
+     *            JSON SERIALIZER        *
+     ************************************/
+    public List<Map<String, String>> serializeJSONToMaps(String jsonFile) {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map<String, String>> data;
+
+        JsonNode node = readJsonLocal(jsonFile);
+        try {
+            data = mapper.convertValue(node, List.class);
+
+        }catch (Exception e){
+
+            Map<String, Object> json = mapper.convertValue(node, Map.class);
+
+            String jsonKey = "";
+            for (Map.Entry<String, Object> entry : json.entrySet() ) {      // GET THE JSON KEY
+                jsonKey = entry.getKey();
+            }
+
+            data = (List) json.get(jsonKey);
+        }
+
+        return data;
+    }
+
+
+
+    public List<Map<String, String>> serializeJSONToMaps(String jsonFile,String jsonKey) {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        JsonNode node = readJsonLocal(jsonFile);
+
+        Map<String, Object> json = mapper.convertValue(node, Map.class);
+
+        List<Map<String, String>> data = (List) json.get(jsonKey);
+
+        return data;
+    }
+
+
+
+
+
+
+
 
 
 
@@ -142,47 +270,6 @@ public class UtilityService {
         return groupedMap;
     }
 
-
-
-    public List<Map<String, String>> serializeJSONToMaps(String jsonFile,String jsonKey) {
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        JsonNode node = readJsonLocal(jsonFile);
-
-        Map<String, Object> json = mapper.convertValue(node, Map.class);
-
-        List<Map<String, String>> data = (List) json.get(jsonKey);
-
-        return data;
-    }
-
-
-
-    public List<Map<String, String>> serializeJSONToMaps(String jsonFile) {
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        List<Map<String, String>> data;
-
-        JsonNode node = readJsonLocal(jsonFile);
-        try {
-            data = mapper.convertValue(node, List.class);
-
-        }catch (Exception e){
-
-            Map<String, Object> json = mapper.convertValue(node, Map.class);
-
-            String jsonKey = "";
-            for (Map.Entry<String, Object> entry : json.entrySet() ) {      // GET THE JSON KEY
-                jsonKey = entry.getKey();
-            }
-
-            data = (List) json.get(jsonKey);
-        }
-
-        return data;
-    }
 
 
 
