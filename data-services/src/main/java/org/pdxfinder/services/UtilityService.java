@@ -37,7 +37,7 @@ public class UtilityService {
      *           EXCEL FILE SERIALIZER        *
      *****************************************/
 
-    public List<String> getXlsCellData(Iterator<Cell> cellIterator){
+    public List<String> getXlsTableHeadData(Iterator<Cell> cellIterator){
 
         List<String> data = new ArrayList<>();
 
@@ -99,7 +99,7 @@ public class UtilityService {
                 Iterator<Cell> cellIterator = row.cellIterator();
 
                 if (dataRow == 0) {
-                    tableHead = getXlsCellData(cellIterator);
+                    tableHead = getXlsTableHeadData(cellIterator);
 
                 } else {
                     Map<String, String> rowMap = getXlsCellData(cellIterator, tableHead);
