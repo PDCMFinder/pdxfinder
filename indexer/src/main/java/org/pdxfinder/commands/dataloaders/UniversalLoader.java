@@ -897,7 +897,7 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
 
             //xenograft sample
             //specimen should have been created before
-            else if (origin.toLowerCase().equals("engrafted tumor")) {
+            else if (origin.toLowerCase().equals("engrafted tumor") || origin.toLowerCase().equals("engrafted tumour") || origin.toLowerCase().equals("xenograft") ) {
 
                 if (passage == null || passage.isEmpty() || passage.toLowerCase().equals("not specified")) {
 
