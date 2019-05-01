@@ -983,16 +983,15 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
         dataRootDirectory = dataRootDir+ "UPDOG/";
         omicFileExtension = "xlsx";
 
-        String variationURLStr = "";
+        String variationURLStr = dataRootDirectory+dataSourceAbbreviation+"/mut/data.xlsx";
 
-        try{
-            variationURLStr = dataRootDirectory+dataSourceAbbreviation+"/mut/data.xlsx";
-        }catch (Exception e){
+        List<String> tableHead = utilityService.getXlsHead(variationURLStr, 0);
+
+        if (tableHead.size() == 0){
+
             log.info(dataSourceAbbreviation+" has no Variation Data File, so skip ");
             return;
         }
-
-        List<String> tableHead = utilityService.getXlsHead(variationURLStr, 0);
 
         omicModelID = tableHead.get(1);
         omicSampleID = tableHead.get(2);
