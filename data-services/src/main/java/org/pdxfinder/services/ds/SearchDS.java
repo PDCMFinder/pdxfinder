@@ -261,18 +261,22 @@ public class SearchDS {
         //Breast cancer markers
         //labelIDs should be alphabetically ordered(ER, HER, PR) as per dataprojection requirement
         List<FacetOption> breastCancerMarkerOptions = new ArrayList<>();
-                                                                                    //DP> ERBB2(HER2)--ESR1(ER)--PRG(PR)
-        breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR+", "ERBB2neg_ESR1neg_PGRpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR-", "ERBB2neg_ESR1neg_PGRneg"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR-", "ERBB2neg_ESR1pos_PGRneg"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR+", "ERBB2pos_ESR1pos_PGRpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR-", "ERBB2pos_ESR1neg_PGRneg"));
+                                                                                    //DP> ERBB2(HER2)--ESR1(ER)--PGR(PR)
+        //breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR+", "ERBB2neg_ESR1neg_PGRpos"));
+        //breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR-", "ERBB2neg_ESR1neg_PGRneg"));
+        //breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR-", "ERBB2neg_ESR1pos_PGRneg"));
+        //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR+", "ERBB2pos_ESR1pos_PGRpos"));
+        //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR-", "ERBB2pos_ESR1neg_PGRneg"));
 
         //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR+", "ERneg_HER2pos_PRpos"));
         //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR-", "ERpos_HER2pos_PRneg"));
         //breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR+", "ERneg_HER2neg_PRpos"));
-
-
+        breastCancerMarkerOptions.add(new FacetOption("HER2-", "ERBB2neg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2+", "ERBB2pos"));
+        breastCancerMarkerOptions.add(new FacetOption("ER-", "ESR1neg"));
+        breastCancerMarkerOptions.add(new FacetOption("ER+", "ESR1pos"));
+        breastCancerMarkerOptions.add(new FacetOption("PR-", "PGRneg"));
+        breastCancerMarkerOptions.add(new FacetOption("PR+", "PGRpos"));
 
         OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_markers", false, FilterType.OneParamFilter.get(),
                 breastCancerMarkerOptions, new ArrayList<>());
@@ -568,7 +572,7 @@ public class SearchDS {
                     break;
 
                 case breast_cancer_markers:
-                    result = breastCancerMarkersSearch.search(filters.get(SearchFacetName.breast_cancer_markers), result, ModelForQuery::addBreastCancerMarkers);
+                    result = breastCancerMarkersSearch.search(filters.get(SearchFacetName.breast_cancer_markers), result, ModelForQuery::addBreastCancerMarkers, ComparisonOperator.AND);
                     break;
 
                 default:
