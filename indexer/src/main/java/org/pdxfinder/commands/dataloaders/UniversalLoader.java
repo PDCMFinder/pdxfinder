@@ -845,8 +845,8 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
 
             String origin = derivedDatasetRow.get(1);
             String passage = derivedDatasetRow.get(2);
-            String modelId = derivedDatasetRow.get(3);
-            String nomenclature = derivedDatasetRow.get(4);
+            String nomenclature = derivedDatasetRow.get(3);
+            String modelId = derivedDatasetRow.get(4);
             String molCharType = derivedDatasetRow.get(5);
             String platformName = derivedDatasetRow.get(6);
             String platformTechnology = derivedDatasetRow.get(7);

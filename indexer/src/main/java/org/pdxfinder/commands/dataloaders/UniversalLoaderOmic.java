@@ -33,7 +33,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
     protected ReportManager reportManager;
 
 
-    public void loadOmicData(ModelCreation modelCreation, Group providerGroup, String dataType) {  // csv or json
+    public void loadOmicData(ModelCreation modelCreation, Group providerGroup, String dataType) {  // csv or xlsx or json
 
         reportManager = (ReportManager) context.getBean("ReportManager");
 
