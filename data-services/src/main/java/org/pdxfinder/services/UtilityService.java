@@ -76,12 +76,7 @@ public class UtilityService {
 
     public List<Map<String, String>> serializeExcelData(String excelURL) {
 
-        FileInputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(new File(excelURL));
-        }catch (Exception e) {
-            log.error("Data File "+excelURL+" Not Found");
-        }
+        FileInputStream inputStream = convertFileToStream(excelURL);
 
         int dataRow = 0;
         List<String> tableHead = new ArrayList<>();
@@ -113,6 +108,126 @@ public class UtilityService {
 
         return csvMap;
     }
+
+
+    public FileInputStream convertFileToStream(String filePath){
+
+
+        FileInputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(new File(filePath));
+        }catch (Exception e) {
+            log.error("UtilityService convertFileToStream says Data File "+filePath+" Not Found");
+        }
+
+        return inputStream;
+    }
+
+
+
+
+    public List<Map<String, String>> serializeExcelDataNoIterator(String excelURL, int sheet, int startRow) {
+
+        FileInputStream inputStream = convertFileToStream(excelURL);
+
+        List<String> tableHead = new ArrayList<>();
+        List<Map<String, String>> csvMap = new ArrayList<>();
+
+        startRow--;
+
+        try {
+            Row row;
+            int rowCount = 0;
+            Workbook workbook = WorkbookFactory.create(inputStream);
+            Sheet spreadsheet = workbook.getSheetAt(sheet);
+            Iterator<Row> rowIterator = spreadsheet.iterator();
+
+
+
+            while (rowIterator.hasNext()) // Read the head row
+            {
+                row = rowIterator.next();
+
+                if (rowCount == startRow){
+
+                    Iterator<Cell> cellIterator = row.cellIterator();
+                    tableHead = getXlsTableHeadData(cellIterator);
+                    break;
+                }
+                rowCount++;
+            }
+
+
+            rowCount = 0;
+            for (Row dRow : spreadsheet) {
+
+                if (rowCount <= startRow){
+                    rowCount++;
+                    continue;
+                }
+
+                //isAllowed = validURls.stream().anyMatch(str -> str.equals(dRequestUrl));
+
+                Map<String, String> rowMap = new LinkedHashMap<>();
+                String rowDataTracker = "";
+
+                for (int i = 0; i < tableHead.size(); i++) {
+
+                    Cell nameCell = dRow.getCell(i, Row.RETURN_BLANK_AS_NULL);
+                    String key = tableHead.get(i).trim();
+
+                    if (nameCell != null) {
+
+                        nameCell.setCellType(Cell.CELL_TYPE_STRING);
+                        String data = nameCell.getStringCellValue();
+
+                        rowMap.put(key, data);
+                        rowDataTracker += data;
+
+                    }else{
+                        if (!key.equals("")) rowMap.put(key, "");
+                    }
+                }
+
+                if (rowDataTracker.length() !=0) csvMap.add(rowMap);
+
+                rowCount++;
+            }
+
+            inputStream.close();
+        } catch (Exception ex) { ex.printStackTrace(); }
+
+        return csvMap;
+    }
+
+
+
+    public List<String> getXlsHead(String excelURL, int sheet) {
+
+        FileInputStream inputStream = convertFileToStream(excelURL);
+
+        List<String> tableHead = new ArrayList<>();
+
+        try {
+            Row row;
+            Workbook workbook = WorkbookFactory.create(inputStream);
+            Sheet spreadsheet = workbook.getSheetAt(sheet);
+            Iterator<Row> rowIterator = spreadsheet.iterator();
+
+            while (rowIterator.hasNext())
+            {
+                row = rowIterator.next();
+
+                Iterator<Cell> cellIterator = row.cellIterator();
+                tableHead = getXlsTableHeadData(cellIterator);
+                break;
+            }
+
+        }catch (Exception e){}
+
+        return tableHead;
+    }
+
 
 
 
@@ -244,6 +359,11 @@ public class UtilityService {
             case "json":
                 csvMaps = serializeJSONToMaps(fileName);
                 break;
+
+            case "xlsx":
+                csvMaps = serializeExcelDataNoIterator(fileName,0,1);
+                break;
+
         }
 
         Map<String, List<Map<String, String>> > groupedMap = new HashMap<>();
@@ -358,10 +478,6 @@ public class UtilityService {
 
         }
     }
-
-
-
-
 
 
 
