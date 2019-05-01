@@ -279,16 +279,11 @@ public class CreateDataProjections implements CommandLineRunner{
 
                 for(String result : marker.getValue()) {
 
-                    if(markerResultCombo == null){
-                        markerResultCombo = markerName+result;
-                    }
-                    else{
-                        markerResultCombo += "_" + markerName + result;
-                    }
+                    markerResultCombo = markerName+result;
+                    addToTwoParamDP(immunoHistoChemistryDP, "Not specified", markerResultCombo, modelId);
+
                 }
             }
-
-            addToTwoParamDP(immunoHistoChemistryDP, "Not specified", markerResultCombo, modelId);
 
         }
 
