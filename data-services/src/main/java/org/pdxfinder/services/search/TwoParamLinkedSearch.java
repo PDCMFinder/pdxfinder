@@ -40,14 +40,13 @@ public class TwoParamLinkedSearch extends GeneralSearch{
      *               result list, ie: drug search=> drug name + response)
      * @return       A set of MFQ objects
      */
-    public Set<ModelForQuery> search(List<String> params, Set<ModelForQuery> models, BiConsumer<ModelForQuery, String> setter ){
+    public Set<ModelForQuery> search(List<String> params, Set<ModelForQuery> models, BiConsumer<ModelForQuery, String> setter, ComparisonOperator op ){
 
 
         //param: AAA__BBB
 
         //this set will hold the model ids that were a match and were updated
         Set<Long> modelsToKeep = new HashSet<>();
-
 
         for(String paramString : params) {
 
@@ -72,10 +71,28 @@ public class TwoParamLinkedSearch extends GeneralSearch{
 
                     if(arr1.getValue().containsKey(key2)){
                         Set<Long> foundModelIDs = arr1.getValue().get(key2);
-                        modelsToKeep.addAll(foundModelIDs);
 
-                        //TODO: only the second key value is passed back to the MFQ obj, this needs to be changed in the future
-                        updateModelForQuery(foundModelIDs, models, key2, setter);
+                        if(op.equals(ComparisonOperator.OR)){
+
+                            modelsToKeep.addAll(foundModelIDs);
+                            //TODO: only the second key value is passed back to the MFQ obj, this needs to be changed in the future
+                            updateModelForQuery(foundModelIDs, models, key2, setter);
+                        }
+
+                        else if(op.equals(ComparisonOperator.AND)){
+
+                            if(modelsToKeep.size() == 0){
+                                modelsToKeep.addAll(foundModelIDs);
+                            }
+                            else{
+
+                                //keep only those elements that are present in both sets
+                                modelsToKeep.retainAll(foundModelIDs);
+
+                            }
+
+                            updateModelForQuery(foundModelIDs, models, key2, setter);
+                        }
                     }
                 }
             }
