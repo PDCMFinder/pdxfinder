@@ -15,12 +15,14 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 
+import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
@@ -47,7 +49,7 @@ import org.apache.poi.ss.usermodel.*;
  *
  * We should call it UPDOG. And it sets up a good joke. Any newcomer says "What's UPDOG?" we can say "Nothing much, what's up with you?"
  */
-public class UniversalLoader implements CommandLineRunner, ApplicationContextAware {
+public class UniversalLoader extends UniversalLoaderOmic implements CommandLineRunner, ApplicationContextAware {
 
     private final static Logger log = LoggerFactory.getLogger(UniversalLoader.class);
 
@@ -120,6 +122,11 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
     private Group ds;
 
     private Boolean stopLoading;
+
+    private Set<String> modelIDs;
+
+    @Autowired
+    private UtilityService utilityService;
 
 
     @PostConstruct
@@ -320,11 +327,14 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
         createDerivedPatientModelDataset();
 
+        createVariationData();
+
         createSharingAndContacts();
 
         createBreastAndOrColorectalData();
 
     }
+
 
     private void createDataSourceGroup() {
 
@@ -817,6 +827,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
         }
     }
 
+
     private void createDerivedPatientModelDataset() {
 
         if (stopLoading) return;
@@ -826,14 +837,16 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
         log.info("******************************************************");
 
         int row = 6;
+        this.modelIDs = new HashSet<>();
 
         for (List<String> derivedDatasetRow : derivedDatasetSheetData) {
 
             String sampleId = derivedDatasetRow.get(0);
+
             String origin = derivedDatasetRow.get(1);
             String passage = derivedDatasetRow.get(2);
-            String nomenclature = derivedDatasetRow.get(3);
-            String modelId = derivedDatasetRow.get(4);
+            String modelId = derivedDatasetRow.get(3);
+            String nomenclature = derivedDatasetRow.get(4);
             String molCharType = derivedDatasetRow.get(5);
             String platformName = derivedDatasetRow.get(6);
             String platformTechnology = derivedDatasetRow.get(7);
@@ -884,7 +897,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
             //xenograft sample
             //specimen should have been created before
-            else if (origin.toLowerCase().equals("xenograft")) {
+            else if (origin.toLowerCase().equals("engrafted tumor")) {
 
                 if (passage == null || passage.isEmpty() || passage.toLowerCase().equals("not specified")) {
 
@@ -941,12 +954,12 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                     dataImportService.saveModelCreation(model);
                     dataImportService.saveSample(sample);
 
+                    log.info(" Specimen with the following details was created: "+modelId+" "+passage+" "+nomenclature+ " in row: "+row);
                 }
                 else{
                     // either specimen with passage or the host strain nomenclature was not created
                     log.error("Cannot find specimen with the following details: "+modelId+" "+passage+" "+nomenclature+ " in row: "+row);
                 }
-
 
             }
             else{
@@ -954,12 +967,67 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 log.error("Unknown sample origin in row "+row);
             }
 
+            this.modelIDs.add(modelId);
             row++;
         }
 
-
-
     }
+
+
+
+
+    private void createVariationData() {
+
+        omicDataSource= ds.getAbbreviation();
+        dataSourceAbbreviation = loaderRelatedDataSheetData.get(0).get(1);
+        dataRootDirectory = dataRootDir+ "UPDOG/";
+        omicFileExtension = "xlsx";
+
+        String variationURLStr = dataRootDirectory+dataSourceAbbreviation+"/mut/data.xlsx";
+
+        List<String> tableHead = utilityService.getXlsHead(variationURLStr, 0);
+
+        omicModelID = tableHead.get(1);
+        omicSampleID = tableHead.get(2);
+        omicSampleOrigin = tableHead.get(3);
+        omicPassage = tableHead.get(4);
+        omicHostStrainName = tableHead.get(5);
+        omicHgncSymbol = tableHead.get(6);
+        omicAminoAcidChange = tableHead.get(7);
+        omicNucleotideChange = tableHead.get(8);
+        omicConsequence = tableHead.get(9);
+        omicReadDepth = tableHead.get(10);
+        omicAlleleFrequency = tableHead.get(11);
+        omicChromosome = tableHead.get(12);
+        omicSeqStartPosition = tableHead.get(13);
+        omicRefAllele = tableHead.get(14);
+        omicAltAllele = tableHead.get(15);
+        omicUcscGeneId = tableHead.get(16);
+        omicNcbiGeneId = tableHead.get(17);
+        omicEnsemblGeneId = tableHead.get(18);
+        omicEnsemblTranscriptId = tableHead.get(19);
+        omicRsIdVariants = tableHead.get(20);
+        omicGenomeAssembly = tableHead.get(21);
+        omicPlatform = tableHead.get(22);
+
+        omicDataFilesType = "ALL_MODELS_IN_ONE_FILE";
+
+        platformURL = new HashMap<>();
+        platformURL.put("Targeted_NGS","/platform/targeted-ngs/");
+
+
+
+        for (String modelId : this.modelIDs){
+
+            ModelCreation modelCreation = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
+
+            loadOmicData(modelCreation, ds, "mutation");
+        }
+    }
+
+
+
+
 
 
     private void createSharingAndContacts() {
