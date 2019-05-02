@@ -39,17 +39,18 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
         List<Map<String, String>> dataList;
 
+        String omicDir = (dataType.equals("mutation")) ? "mut" : "cna";
 
         if (omicDataFilesType.equals("ONE_FILE_PER_MODEL")){
 
             // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS 100s OF CSV/JSON WITH ONE_FILE_PER_MODEL
             String modelID = modelCreation.getSourcePdxId();
-            dataList = utilityService.serializeDataToMaps(dataRootDirectory+dataSourceAbbreviation+"/mut/"+modelID+"."+omicFileExtension);
+            dataList = utilityService.serializeDataToMaps(dataRootDirectory+dataSourceAbbreviation+"/"+omicDir+"/"+modelID+"."+omicFileExtension);
 
         }else {
 
             // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS A SINGLE CSV/JSON WITH ALL_MODELS_IN_ONE_FILE
-            String variationURLStr = dataRootDirectory+dataSourceAbbreviation+"/mut/data."+omicFileExtension;
+            String variationURLStr = dataRootDirectory+dataSourceAbbreviation+"/"+omicDir+"/data."+omicFileExtension;
 
             Map<String, List<Map<String, String>> > fullData = utilityService.serializeMergedData(variationURLStr,omicModelID);
 
@@ -72,7 +73,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             return;
         }
 
-        log.info(totalData + " gene variants for model " + modelID);
+        log.info(totalData +" "+dataType+" gene variants for model " + modelID);
 
         int count = 0;
 

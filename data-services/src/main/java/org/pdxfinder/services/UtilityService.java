@@ -488,11 +488,6 @@ public class UtilityService {
 
 
 
-
-
-
-
-
     public JsonNode readJsonURL(String apiLink) {
 
         JsonNode jsonNode = null;

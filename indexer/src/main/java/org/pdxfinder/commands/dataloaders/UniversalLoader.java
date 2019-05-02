@@ -983,52 +983,70 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
         dataRootDirectory = dataRootDir+ "UPDOG/";
         omicFileExtension = "xlsx";
 
-        String variationURLStr = dataRootDirectory+dataSourceAbbreviation+"/mut/data.xlsx";
+        String mutationURLStr = dataRootDirectory+dataSourceAbbreviation+"/mut/data.xlsx";
+        String cnaURLStr = dataRootDirectory+dataSourceAbbreviation+"/cna/data.xlsx";
 
-        List<String> tableHead = utilityService.getXlsHead(variationURLStr, 0);
+        List<String> mutHead = utilityService.getXlsHead(mutationURLStr, 0);
+        List<String> cnaHead = utilityService.getXlsHead(cnaURLStr, 0);
 
-        if (tableHead.size() == 0){
+        omicModelID = "Model_ID";
+        omicSampleID = "Sample_ID";
+        omicSampleOrigin = "sample_origin";
+        omicPassage = "Passage";
+        omicHostStrainName = "host_strain_name";
+        omicHgncSymbol = "hgnc_symbol";
+        omicAminoAcidChange = "amino_acid_change";
+        omicNucleotideChange = "nucleotide_change";
+        omicConsequence = "consequence";
+        omicReadDepth = "read_depth";
+        omicAlleleFrequency = "Allele_frequency";
+        omicChromosome = "chromosome";
+        omicSeqStartPosition = "seq_start_position";
+        omicRefAllele = "ref_allele";
+        omicAltAllele = "alt_allele";
+        omicUcscGeneId = "ucsc_gene_id";
+        omicNcbiGeneId = "ncbi_gene_id";
+        omicEnsemblGeneId = "ensembl_gene_id";
+        omicEnsemblTranscriptId = "ensembl_transcript_id";
+        omicRsIdVariants = "rs_id_Variant";
+        omicGenomeAssembly = "genome_assembly";
+        omicPlatform = "Platform";
 
-            log.info(dataSourceAbbreviation+" has no Variation Data File, so skip ");
-            return;
-        }
-
-        omicModelID = tableHead.get(1);
-        omicSampleID = tableHead.get(2);
-        omicSampleOrigin = tableHead.get(3);
-        omicPassage = tableHead.get(4);
-        omicHostStrainName = tableHead.get(5);
-        omicHgncSymbol = tableHead.get(6);
-        omicAminoAcidChange = tableHead.get(7);
-        omicNucleotideChange = tableHead.get(8);
-        omicConsequence = tableHead.get(9);
-        omicReadDepth = tableHead.get(10);
-        omicAlleleFrequency = tableHead.get(11);
-        omicChromosome = tableHead.get(12);
-        omicSeqStartPosition = tableHead.get(13);
-        omicRefAllele = tableHead.get(14);
-        omicAltAllele = tableHead.get(15);
-        omicUcscGeneId = tableHead.get(16);
-        omicNcbiGeneId = tableHead.get(17);
-        omicEnsemblGeneId = tableHead.get(18);
-        omicEnsemblTranscriptId = tableHead.get(19);
-        omicRsIdVariants = tableHead.get(20);
-        omicGenomeAssembly = tableHead.get(21);
-        omicPlatform = tableHead.get(22);
+        omicSeqEndPosition = "seq_end_position";
+        omicCnaLog10RCNA = "log10R_cna";
+        omicCnaLog2RCNA = "log2R_cna";
+        omicCnaCopyNumberStatus = "copy_number_status";
+        omicCnaGisticvalue = "gistic_value_cna";
+        omicCnaPicnicValue = "picnic_value";
 
         omicDataFilesType = "ALL_MODELS_IN_ONE_FILE";
 
         platformURL = new HashMap<>();
         platformURL.put("Targeted_NGS","/platform/targeted-ngs/");
-
+        platformURL.put("CGH_array","/platform/cgh-array/");
 
 
         for (String modelId : this.modelIDs){
 
             ModelCreation modelCreation = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
 
-            loadOmicData(modelCreation, ds, "mutation");
+            // Mutation Data Load
+            if (mutHead.size() != 0) {
+                loadOmicData(modelCreation, ds, "mutation");
+            }
+
+            // Copy Number Alteration Data Load
+            if (cnaHead.size() != 0){
+
+                loadOmicData(modelCreation, ds, "cna");
+            }
         }
+
+
+
+
+
+
     }
 
 
