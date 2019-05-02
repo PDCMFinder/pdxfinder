@@ -1184,7 +1184,7 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
 
 
                 }
-                else if(origin.toLowerCase().equals("xenograft")){
+                else if(origin.toLowerCase().equals("xenograft") || origin.toLowerCase().equals("engrafted tumor") || origin.toLowerCase().equals("engrafted tumour")){
 
                     //need this trick to get rid of 0.0 if there is any
                     int passageInt = (int) Float.parseFloat(passage);
