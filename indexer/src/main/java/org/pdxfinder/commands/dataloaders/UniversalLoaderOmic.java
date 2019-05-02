@@ -262,17 +262,17 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         ma.setChromosome(data.get(omicChromosome));
         ma.setSeqStartPosition(data.get(omicSeqStartPosition));
         ma.setSeqEndPosition(data.get(omicSeqEndPosition));
-        ma.setCnaLog10RCNA(omicCnaLog10RCNA);
-        ma.setCnaLog2RCNA(omicCnaLog2RCNA);
-        ma.setCnaCopyNumberStatus(omicCnaCopyNumberStatus);
-        ma.setCnaGisticValue(omicCnaGisticvalue);
-        ma.setCnaPicnicValue(omicCnaPicnicValue);
+        ma.setCnaLog10RCNA(data.get(omicCnaLog10RCNA));
+        ma.setCnaLog2RCNA(data.get(omicCnaLog2RCNA));
+        ma.setCnaCopyNumberStatus(data.get(omicCnaCopyNumberStatus));
+        ma.setCnaGisticValue(data.get(omicCnaGisticvalue));
+        ma.setCnaPicnicValue(data.get(omicCnaPicnicValue));
         ma.setGenomeAssembly(data.get(omicGenomeAssembly));
 
-        marker.setHgncSymbol(omicHgncSymbol);
-        marker.setUcscGeneId(omicUcscGeneId);
-        marker.setNcbiGeneId(omicNcbiGeneId);
-        marker.setEnsemblGeneId(omicEnsemblGeneId);
+        marker.setHgncSymbol(data.get(omicHgncSymbol));
+        marker.setUcscGeneId(data.get(omicUcscGeneId));
+        marker.setNcbiGeneId(data.get(omicNcbiGeneId));
+        marker.setEnsemblGeneId(data.get(omicEnsemblGeneId));
 
         ma.setMarker(marker);
         return  ma;
