@@ -29,14 +29,20 @@ public class ReportManager {
             messages.add(m);
     }
 
-    public void printMessages(){
+    public void printMessages(String level){
+
         if(messages.size() == 0){
             System.out.println("There are no message entries in the Report Manager.");
         }
         else{
 
             for(LogEntity le: messages){
-                System.out.println(le);
+
+                if(le.getType().equals(level) || level.equals("ALL")){
+                    System.out.println(le);
+                }
+
+
             }
         }
 
