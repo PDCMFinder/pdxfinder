@@ -25,8 +25,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +51,8 @@ import org.apache.poi.ss.usermodel.*;
  *
  * We should call it UPDOG. And it sets up a good joke. Any newcomer says "What's UPDOG?" we can say "Nothing much, what's up with you?"
  */
+@PropertySource("classpath:loader.properties")
+@ConfigurationProperties(prefix = "updog")
 public class UniversalLoader extends UniversalLoaderOmic implements CommandLineRunner, ApplicationContextAware {
 
     private final static Logger log = LoggerFactory.getLogger(UniversalLoader.class);
@@ -981,50 +985,12 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
         omicDataSource= ds.getAbbreviation();
         dataSourceAbbreviation = loaderRelatedDataSheetData.get(0).get(1);
         dataRootDirectory = dataRootDir+ "UPDOG/";
-        omicFileExtension = "xlsx";
 
         String mutationURLStr = dataRootDirectory+dataSourceAbbreviation+"/mut/data.xlsx";
         String cnaURLStr = dataRootDirectory+dataSourceAbbreviation+"/cna/data.xlsx";
 
         List<String> mutHead = utilityService.getXlsHead(mutationURLStr, 0);
         List<String> cnaHead = utilityService.getXlsHead(cnaURLStr, 0);
-
-        omicModelID = "Model_ID";
-        omicSampleID = "Sample_ID";
-        omicSampleOrigin = "sample_origin";
-        omicPassage = "Passage";
-        omicHostStrainName = "host_strain_name";
-        omicHgncSymbol = "hgnc_symbol";
-        omicAminoAcidChange = "amino_acid_change";
-        omicNucleotideChange = "nucleotide_change";
-        omicConsequence = "consequence";
-        omicReadDepth = "read_depth";
-        omicAlleleFrequency = "Allele_frequency";
-        omicChromosome = "chromosome";
-        omicSeqStartPosition = "seq_start_position";
-        omicRefAllele = "ref_allele";
-        omicAltAllele = "alt_allele";
-        omicUcscGeneId = "ucsc_gene_id";
-        omicNcbiGeneId = "ncbi_gene_id";
-        omicEnsemblGeneId = "ensembl_gene_id";
-        omicEnsemblTranscriptId = "ensembl_transcript_id";
-        omicRsIdVariants = "rs_id_Variant";
-        omicGenomeAssembly = "genome_assembly";
-        omicPlatform = "Platform";
-
-        omicSeqEndPosition = "seq_end_position";
-        omicCnaLog10RCNA = "log10R_cna";
-        omicCnaLog2RCNA = "log2R_cna";
-        omicCnaCopyNumberStatus = "copy_number_status";
-        omicCnaGisticvalue = "gistic_value_cna";
-        omicCnaPicnicValue = "picnic_value";
-
-        omicDataFilesType = "ALL_MODELS_IN_ONE_FILE";
-
-        platformURL = new HashMap<>();
-        platformURL.put("Targeted_NGS","/platform/targeted-ngs/");
-        platformURL.put("CGH_array","/platform/cgh-array/");
-
 
         for (String modelId : this.modelIDs){
 
@@ -1041,11 +1007,6 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
                 loadOmicData(modelCreation, ds, "cna");
             }
         }
-
-
-
-
-
 
     }
 
