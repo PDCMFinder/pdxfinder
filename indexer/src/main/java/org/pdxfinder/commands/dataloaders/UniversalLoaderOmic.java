@@ -259,11 +259,11 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         //setHostStrain Name
         ma.setChromosome(data.get(omicChromosome));
         ma.setSeqStartPosition(data.get(omicSeqStartPosition));
-        ma.setSeqEndPosition("9268558");
-        ma.setCnaLog10RCNA("XXXXXXX");
-        ma.setCnaLog2RCNA("XXXXXXX");
-        ma.setCnaCopyNumberStatus("XXXXXXX");
-        ma.setCnaGisticValue("XXXXXXX");
+        ma.setSeqEndPosition(data.get(omicSeqStartPosition));
+        ma.setCnaLog10RCNA(data.get(omicCnaLog10RCNA));
+        ma.setCnaLog2RCNA(data.get(omicCnaLog2RCNA));
+        ma.setCnaCopyNumberStatus(data.get(omicCnaCopyNumberStatus));
+        ma.setCnaGisticValue(data.get(omicCnaGisticvalue));
         ma.setCnaPicnicValue(data.get(omicCnaPicnicValue));
         ma.setGenomeAssembly(data.get(omicGenomeAssembly));
 
