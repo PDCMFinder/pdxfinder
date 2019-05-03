@@ -822,6 +822,34 @@ public class UtilityService {
     }
 
 
+    // File to Byte
+    public void moveFile(String source,String destination){
+
+        byte[] bytes = imageToByteLocal(source);
+
+        Path path = Paths.get(destination);
+        try{
+            Files.write(path, bytes);
+        }catch (Exception e){}
+    }
+
+
+    public  byte[] imageToByteLocal(String filePath) {
+
+        byte fileData[] = null;
+        File file = new File(filePath);
+
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+
+            fileData = new byte[(int) file.length()];
+            inputStream.read(fileData);
+        } catch (Exception e) {
+            System.out.println("Exception while reading the file " + e);
+        }
+
+        return fileData;
+    }
+
 
 
 

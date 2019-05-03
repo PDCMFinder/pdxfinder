@@ -349,7 +349,48 @@ public class TransController {
     }
 
 
+
+
+
+    @RequestMapping("/move-file")
+    public Object moveFile() {
+
+
+
+        String templateFile= System.getProperty("user.home") + "/Downloads/template.xlsx";
+        List<Map<String, String>> data = utilityService.serializeExcelDataNoIterator(templateFile,6,4);
+        data.remove(data.get(0));
+
+        for (Map<String, String> dData : data){
+
+            String sampleID = dData.get("sample ID");
+            String dataType = dData.get("Molecular Characterization type");
+
+            String sourceDir = (dataType.equals("Mutation")) ? "Mutation" : "Copy_Numbers";
+            String destinationDir = sourceDir+"2";
+            String fileSuffix = (dataType.equals("Mutation")) ? "_mutation_list_pdxfinder.csv" : "_cna_list_pdxfinder.csv";
+
+            String source = System.getProperty("user.home") + "/Downloads/TEMP/"+sourceDir+"/"+sampleID+fileSuffix;
+
+            String destination = System.getProperty("user.home") + "/Downloads/TEMP/"+destinationDir+"/"+sampleID+fileSuffix;
+
+            utilityService.moveFile(source,destination);
+
+            log.info("Moving {} File ...  ",dataType);
+
+        }
+
+        return data;
+    }
+
+
+
+
 }
+
+
+
+
 
 
 

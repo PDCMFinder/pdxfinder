@@ -57,7 +57,6 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         }
 
 
-
         String modelID = modelCreation.getSourcePdxId();
         Map<String, Platform> platformMap = new HashMap<>();
         Map<String, MolecularCharacterization> molcharMap = new HashMap<>();
@@ -78,7 +77,6 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
         //PHASE 1: ASSEMBLE OBJECTS IN MEMORY, REDUCING DB INTERACTIONS AS MUCH AS POSSIBLE
         for (Map<String, String> data : dataList ) {
-
 
             //STEP 1: GET THE PLATFORM AND CACHE IT
             String technology = data.get(omicPlatform);
@@ -147,11 +145,11 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 MarkerAssociation ma = new MarkerAssociation();
                 switch (dataType){
 
-                    case "cna":
-                        setCNAProperties(data, marker);
-
                     case "mutation":
                         ma = setVariationProperties(data, marker);
+
+                    case "cna":
+                        ma = setCNAProperties(data, marker);
                 }
 
                 molecularCharacterization.addMarkerAssociation(ma);
@@ -257,14 +255,15 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
         MarkerAssociation ma = new MarkerAssociation();
 
+
         //setHostStrain Name
         ma.setChromosome(data.get(omicChromosome));
         ma.setSeqStartPosition(data.get(omicSeqStartPosition));
-        ma.setSeqEndPosition(data.get(omicSeqEndPosition));
-        ma.setCnaLog10RCNA(data.get(omicCnaLog10RCNA));
-        ma.setCnaLog2RCNA(data.get(omicCnaLog2RCNA));
-        ma.setCnaCopyNumberStatus(data.get(omicCnaCopyNumberStatus));
-        ma.setCnaGisticValue(data.get(omicCnaGisticvalue));
+        ma.setSeqEndPosition("9268558");
+        ma.setCnaLog10RCNA("XXXXXXX");
+        ma.setCnaLog2RCNA("XXXXXXX");
+        ma.setCnaCopyNumberStatus("XXXXXXX");
+        ma.setCnaGisticValue("XXXXXXX");
         ma.setCnaPicnicValue(data.get(omicCnaPicnicValue));
         ma.setGenomeAssembly(data.get(omicGenomeAssembly));
 
