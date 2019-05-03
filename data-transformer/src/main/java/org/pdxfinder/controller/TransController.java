@@ -300,7 +300,7 @@ public class TransController {
         // UPDATE PDX DETAILS SHEET
 
         List<Map<String, String>> pdxModelDetailSheet = utilityService.serializeExcelDataNoIterator(templateFile,4,4);
-        pdxModelDetailSheet.remove(pdxModelDetailSheet.get(0));
+        //pdxModelDetailSheet.remove(pdxModelDetailSheet.get(0));
 
         // Group DerivedDataSheet By ModelID
         Map<String, List<Map<String, String>> > groupedDerivedDataSheet = utilityService.groupDataByColumn(derivedDataSheet,"Model ID");
@@ -333,6 +333,13 @@ public class TransController {
             }
         }
 
+
+
+        // Capture Map Keys to use as excel head
+        xlsHead = new ArrayList<>();
+        for (Map.Entry<String, String> entry : pdxModelDetailSheet.get(0).entrySet() ) {
+            xlsHead.add(entry.getKey());
+        }
 
         utilityService.writeCsvFile(pdxModelDetailSheet,xlsHead, "CRL-PDX_Model_detail.csv");
         utilityService.writeXLSXFile(pdxModelDetailSheet,"CRL-PDX_Model_detail.xlsx", "PDX_Model_detail");
