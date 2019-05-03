@@ -2,7 +2,14 @@ package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,53 +34,102 @@ public class UtilityService {
     private final static Logger log = LoggerFactory.getLogger(UtilityService.class);
     private ObjectMapper mapper = new ObjectMapper();
 
-
     //Delimiter used in CSV file
     private static final String COMMA_DELIMITER = ",";
     private static final String NEW_LINE_SEPARATOR = "\n";
 
 
+
+
+
     /*************************************************************************************************************
-     *           EXCEL FILE SERIALIZER        *
-     *****************************************/
+     *                                           DATA SERIALIZER METHODS SECTION                                 *
+     ************************************************************************************************************/
 
-    public List<String> getXlsTableHeadData(Iterator<Cell> cellIterator){
+    public List<Map<String, String>> serializeDataToMaps(String fileName) {
 
-        List<String> data = new ArrayList<>();
 
-        while (cellIterator.hasNext())
-        {
-            Cell cell = cellIterator.next();
-            if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
-                data.add(cell.getNumericCellValue() + "");
-            }else {
-                data.add(cell.getStringCellValue());
-            }
-        }
-        return data;
+        String fileExtension = getFileExtension(fileName);
+
+        List<Map<String, String>> csvMaps = (fileExtension.equals("csv")) ? serializeCSVToMaps(fileName) : serializeJSONToMaps(fileName);
+
+        return csvMaps;
     }
 
 
-    public Map<String, String> getXlsCellData(Iterator<Cell> cellIterator, List<String> tableHead){
 
-        Map<String, String> rowMap = new HashMap();
+    public Map<String, List<Map<String, String>> > serializeAndGroupFileContent(String fileName, String groupColumn) {
 
-        int column = 0;
-        while (cellIterator.hasNext())
-        {
-            Cell cell = cellIterator.next();
+        String fileExtension = getFileExtension(fileName);
 
-            if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
-                rowMap.put(tableHead.get(column).trim(), cell.getNumericCellValue() + "");
-            }else {
-                rowMap.put(tableHead.get(column).trim(), cell.getStringCellValue() + "");
-            }
-            column++;
+        List<Map<String, String>> csvMaps = new ArrayList<>();
+
+        switch (fileExtension){
+
+            case "csv":
+                csvMaps = serializeCSVToMaps(fileName);
+                break;
+
+            case "json":
+                csvMaps = serializeJSONToMaps(fileName);
+                break;
+
+            case "xlsx":
+                csvMaps = serializeExcelDataNoIterator(fileName,0,1);
+                break;
+
         }
-        return rowMap;
+
+        Map<String, List<Map<String, String>> > groupedMap = groupDataByColumn(csvMaps, groupColumn);
+        return groupedMap;
     }
 
 
+
+    public Map<String, List<Map<String, String>> > groupDataByColumn(List<Map<String, String>> csvMaps, String groupColumn) {
+
+
+        Map<String, List<Map<String, String>> > groupedMap = new LinkedHashMap<>();
+
+        for (Map<String, String> rowData : csvMaps){
+
+            List<Map<String, String>> tempList = new ArrayList<>();
+
+            String rowKey = rowData.get(groupColumn);
+
+            if (groupedMap.get(rowKey) == null) {
+
+                tempList.add(rowData);
+                groupedMap.put(rowKey, tempList);
+            } else {
+
+                tempList = groupedMap.get(rowKey);
+                tempList.add(rowData);
+
+                groupedMap.put(rowKey, tempList);
+            }
+
+        }
+        return groupedMap;
+    }
+
+
+
+
+
+
+
+
+
+
+
+    /*************************************************************************************************************
+     *                                  MICROSOFT EXCEL FILE HANDLER SECTION                                     *
+     ************************************************************************************************************/
+
+
+
+    // EXCEL FILE READER : READ EXCEL FILE USING ITERATOR, NOT VERY SAFE FOR EMPTY/FORMATTED CELLS
     public List<Map<String, String>> serializeExcelData(String excelURL) {
 
         FileInputStream inputStream = convertFileToStream(excelURL);
@@ -110,22 +166,9 @@ public class UtilityService {
     }
 
 
-    public FileInputStream convertFileToStream(String filePath){
 
 
-        FileInputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(new File(filePath));
-        }catch (Exception e) {
-            log.error("UtilityService convertFileToStream says Data File "+filePath+" Not Found");
-        }
-
-        return inputStream;
-    }
-
-
-
-
+    // EXCEL FILE READER : READ EXCEL FILE WITHOUT USING ITERATOR, SAFER LOADING FOR EMPTY CELLS
     public List<Map<String, String>> serializeExcelDataNoIterator(String excelURL, int sheet, int startRow) {
 
         FileInputStream inputStream = convertFileToStream(excelURL);
@@ -156,7 +199,6 @@ public class UtilityService {
                 }
                 rowCount++;
             }
-
 
             rowCount = 0;
             for (Row dRow : spreadsheet) {
@@ -202,6 +244,95 @@ public class UtilityService {
 
 
 
+
+    // EXCEL WRITER : CREATE .XLSX FILE
+    public void writeXLSXFile(List<Map<String, String>> dataList,String fileName, String sheetName) {
+
+        String excelFileName = homeDir+"/Downloads/"+fileName;
+
+        XSSFWorkbook wb = new XSSFWorkbook();
+        XSSFSheet sheet = wb.createSheet(sheetName) ;
+
+        CellStyle headerCellStyle = setXLSFont(wb, 14, IndexedColors.BROWN);
+
+        //iterating r number of rows
+        int rowCount = 0;
+        for (Map<String, String> data : dataList){
+
+            XSSFRow row = sheet.createRow(rowCount);
+
+            int columnCount = 0;
+            for (Map.Entry<String, String> entry : data.entrySet() ) {
+
+                XSSFCell cell = row.createCell(columnCount);
+
+                if (rowCount == 0){
+
+                    cell.setCellValue(entry.getKey());
+                    cell.setCellStyle(headerCellStyle);
+
+                    sheet.autoSizeColumn(columnCount);
+                }else {
+
+                    cell.setCellValue(data.get(entry.getKey()));
+                }
+                columnCount++;
+            }
+
+            rowCount++;
+        }
+
+
+        FileOutputStream fileOut;
+        try {
+            fileOut = new FileOutputStream(excelFileName);
+
+            //write this workbook to an Outputstream.
+            wb.write(fileOut);
+            fileOut.flush();
+            fileOut.close();
+
+        }catch (Exception e){ }
+
+    }
+
+
+
+    // EXCEL WRITER : CREATE .XLS FILE
+    public void writeXLSFile() throws IOException {
+
+        String excelFileName = "";//name of excel file
+
+        String sheetName = "Sheet1";//name of sheet
+
+        HSSFWorkbook wb = new HSSFWorkbook();
+        HSSFSheet sheet = wb.createSheet(sheetName) ;
+
+        //iterating r number of rows
+        for (int r=0;r < 5; r++ )
+        {
+            HSSFRow row = sheet.createRow(r);
+
+            //iterating c number of columns
+            for (int c=0;c < 5; c++ )
+            {
+                HSSFCell cell = row.createCell(c);
+
+                cell.setCellValue("Cell "+r+" "+c);
+            }
+        }
+
+        FileOutputStream fileOut = new FileOutputStream(excelFileName);
+
+        //write this workbook to an Outputstream.
+        wb.write(fileOut);
+        fileOut.flush();
+        fileOut.close();
+    }
+
+
+
+    // GET SMALL SECTIONS OF EXCEL: RETRIEVE FIRST ROW OF EXCEL SHEET
     public List<String> getXlsHead(String excelURL, int sheet) {
 
         FileInputStream inputStream = convertFileToStream(excelURL);
@@ -229,11 +360,84 @@ public class UtilityService {
     }
 
 
+    // GET SMALL SECTIONS OF EXCEL: RETRIEVE FIRST ROW OF EXCEL SHEET
+    public List<String> getXlsTableHeadData(Iterator<Cell> cellIterator){
+
+        List<String> data = new ArrayList<>();
+
+        while (cellIterator.hasNext())
+        {
+            Cell cell = cellIterator.next();
+            if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
+                data.add(cell.getNumericCellValue() + "");
+            }else {
+                data.add(cell.getStringCellValue());
+            }
+        }
+        return data;
+    }
+
+
+
+
+    // GET SMALL SECTIONS OF EXCEL: RETRIEVE BODY ROWS OF EXCEL SHEET
+    public Map<String, String> getXlsCellData(Iterator<Cell> cellIterator, List<String> tableHead){
+
+        Map<String, String> rowMap = new HashMap();
+
+        int column = 0;
+        while (cellIterator.hasNext())
+        {
+            Cell cell = cellIterator.next();
+
+            if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
+                rowMap.put(tableHead.get(column).trim(), cell.getNumericCellValue() + "");
+            }else {
+                rowMap.put(tableHead.get(column).trim(), cell.getStringCellValue() + "");
+            }
+            column++;
+        }
+        return rowMap;
+    }
+
+
+
+    // EXCEL CUSTOMIZER : SET EXCEL CELL FONT SIZE AND COLOR
+    private CellStyle setXLSFont(Workbook wb, int fontSize, IndexedColors colors){
+
+        // Create a Font for styling header cells
+        Font headerFont = wb.createFont();
+        headerFont.setBold(true);
+        headerFont.setFontHeightInPoints((short) fontSize);
+        headerFont.setColor(colors.getIndex());
+
+        // Create a CellStyle with the font
+        CellStyle headerCellStyle = wb.createCellStyle();
+        headerCellStyle.setFont(headerFont);
+
+        return headerCellStyle;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     /*************************************************************************************************************
-     *           CSV FILE SERIALIZER        *
-     ************************************/
+     *                                           CSV FILE HANDLER SECTION                                      *
+     ************************************************************************************************************/
+
+
+    // SERIALIZE CSV TO LIST OF MAPS
     public List<Map<String, String>> serializeCSVToMaps(String csvFile) {
 
         FileInputStream fileStream = null;
@@ -279,123 +483,7 @@ public class UtilityService {
     }
 
 
-    /*************************************************************************************************************
-     *            JSON SERIALIZER        *
-     ************************************/
-    public List<Map<String, String>> serializeJSONToMaps(String jsonFile) {
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        List<Map<String, String>> data;
-
-        JsonNode node = readJsonLocal(jsonFile);
-        try {
-            data = mapper.convertValue(node, List.class);
-
-        }catch (Exception e){
-
-            Map<String, Object> json = mapper.convertValue(node, Map.class);
-
-            String jsonKey = "";
-            for (Map.Entry<String, Object> entry : json.entrySet() ) {      // GET THE JSON KEY
-                jsonKey = entry.getKey();
-            }
-
-            data = (List) json.get(jsonKey);
-        }
-
-        return data;
-    }
-
-
-
-    public List<Map<String, String>> serializeJSONToMaps(String jsonFile,String jsonKey) {
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        JsonNode node = readJsonLocal(jsonFile);
-
-        Map<String, Object> json = mapper.convertValue(node, Map.class);
-
-        List<Map<String, String>> data = (List) json.get(jsonKey);
-
-        return data;
-    }
-
-
-
-
-
-
-
-
-
-
-
-    public List<Map<String, String>> serializeDataToMaps(String fileName) {
-
-
-        String fileExtension = getFileExtension(fileName);
-
-        List<Map<String, String>> csvMaps = (fileExtension.equals("csv")) ? serializeCSVToMaps(fileName) : serializeJSONToMaps(fileName);
-
-        return csvMaps;
-    }
-
-
-    public Map<String, List<Map<String, String>> > serializeMergedData(String fileName, String groupColumn) {
-
-
-        String fileExtension = getFileExtension(fileName);
-
-        List<Map<String, String>> csvMaps = new ArrayList<>();
-
-        switch (fileExtension){
-
-            case "csv":
-                csvMaps = serializeCSVToMaps(fileName);
-                break;
-
-            case "json":
-                csvMaps = serializeJSONToMaps(fileName);
-                break;
-
-            case "xlsx":
-                csvMaps = serializeExcelDataNoIterator(fileName,0,1);
-                break;
-
-        }
-
-        Map<String, List<Map<String, String>> > groupedMap = new HashMap<>();
-
-        for (Map<String, String> rowData : csvMaps){
-
-            List<Map<String, String>> tempList = new ArrayList<>();
-
-            String rowKey = rowData.get(groupColumn);
-
-            if (groupedMap.get(rowKey) == null) {
-
-                tempList.add(rowData);
-                groupedMap.put(rowKey, tempList);
-            } else {
-
-                tempList = groupedMap.get(rowKey);
-                tempList.add(rowData);
-
-                groupedMap.put(rowKey, tempList);
-            }
-
-        }
-        return groupedMap;
-    }
-
-
-
-
-
-
-
+    // SERIALIZE CSV TO ARRAY LIST
     public List<List<String>> serializeCSVToArrayList(String dataFile)
     {
 
@@ -434,6 +522,7 @@ public class UtilityService {
 
 
 
+    // CREATE CSV FILE
     public void writeCsvFile(List<Map<String, String>> dataList,  List<String> csvHead, String fileName) {
 
         FileWriter fileWriter = null;
@@ -488,6 +577,54 @@ public class UtilityService {
 
 
 
+    /*************************************************************************************************************
+     *                                           JSON FILE HANDLER SECTION                                      *
+     ************************************************************************************************************/
+
+    // SERIALIZER : CONVERT JSON URL TO JAVA MAPS
+    public List<Map<String, String>> serializeJSONToMaps(String jsonFile) {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<Map<String, String>> data;
+
+        JsonNode node = readJsonLocal(jsonFile);
+        try {
+            data = mapper.convertValue(node, List.class);
+
+        }catch (Exception e){
+
+            Map<String, Object> json = mapper.convertValue(node, Map.class);
+
+            String jsonKey = "";
+            for (Map.Entry<String, Object> entry : json.entrySet() ) {      // GET THE JSON KEY
+                jsonKey = entry.getKey();
+            }
+
+            data = (List) json.get(jsonKey);
+        }
+
+        return data;
+    }
+
+
+    // SERIALIZER : CONVERT JSON URL TO JAVA MAPS
+    public List<Map<String, String>> serializeJSONToMaps(String jsonFile,String jsonKey) {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        JsonNode node = readJsonLocal(jsonFile);
+
+        Map<String, Object> json = mapper.convertValue(node, Map.class);
+
+        List<Map<String, String>> data = (List) json.get(jsonKey);
+
+        return data;
+    }
+
+
+
+    // PARSER : LOAD JSON NODES FROM  REMOTE JSON HTTP URL
     public JsonNode readJsonURL(String apiLink) {
 
         JsonNode jsonNode = null;
@@ -520,7 +657,7 @@ public class UtilityService {
     }
 
 
-
+    // PARSER : LOAD JSON NODES FROM  LOCAL JSON
     public JsonNode readJsonLocal(String jsonFileLink) {
 
         JsonNode jsonNode = null;
@@ -539,40 +676,34 @@ public class UtilityService {
 
 
 
-    public void writeToFile(String data, String name){
 
-        String fileName = homeDir+"/Documents/"+name;
 
-        // Write to the file using BufferedReader and FileWriter
+
+
+
+
+
+    /*************************************************************************************************************
+     *                              LOCAL OR REMOTE FILE HANDLERS PARSERS SECTION                               *
+     ************************************************************************************************************/
+
+    // PARSER : CONVERT ANY FILE TO INPUTSTREAM
+    public FileInputStream convertFileToStream(String filePath){
+
+        FileInputStream inputStream = null;
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
-            writer.append(data);
-            writer.close();
-
-        } catch (Exception e) {}
-
-    }
-
-
-    public Boolean deleteFile(String name) {
-
-        String fileURL = homeDir+"/Documents/"+name;
-
-        Boolean report = false;
-        try {
-
-            Path path = Paths.get(fileURL);
-            Files.deleteIfExists(path);
-
-            report = true;
-        } catch (Exception e) {
+            inputStream = new FileInputStream(new File(filePath));
+            log.info("Loading template from : {}", filePath);
+        }catch (Exception e) {
+            log.error("UtilityService convertFileToStream says Data File "+filePath+" Not Found");
         }
 
-        return report;
+        return inputStream;
     }
 
 
 
+    // PARSER : LOAD FILE CONTENT FROM HTTP URL
     public String parseURL(String urlStr) {
 
         StringBuilder sb = new StringBuilder();
@@ -592,6 +723,8 @@ public class UtilityService {
     }
 
 
+
+    // LOAD FILE CONTENT FROM LOCAL DIRECTORY
     public String parseFile(String path) {
 
         StringBuilder sb = new StringBuilder();
@@ -608,6 +741,70 @@ public class UtilityService {
         }
         return sb.toString();
     }
+
+
+    // GET THE EXTENSION OF A FILE
+    public String getFileExtension(String fileName){
+
+        String[] check = fileName.split("\\.");
+        String fileExtension = check[check.length-1];
+
+        return fileExtension;
+    }
+
+
+    // FILE WRITE: WRITE STRIN DATA TO FILE
+    public void writeToFile(String data, String name){
+
+        String fileName = homeDir+"/Documents/"+name;
+
+        // Write to the file using BufferedReader and FileWriter
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
+            writer.append(data);
+            writer.close();
+
+        } catch (Exception e) {}
+
+    }
+
+
+    // DELETE FILE FROM A LOCAL DIRECTORY
+    public Boolean deleteFile(String localDirectory) {
+
+        Boolean report = false;
+        try {
+
+            Path path = Paths.get(localDirectory);
+            Files.deleteIfExists(path);
+
+            report = true;
+        } catch (Exception e) {
+        }
+
+        return report;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*************************************************************************************************************
+     *                                          OTHER UTILITIES                                                  *
+     ************************************************************************************************************/
 
 
     public String splitText(String data, String delim, String seperator){
@@ -627,13 +824,7 @@ public class UtilityService {
 
 
 
-    public String getFileExtension(String fileName){
 
-        String[] check = fileName.split("\\.");
-        String fileExtension = check[check.length-1];
-
-        return fileExtension;
-    }
 
 
 
