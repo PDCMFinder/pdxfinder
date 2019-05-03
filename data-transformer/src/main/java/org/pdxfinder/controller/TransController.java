@@ -1,6 +1,7 @@
 package org.pdxfinder.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.UtilityService;
@@ -235,6 +236,110 @@ public class TransController {
 
 
 
+
+
+
+
+    // FIX DERIVED DATA SHEET / PDX DETAILS IN CRL DATA
+    @RequestMapping("/rewrite-crl")
+    public Object crlTransform() {
+
+
+        // UPDATE DERIVED DATA SHEET
+        String templateFile= System.getProperty("user.home") + "/Downloads/DATA/crl.xlsx";
+        List<Map<String, String>> derivedDataSheet = utilityService.serializeExcelDataNoIterator(templateFile,6,4);
+
+        List removedList = new ArrayList();
+
+
+        for (Map<String, String> data : derivedDataSheet) {
+
+            String modelID = data.get("Model ID");
+
+            // Replace Model Ids with prefix CRL-
+            data.put("Model ID","CRL-"+modelID);
+
+            // Deduct 1 from all passages
+            String passage = data.get("Passage");
+            try {
+
+                String cleanPassage = Integer.toString(Integer.parseInt(passage) - 1);
+                data.put("Passage", cleanPassage);
+            }catch (Exception e){
+
+                log.error("{}'s passage {} is not a meaningful passage data ", modelID, passage);
+
+                // Trash it now, but treat later
+                removedList.add(data);
+            }
+
+            // Change Sample Origin to Xenograft
+            data.put("Sample origin","xenograft");
+
+            // remove Gene Expression Data
+            if ( data.get("Molecular Characterization type").contains("Gene expression") ){
+
+                removedList.add(data);
+            }
+        }
+        derivedDataSheet.removeAll(removedList);
+
+        // Capture Map Keys to use as excel head
+        List<String> xlsHead = new ArrayList<>();
+        for (Map.Entry<String, String> entry : derivedDataSheet.get(0).entrySet() ) {
+            xlsHead.add(entry.getKey());
+        }
+
+        utilityService.writeCsvFile(derivedDataSheet,xlsHead, "CRL-Derived_dataset_from_tumor.csv");
+        utilityService.writeXLSXFile(derivedDataSheet,"CRL-Derived_dataset_from_tumor.xlsx", "Derived_dataset_from_tumor");
+
+
+
+
+
+        // UPDATE PDX DETAILS SHEET
+
+        List<Map<String, String>> pdxModelDetailSheet = utilityService.serializeExcelDataNoIterator(templateFile,4,4);
+        pdxModelDetailSheet.remove(pdxModelDetailSheet.get(0));
+
+        // Group DerivedDataSheet By ModelID
+        Map<String, List<Map<String, String>> > groupedDerivedDataSheet = utilityService.groupDataByColumn(derivedDataSheet,"Model ID");
+
+
+        // Pull Model from ModelDetailSheet and look Up in DerivedDataSheet using the grouped version, pick the Passages and add to ModelDetailSheet
+        for (Map<String, String> modelDetail : pdxModelDetailSheet) {
+
+            String modelID = modelDetail.get("Model ID");
+            String modelDetailPassage = modelDetail.get("Passage");
+
+            // Look up ModelID in groupedDerivedDataSheet
+            List<Map<String, String>> derivedDatas = groupedDerivedDataSheet.get(modelID);
+
+            // Pick the New Passages from derivedData and add to ModelDetailSheet
+            Set<String> derivedDataPassages = new HashSet<>();
+            derivedDataPassages.add(modelDetailPassage);
+
+            try{
+
+                for (Map<String, String> derivedData : derivedDatas ){
+
+                    derivedDataPassages.add(derivedData.get("Passage"));
+                }
+                modelDetail.put("Passage", StringUtils.join(derivedDataPassages, ','));
+
+            }catch (Exception e){
+
+                log.error(modelID+" Found in Model Detail, but not in derived data");
+            }
+        }
+
+
+        utilityService.writeCsvFile(pdxModelDetailSheet,xlsHead, "CRL-PDX_Model_detail.csv");
+        utilityService.writeXLSXFile(pdxModelDetailSheet,"CRL-PDX_Model_detail.xlsx", "PDX_Model_detail");
+
+
+        return pdxModelDetailSheet;
+    }
 
 
 }
