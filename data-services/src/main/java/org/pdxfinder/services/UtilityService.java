@@ -825,7 +825,7 @@ public class UtilityService {
     // File to Byte
     public void moveFile(String source,String destination){
 
-        byte[] bytes = imageToByteLocal(source);
+        byte[] bytes = convertLocalFileToByte(source);
 
         Path path = Paths.get(destination);
         try{
@@ -834,7 +834,7 @@ public class UtilityService {
     }
 
 
-    public  byte[] imageToByteLocal(String filePath) {
+    public  byte[] convertLocalFileToByte(String filePath) {
 
         byte fileData[] = null;
         File file = new File(filePath);
