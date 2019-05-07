@@ -148,7 +148,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                     case "mutation":
                         ma = setVariationProperties(data, marker);
 
-                    case "cna":
+                    case "copy number alteration":
                         ma = setCNAProperties(data, marker);
                 }
 
