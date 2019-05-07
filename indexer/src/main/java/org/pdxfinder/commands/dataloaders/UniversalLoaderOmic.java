@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
@@ -52,11 +51,10 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS A SINGLE CSV/JSON WITH ALL_MODELS_IN_ONE_FILE
             String variationURLStr = dataRootDirectory+dataSourceAbbreviation+"/"+omicDir+"/data."+omicFileExtension;
 
-            Map<String, List<Map<String, String>> > fullData = utilityService.serializeMergedData(variationURLStr,omicModelID);
+            Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(variationURLStr,omicModelID);
 
             dataList = fullData.get(modelCreation.getSourcePdxId());
         }
-
 
 
         String modelID = modelCreation.getSourcePdxId();
@@ -79,7 +77,6 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
         //PHASE 1: ASSEMBLE OBJECTS IN MEMORY, REDUCING DB INTERACTIONS AS MUCH AS POSSIBLE
         for (Map<String, String> data : dataList ) {
-
 
             //STEP 1: GET THE PLATFORM AND CACHE IT
             String technology = data.get(omicPlatform);
@@ -148,11 +145,11 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 MarkerAssociation ma = new MarkerAssociation();
                 switch (dataType){
 
-                    case "cna":
-                        setCNAProperties(data, marker);
-
                     case "mutation":
                         ma = setVariationProperties(data, marker);
+
+                    case "cna":
+                        ma = setCNAProperties(data, marker);
                 }
 
                 molecularCharacterization.addMarkerAssociation(ma);
@@ -258,10 +255,11 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
         MarkerAssociation ma = new MarkerAssociation();
 
+
         //setHostStrain Name
         ma.setChromosome(data.get(omicChromosome));
         ma.setSeqStartPosition(data.get(omicSeqStartPosition));
-        ma.setSeqEndPosition(data.get(omicSeqEndPosition));
+        ma.setSeqEndPosition(data.get(omicSeqStartPosition));
         ma.setCnaLog10RCNA(data.get(omicCnaLog10RCNA));
         ma.setCnaLog2RCNA(data.get(omicCnaLog2RCNA));
         ma.setCnaCopyNumberStatus(data.get(omicCnaCopyNumberStatus));
