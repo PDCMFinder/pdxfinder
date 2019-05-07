@@ -1039,7 +1039,7 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
             // Copy Number Alteration Data Load
             if (cnaHead.size() != 0){
 
-                loadOmicData(modelCreation, ds, "cna");
+                loadOmicData(modelCreation, ds, "copy number alteration");
             }
         }
 
