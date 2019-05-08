@@ -26,6 +26,10 @@ import java.util.stream.Stream;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+/*
+ * Created by abayomi on 12/02/2019.
+ */
+
 @Service
 public class UtilityService {
 
@@ -466,7 +470,7 @@ public class UtilityService {
                     }
                 } else {
 
-                    Map<String, String> rowMap = new HashMap();
+                    Map<String, String> rowMap = new LinkedHashMap<>();
                     for (String columnHead : tableHead) {
 
                         rowMap.put(columnHead.trim(), rowDataArr[column].trim());
@@ -523,16 +527,23 @@ public class UtilityService {
 
 
     // CREATE CSV FILE
-    public void writeCsvFile(List<Map<String, String>> dataList,  List<String> csvHead, String fileName) {
+    public void writeCsvFile(List<Map<String, String>> dataList, String destination) {
 
         FileWriter fileWriter = null;
 
         try {
 
-            String destination = homeDir+"/Downloads/"+fileName;
             fileWriter = new FileWriter(destination);
 
             //Write the CSV file header
+            List<String> csvHead = new ArrayList<>();
+            Map<String, String> refData = dataList.get(0);
+
+            for (Map.Entry<String, String> entry : refData.entrySet() ) {      // GET THE JSON KEY
+                csvHead.add(entry.getKey());
+            }
+            //log.info(csvHead.toString()); System.exit(0);
+
             fileWriter.append(String.join(COMMA_DELIMITER,csvHead));
 
             //Add a new line separator after the header
@@ -546,6 +557,7 @@ public class UtilityService {
                     fileWriter.append(String.valueOf(data.get(dKey)));
                     fileWriter.append(COMMA_DELIMITER);
                 }
+
                 fileWriter.append(NEW_LINE_SEPARATOR);
 
             }

@@ -127,12 +127,15 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             if(nsdto.getNode() == null){
 
-                // Found an unrecognised marker symbol, abort, abort!!!!
+                //log.info("Found an unrecognised Marker Symbol {} in Model: {}, Skipping This!!!! ", data.get(omicHgncSymbol), modelID);
+                log.info(data.toString());
+
                 reportManager.addMessage(nsdto.getLogEntity());
                 count++;
                 continue;
             }
             else{
+
 
                 // step 4: assemble the MarkerAssoc object and add it to molchar
                 marker = (Marker) nsdto.getNode();
@@ -142,15 +145,24 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                     reportManager.addMessage(nsdto.getLogEntity());
                 }
 
-                MarkerAssociation ma = new MarkerAssociation();
-                switch (dataType){
+                MarkerAssociation ma;
+
+                if (dataType.equals("mutation")){
+
+                    ma = setVariationProperties(data, marker);
+                }else {
+
+                    ma = setCNAProperties(data, marker);
+                }
+
+                /*switch (dataType){
 
                     case "mutation":
                         ma = setVariationProperties(data, marker);
 
                     case "copy number alteration":
                         ma = setCNAProperties(data, marker);
-                }
+                }*/
 
                 molecularCharacterization.addMarkerAssociation(ma);
 

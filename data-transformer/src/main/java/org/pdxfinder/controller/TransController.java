@@ -413,12 +413,15 @@ public class TransController {
 
             String sourceDir = (dataType.equals("Mutation")) ? "Mutation2" : "Copy_Numbers2";
 
+
             String fileSuffix = (dataType.equals("Mutation")) ? "_mutation_list_pdxfinder.csv" : "_cna_list_pdxfinder.csv";
 
             String destinationDir = sourceDir+"-Final";
 
 
             String source = homeDir+"/Downloads/TEMP/"+sourceDir+"/"+sampleID+fileSuffix;
+
+            log.info(source);
 
             List<Map<String, String>> dataList = utilityService.serializeCSVToMaps(source);
 
