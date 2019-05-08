@@ -1264,6 +1264,10 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
                     }
 
                 }
+                else{
+                    //origin is not patient nor xenograft
+                    log.error("Unknown sample origin in row "+row);
+                }
 
             }
 

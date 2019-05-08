@@ -455,7 +455,7 @@ public class DetailsService {
             tableHeaders.add("");
 
             List<String> notVisibleDataRow = new ArrayList<>();
-            notVisibleDataRow.add("This data is only accessible through the provider website - please click there for access.");
+            notVisibleDataRow.add("This data is only accessible through the provider website - please contact them for access.");
 
             tableRows.add(notVisibleDataRow);
 
