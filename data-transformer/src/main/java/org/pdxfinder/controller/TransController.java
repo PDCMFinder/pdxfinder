@@ -25,6 +25,7 @@ import java.util.*;
 public class TransController {
 
     private final static Logger log = LoggerFactory.getLogger(TransController.class);
+    private String homeDir = System.getProperty("user.home");
 
     private RestTemplate restTemplate = new RestTemplate();
     private ObjectMapper mapper = new ObjectMapper();
@@ -128,10 +129,10 @@ public class TransController {
 
         List<Map<String, String>> dataList = utilityService.serializeCSVToMaps(omicFile);
 
-
+/*
         List<String> csvHead = Arrays.asList("datasource","Model_ID","Sample_ID","sample_origin","Passage","host_strain_name","hgnc_symbol","amino_acid_change","nucleotide_change",
                 "consequence","read_depth","Allele_frequency","chromosome","seq_start_position","ref_allele","alt_allele","ucsc_gene_id",
-                "ncbi_gene_id","ensembl_gene_id","ensembl_transcript_id","rs_id_Variant","genome_assembly","Platform");
+                "ncbi_gene_id","ensembl_gene_id","ensembl_transcript_id","rs_id_Variant","genome_assembly","Platform");*/
 
 
 
@@ -163,7 +164,8 @@ public class TransController {
         dataList.removeAll(removedList);
 
 
-        utilityService.writeCsvFile(dataList,csvHead, "data.csv");
+        String destination = homeDir+"/Downloads/data.csv";
+        utilityService.writeCsvFile(dataList, destination);
 
         return dataList;
     }
@@ -180,10 +182,10 @@ public class TransController {
 
         List<Map<String, String>> dataList = utilityService.serializeExcelDataNoIterator(cnaFile,0,1);
 
-
+/*
         List<String> xlsHead = Arrays.asList("datasource","Model_ID","Sample_ID","sample_origin","Passage","host_strain_name","chromosome","seq_start_position","seq_end_position",
                 "Probe_ID_affymetrix","hgnc_symbol","ucsc_gene_id","ncbi_gene_id","ensembl_gene_id","log10R_cna","log2R_cna","copy_number_status",
-                "gistic_value_cna","genome_assembly","Platform");
+                "gistic_value_cna","genome_assembly","Platform");*/
 
 
         for (Map<String, String> data : dataList) {
@@ -228,7 +230,9 @@ public class TransController {
 
         }
 
-        utilityService.writeCsvFile(dataList,xlsHead, "curie-cna.csv");
+
+        String destination = homeDir+"/Downloads/curie-cna.csv";
+        utilityService.writeCsvFile(dataList, destination);
 
         return dataList;
     }
@@ -290,11 +294,10 @@ public class TransController {
             xlsHead.add(entry.getKey());
         }
 
-        utilityService.writeCsvFile(derivedDataSheet,xlsHead, "CRL-Derived_dataset_from_tumor.csv");
+
+        String destination = homeDir+"/Downloads/CRL-Derived_dataset_from_tumor.csv";
+        utilityService.writeCsvFile(derivedDataSheet, destination);
         utilityService.writeXLSXFile(derivedDataSheet,"CRL-Derived_dataset_from_tumor.xlsx", "Derived_dataset_from_tumor");
-
-
-
 
 
         // UPDATE PDX DETAILS SHEET
@@ -341,7 +344,9 @@ public class TransController {
             xlsHead.add(entry.getKey());
         }
 
-        utilityService.writeCsvFile(pdxModelDetailSheet,xlsHead, "CRL-PDX_Model_detail.csv");
+
+        destination = homeDir+"/Downloads/CRL-PDX_Model_detail.csv";
+        utilityService.writeCsvFile(pdxModelDetailSheet, destination);
         utilityService.writeXLSXFile(pdxModelDetailSheet,"CRL-PDX_Model_detail.xlsx", "PDX_Model_detail");
 
 
@@ -352,7 +357,7 @@ public class TransController {
 
 
 
-    @RequestMapping("/move-file")
+    @RequestMapping("/move-crl-omic-file")
     public Object moveFile() {
 
 
@@ -377,6 +382,59 @@ public class TransController {
             utilityService.moveFile(source,destination);
 
             log.info("Moving {} File ...  ",dataType);
+
+        }
+
+        return data;
+    }
+
+
+
+
+
+    @RequestMapping("/clean-crl-omic-files")
+    public Object cleanCRLOMICFiles() {
+
+
+        List<String> csvHead = Arrays.asList("datasource","Model_ID","Sample_ID","sample_origin","Passage","host_strain_name","hgnc_symbol","amino_acid_change","nucleotide_change",
+                "consequence","read_depth","Allele_frequency","chromosome","seq_start_position","ref_allele","alt_allele","ucsc_gene_id",
+                "ncbi_gene_id","ensembl_gene_id","ensembl_transcript_id","rs_id_Variant","genome_assembly","Platform");
+
+
+        String templateFile= homeDir + "/Downloads/template.xlsx";
+        List<Map<String, String>> data = utilityService.serializeExcelDataNoIterator(templateFile,6,4);
+        data.remove(data.get(0));
+
+
+        for (Map<String, String> dData : data){
+
+            String sampleID = dData.get("sample ID");
+            String dataType = dData.get("Molecular Characterization type");
+
+            String sourceDir = (dataType.equals("Mutation")) ? "Mutation2" : "Copy_Numbers2";
+
+            String fileSuffix = (dataType.equals("Mutation")) ? "_mutation_list_pdxfinder.csv" : "_cna_list_pdxfinder.csv";
+
+            String destinationDir = sourceDir+"-Final";
+
+
+            String source = homeDir+"/Downloads/TEMP/"+sourceDir+"/"+sampleID+fileSuffix;
+
+            List<Map<String, String>> dataList = utilityService.serializeCSVToMaps(source);
+
+
+            String modelID = "";
+            for (Map<String, String> dataRow : dataList) {
+
+                modelID = "CRL-"+dataRow.get("Model_ID");
+                dataRow.put("Model_ID", modelID);
+            }
+
+            String destination = homeDir+"/Downloads/TEMP/"+destinationDir+"/"+modelID+".csv";
+
+            utilityService.writeCsvFile(dataList, destination);
+
+            log.info("Created {} File ...  in {} ", dataType, destination);
 
         }
 
