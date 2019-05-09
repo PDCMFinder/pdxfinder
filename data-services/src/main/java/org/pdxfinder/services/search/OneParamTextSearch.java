@@ -46,7 +46,6 @@ public class OneParamTextSearch extends GeneralSearch{
                 if(op.equals(ComparisonOperator.OR)){
 
                     modelsToKeep.addAll(foundModelIDs);
-                    //TODO: only the second key value is passed back to the MFQ obj, this needs to be changed in the future
                     updateModelForQuery(foundModelIDs, models, param, setter);
                 }
 
