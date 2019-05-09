@@ -182,9 +182,9 @@
 
                                         <!-- Check what kind of component is it, not all components have options-->
 
-                                        <!-- OneParamFilter -->
+                                        <!-- OneParamCheckboxFilter -->
                                         <div class="large-form"
-                                             th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamFilter)}">
+                                             th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamCheckboxFilter)}">
                                             <div class="checkbox-item" th:each="option:${filterComponent.options}">
 
                                                 <input type="checkbox" class="filter"

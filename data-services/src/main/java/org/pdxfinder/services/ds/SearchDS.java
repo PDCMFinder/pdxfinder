@@ -16,7 +16,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -61,7 +60,7 @@ public class SearchDS {
     /**
      * A general one param search object that is being used when search is performed on a MFQ object field
      */
-    private OneParamSearch oneParamSearch;
+    private OneParamCheckboxSearch oneParamCheckboxSearch;
 
     /**
      * Three param search object for performing a search on gene mutations
@@ -136,7 +135,7 @@ public class SearchDS {
         cancerBySystemOptions.add(new FacetOption("Urinary System Cancer", "Urinary_System_Cancer"));
         cancerBySystemOptions.add(new FacetOption("Unclassified", "Unclassified"));
 
-        OneParamFilter cancerBySystem = new OneParamFilter("CANCER BY SYSTEM", "cancer_system", false, FilterType.OneParamFilter.get(),
+        OneParamCheckboxFilter cancerBySystem = new OneParamCheckboxFilter("CANCER BY SYSTEM", "cancer_system", false, FilterType.OneParamFilter.get(),
                 cancerBySystemOptions, new ArrayList<>());
         patientTumorSection.addComponent(cancerBySystem);
         facetOptionMap.put("cancer_system", cancerBySystemOptions);
@@ -149,7 +148,7 @@ public class SearchDS {
         tumorTypeOptions.add(new FacetOption("Refractory", "Refractory"));
         tumorTypeOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
-        OneParamFilter tumorType = new OneParamFilter("TUMOR_TYPE", "sample_tumor_type", false, FilterType.OneParamFilter.get(),
+        OneParamCheckboxFilter tumorType = new OneParamCheckboxFilter("TUMOR_TYPE", "sample_tumor_type", false, FilterType.OneParamFilter.get(),
               tumorTypeOptions, new ArrayList<>());
         patientTumorSection.addComponent(tumorType);
         facetOptionMap.put("sample_tumor_type", tumorTypeOptions);
@@ -159,7 +158,7 @@ public class SearchDS {
         patientSexOptions.add(new FacetOption("Male", "Male"));
         patientSexOptions.add(new FacetOption("Female", "Female"));
         patientSexOptions.add(new FacetOption("Not Specified", "Not_Specified"));
-        OneParamFilter sex = new OneParamFilter("SEX", "patient_gender", false, FilterType.OneParamFilter.get(),
+        OneParamCheckboxFilter sex = new OneParamCheckboxFilter("SEX", "patient_gender", false, FilterType.OneParamFilter.get(),
         patientSexOptions, new ArrayList<>());
         patientTumorSection.addComponent(sex);
         facetOptionMap.put("patient_gender", patientSexOptions);
@@ -178,7 +177,7 @@ public class SearchDS {
         ageOptions.add(new FacetOption("90", "90"));
         ageOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
-        OneParamFilter age = new OneParamFilter("AGE", "patient_age", false, FilterType.OneParamFilter.get(),
+        OneParamCheckboxFilter age = new OneParamCheckboxFilter("AGE", "patient_age", false, FilterType.OneParamFilter.get(),
         ageOptions, new ArrayList<>());
         patientTumorSection.addComponent(age);
         facetOptionMap.put("patient_age",ageOptions);
@@ -189,7 +188,7 @@ public class SearchDS {
         patientTreatmentStatusOptions.add(new FacetOption("Not Treatment Naive", "not_treatment_naive"));
         patientTreatmentStatusOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
-        OneParamFilter patientTreatmentStatus = new OneParamFilter("TREATMENT STATUS", "patient_treatment_status", false,
+        OneParamCheckboxFilter patientTreatmentStatus = new OneParamCheckboxFilter("TREATMENT STATUS", "patient_treatment_status", false,
                 FilterType.OneParamFilter.get(), patientTreatmentStatusOptions, new ArrayList<>());
         patientTumorSection.addComponent(patientTreatmentStatus);
         facetOptionMap.put("patient_treatment_status", patientTreatmentStatusOptions);
@@ -215,13 +214,13 @@ public class SearchDS {
         datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
         datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
 
-        OneParamFilter datasetAvailable = new OneParamFilter("DATASET AVAILABLE", "data_available", false, FilterType.OneParamFilter.get(),
+        OneParamCheckboxFilter datasetAvailable = new OneParamCheckboxFilter("DATASET AVAILABLE", "data_available", false, FilterType.OneParamFilter.get(),
                 datasetAvailableOptions, new ArrayList<>());
 
         pdxModelSection.addComponent(datasetAvailable);
         facetOptionMap.put("data_available", datasetAvailableOptions);
 
-        OneParamFilter datasource = new OneParamFilter("DATASOURCE", "datasource", false, FilterType.OneParamFilter.get(), datasourceOptions, new ArrayList<>());
+        OneParamCheckboxFilter datasource = new OneParamCheckboxFilter("DATASOURCE", "datasource", false, FilterType.OneParamFilter.get(), datasourceOptions, new ArrayList<>());
         pdxModelSection.addComponent(datasource);
         facetOptionMap.put("datasource", datasourceOptions);
 
@@ -246,7 +245,7 @@ public class SearchDS {
         for(String p: projectList){
             projectOptions.add(new FacetOption(p, p));
         }
-        OneParamFilter projects = new OneParamFilter("PROJECT", "project", false, FilterType.OneParamFilter.get(), projectOptions, new ArrayList<>());
+        OneParamCheckboxFilter projects = new OneParamCheckboxFilter("PROJECT", "project", false, FilterType.OneParamFilter.get(), projectOptions, new ArrayList<>());
         pdxModelSection.addComponent(projects);
         facetOptionMap.put("project", projectOptions);
 
@@ -278,7 +277,7 @@ public class SearchDS {
         breastCancerMarkerOptions.add(new FacetOption("PR negative", "PGRneg"));
         breastCancerMarkerOptions.add(new FacetOption("PR positive", "PGRpos"));
 
-        OneParamFilter breastCancerMarkers = new OneParamFilter("BREAST CANCER BIOMARKERS", "breast_cancer_markers", false, FilterType.OneParamFilter.get(),
+        OneParamCheckboxFilter breastCancerMarkers = new OneParamCheckboxFilter("BREAST CANCER BIOMARKERS", "breast_cancer_markers", false, FilterType.OneParamFilter.get(),
                 breastCancerMarkerOptions, new ArrayList<>());
         molecularDataSection.addComponent(breastCancerMarkers);
         facetOptionMap.put("breast_cancer_markers",breastCancerMarkerOptions);
@@ -310,7 +309,7 @@ public class SearchDS {
 
 
         //one general search object for searching on MFQ object fields
-        oneParamSearch = new OneParamSearch(null, null);
+        oneParamCheckboxSearch = new OneParamCheckboxSearch(null, null);
 
         //drug search
         dosingStudySearch = new TwoParamUnlinkedSearch();
@@ -345,9 +344,9 @@ public class SearchDS {
             for(GeneralFilter filter: wfs.getFilterComponents()){
                 filter.setActive(false);
 
-                if(filter instanceof OneParamFilter){
+                if(filter instanceof OneParamCheckboxFilter){
 
-                    OneParamFilter f = (OneParamFilter)filter;
+                    OneParamCheckboxFilter f = (OneParamCheckboxFilter)filter;
                     f.setSelected(new ArrayList<>());
 
                 }
@@ -394,9 +393,9 @@ public class SearchDS {
                     if(filter.getUrlParam().equals(facetName)){
                         filter.setActive(true);
 
-                        if(filter instanceof OneParamFilter){
+                        if(filter instanceof OneParamCheckboxFilter){
 
-                            OneParamFilter f = (OneParamFilter)filter;
+                            OneParamCheckboxFilter f = (OneParamCheckboxFilter)filter;
                             f.setSelected(decodedSelected);
 
                         }
@@ -487,7 +486,7 @@ public class SearchDS {
             return result;
         }
 
-        OneParamSearch oneParamSearch = new OneParamSearch("search","search");
+        OneParamCheckboxSearch oneParamCheckboxSearch = new OneParamCheckboxSearch("search","search");
 
         for (SearchFacetName facet : filters.keySet()) {
 
@@ -497,70 +496,70 @@ public class SearchDS {
 
                 case query:
                     //List<String> searchParams, Set<ModelForQuery> mfqSet, Function<ModelForQuery, List<String>> searchFunc
-                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("query"), filters.get(SearchFacetName.query), result, ModelForQuery::getAllOntologyTermAncestors);
+                    result = oneParamCheckboxSearch.searchOnCollection(facetOptionMap.get("query"), filters.get(SearchFacetName.query), result, ModelForQuery::getAllOntologyTermAncestors);
                     break;
 
                 case datasource:
-                    result = oneParamSearch.searchOnString(facetOptionMap.get("datasource"), filters.get(SearchFacetName.datasource), result, ModelForQuery::getDatasource);
+                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("datasource"), filters.get(SearchFacetName.datasource), result, ModelForQuery::getDatasource);
                     break;
 
                 case diagnosis:
-                    result = oneParamSearch.searchOnString(facetOptionMap.get("diagnosis"), filters.get(SearchFacetName.diagnosis), result, ModelForQuery::getMappedOntologyTerm);
+                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("diagnosis"), filters.get(SearchFacetName.diagnosis), result, ModelForQuery::getMappedOntologyTerm);
                     break;
 
                 case patient_age:
-                    result = oneParamSearch.searchOnString(facetOptionMap.get("patient_age"), filters.get(SearchFacetName.patient_age), result, ModelForQuery::getPatientAge);
+                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("patient_age"), filters.get(SearchFacetName.patient_age), result, ModelForQuery::getPatientAge);
                     break;
                 case patient_treatment_status:
-                    result = oneParamSearch.searchOnString(facetOptionMap.get("patient_treatment_status"), filters.get(SearchFacetName.patient_treatment_status), result, ModelForQuery::getPatientTreatmentStatus);
+                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("patient_treatment_status"), filters.get(SearchFacetName.patient_treatment_status), result, ModelForQuery::getPatientTreatmentStatus);
                     break;
 
                 case patient_gender:
-                    result = oneParamSearch.searchOnString(facetOptionMap.get("patient_gender"), filters.get(SearchFacetName.patient_gender), result, ModelForQuery::getPatientGender);
+                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("patient_gender"), filters.get(SearchFacetName.patient_gender), result, ModelForQuery::getPatientGender);
                     break;
 
                 case sample_origin_tissue:
-                    result = oneParamSearch.searchOnString(facetOptionMap.get("sample_origin_tissue"), filters.get(SearchFacetName.sample_origin_tissue), result, ModelForQuery::getSampleOriginTissue);
+                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("sample_origin_tissue"), filters.get(SearchFacetName.sample_origin_tissue), result, ModelForQuery::getSampleOriginTissue);
                     break;
 
                 case sample_classification:
-                    result = oneParamSearch.searchOnString(facetOptionMap.get("sample_classification"), filters.get(SearchFacetName.sample_classification), result, ModelForQuery::getSampleClassification);
+                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("sample_classification"), filters.get(SearchFacetName.sample_classification), result, ModelForQuery::getSampleClassification);
                     break;
 
                 case sample_tumor_type:
-                    result = oneParamSearch.searchOnString(facetOptionMap.get("sample_tumor_type"), filters.get(SearchFacetName.sample_tumor_type), result, ModelForQuery::getSampleTumorType);
+                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("sample_tumor_type"), filters.get(SearchFacetName.sample_tumor_type), result, ModelForQuery::getSampleTumorType);
                     break;
 
                 case model_implantation_site:
-                    result = oneParamSearch.searchOnString(facetOptionMap.get("model_implantation_site"), filters.get(SearchFacetName.model_implantation_site), result, ModelForQuery::getModelImplantationSite);
+                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("model_implantation_site"), filters.get(SearchFacetName.model_implantation_site), result, ModelForQuery::getModelImplantationSite);
                     break;
 
                 case model_implantation_type:
-                    result = oneParamSearch.searchOnString(facetOptionMap.get("model_implantation_type"), filters.get(SearchFacetName.model_implantation_type), result, ModelForQuery::getModelImplantationSite);
+                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("model_implantation_type"), filters.get(SearchFacetName.model_implantation_type), result, ModelForQuery::getModelImplantationSite);
                     break;
 
                 case model_host_strain:
-                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("model_host_strain"), filters.get(SearchFacetName.model_host_strain), result, ModelForQuery::getModelHostStrain);
+                    result = oneParamCheckboxSearch.searchOnCollection(facetOptionMap.get("model_host_strain"), filters.get(SearchFacetName.model_host_strain), result, ModelForQuery::getModelHostStrain);
                     break;
 
                 case cancer_system:
-                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("cancer_system"), filters.get(SearchFacetName.cancer_system), result, ModelForQuery::getCancerSystem);
+                    result = oneParamCheckboxSearch.searchOnCollection(facetOptionMap.get("cancer_system"), filters.get(SearchFacetName.cancer_system), result, ModelForQuery::getCancerSystem);
                     break;
 
                 case organ:
-                    result = oneParamSearch.searchOnString(facetOptionMap.get("organ"), filters.get(SearchFacetName.organ), result, ModelForQuery::getCancerOrgan);
+                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("organ"), filters.get(SearchFacetName.organ), result, ModelForQuery::getCancerOrgan);
                     break;
 
                 case cell_type:
-                    result = oneParamSearch.searchOnString(facetOptionMap.get("cell_type"), filters.get(SearchFacetName.cell_type), result, ModelForQuery::getCancerCellType);
+                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("cell_type"), filters.get(SearchFacetName.cell_type), result, ModelForQuery::getCancerCellType);
                     break;
 
                 case project:
-                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("project"), filters.get(SearchFacetName.project), result, ModelForQuery::getProjects);
+                    result = oneParamCheckboxSearch.searchOnCollection(facetOptionMap.get("project"), filters.get(SearchFacetName.project), result, ModelForQuery::getProjects);
                     break;
 
                 case data_available:
-                    result = oneParamSearch.searchOnCollection(facetOptionMap.get("data_available"), filters.get(SearchFacetName.data_available), result, ModelForQuery::getDataAvailable);
+                    result = oneParamCheckboxSearch.searchOnCollection(facetOptionMap.get("data_available"), filters.get(SearchFacetName.data_available), result, ModelForQuery::getDataAvailable);
                     break;
 
                 case mutation:

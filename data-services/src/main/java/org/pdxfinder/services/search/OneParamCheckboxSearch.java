@@ -9,9 +9,9 @@ import java.util.function.Function;
 /*
  * Created by csaba on 20/11/2018.
  */
-public class OneParamSearch extends GeneralSearch{
+public class OneParamCheckboxSearch extends GeneralSearch{
 
-    public OneParamSearch(String name, String urlParam) {
+    public OneParamCheckboxSearch(String name, String urlParam) {
         super(name, urlParam);
     }
 
