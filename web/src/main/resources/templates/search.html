@@ -195,6 +195,17 @@
                                             </div>
                                         </div>
 
+                                        <div class="light-grey-bg-box"
+                                             th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamTextFilter)}">
+
+                                            <!-- OneParamTextFilter-->
+                                            <th:block
+                                                    th:include="fragments/filter-components :: oneParamTextFilter(filterComponent=${filterComponent})">
+                                                ...
+                                            </th:block>
+
+                                        </div>
+
 
                                         <div class="light-grey-bg-box"
                                              th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamUnlinkedFilter)}">
