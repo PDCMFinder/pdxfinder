@@ -954,7 +954,7 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
                     dataImportService.saveModelCreation(model);
                     dataImportService.saveSample(sample);
 
-                    log.info(" Specimen with the following details was created: "+modelId+" "+passage+" "+nomenclature+ " in row: "+row);
+                    //log.info(" Specimen with the following details was created: "+modelId+" "+passage+" "+nomenclature+ " in row: "+row);
                 }
                 else{
                     // either specimen with passage or the host strain nomenclature was not created
@@ -978,17 +978,13 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
 
     private void createVariationData() {
 
+        log.info("******************************************************");
+        log.info("*                 Loading Omic Data                  *");
+        log.info("******************************************************");
+
         omicDataSource= ds.getAbbreviation();
         dataSourceAbbreviation = loaderRelatedDataSheetData.get(0).get(1);
         dataRootDirectory = dataRootDir+ "UPDOG/";
-
-        omicFileExtension = "xlsx";
-
-        String mutationURLStr = dataRootDirectory+dataSourceAbbreviation+"/mut/data.xlsx";
-        String cnaURLStr = dataRootDirectory+dataSourceAbbreviation+"/cna/data.xlsx";
-
-        List<String> mutHead = utilityService.getXlsHead(mutationURLStr, 0);
-        List<String> cnaHead = utilityService.getXlsHead(cnaURLStr, 0);
 
         omicModelID = "Model_ID";
         omicSampleID = "Sample_ID";
@@ -1020,11 +1016,24 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
         omicCnaGisticvalue = "gistic_value_cna";
         omicCnaPicnicValue = "picnic_value";
 
-        omicDataFilesType = "ALL_MODELS_IN_ONE_FILE";
-
         platformURL = new HashMap<>();
         platformURL.put("Targeted_NGS","/platform/targeted-ngs/");
         platformURL.put("CGH_array","/platform/cgh-array/");
+
+        if (dataSourceAbbreviation.equals("CRL")){
+            omicDataFilesType = "ONE_FILE_PER_MODEL";
+            omicFileExtension = "csv";
+        }else {
+            omicDataFilesType = "ALL_MODELS_IN_ONE_FILE";
+            omicFileExtension = "xlsx";
+        }
+
+
+        String mutationDataDir = dataRootDirectory+dataSourceAbbreviation+"/mut/";
+        String cnaDataDir = dataRootDirectory+dataSourceAbbreviation+"/cna/";
+
+        File mutationData = new File(mutationDataDir);
+        File cnaData = new File(cnaDataDir);
 
 
         for (String modelId : this.modelIDs){
@@ -1032,16 +1041,16 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
             ModelCreation modelCreation = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
 
             // Mutation Data Load
-            if (mutHead.size() != 0) {
+            if (mutationData.exists()) {
                 loadOmicData(modelCreation, ds, "mutation");
             }
 
             // Copy Number Alteration Data Load
-            if (cnaHead.size() != 0){
+            if (cnaData.exists()){
 
                 loadOmicData(modelCreation, ds, "copy number alteration");
             }
-        }
+        }//-loadEssentials
 
 
 

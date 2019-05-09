@@ -831,6 +831,7 @@
 
                                                 <tr th:each="dataRow,iter : ${data.molecularDataRows}"
                                                     class="tabs-title" style="float:none; text-transform: capitalize;"
+                                                    th:if="${dataRow.sampleId != null}"
                                                     th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
 
                                                     <td th:text="${dataRow.sampleId}"> ...</td>

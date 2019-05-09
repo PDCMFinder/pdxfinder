@@ -128,7 +128,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             if(nsdto.getNode() == null){
 
                 //log.info("Found an unrecognised Marker Symbol {} in Model: {}, Skipping This!!!! ", data.get(omicHgncSymbol), modelID);
-                log.info(data.toString());
+                //log.info(data.toString());
 
                 reportManager.addMessage(nsdto.getLogEntity());
                 count++;

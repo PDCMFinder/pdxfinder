@@ -55,7 +55,18 @@ public class UtilityService {
 
         String fileExtension = getFileExtension(fileName);
 
-        List<Map<String, String>> csvMaps = (fileExtension.equals("csv")) ? serializeCSVToMaps(fileName) : serializeJSONToMaps(fileName);
+        List<Map<String, String>> csvMaps = new ArrayList<>();
+
+        if (fileExtension.equals("csv")) {
+
+            csvMaps = serializeCSVToMaps(fileName);
+        }else if (fileExtension.equals("json")) {
+
+            csvMaps = serializeJSONToMaps(fileName);
+        } else {
+
+            csvMaps = serializeExcelDataNoIterator(fileName,0,1);
+        }
 
         return csvMaps;
     }
