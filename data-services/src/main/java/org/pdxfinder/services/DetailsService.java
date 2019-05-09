@@ -31,6 +31,7 @@ public class DetailsService {
     private MolecularCharacterizationRepository molecularCharacterizationRepository;
     private PlatformRepository platformRepository;
     private TreatmentSummaryRepository treatmentSummaryRepository;
+    private MarkerAssociationRepository markerAssociationRepository;
 
     private GraphService graphService;
     private Map<String, List<String>> facets = new HashMap<>();
@@ -74,7 +75,8 @@ public class DetailsService {
                           GraphService graphService,
                           PlatformService platformService,
                           DrugService drugService,
-                          PatientService patientService) {
+                          PatientService patientService,
+                          MarkerAssociationRepository markerAssociationRepository) {
 
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
@@ -88,6 +90,7 @@ public class DetailsService {
         this.platformService = platformService;
         this.drugService = drugService;
         this.patientService = patientService;
+        this.markerAssociationRepository = markerAssociationRepository;
 
     }
 
@@ -190,8 +193,8 @@ public class DetailsService {
             dto.setEthnicity("Not specified");
         }
 
-        if(patientSample.getSampleToOntologyRelationShip() != null && patientSample.getSampleToOntologyRelationShip().getOntologyTerm()!=null){
-            dto.setMappedOntologyTermLabel(patientSample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
+        if(patientSample.getSampleToOntologyRelationship() != null && patientSample.getSampleToOntologyRelationship().getOntologyTerm()!=null){
+            dto.setMappedOntologyTermLabel(patientSample.getSampleToOntologyRelationship().getOntologyTerm().getLabel());
         }
         else{
             dto.setMappedOntologyTermLabel("");
@@ -413,7 +416,7 @@ public class DetailsService {
         dto.setMolecularDataRows(mdeDTO);
         dto.setMolecularDataEntrySize(mdeDTO.size());
         return dto;
-                //getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
+        //getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
     }
 
 
@@ -431,6 +434,16 @@ public class DetailsService {
         MolecularDataTableDTO dto = new MolecularDataTableDTO();
 
         MolecularCharacterization mc = molecularCharacterizationRepository.getMolecularDataById(Long.valueOf(id));
+
+        int numberOfAssociations = markerAssociationRepository.getMarkerAssociationCountByMolCharId(Long.valueOf(id));
+        List<MarkerAssociation> associationList = new ArrayList<>();
+
+        for(int i=0; i<numberOfAssociations; i += 500){
+
+            List<MarkerAssociation> subList = markerAssociationRepository.findAssociationsByMolCharIdFromTo(Long.valueOf(id), i, 500);
+            associationList.addAll(subList);
+        }
+
 
         //check if molchar exists and if not, display an error message
         if(mc == null){
@@ -477,7 +490,7 @@ public class DetailsService {
 
 
         //STEP 1: dinamically determine the headers of the table
-        for(MarkerAssociation ma: mc.getMarkerAssociations()){
+        for(MarkerAssociation ma: associationList){
 
 
             if(ma.getChromosome() != null && !ma.getChromosome().isEmpty()){
@@ -707,7 +720,7 @@ public class DetailsService {
         //STEP 3: Insert the rows of the table
         // DON'T CHANGE THE ORDER OF THESE CONDITIONS OR THE WORLD WILL TREMBLE!
         // (But if you REALLY need to change the order, don't forget to change it at step 2, too!!!)
-        for(MarkerAssociation ma: mc.getMarkerAssociations()){
+        for(MarkerAssociation ma: associationList){
 
             List<String> row = new ArrayList<>();
 
@@ -961,8 +974,8 @@ public class DetailsService {
             dto.setSampleSite(notEmpty(sample.getSampleSite().getName()));
         }
 
-        if (sample != null && sample.getSampleToOntologyRelationShip() != null) {
-            dto.setMappedOntology(sample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
+        if (sample != null && sample.getSampleToOntologyRelationship() != null) {
+            dto.setMappedOntology(sample.getSampleToOntologyRelationship().getOntologyTerm().getLabel());
         }
 
 
