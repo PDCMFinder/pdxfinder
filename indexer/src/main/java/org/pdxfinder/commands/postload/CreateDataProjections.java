@@ -53,6 +53,9 @@ public class CreateDataProjections implements CommandLineRunner{
     //"platform"=>"markercombos"=>"set of model ids"
     private Map<String, Map<String, Set<Long>>> immunoHistoChemistryDP = new HashMap<>();
 
+    //"cnamarker"=>set of model ids
+    private Map<String, Set<Long>> copyNumberAlterationDP = new HashMap<>();
+
     @Autowired
     public CreateDataProjections(DataImportService dataImportService, DrugService drugService) {
 
@@ -84,6 +87,8 @@ public class CreateDataProjections implements CommandLineRunner{
             createModelDrugResponseDataProjection();
 
             createImmunoHistoChemistryDataProjection();
+
+            createCNADataProjection();
 
             saveDataProjections();
 
@@ -289,6 +294,42 @@ public class CreateDataProjections implements CommandLineRunner{
 
 
         //log.info(immunoHistoChemistryDP.toString());
+    }
+
+    private void createCNADataProjection(){
+
+
+        Collection<MolecularCharacterization> cnaMolchars = dataImportService.findMolCharsByType("copy number alteration");
+        log.info("Looking at "+cnaMolchars.size()+" CNA MolChar objects. This may take a while folks...");
+
+        int count = 0;
+
+        for(MolecularCharacterization mc:cnaMolchars) {
+
+            ModelCreation model = dataImportService.findModelWithSampleByMolChar(mc);
+            Long modelId = model.getId();
+
+            Set<Marker> mas = dataImportService.findAllDistinctMarkersByMolCharId(mc.getId());
+            for(Marker m : mas){
+
+
+                    if(copyNumberAlterationDP.containsKey(m.getHgncSymbol())){
+
+                        copyNumberAlterationDP.get(m.getHgncSymbol()).add(modelId);
+                    }
+                    else{
+
+                        Set<Long> newSet = new HashSet<>();
+                        newSet.add(modelId);
+                        copyNumberAlterationDP.put(m.getHgncSymbol(), newSet);
+                    }
+                }
+
+            }
+
+            count++;
+            if(count%100 == 0) {log.info("Processed "+count+" CNA molchar objects");
+        }
     }
 
 
@@ -925,8 +966,15 @@ public class CreateDataProjections implements CommandLineRunner{
             ihcDP.setLabel("cytogenetics");
         }
 
+        DataProjection cnaDP = dataImportService.findDataProjectionByLabel("copy number alteration");
 
-        JSONObject j1 ,j2, j3, j4;
+
+        if(cnaDP == null){
+            cnaDP = new DataProjection();
+            cnaDP.setLabel("copy number alteration");
+        }
+
+        JSONObject j1 ,j2, j3, j4, j5;
 
         try{
             j1 = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
@@ -964,11 +1012,20 @@ public class CreateDataProjections implements CommandLineRunner{
             log.error(immunoHistoChemistryDP.toString());
         }
 
+        try{
+            j5 = new JSONObject(copyNumberAlterationDP.toString());
+            cnaDP.setValue(j5.toString());
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(copyNumberAlterationDP.toString());
+        }
 
         dataImportService.saveDataProjection(pmvmDP);
         dataImportService.saveDataProjection(mvDP);
         dataImportService.saveDataProjection(drugDP);
         dataImportService.saveDataProjection(ihcDP);
+        dataImportService.saveDataProjection(cnaDP);
 
     }
 

@@ -135,7 +135,7 @@ public class SearchDS {
         cancerBySystemOptions.add(new FacetOption("Urinary System Cancer", "Urinary_System_Cancer"));
         cancerBySystemOptions.add(new FacetOption("Unclassified", "Unclassified"));
 
-        OneParamCheckboxFilter cancerBySystem = new OneParamCheckboxFilter("CANCER BY SYSTEM", "cancer_system", false, FilterType.OneParamFilter.get(),
+        OneParamCheckboxFilter cancerBySystem = new OneParamCheckboxFilter("CANCER BY SYSTEM", "cancer_system", false, FilterType.OneParamCheckboxFilter.get(),
                 cancerBySystemOptions, new ArrayList<>());
         patientTumorSection.addComponent(cancerBySystem);
         facetOptionMap.put("cancer_system", cancerBySystemOptions);
@@ -148,7 +148,7 @@ public class SearchDS {
         tumorTypeOptions.add(new FacetOption("Refractory", "Refractory"));
         tumorTypeOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
-        OneParamCheckboxFilter tumorType = new OneParamCheckboxFilter("TUMOR_TYPE", "sample_tumor_type", false, FilterType.OneParamFilter.get(),
+        OneParamCheckboxFilter tumorType = new OneParamCheckboxFilter("TUMOR_TYPE", "sample_tumor_type", false, FilterType.OneParamCheckboxFilter.get(),
               tumorTypeOptions, new ArrayList<>());
         patientTumorSection.addComponent(tumorType);
         facetOptionMap.put("sample_tumor_type", tumorTypeOptions);
@@ -158,7 +158,7 @@ public class SearchDS {
         patientSexOptions.add(new FacetOption("Male", "Male"));
         patientSexOptions.add(new FacetOption("Female", "Female"));
         patientSexOptions.add(new FacetOption("Not Specified", "Not_Specified"));
-        OneParamCheckboxFilter sex = new OneParamCheckboxFilter("SEX", "patient_gender", false, FilterType.OneParamFilter.get(),
+        OneParamCheckboxFilter sex = new OneParamCheckboxFilter("SEX", "patient_gender", false, FilterType.OneParamCheckboxFilter.get(),
         patientSexOptions, new ArrayList<>());
         patientTumorSection.addComponent(sex);
         facetOptionMap.put("patient_gender", patientSexOptions);
@@ -177,7 +177,7 @@ public class SearchDS {
         ageOptions.add(new FacetOption("90", "90"));
         ageOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
-        OneParamCheckboxFilter age = new OneParamCheckboxFilter("AGE", "patient_age", false, FilterType.OneParamFilter.get(),
+        OneParamCheckboxFilter age = new OneParamCheckboxFilter("AGE", "patient_age", false, FilterType.OneParamCheckboxFilter.get(),
         ageOptions, new ArrayList<>());
         patientTumorSection.addComponent(age);
         facetOptionMap.put("patient_age",ageOptions);
@@ -189,7 +189,7 @@ public class SearchDS {
         patientTreatmentStatusOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
         OneParamCheckboxFilter patientTreatmentStatus = new OneParamCheckboxFilter("TREATMENT STATUS", "patient_treatment_status", false,
-                FilterType.OneParamFilter.get(), patientTreatmentStatusOptions, new ArrayList<>());
+                FilterType.OneParamCheckboxFilter.get(), patientTreatmentStatusOptions, new ArrayList<>());
         patientTumorSection.addComponent(patientTreatmentStatus);
         facetOptionMap.put("patient_treatment_status", patientTreatmentStatusOptions);
 
@@ -214,13 +214,13 @@ public class SearchDS {
         datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
         datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
 
-        OneParamCheckboxFilter datasetAvailable = new OneParamCheckboxFilter("DATASET AVAILABLE", "data_available", false, FilterType.OneParamFilter.get(),
+        OneParamCheckboxFilter datasetAvailable = new OneParamCheckboxFilter("DATASET AVAILABLE", "data_available", false, FilterType.OneParamCheckboxFilter.get(),
                 datasetAvailableOptions, new ArrayList<>());
 
         pdxModelSection.addComponent(datasetAvailable);
         facetOptionMap.put("data_available", datasetAvailableOptions);
 
-        OneParamCheckboxFilter datasource = new OneParamCheckboxFilter("DATASOURCE", "datasource", false, FilterType.OneParamFilter.get(), datasourceOptions, new ArrayList<>());
+        OneParamCheckboxFilter datasource = new OneParamCheckboxFilter("DATASOURCE", "datasource", false, FilterType.OneParamCheckboxFilter.get(), datasourceOptions, new ArrayList<>());
         pdxModelSection.addComponent(datasource);
         facetOptionMap.put("datasource", datasourceOptions);
 
@@ -245,7 +245,8 @@ public class SearchDS {
         for(String p: projectList){
             projectOptions.add(new FacetOption(p, p));
         }
-        OneParamCheckboxFilter projects = new OneParamCheckboxFilter("PROJECT", "project", false, FilterType.OneParamFilter.get(), projectOptions, new ArrayList<>());
+        OneParamCheckboxFilter projects = new OneParamCheckboxFilter("PROJECT", "project", false,
+                FilterType.OneParamCheckboxFilter.get(), projectOptions, new ArrayList<>());
         pdxModelSection.addComponent(projects);
         facetOptionMap.put("project", projectOptions);
 
@@ -255,6 +256,12 @@ public class SearchDS {
                  "GENE", "VARIANT",getMutationOptions(), getMutationAndVariantOptions(), new HashMap<>());
 
         molecularDataSection.addComponent(geneMutation);
+
+        OneParamTextFilter copyNumberAlteration= new OneParamTextFilter("COPY NUMBER ALTERATION", "copy_number_alteration",
+                false, FilterType.OneParamTextFilter.get(), "GENE", getCopyNumberAlterationOptions(), new ArrayList<>());
+
+
+        molecularDataSection.addComponent(copyNumberAlteration);
 
 
         //Breast cancer markers
@@ -277,7 +284,7 @@ public class SearchDS {
         breastCancerMarkerOptions.add(new FacetOption("PR/PGR negative", "PGRneg"));
         breastCancerMarkerOptions.add(new FacetOption("PR/PGR positive", "PGRpos"));
 
-        OneParamCheckboxFilter breastCancerMarkers = new OneParamCheckboxFilter("BREAST CANCER BIOMARKERS", "breast_cancer_markers", false, FilterType.OneParamFilter.get(),
+        OneParamCheckboxFilter breastCancerMarkers = new OneParamCheckboxFilter("BREAST CANCER BIOMARKERS", "breast_cancer_markers", false, FilterType.OneParamCheckboxFilter.get(),
                 breastCancerMarkerOptions, new ArrayList<>());
         molecularDataSection.addComponent(breastCancerMarkers);
         facetOptionMap.put("breast_cancer_markers",breastCancerMarkerOptions);
@@ -869,9 +876,43 @@ public class SearchDS {
         return data;
     }
 
+    private Map<String, Set<Long>> getCopyNumberAlterationDP(){
+
+        Map<String, Set<Long>> data = new HashMap<>();
+
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("copy number alteration");
+
+        String responses = "{}";
+
+        if(dataProjection != null){
+
+            responses = dataProjection.getValue();
+        }
+
+        try{
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            data = mapper.readValue(responses, new TypeReference<Map<String, Set<Long>>>(){});
 
 
+        }
+        catch(Exception e){
 
+            e.printStackTrace();
+        }
+
+        return data;
+    }
+
+
+    private List<String> getCopyNumberAlterationOptions(){
+
+        Map<String, Set<Long>> data = getCopyNumberAlterationDP();
+        List<String> options = new ArrayList<>(data.keySet());
+
+        return options;
+    }
 
     /**
      * getExactMatchDisjunctionPredicate returns a composed predicate with all the supplied filters "OR"ed together

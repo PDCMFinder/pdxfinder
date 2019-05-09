@@ -906,6 +906,11 @@ public class DataImportService {
         return markerRepository.findAllHumanMarkers();
     }
 
+    public Set<Marker> findAllDistinctMarkersByMolCharId(Long id){
+
+        return markerRepository.findDistinctByMolCharId(id);
+    }
+
     public Platform getPlatform(String name, Group group) {
 
         //remove special characters from platform name
