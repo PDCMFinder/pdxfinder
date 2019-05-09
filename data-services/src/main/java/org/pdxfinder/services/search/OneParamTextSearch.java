@@ -76,8 +76,18 @@ public class OneParamTextSearch extends GeneralSearch{
         }
 
 
+        Set<ModelForQuery> results = new HashSet<>();
 
-        return null;
+        for(ModelForQuery mfq:models){
+
+            if(modelsToKeep.contains(mfq.getModelId())){
+
+                results.add(mfq);
+            }
+        }
+
+
+        return results;
     }
 
 
