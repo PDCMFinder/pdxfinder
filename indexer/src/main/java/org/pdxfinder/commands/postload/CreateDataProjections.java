@@ -644,7 +644,7 @@ public class CreateDataProjections implements CommandLineRunner{
             mfq.setPatientGender(mc.getSample().getPatientSnapshot().getPatient().getSex());
             mfq.setPatientEthnicity(mc.getSample().getPatientSnapshot().getPatient().getEthnicity());
             mfq.setDiagnosis(mc.getSample().getDiagnosis());
-            mfq.setMappedOntologyTerm(mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
+            mfq.setMappedOntologyTerm(mc.getSample().getSampleToOntologyRelationship().getOntologyTerm().getLabel());
 
             if (mc.getSample().getPatientSnapshot().getTreatmentNaive() != null) {
                 String treatmentNaive = mc.getSample().getPatientSnapshot().getTreatmentNaive();
@@ -692,11 +692,11 @@ public class CreateDataProjections implements CommandLineRunner{
             Set<OntologyTerm> allOntologyTerms = new HashSet<>();
 
             // Add direct mapped term
-            allOntologyTerms.add(mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm());
+            allOntologyTerms.add(mc.getSample().getSampleToOntologyRelationship().getOntologyTerm());
 
             // Add all ancestors of direct mapped term
-            if(mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getSubclassOf() != null){
-                for (OntologyTerm t : mc.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getSubclassOf()) {
+            if(mc.getSample().getSampleToOntologyRelationship().getOntologyTerm().getSubclassOf() != null){
+                for (OntologyTerm t : mc.getSample().getSampleToOntologyRelationship().getOntologyTerm().getSubclassOf()) {
                     allOntologyTerms.addAll(getAllAncestors(t));
                 }
             }
