@@ -270,12 +270,12 @@ public class SearchDS {
         //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER- PR+", "ERneg_HER2pos_PRpos"));
         //breastCancerMarkerOptions.add(new FacetOption("HER2+ ER+ PR-", "ERpos_HER2pos_PRneg"));
         //breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR+", "ERneg_HER2neg_PRpos"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2 negative", "ERBB2neg"));
-        breastCancerMarkerOptions.add(new FacetOption("HER2 positive", "ERBB2pos"));
-        breastCancerMarkerOptions.add(new FacetOption("ER negative", "ESR1neg"));
-        breastCancerMarkerOptions.add(new FacetOption("ER positive", "ESR1pos"));
-        breastCancerMarkerOptions.add(new FacetOption("PR negative", "PGRneg"));
-        breastCancerMarkerOptions.add(new FacetOption("PR positive", "PGRpos"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2/ERBB2 negative", "ERBB2neg"));
+        breastCancerMarkerOptions.add(new FacetOption("HER2/ERBB2 positive", "ERBB2pos"));
+        breastCancerMarkerOptions.add(new FacetOption("ER/ESR1 negative", "ESR1neg"));
+        breastCancerMarkerOptions.add(new FacetOption("ER/ESR1 positive", "ESR1pos"));
+        breastCancerMarkerOptions.add(new FacetOption("PR/PGR negative", "PGRneg"));
+        breastCancerMarkerOptions.add(new FacetOption("PR/PGR positive", "PGRpos"));
 
         OneParamCheckboxFilter breastCancerMarkers = new OneParamCheckboxFilter("BREAST CANCER BIOMARKERS", "breast_cancer_markers", false, FilterType.OneParamFilter.get(),
                 breastCancerMarkerOptions, new ArrayList<>());
