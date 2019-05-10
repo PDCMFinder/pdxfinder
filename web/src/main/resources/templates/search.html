@@ -182,9 +182,9 @@
 
                                         <!-- Check what kind of component is it, not all components have options-->
 
-                                        <!-- OneParamFilter -->
+                                        <!-- OneParamCheckboxFilter -->
                                         <div class="large-form"
-                                             th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamFilter)}">
+                                             th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamCheckboxFilter)}">
                                             <div class="checkbox-item" th:each="option:${filterComponent.options}">
 
                                                 <input type="checkbox" class="filter"
@@ -193,6 +193,17 @@
                                                 <label th:attr="for=${filterComponent.urlParam} +'__'+${option.labelId}"><span
                                                         th:text="${option.label}"></span></label>
                                             </div>
+                                        </div>
+
+                                        <div class="light-grey-bg-box"
+                                             th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamTextFilter)}">
+
+                                            <!-- OneParamTextFilter-->
+                                            <th:block
+                                                    th:include="fragments/filter-components :: oneParamTextFilter(filterComponent=${filterComponent})">
+                                                ...
+                                            </th:block>
+
                                         </div>
 
 

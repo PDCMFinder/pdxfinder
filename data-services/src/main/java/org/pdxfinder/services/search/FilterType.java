@@ -2,7 +2,8 @@ package org.pdxfinder.services.search;
 
 public enum FilterType {
 
-    OneParamFilter,
+    OneParamCheckboxFilter,
+    OneParamTextFilter,
     TwoParamLinkedFilter,
     TwoParamUnlinkedFilter;
 

@@ -48,6 +48,8 @@ public class TwoParamLinkedSearch extends GeneralSearch{
         //this set will hold the model ids that were a match and were updated
         Set<Long> modelsToKeep = new HashSet<>();
 
+        boolean firstTimeZero = true;
+
         for(String paramString : params) {
 
             String[] paramArr = paramString.split("___");
@@ -81,8 +83,9 @@ public class TwoParamLinkedSearch extends GeneralSearch{
 
                         else if(op.equals(ComparisonOperator.AND)){
 
-                            if(modelsToKeep.size() == 0){
+                            if(firstTimeZero && modelsToKeep.size() == 0){
                                 modelsToKeep.addAll(foundModelIDs);
+                                firstTimeZero = false;
                             }
                             else{
 

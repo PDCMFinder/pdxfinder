@@ -68,7 +68,7 @@ public class PatientService {
                     } catch (Exception e) {}
 
                     try {
-                        diagnosis = sample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel();
+                        diagnosis = sample.getSampleToOntologyRelationship().getOntologyTerm().getLabel();
                     } catch (Exception e) {}
 
                     try {

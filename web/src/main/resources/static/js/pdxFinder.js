@@ -127,7 +127,40 @@ function redirectPage(webFacetSections) {
         }
     });
 
-    
+
+
+
+
+
+    var oneParamTextFilters = getFiltersFromWebFacetSection(webFacetSections, 'OneParamTextFilter');
+    oneParamTextFilters.forEach(function (filterComponent) {
+
+
+        componentId1 = filterComponent.urlParam + "_" + (filterComponent.param1Name).toLowerCase();
+        urlKey = filterComponent.urlParam;
+
+        for (var i = 0; i < 19; i++) {
+
+            var component1Choice = jQuery("#" + componentId1 + i);
+
+
+            if (component1Choice.val() != null && component1Choice.val() != "NULL") {
+
+
+                if (!no_parameters) {
+                        url = url + "&";
+                }
+
+
+                url += urlKey + "=" + component1Choice.val();
+
+            }
+
+        }
+    });
+
+
+
 
     // Add all diagnosis filters to the URL
     jQuery(".diagnosis").each(function () {
@@ -188,6 +221,23 @@ function intializeFilters(webFacetSection, index) {
                 redirectPage(webFacetSections);
             });
         }
+        else if(filterComponent.type === "OneParamTextFilter"){
+
+            dataList = filterComponent.options1;
+            componentOneId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
+            filterButton = componentOneId+'_button';
+
+            initializeOneParamTextFilterComponent(dataList, componentOneId);
+
+
+            //Add event listener to each OneParamTextFilter filter class
+            jQuery('#'+filterButton).click(function () {
+                redirectPage(webFacetSections);
+            });
+        }
+
+
+
     });
 }
 
@@ -213,7 +263,18 @@ function initializeTwoParamFilterComponents(dataList, componentOneId, componentT
     }
 }
 
+function initializeOneParamTextFilterComponent(dataList, componentOneId) {
 
+    dataList = dataList.sort();
+
+
+    for (var i = 0; i <= 19; i++) {
+
+        $('#' + componentOneId + i).autocomplete({
+            source: [dataList]
+        });
+    }
+}
 
 function getFiltersFromWebFacetSection(webFacetSections, desiredFilterType) {
 

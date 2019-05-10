@@ -528,8 +528,8 @@ public class SearchService {
                 sdto.setClassification(model.getSample().getClassification());
             }
 
-            if (model.getSample() != null && model.getSample().getSampleToOntologyRelationShip() != null) {
-                sdto.setMappedOntology(model.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
+            if (model.getSample() != null && model.getSample().getSampleToOntologyRelationship() != null) {
+                sdto.setMappedOntology(model.getSample().getSampleToOntologyRelationship().getOntologyTerm().getLabel());
             }
 
             sdto.setSearchParameter(query);
