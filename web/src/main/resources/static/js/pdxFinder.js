@@ -450,11 +450,16 @@ function displayMolecularDataTable(tableData, clickedData){
     
     //add datarows to table
     var rowCount = tableData["tableRows"].length;
+    var tableHeaderDataSize = tableData["tableHeaders"].length;
     var dataVisibility = tableData["visible"];
 
     for(var j=0; j<rowCount; j++){
 
-        $tr = jQuery('<tr class="tabs-title" style="float:none; text-transform: capitalize;">/');
+        if (tableHeaderDataSize == 1){
+            $tr = jQuery('<tr class="tabs-title" style="float:none; font-weight: bold; font-size: 37px; color: #06369d;">/');
+        }else {
+            $tr = jQuery('<tr class="tabs-title" style="float:none; text-transform: capitalize;">/');
+        }
 
         for(var k=0; k<tableData["tableRows"][j].length; k++){
             console.log("Rows "+tableData["tableRows"][j].length);

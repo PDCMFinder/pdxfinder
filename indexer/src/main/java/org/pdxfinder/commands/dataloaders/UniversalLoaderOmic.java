@@ -155,15 +155,6 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                     ma = setCNAProperties(data, marker);
                 }
 
-                /*switch (dataType){
-
-                    case "mutation":
-                        ma = setVariationProperties(data, marker);
-
-                    case "copy number alteration":
-                        ma = setCNAProperties(data, marker);
-                }*/
-
                 molecularCharacterization.addMarkerAssociation(ma);
 
             }

@@ -369,6 +369,7 @@ public class DetailsService {
             mde.setRawDataLabel("Not available");
             mde.setMolcharId(mc.getId().toString());
 
+            if (patientSample.getSourceSampleId() != null)
             mdeDTO.add(mde);
         }
 
@@ -399,6 +400,7 @@ public class DetailsService {
                     mde.setRawDataLabel("Not available");
                     mde.setMolcharId(mc.getId().toString());
 
+                    if (xenoSample.getSourceSampleId() != null)
                     mdeDTO.add(mde);
 
                 }
@@ -455,7 +457,7 @@ public class DetailsService {
             tableHeaders.add("");
 
             List<String> notVisibleDataRow = new ArrayList<>();
-            notVisibleDataRow.add("This data is only accessible through the provider website - please contact them for access.");
+            notVisibleDataRow.add("This data is only accessible through the provider website - please click on 'Contact Provider' button above to request access.");
 
             tableRows.add(notVisibleDataRow);
 
