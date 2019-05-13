@@ -305,7 +305,7 @@
         <div class="row topSace10" th:each="activeComponent, iter : ${filterComponent.selected}">
 
             <div class="columns nospace small-12 large-12">
-                <input th:value="${activeComponent.key}"
+                <input th:value="${activeComponent}"
                        type="text"
                        class="fullWidth"
                        th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${iter.index}"/>
@@ -315,7 +315,7 @@
 
 
         <!-- Hidden Fields Triggered after Clicking "OR" Button-->
-        <div class="row" th:each="i: ${#numbers.sequence(#maps.size(filterComponent.selected), 19)}"
+        <div class="row" th:each="i: ${#numbers.sequence(#lists.size(filterComponent.selected), 19)}"
              th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_hidden'}+${i}"
              style="display:none">
 
@@ -345,7 +345,7 @@
 
         <button th:if="${filterComponent.active}"
                 href="#" class="icoButn columns large-2 ORButton"
-                th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','${#maps.size(filterComponent.selected)}')|">
+                th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','${#lists.size(filterComponent.selected)}')|">
             OR
         </button>
     </div>
