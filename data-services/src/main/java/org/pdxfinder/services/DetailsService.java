@@ -600,7 +600,7 @@ public class DetailsService {
                 tableHeadersSet.add("cnalog10rcna");
             }
 
-            if(ma.getCnaCopyNumberStatus() != null && ma.getCnaCopyNumberStatus().isEmpty()){
+            if(ma.getCnaCopyNumberStatus() != null && !ma.getCnaCopyNumberStatus().isEmpty()){
                 tableHeadersSet.add("cnacopynumberstatus");
             }
 
