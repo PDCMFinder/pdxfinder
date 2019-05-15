@@ -1,6 +1,7 @@
 package org.pdxfinder.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
@@ -17,6 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.*;
 
 
@@ -172,6 +179,114 @@ public class TransController {
 
 
 
+    @RequestMapping("/rewrite-ircc-cna-to-json")
+    public Object irccCNA() {
+
+        // Get CNA xls Template
+        String cnaFile = System.getProperty("user.home") + "/PDXFinder/data/IRCC-CRC/cna/CNA- IRCC-CRC template.xlsx";
+
+        List<Map<String, String>> dataList = utilityService.serializeExcelDataNoIterator(cnaFile,0,1);
+
+        return dataList;
+    }
+
+
+
+    @RequestMapping("/rewrite-ircc-json")
+    public Object irccTransformJson() {
+
+        String jsonFile= System.getProperty("user.home") + "/PDXFinder/data/IRCC-CRC/mut/data.json";
+
+        List<Map<String, String>> dataList = utilityService.serializeJSONToMaps(jsonFile, "IRCCVariation");
+        List<Map<String, String>> newDataList = new ArrayList<>();
+
+        for (Map<String, String> data : dataList) {
+
+            String modelId = data.get("Model ID");
+            String specimenId = data.get("Specimen ID");
+
+
+            Map<String, String> newData = new LinkedHashMap<>();
+
+            newData.put("datasource", "IRCC-CRC");
+            newData.put("Model_ID", data.get("Model ID"));
+            newData.put("Sample_ID", specimenId);
+
+            if ( specimenId.startsWith(modelId+"H") ){
+                newData.put("sample_origin", "patient tumor");
+            } else if (specimenId.startsWith(modelId+"X")){
+                newData.put("sample_origin", "Xenograft");
+            }
+
+            newData.put("Passage", null);
+            newData.put("host_strain_name", "");
+            newData.put("hgnc_symbol", data.get("Gene"));
+            newData.put("amino_acid_change", data.get("Protein"));
+            newData.put("nucleotide_change", "");
+            newData.put("consequence", data.get("Effect"));
+            newData.put("read_depth", "");
+            newData.put("Allele_frequency", data.get("VAF"));
+            newData.put("chromosome", data.get("Chrom"));
+            newData.put("seq_start_position", data.get("Pos"));
+            newData.put("ref_allele", data.get("Ref"));
+            newData.put("alt_allele", data.get("Alt"));
+            newData.put("ucsc_gene_id", "");
+            newData.put("ncbi_gene_id", "");
+            newData.put("ensembl_gene_id", "");
+            newData.put("ensembl_transcript_id", "");
+            newData.put("rs_id_Variant", data.get("avsnp147"));
+            newData.put("genome_assembly", "");
+            newData.put("Platform", "TargetedNGS_MUT");
+
+
+            newDataList.add(newData);
+        }
+
+
+        /*
+
+            "datasource": "IRCC-CRC",
+            "Model_ID": "CRC0112LM",                                Model ID
+            "Sample_ID": "CRC0112LMH0000000000D01000",              Sample ID
+            "sample_origin": "patient tumor",                       modelId+"H" [patient Tumor] , modelId+"X" [Xenograft]
+            "Passage": "",                                          null
+            "host_strain_name": "",                                 "" *****
+            "hgnc_symbol": "A2M",                                   Gene
+            "amino_acid_change": "R823W",                           Protein
+            "nucleotide_change": "",                                "" *****
+            "consequence": "Missense_Mutation",                     Effect
+            "read_depth": "",                                       "" *****
+            "Allele_frequency": "",                                 VAF
+            "chromosome": "12",                                     Chrom
+            "seq_start_position": "9243799",                        Pos *****
+            "ref_allele": "",                                       Ref
+            "alt_allele": "",                                       Alt
+            "ucsc_gene_id": "",                                     "" *****
+            "ncbi_gene_id": "2",                                    "" *****
+            "ensembl_gene_id": "",                                  "" *****
+            "ensembl_transcript_id": "",                            "" *****
+            "rs_id_Variant": "",                                    avsnp147
+            "genome_assembly": "37",
+            "Platform": "whole exome sequencing                     TargetedNGS_MUT   ... platformURL.get("targetedNgsPlatformURL")
+
+
+
+            ma.setCdsChange(variation.getString("CDS"));
+            ma.setType(type);
+
+        */
+
+
+        // Get Exome Template
+        String exomeFile = System.getProperty("user.home") + "/PDXFinder/data/IRCC-CRC/exome_IRCC-CRC template.xlsx";
+
+        List<Map<String, String>> dataList2 = utilityService.serializeExcelDataNoIterator(exomeFile,0,1);
+
+        return ListUtils.union(dataList2, newDataList);
+    }
+
+
+
 
 
 
@@ -181,12 +296,6 @@ public class TransController {
         String cnaFile= System.getProperty("user.home") + "/Downloads/curie-cna.xlsx";
 
         List<Map<String, String>> dataList = utilityService.serializeExcelDataNoIterator(cnaFile,0,1);
-
-/*
-        List<String> xlsHead = Arrays.asList("datasource","Model_ID","Sample_ID","sample_origin","Passage","host_strain_name","chromosome","seq_start_position","seq_end_position",
-                "Probe_ID_affymetrix","hgnc_symbol","ucsc_gene_id","ncbi_gene_id","ensembl_gene_id","log10R_cna","log2R_cna","copy_number_status",
-                "gistic_value_cna","genome_assembly","Platform");*/
-
 
         for (Map<String, String> data : dataList) {
 
@@ -443,6 +552,61 @@ public class TransController {
 
         return data;
     }
+
+
+
+    @RequestMapping("/get-files")
+    public Object getAllFiles() {
+
+        String source = homeDir+"/Downloads/TEMP/Mutation/";
+
+        utilityService.listAllFilesInADirectory(source);
+
+        return "success";
+    }
+
+
+    @RequestMapping("/get-files-size")
+    public long whenGetReadableSize_thenCorrect() {
+
+        long directorySize = directorySize(homeDir+"/Downloads/TEMP/Mutation2-Final/");
+
+        long oneFileSize = oneFileSize(homeDir+"/Downloads/TEMP/Mutation2-Final/CRL-97.csv");
+
+
+        // Time taken divided by file size times everything:
+
+        return oneFileSize;
+    }
+
+
+    public long oneFileSize(String fileLink) {
+
+        File file =new File(fileLink);
+
+        long fileSize = file.length();
+
+        return fileSize;
+    }
+
+
+    public long directorySize(String dirLink){
+
+        long size = 0;
+
+        Path folder = Paths.get(dirLink);
+        try {
+
+            size = Files.walk(folder)
+                    .filter(p -> p.toFile().isFile())
+                    .mapToLong(p -> p.toFile().length())
+                    .sum();
+
+        }catch (Exception e){ }
+
+        return size;
+    }
+
 
 
 

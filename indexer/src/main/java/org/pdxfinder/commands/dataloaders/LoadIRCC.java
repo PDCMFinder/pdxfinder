@@ -133,11 +133,12 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
             step17LoadModelDosingStudies();
 
+            step16LoadVariationData();
+
         }
 
         step15LoadImmunoHistoChemistry();
 
-        step16LoadVariationData();
     }
 
 
@@ -236,7 +237,15 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step16LoadVariationData() {
 
-        String variationURLStr = dataRootDir+dataSourceAbbreviation+"/mut/data.json";
+        log.info("Loading WGS for model " + dto.getModelCreation().getSourcePdxId());
+
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation");
+
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"cna");
+
+
+
+/*        String variationURLStr = dataRootDir+dataSourceAbbreviation+"/mut/data.json";
         String platformName = "TargetedNGS_MUT";
         String molcharType = "mutation";
 
@@ -426,7 +435,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
                 }
 
             }
-        }
+        }*/
 
 
     }

@@ -125,9 +125,6 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
 
     private Set<String> modelIDs;
 
-    @Autowired
-    private UtilityService utilityService;
-
 
     @PostConstruct
     public void init() {

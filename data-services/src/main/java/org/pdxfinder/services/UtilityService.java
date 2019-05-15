@@ -809,6 +809,36 @@ public class UtilityService {
     }
 
 
+    public String listAllFilesInADirectory(String directory) {
+
+        String fileNames = "";
+
+        File folder = new File(directory);
+
+        File[] filDir = folder.listFiles();
+
+        if (filDir.length == 0) {
+
+            log.warn("No subdirs found for the universal loader, skipping");
+        }
+        else {
+
+            for (int i = 0; i < filDir.length; i++) {
+
+                if (filDir[i].isFile()) {
+
+                    fileNames += filDir[i].getName()+"\n";
+
+                }
+            }
+        }
+
+        log.info(fileNames);
+
+        return "";
+    }
+
+
 
 
 
