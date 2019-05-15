@@ -868,6 +868,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     model.addSpecimen(specimen);
                     model.addRelatedSample(sample);
                     dataImportService.saveModelCreation(model);
+                    dataImportService.saveSpecimen(specimen);
                     dataImportService.saveSample(sample);
 
                     //log.info(" Specimen with the following details was created: "+modelId+" "+passage+" "+nomenclature+ " in row: "+row);
