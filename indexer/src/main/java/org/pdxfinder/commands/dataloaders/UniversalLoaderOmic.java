@@ -188,6 +188,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             if(sampleOrigin.toLowerCase().equals("patient tumor")){
 
                 Sample patientSample = modelCreation.getSample();
+                patientSample.setSourceSampleId(sampleId);          //TODO: Discuss this
                 patientSample.addMolecularCharacterization(mc);
                 continue;
 
