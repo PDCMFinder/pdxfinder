@@ -144,7 +144,7 @@ function redirectPage(webFacetSections) {
             var component1Choice = jQuery("#" + componentId1 + i);
 
 
-            if (component1Choice.val() != null && component1Choice.val() != "NULL") {
+            if (component1Choice.val() != null && component1Choice.val() != "NULL" && component1Choice.val() != "") {
 
 
                 if (!no_parameters) {
@@ -153,6 +153,7 @@ function redirectPage(webFacetSections) {
 
 
                 url += urlKey + "=" + component1Choice.val();
+                no_parameters = false;
 
             }
 

@@ -63,6 +63,11 @@ public class SearchDS {
     private OneParamCheckboxSearch oneParamCheckboxSearch;
 
     /**
+     * A general one param search object that is being used when search is performed on a MFQ object field
+     */
+    private OneParamTextSearch copyNumberAlterationSearch;
+
+    /**
      * Three param search object for performing a search on gene mutations
      */
     private ThreeParamLinkedSearch geneMutationSearch;
@@ -211,6 +216,7 @@ public class SearchDS {
         List<FacetOption> datasetAvailableOptions = new ArrayList<>();
         datasetAvailableOptions.add(new FacetOption("Gene Mutation", "Gene_Mutation"));
         datasetAvailableOptions.add(new FacetOption("Cytogenetics", "Cytogenetics"));
+        datasetAvailableOptions.add(new FacetOption("Copy Number Alteration", "Copy_Number_Alteration"));
         datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
         datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
 
@@ -333,6 +339,8 @@ public class SearchDS {
         breastCancerMarkersSearch = new TwoParamLinkedSearch("breastCancerMarkers", "breast_cancer_markers");
         breastCancerMarkersSearch.setData(getBreastCancerMarkersFromDP());
 
+        copyNumberAlterationSearch = new OneParamTextSearch("copyNumberAlteration", "copy_number_alteration", getCopyNumberAlterationDP());
+
 
         INITIALIZED = true;
     }
@@ -355,6 +363,13 @@ public class SearchDS {
 
                     OneParamCheckboxFilter f = (OneParamCheckboxFilter)filter;
                     f.setSelected(new ArrayList<>());
+
+                }
+                else if(filter instanceof OneParamTextFilter){
+
+                    OneParamTextFilter f = (OneParamTextFilter) filter;
+                    f.setSelected(new ArrayList<>());
+
 
                 }
                 else if(filter instanceof TwoParamUnlinkedFilter){
@@ -403,6 +418,12 @@ public class SearchDS {
                         if(filter instanceof OneParamCheckboxFilter){
 
                             OneParamCheckboxFilter f = (OneParamCheckboxFilter)filter;
+                            f.setSelected(decodedSelected);
+
+                        }
+                        else if(filter instanceof OneParamTextFilter){
+
+                            OneParamTextFilter f = (OneParamTextFilter) filter;
                             f.setSelected(decodedSelected);
 
                         }
@@ -579,6 +600,10 @@ public class SearchDS {
 
                 case breast_cancer_markers:
                     result = breastCancerMarkersSearch.search(filters.get(SearchFacetName.breast_cancer_markers), result, ModelForQuery::addBreastCancerMarkers, ComparisonOperator.AND);
+                    break;
+
+                case copy_number_alteration:
+                    result = copyNumberAlterationSearch.search(filters.get(SearchFacetName.copy_number_alteration), result, ModelForQuery::addCnaMarker, ComparisonOperator.OR);
                     break;
 
                 default:

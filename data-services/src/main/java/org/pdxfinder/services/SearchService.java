@@ -92,6 +92,7 @@ public class SearchService {
                                   Optional<List<String>> project,
                                   Optional<List<String>> data_available,
                                   Optional<List<String>> breast_cancer_markers,
+                                  Optional<List<String>> copy_number_alteration,
                                   Integer page,
                                   Integer size){
 
@@ -110,7 +111,8 @@ public class SearchService {
                 drug,
                 project,
                 data_available,
-                breast_cancer_markers
+                breast_cancer_markers,
+                copy_number_alteration
         );
 
         WebSearchDTO wsDTO = new WebSearchDTO();
@@ -189,7 +191,8 @@ public class SearchService {
                             Optional<List<String>> drug,
                             Optional<List<String>> project,
                             Optional<List<String>> data_available,
-                            Optional<List<String>> breast_cancer_markers){
+                            Optional<List<String>> breast_cancer_markers,
+                            Optional<List<String>> copy_number_alteration){
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
                 query,
@@ -205,7 +208,8 @@ public class SearchService {
                 drug,
                 project,
                 data_available,
-                breast_cancer_markers
+                breast_cancer_markers,
+                copy_number_alteration
 
         );
 
@@ -232,7 +236,8 @@ public class SearchService {
             Optional<List<String>> drug,
             Optional<List<String>> project,
             Optional<List<String>> data_available,
-            Optional<List<String>> breast_cancer_markers
+            Optional<List<String>> breast_cancer_markers,
+            Optional<List<String>> copy_number_alteration
 
 
             ) {
@@ -332,6 +337,13 @@ public class SearchService {
             configuredFacets.put(SearchFacetName.breast_cancer_markers, new ArrayList<>());
             for (String s : breast_cancer_markers.get()) {
                 configuredFacets.get(SearchFacetName.breast_cancer_markers).add(s);
+            }
+        }
+
+        if (copy_number_alteration.isPresent() && !copy_number_alteration.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.copy_number_alteration, new ArrayList<>());
+            for (String s : copy_number_alteration.get()) {
+                configuredFacets.get(SearchFacetName.copy_number_alteration).add(s);
             }
         }
 

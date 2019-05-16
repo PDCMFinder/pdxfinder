@@ -1,12 +1,5 @@
 package org.pdxfinder.commands.dataloaders;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.neo4j.ogm.session.Session;
@@ -24,13 +17,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.*;
@@ -41,32 +33,23 @@ import org.apache.poi.ss.usermodel.*;
  * Created by csaba on 06/08/2018.
  */
 
-@Component
-@Order(value = 0)
+
 /**
  *
  * aka UPDOG: Universal PdxData tO Graph
  *
  * We should call it UPDOG. And it sets up a good joke. Any newcomer says "What's UPDOG?" we can say "Nothing much, what's up with you?"
  */
-public class UniversalLoader extends UniversalLoaderOmic implements CommandLineRunner, ApplicationContextAware {
+@Component
+public class UniversalLoader extends UniversalLoaderOmic {
 
     private final static Logger log = LoggerFactory.getLogger(UniversalLoader.class);
 
-    Logger logger = LoggerFactory.getLogger(UniversalLoader.class);
-
-    private Options options;
-    private CommandLineParser parser;
-    private CommandLine cmd;
-    private HelpFormatter formatter;
-
-    private DataImportService dataImportService;
     private Session session;
 
     static ApplicationContext context;
     ReportManager reportManager;
 
-    @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
 
     /**
@@ -125,91 +108,19 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
 
     private Set<String> modelIDs;
 
-
-    @PostConstruct
-    public void init() {
-        formatter = new HelpFormatter();
+    public UniversalLoader(ReportManager reportManager, UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
+        this.reportManager = reportManager;
     }
 
-    public UniversalLoader(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
-    }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void initTemplate(String templateFileStr) throws Exception{
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadUniversal", "Running universal loader (UPDOG)");
-        parser.accepts("loadALL", "Load all, running universal loader (UPDOG)");
-        OptionSet options = parser.parse(args);
+        FileInputStream excelFile = new FileInputStream(new File(templateFileStr));
+        Workbook workbook = new XSSFWorkbook(excelFile);
+        log.info("Loading template from " + templateFileStr);
+        initializeTemplateData(workbook);
 
-        if (options.has("loadUniversal") || options.has("loadALL")) {
-
-            reportManager = (ReportManager) context.getBean("ReportManager");
-
-
-            File folder = new File(dataRootDir + "UPDOG/");
-
-            if (folder.exists()) {
-
-                File[] updogDirs = folder.listFiles();
-
-                if (updogDirs.length == 0) {
-
-                    log.warn("No subdirs found for the universal loader, skipping");
-                } else {
-
-                    for (int i = 0; i < updogDirs.length; i++) {
-
-                        if (updogDirs[i].isDirectory()) {
-
-                            String templateFileStr = dataRootDir + "UPDOG/" + updogDirs[i].getName() + "/template.xlsx";
-
-                            File template = new File(templateFileStr);
-
-                            //found the template, load it
-                            if (template.exists()) {
-
-                                log.info("******************************************************");
-                                log.info("* Starting universal loader                          *");
-                                log.info("******************************************************");
-
-
-                                FileInputStream excelFile = new FileInputStream(new File(templateFileStr));
-
-                                Workbook workbook = new XSSFWorkbook(excelFile);
-                                log.info("Loading template from " + templateFileStr);
-
-                                initializeTemplateData(workbook);
-
-                                loadTemplateData();
-
-                                workbook.close();
-                                excelFile.close();
-
-                                log.info("******************************************************");
-                                log.info("* Finished running universal loader                  *");
-                                log.info("******************************************************");
-
-                            } else {
-
-                                log.error("No template file found for universal loader in " + updogDirs[i]);
-                            }
-
-                        }
-                    }
-                }
-
-            }
-            //NO UNIVERSAL TEMPLATES, SKIP
-            else {
-
-                log.warn("No UPDOG directory found. Who let the dog out?");
-            }
-
-
-        }
     }
 
 
@@ -298,18 +209,21 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
             //check if there is some data in the row and they are not all nulls
             if (dataRow.size() > 0 && !isRowOfNulls(dataRow)) {
 
-               sheetData.add(dataRow);
-                
+                sheetData.add(dataRow);
+
 
             }
 
         }
     }
 
+
+
+
     /**
      * Loads the data from the lists into the DB
      */
-    private void loadTemplateData() {
+    public void loadTemplateData() {
 
         //:: DON'T CHANGE THE ORDER OF THESE METHODS UNLESS YOU WANT TO RISK THE UNIVERSE TO COLLAPSE!
         createDataSourceGroup();
@@ -340,6 +254,8 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
         log.info("******************************************************");
         log.info("* Creating DataSource                                *");
         log.info("******************************************************");
+
+
 
         if (loaderRelatedDataSheetData.size() != 1) {
             stopLoading = true;
@@ -885,6 +801,7 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
                 } else {
 
                     log.error("Unknown human sample with id: " + sampleId);
+                    row++;
                     continue;
                 }
 
@@ -949,6 +866,7 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
                     model.addSpecimen(specimen);
                     model.addRelatedSample(sample);
                     dataImportService.saveModelCreation(model);
+                    dataImportService.saveSpecimen(specimen);
                     dataImportService.saveSample(sample);
 
                     //log.info(" Specimen with the following details was created: "+modelId+" "+passage+" "+nomenclature+ " in row: "+row);
@@ -978,6 +896,7 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
         log.info("******************************************************");
         log.info("*                 Loading Omic Data                  *");
         log.info("******************************************************");
+        log.info(this.modelIDs.toString());
 
         omicDataSource= ds.getAbbreviation();
         dataSourceAbbreviation = loaderRelatedDataSheetData.get(0).get(1);
@@ -1033,21 +952,35 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
         File cnaData = new File(cnaDataDir);
 
 
+        log.info(mutationDataDir);
+        log.info(cnaDataDir);
         for (String modelId : this.modelIDs){
 
             ModelCreation modelCreation = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
 
-            // Mutation Data Load
-            if (mutationData.exists()) {
-                loadOmicData(modelCreation, ds, "mutation");
+            if(modelCreation != null){
+
+                // Mutation Data Load
+                if (mutationData.exists()) {
+                    log.info("Loading mutation for "+modelId);
+                    loadOmicData(modelCreation, ds, "mutation");
+                }
+
+                // Copy Number Alteration Data Load
+                if (cnaData.exists()){
+                    log.info("Loading cna for "+modelId);
+                    loadOmicData(modelCreation, ds, "copy number alteration");
+                }
+                else{
+                    log.info("No omic data for model "+modelId);
+                }
+            }
+            else{
+
+                log.error("Cannot load omic data for missing model: "+modelId);
             }
 
-            // Copy Number Alteration Data Load
-            if (cnaData.exists()){
-
-                loadOmicData(modelCreation, ds, "copy number alteration");
-            }
-        }//-loadEssentials
+        }
 
 
 
@@ -1387,9 +1320,48 @@ public class UniversalLoader extends UniversalLoaderOmic implements CommandLineR
         return null;
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        context = applicationContext;
+
+    public List<List<String>> getPatientSheetData() {
+        return patientSheetData;
     }
 
+    public List<List<String>> getPatientTumorSheetData() {
+        return patientTumorSheetData;
+    }
+
+    public List<List<String>> getPatientTreatmentSheetData() {
+        return patientTreatmentSheetData;
+    }
+
+    public List<List<String>> getPdxModelSheetData() {
+        return pdxModelSheetData;
+    }
+
+    public List<List<String>> getPdxModelValidationSheetData() {
+        return pdxModelValidationSheetData;
+    }
+
+    public List<List<String>> getDerivedDatasetSheetData() {
+        return derivedDatasetSheetData;
+    }
+
+    public List<List<String>> getSharingAndContactSheetData() {
+        return sharingAndContactSheetData;
+    }
+
+    public List<List<String>> getBreastAndOrColorectalDiagnoSheetData() {
+        return breastAndOrColorectalDiagnoSheetData;
+    }
+
+    public List<List<String>> getLoaderRelatedDataSheetData() {
+        return loaderRelatedDataSheetData;
+    }
+
+    public String getDataRootDir() {
+        return dataRootDir;
+    }
+
+    public void setDataRootDir(String dataRootDir) {
+        this.dataRootDir = dataRootDir;
+    }
 }

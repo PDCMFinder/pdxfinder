@@ -22,14 +22,19 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
     Logger log = LoggerFactory.getLogger(UniversalLoaderOmic.class);
 
-    @Autowired
-    private UtilityService utilityService;
-    @Autowired
-    private DataImportService dataImportService;
+
+    protected UtilityService utilityService;
+
+    protected DataImportService dataImportService;
 
     protected static ApplicationContext context;
 
     protected ReportManager reportManager;
+
+    public UniversalLoaderOmic(UtilityService utilityService, DataImportService dataImportService) {
+        this.utilityService = utilityService;
+        this.dataImportService = dataImportService;
+    }
 
 
     public void loadOmicData(ModelCreation modelCreation, Group providerGroup, String dataType) {  // csv or xlsx or json
@@ -50,9 +55,6 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS A SINGLE CSV/JSON WITH ALL_MODELS_IN_ONE_FILE
             String variationURLStr = dataRootDirectory+dataSourceAbbreviation+"/"+omicDir+"/data."+omicFileExtension;
-
-            log.info("Loading Data File {}", variationURLStr);
-
             Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(variationURLStr,omicModelID);
 
             dataList = fullData.get(modelCreation.getSourcePdxId());
@@ -106,6 +108,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             // STEP 2: GET THE CACHED MOLCHAR OBJECT OR CREATE ONE IF IT DOESN'T EXIST IN THE MAP, KEY is sampleid__passage__technology
             MolecularCharacterization molecularCharacterization;
             String passage = (data.get(omicPassage) == null) ? findMyPassage(modelCreation, data.get(omicSampleID), data.get(omicSampleOrigin)) : data.get(omicPassage);
+
 
             String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "__" + data.get(omicSampleOrigin);
 
@@ -298,7 +301,6 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
     }
 
-
     public String findMyPassage(ModelCreation modelCreation, String sampleId, String sampleOrigin){
 
         String passage = null;
@@ -321,7 +323,6 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         }
         return passage;
     }
-
 
 
     @Override

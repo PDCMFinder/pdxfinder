@@ -505,7 +505,9 @@ public class UtilityService {
         FileInputStream fileStream = null;
         try{
             fileStream = new FileInputStream(dataFile);
-        }catch (Exception e){}
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         DataInputStream myInput = new DataInputStream(fileStream);
 
 
@@ -525,11 +527,12 @@ public class UtilityService {
                     lineList.add(strar[j]);
                 }
                 dataArrayList.add(lineList);
-                System.out.println();
                 i++;
             }
 
-        }catch (Exception e){}
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
 
         return dataArrayList;
@@ -905,7 +908,9 @@ public class UtilityService {
 
 
 
-
+    public String log(){
+        return "Working";
+    }
 
 
 

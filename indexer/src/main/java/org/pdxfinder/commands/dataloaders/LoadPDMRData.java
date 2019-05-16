@@ -42,8 +42,6 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private DataImportService dataImportService;
-
     /*private Session session;
 
     @Value("${pdmrpdx.variation.max}")
@@ -61,8 +59,8 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadPDMRData(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
+    public LoadPDMRData(UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
     }
 
 

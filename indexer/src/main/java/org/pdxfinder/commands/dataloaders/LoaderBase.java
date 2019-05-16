@@ -44,10 +44,12 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
 
     protected ReportManager reportManager;
 
-    @Autowired
-    private UtilityService utilityService;
-    @Autowired
-    private DataImportService dataImportService;
+
+
+
+    public LoaderBase(UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
+    }
 
     /**
      * initMethod

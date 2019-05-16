@@ -5,6 +5,7 @@ import joptsimple.OptionSet;
 import org.apache.commons.cli.HelpFormatter;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
@@ -35,8 +36,6 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
     private HelpFormatter formatter;
 
-    private DataImportService dataImportService;
-
     @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
 
@@ -45,8 +44,8 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadHCI(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
+    public LoadHCI(UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
     }
 
     @Override

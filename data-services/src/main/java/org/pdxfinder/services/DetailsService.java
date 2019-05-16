@@ -435,14 +435,16 @@ public class DetailsService {
         List<List<String>> tableRows = new ArrayList<>();
         MolecularDataTableDTO dto = new MolecularDataTableDTO();
 
+        int batchSize = 500;
+
         MolecularCharacterization mc = molecularCharacterizationRepository.getMolecularDataById(Long.valueOf(id));
 
         int numberOfAssociations = markerAssociationRepository.getMarkerAssociationCountByMolCharId(Long.valueOf(id));
         List<MarkerAssociation> associationList = new ArrayList<>();
 
-        for(int i=0; i<numberOfAssociations; i += 500){
+        for(int i=0; i<numberOfAssociations; i += batchSize){
 
-            List<MarkerAssociation> subList = markerAssociationRepository.findAssociationsByMolCharIdFromTo(Long.valueOf(id), i, 500);
+            List<MarkerAssociation> subList = markerAssociationRepository.findAssociationsByMolCharIdFromTo(Long.valueOf(id), i, batchSize);
             associationList.addAll(subList);
         }
 
@@ -600,7 +602,7 @@ public class DetailsService {
                 tableHeadersSet.add("cnalog10rcna");
             }
 
-            if(ma.getCnaCopyNumberStatus() != null && ma.getCnaCopyNumberStatus().isEmpty()){
+            if(ma.getCnaCopyNumberStatus() != null && !ma.getCnaCopyNumberStatus().isEmpty()){
                 tableHeadersSet.add("cnacopynumberstatus");
             }
 

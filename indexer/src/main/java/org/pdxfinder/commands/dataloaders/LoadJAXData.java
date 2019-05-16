@@ -45,8 +45,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private DataImportService dataImportService;
-
     private Session session;
 
     @Value("${jaxpdx.variation.max}")
@@ -67,11 +65,8 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    @Autowired
-    private UtilityService utilityService;
-
-    public LoadJAXData(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
+    public LoadJAXData(UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
     }
 
     @Override
