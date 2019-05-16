@@ -241,11 +241,11 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
         loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation");
 
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"cna");
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"copy number alteration");
 
 
 
-/*        String variationURLStr = dataRootDir+dataSourceAbbreviation+"/mut/data.json";
+/*      String variationURLStr = dataRootDir+dataSourceAbbreviation+"/mut/data.json";
         String platformName = "TargetedNGS_MUT";
         String molcharType = "mutation";
 

@@ -32,34 +32,6 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
     protected ReportManager reportManager;
 
 
-    public List<Map<String, String>> loadOmicAllModelsInOneFile(ModelCreation modelCreation, Group providerGroup, String dataType, String omicFileExtension, String moreFiles) {
-
-        // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS A SINGLE CSV/JSON WITH ALL_MODELS_IN_ONE_FILE
-        String omicDir = (dataType.equals("mutation")) ? "mut" : "cna";
-
-        String variationURLStr = dataRootDirectory+dataSourceAbbreviation+"/"+omicDir+"/data."+omicFileExtension;
-
-        Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(variationURLStr,omicModelID);
-
-        log.info("Loading Data File {}", variationURLStr);
-        List<Map<String, String>> dataList = fullData.get(modelCreation.getSourcePdxId());
-
-        return dataList;
-    }
-
-
-    public List<Map<String, String>> loadOmicOneFilePerModel(ModelCreation modelCreation, Group providerGroup, String dataType) {
-
-        // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS 100s OF CSV/JSON WITH ONE_FILE_PER_MODEL
-        String omicDir = (dataType.equals("mutation")) ? "mut" : "cna";
-
-        String modelID = modelCreation.getSourcePdxId();
-        List<Map<String, String>> dataList = utilityService.serializeDataToMaps(dataRootDirectory + dataSourceAbbreviation + "/" + omicDir + "/" + modelID + "." + omicFileExtension);
-
-        return dataList;
-    }
-
-
     public void loadOmicData(ModelCreation modelCreation, Group providerGroup, String dataType) {  // csv or xlsx or json
 
         reportManager = (ReportManager) context.getBean("ReportManager");
