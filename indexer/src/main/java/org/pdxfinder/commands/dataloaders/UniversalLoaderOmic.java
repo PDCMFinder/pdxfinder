@@ -22,14 +22,19 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
     Logger log = LoggerFactory.getLogger(UniversalLoaderOmic.class);
 
-    @Autowired
-    private UtilityService utilityService;
-    @Autowired
-    private DataImportService dataImportService;
+
+    protected UtilityService utilityService;
+
+    protected DataImportService dataImportService;
 
     protected static ApplicationContext context;
 
     protected ReportManager reportManager;
+
+    public UniversalLoaderOmic(UtilityService utilityService, DataImportService dataImportService) {
+        this.utilityService = utilityService;
+        this.dataImportService = dataImportService;
+    }
 
 
     public void loadOmicData(ModelCreation modelCreation, Group providerGroup, String dataType) {  // csv or xlsx or json
@@ -50,7 +55,8 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS A SINGLE CSV/JSON WITH ALL_MODELS_IN_ONE_FILE
             String variationURLStr = dataRootDirectory+dataSourceAbbreviation+"/"+omicDir+"/data."+omicFileExtension;
-
+            log.info(variationURLStr);
+            log.info(utilityService.log());
             Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(variationURLStr,omicModelID);
 
             dataList = fullData.get(modelCreation.getSourcePdxId());

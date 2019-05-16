@@ -44,11 +44,8 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private DataImportService dataImportService;
     private Session session;
 
-    @Autowired
-    private UtilityService utilityService;
 
     @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
@@ -60,8 +57,8 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadMDAnderson(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
+    public LoadMDAnderson(UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
     }
 
     @Override

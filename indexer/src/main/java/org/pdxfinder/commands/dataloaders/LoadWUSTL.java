@@ -44,17 +44,14 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private DataImportService dataImportService;
     private Session session;
 
-    @Autowired
-    private UtilityService utilityService;
 
     @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
 
-    public LoadWUSTL(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
+    public LoadWUSTL(UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
     }
 
     //   @Value("${mdapdx.url}")

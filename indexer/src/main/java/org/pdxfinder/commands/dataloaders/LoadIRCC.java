@@ -45,11 +45,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private DataImportService dataImportService;
     private Session session;
-
-    @Autowired
-    private UtilityService utilityService;
 
     // samples -> markerAsssociations
     private HashMap<String, HashSet<MarkerAssociation>> markerAssociations = new HashMap();
@@ -69,8 +65,8 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadIRCC(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
+    public LoadIRCC(UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
     }
 
     @Override

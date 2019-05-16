@@ -33,25 +33,23 @@ import org.apache.poi.ss.usermodel.*;
  * Created by csaba on 06/08/2018.
  */
 
-@Component
-@Order(value = 0)
+
 /**
  *
  * aka UPDOG: Universal PdxData tO Graph
  *
  * We should call it UPDOG. And it sets up a good joke. Any newcomer says "What's UPDOG?" we can say "Nothing much, what's up with you?"
  */
+@Component
 public class UniversalLoader extends UniversalLoaderOmic {
 
     private final static Logger log = LoggerFactory.getLogger(UniversalLoader.class);
 
-    private DataImportService dataImportService;
     private Session session;
 
     static ApplicationContext context;
     ReportManager reportManager;
 
-    @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
 
     /**
@@ -110,11 +108,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
     private Set<String> modelIDs;
 
-    @Autowired
-    private UtilityService utilityService;
-
-    public UniversalLoader(DataImportService dataImportService, ReportManager reportManager) {
-        this.dataImportService = dataImportService;
+    public UniversalLoader(ReportManager reportManager, UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
         this.reportManager = reportManager;
     }
 
@@ -259,6 +254,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
         log.info("******************************************************");
         log.info("* Creating DataSource                                *");
         log.info("******************************************************");
+
+
 
         if (loaderRelatedDataSheetData.size() != 1) {
             stopLoading = true;
@@ -804,6 +801,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 } else {
 
                     log.error("Unknown human sample with id: " + sampleId);
+                    row++;
                     continue;
                 }
 
@@ -898,6 +896,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
         log.info("******************************************************");
         log.info("*                 Loading Omic Data                  *");
         log.info("******************************************************");
+        log.info(this.modelIDs.toString());
 
         omicDataSource= ds.getAbbreviation();
         dataSourceAbbreviation = loaderRelatedDataSheetData.get(0).get(1);
@@ -953,20 +952,33 @@ public class UniversalLoader extends UniversalLoaderOmic {
         File cnaData = new File(cnaDataDir);
 
 
+        log.info(mutationDataDir);
+        log.info(cnaDataDir);
         for (String modelId : this.modelIDs){
 
             ModelCreation modelCreation = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
 
-            // Mutation Data Load
-            if (mutationData.exists()) {
-                loadOmicData(modelCreation, ds, "mutation");
+            if(modelCreation != null){
+                // Mutation Data Load
+                if (mutationData.exists()) {
+                    log.info("Loading mutation for "+modelId);
+                    loadOmicData(modelCreation, ds, "mutation");
+                }
+
+                // Copy Number Alteration Data Load
+                if (cnaData.exists()){
+                    log.info("Loading cna for "+modelId);
+                    loadOmicData(modelCreation, ds, "copy number alteration");
+                }
+                else{
+                    log.info("No omic data for model "+modelId);
+                }
+            }
+            else{
+
+                log.error("Cannot load omic data for missing model: "+modelId);
             }
 
-            // Copy Number Alteration Data Load
-            if (cnaData.exists()){
-
-                loadOmicData(modelCreation, ds, "copy number alteration");
-            }
         }//-loadEssentials
 
 
@@ -1342,5 +1354,13 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
     public List<List<String>> getLoaderRelatedDataSheetData() {
         return loaderRelatedDataSheetData;
+    }
+
+    public String getDataRootDir() {
+        return dataRootDir;
+    }
+
+    public void setDataRootDir(String dataRootDir) {
+        this.dataRootDir = dataRootDir;
     }
 }

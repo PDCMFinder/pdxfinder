@@ -45,8 +45,6 @@ import org.apache.poi.ss.usermodel.*;
  */
 @Component
 @Order(value = 0)
-
-
 public class LoadUniversal implements CommandLineRunner, ApplicationContextAware{
 
 
@@ -67,6 +65,9 @@ public class LoadUniversal implements CommandLineRunner, ApplicationContextAware
 
     @Autowired
     private DataImportService dataImportService;
+
+    @Autowired
+    private UtilityService utilityService;
 
     private Session session;
 
@@ -112,7 +113,8 @@ public class LoadUniversal implements CommandLineRunner, ApplicationContextAware
                                 log.info("* Starting universal loader                          *");
                                 log.info("******************************************************");
 
-                                UniversalLoader updog = new UniversalLoader(dataImportService, reportManager);
+                                UniversalLoader updog = new UniversalLoader(reportManager, utilityService, dataImportService);
+                                updog.setDataRootDir(dataRootDir);
                                 updog.initTemplate(templateFileStr);
                                 updog.loadTemplateData();
 
