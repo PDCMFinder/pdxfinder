@@ -878,7 +878,9 @@ public class UtilityService {
 
 
 
-
+    public String log(){
+        return "Working";
+    }
 
 
 
