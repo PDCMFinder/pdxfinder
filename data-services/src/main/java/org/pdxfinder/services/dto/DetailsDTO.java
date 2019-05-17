@@ -63,6 +63,7 @@ public class DetailsDTO {
      ************************/
     private List<MolecularDataEntryDTO> molecularDataRows;
     private int molecularDataEntrySize;
+    private Set<String> dataTypes;
 
 
 
@@ -374,5 +375,13 @@ public class DetailsDTO {
 
     public void setMolecularDataEntrySize(int molecularDataEntrySize) {
         this.molecularDataEntrySize = molecularDataEntrySize;
+    }
+
+    public Set<String> getDataTypes() {
+        return dataTypes;
+    }
+
+    public void setDataTypes(Set<String> dataTypes) {
+        this.dataTypes = dataTypes;
     }
 }

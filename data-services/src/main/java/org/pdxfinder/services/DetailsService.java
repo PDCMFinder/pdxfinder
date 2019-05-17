@@ -345,6 +345,7 @@ public class DetailsService {
 
         //MOLECULAR DATA TAB
         List<MolecularDataEntryDTO> mdeDTO = new ArrayList<>();
+        Set<String> dataTypes = new HashSet<>();
         //first add molchars linked to the patient sample
         Collection<MolecularCharacterization> patientMCs = molecularCharacterizationRepository.findAllBySample(patientSample);
         for(MolecularCharacterization mc : patientMCs){
@@ -357,6 +358,7 @@ public class DetailsService {
             mde.setDataAvailableLabel(mc.getPlatform().getName());
             mde.setDataAvailableUrl("");
             mde.setPlatformUsedLabel(mc.getPlatform().getName());
+            dataTypes.add(mc.getType());
 
             if(mc.getPlatform().getName() == null || mc.getPlatform().getName().isEmpty() || mc.getPlatform().getName().toLowerCase().equals("not specified")
                     || mc.getPlatform().getUrl() == null || mc.getPlatform().getUrl().isEmpty()){
@@ -402,6 +404,7 @@ public class DetailsService {
                     mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
                     mde.setRawDataLabel("Not available");
                     mde.setMolcharId(mc.getId().toString());
+                    dataTypes.add(mc.getType());
 
                     if (xenoSample.getSourceSampleId() != null)
                     mdeDTO.add(mde);
@@ -417,6 +420,7 @@ public class DetailsService {
 
         dto.setMolecularDataRows(mdeDTO);
         dto.setMolecularDataEntrySize(mdeDTO.size());
+        dto.setDataTypes(dataTypes);
         return dto;
         //getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
     }
