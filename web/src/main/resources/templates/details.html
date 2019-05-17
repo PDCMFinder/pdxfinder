@@ -911,12 +911,13 @@
                                             <input type="checkbox" class="dd-input" id="test">
 
                                             <ul class="dd-menu">
-                                                <li><a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"> Download CNA </a></li>
-                                                <li>Another action</li>
-                                                <li>Something else here</li>
+                                                <li th:each="dataType,iter : ${data.dataTypes}">
+                                                    <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}" th:text="${#strings.capitalizeWords(dataType)}"> Download ... </a>
+                                                </li>
+
                                                 <li class="divider"></li>
                                                 <li>
-                                                    <a href="http://pdxfinder.org">Link to Rane.io</a>
+                                                    <a href="http://pdxfinder.org">Link to pdxfinder.org</a>
                                                 </li>
                                             </ul>
                                         </label>
