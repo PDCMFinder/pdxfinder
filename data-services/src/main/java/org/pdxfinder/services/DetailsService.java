@@ -99,19 +99,19 @@ public class DetailsService {
     public Set<String[]> getVariationDataCSV(String dataSrc, String modelId) {
 
         Set<String[]> variationDataDTOSet = new LinkedHashSet<>();
-        int size = 50000, page = 0, draw=1;
+        int size = 20000, page = 0, draw=1;
         String technology = "", passage="", filter="", sortDir="", sortCol="mAss.seqPosition";
 
         //Retreive Diagnosis Information
         //TODO: fix this
         String diagnosis = ""; //getModelDetails(dataSrc,modelId,page,size,technology,passage,filter).getDiagnosis();
 
-        // Retreive technology Information
+/*        // Retreive technology Information
         List platforms = new ArrayList();
         Map<String, Set<String>> modelTechAndPassages = findModelPlatformAndPassages(dataSrc,modelId,passage);
         for (String tech : modelTechAndPassages.keySet()) {
             platforms.add(tech);
-        }
+        }*/
 
         // Retreive all Genomic Datasets
         VariationDataDTO variationDataDTO = variationDataByPlatform(dataSrc,modelId,technology,passage,page,size,filter,draw,sortCol,sortDir);
@@ -493,7 +493,7 @@ public class DetailsService {
         tableHeadersSet.add("sampleid");
 
 
-        //STEP 1: dinamically determine the headers of the table
+        //STEP 1: dynamically determine the headers of the table
         for(MarkerAssociation ma: associationList){
 
 
@@ -1436,7 +1436,7 @@ public class DetailsService {
         /**
          * Retrieve the Records based on search parameter
          */
-        Page<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource, modelId, technology, passage, searchParam, pageable);
+        Page<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource, modelId, technology, passage,"mutation", searchParam, pageable);
         VariationDataDTO variationDataDTO = new VariationDataDTO();
         List<String[]> variationData = new ArrayList();
 

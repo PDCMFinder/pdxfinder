@@ -61,6 +61,8 @@ public class DetailsController {
 
         CsvMapper mapper = new CsvMapper();
 
+        CsvSchema.Builder builder = CsvSchema.builder().addColumn("");
+
         CsvSchema schema = CsvSchema.builder()
                 .addColumn("Sample ID")
                 .addColumn("Passage")
