@@ -94,8 +94,10 @@ public class UtilityService {
                 break;
 
         }
+        if(csvMaps == null) log.error("Map is null for "+fileName +" in groupCol " +groupColumn);
 
         Map<String, List<Map<String, String>> > groupedMap = groupDataByColumn(csvMaps, groupColumn);
+
         return groupedMap;
     }
 
