@@ -270,6 +270,7 @@
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DRUG AND RESPONSE')}">DRUG AND RESPONSE</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'BREAST CANCER MARKERS')}">BREAST CANCER MARKERS</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'PATIENT TREATMENT STATUS')}">TREATMENT STATUS</th>
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'COPY NUMBER ALTERATION')}">COPY NUMBER ALTERATION</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -286,7 +287,6 @@
 
                                 <td data-title="AGE" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'AGE')}" th:text="${model.patientAge}"> Age </td>
                                 <td data-title="SEX" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'SEX')}" th:text="${model.patientGender}">Sex</td>
-
                                 <td data-title="DATA AVAILABLE" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DATA AVAILABLE')}">
                                     <th:block th:each="dataavailable : ${model.dataAvailable}">
 
@@ -337,6 +337,12 @@
 
                                         <span th:text="${model.patientTreatmentStatus}"></span>
 
+                                </td>
+
+                                <td data-title="COPY NUMBER ALTERATION" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'COPY NUMBER ALTERATION')}">
+                                    <div th:each="cnaMarker : ${model.cnaMarkers}">
+                                        <span th:text="${cnaMarker}"></span>
+                                    </div>
                                 </td>
 
                             </tr>
