@@ -912,7 +912,8 @@
 
                                             <ul class="dd-menu">
                                                 <li th:each="dataType,iter : ${data.dataTypes}">
-                                                    <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}" th:text="${#strings.capitalizeWords(dataType)}"> Download ... </a>
+                                                    <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/'+${#strings.replace(dataType,' ','-')}+'/export'}"
+                                                       th:text="${#strings.capitalizeWords(dataType)}"> Download ... </a>
                                                 </li>
 
                                                 <li class="divider"></li>
