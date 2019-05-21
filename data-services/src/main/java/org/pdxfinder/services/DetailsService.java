@@ -394,7 +394,7 @@ public class DetailsService {
 
                     MolecularDataEntryDTO mde = new MolecularDataEntryDTO();
 
-                    mde.setSampleId(xenoSample.getSourceSampleId());
+                    mde.setSampleId(xenoSample.getSourceSampleId()== null ? "Not Specified":xenoSample.getSourceSampleId());
                     mde.setSampleType("Engrafted Tumor");
                     mde.setEngraftedTumorPassage(sp.getPassage());
                     mde.setMolcharType(mc.getType());
@@ -406,7 +406,7 @@ public class DetailsService {
                     mde.setMolcharId(mc.getId().toString());
                     dataTypes.add(mc.getType());
 
-                    if (xenoSample.getSourceSampleId() != null)
+                    //if (xenoSample.getSourceSampleId() != null)
                     mdeDTO.add(mde);
 
                 }
