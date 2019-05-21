@@ -4,19 +4,29 @@ import com.google.gson.Gson;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.commands.dataloaders.UniversalLoader;
 import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.DrugService;
+import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.ModelForQuery;
+import org.pdxfinder.services.dto.NodeSuggestionDTO;
+import org.pdxfinder.services.reporting.MarkerLogEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import sun.text.normalizer.Utility;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -27,14 +37,22 @@ import java.util.stream.Collectors;
  */
 @Component
 @Order(value = 90)
-public class CreateDataProjections implements CommandLineRunner{
+public class CreateDataProjections implements CommandLineRunner, ApplicationContextAware{
 
     private final static Logger log = LoggerFactory.getLogger(CreateDataProjections.class);
     private DataImportService dataImportService;
     private DrugService drugService;
 
+    private UtilityService utilityService;
+
     @Value("${user.home}")
     String homeDir;
+
+
+    @Value("${pdxfinder.data.root.dir}")
+    private String dataRootDir;
+
+    protected ReportManager reportManager;
 
     //"platform"=>"marker"=>"variant"=>"set of model ids"
     private Map<String, Map<String, Map<String, Set<Long>>>> mutatedPlatformMarkerVariantModelDP = new HashMap<>();
@@ -56,11 +74,14 @@ public class CreateDataProjections implements CommandLineRunner{
     //"cnamarker"=>set of model ids
     private Map<String, Set<Long>> copyNumberAlterationDP = new HashMap<>();
 
+    protected static ApplicationContext context;
+
     @Autowired
-    public CreateDataProjections(DataImportService dataImportService, DrugService drugService) {
+    public CreateDataProjections(DataImportService dataImportService, DrugService drugService, UtilityService utilityService) {
 
         this.dataImportService = dataImportService;
         this.drugService = drugService;
+        this.utilityService = utilityService;
     }
 
     @Override
@@ -79,6 +100,8 @@ public class CreateDataProjections implements CommandLineRunner{
         if (options.has("createDataProjections") || options.has("loadALL")  || options.has("loadSlim") || options.has("loadEssentials")) {
 
             log.info("Creating data projections");
+
+            reportManager = (ReportManager) context.getBean("ReportManager");
 
             createMutationDataProjection();
 
@@ -330,9 +353,142 @@ public class CreateDataProjections implements CommandLineRunner{
             count++;
             if(count%100 == 0) {log.info("Processed "+count+" CNA molchar objects");
         }
+
+        try {
+            addCharlesRiverCNA();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 
+    private void addCharlesRiverCNA() throws Exception {
+
+        log.info("Loading additional datasets for CRL.");
+
+        String templateFileStr = dataRootDir + "UPDOG/CRL/template.xlsx";
+        String markerTemplateFileStr = dataRootDir + "UPDOG/CRL/cna_tested_markers/list.csv";
+
+        File markerListFile = new File(markerTemplateFileStr);
+        File templateFile = new File(templateFileStr);
+
+        Set<Marker> markerSet = new HashSet<>();
+
+        if (markerListFile.exists() && templateFile.exists()) {
+
+            List<List<String>> markerList = utilityService.serializeCSVToArrayList(markerTemplateFileStr);
+
+            //STEP1: get the marker symbols from the csv file then find the corresponding marker node and add it to a set
+            log.info("Found " + markerList.size() + " markers in the marker file.");
+            for (int i = 1; i < markerList.size(); i++) {
+
+                if (i % 500 == 0) {
+                    log.info("Collected " + i + " markers from the repository.");
+                }
+
+                String markerSymbol = markerList.get(i).get(0);
+
+                //skip all symbols with dot in them
+                if (markerSymbol.contains(".")) {
+
+                    MarkerLogEntity le = new MarkerLogEntity(this.getClass().getSimpleName(), "CRL", "-", "copy number alteration", "Not Specified", markerSymbol, "", "");
+                    le.setMessage(markerSymbol + " is an unrecognised symbol");
+                    le.setType("ERROR");
+                    continue;
+
+                }
+
+
+                //log.info("Looking up: "+markerSymbol);
+                NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), "CRL", "-", markerSymbol, "copy number alteration", "Not Specified");
+
+                if (nsdto.getNode() == null) {
+
+                    //uh oh, we found an unrecognised marker symbol, abort, abort!!!!
+                    reportManager.addMessage(nsdto.getLogEntity());
+
+                    continue;
+                } else {
+
+                    Marker marker = (Marker) nsdto.getNode();
+                    markerSet.add(marker);
+
+                }
+
+            }
+
+
+            //STEP2:
+
+            Set<Long> modelIdSet = new HashSet<>();
+
+            UniversalLoader updog = new UniversalLoader(reportManager, utilityService, dataImportService);
+            updog.setDataRootDir(dataRootDir);
+
+            updog.initTemplate(templateFileStr);
+
+            List<List<String>> datasetDerived = updog.getDerivedDatasetSheetData();
+            int row = 6;
+
+            for (List<String> derivedDatasetRow : datasetDerived) {
+
+                String sampleId = derivedDatasetRow.get(0);
+
+                String origin = derivedDatasetRow.get(1);
+                String passage = derivedDatasetRow.get(2);
+                String nomenclature = derivedDatasetRow.get(3);
+                String modelId = derivedDatasetRow.get(4);
+                String molCharType = derivedDatasetRow.get(5);
+                String platformName = derivedDatasetRow.get(6);
+                String platformTechnology = derivedDatasetRow.get(7);
+                String platformDescription = derivedDatasetRow.get(8);
+                String analysisProtocol = derivedDatasetRow.get(9);
+
+                //SKIP everything that is not cna
+                if (!molCharType.toLowerCase().equals("copy number alteration")) {
+
+                    row++;
+                    continue;
+                }
+
+
+                ModelCreation modelCreation = dataImportService.findModelByIdAndDataSource(modelId, "CRL");
+
+                if(modelCreation != null){
+
+                    modelIdSet.add(modelCreation.getId());
+                }
+                else{
+                    log.error("Not found model: "+modelId);
+                }
+
+
+            }
+
+
+            //STEP3: save the same markers for all models
+
+            for(Marker m: markerSet){
+                if(copyNumberAlterationDP.containsKey(m.getHgncSymbol())){
+
+                    copyNumberAlterationDP.get(m.getHgncSymbol()).addAll(modelIdSet);
+                }
+                else{
+
+                    copyNumberAlterationDP.put(m.getHgncSymbol(), modelIdSet);
+                }
+
+            }
+
+
+            log.info("DONE faking CNA data for CRL.");
+
+        }
+        else{
+            log.error("Missing files for creating CRL CNA projection.");
+        }
+    }
     private void addToTwoParamDP(Map<String, Map<String, Set<Long>>> collection, String key1, String key2, Long modelId){
 
         if(collection.containsKey(key1)){
@@ -527,7 +683,7 @@ public class CreateDataProjections implements CommandLineRunner{
                                 if (molc.getPlatform() != null && !molc.getType().isEmpty()) {
                                     String platformName = molc.getPlatform().getName();
 
-                                    if (dataImportService.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), mc.getDataSource(), platformName) > 0) {
+                                    //if (dataImportService.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), mc.getDataSource(), platformName) > 0) {
 
                                         if (molc.getType().toLowerCase().equals("mutation")) {
 
@@ -555,7 +711,7 @@ public class CreateDataProjections implements CommandLineRunner{
                                             cytogeneticsPlatformsByModel.get(mc.getId()).add(platformName);
                                         }
 
-                                    }
+                                    //}
 
                                 }
 
@@ -1061,4 +1217,8 @@ public class CreateDataProjections implements CommandLineRunner{
 
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        context = applicationContext;
+    }
 }
