@@ -146,7 +146,7 @@ public class AjaxController {
     }
 
 
-    @RequestMapping(value = "/modeldata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+   /*  @RequestMapping(value = "/modeldata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public VariationDataDTO postVariationDataByPlatform(@PathVariable String dataSrc,
                                                         @PathVariable String modelId,
                                                         @RequestParam(value="platform", required = false) String platform,
@@ -173,7 +173,7 @@ public class AjaxController {
     }
 
 
-    @RequestMapping(value = "/patientdata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+   @RequestMapping(value = "/patientdata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public VariationDataDTO postPatientVariationData(@PathVariable String dataSrc,
                                                      @PathVariable String modelId,
                                                      @RequestParam(value="platform", required = false) String platform,
@@ -218,7 +218,7 @@ public class AjaxController {
         return variationDataDTO;
 
     }
-
+    */
 
     @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
     public DetailsDTO details(@PathVariable String dataSrc,

@@ -13,9 +13,7 @@ public class VariationDataDTO {
     private int recordsTotal;
     private int recordsFiltered;
 
-    List<String[]> data = new ArrayList();
-
-    List<String[]> moreData = new ArrayList();
+    List<List<String>> data = new ArrayList();
 
     public VariationDataDTO(){
 
@@ -50,37 +48,11 @@ public class VariationDataDTO {
         this.recordsFiltered = recordsFiltered;
     }
 
-    public List<String[]> getData() {
+    public List<List<String>> getData() {
         return data;
     }
 
-    public void setData(List<String[]> data) {
+    public void setData(List<List<String>> data) {
         this.data = data;
-    }
-
-    public void setMoreData(List<String[]> moreData) {
-        this.moreData = moreData;
-    }
-
-    public List<String[]> moreData() {
-
-        List<String[]> adjustedData = new LinkedList<>();
-
-        for (String[] dataArr: data){
-
-            String[] dataArr2 = new String[15];
-
-            dataArr2[0] = dataArr[0];
-            dataArr2[1] = dataArr[12];
-            dataArr2[2] = "";
-            dataArr2[3] = "";
-
-            for (int i=1; i<12; i++){
-                dataArr2[i+3] = dataArr[i];
-            }
-
-            adjustedData.add(dataArr2);
-        }
-        return adjustedData;
     }
 }
