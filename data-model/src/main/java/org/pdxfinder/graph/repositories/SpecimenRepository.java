@@ -54,21 +54,12 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
             "            WHERE  mod.dataSource = {dataSource}  " +
             "            AND    mod.sourcePdxId = {modelId}  " +
-            "            AND    (tech.name = {tech}  OR {tech} = '' ) " +
-            "            AND    (spec.passage = {passage} OR {passage} = '' )" +
-
-            "            AND ( toLower(spec.externalId) CONTAINS toLower({search})" +
-            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search})" +
-            "            OR toLower(tech.name) CONTAINS toLower({search})" +
-            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) ) ) " +
 
             "            RETURN spec, sp, sfrm,msamp, char,molchar, assoc,mAss, aw,m,pl,tech ")
-    Page<Specimen> findSpecimenBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
-                                                        @Param("modelId") String modelId,
-                                                        @Param("tech") String tech,
-                                                        @Param("passage") String passage,
-                                                        @Param("molcharType") String molcharType,
-                                                        @Param("search") String search, Pageable pageable);
+    List<Specimen> findSpecimenBySourcePdxId(@Param("dataSource") String dataSource,
+                                             @Param("modelId") String modelId,
+                                             @Param("molcharType") String molcharType);
+
 
 
     @Query("MATCH (mod:ModelCreation)-[spr:SPECIMENS]-(sp:Specimen) " +
