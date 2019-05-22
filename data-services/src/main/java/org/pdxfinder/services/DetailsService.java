@@ -358,7 +358,7 @@ public class DetailsService {
             mde.setDataAvailableLabel(mc.getPlatform().getName());
             mde.setDataAvailableUrl("");
             mde.setPlatformUsedLabel(mc.getPlatform().getName());
-            dataTypes.add(mc.getType());
+
 
             if(mc.getPlatform().getName() == null || mc.getPlatform().getName().isEmpty() || mc.getPlatform().getName().toLowerCase().equals("not specified")
                     || mc.getPlatform().getUrl() == null || mc.getPlatform().getUrl().isEmpty()){
@@ -370,7 +370,15 @@ public class DetailsService {
                 mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
             }
 
+            int assocData = molecularCharacterizationRepository.findAssociationsNumberById(mc);
 
+            if(assocData == 0){
+                mde.setDataAssociated("NO");
+            }
+            else{
+                mde.setDataAssociated("YES");
+                dataTypes.add(mc.getType());
+            }
             mde.setRawDataLabel("Not available");
             mde.setMolcharId(mc.getId().toString());
 
@@ -404,7 +412,16 @@ public class DetailsService {
                     mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
                     mde.setRawDataLabel("Not available");
                     mde.setMolcharId(mc.getId().toString());
-                    dataTypes.add(mc.getType());
+
+                    int assocData = molecularCharacterizationRepository.findAssociationsNumberById(mc);
+
+                    if(assocData == 0){
+                        mde.setDataAssociated("NO");
+                    }
+                    else{
+                        mde.setDataAssociated("YES");
+                        dataTypes.add(mc.getType());
+                    }
 
                     //if (xenoSample.getSourceSampleId() != null)
                     mdeDTO.add(mde);
