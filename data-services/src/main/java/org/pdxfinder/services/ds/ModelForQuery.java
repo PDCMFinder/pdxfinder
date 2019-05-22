@@ -454,6 +454,8 @@ public class ModelForQuery {
 
         if(this.cnaMarkers == null) this.cnaMarkers = new ArrayList<>();
 
-        this.cnaMarkers.add(s);
+        if(!this.cnaMarkers.contains(s)){
+            this.cnaMarkers.add(s);
+        }
     }
 }

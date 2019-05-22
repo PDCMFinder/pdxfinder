@@ -446,12 +446,19 @@ public class SearchService {
 
                 case patient_treatment_status:
                     headers.add("PATIENT TREATMENT STATUS");
+                    break;
 
                 case patient_gender:
                     headers.add("SEX");
+                    break;
 
                 case patient_age:
                     headers.add("AGE");
+                    break;
+                case copy_number_alteration:
+                    headers.add("COPY NUMBER ALTERATION");
+
+
             }
 
         }

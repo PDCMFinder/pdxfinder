@@ -96,6 +96,7 @@ public class DetailsService {
     }
 
 
+
     public DetailsDTO getModelDetails(String dataSource, String modelId) {
 
         DetailsDTO dto = new DetailsDTO();
@@ -328,6 +329,7 @@ public class DetailsService {
             mde.setDataAvailableUrl("");
             mde.setPlatformUsedLabel(mc.getPlatform().getName());
 
+
             if(mc.getPlatform().getName() == null || mc.getPlatform().getName().isEmpty() || mc.getPlatform().getName().toLowerCase().equals("not specified")
                     || mc.getPlatform().getUrl() == null || mc.getPlatform().getUrl().isEmpty()){
 
@@ -338,14 +340,20 @@ public class DetailsService {
                 mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
             }
 
+            int assocData = molecularCharacterizationRepository.findAssociationsNumberById(mc);
 
+            if(assocData == 0){
+                mde.setDataAssociated("NO");
+            }
+            else{
+                mde.setDataAssociated("YES");
+                dataTypes.add(mc.getType());
+            }
             mde.setRawDataLabel("Not available");
             mde.setMolcharId(mc.getId().toString());
 
-            if (patientSample.getSourceSampleId() != null) {
-                mdeDTO.add(mde);
-                dataTypes.add(mc.getType());
-            }
+            if (patientSample.getSourceSampleId() != null)
+            mdeDTO.add(mde);
         }
 
         //then add molchars linked to the xenograft sample
@@ -364,7 +372,7 @@ public class DetailsService {
 
                     MolecularDataEntryDTO mde = new MolecularDataEntryDTO();
 
-                    mde.setSampleId(xenoSample.getSourceSampleId());
+                    mde.setSampleId(xenoSample.getSourceSampleId()== null ? "Not Specified":xenoSample.getSourceSampleId());
                     mde.setSampleType("Engrafted Tumor");
                     mde.setEngraftedTumorPassage(sp.getPassage());
                     mde.setMolcharType(mc.getType());
@@ -375,10 +383,18 @@ public class DetailsService {
                     mde.setRawDataLabel("Not available");
                     mde.setMolcharId(mc.getId().toString());
 
-                    if (xenoSample.getSourceSampleId() != null) {
-                        mdeDTO.add(mde);
+                    int assocData = molecularCharacterizationRepository.findAssociationsNumberById(mc);
+
+                    if(assocData == 0){
+                        mde.setDataAssociated("NO");
+                    }
+                    else{
+                        mde.setDataAssociated("YES");
                         dataTypes.add(mc.getType());
                     }
+
+                    //if (xenoSample.getSourceSampleId() != null)
+                    mdeDTO.add(mde);
 
                 }
 
@@ -1348,9 +1364,6 @@ public class DetailsService {
     }
 
 
-
-
-
     public List<String> getCsvHead(String molcharType){
 
 
@@ -1490,7 +1503,8 @@ public class DetailsService {
     }
 
 
-    /*    public VariationDataDTO patientVariationDataByPlatform(String dataSource, String modelId, String technology,
+
+        /*    public VariationDataDTO patientVariationDataByPlatform(String dataSource, String modelId, String technology,
                                                            String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
 
         //int recordsTotal = patientRepository.countByBySourcePdxIdAndPlatform(dataSource,modelId,technology,"");
@@ -1523,7 +1537,6 @@ public class DetailsService {
         return variationDataDTO;
 
     }*/
-
 
 
     public Sort.Direction getSortDirection(String sortDir){

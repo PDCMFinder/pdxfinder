@@ -62,4 +62,9 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
             "RETURN mc")
     List<MolecularCharacterization> findAllByDataSource(@Param("ds") String dataSource);
 
+    @Query("MATCH (mc:MolecularCharacterization)-[awr:ASSOCIATED_WITH]-(mAss:MarkerAssociation) " +
+            "WHERE ID(mc) = {id} " +
+            "RETURN count(mAss) ")
+    int findAssociationsNumberById(@Param("id") MolecularCharacterization mc);
+
 }
