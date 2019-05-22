@@ -796,6 +796,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     mc.setType(molCharType);
                     mc.setTechnology(platformTechnology);
                     sample.addMolecularCharacterization(mc);
+                    sample.setSourceSampleId(sampleId);
                     dataImportService.saveSample(sample);
 
                 } else {
@@ -850,6 +851,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     if(sample == null) {
 
                         sample = new Sample();
+                        sample.setSourceSampleId(sampleId);
 
                     }
 
@@ -956,7 +958,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
         log.info(cnaDataDir);
         for (String modelId : this.modelIDs){
 
-            ModelCreation modelCreation = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
+            ModelCreation modelCreation = dataImportService.findModelByIdAndDataSourceWithSpecimensAndHostStrain(modelId, ds.getAbbreviation());
 
             if(modelCreation != null){
 
