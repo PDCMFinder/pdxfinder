@@ -349,6 +349,13 @@ public class DetailsService {
                 mde.setDataAssociated("YES");
                 dataTypes.add(mc.getType());
             }
+
+            if(mc.isVisible()){
+                mde.setIsVisible("YES");
+            }
+            else{
+                mde.setIsVisible("NO");
+            }
             mde.setRawDataLabel("Not available");
             mde.setMolcharId(mc.getId().toString());
 
