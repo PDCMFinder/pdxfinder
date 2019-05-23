@@ -853,7 +853,7 @@
                                                     <td>
                                                         <a th:if="${dataRow.platformUsedUrl != null}" target="_blank"
                                                            style="color: #06369d; text-decoration: none;"
-                                                           th:text="${dataRow.platformUsedLabel}"
+                                                           th:text="${#strings.replace(dataRow.platformUsedLabel,'_',' ')}"
                                                            th:onclick="'window.open(\''+${dataRow.platformUsedUrl}+'\')'">
                                                             ...
                                                         </a>
@@ -919,7 +919,12 @@
 
                                                 <li class="divider"></li>
                                                 <li>
-                                                    <a href="#">Download All</a>
+                                                    <a target="_blank"
+                                                       style="color: #06369d; text-decoration: none;"
+                                                       th:onclick=" 'window.open(\''+${'https://pdmr.cancer.gov/content/docs/NCI_Cancer_Gene_Panel.pdf'}+'\')' "> Download All </a>
+                                                </li>
+                                                <li>
+                                                    <a target="_blank"> Downlload All </a>
                                                 </li>
                                             </ul>
                                         </label>
