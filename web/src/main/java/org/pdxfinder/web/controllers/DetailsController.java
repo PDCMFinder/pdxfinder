@@ -80,7 +80,7 @@ public class DetailsController {
         } catch (JsonProcessingException e) {}
 
         response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder.org_variation" + dataSrc + "_" + modelId + ".csv");
+        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder.org_"+dataType + dataSrc + "_" + modelId + ".csv");
         try{
             response.getOutputStream().flush();
         }catch (Exception e){

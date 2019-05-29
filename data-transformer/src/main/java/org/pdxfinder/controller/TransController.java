@@ -195,7 +195,7 @@ public class TransController {
     @RequestMapping("/rewrite-ircc-json")
     public Object irccTransformJson() {
 
-        String jsonFile= System.getProperty("user.home") + "/PDXFinder/data/IRCC-CRC/mut/data.json";
+        String jsonFile= System.getProperty("user.home") + "/PDXFinder/data/IRCC-CRC/mut/old.json";
 
         List<Map<String, String>> dataList = utilityService.serializeJSONToMaps(jsonFile, "IRCCVariation");
         List<Map<String, String>> newDataList = new ArrayList<>();

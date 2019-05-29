@@ -589,3 +589,43 @@ function customizeDatatable(dTable, presentData){
     })
 
 }
+
+
+
+
+
+
+function downloadAll() {
+
+    var urls = [
+        'http://localhost:8080/data/pdx/PDMR/245127-232-R/mutation/export',
+        'http://localhost:8080/data/pdx/PDMR/245127-232-R/mutation/export',
+        'http://localhost:8080/data/pdx/PDMR/245127-232-R/mutation/export'
+    ];
+
+    console.log("Welcome");
+
+    var link = document.createElement('a');
+
+    link.setAttribute('download', null);
+    link.style.display = 'none';
+
+    document.body.appendChild(link);
+
+    for (var i = 0; i < urls.length; i++) {
+
+        alert("Click Ok to download "+urls[i]);
+        link.setAttribute('href', urls[i]);
+        link.click();
+
+    }
+
+    document.body.removeChild(link);
+}
+
+
+
+
+
+
+
