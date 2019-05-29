@@ -841,7 +841,7 @@
 
                                                     <td>
                                                         <span th:if="${dataRow.isVisible == 'YES' and dataRow.dataAssociated != 'YES'}" th:text="'Data is not available in the Finder'"></span>
-                                                        <a th:if="${dataRow.dataAssociated == 'YES'}" class="molecularDataLink"
+                                                        <a th:if="${dataRow.dataAssociated == 'YES' or dataRow.isVisible == 'NO'}" class="molecularDataLink"
                                                            style="color: #06369d; text-decoration: none;"
                                                            data-th-attr="data-tabs-target=${dataRow.dataAvailableLabel},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
                                                            th:title="${dataRow.sampleId+' | '+data.mappedOntologyTermLabel+' | '+dataRow.sampleType+' | '+dataRow.engraftedTumorPassage+' | '+dataRow.platformUsedLabel}"

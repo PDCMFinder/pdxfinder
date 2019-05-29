@@ -400,6 +400,12 @@ public class DetailsService {
                         dataTypes.add(mc.getType());
                     }
 
+                    if(mc.isVisible()){
+                        mde.setIsVisible("YES");
+                    }
+                    else{
+                        mde.setIsVisible("NO");
+                    }
                     //if (xenoSample.getSourceSampleId() != null)
                     mdeDTO.add(mde);
 
