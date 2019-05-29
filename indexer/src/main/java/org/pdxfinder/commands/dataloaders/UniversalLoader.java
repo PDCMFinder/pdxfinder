@@ -793,7 +793,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     platform = dataImportService.getPlatform(platformName, ds);
                     MolecularCharacterization mc = new MolecularCharacterization();
                     mc.setPlatform(platform);
-                    mc.setType(molCharType);
+                    mc.setType(molCharType.toLowerCase());
                     mc.setTechnology(platformTechnology);
                     sample.addMolecularCharacterization(mc);
                     sample.setSourceSampleId(sampleId);
@@ -858,7 +858,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     platform = dataImportService.getPlatform(platformName, ds);
                     MolecularCharacterization mc = new MolecularCharacterization();
                     mc.setPlatform(platform);
-                    mc.setType(molCharType);
+                    mc.setType(molCharType.toLowerCase());
                     mc.setTechnology(platformTechnology);
                     sample.addMolecularCharacterization(mc);
                     model.addRelatedSample(sample);
@@ -958,7 +958,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
         log.info(cnaDataDir);
         for (String modelId : this.modelIDs){
 
-            ModelCreation modelCreation = dataImportService.findModelByIdAndDataSourceWithSpecimensAndHostStrain(modelId, ds.getAbbreviation());
+            ModelCreation modelCreation = dataImportService.findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(modelId, ds.getAbbreviation());
 
             if(modelCreation != null){
 

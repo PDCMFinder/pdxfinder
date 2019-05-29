@@ -324,7 +324,10 @@ public class DataImportService {
         return modelCreationRepository.findBySourcePdxIdAndDataSourceWithSpecimensAndHostStrain(modelId, dataSource);
     }
 
+    public ModelCreation findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(String modelId, String dataSource){
 
+        return modelCreationRepository.findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(modelId, dataSource);
+    }
 
     public void saveModelCreation(ModelCreation modelCreation){
         this.modelCreationRepository.save(modelCreation);

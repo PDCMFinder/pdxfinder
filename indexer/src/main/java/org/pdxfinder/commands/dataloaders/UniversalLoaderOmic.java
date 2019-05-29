@@ -63,7 +63,59 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
         String modelID = modelCreation.getSourcePdxId();
         Map<String, Platform> platformMap = new HashMap<>();
-        Map<String, MolecularCharacterization> molcharMap = new HashMap<>();
+        Map<String, MolecularCharacterization> existingMolcharNodes = new HashMap<>();
+        Map<String, MolecularCharacterization> toBeCreatedMolcharNodes = new HashMap<>();
+
+        //get existing molchar objects and put them in a map
+        //first the molchars of the patient sample
+        String passage = "";
+        if(modelCreation.getSample().getMolecularCharacterizations() != null){
+
+            for(MolecularCharacterization mc : modelCreation.getSample().getMolecularCharacterizations()){
+
+                if (mc != null && mc.getPlatform() != null){
+
+                    String molcharKey = modelCreation.getSample().getSourceSampleId() + "__" + passage + "__" + mc.getPlatform().getName()+ "__patient";
+                    existingMolcharNodes.put(molcharKey, mc);
+                }
+            }
+        }
+
+        //then all molchars related to xenograft samples
+
+        if(modelCreation.getSpecimens()!= null){
+
+            for(Specimen sp: modelCreation.getSpecimens()){
+
+                Sample sample = sp.getSample();
+
+                if(sample != null && sample.getMolecularCharacterizations() != null){
+
+                    for(MolecularCharacterization mc: sample.getMolecularCharacterizations()){
+
+                        if(sample.getSourceSampleId() == null ) log.error("Missing sampleid for "+modelID);
+                        if(sp.getPassage() == null) log.error("Missing passage for "+modelID);
+                        if(mc.getPlatform() == null) log.error("Missing platform for "+modelID);
+
+                        if(mc.getPlatform().getName() == null) log.error("Missing platform name for "+modelID);
+
+                        String molcharKey = sample.getSourceSampleId() + "__" + sp.getPassage() + "__" + mc.getPlatform().getName()+ "__xenograft";
+                        existingMolcharNodes.put(molcharKey, mc);
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
 
         int totalData = 0;
         try {
@@ -83,50 +135,58 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         for (Map<String, String> data : dataList ) {
 
             //STEP 1: GET THE PLATFORM AND CACHE IT
-            String technology = data.get(omicPlatform);
+            String platformName = data.get(omicPlatform);
 
             //Skip loading fish!
-            if(technology.equals("Other:_FISH")){
+            if(platformName.equals("Other:_FISH")){
                 count++;
                 continue;
             }
 
             Platform platform;
-            if(platformMap.containsKey(technology)){
+            if(platformMap.containsKey(platformName)){
 
-                platform = platformMap.get(technology);
+                platform = platformMap.get(platformName);
             }
             else{
 
-                String platformURLKey = technology.replace("\\s","_");
+                String platformURLKey = platformName.replace("\\s","_");
 
-                platform = dataImportService.getPlatform(technology, providerGroup, platformURL.get(platformURLKey));
-                platformMap.put(technology, platform);
+                platform = dataImportService.getPlatform(platformName, providerGroup);
+                platform.setUrl(platformURLKey);
+                platformMap.put(platformName, platform);
             }
 
 
             // STEP 2: GET THE CACHED MOLCHAR OBJECT OR CREATE ONE IF IT DOESN'T EXIST IN THE MAP, KEY is sampleid__passage__technology
-            MolecularCharacterization molecularCharacterization;
-            String passage = (data.get(omicPassage) == null) ? findMyPassage(modelCreation, data.get(omicSampleID), data.get(omicSampleOrigin)) : data.get(omicPassage);
+            MolecularCharacterization molecularCharacterization = null;
+            passage = (data.get(omicPassage) == null) ? findMyPassage(modelCreation, data.get(omicSampleID), data.get(omicSampleOrigin)) : data.get(omicPassage);
 
 
             String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "__" + data.get(omicSampleOrigin);
 
-            if(molcharMap.containsKey(molcharKey)){
 
-                molecularCharacterization = molcharMap.get(molcharKey);
+
+
+            if(existingMolcharNodes.containsKey(molcharKey)){
+                molecularCharacterization = existingMolcharNodes.get(molcharKey);
+            }
+            else if(toBeCreatedMolcharNodes.containsKey(molcharKey)){
+                molecularCharacterization = toBeCreatedMolcharNodes.get(molcharKey);
             }
             else{
-
+                log.info("Looking at molchar "+molcharKey);
+                log.info("Existing keys: ");
+                log.info(existingMolcharNodes.keySet().toString());
                 molecularCharacterization = new MolecularCharacterization();
                 molecularCharacterization.setType(dataType);
                 molecularCharacterization.setPlatform(platform);
-                molcharMap.put(molcharKey, molecularCharacterization);
+                toBeCreatedMolcharNodes.put(molcharKey, molecularCharacterization);
             }
 
 
             //step 3: get the marker suggestion from the service
-            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, modelCreation.getSourcePdxId(), data.get(omicHgncSymbol), dataType, technology);
+            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, modelCreation.getSourcePdxId(), data.get(omicHgncSymbol), dataType, platformName);
 
             Marker marker;
 
@@ -135,7 +195,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 //log.info("Found an unrecognised Marker Symbol {} in Model: {}, Skipping This!!!! ", data.get(omicHgncSymbol), modelID);
                 //log.info(data.toString());
 
-                reportManager.addMessage(nsdto.getLogEntity());
+               // reportManager.addMessage(nsdto.getLogEntity());
                 count++;
                 continue;
             }
@@ -172,8 +232,18 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         log.info("loaded " + totalData + " markers for " + modelID);
 
 
-        //PHASE 2: get objects from cache and persist them
-        for(Map.Entry<String, MolecularCharacterization> mcEntry : molcharMap.entrySet()){
+        //PHASE 2: save existing molchars with new data
+        log.info("Saving existing molchars for model "+modelID);
+        for(Map.Entry<String, MolecularCharacterization> mcEntry : existingMolcharNodes.entrySet()){
+
+               dataImportService.saveMolecularCharacterization(mcEntry.getValue());
+
+        }
+
+
+        log.info("Saving new molchars for model "+modelID);
+        //PHASE 3: get objects from cache and persist them
+        for(Map.Entry<String, MolecularCharacterization> mcEntry : toBeCreatedMolcharNodes.entrySet()){
 
             String mcKey = mcEntry.getKey();
             MolecularCharacterization mc = mcEntry.getValue();
