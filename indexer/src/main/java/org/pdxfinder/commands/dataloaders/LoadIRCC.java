@@ -200,8 +200,11 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
             EngraftmentSite is = dataImportService.getImplantationSite(specimenJSON.getString("Engraftment Site"));
             specimen.setEngraftmentSite(is);
 
-            EngraftmentType it = dataImportService.getImplantationType(specimenJSON.getString("Engraftment Type"));
+            EngraftmentType it = dataImportService.getImplantationType("Heterotopic");
             specimen.setEngraftmentType(it);
+
+            EngraftmentMaterial em = dataImportService.getEngraftmentMaterial(specimenJSON.getString("Engraftment Type"));
+            specimen.setEngraftmentMaterial(em);
 
             Sample specSample = new Sample();
 
