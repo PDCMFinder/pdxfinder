@@ -6,11 +6,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.admin.pojos.MappingContainer;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.dao.Sample;
-import org.pdxfinder.graph.dao.SampleToOntologyRelationShip;
+import org.pdxfinder.graph.dao.SampleToOntologyRelationship;
 import org.pdxfinder.ontologymapping.MissingMapping;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.DataImportService;
@@ -304,7 +303,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                         this.missingTerms.add(me.getMappedTermLabel());
                     } else {
                         ot.setDirectMappedSamplesNumber(ot.getDirectMappedSamplesNumber() + 1);
-                        SampleToOntologyRelationShip r = new SampleToOntologyRelationShip(me.getMapType(), me.getJustification(), sample, ot);
+                        SampleToOntologyRelationship r = new SampleToOntologyRelationship(me.getMapType(), me.getJustification(), sample, ot);
                         sample.setSampleToOntologyRelationShip(r);
                         ot.setMappedTo(r);
                         dataImportService.saveSample(sample);

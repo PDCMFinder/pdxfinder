@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -27,23 +29,11 @@ import javax.annotation.PostConstruct;
  */
 @Component
 @Order(value = -17)
+@PropertySource("classpath:loader.properties")
+@ConfigurationProperties(prefix = "mda")
 public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadMDAnderson.class);
-
-    private final static String DATASOURCE_ABBREVIATION = "PDXNet-MDAnderson";
-    private final static String DATASOURCE_NAME = "MD Anderson Cancer Center";
-    private final static String DATASOURCE_DESCRIPTION = "University Texas MD Anderson PDX mouse models for PDXNet.";
-    private final static String DATASOURCE_CONTACT = "bfang@mdanderson.org";
-    private final static String SOURCE_URL = null;
-
-    private final static String PROVIDER_TYPE = "";
-    private final static String ACCESSIBILITY = "";
-
-    private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
-
-    // for now all samples are of tumor tissue
-    private final static Boolean NORMAL_TISSUE_FALSE = false;
 
     //   private HostStrain nsgBS;
     private Group mdaDS;
@@ -54,11 +44,8 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private DataImportService dataImportService;
     private Session session;
 
-    @Autowired
-    private UtilityService utilityService;
 
     @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
@@ -70,8 +57,8 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadMDAnderson(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
+    public LoadMDAnderson(UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
     }
 
     @Override
@@ -122,19 +109,11 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
         dto = new LoaderDTO();
         rootDataDirectory = dataRootDir;
-        dataSource = DATASOURCE_ABBREVIATION;
-        filesDirectory = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/";
-        dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
-        dataSourceContact = DATASOURCE_CONTACT;
+        dataSource = dataSourceAbbreviation;
+        filesDirectory = dataRootDir + dataSourceAbbreviation + "/pdx/";
     }
 
     // MD ANDERSON uses default implementation Steps step01GetMetaDataFolder, step02GetMetaDataJSON
-
-    @Override
-    protected void step03CreateProviderGroup() {
-
-        loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, DATASOURCE_CONTACT, SOURCE_URL);
-    }
 
     @Override
     protected void step04CreateNSGammaHostStrain() {
@@ -146,19 +125,6 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
     }
 
-    @Override
-    protected void step06CreateProjectGroup() {
-
-        loadProjectGroup("PDXNet");
-    }
-
-
-    @Override
-    protected void step07GetPDXModels() {
-
-        loadPDXModels(metaDataJSON,"MDA");
-    }
-
 
     // MD ANDERSON uses default implementation Steps step08GetMetaData, step09LoadPatientData
 
@@ -166,7 +132,7 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step10LoadExternalURLs() {
 
-        loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
+        loadExternalURLs(dataSourceContact,Standardizer.NOT_SPECIFIED);
 
     }
 

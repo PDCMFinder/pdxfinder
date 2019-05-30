@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Created by csaba on 16/11/2017.
  */
 @RelationshipEntity(type="MAPPED_TO")
-public class SampleToOntologyRelationShip {
+public class SampleToOntologyRelationship {
 
     @GraphId
     private Long relationshipId;
@@ -24,11 +24,11 @@ public class SampleToOntologyRelationShip {
     @EndNode
     private OntologyTerm ontologyTerm;
 
-    public SampleToOntologyRelationShip() {
+    public SampleToOntologyRelationship() {
     }
 
     @Autowired
-    public SampleToOntologyRelationShip(String type, String justification, Sample sample, OntologyTerm ontologyTerm) {
+    public SampleToOntologyRelationship(String type, String justification, Sample sample, OntologyTerm ontologyTerm) {
         this.type = type;
         this.justification = justification;
         this.sample = sample;

@@ -192,6 +192,49 @@ public class MappingService {
     }
 
 
+    public MappingContainer getDiagnosisMappingsByDS(List<String> ds){
+
+
+        if(existingDiagnosisMappings == null){
+
+            loadSavedDiagnosisMappings();
+        }
+
+        //no filter, return everything
+        if(ds == null) return existingDiagnosisMappings;
+
+        MappingContainer mc = new MappingContainer();
+
+        for(MappingEntity me: existingDiagnosisMappings.getMappings().values()){
+
+            if(me.getEntityType().equals("DIAGNOSIS")){
+
+                for(String dataSource : ds){
+
+                    if(dataSource.toLowerCase().equals(me.getMappingValues().get("DataSource").toLowerCase())){
+                        //clone object but purge keys
+                        MappingEntity me2 = new MappingEntity();
+                        me2.setEntityId(me.getEntityId());
+                        me2.setEntityType(me.getEntityType());
+                        me2.setMappingLabels(me.getMappingLabels());
+                        me2.setMappingValues(me.getMappingValues());
+                        me2.setMappedTermUrl(me.getMappedTermUrl());
+                        me2.setMappedTermLabel(me.getMappedTermLabel());
+                        me2.setMapType(me.getMapType());
+                        me2.setJustification(me.getJustification());
+                        me2.setStatus(me.getStatus());
+                        me2.setSuggestedMappings(me.getSuggestedMappings());
+
+                        mc.add(me2);
+                    }
+                }
+            }
+        }
+
+        return mc;
+
+    }
+
     public void saveMappingsToFile(String fileName, Collection<MappingEntity> maprules){
 
         Map<String, Collection<MappingEntity>> mappings = new HashMap<>();

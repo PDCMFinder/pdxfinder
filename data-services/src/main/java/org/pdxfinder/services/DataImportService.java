@@ -67,6 +67,7 @@ public class DataImportService {
     private TreatmentProtocolRepository treatmentProtocolRepository;
     private CurrentTreatmentRepository currentTreatmentRepository;
     private ExternalUrlRepository externalUrlRepository;
+    private DrugRepository drugRepository;
 
     private final static Logger log = LoggerFactory.getLogger(DataImportService.class);
 
@@ -98,7 +99,8 @@ public class DataImportService {
                              TreatmentSummaryRepository treatmentSummaryRepository,
                              TreatmentProtocolRepository treatmentProtocolRepository,
                              CurrentTreatmentRepository currentTreatmentRepository,
-                             ExternalUrlRepository externalUrlRepository) {
+                             ExternalUrlRepository externalUrlRepository,
+                             DrugRepository drugRepository) {
 
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null");
         Assert.notNull(hostStrainRepository, "hostStrainRepository cannot be null");
@@ -140,6 +142,7 @@ public class DataImportService {
         this.treatmentProtocolRepository = treatmentProtocolRepository;
         this.currentTreatmentRepository = currentTreatmentRepository;
         this.externalUrlRepository = externalUrlRepository;
+        this.drugRepository = drugRepository;
 
         this.markersBySymbol = new HashMap<>();
         this.markersByPrevSymbol = new HashMap<>();
@@ -243,7 +246,7 @@ public class DataImportService {
     public ExternalUrl getExternalUrl(ExternalUrl.Type type, String url) {
         ExternalUrl externalUrl = externalUrlRepository.findByTypeAndUrl(type.getValue(), url);
         if (externalUrl == null) {
-            log.info("External URL '{}' not found. Creating", type);
+            //log.info("External URL '{}' not found. Creating", type);
             externalUrl = new ExternalUrl(
                     type,
                     url);
@@ -321,7 +324,10 @@ public class DataImportService {
         return modelCreationRepository.findBySourcePdxIdAndDataSourceWithSpecimensAndHostStrain(modelId, dataSource);
     }
 
+    public ModelCreation findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(String modelId, String dataSource){
 
+        return modelCreationRepository.findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(modelId, dataSource);
+    }
 
     public void saveModelCreation(ModelCreation modelCreation){
         this.modelCreationRepository.save(modelCreation);
@@ -581,6 +587,10 @@ public class DataImportService {
         return sampleRepository.findHumanSampleWithMolcharByModelIdAndDataSource(modelId, dataSource);
     }
 
+    public List<MolecularCharacterization> findAllMolcharByDataSource(String dataSource){
+
+        return molecularCharacterizationRepository.findAllByDataSource(dataSource);
+    }
 
     public Sample getHumanSample(String sampleId, String dataSource){
 
@@ -899,6 +909,11 @@ public class DataImportService {
         return markerRepository.findAllHumanMarkers();
     }
 
+    public Set<Marker> findAllDistinctMarkersByMolCharId(Long id){
+
+        return markerRepository.findDistinctByMolCharId(id);
+    }
+
     public Platform getPlatform(String name, Group group) {
 
         //remove special characters from platform name
@@ -1025,6 +1040,10 @@ public class DataImportService {
         return ct;
     }
 
+
+    public void createDrug(Drug d){
+        drugRepository.save(d);
+    }
 
 
     /**

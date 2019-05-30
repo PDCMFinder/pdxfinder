@@ -26,7 +26,9 @@ public class Marker {
     String ncbiGeneId;
     String uniprotId;               // e.g For human KRAS : P01116
 
+    @Index
     Set<String> prevSymbols;
+    @Index
     Set<String> aliasSymbols;       // This was formerly called synonymns
 
 

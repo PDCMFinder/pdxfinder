@@ -1,12 +1,5 @@
 package org.pdxfinder.commands.dataloaders;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.neo4j.ogm.session.Session;
@@ -15,20 +8,21 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 
+import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.*;
@@ -39,32 +33,23 @@ import org.apache.poi.ss.usermodel.*;
  * Created by csaba on 06/08/2018.
  */
 
-@Component
-@Order(value = 0)
+
 /**
  *
  * aka UPDOG: Universal PdxData tO Graph
  *
  * We should call it UPDOG. And it sets up a good joke. Any newcomer says "What's UPDOG?" we can say "Nothing much, what's up with you?"
  */
-public class UniversalLoader implements CommandLineRunner, ApplicationContextAware {
+@Component
+public class UniversalLoader extends UniversalLoaderOmic {
 
     private final static Logger log = LoggerFactory.getLogger(UniversalLoader.class);
 
-    Logger logger = LoggerFactory.getLogger(UniversalLoader.class);
-
-    private Options options;
-    private CommandLineParser parser;
-    private CommandLine cmd;
-    private HelpFormatter formatter;
-
-    private DataImportService dataImportService;
     private Session session;
 
     static ApplicationContext context;
     ReportManager reportManager;
 
-    @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
 
     /**
@@ -121,91 +106,21 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
     private Boolean stopLoading;
 
+    private Set<String> modelIDs;
 
-    @PostConstruct
-    public void init() {
-        formatter = new HelpFormatter();
+    public UniversalLoader(ReportManager reportManager, UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
+        this.reportManager = reportManager;
     }
 
-    public UniversalLoader(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
-    }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void initTemplate(String templateFileStr) throws Exception{
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadUniversal", "Running universal loader (UPDOG)");
-        parser.accepts("loadALL", "Load all, running universal loader (UPDOG)");
-        OptionSet options = parser.parse(args);
+        FileInputStream excelFile = new FileInputStream(new File(templateFileStr));
+        Workbook workbook = new XSSFWorkbook(excelFile);
+        log.info("Loading template from " + templateFileStr);
+        initializeTemplateData(workbook);
 
-        if (options.has("loadUniversal") || options.has("loadALL")) {
-
-            reportManager = (ReportManager) context.getBean("ReportManager");
-
-
-            File folder = new File(dataRootDir + "UPDOG/");
-
-            if (folder.exists()) {
-
-                File[] updogDirs = folder.listFiles();
-
-                if (updogDirs.length == 0) {
-
-                    log.warn("No subdirs found for the universal loader, skipping");
-                } else {
-
-                    for (int i = 0; i < updogDirs.length; i++) {
-
-                        if (updogDirs[i].isDirectory()) {
-
-                            String templateFileStr = dataRootDir + "UPDOG/" + updogDirs[i].getName() + "/template.xlsx";
-
-                            File template = new File(templateFileStr);
-
-                            //found the template, load it
-                            if (template.exists()) {
-
-                                log.info("******************************************************");
-                                log.info("* Starting universal loader                          *");
-                                log.info("******************************************************");
-
-
-                                FileInputStream excelFile = new FileInputStream(new File(templateFileStr));
-
-                                Workbook workbook = new XSSFWorkbook(excelFile);
-                                log.info("Loading template from " + templateFileStr);
-
-                                initializeTemplateData(workbook);
-
-                                loadTemplateData();
-
-                                workbook.close();
-                                excelFile.close();
-
-                                log.info("******************************************************");
-                                log.info("* Finished running universal loader                  *");
-                                log.info("******************************************************");
-
-                            } else {
-
-                                log.error("No template file found for universal loader in " + updogDirs[i]);
-                            }
-
-                        }
-                    }
-                }
-
-            }
-            //NO UNIVERSAL TEMPLATES, SKIP
-            else {
-
-                log.warn("No UPDOG directory found. Who let the dog out?");
-            }
-
-
-        }
     }
 
 
@@ -294,18 +209,21 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
             //check if there is some data in the row and they are not all nulls
             if (dataRow.size() > 0 && !isRowOfNulls(dataRow)) {
 
-               sheetData.add(dataRow);
-                
+                sheetData.add(dataRow);
+
 
             }
 
         }
     }
 
+
+
+
     /**
      * Loads the data from the lists into the DB
      */
-    private void loadTemplateData() {
+    public void loadTemplateData() {
 
         //:: DON'T CHANGE THE ORDER OF THESE METHODS UNLESS YOU WANT TO RISK THE UNIVERSE TO COLLAPSE!
         createDataSourceGroup();
@@ -320,11 +238,14 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
         createDerivedPatientModelDataset();
 
+        createVariationData();
+
         createSharingAndContacts();
 
         createBreastAndOrColorectalData();
 
     }
+
 
     private void createDataSourceGroup() {
 
@@ -333,6 +254,8 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
         log.info("******************************************************");
         log.info("* Creating DataSource                                *");
         log.info("******************************************************");
+
+
 
         if (loaderRelatedDataSheetData.size() != 1) {
             stopLoading = true;
@@ -817,6 +740,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
         }
     }
 
+
     private void createDerivedPatientModelDataset() {
 
         if (stopLoading) return;
@@ -826,10 +750,12 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
         log.info("******************************************************");
 
         int row = 6;
+        this.modelIDs = new HashSet<>();
 
         for (List<String> derivedDatasetRow : derivedDatasetSheetData) {
 
             String sampleId = derivedDatasetRow.get(0);
+
             String origin = derivedDatasetRow.get(1);
             String passage = derivedDatasetRow.get(2);
             String nomenclature = derivedDatasetRow.get(3);
@@ -867,14 +793,16 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                     platform = dataImportService.getPlatform(platformName, ds);
                     MolecularCharacterization mc = new MolecularCharacterization();
                     mc.setPlatform(platform);
-                    mc.setType(molCharType);
+                    mc.setType(molCharType.toLowerCase());
                     mc.setTechnology(platformTechnology);
                     sample.addMolecularCharacterization(mc);
+                    sample.setSourceSampleId(sampleId);
                     dataImportService.saveSample(sample);
 
                 } else {
 
                     log.error("Unknown human sample with id: " + sampleId);
+                    row++;
                     continue;
                 }
 
@@ -884,7 +812,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
             //xenograft sample
             //specimen should have been created before
-            else if (origin.toLowerCase().equals("xenograft")) {
+            else if (origin.toLowerCase().equals("engrafted tumor") || origin.toLowerCase().equals("engrafted tumour") || origin.toLowerCase().equals("xenograft") ) {
 
                 if (passage == null || passage.isEmpty() || passage.toLowerCase().equals("not specified")) {
 
@@ -923,13 +851,14 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                     if(sample == null) {
 
                         sample = new Sample();
+                        sample.setSourceSampleId(sampleId);
 
                     }
 
                     platform = dataImportService.getPlatform(platformName, ds);
                     MolecularCharacterization mc = new MolecularCharacterization();
                     mc.setPlatform(platform);
-                    mc.setType(molCharType);
+                    mc.setType(molCharType.toLowerCase());
                     mc.setTechnology(platformTechnology);
                     sample.addMolecularCharacterization(mc);
                     model.addRelatedSample(sample);
@@ -939,14 +868,15 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                     model.addSpecimen(specimen);
                     model.addRelatedSample(sample);
                     dataImportService.saveModelCreation(model);
+                    dataImportService.saveSpecimen(specimen);
                     dataImportService.saveSample(sample);
 
+                    //log.info(" Specimen with the following details was created: "+modelId+" "+passage+" "+nomenclature+ " in row: "+row);
                 }
                 else{
                     // either specimen with passage or the host strain nomenclature was not created
                     log.error("Cannot find specimen with the following details: "+modelId+" "+passage+" "+nomenclature+ " in row: "+row);
                 }
-
 
             }
             else{
@@ -954,12 +884,116 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                 log.error("Unknown sample origin in row "+row);
             }
 
+            this.modelIDs.add(modelId);
             row++;
+        }
+
+    }
+
+
+
+
+    private void createVariationData() {
+
+        log.info("******************************************************");
+        log.info("*                 Loading Omic Data                  *");
+        log.info("******************************************************");
+        log.info(this.modelIDs.toString());
+
+        omicDataSource= ds.getAbbreviation();
+        dataSourceAbbreviation = loaderRelatedDataSheetData.get(0).get(1);
+        dataRootDirectory = dataRootDir+ "UPDOG/";
+
+        omicModelID = "Model_ID";
+        omicSampleID = "Sample_ID";
+        omicSampleOrigin = "sample_origin";
+        omicPassage = "Passage";
+        omicHostStrainName = "host_strain_name";
+        omicHgncSymbol = "hgnc_symbol";
+        omicAminoAcidChange = "amino_acid_change";
+        omicNucleotideChange = "nucleotide_change";
+        omicConsequence = "consequence";
+        omicReadDepth = "read_depth";
+        omicAlleleFrequency = "Allele_frequency";
+        omicChromosome = "chromosome";
+        omicSeqStartPosition = "seq_start_position";
+        omicRefAllele = "ref_allele";
+        omicAltAllele = "alt_allele";
+        omicUcscGeneId = "ucsc_gene_id";
+        omicNcbiGeneId = "ncbi_gene_id";
+        omicEnsemblGeneId = "ensembl_gene_id";
+        omicEnsemblTranscriptId = "ensembl_transcript_id";
+        omicRsIdVariants = "rs_id_Variant";
+        omicGenomeAssembly = "genome_assembly";
+        omicPlatform = "Platform";
+
+        omicSeqEndPosition = "seq_end_position";
+        omicCnaLog10RCNA = "log10R_cna";
+        omicCnaLog2RCNA = "log2R_cna";
+        omicCnaCopyNumberStatus = "copy_number_status";
+        omicCnaGisticvalue = "gistic_value_cna";
+        omicCnaPicnicValue = "picnic_value";
+
+        platformURL = new HashMap<>();
+        platformURL.put("Targeted_NGS","/platform/targeted-ngs/");
+        platformURL.put("CGH_array","/platform/cgh-array/");
+
+        if (dataSourceAbbreviation.equals("CRL")){
+            omicDataFilesType = "ONE_FILE_PER_MODEL";
+            omicFileExtension = "csv";
+        }else {
+            omicDataFilesType = "ALL_MODELS_IN_ONE_FILE";
+            omicFileExtension = "xlsx";
+        }
+
+
+        String mutationDataDir = dataRootDirectory+dataSourceAbbreviation+"/mut/";
+        String cnaDataDir = dataRootDirectory+dataSourceAbbreviation+"/cna/";
+
+        File mutationData = new File(mutationDataDir);
+        File cnaData = new File(cnaDataDir);
+
+
+        log.info(mutationDataDir);
+        log.info(cnaDataDir);
+        for (String modelId : this.modelIDs){
+
+            ModelCreation modelCreation = dataImportService.findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(modelId, ds.getAbbreviation());
+
+            if(modelCreation != null){
+
+                // Mutation Data Load
+                if (mutationData.exists()) {
+                    log.info("Loading mutation for "+modelId);
+                    loadOmicData(modelCreation, ds, "mutation");
+                }
+
+                // Copy Number Alteration Data Load
+                if (cnaData.exists()){
+                    log.info("Loading cna for "+modelId);
+                    loadOmicData(modelCreation, ds, "copy number alteration");
+                }
+                else{
+                    log.info("No omic data for model "+modelId);
+                }
+            }
+            else{
+
+                log.error("Cannot load omic data for missing model: "+modelId);
+            }
+
         }
 
 
 
+
+
+
     }
+
+
+
+
 
 
     private void createSharingAndContacts() {
@@ -1131,7 +1165,7 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
 
 
                 }
-                else if(origin.toLowerCase().equals("xenograft")){
+                else if(origin.toLowerCase().equals("xenograft") || origin.toLowerCase().equals("engrafted tumor") || origin.toLowerCase().equals("engrafted tumour")){
 
                     //need this trick to get rid of 0.0 if there is any
                     int passageInt = (int) Float.parseFloat(passage);
@@ -1170,6 +1204,10 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
                         xenoMolChars.put(mapKey, mc);
                     }
 
+                }
+                else{
+                    //origin is not patient nor xenograft
+                    log.error("Unknown sample origin in row "+row);
                 }
 
             }
@@ -1284,9 +1322,48 @@ public class UniversalLoader implements CommandLineRunner, ApplicationContextAwa
         return null;
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        context = applicationContext;
+
+    public List<List<String>> getPatientSheetData() {
+        return patientSheetData;
     }
 
+    public List<List<String>> getPatientTumorSheetData() {
+        return patientTumorSheetData;
+    }
+
+    public List<List<String>> getPatientTreatmentSheetData() {
+        return patientTreatmentSheetData;
+    }
+
+    public List<List<String>> getPdxModelSheetData() {
+        return pdxModelSheetData;
+    }
+
+    public List<List<String>> getPdxModelValidationSheetData() {
+        return pdxModelValidationSheetData;
+    }
+
+    public List<List<String>> getDerivedDatasetSheetData() {
+        return derivedDatasetSheetData;
+    }
+
+    public List<List<String>> getSharingAndContactSheetData() {
+        return sharingAndContactSheetData;
+    }
+
+    public List<List<String>> getBreastAndOrColorectalDiagnoSheetData() {
+        return breastAndOrColorectalDiagnoSheetData;
+    }
+
+    public List<List<String>> getLoaderRelatedDataSheetData() {
+        return loaderRelatedDataSheetData;
+    }
+
+    public String getDataRootDir() {
+        return dataRootDir;
+    }
+
+    public void setDataRootDir(String dataRootDir) {
+        this.dataRootDir = dataRootDir;
+    }
 }

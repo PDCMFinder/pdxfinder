@@ -1,6 +1,7 @@
 package org.pdxfinder.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.*;
 import org.pdxfinder.services.ds.AutoCompleteOption;
 import org.pdxfinder.services.dto.*;
@@ -13,10 +14,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /*
  * Created by csaba on 03/05/2018.
@@ -35,6 +33,9 @@ public class AjaxController {
     PdfService pdfService;
 
     @Autowired
+    private SearchService searchService;
+
+    @Autowired
     public AjaxController(AutoCompleteService autoCompleteService,
                           PlatformService platformService,
                           MolCharService molCharService,
@@ -48,6 +49,54 @@ public class AjaxController {
         this.detailsService = detailsService;
         this.drugService = drugService;
         this.graphService = graphService;
+    }
+
+
+
+    @GetMapping("/cytogenetics")
+    public String getCytogeneticsCombination(){
+
+
+        String modelID = "";
+        List<String> results = new ArrayList<>();
+
+        String rowData = "";
+
+        List<String> markerFilter = Arrays.asList("ERBB2","PGR","ESR1");
+
+        List<ModelCreation> models = searchService.getModelsByMolcharType("cytogenetics");
+
+        for(ModelCreation modelCreation : models){
+
+            modelID = modelCreation.getSourcePdxId();
+
+            Set<Sample> samples = modelCreation.getRelatedSamples();
+
+            for (Sample sample : samples){
+
+                Set<MolecularCharacterization> molchars = sample.getMolecularCharacterizations();
+
+                for (MolecularCharacterization molchar : molchars){
+
+                    List<MarkerAssociation> markerAssocs = molchar.getMarkerAssociations();
+
+                    results = new ArrayList<>();
+
+                    for (MarkerAssociation mAssoc : markerAssocs){
+
+                        boolean inTheList = markerFilter.stream().anyMatch(str -> str.equals(mAssoc.getMarker().getHgncSymbol()));
+
+                        if (inTheList) {
+                            results.add(mAssoc.getMarker().getHgncSymbol() + " " + mAssoc.getCytogeneticsResult());
+                        }
+                    }
+                }
+            }
+
+            rowData += results+"<br>";
+        }
+
+        return rowData;
     }
 
     @RequestMapping(value = "/drugnames")
@@ -97,7 +146,7 @@ public class AjaxController {
     }
 
 
-    @RequestMapping(value = "/modeldata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+   /*  @RequestMapping(value = "/modeldata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public VariationDataDTO postVariationDataByPlatform(@PathVariable String dataSrc,
                                                         @PathVariable String modelId,
                                                         @RequestParam(value="platform", required = false) String platform,
@@ -124,7 +173,7 @@ public class AjaxController {
     }
 
 
-    @RequestMapping(value = "/patientdata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+   @RequestMapping(value = "/patientdata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public VariationDataDTO postPatientVariationData(@PathVariable String dataSrc,
                                                      @PathVariable String modelId,
                                                      @RequestParam(value="platform", required = false) String platform,
@@ -169,7 +218,7 @@ public class AjaxController {
         return variationDataDTO;
 
     }
-
+    */
 
     @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
     public DetailsDTO details(@PathVariable String dataSrc,
@@ -219,27 +268,6 @@ public class AjaxController {
     }
 
 
-
-    //HELPER METHODS
-    public String getSortColumn(String sortcolumn){
-
-        Map<String, String> tableColumns = new HashMap<>();
-        tableColumns.put("0","msamp.sourceSampleId");
-        tableColumns.put("1","mAss.chromosome");
-        tableColumns.put("2","mAss.seqPosition");
-        tableColumns.put("3","mAss.refAllele");
-        tableColumns.put("4","mAss.altAllele");
-        tableColumns.put("5","mAss.consequence");
-        tableColumns.put("6","m.symbol");
-        tableColumns.put("7","mAss.aminoAcidChange");
-        tableColumns.put("8","mAss.aminoAcidChange");
-        tableColumns.put("9","mAss.alleleFrequency");
-        tableColumns.put("10","mAss.rsVariants");
-
-        return tableColumns.get(sortcolumn);
-    }
-
-
     @GetMapping("/pdx/{dataSrc}/{modelId:.+}/pdf-data")
     public Report pdfView(HttpServletRequest request,
                           @PathVariable String dataSrc,
@@ -268,4 +296,27 @@ public class AjaxController {
         return detailsService.getMolecularDataTable(molcharId);
 
     }
+
+    //HELPER METHODS
+    public String getSortColumn(String sortcolumn){
+
+        Map<String, String> tableColumns = new HashMap<>();
+        tableColumns.put("0","msamp.sourceSampleId");
+        tableColumns.put("1","mAss.chromosome");
+        tableColumns.put("2","mAss.seqPosition");
+        tableColumns.put("3","mAss.refAllele");
+        tableColumns.put("4","mAss.altAllele");
+        tableColumns.put("5","mAss.consequence");
+        tableColumns.put("6","m.symbol");
+        tableColumns.put("7","mAss.aminoAcidChange");
+        tableColumns.put("8","mAss.aminoAcidChange");
+        tableColumns.put("9","mAss.alleleFrequency");
+        tableColumns.put("10","mAss.rsVariants");
+
+        return tableColumns.get(sortcolumn);
+    }
+
+
+
+
 }

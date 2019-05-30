@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -171,5 +172,18 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
             "WHERE id(mc)= {id} " +
             "RETURN s")
     Sample findSampleByMolcharId(@Param("id") Long id);
+
+
+    @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(samp:Sample) " +
+            "-[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) WHERE molchar.type={molcharType} " +
+            "            WITH mod, ii, samp, char,molchar, assoc,mAss, aw,m " +
+            "            MATCH (molchar)-[pl:PLATFORM_USED]-(tech:Platform) " +
+            "            WHERE  mod.dataSource = {dataSource}  " +
+            "            AND    mod.sourcePdxId = {modelId}  " +
+
+            "            RETURN ii, samp, char,molchar, assoc,mAss, aw,m,pl,tech ")
+    Sample findHumanSampleBySourcePdxIdAndMolcharType(@Param("dataSource") String dataSource,
+                                                  @Param("modelId") String modelId,
+                                                  @Param("molcharType") String molcharType);
 
 }

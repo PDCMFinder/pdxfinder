@@ -1,7 +1,5 @@
 package org.pdxfinder.services.dto;
 
-import java.util.List;
-
 /*
  * Created by csaba on 13/03/2019.
  */
@@ -21,6 +19,8 @@ public class MolecularDataEntryDTO {
     private String molcharId;
 
     private String histology;
+    private String dataAssociated;
+    private String isVisible;
 
     public MolecularDataEntryDTO(String sampleId, String sampleType, String engraftedTumorPassage, String dataAvailableLabel,
                                  String dataAvailableUrl, String platformUsedLabel, String platformUsedUrl, String rawDataLabel,
@@ -134,5 +134,21 @@ public class MolecularDataEntryDTO {
 
     public void setMolcharId(String molcharId) {
         this.molcharId = molcharId;
+    }
+
+    public String getDataAssociated() {
+        return dataAssociated;
+    }
+
+    public void setDataAssociated(String dataAssociated) {
+        this.dataAssociated = dataAssociated;
+    }
+
+    public String getIsVisible() {
+        return isVisible;
+    }
+
+    public void setIsVisible(String isVisible) {
+        this.isVisible = isVisible;
     }
 }

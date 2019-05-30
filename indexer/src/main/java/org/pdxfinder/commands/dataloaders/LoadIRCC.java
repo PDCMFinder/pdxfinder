@@ -45,11 +45,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private DataImportService dataImportService;
     private Session session;
-
-    @Autowired
-    private UtilityService utilityService;
 
     // samples -> markerAsssociations
     private HashMap<String, HashSet<MarkerAssociation>> markerAssociations = new HashMap();
@@ -69,8 +65,8 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadIRCC(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
+    public LoadIRCC(UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
     }
 
     @Override
@@ -133,11 +129,12 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
             step17LoadModelDosingStudies();
 
+            step16LoadVariationData();
+
         }
 
         step15LoadImmunoHistoChemistry();
 
-        step16LoadVariationData();
     }
 
 
@@ -157,35 +154,9 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
 
     @Override
-    protected void step03CreateProviderGroup() {
+    protected void step05CreateNSHostStrain() {
 
-        loadProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription,  "", dataSourceContact, sourceURL);
     }
-
-    @Override
-    protected void step04CreateNSGammaHostStrain() {
-
-        loadNSGammaHostStrain(nsgBsSymbol, nsgbsURL, nsgBsName, nsgBsName);
-    }
-
-    @Override
-    protected void step05CreateNSHostStrain() { }
-
-
-    @Override
-    protected void step06CreateProjectGroup() {
-
-        loadProjectGroup("EurOPDX");
-    }
-
-
-    @Override
-    protected void step07GetPDXModels() {
-
-        loadPDXModels(metaDataJSON,"IRCC");
-    }
-
-
 
     // IRCC uses default implementation of Steps step08GetMetaData, step09LoadPatientData
 
@@ -229,8 +200,11 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
             EngraftmentSite is = dataImportService.getImplantationSite(specimenJSON.getString("Engraftment Site"));
             specimen.setEngraftmentSite(is);
 
-            EngraftmentType it = dataImportService.getImplantationType(specimenJSON.getString("Engraftment Type"));
+            EngraftmentType it = dataImportService.getImplantationType("Heterotopic");
             specimen.setEngraftmentType(it);
+
+            EngraftmentMaterial em = dataImportService.getEngraftmentMaterial(specimenJSON.getString("Engraftment Type"));
+            specimen.setEngraftmentMaterial(em);
 
             Sample specSample = new Sample();
 
@@ -262,7 +236,15 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step16LoadVariationData() {
 
-        String variationURLStr = dataRootDir+dataSourceAbbreviation+"/mut/data.json";
+        log.info("Loading WGS for model " + dto.getModelCreation().getSourcePdxId());
+
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation");
+
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"copy number alteration");
+
+
+
+/*      String variationURLStr = dataRootDir+dataSourceAbbreviation+"/mut/data.json";
         String platformName = "TargetedNGS_MUT";
         String molcharType = "mutation";
 
@@ -452,7 +434,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
                 }
 
             }
-        }
+        }*/
 
 
     }

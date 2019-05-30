@@ -42,12 +42,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private DataImportService dataImportService;
-    private Session session;
-
-    @Autowired
-    private UtilityService utilityService;
-
+    /*private Session session;
 
     @Value("${pdmrpdx.variation.max}")
     private int maxVariations;
@@ -57,14 +52,15 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
     HashMap<String, String> passageMap = null;
     HashMap<String, Image> histologyMap = null;
+    */
 
     @PostConstruct
     public void init() {
         formatter = new HelpFormatter();
     }
 
-    public LoadPDMRData(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
+    public LoadPDMRData(UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
     }
 
 
@@ -112,33 +108,15 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
     // PDMR uses default implementation Steps step02GetMetaDataJSON
 
-
     @Override
-    protected void step03CreateProviderGroup() {
+    protected void step05CreateNSHostStrain() {
 
-        loadProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription, providerType,  dataSourceContact, sourceURL);
     }
-
-    @Override
-    protected void step04CreateNSGammaHostStrain() {
-
-        loadNSGammaHostStrain(nsgBsSymbol, nsgbsURL, nsgBsName, nsgBsName);
-    }
-
-    @Override
-    protected void step05CreateNSHostStrain() { }
 
 
     @Override
     protected void step06CreateProjectGroup() {
 
-    }
-
-
-    @Override
-    protected void step07GetPDXModels() {
-
-        loadPDXModels(metaDataJSON,"pdxInfo");
     }
 
     // PDMR uses default implementation Steps step08GetMetaData
@@ -155,7 +133,6 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     protected void step10LoadExternalURLs() {
 
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
-
         loadExternalURLs(dataSourceContact, dto.getSourceURL());
     }
 
@@ -314,7 +291,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
         log.info("Loading NGS for model " + dto.getModelCreation().getSourcePdxId());
 
-        loadOmicData(dto.getModelCreation(),"mutation");
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(), "mutation");
     }
 
 

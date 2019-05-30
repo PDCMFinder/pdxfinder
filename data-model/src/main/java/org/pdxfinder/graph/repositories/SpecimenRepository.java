@@ -48,27 +48,17 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
 
     @Query("MATCH (mod:ModelCreation)-[sp:SPECIMENS]-(spec:Specimen)-[sfrm:SAMPLED_FROM]-(msamp:Sample)" +
-            "-[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
+            "-[char:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) WHERE molchar.type={molcharType} " +
             "            WITH mod, sp, spec, sfrm,msamp, char,molchar, assoc,mAss, aw,m " +
             "            MATCH (molchar)-[pl:PLATFORM_USED]-(tech:Platform) " +
 
             "            WHERE  mod.dataSource = {dataSource}  " +
             "            AND    mod.sourcePdxId = {modelId}  " +
-            "            AND    (tech.name = {tech}  OR {tech} = '' ) " +
-            "            AND    (spec.passage = {passage} OR {passage} = '' )" +
-
-            "            AND ( toLower(spec.externalId) CONTAINS toLower({search})" +
-            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search})" +
-            "            OR toLower(tech.name) CONTAINS toLower({search})" +
-            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) ) ) " +
 
             "            RETURN spec, sp, sfrm,msamp, char,molchar, assoc,mAss, aw,m,pl,tech ")
-    Page<Specimen> findSpecimenBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
-                                                        @Param("modelId") String modelId,
-                                                        @Param("tech") String tech,
-                                                        @Param("passage") String passage,
-                                                        @Param("search") String search, Pageable pageable);
-
+    List<Specimen> findSpecimenBySourcePdxId(@Param("dataSource") String dataSource,
+                                             @Param("modelId") String modelId,
+                                             @Param("molcharType") String molcharType);
 
 
 

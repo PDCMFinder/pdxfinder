@@ -34,7 +34,7 @@ public class Sample {
     private String dataSource;
 
     @Relationship(type="MAPPED_TO")
-    private SampleToOntologyRelationShip sampleToOntologyRelationShip;
+    private SampleToOntologyRelationship sampleToOntologyRelationShip;
 
     @Relationship(type = "OF_TYPE")
     private TumorType type;
@@ -155,11 +155,11 @@ public class Sample {
         this.molecularCharacterizations.add(mc);
     }
 
-    public SampleToOntologyRelationShip getSampleToOntologyRelationShip() {
+    public SampleToOntologyRelationship getSampleToOntologyRelationship() {
         return sampleToOntologyRelationShip;
     }
 
-    public void setSampleToOntologyRelationShip(SampleToOntologyRelationShip sampleToOntologyRelationShip) {
+    public void setSampleToOntologyRelationShip(SampleToOntologyRelationship sampleToOntologyRelationShip) {
         this.sampleToOntologyRelationShip = sampleToOntologyRelationShip;
     }
 

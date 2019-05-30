@@ -7,7 +7,7 @@ import java.util.List;
 /*
  * Created by csaba on 19/11/2018.
  */
-public class OneParamFilter extends GeneralFilter{
+public class OneParamCheckboxFilter extends GeneralFilter{
 
 
     private List<FacetOption> options;
@@ -15,7 +15,7 @@ public class OneParamFilter extends GeneralFilter{
     private List<String> selected;
 
 
-    public OneParamFilter(String name, String urlParam, Boolean isActive,String type,  List<FacetOption> options, List<String> selected) {
+    public OneParamCheckboxFilter(String name, String urlParam, Boolean isActive, String type, List<FacetOption> options, List<String> selected) {
         super(name, urlParam, isActive, type);
         this.options = options;
         this.selected = selected;
