@@ -89,6 +89,8 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
         step01GetMetaDataFolder();
 
+        if (skipThis) return;
+
         for (int i = 0; i < listOfFiles.length; i++) {
 
             if (listOfFiles[i].isFile()) {

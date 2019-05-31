@@ -44,7 +44,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
 
     protected ReportManager reportManager;
 
-
+    protected Boolean skipThis = false;
 
 
     public LoaderBase(UtilityService utilityService, DataImportService dataImportService) {
@@ -84,6 +84,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
             listOfFiles = folder.listFiles();
             if(listOfFiles.length == 0){
                 log.info("No file found for "+dataSource+", skipping");
+                skipThis = true;
             }
         }
         else{ log.info("Directory does not exist, skipping."); }
@@ -107,6 +108,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
             this.metaDataJSON = utilityService.parseFile(jsonFile);
         } else {
             log.info("No file found for " + dataSource + ", skipping");
+            skipThis = true;
         }
     }
 
@@ -312,6 +314,8 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
         step00StartReportManager();
 
         step02GetMetaDataJSON();
+
+        if (skipThis) return;
 
         step03CreateProviderGroup();
 
