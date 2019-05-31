@@ -50,7 +50,7 @@ public class ExportMappings implements CommandLineRunner {
 
         String fileName = "/Users/csaba/Downloads/saved_mappings.json";
 
-        List<String> dataSourcesToExport = new ArrayList<>(Arrays.asList("TRACE", "IRCC-CRC"));
+        List<String> dataSourcesToExport = new ArrayList<>(Arrays.asList("TRACE", "IRCC-CRC", "IRCC-GC", "Curie-LC", "Curie-BC"));
 
         mappingService.saveMappingsToFile(fileName, mappingService.getDiagnosisMappingsByDS(dataSourcesToExport).getMappings().values());
 
