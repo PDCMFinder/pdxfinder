@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Interface describing operations for adding/finding/deleting PDX strain records
@@ -29,7 +30,9 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "WITH model, spr, sp, hsr, hs, qar, qa, url, ext_url " +
             "OPTIONAL MATCH (sp)-[itr:ENGRAFTMENT_TYPE]-(it:EngraftmentType) "+
             "OPTIONAL MATCH (sp)-[isr:ENGRAFTMENT_SITE]-(is:EngraftmentSite) "+
-            "RETURN model, spr, sp, hsr, hs, itr, isr, it, is, qar, qa, url, ext_url")
+            "OPTIONAL MATCH (sp)-[ism:ENGRAFTMENT_MATERIAL]-(im:EngraftmentMaterial) "+
+
+            "RETURN model, spr, sp, hsr, hs, itr, isr, it, is, qar, qa, url, ext_url, ism, im")
     ModelCreation findByDataSourceAndSourcePdxId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
     @Query("MATCH (model:ModelCreation) WHERE model.sourcePdxId = {modelId} AND model.dataSource = {dataSource} RETURN model ")
@@ -178,7 +181,36 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN model, spr, sp, hsr, hs, sfr, s")
     ModelCreation findBySourcePdxIdAndDataSourceWithSpecimensAndHostStrain(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
 
+    @Query("MATCH (psamp:Sample)-[ir:IMPLANTED_IN]-(model:ModelCreation) WHERE model.sourcePdxId = {modelId} AND model.dataSource = {dataSource} " +
+            "WITH model, psamp, ir " +
+            "OPTIONAL MATCH (model)-[spr:SPECIMENS]-(sp:Specimen)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
+            "WITH model, spr, sp, hsr, hs, psamp, ir " +
+            "OPTIONAL MATCH (sp)-[sfr:SAMPLED_FROM]-(s:Sample) " +
+            "OPTIONAL MATCH (s)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[pur:PLATFORM_USED]-(pl:Platform) " +
+            "RETURN model, spr, sp, hsr, hs, sfr, s, psamp, ir, cbr, mc, pur, pl")
+    ModelCreation findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
 
     @Query("CREATE INDEX ON :ModelCreation(dataSource, sourcePdxId)")
     void createIndex();
+
+
+    @Query("MATCH (model:ModelCreation)-[msr:MODEL_SAMPLE_RELATION]-(samp:Sample)-[cby:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[asw:ASSOCIATED_WITH]-(massoc:MarkerAssociation)-[mark:MARKER]-(marker:Marker) WHERE molchar.type={molcharType} " +
+            "RETURN model, msr, samp, cby, molchar, asw, massoc, mark, marker")
+    List<ModelCreation> findByMolcharType(@Param("molcharType") String molcharType);
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

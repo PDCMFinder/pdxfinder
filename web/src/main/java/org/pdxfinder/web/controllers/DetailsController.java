@@ -4,6 +4,7 @@ package org.pdxfinder.web.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.apache.commons.collections4.ListUtils;
 import org.pdxfinder.services.DetailsService;
 import org.pdxfinder.services.PdfService;
 import org.pdxfinder.services.dto.DetailsDTO;
@@ -17,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 /*
@@ -50,34 +54,25 @@ public class DetailsController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, value = "/pdx/{dataSrc}/{modelId}/export")
+    @RequestMapping(method = RequestMethod.GET, value = "/pdx/{dataSrc}/{modelId}/{dataType}/export")
     @ResponseBody
     public String download(HttpServletResponse response,
                            @PathVariable String dataSrc,
-                           @PathVariable String modelId) {
+                           @PathVariable String modelId,
+                           @PathVariable String dataType) {
 
-        Set<String[]> variationDataCSV = detailsService.getVariationDataCSV(dataSrc, modelId);
-
+        List<List<String>> variationDataCSV = detailsService.getVariationDataByMolcharTypeCSV(dataSrc, modelId, dataType);
 
         CsvMapper mapper = new CsvMapper();
+        CsvSchema.Builder builder = CsvSchema.builder();
 
-        CsvSchema schema = CsvSchema.builder()
-                .addColumn("Sample ID")
-                .addColumn("Passage")
-                .addColumn("Histology")
-                .addColumn("Tumor type")
-                .addColumn("Chromosome")
-                .addColumn("Seq. Position")
-                .addColumn("Ref Allele")
-                .addColumn("Alt Allele")
-                .addColumn("Consequence")
-                .addColumn("Gene")
-                .addColumn("Amino Acid Change")
-                .addColumn("Read Depth")
-                .addColumn("Allele Freq")
-                .addColumn("RS Variant")
-                .addColumn("Platform")
-                .build().withHeader();
+        List<String> csvHead = detailsService.getCsvHead(dataType);
+
+        for (String head : csvHead){
+            builder.addColumn(head);
+        }
+        CsvSchema  schema = builder.build().withHeader();
+
 
         String output = "CSV output";
         try {
@@ -85,7 +80,7 @@ public class DetailsController {
         } catch (JsonProcessingException e) {}
 
         response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder.org_variation" + dataSrc + "_" + modelId + ".csv");
+        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder.org_"+dataType + dataSrc + "_" + modelId + ".csv");
         try{
             response.getOutputStream().flush();
         }catch (Exception e){

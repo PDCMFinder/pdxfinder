@@ -48,6 +48,7 @@ public class PdfService {
         );
 
 
+
         Map<String, String> patient = new LinkedHashMap<>();
 
         patient.put(Label.TXT_SEX, data.getPatientSex());

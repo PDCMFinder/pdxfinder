@@ -5,6 +5,7 @@ import joptsimple.OptionSet;
 import org.apache.commons.cli.HelpFormatter;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
@@ -35,8 +36,6 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
     private HelpFormatter formatter;
 
-    private DataImportService dataImportService;
-
     @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
 
@@ -45,8 +44,8 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    public LoadHCI(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
+    public LoadHCI(UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
     }
 
     @Override
@@ -86,40 +85,6 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step01GetMetaDataFolder() { }
 
-
-    @Override
-    protected void step03CreateProviderGroup() {
-
-        loadProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription, providerType, dataSourceContact, sourceURL);
-    }
-
-
-    @Override
-    protected void step04CreateNSGammaHostStrain() {
-
-        loadNSGammaHostStrain(nsgBsSymbol, nsgbsURL, nsgBsName, nsgBsName);
-    }
-
-
-    @Override
-    protected void step05CreateNSHostStrain() {
-
-        loadNSHostStrain(nsBsSymbol, nsBsURL, nsBsName);
-    }
-
-
-    @Override
-    protected void step06CreateProjectGroup() {
-
-        loadProjectGroup("PDXNet");
-    }
-
-
-    @Override
-    protected void step07GetPDXModels() {
-
-        loadPDXModels(metaDataJSON,"HCI");
-    }
 
 
     // HCI uses common implementation Steps step08GetMetaData,step09LoadPatientData default

@@ -37,7 +37,7 @@ public class PrintReport implements CommandLineRunner, ApplicationContextAware {
     private void printReport(){
 
         reportManager = (ReportManager) context.getBean("ReportManager");
-        reportManager.printMessages();
+        reportManager.printMessages("ERROR");
 
 
     }

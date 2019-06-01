@@ -62,6 +62,7 @@
         <!-- Suggested layout containers -->
         <section id="main-content-area" role="main">
 
+
             <div class="row">
                 <nav aria-label="You are here:" role="navigation">
                     <ul class="breadcrumbs columns">
@@ -839,7 +840,8 @@
                                                     <td th:text="${dataRow.molcharType}"> ...</td>
 
                                                     <td>
-                                                        <a class="molecularDataLink"
+                                                        <span th:if="${dataRow.isVisible == 'YES' and dataRow.dataAssociated != 'YES'}" th:text="'Data is not available in the Finder'"></span>
+                                                        <a th:if="${dataRow.dataAssociated == 'YES' or dataRow.isVisible == 'NO'}" class="molecularDataLink"
                                                            style="color: #06369d; text-decoration: none;"
                                                            data-th-attr="data-tabs-target=${dataRow.dataAvailableLabel},  aria-selected=( ${iter.index} == 0 ) ? 'true' : '' "
                                                            th:title="${dataRow.sampleId+' | '+data.mappedOntologyTermLabel+' | '+dataRow.sampleType+' | '+dataRow.engraftedTumorPassage+' | '+dataRow.platformUsedLabel}"
@@ -851,7 +853,7 @@
                                                     <td>
                                                         <a th:if="${dataRow.platformUsedUrl != null}" target="_blank"
                                                            style="color: #06369d; text-decoration: none;"
-                                                           th:text="${dataRow.platformUsedLabel}"
+                                                           th:text="${#strings.replace(dataRow.platformUsedLabel,'_',' ')}"
                                                            th:onclick="'window.open(\''+${dataRow.platformUsedUrl}+'\')'">
                                                             ...
                                                         </a>
@@ -896,22 +898,41 @@
 
 
 
+
                             <div class="columns medium-12 small-12 card-3" style="padding: 15px;">
 
 
+                                <div class="columns medium-6 small-12" id="download-data" style="float: right; margin-top:-65px; margin-right:-30px;">
 
-                                <div class="columns medium-6 small-12" id="sizeSwitch" style="float: right; margin-top:-65px; margin-right:-30px;">
+                                    <div class="columns medium-5 small-12 text-right" style="padding: 0px;">
+                                        <label class="dropdown">
+                                            <a class="button outline secondary">
+                                                Download Results <i class="icon icon-functional" data-icon="="></i>
+                                            </a>
+                                            <input type="checkbox" class="dd-input" id="test">
+
+                                            <ul class="dd-menu">
+                                                <li th:each="dataType,iter : ${data.dataTypes}">
+                                                    <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/'+${#strings.replace(dataType,' ','-')}+'/export'}"
+                                                       th:text="${#strings.capitalizeWords(dataType)}"> Download ... </a>
+                                                </li>
+
+                                                <li class="divider"></li>
+                                                <!--<li>
+                                                    <a target="_blank"
+                                                       style="color: #06369d; text-decoration: none;"
+                                                       th:onclick=" 'window.open(\''+${'https://pdmr.cancer.gov/content/docs/NCI_Cancer_Gene_Panel.pdf'}+'\')' "> Download All </a>
+                                                </li>
+                                                <li>
+                                                    <a target="_blank"> Downlload All </a>
+                                                </li>-->
+                                            </ul>
+                                        </label>
+                                    </div>
+
 
                                     <div id="customSearch" class="columns medium-7 small-12 text-right" style="padding: 0px;">
                                         <!-- Datatable Search Box -->
-                                    </div>
-
-                                    <div class="columns medium-5 small-12 text-right" style="padding: 0px;">
-                                        <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/export'}"
-                                           class="button outline secondary">
-                                            Download Results
-                                            <i class="icon icon-functional" data-icon="="></i>
-                                        </a>
                                     </div>
 
                                 </div>

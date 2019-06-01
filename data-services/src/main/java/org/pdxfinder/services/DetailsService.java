@@ -1,5 +1,6 @@
 package org.pdxfinder.services;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.graph.dao.*;
@@ -31,6 +32,7 @@ public class DetailsService {
     private MolecularCharacterizationRepository molecularCharacterizationRepository;
     private PlatformRepository platformRepository;
     private TreatmentSummaryRepository treatmentSummaryRepository;
+    private MarkerAssociationRepository markerAssociationRepository;
 
     private GraphService graphService;
     private Map<String, List<String>> facets = new HashMap<>();
@@ -74,7 +76,8 @@ public class DetailsService {
                           GraphService graphService,
                           PlatformService platformService,
                           DrugService drugService,
-                          PatientService patientService) {
+                          PatientService patientService,
+                          MarkerAssociationRepository markerAssociationRepository) {
 
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
@@ -88,40 +91,10 @@ public class DetailsService {
         this.platformService = platformService;
         this.drugService = drugService;
         this.patientService = patientService;
+        this.markerAssociationRepository = markerAssociationRepository;
 
     }
 
-
-
-    public Set<String[]> getVariationDataCSV(String dataSrc, String modelId) {
-
-        Set<String[]> variationDataDTOSet = new LinkedHashSet<>();
-        int size = 50000, page = 0, draw=1;
-        String technology = "", passage="", filter="", sortDir="", sortCol="mAss.seqPosition";
-
-        //Retreive Diagnosis Information
-        //TODO: fix this
-        String diagnosis = ""; //getModelDetails(dataSrc,modelId,page,size,technology,passage,filter).getDiagnosis();
-
-        // Retreive technology Information
-        List platforms = new ArrayList();
-        Map<String, Set<String>> modelTechAndPassages = findModelPlatformAndPassages(dataSrc,modelId,passage);
-        for (String tech : modelTechAndPassages.keySet()) {
-            platforms.add(tech);
-        }
-
-        // Retreive all Genomic Datasets
-        VariationDataDTO variationDataDTO = variationDataByPlatform(dataSrc,modelId,technology,passage,page,size,filter,draw,sortCol,sortDir);
-        for (String[] dData : variationDataDTO.moreData())
-        {
-            dData[2] = WordUtils.capitalize(diagnosis);     //Histology
-            dData[3] = "Engrafted Tumor";                   //Tumor type
-            variationDataDTOSet.add(dData);
-        }
-
-        return variationDataDTOSet;
-
-    }
 
 
     public DetailsDTO getModelDetails(String dataSource, String modelId) {
@@ -190,8 +163,8 @@ public class DetailsService {
             dto.setEthnicity("Not specified");
         }
 
-        if(patientSample.getSampleToOntologyRelationShip() != null && patientSample.getSampleToOntologyRelationShip().getOntologyTerm()!=null){
-            dto.setMappedOntologyTermLabel(patientSample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
+        if(patientSample.getSampleToOntologyRelationship() != null && patientSample.getSampleToOntologyRelationship().getOntologyTerm()!=null){
+            dto.setMappedOntologyTermLabel(patientSample.getSampleToOntologyRelationship().getOntologyTerm().getLabel());
         }
         else{
             dto.setMappedOntologyTermLabel("");
@@ -342,6 +315,7 @@ public class DetailsService {
 
         //MOLECULAR DATA TAB
         List<MolecularDataEntryDTO> mdeDTO = new ArrayList<>();
+        Set<String> dataTypes = new HashSet<>();
         //first add molchars linked to the patient sample
         Collection<MolecularCharacterization> patientMCs = molecularCharacterizationRepository.findAllBySample(patientSample);
         for(MolecularCharacterization mc : patientMCs){
@@ -355,6 +329,7 @@ public class DetailsService {
             mde.setDataAvailableUrl("");
             mde.setPlatformUsedLabel(mc.getPlatform().getName());
 
+
             if(mc.getPlatform().getName() == null || mc.getPlatform().getName().isEmpty() || mc.getPlatform().getName().toLowerCase().equals("not specified")
                     || mc.getPlatform().getUrl() == null || mc.getPlatform().getUrl().isEmpty()){
 
@@ -365,10 +340,26 @@ public class DetailsService {
                 mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
             }
 
+            int assocData = molecularCharacterizationRepository.findAssociationsNumberById(mc);
 
+            if(assocData == 0){
+                mde.setDataAssociated("NO");
+            }
+            else{
+                mde.setDataAssociated("YES");
+                dataTypes.add(mc.getType());
+            }
+
+            if(mc.isVisible()){
+                mde.setIsVisible("YES");
+            }
+            else{
+                mde.setIsVisible("NO");
+            }
             mde.setRawDataLabel("Not available");
             mde.setMolcharId(mc.getId().toString());
 
+            if (patientSample.getSourceSampleId() != null)
             mdeDTO.add(mde);
         }
 
@@ -388,7 +379,7 @@ public class DetailsService {
 
                     MolecularDataEntryDTO mde = new MolecularDataEntryDTO();
 
-                    mde.setSampleId(xenoSample.getSourceSampleId());
+                    mde.setSampleId(xenoSample.getSourceSampleId()== null ? "Not Specified":xenoSample.getSourceSampleId());
                     mde.setSampleType("Engrafted Tumor");
                     mde.setEngraftedTumorPassage(sp.getPassage());
                     mde.setMolcharType(mc.getType());
@@ -399,6 +390,23 @@ public class DetailsService {
                     mde.setRawDataLabel("Not available");
                     mde.setMolcharId(mc.getId().toString());
 
+                    int assocData = molecularCharacterizationRepository.findAssociationsNumberById(mc);
+
+                    if(assocData == 0){
+                        mde.setDataAssociated("NO");
+                    }
+                    else{
+                        mde.setDataAssociated("YES");
+                        dataTypes.add(mc.getType());
+                    }
+
+                    if(mc.isVisible()){
+                        mde.setIsVisible("YES");
+                    }
+                    else{
+                        mde.setIsVisible("NO");
+                    }
+                    //if (xenoSample.getSourceSampleId() != null)
                     mdeDTO.add(mde);
 
                 }
@@ -412,8 +420,9 @@ public class DetailsService {
 
         dto.setMolecularDataRows(mdeDTO);
         dto.setMolecularDataEntrySize(mdeDTO.size());
+        dto.setDataTypes(dataTypes);
         return dto;
-                //getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
+        //getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
     }
 
 
@@ -425,23 +434,71 @@ public class DetailsService {
      */
     public MolecularDataTableDTO getMolecularDataTable(String id){
 
+        Set<String> tableHeadersSet = new HashSet<>();
+        ArrayList<String> tableHeaders = new ArrayList<>();
+        List<List<String>> tableRows = new ArrayList<>();
+        MolecularDataTableDTO dto = new MolecularDataTableDTO();
+
+        int batchSize = 500;
+
         MolecularCharacterization mc = molecularCharacterizationRepository.getMolecularDataById(Long.valueOf(id));
+
+        int numberOfAssociations = markerAssociationRepository.getMarkerAssociationCountByMolCharId(Long.valueOf(id));
+        List<MarkerAssociation> associationList = new ArrayList<>();
+
+        for(int i=0; i<numberOfAssociations; i += batchSize){
+
+            List<MarkerAssociation> subList = markerAssociationRepository.findAssociationsByMolCharIdFromTo(Long.valueOf(id), i, batchSize);
+            associationList.addAll(subList);
+        }
+
+
+        //check if molchar exists and if not, display an error message
+        if(mc == null){
+
+            tableHeaders.add("");
+
+            List<String> notVisibleDataRow = new ArrayList<>();
+            notVisibleDataRow.add("ERROR: This molecular characterization does not exist.");
+
+            tableRows.add(notVisibleDataRow);
+
+            dto.setTableHeaders(tableHeaders);
+            dto.setTableRows(tableRows);
+
+            return dto;
+        }
+
+
+        //check if data is visible and can be displayed
+        if(!mc.isVisible()){
+
+            tableHeaders.add("");
+
+            List<String> notVisibleDataRow = new ArrayList<>();
+            notVisibleDataRow.add("This data is only accessible through the provider website - please click on 'Contact Provider' button above to request access.");
+
+            tableRows.add(notVisibleDataRow);
+
+            dto.setTableHeaders(tableHeaders);
+            dto.setTableRows(tableRows);
+            dto.setVisible(false);
+
+            return dto;
+        }
+
+
 
         Sample sample = sampleRepository.findSampleByMolcharId(Long.valueOf(id));
         String sampleId = sample.getSourceSampleId() == null ? "" : sample.getSourceSampleId();
 
-        Set<String> tableHeadersSet = new HashSet<>();
-        ArrayList<String> tableHeaders = new ArrayList<>();
-        List<List<String>> tableRows = new ArrayList<>();
-
-        MolecularDataTableDTO dto = new MolecularDataTableDTO();
 
         //STEP 0: Add sampleid to table, we always display this
         tableHeadersSet.add("sampleid");
 
 
-        //STEP 1: dinamically determine the headers of the table
-        for(MarkerAssociation ma: mc.getMarkerAssociations()){
+        //STEP 1: dynamically determine the headers of the table
+        for(MarkerAssociation ma: associationList){
 
 
             if(ma.getChromosome() != null && !ma.getChromosome().isEmpty()){
@@ -549,7 +606,7 @@ public class DetailsService {
                 tableHeadersSet.add("cnalog10rcna");
             }
 
-            if(ma.getCnaCopyNumberStatus() != null && ma.getCnaCopyNumberStatus().isEmpty()){
+            if(ma.getCnaCopyNumberStatus() != null && !ma.getCnaCopyNumberStatus().isEmpty()){
                 tableHeadersSet.add("cnacopynumberstatus");
             }
 
@@ -671,7 +728,7 @@ public class DetailsService {
         //STEP 3: Insert the rows of the table
         // DON'T CHANGE THE ORDER OF THESE CONDITIONS OR THE WORLD WILL TREMBLE!
         // (But if you REALLY need to change the order, don't forget to change it at step 2, too!!!)
-        for(MarkerAssociation ma: mc.getMarkerAssociations()){
+        for(MarkerAssociation ma: associationList){
 
             List<String> row = new ArrayList<>();
 
@@ -925,8 +982,8 @@ public class DetailsService {
             dto.setSampleSite(notEmpty(sample.getSampleSite().getName()));
         }
 
-        if (sample != null && sample.getSampleToOntologyRelationShip() != null) {
-            dto.setMappedOntology(sample.getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
+        if (sample != null && sample.getSampleToOntologyRelationship() != null) {
+            dto.setMappedOntology(sample.getSampleToOntologyRelationship().getOntologyTerm().getLabel());
         }
 
 
@@ -1320,7 +1377,147 @@ public class DetailsService {
     }
 
 
-    public VariationDataDTO patientVariationDataByPlatform(String dataSource, String modelId, String technology,
+    public List<String> getCsvHead(String molcharType){
+
+
+        List<String> commonHead = Arrays.asList("Sample ID","Sample Origin","Passage","Histology","Data Type","Platform","HGNC Symbol");
+
+        List<String> mutHead = Arrays.asList("Nucleotide Change","Amino Acid Change","Read Depth","Allele Freq","RS ID Variant","Chromosome","Seq Start Position","Ref Allele","Alt Allele","Consequence","Genome Assembly");
+
+        List<String> cnaHead = Arrays.asList("Log10R CNA","Log2R CNA","CNA Status","Gistic Value CNA","Picnic Value CNA","Chromosome","Seq Start Position","Seq End Position","Genome Assembly");
+
+        List<String> cytogeneticsHead = Arrays.asList("Cytogenetics Result");
+
+        List<String> csvHead;
+
+        if (molcharType.equals("mutation")) {
+
+            csvHead = ListUtils.union(commonHead,mutHead);
+        }else if (molcharType.equals("copy-number-alteration")){
+
+            csvHead = ListUtils.union(commonHead,cnaHead);
+        }else{
+
+            csvHead = ListUtils.union(commonHead,cytogeneticsHead);
+        }
+
+        return csvHead;
+    }
+
+
+    public List<List<String>> getVariationDataByMolcharTypeCSV(String dataSource, String modelId, String molcharType) {
+
+        molcharType = molcharType.replace("-"," ");
+
+        /**
+         *  Retreive Diagnosis Information and get Specimens
+         */
+        Sample patientSample = sampleRepository.findPatientSampleWithDetailsByDataSourceAndPdxId(dataSource, modelId);
+
+        String mappedOntologyTermLabel = patientSample.getSampleToOntologyRelationship().getOntologyTerm().getLabel();
+
+        List<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxId(dataSource, modelId, molcharType);
+
+        patientSample = sampleRepository.findHumanSampleBySourcePdxIdAndMolcharType(dataSource, modelId, molcharType);
+
+
+        List<List<String>> variationData = new ArrayList();
+
+        if (specimens != null) {
+            for (Specimen specimen : specimens) {
+                variationData.addAll(buildUpDTO(specimen.getSample(), specimen.getPassage(), mappedOntologyTermLabel, molcharType));
+            }
+        }
+
+        if(patientSample != null){
+
+            variationData.addAll(buildUpDTO(patientSample, "", mappedOntologyTermLabel, molcharType));
+        }
+
+
+        return variationData;
+
+    }
+
+
+
+    public List<List<String>> buildUpDTO(Sample sample,String passage,String mappedOntologyTermLabel, String molcharType){
+
+        List<List<String>> variationData = new LinkedList<>();
+
+        try {
+
+            int count = 1;
+            for (MolecularCharacterization dMolChar : sample.getMolecularCharacterizations()) {
+
+                List<MarkerAssociation> markerAssociations = new ArrayList();
+                markerAssociations.addAll(dMolChar.getMarkerAssociations());
+
+
+                for (MarkerAssociation markerAss : markerAssociations) {
+
+                    List<String> dData = new ArrayList<>();
+
+                    dData.add(sample.getSourceSampleId());
+                    dData.add( (passage.equals("")) ? "Patient Tumor" : "Xenograft" );
+                    dData.add(passage);
+                    dData.add(mappedOntologyTermLabel);
+                    dData.add(WordUtils.capitalizeFully(molcharType));
+                    dData.add(dMolChar.getPlatform().getName());
+                    dData.add(markerAss.getMarker().getHgncSymbol());
+
+                    if (molcharType.equals("mutation")){
+                        dData.add(markerAss.getNucleotideChange());
+                        dData.add(markerAss.getAminoAcidChange());
+                        dData.add(markerAss.getReadDepth());
+                        dData.add(markerAss.getAlleleFrequency());
+                        dData.add(markerAss.getRsIdVariants());
+                        dData.add(markerAss.getChromosome());
+                        dData.add(markerAss.getSeqStartPosition());
+                        dData.add(markerAss.getRefAllele());
+                        dData.add(markerAss.getAltAllele());
+                        dData.add(markerAss.getConsequence());
+                        dData.add(markerAss.getGenomeAssembly());
+                    }
+
+                    if (molcharType.equals("copy number alteration")){
+
+                        dData.add(markerAss.getCnaLog10RCNA());
+                        dData.add(markerAss.getCnaLog2RCNA());
+                        dData.add(markerAss.getCnaCopyNumberStatus());
+                        dData.add(markerAss.getCnaGisticValue());
+                        dData.add(markerAss.getCnaPicnicValue());
+                        dData.add(markerAss.getChromosome());
+                        dData.add(markerAss.getSeqStartPosition());
+                        dData.add(markerAss.getSeqEndPosition());
+                        dData.add(markerAss.getGenomeAssembly());
+                    }
+
+                    if (molcharType.equals("cytogenetics")){
+
+                        dData.add(markerAss.getCytogeneticsResult());
+                    }
+
+                    /*
+                        markerAssocArray[13] = sample.getDiagnosis();
+                        markerAssocArray[14] = sample.getType().getName();
+
+                     */
+                    variationData.add(dData);
+
+                }
+            }
+
+
+        }catch (Exception e) { }
+
+
+        return variationData;
+    }
+
+
+
+        /*    public VariationDataDTO patientVariationDataByPlatform(String dataSource, String modelId, String technology,
                                                            String searchParam, int draw, String sortColumn, String sortDir, int start, int size) {
 
         //int recordsTotal = patientRepository.countByBySourcePdxIdAndPlatform(dataSource,modelId,technology,"");
@@ -1333,9 +1530,9 @@ public class DetailsService {
             recordsFiltered = modelCreationRepository.variationCountByDataSourceAndPdxIdAndPlatform(dataSource, modelId, technology, searchParam);
         }
 
-        /**
-         * Retrieve the Records based on search parameter
-         */
+        *//**
+     * Retrieve the Records based on search parameter
+     *//*
         ModelCreation model = modelCreationRepository.findVariationBySourcePdxIdAndPlatform(dataSource, modelId, technology, searchParam, start, size);
         VariationDataDTO variationDataDTO = new VariationDataDTO();
         List<String[]> variationData = new ArrayList<>();
@@ -1352,103 +1549,7 @@ public class DetailsService {
 
         return variationDataDTO;
 
-    }
-
-
-    public VariationDataDTO variationDataByPlatform(String dataSource, String modelId, String technology, String passage, int start, int size,
-                                                    String searchParam, int draw, String sortColumn, String sortDir) {
-
-        /**
-         * Set the Pagination parameters: start comes in as 0,10,20 e.t.c while pageable works in page batches 0,1,2,...
-         */
-        Sort.Direction direction = getSortDirection(sortDir);
-        Pageable pageable = new PageRequest(start, size, direction, sortColumn);
-
-
-        /**
-         * 1st count all the records and set Total Records & Initialize Filtered Record as Total record
-         */
-        //int recordsTotal = specimenRepository.countBySearchParameterAndPlatform(dataSource,modelId,technology,passage,"");
-        int recordsTotal = specimenRepository.countByPlatform(dataSource, modelId, technology, passage);
-
-        int recordsFiltered = recordsTotal;
-
-        /**
-         * If search Parameter is not empty: Count and Reset the value of filtered records based on search Parameter
-         */
-        if (!searchParam.isEmpty()) {
-            recordsFiltered = specimenRepository.countBySearchParameterAndPlatform(dataSource, modelId, technology, passage, searchParam);
-        }
-
-        /**
-         * Retrieve the Records based on search parameter
-         */
-        Page<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform(dataSource, modelId, technology, passage, searchParam, pageable);
-        VariationDataDTO variationDataDTO = new VariationDataDTO();
-        List<String[]> variationData = new ArrayList();
-
-        if (specimens != null) {
-            for (Specimen specimen : specimens) {
-                variationData.addAll(buildUpDTO(specimen.getSample(), specimen.getPassage(), draw, recordsTotal, recordsFiltered));
-            }
-        }
-
-
-        variationDataDTO.setDraw(draw);
-        variationDataDTO.setRecordsTotal(recordsTotal);
-        variationDataDTO.setRecordsFiltered(recordsFiltered);
-        variationDataDTO.setData(variationData);
-
-        return variationDataDTO;
-
-    }
-
-
-    public List<String[]> buildUpDTO(Sample sample,String passage,int draw,int recordsTotal,int recordsFiltered){
-
-        List<String[]> variationData = new LinkedList<>();
-
-        /**
-         * Generate an equivalent 2-D array type of the Retrieved result Set, the Front end table must be a 2D JSON Array
-         */
-        try {
-
-            for (MolecularCharacterization dMolChar : sample.getMolecularCharacterizations()) {
-
-                List<MarkerAssociation> markerAssociation = new ArrayList();// = dMolChar.getMarkerAssociations();
-                markerAssociation.addAll(dMolChar.getMarkerAssociations());
-
-                for (MarkerAssociation markerAssoc : markerAssociation) {
-
-                    String[] markerAssocArray = new String[13];
-                    markerAssocArray[0] = sample.getSourceSampleId();
-                    markerAssocArray[1] = markerAssoc.getChromosome();
-                    markerAssocArray[2] = markerAssoc.getSeqPosition();
-                    markerAssocArray[3] = markerAssoc.getRefAllele();
-                    markerAssocArray[4] = markerAssoc.getAltAllele();
-                    markerAssocArray[5] = markerAssoc.getConsequence();
-                    markerAssocArray[6] = markerAssoc.getMarker().getHgncSymbol();
-                    markerAssocArray[7] = markerAssoc.getAminoAcidChange();
-                    markerAssocArray[8] = markerAssoc.getReadDepth();
-                    markerAssocArray[9] = markerAssoc.getAlleleFrequency();
-                    markerAssocArray[10] = markerAssoc.getRsIdVariants();
-                    markerAssocArray[11] = dMolChar.getPlatform().getName();
-                    markerAssocArray[12] = passage;
-                    //markerAssocArray[13] = sample.getDiagnosis();
-                    // markerAssocArray[14] = sample.getType().getName();
-
-                    variationData.add(markerAssocArray);
-
-                }
-            }
-
-
-        }catch (Exception e) { }
-
-
-        return variationData;
-    }
-
+    }*/
 
 
     public Sort.Direction getSortDirection(String sortDir){

@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -27,24 +29,11 @@ import javax.annotation.PostConstruct;
  */
 @Component
 @Order(value = -14)
+@PropertySource("classpath:loader.properties")
+@ConfigurationProperties(prefix = "wustl")
 public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadWUSTL.class);
-
-    private final static String DATASOURCE_ABBREVIATION = "PDXNet-WUSTL";
-    private final static String DATASOURCE_NAME = "Washington University in St. Louis";
-    private final static String DATASOURCE_DESCRIPTION = "Washington University St. Louis PDX mouse models for PDXNet.";
-    private final static String DATASOURCE_CONTACT = "bvantine@wustl.edu,rcfields@wustl.edu,jmudd@wustl.edu,sqli@wustl.edu,tprimeau@wustl.edu";
-    private final static String SOURCE_URL = null;
-
-
-    private final static String PROVIDER_TYPE = "";
-    private final static String ACCESSIBILITY = "";
-
-    private final static String NOT_SPECIFIED = Standardizer.NOT_SPECIFIED;
-
-    // for now all samples are of tumor tissue
-    private final static Boolean NORMAL_TISSUE_FALSE = false;
 
     //   private HostStrain nsgBS;
     private Group DS;
@@ -55,17 +44,14 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private DataImportService dataImportService;
     private Session session;
 
-    @Autowired
-    private UtilityService utilityService;
 
     @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
 
-    public LoadWUSTL(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
+    public LoadWUSTL(UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
     }
 
     //   @Value("${mdapdx.url}")
@@ -103,6 +89,8 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
         step01GetMetaDataFolder();
 
+        if (skipThis) return;
+
         for (int i = 0; i < listOfFiles.length; i++) {
 
             if (listOfFiles[i].isFile()) {
@@ -122,19 +110,11 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
         dto = new LoaderDTO();
         rootDataDirectory = dataRootDir;
-        dataSource = DATASOURCE_ABBREVIATION;
-        filesDirectory = dataRootDir + DATASOURCE_ABBREVIATION + "/pdx/";
-        dataSourceAbbreviation = DATASOURCE_ABBREVIATION;
-        dataSourceContact = DATASOURCE_CONTACT;
+        dataSource = dataSourceAbbreviation;
+        filesDirectory = dataRootDir + dataSourceAbbreviation + "/pdx/";
     }
 
     // WUSTL uses default implementation Steps step01GetMetaDataFolder, step02GetMetaDataJSON
-
-    @Override
-    protected void step03CreateProviderGroup() {
-
-        loadProviderGroup(DATASOURCE_NAME, DATASOURCE_ABBREVIATION, DATASOURCE_DESCRIPTION, PROVIDER_TYPE, DATASOURCE_CONTACT, SOURCE_URL);
-    }
 
     @Override
     protected void step04CreateNSGammaHostStrain() {
@@ -146,25 +126,12 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
     }
 
-    @Override
-    protected void step06CreateProjectGroup() {
-
-        loadProjectGroup("PDXNet");
-    }
-
-
-    @Override
-    protected void step07GetPDXModels() {
-
-        loadPDXModels(metaDataJSON,"WUSTL");
-    }
-
     // WUSTL uses default implementation Steps step08GetMetaData, step09LoadPatientData
 
     @Override
     protected void step10LoadExternalURLs() {
 
-        loadExternalURLs(DATASOURCE_CONTACT,Standardizer.NOT_SPECIFIED);
+        loadExternalURLs(dataSourceContact,Standardizer.NOT_SPECIFIED);
 
     }
 

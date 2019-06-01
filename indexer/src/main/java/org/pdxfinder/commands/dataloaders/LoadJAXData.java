@@ -45,7 +45,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
-    private DataImportService dataImportService;
     private Session session;
 
     @Value("${jaxpdx.variation.max}")
@@ -66,11 +65,8 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         formatter = new HelpFormatter();
     }
 
-    @Autowired
-    private UtilityService utilityService;
-
-    public LoadJAXData(DataImportService dataImportService) {
-        this.dataImportService = dataImportService;
+    public LoadJAXData(UtilityService utilityService, DataImportService dataImportService) {
+        super(utilityService, dataImportService);
     }
 
     @Override
@@ -119,22 +115,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     // JAX uses default implementation Steps step02GetMetaDataJSON
 
 
-
-    @Override
-    protected void step03CreateProviderGroup() {
-
-        loadProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription, providerType,  dataSourceContact, sourceURL);
-    }
-
-
-
-    @Override
-    protected void step04CreateNSGammaHostStrain() {
-
-        loadNSGammaHostStrain(nsgBsSymbol, nsgbsURL, nsgBsName, nsgBsName);
-    }
-
-
     @Override
     protected void step05CreateNSHostStrain() {
 
@@ -145,14 +125,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     protected void step06CreateProjectGroup() {
 
     }
-
-
-    @Override
-    protected void step07GetPDXModels() {
-
-        loadPDXModels(metaDataJSON,"pdxInfo");
-    }
-
 
 
     // JAX uses default implementation Steps step08GetMetaData
@@ -305,7 +277,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
         log.info("Loading WGS for model " + dto.getModelCreation().getSourcePdxId());
 
-        loadOmicData(dto.getModelCreation(),"mutation");
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation");
 
     }
 

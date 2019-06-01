@@ -8,6 +8,7 @@ import java.util.Map;
 public class LoaderProperties {
 
     //  DATA SOURCE PROPERTIES
+    protected String jsonKey;
     protected String dataSourceAbbreviation;
     protected String dataSourceName;
     protected String dataSourceDescription;
@@ -15,12 +16,15 @@ public class LoaderProperties {
     protected String dataSourceURL;
     protected String providerType;
     protected String accessibility;
+    protected String projectGroup;
+
     protected String nsgBsName;
     protected String nsgBsSymbol;
     protected String nsgbsURL;
     protected String nsBsName;
     protected String nsBsSymbol;
     protected String nsBsURL;
+
     protected String dosingStudyURL;
     protected String sourceURL;
     protected String normalTissueFalse;
@@ -67,12 +71,20 @@ public class LoaderProperties {
     protected String omicFileExtension;
 
 
+    public String getJsonKey() {
+        return jsonKey;
+    }
+
+    public void setJsonKey(String jsonKey) {
+        this.jsonKey = jsonKey.trim();
+    }
+
     public String getDataSourceAbbreviation() {
         return dataSourceAbbreviation;
     }
 
     public void setDataSourceAbbreviation(String dataSourceAbbreviation) {
-        this.dataSourceAbbreviation = dataSourceAbbreviation;
+        this.dataSourceAbbreviation = dataSourceAbbreviation.trim();
     }
 
     public String getDataSourceName() {
@@ -80,7 +92,7 @@ public class LoaderProperties {
     }
 
     public void setDataSourceName(String dataSourceName) {
-        this.dataSourceName = dataSourceName;
+        this.dataSourceName = dataSourceName.trim();
     }
 
     public String getDataSourceDescription() {
@@ -88,7 +100,7 @@ public class LoaderProperties {
     }
 
     public void setDataSourceDescription(String dataSourceDescription) {
-        this.dataSourceDescription = dataSourceDescription;
+        this.dataSourceDescription = dataSourceDescription.trim();
     }
 
     public String getDataSourceContact() {
@@ -96,7 +108,7 @@ public class LoaderProperties {
     }
 
     public void setDataSourceContact(String dataSourceContact) {
-        this.dataSourceContact = dataSourceContact;
+        this.dataSourceContact = dataSourceContact.trim();
     }
 
     public String getDataSourceURL() {
@@ -104,7 +116,7 @@ public class LoaderProperties {
     }
 
     public void setDataSourceURL(String dataSourceURL) {
-        this.dataSourceURL = dataSourceURL;
+        this.dataSourceURL = dataSourceURL.trim();
     }
 
     public String getProviderType() {
@@ -112,7 +124,7 @@ public class LoaderProperties {
     }
 
     public void setProviderType(String providerType) {
-        this.providerType = providerType;
+        this.providerType = providerType.trim();
     }
 
     public String getAccessibility() {
@@ -120,7 +132,15 @@ public class LoaderProperties {
     }
 
     public void setAccessibility(String accessibility) {
-        this.accessibility = accessibility;
+        this.accessibility = accessibility.trim();
+    }
+
+    public String getProjectGroup() {
+        return projectGroup;
+    }
+
+    public void setProjectGroup(String projectGroup) {
+        this.projectGroup = projectGroup.trim().trim();
     }
 
     public String getNsgBsName() {
@@ -128,7 +148,7 @@ public class LoaderProperties {
     }
 
     public void setNsgBsName(String nsgBsName) {
-        this.nsgBsName = nsgBsName;
+        this.nsgBsName = nsgBsName.trim();
     }
 
     public String getNsgBsSymbol() {
@@ -136,7 +156,7 @@ public class LoaderProperties {
     }
 
     public void setNsgBsSymbol(String nsgBsSymbol) {
-        this.nsgBsSymbol = nsgBsSymbol;
+        this.nsgBsSymbol = nsgBsSymbol.trim();
     }
 
     public String getNsgbsURL() {
@@ -144,7 +164,7 @@ public class LoaderProperties {
     }
 
     public void setNsgbsURL(String nsgbsURL) {
-        this.nsgbsURL = nsgbsURL;
+        this.nsgbsURL = nsgbsURL.trim();
     }
 
     public String getNsBsName() {
@@ -152,7 +172,7 @@ public class LoaderProperties {
     }
 
     public void setNsBsName(String nsBsName) {
-        this.nsBsName = nsBsName;
+        this.nsBsName = nsBsName.trim();
     }
 
     public String getNsBsSymbol() {
@@ -160,7 +180,7 @@ public class LoaderProperties {
     }
 
     public void setNsBsSymbol(String nsBsSymbol) {
-        this.nsBsSymbol = nsBsSymbol;
+        this.nsBsSymbol = nsBsSymbol.trim();
     }
 
     public String getNsBsURL() {
@@ -168,7 +188,7 @@ public class LoaderProperties {
     }
 
     public void setNsBsURL(String nsBsURL) {
-        this.nsBsURL = nsBsURL;
+        this.nsBsURL = nsBsURL.trim();
     }
 
     public String getDosingStudyURL() {
@@ -176,7 +196,7 @@ public class LoaderProperties {
     }
 
     public void setDosingStudyURL(String dosingStudyURL) {
-        this.dosingStudyURL = dosingStudyURL;
+        this.dosingStudyURL = dosingStudyURL.trim();
     }
 
     public String getSourceURL() {
@@ -184,7 +204,7 @@ public class LoaderProperties {
     }
 
     public void setSourceURL(String sourceURL) {
-        this.sourceURL = sourceURL;
+        this.sourceURL = sourceURL.trim();
     }
 
     public String getNormalTissueFalse() {
@@ -192,7 +212,7 @@ public class LoaderProperties {
     }
 
     public void setNormalTissueFalse(String normalTissueFalse) {
-        this.normalTissueFalse = normalTissueFalse;
+        this.normalTissueFalse = normalTissueFalse.trim();
     }
 
     public String getTech() {
@@ -200,7 +220,7 @@ public class LoaderProperties {
     }
 
     public void setTech(String tech) {
-        this.tech = tech;
+        this.tech = tech.trim();
     }
 
     public String getFingerPrintDescription() {
@@ -208,7 +228,7 @@ public class LoaderProperties {
     }
 
     public void setFingerPrintDescription(String fingerPrintDescription) {
-        this.fingerPrintDescription = fingerPrintDescription;
+        this.fingerPrintDescription = fingerPrintDescription.trim();
     }
 
     public String getHistologyNote() {
@@ -216,7 +236,7 @@ public class LoaderProperties {
     }
 
     public void setHistologyNote(String histologyNote) {
-        this.histologyNote = histologyNote;
+        this.histologyNote = histologyNote.trim();
     }
 
     public Map<String, String> getPlatformURL() {
@@ -232,7 +252,7 @@ public class LoaderProperties {
     }
 
     public void setDataRootDirectory(String dataRootDirectory) {
-        this.dataRootDirectory = dataRootDirectory;
+        this.dataRootDirectory = dataRootDirectory.trim();
     }
 
     public String getOmicDataSource() {
@@ -240,7 +260,7 @@ public class LoaderProperties {
     }
 
     public void setOmicDataSource(String omicDataSource) {
-        this.omicDataSource = omicDataSource;
+        this.omicDataSource = omicDataSource.trim();
     }
 
     public String getOmicModelID() {
@@ -248,7 +268,7 @@ public class LoaderProperties {
     }
 
     public void setOmicModelID(String omicModelID) {
-        this.omicModelID = omicModelID;
+        this.omicModelID = omicModelID.trim();
     }
 
     public String getOmicSampleID() {
@@ -256,7 +276,7 @@ public class LoaderProperties {
     }
 
     public void setOmicSampleID(String omicSampleID) {
-        this.omicSampleID = omicSampleID;
+        this.omicSampleID = omicSampleID.trim();
     }
 
     public String getOmicSampleOrigin() {
@@ -264,7 +284,7 @@ public class LoaderProperties {
     }
 
     public void setOmicSampleOrigin(String omicSampleOrigin) {
-        this.omicSampleOrigin = omicSampleOrigin;
+        this.omicSampleOrigin = omicSampleOrigin.trim();
     }
 
     public String getOmicPassage() {
@@ -272,7 +292,7 @@ public class LoaderProperties {
     }
 
     public void setOmicPassage(String omicPassage) {
-        this.omicPassage = omicPassage;
+        this.omicPassage = omicPassage.trim();
     }
 
     public String getOmicHostStrainName() {
@@ -280,7 +300,7 @@ public class LoaderProperties {
     }
 
     public void setOmicHostStrainName(String omicHostStrainName) {
-        this.omicHostStrainName = omicHostStrainName;
+        this.omicHostStrainName = omicHostStrainName.trim();
     }
 
     public String getOmicHgncSymbol() {
@@ -288,7 +308,7 @@ public class LoaderProperties {
     }
 
     public void setOmicHgncSymbol(String omicHgncSymbol) {
-        this.omicHgncSymbol = omicHgncSymbol;
+        this.omicHgncSymbol = omicHgncSymbol.trim();
     }
 
     public String getOmicAminoAcidChange() {
@@ -296,7 +316,7 @@ public class LoaderProperties {
     }
 
     public void setOmicAminoAcidChange(String omicAminoAcidChange) {
-        this.omicAminoAcidChange = omicAminoAcidChange;
+        this.omicAminoAcidChange = omicAminoAcidChange.trim();
     }
 
     public String getOmicNucleotideChange() {
@@ -304,7 +324,7 @@ public class LoaderProperties {
     }
 
     public void setOmicNucleotideChange(String omicNucleotideChange) {
-        this.omicNucleotideChange = omicNucleotideChange;
+        this.omicNucleotideChange = omicNucleotideChange.trim();
     }
 
     public String getOmicConsequence() {
@@ -312,7 +332,7 @@ public class LoaderProperties {
     }
 
     public void setOmicConsequence(String omicConsequence) {
-        this.omicConsequence = omicConsequence;
+        this.omicConsequence = omicConsequence.trim();
     }
 
     public String getOmicReadDepth() {
@@ -320,7 +340,7 @@ public class LoaderProperties {
     }
 
     public void setOmicReadDepth(String omicReadDepth) {
-        this.omicReadDepth = omicReadDepth;
+        this.omicReadDepth = omicReadDepth.trim();
     }
 
     public String getOmicAlleleFrequency() {
@@ -328,7 +348,7 @@ public class LoaderProperties {
     }
 
     public void setOmicAlleleFrequency(String omicAlleleFrequency) {
-        this.omicAlleleFrequency = omicAlleleFrequency;
+        this.omicAlleleFrequency = omicAlleleFrequency.trim();
     }
 
     public String getOmicChromosome() {
@@ -336,7 +356,7 @@ public class LoaderProperties {
     }
 
     public void setOmicChromosome(String omicChromosome) {
-        this.omicChromosome = omicChromosome;
+        this.omicChromosome = omicChromosome.trim();
     }
 
     public String getOmicSeqStartPosition() {
@@ -344,7 +364,7 @@ public class LoaderProperties {
     }
 
     public void setOmicSeqStartPosition(String omicSeqStartPosition) {
-        this.omicSeqStartPosition = omicSeqStartPosition;
+        this.omicSeqStartPosition = omicSeqStartPosition.trim();
     }
 
     public String getOmicRefAllele() {
@@ -352,7 +372,7 @@ public class LoaderProperties {
     }
 
     public void setOmicRefAllele(String omicRefAllele) {
-        this.omicRefAllele = omicRefAllele;
+        this.omicRefAllele = omicRefAllele.trim();
     }
 
     public String getOmicAltAllele() {
@@ -360,7 +380,7 @@ public class LoaderProperties {
     }
 
     public void setOmicAltAllele(String omicAltAllele) {
-        this.omicAltAllele = omicAltAllele;
+        this.omicAltAllele = omicAltAllele.trim();
     }
 
     public String getOmicUcscGeneId() {
@@ -368,7 +388,7 @@ public class LoaderProperties {
     }
 
     public void setOmicUcscGeneId(String omicUcscGeneId) {
-        this.omicUcscGeneId = omicUcscGeneId;
+        this.omicUcscGeneId = omicUcscGeneId.trim();
     }
 
     public String getOmicNcbiGeneId() {
@@ -376,7 +396,7 @@ public class LoaderProperties {
     }
 
     public void setOmicNcbiGeneId(String omicNcbiGeneId) {
-        this.omicNcbiGeneId = omicNcbiGeneId;
+        this.omicNcbiGeneId = omicNcbiGeneId.trim();
     }
 
     public String getOmicEnsemblGeneId() {
@@ -384,7 +404,7 @@ public class LoaderProperties {
     }
 
     public void setOmicEnsemblGeneId(String omicEnsemblGeneId) {
-        this.omicEnsemblGeneId = omicEnsemblGeneId;
+        this.omicEnsemblGeneId = omicEnsemblGeneId.trim();
     }
 
     public String getOmicEnsemblTranscriptId() {
@@ -392,7 +412,7 @@ public class LoaderProperties {
     }
 
     public void setOmicEnsemblTranscriptId(String omicEnsemblTranscriptId) {
-        this.omicEnsemblTranscriptId = omicEnsemblTranscriptId;
+        this.omicEnsemblTranscriptId = omicEnsemblTranscriptId.trim();
     }
 
     public String getOmicRsIdVariants() {
@@ -400,7 +420,7 @@ public class LoaderProperties {
     }
 
     public void setOmicRsIdVariants(String omicRsIdVariants) {
-        this.omicRsIdVariants = omicRsIdVariants;
+        this.omicRsIdVariants = omicRsIdVariants.trim();
     }
 
     public String getOmicGenomeAssembly() {
@@ -408,7 +428,7 @@ public class LoaderProperties {
     }
 
     public void setOmicGenomeAssembly(String omicGenomeAssembly) {
-        this.omicGenomeAssembly = omicGenomeAssembly;
+        this.omicGenomeAssembly = omicGenomeAssembly.trim();
     }
 
     public String getOmicPlatform() {
@@ -416,7 +436,7 @@ public class LoaderProperties {
     }
 
     public void setOmicPlatform(String omicPlatform) {
-        this.omicPlatform = omicPlatform;
+        this.omicPlatform = omicPlatform.trim();
     }
 
 
@@ -425,7 +445,7 @@ public class LoaderProperties {
     }
 
     public void setOmicSeqEndPosition(String omicSeqEndPosition) {
-        this.omicSeqEndPosition = omicSeqEndPosition;
+        this.omicSeqEndPosition = omicSeqEndPosition.trim();
     }
 
     public String getOmicCnaLog10RCNA() {
@@ -433,7 +453,7 @@ public class LoaderProperties {
     }
 
     public void setOmicCnaLog10RCNA(String omicCnaLog10RCNA) {
-        this.omicCnaLog10RCNA = omicCnaLog10RCNA;
+        this.omicCnaLog10RCNA = omicCnaLog10RCNA.trim();
     }
 
     public String getOmicCnaLog2RCNA() {
@@ -441,7 +461,7 @@ public class LoaderProperties {
     }
 
     public void setOmicCnaLog2RCNA(String omicCnaLog2RCNA) {
-        this.omicCnaLog2RCNA = omicCnaLog2RCNA;
+        this.omicCnaLog2RCNA = omicCnaLog2RCNA.trim();
     }
 
     public String getOmicCnaCopyNumberStatus() {
@@ -449,7 +469,7 @@ public class LoaderProperties {
     }
 
     public void setOmicCnaCopyNumberStatus(String omicCnaCopyNumberStatus) {
-        this.omicCnaCopyNumberStatus = omicCnaCopyNumberStatus;
+        this.omicCnaCopyNumberStatus = omicCnaCopyNumberStatus.trim();
     }
 
     public String getOmicCnaGisticvalue() {
@@ -457,7 +477,7 @@ public class LoaderProperties {
     }
 
     public void setOmicCnaGisticvalue(String omicCnaGisticvalue) {
-        this.omicCnaGisticvalue = omicCnaGisticvalue;
+        this.omicCnaGisticvalue = omicCnaGisticvalue.trim();
     }
 
     public String getOmicCnaPicnicValue() {
@@ -465,7 +485,7 @@ public class LoaderProperties {
     }
 
     public void setOmicCnaPicnicValue(String omicCnaPicnicValue) {
-        this.omicCnaPicnicValue = omicCnaPicnicValue;
+        this.omicCnaPicnicValue = omicCnaPicnicValue.trim();
     }
 
     public String getOmicDataFilesType() {
@@ -473,7 +493,7 @@ public class LoaderProperties {
     }
 
     public void setOmicDataFilesType(String omicDataFilesType) {
-        this.omicDataFilesType = omicDataFilesType;
+        this.omicDataFilesType = omicDataFilesType.trim();
     }
 
     public String getOmicFileExtension() {
@@ -481,6 +501,6 @@ public class LoaderProperties {
     }
 
     public void setOmicFileExtension(String omicFileExtension) {
-        this.omicFileExtension = omicFileExtension;
+        this.omicFileExtension = omicFileExtension.trim();
     }
 }

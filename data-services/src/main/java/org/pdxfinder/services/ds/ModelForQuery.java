@@ -47,6 +47,8 @@ public class ModelForQuery {
 
     private List<String> drugWithResponse;
 
+    private List<String> cnaMarkers;
+
     private List<String> projects;
     private List<String> publications;
     private String modelAccessibility;
@@ -438,5 +440,22 @@ public class ModelForQuery {
 
     public void setAccessModalities(String accessModalities) {
         this.accessModalities = accessModalities;
+    }
+
+    public List<String> getCnaMarkers() {
+        return cnaMarkers;
+    }
+
+    public void setCnaMarkers(List<String> cnaMarkers) {
+        this.cnaMarkers = cnaMarkers;
+    }
+
+    public void addCnaMarker(String s){
+
+        if(this.cnaMarkers == null) this.cnaMarkers = new ArrayList<>();
+
+        if(!this.cnaMarkers.contains(s)){
+            this.cnaMarkers.add(s);
+        }
     }
 }

@@ -260,6 +260,101 @@
 </div>
 
 
+
+
+
+
+
+
+
+
+<!-- One Param Text Filter Component Generator -->
+<div th:fragment="oneParamTextFilter(filterComponent)">
+
+    <div class="row topSace10">
+        <div class="columns nospace small-12 large-12 adjusti" th:text="${filterComponent.param1Name}"></div>
+    </div>
+
+
+    <!-- New Filter Search -->
+    <th:block th:unless="${filterComponent.active}">
+        <div class="row topSace10">
+            <div class="columns nospace small-12 large-12">
+                <input type="text" class="fullWidth"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'0'}"/>
+            </div>
+
+        </div>
+
+        <!-- OneParamTextFilter Hidden Fields Triggered after Clicking "OR" Button-->
+        <div class="row" th:each="i: ${#numbers.sequence(1, 19)}"
+             th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_hidden'}+${i}"
+             style="display:none">
+            <div class="columns nospace small-12 large-12">
+                <input type="text" value="NULL"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${i}"
+                       class="fullWidth"/>
+            </div>
+
+        </div>
+    </th:block>
+
+
+    <!-- After a Search was done -->
+    <th:block th:if="${filterComponent.active}">
+        <div class="row topSace10" th:each="activeComponent, iter : ${filterComponent.selected}">
+
+            <div class="columns nospace small-12 large-12">
+                <input th:value="${activeComponent}"
+                       type="text"
+                       class="fullWidth"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${iter.index}"/>
+            </div>
+
+        </div>
+
+
+        <!-- Hidden Fields Triggered after Clicking "OR" Button-->
+        <div class="row" th:each="i: ${#numbers.sequence(#lists.size(filterComponent.selected), 19)}"
+             th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_hidden'}+${i}"
+             style="display:none">
+
+            <div class="columns nospace small-12 large-12">
+                <input type="text" value="NULL"
+                       th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)}+${i}"
+                       class="fullWidth"/>
+            </div>
+
+        </div>
+
+    </th:block>
+
+
+    <!-- OneParamTextFilter Action Buttons -->
+    <div class="checkbox-item height70px">
+        <button href="#" class="button primary columns large-3 white-text-right-float topSpace4 searchButton"
+                th:id="${filterComponent.urlParam}+'_'+${#strings.toLowerCase(filterComponent.param1Name)+'_button'}">
+            <i class="icon icon-functional" data-icon="1"></i>
+        </button>
+
+        <button th:unless="${filterComponent.active}"
+                href="#" class="icoButn columns large-2 ORButton"
+                th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','1')|">
+            OR
+        </button>
+
+        <button th:if="${filterComponent.active}"
+                href="#" class="icoButn columns large-2 ORButton"
+                th:onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','${#lists.size(filterComponent.selected)}')|">
+            OR
+        </button>
+    </div>
+
+</div>
+
+
+
+
 </body>
 </html>
 

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Interface for Markers
@@ -55,5 +56,10 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
 
     @Query("MATCH (m:Marker) WHERE NOT (m)--() DELETE m")
     void deleteMarkersWithoutRelationships();
+
+    @Query("MATCH (mc:MolecularCharacterization)-[awr:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mr:MARKER]-(m:Marker) " +
+            "WHERE ID(mc) = {id} " +
+            "RETURN DISTINCT m")
+    Set<Marker> findDistinctByMolCharId(@Param("id") Long id);
 
 }

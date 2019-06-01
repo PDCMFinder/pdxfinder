@@ -7,6 +7,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.graph.dao.MarkerAssociation;
 import org.pdxfinder.graph.dao.ModelCreation;
 import org.pdxfinder.graph.dao.MolecularCharacterization;
+import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.repositories.ModelCreationRepository;
 import org.pdxfinder.graph.repositories.OntologyTermRepository;
 import org.pdxfinder.services.ds.FacetOption;
@@ -91,6 +92,7 @@ public class SearchService {
                                   Optional<List<String>> project,
                                   Optional<List<String>> data_available,
                                   Optional<List<String>> breast_cancer_markers,
+                                  Optional<List<String>> copy_number_alteration,
                                   Integer page,
                                   Integer size){
 
@@ -109,7 +111,8 @@ public class SearchService {
                 drug,
                 project,
                 data_available,
-                breast_cancer_markers
+                breast_cancer_markers,
+                copy_number_alteration
         );
 
         WebSearchDTO wsDTO = new WebSearchDTO();
@@ -188,7 +191,8 @@ public class SearchService {
                             Optional<List<String>> drug,
                             Optional<List<String>> project,
                             Optional<List<String>> data_available,
-                            Optional<List<String>> breast_cancer_markers){
+                            Optional<List<String>> breast_cancer_markers,
+                            Optional<List<String>> copy_number_alteration){
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
                 query,
@@ -204,7 +208,8 @@ public class SearchService {
                 drug,
                 project,
                 data_available,
-                breast_cancer_markers
+                breast_cancer_markers,
+                copy_number_alteration
 
         );
 
@@ -231,7 +236,8 @@ public class SearchService {
             Optional<List<String>> drug,
             Optional<List<String>> project,
             Optional<List<String>> data_available,
-            Optional<List<String>> breast_cancer_markers
+            Optional<List<String>> breast_cancer_markers,
+            Optional<List<String>> copy_number_alteration
 
 
             ) {
@@ -334,6 +340,13 @@ public class SearchService {
             }
         }
 
+        if (copy_number_alteration.isPresent() && !copy_number_alteration.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.copy_number_alteration, new ArrayList<>());
+            for (String s : copy_number_alteration.get()) {
+                configuredFacets.get(SearchFacetName.copy_number_alteration).add(s);
+            }
+        }
+
         return configuredFacets;
     }
 
@@ -433,12 +446,19 @@ public class SearchService {
 
                 case patient_treatment_status:
                     headers.add("PATIENT TREATMENT STATUS");
+                    break;
 
                 case patient_gender:
                     headers.add("SEX");
+                    break;
 
                 case patient_age:
                     headers.add("AGE");
+                    break;
+                case copy_number_alteration:
+                    headers.add("COPY NUMBER ALTERATION");
+
+
             }
 
         }
@@ -527,8 +547,8 @@ public class SearchService {
                 sdto.setClassification(model.getSample().getClassification());
             }
 
-            if (model.getSample() != null && model.getSample().getSampleToOntologyRelationShip() != null) {
-                sdto.setMappedOntology(model.getSample().getSampleToOntologyRelationShip().getOntologyTerm().getLabel());
+            if (model.getSample() != null && model.getSample().getSampleToOntologyRelationship() != null) {
+                sdto.setMappedOntology(model.getSample().getSampleToOntologyRelationship().getOntologyTerm().getLabel());
             }
 
             sdto.setSearchParameter(query);
@@ -588,6 +608,14 @@ public class SearchService {
         return new HashMap<>();
     }
 
+
+
+    public List<ModelCreation> getModelsByMolcharType(String type) {
+
+        List<ModelCreation> models = modelCreationRepository.findByMolcharType(type);
+
+        return models;
+    }
 
 
 }

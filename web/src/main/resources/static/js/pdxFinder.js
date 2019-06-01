@@ -127,7 +127,41 @@ function redirectPage(webFacetSections) {
         }
     });
 
-    
+
+
+
+
+
+    var oneParamTextFilters = getFiltersFromWebFacetSection(webFacetSections, 'OneParamTextFilter');
+    oneParamTextFilters.forEach(function (filterComponent) {
+
+
+        componentId1 = filterComponent.urlParam + "_" + (filterComponent.param1Name).toLowerCase();
+        urlKey = filterComponent.urlParam;
+
+        for (var i = 0; i < 19; i++) {
+
+            var component1Choice = jQuery("#" + componentId1 + i);
+
+
+            if (component1Choice.val() != null && component1Choice.val() != "NULL" && component1Choice.val() != "") {
+
+
+                if (!no_parameters) {
+                        url = url + "&";
+                }
+
+
+                url += urlKey + "=" + component1Choice.val();
+                no_parameters = false;
+
+            }
+
+        }
+    });
+
+
+
 
     // Add all diagnosis filters to the URL
     jQuery(".diagnosis").each(function () {
@@ -188,6 +222,23 @@ function intializeFilters(webFacetSection, index) {
                 redirectPage(webFacetSections);
             });
         }
+        else if(filterComponent.type === "OneParamTextFilter"){
+
+            dataList = filterComponent.options1;
+            componentOneId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
+            filterButton = componentOneId+'_button';
+
+            initializeOneParamTextFilterComponent(dataList, componentOneId);
+
+
+            //Add event listener to each OneParamTextFilter filter class
+            jQuery('#'+filterButton).click(function () {
+                redirectPage(webFacetSections);
+            });
+        }
+
+
+
     });
 }
 
@@ -213,7 +264,18 @@ function initializeTwoParamFilterComponents(dataList, componentOneId, componentT
     }
 }
 
+function initializeOneParamTextFilterComponent(dataList, componentOneId) {
 
+    dataList = dataList.sort();
+
+
+    for (var i = 0; i <= 19; i++) {
+
+        $('#' + componentOneId + i).autocomplete({
+            source: [dataList]
+        });
+    }
+}
 
 function getFiltersFromWebFacetSection(webFacetSections, desiredFilterType) {
 
@@ -450,10 +512,16 @@ function displayMolecularDataTable(tableData, clickedData){
     
     //add datarows to table
     var rowCount = tableData["tableRows"].length;
+    var tableHeaderDataSize = tableData["tableHeaders"].length;
+    var dataVisibility = tableData["visible"];
 
     for(var j=0; j<rowCount; j++){
 
-        $tr = jQuery('<tr class="tabs-title" style="float:none; text-transform: capitalize;">/');
+        if (tableHeaderDataSize == 1){
+            $tr = jQuery('<tr class="tabs-title" style="float:none; font-weight: bold; font-size: 37px; color: #06369d;">/');
+        }else {
+            $tr = jQuery('<tr class="tabs-title" style="float:none; text-transform: capitalize;">/');
+        }
 
         for(var k=0; k<tableData["tableRows"][j].length; k++){
             console.log("Rows "+tableData["tableRows"][j].length);
@@ -482,6 +550,10 @@ function displayMolecularDataTable(tableData, clickedData){
 
     $('#preLoader').hide();
 
+    if (dataVisibility == false) {
+        $('#download-data').hide();
+    }
+
 
 }
 
@@ -509,7 +581,7 @@ function customizeDatatable(dTable, presentData){
     );
 
     $(".dataTables_filter").hide();
-    $("#customSearch").html('<input style="height: 41px;" type="text" id="omicSearch" placeholder="Search'+presentData+' data">');
+    $("#customSearch").html('<input style="height: 41px; border-left: 0px;" type="text" id="omicSearch" placeholder="Search'+presentData+' data">');
 
     oTable = $('#molcharDataTable').DataTable();
     $('#omicSearch').keyup(function(){
@@ -517,3 +589,43 @@ function customizeDatatable(dTable, presentData){
     })
 
 }
+
+
+
+
+
+
+function downloadAll() {
+
+    var urls = [
+        'http://localhost:8080/data/pdx/PDMR/245127-232-R/mutation/export',
+        'http://localhost:8080/data/pdx/PDMR/245127-232-R/mutation/export',
+        'http://localhost:8080/data/pdx/PDMR/245127-232-R/mutation/export'
+    ];
+
+    console.log("Welcome");
+
+    var link = document.createElement('a');
+
+    link.setAttribute('download', null);
+    link.style.display = 'none';
+
+    document.body.appendChild(link);
+
+    for (var i = 0; i < urls.length; i++) {
+
+        alert("Click Ok to download "+urls[i]);
+        link.setAttribute('href', urls[i]);
+        link.click();
+
+    }
+
+    document.body.removeChild(link);
+}
+
+
+
+
+
+
+

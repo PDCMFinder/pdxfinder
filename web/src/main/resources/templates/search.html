@@ -182,9 +182,9 @@
 
                                         <!-- Check what kind of component is it, not all components have options-->
 
-                                        <!-- OneParamFilter -->
+                                        <!-- OneParamCheckboxFilter -->
                                         <div class="large-form"
-                                             th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamFilter)}">
+                                             th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamCheckboxFilter)}">
                                             <div class="checkbox-item" th:each="option:${filterComponent.options}">
 
                                                 <input type="checkbox" class="filter"
@@ -193,6 +193,17 @@
                                                 <label th:attr="for=${filterComponent.urlParam} +'__'+${option.labelId}"><span
                                                         th:text="${option.label}"></span></label>
                                             </div>
+                                        </div>
+
+                                        <div class="light-grey-bg-box"
+                                             th:if="${filterComponent instanceof T(org.pdxfinder.services.search.OneParamTextFilter)}">
+
+                                            <!-- OneParamTextFilter-->
+                                            <th:block
+                                                    th:include="fragments/filter-components :: oneParamTextFilter(filterComponent=${filterComponent})">
+                                                ...
+                                            </th:block>
+
                                         </div>
 
 
@@ -259,6 +270,7 @@
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DRUG AND RESPONSE')}">DRUG AND RESPONSE</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'BREAST CANCER MARKERS')}">BREAST CANCER MARKERS</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'PATIENT TREATMENT STATUS')}">TREATMENT STATUS</th>
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'COPY NUMBER ALTERATION')}">COPY NUMBER ALTERATION</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -275,7 +287,6 @@
 
                                 <td data-title="AGE" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'AGE')}" th:text="${model.patientAge}"> Age </td>
                                 <td data-title="SEX" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'SEX')}" th:text="${model.patientGender}">Sex</td>
-
                                 <td data-title="DATA AVAILABLE" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DATA AVAILABLE')}">
                                     <th:block th:each="dataavailable : ${model.dataAvailable}">
 
@@ -291,6 +302,9 @@
                                            th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#patients' }"
                                            class="size12" th:utext="${dataavailable} + '<br />'"></a> <!-- platform -->
                                         <a th:if="${#strings.equals(dataavailable, 'Cytogenetics')}"
+                                           th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation' }"
+                                           class="size12" th:utext="${dataavailable} + '<br />'"></a> <!-- platform -->
+                                        <a th:if="${#strings.equals(dataavailable, 'Copy Number Alteration')}"
                                            th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation' }"
                                            class="size12" th:utext="${dataavailable} + '<br />'"></a> <!-- platform -->
                                     </th:block>
@@ -323,6 +337,12 @@
 
                                         <span th:text="${model.patientTreatmentStatus}"></span>
 
+                                </td>
+
+                                <td data-title="COPY NUMBER ALTERATION" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'COPY NUMBER ALTERATION')}">
+                                    <div th:each="cnaMarker : ${model.cnaMarkers}">
+                                        <span th:text="${cnaMarker}"></span>
+                                    </div>
                                 </td>
 
                             </tr>
