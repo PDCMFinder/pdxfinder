@@ -26,9 +26,10 @@ public class OntologyTerm {
     private Set<OntologyTerm> subclassOf;
 
     @Relationship(type = "MAPPED_TO", direction = Relationship.INCOMING)
-    private SampleToOntologyRelationship mappedTo;
+    private SampleToOntologyRelationship sampleMappedTo;
 
-
+    @Relationship(type = "MAPPED_TO", direction = Relationship.INCOMING)
+    private TreatmentToOntologyRelationship treatmentMappedTo;
 
 
     public OntologyTerm() {
@@ -74,12 +75,12 @@ public class OntologyTerm {
         this.subclassOf = subclassOf;
     }
 
-    public SampleToOntologyRelationship getMappedTo() {
-        return mappedTo;
+    public SampleToOntologyRelationship getSampleMappedTo() {
+        return sampleMappedTo;
     }
 
-    public void setMappedTo(SampleToOntologyRelationship mappedTo) {
-        this.mappedTo = mappedTo;
+    public void setSampleMappedTo(SampleToOntologyRelationship sampleMappedTo) {
+        this.sampleMappedTo = sampleMappedTo;
     }
 
     public void addSubclass(OntologyTerm ot){
@@ -112,5 +113,13 @@ public class OntologyTerm {
 
     public void setSynonyms(Set<String> synonyms) {
         this.synonyms = synonyms;
+    }
+
+    public TreatmentToOntologyRelationship getTreatmentMappedTo() {
+        return treatmentMappedTo;
+    }
+
+    public void setTreatmentMappedTo(TreatmentToOntologyRelationship treatmentMappedTo) {
+        this.treatmentMappedTo = treatmentMappedTo;
     }
 }

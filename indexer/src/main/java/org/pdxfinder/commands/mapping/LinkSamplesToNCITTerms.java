@@ -305,7 +305,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                         ot.setDirectMappedSamplesNumber(ot.getDirectMappedSamplesNumber() + 1);
                         SampleToOntologyRelationship r = new SampleToOntologyRelationship(me.getMapType(), me.getJustification(), sample, ot);
                         sample.setSampleToOntologyRelationShip(r);
-                        ot.setMappedTo(r);
+                        ot.setSampleMappedTo(r);
                         dataImportService.saveSample(sample);
                         dataImportService.saveOntologyTerm(ot);
                         //log.info("Mapping "+diagnosis+" to "+mappingRule.getOntologyTerm());
