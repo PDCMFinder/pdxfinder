@@ -246,7 +246,9 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
     }
 
-
+    /**
+     * Creates the provider group in the database
+     */
     private void createDataSourceGroup() {
 
         //TODO: this data has to come from the spreadsheet, I am using constants for now
@@ -279,6 +281,9 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
     }
 
+    /**
+     * Creates the patient nodes
+     */
     private void createPatients() {
 
         if (stopLoading) return;
@@ -309,6 +314,9 @@ public class UniversalLoader extends UniversalLoaderOmic {
         }
     }
 
+    /**
+     * Targets an existing patient, creates patient snapshots, patient sample, tumor type and the model
+     */
     private void createPatientTumors() {
 
         if (stopLoading) return;
@@ -431,6 +439,10 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
     }
 
+    /**
+     *
+     * Targets an existing patient and snapshot to create a treatment summary with treatment protocols
+     */
     private void createPatientTreatments() {
 
         if (stopLoading) return;
@@ -507,6 +519,10 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
     }
 
+    /**
+     *
+     * Targets an existing model to create specimens with engraftment site, type and material, host strain as well as publication groups
+     */
     private void createPdxModelDetails() {
 
         if (stopLoading) return;
@@ -659,6 +675,11 @@ public class UniversalLoader extends UniversalLoaderOmic {
         }
     }
 
+    /**
+     *
+     * Targets existing model to add validation (QA) nodes
+     *
+     */
     private void createPdxModelValidations() {
 
         if (stopLoading) return;
@@ -740,7 +761,19 @@ public class UniversalLoader extends UniversalLoaderOmic {
         }
     }
 
-
+    /**
+     * Requirements:
+     *
+     * PATIENT
+     * existing patient sample
+     *
+     * XENOGRAFT
+     * existing model, specimen, creates xeno sample if not present
+     *
+     * Creates a molecular characterization with a platform and links it to the appropriate sample
+     *
+     *
+     */
     private void createDerivedPatientModelDataset() {
 
         if (stopLoading) return;
@@ -992,10 +1025,10 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
 
-
-
-
-
+    /**
+     * Targets existing model, creates external urls, updates provider type
+     *
+     */
     private void createSharingAndContacts() {
 
         if (stopLoading) return;
