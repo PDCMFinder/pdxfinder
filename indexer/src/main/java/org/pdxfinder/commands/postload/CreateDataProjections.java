@@ -105,15 +105,15 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
             reportManager = (ReportManager) context.getBean("ReportManager");
 
-            //createMutationDataProjection();
+            createMutationDataProjection();
 
-            //createModelForQueryDataProjection();
+            createModelForQueryDataProjection();
 
-            //createModelDrugResponseDataProjection();
+            createModelDrugResponseDataProjection();
 
-            //createImmunoHistoChemistryDataProjection();
+            createImmunoHistoChemistryDataProjection();
 
-            //createCNADataProjection();
+            createCNADataProjection();
 
             createDataAvailableDataProjection();
 
