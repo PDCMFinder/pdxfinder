@@ -935,8 +935,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
         omicCnaPicnicValue = "picnic_value";
 
         platformURL = new HashMap<>();
-        platformURL.put("Targeted_NGS","/platform/targeted-ngs/");
-        platformURL.put("CGH_array","/platform/cgh-array/");
+        platformURL.put("CGH_array","/platform/curie-lc-cna/");
+        platformURL.put("Targeted_NGS","/platform/curie-lc-mutation/");
 
         if (dataSourceAbbreviation.equals("CRL")){
             omicDataFilesType = "ONE_FILE_PER_MODEL";
