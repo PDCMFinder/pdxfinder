@@ -11,6 +11,7 @@ import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.DrugService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.ModelForQuery;
+import org.pdxfinder.services.dto.DataAvailableDTO;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.pdxfinder.services.reporting.MarkerLogEntity;
 import org.slf4j.Logger;
@@ -73,6 +74,8 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
     //"cnamarker"=>set of model ids
     private Map<String, Set<Long>> copyNumberAlterationDP = new HashMap<>();
 
+    private Map<String, List<DataAvailableDTO>> dataAvailableDP = new HashMap<>();
+
     protected static ApplicationContext context;
 
     @Autowired
@@ -102,15 +105,17 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
             reportManager = (ReportManager) context.getBean("ReportManager");
 
-            createMutationDataProjection();
+            //createMutationDataProjection();
 
-            createModelForQueryDataProjection();
+            //createModelForQueryDataProjection();
 
-            createModelDrugResponseDataProjection();
+            //createModelDrugResponseDataProjection();
 
-            createImmunoHistoChemistryDataProjection();
+            //createImmunoHistoChemistryDataProjection();
 
-            createCNADataProjection();
+            //createCNADataProjection();
+
+            createDataAvailableDataProjection();
 
             saveDataProjections();
 
@@ -361,6 +366,86 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
     }
 
+    private void createDataAvailableDataProjection(){
+        log.info("Creating data available projections");
+
+        List<Group> providerGroups = dataImportService.getAllProviderGroups();
+
+        for(Group group : providerGroups){
+
+            int numberOfModels = dataImportService.getModelCountByDataSource(group.getAbbreviation());
+
+            // molcharType + platformName + platformUrl = > Set of pdx ids
+            Map<String, Set<String>> platformMap = new HashMap<>();
+
+            log.info("Creating data available projections for "+group.getAbbreviation()+": "+numberOfModels + " models");
+
+            for(int i =0; i < numberOfModels; i+=100){
+
+                Collection<ModelCreation> models = dataImportService.getModelsWithMolCharBySourceFromTo(group.getAbbreviation(), i, 100);
+
+                for(ModelCreation model: models){
+
+                    for(Sample sample: model.getRelatedSamples()){
+
+                        for(MolecularCharacterization mc: sample.getMolecularCharacterizations()){
+
+                            String platformKey = mc.getType() + "___"+mc.getPlatform().getName()+"___"+mc.getPlatform().getUrl();
+
+                            if(!platformMap.containsKey(platformKey)){
+                                platformMap.put(platformKey, new HashSet<>());
+                            }
+
+                            platformMap.get(platformKey).add(model.getSourcePdxId());
+                        }
+                    }
+                }
+
+
+            }
+
+            List<DataAvailableDTO> dataAvailableDTOList = new ArrayList<>();
+
+            for(Map.Entry<String, Set<String>> platform :platformMap.entrySet()){
+
+                String[] platformArr = platform.getKey().split("___");
+
+                DataAvailableDTO dto = new DataAvailableDTO(platformArr[0], platformArr[1], Integer.toString(platform.getValue().size()), platformArr[2]);
+                dataAvailableDTOList.add(dto);
+            }
+
+            int drugDosingStudies = dataImportService.findDrugDosingStudyNumberByDataSource(group.getAbbreviation());
+            if(drugDosingStudies > 0){
+
+                DataAvailableDTO dto = new DataAvailableDTO("dosing studies", "Dosing Protocol", Integer.toString(drugDosingStudies), dataImportService.getDrugDosingUrlByDataSource(group.getAbbreviation()));
+                dataAvailableDTOList.add(dto);
+            }
+
+            int patientTreatment = dataImportService.findPatientTreatmentNumberByDataSource(group.getAbbreviation());
+
+            if(patientTreatment > 0){
+
+                DataAvailableDTO dto = new DataAvailableDTO("", "Patient Treatment", Integer.toString(patientTreatment));
+                dataAvailableDTOList.add(dto);
+            }
+
+            dataAvailableDP.put(group.getAbbreviation(), dataAvailableDTOList);
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+
+    }
+
 
     private void addCharlesRiverCNA() throws Exception {
 
@@ -488,6 +573,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             log.error("Missing files for creating CRL CNA projection.");
         }
     }
+
     private void addToTwoParamDP(Map<String, Map<String, Set<Long>>> collection, String key1, String key2, Long modelId){
 
         if(collection.containsKey(key1)){
@@ -1129,7 +1215,16 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             cnaDP.setLabel("copy number alteration");
         }
 
-        JSONObject j1 ,j2, j3, j4, j5;
+
+        DataProjection daDP = dataImportService.findDataProjectionByLabel("data available");
+
+        if(daDP == null){
+            daDP = new DataProjection();
+            daDP.setLabel("data available");
+        }
+
+
+        JSONObject j1 ,j2, j3, j4, j5, j6;
 
         try{
             j1 = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
@@ -1176,11 +1271,25 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             log.error(copyNumberAlterationDP.toString());
         }
 
+        try{
+            j6 = new JSONObject(dataAvailableDP.toString());
+            daDP.setValue(j6.toString());
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+            log.error(dataAvailableDP.toString());
+        }
+
+
+
+
         dataImportService.saveDataProjection(pmvmDP);
         dataImportService.saveDataProjection(mvDP);
         dataImportService.saveDataProjection(drugDP);
         dataImportService.saveDataProjection(ihcDP);
         dataImportService.saveDataProjection(cnaDP);
+        dataImportService.saveDataProjection(daDP);
 
     }
 
