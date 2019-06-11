@@ -61,4 +61,13 @@ public class DataAvailableDTO {
     }
 
 
+    @Override
+    public String toString() {
+        return "{" +
+                "dataType='" + dataType + '\'' +
+                ", platformName='" + platformName + '\'' +
+                ", modelNumbers='" + modelNumbers + '\'' +
+                ", platformUrl='" + platformUrl + '\'' +
+                '}';
+    }
 }

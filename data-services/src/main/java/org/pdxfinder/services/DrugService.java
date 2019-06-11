@@ -37,7 +37,7 @@ public class DrugService {
 
     public int getDosingStudiesNumberByDataSource(String dataSource){
 
-        return treatmentSummaryRepository.findStudyNumberByDataSource(dataSource);
+        return treatmentSummaryRepository.findDrugDosingStudyNumberByDataSource(dataSource);
     }
 
 
