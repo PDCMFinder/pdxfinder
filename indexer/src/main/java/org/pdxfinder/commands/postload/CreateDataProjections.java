@@ -425,7 +425,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
             if(patientTreatment > 0){
 
-                DataAvailableDTO dto = new DataAvailableDTO("", "Patient Treatment", Integer.toString(patientTreatment));
+                DataAvailableDTO dto = new DataAvailableDTO("patient treatment", "Treatment Protocol", Integer.toString(patientTreatment));
                 dataAvailableDTOList.add(dto);
             }
 
