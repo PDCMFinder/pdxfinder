@@ -29,10 +29,10 @@ public interface TreatmentSummaryRepository extends Neo4jRepository<TreatmentSum
             "RETURN ts, tpr, tp, rr, r, tcr, tc, dr, d")
     TreatmentSummary findPatientTreatmentByDataSourceAndModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
-    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary) WHERE toLower(mod.dataSource) = toLower({dataSource}) RETURN count(mod)")
+    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary) WHERE toLower(mod.dataSource) = toLower({dataSource}) RETURN count(distinct mod)")
     int findDrugDosingStudyNumberByDataSource(@Param("dataSource") String dataSource);
 
-    @Query("MATCH (mod:ModelCreation)--(s:Sample)--(ps:PatientSnapshot)--(ts:TreatmentSummary) WHERE toLower(mod.dataSource) = toLower({dataSource}) RETURN count(mod)")
+    @Query("MATCH (mod:ModelCreation)--(s:Sample)--(ps:PatientSnapshot)--(ts:TreatmentSummary) WHERE toLower(mod.dataSource) = toLower({dataSource}) RETURN count(distinct mod)")
     int findPatientTreatmentNumberByDataSource(@Param("dataSource") String dataSource);
 
 
