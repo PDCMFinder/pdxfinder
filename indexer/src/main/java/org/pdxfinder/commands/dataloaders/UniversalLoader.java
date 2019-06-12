@@ -798,6 +798,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
             String platformTechnology = derivedDatasetRow.get(7);
             String platformDescription = derivedDatasetRow.get(8);
             String analysisProtocol = derivedDatasetRow.get(9);
+
+            String platformUrl = derivedDatasetRow.get(13);
             //TODO: get additional fields from the sheet
 
             //check essential values
@@ -824,6 +826,12 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 if (sample != null) {
 
                     platform = dataImportService.getPlatform(platformName, ds);
+
+                    if((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3){
+                        platform.setUrl(platformUrl);
+                        dataImportService.savePlatform(platform);
+                    }
+
                     MolecularCharacterization mc = new MolecularCharacterization();
                     mc.setPlatform(platform);
                     mc.setType(molCharType.toLowerCase());
@@ -889,6 +897,12 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     }
 
                     platform = dataImportService.getPlatform(platformName, ds);
+
+                    if((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3){
+                        platform.setUrl(platformUrl);
+                        dataImportService.savePlatform(platform);
+                    }
+
                     MolecularCharacterization mc = new MolecularCharacterization();
                     mc.setPlatform(platform);
                     mc.setType(molCharType.toLowerCase());
