@@ -828,8 +828,14 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     platform = dataImportService.getPlatform(platformName, ds);
 
                     if((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3){
+                        log.info("Saved platform:"+platform.getName() + " Url: "+(platform.getUrl()==null?"null":platform.getUrl())+" Url in file: "+platformUrl);
                         platform.setUrl(platformUrl);
                         dataImportService.savePlatform(platform);
+                        log.info("Updating platform url");
+                    }
+                    else{
+
+                        log.warn("Platform "+platform.getName() +" was not updated. ");
                     }
 
                     MolecularCharacterization mc = new MolecularCharacterization();
@@ -898,9 +904,17 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                     platform = dataImportService.getPlatform(platformName, ds);
 
+
+
                     if((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3){
+                        log.info("Saved platform:"+platform.getName() + " Url: "+(platform.getUrl()==null?"null":platform.getUrl())+" Url in file: "+platformUrl);
                         platform.setUrl(platformUrl);
                         dataImportService.savePlatform(platform);
+                        log.info("Updating platform url");
+                    }
+                    else{
+
+                        log.warn("Platform "+platform.getName() +" was not updated. ");
                     }
 
                     MolecularCharacterization mc = new MolecularCharacterization();
