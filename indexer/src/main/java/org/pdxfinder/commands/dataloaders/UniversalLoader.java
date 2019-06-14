@@ -800,6 +800,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
             String analysisProtocol = derivedDatasetRow.get(9);
 
             String platformUrl = derivedDatasetRow.get(13);
+
+            platformUrl = platformUrl.replaceAll("[^A-Za-z0-9 /_-]", "");
             //TODO: get additional fields from the sheet
 
             //check essential values
