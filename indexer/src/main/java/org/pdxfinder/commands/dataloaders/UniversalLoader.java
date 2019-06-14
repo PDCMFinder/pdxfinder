@@ -801,7 +801,12 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             String platformUrl = derivedDatasetRow.get(13);
 
-            platformUrl = platformUrl.replaceAll("[^A-Za-z0-9 /_-]", "");
+
+            if(platformUrl != null){
+                platformUrl = platformUrl.replaceAll("[^A-Za-z0-9 /_-]", "");
+            }
+
+
             //TODO: get additional fields from the sheet
 
             //check essential values
