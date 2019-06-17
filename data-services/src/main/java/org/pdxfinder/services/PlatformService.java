@@ -1,9 +1,9 @@
 package org.pdxfinder.services;
 
-import org.pdxfinder.graph.dao.ModelCreation;
-import org.pdxfinder.graph.dao.MolecularCharacterization;
-import org.pdxfinder.graph.dao.Platform;
-import org.pdxfinder.graph.dao.Sample;
+import org.neo4j.ogm.json.JSONArray;
+import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.graph.repositories.DataProjectionRepository;
 import org.pdxfinder.graph.repositories.ModelCreationRepository;
 import org.pdxfinder.graph.repositories.PlatformRepository;
 import org.pdxfinder.services.dto.DataAvailableDTO;
@@ -22,12 +22,14 @@ public class PlatformService
     private PlatformRepository platformRepository;
     private ModelCreationRepository modelCreationRepository;
     private DrugService drugService;
+    private DataProjectionRepository dataProjectionRepository;
 
 
-    public PlatformService(PlatformRepository platformRepository, ModelCreationRepository modelCreationRepository, DrugService drugService) {
+    public PlatformService(PlatformRepository platformRepository, ModelCreationRepository modelCreationRepository, DrugService drugService, DataProjectionRepository dataProjectionRepository) {
         this.platformRepository = platformRepository;
         this.modelCreationRepository = modelCreationRepository;
         this.drugService = drugService;
+        this.dataProjectionRepository = dataProjectionRepository;
     }
 
 
@@ -133,73 +135,48 @@ public class PlatformService
 
     public List<DataAvailableDTO> getAvailableDataBySource(String dataSource){
 
-        Map<String, DataAvailableDTO> daMap = new HashMap<>();
 
-        Collection<ModelCreation> models = modelCreationRepository.getModelsWithMolCharBySource(dataSource);
+        List<DataAvailableDTO> results = new ArrayList<>();
 
-        for(ModelCreation m : models){
+        String daJson;
+        if(dataProjectionRepository.findByLabel("data available") != null){
 
-            String platformName;
-            String mcType;
-            String platformUrl;
+            daJson = dataProjectionRepository.findByLabel("data available").getValue();
+        }
+        else{
+            return results;
+        }
 
-            for(Sample s : m.getRelatedSamples()){
+        try{
 
-                for(MolecularCharacterization mc : s.getMolecularCharacterizations()){
+            JSONObject json = new JSONObject(daJson);
 
-                    platformName = mc.getPlatform().getName();
-                    platformUrl = mc.getPlatform().getUrl();
+            for(int i=0; i<json.names().length(); i++){
 
-                    mcType = mc.getType();
+                if(json.names().getString(i).toLowerCase().equals(dataSource.toLowerCase())){
 
-                    DataAvailableDTO dto;
+                    JSONArray jarray = json.getJSONArray(json.names().getString(i));
 
-                    if(daMap.containsKey(mcType+platformName+platformUrl)){
+                    for(int j = 0; j < jarray.length(); j++){
+                        JSONObject obj = jarray.getJSONObject(j);
 
-                        dto = daMap.get(mcType+platformName+platformUrl);
-                        int oldNum = Integer.parseInt(dto.getModelNumbers());
-                        oldNum++;
-                        dto.setModelNumbers(Integer.toString(oldNum));
-                        daMap.put(mcType+platformName+platformUrl, dto);
-
-                    }
-                    else{
-
-                        daMap.put(mcType+platformName+platformUrl, new DataAvailableDTO(mcType, platformName, "1", platformUrl));
+                        results.add(new DataAvailableDTO(obj.getString("dataType"), obj.getString("platformName"), obj.getString("modelNumbers"), obj.getString("platformUrl")));
                     }
 
-
+                    return results;
                 }
             }
 
         }
+        catch (Exception e){
 
-        List<DataAvailableDTO> results = new ArrayList<>();
-
-        for(DataAvailableDTO dto : daMap.values()){
-
-            results.add(dto);
-        }
-
-
-        //Add dosing studies number
-        int dosingStudiesNumber = drugService.getDosingStudiesNumberByDataSource(dataSource);
-
-        if(dosingStudiesNumber > 0) {
-
-            DataAvailableDTO dto = new DataAvailableDTO("dosing studies", "Dosing Protocol", Integer.toString(dosingStudiesNumber));
-            String platformUrl = drugService.getPlatformUrlByDataSource(dataSource);
-
-            if(platformUrl == null || platformUrl.isEmpty()){
-                dto.setPlatformUrl("");
-            }
-            else{
-                dto.setPlatformUrl(platformUrl);
-            }
-            results.add(dto);
+            e.printStackTrace();
         }
 
         return results;
+
+
+
     }
 
 
