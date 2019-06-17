@@ -150,10 +150,10 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             }
             else{
 
-                String platformURLKey = platformName.replace("\\s","_");
+                String platformURLKey = platformName.replaceAll("\\s","_");
 
                 platform = dataImportService.getPlatform(platformName, providerGroup);
-                platform.setUrl(platformURLKey);
+                platform.setUrl(platformURL.get(platformURLKey));
                 platformMap.put(platformName, platform);
             }
 
@@ -176,8 +176,8 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             }
             else{
                 log.info("Looking at molchar "+molcharKey);
-                log.info("Existing keys: ");
-                log.info(existingMolcharNodes.keySet().toString());
+                //log.info("Existing keys: ");
+                //log.info(existingMolcharNodes.keySet().toString());
                 molecularCharacterization = new MolecularCharacterization();
                 molecularCharacterization.setType(dataType);
                 molecularCharacterization.setPlatform(platform);
