@@ -490,8 +490,8 @@
 
 
     mainSearch.passedElement.addEventListener('showDropdown', function (event) {
-        if (mainSearch.currentState.items.length) {
-            if (mainSearch.currentState.items[mainSearch.currentState.items.length - 1].active) {
+        if (mainSearch.currentState.item.length) {
+            if (mainSearch.currentState.item[mainSearch.currentState.item.length - 1].active) {
                 // only show dropdown if something hasn't been selected
                 mainSearch.hideDropdown();
                 // hide placeholder text

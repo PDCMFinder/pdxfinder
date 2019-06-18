@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -18,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class Labels {
 
-    private List<Items> items;
+    private List<Item> items;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -26,15 +25,15 @@ public class Labels {
     public Labels() {
     }
 
-    public Labels(List<Items> items) {
+    public Labels(List<Item> items) {
         this.items = items;
     }
 
-    public List<Items> getItems() {
+    public List<Item> getItems() {
         return items;
     }
 
-    public void setItems(List<Items> items) {
+    public void setItems(List<Item> items) {
         this.items = items;
     }
 

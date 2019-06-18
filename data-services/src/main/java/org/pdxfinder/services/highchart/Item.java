@@ -15,7 +15,7 @@ package org.pdxfinder.services.highchart;
         "style",
         "color"
 })
-public class Items {
+public class Item {
 
     private String html;
     private Style style;
@@ -23,7 +23,7 @@ public class Items {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public Items(String html, Style style) {
+    public Item(String html, Style style) {
         this.html = html;
         this.style = style;
     }

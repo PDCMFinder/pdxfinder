@@ -48,6 +48,18 @@ public class ChartHelper {
     }
 
 
+    public Labels simpleLabel(String html, String left, String top, String color){
+
+        Style style = new Style(left,top,color);
+
+        Item item = new Item(html, style);
+
+        Labels labels = new Labels(Arrays.asList(item));
+
+        return labels;
+    }
+
+
 
 
 }
