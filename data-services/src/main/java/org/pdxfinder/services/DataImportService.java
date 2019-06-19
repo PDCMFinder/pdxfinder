@@ -343,6 +343,23 @@ public class DataImportService {
         return modelCreationRepository.findModelWithSampleByMolChar(mc);
     }
 
+    public int getModelCount(){
+
+        return modelCreationRepository.countAllModels();
+    }
+
+    public int getModelCountByDataSource(String dataSource){
+
+        return modelCreationRepository.getModelCountByDataSource(dataSource);
+    }
+
+
+    public Collection<ModelCreation> getModelsWithMolCharBySourceFromTo(String dataSource, int from, int to){
+
+        return modelCreationRepository.getModelsWithMolCharBySourceFromTo(dataSource, from, to);
+    }
+
+
     public Patient createPatient(String patientId, Group dataSource, String sex, String race, String ethnicity){
 
         Patient patient = findPatient(patientId, dataSource);
@@ -1012,11 +1029,26 @@ public class DataImportService {
         return false;
     }
 
+    public int findDrugDosingStudyNumberByDataSource(String datasource){
+
+        return treatmentSummaryRepository.findDrugDosingStudyNumberByDataSource(datasource);
+    }
+
+    public int findPatientTreatmentNumberByDataSource(String datasource){
+
+        return treatmentSummaryRepository.findPatientTreatmentNumberByDataSource(datasource);
+    }
+
     public ModelCreation findModelByTreatmentSummary(TreatmentSummary ts){
 
         return modelCreationRepository.findByTreatmentSummary(ts);
     }
 
+
+    public String getDrugDosingUrlByDataSource(String dataSource){
+
+        return treatmentSummaryRepository.findPlatformUrlByDataSource(dataSource);
+    }
 
     public Drug getStandardizedDrug(String drugString){
 

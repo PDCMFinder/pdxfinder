@@ -42,6 +42,9 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     int countAllModels();
 
 
+    @Query("MATCH (mod:ModelCreation) where toLower(mod.dataSource) = toLower({datasource}) RETURN count(mod)")
+    int getModelCountByDataSource(@Param("datasource") String dataSource);
+
     @Query("MATCH (s:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
             "WHERE s.sourceSampleId = {sampleId} " +
             "RETURN mod")
@@ -166,6 +169,13 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN mod, msr, s, cbr, mc, pur, pl")
     Collection<ModelCreation> getModelsWithMolCharBySource(@Param("dataSource") String dataSource);
 
+    @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource})  " +
+            "WITH mod SKIP {from} LIMIT {to}" +
+            "MATCH (mod)-[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)--(ma:MarkerAssociation) " +
+            "WITH mod, msr, s, cbr, mc " +
+            "MATCH (mc)-[pur:PLATFORM_USED]-(pl:Platform) " +
+            "RETURN mod, msr, s, cbr, mc, pur, pl")
+    Collection<ModelCreation> getModelsWithMolCharBySourceFromTo(@Param("dataSource") String dataSource, @Param("from") int from, @Param("to") int to);
 
     @Query("MATCH (model:ModelCreation)--(ts:TreatmentSummary) " +
             "WHERE id(ts) = {ts} " +

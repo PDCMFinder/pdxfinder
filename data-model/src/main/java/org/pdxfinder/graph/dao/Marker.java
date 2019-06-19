@@ -20,7 +20,7 @@ public class Marker {
     String hgncSymbol;              // This is the approved Symbol in HGNC - KRAS
     String hgncName;                // This is the approved name in HGNC KRAS proto-oncogene, GTPase
     String hgncId;                  // This is the hugo unique ID - e.g HGNC:6407
-    String ucscGeneId;              // This replaces entrez_id
+    String ucscGeneId;
 
     String ensemblGeneId;
     String ncbiGeneId;
