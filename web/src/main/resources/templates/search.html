@@ -505,6 +505,7 @@
             conditionallyShowDropdown(mainSearch.currentValue);
         }
     }, false);
+
     mainSearch.passedElement.addEventListener('search', function (event) {
         var currentSearch = mainSearch.currentValue;
         // highlight match, docs:
@@ -516,6 +517,7 @@
         });
         conditionallyShowDropdown(currentSearch);
     }, false);
+
     mainSearch.passedElement.addEventListener('choice', function (event) {
         // Hide form after selecting an option
         mainSearch.hideDropdown();

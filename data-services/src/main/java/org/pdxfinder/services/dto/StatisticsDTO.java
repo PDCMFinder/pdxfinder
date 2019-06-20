@@ -1,16 +1,18 @@
 package org.pdxfinder.services.dto;
 
+import java.util.List;
+
 /*
  * Created by abayomi on 19/06/2019.
  */
 public class StatisticsDTO {
 
     private String category;
-    private CountDTO countDTO;
+    private List<CountDTO> dataCounts;
 
-    public StatisticsDTO(String category, CountDTO countDTO) {
+    public StatisticsDTO(String category, List<CountDTO> dataCounts) {
         this.category = category;
-        this.countDTO = countDTO;
+        this.dataCounts = dataCounts;
     }
 
     public String getCategory() {
@@ -21,11 +23,11 @@ public class StatisticsDTO {
         this.category = category;
     }
 
-    public CountDTO getCountDTO() {
-        return countDTO;
+    public List<CountDTO> getDataCounts() {
+        return dataCounts;
     }
 
-    public void setCountDTO(CountDTO countDTO) {
-        this.countDTO = countDTO;
+    public void setDataCounts(List<CountDTO> dataCounts) {
+        this.dataCounts = dataCounts;
     }
 }
