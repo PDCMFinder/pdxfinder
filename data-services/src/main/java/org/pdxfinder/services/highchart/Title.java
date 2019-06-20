@@ -10,6 +10,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+/*
+ * Created by abayomi on 19/06/2019.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "text"
@@ -17,20 +20,21 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class Title {
 
 
-    private List<String> text;
+    private String text;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public Title(List<String> text) {
+
+    public Title(String text) {
         this.text = text;
     }
 
-    public List<String> getText() {
+    public String getText() {
         return text;
     }
 
-    public void setText(List<String> text) {
+    public void setText(String text) {
         this.text = text;
     }
 

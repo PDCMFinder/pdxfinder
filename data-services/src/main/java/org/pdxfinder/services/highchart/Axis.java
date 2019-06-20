@@ -10,11 +10,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+/*
+ * Created by abayomi on 19/06/2019.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "categories"
 })
-public class XAxis {
+public class Axis {
 
 
     private List<String> categories;
@@ -22,7 +25,7 @@ public class XAxis {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public XAxis(List<String> categories) {
+    public Axis(List<String> categories) {
         this.categories = categories;
     }
 

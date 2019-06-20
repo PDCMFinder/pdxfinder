@@ -3,12 +3,17 @@ package org.pdxfinder.services.highchart;
 import java.util.Arrays;
 import java.util.List;
 
+/*
+ * Created by abayomi on 19/06/2019.
+ */
 public class ChartHelper {
 
+    public ChartHelper() {
+    }
 
-    public Series splineChart(List<Double> data, String chartName){
+    public Series splineChart(List<Object> data, String chartName){
 
-        String type = "spline";
+        String type = SeriesType.SPLINE.get();
         int lineWidth = 2;
         String lineColor = "#007BFF";
         String fillColor = "white";
@@ -22,10 +27,10 @@ public class ChartHelper {
     }
 
 
-    public Series columnChart(List<Double> data, String chartName){
 
-        String type = "column";
-        String color = "#007BFF";
+    public Series columnChart(List<Object> data, String chartName, String color){
+
+        String type = SeriesType.COLUMN.get();
 
         Series columnSeries = new Series(type,chartName,data,color);
 
@@ -35,7 +40,7 @@ public class ChartHelper {
 
     public Series pieChart(List<PieData> data, String chartName){
 
-        String type = "pie";
+        String type = SeriesType.PIE.get();
         List<Integer> center = Arrays.asList(100,80);
         Integer size = 100;
         Boolean showInLegend = false;

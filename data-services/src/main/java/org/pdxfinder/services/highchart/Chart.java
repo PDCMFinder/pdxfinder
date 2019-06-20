@@ -1,8 +1,8 @@
 package org.pdxfinder.services.highchart;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,37 +15,57 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "html",
-        "style",
-        "color"
+        "text"
 })
-public class Item {
+public class Chart {
 
-    private String html;
-    private Style style;
+
+    private Title title;
+    private Axis xAxis;
+    private Labels labels;
+    private List<Series> series;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public Item(String html, Style style) {
-        this.html = html;
-        this.style = style;
+
+    public Chart(Title title, Axis xAxis, Labels labels, List<Series> series) {
+        this.title = title;
+        this.xAxis = xAxis;
+        this.labels = labels;
+        this.series = series;
     }
 
-    public String getHtml() {
-        return html;
+    public Title getTitle() {
+        return title;
     }
 
-    public void setHtml(String html) {
-        this.html = html;
+    public void setTitle(Title title) {
+        this.title = title;
     }
 
-    public Style getStyle() {
-        return style;
+    public Axis getxAxis() {
+        return xAxis;
     }
 
-    public void setStyle(Style style) {
-        this.style = style;
+    public void setxAxis(Axis xAxis) {
+        this.xAxis = xAxis;
+    }
+
+    public Labels getLabels() {
+        return labels;
+    }
+
+    public void setLabels(Labels labels) {
+        this.labels = labels;
+    }
+
+    public List<Series> getSeries() {
+        return series;
+    }
+
+    public void setSeries(List<Series> series) {
+        this.series = series;
     }
 
     @JsonAnyGetter
