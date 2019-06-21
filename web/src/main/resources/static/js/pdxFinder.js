@@ -45,6 +45,7 @@ function redirectPage(webFacetSections) {
     });
 
 
+    //  alert("JESUS IS LORD")
 
     var twoParamUnlinkedFilters = getFiltersFromWebFacetSection(webFacetSections, 'TwoParamUnlinkedFilter');
     twoParamUnlinkedFilters.forEach(function (filterComponent) {
@@ -73,7 +74,7 @@ function redirectPage(webFacetSections) {
                             no_parameters = false;
                             break;
                         } else {
-                            url += urlKey + "=" + component1Choice.val() + "___" + component2Choices.val()[j];
+                            url += urlKey + "=" + component1Choice.val() + "___" + component2Choices.val()[j].replace(/^\s+|\s+$/g, '');
                             no_parameters = false;
 
                         }
