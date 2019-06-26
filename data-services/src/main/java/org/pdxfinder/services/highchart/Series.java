@@ -21,6 +21,12 @@ public class Series {
     private Object data;
     private String color;
     private Marker marker;
+    private String dashStyle;
+    private Double opacity;
+    private Double pointPadding;
+    private Double pointPlacement;
+    private Integer yAxis;
+    private ToolTip toolTip;
 
     private List<Integer> center;
     private Integer size;
@@ -94,6 +100,22 @@ public class Series {
 
     public void setMarker(Marker marker) {
         this.marker = marker;
+    }
+
+    public String getDashStyle() {
+        return dashStyle;
+    }
+
+    public void setDashStyle(String dashStyle) {
+        this.dashStyle = dashStyle;
+    }
+
+    public Double getOpacity() {
+        return opacity;
+    }
+
+    public void setOpacity(Double opacity) {
+        this.opacity = opacity;
     }
 
     public List<Integer> getCenter() {
