@@ -14,13 +14,15 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "html",
+        "items",
         "style",
-        "color"
+        "format",
 })
 public class Labels {
 
     private List<Item> items;
+    private String format;
+    private Style style;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();

@@ -80,7 +80,7 @@ public class Statistics {
 
         Title title = new Title(chartTitle);
 
-        Axis xAxis = new Axis(categories);
+        XAxis xAxis = new XAxis(categories);
 
         Labels labels = chartHelper.simpleLabel(lablelString , labelLeft, labelTop, labelColor);
 

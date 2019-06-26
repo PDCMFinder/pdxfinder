@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /*
@@ -21,7 +20,7 @@ public class Chart {
 
 
     private Title title;
-    private Axis xAxis;
+    private XAxis xAxis;
     private Labels labels;
     private List<Series> series;
 
@@ -29,7 +28,7 @@ public class Chart {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 
-    public Chart(Title title, Axis xAxis, Labels labels, List<Series> series) {
+    public Chart(Title title, XAxis xAxis, Labels labels, List<Series> series) {
         this.title = title;
         this.xAxis = xAxis;
         this.labels = labels;
@@ -44,11 +43,11 @@ public class Chart {
         this.title = title;
     }
 
-    public Axis getxAxis() {
+    public XAxis getxAxis() {
         return xAxis;
     }
 
-    public void setxAxis(Axis xAxis) {
+    public void setxAxis(XAxis xAxis) {
         this.xAxis = xAxis;
     }
 

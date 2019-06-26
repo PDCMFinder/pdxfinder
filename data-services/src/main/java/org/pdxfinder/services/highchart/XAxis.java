@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
         "categories"
 })
-public class Axis {
+public class XAxis {
 
 
     private List<String> categories;
@@ -25,7 +25,7 @@ public class Axis {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public Axis(List<String> categories) {
+    public XAxis(List<String> categories) {
         this.categories = categories;
     }
 
