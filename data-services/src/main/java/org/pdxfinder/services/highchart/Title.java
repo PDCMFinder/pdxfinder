@@ -21,6 +21,7 @@ public class Title {
 
 
     private String text;
+    private Style style;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -36,6 +37,14 @@ public class Title {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public Style getStyle() {
+        return style;
+    }
+
+    public void setStyle(Style style) {
+        this.style = style;
     }
 
     @JsonAnyGetter

@@ -38,6 +38,22 @@ public class Labels {
         return items;
     }
 
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public Style getStyle() {
+        return style;
+    }
+
+    public void setStyle(Style style) {
+        this.style = style;
+    }
+
     public void setItems(List<Item> items) {
         this.items = items;
     }

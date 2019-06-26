@@ -15,35 +15,52 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "categories"
+        "labels",
+        "title",
+        "opposite"
 })
-public class XAxis {
+public class YAxis {
 
 
-    private List<String> categories;
-    private Boolean crosshair;
+    private Labels labels;
+    private Title title;
+    private Boolean opposite;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public XAxis(List<String> categories) {
-        this.categories = categories;
+
+    public YAxis() {
     }
 
-    public List<String> getCategories() {
-        return categories;
+    public YAxis(Labels labels, Title title, Boolean opposite) {
+        this.labels = labels;
+        this.title = title;
+        this.opposite = opposite;
     }
 
-    public void setCategories(List<String> categories) {
-        this.categories = categories;
+    public Labels getLabels() {
+        return labels;
     }
 
-    public Boolean getCrosshair() {
-        return crosshair;
+    public void setLabels(Labels labels) {
+        this.labels = labels;
     }
 
-    public void setCrosshair(Boolean crosshair) {
-        this.crosshair = crosshair;
+    public Title getTitle() {
+        return title;
+    }
+
+    public void setTitle(Title title) {
+        this.title = title;
+    }
+
+    public Boolean getOpposite() {
+        return opposite;
+    }
+
+    public void setOpposite(Boolean opposite) {
+        this.opposite = opposite;
     }
 
     @JsonAnyGetter
