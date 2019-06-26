@@ -19,7 +19,7 @@ public class Statistics {
     private Logger log = LoggerFactory.getLogger(Statistics.class);
 
 
-    public Object clusteredChart(List<StatisticsDTO> stats){
+    public Object columnLineAndBar(List<StatisticsDTO> stats){
 
         List<String> categories = new ArrayList<>();
         Map<String, List<Object>> dataMap = new HashMap<>();
