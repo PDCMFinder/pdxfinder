@@ -31,6 +31,11 @@ public class Title {
         this.text = text;
     }
 
+    public Title(String text, Style style) {
+        this.text = text;
+        this.style = style;
+    }
+
     public String getText() {
         return text;
     }

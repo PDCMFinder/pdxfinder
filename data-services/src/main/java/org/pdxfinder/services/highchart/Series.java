@@ -118,6 +118,39 @@ public class Series {
         this.opacity = opacity;
     }
 
+
+    public Double getPointPadding() {
+        return pointPadding;
+    }
+
+    public void setPointPadding(Double pointPadding) {
+        this.pointPadding = pointPadding;
+    }
+
+    public Double getPointPlacement() {
+        return pointPlacement;
+    }
+
+    public void setPointPlacement(Double pointPlacement) {
+        this.pointPlacement = pointPlacement;
+    }
+
+    public Integer getyAxis() {
+        return yAxis;
+    }
+
+    public void setyAxis(Integer yAxis) {
+        this.yAxis = yAxis;
+    }
+
+    public ToolTip getToolTip() {
+        return toolTip;
+    }
+
+    public void setToolTip(ToolTip toolTip) {
+        this.toolTip = toolTip;
+    }
+
     public List<Integer> getCenter() {
         return center;
     }

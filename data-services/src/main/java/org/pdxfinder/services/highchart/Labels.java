@@ -34,6 +34,11 @@ public class Labels {
         this.items = items;
     }
 
+    public Labels(String format, Style style) {
+        this.format = format;
+        this.style = style;
+    }
+
     public List<Item> getItems() {
         return items;
     }

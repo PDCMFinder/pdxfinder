@@ -14,11 +14,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "valueSuffix"
+        "valueSuffix",
+        "shared"
 })
 public class ToolTip {
 
     private String valueSuffix;
+    private Boolean shared;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -32,6 +34,14 @@ public class ToolTip {
 
     public String getValueSuffix() {
         return valueSuffix;
+    }
+
+    public Boolean getShared() {
+        return shared;
+    }
+
+    public void setShared(Boolean shared) {
+        this.shared = shared;
     }
 
     public void setValueSuffix(String valueSuffix) {

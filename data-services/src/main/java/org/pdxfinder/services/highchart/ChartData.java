@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /*
@@ -15,37 +14,33 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "labels",
-        "title",
-        "opposite"
+        "text"
 })
-public class YAxis {
+public class ChartData {
 
-
-    private Labels labels;
+    private Chart chart;
     private Title title;
-    private Boolean opposite;
-    private ToolTip toolTip;
+    private XAxis xAxis;
+    private Labels labels;
+    private List<Series> series;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 
-    public YAxis() {
-    }
-
-    public YAxis(Labels labels, Title title, Boolean opposite) {
-        this.labels = labels;
+    public ChartData(Title title, XAxis xAxis, Labels labels, List<Series> series) {
         this.title = title;
-        this.opposite = opposite;
-    }
-
-    public Labels getLabels() {
-        return labels;
-    }
-
-    public void setLabels(Labels labels) {
+        this.xAxis = xAxis;
         this.labels = labels;
+        this.series = series;
+    }
+
+    public Chart getChart() {
+        return chart;
+    }
+
+    public void setChart(Chart chart) {
+        this.chart = chart;
     }
 
     public Title getTitle() {
@@ -56,20 +51,28 @@ public class YAxis {
         this.title = title;
     }
 
-    public Boolean getOpposite() {
-        return opposite;
+    public XAxis getxAxis() {
+        return xAxis;
     }
 
-    public void setOpposite(Boolean opposite) {
-        this.opposite = opposite;
+    public void setxAxis(XAxis xAxis) {
+        this.xAxis = xAxis;
     }
 
-    public ToolTip getToolTip() {
-        return toolTip;
+    public Labels getLabels() {
+        return labels;
     }
 
-    public void setToolTip(ToolTip toolTip) {
-        this.toolTip = toolTip;
+    public void setLabels(Labels labels) {
+        this.labels = labels;
+    }
+
+    public List<Series> getSeries() {
+        return series;
+    }
+
+    public void setSeries(List<Series> series) {
+        this.series = series;
     }
 
     @JsonAnyGetter
