@@ -108,7 +108,7 @@ public class TreatmentProtocol {
 
         for(TreatmentComponent comp:components){
 
-            String drugName = comp.getDrug().getName();
+            String drugName = comp.getTreatment().getName();
 
             if(includeControlDrugs){
                 if(!ret.isEmpty()){

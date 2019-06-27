@@ -1050,15 +1050,6 @@ public class DataImportService {
         return treatmentSummaryRepository.findPlatformUrlByDataSource(dataSource);
     }
 
-    public Drug getStandardizedDrug(String drugString){
-
-        Drug d = new Drug();
-        d.setName(Standardizer.getDrugName(drugString));
-        if(d.getName().equals("Not Specified")) log.error("Unrecognised drug string: "+drugString);
-
-        return d;
-    }
-
     public CurrentTreatment getCurrentTreatment(String name){
 
         CurrentTreatment ct = currentTreatmentRepository.findByName(name);
@@ -1107,19 +1098,17 @@ public class DataImportService {
 
                 for(int i=0;i<drugArray.length;i++){
 
-                    Drug d = getStandardizedDrug(drugArray[i].trim());
+
+                    Treatment treatment = new Treatment();
+                    treatment.setName(drugArray[i].trim());
                     TreatmentComponent tc = new TreatmentComponent();
                     tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                     tc.setDose(doseArray[i].trim());
-                    //don't load unknown drugs
-                    if(!d.getName().equals("Not Specified")){
-                        tc.setDrug(d);
-                        tp.addTreatmentComponent(tc);
-                    }
-                    else{
-                        log.warn("Unrecognised drug name, skipping: "+drugString);
 
-                    }
+
+                    tc.setTreatment(treatment);
+                    tp.addTreatmentComponent(tc);
+
 
                 }
 
@@ -1131,19 +1120,15 @@ public class DataImportService {
 
                 for(int i=0;i<drugArray.length;i++){
 
-                    Drug d = getStandardizedDrug(drugArray[i].trim());
+                    Treatment treatment = new Treatment();
+                    treatment.setName(drugArray[i].trim());
+
                     TreatmentComponent tc = new TreatmentComponent();
                     tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                     tc.setDose(doseArray[0].trim());
-                    //don't load unknown drugs
-                    if(!d.getName().equals("Not Specified")){
-                        tc.setDrug(d);
-                        tp.addTreatmentComponent(tc);
-                    }
-                    else{
-                        log.warn("Unrecognised drug name, skipping: "+drugString);
 
-                    }
+                    tc.setTreatment(treatment);
+                    tp.addTreatmentComponent(tc);
 
                 }
 
@@ -1162,20 +1147,14 @@ public class DataImportService {
 
                     for(int i=0;i<drugArray.length;i++){
 
-                        Drug d = getStandardizedDrug(drugArray[i].trim());
+                        Treatment treatment = new Treatment();
+                        treatment.setName(drugArray[i].trim());
                         TreatmentComponent tc = new TreatmentComponent();
                         tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                         tc.setDose(doseArray[i].trim());
 
-                        //don't load unknown drugs
-                        if(!d.getName().equals("Not Specified")){
-                            tc.setDrug(d);
-                            tp.addTreatmentComponent(tc);
-                        }
-                        else{
-                            log.warn("Unrecognised drug name, skipping: "+drugString);
-
-                        }
+                        tc.setTreatment(treatment);
+                        tp.addTreatmentComponent(tc);
 
                     }
 
@@ -1190,19 +1169,13 @@ public class DataImportService {
 
                 for(int i=0;i<drugArray.length;i++){
 
-                    Drug d = getStandardizedDrug(drugArray[i].trim());
+                    Treatment treatment = new Treatment();
+                    treatment.setName(drugArray[i].trim());
                     TreatmentComponent tc = new TreatmentComponent();
                     tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                     tc.setDose(doseString.trim());
-                    //don't load unknown drugs
-                    if(!d.getName().equals("Not Specified")){
-                        tc.setDrug(d);
-                        tp.addTreatmentComponent(tc);
-                    }
-                    else{
-                        log.warn("Unrecognised drug name, skipping: "+drugString);
-
-                    }
+                    tc.setTreatment(treatment);
+                    tp.addTreatmentComponent(tc);
                 }
             }
 
@@ -1210,25 +1183,21 @@ public class DataImportService {
         //one drug only
         else{
 
-            Drug d = getStandardizedDrug(drugString.trim());
+
+            Treatment treatment = new Treatment();
+            treatment.setName(drugString.trim());
             TreatmentComponent tc = new TreatmentComponent();
             tc.setType(Standardizer.getTreatmentComponentType(drugString));
-            tc.setDrug(d);
+
             if(doseString != null) {
                 tc.setDose(doseString.trim());
             }
             else{
                 tc.setDose("");
             }
-            //don't load unknown drugs
-            if(!d.getName().equals("Not Specified")){
-                tc.setDrug(d);
-                tp.addTreatmentComponent(tc);
-            }
-            else{
-                log.warn("Unrecognised drug name, skipping: "+drugString);
 
-            }
+            tc.setTreatment(treatment);
+            tp.addTreatmentComponent(tc);
         }
 
         Response r = new Response();
