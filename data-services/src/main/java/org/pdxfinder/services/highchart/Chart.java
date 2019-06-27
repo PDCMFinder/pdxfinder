@@ -28,6 +28,10 @@ public class Chart {
     public Chart() {
     }
 
+    public Chart(String type) {
+        this.type = type;
+    }
+
     public Chart(String type, String zoomType) {
         this.type = type;
         this.zoomType = zoomType;

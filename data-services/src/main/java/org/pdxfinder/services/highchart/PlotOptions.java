@@ -14,11 +14,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        ""
+        "column"
 })
 public class PlotOptions {
 
-    private String column;
+    private Column column;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -26,15 +26,15 @@ public class PlotOptions {
     public PlotOptions() {
     }
 
-    public PlotOptions(String column) {
+    public PlotOptions(Column column) {
         this.column = column;
     }
 
-    public String getColumn() {
+    public Column getColumn() {
         return column;
     }
 
-    public void setColumn(String column) {
+    public void setColumn(Column column) {
         this.column = column;
     }
 

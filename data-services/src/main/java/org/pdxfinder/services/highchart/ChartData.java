@@ -14,15 +14,24 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "text"
+        "chart",
+        "title",
+        "xAxis",
+        "yAxis",
+        "plotOptions",
+        "series",
+        "labels"
 })
 public class ChartData {
 
     private Chart chart;
     private Title title;
     private XAxis xAxis;
-    private Labels labels;
+    private List<YAxis> yAxis;
+    private PlotOptions plotOptions;
     private List<Series> series;
+    private Labels labels;
+
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -33,6 +42,15 @@ public class ChartData {
         this.xAxis = xAxis;
         this.labels = labels;
         this.series = series;
+    }
+
+    public ChartData(Chart chart, Title title, XAxis xAxis, List<Series> series, List<YAxis> yAxis, PlotOptions plotOptions) {
+        this.chart = chart;
+        this.title = title;
+        this.xAxis = xAxis;
+        this.series = series;
+        this.yAxis = yAxis;
+        this.plotOptions = plotOptions;
     }
 
     public Chart getChart() {
@@ -59,6 +77,15 @@ public class ChartData {
         this.xAxis = xAxis;
     }
 
+
+    public List<YAxis> getyAxis() {
+        return yAxis;
+    }
+
+    public void setyAxis(List<YAxis> yAxis) {
+        this.yAxis = yAxis;
+    }
+
     public Labels getLabels() {
         return labels;
     }
@@ -73,6 +100,14 @@ public class ChartData {
 
     public void setSeries(List<Series> series) {
         this.series = series;
+    }
+
+    public PlotOptions getPlotOptions() {
+        return plotOptions;
+    }
+
+    public void setPlotOptions(PlotOptions plotOptions) {
+        this.plotOptions = plotOptions;
     }
 
     @JsonAnyGetter

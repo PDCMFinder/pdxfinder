@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class YAxis {
 
 
+    private Integer min;
     private Labels labels;
     private Title title;
     private Boolean opposite;
@@ -34,10 +35,23 @@ public class YAxis {
     public YAxis() {
     }
 
+    public YAxis(Title title, Boolean opposite) {
+        this.title = title;
+        this.opposite = opposite;
+    }
+
     public YAxis(Labels labels, Title title, Boolean opposite) {
         this.labels = labels;
         this.title = title;
         this.opposite = opposite;
+    }
+
+    public Integer getMin() {
+        return min;
+    }
+
+    public void setMin(Integer min) {
+        this.min = min;
     }
 
     public Labels getLabels() {

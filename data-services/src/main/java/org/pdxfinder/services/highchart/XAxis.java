@@ -26,6 +26,9 @@ public class XAxis {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    public XAxis() {
+    }
+
     public XAxis(List<String> categories) {
         this.categories = categories;
     }
