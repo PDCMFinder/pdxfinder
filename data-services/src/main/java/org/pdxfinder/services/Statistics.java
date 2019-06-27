@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /*
  * Created by abayomi on 20/06/2019.
@@ -52,8 +53,9 @@ public class Statistics {
 
         // Create the Column Charts Data to create a cluster
         List<Series> seriesList = new ArrayList<>();
+        int count = 0;
         for (Map.Entry<String, List<Object>> map : dataMap.entrySet()){
-            seriesList.add( chartHelper.columnChart(map.getValue(), map.getKey(), "#03458E") );
+            seriesList.add( chartHelper.columnChart(map.getValue(), map.getKey(), chartHelper.colors(count++)) );
         }
 
 
@@ -63,14 +65,14 @@ public class Statistics {
 
         // Get Most Recent Dataset from the Clustered Data to create Pie-ChartData.
         List<PieData> pieDatas = new ArrayList<>();
+        AtomicInteger counter = new AtomicInteger(0);
         stats.get(stats.size()-1).getDataCounts().forEach(CountDTO->{
             pieDatas.add(
-                    new PieData(CountDTO.getKey(),CountDTO.getValue(),"#03458E")
+                    new PieData(CountDTO.getKey(),CountDTO.getValue(),chartHelper.colors(counter.getAndIncrement()))
             );
         });
 
         seriesList.add(chartHelper.pieChart(pieDatas, "Molecular Data"));
-
 
         String chartTitle = "";
         String lablelString = "Data Distribution Today";
@@ -93,8 +95,8 @@ public class Statistics {
 
 
 
-    public Object fixedPlacementColumnChart(Map<String, List<StatisticsDTO>> data,
-                                            String chartTitle){
+
+    public Object fixedPlacementColumnChart(Map<String, List<StatisticsDTO>> data, String chartTitle){
 
 
         Map colors = new HashMap();
