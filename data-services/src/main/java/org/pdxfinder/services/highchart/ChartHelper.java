@@ -65,6 +65,24 @@ public class ChartHelper {
     }
 
 
+    public YAxis simpleYAxis(String labelText, String titleText, String labelColor, String titleColor, Boolean isOpposite){
+
+        Style labelStyle = new Style(labelColor);
+        String format = "{value}"+labelText;
+        Labels labels = new Labels(format,labelStyle);
+
+        Style titleStyle = new Style(titleColor);
+        Title title = new Title(titleText, titleStyle);
+
+        YAxis yAxis = new YAxis(labels,title,isOpposite);
+
+        return yAxis;
+    }
+
+
 
 
 }
+
+
+

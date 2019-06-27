@@ -15,41 +15,61 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "text"
+        "labels",
+        "title",
+        "opposite"
 })
-public class Title {
+public class YAxis {
 
 
-    private String text;
-    private Style style;
+    private Labels labels;
+    private Title title;
+    private Boolean opposite;
+    private ToolTip toolTip;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 
-    public Title(String text) {
-        this.text = text;
+    public YAxis() {
     }
 
-    public Title(String text, Style style) {
-        this.text = text;
-        this.style = style;
+    public YAxis(Labels labels, Title title, Boolean opposite) {
+        this.labels = labels;
+        this.title = title;
+        this.opposite = opposite;
     }
 
-    public String getText() {
-        return text;
+    public Labels getLabels() {
+        return labels;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setLabels(Labels labels) {
+        this.labels = labels;
     }
 
-    public Style getStyle() {
-        return style;
+    public Title getTitle() {
+        return title;
     }
 
-    public void setStyle(Style style) {
-        this.style = style;
+    public void setTitle(Title title) {
+        this.title = title;
+    }
+
+    public Boolean getOpposite() {
+        return opposite;
+    }
+
+    public void setOpposite(Boolean opposite) {
+        this.opposite = opposite;
+    }
+
+    public ToolTip getToolTip() {
+        return toolTip;
+    }
+
+    public void setToolTip(ToolTip toolTip) {
+        this.toolTip = toolTip;
     }
 
     @JsonAnyGetter

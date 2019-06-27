@@ -14,39 +14,38 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "type",
-        "zoomType"
+        "valueSuffix",
+        "shared"
 })
-public class Chart {
+public class ToolTip {
 
-    private String type;
-    private String zoomType;
+    private String valueSuffix;
+    private Boolean shared;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public Chart() {
+    public ToolTip() {
     }
 
-    public Chart(String type, String zoomType) {
-        this.type = type;
-        this.zoomType = zoomType;
+    public ToolTip(String valueSuffix) {
+        this.valueSuffix = valueSuffix;
     }
 
-    public String getType() {
-        return type;
+    public String getValueSuffix() {
+        return valueSuffix;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public Boolean getShared() {
+        return shared;
     }
 
-    public String getZoomType() {
-        return zoomType;
+    public void setShared(Boolean shared) {
+        this.shared = shared;
     }
 
-    public void setZoomType(String zoomType) {
-        this.zoomType = zoomType;
+    public void setValueSuffix(String valueSuffix) {
+        this.valueSuffix = valueSuffix;
     }
 
     @JsonAnyGetter

@@ -19,7 +19,7 @@ public class Statistics {
     private Logger log = LoggerFactory.getLogger(Statistics.class);
 
 
-    public Object clusteredChart(List<StatisticsDTO> stats){
+    public Object combinedColumnLineAndPieChart(List<StatisticsDTO> stats){
 
         List<String> categories = new ArrayList<>();
         Map<String, List<Object>> dataMap = new HashMap<>();
@@ -33,7 +33,7 @@ public class Statistics {
 
         stats.forEach(StatisticsDTO ->{
 
-            // Populate the chart category List
+            // Populate the chartData category List
             categories.add(StatisticsDTO.getCategory());
 
             //
@@ -57,11 +57,11 @@ public class Statistics {
         }
 
 
-        // Create a Spline Chart of Total Dataset counts
+        // Create a Spline ChartData of Total Dataset counts
         seriesList.add( chartHelper.splineChart(categorySum, "Aggregate") );
 
 
-        // Get Most Recent Dataset from the Clustered Data to create Pie-Chart.
+        // Get Most Recent Dataset from the Clustered Data to create Pie-ChartData.
         List<PieData> pieDatas = new ArrayList<>();
         stats.get(stats.size()-1).getDataCounts().forEach(CountDTO->{
             pieDatas.add(
@@ -80,16 +80,26 @@ public class Statistics {
 
         Title title = new Title(chartTitle);
 
-        Axis xAxis = new Axis(categories);
+        XAxis xAxis = new XAxis(categories);
 
         Labels labels = chartHelper.simpleLabel(lablelString , labelLeft, labelTop, labelColor);
 
-        Chart chart = new Chart(title,xAxis,labels,seriesList);
+        ChartData chartData = new ChartData(title,xAxis,labels,seriesList);
 
 
-        return chart;
+        return chartData;
 
     }
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -7,46 +7,43 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /*
- * Created by abayomi on 26/06/2019.
+ * Created by abayomi on 19/06/2019.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "type",
-        "zoomType"
+        "categories"
 })
-public class Chart {
+public class XAxis {
 
-    private String type;
-    private String zoomType;
+
+    private List<String> categories;
+    private Boolean crosshair;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public Chart() {
+    public XAxis(List<String> categories) {
+        this.categories = categories;
     }
 
-    public Chart(String type, String zoomType) {
-        this.type = type;
-        this.zoomType = zoomType;
+    public List<String> getCategories() {
+        return categories;
     }
 
-    public String getType() {
-        return type;
+    public void setCategories(List<String> categories) {
+        this.categories = categories;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public Boolean getCrosshair() {
+        return crosshair;
     }
 
-    public String getZoomType() {
-        return zoomType;
-    }
-
-    public void setZoomType(String zoomType) {
-        this.zoomType = zoomType;
+    public void setCrosshair(Boolean crosshair) {
+        this.crosshair = crosshair;
     }
 
     @JsonAnyGetter
