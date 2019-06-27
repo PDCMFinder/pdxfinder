@@ -9,8 +9,6 @@ import org.pdxfinder.services.pdf.Label;
 import org.pdxfinder.services.pdf.PdfHelper;
 import org.pdxfinder.services.pdf.Report;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +26,7 @@ public class AjaxController {
     private DetailsService detailsService;
     private DrugService drugService;
     private GraphService graphService;
+    private Statistics statistics;
 
     @Autowired
     PdfService pdfService;
@@ -41,7 +40,8 @@ public class AjaxController {
                           MolCharService molCharService,
                           DetailsService detailsService,
                           DrugService drugService,
-                          GraphService graphService) {
+                          GraphService graphService,
+                          Statistics statistics) {
 
         this.autoCompleteService = autoCompleteService;
         this.platformService = platformService;
@@ -49,9 +49,20 @@ public class AjaxController {
         this.detailsService = detailsService;
         this.drugService = drugService;
         this.graphService = graphService;
+        this.statistics = statistics;
     }
 
 
+
+
+
+    @GetMapping("/chart")
+    public Object getChart(){
+
+        List<StatisticsDTO> stats = statistics.mockRepository();
+
+       return statistics.combinedColumnLineAndPieChart(stats);
+    }
 
     @GetMapping("/cytogenetics")
     public String getCytogeneticsCombination(){

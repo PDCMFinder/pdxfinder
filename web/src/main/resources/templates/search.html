@@ -252,8 +252,11 @@
 
                     <div class="responsive-table">
 
-                        <table id="search-datatable" class="stripe display datatable-pdx sticky-header" cellspacing="0"
-                               width="100%">
+
+
+                        <!--<table id="search-datatable" class="stripe display datatable-pdx sticky-header" cellspacing="0"
+                               width="100%"> -->
+                        <table class="striped pdx-table head-left sticky-header" id="cancer-table">
                             <thead>
                             <tr>
                                 <th>MODEL</th>
@@ -490,8 +493,8 @@
 
 
     mainSearch.passedElement.addEventListener('showDropdown', function (event) {
-        if (mainSearch.currentState.items.length) {
-            if (mainSearch.currentState.items[mainSearch.currentState.items.length - 1].active) {
+        if (mainSearch.currentState.item.length) {
+            if (mainSearch.currentState.item[mainSearch.currentState.item.length - 1].active) {
                 // only show dropdown if something hasn't been selected
                 mainSearch.hideDropdown();
                 // hide placeholder text
@@ -505,6 +508,7 @@
             conditionallyShowDropdown(mainSearch.currentValue);
         }
     }, false);
+
     mainSearch.passedElement.addEventListener('search', function (event) {
         var currentSearch = mainSearch.currentValue;
         // highlight match, docs:
@@ -516,6 +520,7 @@
         });
         conditionallyShowDropdown(currentSearch);
     }, false);
+
     mainSearch.passedElement.addEventListener('choice', function (event) {
         // Hide form after selecting an option
         mainSearch.hideDropdown();
