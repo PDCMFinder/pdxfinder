@@ -61,8 +61,17 @@ public class AjaxController {
 
         List<StatisticsDTO> stats = statistics.mockRepository();
 
-       return statistics.combinedColumnLineAndPieChart(stats);
+        return statistics.combinedColumnLineAndPieChart(stats);
     }
+
+    @GetMapping("/chart2")
+    public Object getChart2(){
+
+        Map<String, List<StatisticsDTO>> data = statistics.groupedData();
+
+        return statistics.fixedPlacementColumnChart(data, "Patient Treatments Data");
+    }
+
 
     @GetMapping("/cytogenetics")
     public String getCytogeneticsCombination(){
