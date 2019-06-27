@@ -509,6 +509,9 @@ public class SearchDS {
         //reset breast cancer markers
         result.forEach(x ->x.setBreastCancerMarkers(new ArrayList<>()));
 
+        //reset copy number alteration values
+        result.forEach(x -> x.setCnaMarkers(new ArrayList<>()));
+
         // If no filters have been specified, return the complete set
         if (filters == null) {
             return result;
