@@ -16,13 +16,16 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
         "lineWidth",
         "lineColor",
-        "fillColor"
+        "fillColor",
+        "enabled"
 })
 public class Marker {
 
     private Integer lineWidth;
     private String lineColor;
     private String fillColor;
+    private Boolean enabled;
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -54,6 +57,14 @@ public class Marker {
 
     public void setFillColor(String fillColor) {
         this.fillColor = fillColor;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     @JsonAnyGetter

@@ -154,7 +154,7 @@ public class SearchDS {
         tumorTypeOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
         OneParamCheckboxFilter tumorType = new OneParamCheckboxFilter("TUMOR_TYPE", "sample_tumor_type", false, FilterType.OneParamCheckboxFilter.get(),
-              tumorTypeOptions, new ArrayList<>());
+                tumorTypeOptions, new ArrayList<>());
         patientTumorSection.addComponent(tumorType);
         facetOptionMap.put("sample_tumor_type", tumorTypeOptions);
 
@@ -164,7 +164,7 @@ public class SearchDS {
         patientSexOptions.add(new FacetOption("Female", "Female"));
         patientSexOptions.add(new FacetOption("Not Specified", "Not_Specified"));
         OneParamCheckboxFilter sex = new OneParamCheckboxFilter("SEX", "patient_gender", false, FilterType.OneParamCheckboxFilter.get(),
-        patientSexOptions, new ArrayList<>());
+                patientSexOptions, new ArrayList<>());
         patientTumorSection.addComponent(sex);
         facetOptionMap.put("patient_gender", patientSexOptions);
 
@@ -183,7 +183,7 @@ public class SearchDS {
         ageOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
         OneParamCheckboxFilter age = new OneParamCheckboxFilter("AGE", "patient_age", false, FilterType.OneParamCheckboxFilter.get(),
-        ageOptions, new ArrayList<>());
+                ageOptions, new ArrayList<>());
         patientTumorSection.addComponent(age);
         facetOptionMap.put("patient_age",ageOptions);
 
@@ -259,7 +259,7 @@ public class SearchDS {
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
         TwoParamLinkedFilter geneMutation = new TwoParamLinkedFilter("GENE MUTATION", "mutation", false, FilterType.TwoParamLinkedFilter.get(),
-                 "GENE", "VARIANT",getMutationOptions(), getMutationAndVariantOptions(), new HashMap<>());
+                "GENE", "VARIANT",getMutationOptions(), getMutationAndVariantOptions(), new HashMap<>());
 
         molecularDataSection.addComponent(geneMutation);
 
@@ -273,7 +273,7 @@ public class SearchDS {
         //Breast cancer markers
         //labelIDs should be alphabetically ordered(ER, HER, PR) as per dataprojection requirement
         List<FacetOption> breastCancerMarkerOptions = new ArrayList<>();
-                                                                                    //DP> ERBB2(HER2)--ESR1(ER)--PGR(PR)
+        //DP> ERBB2(HER2)--ESR1(ER)--PGR(PR)
         //breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR+", "ERBB2neg_ESR1neg_PGRpos"));
         //breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR-", "ERBB2neg_ESR1neg_PGRneg"));
         //breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR-", "ERBB2neg_ESR1pos_PGRneg"));
@@ -399,7 +399,7 @@ public class SearchDS {
                 for(FacetOption fo: facetOptionMap.get(facetName)){
 
                     if(selected.contains(fo.getLabelId()))
-                    decodedSelected.add(fo.getLabelId());
+                        decodedSelected.add(fo.getLabelId());
                 }
             }
             //no overwrite rule
@@ -508,6 +508,9 @@ public class SearchDS {
 
         //reset breast cancer markers
         result.forEach(x ->x.setBreastCancerMarkers(new ArrayList<>()));
+
+        //reset copy number alteration values
+        result.forEach(x -> x.setCnaMarkers(new ArrayList<>()));
 
         // If no filters have been specified, return the complete set
         if (filters == null) {

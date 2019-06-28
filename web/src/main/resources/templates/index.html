@@ -3,7 +3,7 @@
     <link th:remove="all" rel="stylesheet" media="screen" href="//cdn.jsdelivr.net/bootswatch/3.3.7/flatly/bootstrap.min.css"/>
     <!--/*/ <th:block th:include="fragments/head-includes :: bootstrap"></th:block> /*/-->
     <!--/*/ <th:block th:include="fragments/head-includes :: datatables"></th:block> /*/-->
-    <!--/*/ <th:block th:include="fragments/head-includes :: chart"></th:block> /*/-->
+    <!--/*/ <th:block th:include="fragments/head-includes :: chartData"></th:block> /*/-->
     <!--/*/ <th:block th:include="fragments/head-includes :: general"></th:block> /*/-->
     <title>PDX Finder</title>
 </head>
@@ -132,7 +132,7 @@
             <!-- Second Graph Row, will get replaced by first query -->
             <div class="row">
                 <div class="col-md-12">
-                    <div id="cancer-tissue-chart" style="height: 550px;"></div>
+                    <div id="cancer-tissue-chartData" style="height: 550px;"></div>
                 </div>
             </div>
             <!-- /.row -->
@@ -140,11 +140,11 @@
             <!-- Graph Row, will get replaced by first query -->
             <div class="row">
                 <div class="col-md-6">
-                    <div id="cancer-system-chart"></div>
+                    <div id="cancer-system-chartData"></div>
                 </div>
                 <!-- /.col-md-4 -->
                 <div class="col-md-6">
-                    <div id="cancer-histology-chart"></div>
+                    <div id="cancer-histology-chartData"></div>
                 </div>
             </div>
             <!-- /.row -->
@@ -188,9 +188,9 @@
 
 <script type="text/javascript" th:inline="javascript">
 
-    cancerBySystemChart(/*[[ ${cancerBySystem} ]]*/,"cancer-system-chart");
-    cancerByHistologyChart("","cancer-histology-chart");
-    cancerByTissueChart("","cancer-tissue-chart");
+    cancerBySystemChart(/*[[ ${cancerBySystem} ]]*/,"cancer-system-chartData");
+    cancerByHistologyChart("","cancer-histology-chartData");
+    cancerByTissueChart("","cancer-tissue-chartData");
 
 </script>
 

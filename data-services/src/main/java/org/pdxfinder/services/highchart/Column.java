@@ -14,39 +14,50 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "type",
-        "zoomType"
+        "grouping",
+        "shadow",
+        "borderWidth"
 })
-public class Chart {
+public class Column {
 
-    private String type;
-    private String zoomType;
+    private Boolean grouping;
+    private Boolean shadow;
+    private Integer borderWidth;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public Chart() {
+    public Column() {
     }
 
-    public Chart(String type, String zoomType) {
-        this.type = type;
-        this.zoomType = zoomType;
+    public Column(Boolean grouping, Boolean shadow, Integer borderWidth) {
+        this.grouping = grouping;
+        this.shadow = shadow;
+        this.borderWidth = borderWidth;
     }
 
-    public String getType() {
-        return type;
+    public Boolean getGrouping() {
+        return grouping;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setGrouping(Boolean grouping) {
+        this.grouping = grouping;
     }
 
-    public String getZoomType() {
-        return zoomType;
+    public Boolean getShadow() {
+        return shadow;
     }
 
-    public void setZoomType(String zoomType) {
-        this.zoomType = zoomType;
+    public void setShadow(Boolean shadow) {
+        this.shadow = shadow;
+    }
+
+    public Integer getBorderWidth() {
+        return borderWidth;
+    }
+
+    public void setBorderWidth(Integer borderWidth) {
+        this.borderWidth = borderWidth;
     }
 
     @JsonAnyGetter

@@ -7,34 +7,35 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /*
- * Created by abayomi on 19/06/2019.
+ * Created by abayomi on 26/06/2019.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "categories"
+        ""
 })
-public class Axis {
+public class PlotOptions {
 
-
-    private List<String> categories;
+    private String column;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public Axis(List<String> categories) {
-        this.categories = categories;
+    public PlotOptions() {
     }
 
-    public List<String> getCategories() {
-        return categories;
+    public PlotOptions(String column) {
+        this.column = column;
     }
 
-    public void setCategories(List<String> categories) {
-        this.categories = categories;
+    public String getColumn() {
+        return column;
+    }
+
+    public void setColumn(String column) {
+        this.column = column;
     }
 
     @JsonAnyGetter
