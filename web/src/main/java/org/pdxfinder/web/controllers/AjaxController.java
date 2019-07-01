@@ -338,13 +338,29 @@ public class AjaxController {
         return statistics.fixedPlacementColumnChart(data, "Patient Treatments Data");
     }
 
-    @GetMapping("/statistics/patient-treatment")
-    public Object basicTreatmentStat(){
+    @GetMapping("/statistics/patient-treatment/{param}")
+    public Object basicTreatmentStat(@PathVariable String param){
 
-        List<StatisticsDTO> data = statistics.mockDataDrugDosing();
+        List<StatisticsDTO> data = new ArrayList<>();
+        String chartTitle  = "";
+        String subtitle   = "";
 
-        return statistics.clusteredBarChart(data);
+        if (param.equals("patients") ){
+            chartTitle = "Patient Data";
+            subtitle   = "Patient Count Per Data Release";
+            data = statistics.mockDataTreatmentPatients();
+        }else if (param.equals("drugs")) {
+
+            chartTitle = "Drug Data";
+            subtitle   = "Drug Count Per Data Release";
+            data = statistics.mockDataDrugDosing();
+        }else{
+
+        }
+
+        return statistics.clusteredBarChart(data, chartTitle, subtitle);
     }
+
 
 
     @GetMapping("/statistics/model")
@@ -355,7 +371,7 @@ public class AjaxController {
         String chartTitle  = "Model Count Data";
         String subtitle   = "Model Count Per Data Release";
 
-        return statistics.barChart(data, chartTitle, subtitle, HexColors.DODGERBLUE);
+        return statistics.barChart(data, chartTitle, subtitle, HexColors.NAVY);
     }
 
 
@@ -367,7 +383,7 @@ public class AjaxController {
         String chartTitle  = "Data Providers";
         String subtitle   = "Providers Count Per Data Release";
 
-        return statistics.barChart(data, chartTitle, subtitle, HexColors.DARKSLATEBLUE);
+        return statistics.barChart(data, chartTitle, subtitle, HexColors.BLACK);
     }
 
 

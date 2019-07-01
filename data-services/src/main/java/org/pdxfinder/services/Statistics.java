@@ -218,7 +218,7 @@ public class Statistics {
     }
 
 
-    public Object clusteredBarChart(List<StatisticsDTO> stats){
+    public Object clusteredBarChart(List<StatisticsDTO> stats, String chartName, String subtitle){
 
         List<String> categories = new ArrayList<>();
 
@@ -284,7 +284,7 @@ public class Statistics {
 
     private Map<String, List<Object>> getKeysFromStatDTO(StatisticsDTO stats){
 
-        Map<String, List<Object>> dataMap = new HashMap<>();
+        Map<String, List<Object>> dataMap = new LinkedHashMap<>();
         stats.getDataCounts().forEach(CountDTO->{
             dataMap.put(CountDTO.getKey(), new ArrayList<>());
         });
