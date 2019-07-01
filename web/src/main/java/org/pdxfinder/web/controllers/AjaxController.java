@@ -347,6 +347,29 @@ public class AjaxController {
     }
 
 
+    @GetMapping("/statistics/model")
+    public Object getModelStat(){
+
+        List<CountDTO> data = statistics.modelCountData();
+
+        String chartTitle  = "Model Count Data";
+        String subtitle   = "Model Count Per Data Release";
+
+        return statistics.barChart(data, chartTitle, subtitle, HexColors.DODGERBLUE);
+    }
+
+
+    @GetMapping("/statistics/providers")
+    public Object getProvidersStat(){
+
+        List<CountDTO> data = statistics.providersCountData();
+
+        String chartTitle  = "Data Providers";
+        String subtitle   = "Providers Count Per Data Release";
+
+        return statistics.barChart(data, chartTitle, subtitle, HexColors.DARKSLATEBLUE);
+    }
+
 
 
 

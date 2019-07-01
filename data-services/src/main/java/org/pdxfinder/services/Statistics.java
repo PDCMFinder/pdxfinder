@@ -177,7 +177,45 @@ public class Statistics {
 
 
 
+    public ChartData barChart(List<CountDTO> stats, String chartName, String subtitle, HexColors hexColors){
 
+        List<String> categories = new ArrayList<>();
+        List<Object> categorySum = new ArrayList<>();
+
+        // Get all the Existing Keys
+        List<Object> dataList = new ArrayList<>();
+
+        stats.forEach(CountDTO ->{
+
+            // Populate the chartData category List
+            categories.add(CountDTO.getKey());
+            dataList.add(CountDTO.getValue());
+
+        });
+
+        // Create the Column Charts Data to create a cluster
+        List<Series> seriesList = new ArrayList<>();
+        seriesList.add( chartHelper.columnChart(dataList, chartName, hexColors.get()) );
+
+
+        Title title = new Title(chartName);
+        XAxis xAxis = new XAxis(categories);
+
+        ChartData chartData = new ChartData(title,xAxis,seriesList);
+
+        // Set Subtitle
+        chartData.setSubtitle(new Subtitle(subtitle));
+
+        // Set Chart Title
+        chartData.setyAxis(Arrays.asList(new YAxis(new Title(subtitle))));
+
+        // Set ToolTip
+        chartData.setTooltip(chartHelper.customSharedHTMLToolTip());
+
+
+        return chartData;
+
+    }
 
 
     public Object clusteredBarChart(List<StatisticsDTO> stats){
@@ -390,6 +428,31 @@ public class Statistics {
     }
 
 
+
+    public List<CountDTO> modelCountData(){
+
+        List<CountDTO> count = Arrays.asList(
+                new CountDTO("JAN 2019",900),
+                new CountDTO("MAR 2019",1350),
+                new CountDTO("JUN 2019",1915),
+                new CountDTO("NOV 2019",2500)
+        );
+
+        return count;
+    }
+
+
+    public List<CountDTO> providersCountData(){
+
+        List<CountDTO> count = Arrays.asList(
+                new CountDTO("JAN 2019",3),
+                new CountDTO("MAR 2019",5),
+                new CountDTO("JUN 2019",10),
+                new CountDTO("NOV 2019",20)
+        );
+
+        return count;
+    }
 
 
 
