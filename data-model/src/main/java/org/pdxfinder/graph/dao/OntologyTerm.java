@@ -21,6 +21,7 @@ public class OntologyTerm {
     private int directMappedSamplesNumber;
     private int indirectMappedSamplesNumber;
     private Set<String> synonyms;
+    private String type;
 
     @Relationship(type = "SUBCLASS_OF" ,direction = Relationship.OUTGOING)
     private Set<OntologyTerm> subclassOf;
@@ -121,5 +122,13 @@ public class OntologyTerm {
 
     public void setTreatmentMappedTo(TreatmentToOntologyRelationship treatmentMappedTo) {
         this.treatmentMappedTo = treatmentMappedTo;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
