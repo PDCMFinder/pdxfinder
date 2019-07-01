@@ -22,6 +22,7 @@ public class OntologyTerm {
     private int indirectMappedSamplesNumber;
     private Set<String> synonyms;
     private String type;
+    private String description;
 
     @Relationship(type = "SUBCLASS_OF" ,direction = Relationship.OUTGOING)
     private Set<OntologyTerm> subclassOf;
@@ -130,5 +131,13 @@ public class OntologyTerm {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
