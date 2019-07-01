@@ -21,6 +21,7 @@ public class Chart {
 
     private String type;
     private String zoomType;
+    private Options3d options3d;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -51,6 +52,14 @@ public class Chart {
 
     public void setZoomType(String zoomType) {
         this.zoomType = zoomType;
+    }
+
+    public Options3d getOptions3d() {
+        return options3d;
+    }
+
+    public void setOptions3d(Options3d options3d) {
+        this.options3d = options3d;
     }
 
     @JsonAnyGetter

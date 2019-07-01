@@ -1,5 +1,8 @@
 package org.pdxfinder.services.highchart;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.neo4j.cypher.internal.frontend.v2_3.ast.functions.Str;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -119,6 +122,24 @@ public class ChartHelper {
 
         return new ToolTip(shared, headerFormat, pointFormat, footerFormat, useHTML);
     }
+
+    public Pie doughNutPie(){
+
+        String pointFormat = "{point.name} ({point.percentage:.1f}%)";
+        Integer connectorWidth = 2;
+        Boolean enabled = true;
+
+        Integer innerSize = 100;
+        Integer depth = 65;
+        Boolean allowPointSelect = true;
+        String cursor = "pointer";
+
+        DataLabels dataLabels = new DataLabels(enabled,pointFormat,connectorWidth);
+        Pie pie = new Pie(innerSize,depth,allowPointSelect,cursor, dataLabels);
+
+        return pie;
+    }
+
 
 
     public String colors(int pos){

@@ -20,11 +20,20 @@ public class DataLabels {
 
 
     private Boolean enabled;
+    private String format;
+    private Integer connectorWidth;
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     public DataLabels(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public DataLabels(Boolean enabled, String format, Integer connectorWidth) {
+        this.enabled = enabled;
+        this.format = format;
+        this.connectorWidth = connectorWidth;
     }
 
     public Boolean getEnabled() {
@@ -33,6 +42,22 @@ public class DataLabels {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public Integer getConnectorWidth() {
+        return connectorWidth;
+    }
+
+    public void setConnectorWidth(Integer connectorWidth) {
+        this.connectorWidth = connectorWidth;
     }
 
     @JsonAnyGetter
