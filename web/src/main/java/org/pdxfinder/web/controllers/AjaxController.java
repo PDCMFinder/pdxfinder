@@ -371,7 +371,7 @@ public class AjaxController {
         String chartTitle  = "Model Count Data";
         String subtitle   = "Model Count Per Data Release";
 
-        return statistics.barChart(data, chartTitle, subtitle, HexColors.NAVY);
+        return statistics.barChart(data, chartTitle, subtitle, HexColors.CUSTOMBLUE);
     }
 
 

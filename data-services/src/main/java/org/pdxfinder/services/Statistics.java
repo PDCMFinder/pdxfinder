@@ -154,14 +154,6 @@ public class Statistics {
             count++;
         }
 
-/*
-        String yAxisText1 = "Drugs";
-        String yAxisText2 = "Patients";
-
-        YAxis yAxis1 = chartHelper.simpleYAxis(yAxisText1, false);
-        yAxis1.setMin(0);
-        YAxis yAxis2 = chartHelper.simpleYAxis(yAxisText2, true);*/
-
 
         String chartType = SeriesType.COLUMN.get();
 
@@ -218,7 +210,7 @@ public class Statistics {
     }
 
 
-    public Object clusteredBarChart(List<StatisticsDTO> stats, String chartName, String subtitle){
+    public ChartData clusteredBarChart(List<StatisticsDTO> stats, String chartTitle, String subtitle){
 
         List<String> categories = new ArrayList<>();
 
@@ -240,14 +232,13 @@ public class Statistics {
         // Create the Column Charts Data to create a cluster
         List<Series> seriesList = clusterColumnData(dataMap);
 
-        String chartTitle = "Monthly Average Rainfall";
         Title title = new Title(chartTitle);
         XAxis xAxis = new XAxis(categories, true);
 
         ChartData chartData = new ChartData(title,xAxis,seriesList);
 
         // Set Subtitle
-        chartData.setSubtitle(new Subtitle("Source: worldClimate.org"));
+        chartData.setSubtitle(new Subtitle(subtitle));
 
         // Set Chart Title
         chartData.setyAxis(Arrays.asList(new YAxis(new Title("Rainfall (mm)"))));
@@ -261,6 +252,64 @@ public class Statistics {
 
 
 
+
+
+    /*
+
+
+
+
+    {
+    chart: {
+        type: 'pie',
+        options3d: {
+            enabled: true,
+            alpha: 45
+        }
+    },
+    title: {
+        text: 'Global Social Media User Statistics'
+    },
+    subtitle: {
+        text: 'As per statistics data 2016'
+    },
+    plotOptions: {
+        pie: {
+            innerSize: 100,
+            depth: 65,
+			allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                format: '{point.name} ({point.percentage:.1f}%)',
+				connectorWidth: 2,
+            }
+        }
+    },
+	colors:['#3b5998', '#d34836', '#8a3ab9', '#0077B5', '#0084b4', '#bb0000'],
+    series: [{
+        name: 'Million user',
+        data: [
+            ['Facebook', 1300],
+			['Google+', 375],
+			['Instagram', 500],
+			{name:'LinkedIn',  y:450, sliced: true,selected: true},
+			['Twitter', 313],
+			['YouTube', 1000]
+        ]
+    }],
+	tooltip:{
+		useHTML: true,
+		 headerFormat: '<h1>{point.key}</h1>',
+		 pointFormat: '<h4>{point.percentage:.1f} {series.name} </h4>',
+	}
+}
+
+
+
+
+
+     */
 
 
 

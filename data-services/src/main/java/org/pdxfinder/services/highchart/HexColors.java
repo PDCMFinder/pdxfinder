@@ -20,6 +20,7 @@ public enum HexColors {
     YELLOW("#FFFF00"),
     NAVY("#000080"),
     BLUE("#0000FF"),
+    CUSTOMBLUE("#3b5998"),
     TEAL("#008080"),
     AQUA("#00FFFF"),
     DARKBLUE("#00008B"),
