@@ -109,6 +109,7 @@ public class LoadNCIT implements CommandLineRunner {
 
         //create cancer root term
         OntologyTerm ot = dataImportService.getOntologyTerm(diseasesBranchUrl,diseaseRootLabel);
+        ot.setType("diagnosis");
         log.debug("Creating node: "+diseaseRootLabel);
 
         discoveredTerms.add(ot);
@@ -185,6 +186,8 @@ public class LoadNCIT implements CommandLineRunner {
                     }
 
                     newTerm.setSynonyms(synonymsSet);
+                    newTerm.setType("diagnosis");
+
                     discoveredTerms.add(newTerm);
 
                     OntologyTerm parentTerm = dataImportService.getOntologyTerm(notYetVisitedTerm.getUrl());
