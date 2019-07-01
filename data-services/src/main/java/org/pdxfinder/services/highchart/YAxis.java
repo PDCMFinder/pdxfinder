@@ -35,6 +35,10 @@ public class YAxis {
     public YAxis() {
     }
 
+    public YAxis(Title title) {
+        this.title = title;
+    }
+
     public YAxis(Title title, Boolean opposite) {
         this.title = title;
         this.opposite = opposite;

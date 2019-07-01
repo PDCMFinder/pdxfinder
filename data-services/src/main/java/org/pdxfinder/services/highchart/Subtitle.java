@@ -11,47 +11,45 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /*
- * Created by abayomi on 19/06/2019.
+ * Created by abayomi on 28/06/2019.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "categories"
+        "text"
 })
-public class XAxis {
+public class Subtitle {
 
 
-    private List<String> categories;
-    private Boolean crosshair;
+    private String text;
+    private Style style;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public XAxis() {
+
+    public Subtitle(String text) {
+        this.text = text;
     }
 
-    public XAxis(List<String> categories) {
-        this.categories = categories;
+    public Subtitle(String text, Style style) {
+        this.text = text;
+        this.style = style;
     }
 
-    public XAxis(List<String> categories, Boolean crosshair) {
-        this.categories = categories;
-        this.crosshair = crosshair;
+    public String getText() {
+        return text;
     }
 
-    public List<String> getCategories() {
-        return categories;
+    public void setText(String text) {
+        this.text = text;
     }
 
-    public void setCategories(List<String> categories) {
-        this.categories = categories;
+    public Style getStyle() {
+        return style;
     }
 
-    public Boolean getCrosshair() {
-        return crosshair;
-    }
-
-    public void setCrosshair(Boolean crosshair) {
-        this.crosshair = crosshair;
+    public void setStyle(Style style) {
+        this.style = style;
     }
 
     @JsonAnyGetter

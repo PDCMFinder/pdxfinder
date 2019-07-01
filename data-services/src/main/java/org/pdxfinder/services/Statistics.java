@@ -20,17 +20,13 @@ public class Statistics {
     private Logger log = LoggerFactory.getLogger(Statistics.class);
 
 
-    public Object combinedColumnLineAndPieChart(List<StatisticsDTO> stats){
+    public ChartData combinedColumnLineAndPieChart(List<StatisticsDTO> stats){
 
         List<String> categories = new ArrayList<>();
-        Map<String, List<Object>> dataMap = new HashMap<>();
         List<Object> categorySum = new ArrayList<>();
 
         // Get all the Existing Keys
-        stats.get(0).getDataCounts().forEach(CountDTO->{
-            dataMap.put(CountDTO.getKey(), new ArrayList<>());
-        });
-
+        Map<String, List<Object>> dataMap = getKeysFromStatDTO(stats.get(0));
 
         stats.forEach(StatisticsDTO ->{
 
@@ -52,15 +48,10 @@ public class Statistics {
 
 
         // Create the Column Charts Data to create a cluster
-        List<Series> seriesList = new ArrayList<>();
-        int count = 0;
-        for (Map.Entry<String, List<Object>> map : dataMap.entrySet()){
-            seriesList.add( chartHelper.columnChart(map.getValue(), map.getKey(), chartHelper.colors(count++)) );
-        }
-
+        List<Series> seriesList = clusterColumnData(dataMap);
 
         // Create a Spline ChartData of Total Dataset counts
-        seriesList.add( chartHelper.splineChart(categorySum, "Aggregate") );
+        seriesList.add( chartHelper.splineChart(categorySum, "Total Data Per Release") );
 
 
         // Get Most Recent Dataset from the Clustered Data to create Pie-ChartData.
@@ -96,7 +87,7 @@ public class Statistics {
 
 
 
-    public Object fixedPlacementColumnChart(Map<String, List<StatisticsDTO>> data, String chartTitle){
+    public ChartData fixedPlacementColumnChart(Map<String, List<StatisticsDTO>> data, String chartTitle){
 
 
         Map colors = new HashMap();
@@ -179,10 +170,7 @@ public class Statistics {
 
         PlotOptions plotOptions = chartHelper.simplePlotOptions();
 
-
         ChartData chartData = new ChartData(chart, title, xAxis, seriesList, yAxisList, plotOptions);
-
-
 
         return chartData;
     }
@@ -191,12 +179,88 @@ public class Statistics {
 
 
 
+
+    public Object clusteredBarChart(List<StatisticsDTO> stats){
+
+        List<String> categories = new ArrayList<>();
+
+        // Get all the Existing Keys
+        Map<String, List<Object>> dataMap = getKeysFromStatDTO(stats.get(0));
+
+        stats.forEach(StatisticsDTO ->{
+
+            // Populate the chartData category List
+            categories.add(StatisticsDTO.getCategory());
+
+            StatisticsDTO.getDataCounts().forEach(CountDTO->{
+                dataMap.get(CountDTO.getKey()).add(CountDTO.getValue());
+            });
+
+        });
+
+
+        // Create the Column Charts Data to create a cluster
+        List<Series> seriesList = clusterColumnData(dataMap);
+
+        String chartTitle = "Monthly Average Rainfall";
+        Title title = new Title(chartTitle);
+        XAxis xAxis = new XAxis(categories, true);
+
+        ChartData chartData = new ChartData(title,xAxis,seriesList);
+
+        // Set Subtitle
+        chartData.setSubtitle(new Subtitle("Source: worldClimate.org"));
+
+        // Set Chart Title
+        chartData.setyAxis(Arrays.asList(new YAxis(new Title("Rainfall (mm)"))));
+
+        // Set ToolTip
+        chartData.setTooltip(chartHelper.customSharedHTMLToolTip());
+
+        return chartData;
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+    private List<Series> clusterColumnData(Map<String, List<Object>> dataMap){
+
+        List<Series> seriesList = new ArrayList<>();
+
+        int count = 0;
+        for (Map.Entry<String, List<Object>> map : dataMap.entrySet()){
+            seriesList.add( chartHelper.columnChart(map.getValue(), map.getKey(), chartHelper.colors(count++)) );
+        }
+
+        return seriesList;
+    }
+
+
+    private Map<String, List<Object>> getKeysFromStatDTO(StatisticsDTO stats){
+
+        Map<String, List<Object>> dataMap = new HashMap<>();
+        stats.getDataCounts().forEach(CountDTO->{
+            dataMap.put(CountDTO.getKey(), new ArrayList<>());
+        });
+
+        return dataMap;
+    }
+
+
     public Map<String, List<StatisticsDTO>> groupedData(){
 
         Map<String, List<StatisticsDTO>> data = new HashMap<>();
 
         data.put("Patients", mockDataTreatmentPatients());
-        data.put("Drugs", mockDataTreatmentDrugs());
+        data.put("Drugs", mockDataDrugDosing());
 
         return data;
     }
@@ -244,7 +308,7 @@ public class Statistics {
 
 
 
-    public List<StatisticsDTO> mockDataTreatmentDrugs(){
+    public List<StatisticsDTO> mockDataDrugDosing(){
 
         // Mock Data Generation Starts
 
@@ -324,6 +388,8 @@ public class Statistics {
 
         return stats;
     }
+
+
 
 
 

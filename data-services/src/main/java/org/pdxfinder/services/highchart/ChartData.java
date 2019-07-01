@@ -26,16 +26,26 @@ public class ChartData {
 
     private Chart chart;
     private Title title;
+    private Subtitle subtitle;
     private XAxis xAxis;
     private List<YAxis> yAxis;
     private PlotOptions plotOptions;
     private List<Series> series;
     private Labels labels;
 
+    private ToolTip tooltip;
+
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+
+
+    public ChartData(Title title, XAxis xAxis, List<Series> series) {
+        this.title = title;
+        this.xAxis = xAxis;
+        this.series = series;
+    }
 
     public ChartData(Title title, XAxis xAxis, Labels labels, List<Series> series) {
         this.title = title;
@@ -43,6 +53,7 @@ public class ChartData {
         this.labels = labels;
         this.series = series;
     }
+
 
     public ChartData(Chart chart, Title title, XAxis xAxis, List<Series> series, List<YAxis> yAxis, PlotOptions plotOptions) {
         this.chart = chart;
@@ -67,6 +78,14 @@ public class ChartData {
 
     public void setTitle(Title title) {
         this.title = title;
+    }
+
+    public Subtitle getSubtitle() {
+        return subtitle;
+    }
+
+    public void setSubtitle(Subtitle subtitle) {
+        this.subtitle = subtitle;
     }
 
     public XAxis getxAxis() {
@@ -108,6 +127,14 @@ public class ChartData {
 
     public void setPlotOptions(PlotOptions plotOptions) {
         this.plotOptions = plotOptions;
+    }
+
+    public ToolTip getTooltip() {
+        return tooltip;
+    }
+
+    public void setTooltip(ToolTip tooltip) {
+        this.tooltip = tooltip;
     }
 
     @JsonAnyGetter

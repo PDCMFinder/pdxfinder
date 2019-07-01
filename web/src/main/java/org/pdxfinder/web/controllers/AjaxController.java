@@ -5,6 +5,7 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.*;
 import org.pdxfinder.services.ds.AutoCompleteOption;
 import org.pdxfinder.services.dto.*;
+import org.pdxfinder.services.highchart.HexColors;
 import org.pdxfinder.services.pdf.Label;
 import org.pdxfinder.services.pdf.PdfHelper;
 import org.pdxfinder.services.pdf.Report;
@@ -50,26 +51,6 @@ public class AjaxController {
         this.drugService = drugService;
         this.graphService = graphService;
         this.statistics = statistics;
-    }
-
-
-
-
-
-    @GetMapping("/chart")
-    public Object getChart(){
-
-        List<StatisticsDTO> stats = statistics.mockRepository();
-
-        return statistics.combinedColumnLineAndPieChart(stats);
-    }
-
-    @GetMapping("/chart2")
-    public Object getChart2(){
-
-        Map<String, List<StatisticsDTO>> data = statistics.groupedData();
-
-        return statistics.fixedPlacementColumnChart(data, "Patient Treatments Data");
     }
 
 
@@ -335,6 +316,36 @@ public class AjaxController {
 
         return tableColumns.get(sortcolumn);
     }
+
+
+
+    /**********   STATISTICS CONTROLLERS   ************/
+
+    @GetMapping("/statistics/molecular-data")
+    public Object getChart(){
+
+        List<StatisticsDTO> stats = statistics.mockRepository();
+
+        return statistics.combinedColumnLineAndPieChart(stats);
+    }
+
+
+    @GetMapping("/statistics/drug-dosing")
+    public Object getDosingStat(){
+
+        Map<String, List<StatisticsDTO>> data = statistics.groupedData();
+
+        return statistics.fixedPlacementColumnChart(data, "Patient Treatments Data");
+    }
+
+    @GetMapping("/statistics/patient-treatment")
+    public Object basicTreatmentStat(){
+
+        List<StatisticsDTO> data = statistics.mockDataDrugDosing();
+
+        return statistics.clusteredBarChart(data);
+    }
+
 
 
 

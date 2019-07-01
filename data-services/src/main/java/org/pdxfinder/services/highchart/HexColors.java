@@ -1,6 +1,9 @@
 package org.pdxfinder.services.highchart;
 
-public enum Colors {
+/*
+ * Created by abayomi on 01/07/2019.
+ */
+public enum HexColors {
 
     BLACK("#000000"),
     SILVER("#C0C0C0"),
@@ -154,7 +157,7 @@ public enum Colors {
 
     private String value;
 
-    private Colors(String val) {
+    private HexColors(String val) {
         value = val;
     }
 

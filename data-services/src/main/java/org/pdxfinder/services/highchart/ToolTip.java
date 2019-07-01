@@ -21,6 +21,10 @@ public class ToolTip {
 
     private String valueSuffix;
     private Boolean shared;
+    private String headerFormat;
+    private String pointFormat;
+    private String footerFormat;
+    private Boolean useHTML;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -30,6 +34,14 @@ public class ToolTip {
 
     public ToolTip(String valueSuffix) {
         this.valueSuffix = valueSuffix;
+    }
+
+    public ToolTip(Boolean shared, String headerFormat, String pointFormat, String footerFormat, Boolean useHTML) {
+        this.shared = shared;
+        this.headerFormat = headerFormat;
+        this.pointFormat = pointFormat;
+        this.footerFormat = footerFormat;
+        this.useHTML = useHTML;
     }
 
     public String getValueSuffix() {
@@ -46,6 +58,38 @@ public class ToolTip {
 
     public void setValueSuffix(String valueSuffix) {
         this.valueSuffix = valueSuffix;
+    }
+
+    public String getHeaderFormat() {
+        return headerFormat;
+    }
+
+    public void setHeaderFormat(String headerFormat) {
+        this.headerFormat = headerFormat;
+    }
+
+    public String getPointFormat() {
+        return pointFormat;
+    }
+
+    public void setPointFormat(String pointFormat) {
+        this.pointFormat = pointFormat;
+    }
+
+    public String getFooterFormat() {
+        return footerFormat;
+    }
+
+    public void setFooterFormat(String footerFormat) {
+        this.footerFormat = footerFormat;
+    }
+
+    public Boolean getUseHTML() {
+        return useHTML;
+    }
+
+    public void setUseHTML(Boolean useHTML) {
+        this.useHTML = useHTML;
     }
 
     @JsonAnyGetter
