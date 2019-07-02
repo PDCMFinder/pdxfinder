@@ -1,8 +1,5 @@
 package org.pdxfinder.services.highchart;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import org.neo4j.cypher.internal.frontend.v2_3.ast.functions.Str;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -138,6 +135,20 @@ public class ChartHelper {
         Pie pie = new Pie(innerSize,depth,allowPointSelect,cursor, dataLabels);
 
         return pie;
+    }
+
+    public ChartData subtitleYAxisNToolTip(ChartData chartData, String subtitle){
+
+        // Set Subtitle
+        chartData.setSubtitle(new Subtitle(subtitle));
+
+        // Set Chart Title
+        chartData.setyAxis(Arrays.asList(new YAxis(new Title(subtitle))));
+
+        // Set ToolTip
+        chartData.setTooltip(customSharedHTMLToolTip());
+
+        return chartData;
     }
 
 

@@ -195,15 +195,8 @@ public class Statistics {
 
         ChartData chartData = new ChartData(title,xAxis,seriesList);
 
-        // Set Subtitle
-        chartData.setSubtitle(new Subtitle(subtitle));
-
-        // Set Chart Title
-        chartData.setyAxis(Arrays.asList(new YAxis(new Title(subtitle))));
-
-        // Set ToolTip
-        chartData.setTooltip(chartHelper.customSharedHTMLToolTip());
-
+        // Set Subtitle, Chart Title and ToolTip
+        chartData = chartHelper.subtitleYAxisNToolTip(chartData, subtitle) ;
 
         return chartData;
 
@@ -237,14 +230,8 @@ public class Statistics {
 
         ChartData chartData = new ChartData(title,xAxis,seriesList);
 
-        // Set Subtitle
-        chartData.setSubtitle(new Subtitle(subtitle));
-
-        // Set Chart Title
-        chartData.setyAxis(Arrays.asList(new YAxis(new Title(subtitle))));
-
-        // Set ToolTip
-        chartData.setTooltip(chartHelper.customSharedHTMLToolTip());
+        // Set Subtitle, Chart Title and ToolTip
+        chartData = chartHelper.subtitleYAxisNToolTip(chartData, subtitle) ;
 
         return chartData;
 
