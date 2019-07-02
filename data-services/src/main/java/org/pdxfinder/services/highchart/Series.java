@@ -33,6 +33,8 @@ public class Series {
     private Boolean showInLegend;
     private DataLabels dataLabels;
 
+    private String stacking;
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -71,6 +73,10 @@ public class Series {
         this.center = center;
         this.size = size;
         this.showInLegend = showInLegend;
+    }
+
+    public Series(Map<String, Object> additionalProperties) {
+        this.additionalProperties = additionalProperties;
     }
 
     public String getType() {
@@ -192,6 +198,14 @@ public class Series {
 
     public void setDataLabels(DataLabels dataLabels) {
         this.dataLabels = dataLabels;
+    }
+
+    public String getStacking() {
+        return stacking;
+    }
+
+    public void setStacking(String stacking) {
+        this.stacking = stacking;
     }
 
     @JsonAnyGetter

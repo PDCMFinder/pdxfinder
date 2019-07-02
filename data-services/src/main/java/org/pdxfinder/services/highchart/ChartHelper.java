@@ -169,7 +169,7 @@ public class ChartHelper {
 
 
     public String colors(int pos){
-        String colors[] = {"#3b5998","#d34836","#8a3ab9","#0077B5","#800080", "#000", "#FF0000", "#6F42C1", "#03458E", "#40424B", "#BADAFC", "#FF0F00", "#CD0D74", "#2E92FE", "#2A0CD0", "#0D52D1"};
+        String colors[] = {"#3b5998","#d34836","#8a3ab9","#0077B5","#0084b4","#800080", "#000000", "#FF0000", "#6F42C1", "#03458E", "#40424B", "#BADAFC", "#FF0F00", "#CD0D74", "#2E92FE", "#2A0CD0", "#0D52D1"};
         return colors[pos];
     }
 

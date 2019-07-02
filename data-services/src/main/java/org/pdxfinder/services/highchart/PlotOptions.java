@@ -14,12 +14,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "column",
-        "pie"
+        "pie",
+        "series"
 })
 public class PlotOptions {
 
     private Column column;
     private Pie pie;
+    private Series series;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -49,6 +51,14 @@ public class PlotOptions {
 
     public void setPie(Pie pie) {
         this.pie = pie;
+    }
+
+    public Series getSeries() {
+        return series;
+    }
+
+    public void setSeries(Series series) {
+        this.series = series;
     }
 
     @JsonAnyGetter

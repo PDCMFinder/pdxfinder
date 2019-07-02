@@ -371,7 +371,7 @@ public class AjaxController {
 
         }
 
-        return statistics.clusteredBarChart(data, chartTitle, subtitle);
+        return statistics.stackedBarChart(data, chartTitle, subtitle);
     }
 
 

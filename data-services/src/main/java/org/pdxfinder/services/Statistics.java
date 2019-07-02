@@ -238,9 +238,29 @@ public class Statistics {
     }
 
 
+    public ChartData stackedBarChart(List<StatisticsDTO> stats, String chartTitle, String subtitle) {
+
+        ChartData chartData = clusteredBarChart(stats, chartTitle, subtitle);
+
+        Series series = new Series();
+        series.setStacking("normal");
+        PlotOptions plotOptions = new PlotOptions();
+        plotOptions.setSeries(series);
+
+        chartData.setPlotOptions(plotOptions);
+
+        return chartData;
+
+    }
+
+
+
+
+
     public Object threeDPieChart(List<String> labels, List values, String title, String subtitle, String sliced) {
 
         AtomicInteger count = new AtomicInteger(0);
+        List<String> colors = new ArrayList<>();
 
         // CREATE CHART TITLE
         Title charTitle = new Title(title);
@@ -253,6 +273,7 @@ public class Statistics {
             data.add( (label.equals(sliced) && label != null) ?
                     new PieData(label, values.get(count.getAndIncrement()), TRUE, TRUE) : Arrays.asList(label, values.get(count.getAndIncrement()))
             );
+            colors.add(chartHelper.colors(count.get()));
         });
 
         Series series = new Series(null, description, data);
@@ -278,6 +299,7 @@ public class Statistics {
         ToolTip toolTip = chartHelper.pieHTMLToolTip();
         chartData.setTooltip(toolTip);
 
+        chartData.setColors(colors);
         return chartData;
     }
 
