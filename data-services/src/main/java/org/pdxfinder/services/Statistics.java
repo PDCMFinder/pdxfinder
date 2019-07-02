@@ -282,73 +282,11 @@ public class Statistics {
     }
 
 
-    // {name:'LinkedIn',  y:450, sliced: true,selected: true}
-
-        /*
-
-                ['Facebook', 1300],
-                        ['Google+', 375],
-    {name:'LinkedIn',  y:450, sliced: true,selected: true},
-            ['Twitter', 313],
-            ['YouTube', 1000]
-
-threeDPieChart(List labels, List values, String title, String subtitle)
-
-     */
 
 
-    // list of colors
-
-    /*
-
-    Highcharts.chart('pie', {
-    chart: {
-        type: 'pie',
-        options3d: {
-            enabled: true,
-            alpha: 45
-        }
-    },
-    title: {
-        text: 'Global Social Media User Statistics'
-    },
-    subtitle: {
-        text: 'As per statistics data 2016'
-    },
-    plotOptions: {
-        pie: {
-            innerSize: 100,
-            depth: 65,
-			allowPointSelect: true,
-            cursor: 'pointer',
-            dataLabels: {
-                enabled: true,
-                format: '{point.name} ({point.percentage:.1f}%)',
-				connectorWidth: 2,
-            }
-        }
-    },
-	colors:['#3b5998', '#d34836', '#8a3ab9', '#0077B5', '#0084b4', '#bb0000'],
-    series: [{
-        name: 'Million user',
-        data: [
-            ['Facebook', 1300],
-			['Google+', 375],
-			['Instagram', 500],
-			{name:'LinkedIn',  y:450, sliced: true,selected: true},
-			['Twitter', 313],
-			['YouTube', 1000]
-        ]
-    }],
-	tooltip:{
-		useHTML: true,
-		 headerFormat: '<h1>{point.key}</h1>',
-		 pointFormat: '<h4>{point.percentage:.1f} {series.name} </h4>',
-	}
-});
 
 
-     */
+
 
 
     private List<Series> clusterColumnData(Map<String, List<Object>> dataMap) {
