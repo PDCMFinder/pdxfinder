@@ -321,6 +321,19 @@ public class AjaxController {
 
     /**********   STATISTICS CONTROLLERS   ************/
 
+
+    @GetMapping("/statistics/test")
+    public Object doTest(){
+
+        List dataLabels = Arrays.asList("Facebook","Google+","Instagram","LinkedIn","Twitter","YouTube");
+        List dataValues = Arrays.asList(1300, 375, 500, 450, 313, 1000);
+        String chartTitle  = "Global Social Media User Statistics";
+        String subtitle   = "As per statistics data 2016";
+
+        return statistics.threeDPieChart(dataLabels,dataValues,chartTitle,subtitle,"LinkedIn");
+    }
+
+
     @GetMapping("/statistics/molecular-data")
     public Object getChart(){
 

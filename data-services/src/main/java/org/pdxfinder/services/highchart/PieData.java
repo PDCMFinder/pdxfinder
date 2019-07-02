@@ -21,15 +21,25 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class PieData {
 
     private String name;
-    private Integer y;
+    private Object y;
     private String color;
+    private Boolean sliced;
+    private Boolean selected;
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public PieData(String name, Integer y, String color) {
+    public PieData(String name, Object y, String color) {
         this.name = name;
         this.y = y;
         this.color = color;
+    }
+
+    public PieData(String name, Object y, Boolean sliced, Boolean selected) {
+        this.name = name;
+        this.y = y;
+        this.sliced = sliced;
+        this.selected = selected;
     }
 
     public String getName() {
@@ -40,11 +50,11 @@ public class PieData {
         this.name = name;
     }
 
-    public Integer getY() {
+    public Object getY() {
         return y;
     }
 
-    public void setY(Integer y) {
+    public void setY(Object y) {
         this.y = y;
     }
 
@@ -54,6 +64,22 @@ public class PieData {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Boolean getSliced() {
+        return sliced;
+    }
+
+    public void setSliced(Boolean sliced) {
+        this.sliced = sliced;
+    }
+
+    public Boolean getSelected() {
+        return selected;
+    }
+
+    public void setSelected(Boolean selected) {
+        this.selected = selected;
     }
 
     @JsonAnyGetter

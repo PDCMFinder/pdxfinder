@@ -8,6 +8,9 @@ import java.util.List;
  */
 public class ChartHelper {
 
+    private String NULLSTRING = null;
+    private Boolean NULLBOOLEAN = null;
+
     public ChartHelper() {
     }
 
@@ -119,6 +122,18 @@ public class ChartHelper {
 
         return new ToolTip(shared, headerFormat, pointFormat, footerFormat, useHTML);
     }
+
+
+    public ToolTip pieHTMLToolTip(){
+
+        String headerFormat = "<h1>{point.key}</h1>";
+        String pointFormat = "<h4>{point.percentage:.1f} {series.name} </h4>";
+        Boolean useHTML = true;
+
+        return new ToolTip(NULLBOOLEAN, headerFormat, pointFormat,NULLSTRING, useHTML);
+    }
+
+
 
     public Pie doughNutPie(){
 

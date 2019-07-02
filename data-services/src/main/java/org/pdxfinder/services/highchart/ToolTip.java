@@ -36,6 +36,12 @@ public class ToolTip {
         this.valueSuffix = valueSuffix;
     }
 
+    public ToolTip(String headerFormat, String footerFormat, Boolean useHTML) {
+        this.headerFormat = headerFormat;
+        this.footerFormat = footerFormat;
+        this.useHTML = useHTML;
+    }
+
     public ToolTip(Boolean shared, String headerFormat, String pointFormat, String footerFormat, Boolean useHTML) {
         this.shared = shared;
         this.headerFormat = headerFormat;

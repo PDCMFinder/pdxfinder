@@ -32,6 +32,7 @@ public class ChartData {
     private PlotOptions plotOptions;
     private List<Series> series;
     private Labels labels;
+    private List<String> colors;
 
     private ToolTip tooltip;
 
@@ -127,6 +128,14 @@ public class ChartData {
 
     public void setPlotOptions(PlotOptions plotOptions) {
         this.plotOptions = plotOptions;
+    }
+
+    public List<String> getColors() {
+        return colors;
+    }
+
+    public void setColors(List<String> colors) {
+        this.colors = colors;
     }
 
     public ToolTip getTooltip() {
