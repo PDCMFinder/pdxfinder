@@ -221,32 +221,27 @@ public class LoadNCITDrugs implements CommandLineRunner {
 
                     if(!hasChildren){
 
+                        OntologyTerm ot = new OntologyTerm();
+                        ot.setType("treatment");
+                        ot.setLabel(term.getString("label"));
+                        ot.setUrl(term.getString("iri"));
 
-                        Drug drug = new Drug();
-                        String drugName = term.getString("label");
-                        String description = "";
-                        String synonyms = "";
+                        if(term.has("synonyms")) {
+                            JSONArray synonyms = term.getJSONArray("synonyms");
+                            Set<String> synonymsSet = new HashSet<>();
 
-                        if(term.has("description")){
-                            description = term.getString("description");
-                        }
-
-                        if(term.has("synonyms")){
-                            JSONArray syn = term.getJSONArray("synonyms");
-                            List<Object> synList = syn.toList();
-
-                            for(int k=0; k<synList.size(); k++){
-                                String s = (String)synList.get(k);
-                                synonyms += s;
-                                synonyms += ";";
-
+                            for (int i = 0; i < synonyms.length(); i++) {
+                                synonymsSet.add(synonyms.getString(i));
                             }
+
+                            ot.setSynonyms(synonymsSet);
+                        }
+                        if(term.has("description")){
+                            ot.setDescription(term.getString("description"));
                         }
 
-                        drug.setName(drugName);
-                        drug.setSynonyms(synonyms);
-                        drug.setDescription(description);
-                        dataImportService.createDrug(drug);
+
+                        dataImportService.saveOntologyTerm(ot);
 
                         totalDrugs++;
 
