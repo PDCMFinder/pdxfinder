@@ -242,4 +242,19 @@ public class MappingEntity {
     public void setMappingKey(String mappingKey) {
         this.mappingKey = mappingKey;
     }
+
+    public String getContainerKey(){
+
+        String key = entityType;
+
+        for(String label : mappingLabels){
+
+            key += mappingValues.get(label);
+        }
+
+        key = key.replaceAll("[^a-zA-Z0-9]","");
+
+        return key.toLowerCase();
+
+    }
 }
