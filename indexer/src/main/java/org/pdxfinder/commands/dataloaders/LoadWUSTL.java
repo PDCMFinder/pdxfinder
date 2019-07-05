@@ -110,7 +110,7 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
         dto = new LoaderDTO();
         rootDataDirectory = finderRootDir;
         dataSource = dataSourceAbbreviation;
-        filesDirectory = finderRootDir + dataSourceAbbreviation + "/pdx/";
+        filesDirectory = finderRootDir +"/data/" + dataSourceAbbreviation + "/pdx/";
     }
 
     // WUSTL uses default implementation Steps step01GetMetaDataFolder, step02GetMetaDataJSON
