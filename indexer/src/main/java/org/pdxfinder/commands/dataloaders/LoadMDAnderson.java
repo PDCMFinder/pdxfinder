@@ -112,7 +112,7 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
         dto = new LoaderDTO();
         rootDataDirectory = finderRootDir + "/data";
         dataSource = dataSourceAbbreviation;
-        filesDirectory = finderRootDir + "/" + dataSourceAbbreviation + "/pdx/";
+        filesDirectory = finderRootDir + "/data/" + dataSourceAbbreviation + "/pdx/";
     }
 
     // MD ANDERSON uses default implementation Steps step01GetMetaDataFolder, step02GetMetaDataJSON
