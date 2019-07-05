@@ -13,6 +13,7 @@ import org.pdxfinder.admin.zooma.*;
 import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.repositories.SampleRepository;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
+import org.pdxfinder.services.mapping.MappingEntityType;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,15 +42,21 @@ public class MappingService {
     private static final String ACCURACY = "PRECISE";
     private static final String ANNOTATOR = "Nathalie Conte";
 
-    @Value("${mappings.diagnosis.file}")
-    private String savedDiagnosisMappingsFile;
+    @Value("${pdxfinder.root.dir}")
+    private String rootDir;
+
+
 
     @Value("${mappings.mappedTermUrl}")
     private String knowledgBaseURL;
 
     private SampleRepository sampleRepository;
 
-    private MappingContainer existingDiagnosisMappings;
+    private MappingContainer container;
+
+    private boolean INITIALIZED = false;
+
+
 
     @Autowired
     private UtilityService utilityService;
@@ -60,25 +67,85 @@ public class MappingService {
     public MappingService(SampleRepository sampleRepository) {
 
         this.sampleRepository = sampleRepository;
-        this.savedDiagnosisMappingsFile = savedDiagnosisMappingsFile;
-        //this.mappingEntityRepository =  mappingEntityRepository;
-    }
-
-    public String getSavedDiagnosisMappingsFile() {
-        return savedDiagnosisMappingsFile;
-    }
-
-    public void setSavedDiagnosisMappingsFile(String savedDiagnosisMappingsFile) {
-        this.savedDiagnosisMappingsFile = savedDiagnosisMappingsFile;
+        container = new MappingContainer();
     }
 
 
-    public List<MappingEntity> loadSavedDiagnosisMappings(){
+    /**
+     * Loads rules from a source: file or h2
+     * @param source
+     */
+    private void loadRules(String source){
 
-        String json = utilityService.parseFile(savedDiagnosisMappingsFile);
-        existingDiagnosisMappings = new MappingContainer();
 
-        List<MappingEntity> mappingEntities = new ArrayList<>();
+        log.info("Loading mapping rules");
+
+        if(source.equals("json")){
+
+            String mappingRulesDir = rootDir + "/mapping";
+            File folder = new File(mappingRulesDir);
+
+            if(folder.exists()){
+
+                String diagnosisMappingsFilePath = mappingRulesDir+"/diagnosis_mappings.json";
+                String treatmentMappingsFilePath = mappingRulesDir+"/treatment_mappings.json";
+
+                File diagnosisFile = new File(diagnosisMappingsFilePath);
+                File treatmentFile = new File(treatmentMappingsFilePath);
+
+                if(diagnosisFile.exists()){
+
+                    loadDiagnosisMappings(diagnosisMappingsFilePath);
+                }
+                else{
+                    log.error("Diagnosis mappings file not found at "+diagnosisMappingsFilePath);
+                }
+
+
+                if(treatmentFile.exists()){
+
+                    loadTreatmentMappings(treatmentMappingsFilePath);
+                }
+                else{
+                    log.error("Treatment mappings file not found at "+treatmentMappingsFilePath);
+                }
+
+
+            }
+            else{
+
+                log.error("Mapping rules directory not found at "+mappingRulesDir);
+
+            }
+
+
+        }
+        else if(source.equals("h2")){
+
+
+
+        }
+        else{
+
+            log.error("Couldn't load mapping rules, no source was specified");
+
+
+        }
+
+
+        INITIALIZED = true;
+
+    }
+
+
+    /**
+     * Populates the container with the diagnosis mapping rules
+     * @param file
+     */
+    private void loadDiagnosisMappings(String file){
+
+
+        String json = utilityService.parseFile(file);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -140,7 +207,7 @@ public class MappingService {
                     mappingValues.put("OriginTissue", originTissue);
                     mappingValues.put("TumorType", tumorType);
 
-                    MappingEntity me = new MappingEntity("DIAGNOSIS", getDiagnosisMappingLabels(), mappingValues);
+                    MappingEntity me = new MappingEntity(MappingEntityType.diagnosis.get(), getDiagnosisMappingLabels(), mappingValues);
                     me.setMappedTermLabel(ontologyTerm);
                     me.setMapType(mapType);
                     me.setJustification(justification);
@@ -148,9 +215,8 @@ public class MappingService {
                     me.setMappedTermUrl(mappedTermUrl);
                     me.setMappingKey(mappingKey);
 
-                    mappingEntities.add(me);
+                    container.add(me);
 
-                    existingDiagnosisMappings.add(me);
                 }
             }
 
@@ -158,20 +224,43 @@ public class MappingService {
             e.printStackTrace();
         }
 
+    }
 
-        return mappingEntities;
+
+    /**
+     * Populates the container with the treatment mapping rules
+     * @param file
+     */
+    private void loadTreatmentMappings(String file){
+
+    }
+
+
+
+
+    public MappingEntity getDiagnosisMapping(String dataSource, String diagnosis, String originTissue, String tumorType){
+
+        if(!INITIALIZED) loadRules("json");
+
+        String mapKey = MappingEntityType.diagnosis.get()+dataSource+diagnosis+originTissue+tumorType;
+
+        mapKey = mapKey.replaceAll("[^a-zA-Z0-9]","").toLowerCase();
+
+
+       return container.getEntityById(mapKey);
 
 
     }
 
 
 
+/*
     public MappingContainer getSavedDiagnosisMappings(String ds){
 
 
-        if(existingDiagnosisMappings == null){
+        if(!INITIALIZED){
 
-            loadSavedDiagnosisMappings();
+            loadRules("file");
         }
 
         //no filter, return everything
@@ -191,23 +280,21 @@ public class MappingService {
     return mc;
     }
 
-
+*/
     public MappingContainer getDiagnosisMappingsByDS(List<String> ds){
 
 
-        if(existingDiagnosisMappings == null){
+        if(!INITIALIZED){
 
-            loadSavedDiagnosisMappings();
+            loadRules("json");
         }
 
-        //no filter, return everything
-        if(ds == null) return existingDiagnosisMappings;
 
         MappingContainer mc = new MappingContainer();
 
-        for(MappingEntity me: existingDiagnosisMappings.getMappings().values()){
+        for(MappingEntity me: container.getMappings().values()){
 
-            if(me.getEntityType().equals("DIAGNOSIS")){
+            if(me.getEntityType().toLowerCase().equals(MappingEntityType.diagnosis.get())){
 
                 for(String dataSource : ds){
 
@@ -235,9 +322,11 @@ public class MappingService {
 
     }
 
-    public void saveMappingsToFile(String fileName, Collection<MappingEntity> maprules){
 
-        Map<String, Collection<MappingEntity>> mappings = new HashMap<>();
+
+    public void saveMappingsToFile(String fileName, List<MappingEntity> maprules){
+
+        Map<String, List<MappingEntity>> mappings = new HashMap<>();
         mappings.put("mappings", maprules);
 
         Gson gson = new Gson();
