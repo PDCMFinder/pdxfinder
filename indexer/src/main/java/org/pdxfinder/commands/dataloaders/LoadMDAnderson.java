@@ -47,8 +47,8 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
     private Session session;
 
 
-    @Value("${pdxfinder.data.root.dir}")
-    private String dataRootDir;
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     //   @Value("${mdapdx.url}")
     //   private String urlStr;
@@ -94,7 +94,7 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
 
             if (listOfFiles[i].isFile()) {
 
-                this.jsonFile = rootDataDirectory + dataSourceAbbreviation + "/pdx/" + listOfFiles[i].getName();
+                this.jsonFile = rootDataDirectory +"/" + dataSourceAbbreviation + "/pdx/" + listOfFiles[i].getName();
                 globalLoadingOrder();
             }
         }
@@ -110,9 +110,9 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
         log.info("Loading MDAnderson PDX data.");
 
         dto = new LoaderDTO();
-        rootDataDirectory = dataRootDir;
+        rootDataDirectory = finderRootDir + "/data";
         dataSource = dataSourceAbbreviation;
-        filesDirectory = dataRootDir + dataSourceAbbreviation + "/pdx/";
+        filesDirectory = finderRootDir + "/" + dataSourceAbbreviation + "/pdx/";
     }
 
     // MD ANDERSON uses default implementation Steps step01GetMetaDataFolder, step02GetMetaDataJSON

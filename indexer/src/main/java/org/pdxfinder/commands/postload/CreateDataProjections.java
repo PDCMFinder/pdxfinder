@@ -49,8 +49,8 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
     String homeDir;
 
 
-    @Value("${pdxfinder.data.root.dir}")
-    private String dataRootDir;
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     protected ReportManager reportManager;
 
@@ -451,8 +451,8 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
         log.info("Loading additional datasets for CRL.");
 
-        String templateFileStr = dataRootDir + "UPDOG/CRL/template.xlsx";
-        String markerTemplateFileStr = dataRootDir + "UPDOG/CRL/cna_tested_markers/list.csv";
+        String templateFileStr = finderRootDir + "/data/UPDOG/CRL/template.xlsx";
+        String markerTemplateFileStr = finderRootDir + "/data/UPDOG/CRL/cna_tested_markers/list.csv";
 
         File markerListFile = new File(markerTemplateFileStr);
         File templateFile = new File(templateFileStr);
@@ -508,7 +508,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             Set<Long> modelIdSet = new HashSet<>();
 
             UniversalLoader updog = new UniversalLoader(reportManager, utilityService, dataImportService);
-            updog.setDataRootDir(dataRootDir);
+            updog.setFinderRootDir(finderRootDir);
 
             updog.initTemplate(templateFileStr);
 

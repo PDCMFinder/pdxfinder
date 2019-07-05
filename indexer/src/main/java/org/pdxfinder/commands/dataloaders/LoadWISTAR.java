@@ -66,8 +66,8 @@ public class LoadWISTAR implements CommandLineRunner {
     private UtilityService utilityService;
 
 
-    @Value("${pdxfinder.data.root.dir}")
-    private String dataRootDir;
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     @PostConstruct
     public void init() {
@@ -90,7 +90,7 @@ public class LoadWISTAR implements CommandLineRunner {
         if (options.has("loadWISTAR") || options.has("loadALL")) {
 
 
-            String urlStr = dataRootDir+DATASOURCE_ABBREVIATION+"/pdx/models.json";
+            String urlStr = finderRootDir+ "/data/" +DATASOURCE_ABBREVIATION+"/pdx/models.json";
             File file = new File(urlStr);
             if(file.exists()){
 

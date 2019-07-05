@@ -33,8 +33,6 @@ import java.util.*;
 public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
 
-    @Value("${mappings.diagnosis.file}")
-    private String diagnosisMappingsFile;
 
     private final static Logger log = LoggerFactory.getLogger(LinkSamplesToNCITTerms.class);
     private DataImportService dataImportService;
@@ -82,7 +80,6 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
             log.info("Mapping samples to NCIT terms with cleanup.");
 
-            loadMappingRules();
             mapSamplesToTerms();
             updateIndirectMappingData();
             deleteTermsWithoutMapping();
@@ -91,7 +88,6 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
             log.info("Mapping samples to NCIT terms.");
 
-            loadMappingRules();
             mapSamplesToTerms();
             updateIndirectMappingData();
 
@@ -107,134 +103,8 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
     }
 
 
-    private void loadMappingRules() {
-
-        String json = utilityService.parseFile(diagnosisMappingsFile);
-
-        log.info("Fetching mapping rules from " + diagnosisMappingsFile);
-
-        this.mappingRules = new HashMap<>();
-
-        try {
-            JSONObject job = new JSONObject(json);
-            if (job.has("mappings")) {
-                JSONArray rows = job.getJSONArray("mappings");
-
-
-                for (int i = 0; i < rows.length(); i++) {
-                    JSONObject row = rows.getJSONObject(i);
-
-                    JSONObject mappingValues = row.getJSONObject("mappingValues");
-                    String mapId = row.getString("entityId");
-                    String dataSource = mappingValues.getString("DataSource");
-                    String sampleDiagnosis = mappingValues.getString("SampleDiagnosis").toLowerCase();
-                    String originTissue = mappingValues.getString("OriginTissue");
-                    String tumorType = mappingValues.getString("TumorType");
-
-                    String ontologyTerm = row.getString("mappedTermLabel");
-                    String ontologyTermUrl = row.getString("mappedTermUrl");
-
-                    String mapType = row.getString("mapType");
-                    String justification = row.getString("justification");
-
-                    if (ontologyTerm.equals("") || ontologyTerm == null) continue;
-                    if (sampleDiagnosis.equals("") || sampleDiagnosis == null) continue;
-
-
-                    //DO not ask, I know it looks horrible...
-                    if (originTissue == null || originTissue.equals("null")) originTissue = "";
-                    if (tumorType == null || tumorType.equals("null")) tumorType = "";
-                    if (justification == null || justification.equals("null")) justification = "";
-
-                    //make everything lowercase
-                    if (dataSource != null) dataSource = dataSource.toLowerCase();
-                    if (originTissue != null) originTissue = originTissue.toLowerCase();
-                    if (tumorType != null) tumorType = tumorType.toLowerCase();
-                    sampleDiagnosis = sampleDiagnosis.toLowerCase();
-
-                    /*
-                    DATASOURCE SPECIFIC:
-                    Center first
-                    1) PDMR-ad-lung-met ->  lung-met-adeno
-
-                    2) PDMR-ad-lung -> lung-adeno
-
-                    3) PDMR-ad ->adeno
-
-                    GENERAL:
-                    Maximum information to least specific information
-                    4) ad-lung-met ->  lung-met-adeno
-
-                    5) ad-lung ->  lung-adeno
-
-                    6) ad -> adenocarcinoma
-
-                     */
-
-                    MappingEntity me = new MappingEntity();
-                    me.setMappedTermUrl(ontologyTermUrl);
-                    me.setMappedTermLabel(ontologyTerm);
-                    me.setMapType(mapType);
-                    me.setJustification(justification);
-
-                    String key = dataSource + sampleDiagnosis + originTissue + tumorType;
-
-                    key = key.replaceAll("[^a-zA-Z0-9]","");
-
-                    this.mappingRules.put(key, me);
-                    log.info("Adding mappingrule "+mapId + " "+key);
-                }
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-    private MappingEntity getMappingForSample(String dataSource, String diagnosis, String originTissue, String tumorType) {
-
-        MappingEntity me = new MappingEntity();
-
-        //0. if diagnosis is empty return empty object
-        if (diagnosis.equals("") || diagnosis == null) return me;
-
-        if (dataSource == null) dataSource = "";
-        if (originTissue == null) originTissue = "";
-        if (tumorType == null) tumorType = "";
-        /*
-        DATASOURCE SPECIFIC:
-        Center first
-        1) PDMR-ad-lung-met ->  lung-met-adeno
-
-        2) PDMR-ad-lung -> lung-adeno
-
-        3) PDMR-ad ->adeno
-
-        GENERAL:
-        Maximum information to least specific information
-        4) ad-lung-met ->  lung-met-adeno
-
-        5) ad-lung ->  lung-adeno
-
-        6) ad -> adenocarcinoma
-
-        */
-        String key = dataSource.toLowerCase() + diagnosis.toLowerCase() + originTissue.toLowerCase() + tumorType.toLowerCase();
-        key = key.replaceAll("[^a-zA-Z0-9]","");
-
-        if (this.mappingRules.containsKey(key)) {
-
-            return this.mappingRules.get(key);
-        }
-
-        //else return empty object
-        //log.warn("No mapping for "+dataSource.toLowerCase() + diagnosis.toLowerCase() + originTissue.toLowerCase() + tumorType.toLowerCase());
-        return me;
-    }
-
     private void mapSamplesToTerms() {
+
 
         int batchSize = 50;
         int startNode = 0;
@@ -259,21 +129,6 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                 dataSource = sample.getDataSource();
                 diagnosis = sample.getDiagnosis();
 
-                // Per Nat 20180219, remove commas from the ontology terms
-                // to fix issues with term "Invasive Ductal Carcinoma, Not Otherwise Specified"
-                // URL parsing has trouble with commas
-                // Decided solution is to remove commas from ontology labels
-                // https://www.ebi.ac.uk/panda/jira/browse/PDXI-258
-                // Changes Malignant * Neoplasm to * Cancer
-                String updatedDiagnosis = diagnosis;
-                String pattern = "(.*)Malignant(.*)Neoplasm(.*)";
-
-                if (diagnosis.matches(pattern)) {
-                    updatedDiagnosis = (diagnosis.replaceAll(pattern, "\t$1$2Cancer$3")).trim();
-                    log.info("Updating ontology linking of diagnosis '{}' with '{}'", diagnosis, updatedDiagnosis);
-                }
-
-                updatedDiagnosis = updatedDiagnosis.replaceAll(",", "");
 
                 if (sample.getOriginTissue() != null) {
                     originTissue = sample.getOriginTissue().getName();
@@ -283,16 +138,15 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                     tumorType = sample.getType().getName();
                 }
 
+                MappingEntity me = mappingService.getDiagnosisMapping(dataSource, diagnosis, originTissue, tumorType);
 
-                MappingEntity me = getMappingForSample(dataSource, updatedDiagnosis, originTissue, tumorType);
+                if(me == null){
 
-                //deal with empty mapping rules here!
-                if (me.getMappedTermUrl() == null || me.getMappedTermUrl().equals("")) {
+                    MissingMapping mm = new MissingMapping(dataSource, diagnosis, originTissue, tumorType);
+                    insertMissingMapping(diagnosis, mm);
 
-                    MissingMapping mm = new MissingMapping(dataSource, updatedDiagnosis, originTissue, tumorType);
-                    insertMissingMapping(updatedDiagnosis, mm);
-
-                } else {
+                }
+                 else {
 
                     OntologyTerm ot = dataImportService.findOntologyTermByUrl(me.getMappedTermUrl());
 
@@ -317,7 +171,6 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
             startNode += batchSize;
         }
 
-        saveMappedTerms();
 
         if (this.missingMappings.size() > 0) {
             printAndSaveMissingMappings();
@@ -394,28 +247,6 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
     }
 
-
-    public void saveMappedTerms(){
-
-        List<MappingEntity> mappingEntities = mappingService.loadSavedDiagnosisMappings();
-
-        for (MappingEntity mappingEntity : mappingEntities){
-
-            mappingEntity.setEntityId(null);
-            String mappingKey = mappingEntity.getMappingKey();
-
-            MappingEntity entity = mappingEntityRepository.findByMappingKey(mappingKey);
-
-            if(entity == null){
-
-                mappingEntityRepository.save(mappingEntity);
-
-            }else{
-
-                log.warn("NOT SAVED: was found in the Database "+mappingKey);
-            }
-        }
-    }
 
 
 

@@ -42,6 +42,10 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     private CommandLine cmd;
     private HelpFormatter formatter;
 
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
+
+
     /*private Session session;
 
     @Value("${pdmrpdx.variation.max}")
@@ -96,7 +100,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
         dto = new LoaderDTO();
 
-        jsonFile = dataRootDirectory+dataSourceAbbreviation+"/pdx/models.json";
+        jsonFile = finderRootDirectory +"/data/"+dataSourceAbbreviation+"/pdx/models.json";
         dataSource = dataSourceAbbreviation;
     }
 
@@ -291,7 +295,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
         log.info("Loading NGS for model " + dto.getModelCreation().getSourcePdxId());
 
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(), "mutation");
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(), "mutation",finderRootDir+"/data");
     }
 
 

@@ -12,34 +12,24 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
 
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.neo4j.ogm.session.Session;
 
-import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 
 import org.pdxfinder.services.UtilityService;
-import org.pdxfinder.services.ds.Standardizer;
-import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
-import java.io.FileInputStream;
-import java.util.*;
 
-import org.apache.poi.ss.usermodel.*;
 /*
  * Created by csaba on 14/05/2019.
  */
@@ -48,8 +38,8 @@ import org.apache.poi.ss.usermodel.*;
 public class LoadUniversal implements CommandLineRunner, ApplicationContextAware{
 
 
-    @Value("${pdxfinder.data.root.dir}")
-    private String dataRootDir;
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     Logger log = LoggerFactory.getLogger(LoadUniversal.class);
 
@@ -85,7 +75,7 @@ public class LoadUniversal implements CommandLineRunner, ApplicationContextAware
 
             reportManager = (ReportManager) context.getBean("ReportManager");
 
-            File folder = new File(dataRootDir + "UPDOG/");
+            File folder = new File(finderRootDir +"/data/UPDOG/");
 
             if (folder.exists()) {
 
@@ -100,7 +90,7 @@ public class LoadUniversal implements CommandLineRunner, ApplicationContextAware
 
                         if (updogDirs[i].isDirectory()) {
 
-                            String templateFileStr = dataRootDir + "UPDOG/" + updogDirs[i].getName() + "/template.xlsx";
+                            String templateFileStr = finderRootDir + "/data/UPDOG/" + updogDirs[i].getName() + "/template.xlsx";
 
                             File template = new File(templateFileStr);
 
@@ -114,7 +104,7 @@ public class LoadUniversal implements CommandLineRunner, ApplicationContextAware
                                 log.info("******************************************************");
 
                                 UniversalLoader updog = new UniversalLoader(reportManager, utilityService, dataImportService);
-                                updog.setDataRootDir(dataRootDir);
+                                updog.setFinderRootDir(finderRootDir);
                                 updog.initTemplate(templateFileStr);
                                 updog.loadTemplateData();
 

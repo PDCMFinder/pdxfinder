@@ -36,8 +36,8 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
     private HelpFormatter formatter;
 
-    @Value("${pdxfinder.data.root.dir}")
-    private String dataRootDir;
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     @PostConstruct
     public void init() {
@@ -75,7 +75,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
         dto = new LoaderDTO();
 
-        jsonFile = dataRootDir + dataSourceAbbreviation + "/pdx/models.json";
+        jsonFile = finderRootDir + "/data/" + dataSourceAbbreviation + "/pdx/models.json";
         dataSource = dataSourceAbbreviation;
         filesDirectory = "";
     }
@@ -164,7 +164,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step15LoadImmunoHistoChemistry() {
 
-        String ihcFileStr = dataRootDir + dataSourceAbbreviation + "/ihc/ihc.txt";
+        String ihcFileStr = finderRootDir + dataSourceAbbreviation + "/ihc/ihc.txt";
 
         File file = new File(ihcFileStr);
 
