@@ -40,7 +40,8 @@ public class ChartData {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-
+    public ChartData() {
+    }
 
     public ChartData(Title title, XAxis xAxis, List<Series> series) {
         this.title = title;

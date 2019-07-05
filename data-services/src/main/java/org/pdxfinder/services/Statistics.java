@@ -22,6 +22,140 @@ public class Statistics {
     private Boolean TRUE = true;
 
 
+    /*************************************************************************************************************
+     *         CUSTOM COLUMN AND BAR CHARTS           *
+     **************************************************/
+
+
+
+    public ChartData basicColumnChart(List<CountDTO> stats, String chartName, String subtitle, HexColors hexColors) {
+
+        List<String> categories = new ArrayList<>();
+        List<Object> categorySum = new ArrayList<>();
+
+        // Get all the Existing Keys
+        List<Object> dataList = new ArrayList<>();
+
+        stats.forEach(CountDTO -> {
+
+            // Populate the chartData category List
+            categories.add(CountDTO.getKey());
+            dataList.add(CountDTO.getValue());
+
+        });
+
+        // Create the Column Charts Data to create a cluster
+        List<Series> seriesList = new ArrayList<>();
+        seriesList.add(chartHelper.columnChart(dataList, chartName, hexColors.get()));
+
+
+        Title title = new Title(chartName);
+        XAxis xAxis = new XAxis(categories);
+
+        ChartData chartData = new ChartData(title, xAxis, seriesList);
+
+        // Set Subtitle, Chart Title and ToolTip
+        chartData = chartHelper.subtitleYAxisNToolTip(chartData, subtitle);
+
+        return chartData;
+
+    }
+
+
+
+    public ChartData basicBarChart(List<CountDTO> stats, String chartName, String subtitle, HexColors hexColors) {
+
+        ChartData chartData = basicColumnChart(stats, chartName, subtitle, hexColors) ;
+
+        chartData.getSeries().forEach(Series ->{
+            Series.setType(SeriesType.BAR.get());
+        });
+        return chartData;
+    }
+
+
+
+
+    public ChartData stackedBarChart(List<StatisticsDTO> stats, String chartTitle, String subtitle) {
+
+        ChartData chartData = stackedColumnChart( stats, chartTitle, subtitle);
+
+        chartData.getSeries().forEach(Series ->{
+            Series.setType(SeriesType.BAR.get());
+        });
+
+        return chartData;
+
+    }
+
+
+
+    public ChartData clusteredBarChart(List<StatisticsDTO> stats, String chartTitle, String subtitle) {
+
+        ChartData chartData = clusteredColumnChart( stats, chartTitle, subtitle);
+
+        chartData.getSeries().forEach(Series ->{
+            Series.setType(SeriesType.BAR.get());
+        });
+
+        return chartData;
+
+    }
+
+
+    public ChartData stackedColumnChart(List<StatisticsDTO> stats, String chartTitle, String subtitle) {
+
+        ChartData chartData = clusteredColumnChart(stats, chartTitle, subtitle);
+
+        Series series = new Series();
+        series.setStacking("normal");
+        PlotOptions plotOptions = new PlotOptions();
+        plotOptions.setSeries(series);
+
+        chartData.setPlotOptions(plotOptions);
+
+        return chartData;
+
+    }
+
+
+
+    public ChartData clusteredColumnChart(List<StatisticsDTO> stats, String chartTitle, String subtitle) {
+
+        List<String> categories = new ArrayList<>();
+
+        // Get all the Existing Keys
+        Map<String, List<Object>> dataMap = getKeysFromStatDTO(stats.get(0));
+
+        stats.forEach(StatisticsDTO -> {
+
+            // Populate the chartData category List
+            categories.add(StatisticsDTO.getCategory());
+
+            StatisticsDTO.getDataCounts().forEach(CountDTO -> {
+                dataMap.get(CountDTO.getKey()).add(CountDTO.getValue());
+            });
+
+        });
+
+        // Create the Column Charts Data to create a cluster
+        List<Series> seriesList = clusterColumnData(dataMap);
+
+        Title title = new Title(chartTitle);
+        XAxis xAxis = new XAxis(categories, true);
+
+        ChartData chartData = new ChartData(title, xAxis, seriesList);
+
+        // Set Subtitle, Chart Title and ToolTip
+        chartData = chartHelper.subtitleYAxisNToolTip(chartData, subtitle);
+
+        return chartData;
+
+    }
+
+
+
+
     public ChartData combinedColumnLineAndPieChart(List<StatisticsDTO> stats) {
 
         List<String> categories = new ArrayList<>();
@@ -169,89 +303,8 @@ public class Statistics {
     }
 
 
-    public ChartData barChart(List<CountDTO> stats, String chartName, String subtitle, HexColors hexColors) {
-
-        List<String> categories = new ArrayList<>();
-        List<Object> categorySum = new ArrayList<>();
-
-        // Get all the Existing Keys
-        List<Object> dataList = new ArrayList<>();
-
-        stats.forEach(CountDTO -> {
-
-            // Populate the chartData category List
-            categories.add(CountDTO.getKey());
-            dataList.add(CountDTO.getValue());
-
-        });
-
-        // Create the Column Charts Data to create a cluster
-        List<Series> seriesList = new ArrayList<>();
-        seriesList.add(chartHelper.columnChart(dataList, chartName, hexColors.get()));
 
 
-        Title title = new Title(chartName);
-        XAxis xAxis = new XAxis(categories);
-
-        ChartData chartData = new ChartData(title, xAxis, seriesList);
-
-        // Set Subtitle, Chart Title and ToolTip
-        chartData = chartHelper.subtitleYAxisNToolTip(chartData, subtitle);
-
-        return chartData;
-
-    }
-
-
-    public ChartData clusteredBarChart(List<StatisticsDTO> stats, String chartTitle, String subtitle) {
-
-        List<String> categories = new ArrayList<>();
-
-        // Get all the Existing Keys
-        Map<String, List<Object>> dataMap = getKeysFromStatDTO(stats.get(0));
-
-        stats.forEach(StatisticsDTO -> {
-
-            // Populate the chartData category List
-            categories.add(StatisticsDTO.getCategory());
-
-            StatisticsDTO.getDataCounts().forEach(CountDTO -> {
-                dataMap.get(CountDTO.getKey()).add(CountDTO.getValue());
-            });
-
-        });
-
-
-        // Create the Column Charts Data to create a cluster
-        List<Series> seriesList = clusterColumnData(dataMap);
-
-        Title title = new Title(chartTitle);
-        XAxis xAxis = new XAxis(categories, true);
-
-        ChartData chartData = new ChartData(title, xAxis, seriesList);
-
-        // Set Subtitle, Chart Title and ToolTip
-        chartData = chartHelper.subtitleYAxisNToolTip(chartData, subtitle);
-
-        return chartData;
-
-    }
-
-
-    public ChartData stackedBarChart(List<StatisticsDTO> stats, String chartTitle, String subtitle) {
-
-        ChartData chartData = clusteredBarChart(stats, chartTitle, subtitle);
-
-        Series series = new Series();
-        series.setStacking("normal");
-        PlotOptions plotOptions = new PlotOptions();
-        plotOptions.setSeries(series);
-
-        chartData.setPlotOptions(plotOptions);
-
-        return chartData;
-
-    }
 
 
 
@@ -309,8 +362,6 @@ public class Statistics {
 
 
 
-
-
     private List<Series> clusterColumnData(Map<String, List<Object>> dataMap) {
 
         List<Series> seriesList = new ArrayList<>();
@@ -348,8 +399,6 @@ public class Statistics {
 
     public List<StatisticsDTO> mockDataTreatmentPatients() {
 
-        // Mock Data Generation Starts
-
         List<CountDTO> count1 = Arrays.asList(
                 new CountDTO("IRCC-CRC", 275),
                 new CountDTO("JAX", 90),
@@ -381,15 +430,11 @@ public class Statistics {
                 new StatisticsDTO("NOV 2019", count4)
         );
 
-        // Mock data Generation Ends
-
         return stats;
     }
 
 
     public List<StatisticsDTO> mockDataDrugDosing() {
-
-        // Mock Data Generation Starts
 
         List<CountDTO> count1 = Arrays.asList(
                 new CountDTO("IRCC-CRC", 1),
@@ -422,15 +467,11 @@ public class Statistics {
                 new StatisticsDTO("NOV 2019", count4)
         );
 
-        // Mock data Generation Ends
-
         return stats;
     }
 
 
     public List<StatisticsDTO> mockRepository() {
-
-        // Mock Data Generation Starts
 
         List<CountDTO> count1 = Arrays.asList(
                 new CountDTO("mutation", 1000),
@@ -462,8 +503,6 @@ public class Statistics {
                 new StatisticsDTO("JUN 2019", count3),
                 new StatisticsDTO("NOV 2019", count4)
         );
-
-        // Mock data Generation Ends
 
         return stats;
     }

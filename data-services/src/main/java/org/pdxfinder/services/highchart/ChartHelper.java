@@ -42,6 +42,16 @@ public class ChartHelper {
     }
 
 
+    public Series barChart(List<Object> data, String chartName, String color){
+
+        String type = SeriesType.BAR.get();
+
+        Series columnSeries = new Series(type,chartName,data,color);
+
+        return columnSeries;
+    }
+
+
     public Series columnChart(List<Object> data, String chartName, Object color, Double opacity, Double pointPadding, Double pointPlacement, Integer yAxis){
 
         String type = SeriesType.COLUMN.get();
