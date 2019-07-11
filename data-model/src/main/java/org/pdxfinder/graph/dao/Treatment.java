@@ -2,6 +2,7 @@ package org.pdxfinder.graph.dao;
 
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
 /*
  * Created by csaba on 08/05/2019.
@@ -15,7 +16,8 @@ public class Treatment {
 
     private String name;
 
-
+    @Relationship(type="MAPPED_TO")
+    private TreatmentToOntologyRelationship treatmentToOntologyRelationship;
 
     public Treatment(String name) {
         this.name = name;
@@ -39,5 +41,13 @@ public class Treatment {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public TreatmentToOntologyRelationship getTreatmentToOntologyRelationship() {
+        return treatmentToOntologyRelationship;
+    }
+
+    public void setTreatmentToOntologyRelationship(TreatmentToOntologyRelationship treatmentToOntologyRelationship) {
+        this.treatmentToOntologyRelationship = treatmentToOntologyRelationship;
     }
 }
