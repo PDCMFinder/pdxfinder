@@ -169,9 +169,6 @@ public class MappingService {
                     String mappedTermUrl = row.getString("mappedTermUrl");
                     Long entityId = Long.parseLong(row.getString("entityId"));
 
-                    String mappingKey = StringUtils.join(
-                            Arrays.asList(dataSource, sampleDiagnosis, originTissue, tumorType), "__"
-                    );
 
                     //if(ds!= null && !ds.toLowerCase().equals(dataSource.toLowerCase())) continue;
 
@@ -213,7 +210,7 @@ public class MappingService {
                     me.setJustification(justification);
                     me.setEntityId(entityId);
                     me.setMappedTermUrl(mappedTermUrl);
-                    me.setMappingKey(mappingKey);
+                    me.setMappingKey(me.generateMappingKey());
 
                     container.add(me);
 
@@ -227,11 +224,63 @@ public class MappingService {
     }
 
 
-    /**
-     * Populates the container with the treatment mapping rules
-     * @param file
-     */
-    private void loadTreatmentMappings(String file){
+
+   private void loadTreatmentMappings(String file){
+
+
+        String json = utilityService.parseFile(file);
+
+        try {
+            JSONObject job = new JSONObject(json);
+            if (job.has("mappings")) {
+                JSONArray rows = job.getJSONArray("mappings");
+
+
+                for (int i = 0; i < rows.length(); i++) {
+                    JSONObject row = rows.getJSONObject(i);
+
+                    JSONObject mappingVal = row.getJSONObject("mappingValues");
+
+
+                    String dataSource = mappingVal.getString("DataSource");
+                    String treatmentName = mappingVal.getString("TreatmentName").toLowerCase();
+                    String ontologyTerm = row.getString("mappedTermLabel");
+                    String mapType = row.getString("mapType");
+                    String justification = row.getString("justification");
+                    String mappedTermUrl = row.getString("mappedTermUrl");
+                    Long entityId = Long.parseLong(row.getString("entityId"));
+
+
+
+                    if (ontologyTerm.equals("") || ontologyTerm == null) continue;
+
+                    //DO not ask, I know it looks horrible...
+                    if (justification == null || justification.equals("null")) justification = "";
+
+                    //make everything lowercase
+                    if (dataSource != null) dataSource = dataSource.toLowerCase();
+
+
+                    Map<String, String> mappingValues = new HashMap<>();
+                    mappingValues.put("DataSource", dataSource);
+                    mappingValues.put("TreatmentName", treatmentName);
+
+                    MappingEntity me = new MappingEntity(MappingEntityType.treatment.get(), getTreatmentMappingLabels(), mappingValues);
+                    me.setMappedTermLabel(ontologyTerm);
+                    me.setMapType(mapType);
+                    me.setJustification(justification);
+                    me.setEntityId(entityId);
+                    me.setMappedTermUrl(mappedTermUrl);
+                    me.setMappingKey(me.generateMappingKey());
+
+                    container.add(me);
+
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -242,9 +291,9 @@ public class MappingService {
 
         if(!INITIALIZED) loadRules("json");
 
-        String mapKey = MappingEntityType.diagnosis.get()+dataSource+diagnosis+originTissue+tumorType;
+        String mapKey = MappingEntityType.diagnosis.get()+"__"+dataSource+"__"+diagnosis+"__"+originTissue+"__"+tumorType;
 
-        mapKey = mapKey.replaceAll("[^a-zA-Z0-9]","").toLowerCase();
+        mapKey = mapKey.replaceAll("[^a-zA-Z0-9 _-]","").toLowerCase();
 
 
        return container.getEntityById(mapKey);
@@ -252,6 +301,19 @@ public class MappingService {
 
     }
 
+    public MappingEntity getTreatmentMapping(String dataSource, String treatmentName){
+
+        if(!INITIALIZED) loadRules("json");
+
+        String mapKey = MappingEntityType.treatment.get()+"__"+dataSource+"__"+treatmentName;
+
+        mapKey = mapKey.replaceAll("[^a-zA-Z0-9 _-]","").toLowerCase();
+
+
+        return container.getEntityById(mapKey);
+
+
+    }
 
 
 /*
@@ -519,7 +581,14 @@ public class MappingService {
         return mapLabels;
     }
 
+    List<String> getTreatmentMappingLabels(){
 
+        List<String> mapLabels = new ArrayList<>();
+        mapLabels.add("DataSource");
+        mapLabels.add("TreatmentName");
+
+        return mapLabels;
+    }
 
 
     private int getStringSimilarity(DamerauLevenshteinAlgorithm dla, String key1, String key2){
