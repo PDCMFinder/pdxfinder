@@ -58,9 +58,9 @@ public class MappingContainer {
 
     public void add(MappingEntity me){
 
-        if(!mappings.containsKey(me.getContainerKey())){
+        if(!mappings.containsKey(me.getMappingKey())){
 
-            mappings.put(me.getContainerKey(), me);
+            mappings.put(me.getMappingKey(), me);
             size += 1;
         }
 
