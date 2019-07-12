@@ -384,7 +384,7 @@ public class AjaxController {
         String chartTitle  = "Model Count Data";
         String subtitle   = "Model Count Per Data Release";
 
-        return statistics.barChart(data, chartTitle, subtitle, HexColors.CUSTOMBLUE);
+        return statistics.basicColumnChart(data, chartTitle, subtitle, HexColors.CUSTOMBLUE);
     }
 
 
@@ -396,7 +396,7 @@ public class AjaxController {
         String chartTitle  = "Data Providers";
         String subtitle   = "Providers Count Per Data Release";
 
-        return statistics.barChart(data, chartTitle, subtitle, HexColors.BLACK);
+        return statistics.basicColumnChart(data, chartTitle, subtitle, HexColors.BLACK);
     }
 
 
