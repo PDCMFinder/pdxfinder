@@ -6,8 +6,10 @@ import org.pdxfinder.admin.pojos.MappingContainer;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.repositories.SampleRepository;
+import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.MappingService;
+import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,9 @@ public class UpdateMappings implements CommandLineRunner {
     private SampleRepository sampleRepository;
     private DataImportService dataImportService;
 
+    private UtilityService utilityService;
+    private MappingEntityRepository mappingEntityRepository;
+
 
     @Value("${mappings.diagnosis.file}")
     private String savedDiagnosisMappingsFile;
@@ -39,9 +44,13 @@ public class UpdateMappings implements CommandLineRunner {
     private String savedDiagnosisMappingsFile2;
 
     @Autowired
-    public UpdateMappings(SampleRepository sampleRepository, DataImportService dataImportService) {
+    public UpdateMappings(SampleRepository sampleRepository, DataImportService dataImportService,
+                          UtilityService utilityService,
+                          MappingEntityRepository mappingEntityRepository) {
         this.sampleRepository = sampleRepository;
         this.dataImportService = dataImportService;
+        this.utilityService = utilityService;
+        this.mappingEntityRepository = mappingEntityRepository;
     }
 
     @Override
@@ -69,7 +78,7 @@ public class UpdateMappings implements CommandLineRunner {
 
     private void updateMappings(){
 
-        MappingService mappingService = new MappingService(sampleRepository);
+        MappingService mappingService = new MappingService(sampleRepository, utilityService, mappingEntityRepository);
 
         mappingService.setSavedDiagnosisMappingsFile(savedDiagnosisMappingsFile);
         MappingContainer mcont = mappingService.getSavedDiagnosisMappings(null);

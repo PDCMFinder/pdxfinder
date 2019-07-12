@@ -57,7 +57,9 @@ public class MappingService {
     //MappingEntityRepository mappingEntityRepository;
 
     @Autowired
-    public MappingService(SampleRepository sampleRepository, UtilityService utilityService, MappingEntityRepository mappingEntityRepository) {
+    public MappingService(SampleRepository sampleRepository,
+                          UtilityService utilityService,
+                          MappingEntityRepository mappingEntityRepository) {
 
         this.sampleRepository = sampleRepository;
         this.savedDiagnosisMappingsFile = savedDiagnosisMappingsFile;
