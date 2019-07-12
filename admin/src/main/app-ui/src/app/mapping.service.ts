@@ -48,6 +48,14 @@ export class MappingService {
         return throwError(error);
     }
 
+    connectTopDataFlow() {
+
+        return fetch('https://jsonplaceholder.typicode.com/users')
+            .then((res) => res.json())
+            .then((data) => data)
+            .catch(error => console.log(error));
+    }
+
 
 
 }

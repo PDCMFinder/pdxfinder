@@ -35,9 +35,17 @@ export class DatasourceSummaryComponent implements OnInit {
 
     ngOnInit() {
 
+        this._mappingService.connectTopDataFlow().then(
+            (data) => {
+            data.forEach((user) => {
+                const { id, name, email, address: { city } } = user
+                console.log(user);
+            });
+        })
+
         let tempArr = [];
 
-        // Component to the Service using Reactive Observables
+        // Connect to the Service using Reactive Observables
         this._mappingService.connectTotalMappedStream()
             .subscribe(
                 data => {
@@ -142,11 +150,11 @@ export class DatasourceSummaryComponent implements OnInit {
 
 
 
-        this.gs.loadScript('../pdxfinder/dependencies/chart/amcharts.js');
+/*        this.gs.loadScript('../pdxfinder/dependencies/chart/amcharts.js');
         this.gs.loadScript('../pdxfinder/dependencies/chart/serial.js');
         this.gs.loadScript('../pdxfinder/dependencies/chart/export.min.js');
         this.gs.loadScript('../pdxfinder/dependencies/chart/light.js');
-        this.gs.loadScript('../pdxfinder/dependencies/chart/3dbar.js');
+        this.gs.loadScript('../pdxfinder/dependencies/chart/3dbar.js')*/;
 
         pdxFinderbarChart("Missing Mapping",chartData,"chartdiv", "mapping", "visits", 15);
     }

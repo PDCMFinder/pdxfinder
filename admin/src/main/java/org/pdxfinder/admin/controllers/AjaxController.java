@@ -72,7 +72,8 @@ public class AjaxController {
             ds = dataSource.get();
         }
 
-        return mappingService.getSavedDiagnosisMappings(ds).getEntityList();
+        Map<String, List<MappingEntity>> result =  mappingService.getMissingDiagnosisMappings(null); //getSavedDiagnosisMappings(ds).getEntityList();
+        return result;
     }
 
 

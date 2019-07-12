@@ -36,7 +36,7 @@ export class DashboardComponent implements OnInit {
           "visits": 0
       }, {
           "mapping": "PDXNET-MDANDERSON",
-          "visits": 0
+          "visits": 2
       }, {
           "mapping": "PDXNET-MDANDERSON-PENN ",
           "visits": 0
@@ -46,11 +46,11 @@ export class DashboardComponent implements OnInit {
       }]
 
 
-      this.gs.loadScript('../pdxfinder/dependencies/chart/amcharts.js');
-      this.gs.loadScript('../pdxfinder/dependencies/chart/serial.js');
-      this.gs.loadScript('../pdxfinder/dependencies/chart/export.min.js');
-      this.gs.loadScript('../pdxfinder/dependencies/chart/light.js');
-      this.gs.loadScript('../pdxfinder/dependencies/chart/3dbar.js');
+      //this.gs.loadScript('../pdxfinder/dependencies/chart/amcharts.js');
+      //this.gs.loadScript('../pdxfinder/dependencies/chart/serial.js');
+      //this.gs.loadScript('../pdxfinder/dependencies/chart/export.min.js');
+      //this.gs.loadScript('../pdxfinder/dependencies/chart/light.js');
+      //this.gs.loadScript('../pdxfinder/dependencies/chart/3dbar.js');
 
       pdxFinderbarChart("Missing Mapping",chartData,"chartdiv", "mapping", "visits", 15);
 
