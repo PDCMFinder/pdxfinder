@@ -1087,6 +1087,12 @@ public class DataImportService {
 
     }
 
+
+    public void saveTreatment(Treatment t){
+
+        treatmentRepository.save(t);
+    }
+
     public int findDrugDosingStudyNumberByDataSource(String datasource){
 
         return treatmentSummaryRepository.findDrugDosingStudyNumberByDataSource(datasource);
