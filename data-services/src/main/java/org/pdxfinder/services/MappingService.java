@@ -18,6 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -51,20 +55,14 @@ public class MappingService {
 
     private MappingContainer existingDiagnosisMappings;
 
+    @Autowired
     private UtilityService utilityService;
-    private MappingEntityRepository mappingEntityRepository;
-
-    //MappingEntityRepository mappingEntityRepository;
 
     @Autowired
-    public MappingService(SampleRepository sampleRepository,
-                          UtilityService utilityService,
-                          MappingEntityRepository mappingEntityRepository) {
+    public MappingService(SampleRepository sampleRepository) {
 
         this.sampleRepository = sampleRepository;
         this.savedDiagnosisMappingsFile = savedDiagnosisMappingsFile;
-        this.utilityService = utilityService;
-        this.mappingEntityRepository = mappingEntityRepository;
         //this.mappingEntityRepository =  mappingEntityRepository;
     }
 
@@ -276,7 +274,7 @@ public class MappingService {
 
         Map<String, List<MappingEntity>> entityMap = new HashMap<>();
 
-        List<MappingEntity> mappingEntities = mappingEntityRepository.findByMappedTermLabel(null); //new ArrayList<>();
+        List<MappingEntity> mappingEntities =  new ArrayList<>(); //mappingEntityRepository.findByMappedTermLabel(null);
 
 
         for (MappingEntity mappingEntity : mappingEntities){

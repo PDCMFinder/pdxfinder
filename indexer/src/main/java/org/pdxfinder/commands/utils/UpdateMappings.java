@@ -33,9 +33,6 @@ public class UpdateMappings implements CommandLineRunner {
     private SampleRepository sampleRepository;
     private DataImportService dataImportService;
 
-    private UtilityService utilityService;
-    private MappingEntityRepository mappingEntityRepository;
-
 
     @Value("${mappings.diagnosis.file}")
     private String savedDiagnosisMappingsFile;
@@ -44,13 +41,9 @@ public class UpdateMappings implements CommandLineRunner {
     private String savedDiagnosisMappingsFile2;
 
     @Autowired
-    public UpdateMappings(SampleRepository sampleRepository, DataImportService dataImportService,
-                          UtilityService utilityService,
-                          MappingEntityRepository mappingEntityRepository) {
+    public UpdateMappings(SampleRepository sampleRepository, DataImportService dataImportService) {
         this.sampleRepository = sampleRepository;
         this.dataImportService = dataImportService;
-        this.utilityService = utilityService;
-        this.mappingEntityRepository = mappingEntityRepository;
     }
 
     @Override
@@ -78,7 +71,7 @@ public class UpdateMappings implements CommandLineRunner {
 
     private void updateMappings(){
 
-        MappingService mappingService = new MappingService(sampleRepository, utilityService, mappingEntityRepository);
+        MappingService mappingService = new MappingService(sampleRepository);
 
         mappingService.setSavedDiagnosisMappingsFile(savedDiagnosisMappingsFile);
         MappingContainer mcont = mappingService.getSavedDiagnosisMappings(null);
