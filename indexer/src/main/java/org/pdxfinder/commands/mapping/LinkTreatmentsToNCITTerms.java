@@ -52,7 +52,7 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
 
         if (options.has("linkTreatmentsToNCITTerms") || options.has("loadALL")  || options.has("loadSlim") || options.has("loadEssentials")) {
 
-            log.info("Mapping samples to NCIT terms with cleanup.");
+            log.info("Mapping treatments to NCIT terms.");
 
             mapTreatmentsToTerms();
 
@@ -133,7 +133,7 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
 
                 }
 
-
+                startNode += batchSize;
             }
 
 
