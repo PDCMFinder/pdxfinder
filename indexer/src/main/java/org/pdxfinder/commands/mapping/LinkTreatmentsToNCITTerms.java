@@ -100,7 +100,6 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
 
 
                         //TODO: deal with missing mapping rules here
-
                         log.warn("No mapping rule found for "+treatment.getName());
                     }
                     else{
