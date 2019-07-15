@@ -63,16 +63,17 @@ public class AjaxController {
 */
 
 
+    @CrossOrigin
     @RequestMapping(value = "/mapping/diagnosis")
     @ResponseBody
-    public Map<String, List<MappingEntity>>  getDiagnosisMappings(@RequestParam("ds") Optional<String> dataSource){
+    public List<MappingEntity>  getDiagnosisMappings(@RequestParam("ds") Optional<String> dataSource){
 
         String ds = null;
         if(dataSource.isPresent() && !dataSource.get().isEmpty()){
             ds = dataSource.get();
         }
 
-        Map<String, List<MappingEntity>> result =  mappingService.getMissingDiagnosisMappings(null); //getSavedDiagnosisMappings(ds).getEntityList();
+        List<MappingEntity> result =  mappingService.getMissingDiagnosisMappings(ds); //getSavedDiagnosisMappings(ds).getEntityList();
         return result;
     }
 
