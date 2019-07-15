@@ -24,6 +24,8 @@ public class OntologyTerm {
     private String type;
     private String description;
 
+    private boolean allowAsSuggestion = true;
+
     @Relationship(type = "SUBCLASS_OF" ,direction = Relationship.OUTGOING)
     private Set<OntologyTerm> subclassOf;
 
@@ -139,5 +141,13 @@ public class OntologyTerm {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isAllowAsSuggestion() {
+        return allowAsSuggestion;
+    }
+
+    public void setAllowAsSuggestion(boolean allowAsSuggestion) {
+        this.allowAsSuggestion = allowAsSuggestion;
     }
 }
