@@ -82,7 +82,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
             mapSamplesToTerms();
             updateIndirectMappingData();
-            deleteTermsWithoutMapping();
+            //deleteTermsWithoutMapping();
 
         } else if (options.has("linkSamplesToNCITTerms")) {
 
@@ -258,6 +258,7 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
         for (OntologyTerm ot : termsWithDirectMappings) {
 
+            ot.setAllowAsSuggestion(true);
             Set<OntologyTerm> discoveredTerms = new HashSet<>();
             Set<String> visitedTerms = new HashSet<>();
             Collection<OntologyTerm> parents = dataImportService.getAllDirectParents(ot.getUrl());
@@ -278,6 +279,8 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
                 visitedTerms.add(currentParentTerm.getUrl());
                 //update indirect number
                 currentParentTerm.setIndirectMappedSamplesNumber(currentParentTerm.getIndirectMappedSamplesNumber() + ot.getDirectMappedSamplesNumber());
+                currentParentTerm.setAllowAsSuggestion(true);
+
                 dataImportService.saveOntologyTerm(currentParentTerm);
                 //get parents
                 parents = dataImportService.getAllDirectParents(currentParentTerm.getUrl());
