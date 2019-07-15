@@ -10,9 +10,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.admin.pojos.MappingContainer;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.admin.zooma.*;
-import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.repositories.SampleRepository;
-import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.mapping.MappingEntityType;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
 import org.slf4j.Logger;
@@ -77,6 +75,7 @@ public class MappingService {
      */
     private void loadRules(String source){
 
+        if(container == null) container = new MappingContainer();
 
         log.info("Loading mapping rules");
 
@@ -212,7 +211,7 @@ public class MappingService {
                     me.setMappedTermUrl(mappedTermUrl);
                     me.setMappingKey(me.generateMappingKey());
 
-                    container.add(me);
+                    container.addEntity(me);
 
                 }
             }
@@ -273,7 +272,7 @@ public class MappingService {
                     me.setMappedTermUrl(mappedTermUrl);
                     me.setMappingKey(me.generateMappingKey());
 
-                    container.add(me);
+                    container.addEntity(me);
 
                 }
             }
@@ -309,7 +308,6 @@ public class MappingService {
 
         mapKey = mapKey.replaceAll("[^a-zA-Z0-9 _-]","").toLowerCase();
 
-
         return container.getEntityById(mapKey);
 
 
@@ -335,7 +333,7 @@ public class MappingService {
                         x.getMappingValues().get("DataSource").equals(ds)).collect(Collectors.toList());
 
         results.forEach(x -> {
-            mc.add(x);
+            mc.addEntity(x);
         });
 
 
@@ -374,7 +372,7 @@ public class MappingService {
                         me2.setStatus(me.getStatus());
                         me2.setSuggestedMappings(me.getSuggestedMappings());
 
-                        mc.add(me2);
+                        mc.addEntity(me2);
                     }
                 }
             }
@@ -428,7 +426,7 @@ public class MappingService {
             //get suggestions for missing mapping
             mappingEntity.setSuggestedMappings(getSuggestionsForUnmappedEntity(mappingEntity, getSavedDiagnosisMappings(null)));
 
-            mc.add(mappingEntity);
+            mc.addEntity(mappingEntity);
         }
 
         entityMap.put("mappings", mappingEntities);
