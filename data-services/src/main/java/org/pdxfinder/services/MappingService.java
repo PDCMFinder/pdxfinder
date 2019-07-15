@@ -55,15 +55,16 @@ public class MappingService {
 
     private MappingContainer existingDiagnosisMappings;
 
-    @Autowired
     private UtilityService utilityService;
+    private MappingEntityRepository mappingEntityRepository;
 
     @Autowired
-    public MappingService(SampleRepository sampleRepository) {
+    public MappingService(SampleRepository sampleRepository, UtilityService utilityService, MappingEntityRepository mappingEntityRepository) {
 
         this.sampleRepository = sampleRepository;
         this.savedDiagnosisMappingsFile = savedDiagnosisMappingsFile;
-        //this.mappingEntityRepository =  mappingEntityRepository;
+        this.utilityService = utilityService;
+        this.mappingEntityRepository =  mappingEntityRepository;
     }
 
     public String getSavedDiagnosisMappingsFile() {
@@ -266,7 +267,7 @@ public class MappingService {
 
 
 
-    public Map<String, List<MappingEntity>> getMissingDiagnosisMappings(String ds){
+    public List<MappingEntity> getMissingDiagnosisMappings(String ds){
 
         MappingContainer mc = new MappingContainer();
 
@@ -274,19 +275,23 @@ public class MappingService {
 
         Map<String, List<MappingEntity>> entityMap = new HashMap<>();
 
-        List<MappingEntity> mappingEntities =  new ArrayList<>(); //mappingEntityRepository.findByMappedTermLabel(null);
+        List<MappingEntity> mappingEntities =  mappingEntityRepository.findByMappedTermLabel(null);  // new ArrayList<>();
 
 
+        List<MappingEntity> updatedEntities = new ArrayList<>();
         for (MappingEntity mappingEntity : mappingEntities){
 
-            //get suggestions for missing mapping
-            mappingEntity.setSuggestedMappings(getSuggestionsForUnmappedEntity(mappingEntity, getSavedDiagnosisMappings(null)));
+            if ( mappingEntity.getMappingValues().get("DataSource").equals(ds) || ds == null){
 
-            mc.add(mappingEntity);
+                //get suggestions for missing mapping
+                mappingEntity.setSuggestedMappings(getSuggestionsForUnmappedEntity(mappingEntity, getSavedDiagnosisMappings(null)));
+                mc.add(mappingEntity);
+                updatedEntities.add(mappingEntity);
+            }
         }
 
-        entityMap.put("mappings", mappingEntities);
-        return entityMap;
+        entityMap.put("mappings", updatedEntities);
+        return updatedEntities;
 
     }
 
