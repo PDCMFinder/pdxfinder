@@ -35,13 +35,19 @@ export class DatasourceSummaryComponent implements OnInit {
 
     ngOnInit() {
 
-        this._mappingService.connectTopDataFlow().then(
+/*        this._mappingService.connectTopDataFlow().then(
             (data) => {
             data.forEach((user) => {
-                const { id, name, email, address: { city } } = user
-                console.log(user);
+                const { entityId, entityType, mappedTermLabel, mappingValues: { SampleDiagnosis } } = user
+               // console.log(user);
+
+                this.pdxStatArray.source.push(user["mappingValues"].DataSource);
+                this.pdxStatArray.total.push(user.length);
+                this.pdxStatArray.validated.push(user.length);
+                this.pdxStatArray.unvalidated.push(0);
             });
-        })
+        })*/
+        
 
         let tempArr = [];
 

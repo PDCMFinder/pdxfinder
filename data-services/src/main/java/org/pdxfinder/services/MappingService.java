@@ -267,7 +267,7 @@ public class MappingService {
 
 
 
-    public List<MappingEntity> getMissingDiagnosisMappings(String ds){
+    public Map<String, List<MappingEntity>> getMissingDiagnosisMappings(String ds){
 
         MappingContainer mc = new MappingContainer();
 
@@ -291,7 +291,7 @@ public class MappingService {
         }
 
         entityMap.put("mappings", updatedEntities);
-        return updatedEntities;
+        return entityMap;
 
     }
 

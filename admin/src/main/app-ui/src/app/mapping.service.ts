@@ -10,7 +10,7 @@ import {catchError} from "rxjs/internal/operators";
 export class MappingService {
 
     private _totalMappedUrl = "/api/mapping/diagnosis";
-    private _missingMappedUrl = "/api/missingmapping/diagnosis";
+    private _missingMappedUrl = "/api/mapping/diagnosis";
 
     private _submitCurationUrl = "/api/diagnosis";
 
@@ -48,13 +48,13 @@ export class MappingService {
         return throwError(error);
     }
 
-    connectTopDataFlow() {
+/*    connectTopDataFlow() {
 
-        return fetch('https://jsonplaceholder.typicode.com/users')
+        return fetch('http://localhost:8081/api/mapping/diagnosis?ds=JAX')
             .then((res) => res.json())
             .then((data) => data)
             .catch(error => console.log(error));
-    }
+    }*/
 
 
 

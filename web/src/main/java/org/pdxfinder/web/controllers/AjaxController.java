@@ -330,7 +330,7 @@ public class AjaxController {
         String chartTitle  = "Global Social Media User Statistics";
         String subtitle   = "As per statistics data 2016";
 
-        return statistics.threeDPieChart(dataLabels,dataValues,chartTitle,subtitle,"LinkedIn");
+        return statistics.threeDdoughNutPie(dataLabels,dataValues,chartTitle,subtitle,"LinkedIn");
     }
 
 
@@ -371,7 +371,7 @@ public class AjaxController {
 
         }
 
-        return statistics.stackedBarChart(data, chartTitle, subtitle);
+        return statistics.clusteredColumnChart(data, chartTitle, subtitle);
     }
 
 
