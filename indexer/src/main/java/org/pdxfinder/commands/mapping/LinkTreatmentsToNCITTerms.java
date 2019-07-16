@@ -80,9 +80,13 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
         int batchSize = 50;
         int startNode = 0;
 
+
+
         List<Group> providerGroups = dataImportService.getAllProviderGroups();
 
         for(Group group: providerGroups){
+
+            //STEP1: Look up patient treatments and link them to ontology terms
 
             String dataSource = group.getAbbreviation();
 
@@ -92,49 +96,24 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
 
                 Collection<Treatment> treatments = dataImportService.getPatientTreatmentFrom(startNode, batchSize, dataSource);
 
-                for(Treatment treatment : treatments){
-
-                    MappingEntity me = mappingService.getTreatmentMapping(dataSource, treatment.getName());
-
-                    if(me == null){
-
-
-                        //TODO: deal with missing mapping rules here
-                        log.warn("No mapping rule found for "+treatment.getName());
-                    }
-                    else{
-
-
-                        OntologyTerm ot = dataImportService.findOntologyTermByUrl(me.getMappedTermUrl());
-
-                        if(ot == null){
-
-
-
-                            log.error("Ontology term not found "+me.getMappedTermUrl());
-                        }
-                        else{
-
-                            TreatmentToOntologyRelationship r = new TreatmentToOntologyRelationship();
-                            r.setType(me.getMapType());
-                            r.setJustification(me.getJustification());
-                            r.setOntologyTerm(ot);
-                            r.setTreatment(treatment);
-
-
-                            treatment.setTreatmentToOntologyRelationship(r);
-                            dataImportService.saveTreatment(treatment);
-
-
-                        }
-
-                    }
-
-                }
+                addRelationshipToTreatments(treatments, dataSource);
 
                 startNode += batchSize;
             }
 
+            //STEP2: Look up drug dosing and link them to ontology terms
+
+            maxTreatmentNumber = dataImportService.findDrugDosingStudyNumberByDataSource(dataSource);
+            startNode = 0;
+
+            while(startNode < maxTreatmentNumber){
+
+                Collection<Treatment> treatments = dataImportService.getModelTreatmentFrom(startNode, batchSize, dataSource);
+
+                addRelationshipToTreatments(treatments, dataSource);
+
+                startNode += batchSize;
+            }
 
         }
 
@@ -146,6 +125,46 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
 
 
 
+    }
+
+
+    private void addRelationshipToTreatments(Collection<Treatment> treatments, String dataSource){
+
+        for(Treatment treatment : treatments){
+
+            MappingEntity me = mappingService.getTreatmentMapping(dataSource, treatment.getName());
+
+            if(me == null){
+
+
+                //TODO: deal with missing mapping rules here
+                log.warn("No mapping rule found for "+treatment.getName());
+            }
+            else{
+
+
+                OntologyTerm ot = dataImportService.findOntologyTermByUrl(me.getMappedTermUrl());
+
+                if(ot == null){
+
+
+
+                    log.error("Ontology term not found "+me.getMappedTermUrl());
+                }
+                else{
+
+                    TreatmentToOntologyRelationship r = new TreatmentToOntologyRelationship();
+                    r.setType(me.getMapType());
+                    r.setJustification(me.getJustification());
+                    r.setOntologyTerm(ot);
+                    r.setTreatment(treatment);
+
+
+                    treatment.setTreatmentToOntologyRelationship(r);
+                    dataImportService.saveTreatment(treatment);
+                }
+            }
+        }
     }
 
 
