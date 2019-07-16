@@ -22,6 +22,7 @@ public class DataLabels {
     private Boolean enabled;
     private String format;
     private Integer connectorWidth;
+    private Style style;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -58,6 +59,14 @@ public class DataLabels {
 
     public void setConnectorWidth(Integer connectorWidth) {
         this.connectorWidth = connectorWidth;
+    }
+
+    public Style getStyle() {
+        return style;
+    }
+
+    public void setStyle(Style style) {
+        this.style = style;
     }
 
     @JsonAnyGetter

@@ -89,20 +89,6 @@ public class Statistics {
     }
 
 
-
-    public ChartData clusteredBarChart(List<StatisticsDTO> stats, String chartTitle, String subtitle) {
-
-        ChartData chartData = clusteredColumnChart( stats, chartTitle, subtitle);
-
-        chartData.getSeries().forEach(Series ->{
-            Series.setType(SeriesType.BAR.get());
-        });
-
-        return chartData;
-
-    }
-
-
     public ChartData stackedColumnChart(List<StatisticsDTO> stats, String chartTitle, String subtitle) {
 
         ChartData chartData = clusteredColumnChart(stats, chartTitle, subtitle);
@@ -113,6 +99,20 @@ public class Statistics {
         plotOptions.setSeries(series);
 
         chartData.setPlotOptions(plotOptions);
+
+        return chartData;
+
+    }
+
+
+
+    public ChartData clusteredBarChart(List<StatisticsDTO> stats, String chartTitle, String subtitle) {
+
+        ChartData chartData = clusteredColumnChart( stats, chartTitle, subtitle);
+
+        chartData.getSeries().forEach(Series ->{
+            Series.setType(SeriesType.BAR.get());
+        });
 
         return chartData;
 
@@ -304,13 +304,22 @@ public class Statistics {
 
 
 
+    /*************************************************************************************************************
+     *         CUSTOM BUILT PIE CHARTS           *
+     **************************************************/
+
+    public ChartData threeDPieChart(List<String> labels, List values, String title, String subtitle, String sliced) {
+
+        ChartData chartData = pieChart(labels, values, title,subtitle, sliced);
+
+        // SET 3D OPTION FOR CHART
+        chartData.getChart().setOptions3d(new Options3d(true, 45));
+
+        return chartData;
+    }
 
 
-
-
-
-
-    public Object threeDPieChart(List<String> labels, List values, String title, String subtitle, String sliced) {
+    public ChartData pieChart(List<String> labels, List values, String title, String subtitle, String sliced) {
 
         AtomicInteger count = new AtomicInteger(0);
         List<String> colors = new ArrayList<>();
@@ -334,10 +343,8 @@ public class Statistics {
         // CREATE CHART DATA
         ChartData chartData = new ChartData(charTitle, null, Arrays.asList(series));
 
-
         // SET 3D OPTION FOR CHART
         Chart chart = new Chart(SeriesType.PIE.get());
-        chart.setOptions3d(new Options3d(true, 45));
         chartData.setChart(chart);
 
         // CREATE CHART SUBTITLE
@@ -345,7 +352,7 @@ public class Statistics {
         chartData.setSubtitle(chartSubtitle);
 
         // CREATE PLOT OPTIONS
-        PlotOptions plotOptions = new PlotOptions(chartHelper.doughNutPie());
+        PlotOptions plotOptions = new PlotOptions(chartHelper.plotPie());
         chartData.setPlotOptions(plotOptions);
 
         // USE TOOL TIP
@@ -353,6 +360,27 @@ public class Statistics {
         chartData.setTooltip(toolTip);
 
         chartData.setColors(colors);
+        return chartData;
+    }
+
+
+    public ChartData doughNutPie(List<String> labels, List values, String title, String subtitle, String sliced) {
+
+        ChartData chartData = pieChart(labels, values, title,subtitle, sliced);
+
+        //SET DOUGHNUT OPTION
+        chartData.getPlotOptions().getPie().setInnerSize(100);
+
+        return chartData;
+    }
+
+    public ChartData threeDdoughNutPie(List<String> labels, List values, String title, String subtitle, String sliced) {
+
+        ChartData chartData = threeDPieChart(labels, values, title,subtitle, sliced);
+
+        //SET DOUGHNUT OPTION
+        chartData.getPlotOptions().getPie().setInnerSize(100);
+
         return chartData;
     }
 

@@ -23,6 +23,10 @@ public class Chart {
     private String zoomType;
     private Options3d options3d;
 
+    private String plotBackgroundColor;
+    private Integer plotBorderWidth;
+    private Boolean plotShadow;
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -60,6 +64,30 @@ public class Chart {
 
     public void setOptions3d(Options3d options3d) {
         this.options3d = options3d;
+    }
+
+    public String getPlotBackgroundColor() {
+        return plotBackgroundColor;
+    }
+
+    public void setPlotBackgroundColor(String plotBackgroundColor) {
+        this.plotBackgroundColor = plotBackgroundColor;
+    }
+
+    public Integer getPlotBorderWidth() {
+        return plotBorderWidth;
+    }
+
+    public void setPlotBorderWidth(Integer plotBorderWidth) {
+        this.plotBorderWidth = plotBorderWidth;
+    }
+
+    public Boolean getPlotShadow() {
+        return plotShadow;
+    }
+
+    public void setPlotShadow(Boolean plotShadow) {
+        this.plotShadow = plotShadow;
     }
 
     @JsonAnyGetter

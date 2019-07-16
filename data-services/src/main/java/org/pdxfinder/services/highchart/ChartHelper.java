@@ -145,13 +145,13 @@ public class ChartHelper {
 
 
 
-    public Pie doughNutPie(){
+    public Pie plotPie(){
 
         String pointFormat = "{point.name} ({point.percentage:.1f}%)";
         Integer connectorWidth = 2;
         Boolean enabled = true;
 
-        Integer innerSize = 100;
+        Integer innerSize = 0;
         Integer depth = 65;
         Boolean allowPointSelect = true;
         String cursor = "pointer";

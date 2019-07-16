@@ -34,6 +34,7 @@ public class Series {
     private DataLabels dataLabels;
 
     private String stacking;
+    private Boolean colorByPoint;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
