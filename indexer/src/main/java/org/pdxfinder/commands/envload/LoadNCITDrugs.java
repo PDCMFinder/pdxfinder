@@ -240,6 +240,7 @@ public class LoadNCITDrugs implements CommandLineRunner {
                             ot.setDescription(term.getString("description"));
                         }
 
+                        ot.setAllowAsSuggestion(false);
 
                         dataImportService.saveOntologyTerm(ot);
 
