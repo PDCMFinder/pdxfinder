@@ -319,6 +319,15 @@ public class Statistics {
     }
 
 
+    public ChartData pieWithLegend(List<String> labels, List values, String title, String subtitle, String sliced) {
+
+        ChartData chartData = pieChart(labels, values, title,subtitle, sliced);
+        chartData.getPlotOptions().setShowInLegend(true);
+
+        return chartData;
+    }
+
+
     public ChartData pieChart(List<String> labels, List values, String title, String subtitle, String sliced) {
 
         AtomicInteger count = new AtomicInteger(0);
