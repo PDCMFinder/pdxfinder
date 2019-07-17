@@ -343,12 +343,31 @@ public class AjaxController {
     }
 
 
-    @GetMapping("/statistics/drug-dosing")
-    public Object getDosingStat(){
+    @GetMapping("/statistics/drug-dosing/{param}")
+    public Object getDosingStat(@PathVariable String param){
 
-        Map<String, List<StatisticsDTO>> data = statistics.groupedData();
 
-        return statistics.fixedPlacementColumnChart(data, "Patient Treatments Data");
+        List<StatisticsDTO> data = new ArrayList<>();
+        String chartTitle  = "";
+        String subtitle   = "";
+
+        if (param.equals("models") ){
+            chartTitle = "PDx Model Data";
+            subtitle   = "PDX-Model Per Data Release";
+            data = statistics.mockDataTreatmentPatients();
+        }else if (param.equals("drugs")) {
+
+            chartTitle = "Drug Data";
+            subtitle   = "Drug Count Per Data Release";
+            data = statistics.mockDataDrugDosing();
+        }else{
+
+        }
+
+        return statistics.clusteredColumnChart(data, chartTitle, subtitle);
+        // Map<String, List<StatisticsDTO>> data = statistics.groupedData();
+       // return statistics.clusteredColumnChart(data, "Patient Treatments Data");
+
     }
 
     @GetMapping("/statistics/patient-treatment/{param}")
@@ -362,14 +381,12 @@ public class AjaxController {
             chartTitle = "Patient Data";
             subtitle   = "Patient Count Per Data Release";
             data = statistics.mockDataTreatmentPatients();
-        }else if (param.equals("drugs")) {
+        }else if (param.equals("treatments")) {
 
-            chartTitle = "Drug Data";
-            subtitle   = "Drug Count Per Data Release";
+            chartTitle = "Treatment Data";
+            subtitle   = "Treatment Count Per Data Release";
             data = statistics.mockDataDrugDosing();
-        }else{
-
-        }
+        }else{ }
 
         return statistics.clusteredColumnChart(data, chartTitle, subtitle);
     }
