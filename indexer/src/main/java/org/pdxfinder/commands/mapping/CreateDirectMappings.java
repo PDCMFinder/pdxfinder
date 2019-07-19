@@ -88,7 +88,7 @@ public class CreateDirectMappings implements CommandLineRunner{
                 MappingEntity mappingEntity = new MappingEntity();
 
                 mappingEntity.setEntityId(new Long(counter));
-                mappingEntity.setMapType("treatment");
+                mappingEntity.setEntityType("TREATMENT");
                 mappingEntity.setMappingLabels(mappingService.getTreatmentMappingLabels());
 
                 Map<String, String> mappingValues = new HashMap<>();
@@ -104,6 +104,7 @@ public class CreateDirectMappings implements CommandLineRunner{
                 mappingEntity.setStatus("Created");
 
                 mappingEntity.setSuggestedMappings(new ArrayList<>());
+                mappingEntity.setMappingKey(mappingEntity.generateMappingKey());
 
                 container.addEntity(mappingEntity);
 
