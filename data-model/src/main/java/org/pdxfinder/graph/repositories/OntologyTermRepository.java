@@ -18,8 +18,12 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
 
     OntologyTerm findById();
 
+    @Query("MATCH (o:OntologyTerm) WHERE toLower(o.label) = toLower({label}) AND o.type = {type} return o")
+    OntologyTerm findByLabelAndType(@Param("label") String label, @Param("type") String type);
+
     @Query("MATCH (o:OntologyTerm) WHERE toLower(o.label) = toLower({label}) return o")
     OntologyTerm findByLabel(@Param("label") String label);
+
 
     OntologyTerm findByUrl(String url);
 

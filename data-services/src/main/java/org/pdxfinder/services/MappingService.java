@@ -568,7 +568,7 @@ public class MappingService {
 
 
 
-    List<String> getDiagnosisMappingLabels(){
+    public List<String> getDiagnosisMappingLabels(){
 
         List<String> mapLabels = new ArrayList<>();
         mapLabels.add("DataSource");
@@ -579,7 +579,7 @@ public class MappingService {
         return mapLabels;
     }
 
-    List<String> getTreatmentMappingLabels(){
+    public List<String> getTreatmentMappingLabels(){
 
         List<String> mapLabels = new ArrayList<>();
         mapLabels.add("DataSource");
