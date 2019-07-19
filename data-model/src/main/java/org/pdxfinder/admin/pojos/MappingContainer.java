@@ -96,4 +96,12 @@ public class MappingContainer {
 
         return list;
     }
+
+
+    @Override
+    public String toString() {
+        return "[" +
+                  mappings +
+                ']';
+    }
 }

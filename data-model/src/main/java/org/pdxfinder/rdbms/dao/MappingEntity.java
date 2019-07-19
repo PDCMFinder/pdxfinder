@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /*
  * Created by csaba on 18/06/2018.
@@ -256,5 +257,53 @@ public class MappingEntity {
 
         return key.toLowerCase();
 
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n {");
+        sb.append("\"entityId\":" + entityId + ", \n");
+        sb.append("\"entityType\": \"" + entityType + "\", \n");
+        sb.append("\"mappingLabels\":");
+
+        sb.append(mappingLabels.stream()
+                .map(n -> "\""+n+"\"")
+                .collect(Collectors.joining(",", "[", "]")));
+        sb.append(", \n");
+
+        sb.append("\"mappingValues\":");
+        sb.append(mappingLabels.stream()
+                .map(n -> "\""+n+"\":\"" +mappingValues.get(n)+"\"")
+                .collect(Collectors.joining(",", "{", "}")));
+        sb.append(", \n");
+        sb.append("\"mappedTermLabel\": \"" + mappedTermLabel + "\", \n");
+        sb.append("\"mappedTermUrl\": \"" + mappedTermUrl + "\", \n");
+        sb.append("\"mapType\": \"" + mapType + "\", \n");
+        sb.append("\"justification\": \"" + justification + "\", \n");
+        sb.append("\"status\": \"" + status + "\", \n");
+        sb.append("\"suggestedMappings\": " + suggestedMappings + " \n");
+
+        sb.append("}");
+
+        return sb.toString();
+
+
+        /*
+        return "{" +
+                "\"entityId\":" + entityId + ", \n" +
+                "\"entityType\": \"" + entityType + "\", \n" +
+                ", mappingLabels:" + mappingLabels +
+                ", mappingValues:" + mappingValues +
+                ", mappedTermLabel:'" + mappedTermLabel + '\'' +
+                ", mappedTermUrl:'" + mappedTermUrl + '\'' +
+                ", mapType:'" + mapType + '\'' +
+                ", justification:'" + justification + '\'' +
+                ", status:'" + status + '\'' +
+                ", suggestedMappings:" + suggestedMappings +
+                '}';
+
+                */
     }
 }
