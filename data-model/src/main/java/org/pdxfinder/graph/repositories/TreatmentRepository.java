@@ -1,6 +1,7 @@
 package org.pdxfinder.graph.repositories;
 
 import org.pdxfinder.graph.dao.Treatment;
+import org.pdxfinder.graph.queryresults.TreatmentMappingData;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
@@ -48,5 +49,12 @@ public interface TreatmentRepository extends Neo4jRepository<Treatment, Long> {
             "WHERE mod.dataSource = {ds} "+
             "RETURN tr SKIP {from} LIMIT {batch}")
     Collection<Treatment> getModelTreatmentFromByDS(@Param("from") int from, @Param("batch") int batch, @Param("ds") String ds);
+
+    @Query("match (gr:Group)--(p:Patient)--(ps:PatientSnapshot)--(ts:TreatmentSummary)--(tp:TreatmentProtocol)--(tc:TreatmentComponent)--(t:Treatment) " +
+            "where gr.type='Provider' " +
+            "return COLLECT(distinct gr.abbreviation+ '___' + toLower(t.name)) as abbrAndTreatmentName")
+    TreatmentMappingData getUnmappedPatientTreatments();
+
+
 
 }

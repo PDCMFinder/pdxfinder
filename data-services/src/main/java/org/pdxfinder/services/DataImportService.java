@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.graph.queryresults.TreatmentMappingData;
 import org.pdxfinder.graph.repositories.*;
 import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
@@ -1085,6 +1086,12 @@ public class DataImportService {
             return treatmentRepository.getModelTreatmentFromByDS(from, batch, dataSource);
         }
 
+    }
+
+
+    public TreatmentMappingData getUnmappedPatientTreatments(){
+
+        return treatmentRepository.getUnmappedPatientTreatments();
     }
 
 
