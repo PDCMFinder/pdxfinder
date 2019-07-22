@@ -92,6 +92,8 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
 
             int maxTreatmentNumber = dataImportService.findPatientTreatmentNumber(dataSource);
 
+            if(maxTreatmentNumber > 0) log.info("Mapping patient treatments for "+dataSource);
+
             while(startNode < maxTreatmentNumber){
 
                 Collection<Treatment> treatments = dataImportService.getPatientTreatmentFrom(startNode, batchSize, dataSource);
@@ -105,6 +107,8 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
 
             maxTreatmentNumber = dataImportService.findDrugDosingStudyNumberByDataSource(dataSource);
             startNode = 0;
+
+            if(maxTreatmentNumber > 0) log.info("Mapping drug dosing for "+dataSource);
 
             while(startNode < maxTreatmentNumber){
 
@@ -138,7 +142,7 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
 
 
                 //TODO: deal with missing mapping rules here
-                log.warn("No mapping rule found for "+treatment.getName());
+                log.warn("No mapping rule found for "+dataSource+" "+treatment.getName());
             }
             else{
 
