@@ -50,4 +50,12 @@ public class Treatment {
     public void setTreatmentToOntologyRelationship(TreatmentToOntologyRelationship treatmentToOntologyRelationship) {
         this.treatmentToOntologyRelationship = treatmentToOntologyRelationship;
     }
+
+    @Override
+    public String toString() {
+        return "Treatment{" +
+                "name='" + name + '\'' +
+                ", treatmentToOntologyRelationship=" + treatmentToOntologyRelationship +
+                '}';
+    }
 }

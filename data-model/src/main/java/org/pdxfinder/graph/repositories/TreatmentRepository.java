@@ -14,40 +14,48 @@ import java.util.Collection;
 public interface TreatmentRepository extends Neo4jRepository<Treatment, Long> {
 
 
-    @Query("MATCH (ps:PatientSnapshot)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) RETURN count(tr)")
+    @Query("MATCH (ps:PatientSnapshot)--(ts:TreatmentSummary) RETURN count(ts)")
     int findPatientTreatmentNumber();
 
-    @Query("MATCH (gr:Group)--(p:Patient)--(ps:PatientSnapshot)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) " +
+    @Query("MATCH (gr:Group)--(p:Patient)--(ps:PatientSnapshot)--(ts:TreatmentSummary) " +
             "WHERE gr.type='Provider' AND gr.abbreviation = {ds} "+
-            "RETURN count(tr)")
+            "RETURN count(ts)")
     int findPatientTreatmentNumberByDS(@Param("ds") String ds);
 
 
-    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) RETURN count(tr) ")
+    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary) RETURN count(ts) ")
     int findModelTreatmentNumber();
 
-    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) " +
+    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary) " +
             "WHERE mod.dataSource = {ds} "+
-            "RETURN count(tr) ")
+            "RETURN count(ts) ")
     int findModelTreatmentNumberByDS(@Param("ds") String ds);
 
 
-    @Query("MATCH (ps:PatientSnapshot)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) " +
+    @Query("MATCH (ps:PatientSnapshot)--(ts:TreatmentSummary)" +
+            "WITH ts "+
+            "MATCH (ts)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) "+
             "RETURN tr SKIP {from} LIMIT {batch}")
     Collection<Treatment> getPatientTreatmentFrom(@Param("from") int from, @Param("batch") int batch);
 
-    @Query("MATCH (gr:Group)--(p:Patient)--(ps:PatientSnapshot)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) " +
+    @Query("MATCH (gr:Group)--(p:Patient)--(ps:PatientSnapshot)--(ts:TreatmentSummary)" +
             "WHERE gr.type='Provider' AND gr.abbreviation = {ds} "+
+            "WITH ts "+
+            "MATCH (ts)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) "+
             "RETURN tr SKIP {from} LIMIT {batch}")
     Collection<Treatment> getPatientTreatmentFromByDS(@Param("from") int from, @Param("batch") int batch, @Param("ds") String ds);
 
-    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) " +
-            "RETURN tr SKIP {from} LIMIT {batch}")
+    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary) " +
+            "WITH ts SKIP {from} LIMIT {batch} "+
+            "MATCH (ts)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) " +
+            "RETURN tr")
     Collection<Treatment> getModelTreatmentFrom(@Param("from") int from, @Param("batch") int batch);
 
-    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) " +
+    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary) " +
             "WHERE mod.dataSource = {ds} "+
-            "RETURN tr SKIP {from} LIMIT {batch}")
+            "WITH ts SKIP {from} LIMIT {batch} "+
+            "MATCH (ts)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) " +
+            "RETURN tr")
     Collection<Treatment> getModelTreatmentFromByDS(@Param("from") int from, @Param("batch") int batch, @Param("ds") String ds);
 
     @Query("match (gr:Group)--(p:Patient)--(ps:PatientSnapshot)--(ts:TreatmentSummary)--(tp:TreatmentProtocol)--(tc:TreatmentComponent)--(t:Treatment) " +

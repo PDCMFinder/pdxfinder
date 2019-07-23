@@ -8,9 +8,6 @@ import org.pdxfinder.graph.repositories.*;
 import org.pdxfinder.services.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -925,7 +922,7 @@ public class DetailsService {
 
 
                 DrugSummaryDTO dto = new DrugSummaryDTO();
-                dto.setDrugName(tp.getDrugString(true));
+                dto.setDrugName(tp.getTreatmentString(true));
                 List<TreatmentComponent> components = tp.getComponents();
                 String dose = "";
 

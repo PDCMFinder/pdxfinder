@@ -18,8 +18,8 @@ public interface TreatmentSummaryRepository extends Neo4jRepository<TreatmentSum
     @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary) WHERE mod.dataSource = {dataSource} AND mod.sourcePdxId = {modelId} " +
             "WITH ts " +
             "MATCH (ts)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[rr:RESPONSE]-(r:Response) " +
-            "MATCH (tp)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(d:Treatment) "+
-            "RETURN ts, tpr, tp, rr, r, tcr, tc, dr, d")
+            "MATCH (tp)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(d:Treatment)-[mtr:MAPPED_TO]-(ot:OntologyTerm) "+
+            "RETURN ts, tpr, tp, rr, r, tcr, tc, dr, d, mtr, ot")
     TreatmentSummary findModelTreatmentByDataSourceAndModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
     @Query("MATCH (mod:ModelCreation)--(s:Sample)--(ps:PatientSnapshot)--(ts:TreatmentSummary) WHERE mod.dataSource = {dataSource} AND mod.sourcePdxId = {modelId} " +
@@ -44,9 +44,9 @@ public interface TreatmentSummaryRepository extends Neo4jRepository<TreatmentSum
             "RETURN ts, tpr, tp, tcr, tc, dr, d, rr, r")
     List<TreatmentSummary> findAllWithDrugData();
 
-    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(d:Treatment) " +
+    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(d:Treatment)-[mtr:MAPPED_TO]-(ot:OntologyTerm) " +
             "MATCH (tp)-[rr:RESPONSE]-(r:Response) " +
-            "RETURN ts, tpr, tp, tcr, tc, dr, d, rr, r")
+            "RETURN ts, tpr, tp, tcr, tc, dr, d, rr, r, mtr, ot")
     List<TreatmentSummary> findAllMouseTreatments();
 
     @Query("MATCH (ps:PatientSnapshot)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(d:Treatment) " +
