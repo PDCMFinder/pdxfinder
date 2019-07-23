@@ -1154,7 +1154,7 @@ public class DataImportService {
      * @param response
      * @return
      *
-     * Creates a (tp:TreatmentProtocol)--(tc:TreatmentComponent)--(d:Drug)
+     * Creates a (tp:TreatmentProtocol)--(tc:TreatmentComponent)--(t:Treatment)
      *           (tp)--(r:Response) node
      *
      * If drug names are separated with + it will create multiple components to represent drug combos
