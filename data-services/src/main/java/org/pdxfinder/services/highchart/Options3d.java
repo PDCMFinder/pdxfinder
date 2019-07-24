@@ -1,64 +1,55 @@
 package org.pdxfinder.services.highchart;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /*
- * Created by abayomi on 26/06/2019.
+ * Created by abayomi on 19/06/2019.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "column",
-        "pie",
-        "series"
+        "enabled",
+        "alpha"
 })
-public class PlotOptions {
+public class Options3d {
 
-    private Column column;
-    private Pie pie;
-    private Series series;
+
+    private Boolean enabled;
+    private Integer alpha;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public PlotOptions() {
+
+    public Options3d() {
     }
 
-    public PlotOptions(Column column) {
-        this.column = column;
+    public Options3d(Boolean enabled, Integer alpha) {
+        this.enabled = enabled;
+        this.alpha = alpha;
     }
 
-    public PlotOptions(Pie pie) {
-        this.pie = pie;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public Column getColumn() {
-        return column;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
-    public void setColumn(Column column) {
-        this.column = column;
+    public Integer getAlpha() {
+        return alpha;
     }
 
-    public Pie getPie() {
-        return pie;
-    }
-
-    public void setPie(Pie pie) {
-        this.pie = pie;
-    }
-
-    public Series getSeries() {
-        return series;
-    }
-
-    public void setSeries(Series series) {
-        this.series = series;
+    public void setAlpha(Integer alpha) {
+        this.alpha = alpha;
     }
 
     @JsonAnyGetter

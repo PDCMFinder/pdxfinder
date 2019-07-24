@@ -8,6 +8,9 @@ import java.util.List;
  */
 public class ChartHelper {
 
+    private String NULLSTRING = null;
+    private Boolean NULLBOOLEAN = null;
+
     public ChartHelper() {
     }
 
@@ -27,22 +30,21 @@ public class ChartHelper {
     }
 
 
-/*
-    {
-        name: 'IRCC-MODEL',
-                color: '#000',
-            opacity: 0.4,
-            data: [150, 73, 20],
 
-        pointPadding: 0.35,
-                pointPlacement: -0.2,
-            yAxis: 0
-    }
-*/
 
     public Series columnChart(List<Object> data, String chartName, String color){
 
         String type = SeriesType.COLUMN.get();
+
+        Series columnSeries = new Series(type,chartName,data,color);
+
+        return columnSeries;
+    }
+
+
+    public Series barChart(List<Object> data, String chartName, String color){
+
+        String type = SeriesType.BAR.get();
 
         Series columnSeries = new Series(type,chartName,data,color);
 
@@ -120,94 +122,68 @@ public class ChartHelper {
         return buildPlotOptions(false, true, 1);
     }
 
+    public ToolTip customSharedHTMLToolTip(){
+
+        Boolean shared = true;
+        String headerFormat = ChartStrings.HTML_HEAD_FORMAT.get();
+        String pointFormat = ChartStrings.HTML_POINT_FORMAT.get();
+        String footerFormat= ChartStrings.HTML_FOOTER_FORMAT.get();
+        Boolean useHTML = true;
+
+        return new ToolTip(shared, headerFormat, pointFormat, footerFormat, useHTML);
+    }
+
+
+    public ToolTip pieHTMLToolTip(){
+
+        String headerFormat = "<h1>{point.key}</h1>";
+        String pointFormat = "<h4>{point.percentage:.1f} {series.name} </h4>";
+        Boolean useHTML = true;
+
+        return new ToolTip(NULLBOOLEAN, headerFormat, pointFormat,NULLSTRING, useHTML);
+    }
+
+
+
+    public Pie plotPie(){
+
+        String pointFormat = "{point.name} ({point.percentage:.1f}%)";
+        Integer connectorWidth = 2;
+        Boolean enabled = true;
+
+        Integer innerSize = 0;
+        Integer depth = 65;
+        Boolean allowPointSelect = true;
+        String cursor = "pointer";
+
+        DataLabels dataLabels = new DataLabels(enabled,pointFormat,connectorWidth);
+        Pie pie = new Pie(innerSize,depth,allowPointSelect,cursor, dataLabels);
+
+        return pie;
+    }
+
+    public ChartData subtitleYAxisNToolTip(ChartData chartData, String subtitle){
+
+        // Set Subtitle
+        chartData.setSubtitle(new Subtitle(subtitle));
+
+        // Set Chart Title
+        chartData.setyAxis(Arrays.asList(new YAxis(new Title(subtitle))));
+
+        // Set ToolTip
+        chartData.setTooltip(customSharedHTMLToolTip());
+
+        return chartData;
+    }
+
+
 
     public String colors(int pos){
-        String colors[] = {"#800080", "#000", "#FF0000", "#6F42C1", "#03458E", "#40424B", "#BADAFC", "#FF0F00", "#CD0D74", "#2E92FE", "#2A0CD0", "#0D52D1"};
+        String colors[] = {"#3b5998","#d34836","#8a3ab9","#0077B5","#0084b4","#800080", "#000000", "#FF0000", "#6F42C1", "#03458E", "#40424B", "#BADAFC", "#FF0F00", "#CD0D74", "#2E92FE", "#2A0CD0", "#0D52D1"};
         return colors[pos];
     }
 
 }
 
-
-
-    /*
-
-
-    Highcharts.chart('container', {
-  chart: {
-    type: 'column'
-  },
-  title: {
-    text: 'Efficiency Optimization by Branch'
-  },
-  xAxis: {
-    categories: ['January','February','March']
-  },
-
-  yAxis: [{
-    min: 0,
-    title: {
-      text: 'Employees'
-    }
-  }, {
-    title: {
-      text: 'Profit (millions)'
-    },
-    opposite: true
-  }],
-
-
-  plotOptions: {
-    column: {
-      grouping: false,
-      shadow: true,
-      borderWidth: 1
-    }
-  },
-  series: [{
-    name: 'IRCC-MODEL',
-    color: '#000',
-    opacity: 0.4,
-    data: [150, 73, 20],
-    pointPadding: 0.35,
-    pointPlacement: -0.2,
-    yAxis: 0
-  }, {
-    name: 'IRCC-DRUG',
-    color: '#000',
-    opacity: 0.9,
-    data: [120, 90, 40],
-    pointPadding: 0.4,
-    pointPlacement: -0.2,
-    yAxis: 1
-  }, {
-    name: 'JAX-MODEL',
-    color: '#FF0000',
-    opacity: 0.4,
-    data: [183.6, 178.8, 198.5],
-    tooltip: {
-      valuePrefix: '$',
-      valueSuffix: ' M'
-    },
-    pointPadding: 0.35,
-    pointPlacement: 0.2,
-    yAxis: 0
-  }, {
-    name: 'JAX-DRUG',
-    color: '#FF0000',
-    opacity: 0.9,
-    data: [203.6, 198.8, 208.5],
-    tooltip: {
-      valuePrefix: '$',
-      valueSuffix: ' M'
-    },
-    pointPadding: 0.4,
-    pointPlacement: 0.2,
-    yAxis: 1
-  }]
-});
-
-
-     */
 
 

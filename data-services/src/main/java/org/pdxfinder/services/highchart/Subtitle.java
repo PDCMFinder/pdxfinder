@@ -1,64 +1,55 @@
 package org.pdxfinder.services.highchart;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /*
- * Created by abayomi on 26/06/2019.
+ * Created by abayomi on 28/06/2019.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "column",
-        "pie",
-        "series"
+        "text"
 })
-public class PlotOptions {
+public class Subtitle {
 
-    private Column column;
-    private Pie pie;
-    private Series series;
+
+    private String text;
+    private Style style;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public PlotOptions() {
+
+    public Subtitle(String text) {
+        this.text = text;
     }
 
-    public PlotOptions(Column column) {
-        this.column = column;
+    public Subtitle(String text, Style style) {
+        this.text = text;
+        this.style = style;
     }
 
-    public PlotOptions(Pie pie) {
-        this.pie = pie;
+    public String getText() {
+        return text;
     }
 
-    public Column getColumn() {
-        return column;
+    public void setText(String text) {
+        this.text = text;
     }
 
-    public void setColumn(Column column) {
-        this.column = column;
+    public Style getStyle() {
+        return style;
     }
 
-    public Pie getPie() {
-        return pie;
-    }
-
-    public void setPie(Pie pie) {
-        this.pie = pie;
-    }
-
-    public Series getSeries() {
-        return series;
-    }
-
-    public void setSeries(Series series) {
-        this.series = series;
+    public void setStyle(Style style) {
+        this.style = style;
     }
 
     @JsonAnyGetter

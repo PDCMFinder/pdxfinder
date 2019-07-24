@@ -5,6 +5,7 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.*;
 import org.pdxfinder.services.ds.AutoCompleteOption;
 import org.pdxfinder.services.dto.*;
+import org.pdxfinder.services.highchart.HexColors;
 import org.pdxfinder.services.pdf.Label;
 import org.pdxfinder.services.pdf.PdfHelper;
 import org.pdxfinder.services.pdf.Report;
@@ -50,26 +51,6 @@ public class AjaxController {
         this.drugService = drugService;
         this.graphService = graphService;
         this.statistics = statistics;
-    }
-
-
-
-
-
-    @GetMapping("/chart")
-    public Object getChart(){
-
-        List<StatisticsDTO> stats = statistics.mockRepository();
-
-        return statistics.combinedColumnLineAndPieChart(stats);
-    }
-
-    @GetMapping("/chart2")
-    public Object getChart2(){
-
-        Map<String, List<StatisticsDTO>> data = statistics.groupedData();
-
-        return statistics.fixedPlacementColumnChart(data, "Patient Treatments Data");
     }
 
 
@@ -334,6 +315,105 @@ public class AjaxController {
         tableColumns.put("10","mAss.rsVariants");
 
         return tableColumns.get(sortcolumn);
+    }
+
+
+
+    /**********   STATISTICS CONTROLLERS   ************/
+
+
+    @GetMapping("/statistics/test")
+    public Object doTest(){
+
+        List dataLabels = Arrays.asList("Facebook","Google+","Instagram","LinkedIn","Twitter","YouTube");
+        List dataValues = Arrays.asList(1300, 375, 500, 450, 313, 1000);
+        String chartTitle  = "Global Social Media User Statistics";
+        String subtitle   = "As per statistics data 2016";
+
+        return statistics.threeDdoughNutPie(dataLabels,dataValues,chartTitle,subtitle,"LinkedIn");
+    }
+
+
+    @GetMapping("/statistics/molecular-data")
+    public Object getChart(){
+
+        List<StatisticsDTO> stats = statistics.mockRepository();
+
+        return statistics.combinedColumnLineAndPieChart(stats);
+    }
+
+
+    @GetMapping("/statistics/drug-dosing/{param}")
+    public Object getDosingStat(@PathVariable String param){
+
+
+        List<StatisticsDTO> data = new ArrayList<>();
+        String chartTitle  = "";
+        String subtitle   = "";
+
+        if (param.equals("models") ){
+            chartTitle = "PDx Model Data";
+            subtitle   = "PDX-Model Per Data Release";
+            data = statistics.mockDataTreatmentPatients();
+        }else if (param.equals("drugs")) {
+
+            chartTitle = "Drug Data";
+            subtitle   = "Drug Count Per Data Release";
+            data = statistics.mockDataDrugDosing();
+        }else{
+
+        }
+
+        return statistics.clusteredColumnChart(data, chartTitle, subtitle);
+        // Map<String, List<StatisticsDTO>> data = statistics.groupedData();
+       // return statistics.clusteredColumnChart(data, "Patient Treatments Data");
+
+    }
+
+    @GetMapping("/statistics/patient-treatment/{param}")
+    public Object basicTreatmentStat(@PathVariable String param){
+
+        List<StatisticsDTO> data = new ArrayList<>();
+        String chartTitle  = "";
+        String subtitle   = "";
+
+        if (param.equals("patients") ){
+            chartTitle = "Patient Data";
+            subtitle   = "Patient Count Per Data Release";
+            data = statistics.mockDataTreatmentPatients();
+        }else if (param.equals("treatments")) {
+
+            chartTitle = "Treatment Data";
+            subtitle   = "Treatment Count Per Data Release";
+            data = statistics.mockDataDrugDosing();
+        }else{ }
+
+        return statistics.clusteredColumnChart(data, chartTitle, subtitle);
+    }
+
+
+
+    @GetMapping("/statistics/model")
+    public Object getModelStat(){
+
+        List<CountDTO> data = statistics.modelCountData();
+
+        String chartTitle  = "Model Count Data";
+        String subtitle   = "Model Count Per Data Release";
+
+        return statistics.basicColumnChart(data, chartTitle, subtitle, HexColors.CUSTOMBLUE);
+    }
+
+
+    @GetMapping("/statistics/providers")
+    public Object getProvidersStat(){
+
+        List<CountDTO> data = statistics.providersCountData();
+
+        String chartTitle  = "Data Providers";
+        String subtitle   = "Providers Count Per Data Release";
+
+        return statistics.basicColumnChart(data, chartTitle, subtitle, HexColors.BLACK);
     }
 
 

@@ -12,9 +12,9 @@ const routes: Routes = [
     { path: '',   component: DashboardComponent },
     { path: 'dashboard',   component: DashboardComponent },
     { path: 'curation', component: CurationMappingComponent },
-    { path: 'diagnosis-mapping',   component: DatasourceSummaryComponent },
+    { path: 'mapping-summary',   component: DatasourceSummaryComponent },
     {
-        path: 'diagnosis-mapping/:source',  component: DatasourceSpecificComponent,
+        path: 'mapping-summary/:source',  component: DatasourceSpecificComponent,
         children: [ { path: 'suggested-mapping/:id', component: DatasourceSpecificSuggestionsComponent } ]
     }
 ];
