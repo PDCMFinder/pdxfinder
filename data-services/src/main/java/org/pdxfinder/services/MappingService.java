@@ -701,4 +701,47 @@ public class MappingService {
 
 
 
+    public void saveMappedTerms(List<MappingEntity> mappingEntities){
+
+        for (MappingEntity mappingEntity : mappingEntities){
+
+            mappingEntity.setEntityId(null);
+            String mappingKey = mappingEntity.getMappingKey();
+
+            MappingEntity entity = mappingEntityRepository.findByMappingKey(mappingKey);
+
+            if(entity == null){
+
+                mappingEntityRepository.save(mappingEntity);
+
+                log.warn("{} was SAVED ", mappingKey);
+
+            }else{
+                log.warn("{} was not NOT SAVED: found in the Database ", mappingKey);
+            }
+        }
+    }
+
+
+    public List<MappingEntity> loadMappingsFromFile(String jsonFile) {
+
+        String jsonKey = "mappings";
+
+        List<MappingEntity> mappingEntities = new ArrayList<>();
+
+        List<Map<String, Object>> mappings = utilityService.serializeJSONToMaps(jsonFile, jsonKey);
+
+        mappings.forEach(mapping ->{
+
+            MappingEntity mappingEntity = mapper.convertValue(mapping, MappingEntity.class);
+            mappingEntity.setMappingKey(mappingEntity.generateMappingKey());
+            mappingEntity.setDateCreated(new Date());
+            mappingEntities.add(mappingEntity);
+
+        });
+
+        return mappingEntities;
+    }
+
+
 }

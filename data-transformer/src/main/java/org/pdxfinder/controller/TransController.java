@@ -191,7 +191,7 @@ public class TransController {
 
         String jsonFile= System.getProperty("user.home") + "/PDXFinder/data/IRCC-CRC/mut/old.json";
 
-        List<Map<String, String>> dataList = utilityService.serializeJSONToMaps(jsonFile, "IRCCVariation");
+        List<Map<String, String>> dataList = (List) utilityService.serializeJSONToMaps(jsonFile, "IRCCVariation");
         List<Map<String, String>> newDataList = new ArrayList<>();
 
         for (Map<String, String> data : dataList) {

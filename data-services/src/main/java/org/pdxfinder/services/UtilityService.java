@@ -62,7 +62,7 @@ public class UtilityService {
             csvMaps = serializeCSVToMaps(fileName);
         }else if (fileExtension.equals("json")) {
 
-            csvMaps = serializeJSONToMaps(fileName);
+            csvMaps = (List) serializeJSONToMaps(fileName);
         } else {
 
             csvMaps = serializeExcelDataNoIterator(fileName,0,1);
@@ -86,7 +86,7 @@ public class UtilityService {
                 break;
 
             case "json":
-                csvMaps = serializeJSONToMaps(fileName);
+                csvMaps = (List) serializeJSONToMaps(fileName);
                 break;
 
             case "xlsx":
@@ -610,11 +610,11 @@ public class UtilityService {
      ************************************************************************************************************/
 
     // SERIALIZER : CONVERT JSON URL TO JAVA MAPS
-    public List<Map<String, String>> serializeJSONToMaps(String jsonFile) {
+    public List<Map<String, Object>> serializeJSONToMaps(String jsonFile) {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        List<Map<String, String>> data;
+        List<Map<String, Object>> data;
 
         JsonNode node = readJsonLocal(jsonFile);
         try {
@@ -637,7 +637,7 @@ public class UtilityService {
 
 
     // SERIALIZER : CONVERT JSON URL TO JAVA MAPS
-    public List<Map<String, String>> serializeJSONToMaps(String jsonFile,String jsonKey) {
+    public List<Map<String, Object>> serializeJSONToMaps(String jsonFile,String jsonKey) {
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -645,7 +645,7 @@ public class UtilityService {
 
         Map<String, Object> json = mapper.convertValue(node, Map.class);
 
-        List<Map<String, String>> data = (List) json.get(jsonKey);
+        List<Map<String, Object>> data = (List) json.get(jsonKey);
 
         return data;
     }
