@@ -325,12 +325,12 @@ public class AjaxController {
     @GetMapping("/statistics/test")
     public Object doTest(){
 
-        List dataLabels = Arrays.asList("Facebook","Google+","Instagram","LinkedIn","Twitter","YouTube");
+        List dataLabels = Arrays.asList("IRC-CRC","JAX","CRL","TRACE-PDTX","CURIE-LC","CURIE-BC");
         List dataValues = Arrays.asList(1300, 375, 500, 450, 313, 1000);
-        String chartTitle  = "Global Social Media User Statistics";
-        String subtitle   = "As per statistics data 2016";
+        String chartTitle  = "PDX Finder Data Deposit Statistics";
+        String subtitle   = "As per statistics data 2019";
 
-        return statistics.threeDdoughNutPie(dataLabels,dataValues,chartTitle,subtitle,"LinkedIn");
+        return statistics.threeDdoughNutPie(dataLabels,dataValues,chartTitle,subtitle,"JAX");
     }
 
 

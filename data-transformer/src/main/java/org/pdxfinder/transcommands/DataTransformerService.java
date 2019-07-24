@@ -51,9 +51,7 @@ public class DataTransformerService {
     private String dataRootDir = System.getProperty("user.home")+"/PDXFinder/data";
 
 
-    private final static String DATASOURCE_ABBREVIATION = "/PDMR";
-
-    private String RAW_DATA_URL = dataRootDir+DATASOURCE_ABBREVIATION+"/raw";
+    private String RAW_DATA_URL = dataRootDir+"//PDMR/raw";
 
     private String specimenSearchUrl = RAW_DATA_URL+"/PDMR_SPECIMENSEARCH.json";
 

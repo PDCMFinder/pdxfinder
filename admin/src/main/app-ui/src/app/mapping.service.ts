@@ -9,8 +9,8 @@ import {catchError} from "rxjs/internal/operators";
 })
 export class MappingService {
 
-    private _totalMappedUrl = "/api/mapping/diagnosis";
-    private _missingMappedUrl = "/api/mapping/diagnosis";
+    private _totalMappedUrl = "/api/mapping/diagnosis?ds=IRCC-CRC";
+    private _missingMappedUrl = "/api/mapping/diagnosis?ds=IRCC-CRC";
 
     private _submitCurationUrl = "/api/diagnosis";
 
@@ -48,7 +48,7 @@ export class MappingService {
         return throwError(error);
     }
 
-/*    connectTopDataFlow() {
+/*    connectToDataFlow() {
 
         return fetch('http://localhost:8081/api/mapping/diagnosis?ds=JAX')
             .then((res) => res.json())

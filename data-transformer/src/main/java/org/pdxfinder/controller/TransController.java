@@ -136,12 +136,6 @@ public class TransController {
 
         List<Map<String, String>> dataList = utilityService.serializeCSVToMaps(omicFile);
 
-/*
-        List<String> csvHead = Arrays.asList("datasource","Model_ID","Sample_ID","sample_origin","Passage","host_strain_name","hgnc_symbol","amino_acid_change","nucleotide_change",
-                "consequence","read_depth","Allele_frequency","chromosome","seq_start_position","ref_allele","alt_allele","ucsc_gene_id",
-                "ncbi_gene_id","ensembl_gene_id","ensembl_transcript_id","rs_id_Variant","genome_assembly","Platform");*/
-
-
 
         List removedList = new ArrayList();
         for (Map<String, String> data : dataList) {

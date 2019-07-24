@@ -35,7 +35,7 @@ export class DatasourceSummaryComponent implements OnInit {
 
     ngOnInit() {
 
-/*        this._mappingService.connectTopDataFlow().then(
+/*        this._mappingService.connectToDataFlow().then(
             (data) => {
             data.forEach((user) => {
                 const { entityId, entityType, mappedTermLabel, mappingValues: { SampleDiagnosis } } = user

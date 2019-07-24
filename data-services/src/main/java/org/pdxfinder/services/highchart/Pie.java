@@ -28,6 +28,7 @@ public class Pie {
     private Boolean allowPointSelect;
     private String cursor;
     private DataLabels dataLabels;
+    private Boolean showInLegend;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -81,6 +82,14 @@ public class Pie {
 
     public void setDataLabels(DataLabels dataLabels) {
         this.dataLabels = dataLabels;
+    }
+
+    public Boolean getShowInLegend() {
+        return showInLegend;
+    }
+
+    public void setShowInLegend(Boolean showInLegend) {
+        this.showInLegend = showInLegend;
     }
 
     @JsonAnyGetter
