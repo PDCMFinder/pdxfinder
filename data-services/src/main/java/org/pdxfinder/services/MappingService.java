@@ -11,6 +11,7 @@ import org.pdxfinder.admin.pojos.MappingContainer;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.admin.zooma.*;
 import org.pdxfinder.graph.repositories.SampleRepository;
+import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.mapping.MappingEntityType;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
 import org.slf4j.Logger;
@@ -49,6 +50,8 @@ public class MappingService {
     private String knowledgBaseURL;
 
     private SampleRepository sampleRepository;
+    private MappingEntityRepository mappingEntityRepository;
+
 
     private MappingContainer container;
 
@@ -62,9 +65,10 @@ public class MappingService {
     //MappingEntityRepository mappingEntityRepository;
 
     @Autowired
-    public MappingService(SampleRepository sampleRepository) {
+    public MappingService(SampleRepository sampleRepository, MappingEntityRepository mappingEntityRepository) {
 
         this.sampleRepository = sampleRepository;
+        this.mappingEntityRepository = mappingEntityRepository;
         container = new MappingContainer();
     }
 
@@ -313,6 +317,26 @@ public class MappingService {
 
     }
 
+
+
+    public Map<String, List<MappingEntity>> getMissingDiagnosisMappings(String ds){
+
+        MappingContainer mc = new MappingContainer();
+
+        if(ds == null || ds.isEmpty()){
+
+        } else{
+
+        }
+
+        Map<String, List<MappingEntity>> entityMap = new HashMap<>();
+
+        List<MappingEntity> mappingEntities =  mappingEntityRepository.findByMappedTermLabel(null);  // new ArrayList<>();
+
+        entityMap.put("mappings", mappingEntities);
+        return entityMap;
+
+    }
 
 /*
     public MappingContainer getSavedDiagnosisMappings(String ds){

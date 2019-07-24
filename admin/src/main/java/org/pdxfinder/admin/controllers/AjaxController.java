@@ -64,9 +64,9 @@ public class AjaxController {
 
 
     @CrossOrigin
-    @RequestMapping(value = "/mapping/diagnosis")
+    @RequestMapping(value = "/mappings")
     @ResponseBody
-    public Map<String, List<MappingEntity>>  getDiagnosisMappings(@RequestParam("ds") Optional<String> dataSource){
+    public Map<String, List<MappingEntity>> getMissingDiagnosisMappings(@RequestParam("ds") Optional<String> dataSource){
 
         String ds = null;
         if(dataSource.isPresent() && !dataSource.get().isEmpty()){
