@@ -100,7 +100,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
         dto = new LoaderDTO();
 
-        jsonFile = finderRootDirectory +"/data/"+dataSourceAbbreviation+"/pdx/models.json";
+        jsonFile = finderRootDir +"/data/"+dataSourceAbbreviation+"/pdx/models.json";
         dataSource = dataSourceAbbreviation;
     }
 
