@@ -15,4 +15,4 @@ hs_err_pid*
 *.iml
 
 node_modules
-/admin/src/main/resources/
+/admin/src/main/resources/static

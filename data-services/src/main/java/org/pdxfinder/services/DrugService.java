@@ -57,7 +57,7 @@ public class DrugService {
 
             for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
 
-                String drugName = tp.getDrugString(false);
+                String drugName = tp.getTreatmentString(false);
                 drugNamesSet.add(drugName);
             }
         }
@@ -101,7 +101,7 @@ public class DrugService {
             for(TreatmentProtocol tp : mod.getTreatmentSummary().getTreatmentProtocols()){
 
 
-                String drugName = tp.getDrugString(false);
+                String drugName = tp.getTreatmentString(false);
 
                 if(results.containsKey(drugName)){
 

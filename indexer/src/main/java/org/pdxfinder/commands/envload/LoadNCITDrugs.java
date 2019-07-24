@@ -80,108 +80,6 @@ public class LoadNCITDrugs implements CommandLineRunner {
 
 
 
-    private void loadNCITDrugs(){
-
-        Set<String> loadedTerms = new HashSet<>();
-        Set<OntologyTerm> discoveredTerms = new HashSet<>();
-
-        String drugsRootLabel = "Drugs"; // Neoplasm
-
-        int termCounter = 1;
-        int requestCounter = 0;
-
-        //create drug root term
-        OntologyTerm ot = dataImportService.getOntologyTerm(drugsBranchUrl,drugsRootLabel);
-        log.info("Creating node: "+drugsRootLabel);
-
-        discoveredTerms.add(ot);
-
-        while(discoveredTerms.size()>0){
-            //get term from notVisited
-
-            OntologyTerm notYetVisitedTerm = discoveredTerms.iterator().next();
-            discoveredTerms.remove(notYetVisitedTerm);
-
-            if(loadedTerms.contains(notYetVisitedTerm.getUrl())) continue;
-
-            loadedTerms.add(notYetVisitedTerm.getUrl());
-
-            String parentUrlEncoded = "";
-            try {
-                //have to double encode the url to get the desired result
-                parentUrlEncoded = URLEncoder.encode(notYetVisitedTerm.getUrl(), "UTF-8");
-                parentUrlEncoded = URLEncoder.encode(parentUrlEncoded, "UTF-8");
-
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            String url = ontologyUrl+parentUrlEncoded+"/hierarchicalChildren?size=200";
-
-            log.info("Getting data from "+url);
-
-            String json = utilityService.parseURL(url);
-            requestCounter++;
-
-            if(requestCounter%200 == 0){
-                log.info("Terms loaded: " + requestCounter);
-            }
-
-            try {
-                JSONObject job = new JSONObject(json);
-                if (!job.has("_embedded")) continue;
-                String embedded = job.getString("_embedded");
-
-                //if this term does not have child nodes, continue
-
-                JSONObject job2 = new JSONObject(embedded);
-                JSONArray terms = job2.getJSONArray("terms");
-
-
-                for (int i = 0; i < terms.length(); i++) {
-
-                    JSONObject term = terms.getJSONObject(i);
-                    String termLabel = term.getString("label");
-
-                    log.debug("TERM: "+termLabel);
-
-                    termLabel = termLabel.replaceAll(",", "");
-
-                    OntologyTerm newTerm = dataImportService.getOntologyTerm(term.getString("iri"), termLabel);
-
-                    JSONArray synonyms = term.getJSONArray("synonyms");
-                    Set<String> synonymsSet = new HashSet<>();
-
-                    for(int j=0; j<synonyms.length();j++){
-                        synonymsSet.add(synonyms.getString(j));
-                    }
-
-                    newTerm.setSynonyms(synonymsSet);
-                    discoveredTerms.add(newTerm);
-
-                    OntologyTerm parentTerm = dataImportService.getOntologyTerm(notYetVisitedTerm.getUrl());
-                    newTerm.addSubclass(parentTerm);
-                    dataImportService.saveOntologyTerm(newTerm);
-
-                    termCounter++;
-
-
-                }
-
-            } catch (Exception e) {
-                log.error("", e);
-
-            }
-
-        }
-
-        if(requestCounter%200 != 0){
-            log.info("Terms loaded: " + requestCounter);
-        }
-
-    }
-
-
-
     private void loadNCITLeafDrugs(){
 
         int totalDrugs = 0;
@@ -221,32 +119,28 @@ public class LoadNCITDrugs implements CommandLineRunner {
 
                     if(!hasChildren){
 
+                        OntologyTerm ot = new OntologyTerm();
+                        ot.setType("treatment");
+                        ot.setLabel(term.getString("label"));
+                        ot.setUrl(term.getString("iri"));
 
-                        Drug drug = new Drug();
-                        String drugName = term.getString("label");
-                        String description = "";
-                        String synonyms = "";
+                        if(term.has("synonyms")) {
+                            JSONArray synonyms = term.getJSONArray("synonyms");
+                            Set<String> synonymsSet = new HashSet<>();
 
-                        if(term.has("description")){
-                            description = term.getString("description");
-                        }
-
-                        if(term.has("synonyms")){
-                            JSONArray syn = term.getJSONArray("synonyms");
-                            List<Object> synList = syn.toList();
-
-                            for(int k=0; k<synList.size(); k++){
-                                String s = (String)synList.get(k);
-                                synonyms += s;
-                                synonyms += ";";
-
+                            for (int i = 0; i < synonyms.length(); i++) {
+                                synonymsSet.add(synonyms.getString(i));
                             }
+
+                            ot.setSynonyms(synonymsSet);
+                        }
+                        if(term.has("description")){
+                            ot.setDescription(term.getString("description"));
                         }
 
-                        drug.setName(drugName);
-                        drug.setSynonyms(synonyms);
-                        drug.setDescription(description);
-                        dataImportService.createDrug(drug);
+                        ot.setAllowAsSuggestion(false);
+
+                        dataImportService.saveOntologyTerm(ot);
 
                         totalDrugs++;
 

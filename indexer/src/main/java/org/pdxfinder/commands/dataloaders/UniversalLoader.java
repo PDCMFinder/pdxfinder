@@ -14,12 +14,7 @@ import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 
@@ -50,7 +45,9 @@ public class UniversalLoader extends UniversalLoaderOmic {
     static ApplicationContext context;
     ReportManager reportManager;
 
-    private String dataRootDir;
+    private String finderRootDir;
+
+    private String dataRootDirectory;
 
     /**
      * Placeholder for the data stored in the "patient" tab
@@ -970,7 +967,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
         omicDataSource= ds.getAbbreviation();
         dataSourceAbbreviation = loaderRelatedDataSheetData.get(0).get(1);
-        dataRootDirectory = dataRootDir+ "UPDOG/";
+        dataRootDirectory = finderRootDir + "/data/UPDOG";
 
         omicModelID = "Model_ID";
         omicSampleID = "Sample_ID";
@@ -1015,8 +1012,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
         }
 
 
-        String mutationDataDir = dataRootDirectory+dataSourceAbbreviation+"/mut/";
-        String cnaDataDir = dataRootDirectory+dataSourceAbbreviation+"/cna/";
+        String mutationDataDir = dataRootDirectory + "/" + dataSourceAbbreviation+"/mut/";
+        String cnaDataDir = dataRootDirectory + "/" + dataSourceAbbreviation+"/cna/";
 
         File mutationData = new File(mutationDataDir);
         File cnaData = new File(cnaDataDir);
@@ -1033,13 +1030,13 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 // Mutation Data Load
                 if (mutationData.exists()) {
                     log.info("Loading mutation for "+modelId);
-                    loadOmicData(modelCreation, ds, "mutation");
+                    loadOmicData(modelCreation, ds, "mutation", dataRootDirectory);
                 }
 
                 // Copy Number Alteration Data Load
                 if (cnaData.exists()){
                     log.info("Loading cna for "+modelId);
-                    loadOmicData(modelCreation, ds, "copy number alteration");
+                    loadOmicData(modelCreation, ds, "copy number alteration", dataRootDirectory);
                 }
                 else{
                     log.info("No omic data for model "+modelId);
@@ -1427,11 +1424,11 @@ public class UniversalLoader extends UniversalLoaderOmic {
         return loaderRelatedDataSheetData;
     }
 
-    public String getDataRootDir() {
-        return dataRootDir;
+    public String getFinderRootDir() {
+        return finderRootDir;
     }
 
-    public void setDataRootDir(String dataRootDir) {
-        this.dataRootDir = dataRootDir;
+    public void setFinderRootDir(String finderRootDir) {
+        this.finderRootDir = finderRootDir;
     }
 }

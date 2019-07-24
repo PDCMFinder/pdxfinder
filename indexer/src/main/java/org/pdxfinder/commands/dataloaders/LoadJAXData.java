@@ -17,7 +17,6 @@ import org.pdxfinder.services.dto.LoaderDTO;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -53,8 +52,8 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     @Value("${jaxpdx.ref.assembly}")
     private String refAssembly;
 
-    @Value("${pdxfinder.data.root.dir}")
-    private String dataRootDir;
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     HashMap<String, String> passageMap = null;
 
@@ -98,7 +97,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
         dto = new LoaderDTO();
 
-        jsonFile = dataRootDir+dataSourceAbbreviation+"/pdx/models.json";
+        jsonFile = finderRootDir + "/data/" + dataSourceAbbreviation+"/pdx/models.json";
         dataSource = dataSourceAbbreviation;
 
     }
@@ -277,7 +276,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
         log.info("Loading WGS for model " + dto.getModelCreation().getSourcePdxId());
 
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation");
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation", finderRootDir+"/data");
 
     }
 
@@ -297,7 +296,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     private HashMap<String, Image> getHistologyImageMap(String id) {
         HashMap<String, Image> map = new HashMap<>();
 
-            String histologyFile = dataRootDir+dataSourceAbbreviation+"/hist/"+id;
+            String histologyFile = finderRootDir +dataSourceAbbreviation+"/hist/"+id;
             File file = new File(histologyFile);
 
             if(file.exists()){

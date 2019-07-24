@@ -12,7 +12,6 @@ import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
-import org.pdxfinder.services.reporting.LogEntity;
 import org.pdxfinder.services.reporting.MarkerLogEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +36,8 @@ import java.util.Set;
 @Order(value = 15)
 public class LoadAdditionalDatasets implements CommandLineRunner, ApplicationContextAware{
 
-    @Value("${pdxfinder.data.root.dir}")
-    private String dataRootDir;
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     Logger log = LoggerFactory.getLogger(LoadAdditionalDatasets.class);
 
@@ -85,8 +84,8 @@ public class LoadAdditionalDatasets implements CommandLineRunner, ApplicationCon
 
         log.info("Loading additional datasets for CRL.");
 
-        String templateFileStr = dataRootDir+"UPDOG/CRL/template.xlsx";
-        String markerTemplateFileStr = dataRootDir + "UPDOG/CRL/cna_tested_markers/list.csv";
+        String templateFileStr = finderRootDir+"/data/UPDOG/CRL/template.xlsx";
+        String markerTemplateFileStr = finderRootDir + "/data/UPDOG/CRL/cna_tested_markers/list.csv";
 
         File markerListFile = new File(markerTemplateFileStr);
         File templateFile = new File(templateFileStr);
@@ -142,7 +141,7 @@ public class LoadAdditionalDatasets implements CommandLineRunner, ApplicationCon
 
 
             UniversalLoader updog = new UniversalLoader(reportManager, utilityService, dataImportService);
-            updog.setDataRootDir(dataRootDir);
+            updog.setFinderRootDir(finderRootDir);
 
             updog.initTemplate(templateFileStr);
 

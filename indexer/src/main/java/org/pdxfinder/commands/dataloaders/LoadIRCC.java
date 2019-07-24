@@ -13,10 +13,8 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
-import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -26,7 +24,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.util.*;
 
 /**
@@ -54,8 +51,8 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
     private HashSet<Integer> loadedModelHashes = new HashSet<>();
 
-    @Value("${pdxfinder.data.root.dir}")
-    private String dataRootDir;
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     @Value("${irccpdx.variation.max}")
     private int variationMax;
@@ -142,7 +139,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     protected void initMethod() {
 
         log.info("Loading IRCC PDX data.");
-        jsonFile = dataRootDir+dataSourceAbbreviation+"/pdx/models.json";
+        jsonFile = finderRootDir + "/data/" + dataSourceAbbreviation+"/pdx/models.json";
 
         dataSource = dataSourceAbbreviation;
         filesDirectory = "";
@@ -238,13 +235,13 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
         log.info("Loading WGS for model " + dto.getModelCreation().getSourcePdxId());
 
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation");
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation", finderRootDir+"/data");
 
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"copy number alteration");
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"copy number alteration", finderRootDir+"/data");
 
 
 
-/*      String variationURLStr = dataRootDir+dataSourceAbbreviation+"/mut/data.json";
+/*      String variationURLStr = finderRootDir+dataSourceAbbreviation+"/mut/data.json";
         String platformName = "TargetedNGS_MUT";
         String molcharType = "mutation";
 
@@ -487,7 +484,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     public void loadVariantsBySpecimen() {
 
         try {
-            String variationURLStr = dataRootDir+dataSourceAbbreviation+"/mut/data.json";
+            String variationURLStr = finderRootDir +dataSourceAbbreviation+"/mut/data.json";
             JSONObject job = new JSONObject(utilityService.parseFile(variationURLStr));
             JSONArray jarray = job.getJSONArray("IRCCVariation");
             //   System.out.println("loading "+jarray.length()+" variant records");

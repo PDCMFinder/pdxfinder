@@ -107,7 +107,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
             log.info("Loading from file " + jsonFile);
             this.metaDataJSON = utilityService.parseFile(jsonFile);
         } else {
-            log.info("No file found for " + dataSource + ", skipping");
+            log.info("No file found for " + dataSource + "("+jsonFile+"), skipping");
             skipThis = true;
         }
     }

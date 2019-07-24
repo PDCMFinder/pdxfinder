@@ -32,7 +32,7 @@ public class LoaderProperties {
     protected String fingerPrintDescription;
     protected String histologyNote;
     protected Map<String, String> platformURL;
-    protected String dataRootDirectory;
+    protected String finderRootDirectory;
 
 
     // OMIC DATA PROPERTIES
@@ -247,12 +247,12 @@ public class LoaderProperties {
         this.platformURL = platformURL;
     }
 
-    public String getDataRootDirectory() {
-        return dataRootDirectory;
+    public String getFinderRootDirectory() {
+        return finderRootDirectory;
     }
 
-    public void setDataRootDirectory(String dataRootDirectory) {
-        this.dataRootDirectory = dataRootDirectory.trim();
+    public void setFinderRootDirectory(String dataRootDirectory) {
+        this.finderRootDirectory = dataRootDirectory.trim();
     }
 
     public String getOmicDataSource() {

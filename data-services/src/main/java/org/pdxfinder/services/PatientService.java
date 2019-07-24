@@ -110,7 +110,7 @@ public class PatientService {
                     // Aggregate the treatment summaries for this Treatment Protocol
                     for (TreatmentProtocol protocol : ps.getTreatmentSummary().getTreatmentProtocols()){
 
-                        drugName = protocol.getDrugString(false);
+                        drugName = protocol.getTreatmentString(false);
                         treatmentResponse = protocol.getResponse().getDescription();
                         treatmentDose = notEmpty(protocol.getDoseString(false));
                         treatmentDuration = protocol.getDurationString(false);

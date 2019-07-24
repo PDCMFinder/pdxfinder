@@ -8,6 +8,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.pdxfinder.graph.dao.DataProjection;
 import org.pdxfinder.graph.dao.Marker;
+import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,7 @@ public class ValidateDB implements CommandLineRunner{
 
             for(Object node : unlinkedNodes){
 
-                if(!(node instanceof DataProjection || node instanceof Marker) ){
+                if(!(node instanceof DataProjection || node instanceof Marker || node instanceof OntologyTerm) ){
                     //Uh-oh! We found a lonely node that is not DataProjection or Marker!!!
                     unlinkedNodeTypeSet.add(node.getClass().getSimpleName());
                 }

@@ -37,7 +37,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
     }
 
 
-    public void loadOmicData(ModelCreation modelCreation, Group providerGroup, String dataType) {  // csv or xlsx or json
+    public void loadOmicData(ModelCreation modelCreation, Group providerGroup, String dataType, String dataRootDirectory) {  // csv or xlsx or json
 
         reportManager = (ReportManager) context.getBean("ReportManager");
 
@@ -49,12 +49,12 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS 100s OF CSV/JSON WITH ONE_FILE_PER_MODEL
             String modelID = modelCreation.getSourcePdxId();
-            dataList = utilityService.serializeDataToMaps(dataRootDirectory+dataSourceAbbreviation+"/"+omicDir+"/"+modelID+"."+omicFileExtension);
+            dataList = utilityService.serializeDataToMaps(dataRootDirectory+"/"+dataSourceAbbreviation+"/"+omicDir+"/"+modelID+"."+omicFileExtension);
 
         }else {
 
             // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS A SINGLE CSV/JSON WITH ALL_MODELS_IN_ONE_FILE
-            String variationURLStr = dataRootDirectory+dataSourceAbbreviation+"/"+omicDir+"/data."+omicFileExtension;
+            String variationURLStr = dataRootDirectory+"/"+dataSourceAbbreviation+"/"+omicDir+"/data."+omicFileExtension;
             Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(variationURLStr,omicModelID);
 
             dataList = fullData.get(modelCreation.getSourcePdxId());
