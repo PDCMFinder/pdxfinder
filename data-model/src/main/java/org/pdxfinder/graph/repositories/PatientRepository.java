@@ -113,7 +113,7 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
             "            WITH pat, cev, ps, sfrm, hs, ss, tiss "+
             "            MATCH (hs)-[mto:MAPPED_TO]-(oterm:OntologyTerm)"+
 
-            "            OPTIONAL MATCH (ps)-[st:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[drr:DRUG]-(dr:Drug) " +
+            "            OPTIONAL MATCH (ps)-[st:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[drr:TREATMENT]-(dr:Treatment) " +
             "            OPTIONAL MATCH (tp)-[rsp:RESPONSE]-(resp:Response)" +
             "            OPTIONAL MATCH (tp)-[cur:CURRENT_TREATMENT]-(curt:CurrentTreatment)" +
 

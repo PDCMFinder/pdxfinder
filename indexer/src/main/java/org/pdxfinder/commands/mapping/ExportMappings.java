@@ -52,7 +52,7 @@ public class ExportMappings implements CommandLineRunner {
 
         List<String> dataSourcesToExport = new ArrayList<>(Arrays.asList("TRACE", "IRCC-CRC", "IRCC-GC", "Curie-LC", "Curie-BC"));
 
-        mappingService.saveMappingsToFile(fileName, mappingService.getDiagnosisMappingsByDS(dataSourcesToExport).getMappings().values());
+        mappingService.saveMappingsToFile(fileName, mappingService.getDiagnosisMappingsByDS(dataSourcesToExport).getEntityList());
 
 
 

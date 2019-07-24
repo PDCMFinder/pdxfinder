@@ -10,9 +10,8 @@ import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.admin.pojos.MappingContainer;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.admin.zooma.*;
-import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.repositories.SampleRepository;
-import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
+import org.pdxfinder.services.mapping.MappingEntityType;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,15 +40,21 @@ public class MappingService {
     private static final String ACCURACY = "PRECISE";
     private static final String ANNOTATOR = "Nathalie Conte";
 
-    @Value("${mappings.diagnosis.file}")
-    private String savedDiagnosisMappingsFile;
+    @Value("${pdxfinder.root.dir}")
+    private String rootDir;
+
+
 
     @Value("${mappings.mappedTermUrl}")
     private String knowledgBaseURL;
 
     private SampleRepository sampleRepository;
 
-    private MappingContainer existingDiagnosisMappings;
+    private MappingContainer container;
+
+    private boolean INITIALIZED = false;
+
+
 
     @Autowired
     private UtilityService utilityService;
@@ -60,25 +65,86 @@ public class MappingService {
     public MappingService(SampleRepository sampleRepository) {
 
         this.sampleRepository = sampleRepository;
-        this.savedDiagnosisMappingsFile = savedDiagnosisMappingsFile;
-        //this.mappingEntityRepository =  mappingEntityRepository;
-    }
-
-    public String getSavedDiagnosisMappingsFile() {
-        return savedDiagnosisMappingsFile;
-    }
-
-    public void setSavedDiagnosisMappingsFile(String savedDiagnosisMappingsFile) {
-        this.savedDiagnosisMappingsFile = savedDiagnosisMappingsFile;
+        container = new MappingContainer();
     }
 
 
-    public List<MappingEntity> loadSavedDiagnosisMappings(){
+    /**
+     * Loads rules from a source: file or h2
+     * @param source
+     */
+    private void loadRules(String source){
 
-        String json = utilityService.parseFile(savedDiagnosisMappingsFile);
-        existingDiagnosisMappings = new MappingContainer();
+        if(container == null) container = new MappingContainer();
 
-        List<MappingEntity> mappingEntities = new ArrayList<>();
+        log.info("Loading mapping rules");
+
+        if(source.equals("json")){
+
+            String mappingRulesDir = rootDir + "/mapping";
+            File folder = new File(mappingRulesDir);
+
+            if(folder.exists()){
+
+                String diagnosisMappingsFilePath = mappingRulesDir+"/diagnosis_mappings.json";
+                String treatmentMappingsFilePath = mappingRulesDir+"/treatment_mappings.json";
+
+                File diagnosisFile = new File(diagnosisMappingsFilePath);
+                File treatmentFile = new File(treatmentMappingsFilePath);
+
+                if(diagnosisFile.exists()){
+
+                    loadDiagnosisMappings(diagnosisMappingsFilePath);
+                }
+                else{
+                    log.error("Diagnosis mappings file not found at "+diagnosisMappingsFilePath);
+                }
+
+
+                if(treatmentFile.exists()){
+
+                    loadTreatmentMappings(treatmentMappingsFilePath);
+                }
+                else{
+                    log.error("Treatment mappings file not found at "+treatmentMappingsFilePath);
+                }
+
+
+            }
+            else{
+
+                log.error("Mapping rules directory not found at "+mappingRulesDir);
+
+            }
+
+
+        }
+        else if(source.equals("h2")){
+
+
+
+        }
+        else{
+
+            log.error("Couldn't load mapping rules, no source was specified");
+
+
+        }
+
+
+        INITIALIZED = true;
+
+    }
+
+
+    /**
+     * Populates the container with the diagnosis mapping rules
+     * @param file
+     */
+    private void loadDiagnosisMappings(String file){
+
+
+        String json = utilityService.parseFile(file);
 
         try {
             JSONObject job = new JSONObject(json);
@@ -102,9 +168,6 @@ public class MappingService {
                     String mappedTermUrl = row.getString("mappedTermUrl");
                     Long entityId = Long.parseLong(row.getString("entityId"));
 
-                    String mappingKey = StringUtils.join(
-                            Arrays.asList(dataSource, sampleDiagnosis, originTissue, tumorType), "__"
-                    );
 
                     //if(ds!= null && !ds.toLowerCase().equals(dataSource.toLowerCase())) continue;
 
@@ -140,17 +203,16 @@ public class MappingService {
                     mappingValues.put("OriginTissue", originTissue);
                     mappingValues.put("TumorType", tumorType);
 
-                    MappingEntity me = new MappingEntity("DIAGNOSIS", getDiagnosisMappingLabels(), mappingValues);
+                    MappingEntity me = new MappingEntity(MappingEntityType.diagnosis.get(), getDiagnosisMappingLabels(), mappingValues);
                     me.setMappedTermLabel(ontologyTerm);
                     me.setMapType(mapType);
                     me.setJustification(justification);
                     me.setEntityId(entityId);
                     me.setMappedTermUrl(mappedTermUrl);
-                    me.setMappingKey(mappingKey);
+                    me.setMappingKey(me.generateMappingKey());
 
-                    mappingEntities.add(me);
+                    container.addEntity(me);
 
-                    existingDiagnosisMappings.add(me);
                 }
             }
 
@@ -158,20 +220,107 @@ public class MappingService {
             e.printStackTrace();
         }
 
+    }
 
-        return mappingEntities;
 
+
+   private void loadTreatmentMappings(String file){
+
+
+        String json = utilityService.parseFile(file);
+
+        try {
+            JSONObject job = new JSONObject(json);
+            if (job.has("mappings")) {
+                JSONArray rows = job.getJSONArray("mappings");
+
+
+                for (int i = 0; i < rows.length(); i++) {
+                    JSONObject row = rows.getJSONObject(i);
+
+                    JSONObject mappingVal = row.getJSONObject("mappingValues");
+
+
+                    String dataSource = mappingVal.getString("DataSource");
+                    String treatmentName = mappingVal.getString("TreatmentName").toLowerCase();
+                    String ontologyTerm = row.getString("mappedTermLabel");
+                    String mapType = row.getString("mapType");
+                    String justification = row.getString("justification");
+                    String mappedTermUrl = row.getString("mappedTermUrl");
+                    Long entityId = Long.parseLong(row.getString("entityId"));
+
+
+
+                    if (ontologyTerm.equals("") || ontologyTerm == null) continue;
+
+                    //DO not ask, I know it looks horrible...
+                    if (justification == null || justification.equals("null")) justification = "";
+
+                    //make everything lowercase
+                    if (dataSource != null) dataSource = dataSource.toLowerCase();
+
+
+                    Map<String, String> mappingValues = new HashMap<>();
+                    mappingValues.put("DataSource", dataSource);
+                    mappingValues.put("TreatmentName", treatmentName);
+
+                    MappingEntity me = new MappingEntity(MappingEntityType.treatment.get(), getTreatmentMappingLabels(), mappingValues);
+                    me.setMappedTermLabel(ontologyTerm);
+                    me.setMapType(mapType);
+                    me.setJustification(justification);
+                    me.setEntityId(entityId);
+                    me.setMappedTermUrl(mappedTermUrl);
+                    me.setMappingKey(me.generateMappingKey());
+
+                    container.addEntity(me);
+
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
 
 
+
+    public MappingEntity getDiagnosisMapping(String dataSource, String diagnosis, String originTissue, String tumorType){
+
+        if(!INITIALIZED) loadRules("json");
+
+        String mapKey = MappingEntityType.diagnosis.get()+"__"+dataSource+"__"+diagnosis+"__"+originTissue+"__"+tumorType;
+
+        mapKey = mapKey.replaceAll("[^a-zA-Z0-9 _-]","").toLowerCase();
+
+
+       return container.getEntityById(mapKey);
+
+
+    }
+
+    public MappingEntity getTreatmentMapping(String dataSource, String treatmentName){
+
+        if(!INITIALIZED) loadRules("json");
+
+        String mapKey = MappingEntityType.treatment.get()+"__"+dataSource+"__"+treatmentName;
+
+        mapKey = mapKey.replaceAll("[^a-zA-Z0-9 _-]","").toLowerCase();
+
+        return container.getEntityById(mapKey);
+
+
+    }
+
+
+/*
     public MappingContainer getSavedDiagnosisMappings(String ds){
 
 
-        if(existingDiagnosisMappings == null){
+        if(!INITIALIZED){
 
-            loadSavedDiagnosisMappings();
+            loadRules("file");
         }
 
         //no filter, return everything
@@ -184,30 +333,28 @@ public class MappingService {
                         x.getMappingValues().get("DataSource").equals(ds)).collect(Collectors.toList());
 
         results.forEach(x -> {
-            mc.add(x);
+            mc.addEntity(x);
         });
 
 
     return mc;
     }
 
-
+*/
     public MappingContainer getDiagnosisMappingsByDS(List<String> ds){
 
 
-        if(existingDiagnosisMappings == null){
+        if(!INITIALIZED){
 
-            loadSavedDiagnosisMappings();
+            loadRules("json");
         }
 
-        //no filter, return everything
-        if(ds == null) return existingDiagnosisMappings;
 
         MappingContainer mc = new MappingContainer();
 
-        for(MappingEntity me: existingDiagnosisMappings.getMappings().values()){
+        for(MappingEntity me: container.getMappings().values()){
 
-            if(me.getEntityType().equals("DIAGNOSIS")){
+            if(me.getEntityType().toLowerCase().equals(MappingEntityType.diagnosis.get())){
 
                 for(String dataSource : ds){
 
@@ -225,7 +372,7 @@ public class MappingService {
                         me2.setStatus(me.getStatus());
                         me2.setSuggestedMappings(me.getSuggestedMappings());
 
-                        mc.add(me2);
+                        mc.addEntity(me2);
                     }
                 }
             }
@@ -235,9 +382,11 @@ public class MappingService {
 
     }
 
-    public void saveMappingsToFile(String fileName, Collection<MappingEntity> maprules){
 
-        Map<String, Collection<MappingEntity>> mappings = new HashMap<>();
+
+    public void saveMappingsToFile(String fileName, List<MappingEntity> maprules){
+
+        Map<String, List<MappingEntity>> mappings = new HashMap<>();
         mappings.put("mappings", maprules);
 
         Gson gson = new Gson();
@@ -277,7 +426,7 @@ public class MappingService {
             //get suggestions for missing mapping
             mappingEntity.setSuggestedMappings(getSuggestionsForUnmappedEntity(mappingEntity, getSavedDiagnosisMappings(null)));
 
-            mc.add(mappingEntity);
+            mc.addEntity(mappingEntity);
         }
 
         entityMap.put("mappings", mappingEntities);
@@ -419,7 +568,7 @@ public class MappingService {
 
 
 
-    List<String> getDiagnosisMappingLabels(){
+    public List<String> getDiagnosisMappingLabels(){
 
         List<String> mapLabels = new ArrayList<>();
         mapLabels.add("DataSource");
@@ -430,7 +579,14 @@ public class MappingService {
         return mapLabels;
     }
 
+    public List<String> getTreatmentMappingLabels(){
 
+        List<String> mapLabels = new ArrayList<>();
+        mapLabels.add("DataSource");
+        mapLabels.add("TreatmentName");
+
+        return mapLabels;
+    }
 
 
     private int getStringSimilarity(DamerauLevenshteinAlgorithm dla, String key1, String key2){

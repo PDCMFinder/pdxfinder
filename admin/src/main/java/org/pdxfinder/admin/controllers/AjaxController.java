@@ -66,13 +66,13 @@ public class AjaxController {
     @RequestMapping(value = "/mapping/diagnosis")
     @ResponseBody
     public Map<String, List<MappingEntity>>  getDiagnosisMappings(@RequestParam("ds") Optional<String> dataSource){
+        List<String> dsList = new ArrayList<>();
 
-        String ds = null;
         if(dataSource.isPresent() && !dataSource.get().isEmpty()){
-            ds = dataSource.get();
+            dsList.add(dataSource.get());
         }
 
-        return mappingService.getSavedDiagnosisMappings(ds).getEntityList();
+        return mappingService.getDiagnosisMappingsByDS(dsList).getEntityMap();
     }
 
 

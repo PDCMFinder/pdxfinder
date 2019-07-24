@@ -102,13 +102,21 @@ public class TreatmentProtocol {
         this.treatmentDate = treatmentDate;
     }
 
-    public String getDrugString(boolean includeControlDrugs){
+    public String getTreatmentString(boolean includeControlDrugs){
 
         String ret = "";
 
         for(TreatmentComponent comp:components){
 
-            String drugName = comp.getDrug().getName();
+            String drugName;
+
+            if(comp.getTreatment() != null && comp.getTreatment().getTreatmentToOntologyRelationship() != null & comp.getTreatment().getTreatmentToOntologyRelationship().getOntologyTerm() != null){
+
+                drugName = comp.getTreatment().getTreatmentToOntologyRelationship().getOntologyTerm().getLabel();
+            }
+            else{
+                continue;
+            }
 
             if(includeControlDrugs){
                 if(!ret.isEmpty()){

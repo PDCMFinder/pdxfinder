@@ -21,14 +21,19 @@ public class OntologyTerm {
     private int directMappedSamplesNumber;
     private int indirectMappedSamplesNumber;
     private Set<String> synonyms;
+    private String type;
+    private String description;
+
+    private boolean allowAsSuggestion = true;
 
     @Relationship(type = "SUBCLASS_OF" ,direction = Relationship.OUTGOING)
     private Set<OntologyTerm> subclassOf;
 
     @Relationship(type = "MAPPED_TO", direction = Relationship.INCOMING)
-    private SampleToOntologyRelationship mappedTo;
+    private SampleToOntologyRelationship sampleMappedTo;
 
-
+    @Relationship(type = "MAPPED_TO", direction = Relationship.INCOMING)
+    private TreatmentToOntologyRelationship treatmentMappedTo;
 
 
     public OntologyTerm() {
@@ -74,12 +79,12 @@ public class OntologyTerm {
         this.subclassOf = subclassOf;
     }
 
-    public SampleToOntologyRelationship getMappedTo() {
-        return mappedTo;
+    public SampleToOntologyRelationship getSampleMappedTo() {
+        return sampleMappedTo;
     }
 
-    public void setMappedTo(SampleToOntologyRelationship mappedTo) {
-        this.mappedTo = mappedTo;
+    public void setSampleMappedTo(SampleToOntologyRelationship sampleMappedTo) {
+        this.sampleMappedTo = sampleMappedTo;
     }
 
     public void addSubclass(OntologyTerm ot){
@@ -112,5 +117,37 @@ public class OntologyTerm {
 
     public void setSynonyms(Set<String> synonyms) {
         this.synonyms = synonyms;
+    }
+
+    public TreatmentToOntologyRelationship getTreatmentMappedTo() {
+        return treatmentMappedTo;
+    }
+
+    public void setTreatmentMappedTo(TreatmentToOntologyRelationship treatmentMappedTo) {
+        this.treatmentMappedTo = treatmentMappedTo;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isAllowAsSuggestion() {
+        return allowAsSuggestion;
+    }
+
+    public void setAllowAsSuggestion(boolean allowAsSuggestion) {
+        this.allowAsSuggestion = allowAsSuggestion;
     }
 }

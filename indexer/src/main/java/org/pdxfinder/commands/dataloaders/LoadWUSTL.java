@@ -14,7 +14,6 @@ import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -47,8 +46,8 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
     private Session session;
 
 
-    @Value("${pdxfinder.data.root.dir}")
-    private String dataRootDir;
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     public LoadWUSTL(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
@@ -95,7 +94,7 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
 
             if (listOfFiles[i].isFile()) {
 
-                this.jsonFile = rootDataDirectory + dataSourceAbbreviation + "/pdx/" + listOfFiles[i].getName();
+                this.jsonFile = rootDataDirectory + "/data/" + dataSourceAbbreviation + "/pdx/" + listOfFiles[i].getName();
                 globalLoadingOrder();
             }
         }
@@ -109,9 +108,9 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
         log.info("Loading WUSTL PDX data.");
 
         dto = new LoaderDTO();
-        rootDataDirectory = dataRootDir;
+        rootDataDirectory = finderRootDir;
         dataSource = dataSourceAbbreviation;
-        filesDirectory = dataRootDir + dataSourceAbbreviation + "/pdx/";
+        filesDirectory = finderRootDir +"/data/" + dataSourceAbbreviation + "/pdx/";
     }
 
     // WUSTL uses default implementation Steps step01GetMetaDataFolder, step02GetMetaDataJSON

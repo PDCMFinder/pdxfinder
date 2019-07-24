@@ -26,16 +26,15 @@ public class TreatmentComponent {
     private String duration;
     private String frequency;
 
-
-    @Relationship(type = "DRUG")
-    private Drug drug;
+    @Relationship(type = "TREATMENT")
+    private Treatment treatment;
 
     public TreatmentComponent() {
     }
 
-    public TreatmentComponent(String dose, Drug drug) {
+    public TreatmentComponent(String dose, Treatment treatment) {
         this.dose = dose;
-        this.drug = drug;
+        this.treatment = treatment;
     }
 
     public String getDose() {
@@ -44,14 +43,6 @@ public class TreatmentComponent {
 
     public void setDose(String dose) {
         this.dose = dose;
-    }
-
-    public Drug getDrug() {
-        return drug;
-    }
-
-    public void setDrug(Drug drug) {
-        this.drug = drug;
     }
 
     public String getDuration() {
@@ -76,5 +67,13 @@ public class TreatmentComponent {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Treatment getTreatment() {
+        return treatment;
+    }
+
+    public void setTreatment(Treatment treatment) {
+        this.treatment = treatment;
     }
 }

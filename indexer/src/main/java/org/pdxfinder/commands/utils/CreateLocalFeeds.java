@@ -21,7 +21,7 @@ import java.util.List;
  * This will create a local copy of the data feeds.
  *
  * Directory structure:
- * dataRootDir = /abc/def/
+ * finderRootDir = /abc/def/
  *
  * datasource1 = /abc/def/DATASOURCEABBREV1/pdx/models.json
  *
@@ -44,8 +44,8 @@ public class CreateLocalFeeds implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(CreateLocalFeeds.class);
 
-    @Value("${pdxfinder.data.root.dir}")
-    private String dataRootDir;
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     //JAX
     @Value("${jaxpdx.url}")
@@ -130,7 +130,7 @@ public class CreateLocalFeeds implements CommandLineRunner {
         log.info("Creating JAX feeds");
         String jsonString = utilityService.parseURL(jaxUrlStr);
 
-        saveFile(dataRootDir+"JAX/pdx/", "models.json", jsonString);
+        saveFile(finderRootDir +"/data/JAX/pdx/", "models.json", jsonString);
 
         try {
             JSONObject job = new JSONObject(jsonString);
@@ -142,10 +142,10 @@ public class CreateLocalFeeds implements CommandLineRunner {
                 String modelId = j.getString("Model ID");
 
                 String mutation = utilityService.parseURL(jaxVariationURL + modelId);
-                saveFile(dataRootDir+"JAX/mut/", modelId+".json", mutation);
+                saveFile(finderRootDir +"JAX/mut/", modelId+".json", mutation);
 
                 String histology = utilityService.parseURL(jaxHistologyURL + modelId);
-                saveFile(dataRootDir+"JAX/hist/", modelId+".json", histology);
+                saveFile(finderRootDir +"JAX/hist/", modelId+".json", histology);
 
             }
 
@@ -162,10 +162,10 @@ public class CreateLocalFeeds implements CommandLineRunner {
         log.info("Creating IRCC-CRC feeds");
         String jsonString = utilityService.parseURL(irccUrlStr);
 
-        saveFile(dataRootDir+"IRCC-CRC/pdx/", "models.json", jsonString);
+        saveFile(finderRootDir +"/data/IRCC-CRC/pdx/", "models.json", jsonString);
 
         String mutation = utilityService.parseURL(irccVariationURLStr);
-        saveFile(dataRootDir+"IRCC-CRC/mut/", "data.json", mutation);
+        saveFile(finderRootDir +"/data/IRCC-CRC/mut/", "data.json", mutation);
 
     }
 
@@ -175,10 +175,10 @@ public class CreateLocalFeeds implements CommandLineRunner {
         log.info("Creating HCI feeds");
         String jsonString = utilityService.parseURL(hciUrlStr);
 
-        saveFile(dataRootDir+"PDXNet-HCI-BCM/pdx/", "models.json", jsonString);
+        saveFile(finderRootDir +"/data/PDXNet-HCI-BCM/pdx/", "models.json", jsonString);
 
         //String ihc = parseURL(hciIhcFileStr);
-        //saveFile(dataRootDir+"PDXNet-HCI-BCM/ihc/", "data.json", ihc);
+        //saveFile(finderRootDir+"PDXNet-HCI-BCM/ihc/", "data.json", ihc);
 
     }
 
@@ -199,7 +199,7 @@ public class CreateLocalFeeds implements CommandLineRunner {
                 fileName = "models"+counter+".json";
             }
 
-            saveFile(dataRootDir+"PDXNet-MDAnderson/pdx/", fileName, jsonString);
+            saveFile(finderRootDir +"/data/PDXNet-MDAnderson/pdx/", fileName, jsonString);
             counter++;
         }
 
@@ -210,7 +210,7 @@ public class CreateLocalFeeds implements CommandLineRunner {
         log.info("Creating WISTAR feeds");
         String jsonString = utilityService.parseURL(wistarUrlStr);
 
-        saveFile(dataRootDir+"PDXNet-Wistar-MDAnderson-Penn/pdx/", "models.json", jsonString);
+        saveFile(finderRootDir +"/data/PDXNet-Wistar-MDAnderson-Penn/pdx/", "models.json", jsonString);
 
     }
 
@@ -229,7 +229,7 @@ public class CreateLocalFeeds implements CommandLineRunner {
                 fileName = "models"+counter+".json";
             }
 
-            saveFile(dataRootDir+"PDXNet-WUSTL/pdx/", fileName, jsonString);
+            saveFile(finderRootDir +"/data/PDXNet-WUSTL/pdx/", fileName, jsonString);
             counter++;
         }
 
