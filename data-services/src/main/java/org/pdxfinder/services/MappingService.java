@@ -745,6 +745,7 @@ public class MappingService {
     public void saveUnmappedTerms(MappingEntity mappingEntity){
 
         mappingEntity.setStatus("Created");
+        mappingEntity.setMappedTermLabel("-");
         mappingEntity.setDateCreated(new Date());
 
         String mappingKey = mappingEntity.generateMappingKey();
@@ -804,7 +805,7 @@ public class MappingService {
 
 
 
-    public PaginationDTO search(int page, int size, String entityType,String mappingLabel, String mappingValue){
+    public PaginationDTO search(int page, int size, String entityType,String mappingLabel, String mappingValue, String mappedTermLabel, String mapType){
 
         String sortColumn = "id";
         Sort.Direction direction = getSortDirection("asc");
@@ -819,7 +820,7 @@ public class MappingService {
 
         pageable = new PageRequest(start,size, direction,sortColumn);
 
-        Page<MappingEntity> mappingEntityPage = mappingEntityRepository.findByMultipleFilters(entityType, mappingLabel, mappingValue, pageable);
+        Page<MappingEntity> mappingEntityPage = mappingEntityRepository.findByMultipleFilters(entityType, mappingLabel, mappingValue, mappedTermLabel, mapType, pageable);
 
         List<MappingEntity> mappingEntityList = new ArrayList<>();
         for (MappingEntity mappingEntity : mappingEntityPage){

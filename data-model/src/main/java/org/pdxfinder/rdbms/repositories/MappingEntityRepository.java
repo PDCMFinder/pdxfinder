@@ -26,12 +26,17 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
 
     @Query(value = "Select distinct me from MappingEntity me JOIN me.mappingValues mv " +
             "WHERE ((lower(me.entityType) = lower(:entityType)) OR :entityType = '') "+
-            "AND ( (lower(KEY(mv)) = lower(:mappingLabel) AND lower(mv) = lower(:mappingValue)) OR  :mappingValue = '' ) "
+            "AND ( (lower(KEY(mv)) = lower(:mappingLabel) AND lower(mv) = lower(:mappingValue)) OR  :mappingValue = '' ) "+
+            "AND ((lower(me.mappedTermLabel) = lower(:mappedTermLabel)) OR :mappedTermLabel = '') "+
+            "AND ((lower(me.mapType) = lower(:mapType)) OR :mapType = '') "
     )
     Page<MappingEntity> findByMultipleFilters(@Param("entityType") String entityType,
 
                                               @Param("mappingLabel") String mappingLabel,
                                               @Param("mappingValue") String mappingValue,
+
+                                              @Param("mappedTermLabel") String mappedTermLabel,
+                                              @Param("mapType") String mapType,
 
                                               Pageable pageable);
 
