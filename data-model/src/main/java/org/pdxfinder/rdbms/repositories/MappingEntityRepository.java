@@ -26,7 +26,7 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
 
     @Query(value = "Select distinct me from MappingEntity me JOIN me.mappingValues mv " +
             "WHERE ((lower(me.entityType) = lower(:entityType)) OR :entityType = '') "+
-            "AND ((KEY(mv) = :mappingLabel AND mv = :mappingValue) OR  :mappingValue = '') "
+            "AND ( (lower(KEY(mv)) = lower(:mappingLabel) AND lower(mv) = lower(:mappingValue)) OR  :mappingValue = '' ) "
     )
     Page<MappingEntity> findByMultipleFilters(@Param("entityType") String entityType,
 

@@ -38,7 +38,8 @@ public class AjaxController {
     private MappingService mappingService;
 
     @Autowired
-    public AjaxController(MappingService mappingService, RestTemplateBuilder restTemplateBuilder) {
+    public AjaxController(MappingService mappingService,
+                          RestTemplateBuilder restTemplateBuilder) {
         this.mappingService = mappingService;
         this.restTemplate = restTemplateBuilder.build();
     }
@@ -47,22 +48,22 @@ public class AjaxController {
 
     @CrossOrigin
     @GetMapping("/mappings")
-    public PaginationDTO getMappings(@RequestParam(value = "page", defaultValue = "1") Integer page,
-                                     @RequestParam(value = "size", defaultValue = "10") Integer size,
+    public PaginationDTO getMappings(@RequestParam(value="type", defaultValue = "") Optional<String> entityType,
+                                     @RequestParam("mq") Optional<String> mappingQuery,
 
-                                     @RequestParam("q") Optional<String> mappingQuery,
-                                     @RequestParam(value="type", defaultValue = "") Optional<String> entityType){
+                                     @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                     @RequestParam(value = "size", defaultValue = "10") Integer size){
 
         String mappingLabel = "";
         String mappingValue = "";
 
         try {
-
             String[] query = mappingQuery.get().split(":");
-            mappingLabel = getCamelCase(query[0]);
+            mappingLabel = query[0];
             mappingValue = query[1].trim();
-
         }catch (Exception e){ }
+
+
 
         PaginationDTO result = mappingService.search(page, size, entityType.get(), mappingLabel, mappingValue);
         return result;
