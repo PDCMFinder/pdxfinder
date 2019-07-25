@@ -806,14 +806,18 @@ public class MappingService {
 
     public PaginationDTO search(int page, int size, String entityType,String mappingLabel, String mappingValue){
 
-        int start = page - 1;
         String sortColumn = "id";
         Sort.Direction direction = getSortDirection("asc");
 
         Pageable pageable = null;
-        if (size != 0){
-            pageable = new PageRequest(start,size, direction,sortColumn);
-        }
+
+        // requested data size is either greater than zero or forced to 10
+        size = (size > 0) ? size : 10;
+
+        // requested number is either greater than zero or forced to initial page
+        int start = (page > 0) ? page - 1 : 0;
+
+        pageable = new PageRequest(start,size, direction,sortColumn);
 
         Page<MappingEntity> mappingEntityPage = mappingEntityRepository.findByMultipleFilters(entityType, mappingLabel, mappingValue, pageable);
 
