@@ -1,5 +1,7 @@
 package org.pdxfinder.rdbms.dao;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,6 +56,8 @@ public class MappingEntity {
     private String mappedTermLabel;
 
 
+
+
     /**
      * The term url that the entity is mapped to. The value of this attribute should be either null (indicating that the
      * entity is not mapped to anything yet) or an existing ontology term url.
@@ -104,6 +108,7 @@ public class MappingEntity {
     /**
      * The unique String that identifies a Mapping
      */
+    @JsonIgnore
     @Column(unique = true, nullable = false, columnDefinition="Text")
     private String mappingKey;
 
