@@ -12,12 +12,17 @@ import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.admin.zooma.*;
 import org.pdxfinder.graph.repositories.SampleRepository;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
+import org.pdxfinder.services.dto.PaginationDTO;
 import org.pdxfinder.services.mapping.MappingEntityType;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -726,7 +731,6 @@ public class MappingService {
     public List<MappingEntity> loadMappingsFromFile(String jsonFile) {
 
         String jsonKey = "mappings";
-
         List<MappingEntity> mappingEntities = new ArrayList<>();
 
         List<Map<String, Object>> mappings = utilityService.serializeJSONToMaps(jsonFile, jsonKey);
@@ -741,6 +745,50 @@ public class MappingService {
         });
 
         return mappingEntities;
+    }
+
+
+
+    @Autowired
+    private PaginationService paginationService;
+
+    public PaginationDTO search(int page, int size, String entityType,String mappingLabel, String mappingValue){
+
+        int start = page - 1;
+        String sortColumn = "id";
+        Sort.Direction direction = getSortDirection("asc");
+
+        Pageable pageable = null;
+        if (size != 0){
+            pageable = new PageRequest(start,size, direction,sortColumn);
+        }
+
+        Page<MappingEntity> mappingEntityPage = mappingEntityRepository.findByMultipleFilters(entityType, mappingLabel, mappingValue, pageable);
+
+        List<MappingEntity> mappingEntityList = new ArrayList<>();
+        for (MappingEntity mappingEntity : mappingEntityPage){
+            mappingEntityList.add(mappingEntity);
+        }
+
+        PaginationDTO paginationDto = paginationService.initializeDTO(mappingEntityPage);
+        //paginationDto.setData(mappingEntityList);
+
+        paginationDto.setAdditionalProperty("mappings",mappingEntityList);
+
+        return paginationDto;
+
+    }
+
+
+
+    public Sort.Direction getSortDirection(String sortDir){
+
+        Sort.Direction direction = Sort.Direction.ASC;
+
+        if (sortDir.equals("desc")){
+            direction = Sort.Direction.DESC;
+        }
+        return direction;
     }
 
 

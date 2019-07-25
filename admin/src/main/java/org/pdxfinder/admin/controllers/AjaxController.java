@@ -5,11 +5,13 @@ import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.admin.zooma.ZoomaEntity;
 import org.pdxfinder.services.MappingService;
 import org.pdxfinder.services.UtilityService;
+import org.pdxfinder.services.dto.PaginationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -43,24 +45,31 @@ public class AjaxController {
 
 
 
-                        /****************************************************************
-                         *          INTERACTIONS WITH PDX FINDER KNOWLEDGE BASE         *
-                         ****************************************************************/
-
-
     @CrossOrigin
-    @RequestMapping(value = "/mappings")
-    @ResponseBody
-    public Map<String, List<MappingEntity>> getMissingDiagnosisMappings(@RequestParam("ds") Optional<String> dataSource){
+    @GetMapping("/mappings")
+    public PaginationDTO getMappings(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                     @RequestParam(value = "size", defaultValue = "10") Integer size,
 
-        String ds = null;
-        if(dataSource.isPresent() && !dataSource.get().isEmpty()){
-            ds = dataSource.get();
-        }
+                                     @RequestParam("q") Optional<String> mappingQuery,
+                                     @RequestParam(value="type", defaultValue = "") Optional<String> entityType){
 
-        Map<String, List<MappingEntity>> result =  mappingService.getMissingDiagnosisMappings(ds); //getSavedDiagnosisMappings(ds).getEntityList();
+        String mappingLabel = "";
+        String mappingValue = "";
+
+        try {
+
+            String[] query = mappingQuery.get().split(":");
+            mappingLabel = getCamelCase(query[0]);
+            mappingValue = query[1].trim();
+
+        }catch (Exception e){ }
+
+        PaginationDTO result = mappingService.search(page, size, entityType.get(), mappingLabel, mappingValue);
         return result;
+
+        //Map<String, List<MappingEntity>> result =  mappingService.getMissingDiagnosisMappings(ds);
     }
+
 
 
     @PostMapping("/diagnosis")
@@ -159,6 +168,13 @@ public class AjaxController {
         return  entity;
     }
 
+
+    public String getCamelCase(String input){
+
+        String output = StringUtils.capitalize(input.split("-")[0])+StringUtils.capitalize(input.split("-")[1]);
+
+        return output;
+    }
 
 
 }
