@@ -52,6 +52,8 @@ public class ImportMappingsToH2 implements CommandLineRunner{
         if (options.has("initializeMappingDB")) {
 
             mappingFileToH2DB(MappingEntityType.diagnosis);
+
+            mappingFileToH2DB(MappingEntityType.treatment);
         }
     }
 
