@@ -140,9 +140,10 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
 
             if(me == null){
 
-
                 //TODO: deal with missing mapping rules here
                 log.warn("No mapping rule found for "+dataSource+" "+treatment.getName());
+
+                mappingService.saveUnmappedTreatment(dataSource, treatment.getName());
             }
             else{
 
@@ -150,7 +151,6 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
                 OntologyTerm ot = dataImportService.findOntologyTermByUrl(me.getMappedTermUrl());
 
                 if(ot == null){
-
 
 
                     log.error("Ontology term not found "+me.getMappedTermUrl());

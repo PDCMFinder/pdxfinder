@@ -62,18 +62,21 @@ public class MappingService {
 
     private boolean INITIALIZED = false;
 
-
-
-    @Autowired
     private UtilityService utilityService;
 
-    //MappingEntityRepository mappingEntityRepository;
+    private PaginationService paginationService;
+
 
     @Autowired
-    public MappingService(SampleRepository sampleRepository, MappingEntityRepository mappingEntityRepository) {
+    public MappingService(SampleRepository sampleRepository,
+                          MappingEntityRepository mappingEntityRepository,
+                          UtilityService utilityService,
+                          PaginationService paginationService) {
 
         this.sampleRepository = sampleRepository;
         this.mappingEntityRepository = mappingEntityRepository;
+        this.utilityService = utilityService;
+        this.paginationService = paginationService;
         container = new MappingContainer();
     }
 
@@ -704,6 +707,57 @@ public class MappingService {
     }
 
 
+    public void saveUnmappedTreatment(String dataSource, String treatment){
+
+        List<String> mappingLabels = Arrays.asList("DataSource","TreatmentName");
+
+        Map mappingValues = Collections.singletonMap("DataSource",dataSource);
+        mappingValues.put("TreatmentName", treatment);
+
+        MappingEntity mappingEntity = new MappingEntity(MappingEntityType.treatment.get(), mappingLabels, mappingValues);
+
+        saveUnmappedTerms(mappingEntity);
+    }
+
+
+    public void saveUnmappedDiagnosis(String dataSource, String diagnosis, String originTissue, String tumorType){
+
+        ArrayList<String> mappingLabels = new ArrayList<>();
+        mappingLabels.add("DataSource");
+        mappingLabels.add("SampleDiagnosis");
+        mappingLabels.add("OriginTissue");
+        mappingLabels.add("TumorType");
+
+        Map mappingValues = new HashMap();
+        mappingValues.put("OriginTissue", originTissue);
+        mappingValues.put("DataSource", dataSource);
+        mappingValues.put("SampleDiagnosis", diagnosis);
+        mappingValues.put("TumorType", tumorType);
+
+        MappingEntity mappingEntity = new MappingEntity("DIAGNOSIS", mappingLabels, mappingValues);
+
+        saveUnmappedTerms(mappingEntity);
+    }
+
+
+
+    public void saveUnmappedTerms(MappingEntity mappingEntity){
+
+        mappingEntity.setStatus("Created");
+        mappingEntity.setDateCreated(new Date());
+
+        String mappingKey = mappingEntity.generateMappingKey();
+        mappingEntity.setMappingKey(mappingKey);
+
+        MappingEntity entity = mappingEntityRepository.findByMappingKey(mappingKey);
+
+        if(entity == null){
+
+            mappingEntityRepository.save(mappingEntity);
+        }else{
+            log.warn("NOT SAVED: {}_{}_{}_{} was found in the Database", mappingEntity.generateMappingKey());
+        }
+    }
 
 
     public void saveMappedTerms(List<MappingEntity> mappingEntities){
@@ -748,9 +802,6 @@ public class MappingService {
     }
 
 
-
-    @Autowired
-    private PaginationService paginationService;
 
     public PaginationDTO search(int page, int size, String entityType,String mappingLabel, String mappingValue){
 

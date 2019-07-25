@@ -2,10 +2,6 @@ package org.pdxfinder.commands.mapping;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.apache.commons.lang3.StringUtils;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONException;
-import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.dao.Sample;
@@ -18,7 +14,6 @@ import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -203,46 +198,8 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
                 log.warn("Datasource: " + mm.getDataSource() + ", Diagnosis: " + mm.getDiagnosis() + ", Origin Tissue: " + mm.getOriginTissue() + ", Tumor Type: " + mm.getTumorType());
 
-                saveUnmappedDiagnosis(mm.getDataSource(), mm.getDiagnosis(), mm.getOriginTissue(), mm.getTumorType());
+                mappingService.saveUnmappedDiagnosis(mm.getDataSource(), mm.getDiagnosis(), mm.getOriginTissue(), mm.getTumorType());
             }
-        }
-
-    }
-
-
-
-    public void saveUnmappedDiagnosis(String dataSource, String diagnosis, String originTissue, String tumorType){
-
-        ArrayList<String> mappingLabels = new ArrayList<>();
-        mappingLabels.add("DataSource");
-        mappingLabels.add("SampleDiagnosis");
-        mappingLabels.add("OriginTissue");
-        mappingLabels.add("TumorType");
-
-        Map mappingValues = new HashMap();
-        mappingValues.put("OriginTissue", originTissue);
-        mappingValues.put("DataSource", dataSource);
-        mappingValues.put("SampleDiagnosis", diagnosis);
-        mappingValues.put("TumorType", tumorType);
-
-        MappingEntity mappingEntity = new MappingEntity("DIAGNOSIS", mappingLabels, mappingValues);
-        mappingEntity.setStatus("Created");
-        mappingEntity.setDateCreated(new Date());
-
-        String mappingKey = StringUtils.join(
-                Arrays.asList(dataSource, diagnosis, originTissue, tumorType), "__"
-        );
-        mappingEntity.setMappingKey(mappingKey);
-
-        MappingEntity entity = mappingEntityRepository.findByMappingKey(mappingKey);
-
-        if(entity == null){
-
-            mappingEntityRepository.save(mappingEntity);
-
-        }else{
-
-            log.warn("NOT SAVED: {}_{}_{}_{} was found in the Database", dataSource, diagnosis, originTissue, tumorType);
         }
 
     }
