@@ -711,7 +711,8 @@ public class MappingService {
 
         List<String> mappingLabels = Arrays.asList("DataSource","TreatmentName");
 
-        Map mappingValues = Collections.singletonMap("DataSource",dataSource);
+        Map mappingValues = new HashMap();
+        mappingValues.put("DataSource", dataSource);
         mappingValues.put("TreatmentName", treatment);
 
         MappingEntity mappingEntity = new MappingEntity(MappingEntityType.treatment.get(), mappingLabels, mappingValues);
