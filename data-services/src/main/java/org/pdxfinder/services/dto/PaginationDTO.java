@@ -11,22 +11,22 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "data",
-        "numPages",
+        "size",
+        "totalElements",
+        "totaPages",
+        "page",
         "beginIndex",
         "endIndex",
-        "currentIndex",
-        "totalResults",
-        "page",
-        "size"
+        "currentIndex"
 })
 public class PaginationDTO {
 
 
-    private int numPages;
+    private int totaPages;
     private int beginIndex;
     private int endIndex;
     private int currentIndex;
-    private long totalResults;
+    private long totalElements;
     private Integer page;
     private Integer size;
     private Object data;
@@ -46,12 +46,12 @@ public class PaginationDTO {
         this.data = data;
     }
 
-    public int getNumPages() {
-        return numPages;
+    public int getTotaPages() {
+        return totaPages;
     }
 
-    public void setNumPages(int numPages) {
-        this.numPages = numPages;
+    public void setTotaPages(int totaPages) {
+        this.totaPages = totaPages;
     }
 
     public int getBeginIndex() {
@@ -78,12 +78,12 @@ public class PaginationDTO {
         this.currentIndex = currentIndex;
     }
 
-    public long getTotalResults() {
-        return totalResults;
+    public long getTotalElements() {
+        return totalElements;
     }
 
-    public void setTotalResults(long totalResults) {
-        this.totalResults = totalResults;
+    public void setTotalElements(long totalElements) {
+        this.totalElements = totalElements;
     }
 
     public Integer getPage() {

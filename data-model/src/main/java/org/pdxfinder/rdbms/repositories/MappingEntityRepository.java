@@ -47,4 +47,8 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
                                                 @Param("dataValue") String dataValue);
 
 
+
+    List<MappingEntity> findByEntityTypeAndMapTypeIsNotNull(String entityType);
+
+
 }

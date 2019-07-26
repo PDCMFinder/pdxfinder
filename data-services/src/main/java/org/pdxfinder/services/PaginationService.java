@@ -26,11 +26,11 @@ public class PaginationService {
         size = (size == 0) ? (int) totalResult : size;
 
         PaginationDTO paginationDto = new PaginationDTO();
-        paginationDto.setNumPages(numPages);
+        paginationDto.setTotaPages(numPages);
         paginationDto.setBeginIndex(begin);
         paginationDto.setEndIndex(end);
         paginationDto.setCurrentIndex(current);
-        paginationDto.setTotalResults(totalResult);
+        paginationDto.setTotalElements(totalResult);
         paginationDto.setPage(page);
         paginationDto.setSize(size);
 
