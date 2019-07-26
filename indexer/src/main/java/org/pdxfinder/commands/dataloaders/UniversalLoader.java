@@ -78,9 +78,9 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
 
     /**
-     * Placeholder for the data stored in the "dataset derived from patient" tab
+     * Placeholder for the data stored in the "sample platform description" template
      */
-    private List<List<String>> derivedDatasetSheetData;
+    private List<List<String>> samplePlatformDescriptionSheetData;
 
     /**
      * Placeholder for the data stored in the "sharing and contact" tab
@@ -111,14 +111,74 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
 
-    public void initTemplate(String templateFileStr) throws Exception{
+    public void initTemplates(String updogCurrDir) throws Exception{
 
-        FileInputStream excelFile = new FileInputStream(new File(templateFileStr));
-        Workbook workbook = new XSSFWorkbook(excelFile);
-        log.info("Loading template from " + templateFileStr);
-        initializeTemplateData(workbook);
+
+        //Metadata template
+        String metaDataTemplate = updogCurrDir+ "/metadata.xlsx";
+        File metaDataFile = new File(metaDataTemplate);
+
+        if(metaDataFile.exists()){
+
+            FileInputStream excelFile = new FileInputStream(metaDataFile);
+            Workbook workbook = new XSSFWorkbook(excelFile);
+            log.info("Loading template from " + metaDataTemplate);
+            initializeMetaDataTemplate(workbook);
+        }
+
+
+        //SamplePlatformDescription template
+        String samplePlatformDescriptionTemplate = updogCurrDir+ "/sampleplatform.xlsx";
+        File samplePlatformFile = new File(samplePlatformDescriptionTemplate);
+
+        if(samplePlatformFile.exists()){
+
+            FileInputStream excelFile = new FileInputStream(samplePlatformFile);
+            Workbook workbook = new XSSFWorkbook(excelFile);
+            log.info("Loading template from " + samplePlatformDescriptionTemplate);
+            initializeSamplePlatformTemplate(workbook);
+        }
+
+
+        //Cytogenetics template
+
+        //Cna template
+
+        //Patient treatment template
+
+        //Drug dosing template
 
     }
+
+
+    private void initializeMetaDataTemplate(Workbook workbook){
+
+        ds = null;
+        stopLoading = false;
+
+        patientSheetData = new ArrayList<>();
+        patientTumorSheetData = new ArrayList<>();
+        pdxModelSheetData = new ArrayList<>();
+        pdxModelValidationSheetData = new ArrayList<>();
+        sharingAndContactSheetData = new ArrayList<>();
+        loaderRelatedDataSheetData = new ArrayList<>();
+
+        initializeSheetData(workbook.getSheetAt(1), patientSheetData);
+        initializeSheetData(workbook.getSheetAt(2), patientTumorSheetData);
+        initializeSheetData(workbook.getSheetAt(3), pdxModelSheetData);
+        initializeSheetData(workbook.getSheetAt(4), pdxModelValidationSheetData);
+        initializeSheetData(workbook.getSheetAt(5), sharingAndContactSheetData);
+        initializeSheetData(workbook.getSheetAt(6), loaderRelatedDataSheetData);
+
+    }
+
+    private void initializeSamplePlatformTemplate(Workbook workbook){
+
+        samplePlatformDescriptionSheetData = new ArrayList<>();
+        initializeSheetData(workbook.getSheetAt(0), samplePlatformDescriptionSheetData);
+    }
+
+
 
 
     /**
@@ -135,25 +195,21 @@ public class UniversalLoader extends UniversalLoaderOmic {
         ds = null;
         stopLoading = false;
 
-        patientSheetData = new ArrayList<>();
-        patientTumorSheetData = new ArrayList<>();
-        patientTreatmentSheetData = new ArrayList<>();
-        pdxModelSheetData = new ArrayList<>();
-        pdxModelValidationSheetData = new ArrayList<>();
-        derivedDatasetSheetData = new ArrayList<>();
-        breastAndOrColorectalDiagnoSheetData = new ArrayList<>();
-        sharingAndContactSheetData = new ArrayList<>();
-        loaderRelatedDataSheetData = new ArrayList<>();
 
-        initializeSheetData(workbook.getSheetAt(1), patientSheetData);
-        initializeSheetData(workbook.getSheetAt(2), patientTumorSheetData);
+        patientTreatmentSheetData = new ArrayList<>();
+
+
+        breastAndOrColorectalDiagnoSheetData = new ArrayList<>();
+
+
+
+
         initializeSheetData(workbook.getSheetAt(3), patientTreatmentSheetData);
-        initializeSheetData(workbook.getSheetAt(4), pdxModelSheetData);
-        initializeSheetData(workbook.getSheetAt(5), pdxModelValidationSheetData);
-        initializeSheetData(workbook.getSheetAt(6), derivedDatasetSheetData);
-        initializeSheetData(workbook.getSheetAt(7), sharingAndContactSheetData);
+
+
+
         initializeSheetData(workbook.getSheetAt(8), breastAndOrColorectalDiagnoSheetData);
-        initializeSheetData(workbook.getSheetAt(9), loaderRelatedDataSheetData);
+
     }
 
     /**
@@ -782,7 +838,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
         int row = 6;
         this.modelIDs = new HashSet<>();
 
-        for (List<String> derivedDatasetRow : derivedDatasetSheetData) {
+        for (List<String> derivedDatasetRow : samplePlatformDescriptionSheetData) {
 
             String sampleId = derivedDatasetRow.get(0);
 
@@ -1408,8 +1464,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
         return pdxModelValidationSheetData;
     }
 
-    public List<List<String>> getDerivedDatasetSheetData() {
-        return derivedDatasetSheetData;
+    public List<List<String>> getSamplePlatformDescriptionSheetData() {
+        return samplePlatformDescriptionSheetData;
     }
 
     public List<List<String>> getSharingAndContactSheetData() {
