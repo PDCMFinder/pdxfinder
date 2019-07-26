@@ -9,7 +9,8 @@ import {MappingService} from "../mapping.service";
 
 export class CurationMappingComponent implements OnInit {
 
-    public mappingCnt: number;
+    public unmappedDiagnosisCnt: number;
+    public unmappedTreatmentCnt: number;
 
     constructor(private _mappingService: MappingService) { }
 
@@ -18,7 +19,25 @@ export class CurationMappingComponent implements OnInit {
         this._mappingService.connectMissingMappingStream()
             .subscribe(
                 data => {
+                    this.unmappedDiagnosisCnt = data['totalElements'];
+                }
+            );
 
+        this._mappingService.getUnmappedTreatment()
+            .subscribe(
+                data => {
+                    this.unmappedTreatmentCnt = data['totalElements'];
+                }
+            );
+    }
+}
+
+
+
+
+/*
+
+Previous way of counting unmmapped diagnosis terms
                     let myData = data["mappings"]; // This recieves the mappings node of the json in required format
                     // Transform all d mappingValues node objects of each json to array format
                     var count:number = 0;
@@ -26,8 +45,4 @@ export class CurationMappingComponent implements OnInit {
                         myData[count].mappingValues = Array.of(myData[count].mappingValues);
                         count++;
                     }
-                    this.mappingCnt = count;
-                }
-            );
-    }
-}
+ */

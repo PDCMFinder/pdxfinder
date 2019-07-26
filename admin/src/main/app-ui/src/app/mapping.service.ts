@@ -10,7 +10,8 @@ import {catchError} from "rxjs/internal/operators";
 export class MappingService {
 
     private _totalMappedUrl = "/api/mapping/diagnosis?ds=IRCC-CRC";
-    private _missingMappedUrl = "/api/mapping/diagnosis?ds=IRCC-CRC";
+    private _unmappedTreatmentUrl = "/api/mappings?entity-type=treatment&mapped-term=-";
+    private _unmappedDiagnosisUrl = "/api/mappings?entity-type=diagnosis&mapped-term=-";
 
     private _submitCurationUrl = "/api/diagnosis";
 
@@ -18,17 +19,23 @@ export class MappingService {
 
     constructor(private http: HttpClient) { }
 
+
+    //Retrieve unmapped diagnosis entities
+    connectMissingMappingStream(): Observable<MappingInterface[]>{
+
+        return this.http.get<MappingInterface[]>(this._unmappedTreatmentUrl);
+    }
+
+    //Retrieve unmapped treatments
+    getUnmappedTreatment(): Observable<MappingInterface[]>{
+
+        return this.http.get<MappingInterface[]>(this._unmappedDiagnosisUrl);
+    }
+
     //Retrieve Total mapped diagnosis
     connectTotalMappedStream(): Observable<MappingInterface[]>{
 
         return this.http.get<MappingInterface[]>(this._totalMappedUrl);
-
-    }
-
-    //Retrieve missing mapping diagnosis
-    connectMissingMappingStream(): Observable<MappingInterface[]>{
-
-        return this.http.get<MappingInterface[]>(this._missingMappedUrl);
 
     }
 

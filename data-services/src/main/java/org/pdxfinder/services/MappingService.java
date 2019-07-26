@@ -839,6 +839,8 @@ public class MappingService {
     }
 
 
+    // localhost:8081/api/mappings?mq=datasource:pdmr&entity-type=diagnosis
+    // Find by datasource and entityType
 
 
     public MappingContainer getMappedEntitiesByType(String entityType) {
