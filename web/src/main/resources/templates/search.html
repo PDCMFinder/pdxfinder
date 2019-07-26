@@ -136,8 +136,8 @@
             <section class="row padding-vertical-30">
                 <div class="columns">
                     <span th:if="${#strings.isEmpty(websearch.textSearchDescription)}">
-                        PDX Finder contains <span th:text="${websearch.totalElements}">a number of</span> model<span
-                            th:if="${websearch.totalElements ne 1}">s</span>
+                        PDX Finder contains <span th:text="${websearch.totalResults}">a number of</span> model<span
+                            th:if="${websearch.totalResults ne 1}">s</span>
                     </span>
                     <span th:unless="${#strings.isEmpty(websearch.textSearchDescription)}">
                         <span th:remove="tag" th:utext="${websearch.textSearchDescription}">Viewing results</span>
@@ -373,11 +373,11 @@
                                 </li>
 
                                 <li class="pagination-next"
-                                    th:classappend="${#strings.equals(websearch.page, #strings.toString(websearch.totaPages))} ? 'disabled' ">
-                                    <span th:if="${#strings.equals(websearch.page, #strings.toString(websearch.totaPages))}"
+                                    th:classappend="${#strings.equals(websearch.page, #strings.toString(websearch.numPages))} ? 'disabled' ">
+                                    <span th:if="${#strings.equals(websearch.page, #strings.toString(websearch.numPages))}"
                                           aria-label="Last page">Last </span>
-                                    <a th:unless="${#strings.equals(websearch.page, #strings.toString(websearch.totaPages))}"
-                                       th:href="'?' + ${websearch.facetString} + '&page=' + ${websearch.totaPages}"
+                                    <a th:unless="${#strings.equals(websearch.page, #strings.toString(websearch.numPages))}"
+                                       th:href="'?' + ${websearch.facetString} + '&page=' + ${websearch.numPages}"
                                        aria-label="Last page">Last </a>
                                 </li>
                             </ul>
@@ -396,7 +396,7 @@
                                     <option th:value="'?'+${websearch.facetString} + '&size=10'">  10 Models Per Page </option>
                                     <option th:value="'?'+${websearch.facetString} + '&size=50'">  50 Models Per Page </option>
                                     <option th:value="'?'+${websearch.facetString} + '&size=200'">  200 Models Per Page </option>
-                                    <option th:value="'?'+${websearch.facetString} + '&size='+${websearch.totalElements}"> ALL Models </option>
+                                    <option th:value="'?'+${websearch.facetString} + '&size='+${websearch.totalResults}"> ALL Models </option>
                                 </select>
 
                             </div>
