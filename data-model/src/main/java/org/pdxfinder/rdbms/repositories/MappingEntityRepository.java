@@ -28,7 +28,10 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
             "WHERE ((lower(me.entityType) = lower(:entityType)) OR :entityType = '') "+
             "AND ( (lower(KEY(mv)) = lower(:mappingLabel) AND lower(mv) = lower(:mappingValue)) OR  :mappingValue = '' ) "+
             "AND ((lower(me.mappedTermLabel) = lower(:mappedTermLabel)) OR :mappedTermLabel = '') "+
-            "AND ((lower(me.mapType) = lower(:mapType)) OR :mapType = '') "
+
+            "AND ((lower(me.mapType) = lower(:mapType)) OR :mapType = '') "+
+
+            "AND ( :mappedTermsOnly = '' OR (me.mapType is not null )) "
     )
     Page<MappingEntity> findByMultipleFilters(@Param("entityType") String entityType,
 
@@ -37,6 +40,8 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
 
                                               @Param("mappedTermLabel") String mappedTermLabel,
                                               @Param("mapType") String mapType,
+
+                                              @Param("mappedTermsOnly") String mappedTermsOnly,
 
                                               Pageable pageable);
 

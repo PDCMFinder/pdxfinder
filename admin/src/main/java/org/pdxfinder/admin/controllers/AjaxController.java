@@ -46,13 +46,16 @@ public class AjaxController {
 
 
 
+
     /**
      * Provides entry point to query the MappingEntity data store
-     * E.g : .../api/mappings?mq=datasource:pdmr&entity-type=treatment&map-type=direct&mapped-term=-
+     * E.g : .../api/mappings?map-terms-only=true&mq=datasource:jax&entity-type=treatment
      *
      * @param mappingQuery - Key value map of mappingValues e.g to filter by DataSource:jax, ...?mq=datasource:jax
      * @param mappedTermLabel - Filters the data for missing mappings e.g To find missing mappings, ...?mapped-term=-
-     * @param entityType - Search by entityType e.g Find missing treatment mappings ...?entity-type=treatment&mapped-term=-
+     * @param entityType - Search by entityType e.g find unmapped treatment entities ...?entity-type=treatment&mapped-term=-
+     * @param mappedTermsOnly - Search for mapped terms only ... map-terms-only=true
+     *
      * @param mapType - Search data by mapType e.g ...?map-type=direct
      * @param page - Allows client to submit offset value e.g ...?page=10
      * @param size - Allows client to submit size limit values e.g ...?size=5
@@ -62,8 +65,9 @@ public class AjaxController {
     @GetMapping("/mappings")
     public ResponseEntity<?> getMappings(@RequestParam("mq")    Optional<String> mappingQuery,
                                      @RequestParam(value="mapped-term", defaultValue = "")  Optional<String> mappedTermLabel,
-                                     @RequestParam(value="entity-type", defaultValue = "")  Optional<String> entityType,
-                                     @RequestParam(value="map-type", defaultValue = "")     Optional<String> mapType,
+                                         @RequestParam(value="map-terms-only", defaultValue = "")     Optional<String> mappedTermsOnly,
+                                         @RequestParam(value="entity-type", defaultValue = "")  Optional<String> entityType,
+                                         @RequestParam(value="map-type", defaultValue = "")     Optional<String> mapType,
 
                                      @RequestParam(value = "page", defaultValue = "1") Integer page,
                                      @RequestParam(value = "size", defaultValue = "10") Integer size){
@@ -79,7 +83,7 @@ public class AjaxController {
         }catch (Exception e){ }
 
         PaginationDTO result = mappingService.search(page, size, entityType.get(), mappingLabel,
-                mappingValue, mappedTermLabel.get(), mapType.get());
+                mappingValue, mappedTermLabel.get(), mapType.get(), mappedTermsOnly.get());
 
         return new ResponseEntity<Object>(result, HttpStatus.OK);
         //Map<String, List<MappingEntity>> result =  mappingService.getMissingDiagnosisMappings(ds);

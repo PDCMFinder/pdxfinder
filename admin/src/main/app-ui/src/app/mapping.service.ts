@@ -21,7 +21,7 @@ export class MappingService {
 
 
     //Retrieve unmapped diagnosis entities
-    connectMissingMappingStream(): Observable<MappingInterface[]>{
+    getUnmappedDiagnosis(): Observable<MappingInterface[]>{
 
         return this.http.get<MappingInterface[]>(this._unmappedTreatmentUrl);
     }

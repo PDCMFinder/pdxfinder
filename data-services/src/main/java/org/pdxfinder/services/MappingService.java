@@ -786,7 +786,7 @@ public class MappingService {
     }
 
 
-    public PaginationDTO search(int page, int size, String entityType, String mappingLabel, String mappingValue, String mappedTermLabel, String mapType) {
+    public PaginationDTO search(int page, int size, String entityType, String mappingLabel, String mappingValue, String mappedTermLabel, String mapType, String mappedTermsOnly) {
 
         String sortColumn = "id";
         Sort.Direction direction = getSortDirection("asc");
@@ -801,7 +801,7 @@ public class MappingService {
 
         pageable = new PageRequest(start, size, direction, sortColumn);
 
-        Page<MappingEntity> mappingEntityPage = mappingEntityRepository.findByMultipleFilters(entityType, mappingLabel, mappingValue, mappedTermLabel, mapType, pageable);
+        Page<MappingEntity> mappingEntityPage = mappingEntityRepository.findByMultipleFilters(entityType, mappingLabel, mappingValue, mappedTermLabel, mapType, mappedTermsOnly, pageable);
 
         List<MappingEntity> mappingEntityList = new ArrayList<>();
 

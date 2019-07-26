@@ -34,7 +34,7 @@ export class DatasourceSpecificSuggestionsComponent implements OnInit {
               this.entityId = params['id'];
 
               // Retrieve the details of Mapping node with this entityId:
-              this._mappingService.connectMissingMappingStream()
+              this._mappingService.getUnmappedDiagnosis()
                   .subscribe(
                       data => {
 

@@ -16,7 +16,7 @@ export class CurationMappingComponent implements OnInit {
 
     ngOnInit() {
 
-        this._mappingService.connectMissingMappingStream()
+        this._mappingService.getUnmappedDiagnosis()
             .subscribe(
                 data => {
                     this.unmappedDiagnosisCnt = data['totalElements'];

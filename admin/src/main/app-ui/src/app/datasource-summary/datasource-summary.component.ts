@@ -60,7 +60,7 @@ export class DatasourceSummaryComponent implements OnInit {
                     let myData = data["mappings"];
 
                     // Emit Each Unmapped Diagnosis
-                    const  source = from(myData);
+                    const source = from(myData);
 
                     // Group by Data Source
                     const groupedByImpl = source.pipe(
@@ -87,7 +87,7 @@ export class DatasourceSummaryComponent implements OnInit {
         let datArray = new Array<Object>(10);
 
 
-        this._mappingService.connectMissingMappingStream()
+        this._mappingService.getUnmappedDiagnosis()
             .subscribe(
                 data => {
 

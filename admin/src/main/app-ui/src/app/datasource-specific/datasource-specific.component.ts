@@ -27,7 +27,7 @@ export class DatasourceSpecificComponent implements OnInit {
       // From the current url snapshot, get the source parameter and assign to the dataSource property
       this.dataSource = this.route.snapshot.paramMap.get('source');
 
-      this._mappingService.connectMissingMappingStream()
+      this._mappingService.getUnmappedDiagnosis()
           .subscribe(
               data => {
 
