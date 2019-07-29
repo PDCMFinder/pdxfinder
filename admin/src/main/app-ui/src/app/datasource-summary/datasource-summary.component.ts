@@ -30,7 +30,7 @@ export class DatasourceSummaryComponent implements OnInit {
     ngOnInit() {
 
         // Connect to the Service using Reactive Observables
-        this._mappingService.getSummary()
+        this._mappingService.getDiagnosisSummary()
             .subscribe(
                 data => {
 

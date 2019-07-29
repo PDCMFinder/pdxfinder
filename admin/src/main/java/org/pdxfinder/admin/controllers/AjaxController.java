@@ -90,9 +90,9 @@ public class AjaxController {
 
 
     @GetMapping("/mappings/summary")
-    public ResponseEntity<?> getMappingStatSummary() {
+    public ResponseEntity<?> getMappingStatSummary(@RequestParam(value = "entity-type", defaultValue = "") Optional<String> entityType) {
 
-        List<Map> result = mappingService.getMappingSummary();
+        List<Map> result = mappingService.getMappingSummary(entityType.get());
 
         return new ResponseEntity<Object>(result, HttpStatus.OK);
     }

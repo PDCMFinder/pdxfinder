@@ -13,7 +13,7 @@ export class MappingService {
     private _totalMappedUrl = "/api/mappings?map-terms-only=true&entity-type=diagnosis&size=900";
     private _unmappedTreatmentUrl = "/api/mappings?entity-type=treatment&mapped-term=-";
     private _unmappedDiagnosisUrl = "/api/mappings?entity-type=diagnosis&mapped-term=-";
-    private _mappingSummary = "/api/mappings/summary";
+    private _diagnosisSummary = "/api/mappings/summary?entity-type=diagnosis";
 
     private _submitCurationUrl = "/api/diagnosis";
 
@@ -22,9 +22,9 @@ export class MappingService {
     constructor(private http: HttpClient) { }
 
 
-    getSummary(): Observable<SummaryInterface[]>{
+    getDiagnosisSummary(): Observable<SummaryInterface[]>{
 
-        return this.http.get<SummaryInterface[]>(this._mappingSummary);
+        return this.http.get<SummaryInterface[]>(this._diagnosisSummary);
     }
 
     //Retrieve unmapped diagnosis entities

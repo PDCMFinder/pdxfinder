@@ -57,13 +57,13 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
                     COUNT(CASE WHEN MAP_TYPE IS NOT NULL THEN 1 END) AS MAPPED
 
     FROM MAPPING_ENTITY me JOIN MAPPING_VALUES mv on me.ENTITY_ID = mv.MAPPING_ENTITY_ID
-    WHERE mv.MAPPING_VALUES_KEY = 'DataSource' GROUP BY lower(MAPPING_VALUES)
+    WHERE mv.MAPPING_VALUES_KEY = 'DataSource' AND ENTITY_TYPE='treatment'  GROUP BY lower(MAPPING_VALUES)
      */
-    @Query("Select distinct lower(mv), count(case when me.mapType is null THEN 1 END), " +
-            " count(case when me.mapType is not null THEN 1 END) " +
-            " from MappingEntity me join me.mappingValues mv " +
-            " where KEY(mv) = 'DataSource' group by lower(mv)")
-    List<Object[]> findTotalIncomeByCategory();
+    @Query("SELECT distinct lower(mv), count(case when me.mapType is null THEN 1 END), " +
+            " count(case when me.mapType is not null THEN 1 END) from MappingEntity me join me.mappingValues mv " +
+            " WHERE KEY(mv) = 'DataSource' " +
+            " AND ((lower(me.entityType) = lower(:entityType)) OR :entityType = '' ) group by lower(mv)")
+    List<Object[]> findMissingMappingStat(@Param("entityType") String entityType);
 
 
 }

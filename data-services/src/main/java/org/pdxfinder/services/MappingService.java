@@ -853,9 +853,10 @@ public class MappingService {
     }
 
 
-    public List<Map> getMappingSummary() {
+    public List<Map> getMappingSummary(String entityType) {
 
-        List<Object[]> summary = mappingEntityRepository.findTotalIncomeByCategory();
+        List<Object[]> summary = mappingEntityRepository.findMissingMappingStat(entityType);
+
         List<String> resultColumns = Arrays.asList("DataSource", "Unmapped", "Mapped");
 
         List<Map> mappingSummary = utilityService.objectArrayListToMapList(summary, resultColumns);
