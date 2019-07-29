@@ -34,17 +34,13 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
             "AND ( :mappedTermsOnly = '' OR (me.mapType is not null )) "
     )
     Page<MappingEntity> findByMultipleFilters(@Param("entityType") String entityType,
-
                                               @Param("mappingLabel") String mappingLabel,
                                               @Param("mappingValue") String mappingValue,
-
                                               @Param("mappedTermLabel") String mappedTermLabel,
                                               @Param("mapType") String mapType,
-
                                               @Param("mappedTermsOnly") String mappedTermsOnly,
 
                                               Pageable pageable);
-
 
 
     @Query(value = "select me from MappingEntity me JOIN me.mappingValues mv WHERE KEY(mv) = :dataKey AND mv = :dataValue ")
@@ -52,8 +48,22 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
                                                 @Param("dataValue") String dataValue);
 
 
-
     List<MappingEntity> findByEntityTypeAndMapTypeIsNotNull(String entityType);
+
+
+    /*
+    Query: SELECT DISTINCT lower(MAPPING_VALUES),
+                    COUNT(CASE WHEN MAP_TYPE IS NULL THEN 1 END) AS UNMAPPED,
+                    COUNT(CASE WHEN MAP_TYPE IS NOT NULL THEN 1 END) AS MAPPED
+
+    FROM MAPPING_ENTITY me JOIN MAPPING_VALUES mv on me.ENTITY_ID = mv.MAPPING_ENTITY_ID
+    WHERE mv.MAPPING_VALUES_KEY = 'DataSource' GROUP BY lower(MAPPING_VALUES)
+     */
+    @Query("Select distinct lower(mv), count(case when me.mapType is null THEN 1 END), " +
+            " count(case when me.mapType is not null THEN 1 END) " +
+            " from MappingEntity me join me.mappingValues mv " +
+            " where KEY(mv) = 'DataSource' group by lower(mv)")
+    List<Object[]> findTotalIncomeByCategory();
 
 
 }

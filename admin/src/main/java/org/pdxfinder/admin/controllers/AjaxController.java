@@ -45,32 +45,29 @@ public class AjaxController {
     }
 
 
-
-
     /**
      * Provides entry point to query the MappingEntity data store
      * E.g : .../api/mappings?map-terms-only=true&mq=datasource:jax&entity-type=treatment
      *
-     * @param mappingQuery - Key value map of mappingValues e.g to filter by DataSource:jax, ...?mq=datasource:jax
+     * @param mappingQuery    - Key value map of mappingValues e.g to filter by DataSource:jax, ...?mq=datasource:jax
      * @param mappedTermLabel - Filters the data for missing mappings e.g To find missing mappings, ...?mapped-term=-
-     * @param entityType - Search by entityType e.g find unmapped treatment entities ...?entity-type=treatment&mapped-term=-
+     * @param entityType      - Search by entityType e.g find unmapped treatment entities ...?entity-type=treatment&mapped-term=-
      * @param mappedTermsOnly - Search for mapped terms only ... map-terms-only=true
-     *
-     * @param mapType - Search data by mapType e.g ...?map-type=direct
-     * @param page - Allows client to submit offset value e.g ...?page=10
-     * @param size - Allows client to submit size limit values e.g ...?size=5
-     * @return - Mapping Entites with data count, offset and limit Values
+     * @param mapType         - Search data by mapType e.g ...?map-type=direct
+     * @param page            - Allows client to submit offset value e.g ...?page=10
+     * @param size            - Allows client to submit size limit values e.g ...?size=5
+     * @return - Mapping Entities with data count, offset and limit Values
      */
     @CrossOrigin
     @GetMapping("/mappings")
-    public ResponseEntity<?> getMappings(@RequestParam("mq")    Optional<String> mappingQuery,
-                                     @RequestParam(value="mapped-term", defaultValue = "")  Optional<String> mappedTermLabel,
-                                         @RequestParam(value="map-terms-only", defaultValue = "")     Optional<String> mappedTermsOnly,
-                                         @RequestParam(value="entity-type", defaultValue = "")  Optional<String> entityType,
-                                         @RequestParam(value="map-type", defaultValue = "")     Optional<String> mapType,
+    public ResponseEntity<?> getMappings(@RequestParam("mq") Optional<String> mappingQuery,
+                                         @RequestParam(value = "mapped-term", defaultValue = "") Optional<String> mappedTermLabel,
+                                         @RequestParam(value = "map-terms-only", defaultValue = "") Optional<String> mappedTermsOnly,
+                                         @RequestParam(value = "entity-type", defaultValue = "") Optional<String> entityType,
+                                         @RequestParam(value = "map-type", defaultValue = "") Optional<String> mapType,
 
-                                     @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                     @RequestParam(value = "size", defaultValue = "10") Integer size){
+                                         @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                         @RequestParam(value = "size", defaultValue = "10") Integer size) {
 
         String mappingLabel = "";
         String mappingValue = "";
@@ -80,21 +77,32 @@ public class AjaxController {
             mappingLabel = query[0];
             mappingValue = query[1].trim();
 
-        }catch (Exception e){ }
+        } catch (Exception e) {
+        }
 
         PaginationDTO result = mappingService.search(page, size, entityType.get(), mappingLabel,
-                mappingValue, mappedTermLabel.get(), mapType.get(), mappedTermsOnly.get());
+                                                     mappingValue, mappedTermLabel.get(), mapType.get(), mappedTermsOnly.get());
 
         return new ResponseEntity<Object>(result, HttpStatus.OK);
         //Map<String, List<MappingEntity>> result =  mappingService.getMissingDiagnosisMappings(ds);
+    }
 
+
+
+    @GetMapping("/mappings/summary")
+    public ResponseEntity<?> getMappingStatSummary() {
+
+        List<Map> result = mappingService.getMappingSummary();
+
+        return new ResponseEntity<Object>(result, HttpStatus.OK);
     }
 
 
 
 
+
     @PostMapping("/diagnosis")
-    public ResponseEntity<?> createDiagnosisMappings(@RequestBody List<MappingEntity> newMappings){
+    public ResponseEntity<?> createDiagnosisMappings(@RequestBody List<MappingEntity> newMappings) {
 
         log.info(newMappings.toString());
         return ResponseEntity.noContent().build();
@@ -105,35 +113,35 @@ public class AjaxController {
 
 
 
-                        /****************************************************************
-                         *                   INTERACTIONS WITH ZOOMA                    *
-                         ****************************************************************/
+
+    /****************************************************************
+     *                   INTERACTIONS WITH ZOOMA                    *
+     ****************************************************************/
 
 
     @GetMapping("/zooma/transform")
-    public List<ZoomaEntity> transformAnnotationForZooma(){
+    public List<ZoomaEntity> transformAnnotationForZooma() {
 
         List<ZoomaEntity> zoomaEntities = mappingService.transformMappingsForZooma();
         return zoomaEntities; //new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 
-
     @GetMapping("/zooma")
-    public ResponseEntity<?> writeAllAnnotationsToZooma(){
+    public ResponseEntity<?> writeAllAnnotationsToZooma() {
 
         Map report = new LinkedHashMap();
         List<ZoomaEntity> zoomaEntities = mappingService.transformMappingsForZooma();
 
         int count = 0;
         List<ZoomaEntity> failedList = new ArrayList<>();
-        for (ZoomaEntity zoomaEntity : zoomaEntities){
+        for (ZoomaEntity zoomaEntity : zoomaEntities) {
 
-            String entity = zoomaEntity.getBiologicalEntities().getBioEntity()+"__"+count++;
-            if (writeToZooma(zoomaEntity)){
+            String entity = zoomaEntity.getBiologicalEntities().getBioEntity() + "__" + count++;
+            if (writeToZooma(zoomaEntity)) {
 
-                report.put(entity,"SUCCESS WRITE");
-            }else{
+                report.put(entity, "SUCCESS WRITE");
+            } else {
 
                 report.put(entity, "THIS ANNOTATION WAS NOT WRITTEN TO ZOOMA");
                 failedList.add(zoomaEntity);
@@ -142,57 +150,51 @@ public class AjaxController {
 
         /* LOG FAILED OBJECTS TO FILE */
         String failedReport = "";
-        try{
+        try {
             failedReport = mapper.writeValueAsString(failedList);
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
 
-        utilityService.writeToFile(failedReport,(new Date())+"_failed.json");
-        utilityService.writeToFile(this.errReport,(new Date())+"_error.txt");
+        utilityService.writeToFile(failedReport, (new Date()) + "_failed.json");
+        utilityService.writeToFile(this.errReport, (new Date()) + "_error.txt");
 
         return new ResponseEntity<>(report, HttpStatus.OK);
     }
 
 
-
-
-
-    public Boolean writeToZooma(ZoomaEntity zoomaEntity){
+    public Boolean writeToZooma(ZoomaEntity zoomaEntity) {
 
         HttpEntity<String> entity = BuildHttpHeader();
         HttpEntity<Object> req = new HttpEntity<>(zoomaEntity, entity.getHeaders());
-        Map result =  new HashMap();
+        Map result = new HashMap();
 
         Boolean report = false;
-        try{
+        try {
             result = restTemplate.postForObject(ZOOMA_URL, req, Map.class);
             report = true;
-        }catch (Exception e){
+        } catch (Exception e) {
 
-            this.errReport += "\n\n ************************ NEW ERROR LOG "+(new Date())+" *********************** \n"+e;
+            this.errReport += "\n\n ************************ NEW ERROR LOG " + (new Date()) + " *********************** \n" + e;
         }
 
         return report;
     }
 
 
-
-
-
-
-    public HttpEntity<String> BuildHttpHeader(){
+    public HttpEntity<String> BuildHttpHeader() {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.add("Content-Type", "application/json");
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
 
-        return  entity;
+        return entity;
     }
 
 
-    public String getCamelCase(String input){
+    public String getCamelCase(String input) {
 
-        String output = StringUtils.capitalize(input.split("-")[0])+StringUtils.capitalize(input.split("-")[1]);
+        String output = StringUtils.capitalize(input.split("-")[0]) + StringUtils.capitalize(input.split("-")[1]);
 
         return output;
     }

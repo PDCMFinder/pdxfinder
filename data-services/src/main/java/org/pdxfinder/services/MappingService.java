@@ -695,7 +695,7 @@ public class MappingService {
         List<String> mappingLabels = Arrays.asList("DataSource", "TreatmentName");
 
         Map mappingValues = new HashMap();
-        mappingValues.put("DataSource", dataSource);
+        mappingValues.put("DataSource", dataSource.toLowerCase());
         mappingValues.put("TreatmentName", treatment);
 
         MappingEntity mappingEntity = new MappingEntity(MappingEntityType.treatment.get(), mappingLabels, mappingValues);
@@ -714,7 +714,7 @@ public class MappingService {
 
         Map mappingValues = new HashMap();
         mappingValues.put("OriginTissue", originTissue);
-        mappingValues.put("DataSource", dataSource);
+        mappingValues.put("DataSource", dataSource.toLowerCase());
         mappingValues.put("SampleDiagnosis", diagnosis);
         mappingValues.put("TumorType", tumorType);
 
@@ -839,10 +839,6 @@ public class MappingService {
     }
 
 
-    // localhost:8081/api/mappings?mq=datasource:pdmr&entity-type=diagnosis
-    // Find by datasource and entityType
-
-
     public MappingContainer getMappedEntitiesByType(String entityType) {
 
         List<MappingEntity> mappedEntities = mappingEntityRepository.findByEntityTypeAndMapTypeIsNotNull(entityType);
@@ -854,6 +850,17 @@ public class MappingService {
         });
 
         return mc;
+    }
+
+
+    public List<Map> getMappingSummary() {
+
+        List<Object[]> summary = mappingEntityRepository.findTotalIncomeByCategory();
+        List<String> resultColumns = Arrays.asList("DataSource", "Unmapped", "Mapped");
+
+        List<Map> mappingSummary = utilityService.objectArrayListToMapList(summary, resultColumns);
+
+        return mappingSummary;
     }
 
 
