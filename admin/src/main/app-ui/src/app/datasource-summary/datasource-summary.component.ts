@@ -47,7 +47,7 @@ export class DatasourceSummaryComponent implements OnInit {
                 this.pdxStatArray.unvalidated.push(0);
             });
         })*/
-        
+
 
         let tempArr = [];
 
@@ -97,6 +97,7 @@ export class DatasourceSummaryComponent implements OnInit {
                         mergeMap(grouped => grouped.pipe(toArray())) // Return each item in the grouped array.
                     );
 
+
                     const  subscribe = groupedByImpl.subscribe(
                         result =>  {
 
@@ -104,9 +105,9 @@ export class DatasourceSummaryComponent implements OnInit {
 
                             for (var i = 0;i < this.pdxStatArray.source.length; i++) {
                                 for (var num = 0; num < tempArr.length; num++) {
+
                                     if ( tempArr[num].split("__")[0].toUpperCase() == this.pdxStatArray.source[i].toUpperCase() ){
                                         this.pdxStatArray.missing[i] = tempArr[num].split("__")[1];
-
 
                                         // datArray[i]["mapping"] = this.pdxStatArray.source[i];
                                        // datArray[i]["visits"] = this.pdxStatArray.missing[i];
@@ -122,7 +123,7 @@ export class DatasourceSummaryComponent implements OnInit {
                 }
             );
 
-        console.log(this.pdxStatArray.missing);
+        console.log(this.pdxStatArray);
         console.log(this.pdxStatArray.source);
 
 

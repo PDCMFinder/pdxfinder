@@ -9,7 +9,7 @@ import {catchError} from "rxjs/internal/operators";
 })
 export class MappingService {
 
-    private _totalMappedUrl = "/api/mapping/diagnosis?ds=IRCC-CRC";
+    private _totalMappedUrl = "/api/mappings?map-terms-only=true&entity-type=diagnosis&size=900";
     private _unmappedTreatmentUrl = "/api/mappings?entity-type=treatment&mapped-term=-";
     private _unmappedDiagnosisUrl = "/api/mappings?entity-type=diagnosis&mapped-term=-";
 
@@ -23,13 +23,13 @@ export class MappingService {
     //Retrieve unmapped diagnosis entities
     getUnmappedDiagnosis(): Observable<MappingInterface[]>{
 
-        return this.http.get<MappingInterface[]>(this._unmappedTreatmentUrl);
+        return this.http.get<MappingInterface[]>(this._unmappedDiagnosisUrl);
     }
 
     //Retrieve unmapped treatments
     getUnmappedTreatment(): Observable<MappingInterface[]>{
 
-        return this.http.get<MappingInterface[]>(this._unmappedDiagnosisUrl);
+        return this.http.get<MappingInterface[]>(this._unmappedTreatmentUrl);
     }
 
     //Retrieve Total mapped diagnosis
