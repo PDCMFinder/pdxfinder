@@ -41,14 +41,24 @@
                     </thead>
                     <tbody>
 
-                    <tr class="pdxfinder-clickable-rows" *ngFor=" let source of pdxStatArray.source; index as i " (click)="onSelect(source)">
+                    <tr class="pdxfinder-clickable-rows" *ngFor=" let summary of mappingSummary; index as i " (click)="onSelect(summary.DataSource)">
+                        <td> {{i+1}} </td>
+                        <td> {{ summary.DataSource | uppercase }} </td>
+                        <td> {{ summary.Unmapped }} </td>
+                        <td> {{ summary.Mapped }} </td>
+                        <td> {{ summary.Mapped }} </td>
+                        <td> {{ summary.Mapped }} </td>
+                    </tr>
+
+                    <!--<tr class="pdxfinder-clickable-rows" *ngFor=" let source of pdxStatArray.source; index as i " (click)="onSelect(source)">
                         <td> {{i+1}} </td>
                         <td> {{ source | uppercase }} </td>
                         <td> {{pdxStatArray.missing[i]}} </td>
                         <td> {{pdxStatArray.total[i]}} </td>
                         <td> {{pdxStatArray.validated[i]}} </td>
                         <td> {{pdxStatArray.unvalidated[i]}} </td>
-                    </tr>
+                    </tr>-->
+
                     </tbody>
                 </table>
 

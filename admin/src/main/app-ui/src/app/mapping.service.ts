@@ -3,6 +3,7 @@ import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {MappingInterface} from "./mapping-interface";
 import {Observable, Subject, throwError} from "rxjs/index";
 import {catchError} from "rxjs/internal/operators";
+import {SummaryInterface} from "./summary-interface";
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ export class MappingService {
     private _totalMappedUrl = "/api/mappings?map-terms-only=true&entity-type=diagnosis&size=900";
     private _unmappedTreatmentUrl = "/api/mappings?entity-type=treatment&mapped-term=-";
     private _unmappedDiagnosisUrl = "/api/mappings?entity-type=diagnosis&mapped-term=-";
+    private _mappingSummary = "/api/mappings/summary";
 
     private _submitCurationUrl = "/api/diagnosis";
 
@@ -19,6 +21,11 @@ export class MappingService {
 
     constructor(private http: HttpClient) { }
 
+
+    getSummary(): Observable<SummaryInterface[]>{
+
+        return this.http.get<SummaryInterface[]>(this._mappingSummary);
+    }
 
     //Retrieve unmapped diagnosis entities
     getUnmappedDiagnosis(): Observable<MappingInterface[]>{
