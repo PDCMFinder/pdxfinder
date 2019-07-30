@@ -1,6 +1,6 @@
  <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-8">
-        <h2>Center Summary</h2>
+        <h2>Center Summary - {{mapType}} </h2>
         <ol class="breadcrumb">
             <li>
                 <a routerLink="/dashboard">Dashboard</a>
@@ -9,7 +9,7 @@
                 <a routerLink="/curation">Curation Mappings</a>
             </li>
             <li class="active">
-                 Diagnosis Mapping
+                 {{mapType}} Mapping
             </li>
         </ol>
     </div>
@@ -23,7 +23,7 @@
       <div class="col-lg-12">
         <div class="pdxfinder float-e-margins">
           <div class="pdxfinder-title">
-            <h5> Diagnosis Mapping Status By Data Source</h5>
+            <h5> {{mapType}} Mapping Status By Data Source</h5>
           </div>
           <div class="pdxfinder-content">
             <div class="table-responsive">
@@ -41,7 +41,7 @@
                     </thead>
                     <tbody>
 
-                    <tr class="pdxfinder-clickable-rows" *ngFor=" let summary of mappingSummary; index as i " (click)="onSelect(summary.DataSource)">
+                    <tr class="pdxfinder-clickable-area" *ngFor=" let summary of mappingSummary; index as i " (click)="onSelect(summary.DataSource)">
                         <td> {{i+1}} </td>
                         <td> {{ summary.DataSource | uppercase }} </td>
                         <td> {{ summary.Unmapped }} </td>

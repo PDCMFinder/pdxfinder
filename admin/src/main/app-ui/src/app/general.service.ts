@@ -17,4 +17,8 @@ export class GeneralService {
         script.defer = true;
         body.appendChild(script);
     }
+
+    public capitalize(dString: string) {
+        return dString.charAt(0).toUpperCase() + dString.slice(1);
+    }
 }

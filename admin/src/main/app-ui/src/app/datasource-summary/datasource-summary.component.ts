@@ -20,32 +20,35 @@ declare function pdxFinderbarChart(title: String,
 })
 export class DatasourceSummaryComponent implements OnInit {
 
+    public mapType;
+    public mappingSummary = [];
+
     constructor(private _mappingService: MappingService,
                 private router: Router,
                 private route: ActivatedRoute,
                 private gs: GeneralService) { }
 
-    public mappingSummary = [];
 
     ngOnInit() {
 
+        // From the current url snapshot, get the source parameter and ...
+        let urlParam = this.route.snapshot.paramMap.get('mapType').split('-')[0];
+        this.mapType = this.gs.capitalize(urlParam);
+
         // Connect to the Service using Reactive Observables
-        this._mappingService.getDiagnosisSummary()
+        this._mappingService.getDiagnosisSummary(this.mapType)
             .subscribe(
                 data => {
 
                     this.mappingSummary = data
                 }
             );
-
     }
-
 
     onSelect(source){
 
         this.router.navigate([source],{relativeTo: this.route})
     }
-
 
 }
 

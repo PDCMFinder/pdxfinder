@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {MappingService} from "../mapping.service";
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'app-curation-mapping',
@@ -12,7 +13,9 @@ export class CurationMappingComponent implements OnInit {
     public unmappedDiagnosisCnt: number;
     public unmappedTreatmentCnt: number;
 
-    constructor(private _mappingService: MappingService) { }
+    constructor(private _mappingService: MappingService,
+                private router: Router,
+                private route: ActivatedRoute) { }
 
     ngOnInit() {
 
@@ -29,6 +32,13 @@ export class CurationMappingComponent implements OnInit {
                     this.unmappedTreatmentCnt = data['totalElements'];
                 }
             );
+    }
+
+
+
+    onClick(mapType){
+
+        this.router.navigate([mapType],{relativeTo: this.route})
     }
 }
 

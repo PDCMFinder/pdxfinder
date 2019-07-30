@@ -207,9 +207,10 @@ a,tr {
 
 
 
-.pdxfinder-clickable-rows{
+.pdxfinder-clickable-area{
     cursor: pointer;
 }
+
 
 .pdxfinder-clickable-rows2{
     cursor: context-menu;

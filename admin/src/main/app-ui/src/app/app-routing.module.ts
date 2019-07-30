@@ -12,11 +12,15 @@ const routes: Routes = [
     { path: '',   component: DashboardComponent },
     { path: 'dashboard',   component: DashboardComponent },
     { path: 'curation', component: CurationMappingComponent },
-    { path: 'mapping-summary',   component: DatasourceSummaryComponent },
+    {
+        path: 'curation/:mapType',  component: DatasourceSummaryComponent,
+        children: [ { path: ':source', component: DatasourceSpecificComponent } ]
+    }/*,
+
     {
         path: 'mapping-summary/:source',  component: DatasourceSpecificComponent,
         children: [ { path: 'suggested-mapping/:id', component: DatasourceSpecificSuggestionsComponent } ]
-    }
+    }*/
 ];
 
 @NgModule({
@@ -27,3 +31,9 @@ export class AppRoutingModule { }
 export const routingComponents = [DashboardComponent,
                                   CurationMappingComponent,
                                   DatasourceSummaryComponent, DatasourceSpecificComponent]
+
+
+
+/*
+mapping-summary
+ */
