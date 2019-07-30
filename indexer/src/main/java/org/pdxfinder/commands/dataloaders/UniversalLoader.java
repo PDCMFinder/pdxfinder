@@ -30,9 +30,8 @@ import org.apache.poi.ss.usermodel.*;
 
 
 /**
- *
  * aka UPDOG: Universal PdxData tO Graph
- *
+ * <p>
  * We should call it UPDOG. And it sets up a good joke. Any newcomer says "What's UPDOG?" we can say "Nothing much, what's up with you?"
  */
 @Component
@@ -91,13 +90,20 @@ public class UniversalLoader extends UniversalLoaderOmic {
     /**
      * Placeholder for the data stored in the "breast and or colorectal diagno" tab
      */
-    private List<List<String>> breastAndOrColorectalDiagnoSheetData;
+    private List<List<String>> cytogeneticsSheetData;
 
 
     /**
      * Placeholder for the data stored in the "Loader related data tab
      */
     private List<List<String>> loaderRelatedDataSheetData;
+
+
+    /**
+     * Placeholder for the data stored in the drug dosing template
+     */
+    private List<List<String>> drugDosingSheetData;
+
 
     private Group ds;
 
@@ -111,47 +117,11 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
 
-    public void initTemplates(String updogCurrDir) throws Exception{
+    public void initTemplates(String updogCurrDir) throws Exception {
 
-
-        //Metadata template
-        String metaDataTemplate = updogCurrDir+ "/metadata.xlsx";
-        File metaDataFile = new File(metaDataTemplate);
-
-        if(metaDataFile.exists()){
-
-            FileInputStream excelFile = new FileInputStream(metaDataFile);
-            Workbook workbook = new XSSFWorkbook(excelFile);
-            log.info("Loading template from " + metaDataTemplate);
-            initializeMetaDataTemplate(workbook);
-        }
-
-
-        //SamplePlatformDescription template
-        String samplePlatformDescriptionTemplate = updogCurrDir+ "/sampleplatform.xlsx";
-        File samplePlatformFile = new File(samplePlatformDescriptionTemplate);
-
-        if(samplePlatformFile.exists()){
-
-            FileInputStream excelFile = new FileInputStream(samplePlatformFile);
-            Workbook workbook = new XSSFWorkbook(excelFile);
-            log.info("Loading template from " + samplePlatformDescriptionTemplate);
-            initializeSamplePlatformTemplate(workbook);
-        }
-
-
-        //Cytogenetics template
-
-        //Cna template
-
-        //Patient treatment template
-
-        //Drug dosing template
-
-    }
-
-
-    private void initializeMetaDataTemplate(Workbook workbook){
+        log.info("******************************************************");
+        log.info("* Initializing Sheet data                            *");
+        log.info("******************************************************");
 
         ds = null;
         stopLoading = false;
@@ -163,54 +133,113 @@ public class UniversalLoader extends UniversalLoaderOmic {
         sharingAndContactSheetData = new ArrayList<>();
         loaderRelatedDataSheetData = new ArrayList<>();
 
-        initializeSheetData(workbook.getSheetAt(1), patientSheetData);
-        initializeSheetData(workbook.getSheetAt(2), patientTumorSheetData);
-        initializeSheetData(workbook.getSheetAt(3), pdxModelSheetData);
-        initializeSheetData(workbook.getSheetAt(4), pdxModelValidationSheetData);
-        initializeSheetData(workbook.getSheetAt(5), sharingAndContactSheetData);
-        initializeSheetData(workbook.getSheetAt(6), loaderRelatedDataSheetData);
-
-    }
-
-    private void initializeSamplePlatformTemplate(Workbook workbook){
-
         samplePlatformDescriptionSheetData = new ArrayList<>();
-        initializeSheetData(workbook.getSheetAt(0), samplePlatformDescriptionSheetData);
+        cytogeneticsSheetData = new ArrayList<>();
+        patientTreatmentSheetData = new ArrayList<>();
+        drugDosingSheetData = new ArrayList<>();
+
+
+        //Metadata template
+        String metaDataTemplate = updogCurrDir + "/metadata.xlsx";
+        File metaDataFile = new File(metaDataTemplate);
+
+        if (metaDataFile.exists()) {
+
+            FileInputStream excelFile = new FileInputStream(metaDataFile);
+            Workbook workbook = new XSSFWorkbook(excelFile);
+            log.info("Loading template from " + metaDataTemplate);
+
+            initializeSheetData(workbook.getSheetAt(1), patientSheetData);
+            initializeSheetData(workbook.getSheetAt(2), patientTumorSheetData);
+            initializeSheetData(workbook.getSheetAt(3), pdxModelSheetData);
+            initializeSheetData(workbook.getSheetAt(4), pdxModelValidationSheetData);
+            initializeSheetData(workbook.getSheetAt(5), sharingAndContactSheetData);
+            initializeSheetData(workbook.getSheetAt(6), loaderRelatedDataSheetData);
+        }
+
+
+        //SamplePlatformDescription template
+        String samplePlatformDescriptionTemplate = updogCurrDir + "/sampleplatform.xlsx";
+        File samplePlatformFile = new File(samplePlatformDescriptionTemplate);
+
+        if (samplePlatformFile.exists()) {
+
+            FileInputStream excelFile = new FileInputStream(samplePlatformFile);
+            Workbook workbook = new XSSFWorkbook(excelFile);
+            log.info("Loading template from " + samplePlatformDescriptionTemplate);
+
+            initializeSheetData(workbook.getSheetAt(0), samplePlatformDescriptionSheetData);
+        }
+
+
+        //Cytogenetics template
+        String cytogeneticsTemplate = updogCurrDir + "/cyto/cytogenetics.xlsx";
+        File cytogeneticsFile = new File(cytogeneticsTemplate);
+
+        if (cytogeneticsFile.exists()) {
+
+            FileInputStream excelFile = new FileInputStream(cytogeneticsFile);
+            Workbook workbook = new XSSFWorkbook(excelFile);
+            log.info("Loading template from " + cytogeneticsTemplate);
+
+            initializeSheetData(workbook.getSheetAt(0), cytogeneticsSheetData);
+        }
+
+
+        //Patient treatment template
+        String patientTreatmentTemplate = updogCurrDir + "/treatment/patienttreatment.xlsx";
+        File patientTreatmentFile = new File(patientTreatmentTemplate);
+
+        if (patientTreatmentFile.exists()) {
+
+            FileInputStream excelFile = new FileInputStream(patientTreatmentFile);
+            Workbook workbook = new XSSFWorkbook(excelFile);
+            log.info("Loading template from " + patientTreatmentTemplate);
+
+            initializeSheetData(workbook.getSheetAt(0), patientTreatmentSheetData);
+        }
+
+
+        //Drug dosing template
+        String drugDosingTemplate = updogCurrDir + "/treatment/drugdosing.xlsx";
+        File drugDosingFile = new File(drugDosingTemplate);
+
+        if (drugDosingFile.exists()) {
+
+            FileInputStream excelFile = new FileInputStream(drugDosingFile);
+            Workbook workbook = new XSSFWorkbook(excelFile);
+            log.info("Loading template from " + drugDosingTemplate);
+
+            initializeSheetData(workbook.getSheetAt(0), drugDosingSheetData);
+        }
     }
-
-
 
 
     /**
-     * Loads the data from the spreadsheet and stores it in lists
-     *
-     * @param workbook
+     * Loads the data from the lists into the DB
      */
-    private void initializeTemplateData(Workbook workbook) {
+    public void loadTemplateData() {
 
-        log.info("******************************************************");
-        log.info("* Initializing Sheet data                            *");
-        log.info("******************************************************");
-
-        ds = null;
-        stopLoading = false;
-
-
-        patientTreatmentSheetData = new ArrayList<>();
+        //:: DON'T CHANGE THE ORDER OF THESE METHODS UNLESS YOU WANT TO RISK THE UNIVERSE TO COLLAPSE!
+        createDataSourceGroup();
+        createPatients();
+        createPatientTumors();
+        createPdxModelDetails();
+        createPdxModelValidations();
+        createSharingAndContacts();
 
 
-        breastAndOrColorectalDiagnoSheetData = new ArrayList<>();
+        createDerivedPatientModelDataset();
 
 
+        createPatientTreatments();
 
+        createOmicData();
 
-        initializeSheetData(workbook.getSheetAt(3), patientTreatmentSheetData);
-
-
-
-        initializeSheetData(workbook.getSheetAt(8), breastAndOrColorectalDiagnoSheetData);
+        createCytogeneticsData();
 
     }
+
 
     /**
      * Loads the data from a spreadsheet tab into a placeholder
@@ -271,34 +300,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
 
-
-
-    /**
-     * Loads the data from the lists into the DB
-     */
-    public void loadTemplateData() {
-
-        //:: DON'T CHANGE THE ORDER OF THESE METHODS UNLESS YOU WANT TO RISK THE UNIVERSE TO COLLAPSE!
-        createDataSourceGroup();
-        createPatients();
-        createPatientTumors();
-        createPatientTreatments();
-
-
-
-        createPdxModelDetails();
-        createPdxModelValidations();
-
-        createDerivedPatientModelDataset();
-
-        createVariationData();
-
-        createSharingAndContacts();
-
-        createBreastAndOrColorectalData();
-
-    }
-
     /**
      * Creates the provider group in the database
      */
@@ -309,7 +310,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
         log.info("******************************************************");
         log.info("* Creating DataSource                                *");
         log.info("******************************************************");
-
 
 
         if (loaderRelatedDataSheetData.size() != 1) {
@@ -330,7 +330,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
             return;
         }
 
-        ds = dataImportService.getProviderGroup(providerName, providerAbbreviation, "", "",  "", sourceUrl);
+        ds = dataImportService.getProviderGroup(providerName, providerAbbreviation, "", "", "", sourceUrl);
 
     }
 
@@ -420,14 +420,14 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     continue;
                 }
 
-                if(dateOfCollection == null && collectionEvent == null && elapsedTime == null && ageAtCollection == null){
+                if (dateOfCollection == null && collectionEvent == null && elapsedTime == null && ageAtCollection == null) {
                     log.error("Missing collection info  in row " + row);
                     row++;
                     continue;
                 }
 
                 //hack to avoid 0.0 values and negative numbers
-                if(elapsedTime != null){
+                if (elapsedTime != null) {
 
                     elapsedTime = elapsedTime.replaceAll("[^0-9]", "");
                 }
@@ -482,8 +482,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 row++;
 
             } catch (Exception e) {
-                log.error("Exception in row: " + row + " for model: " +modelId);
-                log.error("doc:"+dateOfCollection+" ce:"+ collectionEvent+" et:"+ elapsedTime+" aac:"+ ageAtCollection);
+                log.error("Exception in row: " + row + " for model: " + modelId);
+                log.error("doc:" + dateOfCollection + " ce:" + collectionEvent + " et:" + elapsedTime + " aac:" + ageAtCollection);
                 e.printStackTrace();
 
             }
@@ -493,7 +493,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
     /**
-     *
      * Targets an existing patient and snapshot to create a treatment summary with treatment protocols
      */
     private void createPatientTreatments() {
@@ -573,7 +572,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
     /**
-     *
      * Targets an existing model to create specimens with engraftment site, type and material, host strain as well as publication groups
      */
     private void createPdxModelDetails() {
@@ -614,9 +612,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
             try {
                 model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
 
-            }
-            catch(Exception e){
-                log.error("Error with model: "+ modelId);
+            } catch (Exception e) {
+                log.error("Error with model: " + modelId);
                 e.printStackTrace();
             }
 
@@ -634,10 +631,9 @@ public class UniversalLoader extends UniversalLoaderOmic {
             EngraftmentMaterial em = dataImportService.createEngraftmentMaterial(engraftmentMaterial, engraftmentMaterialStatus);
 
             HostStrain hostStrain = null;
-            try{
+            try {
                 hostStrain = dataImportService.getHostStrain(hostStrainName, hostStrainNomenclature, "", "");
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -660,7 +656,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 }
             }
             //the passage is a single number
-            else if (passage.matches("\\d+") ) {
+            else if (passage.matches("\\d+")) {
 
                 //need this trick to get rid of fractures if there is any
                 int passageInt = Integer.parseInt(passage);
@@ -676,8 +672,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 model.addSpecimen(specimen);
 
-            }
-            else if(passage.matches("[+-]?([0-9]*[.])?[0-9]+")){
+            } else if (passage.matches("[+-]?([0-9]*[.])?[0-9]+")) {
 
                 //need this trick to get rid of fractures if there is any
                 double passageDouble = Double.parseDouble(passage);
@@ -692,8 +687,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 specimen.setHostStrain(hostStrain);
 
                 model.addSpecimen(specimen);
-            }
-            else {
+            } else {
 
                 log.error("Not supported value(" + passage + ") for passage at row " + row);
             }
@@ -729,9 +723,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
     /**
-     *
      * Targets existing model to add validation (QA) nodes
-     *
      */
     private void createPdxModelValidations() {
 
@@ -757,10 +749,9 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 validationDescription = pdxModelValidationRow.get(2);
                 passages = pdxModelValidationRow.get(3);
                 validationHostStrain = pdxModelValidationRow.get(4);
-            }
-            catch(Exception e){
+            } catch (Exception e) {
 
-                log.error("Error in row: "+row);
+                log.error("Error in row: " + row);
                 e.printStackTrace();
             }
 
@@ -789,11 +780,10 @@ public class UniversalLoader extends UniversalLoaderOmic {
             for (int i = 0; i < passageArr.length; i++) {
 
                 String pass;
-                try{
+                try {
                     int passageInt = (int) Float.parseFloat(passageArr[i]);
                     pass = String.valueOf(passageInt);
-                }
-                catch(NumberFormatException | NullPointerException nfe){
+                } catch (NumberFormatException | NullPointerException nfe) {
 
                     pass = passageArr[i];
                 }
@@ -816,16 +806,14 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
     /**
      * Requirements:
-     *
+     * <p>
      * PATIENT
      * existing patient sample
-     *
+     * <p>
      * XENOGRAFT
      * existing model, specimen, creates xeno sample if not present
-     *
+     * <p>
      * Creates a molecular characterization with a platform and links it to the appropriate sample
-     *
-     *
      */
     private void createDerivedPatientModelDataset() {
 
@@ -844,18 +832,22 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             String origin = derivedDatasetRow.get(1);
             String passage = derivedDatasetRow.get(2);
-            String nomenclature = derivedDatasetRow.get(3);
+            String engraftedTumorCollectionSite = derivedDatasetRow.get(3);
             String modelId = derivedDatasetRow.get(4);
-            String molCharType = derivedDatasetRow.get(5);
-            String platformName = derivedDatasetRow.get(6);
-            String platformTechnology = derivedDatasetRow.get(7);
-            String platformDescription = derivedDatasetRow.get(8);
-            String analysisProtocol = derivedDatasetRow.get(9);
+            String hostStrainName = derivedDatasetRow.get(5);
 
-            String platformUrl = derivedDatasetRow.get(13);
+            String nomenclature = derivedDatasetRow.get(6);
+
+            String molCharType = derivedDatasetRow.get(7);
+            String platformName = derivedDatasetRow.get(8);
+            String platformTechnology = derivedDatasetRow.get(9);
+            String platformDescription = derivedDatasetRow.get(10);
+            String analysisProtocol = derivedDatasetRow.get(11);
+
+            String platformUrl = derivedDatasetRow.get(15);
 
 
-            if(platformUrl != null){
+            if (platformUrl != null) {
                 platformUrl = platformUrl.replaceAll("[^A-Za-z0-9 /_-]", "");
             }
 
@@ -887,15 +879,14 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                     platform = dataImportService.getPlatform(platformName, ds);
 
-                    if((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3){
-                        log.info("Saved platform:"+platform.getName() + " Url: "+(platform.getUrl()==null?"null":platform.getUrl())+" Url in file: "+platformUrl);
+                    if ((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3) {
+                        log.info("Saved platform:" + platform.getName() + " Url: " + (platform.getUrl() == null ? "null" : platform.getUrl()) + " Url in file: " + platformUrl);
                         platform.setUrl(platformUrl);
                         dataImportService.savePlatform(platform);
                         log.info("Updating platform url");
-                    }
-                    else{
+                    } else {
 
-                        log.warn("Platform "+platform.getName() +" was not updated. ");
+                        log.warn("Platform " + platform.getName() + " was not updated. ");
                     }
 
                     MolecularCharacterization mc = new MolecularCharacterization();
@@ -919,7 +910,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             //xenograft sample
             //specimen should have been created before
-            else if (origin.toLowerCase().equals("engrafted tumor") || origin.toLowerCase().equals("engrafted tumour") || origin.toLowerCase().equals("xenograft") ) {
+            else if (origin.toLowerCase().equals("engrafted tumor") || origin.toLowerCase().equals("engrafted tumour") || origin.toLowerCase().equals("xenograft")) {
 
                 if (passage == null || passage.isEmpty() || passage.toLowerCase().equals("not specified")) {
 
@@ -942,67 +933,87 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 model = dataImportService.findModelByIdAndDataSourceWithSpecimensAndHostStrain(modelId, ds.getAbbreviation());
 
-                if(model == null){
-                    log.error("Model "+modelId + " not found, skipping");
+                if (model == null) {
+                    log.error("Model " + modelId + " not found, skipping");
                     row++;
                     continue;
                 }
 
-                //this specimen should have the appropriate hoststrain, too!
-                Specimen specimen = dataImportService.findSpecimenByModelAndPassageAndNomenclature(model, passage, nomenclature);
+                //check if targeted specimen is present, if not, create it
+                Specimen specimen = null;
 
-                if(specimen != null){
+                for (Specimen sp : model.getSpecimens()) {
+                    //specimen passage and host strain nomenclature are the same
+                    if (sp.getPassage().equals(passage) && sp.getHostStrain().getSymbol().equals(nomenclature)) {
 
-                    sample = specimen.getSample();
+                        specimen = sp;
+                        break;
+                    }
+                }
 
-                    if(sample == null) {
+                //this is a new specimen
+                if (specimen == null) {
 
-                        sample = new Sample();
-                        sample.setSourceSampleId(sampleId);
+                    HostStrain hostStrain = null;
 
+                    try {
+                        hostStrain = dataImportService.getHostStrain(hostStrainName, nomenclature, null, null);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
 
-                    platform = dataImportService.getPlatform(platformName, ds);
+                    specimen = new Specimen();
+                    specimen.setPassage(passage);
+                    specimen.setHostStrain(hostStrain);
 
-
-
-                    if((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3){
-                        log.info("Saved platform:"+platform.getName() + " Url: "+(platform.getUrl()==null?"null":platform.getUrl())+" Url in file: "+platformUrl);
-                        platform.setUrl(platformUrl);
-                        dataImportService.savePlatform(platform);
-                        log.info("Updating platform url");
-                    }
-                    else{
-
-                        log.warn("Platform "+platform.getName() +" was not updated. ");
-                    }
-
-                    MolecularCharacterization mc = new MolecularCharacterization();
-                    mc.setPlatform(platform);
-                    mc.setType(molCharType.toLowerCase());
-                    mc.setTechnology(platformTechnology);
-                    sample.addMolecularCharacterization(mc);
-                    model.addRelatedSample(sample);
-
-                    specimen.setSample(sample);
-
+                    Sample s = new Sample();
+                    s.setSourceSampleId(sampleId);
+                    specimen.setSample(s);
                     model.addSpecimen(specimen);
-                    model.addRelatedSample(sample);
-                    dataImportService.saveModelCreation(model);
-                    dataImportService.saveSpecimen(specimen);
-                    dataImportService.saveSample(sample);
 
-                    //log.info(" Specimen with the following details was created: "+modelId+" "+passage+" "+nomenclature+ " in row: "+row);
-                }
-                else{
-                    // either specimen with passage or the host strain nomenclature was not created
-                    log.error("Cannot find specimen with the following details: "+modelId+" "+passage+" "+nomenclature+ " in row: "+row);
                 }
 
-            }
-            else{
+
+                sample = specimen.getSample();
+
+                if (sample == null) {
+
+                    sample = new Sample();
+                    sample.setSourceSampleId(sampleId);
+
+                }
+
+                platform = dataImportService.getPlatform(platformName, ds);
+
+
+                if ((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3) {
+                    log.info("Saved platform:" + platform.getName() + " Url: " + (platform.getUrl() == null ? "null" : platform.getUrl()) + " Url in file: " + platformUrl);
+                    platform.setUrl(platformUrl);
+                    dataImportService.savePlatform(platform);
+                    log.info("Updating platform url");
+                }
+
+                MolecularCharacterization mc = new MolecularCharacterization();
+                mc.setPlatform(platform);
+                mc.setType(molCharType.toLowerCase());
+                mc.setTechnology(platformTechnology);
+                sample.addMolecularCharacterization(mc);
+                model.addRelatedSample(sample);
+
+                specimen.setSample(sample);
+
+                model.addSpecimen(specimen);
+                model.addRelatedSample(sample);
+                dataImportService.saveModelCreation(model);
+                dataImportService.saveSpecimen(specimen);
+                dataImportService.saveSample(sample);
+
+                //log.info(" Specimen with the following details was created: "+modelId+" "+passage+" "+nomenclature+ " in row: "+row);
+
+
+            } else {
                 //origin is not patient nor xenograft
-                log.error("Unknown sample origin in row "+row);
+                log.error("Unknown sample origin in row " + row);
             }
 
             this.modelIDs.add(modelId);
@@ -1012,16 +1023,14 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
 
-
-
-    private void createVariationData() {
+    private void createOmicData() {
 
         log.info("******************************************************");
         log.info("*                 Loading Omic Data                  *");
         log.info("******************************************************");
         log.info(this.modelIDs.toString());
 
-        omicDataSource= ds.getAbbreviation();
+        omicDataSource = ds.getAbbreviation();
         dataSourceAbbreviation = loaderRelatedDataSheetData.get(0).get(1);
         dataRootDirectory = finderRootDir + "/data/UPDOG";
 
@@ -1056,20 +1065,20 @@ public class UniversalLoader extends UniversalLoaderOmic {
         omicCnaPicnicValue = "picnic_value";
 
         platformURL = new HashMap<>();
-        platformURL.put("CGH_array","/platform/curie-lc-cna/");
-        platformURL.put("Targeted_NGS","/platform/curie-lc-mutation/");
+        platformURL.put("CGH_array", "/platform/curie-lc-cna/");
+        platformURL.put("Targeted_NGS", "/platform/curie-lc-mutation/");
 
-        if (dataSourceAbbreviation.equals("CRL")){
+        if (dataSourceAbbreviation.equals("CRL")) {
             omicDataFilesType = "ONE_FILE_PER_MODEL";
             omicFileExtension = "csv";
-        }else {
+        } else {
             omicDataFilesType = "ALL_MODELS_IN_ONE_FILE";
             omicFileExtension = "xlsx";
         }
 
 
-        String mutationDataDir = dataRootDirectory + "/" + dataSourceAbbreviation+"/mut/";
-        String cnaDataDir = dataRootDirectory + "/" + dataSourceAbbreviation+"/cna/";
+        String mutationDataDir = dataRootDirectory + "/" + dataSourceAbbreviation + "/mut/";
+        String cnaDataDir = dataRootDirectory + "/" + dataSourceAbbreviation + "/cna/";
 
         File mutationData = new File(mutationDataDir);
         File cnaData = new File(cnaDataDir);
@@ -1077,37 +1086,31 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
         log.info(mutationDataDir);
         log.info(cnaDataDir);
-        for (String modelId : this.modelIDs){
+        for (String modelId : this.modelIDs) {
 
             ModelCreation modelCreation = dataImportService.findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(modelId, ds.getAbbreviation());
 
-            if(modelCreation != null){
+            if (modelCreation != null) {
 
                 // Mutation Data Load
                 if (mutationData.exists()) {
-                    log.info("Loading mutation for "+modelId);
+                    log.info("Loading mutation for " + modelId);
                     loadOmicData(modelCreation, ds, "mutation", dataRootDirectory);
                 }
 
                 // Copy Number Alteration Data Load
-                if (cnaData.exists()){
-                    log.info("Loading cna for "+modelId);
+                if (cnaData.exists()) {
+                    log.info("Loading cna for " + modelId);
                     loadOmicData(modelCreation, ds, "copy number alteration", dataRootDirectory);
+                } else {
+                    log.info("No omic data for model " + modelId);
                 }
-                else{
-                    log.info("No omic data for model "+modelId);
-                }
-            }
-            else{
+            } else {
 
-                log.error("Cannot load omic data for missing model: "+modelId);
+                log.error("Cannot load omic data for missing model: " + modelId);
             }
 
         }
-
-
-
-
 
 
     }
@@ -1115,7 +1118,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
     /**
      * Targets existing model, creates external urls, updates provider type
-     *
      */
     private void createSharingAndContacts() {
 
@@ -1146,8 +1148,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 continue;
             }
 
-            if(accessModalities == null) accessModalities = "";
-            if(modelAccessibility == null) modelAccessibility = "";
+            if (accessModalities == null) accessModalities = "";
+            if (modelAccessibility == null) modelAccessibility = "";
 
             //at this point the corresponding pdx model node should be created
 
@@ -1173,7 +1175,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 model.addGroup(project);
             }
 
-            if(modelAccessibility != "" || accessModalities != ""){
+            if (modelAccessibility != "" || accessModalities != "") {
 
                 Group access = dataImportService.getAccessibilityGroup(modelAccessibility, accessModalities);
                 model.addGroup(access);
@@ -1193,7 +1195,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
 
-    private void createBreastAndOrColorectalData(){
+    private void createCytogeneticsData() {
 
         if (stopLoading) return;
 
@@ -1209,7 +1211,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
         //TODO: At some point deal with micro-satelite instability. Currently those rows are skipped. We don't want instability in our lives just yet.
 
         //first get all markers for the individual molchar objects
-        for (List<String> dataRow : breastAndOrColorectalDiagnoSheetData) {
+        for (List<String> dataRow : cytogeneticsSheetData) {
 
             String sampleId = dataRow.get(0);
             String origin = dataRow.get(1);
@@ -1222,7 +1224,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
             String platform = dataRow.get(9);
             String characterizationType = "Unknown";
 
-            if(origin == null || modelId == null || markerSymbol == null || markerStatus == null || technique == null){
+            if (origin == null || modelId == null || markerSymbol == null || markerStatus == null || technique == null) {
                 log.error("Missing essential value in row " + row);
                 row++;
                 continue;
@@ -1232,33 +1234,30 @@ public class UniversalLoader extends UniversalLoaderOmic {
             Platform pl;
             Marker marker = null;
 
-            if(technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish") ){
+            if (technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")) {
                 characterizationType = "cytogenetics";
             }
 
             NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), ds.getAbbreviation(), modelId, markerSymbol, characterizationType, technique);
 
-            if(nsdto.getNode() == null){
+            if (nsdto.getNode() == null) {
 
                 //uh oh, we found an unrecognised marker symbol, abort, abort!!!!
                 reportManager.addMessage(nsdto.getLogEntity());
                 continue;
-            }
-            else{
+            } else {
 
                 marker = (Marker) nsdto.getNode();
 
-                if(origin.toLowerCase().equals("patient")){
+                if (origin.toLowerCase().equals("patient")) {
 
                     //for patient related molchars it is sufficient to use the model + platform as the key
                     String mapKey = modelId + "___" + technique;
 
-                    if(patientMolChars.containsKey(mapKey)) {
+                    if (patientMolChars.containsKey(mapKey)) {
                         //get a previously created mc object = platform and type are already set
                         mc = patientMolChars.get(mapKey);
-                    }
-
-                    else {
+                    } else {
                         //new mc object, need to set the platform, too
                         pl = dataImportService.getPlatform(technique, ds);
 
@@ -1271,7 +1270,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     MarkerAssociation ma = new MarkerAssociation();
                     ma.setMarker(marker);
 
-                    if(technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")){
+                    if (technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")) {
 
                         ma.setCytogeneticsResult(markerStatus);
                     }
@@ -1280,13 +1279,12 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     mc.addMarkerAssociation(ma);
 
                     //put molchar in the map if it was just created, but don't store molchars without type
-                    if(!patientMolChars.containsKey(mapKey) && mc.getType()!= null){
+                    if (!patientMolChars.containsKey(mapKey) && mc.getType() != null) {
                         patientMolChars.put(mapKey, mc);
                     }
 
 
-                }
-                else if(origin.toLowerCase().equals("xenograft") || origin.toLowerCase().equals("engrafted tumor") || origin.toLowerCase().equals("engrafted tumour")){
+                } else if (origin.toLowerCase().equals("xenograft") || origin.toLowerCase().equals("engrafted tumor") || origin.toLowerCase().equals("engrafted tumour")) {
 
                     //need this trick to get rid of 0.0 if there is any
                     int passageInt = (int) Float.parseFloat(passage);
@@ -1295,11 +1293,10 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     //for xenograft molchars use the combination of the modelid, nomenclature, passage and technique as the key
                     String mapKey = modelId + "___" + nomenclature + "___" + passage + "___" + technique;
 
-                    if(xenoMolChars.containsKey(mapKey)) {
+                    if (xenoMolChars.containsKey(mapKey)) {
                         //get a previously created mc object = platform and type are already set
                         mc = xenoMolChars.get(mapKey);
-                    }
-                    else {
+                    } else {
                         //new mc object, need to set the platform, too
                         pl = dataImportService.getPlatform(technique, ds);
 
@@ -1313,7 +1310,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     MarkerAssociation ma = new MarkerAssociation();
                     ma.setMarker(marker);
 
-                    if(technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")){
+                    if (technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")) {
 
                         ma.setCytogeneticsResult(markerStatus);
                     }
@@ -1321,23 +1318,16 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                     mc.addMarkerAssociation(ma);
                     //but don't store molchars without type
-                    if(!xenoMolChars.containsKey(mapKey) && mc.getType()!= null){
+                    if (!xenoMolChars.containsKey(mapKey) && mc.getType() != null) {
                         xenoMolChars.put(mapKey, mc);
                     }
 
-                }
-                else{
+                } else {
                     //origin is not patient nor xenograft
-                    log.error("Unknown sample origin in row "+row);
+                    log.error("Unknown sample origin in row " + row);
                 }
 
             }
-
-
-
-
-
-
 
 
             row++;
@@ -1346,7 +1336,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
         //get the corresponding samples for the molchar objects, link them and save them.
         //patient samples
-        for(Map.Entry<String, MolecularCharacterization> entry:patientMolChars.entrySet()){
+        for (Map.Entry<String, MolecularCharacterization> entry : patientMolChars.entrySet()) {
             //key = model ID + "___" + platform
             String[] keyArr = entry.getKey().split("___");
             String key = keyArr[0];
@@ -1355,20 +1345,19 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             Sample patientSample = dataImportService.findHumanSample(key, ds.getAbbreviation());
 
-            if(patientSample != null){
+            if (patientSample != null) {
 
                 patientSample.addMolecularCharacterization(mc);
                 dataImportService.saveSample(patientSample);
-            }
-            else{
+            } else {
 
-                log.error("Failed to create molchar for patient sample! Model:"+key);
+                log.error("Failed to create molchar for patient sample! Model:" + key);
             }
 
         }
 
         //xeno samples
-        for(Map.Entry<String, MolecularCharacterization> entry:xenoMolChars.entrySet()){
+        for (Map.Entry<String, MolecularCharacterization> entry : xenoMolChars.entrySet()) {
             //key =  modelId + "___" + nomenclature + "___" + passage + "___" + platform
 
             MolecularCharacterization mc = entry.getValue();
@@ -1379,19 +1368,19 @@ public class UniversalLoader extends UniversalLoaderOmic {
             String passage = keyArr[2];
 
             ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
-            if(model == null){
-                log.error("Cannot load markers, model not found: "+modelId);
+            if (model == null) {
+                log.error("Cannot load markers, model not found: " + modelId);
                 continue;
 
             }
 
             Specimen specimen = dataImportService.findSpecimenByModelAndPassageAndNomenclature(model, passage, nomenclature);
 
-            if(specimen != null){
+            if (specimen != null) {
 
                 Sample xenoSample = specimen.getSample();
 
-                if(xenoSample == null){
+                if (xenoSample == null) {
                     xenoSample = new Sample();
 
                 }
@@ -1402,12 +1391,9 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 dataImportService.saveSpecimen(specimen);
                 dataImportService.saveModelCreation(model);
 
+            } else {
+                log.error("Specimen not found. Model:" + modelId + " Passage: " + passage + " Nomenclature: " + nomenclature);
             }
-            else{
-                log.error("Specimen not found. Model:"+modelId +" Passage: "+passage +" Nomenclature: "+nomenclature);
-            }
-
-
 
 
         }
@@ -1431,12 +1417,11 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
 
-    private String getMolcharType(String technique){
+    private String getMolcharType(String technique) {
 
-        if(technique.toLowerCase().equals("immunohistochemistry")){
+        if (technique.toLowerCase().equals("immunohistochemistry")) {
             return "cytogenetics";
-        }
-        else if(technique.toLowerCase().equals("fish")){
+        } else if (technique.toLowerCase().equals("fish")) {
             return "cytogenetics";
         }
 
@@ -1472,8 +1457,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
         return sharingAndContactSheetData;
     }
 
-    public List<List<String>> getBreastAndOrColorectalDiagnoSheetData() {
-        return breastAndOrColorectalDiagnoSheetData;
+    public List<List<String>> getCytogeneticsSheetData() {
+        return cytogeneticsSheetData;
     }
 
     public List<List<String>> getLoaderRelatedDataSheetData() {
