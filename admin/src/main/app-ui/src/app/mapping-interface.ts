@@ -20,7 +20,14 @@ export interface Mapping {
 }
 
 export interface MappingInterface {
+
     mappings: Mapping[];
+
+    size: number;
+    totalElements: number;
+    totaPages: number;
+    page: number;
+    beginIndex: number;
+    endIndex: number;
+    currentIndex: number;
 }
-
-
