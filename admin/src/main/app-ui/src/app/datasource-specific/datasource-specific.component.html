@@ -108,9 +108,11 @@
                                   </li>
 
                                   <li *ngFor="let count of pageRange " [ngClass]="{'active': data.page == count }">
-                                      <a href="&page={{count}}"> {{count }} </a>
+
+                                      <a [routerLink]="['../'+dataSource]" [queryParams]="{page: count}"  > {{count }} </a>
                                   </li>
 
+                                  <!--  {{'curation/'+entityTypeUrl+'/'+dataSource}} +'?page='+count -->
 
                                   <li [ngClass]="{'disabled': data.page == data.totaPages }">
                                       <span *ngIf="data.page == data.totaPages"> Last « </span>

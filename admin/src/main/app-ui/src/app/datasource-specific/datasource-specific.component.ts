@@ -33,6 +33,9 @@ export class DatasourceSpecificComponent implements OnInit {
                 private route: ActivatedRoute,
                 private _mappingService: MappingService,
                 private gs: GeneralService) {
+
+        // This will allow navigation to respond param changes on thesame route path
+        this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     }
 
     ngOnInit() {
@@ -42,8 +45,28 @@ export class DatasourceSpecificComponent implements OnInit {
         this.entityTypeUrl = this.route.snapshot.paramMap.get('mapType');
         this.entityType = this.entityTypeUrl.split('-')[0];
 
+        var page = this.route.snapshot.queryParamMap.get("page");
+/*        this.route.queryParamMap.subscribe(queryParams => {
 
-        this._mappingService.getUnmappedTerms(this.entityType, this.dataSource)
+
+        })*/
+
+
+
+
+
+
+        var size = this.route.snapshot.queryParamMap.get("size");
+
+
+        // If no page value submitted, set page value as first page
+        page = (page == null) ? "1" : page;
+
+        // If no size value submitted, set size value as five
+        size = (size == null) ? "5" : size;
+
+
+        this._mappingService.getUnmappedTerms(this.entityType, this.dataSource, page, size)
             .subscribe(
                 data => {
 
@@ -57,7 +80,7 @@ export class DatasourceSpecificComponent implements OnInit {
                     // Build Column Headers If data is not empty
                     if (mappings.length > 0) {
 
-                        // Transfer mappingLabel for this entityType to template
+                        // Transfer mappingLabel for this entityType to the template
                         this.dataLabels = mappings[0].mappingLabels;
 
                         // Convert mapping Labels from CamelCase to Normal Case for Column Headers in Template
