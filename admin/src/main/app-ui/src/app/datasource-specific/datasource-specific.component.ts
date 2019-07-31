@@ -16,6 +16,7 @@ export class DatasourceSpecificComponent implements OnInit {
     public entityTypeUrl;
 
     public dataExists = false;
+    public dataLabels;
     public columnHeaders = [];
     public mappings = [];
 
@@ -45,14 +46,18 @@ export class DatasourceSpecificComponent implements OnInit {
                     // This receives the mappings node of the json in required format
                     let myData = data["mappings"];
 
-                    // Convert mapping Labels from CamelCase to Normal Case for Column Headers if data is not empty
-                    if (myData.length > 0){
+                    // If data is not empty
+                    if (myData.length > 0) {
 
-                        myData[0].mappingLabels.forEach((mappingLabel)=>{
+                        // Transfer mappingLabel for this entityType to template
+                        this.dataLabels = myData[0].mappingLabels;
+
+                        // Convert mapping Labels from CamelCase to Normal Case for Column Headers in Template
+                        this.dataLabels.forEach((mappingLabel) => {
+
                             this.columnHeaders.push(mappingLabel.replace(/([a-z])([A-Z])/g, '$1 $2'));
                         });
 
-                        console.log(this.columnHeaders.length);
                         this.dataExists = true;
                     }
 

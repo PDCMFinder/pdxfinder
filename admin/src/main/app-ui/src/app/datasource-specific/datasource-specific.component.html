@@ -64,12 +64,19 @@
                                   </thead>
                                   <tbody>
 
-                                  <!--<tr class="pdxfinder-clickable-rows2" *ngFor="let mapping of mappings; index as i" [routerLink]="['suggested-mapping',mapping.entityId ]" (click)="setClickedRow(i,mapping.entityId)" [class.active]="i == selectedRow">
+                                  <tr class="pdxfinder-clickable-rows2" *ngFor="let mapping of mappings; index as i" [routerLink]="['suggested-mapping',mapping.entityId ]" (click)="setClickedRow(i,mapping.entityId)" [class.active]="i == selectedRow">
+
                                       <td> {{i+1}} </td>
-                                      <td> {{ mapping.mappingValues.DataSource | uppercase }} </td>
-                                      <td> {{ mapping.mappingValues.SampleDiagnosis | uppercase }} </td>
+
+                                      <td *ngFor="let dataLabel of dataLabels ">
+
+                                          {{ mapping.mappingValues[dataLabel] | uppercase }}
+
+                                      </td>
+
+                                     <!--  {{ mapping.mappingValues.SampleDiagnosis | uppercase }}  <td> {{ mapping.mappingValues.SampleDiagnosis | uppercase }} </td>
                                       <td> {{ mapping.mappingValues.TumorType | uppercase }} </td>
-                                      <td> {{ mapping.mappingValues.OriginTissue | uppercase }} </td>
+                                      <td> {{ mapping.mappingValues.OriginTissue | uppercase }} </td> -->
 
                                       <td> <input type="text" name="{{'mappedTerm'+i}}" class="editableField"
                                                   [(ngModel)]="mapping.mappedTerm"
@@ -85,7 +92,7 @@
                                                   [(ngModel)]="mapping.justification"
                                                   value="{{ mapping.justification }}"
                                                   required [class.is-invalid]="'justification'+i.invalid && 'justification'+i.touched"> </td>
-                                  </tr> -->
+                                  </tr>
 
                                   </tbody>
                               </table>
