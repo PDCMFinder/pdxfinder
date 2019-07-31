@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {MappingService} from "../mapping.service";
 import {MappingInterface} from "../mapping-interface";
+import {GeneralService} from "../general.service";
 
 @Component({
     selector: 'app-datasource-specific',
@@ -11,6 +12,11 @@ import {MappingInterface} from "../mapping-interface";
 export class DatasourceSpecificComponent implements OnInit {
 
     public dataSource;
+    public entityType;
+    public entityTypeUrl;
+
+    public dataExists = false;
+    public columnHeaders = [];
     public mappings = [];
 
     public selectedRow: Number;
@@ -20,19 +26,35 @@ export class DatasourceSpecificComponent implements OnInit {
 
     constructor(private router: Router,
                 private route: ActivatedRoute,
-                private _mappingService: MappingService) {
+                private _mappingService: MappingService,
+                private gs: GeneralService) {
     }
 
     ngOnInit() {
 
         // From the current url snapshot, get the source parameter and assign to the dataSource property
         this.dataSource = this.route.snapshot.paramMap.get('source');
+        this.entityTypeUrl = this.route.snapshot.paramMap.get('mapType');
+        this.entityType = this.entityTypeUrl.split('-')[0];
 
-        this._mappingService.getUnmappedDiagnosis()
+
+        this._mappingService.getUnmappedTerms(this.entityType, this.dataSource)
             .subscribe(
                 data => {
 
-                    let myData = data["mappings"]; // This receives the mappings node of the json in required format
+                    // This receives the mappings node of the json in required format
+                    let myData = data["mappings"];
+
+                    // Convert mapping Labels from CamelCase to Normal Case for Column Headers if data is not empty
+                    if (myData.length > 0){
+
+                        myData[0].mappingLabels.forEach((mappingLabel)=>{
+                            this.columnHeaders.push(mappingLabel.replace(/([a-z])([A-Z])/g, '$1 $2'));
+                        });
+
+                        console.log(this.columnHeaders.length);
+                        this.dataExists = true;
+                    }
 
                     var count: number = 0;
                     for (var i of myData) {

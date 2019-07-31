@@ -12,15 +12,13 @@ const routes: Routes = [
     { path: '',   component: DashboardComponent },
     { path: 'dashboard',   component: DashboardComponent },
     { path: 'curation', component: CurationMappingComponent },
+    { path: 'curation/:mapType',  component: DatasourceSummaryComponent},
     {
-        path: 'curation/:mapType',  component: DatasourceSummaryComponent,
-        children: [ { path: ':source', component: DatasourceSpecificComponent } ]
-    }/*,
-
-    {
-        path: 'mapping-summary/:source',  component: DatasourceSpecificComponent,
+        path: 'curation/:mapType/:source',  component: DatasourceSpecificComponent,
         children: [ { path: 'suggested-mapping/:id', component: DatasourceSpecificSuggestionsComponent } ]
-    }*/
+    }
+
+   // children: [ { path: ':source', component: DatasourceSpecificComponent } ]
 ];
 
 @NgModule({

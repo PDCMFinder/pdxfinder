@@ -10,12 +10,15 @@ import {SummaryInterface} from "./summary-interface";
 })
 export class MappingService {
 
-    private _totalMappedUrl = "/api/mappings?map-terms-only=true&entity-type=diagnosis&size=900";
-    private _unmappedTreatmentUrl = "/api/mappings?entity-type=treatment&mapped-term=-";
-    private _unmappedDiagnosisUrl = "/api/mappings?entity-type=diagnosis&mapped-term=-";
-    private _summaryUrl = "/api/mappings/summary";
+    private serverUrl = "http://localhost:8081";
+    private _totalMappedUrl = this.serverUrl+"/api/mappings?map-terms-only=true&entity-type=diagnosis&size=900";
+    private _unmappedTreatmentUrl = this.serverUrl+"/api/mappings?entity-type=treatment&mapped-term=-";
+    private _unmappedDiagnosisUrl = this.serverUrl+"/api/mappings?entity-type=diagnosis&mapped-term=-";
 
-    private _submitCurationUrl = "/api/diagnosis";
+    private _summaryUrl = this.serverUrl+"/api/mappings/summary";
+    private _mappingsUrl = this.serverUrl+"/api/mappings";
+
+    private _submitCurationUrl = this.serverUrl+"/api/diagnosis";
 
     public dataSubject = new Subject<any>();
 
@@ -28,6 +31,15 @@ export class MappingService {
 
         return this.http.get<SummaryInterface[]>(url);
     }
+
+    // http://localhost:8081/api/mappings?mq=datasource:pdmr&entity-type=diagnosis&mapped-term=-
+    getUnmappedTerms(entityType: string, dataSource: string): Observable<MappingInterface[]>{
+
+        const url = `${this._mappingsUrl}?mq=datasource:${dataSource}&entity-type=${entityType}&mapped-term=-`;
+
+        return this.http.get<MappingInterface[]>(url);
+    }
+
 
     //Retrieve unmapped diagnosis entities
     getUnmappedDiagnosis(): Observable<MappingInterface[]>{

@@ -21,6 +21,7 @@ import java.util.*;
 /*
  * Created by csaba on 09/07/2018.
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/api")
 public class AjaxController {
@@ -58,7 +59,6 @@ public class AjaxController {
      * @param size            - Allows client to submit size limit values e.g ...?size=5
      * @return - Mapping Entities with data count, offset and limit Values
      */
-    @CrossOrigin
     @GetMapping("/mappings")
     public ResponseEntity<?> getMappings(@RequestParam("mq") Optional<String> mappingQuery,
                                          @RequestParam(value = "mapped-term", defaultValue = "") Optional<String> mappedTermLabel,
@@ -86,8 +86,6 @@ public class AjaxController {
         return new ResponseEntity<Object>(result, HttpStatus.OK);
         //Map<String, List<MappingEntity>> result =  mappingService.getMissingDiagnosisMappings(ds);
     }
-
-
 
     @GetMapping("/mappings/summary")
     public ResponseEntity<?> getMappingStatSummary(@RequestParam(value = "entity-type", defaultValue = "") Optional<String> entityType) {
