@@ -37,7 +37,10 @@
 
 
 
+
+
                   <div class="pdxfinder-content">
+
                       <div class="table-responsive">
 
                               <table class="table table-striped table-bordered table-hover" >
@@ -96,6 +99,25 @@
 
                                   </tbody>
                               </table>
+
+                              <ul class="pagination pagination-sm" style="margin-top:-3px; margin-bottom:0px;">
+
+                                  <li [ngClass]="{'disabled': data.page == 1 }">
+                                      <span *ngIf="data.page == 1"> First « </span>
+                                      <a *ngIf="data.page != 1" href="'?' + '&page=1'" > First « </a>
+                                  </li>
+
+                                  <li *ngFor="let count of pageRange " [ngClass]="{'active': data.page == count }">
+                                      <a href="&page={{count}}"> {{count }} </a>
+                                  </li>
+
+
+                                  <li [ngClass]="{'disabled': data.page == data.totaPages }">
+                                      <span *ngIf="data.page == data.totaPages"> Last « </span>
+                                      <a *ngIf="data.page != data.totaPages" href="&page={{data.totaPages}}" > Last « </a>
+                                  </li>
+
+                              </ul>
 
                       </div>
                   </div>

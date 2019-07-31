@@ -21,4 +21,15 @@ export class GeneralService {
     public capitalize(dString: string) {
         return dString.charAt(0).toUpperCase() + dString.slice(1);
     }
+
+    public getNumbersInRange(startIndex: number, endIndex: number){
+
+        var items: number[] = [];
+
+        for(var i = startIndex; i <= endIndex; i++){
+            items.push(i);
+        }
+
+        return items;
+    }
 }

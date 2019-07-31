@@ -35,7 +35,7 @@ export class MappingService {
     // http://localhost:8081/api/mappings?mq=datasource:pdmr&entity-type=diagnosis&mapped-term=-
     getUnmappedTerms(entityType: string, dataSource: string): Observable<MappingInterface[]>{
 
-        const url = `${this._mappingsUrl}?mq=datasource:${dataSource}&entity-type=${entityType}&mapped-term=-`;
+        const url = `${this._mappingsUrl}?mq=datasource:${dataSource}&entity-type=${entityType}&mapped-term=-&page=1&size=5`;
 
         return this.http.get<MappingInterface[]>(url);
     }

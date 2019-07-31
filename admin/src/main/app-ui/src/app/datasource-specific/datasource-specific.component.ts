@@ -11,6 +11,9 @@ import {GeneralService} from "../general.service";
 })
 export class DatasourceSpecificComponent implements OnInit {
 
+    public data;
+    public mappings = [];
+
     public dataSource;
     public entityType;
     public entityTypeUrl;
@@ -18,12 +21,13 @@ export class DatasourceSpecificComponent implements OnInit {
     public dataExists = false;
     public dataLabels;
     public columnHeaders = [];
-    public mappings = [];
 
     public selectedRow: Number;
     public setClickedRow: Function;
     public selectedEntity: String;
     public errorMsg = "";
+
+    public pageRange: number[];
 
     constructor(private router: Router,
                 private route: ActivatedRoute,
@@ -43,14 +47,18 @@ export class DatasourceSpecificComponent implements OnInit {
             .subscribe(
                 data => {
 
-                    // This receives the mappings node of the json in required format
-                    let myData = data["mappings"];
+                    this.data = data;
 
-                    // If data is not empty
-                    if (myData.length > 0) {
+                    // This receives the mappings node of the json in required format
+                    let mappings = this.data.mappings;
+
+                    console.log(this.data)
+
+                    // Build Column Headers If data is not empty
+                    if (mappings.length > 0) {
 
                         // Transfer mappingLabel for this entityType to template
-                        this.dataLabels = myData[0].mappingLabels;
+                        this.dataLabels = mappings[0].mappingLabels;
 
                         // Convert mapping Labels from CamelCase to Normal Case for Column Headers in Template
                         this.dataLabels.forEach((mappingLabel) => {
@@ -61,11 +69,15 @@ export class DatasourceSpecificComponent implements OnInit {
                         this.dataExists = true;
                     }
 
-                    var count: number = 0;
-                    for (var i of myData) {
+                    this.pageRange = this.gs.getNumbersInRange(this.data.beginIndex, this.data.endIndex);
+                   // console.log(this.pageRange);
 
-                        if (myData[count].mappingValues.DataSource.toUpperCase() === this.dataSource.toUpperCase()) {
-                            this.mappings.push(myData[count]);
+
+                    var count: number = 0;
+                    for (var i of mappings) {
+
+                        if (mappings[count].mappingValues.DataSource.toUpperCase() === this.dataSource.toUpperCase()) {
+                            this.mappings.push(mappings[count]);
                         }
                         count++;
                     }
