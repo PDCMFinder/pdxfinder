@@ -35,9 +35,8 @@ export class DatasourceSpecificComponent implements OnInit {
                 private gs: GeneralService) {
 
         // This will allow navigation to respond param changes on thesame route path
-        this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+        //this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     }
-
     ngOnInit() {
 
         // From the current url snapshot, get the source parameter and assign to the dataSource property
@@ -45,19 +44,8 @@ export class DatasourceSpecificComponent implements OnInit {
         this.entityTypeUrl = this.route.snapshot.paramMap.get('mapType');
         this.entityType = this.entityTypeUrl.split('-')[0];
 
-        var page = this.route.snapshot.queryParamMap.get("page");
-/*        this.route.queryParamMap.subscribe(queryParams => {
-
-
-        })*/
-
-
-
-
-
-
-        var size = this.route.snapshot.queryParamMap.get("size");
-
+        var page = this.route.snapshot.paramMap.get("page");
+        var size = this.route.snapshot.paramMap.get("size");
 
         // If no page value submitted, set page value as first page
         page = (page == null) ? "1" : page;
@@ -65,6 +53,50 @@ export class DatasourceSpecificComponent implements OnInit {
         // If no size value submitted, set size value as five
         size = (size == null) ? "5" : size;
 
+        this.route.queryParamMap.subscribe(
+            params => {
+
+            }
+        )
+
+        this.getUnmappedTerms(page, size);
+
+
+
+
+
+
+        this.setClickedRow = function (index, entityId) {
+            this.selectedRow = index;
+            this.selectedEntity = entityId;
+        }
+
+
+        this._mappingService.dataSubject.subscribe(
+            data => {
+
+                console.log(data);
+
+                for (var i = 0; i < this.mappings.length; i++) {
+
+                    if (this.mappings[i].entityId == this.selectedEntity) {
+
+                        this.mappings[i].mappedTermLabel = data.mappedTermLabel.toUpperCase();
+                        this.mappings[i].mapType = data.mapType.toUpperCase();
+                        this.mappings[i].justification = data.justification.toUpperCase();
+
+                    }
+
+                }
+
+            }
+        )
+
+
+    };
+
+
+    getUnmappedTerms(page, size){
 
         this._mappingService.getUnmappedTerms(this.entityType, this.dataSource, page, size)
             .subscribe(
@@ -93,7 +125,7 @@ export class DatasourceSpecificComponent implements OnInit {
                     }
 
                     this.pageRange = this.gs.getNumbersInRange(this.data.beginIndex, this.data.endIndex);
-                   // console.log(this.pageRange);
+                    // console.log(this.pageRange);
 
 
                     var count: number = 0;
@@ -107,39 +139,11 @@ export class DatasourceSpecificComponent implements OnInit {
 
                 }
             );
-
-
-        this.setClickedRow = function (index, entityId) {
-            this.selectedRow = index;
-            this.selectedEntity = entityId;
-        }
-
-
-        this._mappingService.dataSubject.subscribe(
-            data => {
-
-                for (var i = 0; i < this.mappings.length; i++) {
-
-                    if (this.mappings[i].entityId == this.selectedEntity) {
-
-                        this.mappings[i].mappedTerm = data.mappedTerm.toUpperCase();
-                        this.mappings[i].mapType = data.mapType.toUpperCase();
-                        this.mappings[i].justification = data.justification.toUpperCase();
-
-                    }
-
-                }
-
-            }
-        )
-
-
-    };
-
+    }
 
     showSuggestedMappings(id) {
 
-        //this.router.navigate(['/suggested-mappings',id])
+        // this.router.navigate([`../${this.dataSource}`],{relativeTo: this.route, queryParams: {page: page}} )
         this.router.navigate(['suggested-mappings'], {relativeTo: this.route})
     }
 
@@ -158,5 +162,6 @@ export class DatasourceSpecificComponent implements OnInit {
 
         console.log(this.mappings);
     }
+
 
 }

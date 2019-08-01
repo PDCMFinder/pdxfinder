@@ -10,7 +10,7 @@ export interface Mapping {
     entityType: string;
     mappingLabels: string[];
     mappingValues: MappingValues;
-    mappedTerm?: any;
+    mappedTermLabel?: any;
     mapType?: any;
     justification?: any;
     status: string;

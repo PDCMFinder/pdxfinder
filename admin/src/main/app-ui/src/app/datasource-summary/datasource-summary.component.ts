@@ -46,8 +46,8 @@ export class DatasourceSummaryComponent implements OnInit {
     }
 
     onSelect(source){
-
-        this.router.navigate([source],{relativeTo: this.route})
+        var datasourceSpecific = `${source}/1`
+        this.router.navigate([datasourceSpecific],{relativeTo: this.route})
     }
 
 }

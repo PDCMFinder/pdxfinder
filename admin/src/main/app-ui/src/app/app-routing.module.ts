@@ -14,16 +14,17 @@ const routes: Routes = [
     { path: 'curation', component: CurationMappingComponent },
     { path: 'curation/:mapType',  component: DatasourceSummaryComponent},
     {
-        path: 'curation/:mapType/:source',  component: DatasourceSpecificComponent,
-        children: [ { path: 'suggested-mapping/:id', component: DatasourceSpecificSuggestionsComponent } ]
+        path: 'curation/:mapType/:source/:page',  component: DatasourceSpecificComponent,
+        children: [ { path: 'suggested-mapping/:id', component: DatasourceSpecificSuggestionsComponent } ],
     }
 
    // children: [ { path: ':source', component: DatasourceSpecificComponent } ]
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  //imports: [RouterModule.forRoot(routes)],
+    imports: [RouterModule.forRoot(routes)],
+    exports: [RouterModule]
 })
 export class AppRoutingModule { }
 export const routingComponents = [DashboardComponent,
@@ -33,5 +34,12 @@ export const routingComponents = [DashboardComponent,
 
 
 /*
-mapping-summary
+@NgModule({
+imports: [RouterModule.forRoot(routes, {
+onSameUrlNavigation: 'reload'
+})],
+exports: [RouterModule]
+})
+export class AppRoutingModule {
+}
  */

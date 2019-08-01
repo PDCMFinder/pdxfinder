@@ -20,7 +20,7 @@
 
 
 
-<div class="wrapper wrapper-content animated bounceIn">
+<div class="wrapper wrapper-content animated fadeInRight">
   <div class="p-w-md m-t-sm col-lg-10 col-lg-offset-1">
 
 
@@ -46,7 +46,7 @@
                               <table class="table table-striped table-bordered table-hover" >
                                   <thead>
                                   <tr>
-                                      <th style="width:10px;">S/N</th>
+                                      <!-- <th style="width:10px;">S/N</th> -->
 
                                       <th *ngFor="let columnHeader of columnHeaders ">
 
@@ -69,7 +69,7 @@
 
                                   <tr class="pdxfinder-clickable-rows2" *ngFor="let mapping of mappings; index as i" [routerLink]="['suggested-mapping',mapping.entityId ]" (click)="setClickedRow(i,mapping.entityId)" [class.active]="i == selectedRow">
 
-                                      <td> {{i+1}} </td>
+                                      <!-- <td> {{i+1}} </td> -->
 
                                       <td *ngFor="let dataLabel of dataLabels ">
 
@@ -83,7 +83,7 @@
 
                                       <td> <input type="text" name="{{'mappedTerm'+i}}" class="editableField"
                                                   [(ngModel)]="mapping.mappedTerm"
-                                                  value="{{ mapping.mappedTerm }}"
+                                                  value="{{ mapping.mappedTermLabel }}"
                                                   required [class.is-invalid]="'mappedTerm'+i.invalid && 'mappedTerm'+i.touched"> </td>
 
                                       <td> <input type="text" name="{{'mapType'+i}}" class="editableField" #curatorMapType
@@ -104,19 +104,21 @@
 
                                   <li [ngClass]="{'disabled': data.page == 1 }">
                                       <span *ngIf="data.page == 1"> First « </span>
-                                      <a *ngIf="data.page != 1" href="'?' + '&page=1'" > First « </a>
+                                      <a *ngIf="data.page != 1"  [routerLink]="['../1']"> First « </a>
                                   </li>
 
                                   <li *ngFor="let count of pageRange " [ngClass]="{'active': data.page == count }">
 
-                                      <a [routerLink]="['../'+dataSource]" [queryParams]="{page: count}"  > {{count }} </a>
+                                      <!-- <a [routerLink]="['../'+count]"> {{count }} </a>
+                                      <a [routerLink]="['../']" [queryParams]="{page: count}"  > {{count }} </a>    {{'curation/'+entityTypeUrl+'/'+dataSource}} +'?page='+count -->
+
+                                      <a [routerLink]="['../'+count]"> {{count }} </a>
                                   </li>
 
-                                  <!--  {{'curation/'+entityTypeUrl+'/'+dataSource}} +'?page='+count -->
 
                                   <li [ngClass]="{'disabled': data.page == data.totaPages }">
                                       <span *ngIf="data.page == data.totaPages"> Last « </span>
-                                      <a *ngIf="data.page != data.totaPages" href="&page={{data.totaPages}}" > Last « </a>
+                                      <a *ngIf="data.page != data.totaPages" [routerLink]="['../'+data.totaPages]"> Last « </a>
                                   </li>
 
                               </ul>

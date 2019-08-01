@@ -26,12 +26,12 @@
                     </thead>
                     <tbody>
 
-                    <tr style="font-size: 12px;"  *ngFor="let suggestion of selectedEntity.suggestedMappings; index as i">
+                    <tr style="font-size: 12px;"  *ngFor="let suggestion of selectedEntity['suggestedMappings']; index as i">
                       <td> {{ suggestion.mappingValues.DataSource | uppercase }} </td>
                       <td> {{ suggestion.mappingValues.SampleDiagnosis | uppercase }} </td>
                       <td> {{ suggestion.mappingValues.TumorType | uppercase }} </td>
                       <td> {{ suggestion.mappingValues.OriginTissue | uppercase }} </td>
-                      <td> {{ suggestion.mappedTerm | uppercase }} </td>
+                      <td> {{ suggestion.mappedTermLabel | uppercase }} </td>
                       <td> {{ suggestion.mapType | uppercase }} </td>
                         <td> {{ suggestion.justification | uppercase }} </td>
                         <td>
