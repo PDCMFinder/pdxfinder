@@ -87,6 +87,21 @@ public class AjaxController {
         //Map<String, List<MappingEntity>> result =  mappingService.getMissingDiagnosisMappings(ds);
     }
 
+
+    @GetMapping("/mappings/{entityId}")
+    public ResponseEntity<?> getOneMapping(@PathVariable Optional<Integer> entityId) {
+
+        if (entityId.isPresent()){
+
+            MappingEntity result = mappingService.getMappingEntityById(entityId.get());
+
+            return new ResponseEntity<Object>(result, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST.getReasonPhrase(), HttpStatus.BAD_REQUEST);
+    }
+
+
     @GetMapping("/mappings/summary")
     public ResponseEntity<?> getMappingStatSummary(@RequestParam(value = "entity-type", defaultValue = "") Optional<String> entityType) {
 

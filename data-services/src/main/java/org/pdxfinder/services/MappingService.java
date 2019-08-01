@@ -865,5 +865,15 @@ public class MappingService {
     }
 
 
+    public MappingEntity getMappingEntityById(Integer entityId) {
+
+        Long id = Long.parseLong(String.valueOf(entityId));
+
+        MappingEntity mappingEntity = mappingEntityRepository.findByEntityId(id);
+
+        return mappingEntity;
+    }
+
+
 
 }
