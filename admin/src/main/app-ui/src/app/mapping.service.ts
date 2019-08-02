@@ -80,7 +80,7 @@ export class MappingService {
     }
 
 
-    submitCuration (mappings: MappingInterface) {
+    submitCuration (mappings) {
 
         return this.http.post<any>(this._submitCurationUrl, mappings)
             .pipe(catchError(this.errorHandler));

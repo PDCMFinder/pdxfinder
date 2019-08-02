@@ -173,23 +173,23 @@ export class DatasourceSpecificComponent implements OnInit {
 
     submitCuration() {
 
-        console.clear();
+        var validatedTerms = [];
 
         this.mappings.forEach((mapping) => {
             mapping['suggestedMappings'] = [];
+
+            if (mapping['mappedTermLabel'] != '-' && mapping['mappedTermUrl'] != 'null') {
+                validatedTerms.push(mapping);
+            }
         })
-        let curatedMappings: any = this.mappings;
 
-        let mappingObject: MappingInterface = <MappingInterface>curatedMappings;
+        console.log(validatedTerms);
 
-        console.log(mappingObject);
-
-        this._mappingService.submitCuration(mappingObject)
+        this._mappingService.submitCuration(validatedTerms)
             .subscribe(
                 response => console.log('Success!', response),
                 error => this.errorMsg = error.statusText
             )
-
 
     }
 
