@@ -38,9 +38,9 @@
                             <h5 style="font-weight: bold;" class="testMobile"><span
                                     style="color: #03369D"> {{dataSource | uppercase}}  </span> -
                                 Unmapped {{entityType | titlecase}} Summary </h5>
-                            <button style="float: right; margin-top:-7px;" class="btn btn-primary btn-sm" type="submit"
-                                    [disabled]="mappingForm.form.invalid"> Submit Mapping
-                            </button>
+                            <button style="float: right; margin-top:-7px;" class="btn btn-primary btn-sm" type="submit">
+                                Submit Curation
+                            </button> <!-- [disabled]="mappingForm.form.invalid" -->
                         </div>
 
 
@@ -78,23 +78,24 @@
 
                                         <td><input type="text" name="{{'mappedTermLabel'+i}}" class="editableField"
                                                    [(ngModel)]="mapping.mappedTermLabel"
-                                                   value="{{ mapping.mappedTermLabel }}"
-                                                   required
-                                                   [class.is-invalid]="'mappedTermLabel'+i.invalid && 'mappedTerm'+i.dirty">
-                                        </td>
+                                                   value="{{ mapping.mappedTermLabel }}">
+                                        </td><!-- required
+                                                   [class.is-invalid]="'mappedTermLabel'+i.invalid && 'mappedTerm'+i.dirty" -->
 
                                         <td><input type="text" name="{{'mapType'+i}}" class="editableField"
                                                    #curatorMapType
                                                    (input)="mapping.mapType=curatorMapType.value"
-                                                   value="{{ mapping.mapType }}"
+                                                   value="{{ mapping.mapType }}">
+                                            <!--
                                                    required
-                                                   [class.is-invalid]="'mapType'+i.invalid && 'mapType'+i.dirty"></td>
+                                                   [class.is-invalid]="'mapType'+i.invalid && 'mapType'+i.dirty" --></td>
 
                                         <td><input type="text" name="{{'justification'+i}}" class="editableField"
                                                    [(ngModel)]="mapping.justification"
-                                                   value="{{ mapping.justification }}"
+                                                   value="{{ mapping.justification }}">
+                                            <!--
                                                    required
-                                                   [class.is-invalid]="'justification'+i.invalid && 'justification'+i.dirty">
+                                                   [class.is-invalid]="'justification'+i.invalid && 'justification'+i.dirty"-->
 
                                             <input type="hidden" name="{{'mappedTermUrl'+i}}"
                                                    [(ngModel)]="mapping.mappedTermUrl"
