@@ -129,12 +129,30 @@
                                             « </a>  <!--  href="/{{'curation/'+entityTypeUrl+'/'+dataSource+'/'+data.totaPages}}"  -->
                                     </li>
 
+
+                                    <li>
+                                        <select (change)="newPageSize($event.target.value)">
+
+                                            <option *ngFor="let pageOption of pageOptions"
+                                                    [value]="pageOption"
+                                                    [selected]="pageOption == pageSize">
+                                                {{pageOption}}
+                                            </option>
+
+                                        </select>
+                                    </li>
+
+
                                 </ul>
 
                             </div>
                         </div>
                     </div>
+
                 </form>
+
+
+
 
             </div>
         </div>

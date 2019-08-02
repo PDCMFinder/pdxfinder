@@ -3,6 +3,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {MappingService} from "../mapping.service";
 import {Mapping, MappingInterface} from "../mapping-interface";
 import {GeneralService} from "../general.service";
+import {FormBuilder, FormGroup} from "@angular/forms";
 
 @Component({
     selector: 'app-datasource-specific',
@@ -35,6 +36,10 @@ export class DatasourceSpecificComponent implements OnInit {
     public selectedSrc: any;
     public showNotif: boolean = false;
 
+    public pageSize;
+    public pageOptions = ['5', '10', '15', '20', '25'];
+    public userPage: number;
+
     constructor(private router: Router,
                 private route: ActivatedRoute,
                 private _mappingService: MappingService,
@@ -46,26 +51,28 @@ export class DatasourceSpecificComponent implements OnInit {
 
     ngOnInit() {
 
+
         // From the current url snapshot, get the source parameter and assign to the dataSource property
         this.dataSource = this.route.snapshot.paramMap.get('source');
         this.entityTypeUrl = this.route.snapshot.paramMap.get('mapType');
         this.entityType = this.entityTypeUrl.split('-')[0];
 
         var page = this.route.snapshot.paramMap.get("page");
-        var size = this.route.snapshot.paramMap.get("size");
+        var size = localStorage.getItem('_pageSize');
 
         this.route.paramMap.subscribe(
             params => {
-
+                
                 page = params.get('page');
 
                 // If no page value submitted, set page value as first page
                 page = (page == null) ? "1" : page;
+                this.userPage = parseInt(page);
 
                 // If no size value submitted, set size value as five
-                size = (size == null) ? "5" : size;
+                //size = (size == null) ? "5" : this.pageSize;
 
-                this.getUnmappedTerms(page, size);
+                this.getUnmappedTerms(page);
             }
         )
 
@@ -103,14 +110,16 @@ export class DatasourceSpecificComponent implements OnInit {
     };
 
 
-    getUnmappedTerms(page, size) {
+    getUnmappedTerms(page) {
 
-        this.toggleNotification(false);
+        this.pageSize = localStorage.getItem('_pageSize') == null ? 5 : localStorage.getItem('_pageSize');
+
+            this.toggleNotification(false);
 
         this.columnHeaders = [];
         this.mappings = [];
 
-        this._mappingService.getUnmappedTerms(this.entityType, this.dataSource, page, size)
+        this._mappingService.getUnmappedTerms(this.entityType, this.dataSource, page, this.pageSize)
             .subscribe(
                 data => {
 
@@ -197,6 +206,19 @@ export class DatasourceSpecificComponent implements OnInit {
     toggleNotification(value: boolean) {
 
         this.showNotif = value;
+    }
+
+    newPageSize(pageSize){
+
+        localStorage.setItem('_pageSize', pageSize);
+
+        //  Auto-Navigate away on page size change
+        let newPage = (this.userPage <= 1) ? this.userPage + 1 : 1;
+
+        this.router.navigate([`curation/${this.entityTypeUrl}/${this.dataSource}/${newPage}`])
+
+
+        
     }
 
 
