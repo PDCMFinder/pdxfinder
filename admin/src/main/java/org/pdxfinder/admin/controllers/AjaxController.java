@@ -117,7 +117,8 @@ public class AjaxController {
     @PostMapping("/diagnosis")
     public ResponseEntity<?> createDiagnosisMappings(@RequestBody List<MappingEntity> newMappings) {
 
-        log.info(newMappings.toString());
+        List data =  mapper.convertValue(newMappings, List.class);
+        log.info(data.toString());
         return ResponseEntity.noContent().build();
     }
 

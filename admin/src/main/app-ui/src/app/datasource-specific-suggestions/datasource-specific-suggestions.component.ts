@@ -53,10 +53,11 @@ export class DatasourceSpecificSuggestionsComponent implements OnInit {
                             this.dataLabels.forEach((mappingLabel) => {
                                 this.columnHeaders.push(mappingLabel.replace(/([a-z])([A-Z])/g, '$1 $2'));
                             });
+
+                            this.sendDataToParent(this.selectedEntity);
                         }
                     );
 
-                this.sendDataToParent(this.entityId);
             }
         )
     }

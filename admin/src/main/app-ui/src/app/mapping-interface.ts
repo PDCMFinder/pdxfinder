@@ -9,6 +9,7 @@ export interface Mapping {
     entityId: number;
     entityType: string;
     mappingLabels: string[];
+    mappedTermUrl: string;
     mappingValues: MappingValues;
     mappedTermLabel?: any;
     mapType?: any;

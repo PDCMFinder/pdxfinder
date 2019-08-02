@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
-import {MappingInterface} from "./mapping-interface";
+import {Mapping, MappingInterface} from "./mapping-interface";
 import {Observable, Subject, throwError} from "rxjs/index";
 import {catchError} from "rxjs/internal/operators";
 import {SummaryInterface} from "./summary-interface";
@@ -21,6 +21,8 @@ export class MappingService {
     private _submitCurationUrl = this.serverUrl+"/api/diagnosis";
 
     public dataSubject = new Subject<any>();
+
+    public stringDataBusSubject = new Subject<any>();
 
     constructor(private http: HttpClient) { }
 
@@ -47,6 +49,15 @@ export class MappingService {
         return this.http.get<MappingInterface[]>(this._unmappedDiagnosisUrl);
     }
 
+    //Retrieve one mapping entity by entityId
+    getMappingEntityById(entityId: string): Observable<Mapping>{
+
+        let url = `${this._mappingsUrl}/${entityId}`;
+
+        return this.http.get<Mapping>(url);
+    }
+
+
     //Retrieve unmapped treatments
     getUnmappedTreatment(): Observable<MappingInterface[]>{
 
@@ -62,6 +73,10 @@ export class MappingService {
 
     componentsDataBus(data): void{
         this.dataSubject.next(data);
+    }
+
+    stringDataBus(data): void{
+        this.stringDataBusSubject.next(data);
     }
 
 
@@ -83,7 +98,6 @@ export class MappingService {
             .then((data) => data)
             .catch(error => console.log(error));
     }*/
-
 
 
 }

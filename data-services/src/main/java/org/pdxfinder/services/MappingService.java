@@ -871,6 +871,11 @@ public class MappingService {
 
         MappingEntity mappingEntity = mappingEntityRepository.findByEntityId(id);
 
+        mappingEntity
+                .setSuggestedMappings(getSuggestionsForUnmappedEntity(
+                        mappingEntity,
+                        getMappedEntitiesByType(mappingEntity.getEntityType())));
+
         return mappingEntity;
     }
 

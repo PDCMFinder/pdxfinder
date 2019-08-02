@@ -21,6 +21,8 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
 
     MappingEntity findByMappingKey(String mappingKey);
 
+    MappingEntity findByEntityId(Long entityId);
+
     List<MappingEntity> findByMappedTermLabel(String mappedTermLabel);
 
 
