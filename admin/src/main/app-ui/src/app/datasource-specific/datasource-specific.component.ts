@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {MappingService} from "../mapping.service";
-import {MappingInterface} from "../mapping-interface";
+import {Mapping, MappingInterface} from "../mapping-interface";
 import {GeneralService} from "../general.service";
 
 @Component({
@@ -22,12 +22,18 @@ export class DatasourceSpecificComponent implements OnInit {
     public dataLabels;
     public columnHeaders = [];
 
-    public selectedRow: Number;
+    public selectedRow;
     public setClickedRow: Function;
-    public selectedEntity: String;
+    public selectedEntity: any;
     public errorMsg = "";
 
     public pageRange: number[];
+
+    // Selected Fields
+    public selectedDetails: any;
+    public selectedEntityType: string;
+    public selectedSrc: any;
+    public showNotif: boolean = false;
 
     constructor(private router: Router,
                 private route: ActivatedRoute,
@@ -35,8 +41,9 @@ export class DatasourceSpecificComponent implements OnInit {
                 private gs: GeneralService) {
 
         // This will allow navigation to respond param changes on thesame route path
-        //this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+        // This.router.routeReuseStrategy.shouldReuseRoute = () => false;
     }
+
     ngOnInit() {
 
         // From the current url snapshot, get the source parameter and assign to the dataSource property
@@ -47,35 +54,25 @@ export class DatasourceSpecificComponent implements OnInit {
         var page = this.route.snapshot.paramMap.get("page");
         var size = this.route.snapshot.paramMap.get("size");
 
-        // If no page value submitted, set page value as first page
-        page = (page == null) ? "1" : page;
-
-        // If no size value submitted, set size value as five
-        size = (size == null) ? "5" : size;
-
-        this.route.queryParamMap.subscribe(
+        this.route.paramMap.subscribe(
             params => {
 
+                page = params.get('page');
+
+                // If no page value submitted, set page value as first page
+                page = (page == null) ? "1" : page;
+
+                // If no size value submitted, set size value as five
+                size = (size == null) ? "5" : size;
+
+                this.getUnmappedTerms(page, size);
             }
         )
 
-        this.getUnmappedTerms(page, size);
 
-
-
-
-
-
-        this.setClickedRow = function (index, entityId) {
-            this.selectedRow = index;
-            this.selectedEntity = entityId;
-        }
-
-
+        // Get Data from Child Component
         this._mappingService.dataSubject.subscribe(
             data => {
-
-                console.log(data);
 
                 for (var i = 0; i < this.mappings.length; i++) {
 
@@ -84,6 +81,7 @@ export class DatasourceSpecificComponent implements OnInit {
                         this.mappings[i].mappedTermLabel = data.mappedTermLabel.toUpperCase();
                         this.mappings[i].mapType = data.mapType.toUpperCase();
                         this.mappings[i].justification = data.justification.toUpperCase();
+                        this.mappings[i].mappedTermUrl = data.mappedTermUrl;
 
                     }
 
@@ -92,11 +90,25 @@ export class DatasourceSpecificComponent implements OnInit {
             }
         )
 
+        // Get String Data from Child Component :
+        // This data is sent to the parent on load, so it allows parent data Row to be selected when deeplink url is visited
+        this._mappingService.stringDataBusSubject.subscribe(
+            data => {
+
+                this.getClickedRow(data);
+            }
+        )
+
 
     };
 
 
-    getUnmappedTerms(page, size){
+    getUnmappedTerms(page, size) {
+
+        this.toggleNotification(false);
+
+        this.columnHeaders = [];
+        this.mappings = [];
 
         this._mappingService.getUnmappedTerms(this.entityType, this.dataSource, page, size)
             .subscribe(
@@ -106,8 +118,6 @@ export class DatasourceSpecificComponent implements OnInit {
 
                     // This receives the mappings node of the json in required format
                     let mappings = this.data.mappings;
-
-                    console.log(this.data)
 
                     // Build Column Headers If data is not empty
                     if (mappings.length > 0) {
@@ -125,8 +135,6 @@ export class DatasourceSpecificComponent implements OnInit {
                     }
 
                     this.pageRange = this.gs.getNumbersInRange(this.data.beginIndex, this.data.endIndex);
-                    // console.log(this.pageRange);
-
 
                     var count: number = 0;
                     for (var i of mappings) {
@@ -141,6 +149,22 @@ export class DatasourceSpecificComponent implements OnInit {
             );
     }
 
+
+    getClickedRow(mapping: Mapping) {
+
+        this.selectedEntity = mapping.entityId;
+        this.selectedRow = mapping.entityId;
+
+        this.selectedDetails = (mapping.entityType == 'diagnosis') ?
+            mapping.mappingValues.SampleDiagnosis : mapping.mappingValues['TreatmentName'];
+
+        this.selectedSrc = mapping.mappingValues.DataSource;
+        this.selectedEntityType = mapping.entityType;
+
+        this.toggleNotification(true);
+
+    }
+
     showSuggestedMappings(id) {
 
         // this.router.navigate([`../${this.dataSource}`],{relativeTo: this.route, queryParams: {page: page}} )
@@ -151,8 +175,14 @@ export class DatasourceSpecificComponent implements OnInit {
 
         console.clear();
 
+        this.mappings.forEach((mapping) => {
+            mapping['suggestedMappings'] = [];
+        })
         let curatedMappings: any = this.mappings;
+
         let mappingObject: MappingInterface = <MappingInterface>curatedMappings;
+
+        console.log(mappingObject);
 
         this._mappingService.submitCuration(mappingObject)
             .subscribe(
@@ -160,7 +190,13 @@ export class DatasourceSpecificComponent implements OnInit {
                 error => this.errorMsg = error.statusText
             )
 
-        console.log(this.mappings);
+
+    }
+
+
+    toggleNotification(value: boolean) {
+
+        this.showNotif = value;
     }
 
 
