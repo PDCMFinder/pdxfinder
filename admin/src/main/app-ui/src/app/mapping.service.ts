@@ -10,7 +10,7 @@ import {SummaryInterface} from "./summary-interface";
 })
 export class MappingService {
 
-    private serverUrl = "http://localhost:8081";
+    private serverUrl = ""; //"http://localhost:8081";
     private _totalMappedUrl = this.serverUrl+"/api/mappings?map-terms-only=true&entity-type=diagnosis&size=900";
     private _unmappedTreatmentUrl = this.serverUrl+"/api/mappings?entity-type=treatment&mapped-term=-";
     private _unmappedDiagnosisUrl = this.serverUrl+"/api/mappings?entity-type=diagnosis&mapped-term=-";

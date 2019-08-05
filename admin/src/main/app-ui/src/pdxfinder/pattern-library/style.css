@@ -113,7 +113,7 @@ button a {
 
 
 .clipText {
-    max-width: 350px;
+    max-width: 300px;
     white-space: nowrap;
     overflow: hidden;
     display: inline-block;

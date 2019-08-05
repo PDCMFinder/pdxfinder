@@ -37,7 +37,7 @@ export class DatasourceSpecificComponent implements OnInit {
     public showNotif: boolean = false;
 
     public pageSize;
-    public pageOptions = ['5', '10', '15', '20', '25'];
+    public pageOptions = ['2', '3', '5', '10', '15', '20', '25'];
     public userPage: number;
 
     constructor(private router: Router,
@@ -105,8 +105,6 @@ export class DatasourceSpecificComponent implements OnInit {
                 this.getClickedRow(data);
             }
         )
-
-
     };
 
 
@@ -187,12 +185,14 @@ export class DatasourceSpecificComponent implements OnInit {
         this.mappings.forEach((mapping) => {
             mapping['suggestedMappings'] = [];
 
-            if (mapping['mappedTermLabel'] != '-' && mapping['mappedTermUrl'] != 'null') {
+            if (mapping['mappedTermLabel'] != '-' && mapping['mappedTermUrl'] != null) {
                 validatedTerms.push(mapping);
             }
         })
 
         console.log(validatedTerms);
+
+
 
         this._mappingService.submitCuration(validatedTerms)
             .subscribe(
@@ -216,8 +216,6 @@ export class DatasourceSpecificComponent implements OnInit {
         let newPage = (this.userPage <= 1) ? this.userPage + 1 : 1;
 
         this.router.navigate([`curation/${this.entityTypeUrl}/${this.dataSource}/${newPage}`])
-
-
         
     }
 
