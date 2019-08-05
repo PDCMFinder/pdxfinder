@@ -871,10 +871,14 @@ public class MappingService {
 
         MappingEntity mappingEntity = mappingEntityRepository.findByEntityId(id);
 
-        mappingEntity
-                .setSuggestedMappings(getSuggestionsForUnmappedEntity(
-                        mappingEntity,
-                        getMappedEntitiesByType(mappingEntity.getEntityType())));
+        //Get suggestions only if mapped term is missing
+        if (mappingEntity.getMappedTermLabel().equals("-")) {
+
+            mappingEntity
+                    .setSuggestedMappings(getSuggestionsForUnmappedEntity(
+                            mappingEntity,
+                            getMappedEntitiesByType(mappingEntity.getEntityType())));
+        }
 
         return mappingEntity;
     }
