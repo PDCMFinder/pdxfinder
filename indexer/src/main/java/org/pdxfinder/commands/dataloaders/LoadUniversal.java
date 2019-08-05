@@ -35,7 +35,7 @@ import java.io.File;
  */
 @Component
 @Order(value = 0)
-public class LoadUniversal implements CommandLineRunner, ApplicationContextAware{
+public class LoadUniversal implements CommandLineRunner, ApplicationContextAware {
 
 
     @Value("${pdxfinder.root.dir}")
@@ -75,7 +75,7 @@ public class LoadUniversal implements CommandLineRunner, ApplicationContextAware
 
             reportManager = (ReportManager) context.getBean("ReportManager");
 
-            File folder = new File(finderRootDir +"/data/UPDOG/");
+            File folder = new File(finderRootDir + "/data/UPDOG/");
 
             if (folder.exists()) {
 
@@ -90,32 +90,20 @@ public class LoadUniversal implements CommandLineRunner, ApplicationContextAware
 
                         if (updogDirs[i].isDirectory()) {
 
-                            String templateFileStr = finderRootDir + "/data/UPDOG/" + updogDirs[i].getName() + "/template.xlsx";
+                            String updogCurrDir = finderRootDir + "/data/UPDOG/" + updogDirs[i].getName();
 
-                            File template = new File(templateFileStr);
+                            log.info("******************************************************");
+                            log.info("* Starting universal loader                          *");
+                            log.info("******************************************************");
+                            log.info("Loading data from "+updogCurrDir);
+                            UniversalLoader updog = new UniversalLoader(reportManager, utilityService, dataImportService);
+                            updog.setFinderRootDir(finderRootDir);
+                            updog.initTemplates(updogCurrDir);
+                            updog.loadTemplateData();
 
-                            //found the template, load it
-                            if (template.exists()) {
-
-
-
-                                log.info("******************************************************");
-                                log.info("* Starting universal loader                          *");
-                                log.info("******************************************************");
-
-                                UniversalLoader updog = new UniversalLoader(reportManager, utilityService, dataImportService);
-                                updog.setFinderRootDir(finderRootDir);
-                                updog.initTemplate(templateFileStr);
-                                updog.loadTemplateData();
-
-                                log.info("******************************************************");
-                                log.info("* Finished running universal loader                  *");
-                                log.info("******************************************************");
-
-                            } else {
-
-                                log.error("No template file found for universal loader in " + updogDirs[i]);
-                            }
+                            log.info("******************************************************");
+                            log.info("* Finished running universal loader                  *");
+                            log.info("******************************************************");
 
                         }
                     }
