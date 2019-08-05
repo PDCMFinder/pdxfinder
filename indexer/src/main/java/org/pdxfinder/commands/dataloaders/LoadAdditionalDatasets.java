@@ -74,7 +74,7 @@ public class LoadAdditionalDatasets implements CommandLineRunner, ApplicationCon
 
             reportManager = (ReportManager) context.getBean("ReportManager");
 
-            //loadAdditionalDatasetForCRL();
+            loadAdditionalDatasetForCRL();
 
         }
     }
@@ -143,9 +143,9 @@ public class LoadAdditionalDatasets implements CommandLineRunner, ApplicationCon
             UniversalLoader updog = new UniversalLoader(reportManager, utilityService, dataImportService);
             updog.setFinderRootDir(finderRootDir);
 
-            updog.initTemplate(templateFileStr);
+            updog.initTemplates(templateFileStr);
 
-            List<List<String>> datasetDerived = updog.getDerivedDatasetSheetData();
+            List<List<String>> datasetDerived = updog.getSamplePlatformDescriptionSheetData();
             int row = 6;
 
             for (List<String> derivedDatasetRow : datasetDerived) {
