@@ -1180,7 +1180,6 @@ public class DataImportService {
                     Treatment treatment = new Treatment();
                     treatment.setName(drugArray[i].trim());
                     TreatmentComponent tc = new TreatmentComponent();
-                    tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                     tc.setDose(doseArray[i].trim());
 
 
@@ -1202,7 +1201,6 @@ public class DataImportService {
                     treatment.setName(drugArray[i].trim());
 
                     TreatmentComponent tc = new TreatmentComponent();
-                    tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                     tc.setDose(doseArray[0].trim());
 
                     tc.setTreatment(treatment);
@@ -1228,7 +1226,6 @@ public class DataImportService {
                         Treatment treatment = new Treatment();
                         treatment.setName(drugArray[i].trim());
                         TreatmentComponent tc = new TreatmentComponent();
-                        tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                         tc.setDose(doseArray[i].trim());
 
                         tc.setTreatment(treatment);
@@ -1250,7 +1247,6 @@ public class DataImportService {
                     Treatment treatment = new Treatment();
                     treatment.setName(drugArray[i].trim());
                     TreatmentComponent tc = new TreatmentComponent();
-                    tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                     tc.setDose(doseString.trim());
                     tc.setTreatment(treatment);
                     tp.addTreatmentComponent(tc);
@@ -1265,7 +1261,6 @@ public class DataImportService {
             Treatment treatment = new Treatment();
             treatment.setName(drugString.trim());
             TreatmentComponent tc = new TreatmentComponent();
-            tc.setType(Standardizer.getTreatmentComponentType(drugString));
 
             if(doseString != null) {
                 tc.setDose(doseString.trim());
