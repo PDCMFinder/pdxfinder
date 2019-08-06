@@ -21,7 +21,7 @@ public interface DrugRepository extends Neo4jRepository<Drug, Long> {
     List<String> findDistinctDrugNames();
 
 
-    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:DRUG]-(drug:Drug) " +
+    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(drug:Drug) " +
             "RETURN drug.name AS drug_name, COUNT(DISTINCT mod.sourcePdxId) as model_count " +
             "ORDER BY model_count DESC")
     Result countModelsByDrug();
@@ -33,8 +33,5 @@ public interface DrugRepository extends Neo4jRepository<Drug, Long> {
     Result countModelsByDrugAndComponentType(@Param("type") String type);
 
 
-    @Query("MATCH (mod:ModelCreation)-[tsr:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:DRUG]-(d:Drug) " +
-            "WHERE tc.type = {type} " +
-            "RETURN mod, tsr, ts, tpr, tp, tcr, tc, dr, d")
-    Set<ModelCreation> getModelsTreatmentsAndDrugs(@Param("type") String type);
+
 }

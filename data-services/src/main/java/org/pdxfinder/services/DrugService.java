@@ -3,10 +3,7 @@ package org.pdxfinder.services;
 import org.pdxfinder.graph.dao.ModelCreation;
 import org.pdxfinder.graph.dao.TreatmentProtocol;
 import org.pdxfinder.graph.dao.TreatmentSummary;
-import org.pdxfinder.graph.repositories.DrugRepository;
-import org.pdxfinder.graph.repositories.ResponseRepository;
-import org.pdxfinder.graph.repositories.TreatmentProtocolRepository;
-import org.pdxfinder.graph.repositories.TreatmentSummaryRepository;
+import org.pdxfinder.graph.repositories.*;
 import org.pdxfinder.services.dto.CountDTO;
 import org.springframework.stereotype.Service;
 
@@ -21,17 +18,17 @@ public class DrugService {
     private TreatmentSummaryRepository treatmentSummaryRepository;
     private TreatmentProtocolRepository treatmentProtocolRepository;
     private ResponseRepository responseRepository;
-    private DrugRepository drugRepository;
+    private ModelCreationRepository modelCreationRepository;
 
     public DrugService(TreatmentSummaryRepository treatmentSummaryRepository,
                        TreatmentProtocolRepository treatmentProtocolRepository,
                        ResponseRepository responseRepository,
-                       DrugRepository drugRepository) {
+                       ModelCreationRepository modelCreationRepository) {
 
         this.treatmentSummaryRepository = treatmentSummaryRepository;
         this.treatmentProtocolRepository = treatmentProtocolRepository;
         this.responseRepository = responseRepository;
-        this.drugRepository = drugRepository;
+        this.modelCreationRepository = modelCreationRepository;
     }
 
 
@@ -82,18 +79,11 @@ public class DrugService {
     }
 
 
-    public Iterable<Map<String, Object>> getModelCountByDrug(){
-
-        Iterable<Map<String, Object>> iterableResults = drugRepository.countModelsByDrug().queryResults();
-
-        return iterableResults;
-
-    }
 
     public List<CountDTO> getModelCountByDrugAndComponentType(String type){
 
         Map<String, Set<String>> results = new HashMap<>();
-        Set<ModelCreation> models = drugRepository.getModelsTreatmentsAndDrugs(type);
+        Set<ModelCreation> models = modelCreationRepository.getModelsTreatmentsAndDrugs(type);
         List<CountDTO> res = new ArrayList<CountDTO>();
 
         for(ModelCreation mod : models){
