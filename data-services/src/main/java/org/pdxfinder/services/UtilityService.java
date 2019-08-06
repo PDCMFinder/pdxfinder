@@ -910,9 +910,25 @@ public class UtilityService {
 
 
 
-    public String log(){
-        return "Working";
+    public List<Map> objectArrayListToMapList(List<Object[]> dataList, List<String> keys){
+
+        List<Map> result = new ArrayList<>();
+
+        for (Object[] data : dataList) {
+
+            Map<String, Object> dataMap = new LinkedHashMap<>();
+            int count = 0;
+            for (Object content : data){
+
+                dataMap.put(keys.get(count), content);
+                count++;
+            }
+            result.add(dataMap);
+        }
+        return result;
     }
+
+
 
 
 

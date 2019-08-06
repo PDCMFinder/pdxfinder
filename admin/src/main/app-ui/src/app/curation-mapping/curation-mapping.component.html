@@ -3,7 +3,7 @@
         <h2>Curation Mappings</h2>
         <ol class="breadcrumb">
             <li>
-                <a routerLink="/dashboard">Dashboard </a>
+                <a routerLink="/dashboard"> Dashboard </a>
             </li>
             <li class="active">
                 Curation Mappings
@@ -21,9 +21,18 @@
     <div class="row">
       <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
         <div class="pdxfinder">
-          <div class="pdxfinder-content pdx-badge" style="padding-bottom:10px;" attr.pdxfinder-badge={{mappingCnt}}>
-            <a routerLink="/mapping-summary"> <img src="assets/icons/diagnosis.png" class="icon"> </a>
-            <div class='text-navy pdx-singleLine'> DIAGNOSIS MAPPINGS </div>
+          <div class="pdxfinder-content pdx-badge" style="padding-bottom:10px;" attr.pdxfinder-badge={{unmappedDiagnosisCnt}}>
+            <img (click)="onClick('diagnosis-summary')" src="assets/icons/diagnosis.png" class="icon pdxfinder-clickable-area">
+            <div class='text-navy pdx-singleLine'> DIAGNOSIS MAPPING </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+        <div class="pdxfinder">
+          <div class="pdxfinder-content pdx-badge" style="padding-bottom:10px;" attr.pdxfinder-badge={{unmappedTreatmentCnt}}>
+            <img (click)="onClick('treatment-summary')" src="assets/icons/drug.png" class="icon pdxfinder-clickable-area">
+            <div class='text-navy pdx-singleLine'> TREATMENT MAPPING </div>
           </div>
         </div>
       </div>
@@ -31,16 +40,7 @@
       <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
         <div class="pdxfinder">
           <div class="pdxfinder-content" style="padding-bottom:10px;">
-            <img src="assets/icons/drug.png" class="icon">
-            <div class='text-navy pdx-singleLine'> DRUG MAPPINGS </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
-        <div class="pdxfinder">
-          <div class="pdxfinder-content" style="padding-bottom:10px;">
-            <img src="assets/icons/images.png" class="icon">
+            <img src="assets/icons/images.png" class="icon pdxfinder-clickable-area">
             <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>
           </div>
         </div>
@@ -49,7 +49,7 @@
       <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
         <div class="pdxfinder">
           <div class="pdxfinder-content" style="padding-bottom:10px;">
-            <img src="assets/icons/images.png" class="icon">
+            <img src="assets/icons/images.png" class="icon pdxfinder-clickable-area">
             <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>
           </div>
         </div>
@@ -58,7 +58,7 @@
       <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
         <div class="pdxfinder">
           <div class="pdxfinder-content" style="padding-bottom:10px;">
-            <img src="assets/icons/images.png" class="icon">
+            <img src="assets/icons/images.png" class="icon pdxfinder-clickable-area">
             <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>
           </div>
         </div>
@@ -67,7 +67,7 @@
       <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
         <div class="pdxfinder">
           <div class="pdxfinder-content" style="padding-bottom:10px;">
-            <img src="assets/icons/images.png" class="icon">
+            <img src="assets/icons/images.png" class="icon pdxfinder-clickable-area">
             <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>
           </div>
         </div>
