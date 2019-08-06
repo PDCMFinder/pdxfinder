@@ -14,6 +14,7 @@ import org.pdxfinder.graph.repositories.SampleRepository;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.dto.PaginationDTO;
 import org.pdxfinder.services.mapping.MappingEntityType;
+import org.pdxfinder.services.mapping.Status;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -726,7 +727,7 @@ public class MappingService {
 
     public void saveUnmappedTerms(MappingEntity mappingEntity) {
 
-        mappingEntity.setStatus("Created");
+        mappingEntity.setStatus(Status.unmapped.get());
         mappingEntity.setMappedTermLabel("-");
         mappingEntity.setDateCreated(new Date());
 
@@ -749,6 +750,7 @@ public class MappingService {
         for (MappingEntity mappingEntity : mappingEntities) {
 
             mappingEntity.setEntityId(null);
+            mappingEntity.setStatus(Status.validated.get());
             String mappingKey = mappingEntity.getMappingKey();
 
             MappingEntity entity = mappingEntityRepository.findByMappingKey(mappingKey);
@@ -869,7 +871,7 @@ public class MappingService {
 
         Long id = Long.parseLong(String.valueOf(entityId));
 
-        MappingEntity mappingEntity = mappingEntityRepository.findByEntityId(id);
+        MappingEntity mappingEntity = mappingEntityRepository.findByEntityId(id).get();
 
         //Get suggestions only if mapped term is missing
         if (mappingEntity.getMappedTermLabel().equals("-")) {
@@ -883,6 +885,43 @@ public class MappingService {
         return mappingEntity;
     }
 
+
+    public boolean checkExistence(Long entityId) {
+
+        return mappingEntityRepository.exists(entityId);
+
+    }
+
+
+    // Update Bulk List of Mapping Entity Records
+    public List<MappingEntity> updateRecords(List<MappingEntity> submittedEntities) {
+
+        List<MappingEntity> savedEntities = new ArrayList<>();
+
+        submittedEntities.forEach(newEntity ->{
+
+            MappingEntity updated = mappingEntityRepository.findByEntityId(newEntity.getEntityId())
+                    .map(mappingEntity -> {
+
+                        mappingEntity.setDateUpdated(new Date());
+                        mappingEntity.setStatus(Status.created.get());
+                        mappingEntity.setMappedTermLabel(newEntity.getMappedTermLabel());
+                        mappingEntity.setMappedTermUrl(newEntity.getMappedTermUrl());
+                        mappingEntity.setMapType(newEntity.getMapType());
+                        mappingEntity.setJustification(newEntity.getJustification());
+
+                        return mappingEntityRepository.save(mappingEntity);
+                    })
+                    .orElseGet(() -> {
+                        return newEntity;
+                    });
+
+            savedEntities.add(updated);
+
+        });
+
+        return savedEntities;
+    }
 
 
 }

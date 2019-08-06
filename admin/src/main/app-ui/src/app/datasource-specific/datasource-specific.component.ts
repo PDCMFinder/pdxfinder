@@ -91,9 +91,7 @@ export class DatasourceSpecificComponent implements OnInit {
                         this.mappings[i].mappedTermUrl = data.mappedTermUrl;
 
                     }
-
                 }
-
             }
         )
 
@@ -178,7 +176,7 @@ export class DatasourceSpecificComponent implements OnInit {
         this.router.navigate(['suggested-mappings'], {relativeTo: this.route})
     }
 
-    submitCuration() {
+    updateMappingEntity() {
 
         var validatedTerms = [];
 
@@ -192,9 +190,7 @@ export class DatasourceSpecificComponent implements OnInit {
 
         console.log(validatedTerms);
 
-
-
-        this._mappingService.submitCuration(validatedTerms)
+        this._mappingService.updateEntity(validatedTerms)
             .subscribe(
                 response => console.log('Success!', response),
                 error => this.errorMsg = error.statusText

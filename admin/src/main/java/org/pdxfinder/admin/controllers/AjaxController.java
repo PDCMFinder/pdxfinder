@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -102,6 +103,7 @@ public class AjaxController {
     }
 
 
+
     @GetMapping("/mappings/summary")
     public ResponseEntity<?> getMappingStatSummary(@RequestParam(value = "entity-type", defaultValue = "") Optional<String> entityType) {
 
@@ -111,18 +113,23 @@ public class AjaxController {
     }
 
 
+    // Bulk update of Records
+    @PutMapping("/mappings")
+    public ResponseEntity<?> editListOfEntityMappings(@RequestBody List<MappingEntity> submittedEntities) {
 
-
-
-    @PostMapping("/diagnosis")
-    public ResponseEntity<?> createDiagnosisMappings(@RequestBody List<MappingEntity> newMappings) {
-
-        List data =  mapper.convertValue(newMappings, List.class);
+        List data =  mapper.convertValue(submittedEntities, List.class);
         log.info(data.toString());
-        return ResponseEntity.noContent().build();
+
+        List<Error> errors = validateEntities(submittedEntities);
+
+        if (!errors.isEmpty()){
+            return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
+        }
+
+        List<MappingEntity> updated = mappingService.updateRecords(submittedEntities);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
+
     }
-
-
 
 
 
@@ -211,6 +218,22 @@ public class AjaxController {
         String output = StringUtils.capitalize(input.split("-")[0]) + StringUtils.capitalize(input.split("-")[1]);
 
         return output;
+    }
+
+
+    public List validateEntities(List<MappingEntity> mappingEntities){
+
+        List<Error> errors = new ArrayList<>();
+
+        for (MappingEntity me : mappingEntities){
+
+            if (!mappingService.checkExistence(me.getEntityId())){
+
+                Error error = new Error("Entity " + me.getEntityId() + " Not Found", HttpStatus.NOT_FOUND);
+                errors.add(error);
+            }
+        }
+        return errors;
     }
 
 
