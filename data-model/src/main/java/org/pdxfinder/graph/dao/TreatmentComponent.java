@@ -30,11 +30,13 @@ public class TreatmentComponent {
     private Treatment treatment;
 
     public TreatmentComponent() {
+        this.type = "Drug";
     }
 
     public TreatmentComponent(String dose, Treatment treatment) {
         this.dose = dose;
         this.treatment = treatment;
+        this.type = "Drug";
     }
 
     public String getDose() {
