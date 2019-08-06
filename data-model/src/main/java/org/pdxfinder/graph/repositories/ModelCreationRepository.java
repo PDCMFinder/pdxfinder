@@ -209,9 +209,9 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN model, msr, samp, cby, molchar, asw, massoc, mark, marker")
     List<ModelCreation> findByMolcharType(@Param("molcharType") String molcharType);
 
-    @Query("MATCH (mod:ModelCreation)-[tsr:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(d:Treatment) " +
+    @Query("MATCH (mod:ModelCreation)-[tsr:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(d:Treatment)-[mt:MAPPED_TO]-(ot:OntologyTerm) " +
             "WHERE tc.type = {type} " +
-            "RETURN mod, tsr, ts, tpr, tp, tcr, tc, dr, d")
+            "RETURN mod, tsr, ts, tpr, tp, tcr, tc, dr, d, mt, ot")
     Set<ModelCreation> getModelsTreatmentsAndDrugs(@Param("type") String type);
 
 }
