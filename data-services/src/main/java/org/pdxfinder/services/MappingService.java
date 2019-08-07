@@ -794,17 +794,17 @@ public class MappingService {
 
         String jsonKey = "mappings";
 
-        String mappingFile = rootDir+"/mapping/"+entityType+"_mappings.json";
+        String mappingFile = rootDir + "/mapping/" + entityType + "_mappings.json";
 
         // Generate Unique name to back up previous mapping file
-        String backupPreviousMappingFile = rootDir+"/mapping/backup/"+
-                (new Date()).toString().replaceAll(" ", "-")+"-"+entityType+"_mappings.json";
+        String backupPreviousMappingFile = rootDir + "/mapping/backup/" + entityType + "/" +
+                (new Date()).toString().replaceAll(" ", "-") + "-" + entityType + "_mappings.json";
 
         // Back up previous mapping file before replacement
         utilityService.moveFile(mappingFile, backupPreviousMappingFile);
 
         // Get Latest mapped terms from the data base
-       List<MappingEntity> mappingEntities = mappingEntityRepository.findByEntityTypeAndStatusIsNot(entityType, "unmapped");
+        List<MappingEntity> mappingEntities = mappingEntityRepository.findByEntityTypeAndStatusIsNot(entityType, "unmapped");
 
         Map dataMap = new HashMap();
 
@@ -816,12 +816,21 @@ public class MappingService {
             String newFile = mapper.writeValueAsString(dataMap);
             utilityService.writeToFile(newFile, mappingFile, false);
 
-        } catch (JsonProcessingException e) {}
+        } catch (JsonProcessingException e) {
+        }
 
     }
 
 
-    public PaginationDTO search(int page, int size, String entityType, String mappingLabel, String mappingValue, String mappedTermLabel, String mapType, String mappedTermsOnly) {
+    public PaginationDTO search(int page,
+                                int size,
+                                String entityType,
+                                String mappingLabel,
+                                String mappingValue,
+                                String mappedTermLabel,
+                                String mapType,
+                                String mappedTermsOnly,
+                                String status) {
 
         String sortColumn = "id";
         Sort.Direction direction = getSortDirection("asc");
@@ -836,7 +845,7 @@ public class MappingService {
 
         pageable = new PageRequest(start, size, direction, sortColumn);
 
-        Page<MappingEntity> mappingEntityPage = mappingEntityRepository.findByMultipleFilters(entityType, mappingLabel, mappingValue, mappedTermLabel, mapType, mappedTermsOnly, pageable);
+        Page<MappingEntity> mappingEntityPage = mappingEntityRepository.findByMultipleFilters(entityType, mappingLabel, mappingValue, mappedTermLabel, mapType, mappedTermsOnly, status, pageable);
 
         List<MappingEntity> mappingEntityList = new ArrayList<>();
 
@@ -931,7 +940,7 @@ public class MappingService {
 
         List<MappingEntity> savedEntities = new ArrayList<>();
 
-        submittedEntities.forEach(newEntity ->{
+        submittedEntities.forEach(newEntity -> {
 
             MappingEntity updated = mappingEntityRepository.findByEntityId(newEntity.getEntityId())
                     .map(mappingEntity -> {
@@ -954,7 +963,6 @@ public class MappingService {
         });
 
         /* WRITE updated mapped terms to the file system and backup old file */
-
         writeMappingsToFile(submittedEntities.get(0).getEntityType());
 
         return savedEntities;

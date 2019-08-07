@@ -57,6 +57,7 @@ public class AjaxController {
      * @param entityType      - Search by entityType e.g find unmapped treatment entities ...?entity-type=treatment&mapped-term=-
      * @param mappedTermsOnly - Search for mapped terms only ... map-terms-only=true
      * @param mapType         - Search data by mapType e.g ...?map-type=direct
+     * @param status         - Search data by mapping status e.g ...?status=unmapped
      * @param page            - Allows client to submit offset value e.g ...?page=10
      * @param size            - Allows client to submit size limit values e.g ...?size=5
      * @return - Mapping Entities with data count, offset and limit Values
@@ -67,6 +68,7 @@ public class AjaxController {
                                          @RequestParam(value = "map-terms-only", defaultValue = "") Optional<String> mappedTermsOnly,
                                          @RequestParam(value = "entity-type", defaultValue = "") Optional<String> entityType,
                                          @RequestParam(value = "map-type", defaultValue = "") Optional<String> mapType,
+                                         @RequestParam(value = "status", defaultValue = "") Optional<String> status,
 
                                          @RequestParam(value = "page", defaultValue = "1") Integer page,
                                          @RequestParam(value = "size", defaultValue = "10") Integer size) {
@@ -83,7 +85,7 @@ public class AjaxController {
         }
 
         PaginationDTO result = mappingService.search(page, size, entityType.get(), mappingLabel,
-                                                     mappingValue, mappedTermLabel.get(), mapType.get(), mappedTermsOnly.get());
+                                                     mappingValue, mappedTermLabel.get(), mapType.get(), mappedTermsOnly.get(), status.get());
 
         return new ResponseEntity<Object>(result, HttpStatus.OK);
         //Map<String, List<MappingEntity>> result =  mappingService.getMissingDiagnosisMappings(ds);
