@@ -782,13 +782,11 @@ public class UtilityService {
 
 
     // FILE WRITE: WRITE STRIN DATA TO FILE
-    public void writeToFile(String data, String name){
-
-        String fileName = homeDir+"/Documents/"+name;
+    public void writeToFile(String data, String destination, Boolean shouldAppend){
 
         // Write to the file using BufferedReader and FileWriter
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(destination, shouldAppend));
             writer.append(data);
             writer.close();
 

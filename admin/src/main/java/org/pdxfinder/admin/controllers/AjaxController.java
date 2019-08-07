@@ -30,6 +30,7 @@ public class AjaxController {
     private final static Logger log = LoggerFactory.getLogger(AjaxController.class);
     private ObjectMapper mapper = new ObjectMapper();
     private RestTemplate restTemplate;
+    private String homeDir = System.getProperty("user.home");
 
     private final String ZOOMA_URL = "http://scrappy.ebi.ac.uk:8080/annotations";
     private String errReport = "";
@@ -135,6 +136,7 @@ public class AjaxController {
 
 
 
+
     /****************************************************************
      *                   INTERACTIONS WITH ZOOMA                    *
      ****************************************************************/
@@ -176,8 +178,11 @@ public class AjaxController {
         } catch (Exception e) {
         }
 
-        utilityService.writeToFile(failedReport, (new Date()) + "_failed.json");
-        utilityService.writeToFile(this.errReport, (new Date()) + "_error.txt");
+        String failedReportFile = homeDir+"/Documents/"+(new Date())+"_failed.json";
+        String errorReportFile = homeDir+"/Documents/"+(new Date())+"_error.txt";
+
+        utilityService.writeToFile(failedReport, failedReportFile, true);
+        utilityService.writeToFile(this.errReport, errorReportFile, true);
 
         return new ResponseEntity<>(report, HttpStatus.OK);
     }

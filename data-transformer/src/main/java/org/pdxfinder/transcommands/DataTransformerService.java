@@ -40,6 +40,7 @@ public class DataTransformerService {
     private TransTreatmentRepository transTreatmentRepository;
     private TransValidationRepository transValidationRepository;
     private TransSampleRepository transSampleRepository;
+    private String homeDir = System.getProperty("user.home");
 
 
     @Autowired
@@ -675,7 +676,9 @@ public class DataTransformerService {
             }catch (Exception e){}
         }
 
-        util.writeToFile(drugLista,(new Date())+"_pdmrDrug.csv");
+        String drugList = homeDir+"/Documents/"+(new Date())+"_pdmrDrug.csv";
+
+        util.writeToFile(drugLista,drugList, false);
 
         return drugLista.replace("\n","<br>");
     }
