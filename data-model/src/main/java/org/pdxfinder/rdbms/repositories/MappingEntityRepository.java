@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -21,7 +22,7 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
 
     MappingEntity findByMappingKey(String mappingKey);
 
-    MappingEntity findByEntityId(Long entityId);
+    Optional<MappingEntity> findByEntityId(Long entityId);
 
     List<MappingEntity> findByMappedTermLabel(String mappedTermLabel);
 
@@ -51,6 +52,10 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
 
 
     List<MappingEntity> findByEntityTypeAndMapTypeIsNotNull(String entityType);
+
+    List<MappingEntity> findByEntityTypeAndStatusIsNot(String entityType, String statusIsNot);
+
+
 
 
     /*

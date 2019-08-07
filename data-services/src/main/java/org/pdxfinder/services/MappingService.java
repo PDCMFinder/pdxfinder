@@ -1,5 +1,6 @@
 package org.pdxfinder.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -14,6 +15,7 @@ import org.pdxfinder.graph.repositories.SampleRepository;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.dto.PaginationDTO;
 import org.pdxfinder.services.mapping.MappingEntityType;
+import org.pdxfinder.services.mapping.Status;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -726,7 +728,7 @@ public class MappingService {
 
     public void saveUnmappedTerms(MappingEntity mappingEntity) {
 
-        mappingEntity.setStatus("Created");
+        mappingEntity.setStatus(Status.unmapped.get());
         mappingEntity.setMappedTermLabel("-");
         mappingEntity.setDateCreated(new Date());
 
@@ -749,6 +751,7 @@ public class MappingService {
         for (MappingEntity mappingEntity : mappingEntities) {
 
             mappingEntity.setEntityId(null);
+            mappingEntity.setStatus(Status.validated.get());
             String mappingKey = mappingEntity.getMappingKey();
 
             MappingEntity entity = mappingEntityRepository.findByMappingKey(mappingKey);
@@ -783,6 +786,38 @@ public class MappingService {
         });
 
         return mappingEntities;
+    }
+
+
+    public void writeMappingsToFile(String entityType) {
+
+
+        String jsonKey = "mappings";
+
+        String mappingFile = rootDir+"/mapping/"+entityType+"_mappings.json";
+
+        // Generate Unique name to back up previous mapping file
+        String backupPreviousMappingFile = rootDir+"/mapping/backup/"+
+                (new Date()).toString().replaceAll(" ", "-")+"-"+entityType+"_mappings.json";
+
+        // Back up previous mapping file before replacement
+        utilityService.moveFile(mappingFile, backupPreviousMappingFile);
+
+        // Get Latest mapped terms from the data base
+       List<MappingEntity> mappingEntities = mappingEntityRepository.findByEntityTypeAndStatusIsNot(entityType, "unmapped");
+
+        Map dataMap = new HashMap();
+
+        dataMap.put(jsonKey, mappingEntities);
+
+        // Write latest mapped terms to the file system
+        try {
+
+            String newFile = mapper.writeValueAsString(dataMap);
+            utilityService.writeToFile(newFile, mappingFile, false);
+
+        } catch (JsonProcessingException e) {}
+
     }
 
 
@@ -869,7 +904,7 @@ public class MappingService {
 
         Long id = Long.parseLong(String.valueOf(entityId));
 
-        MappingEntity mappingEntity = mappingEntityRepository.findByEntityId(id);
+        MappingEntity mappingEntity = mappingEntityRepository.findByEntityId(id).get();
 
         //Get suggestions only if mapped term is missing
         if (mappingEntity.getMappedTermLabel().equals("-")) {
@@ -883,6 +918,47 @@ public class MappingService {
         return mappingEntity;
     }
 
+
+    public boolean checkExistence(Long entityId) {
+
+        return mappingEntityRepository.exists(entityId);
+
+    }
+
+
+    // Update Bulk List of Mapping Entity Records
+    public List<MappingEntity> updateRecords(List<MappingEntity> submittedEntities) {
+
+        List<MappingEntity> savedEntities = new ArrayList<>();
+
+        submittedEntities.forEach(newEntity ->{
+
+            MappingEntity updated = mappingEntityRepository.findByEntityId(newEntity.getEntityId())
+                    .map(mappingEntity -> {
+
+                        mappingEntity.setDateUpdated(new Date());
+                        mappingEntity.setStatus(Status.created.get());
+                        mappingEntity.setMappedTermLabel(newEntity.getMappedTermLabel());
+                        mappingEntity.setMappedTermUrl(newEntity.getMappedTermUrl());
+                        mappingEntity.setMapType(newEntity.getMapType());
+                        mappingEntity.setJustification(newEntity.getJustification());
+
+                        return mappingEntityRepository.save(mappingEntity);
+                    })
+                    .orElseGet(() -> {
+                        return newEntity;
+                    });
+
+            savedEntities.add(updated);
+
+        });
+
+        /* WRITE updated mapped terms to the file system and backup old file */
+
+        writeMappingsToFile(submittedEntities.get(0).getEntityType());
+
+        return savedEntities;
+    }
 
 
 }

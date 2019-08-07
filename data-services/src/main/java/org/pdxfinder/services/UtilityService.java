@@ -782,13 +782,11 @@ public class UtilityService {
 
 
     // FILE WRITE: WRITE STRIN DATA TO FILE
-    public void writeToFile(String data, String name){
-
-        String fileName = homeDir+"/Documents/"+name;
+    public void writeToFile(String data, String destination, Boolean shouldAppend){
 
         // Write to the file using BufferedReader and FileWriter
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(destination, shouldAppend));
             writer.append(data);
             writer.close();
 
@@ -883,12 +881,30 @@ public class UtilityService {
     // File to Byte
     public void moveFile(String source,String destination){
 
+        // Create Directory if it does not exist
+        this.mkDirectoryFromFilePathName(destination);
+
         byte[] bytes = convertLocalFileToByte(source);
 
         Path path = Paths.get(destination);
         try{
             Files.write(path, bytes);
         }catch (Exception e){}
+
+    }
+
+
+    public void mkDirectoryFromFilePathName(String filePath){
+
+        // Get Directory from file path string
+        String directoryName = filePath.substring(0, filePath.lastIndexOf("/"));
+
+        // Create Directory if it does not exist
+        File directory = new File(directoryName);
+
+        if (!directory.exists()){
+            directory.mkdirs();
+        }
     }
 
 
