@@ -88,7 +88,6 @@ public class AjaxController {
                                                      mappingValue, mappedTermLabel.get(), mapType.get(), mappedTermsOnly.get(), status.get());
 
         return new ResponseEntity<Object>(result, HttpStatus.OK);
-        //Map<String, List<MappingEntity>> result =  mappingService.getMissingDiagnosisMappings(ds);
     }
 
 
@@ -125,7 +124,7 @@ public class AjaxController {
 
         List<Error> errors = validateEntities(submittedEntities);
 
-        if (!errors.isEmpty()){
+        if (submittedEntities.size() < 1 || !errors.isEmpty()){
             return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
         }
 
