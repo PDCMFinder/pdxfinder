@@ -43,7 +43,24 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
         List<Map<String, String>> dataList;
 
-        String omicDir = (dataType.equals("mutation")) ? "mut" : "cna";
+        String omicDir = null;
+
+        if(dataType.equals("mutation")){
+            omicDir = "mut";
+        }
+        else if(dataType.equals("copy number alteration")){
+            omicDir = "cna";
+        }
+        else if(dataType.equals("transcriptomics")){
+            omicDir = "trans";
+        }
+
+        if(omicDir == null) {
+            log.error("Cannot determine directory for datatype: "+dataType);
+            return;
+        }
+
+
 
         if (omicDataFilesType.equals("ONE_FILE_PER_MODEL")){
 
@@ -195,7 +212,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 //log.info("Found an unrecognised Marker Symbol {} in Model: {}, Skipping This!!!! ", data.get(omicHgncSymbol), modelID);
                 //log.info(data.toString());
 
-               // reportManager.addMessage(nsdto.getLogEntity());
+                reportManager.addMessage(nsdto.getLogEntity());
                 count++;
                 continue;
             }
@@ -215,9 +232,13 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 if (dataType.equals("mutation")){
 
                     ma = setVariationProperties(data, marker);
-                }else {
+                }else if(dataType.equals("copy number alteration")) {
 
                     ma = setCNAProperties(data, marker);
+                }
+                else{
+
+                    ma = setTranscriptomicProperties(data, marker);
                 }
 
                 molecularCharacterization.addMarkerAssociation(ma);
@@ -356,6 +377,26 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
     }
 
 
+    private MarkerAssociation setTranscriptomicProperties(Map<String,String> data, Marker marker){
+
+        MarkerAssociation ma = new MarkerAssociation();
+        ma.setChromosome(data.get(omicChromosome));
+        ma.setSeqStartPosition(data.get(omicSeqStartPosition));
+        ma.setSeqEndPosition(data.get(omicSeqEndPosition));
+        ma.setRnaSeqCoverage(data.get(rnaSeqCoverage));
+        ma.setRnaSeqFPKM(data.get(rnaSeqFPKM));
+        ma.setRnaSeqTPM(data.get(rnaSeqTPM));
+        ma.setRnaSeqCount(data.get(rnaSeqCount));
+        ma.setAffyHGEAProbeId(data.get(affyHGEAProbeId));
+        ma.setAffyHGEAExpressionValue(data.get(affyHGEAExpressionValue));
+        ma.setIlluminaHGEAProbeId(data.get(illuminaHGEAProbeId));
+        ma.setIlluminaHGEAExpressionValue(data.get(illuminaHGEAExpressionValue));
+        ma.setGenomeAssembly(data.get(omicGenomeAssembly));
+
+        ma.setMarker(marker);
+
+        return  ma;
+    }
 
 
     public String getPassage(String passageString) {
