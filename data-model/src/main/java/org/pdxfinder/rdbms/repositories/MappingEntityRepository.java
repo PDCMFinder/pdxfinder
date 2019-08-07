@@ -53,6 +53,10 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
 
     List<MappingEntity> findByEntityTypeAndMapTypeIsNotNull(String entityType);
 
+    List<MappingEntity> findByEntityTypeAndStatusIsNot(String entityType, String statusIsNot);
+
+
+
 
     /*
     Query: SELECT DISTINCT lower(MAPPING_VALUES),

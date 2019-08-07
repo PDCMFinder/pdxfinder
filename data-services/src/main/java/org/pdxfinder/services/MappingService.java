@@ -1,5 +1,6 @@
 package org.pdxfinder.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -788,6 +789,38 @@ public class MappingService {
     }
 
 
+    public void writeMappingsToFile(String entityType) {
+
+
+        String jsonKey = "mappings";
+
+        String mappingFile = rootDir+"/mapping/"+entityType+"_mappings.json";
+
+        // Generate Unique name to back up previous mapping file
+        String backupPreviousMappingFile = rootDir+"/mapping/backup/"+
+                (new Date()).toString().replaceAll(" ", "-")+"-"+entityType+"_mappings.json";
+
+        // Back up previous mapping file before replacement
+        utilityService.moveFile(mappingFile, backupPreviousMappingFile);
+
+        // Get Latest mapped terms from the data base
+       List<MappingEntity> mappingEntities = mappingEntityRepository.findByEntityTypeAndStatusIsNot(entityType, "unmapped");
+
+        Map dataMap = new HashMap();
+
+        dataMap.put(jsonKey, mappingEntities);
+
+        // Write latest mapped terms to the file system
+        try {
+
+            String newFile = mapper.writeValueAsString(dataMap);
+            utilityService.writeToFile(newFile, mappingFile, false);
+
+        } catch (JsonProcessingException e) {}
+
+    }
+
+
     public PaginationDTO search(int page, int size, String entityType, String mappingLabel, String mappingValue, String mappedTermLabel, String mapType, String mappedTermsOnly) {
 
         String sortColumn = "id";
@@ -919,6 +952,10 @@ public class MappingService {
             savedEntities.add(updated);
 
         });
+
+        /* WRITE updated mapped terms to the file system and backup old file */
+
+        writeMappingsToFile(submittedEntities.get(0).getEntityType());
 
         return savedEntities;
     }
