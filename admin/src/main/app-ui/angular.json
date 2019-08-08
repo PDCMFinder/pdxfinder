@@ -31,7 +31,8 @@
               "src/pdxfinder/pattern-library/themify/themify-icons.css",
               "src/pdxfinder/pattern-library/themify/ie7/ie7.css",
               "src/pdxfinder/pattern-library/animate.css",
-              "src/pdxfinder/dependencies/chart/export.css"
+              "src/pdxfinder/dependencies/chart/export.css",
+              "src/pdxfinder/pattern-library/alert/sweetalert2.min.css"
             ],
             "scripts": [
               "src/pdxfinder/dependencies/jquery-2.1.1.js",
@@ -44,7 +45,8 @@
               "src/pdxfinder/dependencies/chart/serial.js",
               "src/pdxfinder/dependencies/chart/export.min.js",
               "src/pdxfinder/dependencies/chart/light.js",
-              "src/pdxfinder/dependencies/chart/3dbar.js"
+              "src/pdxfinder/dependencies/chart/3dbar.js",
+              "src/pdxfinder/dependencies/alert/sweetalert2.min.js"
             ]
           },
           "configurations": {

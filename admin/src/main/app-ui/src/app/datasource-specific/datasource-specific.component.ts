@@ -5,6 +5,8 @@ import {Mapping, MappingInterface} from "../mapping-interface";
 import {GeneralService} from "../general.service";
 import {FormBuilder, FormGroup} from "@angular/forms";
 
+declare var swal: any;
+
 @Component({
     selector: 'app-datasource-specific',
     templateUrl: './datasource-specific.component.html',
@@ -62,7 +64,7 @@ export class DatasourceSpecificComponent implements OnInit {
 
         this.route.paramMap.subscribe(
             params => {
-                
+
                 page = params.get('page');
 
                 // If no page value submitted, set page value as first page
@@ -110,7 +112,7 @@ export class DatasourceSpecificComponent implements OnInit {
 
         this.pageSize = localStorage.getItem('_pageSize') == null ? 5 : localStorage.getItem('_pageSize');
 
-            this.toggleNotification(false);
+        this.toggleNotification(false);
 
         this.columnHeaders = [];
         this.mappings = [];
@@ -175,9 +177,14 @@ export class DatasourceSpecificComponent implements OnInit {
         this.router.navigate(['suggested-mappings'], {relativeTo: this.route})
     }
 
+    deleteStaff(staffId: number) {
+
+    }
+
     updateMappingEntity() {
 
         var validatedTerms = [];
+
 
         this.mappings.forEach((mapping) => {
             mapping['suggestedMappings'] = [];
@@ -185,24 +192,43 @@ export class DatasourceSpecificComponent implements OnInit {
             if (mapping['mappedTermLabel'] != '-' && mapping['mappedTermUrl'] != null) {
                 validatedTerms.push(mapping);
             }
-        })
+        });
 
-       // console.log(validatedTerms);
 
-        this._mappingService.updateEntity(validatedTerms)
-            .subscribe(
-                response => {
+        swal({
+                title: "Are you sure?",
+                text: "You may not be able to reverse this operation",
+                imageUrl: 'assets/icons/question.jpg',
+                showCancelButton: true,
+                confirmButtonColor: '#03369D',
+                confirmButtonText: 'Yes, submit curation!',
+                cancelButtonText: "Do Not Submit",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            },
+            (isConfirm) => {
 
-                    this.report = "success"
-                   // console.log(response)
-                },
-                error => {
+                if (isConfirm) {
 
-                    this.report = "failed"
-                    //console.log(error.ok, error)
+                    this._mappingService.updateEntity(validatedTerms)
+                        .subscribe(
+                            response => {
+
+                                this.report = "success";
+                                swal("Submitted!", "Your curation has been submitted", "success");
+                                // console.log(response)
+                            },
+                            error => {
+
+                                this.report = "failed";
+                                swal("Failed", " The curation is invalid :)", "error");
+                                //console.log(error.ok, error)
+                            }
+                        );
+                } else {
+                    swal("Cancelled", "The request was cancelled :)", "error");
                 }
-            );
-
+            })
 
 
     }
@@ -219,11 +245,13 @@ export class DatasourceSpecificComponent implements OnInit {
         this.report = null;
 
         if (value == 'success') {
-            setTimeout(()=>{ this.refreshPage() }, 1000)
+            setTimeout(() => {
+                this.refreshPage()
+            }, 1000)
         }
     }
 
-    newPageSize(pageSize){
+    newPageSize(pageSize) {
 
         localStorage.setItem('_pageSize', pageSize);
 
@@ -234,7 +262,7 @@ export class DatasourceSpecificComponent implements OnInit {
 
     }
 
-    refreshPage(){
+    refreshPage() {
 
         //  Auto-Navigate away on page size change
         let newPage = (this.userPage <= 1) ? this.userPage + 1 : 1;
