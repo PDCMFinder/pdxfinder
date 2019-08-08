@@ -28,23 +28,38 @@
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="p-w-md m-t-sm col-lg-10 col-lg-offset-1">
 
+
         <div class="row" style="margin-top: -10px;">
 
             <div class="col-lg-12" *ngIf="dataExists">
 
                 <form #mappingForm="ngForm" *ngIf="!submitted" (ngSubmit)="updateMappingEntity()" novalidate>
                     <div class="pdxfinder float-e-margins">
+
                         <div class="pdxfinder-title">
                             <h5 style="font-weight: bold;" class="testMobile"><span
-                                    style="color: #03369D"> {{dataSource | uppercase}}  </span> -
-                                Unmapped {{entityType | titlecase}} Summary </h5>
-                            <button style="float: right; margin-top:-7px;" class="btn btn-primary btn-sm" type="submit">
+                                    style="color: #03369D"> {{dataSource | uppercase}}  </span> - Unmapped {{entityType | titlecase}} Summary </h5>
+
+                            <button *ngIf="report == null" style="float: right; margin-top:-7px;" class="btn btn-primary btn-sm" type="submit">
                                 Submit Curation
                             </button> <!-- [disabled]="mappingForm.form.invalid" -->
+
                         </div>
 
 
                         <div class="pdxfinder-content">
+
+
+
+                            <div *ngIf="report == 'success'" class="alert alert-success alert-dismissable">
+                                <a aria-hidden="true" class="close" type="button" (click)="toggleReport('success')">×</a>
+                                Success: <em>  The submitted curation was successful, Clear off notification to continue </em>  <a class="alert-link"> ... </a>.
+                            </div>
+
+                            <div *ngIf="report == 'failed'" class="alert alert-danger alert-dismissable">
+                                <a aria-hidden="true" class="close" type="button" (click)="toggleReport(null)">×</a>
+                                OOps!! <em> Failed Request: The submitted curation is invalid, Clear off notification to continue </em> <a class="alert-link"> ... </a>.
+                            </div>
 
                             <div class="table-responsive">
 
@@ -73,7 +88,9 @@
 
                                         <td *ngFor="let dataLabel of dataLabels ">
 
-                                            <span class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] }} </span>
+                                            <span *ngIf="dataLabel == 'DataSource'" class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | uppercase }} </span>
+                                            <span *ngIf="dataLabel != 'DataSource'" class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] }} </span>
+
                                         </td>
 
                                         <td><input type="text" name="{{'mappedTermLabel'+i}}" class="editableField"

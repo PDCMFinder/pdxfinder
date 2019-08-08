@@ -26,7 +26,7 @@ export class DatasourceSpecificComponent implements OnInit {
     public selectedRow;
     public setClickedRow: Function;
     public selectedEntity: any;
-    public errorMsg = "";
+    public report = null;
 
     public pageRange: number[];
 
@@ -172,7 +172,6 @@ export class DatasourceSpecificComponent implements OnInit {
 
     showSuggestedMappings(id) {
 
-        // this.router.navigate([`../${this.dataSource}`],{relativeTo: this.route, queryParams: {page: page}} )
         this.router.navigate(['suggested-mappings'], {relativeTo: this.route})
     }
 
@@ -188,13 +187,23 @@ export class DatasourceSpecificComponent implements OnInit {
             }
         })
 
-        console.log(validatedTerms);
+       // console.log(validatedTerms);
 
         this._mappingService.updateEntity(validatedTerms)
             .subscribe(
-                response => console.log('Success!', response),
-                error => this.errorMsg = error.statusText
-            )
+                response => {
+
+                    this.report = "success"
+                   // console.log(response)
+                },
+                error => {
+
+                    this.report = "failed"
+                    //console.log(error.ok, error)
+                }
+            );
+
+
 
     }
 
@@ -202,6 +211,16 @@ export class DatasourceSpecificComponent implements OnInit {
     toggleNotification(value: boolean) {
 
         this.showNotif = value;
+    }
+
+
+    toggleReport(value: string) {
+
+        this.report = null;
+
+        if (value == 'success') {
+            setTimeout(()=>{ this.refreshPage() }, 1000)
+        }
     }
 
     newPageSize(pageSize){
@@ -212,7 +231,16 @@ export class DatasourceSpecificComponent implements OnInit {
         let newPage = (this.userPage <= 1) ? this.userPage + 1 : 1;
 
         this.router.navigate([`curation/${this.entityTypeUrl}/${this.dataSource}/${newPage}`])
-        
+
+    }
+
+    refreshPage(){
+
+        //  Auto-Navigate away on page size change
+        let newPage = (this.userPage <= 1) ? this.userPage + 1 : 1;
+
+        this.router.navigate([`curation/${this.entityTypeUrl}/${this.dataSource}/${newPage}`])
+
     }
 
 

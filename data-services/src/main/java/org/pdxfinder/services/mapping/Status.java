@@ -7,6 +7,7 @@ public enum Status {
 
     unmapped,
     created,
+    orphaned,
     validated,
     unvalidated;
 
