@@ -1063,6 +1063,16 @@ public class UniversalLoader extends UniversalLoaderOmic {
         omicCnaCopyNumberStatus = "copy_number_status";
         omicCnaGisticvalue = "gistic_value_cna";
         omicCnaPicnicValue = "picnic_value";
+        rnaSeqCoverage = "RNAseq_coverage";
+        rnaSeqFPKM = "RNAseq_FPKM";
+        rnaSeqTPM = "RNAseq_TPM";
+        rnaSeqCount = "RNAseq_count";
+        affyHGEAProbeId = "affy_HGEA_probeID";
+        affyHGEAExpressionValue = "Affy_HGEA_expressionValue";
+        illuminaHGEAProbeId = "Illumina_HGEA_probeID";
+        illuminaHGEAExpressionValue = "Illumina_HGEA_expressionValue";
+
+
 
         platformURL = new HashMap<>();
         platformURL.put("CGH_array", "/platform/curie-lc-cna/");
@@ -1079,9 +1089,11 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
         String mutationDataDir = dataRootDirectory + "/" + dataSourceAbbreviation + "/mut/";
         String cnaDataDir = dataRootDirectory + "/" + dataSourceAbbreviation + "/cna/";
+        String transcriptomicDataDir = dataRootDirectory + "/" + dataSourceAbbreviation + "/trans/";
 
         File mutationData = new File(mutationDataDir);
         File cnaData = new File(cnaDataDir);
+        File transcriptomicData = new File(transcriptomicDataDir);
 
 
         log.info(mutationDataDir);
@@ -1105,6 +1117,14 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 } else {
                     log.info("No omic data for model " + modelId);
                 }
+
+                // Transcriptomics
+                if(transcriptomicData.exists()){
+                    log.info("Loading transcriptomics for "+modelId);
+                    loadOmicData(modelCreation, ds, "transcriptomics", dataRootDirectory);
+                }
+
+
             } else {
 
                 log.error("Cannot load omic data for missing model: " + modelId);
