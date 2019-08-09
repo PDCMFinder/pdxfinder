@@ -33,7 +33,9 @@
                                         *ngFor="let suggestion of selectedEntity['suggestedMappings']; index as i">
 
                                         <td *ngFor="let dataLabel of dataLabels ">
-                                            <span class="clipText overflow-ellipsis"> {{ suggestion.mappingValues[dataLabel] | titlecase }} </span>
+
+                                            <span *ngIf="dataLabel == 'DataSource'" class="clipText overflow-ellipsis"> {{ suggestion.mappingValues[dataLabel] | uppercase }} </span>
+                                            <span *ngIf="dataLabel != 'DataSource'" class="clipText overflow-ellipsis"> {{ suggestion.mappingValues[dataLabel] | titlecase }} </span>
                                         </td>
 <!--
                                         <td> {{ suggestion.mappingValues.DataSource | uppercase }} </td>

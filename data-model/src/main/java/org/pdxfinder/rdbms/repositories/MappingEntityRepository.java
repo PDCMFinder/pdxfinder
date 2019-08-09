@@ -33,6 +33,7 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
             "AND ((lower(me.mappedTermLabel) = lower(:mappedTermLabel)) OR :mappedTermLabel = '') "+
 
             "AND ((lower(me.mapType) = lower(:mapType)) OR :mapType = '') "+
+            "AND ((lower(me.status) = lower(:status)) OR :status = '') "+
 
             "AND ( :mappedTermsOnly = '' OR (me.mapType is not null )) "
     )
@@ -42,6 +43,7 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
                                               @Param("mappedTermLabel") String mappedTermLabel,
                                               @Param("mapType") String mapType,
                                               @Param("mappedTermsOnly") String mappedTermsOnly,
+                                              @Param("status") String status,
 
                                               Pageable pageable);
 
