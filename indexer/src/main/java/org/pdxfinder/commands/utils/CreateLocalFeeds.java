@@ -142,10 +142,10 @@ public class CreateLocalFeeds implements CommandLineRunner {
                 String modelId = j.getString("Model ID");
 
                 String mutation = utilityService.parseURL(jaxVariationURL + modelId);
-                saveFile(finderRootDir +"JAX/mut/", modelId+".json", mutation);
+                saveFile(finderRootDir +"/data/JAX/mut/", modelId+".json", mutation);
 
                 String histology = utilityService.parseURL(jaxHistologyURL + modelId);
-                saveFile(finderRootDir +"JAX/hist/", modelId+".json", histology);
+                saveFile(finderRootDir +"/data/JAX/hist/", modelId+".json", histology);
 
             }
 
