@@ -177,9 +177,6 @@ export class DatasourceSpecificComponent implements OnInit {
         this.router.navigate(['suggested-mappings'], {relativeTo: this.route})
     }
 
-    deleteStaff(staffId: number) {
-
-    }
 
     updateMappingEntity() {
 
@@ -201,8 +198,8 @@ export class DatasourceSpecificComponent implements OnInit {
                 imageUrl: 'assets/icons/question.jpg',
                 showCancelButton: true,
                 confirmButtonColor: '#03369D',
-                confirmButtonText: 'Yes, submit curation!',
-                cancelButtonText: "Do Not Submit",
+                confirmButtonText: 'YES',
+                cancelButtonText: "NO",
                 closeOnConfirm: false,
                 closeOnCancel: false
             },

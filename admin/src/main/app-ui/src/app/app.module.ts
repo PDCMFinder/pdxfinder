@@ -8,8 +8,11 @@ import { TopNavBarComponent } from './top-nav-bar/top-nav-bar.component';
 import {MappingService} from "./mapping.service";
 import { HttpClientModule} from "@angular/common/http";
 import { DatasourceSpecificComponent } from './datasource-specific/datasource-specific.component';
-import { DatasourceSpecificSuggestionsComponent } from './datasource-specific-suggestions/datasource-specific-suggestions.component';
 import {FormsModule} from "@angular/forms";
+import {DatasourceSpecificSuggestionsComponent} from "./datasource-specific-suggestions/datasource-specific-suggestions.component";
+import {CurationManageComponent} from "./curation-manage/curation-manage.component";
+import { CurationArchiveComponent } from './curation-archive/curation-archive.component';
+import { CurationOrphanComponent } from './curation-orphan/curation-orphan.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +21,10 @@ import {FormsModule} from "@angular/forms";
     TopNavBarComponent,
       routingComponents,
       DatasourceSpecificComponent,
-      DatasourceSpecificSuggestionsComponent
+      DatasourceSpecificSuggestionsComponent,
+      CurationManageComponent,
+      CurationArchiveComponent,
+      CurationOrphanComponent
   ],
   imports: [
     BrowserModule,

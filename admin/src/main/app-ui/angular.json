@@ -32,7 +32,7 @@
               "src/pdxfinder/pattern-library/themify/ie7/ie7.css",
               "src/pdxfinder/pattern-library/animate.css",
               "src/pdxfinder/dependencies/chart/export.css",
-              "src/pdxfinder/pattern-library/alert/sweetalert2.min.css"
+              "src/pdxfinder/pattern-library/alert/sweetalert2.css"
             ],
             "scripts": [
               "src/pdxfinder/dependencies/jquery-2.1.1.js",
