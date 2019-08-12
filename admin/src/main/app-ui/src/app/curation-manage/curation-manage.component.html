@@ -1,3 +1,162 @@
-<p>
-  manage works!
-</p>
+<div class="row wrapper border-bottom white-bg page-heading">
+
+    <div class="col-lg-8">
+        <h2> Manage Ontology Mapped Data </h2>
+        <ol class="breadcrumb">
+            <li>
+                <a routerLink="/dashboard">Dashboard</a>
+            </li>
+            <li>
+                <a routerLink="/curation">Curation </a>
+            </li>
+            <li class="active"> Manage</li>
+        </ol>
+    </div>
+</div>
+
+
+
+
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    
+    <div class="">
+
+        <div class="row" style="margin-top: -10px;">
+
+            <div [ngClass]="{'col-lg-9': showFilter == true }" *ngIf="dataExists" >
+
+                <form #mappingForm="ngForm" *ngIf="!submitted" novalidate>
+                    <div class="pdxfinder float-e-margins">
+
+                        <div class="pdxfinder-title">
+                            <h5> Manage / Export / Download Curated Data</h5>
+                            <div class="pdxfinder-tools">
+
+
+                               <!-- <button (click)="toggle(true)"
+                                        class="btn btn-primary btn-circle" type="button"><i class="ti-export"></i>
+                                </button>
+                                <button (click)="toggle(true)"
+                                        class="btn btn-primary btn-circle" type="button"><i class="ti-download"></i>
+                                </button>-->
+
+                                <div class="btn-group">
+                                    <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle ">
+                                        <i class="ti-export"></i> &nbsp; Download Data <span class="caret"></span></button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#">Action</a></li>
+                                        <li><a href="#">Another action</a></li>
+                                        <li><a href="#">Something else here</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="#">Separated link</a></li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="pdxfinder-content pdxfinder-heading">
+                            <h3><i class="ti-settings"></i> Export Curated Data </h3>
+                            <small><i class="fa fa-tim"></i> Manage and download unvalidated mappings and others ...
+                            </small>
+                        </div>
+
+
+                        <div class="pdxfinder-content">
+
+
+                            <div class="table-responsive">
+
+                                <table class="table table-striped table-bordered table-hover pdx-table">
+                                    <thead>
+                                    <tr>
+                                        <th style="width:10px;">ID</th>
+
+                                        <th *ngFor="let columnHeader of columnHeaders ">
+                                            {{columnHeader | uppercase}}
+                                        </th>
+
+                                        <th> MAPPED TERM</th>
+                                        <th style="width:80px;"> TYPE</th>
+                                        <th>JUSTIFICATION</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    <tr class="pdxfinder-clickable-rows2" *ngFor="let mapping of mappings; index as i"
+                                        [class.active]="mapping.entityId == selectedRow">
+
+                                        <td> {{mapping.entityId}} </td>
+
+                                        <td *ngFor="let dataLabel of dataLabels ">
+
+                                            <span *ngIf="dataLabel == 'DataSource'"
+                                                  class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | uppercase }} </span>
+                                            <span *ngIf="dataLabel != 'DataSource'"
+                                                  class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | titlecase }} </span>
+
+                                        </td>
+
+                                        <td>
+                                            <span class="clipText overflow-ellipsis"> {{ mapping.mappedTermLabel | titlecase }} </span>
+                                        </td>
+
+                                        <td>
+                                            <span class="clipText overflow-ellipsis"> {{ mapping.mapType | titlecase }} </span>
+                                        </td>
+
+                                        <td>
+                                            <span class="clipText overflow-ellipsis"> {{ mapping.justification | titlecase }} </span>
+                                        </td>
+
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+
+                                <ul class="pagination pagination-sm" style="margin-top:-3px; margin-bottom:0px;">
+
+                                    <li [ngClass]="{'disabled': data.page == 1 }">
+                                        <span *ngIf="data.page == 1"> First << </span>
+
+                                        <a *ngIf="data.page != 1"
+                                           [routerLink]="['/curation/manage']" [queryParams]="{page: 1, size: pageSize, type: entityType, status : mappingStatus, source: dataSource}"> First << </a>
+
+                                    </li>
+
+                                    <li *ngFor="let count of pageRange " [ngClass]="{'active': data.page == count }" >
+
+                                        <a [routerLink]="['/curation/manage']" [queryParams]="{page: count, size: pageSize, type: entityType, status : mappingStatus, source: dataSource}"> {{count }} </a>
+                                    </li>
+
+
+                                    <li [ngClass]="{'disabled': data.page == data.totaPages }">
+                                        <span *ngIf="data.page == data.totaPages"> Last >> </span>
+                                        <a *ngIf="data.page != data.totaPages"
+                                           [routerLink]="['/curation/manage']" [queryParams]="{page: data.totaPages, size: pageSize, type: entityType, status : mappingStatus, source: dataSource}"  > Last
+                                        >> </a>
+
+
+                                    </li>
+
+
+                                </ul>
+
+<!-- Pagination here -->
+
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </form>
+
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+

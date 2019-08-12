@@ -1,4 +1,8 @@
 
+.mr-15 {
+    margin-right:15px;
+}
+
 .ico-space{
     font-size: 21px; color:#03369D !important; margin-left: 5px; margin-right: 5px;
 }
@@ -3734,18 +3738,18 @@ font-size: 13px;
     bottom: 0;
     position: fixed;
     margin: 1em;
-    right: 0;
+    left: 0;
     z-index: 998;
 }
 
 .fab {
     display: block;
-    width: 56px;
-    height: 56px;
+    width: 57px;
+    height: 57px;
     border-radius: 50%;
     text-align: center;
     color: #FFF;
-    background: #00BCD4;
+    background: rgba(3, 54, 157, 1);
     margin: 25px auto 0;
     box-shadow: 0 0 4px rgba(0, 0, 0, .14), 0 4px 8px rgba(0, 0, 0, .28);
     cursor: pointer;
@@ -3767,6 +3771,13 @@ font-size: 13px;
     transition: all .2s ease-in-out;
 }
 
+.fab:hover {
+    color: rgba(3, 54, 157, 1);
+    background: #ffffff;
+}
+
+
+
 .fab:not(:last-child) {
     width: 0;
     height: 0;
@@ -3781,89 +3792,13 @@ font-size: 13px;
 }
 
 .fab:not(:last-child).is-visible {
-    width: 40px;
-    height: 40px;
-    margin: 15px auto 10;
+    width: 50px;
+    height: 50px;
     opacity: 1;
     visibility: visible;
 }
 
-.fab:nth-last-child(1) {
-    -webkit-transition-delay: 25ms;
-    -moz-transition-delay: 25ms;
-    -o-transition-delay: 25ms;
-    transition-delay: 25ms;
-}
 
-.fab:not(:last-child):nth-last-child(2) {
-    -webkit-transition-delay: 20ms;
-    -moz-transition-delay: 20ms;
-    -o-transition-delay: 20ms;
-    transition-delay: 20ms;
-}
-
-.fab:not(:last-child):nth-last-child(3) {
-    -webkit-transition-delay: 40ms;
-    -moz-transition-delay: 40ms;
-    -o-transition-delay: 40ms;
-    transition-delay: 40ms;
-}
-
-.fab:not(:last-child):nth-last-child(4) {
-    -webkit-transition-delay: 60ms;
-    -moz-transition-delay: 60ms;
-    -o-transition-delay: 60ms;
-    transition-delay: 60ms;
-}
-
-.fab:not(:last-child):nth-last-child(5) {
-    -webkit-transition-delay: 80ms;
-    -moz-transition-delay: 80ms;
-    -o-transition-delay: 80ms;
-    transition-delay: 80ms;
-}
-
-.fab:not(:last-child):active,
-.fab:not(:last-child):focus,
-.fab:not(:last-child):hover {
-    box-shadow: 0 0 6px rgba(0, 0, 0, .16), 0 6px 12px rgba(0, 0, 0, .32);
-}
-
-.fab_field {
-    width: 100%;
-    display: inline-block;
-    text-align: center;
-    background: #eceff1;
-    box-shadow: 0 0 6px rgba(0, 0, 0, .16), 0 6px 12px rgba(0, 0, 0, .32);
-}
-
-.fab_field a {
-    display: inline-block;
-    text-align: center;
-}
-
-#fab_listen {
-    float: left;
-    background: rgba(0, 0, 0, 0);
-}
-
-#fab_send {
-    float: right;
-    background: rgba(0, 0, 0, 0);
-}
-
-.fab_field .fab {
-    width: 35px;
-    height: 35px;
-    box-shadow: none;
-    margin: 5px;
-}
-
-.fab_field .fab>i {
-    font-size: 1.6em;
-    line-height: 35px;
-    color: #263238;
-}
 
 
 /*Element state*/
