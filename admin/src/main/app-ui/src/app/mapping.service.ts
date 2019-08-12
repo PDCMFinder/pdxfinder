@@ -27,9 +27,11 @@ export class MappingService {
     constructor(private http: HttpClient) { }
 
 
-    getDiagnosisSummary(maptype: string): Observable<SummaryInterface[]>{
+    getCurationSummary(maptype: string): Observable<SummaryInterface[]>{
 
-        const url = `${this._summaryUrl}?entity-type=${maptype}`;
+        var curationType = (maptype == null) ? '' : `?entity-type=${maptype}`;
+
+        const url = `${this._summaryUrl}${curationType}`;
 
         return this.http.get<SummaryInterface[]>(url);
     }

@@ -60,32 +60,42 @@
                         <div class="pdxfinder-content">
 
                             <div class="form-group">
-                                <select name="type" ngModel class="select2_demo_3 form-control">
-                                    <option value="" selected> DATA TYPE</option>
-                                    <option value="diagnosis">Diagnosis</option>
-                                    <option value="treatment">Drug Treatment</option>
+                                <select name="type" [(ngModel)]="entityType" class="select2_demo_3 form-control">
+
+                                    <option *ngFor="let dataType of dataTypes"
+                                            [value]="dataType"
+                                            [selected]="dataType == entityType">
+                                        {{dataType | uppercase}}
+                                    </option>
                                 </select>
+
                             </div>
 
 
                             <div class="form-group">
-                                <select name="status" ngModel class="select2_demo_3 form-control">
+                                <select name="status" [(ngModel)]="mappingStatus" class="select2_demo_3 form-control">
+
                                     <option value="" selected> CURATION STATUS</option>
-                                    <option value="validated"> Validated </option>
-                                    <option value="created"> Unvalidated </option>
+                                    <option *ngFor="let dStatus of statusList"
+                                            [value]="dStatus"
+                                            [selected]="dStatus == mappingStatus">
+                                        {{dStatus | uppercase}}
+                                    </option>
                                 </select>
                             </div>
 
                             <div class="form-group">
-                                <select name="source" ngModel class="select2_demo_3 form-control">
-                                    <option value="" selected> DATA PROVIDER</option>
-                                    <option value="jax"> JAX </option>
-                                    <option value="pdmr"> PDMR </option>
-                                    <option value="crl"> CRL </option>
+                                <select name="source"  [(ngModel)]="dataSource" class="select2_demo_3 form-control">
+
+                                    <option *ngFor="let provider of providersList"
+                                            [value]="provider"
+                                            [selected]="provider == dataSource">
+                                        {{provider | uppercase}}
+                                    </option>
                                 </select>
                             </div>
 
-                            <!--
+                            <!-- <option value="" selected> CURATION STATUS</option>
                             <div class="form-group">
                                 <label>Data Source</label>
                                 <input type="email" placeholder="Enter email" class="form-control"></div>

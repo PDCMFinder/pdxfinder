@@ -32,8 +32,6 @@ export class CurationManageComponent implements OnInit {
 
     // Selected Fields
     public selectedDetails: any;
-    public selectedEntityType: string;
-    public selectedSrc: any;
     public showNotif: boolean = false;
     public showFilter: boolean = false;
 
@@ -41,9 +39,12 @@ export class CurationManageComponent implements OnInit {
     public pageOptions = ['2', '3', '5', '10', '15', '20', '25'];
     public userPage: number;
 
-    public queryParamData: any;
-    private mappingStatus: any;
+    public mappingStatus: any;
     public pageOptionSize: string;
+
+    public dataTypes = ['diagnosis', 'treatment'];
+    public providersList = [];
+    public statusList = ['validated', 'created', 'orphaned', 'unmapped'];
 
 
     constructor(private router: Router,
@@ -54,6 +55,7 @@ export class CurationManageComponent implements OnInit {
 
     ngOnInit() {
 
+        this.getProvidersList();
 
         // From the current url snapshot, get the source parameter and assign to the dataSource property
 
@@ -110,7 +112,7 @@ export class CurationManageComponent implements OnInit {
                     // This receives the mappings node of the json in required format
                     let mappings = this.data.mappings;
 
-                    console.log(mappings);
+                    //console.log(mappings);
 
                     // Build Column Headers If data is not empty
                     if (mappings.length > 0) {
@@ -136,6 +138,21 @@ export class CurationManageComponent implements OnInit {
     }
 
 
+
+    getProvidersList(){
+
+        this._mappingService.getCurationSummary(null)
+            .subscribe(
+                data => {
+
+                    data.forEach((dData) =>{
+                        this.providersList.push(dData.DataSource);
+                    })
+                }
+            );
+    }
+
+
     // whenever filter is apllied doit as size dro down, reset page to 1
     newPageSize(pageSize) {
 
@@ -155,6 +172,8 @@ export class CurationManageComponent implements OnInit {
     searchFilter(form) {
 
         var filter = form.value;
+
+        console.log(filter)
 
         this.entityType = (filter.type != "") ? filter.type : this.entityType;
 
