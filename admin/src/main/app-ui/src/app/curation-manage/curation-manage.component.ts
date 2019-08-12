@@ -60,8 +60,32 @@ export class CurationManageComponent implements OnInit {
         this.route.queryParamMap.subscribe(
             params => {
 
+                var page = params.get('page');
+                var type = params.get('type');
+                var size = params.get('size');
+                var status = params.get('status');
+                var source = params.get('source');
 
-                this.manageCuratedData(this.userPage, this.pageSize, this.entityType, status, this.dataSource);
+                // If no page value submitted, set page value as first page
+                page = (page == null) ? "1" : page;
+                this.userPage = parseInt(page);
+
+                this.pageSize = size;
+                this.entityType = type;
+                this.mappingStatus = status;
+                this.dataSource = source;
+
+
+                // Sete default values incase no value is specified
+                page = (page == null) ? "1" : page;
+                size = (size == null) ? "10" : size;
+                status = (status == null) ? "" : status;
+                type = (type == null) ? "diagnosis" : type;
+                source = (source == null) ? null : source;
+                this.pageOptionSize = size;
+
+
+                this.manageCuratedData(page, size, type, status, source);
 
             }
         )
@@ -111,6 +135,21 @@ export class CurationManageComponent implements OnInit {
             );
     }
 
+
+    // whenever filter is apllied doit as size dro down, reset page to 1
+    newPageSize(pageSize) {
+
+        localStorage.setItem('_pageSize', pageSize);
+
+        //  Auto-Navigate away on page size change
+        let newPage = (this.userPage <= 1) ? this.userPage + 1 : 1;
+
+        this.router.navigate(
+            ['/curation/manage'],
+            { queryParams: {page: newPage, size: pageSize, type: this.entityType, status : this.mappingStatus, source: this.dataSource} }
+        );
+
+    }
 
 
 

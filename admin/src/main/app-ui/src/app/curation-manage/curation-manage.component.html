@@ -142,7 +142,18 @@
 
                                 </ul>
 
-<!-- Pagination here -->
+
+                                <div style="display: inline; width: 70px; margin-left: 5px; margin-top: -10px; float: right">
+                                    <select class="form-control" (change)="newPageSize($event.target.value)">
+
+                                        <option *ngFor="let pageOption of pageOptions"
+                                                [value]="pageOption"
+                                                [selected]="pageOption == pageOptionSize">
+                                            {{pageOption}}
+                                        </option>
+
+                                    </select>
+                                </div>
 
                             </div>
 
