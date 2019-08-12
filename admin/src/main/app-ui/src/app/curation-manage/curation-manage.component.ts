@@ -152,6 +152,38 @@ export class CurationManageComponent implements OnInit {
     }
 
 
+    searchFilter(form) {
+
+        var filter = form.value;
+
+        this.entityType = (filter.type != "") ? filter.type : this.entityType;
+
+        this.mappingStatus = (filter.status != "") ? filter.status : this.mappingStatus;
+
+        this.dataSource = (filter.source != "") ? filter.source : this.dataSource;
+
+
+        this.router.navigate(
+            ['/curation/manage'],
+            { queryParams: {page: null, size: this.pageSize, type: this.entityType, status : this.mappingStatus, source: this.dataSource} }
+        );
+
+    }
+
+    toggleDisplay(compType: string) {
+
+        if (compType == 'notif') {
+
+            this.showNotif = (this.showNotif == true) ? false : true;
+
+        }else if (compType == 'filter'){
+
+            this.showFilter = (this.showFilter == true) ? false : true;
+        }
+    }
+
+
+
 
 
 

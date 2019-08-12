@@ -15,6 +15,16 @@
 </div>
 
 
+<div *ngIf="showNotif" class="top-notif col-lg-3 animated fadeInRight">
+    <h3> Filter Mapping Data
+        <span (click)="toggleDisplay('details')" class='close'></span>
+    </h3>
+    <p> {{selectedDetails}}  </p>
+
+    <!--<button class="btn btn-primary btn-sm" type="submit" type="button"><a href="" target="_blank"> Orphan </a></button>
+    <button class="btn btn-outline btn-default btn-sm" (click)="toggleDisplay('details')"> Close</button> col-lg-offset-1 -->
+</div>
+
 
 
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -23,6 +33,84 @@
     <div class="">
 
         <div class="row" style="margin-top: -10px;">
+
+
+            <div class="col-lg-3" *ngIf="showFilter">
+                <div class="pdxfinder float-e-margins">
+                    <div class="pdxfinder-title">
+                        <div style="margin-bottom: -10px;"><h5> FILTER BY: </h5></div>
+                        <div class="pdxfinder-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="btn btn-primary btn-circle" (click)="toggleDisplay('filter')">
+                                <i class="ti-close"></i>
+                            </a>
+
+                        </div>
+                    </div>
+
+
+                    <form #filterForm="ngForm" (ngSubmit)="searchFilter(filterForm)" novalidate>
+
+                        <div class="pdxfinder-content">
+                            <p> With chosen select uesr can fase chose from large in select input.</p>
+                        </div>
+
+                        <div class="pdxfinder-content">
+
+                            <div class="form-group">
+                                <select name="type" ngModel class="select2_demo_3 form-control">
+                                    <option value="" selected> DATA TYPE</option>
+                                    <option value="diagnosis">Diagnosis</option>
+                                    <option value="treatment">Drug Treatment</option>
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <select name="status" ngModel class="select2_demo_3 form-control">
+                                    <option value="" selected> CURATION STATUS</option>
+                                    <option value="validated"> Validated </option>
+                                    <option value="created"> Unvalidated </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <select name="source" ngModel class="select2_demo_3 form-control">
+                                    <option value="" selected> DATA PROVIDER</option>
+                                    <option value="jax"> JAX </option>
+                                    <option value="pdmr"> PDMR </option>
+                                    <option value="crl"> CRL </option>
+                                </select>
+                            </div>
+
+                            <!--
+                            <div class="form-group">
+                                <label>Data Source</label>
+                                <input type="email" placeholder="Enter email" class="form-control"></div>
+
+                            <div class="form-group">
+                                <label>Data Status</label>
+                                <input type="email" placeholder="Enter email" class="form-control"></div>
+                            -->
+                        </div>
+
+
+                        <div class="pdxfinder-content">
+                            <div class="row">
+                                <button class="btn btn-sm btn-primary pull-right m-t-n-xs mr-15" type="submit">
+                                    <strong> Search </strong>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+
+                </div>
+            </div>
+
+
 
             <div [ngClass]="{'col-lg-9': showFilter == true }" *ngIf="dataExists" >
 
@@ -170,4 +258,13 @@
     </div>
 </div>
 
+<div class="fabs" *ngIf="!showFilter">
+    <!--<a target="_blank" class="fab"></a>
+    <a target="_blank" class="fab"></a>
+    <a target="_blank" class="fab" style="padding-bottom: 15px;"> <i class="ti-filter" style="font-size: 45px;"></i> </a> -->
+    <a id="prime" class="fab"
+       (click)="toggleDisplay('filter')">
+        <i class="ti-filter" style="font-size: 30px;"></i>
+    </a>
+</div>
 

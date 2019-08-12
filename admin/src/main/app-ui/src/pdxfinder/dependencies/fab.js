@@ -1,4 +1,4 @@
-toggleFab();
+//toggleFab();
 
 //Fab click
 $('#prime').click(function() {
