@@ -19,7 +19,7 @@ $(document).ready(function () {
         var button = $(this).find('i');
         var content = pdxfinder.find('div.pdxfinder-content');
         content.slideToggle(200);
-        button.toggleClass('fa-chevron-up').toggleClass('fa-chevron-down');
+        button.toggleClass('ti-angle-double-up').toggleClass('ti-angle-double-down');
         pdxfinder.toggleClass('').toggleClass('border-bottom');
         setTimeout(function () {
             pdxfinder.resize();
@@ -38,14 +38,6 @@ $(document).ready(function () {
         SmoothlyMenu();
     });
 
-    // Small todo handler
-    $('.check-link').click(function () {
-        var button = $(this).find('i');
-        var label = $(this).next('span');
-        button.toggleClass('fa-check-square').toggleClass('fa-square-o');
-        label.toggleClass('todo-completed');
-        return false;
-    });
 
     // Minimalize menu
     $('.navbar-minimalize').click(function () {

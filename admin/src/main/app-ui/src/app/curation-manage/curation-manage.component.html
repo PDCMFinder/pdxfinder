@@ -35,7 +35,77 @@
         <div class="row" style="margin-top: -10px;">
 
 
+            <!--
+            <div class="col-lg-4">
+                <div class="pdxfinder float-e-margins">
+                    <div class="pdxfinder-title">
+                        <h5>Collaps panels</h5>
+                        <div class="pdxfinder-tools">
+                            <a class="collapse-link">
+                                <i class="ti-angle-double-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="ti-settings"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#">Config option 1</a>
+                                </li>
+                                <li><a href="#">Config option 2</a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="ti ti-close"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="pdxfinder-content">
+                        <div class="panel-body">
+                            <div class="panel-group" id="accordion">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h5 class="panel-title">
+                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Collapsible Group Item #1</a>
+                                        </h5>
+                                    </div>
+                                    <div id="collapseOne" class="panel-collapse collapse in">
+                                        <div class="panel-body">
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">Collapsible Group Item #2</a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseTwo" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">Collapsible Group Item #3</a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseThree" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+            
             <div class="col-lg-3" *ngIf="showFilter">
+
+
                 <div class="pdxfinder float-e-margins">
                     <div class="pdxfinder-title">
                         <div style="margin-bottom: -10px;"><h5> FILTER BY: </h5></div>
@@ -53,11 +123,89 @@
 
                     <form #filterForm="ngForm" (ngSubmit)="searchFilter(filterForm)" novalidate>
 
-                        <div class="pdxfinder-content">
-                            <p> With chosen select uesr can fase chose from large in select input.</p>
+                        <div class="pdxfinder">
+                            <div class="pdxfinder-title">
+                                <h5> DATA TYPES </h5>
+                                <div class="pdxfinder-tools">
+                                    <a class="collapse-link"> <i class="ti-angle-double-up"></i> </a>
+                                </div>
+                            </div>
+                            <div class="pdxfinder-content no-padding">
+                                <ul class="list-group">
+
+                                    <li class="list-group-item" *ngFor="let dataType of dataTypes">
+
+                                        <input (change)="searchFilter(filterForm)" type="checkbox" value="{{dataType.id}}" [(ngModel)]="dataType.checked" [name]="dataType.text" id="{{dataType.text}}" />
+                                        <label for="{{dataType.text}}"> {{dataType.text | titlecase}}</label>
+
+                                    </li>
+
+                                </ul>
+                            </div>
                         </div>
 
+                        <div class="pdxfinder">
+                            <div class="pdxfinder-title">
+                                <h5> CURATION STATUS </h5>
+                                <div class="pdxfinder-tools">
+                                    <a class="collapse-link"> <i class="ti-angle-double-up"></i> </a>
+                                </div>
+                            </div>
+                            <div class="pdxfinder-content no-padding">
+                                <ul class="list-group">
+
+                                    <li class="list-group-item" *ngFor="let status of statusList">
+
+                                        <input (change)="searchFilter(filterForm)"  type="checkbox" value="{{status.id}}" [(ngModel)]="status.checked" [name]="status.text" id="{{status.text}}" />
+                                        <label for="{{status.text}}"> {{status.text | titlecase}}</label>
+
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="pdxfinder">
+                            <div class="pdxfinder-title">
+                                <h5> CURATION STATUS </h5>
+                                <div class="pdxfinder-tools">
+                                    <a class="collapse-link"> <i class="ti-angle-double-up"></i> </a>
+                                </div>
+                            </div>
+
+                            <div class="pdxfinder-content no-padding">
+                                <ul class="list-group">
+
+                                    <li class="list-group-item" *ngFor="let item of providersList2">
+
+                                        <input (change)="searchFilter(filterForm)" type="checkbox" value="{{item.id}}" [(ngModel)]="item.checked" [name]="item.text" id="{{item.text}}" />
+                                        <label for="{{item.text}}"> {{item.text | uppercase}}</label>
+
+                                    </li>
+
+                                </ul>
+                            </div>
+
+                        </div>
+
+                        <!--
+                        <div class="pdxfinder">
+
+                            <div class="pdxfinder-content">
+                                <div class="row">
+                                    <button class="btn btn-sm btn-primary pull-right m-t-n-xs mr-15" type="submit">
+                                        <strong> Search </strong>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div> -->
+
+
+
+                        <!--
                         <div class="pdxfinder-content">
+                            
 
                             <div class="form-group">
                                 <select name="type" [(ngModel)]="entityType" class="select2_demo_3 form-control">
@@ -95,25 +243,16 @@
                                 </select>
                             </div>
 
-                            <!-- <option value="" selected> CURATION STATUS</option>
+                            <option value="" selected> CURATION STATUS</option>
                             <div class="form-group">
                                 <label>Data Source</label>
                                 <input type="email" placeholder="Enter email" class="form-control"></div>
 
                             <div class="form-group">
                                 <label>Data Status</label>
-                                <input type="email" placeholder="Enter email" class="form-control"></div>
-                            -->
-                        </div>
 
+                        </div> -->
 
-                        <div class="pdxfinder-content">
-                            <div class="row">
-                                <button class="btn btn-sm btn-primary pull-right m-t-n-xs mr-15" type="submit">
-                                    <strong> Search </strong>
-                                </button>
-                            </div>
-                        </div>
                     </form>
 
 

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {MappingService} from "../mapping.service";
-import {Mapping, MappingInterface} from "../mapping-interface";
+import {Mapping, MappingInterface, MappingValues} from "../mapping-interface";
 import {GeneralService} from "../general.service";
 import {FormBuilder, FormGroup} from "@angular/forms";
 
@@ -33,7 +33,7 @@ export class CurationManageComponent implements OnInit {
     // Selected Fields
     public selectedDetails: any;
     public showNotif: boolean = false;
-    public showFilter: boolean = false;
+    public showFilter: boolean = true;
 
     public pageSize;
     public pageOptions = ['2', '3', '5', '10', '15', '20', '25'];
@@ -42,10 +42,11 @@ export class CurationManageComponent implements OnInit {
     public mappingStatus: any;
     public pageOptionSize: string;
 
-    public dataTypes = ['diagnosis', 'treatment'];
+    public dataTypes = [];
+    public statusList = [];
     public providersList = [];
-    public statusList = ['validated', 'created', 'orphaned', 'unmapped'];
 
+    public providersList2 = [];
 
     constructor(private router: Router,
                 private route: ActivatedRoute,
@@ -56,6 +57,10 @@ export class CurationManageComponent implements OnInit {
     ngOnInit() {
 
         this.getProvidersList();
+
+        this.getDataTypes();
+
+        this.getStatusList();
 
         // From the current url snapshot, get the source parameter and assign to the dataSource property
 
@@ -138,18 +143,47 @@ export class CurationManageComponent implements OnInit {
     }
 
 
-
     getProvidersList(){
 
         this._mappingService.getCurationSummary(null)
             .subscribe(
                 data => {
 
-                    data.forEach((dData) =>{
+                    data.forEach((dData, index) =>{
+
                         this.providersList.push(dData.DataSource);
+
+                        this.providersList2.push(
+                            {id: index, text: dData.DataSource, checked: false}
+                        )
+
                     })
                 }
             );
+    }
+
+
+    getDataTypes(){
+
+        var entityTypes =  ['diagnosis', 'treatment'];
+
+        entityTypes.forEach((entity, index) => {
+            this.dataTypes.push(
+                {id: index, text: entity, checked: false}
+            )
+        })
+
+    }
+
+    getStatusList(){
+
+       var statArray = ['validated', 'created', 'orphaned', 'unmapped'];
+
+        statArray.forEach((status, index) => {
+            this.statusList.push(
+                {id: index, text: status, checked: false}
+            )
+        })
     }
 
 
@@ -172,14 +206,42 @@ export class CurationManageComponent implements OnInit {
     searchFilter(form) {
 
         var filter = form.value;
-
-        console.log(filter)
-
         this.entityType = (filter.type != "") ? filter.type : this.entityType;
-
         this.mappingStatus = (filter.status != "") ? filter.status : this.mappingStatus;
-
         this.dataSource = (filter.source != "") ? filter.source : this.dataSource;
+
+
+        // Capture Selected Providers Check Box
+        var sources = [];
+        this.providersList2.forEach((provider)=>{
+
+            if (provider.checked == true) {
+                sources.push(provider.text);
+            }
+        })
+        this.dataSource = (sources.length != 0) ? sources.join() : this.dataSource;
+
+
+        // Capture Selected Curation Status Check Box
+        var status = [];
+        this.statusList.forEach((dStatus)=>{
+
+            if (dStatus.checked == true) {
+                status.push(dStatus.text);
+            }
+        })
+        this.mappingStatus = (status.length != 0) ? status.join() : this.mappingStatus;
+
+
+        // Capture Data Type Status Check Box
+        var types = [];
+        this.dataTypes.forEach((dType)=>{
+
+            if (dType.checked == true) {
+                types.push(dType.text);
+            }
+        })
+        this.entityType = (types.length != 0) ? types.join() : this.entityType;
 
 
         this.router.navigate(
@@ -188,6 +250,8 @@ export class CurationManageComponent implements OnInit {
         );
 
     }
+
+
 
     toggleDisplay(compType: string) {
 

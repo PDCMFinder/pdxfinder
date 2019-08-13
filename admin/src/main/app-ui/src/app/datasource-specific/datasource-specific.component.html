@@ -37,13 +37,17 @@
                     <div class="pdxfinder float-e-margins">
 
                         <div class="pdxfinder-title">
-                            <h5 style="font-weight: bold;" class="testMobile"><span
-                                    style="color: #03369D"> {{dataSource | uppercase}}  </span> - Unmapped {{entityType | titlecase}} Summary </h5>
+                            <h5 class="testMobile"> Unmapped {{entityType | titlecase}} Summary </h5>
 
                             <button *ngIf="report == null" style="float: right; margin-top:-7px;" class="btn btn-primary btn-sm" type="submit">
                                 <i class="ti-cloud-up"></i> &nbsp; Submit Curation &nbsp;
                             </button> <!-- [disabled]="mappingForm.form.invalid" -->
 
+                        </div>
+
+                        <div class="pdxfinder-content pdxfinder-heading">
+                            <h3><i class="ti-agenda"></i> <span style="color: #03369D"> {{dataSource | uppercase}}  </span> Mapping </h3>
+                            <small><i class="fa fa-tim"></i> You have 70 unmapped ... and 16 orphaned ...</small>
                         </div>
 
 
