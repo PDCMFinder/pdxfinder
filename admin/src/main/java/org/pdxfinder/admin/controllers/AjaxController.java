@@ -57,7 +57,7 @@ public class AjaxController {
      * @param entityType      - Search by entityType e.g find unmapped treatment entities ...?entity-type=treatment&mapped-term=-
      * @param mappedTermsOnly - Search for mapped terms only ... map-terms-only=true
      * @param mapType         - Search data by mapType e.g ...?map-type=direct
-     * @param status         - Search data by mapping status e.g ...?status=unmapped
+     * @param status          - Search data by mapping status e.g ...?status=unmapped
      * @param page            - Allows client to submit offset value e.g ...?page=10
      * @param size            - Allows client to submit size limit values e.g ...?size=5
      * @return - Mapping Entities with data count, offset and limit Values
@@ -66,20 +66,21 @@ public class AjaxController {
     public ResponseEntity<?> getMappings(@RequestParam("mq") Optional<String> mappingQuery,
                                          @RequestParam(value = "mapped-term", defaultValue = "") Optional<String> mappedTermLabel,
                                          @RequestParam(value = "map-terms-only", defaultValue = "") Optional<String> mappedTermsOnly,
-                                         @RequestParam(value = "entity-type", defaultValue = "") Optional<String> entityType,
+                                         @RequestParam(value = "entity-type", defaultValue = "0") Optional<List<String>> entityType,
                                          @RequestParam(value = "map-type", defaultValue = "") Optional<String> mapType,
-                                         @RequestParam(value = "status", defaultValue = "") Optional<String> status,
+                                         @RequestParam(value = "status", defaultValue = "0") Optional<List<String>> status,
 
                                          @RequestParam(value = "page", defaultValue = "1") Integer page,
                                          @RequestParam(value = "size", defaultValue = "10") Integer size) {
 
         String mappingLabel = "";
-        String mappingValue = "";
+        List<String> mappingValue = Arrays.asList("0");
 
         try {
             String[] query = mappingQuery.get().split(":");
             mappingLabel = query[0];
-            mappingValue = query[1].trim();
+            mappingValue = Arrays.asList(query[1].trim());
+
 
         } catch (Exception e) {
         }
@@ -94,7 +95,7 @@ public class AjaxController {
     @GetMapping("/mappings/{entityId}")
     public ResponseEntity<?> getOneMapping(@PathVariable Optional<Integer> entityId) {
 
-        if (entityId.isPresent()){
+        if (entityId.isPresent()) {
 
             MappingEntity result = mappingService.getMappingEntityById(entityId.get());
 
@@ -103,7 +104,6 @@ public class AjaxController {
 
         return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST.getReasonPhrase(), HttpStatus.BAD_REQUEST);
     }
-
 
 
     @GetMapping("/mappings/summary")
@@ -119,12 +119,12 @@ public class AjaxController {
     @PutMapping("/mappings")
     public ResponseEntity<?> editListOfEntityMappings(@RequestBody List<MappingEntity> submittedEntities) {
 
-        List data =  mapper.convertValue(submittedEntities, List.class);
+        List data = mapper.convertValue(submittedEntities, List.class);
         log.info(data.toString());
 
         List<Error> errors = validateEntities(submittedEntities);
 
-        if (submittedEntities.size() < 1 || !errors.isEmpty()){
+        if (submittedEntities.size() < 1 || !errors.isEmpty()) {
             return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
         }
 
@@ -132,10 +132,6 @@ public class AjaxController {
         return new ResponseEntity<>(updated, HttpStatus.OK);
 
     }
-
-
-
-
 
 
     /****************************************************************
@@ -179,8 +175,8 @@ public class AjaxController {
         } catch (Exception e) {
         }
 
-        String failedReportFile = homeDir+"/Documents/"+(new Date())+"_failed.json";
-        String errorReportFile = homeDir+"/Documents/"+(new Date())+"_error.txt";
+        String failedReportFile = homeDir + "/Documents/" + (new Date()) + "_failed.json";
+        String errorReportFile = homeDir + "/Documents/" + (new Date()) + "_error.txt";
 
         utilityService.writeToFile(failedReport, failedReportFile, true);
         utilityService.writeToFile(this.errReport, errorReportFile, true);
@@ -227,13 +223,13 @@ public class AjaxController {
     }
 
 
-    public List validateEntities(List<MappingEntity> mappingEntities){
+    public List validateEntities(List<MappingEntity> mappingEntities) {
 
         List<Error> errors = new ArrayList<>();
 
-        for (MappingEntity me : mappingEntities){
+        for (MappingEntity me : mappingEntities) {
 
-            if (!mappingService.checkExistence(me.getEntityId())){
+            if (!mappingService.checkExistence(me.getEntityId())) {
 
                 Error error = new Error("Entity " + me.getEntityId() + " Not Found", HttpStatus.NOT_FOUND);
                 errors.add(error);

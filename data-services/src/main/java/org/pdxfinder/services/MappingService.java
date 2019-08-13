@@ -824,13 +824,13 @@ public class MappingService {
 
     public PaginationDTO search(int page,
                                 int size,
-                                String entityType,
+                                List<String> entityType,
                                 String mappingLabel,
-                                String mappingValue,
+                                List<String> mappingValue,
                                 String mappedTermLabel,
                                 String mapType,
                                 String mappedTermsOnly,
-                                String status) {
+                                List<String> status) {
 
         String sortColumn = "id";
         Sort.Direction direction = getSortDirection("asc");

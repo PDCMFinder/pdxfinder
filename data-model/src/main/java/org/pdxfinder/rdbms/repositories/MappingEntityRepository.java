@@ -28,22 +28,22 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
 
 
     @Query(value = "Select distinct me from MappingEntity me JOIN me.mappingValues mv " +
-            "WHERE ((lower(me.entityType) = lower(:entityType)) OR :entityType = '') "+
-            "AND ( (lower(KEY(mv)) = lower(:mappingLabel) AND lower(mv) = lower(:mappingValue)) OR  :mappingValue = '' ) "+
+            "WHERE ((lower(me.entityType) in :entityType) OR :entityType = '0') "+
+            "AND ( (lower(KEY(mv)) = lower(:mappingLabel) AND lower(mv) in :mappingValue) OR  :mappingValue = '0' ) "+
             "AND ((lower(me.mappedTermLabel) = lower(:mappedTermLabel)) OR :mappedTermLabel = '') "+
 
             "AND ((lower(me.mapType) = lower(:mapType)) OR :mapType = '') "+
-            "AND ((lower(me.status) = lower(:status)) OR :status = '') "+
+            "AND ((lower(me.status) in :status) OR :status = '0') "+
 
             "AND ( :mappedTermsOnly = '' OR (me.mapType is not null )) "
     )
-    Page<MappingEntity> findByMultipleFilters(@Param("entityType") String entityType,
+    Page<MappingEntity> findByMultipleFilters(@Param("entityType") List<String> entityType,
                                               @Param("mappingLabel") String mappingLabel,
-                                              @Param("mappingValue") String mappingValue,
+                                              @Param("mappingValue") List<String> mappingValue,
                                               @Param("mappedTermLabel") String mappedTermLabel,
                                               @Param("mapType") String mapType,
                                               @Param("mappedTermsOnly") String mappedTermsOnly,
-                                              @Param("status") String status,
+                                              @Param("status") List<String> status,
 
                                               Pageable pageable);
 
