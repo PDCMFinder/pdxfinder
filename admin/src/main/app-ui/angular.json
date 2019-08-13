@@ -32,11 +32,12 @@
               "src/pdxfinder/pattern-library/themify/ie7/ie7.css",
               "src/pdxfinder/pattern-library/animate.css",
               "src/pdxfinder/dependencies/chart/export.css",
-              "src/pdxfinder/pattern-library/alert/sweetalert2.min.css"
+              "src/pdxfinder/pattern-library/alert/sweetalert2.css"
             ],
             "scripts": [
               "src/pdxfinder/dependencies/jquery-2.1.1.js",
               "src/pdxfinder/dependencies/bootstrap.min.js",
+              "src/pdxfinder/dependencies/fab.js",
               "src/pdxfinder/dependencies/datatables.min.js",
               "src/pdxfinder/dependencies/plugins/metisMenu/jquery.metisMenu.js",
               "src/pdxfinder/dependencies/plugins/slimscroll/jquery.slimscroll.min.js",

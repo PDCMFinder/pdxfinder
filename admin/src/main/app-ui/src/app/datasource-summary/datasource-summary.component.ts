@@ -36,7 +36,7 @@ export class DatasourceSummaryComponent implements OnInit {
         this.mapType = this.gs.capitalize(urlParam);
 
         // Connect to the Service using Reactive Observables
-        this._mappingService.getDiagnosisSummary(this.mapType)
+        this._mappingService.getCurationSummary(this.mapType)
             .subscribe(
                 data => {
 
@@ -47,7 +47,7 @@ export class DatasourceSummaryComponent implements OnInit {
 
     onSelect(source){
         var datasourceSpecific = `${source}/1`
-        this.router.navigate([datasourceSpecific],{relativeTo: this.route})
+        this.router.navigate([datasourceSpecific],{relativeTo: this.route, queryParams: { page: 1, size : 4 }})
     }
 
 }

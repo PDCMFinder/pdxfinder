@@ -39,9 +39,9 @@
 
       <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
         <div class="pdxfinder">
-          <div class="pdxfinder-content" style="padding-bottom:10px;">
-            <img src="assets/icons/images.png" class="icon pdxfinder-clickable-area">
-            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>
+          <div class="pdxfinder-content pdx-badge" style="padding-bottom:10px;" attr.pdxfinder-badge={{0}}>
+            <img (click)="onClick('orphan')" src="assets/icons/broken.png" class="icon pdxfinder-clickable-area">
+            <div class='text-navy pdx-singleLine'> ORPHANED MAPPINGS </div>
           </div>
         </div>
       </div>
@@ -49,8 +49,8 @@
       <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
         <div class="pdxfinder">
           <div class="pdxfinder-content" style="padding-bottom:10px;">
-            <img src="assets/icons/images.png" class="icon pdxfinder-clickable-area">
-            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>
+            <img (click)="onClick('manage')" src="assets/icons/Settings-icon.png" class="icon pdxfinder-clickable-area" style="padding-bottom: 10px">
+            <div class='text-navy pdx-singleLine'> MANAGE CURATIONS </div>
           </div>
         </div>
       </div>
@@ -58,8 +58,8 @@
       <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
         <div class="pdxfinder">
           <div class="pdxfinder-content" style="padding-bottom:10px;">
-            <img src="assets/icons/images.png" class="icon pdxfinder-clickable-area">
-            <div class='text-navy pdx-singleLine'> ... MAPPINGS </div>
+            <img (click)="onClick('archive')" src="assets/icons/document-compress-icon.png" class="icon pdxfinder-clickable-area" style="padding-bottom: 10px">
+            <div class='text-navy pdx-singleLine'> ARCHIVE </div>
           </div>
         </div>
       </div>

@@ -27,9 +27,11 @@ export class MappingService {
     constructor(private http: HttpClient) { }
 
 
-    getDiagnosisSummary(maptype: string): Observable<SummaryInterface[]>{
+    getCurationSummary(maptype: string): Observable<SummaryInterface[]>{
 
-        const url = `${this._summaryUrl}?entity-type=${maptype}`;
+        var curationType = (maptype == null) ? '' : `?entity-type=${maptype}`;
+
+        const url = `${this._summaryUrl}${curationType}`;
 
         return this.http.get<SummaryInterface[]>(url);
     }
@@ -41,6 +43,21 @@ export class MappingService {
 
         return this.http.get<MappingInterface[]>(url);
     }
+
+    getManagedTerms(entityType: string, dataSource: string, page: string, size: string, status: string): Observable<MappingInterface[]>{
+
+        var dsQuery = "";
+        if (dataSource != null){
+            dsQuery = `&mq=datasource:${dataSource}`;
+        }
+
+        const url = `${this._mappingsUrl}?entity-type=${entityType}&page=${page}&size=${size}&status=${status}${dsQuery}`;
+
+        console.log(url);
+
+        return this.http.get<MappingInterface[]>(url);
+    }
+
 
 
     //Retrieve unmapped diagnosis entities
