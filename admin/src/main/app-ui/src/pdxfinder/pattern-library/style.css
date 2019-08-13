@@ -1,3 +1,21 @@
+/* CUSTOMIZE BOOTSTRAP CSS FOR 1/2*/
+.col-lg-2-5 {
+    position: relative;
+    width: 100%;
+    min-height:1px;
+    padding-right: 6px;
+    padding-left: 6px;
+}
+
+.col-lg-2-5, col-lg-9-5{float:left}
+
+.col-lg-2-5{-ms-flex:0 0  20.8333333333%;flex:0 0  20.8333333333%;max-width: 20.8333333333%}
+
+
+
+
+/*---------------*/
+
 /* CHECK BOX STYLING */
 
 [type="checkbox"]:checked,
@@ -54,6 +72,10 @@
 
 .mr-15 {
     margin-right:15px;
+}
+
+.mu--15 {
+    margin-top: -15px !important;
 }
 
 .ico-space{
