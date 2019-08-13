@@ -676,7 +676,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 //need this trick to get rid of fractures if there is any
                 double passageDouble = Double.parseDouble(passage);
-                passage = String.valueOf(passageDouble);
+                passage = String.valueOf((int)passageDouble);
 
                 //create specimens with engraftment data
                 Specimen specimen = new Specimen();
