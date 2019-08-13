@@ -1,4 +1,62 @@
+/* CHECK BOX STYLING */
 
+[type="checkbox"]:checked,
+[type="checkbox"]:not(:checked) {
+    position: absolute;
+    left: -9999px;
+}
+[type="checkbox"]:checked + label,
+[type="checkbox"]:not(:checked) + label
+{
+    position: relative;
+    padding-left: 35px;
+    cursor: pointer;
+    line-height: 30px;
+    display: inline-block;
+    color: #666;
+}
+[type="checkbox"]:checked + label:before,
+[type="checkbox"]:not(:checked) + label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 25px;
+    height: 25px;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+[type="checkbox"]:checked + label:after,
+[type="checkbox"]:not(:checked) + label:after {
+    content: '';
+    width: 12px;
+    height:12px;
+    background: rgba(3, 54, 157, 0.9);
+    position: absolute;
+    top: 7px;
+    left: 7px;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+[type="checkbox"]:not(:checked) + label:after {
+    opacity: 0;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+}
+[type="checkbox"]:checked + label:after {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}
+
+/*--------*/
+.mr-15 {
+    margin-right:15px;
+}
+
+.ico-space{
+    font-size: 21px; color:#03369D !important; margin-left: 5px; margin-right: 5px;
+}
 /* Stylesheet for Material deisgn Notification */
 .hidden {
     visibility: hidden;
@@ -3713,7 +3771,6 @@ nav.navbar-static-side {
 }
 
 
-
 /*
   ##Device = Desktops
   ##Screen = 1281px to higher resolution desktops
@@ -3723,3 +3780,214 @@ font-size: 13px;
 }
 */
 
+
+
+
+/*Floating Action Button*/
+
+.fabs {
+    bottom: 0;
+    position: fixed;
+    margin: 1em;
+    left: 0;
+    z-index: 998;
+}
+
+.fab {
+    display: block;
+    width: 57px;
+    height: 57px;
+    border-radius: 50%;
+    text-align: center;
+    color: #FFF;
+    background: rgba(3, 54, 157, 1);
+    margin: 25px auto 0;
+    box-shadow: 0 0 4px rgba(0, 0, 0, .14), 0 4px 8px rgba(0, 0, 0, .28);
+    cursor: pointer;
+    -webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    transition: all .1s ease-out;
+    position: relative;
+    z-index: 998;
+    overflow: hidden;
+}
+
+.fab > i {
+    font-size: 2em;
+    line-height: 55px;
+    -webkit-transition: all .2s ease-out;
+    -moz-transition: all .2s ease-out;
+    -o-transition: all .2s ease-out;
+    transition: all .2s ease-in-out;
+}
+
+.fab:hover {
+    color: rgba(3, 54, 157, 1);
+    background: #ffffff;
+}
+
+
+
+.fab:not(:last-child) {
+    width: 0;
+    height: 0;
+    margin: 20px auto 0;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.fab:not(:last-child) > i {
+    font-size: 1.4em;
+    line-height: 40px;
+}
+
+.fab:not(:last-child).is-visible {
+    width: 50px;
+    height: 50px;
+    opacity: 1;
+    visibility: visible;
+}
+
+
+
+
+/*Element state*/
+
+.is-active {
+    -moz-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+    -o-transition: all 1s ease-in-out;
+    -moz-transition: all 1s ease-in-out;
+    transition: all 1s ease-in-out;
+}
+
+.is-float {
+    box-shadow: 0 0 6px rgba(0, 0, 0, .16), 0 6px 12px rgba(0, 0, 0, .32);
+}
+
+.is-max {
+    box-shadow: inset 0 -12px 10px -10px rgba(0, 0, 0, 0.18), inset 0 12px 10px -10px rgba(0, 0, 0, 0.10);
+}
+
+.is-loading {
+    display: block;
+    -webkit-animation: load 1s cubic-bezier(0, .99, 1, 0.6) infinite;
+    -moz-animation: load 1s cubic-bezier(0, .99, 1, 0.6) infinite;
+    -o-animation: load 1s cubic-bezier(0, .99, 1, 0.6) infinite;
+    animation: load 1s cubic-bezier(0, .99, 1, 0.6) infinite;
+}
+
+
+/*Animation*/
+
+@keyframes zoomIn {
+    0% {
+        -moz-transform: scale(0);
+        -ms-transform: scale(0);
+        -webkit-transform: scale(0);
+        transform: scale(0);
+        opacity: 0.0;
+    }
+    100% {
+        -moz-transform: scale(1);
+        -ms-transform: scale(1);
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes load {
+    0% {
+        -moz-transform: scale(0);
+        -ms-transform: scale(0);
+        -webkit-transform: scale(0);
+        transform: scale(0);
+        opacity: 0.0;
+    }
+    50% {
+        -moz-transform: scale(1.5);
+        -ms-transform: scale(1.5);
+        -webkit-transform: scale(1.5);
+        transform: scale(1.5);
+        opacity: 1;
+    }
+    100% {
+        -moz-transform: scale(1);
+        -ms-transform: scale(1);
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+/* SMARTPHONES PORTRAIT */
+
+@media only screen and (min-width: 300px) {
+    .chat {
+        width: 200px;
+    }
+}
+/* SMARTPHONES LANDSCAPE */
+
+@media only screen and (min-width: 480px) {
+    .chat {
+        width: 300px;
+    }
+    .chat_field {
+        width: 65%;
+    }
+}
+/* TABLETS PORTRAIT */
+
+@media only screen and (min-width: 768px) {
+    .chat {
+        width: 300px;
+    }
+    .chat_field {
+        width: 65%;
+    }
+}
+/* TABLET LANDSCAPE / DESKTOP */
+
+@media only screen and (min-width: 1024px) {
+    .chat {
+        width: 400px;
+    }
+    .chat_field {
+        width: 65%;
+    }
+}
+
+
+/* Ripple */
+
+.ink {
+    display: block;
+    position: absolute;
+    background: rgba(38, 50, 56, 0.4);
+    border-radius: 100%;
+    -moz-transform: scale(0);
+    -ms-transform: scale(0);
+    webkit-transform: scale(0);
+    transform: scale(0);
+}
+/*animation effect*/
+
+.ink.animate {
+    animation: ripple 0.5s ease-in-out;
+}
+
+@keyframes ripple {
+    /*scale the element to 250% to safely cover the entire link and fade it out*/
+
+    100% {
+        opacity: 0;
+        -moz-transform: scale(5);
+        -ms-transform: scale(5);
+        webkit-transform: scale(5);
+        transform: scale(5);
+    }
+}

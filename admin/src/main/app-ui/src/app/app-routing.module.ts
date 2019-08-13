@@ -5,6 +5,7 @@ import { DatasourceSummaryComponent} from "./datasource-summary/datasource-summa
 import { DashboardComponent } from "./dashboard/dashboard.component";
 import {DatasourceSpecificComponent} from "./datasource-specific/datasource-specific.component";
 import {DatasourceSpecificSuggestionsComponent} from "./datasource-specific-suggestions/datasource-specific-suggestions.component";
+import {CurationManageComponent} from "./curation-manage/curation-manage.component";
 
 
 const routes: Routes = [
@@ -12,6 +13,9 @@ const routes: Routes = [
     { path: '',   component: DashboardComponent },
     { path: 'dashboard',   component: DashboardComponent },
     { path: 'curation', component: CurationMappingComponent },
+    { path: 'curation/manage', component: CurationManageComponent },
+    { path: 'curation/orphan', component: CurationManageComponent },
+    { path: 'curation/archive', component: CurationManageComponent },
     { path: 'curation/:mapType',  component: DatasourceSummaryComponent},
     {
         path: 'curation/:mapType/:source/:page',  component: DatasourceSpecificComponent,
