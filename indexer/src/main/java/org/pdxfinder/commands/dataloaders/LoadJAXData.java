@@ -288,6 +288,8 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     }
 
+    @Override
+    void addAccessModality() {}
 
 
     /*

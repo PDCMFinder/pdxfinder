@@ -475,7 +475,10 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
     }
 
+    @Override
+    void addAccessModality() {
 
+    }
 
 
 

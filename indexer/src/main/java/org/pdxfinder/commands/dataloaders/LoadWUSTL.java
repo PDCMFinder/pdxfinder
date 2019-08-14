@@ -169,4 +169,8 @@ public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
     void step17LoadModelDosingStudies() throws Exception {
 
     }
+
+    @Override
+    void addAccessModality() {}
+
 }
