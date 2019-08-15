@@ -82,6 +82,51 @@ public class MappingService {
     }
 
 
+
+    public MappingEntity getDiagnosisMapping(String dataSource, String diagnosis, String originTissue, String tumorType) {
+
+        if (!INITIALIZED) loadRules("json");
+
+        String mapKey = MappingEntityType.diagnosis.get() + "__" + dataSource + "__" + diagnosis + "__" + originTissue + "__" + tumorType;
+
+        mapKey = mapKey.replaceAll("[^a-zA-Z0-9 _-]", "").toLowerCase();
+
+        return container.getEntityById(mapKey);
+    }
+
+    public MappingEntity getTreatmentMapping(String dataSource, String treatmentName) {
+
+        if (!INITIALIZED) loadRules("json");
+
+        String mapKey = MappingEntityType.treatment.get() + "__" + dataSource + "__" + treatmentName;
+
+        mapKey = mapKey.replaceAll("[^a-zA-Z0-9 _-]", "").toLowerCase();
+
+        return container.getEntityById(mapKey);
+    }
+
+
+    public void saveMappingsToFile(String fileName, List<MappingEntity> maprules) {
+
+        Map<String, List<MappingEntity>> mappings = new HashMap<>();
+        mappings.put("mappings", maprules);
+
+        Gson gson = new Gson();
+        String json = gson.toJson(mappings);
+
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
+
+            writer.append(json);
+            writer.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     /**
      * Loads rules from a source: file or h2
      *
@@ -291,32 +336,9 @@ public class MappingService {
     }
 
 
-    public MappingEntity getDiagnosisMapping(String dataSource, String diagnosis, String originTissue, String tumorType) {
-
-        if (!INITIALIZED) loadRules("json");
-
-        String mapKey = MappingEntityType.diagnosis.get() + "__" + dataSource + "__" + diagnosis + "__" + originTissue + "__" + tumorType;
-
-        mapKey = mapKey.replaceAll("[^a-zA-Z0-9 _-]", "").toLowerCase();
 
 
-        return container.getEntityById(mapKey);
 
-
-    }
-
-    public MappingEntity getTreatmentMapping(String dataSource, String treatmentName) {
-
-        if (!INITIALIZED) loadRules("json");
-
-        String mapKey = MappingEntityType.treatment.get() + "__" + dataSource + "__" + treatmentName;
-
-        mapKey = mapKey.replaceAll("[^a-zA-Z0-9 _-]", "").toLowerCase();
-
-        return container.getEntityById(mapKey);
-
-
-    }
 
 
     public Map<String, List<MappingEntity>> getMissingDiagnosisMappings(String ds) {
@@ -409,56 +431,6 @@ public class MappingService {
     }
 
 
-    public void saveMappingsToFile(String fileName, List<MappingEntity> maprules) {
-
-        Map<String, List<MappingEntity>> mappings = new HashMap<>();
-        mappings.put("mappings", maprules);
-
-        Gson gson = new Gson();
-        String json = gson.toJson(mappings);
-
-
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
-
-            writer.append(json);
-            writer.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-
-
-/*
-    public Map<String, List<MappingEntity>> getMissingDiagnosisMappings(String ds){
-
-        MappingContainer mc = new MappingContainer();
-
-        if(ds == null || ds.isEmpty()){ } else{ }
-
-        Map<String, List<MappingEntity>> entityMap = new HashMap<>();
-
-        List<MappingEntity> mappingEntities = mappingEntityRepository.findByMappedTermLabel(null); //new ArrayList<>();
-
-
-        for (MappingEntity mappingEntity : mappingEntities){
-
-            //get suggestions for missing mapping
-            mappingEntity.setSuggestedMappings(getSuggestionsForUnmappedEntity(mappingEntity, getSavedDiagnosisMappings(null)));
-
-            mc.addEntity(mappingEntity);
-        }
-
-        entityMap.put("mappings", mappingEntities);
-        return entityMap;
-
-    }
-*/
-
 
     private List<MappingEntity> getSuggestionsForUnmappedEntity(MappingEntity me, MappingContainer mc) {
 
@@ -516,7 +488,7 @@ public class MappingService {
             List<MappingEntity> list = entry.getValue();
             for (MappingEntity ment : list) {
 
-                log.info("SUGG: " + ment.getMappingValues().get("SampleDiagnosis") + " " + ment.getMappingValues().get("OriginTissue") + "INDEX:" + ix);
+                //log.info("SUGG: " + ment.getMappingValues().get("SampleDiagnosis") + " " + ment.getMappingValues().get("OriginTissue") + "INDEX:" + ix);
                 resultList.add(ment);
                 entityCounter++;
 
@@ -535,24 +507,39 @@ public class MappingService {
     private int getSimilarityIndexComponent(DamerauLevenshteinAlgorithm dla, String entityType, String entityAttribute, String attribute1, String attribute2) {
 
 
-        if (entityType.equals("DIAGNOSIS")) {
+        if (entityType.toUpperCase().equals("DIAGNOSIS")) {
 
             if (entityAttribute.equals("SampleDiagnosis")) {
 
                 return dla.execute(attribute1.toLowerCase(), attribute2.toLowerCase()) * 5;
-            } else if (entityAttribute.equals("OriginTissue")) {
+            }
+
+            if (entityAttribute.equals("OriginTissue")) {
 
                 int diff = dla.execute(attribute1.toLowerCase(), attribute2.toLowerCase());
                 //the origin tissue is very different, less likely will be a good suggestion
                 if (diff > 4) return 50;
                 return diff;
-            } else {
-
-                int diff = dla.execute(attribute1.toLowerCase(), attribute2.toLowerCase());
-
-                if (diff > 4) return 1;
-                return diff;
             }
+
+            int diff = dla.execute(attribute1.toLowerCase(), attribute2.toLowerCase());
+
+            if (diff > 4) return 1;
+            return diff;
+
+
+        }
+        else if(entityType.toUpperCase().equals("TREATMENT")){
+
+            if (entityAttribute.equals("TreatmentName")) {
+
+                return dla.execute(attribute1.toLowerCase(), attribute2.toLowerCase()) * 5;
+            }
+
+            int diff = dla.execute(attribute1.toLowerCase(), attribute2.toLowerCase());
+
+            if (diff > 4) return 1;
+            return diff;
 
         }
 
