@@ -33,75 +33,6 @@
     <div class="">
 
         <div class="row" style="margin-top: -10px;">
-
-
-            <!--
-            <div class="col-lg-4">
-                <div class="pdxfinder float-e-margins">
-                    <div class="pdxfinder-title">
-                        <h5>Collaps panels</h5>
-                        <div class="pdxfinder-tools">
-                            <a class="collapse-link">
-                                <i class="ti-angle-double-up"></i>
-                            </a>
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                <i class="ti-settings"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-user">
-                                <li><a href="#">Config option 1</a>
-                                </li>
-                                <li><a href="#">Config option 2</a>
-                                </li>
-                            </ul>
-                            <a class="close-link">
-                                <i class="ti ti-close"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="pdxfinder-content">
-                        <div class="panel-body">
-                            <div class="panel-group" id="accordion">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <h5 class="panel-title">
-                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Collapsible Group Item #1</a>
-                                        </h5>
-                                    </div>
-                                    <div id="collapseOne" class="panel-collapse collapse in">
-                                        <div class="panel-body">
-                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <h4 class="panel-title">
-                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">Collapsible Group Item #2</a>
-                                        </h4>
-                                    </div>
-                                    <div id="collapseTwo" class="panel-collapse collapse">
-                                        <div class="panel-body">
-                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <h4 class="panel-title">
-                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">Collapsible Group Item #3</a>
-                                        </h4>
-                                    </div>
-                                    <div id="collapseThree" class="panel-collapse collapse">
-                                        <div class="panel-body">
-                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
             
             <div class="col-lg-2-5" *ngIf="showFilter">
 
@@ -261,7 +192,7 @@
 
 
 
-            <div [ngClass]="{'col-lg-9': showFilter == true }" *ngIf="dataExists" style="width: 79.1666666667%">
+            <div [ngClass]="{'col-lg-9': showFilter == true }" *ngIf="dataExists" [style.width]="showFilter == true ? '79.1666666667%' : '100%'">
 
                 <form #mappingForm="ngForm" *ngIf="!submitted" novalidate>
                     <div class="pdxfinder float-e-margins">
@@ -282,7 +213,8 @@
                                     <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle ">
                                         <i class="ti-export"></i> &nbsp; Download Data <span class="caret"></span></button>
                                     <ul class="dropdown-menu">
-                                        <li><a href="#">Action</a></li>
+                                        <li><a (click)="exportCSV()"> Download CSV</a></li>
+
                                         <li><a href="#">Another action</a></li>
                                         <li><a href="#">Something else here</a></li>
                                         <li class="divider"></li>

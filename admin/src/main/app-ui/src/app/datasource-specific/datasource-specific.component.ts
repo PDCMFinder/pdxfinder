@@ -25,14 +25,14 @@ export class DatasourceSpecificComponent implements OnInit {
     public dataLabels;
     public columnHeaders = [];
 
-    public selectedRow;
-    public setClickedRow: Function;
-    public selectedEntity: any;
     public report = null;
 
     public pageRange: number[];
 
     // Selected Fields
+    public selectedEntity;
+    public selectedRow;
+    public selectedEntityId: any;
     public selectedDetails: any;
     public selectedEntityType: string;
     public selectedSrc: any;
@@ -85,7 +85,7 @@ export class DatasourceSpecificComponent implements OnInit {
 
                 for (var i = 0; i < this.mappings.length; i++) {
 
-                    if (this.mappings[i].entityId == this.selectedEntity) {
+                    if (this.mappings[i].entityId == this.selectedEntityId) {
 
                         this.mappings[i].mappedTermLabel = data.mappedTermLabel.toUpperCase();
                         this.mappings[i].mapType = data.mapType.toUpperCase();
@@ -159,7 +159,9 @@ export class DatasourceSpecificComponent implements OnInit {
 
     getClickedRow(mapping: Mapping) {
 
-        this.selectedEntity = mapping.entityId;
+        this.selectedEntity = mapping;
+
+        this.selectedEntityId = mapping.entityId;
         this.selectedRow = mapping.entityId;
 
         this.selectedDetails = (mapping.entityType == 'diagnosis') ?
@@ -169,64 +171,6 @@ export class DatasourceSpecificComponent implements OnInit {
         this.selectedEntityType = mapping.entityType;
 
         this.toggleNotification(true);
-
-    }
-
-    showSuggestedMappings(id) {
-
-        this.router.navigate(['suggested-mappings'], {relativeTo: this.route})
-    }
-
-
-    updateMappingEntity() {
-
-        var validatedTerms = [];
-
-
-        this.mappings.forEach((mapping) => {
-            mapping['suggestedMappings'] = [];
-
-            if (mapping['mappedTermLabel'] != '-' && mapping['mappedTermUrl'] != null) {
-                validatedTerms.push(mapping);
-            }
-        });
-
-
-        swal({
-                title: "Are you sure?",
-                text: "You may not be able to reverse this operation",
-                imageUrl: 'assets/icons/question.jpg',
-                showCancelButton: true,
-                confirmButtonColor: '#03369D',
-                confirmButtonText: 'YES',
-                cancelButtonText: "NO",
-                closeOnConfirm: false,
-                closeOnCancel: false
-            },
-            (isConfirm) => {
-
-                if (isConfirm) {
-
-                    this._mappingService.updateEntity(validatedTerms)
-                        .subscribe(
-                            response => {
-
-                                this.report = "success";
-                                swal("Submitted!", "Your curation has been submitted", "success");
-                                // console.log(response)
-                            },
-                            error => {
-
-                                this.report = "failed";
-                                swal("Failed", " The curation is invalid :)", "error");
-                                //console.log(error.ok, error)
-                            }
-                        );
-                } else {
-                    swal("Cancelled", "The request was cancelled :)", "error");
-                }
-            })
-
 
     }
 
@@ -265,6 +209,83 @@ export class DatasourceSpecificComponent implements OnInit {
         let newPage = (this.userPage <= 1) ? this.userPage + 1 : 1;
 
         this.router.navigate([`curation/${this.entityTypeUrl}/${this.dataSource}/${newPage}`])
+
+    }
+
+
+
+    updateSkippedTerm() {
+
+        var skippedTerms = [];
+        var skippedTerm = {};
+
+        skippedTerm = Object.assign(skippedTerm, this.selectedEntity);
+
+        // Update the selected entity before submission
+        skippedTerm['suggestedMappings'] = [];
+        skippedTerm['status'] = "orphaned";
+
+        skippedTerms.push(skippedTerm);
+
+        this.sendDataForUpdate(skippedTerms);
+    }
+
+
+    updateMappingEntity() {
+
+        var validatedTerms = [];
+
+
+        this.mappings.forEach((mapping) => {
+            mapping.suggestedMappings = [];
+            mapping.status = "created";
+
+            if (mapping['mappedTermLabel'] != '-' && mapping['mappedTermUrl'] != null) {
+                validatedTerms.push(mapping);
+            }
+        });
+
+        this.sendDataForUpdate(validatedTerms);
+    }
+
+
+    sendDataForUpdate(validatedTerms){
+
+        swal({
+                title: "Are you sure?",
+                text: "You may not be able to reverse this operation",
+                imageUrl: 'assets/icons/question.jpg',
+                showCancelButton: true,
+                confirmButtonColor: '#03369D',
+                confirmButtonText: 'YES',
+                cancelButtonText: "NO",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            },
+            (isConfirm) => {
+
+                if (isConfirm) {
+
+                    this._mappingService.updateEntity(validatedTerms)
+                        .subscribe(
+                            response => {
+
+                                this.report = "success";
+                                this.showNotif = false;
+                                swal("Submitted!", "Your curation has been submitted", "success");
+                                // console.log(response)
+                            },
+                            error => {
+
+                                this.report = "failed";
+                                swal("Failed", " The curation is invalid :)", "error");
+                                //console.log(error.ok, error)
+                            }
+                        );
+                } else {
+                    swal("Cancelled", "The request was cancelled :)", "error");
+                }
+            })
 
     }
 

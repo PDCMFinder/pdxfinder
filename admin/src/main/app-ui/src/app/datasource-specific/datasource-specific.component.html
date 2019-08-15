@@ -21,7 +21,7 @@
     <h3> {{selectedSrc}} {{selectedEntityType | titlecase}}<span (click)="toggleNotification(false)" class='close'></span></h3>
     <p> {{selectedDetails}}  </p>
 
-    <button class="btn btn-primary btn-sm" type="submit" type="button"><a href="" target="_blank"> Orphan </a></button>
+    <button class="btn btn-primary btn-sm" type="submit" (click)="updateSkippedTerm()"> Skip Term </button>
     <button class="btn btn-outline btn-default btn-sm" (click)="toggleNotification(false)"> Close </button>
 </div>
 
