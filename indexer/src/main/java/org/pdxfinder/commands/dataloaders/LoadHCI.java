@@ -307,6 +307,8 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
         loadModelDosingStudies();
     }
 
+    @Override
+    void addAccessModality() {}
 
 
 

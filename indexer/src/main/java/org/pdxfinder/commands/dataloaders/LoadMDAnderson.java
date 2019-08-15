@@ -177,4 +177,8 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
     void step17LoadModelDosingStudies() throws Exception {
 
     }
+
+    @Override
+    void addAccessModality() {}
+
 }

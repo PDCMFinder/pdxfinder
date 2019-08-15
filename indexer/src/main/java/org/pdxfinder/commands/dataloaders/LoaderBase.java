@@ -9,74 +9,43 @@ import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Harmonizer;
 import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.LoaderDTO;
-import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.io.File;
 import java.util.*;
 
-/*
- * Created by abayomi on 28/02/2019.
- */
 public abstract class LoaderBase extends UniversalLoaderOmic implements ApplicationContextAware{
 
-    private final static Logger log = LoggerFactory.getLogger(LoaderBase.class);
+    private static final Logger log = LoggerFactory.getLogger(LoaderBase.class);
     protected String jsonFile;
     protected String dataSource;
     protected String rootDataDirectory;
-
     protected File[] listOfFiles;
-
     protected String metaDataJSON = "NOT FOUND";
     protected JSONArray jsonArray;
-
     protected String filesDirectory;
     protected JSONObject jsonData;
-
     protected LoaderDTO dto = new LoaderDTO();
-
     protected static ApplicationContext context;
-
     protected ReportManager reportManager;
-
     protected Boolean skipThis = false;
-
 
     public LoaderBase(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
     }
 
-    /**
-     * initMethod
-     *
-     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
-     * Concrete / Derived classes MUST override these placeholder method
-     */
+    // Derived classes MUST override initMethod()
     abstract void initMethod();
 
-    /**
-     * Initializes the report manager for the loader
-     */
     void step00StartReportManager(){
-
         reportManager = (ReportManager) context.getBean("ReportManager");
     }
 
-
-    /**
-     *
-     * This has Common Implementations: So it is fully implemented in the base class
-     * Concrete classes automatically inherits the default implementation or override it
-     * Concrete classes can also override and "call back to" this base class method at once using super.step01GetMetaDataFolder()
-     */
     void step01GetMetaDataFolder(){
-
-
         listOfFiles = new File[0];
         File folder = new File(filesDirectory);
 
@@ -88,20 +57,10 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
             }
         }
         else{ log.info("Directory does not exist, skipping."); }
-
     }
 
-
-    /**
-     *
-     * This has Common Implementations: So it is fully implemented in the base class
-     * Concrete classes automatically inherits the default implementation or override it
-     * Concrete classes can also override and "call back to" this base class method at once using super.step02GetMetaDataJSON()
-     */
     void step02GetMetaDataJSON(){
-
         File file = new File(jsonFile);
-
         if (file.exists()) {
 
             log.info("Loading from file " + jsonFile);
@@ -114,37 +73,28 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
 
 
     void step03CreateProviderGroup(){
-
         Group providerDS = dataImportService.getProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription, providerType, dataSourceContact, sourceURL);
         dto.setProviderGroup(providerDS);
     }
 
-
     void step04CreateNSGammaHostStrain(){
-
         try {
             HostStrain nsgBS = dataImportService.getHostStrain(nsgBsName, nsgBsSymbol, nsgbsURL, nsgBsName);
             dto.setNodScidGamma(nsgBS);
         } catch (Exception e) {}
     }
 
-
     void step05CreateNSHostStrain(){
-
         try {
             HostStrain nsBS = dataImportService.getHostStrain(nsBsName, nsBsSymbol, nsBsURL, nsBsName);
             dto.setNodScid(nsBS);
         } catch (Exception e) {}
     }
 
-
     void step06CreateProjectGroup(){
-
         Group group = dataImportService.getProjectGroup(projectGroup);
         dto.setProjectGroup(group);
     }
-
-
 
     void step07GetPDXModels(){
 
@@ -156,13 +106,6 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
         }
     }
 
-
-    /**
-     *
-     * Has Common Implementations: So they are fully implemented in the base class
-     * Concrete classes automatically inherits these implementations or can override implemented methods
-     * Concrete classes can also override and as well "call back to" these base class methods using super.step08GetMetaData() at once
-     */
     void step08GetMetaData() throws Exception {
 
         JSONObject data = this.jsonData;
@@ -205,14 +148,6 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
 
     }
 
-
-
-    /**
-     *
-     * Has Common Implementations: So they are fully implemented in the base class
-     * Concrete classes automatically inherits these implementations or can override implemented methods
-     * Concrete classes can also override and as well "call back to" this base class method using super.step09LoadPatientData() at once
-     */
     void step09LoadPatientData(){
 
         Group dataSource = dto.getProviderGroup();
@@ -236,74 +171,20 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
 
     }
 
-
-    /**
-     *
-     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
-     * Concrete / Derived classes MUST override these placeholder methods as required
-     */
     abstract void step10LoadExternalURLs();
-
-
-
-    /**
-     *
-     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
-     * Concrete / Derived classes MUST override these placeholder methods as required
-     */
     abstract void step11LoadBreastMarkers();
 
-
-    /**
-     *
-     * Has Common Implementations: So they are fully implemented in the base class
-     * Concrete classes automatically inherits these implementations or can override implemented methods
-     * Concrete classes can also override and as well "call back to" these base class methods using super.step12CreateModels() at once
-     */
     void step12CreateModels() throws Exception {
-
         ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls());
         dto.setModelCreation(modelCreation);
-
     }
 
-    /**
-     *
-     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
-     * Concrete / Derived classes MUST override these placeholder methods as required
-     */
     abstract void step13LoadSpecimens() throws Exception;
-
-
-    /**
-     *
-     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
-     * Concrete / Derived classes MUST override these placeholder methods as required
-     */
     abstract void step14LoadPatientTreatments() throws Exception;
-
-    /**
-     *
-     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
-     * Concrete / Derived classes MUST override these placeholder methods as required
-     */
     abstract void step15LoadImmunoHistoChemistry();
-
-    /**
-     *
-     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
-     * Concrete / Derived classes MUST override these placeholder methods as required
-     */
     abstract void step16LoadVariationData();
-
-    /**
-     *
-     * This requires peculiar implementations: So it is implemented as "placeholder" in the base class
-     * Concrete / Derived classes MUST override these placeholder methods as required
-     */
     abstract void step17LoadModelDosingStudies() throws Exception;
-
-
+    abstract void addAccessModality();
 
     /*****************************************************************************************************
      *     SKELETON OF LOADING ALGORITHM STANDARDIZED IN A TEMPLATE METHOD        *
@@ -312,61 +193,33 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
     public final void globalLoadingOrder() throws Exception {
 
         step00StartReportManager();
-
         step02GetMetaDataJSON();
-
         if (skipThis) return;
-
         step03CreateProviderGroup();
-
         step04CreateNSGammaHostStrain();
-
         step05CreateNSHostStrain();
-
         step06CreateProjectGroup();
-
         step07GetPDXModels();
-
 
         for (int i = 0; i < jsonArray.length(); i++) {
 
             this.jsonData = jsonArray.getJSONObject(i);
 
             step08GetMetaData();
-
             step09LoadPatientData();
-
             step10LoadExternalURLs();
-
             step11LoadBreastMarkers();
-
             step12CreateModels();
-
             step13LoadSpecimens();
-
             step14LoadPatientTreatments();
-
             step17LoadModelDosingStudies();
-
             step16LoadVariationData();
         }
 
         step15LoadImmunoHistoChemistry();
     }
 
-
-
-
-
-
-
-
-
-
-
-
     public void loadExternalURLs(String dataSourceContact, String dataSourceURL){
-
         List<ExternalUrl> externalUrls = new ArrayList<>();
         externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, dataSourceContact));
 
@@ -374,14 +227,9 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
             externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, dataSourceURL));
         }
         dto.setExternalUrls(externalUrls);
-
     }
 
-
-
     public void loadModelDosingStudies(){
-
-
         TreatmentSummary ts;
         try {
             //log.info("Model dosing number for model "+dto.getModelID() + " is "+dto.getModelDosingStudies().length());
@@ -406,7 +254,6 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
                 ts.setModelCreation(dto.getModelCreation());
                 dto.getModelCreation().setTreatmentSummary(ts);
             }
-
             dataImportService.saveModelCreation(dto.getModelCreation());
 
         } catch (Exception e) {
@@ -415,18 +262,8 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
 
     }
 
-
-
-
-
-
-
-
     public void loadSpecimens(String ds)  throws Exception{
-
-
         if (ds.equals("mdAnderson") || ds.equals("wustl")) {
-
             HostStrain bs = dataImportService.getHostStrain("", dto.getStrain(), "", "");
             boolean human = false;
             String markerPlatform = Standardizer.NOT_SPECIFIED;
@@ -438,67 +275,9 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
                 }
             } catch (Exception e) { /* this is for the FANG data and we don't really care about markers at this point anyway */ }
 
-            /*
-            //Disabling loading markers for MDA
-
-            if (ds.equals("mdAnderson")) {
-                String markerStr = dto.getMarkerStr();
-                String[] markers = markerStr.split(";");
-                if (markerStr.trim().length() > 0 && markers.length>0) {
-                    Platform pl = dataImportService.getPlatform(markerPlatform, dto.getProviderGroup());
-                    MolecularCharacterization molC = new MolecularCharacterization();
-                    molC.setType("mutation");
-                    molC.setPlatform(pl);
-                    List<MarkerAssociation> markerAssocs = new ArrayList<>();
-
-                    for (int i = 0; i < markers.length; i++) {
-                        String markerSymbol = markers[i];
-
-
-                        NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), markerSymbol, "mutation", markerPlatform);
-
-                        Marker m;
-
-                        if(nsdto.getNode() == null){
-
-                            //uh oh, we found an unrecognised marker symbol, abort, abort!!!!
-                            reportManager.addMessage(nsdto.getLogEntity());
-                            continue;
-                        }
-                        else{
-
-                            m = (Marker)nsdto.getNode();
-
-                            if(nsdto.getLogEntity() != null){
-                                reportManager.addMessage(nsdto.getLogEntity());
-                            }
-
-
-
-                            MarkerAssociation ma = new MarkerAssociation();
-                            ma.setMarker(m);
-                            markerAssocs.add(ma);
-
-
-                        }
-
-
-                    }
-                    molC.setMarkerAssociations(markerAssocs);
-                    Set<MolecularCharacterization> mcs = new HashSet<>();
-                    mcs.add(molC);
-
-                    //sample.setMolecularCharacterizations(mcs);
-                }
-            }
-
-            */
-
             if (human) {
                 dto.getPatientSnapshot().addSample(dto.getPatientSample());
-
             } else {
-
                 String passage = "0";
                 try {
                     passage = dto.getQaPassage().replaceAll("P", "");
@@ -518,15 +297,12 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
                         dto.setImplantationSiteStr(parts[1].trim());
                         dto.setImplantationtypeStr(parts[0].trim());
                     }
-
                 }
 
                 EngraftmentSite is = dataImportService.getImplantationSite(dto.getImplantationSiteStr());
                 specimen.setEngraftmentSite(is);
-
                 EngraftmentType it = dataImportService.getImplantationType(dto.getImplantationtypeStr());
                 specimen.setEngraftmentType(it);
-
 
                 if (ds.equals("wustl")){
                     dto.getModelCreation().addSpecimen(specimen);
@@ -538,10 +314,31 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
                 }
 
             }
-
             dataImportService.saveSample(dto.getPatientSample());  // TODO: This was not be implemented for wustl
             dataImportService.saveModelCreation(dto.getModelCreation());
             dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
+        }
+
+    }
+
+    static String validateAccessibility(String accessibility) {
+        return accessibility == null ? "" : accessibility;
+    }
+
+    static String validateModality(String accessModality) {
+        if (accessModality == null) accessModality = "";
+        accessModality = accessModality.trim();
+        ArrayList<String> validOptions = new ArrayList<>(
+            Arrays.asList(
+                "transnational access",
+                "TA",
+                "collaboration only"
+            ));
+        if (validOptions.contains(accessModality)) {
+            return accessModality;
+        } else {
+            log.error(String.format("Invalid access modality passed (%s)", accessModality));
+            return accessModality;
         }
 
     }
