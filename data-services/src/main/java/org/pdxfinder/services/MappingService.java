@@ -946,7 +946,7 @@ public class MappingService {
                     .map(mappingEntity -> {
 
                         mappingEntity.setDateUpdated(new Date());
-                        mappingEntity.setStatus(Status.created.get());
+                        mappingEntity.setStatus(newEntity.getStatus());
                         mappingEntity.setMappedTermLabel(newEntity.getMappedTermLabel());
                         mappingEntity.setMappedTermUrl(newEntity.getMappedTermUrl());
                         mappingEntity.setMapType(newEntity.getMapType());

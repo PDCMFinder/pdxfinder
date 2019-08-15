@@ -62,16 +62,16 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
 
     /*
     Query: SELECT DISTINCT lower(MAPPING_VALUES),
-                    COUNT(CASE WHEN MAP_TYPE IS NULL THEN 1 END) AS UNMAPPED,
-                    COUNT(CASE WHEN MAP_TYPE IS NOT NULL THEN 1 END) AS MAPPED
+                    COUNT(CASE WHEN STATUS = 'unmapped' THEN 1 END) AS UNMAPPED,
+                    COUNT(CASE WHEN STATUS <> 'unmapped' THEN 1 END) AS MAPPED
 
     FROM MAPPING_ENTITY me JOIN MAPPING_VALUES mv on me.ENTITY_ID = mv.MAPPING_ENTITY_ID
-    WHERE mv.MAPPING_VALUES_KEY = 'DataSource' AND ENTITY_TYPE='treatment'  GROUP BY lower(MAPPING_VALUES)
+    WHERE mv.MAPPING_VALUES_KEY = 'DataSource' AND ENTITY_TYPE='diagnosis'  GROUP BY lower(MAPPING_VALUES)
      */
-    @Query("SELECT distinct lower(mv), count(case when me.mapType is null THEN 1 END), " +
-            " count(case when me.mapType is not null THEN 1 END) from MappingEntity me join me.mappingValues mv " +
+    @Query("SELECT distinct lower(mv), count(case when me.status = 'unmapped' THEN 1 END), " +
+            " count(case when me.status <> 'unmapped' THEN 1 END) from MappingEntity me join me.mappingValues mv " +
             " WHERE KEY(mv) = 'DataSource' " +
-            " AND ((lower(me.entityType) = lower(:entityType)) OR :entityType = '' ) group by lower(mv)")
+            " AND ((lower(me.entityType) = lower(:entityType)) OR :entityType = '' ) group by lower(mv) order by lower(mv)")
     List<Object[]> findMissingMappingStat(@Param("entityType") String entityType);
 
 
