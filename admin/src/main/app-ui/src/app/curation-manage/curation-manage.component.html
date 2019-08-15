@@ -98,7 +98,7 @@
 
                         <div class="pdxfinder mu--15">
                             <div class="pdxfinder-title">
-                                <h5> CURATION STATUS </h5>
+                                <h5> DATA PROVIDER </h5>
                                 <div class="pdxfinder-tools">
                                     <a class="collapse-link"> <i class="ti-angle-double-up"></i> </a>
                                 </div>
@@ -116,7 +116,6 @@
 
                                 </ul>
                             </div>
-
                         </div>
 
                         <!--
@@ -191,7 +190,7 @@
             </div>
 
 
-            <div [ngClass]="showFilter == true ? 'col-lg-9' : 'col-lg-10 col-lg-offset-1'"
+            <div [ngClass]="showFilter == true ? 'col-lg-9' : 'col-lg-12'"
 
                  *ngIf="dataExists" [style.width]="showFilter == true ? '79.1666666667%' : null">
 
@@ -305,7 +304,6 @@
                                         <a *ngIf="data.page != data.totaPages"
                                            [routerLink]="['/curation/manage']" [queryParams]="{page: data.totaPages, size: pageSize, type: entityType, status : mappingStatus, source: dataSource}"  > Last
                                         >> </a>
-
 
                                     </li>
 
