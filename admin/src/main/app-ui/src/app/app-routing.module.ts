@@ -6,6 +6,8 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
 import {DatasourceSpecificComponent} from "./datasource-specific/datasource-specific.component";
 import {DatasourceSpecificSuggestionsComponent} from "./datasource-specific-suggestions/datasource-specific-suggestions.component";
 import {CurationManageComponent} from "./curation-manage/curation-manage.component";
+import {CurationOrphanComponent} from "./curation-orphan/curation-orphan.component";
+import {CurationArchiveComponent} from "./curation-archive/curation-archive.component";
 
 
 const routes: Routes = [
@@ -14,8 +16,8 @@ const routes: Routes = [
     { path: 'dashboard',   component: DashboardComponent },
     { path: 'curation', component: CurationMappingComponent },
     { path: 'curation/manage', component: CurationManageComponent },
-    { path: 'curation/orphan', component: CurationManageComponent },
-    { path: 'curation/archive', component: CurationManageComponent },
+    { path: 'curation/orphan', component: CurationOrphanComponent },
+    { path: 'curation/archive', component: CurationArchiveComponent },
     { path: 'curation/:mapType',  component: DatasourceSummaryComponent},
     {
         path: 'curation/:mapType/:source/:page',  component: DatasourceSpecificComponent,

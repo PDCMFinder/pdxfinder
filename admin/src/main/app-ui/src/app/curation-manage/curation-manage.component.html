@@ -191,8 +191,9 @@
             </div>
 
 
+            <div [ngClass]="showFilter == true ? 'col-lg-9' : 'col-lg-10 col-lg-offset-1'"
 
-            <div [ngClass]="{'col-lg-9': showFilter == true }" *ngIf="dataExists" [style.width]="showFilter == true ? '79.1666666667%' : '100%'">
+                 *ngIf="dataExists" [style.width]="showFilter == true ? '79.1666666667%' : null">
 
                 <form #mappingForm="ngForm" *ngIf="!submitted" novalidate>
                     <div class="pdxfinder float-e-margins">

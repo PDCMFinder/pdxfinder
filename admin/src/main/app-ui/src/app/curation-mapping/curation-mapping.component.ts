@@ -12,6 +12,7 @@ export class CurationMappingComponent implements OnInit {
 
     public unmappedDiagnosisCnt: number;
     public unmappedTreatmentCnt: number;
+    public orphanedTerms: number;
 
     constructor(private _mappingService: MappingService,
                 private router: Router,
@@ -19,17 +20,24 @@ export class CurationMappingComponent implements OnInit {
 
     ngOnInit() {
 
-        this._mappingService.getUnmappedDiagnosis()
+        this._mappingService.getUnmappedTermsByType('diagnosis')
             .subscribe(
                 data => {
                     this.unmappedDiagnosisCnt = data['totalElements'];
                 }
             );
 
-        this._mappingService.getUnmappedTreatment()
+        this._mappingService.getUnmappedTermsByType('treatment')
             .subscribe(
                 data => {
                     this.unmappedTreatmentCnt = data['totalElements'];
+                }
+            );
+
+        this._mappingService.getTermsByStatus('orphaned')
+            .subscribe(
+                data => {
+                    this.orphanedTerms = data['totalElements'];
                 }
             );
     }

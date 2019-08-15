@@ -11,9 +11,6 @@ import {SummaryInterface} from "./summary-interface";
 export class MappingService {
 
     private serverUrl = "http://localhost:8081";
-    private _totalMappedUrl = this.serverUrl+"/api/mappings?map-terms-only=true&entity-type=diagnosis&size=900";
-    private _unmappedTreatmentUrl = this.serverUrl+"/api/mappings?entity-type=treatment&status=unmapped";
-    private _unmappedDiagnosisUrl = this.serverUrl+"/api/mappings?entity-type=diagnosis&status=unmapped";
 
     private _summaryUrl = this.serverUrl+"/api/mappings/summary";
     private _mappingsUrl = this.serverUrl+"/api/mappings";
@@ -46,6 +43,23 @@ export class MappingService {
 
 
 
+    getUnmappedTermsByType(entityType: string): Observable<MappingInterface[]>{
+
+        const url = `${this._mappingsUrl}?entity-type=${entityType}&status=unmapped`;
+
+        return this.http.get<MappingInterface[]>(url);
+    }
+
+
+    getTermsByStatus(status: string): Observable<MappingInterface[]>{
+
+        const url = `${this._mappingsUrl}?status=${status}`;
+
+        return this.http.get<MappingInterface[]>(url);
+    }
+
+
+
     getManagedTerms(entityType: string, dataSource: string, page: string, size: string, status: string): Observable<MappingInterface[]>{
 
         var dsQuery = "";
@@ -61,36 +75,11 @@ export class MappingService {
     }
 
 
-
-
-    getUnmappedDiagnosis(): Observable<MappingInterface[]>{
-
-        return this.http.get<MappingInterface[]>(this._unmappedDiagnosisUrl);
-    }
-
-
-
     getMappingEntityById(entityId: string): Observable<Mapping>{
 
         let url = `${this._mappingsUrl}/${entityId}`;
 
         return this.http.get<Mapping>(url);
-    }
-
-
-
-
-    getUnmappedTreatment(): Observable<MappingInterface[]>{
-
-        return this.http.get<MappingInterface[]>(this._unmappedTreatmentUrl);
-    }
-
-
-
-    connectTotalMappedStream(): Observable<MappingInterface[]>{
-
-        return this.http.get<MappingInterface[]>(this._totalMappedUrl);
-
     }
 
 
