@@ -21,8 +21,8 @@ public class TreatmentProtocolTest extends BaseTest {
 
     private final static Logger log = LoggerFactory.getLogger(TreatmentProtocolTest.class);
 
-    final Boolean READ_CONTROLS_COMPONENTS = true;
-    final Boolean DO_NOT_READ_CONTROLS = false;
+    private final Boolean READ_CONTROLS_COMPONENTS = true;
+    private final Boolean DO_NOT_READ_CONTROLS = false;
 
     private final String firstTreatmentName = "TEST_TREATMENT_ONE";
     private final String secondTreatmentName = "TEST_TREATMENT_TWO";
@@ -58,7 +58,7 @@ public class TreatmentProtocolTest extends BaseTest {
 
     private void createMockDatasets1() {
 
-        List<Treatment> treatments = new ArrayList<Treatment>();
+        List<Treatment> treatments;
 
         treatments = createTreatmentsAndOntologies1();
 
@@ -89,6 +89,7 @@ public class TreatmentProtocolTest extends BaseTest {
         ontologyRelationship1.setTreatment(treatment1);
         ontologyRelationship2.setTreatment(treatment2);
         ontologyRelationship3.setTreatment(treatment3);
+
         treatment1.setTreatmentToOntologyRelationship(ontologyRelationship1);
         treatment2.setTreatmentToOntologyRelationship(ontologyRelationship2);
         treatment3.setTreatmentToOntologyRelationship(ontologyRelationship3);
@@ -99,8 +100,8 @@ public class TreatmentProtocolTest extends BaseTest {
     private void createTreatmentComponentsAndProtocols1(List<Treatment> treatments) {
 
         TreatmentProtocol treatmentProtocol = new TreatmentProtocol();
-
         List<TreatmentComponent> componentsList= new ArrayList<TreatmentComponent>();
+
         TreatmentComponent controlTC = new TreatmentComponent();
         TreatmentComponent drug1 = new TreatmentComponent();
         TreatmentComponent drug2 = new TreatmentComponent();
@@ -183,12 +184,10 @@ public class TreatmentProtocolTest extends BaseTest {
         treatmentProtocolList.add(treatmentProtocol2);
     }
 
-    @Test
-    public void testGetTreatmentStringWithControlComponents(){
+    @Test //How about this for a naming conventions
+    public void Given_MultipleTreatmentComponents_When_GetTreatmentStringisCalled_Then_ReturnNotNullConcatonatedString(){
 
-        final Boolean READ_CONTROLS_COMPONENTS = true;
-
-        String treatmentString = null;
+        String treatmentString;
 
         treatmentString = treatmentProtocolList
                 .get(0)
@@ -200,7 +199,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void testGetTreatmentStringWithNoControlComponents(){
+    public void getTreatmentString_ValidTCandControllsOff_NonNullAndConcatonatedStringWithoutControls(){
 
         String treatmentString = null;
 
@@ -209,7 +208,7 @@ public class TreatmentProtocolTest extends BaseTest {
                 .getTreatmentString(DO_NOT_READ_CONTROLS);
 
         Assert.assertNotNull(treatmentString);
-        Assert.assertEquals(drugOntologyLabel + " and " + drugOntologyLabel2, treatmentString);
+        Assert.assertEquals(drugOntologyLabel + " and " + drugOntologyLabel2,treatmentString);
     }
 
     @Test
@@ -263,8 +262,6 @@ public class TreatmentProtocolTest extends BaseTest {
 
     @Test
     public void testGetDurationString() {
-
-        final Boolean READ_CONTROLS_COMPONENTS = true;
 
         String durationStringWithControls;
         String durationStringWithoutControls;
