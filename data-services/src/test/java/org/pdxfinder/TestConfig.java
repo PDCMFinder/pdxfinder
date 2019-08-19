@@ -13,8 +13,11 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
 
 import javax.sql.DataSource;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -77,6 +80,24 @@ public class TestConfig {
     entityManagerFactoryBean.setJpaVendorAdapter(vendorAdapter);
 
     return entityManagerFactoryBean;
+  }
+
+
+  @Bean
+  public SpringTemplateEngine springTemplateEngine() {
+    SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+    templateEngine.addTemplateResolver(htmlTemplateResolver());
+    return templateEngine;
+  }
+
+  @Bean
+  public SpringResourceTemplateResolver htmlTemplateResolver(){
+    SpringResourceTemplateResolver emailTemplateResolver = new SpringResourceTemplateResolver();
+    emailTemplateResolver.setPrefix("classpath:/templates/");
+    emailTemplateResolver.setSuffix(".html");
+    //emailTemplateResolver.setTemplateMode();
+    emailTemplateResolver.setCharacterEncoding(StandardCharsets.UTF_8.name());
+    return emailTemplateResolver;
   }
 
 
