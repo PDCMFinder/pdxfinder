@@ -1,6 +1,9 @@
 package org.pdxfinder.admin.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.admin.zooma.ZoomaEntity;
 import org.pdxfinder.services.MappingService;
@@ -16,6 +19,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 
@@ -132,6 +136,68 @@ public class AjaxController {
         return new ResponseEntity<>(updated, HttpStatus.OK);
 
     }
+
+
+    @GetMapping("/mappings/export")
+    @ResponseBody
+    public Object exportMappingData(HttpServletResponse response,
+                           @RequestParam("mq") Optional<String> mappingQuery,
+                           @RequestParam(value = "mapped-term", defaultValue = "") Optional<String> mappedTermLabel,
+                           @RequestParam(value = "map-terms-only", defaultValue = "") Optional<String> mappedTermsOnly,
+                           @RequestParam(value = "entity-type", defaultValue = "0") Optional<List<String>> entityType,
+                           @RequestParam(value = "map-type", defaultValue = "") Optional<String> mapType,
+                           @RequestParam(value = "status", defaultValue = "0") Optional<List<String>> status,
+                           @RequestParam(value = "page", defaultValue = "1") Integer page) {
+
+        String mappingLabel = "";
+        List<String> mappingValue = Arrays.asList("0");
+
+        try {
+            String[] query = mappingQuery.get().split(":");
+            mappingLabel = mappingQuery.get().split(":")[0];
+            mappingValue = Arrays.asList(query[1].trim());
+        } catch (Exception e) { }
+
+        int size = 1000;
+        PaginationDTO result = mappingService.search(page, size, entityType.get(), mappingLabel,
+                                                     mappingValue, mappedTermLabel.get(), mapType.get(), mappedTermsOnly.get(), status.get());
+
+
+        List<MappingEntity> mappingEntities = mapper.convertValue(result.getAdditionalProperties().get("mappings"), List.class);
+
+        // Get Mapping Entity CSV Header
+        MappingEntity me = mappingEntities.get(0);
+        List<String> csvHead = mappingService.getMappingEntityCSVHead(mappingEntities.get(0));
+
+        // Get Mapping Entity CSV Data Body
+        List<List<String>> mappingDataCSV = mappingService.prepareMappingEntityForCSV(mappingEntities);
+
+        CsvMapper mapper = new CsvMapper();
+        CsvSchema.Builder builder = CsvSchema.builder();
+
+        for (String head : csvHead){
+            builder.addColumn(head);
+        }
+        CsvSchema  schema = builder.build().withHeader();
+
+
+        String csvReport = "CSV Report";
+        try {
+            csvReport = mapper.writer(schema).writeValueAsString(mappingDataCSV);
+        } catch (JsonProcessingException e) {}
+
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=pdxAdmin-"+me.getStatus()+".csv");
+        try{
+            response.getOutputStream().flush();
+        }catch (Exception e){
+
+        }
+
+        return csvReport;
+
+    }
+
 
 
     /****************************************************************
