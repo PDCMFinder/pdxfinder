@@ -5,6 +5,8 @@ import {Mapping, MappingInterface, MappingValues} from "../mapping-interface";
 import {GeneralService} from "../general.service";
 import {FormBuilder, FormGroup} from "@angular/forms";
 
+import { saveAs } from 'file-saver';
+
 declare var swal: any;
 
 @Component({
@@ -33,7 +35,7 @@ export class CurationManageComponent implements OnInit {
     // Selected Fields
     public selectedDetails: any;
     public showNotif: boolean = false;
-    public showFilter: boolean = true;
+    public showFilter: boolean = false;
 
     public pageSize;
     public pageOptions = ['2', '3', '5', '10', '15', '20', '25'];
@@ -141,6 +143,68 @@ export class CurationManageComponent implements OnInit {
                 }
             );
     }
+
+
+
+    exportCSV(){
+
+        const download = function (data) {
+
+            const blob = new Blob([data], {type: 'text/csv'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+           // a.setAttribute('hidden', '');
+           // a.setAttribute('download', 'download.csv');
+           // document.body.appendChild(a);
+           // a.click();
+           // document.removeChild(a);
+
+            a.href = url;
+            a.download = "myFile.csv";
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+        };
+
+
+
+        const objectToCsv = function (data) {
+
+            const csvRows = [];
+
+            const headers = Object.keys(data[0]);
+            csvRows.push(headers.join(','));
+
+            //loop over rows
+            for (const row of data){
+
+               const values = headers.map(header =>{
+                   const escaped = (''+row[header]).replace(/"/g, '\\"');
+                   return `"${escaped}"`;
+                });
+               csvRows.push(values.join(','));
+            }
+
+            return csvRows.join('\n');
+
+        }
+        
+        const data = this.mappings.map(row =>({
+
+            dateCreated: row.dateCreated,
+            entityId: row.entityId,
+            entityType: row.entityType,
+            mapType: row.mapType,
+            mappedTermLabel: row.mappedTermLabel
+
+        }));
+
+        const csvData = objectToCsv(data);
+
+
+        download(csvData);
+    }
+    
 
 
     getProvidersList(){
@@ -264,6 +328,9 @@ export class CurationManageComponent implements OnInit {
             this.showFilter = (this.showFilter == true) ? false : true;
         }
     }
+
+
+
 
 
 
