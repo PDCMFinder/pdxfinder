@@ -1,34 +1,45 @@
 package org.pdxfinder.commands.dataloaders;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
+
+import org.pdxfinder.commands.BaseTest;
 import org.pdxfinder.graph.dao.ModelCreation;
-import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.dto.LoaderDTO;
 
+import java.util.List;
 
-public class LoadIRCCTest {
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this.getClass());
-    }
+public class LoadIRCCTest extends BaseTest {
+
+//    @Before
+//    public void setUp() throws Exception {
+//        MockitoAnnotations.initMocks(this.getClass());
+//    }
+
+//    @Before
+//    public void init(){
+//        MockitoAnnotations.initMocks(LoadIRCC.class);
+//    }
 
     @Mock
-    LoadIRCC loader;
+    private List list;
 
-    @InjectMocks
-    LoaderDTO dto;
+    @Mock
+    private LoaderDTO dto;
 
-    @InjectMocks
-    ModelCreation modelCreation;
+    @Mock
+    private ModelCreation modelCreation;
 
-    @InjectMocks
-    DataImportService dataImportService;
+//    @Autowired
+//    void LoadIIRCTest(LoadIRCC loader) {
+//        this.loader = loader;
+//    }
+
+//    @Spy
+//    @InjectMocks
+    private LoadIRCC loader;
 
     @Test
     public void addAccessModality() {
