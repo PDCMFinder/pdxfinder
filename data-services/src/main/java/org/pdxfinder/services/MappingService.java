@@ -836,6 +836,10 @@ public class MappingService {
 
         List<MappingEntity> mappingEntityList = new ArrayList<>();
 
+
+
+        log.info("This is the Starting point of the suggestion: {} ", new Date());
+
         mappingEntityPage.forEach(mappingEntity -> {
 
             //get suggestions for missing mapping
@@ -849,6 +853,9 @@ public class MappingService {
 
             mappingEntityList.add(mappingEntity);
         });
+
+
+        log.info("This is the Finishing point of the suggestion: {} ", new Date());
 
 
         PaginationDTO paginationDto = paginationService.initializeDTO(mappingEntityPage);
