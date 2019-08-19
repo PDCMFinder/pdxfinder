@@ -138,6 +138,7 @@ public class AjaxController {
     }
 
 
+
     @GetMapping("/mappings/export")
     @ResponseBody
     public Object exportMappingData(HttpServletResponse response,
@@ -161,7 +162,6 @@ public class AjaxController {
         int size = 1000;
         PaginationDTO result = mappingService.search(page, size, entityType.get(), mappingLabel,
                                                      mappingValue, mappedTermLabel.get(), mapType.get(), mappedTermsOnly.get(), status.get());
-
 
         List<MappingEntity> mappingEntities = mapper.convertValue(result.getAdditionalProperties().get("mappings"), List.class);
 
@@ -195,7 +195,6 @@ public class AjaxController {
         }
 
         return csvReport;
-
     }
 
 

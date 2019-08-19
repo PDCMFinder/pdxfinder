@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse, HttpHeaders} from "@angular/common/http";
 import {Mapping, MappingInterface} from "./mapping-interface";
 import {Observable, Subject, throwError} from "rxjs/index";
 import {catchError} from "rxjs/internal/operators";
@@ -14,6 +14,7 @@ export class MappingService {
 
     private _summaryUrl = this.serverUrl+"/api/mappings/summary";
     private _mappingsUrl = this.serverUrl+"/api/mappings";
+    public _exportUrl = this.serverUrl+"/api/mappings/export";
 
 
     public dataSubject = new Subject<any>();
@@ -69,7 +70,7 @@ export class MappingService {
 
         const url = `${this._mappingsUrl}?entity-type=${entityType}&page=${page}&size=${size}&status=${status}${dsQuery}`;
 
-        console.log(url);
+        //console.log(url);
 
         return this.http.get<MappingInterface[]>(url);
     }
@@ -105,6 +106,7 @@ export class MappingService {
     errorHandler(error: HttpErrorResponse) {
         return throwError(error);
     }
+
 
 
     connectToDataFlow() {

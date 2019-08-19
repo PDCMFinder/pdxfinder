@@ -50,6 +50,8 @@ export class CurationManageComponent implements OnInit {
 
     public providersList2 = [];
 
+    public csvURL = "";
+
     constructor(private router: Router,
                 private route: ActivatedRoute,
                 private _mappingService: MappingService,
@@ -106,6 +108,11 @@ export class CurationManageComponent implements OnInit {
 
 
     manageCuratedData(page, size, type, status, source) {
+
+        this.csvURL = `${this._mappingService._exportUrl}?entity-type=${type}&page=${page}&status=${status}`
+
+
+        console.log(this.csvURL);
 
         this.columnHeaders = [];
         this.mappings = [];
