@@ -2509,7 +2509,7 @@ label.error {
 body {
   font-family: "open sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: #ccc; /*2f4050*/
-  background: url("../../assets/icons/loader.gif") no-repeat;
+  /*background: url("../../assets/icons/loader.gif") no-repeat; */
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-position: center;

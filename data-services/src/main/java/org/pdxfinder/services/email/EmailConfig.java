@@ -1,6 +1,7 @@
 package org.pdxfinder.services.email;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
@@ -8,12 +9,12 @@ import java.util.Properties;
 /*
  * Created by abayomi on 16/08/2019.
  */
-//@Configuration
+@Configuration
 public class EmailConfig {
 
-    private String host = "mail.sprintell.com";
-    private String username = "abayomi@sprintell.com";
-    private String password = "abayomi@sprintelli.com";
+    private String host = "mail.pdxfinder.org";
+    private String username = "";
+    private String password = "";
     private Integer port = 26;
     private String protocol = "smtp";
 
