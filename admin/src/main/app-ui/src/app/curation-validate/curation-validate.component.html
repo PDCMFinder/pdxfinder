@@ -1,139 +1,187 @@
 <div class="row wrapper border-bottom white-bg page-heading">
 
-  <div class="col-lg-8">
-    <h2> Mapped Data Validation </h2>
-    <ol class="breadcrumb">
-      <li>
-        <a routerLink="/dashboard">Dashboard</a>
-      </li>
-      <li>
-        <a routerLink="/curation">Curation </a>
-      </li>
-      <li class="active"> Validate Terms </li>
-    </ol>
-  </div>
+    <div class="col-lg-8">
+        <h2> Mapped Data Validation </h2>
+        <ol class="breadcrumb">
+            <li>
+                <a routerLink="/dashboard">Dashboard</a>
+            </li>
+            <li>
+                <a routerLink="/curation">Curation </a>
+            </li>
+            <li class="active"> Validate Terms</li>
+        </ol>
+    </div>
 </div>
-
 
 
 <div class="wrapper wrapper-content animated fadeInRight">
 
-  <div class="p-w-md m-t-sm col-lg-10 col-lg-offset-1">
+    <div class="p-w-md m-t-sm col-lg-10 col-lg-offset-1">
 
-    <div class="row" style="margin-top: -10px;">
+        <div class="row" style="margin-top: -10px;">
 
 
-      <div [ngClass]="showFilter == true ? 'col-lg-12' : 'col-lg-12'">
+            <div [ngClass]="showFilter == true ? 'col-lg-12' : 'col-lg-12'">
 
-        <form #mappingForm="ngForm" *ngIf="!submitted" (ngSubmit)="updateMappingEntity()" novalidate>
-          <div class="pdxfinder float-e-margins">
 
-            <div class="pdxfinder-title">
-              <h5> Orphaned {{entityType | titlecase}} List</h5>
+                <div class="pdxfinder float-e-margins">
 
-              <button *ngIf="report == null" style="float: right; margin-top:-7px;"
-                      class="btn btn-primary btn-sm" type="submit">
-                <i class="ti-cloud-up"></i> &nbsp; Submit Curation &nbsp;
-              </button>
+                    <!--
+                    <div class="pdxfinder-title">
+                      <h5> Orphaned {{entityType | titlecase}} List</h5>
+                    </div>
+                    -->
+
+                    <div class="pdxfinder-content pdxfinder-heading">
+                        <h3><i class="ti-unlink"></i> Upload Validated File </h3>
+                        <small><i class="fa fa-tim"></i> Ensure you upload CSV File of the required type only ...
+                        </small>
+                    </div>
+
+
+                    <div class="pdxfinder-content">
+
+                        <div *ngIf="report == 'success'" class="alert alert-success alert-dismissable">
+                            <a aria-hidden="true" class="close" type="button"
+                               (click)="toggleReport('success')">×</a>
+                            Success: <em> The submitted curation was successful, Clear off notification to
+                            continue </em> <a class="alert-link"> ... </a>.
+                        </div>
+
+                        <div *ngIf="report == 'failed'" class="alert alert-danger alert-dismissable">
+                            <a aria-hidden="true" class="close" type="button" (click)="toggleReport(null)">×</a>
+                            OOps!! <em> Failed Request: The submitted curation is invalid, Clear off notification to
+                            continue </em> <a class="alert-link"> ... </a>.
+                        </div>
+
+
+                        <div class="row sideFall">
+
+                            <div class="col-sm-12">
+
+                                <form role="form">
+
+                                    <!--
+                                    <div class="form-group"><label> Data Type </label>
+                                      <input type="text" placeholder="Text Field" class="form-control">
+                                    </div> -->
+
+                                    <div class="form-group"><label> Validated CSV File</label>
+
+                                        <label style='width:100%; cursor:pointer;'>
+
+                                            <div id='output' class='styleFile'>
+                                                <span *ngIf="report == null"> Click here to upload your File </span>
+                                                <span *ngIf="report == 'waiting'">Waiting ... Click on upload button to send Data File:
+                                                    <b class="text-primary"> {{uploadedFilename}}</b> </span>
+                                                <span *ngIf="report == 'success'"> File upload done! Click here to Upload another file </span>
+                                            </div>
+
+                                            <input (change)="selectFile($event)"
+                                                   type='file' id='uploads' style='display:none;'
+                                                   accept='.csv,.xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'>
+                                        </label>
+
+                                    </div>
+
+
+                                    <div>
+                                        <button [disabled]="!selectedFiles"
+                                                (click)="upload()"
+                                                class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit">
+                                            <strong> <i class="ti-cloud-up"></i> &nbsp; Upload File </strong>
+                                        </button>
+
+                                    </div>
+
+
+                                </form>
+                            </div>
+
+                            <!--
+                            <div class="col-sm-6"><h4>Not a member?</h4>
+                              <p>You can create an account:</p>
+                              <p class="text-center">
+                                <a href=""><i class="fa fa-sign-in big-icon"></i></a>
+                              </p>
+                            </div>
+                            -->
+                        </div>
+
+
+                        <!--
+                        <div class="table-responsive">
+
+                          <table class="table table-striped table-bordered table-hover pdx-table">
+                            <thead>
+                            <tr>
+                              <th style="width:10px;">ID</th>
+
+                              <th *ngFor="let columnHeader of columnHeaders ">
+                                {{columnHeader | uppercase}}
+                              </th>
+
+                              <th> MAPPED TERM</th>
+                              <th style="width:80px;"> TYPE</th>
+                              <th>JUSTIFICATION</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            <tr class="pdxfinder-clickable-rows2" *ngFor="let mapping of mappings; index as i"
+                                [routerLink]="['recommendation',mapping.entityId ]"
+                                [class.active]="mapping.entityId == selectedRow">
+
+                              <td> {{mapping.entityId}} </td>
+
+                              <td *ngFor="let dataLabel of dataLabels ">
+
+                                                      <span *ngIf="dataLabel == 'DataSource'"
+                                                            class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | uppercase }} </span>
+                                <span *ngIf="dataLabel != 'DataSource'"
+                                      class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | titlecase }} </span>
+
+                              </td>
+
+                              <td><input type="text" name="{{'mappedTermLabel'+i}}" class="editableField"
+                                         [(ngModel)]="mapping.mappedTermLabel"
+                                         value="{{ mapping.mappedTermLabel }}">
+                              </td>
+
+                              <td><input type="text" name="{{'mapType'+i}}" class="editableField"
+                                         #curatorMapType
+                                         (input)="mapping.mapType=curatorMapType.value"
+                                         value="{{ mapping.mapType }}">
+                              </td>
+
+                              <td><input type="text" name="{{'justification'+i}}" class="editableField"
+                                         [(ngModel)]="mapping.justification"
+                                         value="{{ mapping.justification }}">
+
+                                <input type="hidden" name="{{'mappedTermUrl'+i}}"
+                                       [(ngModel)]="mapping.mappedTermUrl"
+                                       value="{{ mapping.mappedTermUrl }}">
+                              </td>
+
+
+                            </tr>
+
+                            </tbody>
+                          </table>
+
+
+                        </div> -->
+
+
+                    </div>
+                </div>
+
 
             </div>
-            <div class="pdxfinder-content pdxfinder-heading">
-              <h3><i class="ti-unlink"></i> Orphaned Curated Data </h3>
-              <small><i class="fa fa-tim"></i> You have ... orphaned {{entityType | titlecase}} terms in
-                the database ...
-              </small>
-            </div>
+        </div>
 
-
-            <div class="pdxfinder-content">
-
-              <div *ngIf="report == 'success'" class="alert alert-success alert-dismissable">
-                <a aria-hidden="true" class="close" type="button"
-                   (click)="toggleReport('success')">×</a>
-                Success: <em> The submitted curation was successful, Clear off notification to
-                continue </em> <a class="alert-link"> ... </a>.
-              </div>
-
-              <div *ngIf="report == 'failed'" class="alert alert-danger alert-dismissable">
-                <a aria-hidden="true" class="close" type="button" (click)="toggleReport(null)">×</a>
-                OOps!! <em> Failed Request: The submitted curation is invalid, Clear off notification to
-                continue </em> <a class="alert-link"> ... </a>.
-              </div>
-
-              <div class="table-responsive">
-
-                <table class="table table-striped table-bordered table-hover pdx-table">
-                  <thead>
-                  <tr>
-                    <th style="width:10px;">ID</th>
-
-                    <th *ngFor="let columnHeader of columnHeaders ">
-                      {{columnHeader | uppercase}}
-                    </th>
-
-                    <th> MAPPED TERM</th>
-                    <th style="width:80px;"> TYPE</th>
-                    <th>JUSTIFICATION</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-
-                  <tr class="pdxfinder-clickable-rows2" *ngFor="let mapping of mappings; index as i"
-                      [routerLink]="['recommendation',mapping.entityId ]"
-                      [class.active]="mapping.entityId == selectedRow">
-
-                    <td> {{mapping.entityId}} </td>
-
-                    <td *ngFor="let dataLabel of dataLabels ">
-
-                                            <span *ngIf="dataLabel == 'DataSource'"
-                                                  class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | uppercase }} </span>
-                      <span *ngIf="dataLabel != 'DataSource'"
-                            class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | titlecase }} </span>
-
-                    </td>
-
-                    <td><input type="text" name="{{'mappedTermLabel'+i}}" class="editableField"
-                               [(ngModel)]="mapping.mappedTermLabel"
-                               value="{{ mapping.mappedTermLabel }}">
-                    </td>
-
-                    <td><input type="text" name="{{'mapType'+i}}" class="editableField"
-                               #curatorMapType
-                               (input)="mapping.mapType=curatorMapType.value"
-                               value="{{ mapping.mapType }}">
-                    </td>
-
-                    <td><input type="text" name="{{'justification'+i}}" class="editableField"
-                               [(ngModel)]="mapping.justification"
-                               value="{{ mapping.justification }}">
-
-                      <input type="hidden" name="{{'mappedTermUrl'+i}}"
-                             [(ngModel)]="mapping.mappedTermUrl"
-                             value="{{ mapping.mappedTermUrl }}">
-                    </td>
-
-
-                  </tr>
-
-                  </tbody>
-                </table>
-
-
-              </div>
-
-
-            </div>
-          </div>
-
-        </form>
-
-
-      </div>
     </div>
-
-  </div>
-
 
 
 </div>
