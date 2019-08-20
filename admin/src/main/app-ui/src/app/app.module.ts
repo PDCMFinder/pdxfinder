@@ -13,6 +13,7 @@ import {DatasourceSpecificSuggestionsComponent} from "./datasource-specific-sugg
 import {CurationManageComponent} from "./curation-manage/curation-manage.component";
 import { CurationArchiveComponent } from './curation-archive/curation-archive.component';
 import { CurationOrphanComponent } from './curation-orphan/curation-orphan.component';
+import { CurationValidateComponent } from './curation-validate/curation-validate.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { CurationOrphanComponent } from './curation-orphan/curation-orphan.compo
       DatasourceSpecificSuggestionsComponent,
       CurationManageComponent,
       CurationArchiveComponent,
-      CurationOrphanComponent
+      CurationOrphanComponent,
+      CurationValidateComponent
   ],
   imports: [
     BrowserModule,
