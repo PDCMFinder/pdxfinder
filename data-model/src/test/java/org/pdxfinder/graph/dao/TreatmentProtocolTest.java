@@ -4,22 +4,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.pdxfinder.BaseTest;
-import org.pdxfinder.graph.repositories.TreatmentProtocolRepository;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Test for getTreamentString() in TreatmentProtocol
- */
-
 public class TreatmentProtocolTest extends BaseTest {
-
-    private final static Logger log = LoggerFactory.getLogger(TreatmentProtocolTest.class);
 
     private final Boolean READ_CONTROLS_COMPONENTS = true;
     private final Boolean DO_NOT_READ_CONTROLS = false;
@@ -44,9 +34,6 @@ public class TreatmentProtocolTest extends BaseTest {
     private final String drugDose2 = "TEST_DOSE_2";
     private final String drugDose3 = "TEST_DOSE_3";
 
-    @Autowired
-    private TreatmentProtocolRepository treatmentProtocolRepository;
-
     private List<TreatmentProtocol> treatmentProtocolList = new ArrayList<TreatmentProtocol>();
 
     @Before
@@ -59,16 +46,12 @@ public class TreatmentProtocolTest extends BaseTest {
     private void createMockDatasets1() {
 
         List<Treatment> treatments;
-
         treatments = createTreatmentsAndOntologies1();
-
         createTreatmentComponentsAndProtocols1(treatments);
     }
 
 
     private List<Treatment> createTreatmentsAndOntologies1(){
-
-        TreatmentProtocol treatmentProtocol = new TreatmentProtocol();
 
         Treatment treatment1 = new Treatment(firstTreatmentName);
         Treatment treatment2 = new Treatment(secondTreatmentName);
@@ -134,25 +117,21 @@ public class TreatmentProtocolTest extends BaseTest {
 
     private void createMockDatasets2() {
 
-        List<Treatment> treatments;
-
-        treatments = createTreatmentsAndOntologies2();
-
-        createTreatmentComponentsAndProtocols2(treatments);
-
+        Treatment treatment;
+        treatment = createTreatmentsAndOntologies2();
+        createTreatmentComponentsAndProtocols2(treatment);
     }
 
-    private List<Treatment> createTreatmentsAndOntologies2() {
+    private Treatment createTreatmentsAndOntologies2() {
 
         Treatment treatment1 = new Treatment(firstTreatmentName);
-
         TreatmentToOntologyRelationship ontologyRelationship1 = new TreatmentToOntologyRelationship();
         treatment1.setTreatmentToOntologyRelationship(ontologyRelationship1);
 
-        return Arrays.asList(treatment1);
+        return treatment1;
     }
 
-    private void createTreatmentComponentsAndProtocols2(List<Treatment> treatments){
+    private void createTreatmentComponentsAndProtocols2(Treatment treatments){
 
         TreatmentProtocol treatmentProtocol = new TreatmentProtocol();
         TreatmentProtocol treatmentProtocol2 = new TreatmentProtocol();
@@ -163,10 +142,10 @@ public class TreatmentProtocolTest extends BaseTest {
         TreatmentComponent controlTC = new TreatmentComponent();
         TreatmentComponent drug1 = new TreatmentComponent();
 
-        controlTC.setTreatment(treatments.get(0));
+        controlTC.setTreatment(treatments);
         controlTC.setType("Control");
 
-        controlTC.setTreatment(treatments.get(0));
+        controlTC.setTreatment(treatments);
 
         componentsList1.add(controlTC);
         componentsList2.add(drug1);
@@ -194,21 +173,24 @@ public class TreatmentProtocolTest extends BaseTest {
                 .getTreatmentString(READ_CONTROLS_COMPONENTS);
 
         Assert.assertNotNull(treatmentString);
-        Assert.assertEquals(controlOntologyLabel + " and " + drugOntologyLabel + " and " +
-                drugOntologyLabel2,treatmentString);
+        Assert.assertEquals(
+                String.format("%s and %s and %s",controlOntologyLabel, drugOntologyLabel,drugOntologyLabel2),
+                treatmentString);
     }
 
     @Test
     public void getTreatmentString_ValidTCandControllsOff_NonNullAndConcatonatedStringWithoutControls(){
 
-        String treatmentString = null;
+        String treatmentString;
 
         treatmentString = treatmentProtocolList
                 .get(0)
                 .getTreatmentString(DO_NOT_READ_CONTROLS);
 
         Assert.assertNotNull(treatmentString);
-        Assert.assertEquals(drugOntologyLabel + " and " + drugOntologyLabel2,treatmentString);
+        Assert.assertEquals(
+                String.format("%s and %s",drugOntologyLabel,drugOntologyLabel2),
+                treatmentString);
     }
 
     @Test
@@ -237,8 +219,6 @@ public class TreatmentProtocolTest extends BaseTest {
     @Test
     public void testGetDoseString() {
 
-        final Boolean READ_CONTROLS_COMPONENTS = true;
-
         String doseStringWithControls;
         String doseStringWithoutControls;
 
@@ -254,10 +234,12 @@ public class TreatmentProtocolTest extends BaseTest {
         Assert.assertNotNull(doseStringWithControls);
         Assert.assertNotNull(doseStringWithoutControls);
 
-        Assert.assertEquals(controlDose1 + " / " + drugDose2 + " / " +
-                drugDose3, doseStringWithControls);
-        Assert.assertEquals(drugDose2 + " / " +
-                drugDose3, doseStringWithoutControls);
+        Assert.assertEquals(
+                String.format("%s / %s / %s",controlDose1,drugDose2,drugDose3),
+                doseStringWithControls);
+        Assert.assertEquals(
+                String.format("%s / %s",drugDose2,drugDose3),
+                doseStringWithoutControls);
     }
 
     @Test
@@ -277,10 +259,12 @@ public class TreatmentProtocolTest extends BaseTest {
         Assert.assertNotNull(durationStringWithControls);
         Assert.assertNotNull(durationStringWithoutControls);
 
-        Assert.assertEquals(controlDuration1 + " / " + drugDuration2 + " / " +
-                drugDuration3, durationStringWithControls);
-        Assert.assertEquals(drugDuration2 + " / " +
-                drugDuration3, durationStringWithoutControls);
+        Assert.assertEquals(
+                String.format("%s / %s / %s",controlDuration1,drugDuration2,drugDuration3),
+                durationStringWithControls);
+        Assert.assertEquals(
+                String.format("%s / %s",drugDuration2,drugDuration3),
+                durationStringWithoutControls);
 
     }
 

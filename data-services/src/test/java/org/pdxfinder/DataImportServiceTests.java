@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 
-import static org.junit.Assert.fail;
-
 public class DataImportServiceTests extends BaseTest {
 
     @Mock
@@ -41,26 +39,26 @@ public class DataImportServiceTests extends BaseTest {
     private static final String sex = "Male";
     private static final String race = "Asian";
     private static final String ethnicity = "German";
-    private static final String age = "99";
-
-    private static final Group group = new Group("TEST","","TST");
-    private static final Patient patient = new Patient(externalId, sex, race, ethnicity, group);
 
     private static final String ageAtCollection = "99";
     private static final String collectionDate = "TEST";
     private static final String collectionEvent = "TEST";
     private static final String elapsedTime = "TEST";
 
-    private Patient patientWithSnapshots = new Patient(externalId, sex, race, ethnicity, group);
-    private PatientSnapshot snapshot = new PatientSnapshot(patient, ageAtCollection,
+    private static final Group group = new Group("TEST","","TST");
+    private static final Patient patient = new Patient(externalId, sex, race, ethnicity, group);
+
+    private static final PatientSnapshot snapshot = new PatientSnapshot(patient, ageAtCollection,
             collectionDate, collectionEvent, elapsedTime);
+    private PatientSnapshot actualSnapshot;
 
     @Before
     public void init(){
+        actualSnapshot = null;
     }
 
     @Test
-    public void GetPatient_WhenValidDataNotInDB_ReturnNewPatient(){
+    public void GetPatient_WhenPSNotInDB_ReturnNewPatient(){
 
         when(this.patientRepository.findByExternalIdAndGroup(externalId,group))
                 .thenReturn(null);
@@ -84,23 +82,22 @@ public class DataImportServiceTests extends BaseTest {
 
         //Not clear if this is should be defined behavior.
         dataImportService.getPatient(null,null,null,null, group);
-
     }
 
     @Test
     public void GetPatientSnapshotTwoParam_WhenValidArgAndPSinDB_ReturnPSfromDBwithEqualRef() {
 
-        PatientSnapshot expectedSnapshot = new PatientSnapshot(patient, age);
+        PatientSnapshot snapshot1 = new PatientSnapshot(patient,ageAtCollection);
 
-        HashSet<PatientSnapshot> pSnaps = new HashSet<PatientSnapshot>();
-        pSnaps.add(expectedSnapshot);
+        HashSet<PatientSnapshot> pSnaps = new HashSet<>();
+        pSnaps.add(snapshot1);
 
         when(this.patientSnapshotRepository.findByPatient(externalId))
                 .thenReturn(pSnaps);
 
         PatientSnapshot returnSnapshot = dataImportService.getPatientSnapshot(patient, age);
 
-        Assert.assertEquals(expectedSnapshot, returnSnapshot);
+        Assert.assertEquals(returnSnapshot, snapshot1);
     }
 
     @Test
@@ -113,45 +110,33 @@ public class DataImportServiceTests extends BaseTest {
 
         Assert.assertEquals(patient, returnSnapshot.getPatient());
         Assert.assertEquals(age, returnSnapshot.getAgeAtCollection());
-
     }
 
     @Test
     public void GetPatientSnapshot4Param_WhenValidArg_ReturnPSfromPatientWithEqualREF() {
 
         Patient patientWithSnapshots = new Patient(externalId, sex, race, ethnicity, group);
-        PatientSnapshot snapshot = new PatientSnapshot(patient, ageAtCollection,
+
+        patientWithSnapshots.hasSnapshot(actualSnapshot);
+        actualSnapshot.setPatient(patientWithSnapshots);
+
+        actualSnapshot = dataImportService.getPatientSnapshot(patientWithSnapshots, ageAtCollection,
                 collectionDate, collectionEvent, elapsedTime);
 
-       PatientSnapshot testSnapshot;
-
-       patientWithSnapshots.hasSnapshot(snapshot);
-       snapshot.setPatient(patientWithSnapshots);
-
-       testSnapshot = dataImportService.getPatientSnapshot(patientWithSnapshots, ageAtCollection,
-                collectionDate, collectionEvent, elapsedTime);
-
-       Assert.assertTrue(testSnapshot.equals(snapshot));
-
-
+        Assert.assertTrue(actualSnapshot.equals(actualSnapshot));
     }
 
     @Test
     public void GetPatientSnapshot4Param_WhenValidArgAndNoMatchingPS_ReturnNewPSforPatient(){
 
-        PatientSnapshot snapshot = new PatientSnapshot(patient, ageAtCollection,
+        actualSnapshot = dataImportService.getPatientSnapshot(patient, ageAtCollection,
                 collectionDate, collectionEvent, elapsedTime);
 
-        PatientSnapshot testSnapshot;
-
-        testSnapshot = dataImportService.getPatientSnapshot(patient, ageAtCollection,
-                collectionDate, collectionEvent, elapsedTime);
-
-        Assert.assertEquals(snapshot.getPatient(), testSnapshot.getPatient());
-        Assert.assertEquals(snapshot.getAgeAtCollection(), testSnapshot.getAgeAtCollection());
-        Assert.assertEquals(snapshot.getDateAtCollection(), testSnapshot.getDateAtCollection());
-        Assert.assertEquals(snapshot.getCollectionEvent(), testSnapshot.getCollectionEvent());
-        Assert.assertEquals(snapshot.getElapsedTime(), testSnapshot.getDateAtCollection());
+        Assert.assertEquals(patient, snapshot.getPatient());
+        Assert.assertEquals(ageAtCollection, snapshot.getAgeAtCollection());
+        Assert.assertEquals(collectionDate, snapshot.getDateAtCollection());
+        Assert.assertEquals(collectionEvent, snapshot.getCollectionEvent());
+        Assert.assertEquals(elapsedTime, snapshot.getDateAtCollection());
     }
 
     @Test
@@ -161,16 +146,13 @@ public class DataImportServiceTests extends BaseTest {
                 .thenReturn(patient);
 
         when(dataImportService.getPatientSnapshot(patient, age))
-                .thenReturn(snapshot);
+                .thenReturn(actualSnapshot);
 
-        PatientSnapshot patientSnapshot;
-
-        patientSnapshot = dataImportService.getPatientSnapshot(externalId, sex, race,
+        actualSnapshot = dataImportService.getPatientSnapshot(externalId, sex, race,
                 ethnicity, age, group);
 
-        //Restricts method to creating a new patient since REF are checked. Could cause odd behavior.
-        Assert.assertEquals(patientSnapshot.getPatient(),patient);
-        Assert.assertEquals(patientSnapshot.getAgeAtCollection(), snapshot.getAgeAtCollection());
+        Assert.assertEquals(actualSnapshot.getPatient(),patient);
+        Assert.assertEquals(actualSnapshot.getAgeAtCollection(), actualSnapshot.getAgeAtCollection());
     }
 
     @Test
@@ -182,15 +164,14 @@ public class DataImportServiceTests extends BaseTest {
         when(dataImportService.getPatient(externalId, sex, race,
                 ethnicity, group)).thenReturn(patient);
 
-        PatientSnapshot testSnapshot;
-
-        testSnapshot = dataImportService.getPatientSnapshot(externalId, sex, race,
+         actualSnapshot = dataImportService.getPatientSnapshot(externalId, sex, race,
                 ethnicity, age, group);
 
         //It seems that the patient being returned is not the same reference Mockito is passing to it.
         //I am unclear to the origin of this behavior. Could be problmatic in the future.
-        Assert.assertEquals(snapshot.getPatient().getExternalId(), testSnapshot.getPatient().getExternalId());
-        Assert.assertEquals(snapshot.getAgeAtCollection(), testSnapshot.getAgeAtCollection());
+        Assert.assertEquals(patient,actualSnapshot.getPatient());
+        Assert.assertEquals(externalId,  actualSnapshot.getPatient().getExternalId());
+        Assert.assertEquals(ageAtCollection,  actualSnapshot.getAgeAtCollection());
     }
 
 }
