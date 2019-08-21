@@ -641,6 +641,26 @@ public class UtilityService {
     }
 
 
+    public void writeCsvFile(List<String> headers, List<List<String>> dataList, String destination){
+
+        List<Map<String, String>> mapList = new ArrayList<>();
+
+        for(int i = 0; i < dataList.size(); i++){
+
+            Map<String, String> rowMap = new HashMap<>();
+
+            List<String> row = dataList.get(i);
+
+            for(int j = 0; j < row.size(); j++){
+
+                rowMap.put(headers.get(j), row.get(j));
+            }
+
+            mapList.add(rowMap);
+        }
+
+        writeCsvFile(mapList, destination);
+    }
 
 
 

@@ -5,6 +5,7 @@ package org.pdxfinder.reportmanager;
  */
 
 import org.pdxfinder.services.reporting.LogEntity;
+import org.pdxfinder.services.reporting.MarkerLogEntity;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +46,34 @@ public class ReportManager {
 
             }
         }
+    }
 
+
+    public List<List<String>> getMarkerHarmonizationMessagesInList(){
+
+        List list = new ArrayList();
+
+        for(LogEntity le: messages){
+            List<String> row = new ArrayList();
+
+            if(le instanceof MarkerLogEntity){
+
+                MarkerLogEntity mle = (MarkerLogEntity) le;
+                row.add(mle.getType());
+                row.add(mle.getReporter());
+                row.add(mle.getDataSource());
+                row.add(mle.getModel());
+                row.add(mle.getCharacterizationType());
+                row.add(mle.getPlatform());
+                row.add(mle.getUsedMarkerSymbol());
+                row.add(mle.getSuggestedMarkerSymbol());
+                row.add(mle.getReasonForChange());
+                row.add(mle.getMessage());
+                list.add(row);
+            }
+        }
+
+        return list;
     }
 
 }
