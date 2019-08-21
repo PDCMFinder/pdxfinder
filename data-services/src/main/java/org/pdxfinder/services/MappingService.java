@@ -967,10 +967,13 @@ public class MappingService {
 
         List<String> csvHead = new ArrayList<>();
 
+        csvHead.add("Data Id");
+
         for (Map.Entry<String, String> entry : mappingEntity.getMappingValues().entrySet() ) {
-            csvHead.add(entry.getKey().toUpperCase());
+            csvHead.add(utilityService.camelCaseToSentence(entry.getKey()));
         }
-        csvHead.addAll(Arrays.asList("MAPPED TERM","TYPE","JUSTIFICATION"));
+
+        csvHead.addAll(Arrays.asList("Mapped Term","Type","Justification"));
 
         return csvHead;
     }
@@ -984,6 +987,9 @@ public class MappingService {
         mappingEntities.forEach(mappingEntity -> {
 
             List<String> csvData = new ArrayList<>();
+
+            csvData.add(mappingEntity.getEntityId().toString());
+
             for (Map.Entry<String, String> entry : mappingEntity.getMappingValues().entrySet() ) {
                 csvData.add(
                         entry.getKey().equals("DataSource") ? entry.getValue().toUpperCase() : entry.getValue()

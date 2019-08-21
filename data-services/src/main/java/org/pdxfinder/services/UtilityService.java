@@ -911,7 +911,8 @@ public class UtilityService {
      ************************************************************************************************************/
 
     public String camelCaseToSentence(String s) {
-        return s.replaceAll(
+
+        String converted = s.replaceAll(
                 String.format("%s|%s|%s",
                               "(?<=[A-Z])(?=[A-Z][a-z])",
                               "(?<=[^A-Z])(?=[A-Z])",
@@ -919,6 +920,9 @@ public class UtilityService {
                 ),
                 " "
         );
+
+        // Fix situations when non camel case is sent, remove double spaces generated
+        return converted.trim().replaceAll(" +", " ");
     }
 
 
