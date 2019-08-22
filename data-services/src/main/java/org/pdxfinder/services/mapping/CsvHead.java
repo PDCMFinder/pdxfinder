@@ -5,13 +5,17 @@ package org.pdxfinder.services.mapping;
  */
 public enum CsvHead {
 
-
+    // Diagnosis csv Header Strings
     entityId("Data Id"),
     dataSource("Data Source"),
     sampleDiagnosis("Sample Diagnosis"),
     originTissue("Origin Tissue"),
     tumorType("Tumor Type"),
 
+    // Treatment csv Header Strings
+    treatmentName("Treatment Name"),
+
+    // CSV Header Strings common to all entity types
     mappedTerm("Mapped Term"),
     mapType("Type"),
     justification("Justification"),

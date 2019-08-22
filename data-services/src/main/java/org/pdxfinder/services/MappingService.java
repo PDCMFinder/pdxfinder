@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /*
  * Created by csaba on 09/07/2018.
@@ -1018,6 +1019,13 @@ public class MappingService {
     }
 
 
+    /**
+     * Validates CSV column headers and contents, confirm each row data based on entityId and mappingKey
+     * Capture failed rows and return report accordingly then Halt the process if failure
+     *
+     * @param fileData {List<Map>} holding serialized csv contents
+     * @return List of errors if any
+     */
     public List validateUploadedCSV(List<Map<String, String>> fileData) {
 
         List<String> report = new ArrayList<>();
@@ -1049,7 +1057,7 @@ public class MappingService {
         }
 
         /*
-         *  Validate each row data based on existing EntityId and MappingKey
+         *  Iterate all rows to Validate each data based on existing entityId and mappingKey
          *
          *  Capture failed rows and return report accordingly
          */
@@ -1057,17 +1065,11 @@ public class MappingService {
 
         for (Map<String, String> eachData : fileData) {
 
-
-            String mappingKey = String.join("__",
-                    entityType,
-                    eachData.get(CsvHead.dataSource.get()),
-                    eachData.get(CsvHead.sampleDiagnosis.get()),
-                    eachData.get(CsvHead.originTissue.get()),
-                    eachData.get(CsvHead.tumorType.get())
-
-            ).toLowerCase().replaceAll("[^a-zA-Z0-9 _-]", "");
-
             Long entityId = Long.parseLong(eachData.get(CsvHead.entityId.get()));
+
+            String mappingKey = getMappingKeyFromCSVData(entityType, eachData);
+
+            log.info(mappingKey);
 
             Optional<MappingEntity> me = getByMappingKeyAndEntityId(mappingKey, entityId);
 
@@ -1079,7 +1081,39 @@ public class MappingService {
         }
 
         return report;
+    }
 
+
+    public String getMappingKeyFromCSVData(String entityType, Map<String, String> data){
+
+
+        String mappingKey = "";
+
+        if (entityType.equals(MappingEntityType.diagnosis.get())) {
+
+            mappingKey = String.join("__",
+                                     entityType,
+                                     data.get(CsvHead.dataSource.get()),
+                                     data.get(CsvHead.sampleDiagnosis.get()),
+                                     data.get(CsvHead.originTissue.get()),
+                                     data.get(CsvHead.tumorType.get())
+
+            ).toLowerCase().replaceAll("[^a-zA-Z0-9 _-]", "");
+
+        }
+        else if (entityType.equals(MappingEntityType.treatment.get())) {
+
+            mappingKey = String.join("__",
+                                     entityType,
+                                     data.get(CsvHead.dataSource.get()),
+                                     data.get(CsvHead.treatmentName.get())
+
+            ).toLowerCase().replaceAll("[^a-zA-Z0-9 _-]", "");
+
+        }
+
+
+        return mappingKey;
     }
 
 
