@@ -8,6 +8,7 @@ import {DatasourceSpecificSuggestionsComponent} from "./datasource-specific-sugg
 import {CurationManageComponent} from "./curation-manage/curation-manage.component";
 import {CurationOrphanComponent} from "./curation-orphan/curation-orphan.component";
 import {CurationArchiveComponent} from "./curation-archive/curation-archive.component";
+import {CurationValidateComponent} from "./curation-validate/curation-validate.component";
 
 
 const routes: Routes = [
@@ -16,6 +17,7 @@ const routes: Routes = [
     {path: 'dashboard', component: DashboardComponent},
     {path: 'curation', component: CurationMappingComponent},
     {path: 'curation/manage', component: CurationManageComponent},
+    {path: 'curation/validate', component: CurationValidateComponent},
 
     {
         path: 'curation/orphan', component: CurationOrphanComponent,

@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.web.multipart.MultipartFile;
 
 /*
  * Created by abayomi on 12/02/2019.
@@ -190,6 +191,12 @@ public class UtilityService {
 
         FileInputStream inputStream = convertFileToStream(excelURL);
 
+        return serializeExcelDataNoIterator(inputStream, sheet, startRow);
+
+    }
+
+    public List<Map<String, String>> serializeExcelDataNoIterator(InputStream inputStream, int sheet, int startRow) {
+
         List<String> tableHead = new ArrayList<>();
         List<Map<String, String>> csvMap = new ArrayList<>();
 
@@ -203,12 +210,11 @@ public class UtilityService {
             Iterator<Row> rowIterator = spreadsheet.iterator();
 
 
-
             while (rowIterator.hasNext()) // Read the head row
             {
                 row = rowIterator.next();
 
-                if (rowCount == startRow){
+                if (rowCount == startRow) {
 
                     Iterator<Cell> cellIterator = row.cellIterator();
                     tableHead = getXlsTableHeadData(cellIterator);
@@ -220,7 +226,7 @@ public class UtilityService {
             rowCount = 0;
             for (Row dRow : spreadsheet) {
 
-                if (rowCount <= startRow){
+                if (rowCount <= startRow) {
                     rowCount++;
                     continue;
                 }
@@ -243,21 +249,24 @@ public class UtilityService {
                         rowMap.put(key, data);
                         rowDataTracker += data;
 
-                    }else{
+                    } else {
                         if (!key.equals("")) rowMap.put(key, "");
                     }
                 }
 
-                if (rowDataTracker.length() !=0) csvMap.add(rowMap);
+                if (rowDataTracker.length() != 0) csvMap.add(rowMap);
 
                 rowCount++;
             }
 
             inputStream.close();
-        } catch (Exception ex) { ex.printStackTrace(); }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         return csvMap;
     }
+
 
 
 
@@ -453,6 +462,34 @@ public class UtilityService {
      *                                           CSV FILE HANDLER SECTION                                      *
      ************************************************************************************************************/
 
+    public List<Map<String, String>> serializeMultipartFile(MultipartFile multipartFile) {
+
+        String[] stringArr = multipartFile.getOriginalFilename().split("\\.");
+        String type = stringArr[stringArr.length - 1];
+
+        // multipartFile.getContentType()
+
+        InputStream inputStream = null;
+        List<Map<String, String>> dataList = new ArrayList<>();
+
+        try {
+            inputStream = multipartFile.getInputStream();
+        } catch (Exception e) {
+        }
+
+        if (type.equals("xlsx")) {
+
+            dataList = serializeExcelDataNoIterator(inputStream, 0, 1);
+
+        } else if (type.equals("csv")) {
+
+            DataInputStream csvData = new DataInputStream(inputStream);
+            dataList = serializeCSVToMaps(csvData);
+        }
+
+        return dataList;
+    }
+
 
     // SERIALIZE CSV TO LIST OF MAPS
     public List<Map<String, String>> serializeCSVToMaps(String csvFile) {
@@ -460,9 +497,15 @@ public class UtilityService {
         FileInputStream fileStream = null;
         try {
             fileStream = new FileInputStream(csvFile);
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
         DataInputStream csvData = new DataInputStream(fileStream);
 
+        return serializeCSVToMaps(csvData);
+    }
+
+
+    public List<Map<String, String>> serializeCSVToMaps(DataInputStream csvData) {
 
         int row = 0;
         String thisLine;
@@ -493,7 +536,8 @@ public class UtilityService {
                 }
                 row++;
             }
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
 
         return csvMap;
 

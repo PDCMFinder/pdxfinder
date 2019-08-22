@@ -963,4 +963,42 @@ public class MappingService {
     }
 
 
+    public List<String> getMappingEntityCSVHead(MappingEntity mappingEntity){
+
+        List<String> csvHead = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : mappingEntity.getMappingValues().entrySet() ) {
+            csvHead.add(entry.getKey().toUpperCase());
+        }
+        csvHead.addAll(Arrays.asList("MAPPED TERM","TYPE","JUSTIFICATION"));
+
+        return csvHead;
+    }
+
+
+
+    public List<List<String>> prepareMappingEntityForCSV(List<MappingEntity> mappingEntities){
+
+        List<List<String>> mappingDataCSV = new ArrayList<>();
+
+        mappingEntities.forEach(mappingEntity -> {
+
+            List<String> csvData = new ArrayList<>();
+            for (Map.Entry<String, String> entry : mappingEntity.getMappingValues().entrySet() ) {
+                csvData.add(
+                        entry.getKey().equals("DataSource") ? entry.getValue().toUpperCase() : entry.getValue()
+                );
+            }
+
+            csvData.add(mappingEntity.getMappedTermLabel());
+            csvData.add(mappingEntity.getMapType());
+            csvData.add(mappingEntity.getJustification());
+
+            mappingDataCSV.add(csvData);
+        });
+
+        return mappingDataCSV;
+    }
+
+
 }

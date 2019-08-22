@@ -1,3 +1,7 @@
+
+
+.styleFile{ padding:0px 0px 15px; border-bottom:1px solid rgba(3, 54, 157, 0.9); color:#666; margin:20px 10px 0px 0px; font-weight: normal; }
+
 /* CUSTOMIZE BOOTSTRAP CSS FOR 1/2*/
 .col-lg-2-5 {
     position: relative;
@@ -3113,7 +3117,7 @@ table.table-mail tr td {
   color: #007C82;
 }
 .text-primary {
-  color: inherit;
+  color: #03369D;
 }
 .text-success {
   color: #1c84c6;

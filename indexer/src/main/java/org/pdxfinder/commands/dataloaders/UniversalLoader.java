@@ -511,8 +511,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
             String dose = patientTreatmentRow.get(2);
             String startingDate = patientTreatmentRow.get(3);
             String duration = patientTreatmentRow.get(4);
-            String response = patientTreatmentRow.get(5);
-            String responseClassification = patientTreatmentRow.get(6);
+            String response = patientTreatmentRow.get(7);
+            String responseClassification = patientTreatmentRow.get(8);
 
             if (patientId.isEmpty() || treatment.isEmpty()) {
 
