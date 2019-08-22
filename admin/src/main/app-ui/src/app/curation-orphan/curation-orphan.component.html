@@ -1,66 +1,119 @@
 <div class="row wrapper border-bottom white-bg page-heading">
 
     <div class="col-lg-8">
-        <h2> {{dataSource | uppercase}} Unmapped {{entityType | titlecase}} Summary</h2>
+        <h2> Manage Orphaned Data </h2>
         <ol class="breadcrumb">
             <li>
-                <a routerLink="/dashboard">...</a>
+                <a routerLink="/dashboard">Dashboard</a>
             </li>
             <li>
-                <a routerLink="/curation">Curation Mappings</a>
+                <a routerLink="/curation">Curation </a>
             </li>
-            <li>
-                <a routerLink="/{{'curation/'+entityTypeUrl}}"> All {{entityType | titlecase}} Summaries </a>
-            </li>
-            <li class="active"> {{dataSource | uppercase}} </li>
+            <li class="active"> Orphaned Terms </li>
         </ol>
     </div>
 </div>
 
+
+
 <div *ngIf="showNotif" class="top-notif col-lg-3 animated fadeInRight">
     <h3> {{selectedSrc}} {{selectedEntityType | titlecase}}<span (click)="toggleNotification(false)" class='close'></span></h3>
     <p> {{selectedDetails}}  </p>
-
-    <button class="btn btn-primary btn-sm" type="submit" (click)="updateSkippedTerm()"> Skip Term </button>
-    <button class="btn btn-outline btn-default btn-sm" (click)="toggleNotification(false)"> Close </button>
 </div>
 
-<div class="wrapper wrapper-content animated fadeInRight">
-    <div class="p-w-md m-t-sm col-lg-10 col-lg-offset-1">
 
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    <div class="p-w-md m-t-sm col-lg-10 col-lg-offset-1">
 
         <div class="row" style="margin-top: -10px;">
 
-            <div class="col-lg-12" *ngIf="dataExists">
+
+
+            <div class="col-lg-2-5" *ngIf="showFilter">
+
+                <div class="pdxfinder float-e-margins">
+                    <div class="pdxfinder-title">
+                        <div style="margin-bottom: -10px;"><h5> FILTER BY: </h5></div>
+                        <div class="pdxfinder-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="btn btn-primary btn-circle" (click)="toggleDisplay('filter')">
+                                <i class="ti-close"></i>
+                            </a>
+
+                        </div>
+                    </div>
+
+
+                    <form #filterForm="ngForm" (ngSubmit)="searchFilter(filterForm)" novalidate>
+
+                        <div class="pdxfinder">
+                            <div class="pdxfinder-title">
+                                <h5> DATA TYPES </h5>
+                                <div class="pdxfinder-tools">
+                                    <a class="collapse-link"> <i class="ti-angle-double-up"></i> </a>
+                                </div>
+                            </div>
+                            <div class="pdxfinder-content no-padding">
+                                <ul class="list-group">
+
+                                    <li class="list-group-item" *ngFor="let dataType of dataTypes">
+
+                                        <input (change)="searchFilter(filterForm)" type="checkbox"
+                                               value="{{dataType.id}}" [(ngModel)]="dataType.checked"
+                                               [name]="dataType.text" id="{{dataType.text}}"/>
+                                        <label for="{{dataType.text}}"> {{dataType.text | titlecase}}</label>
+
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+
+
+                    </form>
+
+                </div>
+            </div>
+
+
+            <div [ngClass]="showFilter == true ? 'col-lg-12' : 'col-lg-12'">
 
                 <form #mappingForm="ngForm" *ngIf="!submitted" (ngSubmit)="updateMappingEntity()" novalidate>
                     <div class="pdxfinder float-e-margins">
 
                         <div class="pdxfinder-title">
-                            <h5 class="testMobile"> Unmapped {{entityType | titlecase}} Summary </h5>
+                            <h5> Orphaned {{entityType | titlecase}} List</h5>
 
-                            <button *ngIf="report == null" style="float: right; margin-top:-7px;" class="btn btn-primary btn-sm" type="submit">
+                            <button *ngIf="report == null" style="float: right; margin-top:-7px;"
+                                    class="btn btn-primary btn-sm" type="submit">
                                 <i class="ti-cloud-up"></i> &nbsp; Submit Curation &nbsp;
-                            </button> <!-- [disabled]="mappingForm.form.invalid" -->
+                            </button>
 
                         </div>
-
                         <div class="pdxfinder-content pdxfinder-heading">
-                            <h3><i class="ti-agenda"></i> <span style="color: #03369D"> {{dataSource | uppercase}}  </span> Mapping </h3>
-                            <small><i class="fa fa-tim"></i> You have 70 unmapped ... and 16 orphaned ...</small>
+                            <h3><i class="ti-unlink"></i> Orphaned Curated Data </h3>
+                            <small><i class="fa fa-tim"></i> You have ... orphaned {{entityType | titlecase}} terms in
+                                the database ...
+                            </small>
                         </div>
 
 
                         <div class="pdxfinder-content">
 
                             <div *ngIf="report == 'success'" class="alert alert-success alert-dismissable">
-                                <a aria-hidden="true" class="close" type="button" (click)="toggleReport('success')">×</a>
-                                Success: <em>  The submitted curation was successful, Clear off notification to continue </em>  <a class="alert-link"> ... </a>.
+                                <a aria-hidden="true" class="close" type="button"
+                                   (click)="toggleReport('success')">×</a>
+                                Success: <em> The submitted curation was successful, Clear off notification to
+                                continue </em> <a class="alert-link"> ... </a>.
                             </div>
 
                             <div *ngIf="report == 'failed'" class="alert alert-danger alert-dismissable">
                                 <a aria-hidden="true" class="close" type="button" (click)="toggleReport(null)">×</a>
-                                OOps!! <em> Failed Request: The submitted curation is invalid, Clear off notification to continue </em> <a class="alert-link"> ... </a>.
+                                OOps!! <em> Failed Request: The submitted curation is invalid, Clear off notification to
+                                continue </em> <a class="alert-link"> ... </a>.
                             </div>
 
                             <div class="table-responsive">
@@ -82,7 +135,7 @@
                                     <tbody>
 
                                     <tr class="pdxfinder-clickable-rows2" *ngFor="let mapping of mappings; index as i"
-                                        [routerLink]="['suggested-mapping',mapping.entityId ]"
+                                        [routerLink]="['recommendation',mapping.entityId ]"
                                         (click)="getClickedRow(mapping)"
                                         [class.active]="mapping.entityId == selectedRow">
 
@@ -90,36 +143,35 @@
 
                                         <td *ngFor="let dataLabel of dataLabels ">
 
-                                            <span *ngIf="dataLabel == 'DataSource'" class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | uppercase }} </span>
-                                            <span *ngIf="dataLabel != 'DataSource'" class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] }} </span>
+                                            <span *ngIf="dataLabel == 'DataSource'"
+                                                  class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | uppercase }} </span>
+                                            <span *ngIf="dataLabel != 'DataSource'"
+                                                  class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | titlecase }} </span>
 
                                         </td>
 
                                         <td><input type="text" name="{{'mappedTermLabel'+i}}" class="editableField"
                                                    [(ngModel)]="mapping.mappedTermLabel"
                                                    value="{{ mapping.mappedTermLabel }}">
-                                        </td><!-- required
-                                                   [class.is-invalid]="'mappedTermLabel'+i.invalid && 'mappedTerm'+i.dirty" -->
+                                        </td>
 
                                         <td><input type="text" name="{{'mapType'+i}}" class="editableField"
                                                    #curatorMapType
                                                    (input)="mapping.mapType=curatorMapType.value"
                                                    value="{{ mapping.mapType }}">
-                                            <!--
-                                                   required
-                                                   [class.is-invalid]="'mapType'+i.invalid && 'mapType'+i.dirty" --></td>
+                                        </td>
 
                                         <td><input type="text" name="{{'justification'+i}}" class="editableField"
                                                    [(ngModel)]="mapping.justification"
                                                    value="{{ mapping.justification }}">
-                                            <!--
-                                                   required
-                                                   [class.is-invalid]="'justification'+i.invalid && 'justification'+i.dirty"-->
 
                                             <input type="hidden" name="{{'mappedTermUrl'+i}}"
                                                    [(ngModel)]="mapping.mappedTermUrl"
                                                    value="{{ mapping.mappedTermUrl }}">
                                         </td>
+
+
+
                                     </tr>
 
                                     </tbody>
@@ -128,36 +180,37 @@
                                 <ul class="pagination pagination-sm" style="margin-top:-3px; margin-bottom:0px;">
 
                                     <li [ngClass]="{'disabled': data.page == 1 }">
-                                        <span *ngIf="data.page == 1"> First « </span>
+                                        <span *ngIf="data.page == 1"> First << </span>
+
                                         <a *ngIf="data.page != 1"
-                                           [routerLink]="['../1']"> First « </a>
-                                        <!--    href="/{{'curation/'+entityTypeUrl+'/'+dataSource+'/1'}}" -->
+                                           [routerLink]="['/curation/orphan/1']">
+                                            First << </a>
                                     </li>
 
                                     <li *ngFor="let count of pageRange " [ngClass]="{'active': data.page == count }">
 
-                                        <a [routerLink]="['../'+count]"> {{count }} </a>
-                                        <!--     href="/{{'curation/'+entityTypeUrl+'/'+dataSource+'/'+count}}" -->
+                                        <a [routerLink]="['/curation/orphan/'+count]"> {{count }} </a>
                                     </li>
+
 
 
                                     <li [ngClass]="{'disabled': data.page == data.totaPages }">
-                                        <span *ngIf="data.page == data.totaPages"> Last « </span>
+                                        <span *ngIf="data.page == data.totaPages"> Last >> </span>
                                         <a *ngIf="data.page != data.totaPages"
-                                           [routerLink]="['../'+data.totaPages]"> Last
-                                            « </a>  <!--  href="/{{'curation/'+entityTypeUrl+'/'+dataSource+'/'+data.totaPages}}"  -->
+                                           [routerLink]="['/curation/orphan/'+data.totaPages]">
+                                            Last
+                                            >> </a>
                                     </li>
-
 
                                 </ul>
 
 
                                 <div style="display: inline; width: 70px; margin-left: 5px; margin-top: -10px; float: right">
-                                    <select class="form-control"  (change)="newPageSize($event.target.value)">
+                                    <select class="form-control" (change)="newPageSize($event.target.value)">
 
                                         <option *ngFor="let pageOption of pageOptions"
                                                 [value]="pageOption"
-                                                [selected]="pageOption == pageSize">
+                                                [selected]="pageOption == pageOptionSize">
                                             {{pageOption}}
                                         </option>
 
@@ -165,36 +218,31 @@
                                 </div>
 
                             </div>
+
+
                         </div>
                     </div>
 
                 </form>
 
 
-
-
             </div>
         </div>
 
     </div>
+
+
+    <div class="fabs" *ngIf="!showFilter">
+        <a id="prime" class="fab"
+           (click)="toggleDisplay('filter')">
+            <i class="ti-filter" style="font-size: 30px;"></i>
+        </a>
+    </div>
+
 </div>
 
-
-<!-- The Suggested Mappings Displayes here as a child route with deeplinked url  (click)="showSuggestedMappings(34)"  [disabled]="mappingForm.form.invalid || topicHasError"  -->
+<!-- The Suggested Mappings Displays here as a child route with deep linked url -->
 <router-outlet>
 
 </router-outlet>
 
-<!--
-<th> SOURCE </th>
-<th> DIAGNOSIS </th>
-<th> TUMOR TYPE </th>
-<th> PRIMARY TUMOR </th>
--->
-
-<!-- ; {{ mapping.mappingValues.SampleDiagnosis | uppercase }}  <td> {{ mapping.mappingValues.SampleDiagnosis | uppercase }} </td>
- <td> {{ mapping.mappingValues.TumorType | uppercase }} </td>
- <td> {{ mapping.mappingValues.OriginTissue | uppercase }} </td> -->
-
-<!-- <a [routerLink]="['../'+count]"> {{count }} </a>
-<a [routerLink]="['../']" [queryParams]="{page: count}"  > {{count }} </a>    {{'curation/'+entityTypeUrl+'/'+dataSource}} +'?page='+count -->
