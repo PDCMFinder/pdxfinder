@@ -13,6 +13,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,11 +39,11 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
     }
 
 
-    public void loadOmicData(ModelCreation modelCreation, Group providerGroup, String dataType, String dataRootDirectory) {  // csv or xlsx or json
+    public void loadOmicData(ModelCreation modelCreation, Group providerGroup, String dataType, String providerRootDirectory) {  // csv or xlsx or json
 
         reportManager = (ReportManager) context.getBean("ReportManager");
 
-        List<Map<String, String>> dataList;
+        List<Map<String, String>> dataList = new ArrayList<>();
 
         String omicDir = null;
 
@@ -61,22 +63,89 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         }
 
 
+        String omicDataRootDirUrl = providerRootDirectory + "/"+omicDir;
+        File dataRootDir = new File(omicDataRootDirUrl);
 
+        if(dataRootDir.exists()){
+
+            String[] filesInDir = dataRootDir.list();
+
+            if(filesInDir.length > 0){
+
+                //look for the data.xlsx first
+                String singleDataXls = omicDataRootDirUrl + "/data.xlsx";
+                File singleDataXlsFile = new File(singleDataXls);
+
+                //look for data.json
+                String singleDataJson = omicDataRootDirUrl + "/data.json";
+                File singleDataJsonFile = new File(singleDataJson);
+
+                //look for data.csv
+                String singleDataCsv = omicDataRootDirUrl + "/data.csv";
+                File singleDataCsvFile = new File(singleDataCsv);
+
+                //look for modelid.json
+                String modelDataJson = omicDataRootDirUrl + "/" + modelCreation.getSourcePdxId() + ".json";
+                File modelDataJsonFile = new File(modelDataJson);
+
+                //look for modelid.csv
+                String modelDataCsv = omicDataRootDirUrl + "/" + modelCreation.getSourcePdxId() + ".csv";
+                File modelDataCsvFile = new File(modelDataCsv);
+
+                if(singleDataXlsFile.exists()){
+
+                    Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(singleDataXls,omicModelID);
+                    dataList = fullData.get(modelCreation.getSourcePdxId());
+                }
+                else if(singleDataCsvFile.exists()){
+
+                    Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(singleDataCsv,omicModelID);
+                    dataList = fullData.get(modelCreation.getSourcePdxId());
+                }
+                else if(singleDataJsonFile.exists()){
+
+                    Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(singleDataJson,omicModelID);
+                    dataList = fullData.get(modelCreation.getSourcePdxId());
+                }
+                else if(modelDataJsonFile.exists()){
+
+                    dataList = utilityService.serializeDataToMaps(modelDataJson);
+                }
+                else if(modelDataCsvFile.exists()){
+
+                    dataList = utilityService.serializeDataToMaps(modelDataCsv);
+                }
+
+
+
+
+            }
+
+        }
+        else{
+
+            log.error("Directory doesn't exist: "+omicDataRootDirUrl);
+        }
+
+
+
+/*
         if (omicDataFilesType.equals("ONE_FILE_PER_MODEL")){
 
             // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS 100s OF CSV/JSON WITH ONE_FILE_PER_MODEL
             String modelID = modelCreation.getSourcePdxId();
-            dataList = utilityService.serializeDataToMaps(dataRootDirectory+"/"+dataSourceAbbreviation+"/"+omicDir+"/"+modelID+"."+omicFileExtension);
+            dataList = utilityService.serializeDataToMaps(providerRootDirectory+"/"+dataSourceAbbreviation+"/"+omicDir+"/"+modelID+"."+omicFileExtension);
 
         }else {
 
             // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS A SINGLE CSV/JSON WITH ALL_MODELS_IN_ONE_FILE
-            String variationURLStr = dataRootDirectory+"/"+dataSourceAbbreviation+"/"+omicDir+"/data."+omicFileExtension;
+            String variationURLStr = providerRootDirectory+"/"+dataSourceAbbreviation+"/"+omicDir+"/data."+omicFileExtension;
             Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(variationURLStr,omicModelID);
 
             dataList = fullData.get(modelCreation.getSourcePdxId());
         }
 
+*/
 
         String modelID = modelCreation.getSourcePdxId();
         Map<String, Platform> platformMap = new HashMap<>();

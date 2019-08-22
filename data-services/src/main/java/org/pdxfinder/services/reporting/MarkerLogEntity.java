@@ -78,4 +78,43 @@ public class MarkerLogEntity extends LogEntity{
             ", " + super.getMessage();
     }
 
+    public String getCharacterizationType() {
+        return characterizationType;
+    }
+
+    public void setCharacterizationType(String characterizationType) {
+        this.characterizationType = characterizationType;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
+
+    public String getUsedMarkerSymbol() {
+        return usedMarkerSymbol;
+    }
+
+    public void setUsedMarkerSymbol(String usedMarkerSymbol) {
+        this.usedMarkerSymbol = usedMarkerSymbol;
+    }
+
+    public String getSuggestedMarkerSymbol() {
+        return suggestedMarkerSymbol;
+    }
+
+    public void setSuggestedMarkerSymbol(String suggestedMarkerSymbol) {
+        this.suggestedMarkerSymbol = suggestedMarkerSymbol;
+    }
+
+    public String getReasonForChange() {
+        return reasonForChange;
+    }
+
+    public void setReasonForChange(String reasonForChange) {
+        this.reasonForChange = reasonForChange;
+    }
 }
