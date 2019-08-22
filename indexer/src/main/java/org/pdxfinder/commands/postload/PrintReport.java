@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,9 +64,21 @@ public class PrintReport implements CommandLineRunner, ApplicationContextAware {
     private void saveReportInCsv(){
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
         String logFile = finderRootDir + "/logs/markerlog_"+timeStamp+".csv";
-        List<String> headers = new ArrayList<>();
-        headers.addAll(Arrays.asList("Type", "Reporter", "DataSource", "Model", "MolChar", "Platform", "MarkerInFile", "HarmonizedMarker", "ReasonOfChange", "Message"));
-        utilityService.writeCsvFile(headers, reportManager.getMarkerHarmonizationMessagesInList(), logFile);
+
+        File logDir = new File(finderRootDir+ "/logs");
+
+        if(logDir.canWrite()){
+
+            List<String> headers = new ArrayList<>();
+            headers.addAll(Arrays.asList("Type", "Reporter", "DataSource", "Model", "MolChar", "Platform", "MarkerInFile", "HarmonizedMarker", "ReasonOfChange", "Message"));
+            utilityService.writeCsvFile(headers, reportManager.getMarkerHarmonizationMessagesInList(), logFile);
+        }
+        else{
+
+            log.warn("Cannot save log file, need write permission to "+finderRootDir + "/logs");
+        }
+
+
 
     }
 
