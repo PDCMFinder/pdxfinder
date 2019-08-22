@@ -14,7 +14,7 @@ import org.pdxfinder.admin.zooma.*;
 import org.pdxfinder.graph.repositories.SampleRepository;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.dto.PaginationDTO;
-import org.pdxfinder.services.mapping.CsvHead;
+import org.pdxfinder.services.mapping.CSV;
 import org.pdxfinder.services.mapping.MappingEntityType;
 import org.pdxfinder.services.mapping.Status;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /*
  * Created by csaba on 09/07/2018.
@@ -967,154 +966,52 @@ public class MappingService {
     }
 
 
-    public List<String> getMappingEntityCSVHead(MappingEntity mappingEntity) {
-
-        List<String> csvHead = new ArrayList<>();
-
-        csvHead.add(CsvHead.entityId.get());
-
-        for (Map.Entry<String, String> entry : mappingEntity.getMappingValues().entrySet()) {
-            csvHead.add(utilityService.camelCaseToSentence(entry.getKey()));
-        }
-
-        csvHead.addAll(Arrays.asList(
-                CsvHead.mappedTerm.get(),
-                CsvHead.mapType.get(),
-                CsvHead.justification.get(),
-                CsvHead.yesOrNo.get(),
-                CsvHead.validTerm.get())
-        );
-
-        return csvHead;
-    }
 
 
+    public List<MappingEntity> processUploadedCSV(List<Map<String, String>> csvData) {
 
-    public List<List<String>> prepareMappingEntityForCSV(List<MappingEntity> mappingEntities){
 
-        List<List<String>> mappingDataCSV = new ArrayList<>();
+        List<MappingEntity> savedEntities = new ArrayList<>();
 
-        mappingEntities.forEach(mappingEntity -> {
+        csvData.forEach(eachData -> {
 
-            List<String> csvData = new ArrayList<>();
+            // Retrieve the entityId from the csv data
+            Long entityId = Long.parseLong(eachData.get(CSV.entityId.get()));
 
-            csvData.add(mappingEntity.getEntityId().toString());
 
-            for (Map.Entry<String, String> entry : mappingEntity.getMappingValues().entrySet() ) {
-                csvData.add(
-                        entry.getKey().equals("DataSource") ? entry.getValue().toUpperCase() : entry.getValue()
-                );
-            }
+            // Pull the data from h2 based on the entityId, update the data from csvData and save
+            MappingEntity updated = mappingEntityRepository.findByEntityId(entityId)
+                    .map(mappingEntity -> {
 
-            csvData.add(mappingEntity.getMappedTermLabel());
-            csvData.add(mappingEntity.getMapType());
-            csvData.add(mappingEntity.getJustification());
-            csvData.add(" ");
-            csvData.add(" ");
+                        /*
+                         *  Get Decision column of this csvData, if Yes, change Status to Validated
+                         *  If Decision column is NO, Pick content of ApprovedTerm column, replace maped term for that entity and set status as validated
+                         */
+                        if (eachData.get(CSV.decision.get()).equalsIgnoreCase(CSV.no.get())){
 
-            mappingDataCSV.add(csvData);
+                            mappingEntity.setMappedTermLabel(eachData.get(CSV.mappedTerm.get()));
+                            mappingEntity.setMappedTermUrl(eachData.get(CSV.mappedTermUrl.get()));
+                        }
+
+
+                        mappingEntity.setDateUpdated(new Date());
+                        mappingEntity.setStatus(Status.validated.get());
+                        return mappingEntityRepository.save(mappingEntity);
+                    })
+                    .orElseGet(() -> {
+                        return new MappingEntity();
+                    });
+
+            savedEntities.add(updated);
+
         });
 
-        return mappingDataCSV;
+        return savedEntities;
+
     }
 
 
-    /**
-     * Validates CSV column headers and contents, confirm each row data based on entityId and mappingKey
-     * Capture failed rows and return report accordingly then Halt the process if failure
-     *
-     * @param fileData {List<Map>} holding serialized csv contents
-     * @return List of errors if any
-     */
-    public List validateUploadedCSV(List<Map<String, String>> fileData) {
 
-        List<String> report = new ArrayList<>();
-
-        /*
-         * Validate the CSV header for the correct entity type
-         *
-         * Get Column head using one of the row data
-         */
-        Map<String, String> oneData = fileData.get(0);
-        Integer firstDataId = Integer.parseInt(oneData.get("Data Id"));
-
-
-        List<String> incomingCSVHead = new ArrayList<>();
-
-        oneData.forEach((key, value)-> incomingCSVHead.add(key) );
-
-        // Get Expected CSV header for this entity type
-        MappingEntity disEntity = getMappingEntityById(firstDataId);
-        List<String> expectedCSVHead = getMappingEntityCSVHead(disEntity);
-
-
-        // If discrepancy occurs, add expected csv head into report
-        if (!expectedCSVHead.equals(incomingCSVHead)) {
-
-            report.add(expectedCSVHead.toString());
-
-            return report;
-        }
-
-        /*
-         *  Iterate all rows to Validate each data based on existing entityId and mappingKey
-         *
-         *  Capture failed rows and return report accordingly
-         */
-        String entityType = disEntity.getEntityType();
-
-        for (Map<String, String> eachData : fileData) {
-
-            Long entityId = Long.parseLong(eachData.get(CsvHead.entityId.get()));
-
-            String mappingKey = getMappingKeyFromCSVData(entityType, eachData);
-
-            log.info(mappingKey);
-
-            Optional<MappingEntity> me = getByMappingKeyAndEntityId(mappingKey, entityId);
-
-            if (!me.isPresent()) {
-
-                report.add("Row with "+CsvHead.entityId.get()+" "+eachData.get(CsvHead.entityId.get()) +" is not valid");
-            }
-
-        }
-
-        return report;
-    }
-
-
-    public String getMappingKeyFromCSVData(String entityType, Map<String, String> data){
-
-
-        String mappingKey = "";
-
-        if (entityType.equals(MappingEntityType.diagnosis.get())) {
-
-            mappingKey = String.join("__",
-                                     entityType,
-                                     data.get(CsvHead.dataSource.get()),
-                                     data.get(CsvHead.sampleDiagnosis.get()),
-                                     data.get(CsvHead.originTissue.get()),
-                                     data.get(CsvHead.tumorType.get())
-
-            ).toLowerCase().replaceAll("[^a-zA-Z0-9 _-]", "");
-
-        }
-        else if (entityType.equals(MappingEntityType.treatment.get())) {
-
-            mappingKey = String.join("__",
-                                     entityType,
-                                     data.get(CsvHead.dataSource.get()),
-                                     data.get(CsvHead.treatmentName.get())
-
-            ).toLowerCase().replaceAll("[^a-zA-Z0-9 _-]", "");
-
-        }
-
-
-        return mappingKey;
-    }
 
 
 }

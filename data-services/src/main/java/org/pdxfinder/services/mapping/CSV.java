@@ -3,7 +3,7 @@ package org.pdxfinder.services.mapping;
 /*
  * Created by abayomi on 22/08/2019.
  */
-public enum CsvHead {
+public enum CSV {
 
     // Diagnosis csv Header Strings
     entityId("Data Id"),
@@ -17,14 +17,21 @@ public enum CsvHead {
 
     // CSV Header Strings common to all entity types
     mappedTerm("Mapped Term"),
+    mappedTermUrl("Mapped Term URL"),
     mapType("Type"),
     justification("Justification"),
-    yesOrNo("Decision (Yes or No)"),
-    validTerm("Valid Term");
+    decision("Decision (Yes or No)"),
+    validTerm("Valid Term"),
+
+
+    yes("yes"),
+    no("no");
+
+
 
     private String value;
 
-    private CsvHead(String val) {
+    private CSV(String val) {
         value = val;
     }
 
