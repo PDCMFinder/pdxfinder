@@ -178,7 +178,9 @@ public class UtilityService {
             }
 
             inputStream.close();
-        } catch (Exception ex) { }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         return csvMap;
     }
