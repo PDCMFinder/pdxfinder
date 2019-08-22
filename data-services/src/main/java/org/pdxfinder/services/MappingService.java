@@ -14,6 +14,7 @@ import org.pdxfinder.admin.zooma.*;
 import org.pdxfinder.graph.repositories.SampleRepository;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.dto.PaginationDTO;
+import org.pdxfinder.services.mapping.CsvHead;
 import org.pdxfinder.services.mapping.MappingEntityType;
 import org.pdxfinder.services.mapping.Status;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
@@ -702,9 +703,9 @@ public class MappingService {
         mappingLabels.add("TumorType");
 
         Map mappingValues = new HashMap();
-        mappingValues.put("OriginTissue", originTissue);
         mappingValues.put("DataSource", dataSource.toLowerCase());
         mappingValues.put("SampleDiagnosis", diagnosis);
+        mappingValues.put("OriginTissue", originTissue);
         mappingValues.put("TumorType", tumorType);
 
         MappingEntity mappingEntity = new MappingEntity(MappingEntityType.diagnosis.get(), mappingLabels, mappingValues);
@@ -837,9 +838,6 @@ public class MappingService {
         List<MappingEntity> mappingEntityList = new ArrayList<>();
 
 
-
-        log.info("This is the Starting point of the suggestion: {} ", new Date());
-
         mappingEntityPage.forEach(mappingEntity -> {
 
             //get suggestions for missing mapping
@@ -853,10 +851,6 @@ public class MappingService {
 
             mappingEntityList.add(mappingEntity);
         });
-
-
-        log.info("This is the Finishing point of the suggestion: {} ", new Date());
-
 
         PaginationDTO paginationDto = paginationService.initializeDTO(mappingEntityPage);
         paginationDto.setAdditionalProperty("mappings", mappingEntityList);
@@ -929,6 +923,15 @@ public class MappingService {
     }
 
 
+    public Optional<MappingEntity> getByMappingKeyAndEntityId(String mappingKey, Long entityId) {
+
+        Optional<MappingEntity> mappingEntity = mappingEntityRepository
+                .findByMappingKeyAndEntityId(mappingKey, entityId);
+
+        return mappingEntity;
+    }
+
+
     // Update Bulk List of Mapping Entity Records
     public List<MappingEntity> updateRecords(List<MappingEntity> submittedEntities) {
 
@@ -963,17 +966,23 @@ public class MappingService {
     }
 
 
-    public List<String> getMappingEntityCSVHead(MappingEntity mappingEntity){
+    public List<String> getMappingEntityCSVHead(MappingEntity mappingEntity) {
 
         List<String> csvHead = new ArrayList<>();
 
-        csvHead.add("Data Id");
+        csvHead.add(CsvHead.entityId.get());
 
-        for (Map.Entry<String, String> entry : mappingEntity.getMappingValues().entrySet() ) {
+        for (Map.Entry<String, String> entry : mappingEntity.getMappingValues().entrySet()) {
             csvHead.add(utilityService.camelCaseToSentence(entry.getKey()));
         }
 
-        csvHead.addAll(Arrays.asList("Mapped Term","Type","Justification"));
+        csvHead.addAll(Arrays.asList(
+                CsvHead.mappedTerm.get(),
+                CsvHead.mapType.get(),
+                CsvHead.justification.get(),
+                CsvHead.yesOrNo.get(),
+                CsvHead.validTerm.get())
+        );
 
         return csvHead;
     }
@@ -999,11 +1008,78 @@ public class MappingService {
             csvData.add(mappingEntity.getMappedTermLabel());
             csvData.add(mappingEntity.getMapType());
             csvData.add(mappingEntity.getJustification());
+            csvData.add(" ");
+            csvData.add(" ");
 
             mappingDataCSV.add(csvData);
         });
 
         return mappingDataCSV;
+    }
+
+
+    public List validateUploadedCSV(List<Map<String, String>> fileData) {
+
+        List<String> report = new ArrayList<>();
+
+        /*
+         * Validate the CSV header for the correct entity type
+         *
+         * Get Column head using one of the row data
+         */
+        Map<String, String> oneData = fileData.get(0);
+        Integer firstDataId = Integer.parseInt(oneData.get("Data Id"));
+
+
+        List<String> incomingCSVHead = new ArrayList<>();
+
+        oneData.forEach((key, value)-> incomingCSVHead.add(key) );
+
+        // Get Expected CSV header for this entity type
+        MappingEntity disEntity = getMappingEntityById(firstDataId);
+        List<String> expectedCSVHead = getMappingEntityCSVHead(disEntity);
+
+
+        // If discrepancy occurs, add expected csv head into report
+        if (!expectedCSVHead.equals(incomingCSVHead)) {
+
+            report.add(expectedCSVHead.toString());
+
+            return report;
+        }
+
+        /*
+         *  Validate each row data based on existing EntityId and MappingKey
+         *
+         *  Capture failed rows and return report accordingly
+         */
+        String entityType = disEntity.getEntityType();
+
+        for (Map<String, String> eachData : fileData) {
+
+
+            String mappingKey = String.join("__",
+                    entityType,
+                    eachData.get(CsvHead.dataSource.get()),
+                    eachData.get(CsvHead.sampleDiagnosis.get()),
+                    eachData.get(CsvHead.originTissue.get()),
+                    eachData.get(CsvHead.tumorType.get())
+
+            ).toLowerCase().replaceAll("[^a-zA-Z0-9 _-]", "");
+
+            Long entityId = Long.parseLong(eachData.get(CsvHead.entityId.get()));
+
+            Optional<MappingEntity> me = getByMappingKeyAndEntityId(mappingKey, entityId);
+
+            if (!me.isPresent()) {
+
+                report.add("Row with "+CsvHead.entityId.get()+" "+eachData.get(CsvHead.entityId.get()) +" is not valid");
+            }
+
+        }
+
+        return report;
+
     }
 
 
