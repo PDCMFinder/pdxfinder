@@ -112,12 +112,14 @@ export class MappingService {
 
 
 
-    pushFileToStorage(file: File): Observable<HttpEvent<{}>> {
+    pushFileToStorage(file: File, entityType: string): Observable<HttpEvent<{}>> {
 
         const formdata: FormData = new FormData();
         formdata.append('uploads', file);
 
-        const req = new HttpRequest('POST', this._uploadURL, formdata, {
+        const url = `${this._uploadURL}?entity-type=${entityType}`;
+
+        const req = new HttpRequest('POST', url, formdata, {
 
                 reportProgress: true,
                 responseType: 'text'

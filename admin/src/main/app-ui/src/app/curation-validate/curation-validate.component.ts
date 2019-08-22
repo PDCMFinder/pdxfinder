@@ -26,6 +26,7 @@ export class CurationValidateComponent implements OnInit {
     public selectedFiles: FileList;
     public currentFileUpload: File;
     public uploadedFilename: string;
+    errorReport: string;
 
     constructor(private router: Router,
                 private route: ActivatedRoute,
@@ -57,7 +58,7 @@ export class CurationValidateComponent implements OnInit {
 
         const userFile = event.target.files.item(0);
 
-        if ( userFile.type == 'text/csv'){
+        if (userFile.type == 'text/csv') {
 
             this.selectedFiles = event.target.files;
 
@@ -66,19 +67,24 @@ export class CurationValidateComponent implements OnInit {
             console.log(this.currentFileUpload);
 
             this.uploadedFilename = this.currentFileUpload.name;
+
             this.report = 'waiting';
 
+        }else {
+            this.report = 'failed';
+            this.selectedFiles = null;
+            this.errorReport = `${userFile.name} is an Invalid file type, pls upload CSV`;
         }
-
     }
 
     upload() {
 
-        this._mappingService.pushFileToStorage(this.currentFileUpload).subscribe(event => {
+        this._mappingService.pushFileToStorage(this.currentFileUpload, 'diagnosis').subscribe(event => {
 
             if (event instanceof HttpResponse) {
 
                 console.log('File is completely uploaded!');
+                console.log(event);
             }
         });
 
