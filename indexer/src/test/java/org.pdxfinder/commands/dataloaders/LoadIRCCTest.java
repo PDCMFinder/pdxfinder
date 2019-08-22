@@ -48,10 +48,10 @@ public class LoadIRCCTest extends BaseTest {
 
         ModelCreation mc = new ModelCreation();
         loader.dto.setModelCreation(mc);
-
         loader.addAccessModality();
 
         assertThat(loader.dto.getModelCreation().getGroups().contains(g), is(true));
         assertThat(loader.dto.getModelCreation().getGroups().contains(badG), is(false));
     }
+
 }
