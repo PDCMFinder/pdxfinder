@@ -161,7 +161,14 @@ public class AjaxController {
             /*
              * Validate CSV for emptiness, correct column Headers and valid contents
              */
-            List report = csvHandler.validateUploadedCSV(csvData);
+            List report = new ArrayList();
+            try {
+
+                report = csvHandler.validateUploadedCSV(csvData);
+            }catch (Exception e){
+
+                report.add(HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase());
+            }
 
             // If all rows passed submit data for processing
             if (report.isEmpty()) {
@@ -172,19 +179,15 @@ public class AjaxController {
                 responseStatus = HttpStatus.OK;
             }else {
 
-
                 responseBody = report;
                 responseStatus = HttpStatus.UNPROCESSABLE_ENTITY;
             }
 
             // For this operation, create record in uploadedFileTable, For each of this back up in the validatedData Table
             // Further read uploadedFile Table for getting history.
-
         }
 
-
         return new ResponseEntity<>(responseBody, responseStatus);
-
     }
 
 

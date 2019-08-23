@@ -2958,9 +2958,16 @@ table.table-mail tr td {
   clear: both;
 }
 .pdxfinder-heading {
-  background-color: #f3f6fb;
-  border-bottom: none;
+    background-color: #f3f6fb;
+    border-bottom: none;
 }
+
+.pdxfinder-heading2 {
+    background-color: rgba(243, 246, 251, 0.4);
+    color: #000;
+    border-bottom: none;
+}
+
 .pdxfinder-heading h3 {
   font-weight: 200;
   font-size: 24px;

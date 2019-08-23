@@ -50,11 +50,6 @@
 
                                 <form role="form">
 
-                                    <!--
-                                    <div class="form-group"><label> Data Type </label>
-                                      <input type="text" placeholder="Text Field" class="form-control">
-                                    </div> -->
-
                                     <div class="form-group"><label> Validated CSV File</label>
 
                                         <label style='width:100%; cursor:pointer;'>
@@ -73,7 +68,6 @@
 
                                     </div>
 
-
                                     <div>
                                         <button [disabled]="!selectedFiles"
                                                 (click)="upload()"
@@ -83,87 +77,64 @@
 
                                     </div>
 
-
                                 </form>
                             </div>
-
-                            <!--
-                            <div class="col-sm-6"><h4>Not a member?</h4>
-                              <p>You can create an account:</p>
-                              <p class="text-center">
-                                <a href=""><i class="fa fa-sign-in big-icon"></i></a>
-                              </p>
-                            </div>
-                            -->
                         </div>
 
+                    </div>
+                </div>
 
-                        <!--
+
+
+
+
+
+
+
+
+                <div *ngIf="showCSV" class="pdxfinder float-e-margins" style="margin-top: -15px;">
+
+                    <div class="pdxfinder-content pdxfinder-heading2">
+                        <i class="ti-alert"></i> Please Ensure <b> {{uploadedFilename | uppercase }} </b> is a valid curated file ...
+                    </div>
+
+                    <div class="pdxfinder-content">
+
                         <div class="table-responsive">
-
-                          <table class="table table-striped table-bordered table-hover pdx-table">
-                            <thead>
-                            <tr>
-                              <th style="width:10px;">ID</th>
-
-                              <th *ngFor="let columnHeader of columnHeaders ">
-                                {{columnHeader | uppercase}}
-                              </th>
-
-                              <th> MAPPED TERM</th>
-                              <th style="width:80px;"> TYPE</th>
-                              <th>JUSTIFICATION</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            <tr class="pdxfinder-clickable-rows2" *ngFor="let mapping of mappings; index as i"
-                                [routerLink]="['recommendation',mapping.entityId ]"
-                                [class.active]="mapping.entityId == selectedRow">
-
-                              <td> {{mapping.entityId}} </td>
-
-                              <td *ngFor="let dataLabel of dataLabels ">
-
-                                                      <span *ngIf="dataLabel == 'DataSource'"
-                                                            class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | uppercase }} </span>
-                                <span *ngIf="dataLabel != 'DataSource'"
-                                      class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | titlecase }} </span>
-
-                              </td>
-
-                              <td><input type="text" name="{{'mappedTermLabel'+i}}" class="editableField"
-                                         [(ngModel)]="mapping.mappedTermLabel"
-                                         value="{{ mapping.mappedTermLabel }}">
-                              </td>
-
-                              <td><input type="text" name="{{'mapType'+i}}" class="editableField"
-                                         #curatorMapType
-                                         (input)="mapping.mapType=curatorMapType.value"
-                                         value="{{ mapping.mapType }}">
-                              </td>
-
-                              <td><input type="text" name="{{'justification'+i}}" class="editableField"
-                                         [(ngModel)]="mapping.justification"
-                                         value="{{ mapping.justification }}">
-
-                                <input type="hidden" name="{{'mappedTermUrl'+i}}"
-                                       [(ngModel)]="mapping.mappedTermUrl"
-                                       value="{{ mapping.mappedTermUrl }}">
-                              </td>
+                            <table class="table table-striped table-bordered table-hover pdx-table">
+                                <thead>
+                                <tr>
+                                    <th *ngFor="let columnHeader of parsedCsvHead index as i">
+                                        {{columnHeader | uppercase }}
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
 
 
-                            </tr>
+                                <tr *ngFor="let rowData of parsedCsvBody; index as i">
 
-                            </tbody>
-                          </table>
+                                    <td *ngFor="let colData of rowData; index as i">
 
+                                        <span *ngIf="!colData.includes('http')">  {{colData }}  </span>
 
-                        </div> -->
+                                        <a *ngIf="colData.includes('http')" href="{{colData}}"
+                                           target="_blank">  {{colData}}  </a>
+
+                                    </td>
+
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
 
 
                     </div>
                 </div>
+
+
+
 
 
             </div>

@@ -28,6 +28,10 @@ export class CurationValidateComponent implements OnInit {
     public uploadedFilename: string;
     errorReport: string;
 
+    public parsedCsvHead = [];
+    public parsedCsvBody = [];
+    public showCSV = false;
+
     constructor(private router: Router,
                 private route: ActivatedRoute,
                 private _mappingService: MappingService,
@@ -56,9 +60,13 @@ export class CurationValidateComponent implements OnInit {
 
     selectFile(event) {
 
+
         const userFile = event.target.files.item(0);
 
+
         if (userFile.type == 'text/csv') {
+
+            this.displayUploadedCSV(event);
 
             this.selectedFiles = event.target.files;
 
@@ -70,12 +78,42 @@ export class CurationValidateComponent implements OnInit {
 
             this.report = 'waiting';
 
-        }else {
+        } else {
             this.report = 'failed';
             this.selectedFiles = null;
             this.errorReport = `${userFile.name} is an Invalid file type, pls upload CSV`;
         }
     }
+
+
+    displayUploadedCSV(event) {
+
+        var reader = new FileReader();
+
+        this.parsedCsvBody = [];
+
+        reader.readAsText(event.srcElement.files[0]);
+
+        reader.onload = () => {
+
+            const lines = reader.result.split('\n');
+
+            lines.forEach((element, index) => {
+
+                const cols: string[] = element.replace(/['"]+/g, '').split(',');
+
+                if (index == 0) {
+
+                    this.parsedCsvHead = cols;
+                } else {
+                    this.parsedCsvBody.push(cols);
+                }
+            });
+        }
+
+        this.showCSV = true;
+    }
+
 
     upload() {
 
@@ -91,6 +129,7 @@ export class CurationValidateComponent implements OnInit {
         this.selectedFiles = undefined;
         this.report = 'success';
     }
+
 
 
     toggleReport(success: string) {
