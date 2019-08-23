@@ -8,18 +8,28 @@ import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-/**
- * Test configuration sets up the embedded Neo4J driver in memory mode
- */
+import java.nio.file.Paths;
+
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(value = "org.pdxfinder")
 @EnableNeo4jRepositories("org.pdxfinder.graph.repositories")
-public class TestConfig{
+public class TestConfigWithPersistence {
 
     @Bean
     public org.neo4j.ogm.config.Configuration getConfiguration() {
-        return new org.neo4j.ogm.config.Configuration();
+        org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration();
+
+        //   To persist the database, uncomment this section
+        String pathToDb = Paths.get(".").toAbsolutePath().normalize().toString() + "/target/test_graph.db";
+        config
+                .driverConfiguration()
+                .setDriverClassName("org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver")
+                .setURI("file://" + pathToDb);
+
+        System.out.println(config);
+
+        return config;
     }
 
     @Bean
@@ -31,4 +41,7 @@ public class TestConfig{
     public Neo4jTransactionManager transactionManager() {
         return new Neo4jTransactionManager(sessionFactory());
     }
+
 }
+
+
