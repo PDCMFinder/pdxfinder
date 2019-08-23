@@ -22,19 +22,13 @@
         <div class="row" style="margin-top: -10px;">
 
 
-            <div [ngClass]="showFilter == true ? 'col-lg-12' : 'col-lg-12'">
+            <div class="col-lg-12">
 
 
                 <div class="pdxfinder float-e-margins">
 
-                    <!--
-                    <div class="pdxfinder-title">
-                      <h5> Orphaned {{entityType | titlecase}} List</h5>
-                    </div>
-                    -->
-
                     <div class="pdxfinder-content pdxfinder-heading">
-                        <h3><i class="ti-unlink"></i> Upload Validated File </h3>
+                        <h3> <i class="ti-files"></i>  Upload Validated File </h3>
                         <small><i class="fa fa-tim"></i> Ensure you upload CSV File of the required type only ...
                         </small>
                     </div>
@@ -46,12 +40,6 @@
                             <a aria-hidden="true" class="close" type="button"
                                (click)="toggleReport('success')">×</a>
                             Success: <em> The submitted curation was successful, Clear off notification to
-                            continue </em> <a class="alert-link"> ... </a>.
-                        </div>
-
-                        <div *ngIf="report == 'failed'" class="alert alert-danger alert-dismissable">
-                            <a aria-hidden="true" class="close" type="button" (click)="toggleReport(null)">×</a>
-                            OOps!! <em> Failed Request: The submitted curation is invalid, Clear off notification to
                             continue </em> <a class="alert-link"> ... </a>.
                         </div>
 
@@ -73,9 +61,9 @@
 
                                             <div id='output' class='styleFile'>
                                                 <span *ngIf="report == null"> Click here to upload your File </span>
-                                                <span *ngIf="report == 'waiting'">Waiting ... Click on upload button to send Data File:
-                                                    <b class="text-primary"> {{uploadedFilename}}</b> </span>
+                                                <span *ngIf="report == 'waiting'">Waiting ... Click on upload button to send Data File:<b class="text-primary"> {{uploadedFilename}}</b> </span>
                                                 <span *ngIf="report == 'success'"> File upload done! Click here to Upload another file </span>
+                                                <span *ngIf="report == 'failed'" class="text-danger"> {{errorReport}} </span>
                                             </div>
 
                                             <input (change)="selectFile($event)"
