@@ -911,6 +911,16 @@ public class DataImportService {
 
     }
 
+    public Collection<OntologyTerm> getAllOntologyTermsByTypeFromTo(String type, int from, int to) {
+
+        return ontologyTermRepository.findAllByTypeFromTo(type, from, to);
+
+    }
+
+    public int getOntologyTermNumberByType(String type){
+
+        return ontologyTermRepository.getOntologyTermNumberByType(type);
+    }
 
     public void saveOntologyTerm(OntologyTerm ot){
 
