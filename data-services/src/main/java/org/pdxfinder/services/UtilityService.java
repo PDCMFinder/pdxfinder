@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /*
@@ -178,7 +179,9 @@ public class UtilityService {
             }
 
             inputStream.close();
-        } catch (Exception ex) { }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         return csvMap;
     }
@@ -529,7 +532,10 @@ public class UtilityService {
                     Map<String, String> rowMap = new LinkedHashMap<>();
                     for (String columnHead : tableHead) {
 
-                        rowMap.put(columnHead.trim(), rowDataArr[column].trim());
+                        String dKey = columnHead.trim().replaceAll("\"","");
+                        String dValue = rowDataArr[column].trim().replaceAll("\"","");
+
+                        rowMap.put(dKey, dValue);
                         column++;
                     }
                     csvMap.add(rowMap);
@@ -641,6 +647,26 @@ public class UtilityService {
     }
 
 
+    public void writeCsvFile(List<String> headers, List<List<String>> dataList, String destination){
+
+        List<Map<String, String>> mapList = new ArrayList<>();
+
+        for(int i = 0; i < dataList.size(); i++){
+
+            Map<String, String> rowMap = new HashMap<>();
+
+            List<String> row = dataList.get(i);
+
+            for(int j = 0; j < row.size(); j++){
+
+                rowMap.put(headers.get(j), row.get(j));
+            }
+
+            mapList.add(rowMap);
+        }
+
+        writeCsvFile(mapList, destination);
+    }
 
 
 
@@ -825,7 +851,7 @@ public class UtilityService {
     }
 
 
-    // FILE WRITE: WRITE STRIN DATA TO FILE
+    // FILE WRITE: WRITE STRING DATA TO FILE
     public void writeToFile(String data, String destination, Boolean shouldAppend){
 
         // Write to the file using BufferedReader and FileWriter
@@ -905,6 +931,29 @@ public class UtilityService {
     /*************************************************************************************************************
      *                                          OTHER UTILITIES                                                  *
      ************************************************************************************************************/
+
+    public String camelCaseToSentence(String s) {
+
+        String converted = s.replaceAll(
+                String.format("%s|%s|%s",
+                              "(?<=[A-Z])(?=[A-Z][a-z])",
+                              "(?<=[^A-Z])(?=[A-Z])",
+                              "(?<=[A-Za-z])(?=[^A-Za-z])"
+                ),
+                " "
+        );
+
+        // Fix situations when non camel case is sent, remove double spaces generated
+        return converted.trim().replaceAll(" +", " ");
+    }
+
+
+    public String sentenceToCamelCase(String input) {
+
+        String output = StringUtils.capitalize(input.split("-")[0]) + StringUtils.capitalize(input.split("-")[1]);
+
+        return output;
+    }
 
 
     public String splitText(String data, String delim, String seperator){

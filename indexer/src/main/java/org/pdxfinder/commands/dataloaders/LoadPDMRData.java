@@ -295,7 +295,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
         log.info("Loading NGS for model " + dto.getModelCreation().getSourcePdxId());
 
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(), "mutation",finderRootDir+"/data");
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(), "mutation",finderRootDir+"/data/"+dataSourceAbbreviation);
     }
 
 

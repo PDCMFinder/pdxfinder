@@ -1082,11 +1082,18 @@ public class UniversalLoader extends UniversalLoaderOmic {
         if (dataSourceAbbreviation.equals("CRL")) {
             omicDataFilesType = "ONE_FILE_PER_MODEL";
             omicFileExtension = "csv";
-        } else {
+        }
+        else if(dataSourceAbbreviation.equals("UOM-BC")){
+            omicDataFilesType = "ONE_FILE_PER_MODEL";
+            omicFileExtension = "xlsx";
+        }
+        else {
             omicDataFilesType = "ALL_MODELS_IN_ONE_FILE";
             omicFileExtension = "xlsx";
         }
 
+
+        String providerDataRootDir = dataRootDirectory + "/" +dataSourceAbbreviation;
 
         String mutationDataDir = dataRootDirectory + "/" + dataSourceAbbreviation + "/mut/";
         String cnaDataDir = dataRootDirectory + "/" + dataSourceAbbreviation + "/cna/";
@@ -1097,8 +1104,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
         File transcriptomicData = new File(transcriptomicDataDir);
 
 
-        log.info(mutationDataDir);
-        log.info(cnaDataDir);
+        log.info("Provider data root dir: "+providerDataRootDir);
         for (String modelId : this.modelIDs) {
 
             ModelCreation modelCreation = dataImportService.findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(modelId, ds.getAbbreviation());
@@ -1108,13 +1114,13 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 // Mutation Data Load
                 if (mutationData.exists()) {
                     log.info("Loading mutation for " + modelId);
-                    loadOmicData(modelCreation, ds, "mutation", dataRootDirectory);
+                    loadOmicData(modelCreation, ds, "mutation", providerDataRootDir);
                 }
 
                 // Copy Number Alteration Data Load
                 if (cnaData.exists()) {
                     log.info("Loading cna for " + modelId);
-                    loadOmicData(modelCreation, ds, "copy number alteration", dataRootDirectory);
+                    loadOmicData(modelCreation, ds, "copy number alteration", providerDataRootDir);
                 } else {
                     log.info("No omic data for model " + modelId);
                 }
@@ -1122,7 +1128,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 // Transcriptomics
                 if(transcriptomicData.exists()){
                     log.info("Loading transcriptomics for "+modelId);
-                    loadOmicData(modelCreation, ds, "transcriptomics", dataRootDirectory);
+                    loadOmicData(modelCreation, ds, "transcriptomics", providerDataRootDir);
                 }
 
 

@@ -14,6 +14,7 @@ import org.pdxfinder.admin.zooma.*;
 import org.pdxfinder.graph.repositories.SampleRepository;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.dto.PaginationDTO;
+import org.pdxfinder.services.mapping.CSV;
 import org.pdxfinder.services.mapping.MappingEntityType;
 import org.pdxfinder.services.mapping.Status;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
@@ -702,9 +703,9 @@ public class MappingService {
         mappingLabels.add("TumorType");
 
         Map mappingValues = new HashMap();
-        mappingValues.put("OriginTissue", originTissue);
         mappingValues.put("DataSource", dataSource.toLowerCase());
         mappingValues.put("SampleDiagnosis", diagnosis);
+        mappingValues.put("OriginTissue", originTissue);
         mappingValues.put("TumorType", tumorType);
 
         MappingEntity mappingEntity = new MappingEntity(MappingEntityType.diagnosis.get(), mappingLabels, mappingValues);
@@ -837,9 +838,6 @@ public class MappingService {
         List<MappingEntity> mappingEntityList = new ArrayList<>();
 
 
-
-        log.info("This is the Starting point of the suggestion: {} ", new Date());
-
         mappingEntityPage.forEach(mappingEntity -> {
 
             //get suggestions for missing mapping
@@ -853,10 +851,6 @@ public class MappingService {
 
             mappingEntityList.add(mappingEntity);
         });
-
-
-        log.info("This is the Finishing point of the suggestion: {} ", new Date());
-
 
         PaginationDTO paginationDto = paginationService.initializeDTO(mappingEntityPage);
         paginationDto.setAdditionalProperty("mappings", mappingEntityList);
@@ -929,6 +923,15 @@ public class MappingService {
     }
 
 
+    public Optional<MappingEntity> getByMappingKeyAndEntityId(String mappingKey, Long entityId) {
+
+        Optional<MappingEntity> mappingEntity = mappingEntityRepository
+                .findByMappingKeyAndEntityId(mappingKey, entityId);
+
+        return mappingEntity;
+    }
+
+
     // Update Bulk List of Mapping Entity Records
     public List<MappingEntity> updateRecords(List<MappingEntity> submittedEntities) {
 
@@ -963,42 +966,52 @@ public class MappingService {
     }
 
 
-    public List<String> getMappingEntityCSVHead(MappingEntity mappingEntity){
-
-        List<String> csvHead = new ArrayList<>();
-
-        for (Map.Entry<String, String> entry : mappingEntity.getMappingValues().entrySet() ) {
-            csvHead.add(entry.getKey().toUpperCase());
-        }
-        csvHead.addAll(Arrays.asList("MAPPED TERM","TYPE","JUSTIFICATION"));
-
-        return csvHead;
-    }
 
 
+    public List<MappingEntity> processUploadedCSV(List<Map<String, String>> csvData) {
 
-    public List<List<String>> prepareMappingEntityForCSV(List<MappingEntity> mappingEntities){
 
-        List<List<String>> mappingDataCSV = new ArrayList<>();
+        List<MappingEntity> savedEntities = new ArrayList<>();
 
-        mappingEntities.forEach(mappingEntity -> {
+        csvData.forEach(eachData -> {
 
-            List<String> csvData = new ArrayList<>();
-            for (Map.Entry<String, String> entry : mappingEntity.getMappingValues().entrySet() ) {
-                csvData.add(
-                        entry.getKey().equals("DataSource") ? entry.getValue().toUpperCase() : entry.getValue()
-                );
-            }
+            // Retrieve the entityId from the csv data
+            Long entityId = Long.parseLong(eachData.get(CSV.entityId.get()));
 
-            csvData.add(mappingEntity.getMappedTermLabel());
-            csvData.add(mappingEntity.getMapType());
-            csvData.add(mappingEntity.getJustification());
 
-            mappingDataCSV.add(csvData);
+            // Pull the data from h2 based on the entityId, update the data from csvData and save
+            MappingEntity updated = mappingEntityRepository.findByEntityId(entityId)
+                    .map(mappingEntity -> {
+
+                        /*
+                         *  Get Decision column of this csvData, if Yes, change Status to Validated
+                         *  If Decision column is NO, Pick content of ApprovedTerm column, replace maped term for that entity and set status as validated
+                         */
+                        if (eachData.get(CSV.decision.get()).equalsIgnoreCase(CSV.no.get())){
+
+                            mappingEntity.setMappedTermLabel(eachData.get(CSV.mappedTerm.get()));
+                            mappingEntity.setMappedTermUrl(eachData.get(CSV.mappedTermUrl.get()));
+                        }
+
+
+                        mappingEntity.setDateUpdated(new Date());
+                        mappingEntity.setStatus(Status.validated.get());
+                        return mappingEntityRepository.save(mappingEntity);
+                    })
+                    .orElseGet(() -> {
+                        return new MappingEntity();
+                    });
+
+            savedEntities.add(updated);
+
         });
 
-        return mappingDataCSV;
+        return savedEntities;
+
     }
+
+
+
 
 
 }
