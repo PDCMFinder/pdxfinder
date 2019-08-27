@@ -33,12 +33,12 @@ public class LoadIRCCTest extends BaseTest {
         badAccess.setName("another group");
 
         provider = new Group(
-                "Test IRCC Provider",
-                "IRCC-CRC",
-                "Test provider description",
-                "Academia",
-                "Joe Bloggs",
-                "ircc.example.com");
+            "Test IRCC Provider",
+            "IRCC-CRC",
+            "Test provider description",
+            "Academia",
+            "Joe Bloggs",
+            "ircc.example.com");
     }
 
     @MockBean UtilityService utilityService;
@@ -50,7 +50,7 @@ public class LoadIRCCTest extends BaseTest {
     public void Given_ValidSpecimen_WhenLoadSpecimen_Then_SpecimenAddedToModel() throws Exception {
         ModelCreation modelCreation = new ModelCreation("1");
         JSONArray specimens = new JSONArray(
-    "[{" +
+            "[{" +
                 "\"Specimen ID\":\"CRCTEST\"," +
                 "\"Engraftment Type\":\"tissue fragment\"," +
                 "\"Engraftment Site\":\"subcutis right\"," +
@@ -79,7 +79,7 @@ public class LoadIRCCTest extends BaseTest {
 
         loader.step13LoadSpecimens();
 
-        assertEquals(loader.dto.getSpecimens().getJSONObject(0).getString("Specimen ID"), "CRCTEST");
+        assertEquals( "CRCTEST", loader.dto.getSpecimens().getJSONObject(0).getString("Specimen ID"));
         assertThat(loader.dto.getModelCreation().getSpecimens().contains(specimen), is(true));
     }
 
