@@ -23,6 +23,8 @@ export class MappingService {
 
     public stringDataBusSubject = new Subject<any>();
 
+    public errorReport = null;
+
     constructor(private http: HttpClient) { }
 
 
@@ -105,10 +107,27 @@ export class MappingService {
 
 
 
-    errorHandler(error: HttpErrorResponse) {
+    errorHandler2(error: HttpErrorResponse) {
+
+        this.errorReport = error;
+
         return throwError(error);
     }
 
+
+    errorHandler(error) {
+
+        let errorMessage = '';
+        if (error.error instanceof ErrorEvent) {
+            // client-side error
+            errorMessage = `Error: ${error.error.message}`;
+        } else {
+            // server-side error
+            errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+        }
+
+        return throwError(error);
+    }
 
 
 
@@ -119,13 +138,11 @@ export class MappingService {
 
         const url = `${this._uploadURL}?entity-type=${entityType}`;
 
-        const req = new HttpRequest('POST', url, formdata, {
+        return this.http.post<any>(url, formdata)
+            .pipe(
+                catchError(this.errorHandler)
+            );
 
-                reportProgress: true,
-                responseType: 'text'
-            }
-        );
-        return this.http.request(req);
     }
 
 

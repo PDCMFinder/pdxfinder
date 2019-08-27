@@ -60,7 +60,6 @@ export class CurationValidateComponent implements OnInit {
 
     selectFile(event) {
 
-
         const userFile = event.target.files.item(0);
 
 
@@ -72,7 +71,7 @@ export class CurationValidateComponent implements OnInit {
 
             this.currentFileUpload = this.selectedFiles.item(0);
 
-            console.log(this.currentFileUpload);
+            //console.log(this.currentFileUpload);
 
             this.uploadedFilename = this.currentFileUpload.name;
 
@@ -82,15 +81,18 @@ export class CurationValidateComponent implements OnInit {
             this.report = 'failed';
             this.selectedFiles = null;
             this.errorReport = `${userFile.name} is an Invalid file type, pls upload CSV`;
+            this.showCSV = false;
         }
     }
 
 
     displayUploadedCSV(event) {
 
-        var reader = new FileReader();
 
+        this.parsedCsvHead = [];
         this.parsedCsvBody = [];
+
+        var reader = new FileReader();
 
         reader.readAsText(event.srcElement.files[0]);
 
@@ -108,6 +110,7 @@ export class CurationValidateComponent implements OnInit {
                 } else {
                     this.parsedCsvBody.push(cols);
                 }
+                
             });
         }
 
@@ -117,17 +120,25 @@ export class CurationValidateComponent implements OnInit {
 
     upload() {
 
-        this._mappingService.pushFileToStorage(this.currentFileUpload, 'diagnosis').subscribe(event => {
-
-            if (event instanceof HttpResponse) {
+        this._mappingService.pushFileToStorage(this.currentFileUpload, 'diagnosis').subscribe(responseEntity => {
 
                 console.log('File is completely uploaded!');
-                console.log(event);
-            }
-        });
+                console.log(responseEntity);
+                this.report = 'success';
 
-        this.selectedFiles = undefined;
-        this.report = 'success';
+            },
+            failedResponse => {
+
+                this.report = 'failed';
+                this.errorReport = `${failedResponse.error}`;
+
+                console.log('File was not completely uploaded!');
+                console.log(failedResponse);
+            }
+        );
+
+        this.selectedFiles = null;
+
     }
 
 
@@ -136,3 +147,11 @@ export class CurationValidateComponent implements OnInit {
         this.report = null;
     }
 }
+
+
+
+/*
+
+
+
+ */

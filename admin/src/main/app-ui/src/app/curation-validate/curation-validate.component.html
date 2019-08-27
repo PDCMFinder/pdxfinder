@@ -21,9 +21,7 @@
 
         <div class="row" style="margin-top: -10px;">
 
-
             <div class="col-lg-12">
-
 
                 <div class="pdxfinder float-e-margins">
 
@@ -36,12 +34,19 @@
 
                     <div class="pdxfinder-content">
 
+
                         <div *ngIf="report == 'success'" class="alert alert-success alert-dismissable">
                             <a aria-hidden="true" class="close" type="button"
                                (click)="toggleReport('success')">×</a>
                             Success: <em> The submitted curation was successful, Clear off notification to
                             continue </em> <a class="alert-link"> ... </a>.
                         </div>
+
+                        <div *ngIf="report == 'failed'" class="alert alert-danger alert-dismissable">
+                            <a aria-hidden="true" class="close" type="button" (click)="toggleReport(null)">×</a>
+                            OOps!! <em> Failed Request: The uploaded data is invalid, Clear off notification to continue </em> <a class="alert-link"> ... </a>.
+                        </div>
+
 
 
                         <div class="row sideFall">
@@ -144,9 +149,4 @@
 
 
 </div>
-
-<!-- The Suggested Mappings Displays here as a child route with deep linked url -->
-<router-outlet>
-
-</router-outlet>
 
