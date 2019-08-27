@@ -94,6 +94,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     @Override
     protected void initMethod() {
         log.info("Loading IRCC PDX data.");
+        finderRootDir = UniversalLoader.stripTrailingSlash(finderRootDir);
         jsonFile = finderRootDir + "/data/" + dataSourceAbbreviation+"/pdx/models.json";
 
         dataSource = dataSourceAbbreviation;

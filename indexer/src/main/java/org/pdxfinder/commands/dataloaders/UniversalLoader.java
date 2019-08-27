@@ -1032,6 +1032,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
         omicDataSource = ds.getAbbreviation();
         dataSourceAbbreviation = loaderRelatedDataSheetData.get(0).get(1);
+        finderRootDir = stripTrailingSlash(finderRootDir);
         dataRootDirectory = finderRootDir + "/data/UPDOG";
 
         omicModelID = "Model_ID";
@@ -1446,6 +1447,12 @@ public class UniversalLoader extends UniversalLoaderOmic {
         }
 
         return null;
+    }
+
+    public static String stripTrailingSlash(String filePath) {
+        return filePath.endsWith("/") ?
+            filePath.replaceFirst("/$", "") :
+            filePath;
     }
 
 
