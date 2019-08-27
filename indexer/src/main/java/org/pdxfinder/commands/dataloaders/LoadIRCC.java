@@ -134,15 +134,15 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
             JSONObject specimenJSON = specimens.getJSONObject(i);
 
             String specimenId = specimenJSON.getString("Specimen ID");
-
-            Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(),
-                    specimenId, dto.getProviderGroup().getAbbreviation(), specimenJSON.getString("Passage"));
-
+            Specimen specimen = dataImportService.getSpecimen(
+                dto.getModelCreation(),
+                specimenId,
+                dto.getProviderGroup().getAbbreviation(),
+                specimenJSON.getString("Passage"));
             specimen.setHostStrain(dto.getNodScidGamma());
 
             EngraftmentSite is = dataImportService.getImplantationSite(specimenJSON.getString("Engraftment Site"));
             specimen.setEngraftmentSite(is);
-
             EngraftmentType it = dataImportService.getImplantationType("Heterotopic");
             specimen.setEngraftmentType(it);
 
@@ -150,7 +150,6 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
             specimen.setEngraftmentMaterial(em);
 
             Sample specSample = new Sample();
-
             specSample.setSourceSampleId(specimenId);
             specSample.setDataSource(dto.getProviderGroup().getAbbreviation());
 
