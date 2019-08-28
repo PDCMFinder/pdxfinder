@@ -23,11 +23,11 @@ public class DataProjectionsTimeTest extends BaseTestWithPersistence {
     @Test
     public void Given_DataProjection_When_CascadeCreateSaveAndFinds_Then_PrintTimes(){
 
-        byte[] hundredBytes = generateRandomByte(2);
-        byte[] tenKiB = generateRandomByte(4);
-        byte[] hundredKib = generateRandomByte(5);
-        byte[] oneMib = generateRandomByte(6);
-        byte[] tenMiB = generateRandomByte(7);
+        String hundredBytes = generateRandomString(2);
+        String tenKiB = generateRandomString(4);
+        String hundredKib = generateRandomString(5);
+        String oneMib = generateRandomString(6);
+        String tenMiB = generateRandomString(7);
 
         //to init db. Else the first time test is off by a second.
         timeCreateSaveAndFindAndReturnElapsedTime(hundredBytes);
@@ -38,23 +38,23 @@ public class DataProjectionsTimeTest extends BaseTestWithPersistence {
         List<Long> elapsedTime3 = timeCreateSaveAndFindAndReturnElapsedTime(tenMiB);
 
 
-        String timeTable = String.format(" Data Size: %s Time %s %s %s Average %s \n", tenKiB.length, elapsedTime.get(0), elapsedTime.get(1), elapsedTime.get(2), elapsedTime.get(3)) +
-                String.format(" Data Size: %s Time %s %s %s Average %s \n", hundredKib.length, elapsedTime1.get(0), elapsedTime1.get(1), elapsedTime1.get(2), elapsedTime1.get(3)) +
-                String.format(" Data Size: %s Time %s %s %s  Average %s \n", oneMib.length, elapsedTime2.get(0), elapsedTime2.get(1), elapsedTime2.get(2), elapsedTime2.get(3)) +
-                String.format(" Data Size: %s Time %s %s %s Average %s \n", tenMiB.length, elapsedTime3.get(0), elapsedTime3.get(1), elapsedTime3.get(2), elapsedTime3.get(3));
+        String timeTable = String.format(" Data Size: %s Time %s %s %s Average %s \n", tenKiB.length(), elapsedTime.get(0), elapsedTime.get(1), elapsedTime.get(2), elapsedTime.get(3)) +
+                String.format(" Data Size: %s Time %s %s %s Average %s \n", hundredKib.length(), elapsedTime1.get(0), elapsedTime1.get(1), elapsedTime1.get(2), elapsedTime1.get(3)) +
+                String.format(" Data Size: %s Time %s %s %s  Average %s \n", oneMib.length(), elapsedTime2.get(0), elapsedTime2.get(1), elapsedTime2.get(2), elapsedTime2.get(3)) +
+                String.format(" Data Size: %s Time %s %s %s Average %s \n", tenMiB.length(), elapsedTime3.get(0), elapsedTime3.get(1), elapsedTime3.get(2), elapsedTime3.get(3));
         System.out.println(timeTable);
     }
 
 
-    private byte[] generateRandomByte(int exponent){
+    private String generateRandomString(int exponent){
 
         int byteSize = (int) Math.pow(10, exponent);
         byte[] generatedByte = new byte[byteSize];
         new Random().nextBytes(generatedByte);
-        return generatedByte;
+        return Arrays.toString(generatedByte);
     }
 
-    private List<Long> timeCreateSaveAndFindAndReturnElapsedTime(byte[] randomData){
+    private List<Long> timeCreateSaveAndFindAndReturnElapsedTime(String randomString){
 
         List<Long> time = new ArrayList<>();
         long average;
@@ -69,7 +69,7 @@ public class DataProjectionsTimeTest extends BaseTestWithPersistence {
 
             DataProjection dataProjection = new DataProjection();
             dataProjection.setLabel(LABEL);
-            dataProjection.setValue(Arrays.toString(randomData));
+            dataProjection.setValue(randomString);
 
             dataProjectionRepository.save(dataProjection);
             returnProjection = dataProjectionRepository.findByLabel(LABEL);
