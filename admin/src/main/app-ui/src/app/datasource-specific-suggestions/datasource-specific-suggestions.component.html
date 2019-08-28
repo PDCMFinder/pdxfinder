@@ -2,11 +2,12 @@
     <div class="p-w-md m-t-sm col-lg-10 col-lg-offset-1">
 
         <div class="row flipInY" style="margin-top: -20px;">
-            <div class="col-lg-12">
-                <div class="pdxfinder float-e-margins">
+            <div class="col-lg-12" >
+                <div class="pdxfinder float-e-margins"style="border: 2px solid rgba(3, 54, 157, 1);">
+
                     <div class="pdxfinder-title">
                         <h5 style="font-weight: bold;"> PDX Finder KB Suggested Mappings For -
-                            <!--<span style="color: #03369D"> Entity ID: {{data.DataSource+'&nbsp;|&nbsp;'+data.SampleDiagnosis+'&nbsp;|&nbsp;'+data.TumorType+'&nbsp;|&nbsp;'+data.OriginTissue | uppercase}} </span> --></h5>
+                            <!--<span style="color: #03369D"> Entasy ID: {{data.DataSource+'&nbsp;|&nbsp;'+data.SampleDiagnosis+'&nbsp;|&nbsp;'+data.TumorType+'&nbsp;|&nbsp;'+data.OriginTissue | uppercase}} </span> --></h5>
                     </div>
                     <div class="pdxfinder-content">
                         <div class="table-responsive">
@@ -37,11 +38,6 @@
                                             <span *ngIf="dataLabel == 'DataSource'" class="clipText overflow-ellipsis"> {{ suggestion.mappingValues[dataLabel] | uppercase }} </span>
                                             <span *ngIf="dataLabel != 'DataSource'" class="clipText overflow-ellipsis"> {{ suggestion.mappingValues[dataLabel] | titlecase }} </span>
                                         </td>
-<!--
-                                        <td> {{ suggestion.mappingValues.DataSource | uppercase }} </td>
-                                        <td> {{ suggestion.mappingValues.SampleDiagnosis | uppercase }} </td>
-                                        <td> {{ suggestion.mappingValues.TumorType | uppercase }} </td>
-                                        <td> {{ suggestion.mappingValues.OriginTissue | uppercase }} </td>-->
 
                                         <td> {{ suggestion.mappedTermLabel | uppercase }} </td>
                                         <td> {{ suggestion.mapType | uppercase }} </td>
