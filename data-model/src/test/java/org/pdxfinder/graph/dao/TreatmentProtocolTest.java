@@ -47,9 +47,9 @@ public class TreatmentProtocolTest extends BaseTest {
 
         List<Treatment> treatments;
         treatments = createTreatmentsAndOntologies1();
-        createTreatmentComponentsAndProtocols1(treatments);
-    }
+        treatmentProtocolList.add(createTreatmentComponentsAndProtocols1(treatments));
 
+    }
 
     private List<Treatment> createTreatmentsAndOntologies1(){
 
@@ -80,30 +80,32 @@ public class TreatmentProtocolTest extends BaseTest {
         return Arrays.asList(treatment1, treatment2, treatment3);
     }
 
-    private void createTreatmentComponentsAndProtocols1(List<Treatment> treatments) {
+    private TreatmentProtocol createTreatmentComponentsAndProtocols1(List<Treatment> treatments) {
 
         TreatmentProtocol treatmentProtocol = new TreatmentProtocol();
         List<TreatmentComponent> componentsList= new ArrayList<>();
 
-        TreatmentComponent controlTC = new TreatmentComponent();
+        TreatmentComponent control = new TreatmentComponent();
         TreatmentComponent drug1 = new TreatmentComponent();
         TreatmentComponent drug2 = new TreatmentComponent();
 
-        controlTC.setDose(CONTROL_DOSE_1);
+        control.setDose(CONTROL_DOSE_1);
         drug1.setDose(DRUG_DOSE_2);
         drug2.setDose(DRUG_DOSE_3);
 
-        controlTC.setDuration(CONTROL_DURATION_1);
+        control.setDuration(CONTROL_DURATION_1);
         drug1.setDuration(DRUG_DURATION_2);
         drug2.setDuration(DRUG_DURATION_3);
 
-        controlTC.setTreatment(treatments.get(0));
-        controlTC.setType("Control");
+        control.setType("Control");
+        drug1.setType("Drug");
+        drug2.setType("Drug");
 
+        control.setTreatment(treatments.get(0));
         drug1.setTreatment(treatments.get(1));
         drug2.setTreatment(treatments.get(2));
 
-        componentsList.add(controlTC);
+        componentsList.add(control);
         componentsList.add(drug1);
         componentsList.add(drug2);
 
@@ -112,17 +114,17 @@ public class TreatmentProtocolTest extends BaseTest {
         treatmentProtocol.setComponents(componentsList);
         treatmentProtocol.setResponse(testResponse);
 
-        treatmentProtocolList.add(treatmentProtocol);
+        return treatmentProtocol;
     }
 
     private void createMockDatasets2() {
 
         Treatment treatment;
-        treatment = createTreatmentsAndOntologies2();
-        createTreatmentComponentsAndProtocols2(treatment);
+        treatment = createTreatmentsAndOntologyRelationship();
+        treatmentProtocolList.addAll(createTreatmentComponentsAndProtocols2(treatment));
     }
 
-    private Treatment createTreatmentsAndOntologies2() {
+    private Treatment createTreatmentsAndOntologyRelationship() {
 
         Treatment treatment1 = new Treatment(FIRST_TREATMENT_NAME);
         TreatmentToOntologyRelationship ontologyRelationship1 = new TreatmentToOntologyRelationship();
@@ -131,7 +133,7 @@ public class TreatmentProtocolTest extends BaseTest {
         return treatment1;
     }
 
-    private void createTreatmentComponentsAndProtocols2(Treatment treatments){
+    private List<TreatmentProtocol> createTreatmentComponentsAndProtocols2(Treatment treatments){
 
         TreatmentProtocol treatmentProtocol = new TreatmentProtocol();
         TreatmentProtocol treatmentProtocol2 = new TreatmentProtocol();
@@ -139,15 +141,16 @@ public class TreatmentProtocolTest extends BaseTest {
         List<TreatmentComponent> componentsList1 = new ArrayList<>();
         List<TreatmentComponent> componentsList2 = new ArrayList<>();
 
-        TreatmentComponent controlTC = new TreatmentComponent();
+        TreatmentComponent control = new TreatmentComponent();
         TreatmentComponent drug1 = new TreatmentComponent();
 
-        controlTC.setTreatment(treatments);
-        controlTC.setType("Control");
+        control.setType("Control");
+        control.setTreatment(treatments);
 
-        controlTC.setTreatment(treatments);
+        control.setDose(CONTROL_DOSE_1);
+        control.setDuration(CONTROL_DURATION_1);
 
-        componentsList1.add(controlTC);
+        componentsList1.add(control);
         componentsList2.add(drug1);
 
         Response testResponse = new Response(RESPONSE_STRING, treatmentProtocol);
@@ -159,12 +162,11 @@ public class TreatmentProtocolTest extends BaseTest {
         treatmentProtocol.setResponse(testResponse);
         treatmentProtocol2.setResponse(testResponse2);
 
-        treatmentProtocolList.add(treatmentProtocol);
-        treatmentProtocolList.add(treatmentProtocol2);
+        return Arrays.asList(treatmentProtocol,treatmentProtocol2);
     }
 
-    @Test //How about this for a naming conventions
-    public void Given_MultipleTreatmentComponents_When_GetTreatmentStringisCalled_Then_ReturnNotNullConcatonatedString(){
+    @Test
+    public void Given_getTreatmentString_When_MultipleTCandControlsOn_Then_ReturnNotNullConcatenatedString(){
 
         String treatmentString;
 
@@ -179,7 +181,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void getTreatmentString_ValidTCandControllsOff_NonNullAndConcatonatedStringWithoutControls(){
+    public void Given_getTreatmentString_WhenTreatmentComponentsWithNoControl_Then_returnConcatenatedStrings(){
 
         String treatmentString;
 
@@ -194,7 +196,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void testGetTreatmentStringNoNullOnReturn() {
+    public void Given_getTreatmentString_When_TreatmentsAreMissingOntologies_Then_returnBlankStrings() {
 
         String treatmentString1;
         String treatmentString2;
@@ -217,7 +219,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void testGetDoseString() {
+    public void Given_getDostString_When_ControlFlagIsToggled_Then_returnAppropriateNotNullDoseString() {
 
         String doseStringWithControls;
         String doseStringWithoutControls;
@@ -243,7 +245,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void testGetDurationString() {
+    public void  Given_getDurationString_When_ControlFlagIsToggled_Then_returnStringWithAndWithoutControls() {
 
         String durationStringWithControls;
         String durationStringWithoutControls;
@@ -265,10 +267,10 @@ public class TreatmentProtocolTest extends BaseTest {
         Assert.assertEquals(
                 String.format("%s / %s", DRUG_DURATION_2, DRUG_DURATION_3),
                 durationStringWithoutControls);
-
     }
 
-    public void testDurationAndDoseForNoDataReturn() {
+    @Test
+    public void Given_getDurationAndGetDose_When_TreatmentIsMissingAnOntology_Then_returnDoseAndDurationUnaffected() {
 
         String durationStringWithControls;
         String doseStringWithControls;
@@ -281,13 +283,12 @@ public class TreatmentProtocolTest extends BaseTest {
                 .get(1)
                 .getDurationString(READ_CONTROLS_COMPONENTS);
 
-        Assert.assertEquals("",durationStringWithControls);
-        Assert.assertEquals("",doseStringWithControls);
-
+        Assert.assertEquals(CONTROL_DURATION_1,durationStringWithControls);
+        Assert.assertEquals(CONTROL_DOSE_1,doseStringWithControls);
     }
 
     @Test
-    public void testDurationAndDoseForNullDataResponse(){
+    public void Given_getDurationAndGetDose_When_NodeStructureisIncomplete_Then_theyDoNotReturnNull(){
 
         TreatmentComponent treatmentComponent = new TreatmentComponent();
         TreatmentProtocol treatmentProtocol = new TreatmentProtocol();
@@ -296,7 +297,6 @@ public class TreatmentProtocolTest extends BaseTest {
 
         Assert.assertNotNull(treatmentProtocol.getDoseString(READ_CONTROLS_COMPONENTS));
         Assert.assertNotNull(treatmentProtocol.getDurationString(READ_CONTROLS_COMPONENTS));
-
     }
 
 }

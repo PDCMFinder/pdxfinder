@@ -54,34 +54,6 @@ public class DataImportServiceTests extends BaseTest {
     }
 
     @Test
-    public void GetPatient_WhenPSNotInDB_ReturnNewPatient(){
-
-        when(this.patientRepository.findByExternalIdAndGroup(EXTERNAL_ID, GROUP))
-                .thenReturn(null);
-
-        Patient patient = dataImportService.getPatient(EXTERNAL_ID, SEX, RACE, ETHNICITY, GROUP);
-
-        Assert.assertEquals(EXTERNAL_ID, patient.getExternalId());
-        Assert.assertEquals(SEX,patient.getSex());
-        Assert.assertEquals(RACE,patient.getRace());
-        Assert.assertEquals(ETHNICITY,patient.getEthnicity());
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void GetPatient_WhenGroupIsNull_ThrowNullPointer() {
-
-        dataImportService.getPatient(EXTERNAL_ID, SEX, RACE, ETHNICITY, null);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void GetPatient_WhenAllButGroupIsNull_ReturnException() {
-
-        //Not clear if this is should be defined behavior.
-        //Only used by GetPatientSnapshot
-        dataImportService.getPatient(null,null,null,null, GROUP);
-    }
-
-    @Test
     public void GetPatientSnapshotTwoParam_WhenValidArgAndPSinDB_ReturnPSfromDBwithEqualRef() {
 
         PatientSnapshot expectedSnapshot = new PatientSnapshot(PATIENT, AGE_AT_COLLECTION);
@@ -158,18 +130,9 @@ public class DataImportServiceTests extends BaseTest {
         when(patientRepository.findByExternalIdAndGroup(EXTERNAL_ID, GROUP))
                 .thenReturn(null);
 
-        //
-        when(patientRepository.findByExternalIdAndGroup(EXTERNAL_ID,GROUP))
-                .thenReturn(PATIENT);
-
-        //Should use the following command. However, it is returning a Patient with a new reference
-        //when(dataImportService.getPatient(EXTERNAL_ID, SEX, RACE,
-          //      ETHNICITY, GROUP)).thenReturn(PATIENT);
-
          actualSnapshot = dataImportService.getPatientSnapshot(EXTERNAL_ID, SEX, RACE,
                  ETHNICITY, AGE_AT_COLLECTION, GROUP);
 
-        Assert.assertEquals(PATIENT, actualSnapshot.getPatient());
         Assert.assertEquals(EXTERNAL_ID,  actualSnapshot.getPatient().getExternalId());
         Assert.assertEquals(AGE_AT_COLLECTION,  actualSnapshot.getAgeAtCollection());
     }
