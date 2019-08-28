@@ -23,28 +23,25 @@ public class DataProjectionsTimeTest extends BaseTestWithPersistence {
     @Test
     public void Given_DataProjection_When_CascadeCreateSaveAndFinds_Then_PrintTimes(){
 
+        byte[] hundredBytes = generateRandomByte(2);
         byte[] tenKiB = generateRandomByte(4);
         byte[] hundredKib = generateRandomByte(5);
         byte[] oneMib = generateRandomByte(6);
         byte[] tenMiB = generateRandomByte(7);
-        byte[] hundredMiB = generateRandomByte(8);
+
+        //to init db. Else the first time test is off by a second.
+        timeCreateSaveAndFindAndReturnElapsedTime(hundredBytes);
+
         List<Long> elapsedTime = timeCreateSaveAndFindAndReturnElapsedTime(tenKiB);
         List<Long> elapsedTime1 = timeCreateSaveAndFindAndReturnElapsedTime(hundredKib);
         List<Long> elapsedTime2 = timeCreateSaveAndFindAndReturnElapsedTime(oneMib);
         List<Long> elapsedTime3 = timeCreateSaveAndFindAndReturnElapsedTime(tenMiB);
-        //long elapsedTime4 = timeCreateSaveAndFindAndReturnElapsedTime(hundredMiB);
 
-        StringBuilder timeTable = new StringBuilder(
-                String.format(" Data Size: %s Time %s %s %s Average %s \n", tenKiB.length, elapsedTime.get(0), elapsedTime.get(1), elapsedTime.get(2), elapsedTime.get(3)));
-        timeTable.append(
-                String.format(" Data Size: %s Time %s %s %s Average %s \n", hundredKib.length, elapsedTime1.get(0), elapsedTime1.get(1), elapsedTime1.get(2), elapsedTime1.get(3)));
-        timeTable.append(
-                String.format(" Data Size: %s Time %s %s %s  Average %s \n", oneMib.length, elapsedTime2.get(0), elapsedTime2.get(1), elapsedTime2.get(2), elapsedTime2.get(3)));
-        timeTable.append(
-                String.format(" Data Size: %s Time %s %s %s Average %s \n", tenMiB.length, elapsedTime3.get(0), elapsedTime3.get(1), elapsedTime3.get(2), elapsedTime3.get(3)));
-        //timeTable.append(
-          //      String.format(" Data Size: %s Time %s \n", hundredMiB.length, elapsedTime4));
 
+        String timeTable = String.format(" Data Size: %s Time %s %s %s Average %s \n", tenKiB.length, elapsedTime.get(0), elapsedTime.get(1), elapsedTime.get(2), elapsedTime.get(3)) +
+                String.format(" Data Size: %s Time %s %s %s Average %s \n", hundredKib.length, elapsedTime1.get(0), elapsedTime1.get(1), elapsedTime1.get(2), elapsedTime1.get(3)) +
+                String.format(" Data Size: %s Time %s %s %s  Average %s \n", oneMib.length, elapsedTime2.get(0), elapsedTime2.get(1), elapsedTime2.get(2), elapsedTime2.get(3)) +
+                String.format(" Data Size: %s Time %s %s %s Average %s \n", tenMiB.length, elapsedTime3.get(0), elapsedTime3.get(1), elapsedTime3.get(2), elapsedTime3.get(3));
         System.out.println(timeTable);
     }
 

@@ -11,30 +11,30 @@ import java.util.List;
 
 public class TreatmentProtocolTest extends BaseTest {
 
-    private final Boolean READ_CONTROLS_COMPONENTS = true;
-    private final Boolean DO_NOT_READ_CONTROLS = false;
+    private static final Boolean READ_CONTROLS_COMPONENTS = true;
+    private static final Boolean DO_NOT_READ_CONTROLS = false;
 
-    private final String firstTreatmentName = "TEST_TREATMENT_ONE";
-    private final String secondTreatmentName = "TEST_TREATMENT_TWO";
-    private final String thirdTreatmentName = "TEST_TREATMENT_THREE";
+    private static final String FIRST_TREATMENT_NAME = "TEST_TREATMENT_ONE";
+    private static final String SECOND_TREATMENT_NAME = "TEST_TREATMENT_TWO";
+    private static final String THIRD_TREATMENT_NAME = "TEST_TREATMENT_THREE";
 
-    private final String ontologyURL = "TEST_URL";
+    private static final String ONTOLOGY_URL = "TEST_URL";
 
-    private final String controlOntologyLabel = "TEST_ONTOLOGY_TERM";
-    private final String drugOntologyLabel = "TEST_ONTOLOGY_TERM2";
-    private final String drugOntologyLabel2 = "TEST_ONTOLOGY_TERM3";
+    private static final String CONTROL_ONTOLOGY_LABEL = "TEST_ONTOLOGY_TERM";
+    private static final String DRUG_ONTOLOGY_LABEL = "TEST_ONTOLOGY_TERM2";
+    private static final String DRUG_ONTOLOGY_LABEL_2 = "TEST_ONTOLOGY_TERM3";
 
-    private final String responseString = "TEST_RESPONSE";
+    private static final String RESPONSE_STRING = "TEST_RESPONSE";
 
-    private final String controlDuration1 = "TEST_DURATION_1";
-    private final String drugDuration2 = "TEST_DURATION_2";
-    private final String drugDuration3 = "TEST_DURATION_3";
+    private static final String CONTROL_DURATION_1 = "TEST_DURATION_1";
+    private static final String DRUG_DURATION_2 = "TEST_DURATION_2";
+    private static final String DRUG_DURATION_3 = "TEST_DURATION_3";
 
-    private final String controlDose1 = "TEST_DOSE_1";
-    private final String drugDose2 = "TEST_DOSE_2";
-    private final String drugDose3 = "TEST_DOSE_3";
+    private static final String CONTROL_DOSE_1 = "TEST_DOSE_1";
+    private static final String DRUG_DOSE_2 = "TEST_DOSE_2";
+    private static final String DRUG_DOSE_3 = "TEST_DOSE_3";
 
-    private List<TreatmentProtocol> treatmentProtocolList = new ArrayList<TreatmentProtocol>();
+    private List<TreatmentProtocol> treatmentProtocolList = new ArrayList<>();
 
     @Before
     public void InitModels() {
@@ -53,13 +53,13 @@ public class TreatmentProtocolTest extends BaseTest {
 
     private List<Treatment> createTreatmentsAndOntologies1(){
 
-        Treatment treatment1 = new Treatment(firstTreatmentName);
-        Treatment treatment2 = new Treatment(secondTreatmentName);
-        Treatment treatment3 = new Treatment(thirdTreatmentName);
+        Treatment treatment1 = new Treatment(FIRST_TREATMENT_NAME);
+        Treatment treatment2 = new Treatment(SECOND_TREATMENT_NAME);
+        Treatment treatment3 = new Treatment(THIRD_TREATMENT_NAME);
 
-        OntologyTerm ontologyTerm1 = new OntologyTerm(ontologyURL, controlOntologyLabel);
-        OntologyTerm ontologyTerm2 = new OntologyTerm(ontologyURL, drugOntologyLabel);
-        OntologyTerm ontologyTerm3 = new OntologyTerm(ontologyURL, drugOntologyLabel2);
+        OntologyTerm ontologyTerm1 = new OntologyTerm(ONTOLOGY_URL, CONTROL_ONTOLOGY_LABEL);
+        OntologyTerm ontologyTerm2 = new OntologyTerm(ONTOLOGY_URL, DRUG_ONTOLOGY_LABEL);
+        OntologyTerm ontologyTerm3 = new OntologyTerm(ONTOLOGY_URL, DRUG_ONTOLOGY_LABEL_2);
 
         TreatmentToOntologyRelationship ontologyRelationship1 = new TreatmentToOntologyRelationship();
         TreatmentToOntologyRelationship ontologyRelationship2 = new TreatmentToOntologyRelationship();
@@ -83,19 +83,19 @@ public class TreatmentProtocolTest extends BaseTest {
     private void createTreatmentComponentsAndProtocols1(List<Treatment> treatments) {
 
         TreatmentProtocol treatmentProtocol = new TreatmentProtocol();
-        List<TreatmentComponent> componentsList= new ArrayList<TreatmentComponent>();
+        List<TreatmentComponent> componentsList= new ArrayList<>();
 
         TreatmentComponent controlTC = new TreatmentComponent();
         TreatmentComponent drug1 = new TreatmentComponent();
         TreatmentComponent drug2 = new TreatmentComponent();
 
-        controlTC.setDose(controlDose1);
-        drug1.setDose(drugDose2);
-        drug2.setDose(drugDose3);
+        controlTC.setDose(CONTROL_DOSE_1);
+        drug1.setDose(DRUG_DOSE_2);
+        drug2.setDose(DRUG_DOSE_3);
 
-        controlTC.setDuration(controlDuration1);
-        drug1.setDuration(drugDuration2);
-        drug2.setDuration(drugDuration3);
+        controlTC.setDuration(CONTROL_DURATION_1);
+        drug1.setDuration(DRUG_DURATION_2);
+        drug2.setDuration(DRUG_DURATION_3);
 
         controlTC.setTreatment(treatments.get(0));
         controlTC.setType("Control");
@@ -107,7 +107,7 @@ public class TreatmentProtocolTest extends BaseTest {
         componentsList.add(drug1);
         componentsList.add(drug2);
 
-        Response testResponse = new Response(responseString, treatmentProtocol);
+        Response testResponse = new Response(RESPONSE_STRING, treatmentProtocol);
 
         treatmentProtocol.setComponents(componentsList);
         treatmentProtocol.setResponse(testResponse);
@@ -124,7 +124,7 @@ public class TreatmentProtocolTest extends BaseTest {
 
     private Treatment createTreatmentsAndOntologies2() {
 
-        Treatment treatment1 = new Treatment(firstTreatmentName);
+        Treatment treatment1 = new Treatment(FIRST_TREATMENT_NAME);
         TreatmentToOntologyRelationship ontologyRelationship1 = new TreatmentToOntologyRelationship();
         treatment1.setTreatmentToOntologyRelationship(ontologyRelationship1);
 
@@ -136,8 +136,8 @@ public class TreatmentProtocolTest extends BaseTest {
         TreatmentProtocol treatmentProtocol = new TreatmentProtocol();
         TreatmentProtocol treatmentProtocol2 = new TreatmentProtocol();
 
-        List<TreatmentComponent> componentsList1 = new ArrayList<TreatmentComponent>();
-        List<TreatmentComponent> componentsList2 = new ArrayList<TreatmentComponent>();
+        List<TreatmentComponent> componentsList1 = new ArrayList<>();
+        List<TreatmentComponent> componentsList2 = new ArrayList<>();
 
         TreatmentComponent controlTC = new TreatmentComponent();
         TreatmentComponent drug1 = new TreatmentComponent();
@@ -150,8 +150,8 @@ public class TreatmentProtocolTest extends BaseTest {
         componentsList1.add(controlTC);
         componentsList2.add(drug1);
 
-        Response testResponse = new Response(responseString, treatmentProtocol);
-        Response testResponse2 = new Response(responseString, treatmentProtocol2);
+        Response testResponse = new Response(RESPONSE_STRING, treatmentProtocol);
+        Response testResponse2 = new Response(RESPONSE_STRING, treatmentProtocol2);
 
         treatmentProtocol.setComponents(componentsList1);
         treatmentProtocol2.setComponents(componentsList2);
@@ -174,7 +174,7 @@ public class TreatmentProtocolTest extends BaseTest {
 
         Assert.assertNotNull(treatmentString);
         Assert.assertEquals(
-                String.format("%s and %s and %s",controlOntologyLabel, drugOntologyLabel,drugOntologyLabel2),
+                String.format("%s and %s and %s", CONTROL_ONTOLOGY_LABEL, DRUG_ONTOLOGY_LABEL, DRUG_ONTOLOGY_LABEL_2),
                 treatmentString);
     }
 
@@ -189,7 +189,7 @@ public class TreatmentProtocolTest extends BaseTest {
 
         Assert.assertNotNull(treatmentString);
         Assert.assertEquals(
-                String.format("%s and %s",drugOntologyLabel,drugOntologyLabel2),
+                String.format("%s and %s", DRUG_ONTOLOGY_LABEL, DRUG_ONTOLOGY_LABEL_2),
                 treatmentString);
     }
 
@@ -235,10 +235,10 @@ public class TreatmentProtocolTest extends BaseTest {
         Assert.assertNotNull(doseStringWithoutControls);
 
         Assert.assertEquals(
-                String.format("%s / %s / %s",controlDose1,drugDose2,drugDose3),
+                String.format("%s / %s / %s", CONTROL_DOSE_1, DRUG_DOSE_2, DRUG_DOSE_3),
                 doseStringWithControls);
         Assert.assertEquals(
-                String.format("%s / %s",drugDose2,drugDose3),
+                String.format("%s / %s", DRUG_DOSE_2, DRUG_DOSE_3),
                 doseStringWithoutControls);
     }
 
@@ -260,10 +260,10 @@ public class TreatmentProtocolTest extends BaseTest {
         Assert.assertNotNull(durationStringWithoutControls);
 
         Assert.assertEquals(
-                String.format("%s / %s / %s",controlDuration1,drugDuration2,drugDuration3),
+                String.format("%s / %s / %s", CONTROL_DURATION_1, DRUG_DURATION_2, DRUG_DURATION_3),
                 durationStringWithControls);
         Assert.assertEquals(
-                String.format("%s / %s",drugDuration2,drugDuration3),
+                String.format("%s / %s", DRUG_DURATION_2, DRUG_DURATION_3),
                 durationStringWithoutControls);
 
     }
@@ -290,12 +290,12 @@ public class TreatmentProtocolTest extends BaseTest {
     public void testDurationAndDoseForNullDataResponse(){
 
         TreatmentComponent treatmentComponent = new TreatmentComponent();
-        TreatmentProtocol tp = new TreatmentProtocol();
+        TreatmentProtocol treatmentProtocol = new TreatmentProtocol();
 
-        tp.addTreatmentComponent(treatmentComponent);
+        treatmentProtocol.addTreatmentComponent(treatmentComponent);
 
-        Assert.assertNotNull(tp.getDoseString(READ_CONTROLS_COMPONENTS));
-        Assert.assertNotNull(tp.getDurationString(READ_CONTROLS_COMPONENTS));
+        Assert.assertNotNull(treatmentProtocol.getDoseString(READ_CONTROLS_COMPONENTS));
+        Assert.assertNotNull(treatmentProtocol.getDurationString(READ_CONTROLS_COMPONENTS));
 
     }
 
