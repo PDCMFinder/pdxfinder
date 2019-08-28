@@ -24,6 +24,11 @@ export class DatasourceSpecificSuggestionsComponent implements OnInit {
         OriginTissue : ""
     }
 
+    public clickedSuggestionId: number;
+    public showClickedDetails: boolean = false;
+    public selectedSuggestion: Mapping;
+    public clickedDetails;
+
     constructor(private router: Router,
                 private route: ActivatedRoute,
                 private _mappingService: MappingService) { }
@@ -70,5 +75,36 @@ export class DatasourceSpecificSuggestionsComponent implements OnInit {
     onSuggestionSubmit(suggestion){
         this._mappingService.componentsDataBus(suggestion);
     }
+
+
+    getClickedSuggestion(suggestion: Mapping) {
+
+        console.log(suggestion);
+
+
+        this.clickedSuggestionId = suggestion.entityId;
+        this.selectedSuggestion = suggestion;
+
+
+        this.clickedDetails = (suggestion.entityType == 'diagnosis') ?
+            suggestion.mappingValues.SampleDiagnosis : suggestion.mappingValues['TreatmentName'];
+
+
+
+
+       // this.selectedSrc = mapping.mappingValues.DataSource;
+       // this.selectedEntityType = mapping.entityType;
+
+
+        this.toggleDetails(true);
+
+    }
+
+
+    toggleDetails(value: boolean) {
+
+        this.showClickedDetails = value;
+    }
+
 
 }

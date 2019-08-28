@@ -95,6 +95,22 @@
     opacity: 1;
 }
 
+
+.base-notif {
+    background: #FFF;
+    padding: 15px;
+    color: #212121;
+    border-radius: 2px;
+    box-shadow: 0 0 14px rgba(0, 0, 0, 0.24);
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    transition: .3s;
+    margin-left: 10px;
+    z-index:9999 !important; position: fixed;
+}
+
+
 .top-notif {
     background: #FFF;
     padding: 15px;
@@ -108,14 +124,15 @@
     margin-left: 10px;
     z-index:9999 !important; position: fixed;
 }
-.top-notif h3 {
+
+.top-notif h3, .base-notif h3 {
     padding-bottom: 10px;
     border-bottom: 1px solid rgba(3, 54, 157, 0.5);
     color: rgba(3, 54, 157, 1);
     font-size: 13px;
 
 }
-.top-notif h3 span.close {
+.top-notif h3 span.close, .base-notif h3 span.close {
     float: right;
     height: 12px;
     width: 12px;
@@ -123,7 +140,10 @@
     position: relative;
     cursor: pointer;
 }
-.top-notif h3 span.close:before, .top-notif h3 span.close:after {
+.top-notif h3 span.close:before,
+.base-notif h3 span.close:before,
+.top-notif h3 span.close:after,
+.base-notif h3 span.close:after {
     content: '';
     background: rgba(3, 54, 157, 1);
     width: 2px;
@@ -132,10 +152,12 @@
     left: 50%;
     transform: rotate(-45deg);
 }
-.top-notif h3 span.close:before {
+
+.top-notif h3 span.close:before, .base-notif h3 span.close:before  {
     transform: rotate(45deg);
 }
-.top-notif p {
+
+.top-notif p, .base-notif p  {
     /*font: .85em/1.7em Roboto; */
     margin-bottom: 24px;
 }
@@ -202,6 +224,18 @@ button a {
     white-space: nowrap;
     overflow: hidden;
     display: inline-block;
+}
+
+.clipText2 {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.headTextClip {
+    max-width: 800px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .overflow-visible {
@@ -378,10 +412,15 @@ iPad 3
     text-transform: uppercase;
 }
 
-.table tr.active td {
+.table-v1 tr.active td {
     background-color: rgba(6,54,157,0.3) !important;
     color: black;
     font-weight: 600;
+}
+
+.table-v2 tr.active td {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    color: black;
 }
 
 a,tr {
@@ -2964,7 +3003,7 @@ table.table-mail tr td {
 
 .pdxfinder-heading2 {
     background-color: rgba(243, 246, 251, 0.4);
-    color: #000;
+    color: rgba(3, 54, 157, 1);
     border-bottom: none;
 }
 
@@ -4025,3 +4064,228 @@ font-size: 13px;
         transform: scale(5);
     }
 }
+
+
+
+
+
+
+
+/* FILE MANAGER */
+.file-box {
+    float: left;
+    width: 187px;
+}
+.file-manager h5 {
+    text-transform: uppercase;
+}
+.file-manager {
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+.folder-list li a {
+    color: #666666;
+    display: block;
+    padding: 5px 0;
+}
+.folder-list li {
+    border-bottom: 1px solid #e7eaec;
+    display: block;
+}
+.folder-list li i {
+    margin-right: 8px;
+    color: #3d4d5d;
+}
+.category-list li a {
+    color: #666666;
+    display: block;
+    padding: 5px 0;
+}
+.category-list li {
+    display: block;
+}
+.category-list li i {
+    margin-right: 8px;
+    color: #3d4d5d;
+}
+.category-list li a .text-navy {
+    color: #007C82;
+}
+.category-list li a .text-primary {
+    color: #1c84c6;
+}
+.category-list li a .text-info {
+    color: #23c6c8;
+}
+.category-list li a .text-danger {
+    color: #EF5352;
+}
+.category-list li a .text-warning {
+    color: #F8AC59;
+}
+.file-manager h5.tag-title {
+    margin-top: 20px;
+}
+.tag-list li {
+    float: left;
+}
+.tag-list li a {
+    font-size: 10px;
+    background-color: #f3f3f4;
+    padding: 5px 12px;
+    color: inherit;
+    border-radius: 2px;
+    border: 1px solid #e7eaec;
+    margin-right: 5px;
+    margin-top: 5px;
+    display: block;
+}
+.file {
+    border: 1px solid #e7eaec;
+    padding: 0;
+    background-color: #ffffff;
+    position: relative;
+    margin-bottom: 20px;
+    margin-right: 10px;
+}
+.file-manager .hr-line-dashed {
+    margin: 15px 0;
+}
+.file .icon,
+.file .image {
+    height: 100px;
+    overflow: hidden;
+}
+.file .icon {
+    padding: 15px 10px;
+    text-align: center;
+}
+.file-control {
+    color: inherit;
+    font-size: 11px;
+    margin-right: 10px;
+}
+.file-control.active {
+    text-decoration: underline;
+}
+.file .icon i {
+    font-size: 70px;
+    color: #dadada;
+}
+.file .file-name {
+    padding: 10px;
+    background-color: #f8f8f8;
+    border-top: 1px solid #e7eaec;
+}
+.file-name small {
+    color: #676a6c;
+}
+.corner {
+    position: absolute;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    line-height: 0;
+    border: 0.6em solid transparent;
+    border-right: 0.6em solid #f1f1f1;
+    border-bottom: 0.6em solid #f1f1f1;
+    right: 0em;
+    bottom: 0em;
+}
+a.compose-mail {
+    padding: 8px 10px;
+}
+.mail-search {
+    max-width: 300px;
+}
+/* PROFILE */
+.profile-content {
+    border-top: none !important;
+}
+.profile-stats {
+    margin-right: 10px;
+}
+.profile-image {
+    width: 120px;
+    float: left;
+}
+.profile-image img {
+    width: 96px;
+    height: 96px;
+}
+.profile-info {
+    margin-left: 120px;
+}
+.feed-activity-list .feed-element {
+    border-bottom: 1px solid #e7eaec;
+}
+.feed-element:first-child {
+    margin-top: 0;
+}
+.feed-element {
+    padding-bottom: 15px;
+}
+.feed-element,
+.feed-element .media {
+    margin-top: 15px;
+}
+.feed-element,
+.media-body {
+    overflow: hidden;
+}
+.feed-element > .pull-left {
+    margin-right: 10px;
+}
+.feed-element img.img-circle,
+.dropdown-messages-box img.img-circle {
+    width: 38px;
+    height: 38px;
+}
+.feed-element .well {
+    border: 1px solid #e7eaec;
+    box-shadow: none;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    padding: 10px 20px;
+    font-size: 11px;
+    line-height: 16px;
+}
+.feed-element .actions {
+    margin-top: 10px;
+}
+.feed-element .photos {
+    margin: 10px 0;
+}
+.feed-photo {
+    max-height: 180px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+.file-list li {
+    padding: 5px 10px;
+    font-size: 11px;
+    border-radius: 2px;
+    border: 1px solid #e7eaec;
+    margin-bottom: 5px;
+}
+.file-list li a {
+    color: inherit;
+}
+.file-list li a:hover {
+    color: #007C82;
+}
+.user-friends img {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+}
+
+
+
+
+
+
