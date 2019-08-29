@@ -922,9 +922,9 @@ public class DataImportService {
         return ontologyTermRepository.getOntologyTermNumberByType(type);
     }
 
-    public void saveOntologyTerm(OntologyTerm ot){
+    public OntologyTerm saveOntologyTerm(OntologyTerm ot){
 
-        ontologyTermRepository.save(ot);
+        return ontologyTermRepository.save(ot);
     }
 
     public void deleteOntologyTermsWithoutMapping(){
