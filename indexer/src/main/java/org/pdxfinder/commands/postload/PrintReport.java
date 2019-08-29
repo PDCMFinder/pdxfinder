@@ -72,6 +72,7 @@ public class PrintReport implements CommandLineRunner, ApplicationContextAware {
             List<String> headers = new ArrayList<>();
             headers.addAll(Arrays.asList("Type", "Reporter", "DataSource", "Model", "MolChar", "Platform", "MarkerInFile", "HarmonizedMarker", "ReasonOfChange", "Message"));
             utilityService.writeCsvFile(headers, reportManager.getMarkerHarmonizationMessagesInList(), logFile);
+            log.info("Saving log file to: "+finderRootDir + "/logs");
         }
         else{
 
