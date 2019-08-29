@@ -78,6 +78,9 @@ public class ModelCreation {
         this.omicDataShareable = false;
     }
 
+    public ModelCreation(String sourcePdxId) {
+        this.sourcePdxId = sourcePdxId;
+    }
 
     public Long getId() {
         return id;
