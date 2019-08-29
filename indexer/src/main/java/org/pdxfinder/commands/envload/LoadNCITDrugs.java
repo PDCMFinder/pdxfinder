@@ -48,7 +48,7 @@ public class LoadNCITDrugs implements CommandLineRunner {
     private List<String> unlinkedRegimens;
     private List<String> linkedRegimens;
     private Map<String, OntologyTerm> loadedTreatmentTerms;
-
+    private List<String> unlinkedRegimensSynonyms;
 
 
     @Override
@@ -70,6 +70,8 @@ public class LoadNCITDrugs implements CommandLineRunner {
         if (options.has("loadNCITDrugs") || options.has("loadALL")  || options.has("loadEssentials")) {
 
             loadedTreatmentTerms = new HashMap<>();
+
+            //log.info("Test: "+getCleanLabel("ifosfamide-platinol-adriamycin liver cancer"));
 
             log.info("Loading all Drugs from NCIT.");
             loadNCITLeafDrugs("treatment", drugsBranchUrl);
@@ -101,6 +103,7 @@ public class LoadNCITDrugs implements CommandLineRunner {
 
         unlinkedRegimens = new ArrayList<>();
         linkedRegimens = new ArrayList<>();
+        unlinkedRegimensSynonyms = new ArrayList<>();
 
         int regimenNumber = dataImportService.getOntologyTermNumberByType("treatment regimen");
         int batch = 100;
@@ -121,10 +124,11 @@ public class LoadNCITDrugs implements CommandLineRunner {
 
         log.info("Linked regimens: "+linkedRegimens.size());
         log.info("Unlinked regimens: "+unlinkedRegimens.size());
-        log.info(unlinkedRegimens.get(0));
-        log.info(unlinkedRegimens.get(1));
-        log.info(unlinkedRegimens.get(2));
-        log.info(unlinkedRegimens.get(3));
+
+        for(int j=0; j<unlinkedRegimens.size(); j++){
+            System.out.println(unlinkedRegimens.get(j) + " == " +unlinkedRegimensSynonyms.get(j) +"\n");
+
+        }
 
     }
 
@@ -134,7 +138,9 @@ public class LoadNCITDrugs implements CommandLineRunner {
         Set<String> synonyms = regimen.getSynonyms();
 
         boolean linked = false;
-        List<OntologyTerm> slashMatrix = new ArrayList<>();
+
+
+        String synonymCombo = "";
 
         for(String synonym : synonyms){
 
@@ -143,14 +149,14 @@ public class LoadNCITDrugs implements CommandLineRunner {
             String[] synComma = synonym.split(",");
             String[] synSemicolon = synonym.split(";");
 
+            List<OntologyTerm> slashMatrix = new ArrayList<>();
+            List<OntologyTerm> dashMatrix = new ArrayList<>();
 
-            boolean[] dashMatrix = new boolean[synDash.length];
-            boolean[] commaMatrix = new boolean[synComma.length];
-            boolean[] semicolonMatrix = new boolean[synSemicolon.length];
+            synonymCombo += "#slash ";
 
             for(int i=0; i < synSlash.length; i++){
 
-                String label = synSlash[i].toLowerCase().replace("regimen", "").trim();
+                String label = getCleanLabel(synSlash[i]);
 
                 if(loadedTreatmentTerms.containsKey(label)){
 
@@ -161,9 +167,34 @@ public class LoadNCITDrugs implements CommandLineRunner {
 
                     slashMatrix.add(null);
                 }
+
+                synonymCombo += "|"+label+"|";
             }
 
             if(isAllNotNull(slashMatrix)) {
+                linked = true;
+                break;
+            }
+
+            synonymCombo += "#dash ";
+            for(int i=0; i < synDash.length; i++){
+
+                String label = getCleanLabel(synDash[i]);
+
+                if(loadedTreatmentTerms.containsKey(label)){
+
+                    dashMatrix.add(loadedTreatmentTerms.get(label));
+                    //log.info(regimen.getLabel() + " label found: "+label);
+                }
+                else{
+
+                    dashMatrix.add(null);
+                }
+
+                synonymCombo += "|"+label+"|";
+            }
+
+            if(isAllNotNull(dashMatrix)) {
                 linked = true;
                 break;
             }
@@ -176,6 +207,7 @@ public class LoadNCITDrugs implements CommandLineRunner {
         }
         else{
             unlinkedRegimens.add(regimen.getLabel());
+            unlinkedRegimensSynonyms.add(synonymCombo);
         }
     }
 
@@ -274,6 +306,22 @@ public class LoadNCITDrugs implements CommandLineRunner {
         log.info("Finished loading "+totalDrugs+ " drugs from NCIT.");
     }
 
+    private String getCleanLabel(String label){
+
+        String cleanLabel = label.toLowerCase();
+        cleanLabel = cleanLabel.replaceAll("regimen", "");
+        cleanLabel = cleanLabel.replaceAll("high dose", "");
+        cleanLabel = cleanLabel.replaceAll("high-dose", "");
+        cleanLabel = cleanLabel.replaceAll("pulse intense", "");
+        cleanLabel = cleanLabel.replaceAll("intravenous", "");
+        cleanLabel = cleanLabel.replaceAll("oral", "");
+        cleanLabel = cleanLabel.replaceAll("modified", "");
+        cleanLabel = cleanLabel.replaceAll("hyperfractionated", "");
+
+        cleanLabel = cleanLabel.replaceAll("([^\\s]+\\s+cancer)", "");
+
+        return cleanLabel.trim();
+    }
 
 
     private boolean isAllNotNull(List<OntologyTerm> list){
