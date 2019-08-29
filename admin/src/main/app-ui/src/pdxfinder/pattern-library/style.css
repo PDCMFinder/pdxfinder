@@ -103,8 +103,8 @@
     border-radius: 2px;
     box-shadow: 0 0 14px rgba(0, 0, 0, 0.24);
     position: absolute;
-    bottom: 24px;
-    left: 24px;
+    bottom: 5px;
+    right: 5px;
     transition: .3s;
     margin-left: 10px;
     z-index:9999 !important; position: fixed;
@@ -118,8 +118,8 @@
     border-radius: 2px;
     box-shadow: 0 0 14px rgba(0, 0, 0, 0.24);
     position: absolute;
-    top: 24px;
-    right: 24px;
+    top: 5px;
+    right: 5px;
     transition: .3s;
     margin-left: 10px;
     z-index:9999 !important; position: fixed;

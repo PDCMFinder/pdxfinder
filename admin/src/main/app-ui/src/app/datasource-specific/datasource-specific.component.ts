@@ -101,8 +101,17 @@ export class DatasourceSpecificComponent implements OnInit {
         // This data is sent to the parent on load, so it allows parent data Row to be selected when deeplink url is visited
         this._mappingService.stringDataBusSubject.subscribe(
             data => {
-
                 this.getClickedRow(data);
+            }
+        )
+
+
+        this._mappingService.eventDataSubject.subscribe(
+            data => {
+
+                if(data == 'closeParentDetails'){
+                    this.showNotif = false;
+                }
             }
         )
     };

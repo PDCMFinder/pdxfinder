@@ -144,6 +144,15 @@ public class AjaxController {
     }
 
 
+    @GetMapping("/mappings/archive")
+    public ResponseEntity<?> readArchive(@RequestParam("entity-type") String entityType) {
+
+        mappingService.readArchive(entityType);
+
+        return new ResponseEntity<>("", HttpStatus.OK);
+    }
+
+
     @PostMapping("/mappings/uploads")
     public ResponseEntity<?> uploadData(@RequestParam("uploads") Optional<MultipartFile> uploads,
                                         @RequestParam(value = "entity-type", defaultValue = "") Optional<String> entityType) {

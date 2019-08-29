@@ -35,9 +35,13 @@ export class DatasourceSpecificSuggestionsComponent implements OnInit {
 
     ngOnInit() {
 
+
         // From the current url snapshot, get the source parameter and assign to the dataSource property
         this.route.params.subscribe(
             params => {
+
+
+                this.toggleDetails(false);
 
                 this.entityId = params['id'];
 
@@ -90,13 +94,9 @@ export class DatasourceSpecificSuggestionsComponent implements OnInit {
             suggestion.mappingValues.SampleDiagnosis : suggestion.mappingValues['TreatmentName'];
 
 
-
-
-       // this.selectedSrc = mapping.mappingValues.DataSource;
-       // this.selectedEntityType = mapping.entityType;
-
-
         this.toggleDetails(true);
+
+        this._mappingService.eventDataBus('closeParentDetails');
 
     }
 

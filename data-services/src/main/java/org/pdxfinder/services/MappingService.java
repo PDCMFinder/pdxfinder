@@ -777,6 +777,19 @@ public class MappingService {
     }
 
 
+
+    public void readArchive(String entityType) {
+
+
+        String jsonKey = "mappings";
+
+        String mappingDirectory = rootDir+"/mapping/backup/"+entityType;
+
+        utilityService.listAllFilesInADirectory(mappingDirectory);
+
+    }
+
+
     public void writeMappingsToFile(String entityType) {
 
 
@@ -897,6 +910,7 @@ public class MappingService {
     }
 
 
+
     public MappingEntity getMappingEntityById(Integer entityId) {
 
         Long id = Long.parseLong(String.valueOf(entityId));
@@ -914,6 +928,7 @@ public class MappingService {
 
         return mappingEntity;
     }
+
 
 
     public boolean checkExistence(Long entityId) {

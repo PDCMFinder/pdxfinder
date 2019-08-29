@@ -23,6 +23,8 @@ export class MappingService {
 
     public stringDataBusSubject = new Subject<any>();
 
+    public eventDataSubject = new Subject<any>();
+
     public errorReport = null;
 
     constructor(private http: HttpClient) { }
@@ -96,6 +98,11 @@ export class MappingService {
 
     stringDataBus(data): void{
         this.stringDataBusSubject.next(data);
+    }
+
+
+    eventDataBus(data): void{
+        this.eventDataSubject.next(data);
     }
 
 
