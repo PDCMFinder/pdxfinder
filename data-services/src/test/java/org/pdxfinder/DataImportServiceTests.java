@@ -54,7 +54,7 @@ public class DataImportServiceTests extends BaseTest {
     }
 
     @Test
-    public void GetPatientSnapshotTwoParam_WhenValidArgAndPSinDB_ReturnPSfromDBwithEqualRef() {
+    public void Given_GetPatientSnapshotTwoParam_When_ValidArgAndPSinDB_Then_returnPSfromDBwithEqualRef() {
 
         PatientSnapshot expectedSnapshot = new PatientSnapshot(PATIENT, AGE_AT_COLLECTION);
 
@@ -70,7 +70,7 @@ public class DataImportServiceTests extends BaseTest {
     }
 
     @Test
-    public void GetPatientSnapshotTwoParam_WhenValidArgAndNoPSinDB_ReturnNewPS() {
+    public void Given_GetPatientSnapshotTwoParam_When_ValidArgAndNoPSinDB_Then_ReturnNewPS() {
 
         when(this.patientSnapshotRepository.findByPatient(EXTERNAL_ID))
                 .thenReturn(new HashSet<>());
@@ -82,7 +82,7 @@ public class DataImportServiceTests extends BaseTest {
     }
 
     @Test
-    public void GetPatientSnapshot4Param_WhenValidArg_ReturnPSfromPatientWithEqualREF() {
+    public void Given_GetPatientSnapshot4Param_When_ValidArg_Then_ReturnPSfromPatientWithEqualREF() {
 
         Patient patientWithSnapshots = new Patient(EXTERNAL_ID, SEX, RACE, ETHNICITY, GROUP);
 
@@ -95,8 +95,9 @@ public class DataImportServiceTests extends BaseTest {
         Assert.assertEquals(SNAPSHOT, actualSnapshot);
     }
 
+
     @Test
-    public void GetPatientSnapshot4Param_WhenValidArgAndNoMatchingPS_ReturnNewPSforPatient(){
+    public void Given_GetPatientSnapshot4Param_When_ValidArgAndNoMatchingPS_Then_ReturnNewPSforPatient(){
 
         actualSnapshot = dataImportService.getPatientSnapshot(PATIENT, AGE_AT_COLLECTION,
                 COLLECTION_DATE, COLLECTION_EVENT, ELAPSED_TIME);
@@ -109,7 +110,7 @@ public class DataImportServiceTests extends BaseTest {
     }
 
     @Test
-    public void GetPatientSnapshot6Param_When_PatientInDB_ReturnNewPSforPatient(){
+    public void Given_GetPatientSnapshot6Param_When_PatientInDB_Then_ReturnNewPSforPatient(){
 
         when(patientRepository.findByExternalIdAndGroup(EXTERNAL_ID, GROUP))
                 .thenReturn(PATIENT);
@@ -125,7 +126,7 @@ public class DataImportServiceTests extends BaseTest {
     }
 
     @Test
-    public void getPatientSnapshot6Param_When_ValidArgAndNoPatientInDB_ReturnMatchingPS(){
+    public void Given_getPatientSnapshot6Param_When_ValidArgAndNoPatientInDB_Then_ReturnMatchingPS(){
 
         when(patientRepository.findByExternalIdAndGroup(EXTERNAL_ID, GROUP))
                 .thenReturn(null);
@@ -136,6 +137,23 @@ public class DataImportServiceTests extends BaseTest {
         Assert.assertEquals(EXTERNAL_ID,  actualSnapshot.getPatient().getExternalId());
         Assert.assertEquals(AGE_AT_COLLECTION,  actualSnapshot.getAgeAtCollection());
     }
+
+    @Test(expected = NullPointerException.class)
+    public void Given_getpatiensnapshot6param_When_externalidisblank_Then_returnnullexception(){
+
+        actualSnapshot = dataImportService.getPatientSnapshot("", SEX, RACE,ETHNICITY,
+                AGE_AT_COLLECTION, GROUP);
+
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void Given_getpatiensnapshot6param_When_externalidisnull_Then_returnnullexception(){
+
+        actualSnapshot = dataImportService.getPatientSnapshot(null, SEX, RACE,ETHNICITY,
+                AGE_AT_COLLECTION, GROUP);
+
+    }
+
 
 }
 

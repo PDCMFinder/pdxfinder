@@ -219,7 +219,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void Given_getDostString_When_ControlFlagIsToggled_Then_returnAppropriateNotNullDoseString() {
+    public void Given_getDostString_When_ControlFlagIsToggled_Then_returnAppropriateDoseString() {
 
         String doseStringWithControls;
         String doseStringWithoutControls;
@@ -231,10 +231,6 @@ public class TreatmentProtocolTest extends BaseTest {
         doseStringWithoutControls = treatmentProtocolList
                 .get(0)
                 .getDoseString(DO_NOT_READ_CONTROLS);
-
-
-        Assert.assertNotNull(doseStringWithControls);
-        Assert.assertNotNull(doseStringWithoutControls);
 
         Assert.assertEquals(
                 String.format("%s / %s / %s", CONTROL_DOSE_1, DRUG_DOSE_2, DRUG_DOSE_3),
@@ -257,9 +253,6 @@ public class TreatmentProtocolTest extends BaseTest {
         durationStringWithoutControls = treatmentProtocolList
                 .get(0)
                 .getDurationString(DO_NOT_READ_CONTROLS);
-
-        Assert.assertNotNull(durationStringWithControls);
-        Assert.assertNotNull(durationStringWithoutControls);
 
         Assert.assertEquals(
                 String.format("%s / %s / %s", CONTROL_DURATION_1, DRUG_DURATION_2, DRUG_DURATION_3),
@@ -288,7 +281,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void Given_getDurationAndGetDose_When_NodeStructureisIncomplete_Then_theyDoNotReturnNull(){
+    public void Given_getDurationAndGetDose_When_NodeStructureisIncomplete_Then_DoNotReturnNull(){
 
         TreatmentComponent treatmentComponent = new TreatmentComponent();
         TreatmentProtocol treatmentProtocol = new TreatmentProtocol();

@@ -362,14 +362,14 @@ public class DataImportService {
     }
 
 
-    public Patient createPatient(String patientId, Group dataSource, String sex, String race, String ethnicity) throws NullPointerException  {
+    public Patient createPatient(String patientId, Group dataSource, String sex, String race, String ethnicity) {
 
-        Patient patient = findPatient(patientId, dataSource);
-
-        if(patientId == null){
-            log.warn("In DataImportService.createPatient the patientId is null");
+        if(patientId == null || patientId.equals("")){
+            log.warn("In DataImportService.createPatient() : the patientId is null or blank");
             throw new NullPointerException();
         }
+
+        Patient patient = findPatient(patientId, dataSource);
 
         if(patient == null){
 
@@ -402,8 +402,8 @@ public class DataImportService {
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, Group group) {
 
 
-        if(externalId == null){
-            log.warn("In DataImportService.createPatient the patientId is null");
+        if(externalId == null || externalId.equals("")){
+            log.warn("In DataImportService.createPatient() : patientId is null");
             throw new NullPointerException();
         }
 
