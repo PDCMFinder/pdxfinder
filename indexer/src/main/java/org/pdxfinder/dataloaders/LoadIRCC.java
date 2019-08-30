@@ -174,8 +174,8 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step16LoadVariationData() {
         log.info(String.format("Loading WGS for model %s", dto.getModelCreation().getSourcePdxId()));
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation", finderRootDir+"/data");
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"copy number alteration", finderRootDir+"/data");
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation", finderRootDir+"/data/"+dataSource);
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"copy number alteration", finderRootDir+"/data/"+dataSource);
     }
 
     @Override
