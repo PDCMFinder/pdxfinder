@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.admin.zooma.ZoomaEntity;
+import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.MappingService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.dto.PaginationDTO;
@@ -44,6 +46,9 @@ public class AjaxController {
     private UtilityService utilityService;
     private MappingService mappingService;
     private CSVHandler csvHandler;
+
+    @Autowired
+    private DataImportService dataImportService;
 
     @Autowired
     public AjaxController(MappingService mappingService,
@@ -197,6 +202,12 @@ public class AjaxController {
         }
 
         return new ResponseEntity<>(responseBody, responseStatus);
+    }
+
+    @GetMapping("/ontologies")
+    public Object getOntologies(){
+
+        return dataImportService.getAllOntologyTerms();
     }
 
 

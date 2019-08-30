@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {MappingService} from "../mapping.service";
 import {Mapping, MappingInterface} from "../mapping-interface";
 import {GeneralService} from "../general.service";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder} from "@angular/forms";
 
 declare var swal: any;
 
@@ -50,6 +50,7 @@ export class DatasourceSpecificComponent implements OnInit {
         // This will allow navigation to respond param changes on thesame route path
         // This.router.routeReuseStrategy.shouldReuseRoute = () => false;
     }
+
 
     ngOnInit() {
 
@@ -110,7 +111,7 @@ export class DatasourceSpecificComponent implements OnInit {
             data => {
 
                 if(data == 'closeParentDetails'){
-                    this.showNotif = false;
+                   // this.showNotif = false;
                 }
             }
         )

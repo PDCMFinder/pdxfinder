@@ -1,5 +1,4 @@
 <div class="row wrapper border-bottom white-bg page-heading">
-
     <div class="col-lg-8">
         <h2> {{dataSource | uppercase}} Unmapped {{entityType | titlecase}} Summary</h2>
         <ol class="breadcrumb">
@@ -17,6 +16,13 @@
     </div>
 </div>
 
+
+
+
+
+
+
+
 <div *ngIf="showNotif" class="top-notif col-lg-3 animated fadeInRight">
     <h3> {{selectedSrc | uppercase}} {{selectedEntityType | uppercase}}<span (click)="toggleNotification(false)" class='close'></span></h3>
     <p> {{selectedDetails}}  </p>
@@ -25,7 +31,7 @@
 
     <!--
     <button class="btn btn-primary btn-sm" type="submit" (click)="updateSkippedTerm()"> Skip Term </button>
-     <button class="btn btn-outline btn-default btn-sm" (click)="toggleNotification(false)"> Close </button> -->
+     <button class="btn btn-outline btn-default btn-sm" (click)="toggleNotification(false)"> Close </button> *ngIf="!submitted"  -->
 </div>
 
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -36,8 +42,8 @@
 
             <div class="col-lg-12" *ngIf="dataExists">
 
-                <form #mappingForm="ngForm" *ngIf="!submitted" (ngSubmit)="updateMappingEntity()" novalidate>
-                    <div class="pdxfinder float-e-margins">
+                <form #mappingForm="ngForm" (ngSubmit)="updateMappingEntity()" novalidate>
+                    <div class="pdxfinder float-e-margins" style="border: 1px solid rgba(3, 54, 157, 1);">
 
                         <!--
                         <div class="pdxfinder-title">
