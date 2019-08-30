@@ -26,7 +26,12 @@ import java.util.*;
  */
 public class Ontolia {
 
-    private static final String drugsBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1908";
+    private static final String chemicalModifierBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1932";
+    private static final String dietarySupplementBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1505";
+    private static final String drugOrChemByStructBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1913";
+    private static final String pharmaSubstanceBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1909";
+    private static final String physiologyBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1899";
+
     private static final String regimenBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C12218";
     private static final String geneProductBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C26548";
 
@@ -68,8 +73,20 @@ public class Ontolia {
     public void run(){
 
 
-        log.info("Loading Drugs from NCIT.");
-        loadNCITLeafDrugs("treatment", drugsBranchUrl, true);
+        log.info("Loading Chemical Modifiers from NCIT.");
+        loadNCITLeafDrugs("treatment", chemicalModifierBranchUrl, true);
+
+        log.info("Loading Dietary Supplements from NCIT.");
+        loadNCITLeafDrugs("treatment", dietarySupplementBranchUrl, true);
+
+        log.info("Loading Drug or Chem from NCIT.");
+        loadNCITLeafDrugs("treatment", drugOrChemByStructBranchUrl, true);
+
+        log.info("Loading Pharma Substance from NCIT.");
+        loadNCITLeafDrugs("treatment", pharmaSubstanceBranchUrl, true);
+
+        log.info("Loading Physiology-Regulatory factors from NCIT.");
+        loadNCITLeafDrugs("treatment", physiologyBranchUrl, true);
 
         log.info("Loading Gene Products from NCIT.");
         loadNCITLeafDrugs("treatment", geneProductBranchUrl, true);

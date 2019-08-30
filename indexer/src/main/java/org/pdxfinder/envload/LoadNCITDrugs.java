@@ -11,6 +11,7 @@ import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
+import org.pdxfinder.services.ontology.Ontolia;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,8 +62,8 @@ public class LoadNCITDrugs implements CommandLineRunner {
 
         if (options.has("loadNCITDrugs") || options.has("loadALL")  || options.has("loadEssentials")) {
 
-            log.info("Loading all Drugs from NCIT.");
-            loadNCITLeafDrugs();
+            Ontolia ontolia = new Ontolia(utilityService, dataImportService);
+            ontolia.run();
 
         }
 
