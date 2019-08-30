@@ -274,14 +274,14 @@ public class TreatmentProtocolTest extends BaseTest {
 
         doseStringWithControls = treatmentProtocolList
                 .get(1)
-                .getDurationString(READ_CONTROLS_COMPONENTS);
+                .getDoseString(READ_CONTROLS_COMPONENTS);
 
         Assert.assertEquals(CONTROL_DURATION_1,durationStringWithControls);
         Assert.assertEquals(CONTROL_DOSE_1,doseStringWithControls);
     }
 
     @Test
-    public void Given_getDurationAndGetDose_When_NodeStructureisIncomplete_Then_DoNotReturnNull(){
+    public void Given_getDurationAndGetDose_When_NodeStructureIsIncomplete_Then_DoNotReturnNull(){
 
         TreatmentComponent treatmentComponent = new TreatmentComponent();
         TreatmentProtocol treatmentProtocol = new TreatmentProtocol();
