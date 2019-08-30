@@ -1,13 +1,14 @@
 package org.pdxfinder.dataloaders;
 
-
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.neo4j.ogm.session.Session;
 
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
-
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
@@ -17,98 +18,41 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
 
-import org.apache.poi.ss.usermodel.*;
-
-/*
- * Created by csaba on 06/08/2018.
- */
-
-
 /**
- * aka UPDOG: Universal PdxData tO Graph
- * <p>
- * We should call it UPDOG. And it sets up a good joke. Any newcomer says "What's UPDOG?" we can say "Nothing much, what's up with you?"
+ * Univeral Loader, aka UPDOG: Universal PdxData tO Graph
+ *
+ * "What's UPDOG?"
+ * "Nothing much, what's up with you?"
+ * Comments may contain egregious dog puns.
  */
 @Component
 public class UniversalLoader extends UniversalLoaderOmic {
 
     private final static Logger log = LoggerFactory.getLogger(UniversalLoader.class);
-
-    private Session session;
-
     static ApplicationContext context;
     ReportManager reportManager;
 
     private String finderRootDir;
-
     private String dataRootDirectory;
 
-    /**
-     * Placeholder for the data stored in the "patient" tab
-     */
     private List<List<String>> patientSheetData;
-
-
-    /**
-     * Placeholder for the data stored in the "patienttumor at collection" tab
-     */
     private List<List<String>> patientTumorSheetData;
-
-    /**
-     * Placeholder for the data stored in the "patient treatment information" tab
-     */
     private List<List<String>> patientTreatmentSheetData;
-
-    /**
-     * Placeholder for the data stored in the "PDX model detail" tab
-     */
     private List<List<String>> pdxModelSheetData;
-
-
-    /**
-     * Placeholder for the data stored in the "PDX model validation" tab
-     */
     private List<List<String>> pdxModelValidationSheetData;
-
-
-    /**
-     * Placeholder for the data stored in the "sample platform description" template
-     */
     private List<List<String>> samplePlatformDescriptionSheetData;
-
-    /**
-     * Placeholder for the data stored in the "sharing and contact" tab
-     */
     private List<List<String>> sharingAndContactSheetData;
-
-
-    /**
-     * Placeholder for the data stored in the "breast and or colorectal diagno" tab
-     */
     private List<List<String>> cytogeneticsSheetData;
-
-
-    /**
-     * Placeholder for the data stored in the "Loader related data tab
-     */
     private List<List<String>> loaderRelatedDataSheetData;
-
-
-    /**
-     * Placeholder for the data stored in the drug dosing template
-     */
     private List<List<String>> drugDosingSheetData;
 
-
     private Group ds;
-
     private Boolean stopLoading;
-
     private Set<String> modelIDs;
 
     public UniversalLoader(ReportManager reportManager, UtilityService utilityService, DataImportService dataImportService) {
@@ -132,92 +76,42 @@ public class UniversalLoader extends UniversalLoaderOmic {
         pdxModelValidationSheetData = new ArrayList<>();
         sharingAndContactSheetData = new ArrayList<>();
         loaderRelatedDataSheetData = new ArrayList<>();
+        Optional<Workbook> metadata = getWorkbook(updogCurrDir, "metadata.xlsx");
+        if (metadata.isPresent()) {
+            initializeSheetData(metadata.get().getSheetAt(1), patientSheetData);
+            initializeSheetData(metadata.get().getSheetAt(2), patientTumorSheetData);
+            initializeSheetData(metadata.get().getSheetAt(3), pdxModelSheetData);
+            initializeSheetData(metadata.get().getSheetAt(4), pdxModelValidationSheetData);
+            initializeSheetData(metadata.get().getSheetAt(5), sharingAndContactSheetData);
+            initializeSheetData(metadata.get().getSheetAt(6), loaderRelatedDataSheetData);
+        }
 
         samplePlatformDescriptionSheetData = new ArrayList<>();
+        Optional<Workbook> samplePlatformDescription = getWorkbook(updogCurrDir, "sampleplatform.xlsx");
+        if (samplePlatformDescription.isPresent()) {
+            initializeSheetData(samplePlatformDescription.get().getSheetAt(0), samplePlatformDescriptionSheetData);
+        }
+
         cytogeneticsSheetData = new ArrayList<>();
+        Optional<Workbook> cytogenetics = getWorkbook(updogCurrDir, "cyto/cytogenetics.xlsx");
+        if (cytogenetics.isPresent()) {
+            initializeSheetData(cytogenetics.get().getSheetAt(0), cytogeneticsSheetData);
+        }
+
         patientTreatmentSheetData = new ArrayList<>();
+        Optional<Workbook> patientTreatment = getWorkbook(updogCurrDir, "treatment/patienttreatment.xlsx");
+        if (patientTreatment.isPresent()) {
+            initializeSheetData(patientTreatment.get().getSheetAt(0), patientSheetData);
+        }
+
         drugDosingSheetData = new ArrayList<>();
-
-
-        //Metadata template
-        String metaDataTemplate = updogCurrDir + "/metadata.xlsx";
-        File metaDataFile = new File(metaDataTemplate);
-
-        if (metaDataFile.exists()) {
-
-            FileInputStream excelFile = new FileInputStream(metaDataFile);
-            Workbook workbook = new XSSFWorkbook(excelFile);
-            log.info("Loading template from " + metaDataTemplate);
-
-            initializeSheetData(workbook.getSheetAt(1), patientSheetData);
-            initializeSheetData(workbook.getSheetAt(2), patientTumorSheetData);
-            initializeSheetData(workbook.getSheetAt(3), pdxModelSheetData);
-            initializeSheetData(workbook.getSheetAt(4), pdxModelValidationSheetData);
-            initializeSheetData(workbook.getSheetAt(5), sharingAndContactSheetData);
-            initializeSheetData(workbook.getSheetAt(6), loaderRelatedDataSheetData);
-        }
-
-
-        //SamplePlatformDescription template
-        String samplePlatformDescriptionTemplate = updogCurrDir + "/sampleplatform.xlsx";
-        File samplePlatformFile = new File(samplePlatformDescriptionTemplate);
-
-        if (samplePlatformFile.exists()) {
-
-            FileInputStream excelFile = new FileInputStream(samplePlatformFile);
-            Workbook workbook = new XSSFWorkbook(excelFile);
-            log.info("Loading template from " + samplePlatformDescriptionTemplate);
-
-            initializeSheetData(workbook.getSheetAt(0), samplePlatformDescriptionSheetData);
-        }
-
-
-        //Cytogenetics template
-        String cytogeneticsTemplate = updogCurrDir + "/cyto/cytogenetics.xlsx";
-        File cytogeneticsFile = new File(cytogeneticsTemplate);
-
-        if (cytogeneticsFile.exists()) {
-
-            FileInputStream excelFile = new FileInputStream(cytogeneticsFile);
-            Workbook workbook = new XSSFWorkbook(excelFile);
-            log.info("Loading template from " + cytogeneticsTemplate);
-
-            initializeSheetData(workbook.getSheetAt(0), cytogeneticsSheetData);
-        }
-
-
-        //Patient treatment template
-        String patientTreatmentTemplate = updogCurrDir + "/treatment/patienttreatment.xlsx";
-        File patientTreatmentFile = new File(patientTreatmentTemplate);
-
-        if (patientTreatmentFile.exists()) {
-
-            FileInputStream excelFile = new FileInputStream(patientTreatmentFile);
-            Workbook workbook = new XSSFWorkbook(excelFile);
-            log.info("Loading template from " + patientTreatmentTemplate);
-
-            initializeSheetData(workbook.getSheetAt(0), patientTreatmentSheetData);
-        }
-
-
-        //Drug dosing template
-        String drugDosingTemplate = updogCurrDir + "/treatment/drugdosing.xlsx";
-        File drugDosingFile = new File(drugDosingTemplate);
-
-        if (drugDosingFile.exists()) {
-
-            FileInputStream excelFile = new FileInputStream(drugDosingFile);
-            Workbook workbook = new XSSFWorkbook(excelFile);
-            log.info("Loading template from " + drugDosingTemplate);
-
-            initializeSheetData(workbook.getSheetAt(0), drugDosingSheetData);
+        Optional<Workbook> drugDosing = getWorkbook(updogCurrDir, "treatment/drugdosing.xlsx");
+        if (drugDosing.isPresent()) {
+            initializeSheetData(drugDosing.get().getSheetAt(0), drugDosingSheetData);
         }
     }
 
 
-    /**
-     * Loads the data from the lists into the DB
-     */
     public void loadTemplateData() {
 
         //:: DON'T CHANGE THE ORDER OF THESE METHODS UNLESS YOU WANT TO RISK THE UNIVERSE TO COLLAPSE!
@@ -227,19 +121,28 @@ public class UniversalLoader extends UniversalLoaderOmic {
         createPdxModelDetails();
         createPdxModelValidations();
         createSharingAndContacts();
-
-
         createDerivedPatientModelDataset();
-
-
         createPatientTreatments();
-
         createOmicData();
-
         createCytogeneticsData();
 
     }
 
+    public Optional<Workbook> getWorkbook(String updogCurrDir, String templatePath) {
+        templatePath = String.join("/", updogCurrDir, templatePath);
+        File file = new File(templatePath);
+        log.debug("Loading template {}", templatePath);
+        if (!file.exists()) return Optional.empty();
+
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
+            XSSFWorkbook workbook = new XSSFWorkbook(fileInputStream);
+            return Optional.of(workbook);
+
+        } catch (IOException e) {
+            log.error("There was a problem accessing the file: {}", e);
+        }
+        return Optional.empty();
+    }
 
     /**
      * Loads the data from a spreadsheet tab into a placeholder
