@@ -7,10 +7,8 @@ import org.pdxfinder.BaseTestWithPersistence;
 import org.pdxfinder.graph.repositories.DataProjectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -21,8 +19,9 @@ public class DataProjectionsTimeTest extends BaseTestWithPersistence {
     @Autowired
     private DataProjectionRepository dataProjectionRepository;
 
+    @Ignore
     @Test
-    public void Given_DataProjection_When_CascadeCreateSaveAndFinds_Then_PrintTimes() throws UnsupportedEncodingException {
+    public void Given_DataProjection_When_CascadeCreateSaveAndFinds_Then_PrintTimes() {
 
         String hundredBytes = generateRandomString(2);
         String tenKiB = generateRandomString(4);
@@ -47,7 +46,7 @@ public class DataProjectionsTimeTest extends BaseTestWithPersistence {
     }
 
 
-    private String generateRandomString(int exponent) throws UnsupportedEncodingException {
+    private String generateRandomString(int exponent) {
 
         int byteSize = (int) Math.pow(10, exponent);
         byte[] generatedByte = new byte[byteSize];
