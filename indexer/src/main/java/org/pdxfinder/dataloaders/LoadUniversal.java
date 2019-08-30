@@ -70,6 +70,7 @@ public class LoadUniversal implements CommandLineRunner, ApplicationContextAware
         parser.accepts("loadUniversal", "Running universal loader (UPDOG)");
         parser.accepts("loadALL", "Load all, running universal loader (UPDOG)");
         OptionSet options = parser.parse(args);
+        finderRootDir = UniversalLoader.stripTrailingSlash(finderRootDir);
 
         if (options.has("loadUniversal") || options.has("loadALL")) {
 
