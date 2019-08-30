@@ -911,10 +911,20 @@ public class DataImportService {
 
     }
 
+    public Collection<OntologyTerm> getAllOntologyTermsByTypeFromTo(String type, int from, int to) {
 
-    public void saveOntologyTerm(OntologyTerm ot){
+        return ontologyTermRepository.findAllByTypeFromTo(type, from, to);
 
-        ontologyTermRepository.save(ot);
+    }
+
+    public int getOntologyTermNumberByType(String type){
+
+        return ontologyTermRepository.getOntologyTermNumberByType(type);
+    }
+
+    public OntologyTerm saveOntologyTerm(OntologyTerm ot){
+
+        return ontologyTermRepository.save(ot);
     }
 
     public void deleteOntologyTermsWithoutMapping(){
