@@ -29,6 +29,7 @@ public class Ontolia {
     private static final String chemicalModifierBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1932";
     private static final String dietarySupplementBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1505";
     private static final String drugOrChemByStructBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1913";
+    private static final String industrialAidBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C45678";
     private static final String pharmaSubstanceBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1909";
     private static final String physiologyBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1899";
 
@@ -81,6 +82,9 @@ public class Ontolia {
 
         log.info("Loading Drug or Chem from NCIT.");
         loadNCITLeafDrugs("treatment", drugOrChemByStructBranchUrl, true);
+
+        log.info("Loading Industrial Aids from NCIT.");
+        loadNCITLeafDrugs("treatment", industrialAidBranchUrl, true);
 
         log.info("Loading Pharma Substance from NCIT.");
         loadNCITLeafDrugs("treatment", pharmaSubstanceBranchUrl, true);
