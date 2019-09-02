@@ -22,6 +22,7 @@ public class OntoliaMatrixRow {
 
     public OntoliaMatrixRow(String[] synonyms) {
 
+        this.synonyms = synonyms;
         matchedTerms = new ArrayList<>();
         matchedTermsFoundIn = new ArrayList<>();
         matchScore = 0;
@@ -30,32 +31,39 @@ public class OntoliaMatrixRow {
     }
 
 
-    public void matchToTerms(Map<String, OntologyTerm> termsByLabel, Map<String, OntologyTerm> termsBySynonym){
+    /**
+     *
+     * [existingOntologyLabel]
+     * (existingOntologySynonym)
+     * |not found|
+     *
+     * @return
+     */
+    public String getRowString(){
 
-
+        String s = "";
         for(int i = 0; i < synonyms.length; i++){
 
-            String label = getCleanLabel(synonyms[i]);
+            if(matchedTerms.get(i) != null){
 
-            if(termsByLabel.containsKey(label)){
-                matchedTerms.add(termsByLabel.get(label));
-                matchedTermsFoundIn.add("label");
-            }
-            else if(termsBySynonym.containsKey(label)){
-                matchedTerms.add(termsBySynonym.get(label));
-                matchedTermsFoundIn.add("synonym");
+                if(matchedTermsFoundIn.get(i).equals("label")){
+                    s += "["+matchedTerms.get(i).getLabel()+"] ";
+                }
+                else {
+                    s += "("+matchedTerms.get(i).getLabel()+") ";
+                }
+
             }
             else{
 
-                matchedTerms.add(null);
-                matchedTermsFoundIn.add(null);
+                s += "|"+ synonyms[i]+"| ";
             }
 
-
-
         }
-    }
+        s += "Score: "+matchScore;
 
+        return s;
+    }
 
 
     public void calculateScore(){
@@ -75,26 +83,7 @@ public class OntoliaMatrixRow {
 
 
 
-    private String getCleanLabel(String label){
 
-        String cleanLabel = label.toLowerCase();
-        cleanLabel = cleanLabel.replaceAll("regimen", "");
-        cleanLabel = cleanLabel.replaceAll("high dose", "");
-        cleanLabel = cleanLabel.replaceAll("low-dose", "");
-        cleanLabel = cleanLabel.replaceAll("low dose", "");
-        cleanLabel = cleanLabel.replaceAll("dose-dense", "");
-        cleanLabel = cleanLabel.replaceAll("high-dose", "");
-        cleanLabel = cleanLabel.replaceAll("pulse intense", "");
-        cleanLabel = cleanLabel.replaceAll("intravenous", "");
-        cleanLabel = cleanLabel.replaceAll("oral", "");
-        cleanLabel = cleanLabel.replaceAll("modified", "");
-        cleanLabel = cleanLabel.replaceAll("hyperfractionated", "");
-        cleanLabel = cleanLabel.replaceAll("infusional", "");
-
-        cleanLabel = cleanLabel.replaceAll("([^\\s]+\\s+cancer)", "");
-
-        return cleanLabel.trim();
-    }
 
 
 

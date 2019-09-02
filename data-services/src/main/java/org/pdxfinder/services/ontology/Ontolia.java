@@ -236,10 +236,6 @@ public class Ontolia {
             log.info("Linked regimens: "+Integer.toString(i + batch));
         }
 
-        for(int j=0; j<unlinkedRegimens.size(); j++){
-            System.out.println(unlinkedRegimens.get(j) + " == " +unlinkedRegimensSynonyms.get(j) +"\n");
-
-        }
 
         System.out.println("***********************************");
 
@@ -264,29 +260,66 @@ public class Ontolia {
 
         Set<String> synonyms = regimen.getSynonyms();
 
-        boolean linked = false;
+        OntoliaMatrix slashOntoliaMatrix = new OntoliaMatrix("/", loadedTreatmentTerms, loadedTreatmentTermsSynonyms);
+        OntoliaMatrix dashOntoliaMatrix = new OntoliaMatrix("-", loadedTreatmentTerms, loadedTreatmentTermsSynonyms);
 
-
-        String synonymCombo = "";
-
-        String treatmentCausedTheFailure = "";
-
-        List<OntologyTerm> slashMatrix = new ArrayList<>();
-        List<OntologyTerm> dashMatrix = new ArrayList<>();
-
-        for(String synonym : synonyms){
+        for(String synonym : synonyms) {
 
             String[] synSlashPre = synonym.split("/");
             String[] synDash = synonym.split("-");
 
-
-            slashMatrix = new ArrayList<>();
-            dashMatrix = new ArrayList<>();
-
             String[] synSlash = splitCombos(synSlashPre);
 
+            slashOntoliaMatrix.addMatrixRow(synSlash);
+            dashOntoliaMatrix.addMatrixRow(synDash);
+
+        }
+
+        OntoliaMatrixRow slashOMR = slashOntoliaMatrix.getBestCompleteMatch();
+        OntoliaMatrixRow dashOMR = dashOntoliaMatrix.getBestCompleteMatch();
+
+        OntoliaMatrixRow completeMatch = null;
 
 
+        if(slashOMR != null && dashOMR != null && slashOMR.getMatchScore() >= dashOMR.getMatchScore()) completeMatch = slashOMR;
+        if(slashOMR != null && dashOMR != null && slashOMR.getMatchScore() < dashOMR.getMatchScore()) completeMatch = dashOMR;
+        if(slashOMR == null && dashOMR != null) completeMatch = dashOMR;
+        if(slashOMR != null && dashOMR == null) completeMatch = slashOMR;
+
+        if(completeMatch != null){
+
+            linkedRegimens.add(regimen.getLabel());
+            linkedRegimenLabelsToTerms.put(regimen.getLabel(), new HashSet<>(completeMatch.getMatchedTerms()));
+        }
+        else{
+            //we couldn't match all synonyms to a term
+
+            slashOMR = slashOntoliaMatrix.getBestMatch();
+            dashOMR = dashOntoliaMatrix.getBestMatch();
+
+            OntoliaMatrixRow bestMatch = null;
+
+
+            if(slashOMR != null && dashOMR != null && slashOMR.getMatchScore() >= dashOMR.getMatchScore()) bestMatch = slashOMR;
+            if(slashOMR != null && dashOMR != null && slashOMR.getMatchScore() < dashOMR.getMatchScore()) bestMatch = dashOMR;
+            if(slashOMR == null && dashOMR != null) bestMatch = dashOMR;
+            if(slashOMR != null && dashOMR == null) bestMatch = slashOMR;
+
+            String matchString = "NOT AVAILABLE";
+
+            if(bestMatch != null) {
+                matchString = bestMatch.getRowString();
+            }
+
+
+            unlinkedRegimens.add(regimen.getLabel());
+            unlinkedRegimensWithReason.add(regimen.getLabel() + " => " + matchString);
+
+
+        }
+
+        log.info("");
+            /*
             synonymCombo += "#slash ";
 
             for(int i=0; i < synSlash.length; i++){
@@ -377,6 +410,12 @@ public class Ontolia {
             unlinkedRegimensSynonyms.add(synonymCombo);
             unlinkedRegimensWithReason.add(regimen.getLabel() + " => " + treatmentCausedTheFailure);
         }
+
+        */
+
+
+
+
     }
 
 
@@ -392,9 +431,14 @@ public class Ontolia {
 
             OntologyTerm regimen = loadedRegimenTerms.get(regimenLabel.toLowerCase());
 
-            regimen.setSubclassOf(entry.getValue());
-            dataImportService.saveOntologyTerm(regimen);
-
+            try {
+                regimen.setSubclassOf(entry.getValue());
+                dataImportService.saveOntologyTerm(regimen);
+            }
+            catch (NullPointerException e){
+                log.error("Error saving "+regimenLabel);
+                log.error("");
+            }
         }
 
 
