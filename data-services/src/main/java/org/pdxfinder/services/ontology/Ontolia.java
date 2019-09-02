@@ -143,6 +143,10 @@ public class Ontolia {
 
                     if(!hasChildren){
 
+                        //if the current node has previously been created, skip
+                        if(type.equals("treatment") && loadedTreatmentTerms.containsKey(term.getString("label").toLowerCase())) continue;
+                        if(type.equals("treatment regimen") && loadedRegimenTerms.containsKey(term.getString("label").toLowerCase())) continue;
+
                         OntologyTerm ot = new OntologyTerm();
                         ot.setType(type);
                         ot.setLabel(term.getString("label"));
