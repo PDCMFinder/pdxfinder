@@ -9,6 +9,8 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.admin.pojos.MappingContainer;
+import org.pdxfinder.graph.dao.OntologyTerm;
+import org.pdxfinder.graph.repositories.OntologyTermRepository;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.admin.zooma.*;
 import org.pdxfinder.graph.repositories.SampleRepository;
@@ -67,16 +69,19 @@ public class MappingService {
     private UtilityService utilityService;
 
     private PaginationService paginationService;
+    private OntologyTermRepository ontologyTermRepository;
 
 
     @Autowired
     public MappingService(SampleRepository sampleRepository,
                           MappingEntityRepository mappingEntityRepository,
+                          OntologyTermRepository ontologyTermRepository,
                           UtilityService utilityService,
                           PaginationService paginationService) {
 
         this.sampleRepository = sampleRepository;
         this.mappingEntityRepository = mappingEntityRepository;
+        this.ontologyTermRepository = ontologyTermRepository;
         this.utilityService = utilityService;
         this.paginationService = paginationService;
         container = new MappingContainer();
@@ -978,6 +983,13 @@ public class MappingService {
         writeMappingsToFile(submittedEntities.get(0).getEntityType());
 
         return savedEntities;
+    }
+
+
+    public Collection<OntologyTerm> getAllOntologyTerms() {
+
+        return ontologyTermRepository.findAll();
+
     }
 
 

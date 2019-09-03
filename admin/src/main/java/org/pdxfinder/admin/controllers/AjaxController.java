@@ -48,9 +48,6 @@ public class AjaxController {
     private CSVHandler csvHandler;
 
     @Autowired
-    private DataImportService dataImportService;
-
-    @Autowired
     public AjaxController(MappingService mappingService,
                           RestTemplateBuilder restTemplateBuilder,
                           CSVHandler csvHandler) {
@@ -204,10 +201,10 @@ public class AjaxController {
         return new ResponseEntity<>(responseBody, responseStatus);
     }
 
-    @GetMapping("/ontologies")
+    @GetMapping("/mappings/ontologies")
     public Object getOntologies(){
 
-        return dataImportService.getAllOntologyTerms();
+        return mappingService.getAllOntologyTerms();
     }
 
 

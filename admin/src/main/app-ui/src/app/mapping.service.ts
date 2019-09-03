@@ -89,6 +89,13 @@ export class MappingService {
         return this.http.get<Mapping>(url);
     }
 
+    getOLS(): Observable<any>{
+
+        let url = `${this._mappingsUrl}/ontologies`;
+
+        return this.http.get<any>(url);
+    }
+
 
     componentsDataBus(data): void{
         this.dataSubject.next(data);

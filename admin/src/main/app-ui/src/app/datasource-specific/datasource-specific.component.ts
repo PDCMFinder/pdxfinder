@@ -49,6 +49,8 @@ export class DatasourceSpecificComponent implements OnInit {
 
     private autoSuggestTextBox: string;
 
+    private dataList = [];
+
 
     constructor(private router: Router,
                 private route: ActivatedRoute,
@@ -60,6 +62,8 @@ export class DatasourceSpecificComponent implements OnInit {
     }
 
     ngOnInit() {
+
+        this.getOLSTerms();
 
         // From the current url snapshot, get the source parameter and assign to the dataSource property
         this.dataSource = this.route.snapshot.paramMap.get('source');
@@ -123,6 +127,29 @@ export class DatasourceSpecificComponent implements OnInit {
         )
 
     };
+
+
+
+
+
+    getOLSTerms() {
+
+        this._mappingService.getOLS()
+            .subscribe(
+                data => {
+
+                    console.log(data);
+
+                    this.dataList = data;
+
+                    // transfer data out of observable
+                    // localStorage.setItem('thisMapping', JSON.stringify(this.mappings));
+                }
+            );
+
+    }
+
+
 
 
     getUnmappedTerms(page) {
@@ -363,233 +390,4 @@ export class DatasourceSpecificComponent implements OnInit {
 
     }
 
-
-    dataList = [
-        {
-            "id": 41761,
-            "url": "http://purl.obolibrary.org/obo/NCIT_C3262",
-            "label": "Cancer",
-            "directMappedSamplesNumber": 0,
-            "indirectMappedSamplesNumber": 639,
-            "synonyms": [],
-            "type": null,
-            "description": null,
-            "allowAsSuggestion": true,
-            "subclassOf": null,
-            "sampleMappedTo": null,
-            "treatmentMappedTo": null
-        },
-        {
-            "id": 41762,
-            "url": "http://purl.obolibrary.org/obo/NCIT_C4741",
-            "label": "Neoplasm by Morphology",
-            "directMappedSamplesNumber": 0,
-            "indirectMappedSamplesNumber": 639,
-            "synonyms": [
-                "Neoplasm by Morphology"
-            ],
-            "type": null,
-            "description": null,
-            "allowAsSuggestion": true,
-            "subclassOf": null,
-            "sampleMappedTo": null,
-            "treatmentMappedTo": null
-        },
-        {
-            "id": 41763,
-            "url": "http://purl.obolibrary.org/obo/NCIT_C3263",
-            "label": "Neoplasm by Site",
-            "directMappedSamplesNumber": 0,
-            "indirectMappedSamplesNumber": 639,
-            "synonyms": [
-                "Neoplasm by Site"
-            ],
-            "type": null,
-            "description": null,
-            "allowAsSuggestion": true,
-            "subclassOf": null,
-            "sampleMappedTo": null,
-            "treatmentMappedTo": null
-        },
-        {
-            "id": 41764,
-            "url": "http://purl.obolibrary.org/obo/NCIT_C6974",
-            "label": "Neoplasm of Uncertain Histogenesis",
-            "directMappedSamplesNumber": 0,
-            "indirectMappedSamplesNumber": 0,
-            "synonyms": [
-                "Neoplasm of Uncertain Histogenesis",
-                "Tumor of Uncertain Histogenesis",
-                "Tumor of Uncertain Origin",
-                "Neoplasm of Uncertain Origin"
-            ],
-            "type": null,
-            "description": null,
-            "allowAsSuggestion": true,
-            "subclassOf": null,
-            "sampleMappedTo": null,
-            "treatmentMappedTo": null
-        },
-        {
-            "id": 41765,
-            "url": "http://purl.obolibrary.org/obo/NCIT_C6971",
-            "label": "Meningothelial Cell Neoplasm",
-            "directMappedSamplesNumber": 0,
-            "indirectMappedSamplesNumber": 0,
-            "synonyms": [
-                "Tumor of Meningothelial Cells",
-                "Meningothelial Cell Tumor",
-                "Primary Meningeal Neoplasm",
-                "Meningothelial Cell Neoplasm",
-                "Primary Meningeal Tumor"
-            ],
-            "type": null,
-            "description": null,
-            "allowAsSuggestion": true,
-            "subclassOf": null,
-            "sampleMappedTo": null,
-            "treatmentMappedTo": null
-        },
-        {
-            "id": 41766,
-            "url": "http://purl.obolibrary.org/obo/NCIT_C6930",
-            "label": "Mixed Neoplasm",
-            "directMappedSamplesNumber": 0,
-            "indirectMappedSamplesNumber": 0,
-            "synonyms": [
-                "Mixed Neoplasm",
-                "Mixed Tumor"
-            ],
-            "type": null,
-            "description": null,
-            "allowAsSuggestion": true,
-            "subclassOf": null,
-            "sampleMappedTo": null,
-            "treatmentMappedTo": null
-        },
-        {
-            "id": 41767,
-            "url": "http://purl.obolibrary.org/obo/NCIT_C27134",
-            "label": "Hematopoietic and Lymphoid Cell Neoplasm",
-            "directMappedSamplesNumber": 0,
-            "indirectMappedSamplesNumber": 0,
-            "synonyms": [
-                "Hematologic Cancer",
-                "Hematopoietic and Lymphoid Neoplasms",
-                "HEMOLYMPHORETICULAR TUMOR, MALIGNANT",
-                "Hematopoietic Neoplasm",
-                "Hematopoietic Neoplasms including Lymphomas",
-                "Hematopoietic Cell Tumor",
-                "Hematologic Malignancy",
-                "Hematopoietic, Including Myeloma",
-                "hematologic cancer",
-                "Hematopoietic Cancer",
-                "Hematologic Neoplasm",
-                "Hematopoietic Tumor",
-                "Hematopoietic malignancy, NOS",
-                "Malignant Hematopoietic Neoplasm",
-                "Hematological Tumor",
-                "Hematological Neoplasm",
-                "Malignant Hematologic Neoplasm",
-                "Hematopoietic and Lymphoid Cell Neoplasm"
-            ],
-            "type": null,
-            "description": null,
-            "allowAsSuggestion": true,
-            "subclassOf": null,
-            "sampleMappedTo": null,
-            "treatmentMappedTo": null
-        },
-        {
-            "id": 41768,
-            "url": "http://purl.obolibrary.org/obo/NCIT_C3786",
-            "label": "Mesothelial Neoplasm",
-            "directMappedSamplesNumber": 0,
-            "indirectMappedSamplesNumber": 0,
-            "synonyms": [
-                "Mesothelial Tumor",
-                "Mesothelial Neoplasm"
-            ],
-            "type": null,
-            "description": null,
-            "allowAsSuggestion": true,
-            "subclassOf": null,
-            "sampleMappedTo": null,
-            "treatmentMappedTo": null
-        },
-        {
-            "id": 41769,
-            "url": "http://purl.obolibrary.org/obo/NCIT_C3709",
-            "label": "Epithelial Neoplasm",
-            "directMappedSamplesNumber": 0,
-            "indirectMappedSamplesNumber": 639,
-            "synonyms": [
-                "Epithelial Neoplasms, NOS",
-                "Epithelioma",
-                "Epithelial Neoplasm"
-            ],
-            "type": null,
-            "description": null,
-            "allowAsSuggestion": true,
-            "subclassOf": null,
-            "sampleMappedTo": null,
-            "treatmentMappedTo": null
-        },
-        {
-            "id": 41770,
-            "url": "http://purl.obolibrary.org/obo/NCIT_C3708",
-            "label": "Germ Cell Tumor",
-            "directMappedSamplesNumber": 0,
-            "indirectMappedSamplesNumber": 0,
-            "synonyms": [
-                "Tumor of Germ Cell",
-                "Tumor of the Germ Cell",
-                "Neoplasm of Germ Cell",
-                "Germ Cell Neoplasm",
-                "germ cell tumor",
-                "Neoplasm of the Germ Cell",
-                "Germ Cell Tumor"
-            ],
-            "type": null,
-            "description": null,
-            "allowAsSuggestion": true,
-            "subclassOf": null,
-            "sampleMappedTo": null,
-            "treatmentMappedTo": null
-        },
-        {
-            "id": 41771,
-            "url": "http://purl.obolibrary.org/obo/NCIT_C3422",
-            "label": "Trophoblastic Tumor",
-            "directMappedSamplesNumber": 0,
-            "indirectMappedSamplesNumber": 0,
-            "synonyms": [
-                "Trophoblastic Neoplasms",
-                "Trophoblastic Tumor",
-                "Trophoblastic Neoplasm"
-            ],
-            "type": null,
-            "description": null,
-            "allowAsSuggestion": true,
-            "subclassOf": null,
-            "sampleMappedTo": null,
-            "treatmentMappedTo": null
-        },
-        {
-            "id": 41772,
-            "url": "http://purl.obolibrary.org/obo/NCIT_C7068",
-            "label": "Neoplastic Polyp",
-            "directMappedSamplesNumber": 0,
-            "indirectMappedSamplesNumber": 0,
-            "synonyms": [
-                "Neoplastic Polyp"
-            ],
-            "type": null,
-            "description": null,
-            "allowAsSuggestion": true,
-            "subclassOf": null,
-            "sampleMappedTo": null,
-            "treatmentMappedTo": null
-        }
-    ];
 }
