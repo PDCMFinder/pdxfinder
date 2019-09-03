@@ -101,7 +101,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
         patientTreatmentSheetData = new ArrayList<>();
         Optional<Workbook> patientTreatment = getWorkbook(updogCurrDir, "treatment/patienttreatment.xlsx");
         if (patientTreatment.isPresent()) {
-            initializeSheetData(patientTreatment.get().getSheetAt(0), patientSheetData);
+            initializeSheetData(patientTreatment.get().getSheetAt(0), patientTreatmentSheetData);
         }
 
         drugDosingSheetData = new ArrayList<>();
