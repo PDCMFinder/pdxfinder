@@ -400,7 +400,6 @@ public class DataImportService {
         PatientSnapshot patientSnapshot;
 
         if (patient == null) {
-            log.info("Patient '{}' not found. Creating", externalId);
 
             patient = this.getPatient(externalId, sex, race, ethnicity, group);
 

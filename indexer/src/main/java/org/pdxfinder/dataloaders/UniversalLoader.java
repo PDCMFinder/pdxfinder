@@ -1024,8 +1024,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 if (cnaData.exists()) {
                     log.info("Loading cna for " + modelId);
                     loadOmicData(modelCreation, ds, "copy number alteration", providerDataRootDir);
-                } else {
-                    log.info("No omic data for model " + modelId);
                 }
 
                 // Transcriptomics
