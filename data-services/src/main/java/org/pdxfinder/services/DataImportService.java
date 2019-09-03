@@ -489,7 +489,6 @@ public class DataImportService {
         Patient patient = patientRepository.findByExternalIdAndGroup(externalId, group);
 
         if (patient == null) {
-            log.info("Patient '{}' not found. Creating", externalId);
 
             patient = new Patient(externalId, sex, race, ethnicity, group);
 
@@ -740,6 +739,12 @@ public class DataImportService {
         }
         return hostStrain;
     }
+
+    public HostStrain findHostStrain(String symbol){
+
+        return hostStrainRepository.findBySymbol(symbol);
+    }
+
 
     // is this bad? ... probably..
     public Marker getMarker(String symbol) {
