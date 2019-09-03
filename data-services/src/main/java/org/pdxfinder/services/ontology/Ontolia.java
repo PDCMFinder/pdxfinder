@@ -54,6 +54,8 @@ public class Ontolia {
     private DataImportService dataImportService;
 
 
+    private List<String> customRegimenList = new ArrayList<>(Arrays.asList("http://purl.obolibrary.org/obo/NCIT_C11197"));
+
     private final static Logger log = LoggerFactory.getLogger(Ontolia.class);
 
 
@@ -95,9 +97,11 @@ public class Ontolia {
         log.info("Loading Gene Products from NCIT.");
         loadNCITLeafDrugs("treatment", geneProductBranchUrl, true);
 
-
         log.info("Loading regimens from NCIT.");
         loadNCITLeafDrugs("treatment regimen", regimenBranchUrl, false);
+
+        log.info("Loading custom regimens from NCIT");
+        loadCustomList("treatment regimen", customRegimenList, false);
 
         log.info("Linking drug regimens to individual drugs");
         linkRegimens();
@@ -215,7 +219,79 @@ public class Ontolia {
     }
 
 
+    private void loadCustomList(String type, List<String> list, boolean mapSynonyms){
 
+
+        for(String termUrl: list){
+
+            String encodedTermUrl = "";
+            try {
+                //have to double encode the url to get the desired result
+                encodedTermUrl = URLEncoder.encode(termUrl, "UTF-8");
+                encodedTermUrl = URLEncoder.encode(encodedTermUrl, "UTF-8");
+
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            String url = ontologyUrl+encodedTermUrl;
+
+            String json = utilityService.parseURL(url);
+
+            try {
+                JSONObject term = new JSONObject(json);
+
+
+                OntologyTerm ot = new OntologyTerm();
+                ot.setType(type);
+                ot.setLabel(term.getString("label"));
+                ot.setUrl(term.getString("iri"));
+                ot.setAllowAsSuggestion(false);
+
+                if(term.has("description")){
+                    ot.setDescription(term.getString("description"));
+                }
+
+                if(term.has("synonyms")) {
+                    JSONArray synonyms = term.getJSONArray("synonyms");
+                    Set<String> synonymsSet = new HashSet<>();
+
+                    for (int i = 0; i < synonyms.length(); i++) {
+                        synonymsSet.add(synonyms.getString(i));
+                    }
+
+                    ot.setSynonyms(synonymsSet);
+
+                    if(mapSynonyms){
+
+                        for (int i = 0; i < synonyms.length(); i++) {
+                            loadedTreatmentTermsSynonyms.put(synonyms.getString(i).toLowerCase(), ot);
+                        }
+                    }
+                }
+
+                OntologyTerm savedOt = dataImportService.saveOntologyTerm(ot);
+
+                if(type.equals("treatment")) loadedTreatmentTerms.put(ot.getLabel().toLowerCase(), savedOt);
+                if(type.equals("treatment regimen")) loadedRegimenTerms.put(ot.getLabel().toLowerCase(), savedOt);
+
+
+
+            }
+            catch (Exception e){
+
+                e.printStackTrace();
+            }
+
+
+
+
+        }
+
+
+
+
+    }
 
     private void linkRegimens() {
 
