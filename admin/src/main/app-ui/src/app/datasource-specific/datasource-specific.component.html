@@ -18,25 +18,48 @@
 
 
 
-
-
-
-
-
 <div *ngIf="showNotif" class="top-notif col-lg-3 animated fadeInRight">
-    <h3> {{selectedSrc | uppercase}} {{selectedEntityType | uppercase}}<span (click)="toggleNotification(false)" class='close'></span></h3>
-    <p> {{selectedDetails}}  </p>
+    <h3> {{selectedSrc | uppercase}} {{selectedEntityType | uppercase}}
+        <span (click)="toggleNotification(false)" class='close'></span>
+    </h3>
 
-    <button class="btn btn-primary btn-circle " type="button" (click)="updateSkippedTerm()"> <i class="ti-control-skip-forward"></i> </button>
+    <p style="margin-top: 7px;">
+        {{selectedDetails}}
+    </p>
 
+    <div class="form-group" style="margin-top: -10px;">
+        <label> Insert Mapped Term : </label>
+        <input (click)="ontologySuggest()" type="text" placeholder="Search OLS" class="autocomplete android" [(ngModel)]="autoSuggestTextBox">
+    </div>
+
+
+    <ul *ngIf="selectedURL" class="list-group clear-list m-t-n-sm" style="margin-top: 10px;">
+        <li class="list-group-item fist-item">
+            <a class="pull-right" href="{{selectedURL}}" target="_blank"> {{selectedURL}} </a> <strong> URL </strong>
+        </li>
+        <li class="list-group-item fist-item">
+            <span class="pull-right"> Manual Curation </span> <strong> Justification </strong>
+        </li>
+        <li class="list-group-item fist-item">
+            <span class="pull-right"> Direct </span> <strong> Map Type </strong>
+        </li>
+    </ul>
+
+    <a *ngIf="!olsTermSelected" (click)="updateSkippedTerm()" class="btn btn-primary btn-sm btn-outline ">
+        <i class="ti-control-skip-forward"></i> &nbsp; Skip this Term
+    </a>
+
+    <!--
+    <button class="btn btn-primary btn-circle " type="button" (click)="updateSkippedTerm()"> <i class="ti-control-skip-forward"></i> </button> -->
     <!--
     <button class="btn btn-primary btn-sm" type="submit" (click)="updateSkippedTerm()"> Skip Term </button>
      <button class="btn btn-outline btn-default btn-sm" (click)="toggleNotification(false)"> Close </button> *ngIf="!submitted"  -->
 </div>
 
+
+
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="p-w-md m-t-sm col-lg-10 col-lg-offset-1">
-
 
         <div class="row" style="margin-top: -10px;">
 
@@ -65,7 +88,6 @@
                             </button>
 
                         </div>
-
 
                         <div class="pdxfinder-content">
 

@@ -16,21 +16,21 @@ declare var swal: any;
 })
 export class CurationValidateComponent implements OnInit {
 
-    public data;
-    public mappings = [];
+    private data;
+    private mappings = [];
 
-    public report = null;
+    private report = null;
 
-    public dataTypes = [];
+    private dataTypes = [];
 
-    public selectedFiles: FileList;
-    public currentFileUpload: File;
-    public uploadedFilename: string;
+    private selectedFiles: FileList;
+    private currentFileUpload: File;
+    private uploadedFilename: string;
     errorReport: string;
 
-    public parsedCsvHead = [];
-    public parsedCsvBody = [];
-    public showCSV = false;
+    private parsedCsvHead = [];
+    private parsedCsvBody = [];
+    private showCSV = false;
 
     constructor(private router: Router,
                 private route: ActivatedRoute,

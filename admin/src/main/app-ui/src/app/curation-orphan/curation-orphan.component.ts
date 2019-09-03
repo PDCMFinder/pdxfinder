@@ -16,39 +16,39 @@ declare var swal: any;
 })
 export class CurationOrphanComponent implements OnInit {
 
-    public data;
-    public mappings = [];
+    private data;
+    private mappings = [];
 
-    public dataSource;
-    public entityType;
+    private dataSource;
+    private entityType;
 
-    public dataExists = false;
-    public dataLabels;
-    public columnHeaders = [];
+    private dataExists = false;
+    private dataLabels;
+    private columnHeaders = [];
 
-    public selectedRow;
-    public selectedEntity: any;
-    public report = null;
+    private selectedRow;
+    private selectedEntity: any;
+    private report = null;
 
-    public pageRange: number[];
+    private pageRange: number[];
 
     // Selected Fields
-    public selectedDetails: any;
-    public selectedEntityId: any;
-    public selectedEntityType: string;
-    public selectedSrc: any;
+    private selectedDetails: any;
+    private selectedEntityId: any;
+    private selectedEntityType: string;
+    private selectedSrc: any;
 
-    public showNotif: boolean = false;
-    public showFilter: boolean = false;
+    private showNotif: boolean = false;
+    private showFilter: boolean = false;
 
-    public pageSize;
-    public pageOptions = ['2', '3', '5', '10', '15', '20', '25'];
-    public userPage: number;
+    private pageSize;
+    private pageOptions = ['2', '3', '5', '10', '15', '20', '25'];
+    private userPage: number;
 
-    public mappingStatus: any;
-    public pageOptionSize: string;
+    private mappingStatus: any;
+    private pageOptionSize: string;
 
-    public dataTypes = [];
+    private dataTypes = [];
 
     constructor(private router: Router,
                 private route: ActivatedRoute,
