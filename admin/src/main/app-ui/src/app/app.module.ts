@@ -16,7 +16,6 @@ import {CurationOrphanComponent} from './curation-orphan/curation-orphan.compone
 import {CurationValidateComponent} from './curation-validate/curation-validate.component';
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {MatAutocompleteModule, MatInputModule} from '@angular/material';
 
 
 @NgModule({
@@ -38,8 +37,6 @@ import {MatAutocompleteModule, MatInputModule} from '@angular/material';
         FormsModule,
         AppRoutingModule,
         BrowserAnimationsModule,
-        MatAutocompleteModule,
-        MatInputModule,
         ReactiveFormsModule
     ],
     providers: [MappingService],
