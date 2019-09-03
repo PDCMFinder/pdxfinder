@@ -1,6 +1,18 @@
 
+.styleFile{ padding:0 0 15px; border-bottom:1px solid rgba(3, 54, 157, 0.9); color:#666; margin:20px 10px 0 0; font-weight: normal; }
 
-.styleFile{ padding:0px 0px 15px; border-bottom:1px solid rgba(3, 54, 157, 0.9); color:#666; margin:20px 10px 0px 0px; font-weight: normal; }
+.android {
+    padding: 0;
+    height: 30px;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom:1px solid #03369D;
+    background: transparent;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    padding-left: 0;
+}
 
 /* CUSTOMIZE BOOTSTRAP CSS FOR 1/2*/
 .col-lg-2-5 {
@@ -102,7 +114,7 @@
     color: #212121;
     border-radius: 2px;
     box-shadow: 0 0 14px rgba(0, 0, 0, 0.24);
-    position: absolute;
+    /*position: absolute;*/
     bottom: 15px;
     left: 15px;
     transition: .3s;
@@ -117,7 +129,7 @@
     color: #212121;
     border-radius: 2px;
     box-shadow: 0 0 14px rgba(0, 0, 0, 0.24);
-    position: absolute;
+    /*position: absolute;*/
     top: 15px;
     right: 15px;
     transition: .3s;
