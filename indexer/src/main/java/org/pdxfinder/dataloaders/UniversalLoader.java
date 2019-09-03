@@ -516,7 +516,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
 
             } catch (Exception e) {
-                log.error("Error with model: " + modelId);
+                log.error("Error with model: " + modelId + " Probably duplicates?");
                 e.printStackTrace();
             }
 
@@ -1304,25 +1304,36 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             Specimen specimen = dataImportService.findSpecimenByModelAndPassageAndNomenclature(model, passage, nomenclature);
 
-            if (specimen != null) {
+            if (specimen == null) {
 
-                Sample xenoSample = specimen.getSample();
 
-                if (xenoSample == null) {
-                    xenoSample = new Sample();
+                HostStrain hostStrain = dataImportService.findHostStrain(nomenclature);
 
+                if (hostStrain != null) {
+
+                    specimen = new Specimen();
+                    specimen.setHostStrain(hostStrain);
+                    specimen.setPassage(passage);
+
+                } else {
+
+                    log.error("Cannot save cytogenetics for Model: "+modelId +" Failed to get hoststrain "+nomenclature);
+                    continue;
                 }
-
-                xenoSample.addMolecularCharacterization(mc);
-                specimen.setSample(xenoSample);
-                model.addRelatedSample(xenoSample);
-                dataImportService.saveSpecimen(specimen);
-                dataImportService.saveModelCreation(model);
-
-            } else {
-                log.error("Specimen not found. Model:" + modelId + " Passage: " + passage + " Nomenclature: " + nomenclature);
             }
 
+            Sample xenoSample = specimen.getSample();
+
+            if (xenoSample == null) {
+                xenoSample = new Sample();
+
+            }
+
+            xenoSample.addMolecularCharacterization(mc);
+            specimen.setSample(xenoSample);
+            model.addRelatedSample(xenoSample);
+            dataImportService.saveSpecimen(specimen);
+            dataImportService.saveModelCreation(model);
 
         }
 
