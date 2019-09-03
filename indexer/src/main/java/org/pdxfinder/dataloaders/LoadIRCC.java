@@ -69,6 +69,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
         step00StartReportManager();
         step02GetMetaDataJSON();
+        if (skipThis) return;
         step03CreateProviderGroup();
         step04CreateNSGammaHostStrain();
         step06SetProjectGroup();
