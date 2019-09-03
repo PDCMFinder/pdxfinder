@@ -476,6 +476,22 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         //does this string have digits only now?
         if(passageString.matches("\\d+")) return passageString;
 
+        //is this a double? ie: 1.0
+        if(passageString.matches("(\\d)\\.(\\d)")){
+
+            try {
+                double p = Double.parseDouble(passageString);
+                int i = (int) p;
+                return String.valueOf(i);
+            }
+            catch (Exception e){
+
+                log.warn("Unable to determine passage from sample name " + passageString + ". Assuming 0");
+                return "0";
+            }
+
+        }
+
         log.warn("Unable to determine passage from sample name " + passageString + ". Assuming 0");
         return "0";
 
