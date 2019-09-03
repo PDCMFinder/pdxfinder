@@ -75,8 +75,13 @@ public class ValidateDB implements CommandLineRunner{
         boolean noWarnings = true;
 
         //check if there is any unlinked nodes that are not dataprojections
+
+
         log.info("Looking for sad nodes (nodes without a relationship)");
         Set<String> unlinkedNodeTypeSet = new HashSet<>();
+        /*
+        //this  is disabled now, needs to be batched
+
         Set<Object> unlinkedNodes = dataImportService.findUnlinkedNodes();
 
         if(unlinkedNodes.size() == 0){
@@ -93,6 +98,8 @@ public class ValidateDB implements CommandLineRunner{
                 }
             }
         }
+
+        */
 
 
         //check if there is any patient with multiple treatment summaries
