@@ -110,7 +110,11 @@ public class TreatmentProtocol {
 
             String drugName;
 
-            if(comp.getTreatment() != null && comp.getTreatment().getTreatmentToOntologyRelationship() != null & comp.getTreatment().getTreatmentToOntologyRelationship().getOntologyTerm() != null){
+            if(
+                comp.getTreatment() != null && 
+                comp.getTreatment().getTreatmentToOntologyRelationship() != null && 
+                comp.getTreatment().getTreatmentToOntologyRelationship().getOntologyTerm() != null
+            ){
 
                 drugName = comp.getTreatment().getTreatmentToOntologyRelationship().getOntologyTerm().getLabel();
             }

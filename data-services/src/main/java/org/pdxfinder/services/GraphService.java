@@ -249,9 +249,9 @@ public class GraphService {
 
                     JSONObject j = jarray.getJSONObject(i);
 
-                    MutatedMarkerData mmd = new MutatedMarkerData(j.getString("gene_name"), Integer.parseInt(j.getString("number_of_models")));
-                    //mmd.setGene_name(j.getString("gene_name"));
-                    //mmd.setNumber_of_models(Integer.parseInt(j.getString("number_of_models")));
+                    MutatedMarkerData mmd = new MutatedMarkerData();
+                    mmd.setGene_name(j.getString("gene_name"));
+                    mmd.setNumber_of_models(Integer.parseInt(j.getString("number_of_models")));
 
                     result.add(mmd);
                 }

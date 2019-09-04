@@ -11,10 +11,6 @@ public class MutatedMarkerData {
     String gene_name;
     int number_of_models;
 
-    public MutatedMarkerData(String gene_name, int number_of_models) {
-        this.gene_name = gene_name;
-        this.number_of_models = number_of_models;
-    }
 
     public String getGene_name() {
         return gene_name;
