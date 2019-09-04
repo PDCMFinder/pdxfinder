@@ -199,6 +199,12 @@ public class AjaxController {
         return new ResponseEntity<>(responseBody, responseStatus);
     }
 
+    @GetMapping("/mappings/ontologies")
+    public Object getOntologies(){
+
+        return mappingService.getOntologyTermsByType("diagnosis");
+    }
+
 
     @GetMapping("/mappings/export")
     @ResponseBody

@@ -11,23 +11,25 @@ import {Mapping} from "../mapping-interface";
 })
 export class DatasourceSpecificSuggestionsComponent implements OnInit {
 
-    public entityId;
-    public selectedEntity = {};
+    private entityId;
+    private selectedEntity = {};
 
-    public dataLabels;
-    public columnHeaders = [];
+    private dataLabels;
+    private columnHeaders = [];
 
-    public data = {
+    private data = {
         DataSource: "",
         SampleDiagnosis : "",
         TumorType : "",
         OriginTissue : ""
     }
 
-    public clickedSuggestionId: number;
-    public showClickedDetails: boolean = false;
-    public selectedSuggestion: Mapping;
-    public clickedDetails;
+    private clickedSuggestionId: number;
+    private showClickedDetails: boolean = false;
+    private selectedSuggestion: Mapping;
+    private clickedDetails;
+
+    private olsUrl = 'https://www.ebi.ac.uk/ols/ontologies/ncit/terms?iri=';
 
     constructor(private router: Router,
                 private route: ActivatedRoute,

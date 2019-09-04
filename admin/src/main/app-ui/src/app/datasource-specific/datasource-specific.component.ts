@@ -1,11 +1,12 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {MappingService} from "../mapping.service";
 import {Mapping, MappingInterface} from "../mapping-interface";
 import {GeneralService} from "../general.service";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder, FormControl} from "@angular/forms";
 
 declare var swal: any;
+declare var $: any;
 
 @Component({
     selector: 'app-datasource-specific',
@@ -14,33 +15,43 @@ declare var swal: any;
 })
 export class DatasourceSpecificComponent implements OnInit {
 
-    public data;
-    public mappings = [];
+    private data;
+    private mappings = [];
 
-    public dataSource;
-    public entityType;
-    public entityTypeUrl;
+    private dataSource;
+    private entityType;
+    private entityTypeUrl;
 
-    public dataExists = false;
-    public dataLabels;
-    public columnHeaders = [];
+    private dataExists = false;
+    private dataLabels;
+    private columnHeaders = [];
 
-    public report = null;
+    private report = null;
 
-    public pageRange: number[];
+    private pageRange: number[];
 
     // Selected Fields
-    public selectedEntity;
-    public selectedRow;
-    public selectedEntityId: any;
-    public selectedDetails: any;
-    public selectedEntityType: string;
-    public selectedSrc: any;
-    public showNotif: boolean = false;
+    private selectedEntity;
+    private selectedRow;
+    private selectedEntityId: any;
+    private selectedDetails: any;
+    private selectedEntityType: string;
+    private selectedURL: string;
+    private selectedSrc: any;
+    private olsTermSelected: boolean = false;
+    private showNotif: boolean = false;
 
-    public pageSize;
-    public pageOptions = ['2', '3', '5', '10', '15', '20', '25'];
-    public userPage: number;
+    private pageSize;
+    private pageOptions = ['2', '3', '5', '10', '15', '20', '25'];
+    private userPage: number;
+
+    options: string[] = ['One', 'Two', 'Three'];
+
+    private olsUrl = 'https://www.ebi.ac.uk/ols/ontologies/ncit/terms?iri=';
+    private autoSuggestTextBox: string;
+
+    private dataList = [];
+
 
     constructor(private router: Router,
                 private route: ActivatedRoute,
@@ -53,6 +64,7 @@ export class DatasourceSpecificComponent implements OnInit {
 
     ngOnInit() {
 
+        this.getOLSTerms();
 
         // From the current url snapshot, get the source parameter and assign to the dataSource property
         this.dataSource = this.route.snapshot.paramMap.get('source');
@@ -110,11 +122,35 @@ export class DatasourceSpecificComponent implements OnInit {
             data => {
 
                 if(data == 'closeParentDetails'){
-                    this.showNotif = false;
+                    // this.showNotif = false;
                 }
             }
         )
+
     };
+
+
+
+
+
+    getOLSTerms() {
+
+        this._mappingService.getOLS()
+            .subscribe(
+                data => {
+
+                    console.log(data);
+
+                    this.dataList = data;
+
+                    // transfer data out of observable
+                    // localStorage.setItem('thisMapping', JSON.stringify(this.mappings));
+                }
+            );
+
+    }
+
+
 
 
     getUnmappedTerms(page) {
@@ -161,8 +197,56 @@ export class DatasourceSpecificComponent implements OnInit {
                         count++;
                     }
 
+                    // transfer data out of observable
+                    // localStorage.setItem('thisMapping', JSON.stringify(this.mappings));
                 }
             );
+
+
+    }
+
+
+
+    ontologySuggest(){
+
+        var data = this.mappings;
+        var selectedId = this.selectedEntityId;
+
+        var componentSelector = 'autocomplete';
+
+        var dataArray = this.dataList.map(
+            (data) => {
+                return { value: data.label, data: data };
+            }
+        );
+
+        // Initialize autocomplete:
+        $(`.${componentSelector}`).autocomplete({
+
+            lookup: dataArray,
+            lookupFilter: function(suggestion, originalQuery, queryLowerCase) {
+                var re = new RegExp('\\b' + $.Autocomplete.utils.escapeRegExChars(queryLowerCase), 'gi');
+                return re.test(suggestion.value);
+            },
+            onSelect: (suggestion) => {
+
+                for (var i = 0; i < this.mappings.length; i++) {
+
+                    if (this.mappings[i].entityId == this.selectedEntityId) {
+
+                        this.mappings[i].mappedTermLabel = suggestion.data.label;
+                        this.mappings[i].mappedTermUrl = suggestion.data.url;
+                        this.mappings[i].mapType = 'Direct';
+                        this.mappings[i].justification = 'Manual Curation';
+
+                        this.selectedURL = suggestion.data.url;
+                        this.olsTermSelected = true;
+                    }
+                }
+
+            }
+        });
+
     }
 
 
@@ -178,6 +262,11 @@ export class DatasourceSpecificComponent implements OnInit {
 
         this.selectedSrc = mapping.mappingValues.DataSource;
         this.selectedEntityType = mapping.entityType;
+
+
+        this.autoSuggestTextBox = (mapping.mappedTermLabel === '-') ? '' : mapping.mappedTermLabel;
+        this.selectedURL = mapping.mappedTermUrl;
+        this.olsTermSelected = false;
 
         this.toggleNotification(true);
 
@@ -256,6 +345,8 @@ export class DatasourceSpecificComponent implements OnInit {
             }
         });
 
+       // console.log(validatedTerms);
+
         this.sendDataForUpdate(validatedTerms);
     }
 
@@ -299,6 +390,5 @@ export class DatasourceSpecificComponent implements OnInit {
             })
 
     }
-
 
 }
