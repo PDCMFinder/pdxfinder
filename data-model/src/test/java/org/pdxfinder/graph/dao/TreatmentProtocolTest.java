@@ -166,7 +166,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void Given_getTreatmentString_When_MultipleTCandControlsOn_Then_ReturnNotNullConcatenatedString(){
+    public void Given_GetTreatmentString_When_MultipleTCandControlsOn_Then_ReturnNotNullConcatenatedString(){
 
         String treatmentString;
 
@@ -181,7 +181,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void Given_getTreatmentString_When_TreatmentComponentsWithNoControl_Then_returnConcatenatedStrings(){
+    public void Given_GetTreatmentString_When_TreatmentComponentsWithNoControl_Then_ReturnConcatenatedStrings(){
 
         String treatmentString;
 
@@ -196,7 +196,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void Given_getTreatmentString_When_TreatmentsAreMissingOntologies_Then_returnBlankStrings() {
+    public void Given_GetTreatmentString_When_TreatmentsAreMissingOntologies_Then_ReturnBlankStrings() {
 
         String treatmentString1;
         String treatmentString2;
@@ -219,7 +219,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void Given_getDoseString_When_ControlFlagIsToggled_Then_returnAppropriateDoseString() {
+    public void Given_GetDoseString_When_ControlFlagIsToggled_Then_ReturnAppropriateDoseString() {
 
         String doseStringWithControls;
         String doseStringWithoutControls;
@@ -241,7 +241,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void  Given_getDurationString_When_ControlFlagIsToggled_Then_returnStringWithAndWithoutControls() {
+    public void  Given_GetDurationString_When_ControlFlagIsToggled_Then_ReturnStringWithAndWithoutControls() {
 
         String durationStringWithControls;
         String durationStringWithoutControls;
@@ -263,7 +263,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void Given_getDurationAndGetDose_When_TreatmentIsMissingAnOntology_Then_returnDoseAndDurationUnaffected() {
+    public void Given_GetDurationAndGetDose_When_TreatmentIsMissingAnOntology_Then_ReturnDoseAndDurationUnaffected() {
 
         String durationStringWithControls;
         String doseStringWithControls;
@@ -281,7 +281,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void Given_getDurationAndGetDose_When_NodeStructureIsIncomplete_Then_DoNotReturnNull(){
+    public void Given_GetDurationAndGetDose_When_NodeStructureIsIncomplete_Then_DoNotReturnNull(){
 
         TreatmentComponent treatmentComponent = new TreatmentComponent();
         TreatmentProtocol treatmentProtocol = new TreatmentProtocol();
