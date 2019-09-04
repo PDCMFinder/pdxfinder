@@ -24,6 +24,7 @@ import org.springframework.util.Assert;
 
 import org.springframework.cache.annotation.Cacheable;
 
+import javax.management.RuntimeErrorException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -364,11 +365,16 @@ public class DataImportService {
 
     public Patient createPatient(String patientId, Group dataSource, String sex, String race, String ethnicity){
 
+        if(patientId == null || patientId.equals("")){
+            log.warn("In DataImportService.createPatient() : the patientId is null or blank");
+            throw new NullPointerException();
+        }
+
         Patient patient = findPatient(patientId, dataSource);
 
         if(patient == null){
 
-            patient = this.getPatient(patientId, sex, race, ethnicity, dataSource);
+            patient = new Patient(patientId,sex,race,ethnicity,dataSource);
             patientRepository.save(patient);
         }
 
@@ -397,12 +403,18 @@ public class DataImportService {
 
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, Group group) {
 
+
+        if(externalId == null || externalId.equals("")){
+            log.warn("In DataImportService.createPatient() : patientId is null or blank");
+            throw new NullPointerException();
+        }
+
         Patient patient = patientRepository.findByExternalIdAndGroup(externalId, group);
         PatientSnapshot patientSnapshot;
 
         if (patient == null) {
 
-            patient = this.getPatient(externalId, sex, race, ethnicity, group);
+            patient = new Patient(externalId,sex,race,ethnicity,group);
 
             patientSnapshot = new PatientSnapshot(patient, age);
             patientSnapshotRepository.save(patientSnapshot);
@@ -490,6 +502,7 @@ public class DataImportService {
         Patient patient = patientRepository.findByExternalIdAndGroup(externalId, group);
 
         if (patient == null) {
+            log.info("Patient '{}' not found. Creating", externalId);
 
             patient = new Patient(externalId, sex, race, ethnicity, group);
 
