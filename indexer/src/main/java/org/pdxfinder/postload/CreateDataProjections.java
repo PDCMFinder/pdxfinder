@@ -1117,15 +1117,35 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
                 for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
 
-
+                    //this bit adds the drugA + drugB + drugC etc to the options
                     String drugName = tp.getTreatmentString(true);
                     String response = tp.getResponse().getDescription();
-
                     addToModelDrugResponseDP(modelId, drugName, response);
 
+
+                    //we also need to deal with regimens
+                    for(TreatmentComponent tc: tp.getComponents()){
+
+                        Treatment t = tc.getTreatment();
+                        OntologyTerm ot = t.getTreatmentToOntologyRelationship().getOntologyTerm();
+
+                        if(ot.getType().equals("treatment regimen") && ot.getSubclassOf() != null && !ot.getSubclassOf().isEmpty()){
+
+                            List<String> regimenDrugs = new ArrayList<>();
+
+                            for(OntologyTerm ot2: ot.getSubclassOf()){
+
+                                regimenDrugs.add(ot2.getLabel());
+
+                            }
+                            //sort them alphabetically
+                            Collections.sort(regimenDrugs);
+                            drugName = String.join(" and ", regimenDrugs);
+                            addToModelDrugResponseDP(modelId, drugName, response);
+                        }
+                    }
                 }
             }
-
         }
         System.out.println();
 
