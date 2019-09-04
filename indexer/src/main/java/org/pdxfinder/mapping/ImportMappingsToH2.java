@@ -42,7 +42,7 @@ public class ImportMappingsToH2 implements CommandLineRunner{
         OptionSet options = parser.parse(args);
 
         if (options.has("initializeMappingDB")) {
-
+            log.info("initializing mappings to db");
             mappingFileToH2DB(MappingEntityType.diagnosis);
 
             mappingFileToH2DB(MappingEntityType.treatment);

@@ -5,7 +5,6 @@ import {Mapping, MappingInterface, MappingValues} from "../mapping-interface";
 import {GeneralService} from "../general.service";
 import {FormBuilder, FormGroup} from "@angular/forms";
 
-import { saveAs } from 'file-saver';
 
 declare var swal: any;
 
