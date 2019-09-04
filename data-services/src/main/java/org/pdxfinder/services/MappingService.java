@@ -724,6 +724,7 @@ public class MappingService {
         mappingEntity.setStatus(Status.unmapped.get());
         mappingEntity.setMappedTermLabel("-");
         mappingEntity.setDateCreated(new Date());
+        mappingEntity.setEntityType(mappingEntity.getEntityType().toLowerCase());
 
         String mappingKey = mappingEntity.generateMappingKey();
         mappingEntity.setMappingKey(mappingKey);
