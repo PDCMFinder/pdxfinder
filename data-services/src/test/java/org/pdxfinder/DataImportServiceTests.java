@@ -139,7 +139,7 @@ public class DataImportServiceTests extends BaseTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void Given_getpatiensnapshot6param_When_externalidisblank_Then_returnnullexception(){
+    public void Given_GetPatientSnapshot6Param_When_ExternalIdIsBlank_Then_ReturnNullException(){
 
         actualSnapshot = dataImportService.getPatientSnapshot("", SEX, RACE,ETHNICITY,
                 AGE_AT_COLLECTION, GROUP);
