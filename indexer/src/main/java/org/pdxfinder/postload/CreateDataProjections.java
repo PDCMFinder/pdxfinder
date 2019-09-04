@@ -78,7 +78,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
     private Map<String, List<DataAvailableDTO>> dataAvailableDP = new HashMap<>();
 
-    private List<MutatedMarkerData> frequentlyMutatedMarkers = null;
+    private List<MutatedMarkerData> frequentlyMutatedMarkersDP = null;
 
     protected static ApplicationContext context;
 
@@ -109,17 +109,17 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
             reportManager = (ReportManager) context.getBean("ReportManager");
 
-            //createMutationDataProjection();
+            createMutationDataProjection();
 
-            //createModelForQueryDataProjection();
+            createModelForQueryDataProjection();
 
-            //createModelDrugResponseDataProjection();
+            createModelDrugResponseDataProjection();
 
-            //createImmunoHistoChemistryDataProjection();
+            createImmunoHistoChemistryDataProjection();
 
-            //createCNADataProjection();
+            createCNADataProjection();
 
-            //createDataAvailableDataProjection();
+            createDataAvailableDataProjection();
 
             createFrequentlyMutatedGenesDataProjection();
 
@@ -1161,7 +1161,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
     private void createFrequentlyMutatedGenesDataProjection(){
 
         log.info("Creating Frequently Mutated Genes DP");
-        frequentlyMutatedMarkers = dataImportService.getFrequentlyMutatedGenes();
+        frequentlyMutatedMarkersDP = dataImportService.getFrequentlyMutatedGenes();
 
 
     }
@@ -1327,13 +1327,13 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
 
         try{
-            //ja1 = new JSONArray(frequentlyMutatedMarkers.toString());
-            fmgDP.setValue(frequentlyMutatedMarkers.toString());
+            //ja1 = new JSONArray(frequentlyMutatedMarkersDP.toString());
+            fmgDP.setValue(frequentlyMutatedMarkersDP.toString());
         }
         catch(Exception e){
 
             e.printStackTrace();
-            log.error(frequentlyMutatedMarkers.toString());
+            log.error(frequentlyMutatedMarkersDP.toString());
         }
 
 
