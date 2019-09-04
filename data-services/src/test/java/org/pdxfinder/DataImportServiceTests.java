@@ -66,7 +66,7 @@ public class DataImportServiceTests extends BaseTest {
 
         actualSnapshot = dataImportService.getPatientSnapshot(PATIENT, AGE_AT_COLLECTION);
 
-        Assert.assertEquals(expectedSnapshot, expectedSnapshot);
+        Assert.assertEquals(expectedSnapshot, actualSnapshot);
     }
 
     @Test
