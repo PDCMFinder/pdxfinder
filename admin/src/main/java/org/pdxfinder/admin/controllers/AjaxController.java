@@ -1,21 +1,25 @@
 package org.pdxfinder.admin.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.admin.zooma.ZoomaEntity;
 import org.pdxfinder.services.MappingService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.dto.PaginationDTO;
+import org.pdxfinder.services.mapping.CSVHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 
@@ -39,10 +43,14 @@ public class AjaxController {
     @Autowired
     private UtilityService utilityService;
     private MappingService mappingService;
+    private CSVHandler csvHandler;
 
     @Autowired
     public AjaxController(MappingService mappingService,
-                          RestTemplateBuilder restTemplateBuilder) {
+                          RestTemplateBuilder restTemplateBuilder,
+                          CSVHandler csvHandler) {
+
+        this.csvHandler = csvHandler;
         this.mappingService = mappingService;
         this.restTemplate = restTemplateBuilder.build();
     }
@@ -115,7 +123,9 @@ public class AjaxController {
     }
 
 
-    // Bulk update of Records
+    /**
+     * Bulk update of Records
+     */
     @PutMapping("/mappings")
     public ResponseEntity<?> editListOfEntityMappings(@RequestBody List<MappingEntity> submittedEntities) {
 
@@ -134,16 +144,144 @@ public class AjaxController {
     }
 
 
+    @GetMapping("/mappings/archive")
+    public ResponseEntity<?> readArchive(@RequestParam("entity-type") String entityType) {
+
+        mappingService.readArchive(entityType);
+
+        return new ResponseEntity<>("", HttpStatus.OK);
+    }
+
+
+    @PostMapping("/mappings/uploads")
+    public ResponseEntity<?> uploadData(@RequestParam("uploads") Optional<MultipartFile> uploads,
+                                        @RequestParam(value = "entity-type", defaultValue = "") Optional<String> entityType) {
+
+        Object responseBody = "";
+        HttpStatus responseStatus = HttpStatus.OK;
+
+        if (uploads.isPresent()) {
+
+            /*
+             * Send Data for Serialization
+             */
+            List<Map<String, String>> csvData = utilityService.serializeMultipartFile(uploads.get());
+
+            /*
+             * Validate CSV for emptiness, correct column Headers and valid contents
+             */
+            List report = new ArrayList();
+            try {
+
+                report = csvHandler.validateUploadedCSV(csvData);
+            }catch (Exception e){
+
+                report.add(HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase());
+            }
+
+            // If all rows passed submit data for processing
+            if (report.isEmpty()) {
+
+                List<MappingEntity> updatedData = mappingService.processUploadedCSV(csvData);
+
+                responseBody = updatedData;
+                responseStatus = HttpStatus.OK;
+            }else {
+
+                responseBody = report;
+                responseStatus = HttpStatus.UNPROCESSABLE_ENTITY;
+            }
+
+            // For this operation, create record in uploadedFileTable, For each of this back up in the validatedData Table
+            // Further read uploadedFile Table for getting history.
+        }
+
+        return new ResponseEntity<>(responseBody, responseStatus);
+    }
+
+    @GetMapping("/mappings/ontologies")
+    public Object getOntologies(){
+
+        return mappingService.getOntologyTermsByType("diagnosis");
+    }
+
+
+    @GetMapping("/mappings/export")
+    @ResponseBody
+    public Object exportMappingData(HttpServletResponse response,
+                                    @RequestParam("mq") Optional<String> mappingQuery,
+                                    @RequestParam(value = "mapped-term", defaultValue = "") Optional<String> mappedTermLabel,
+                                    @RequestParam(value = "map-terms-only", defaultValue = "") Optional<String> mappedTermsOnly,
+                                    @RequestParam(value = "entity-type", defaultValue = "0") Optional<List<String>> entityType,
+                                    @RequestParam(value = "map-type", defaultValue = "") Optional<String> mapType,
+                                    @RequestParam(value = "status", defaultValue = "0") Optional<List<String>> status,
+                                    @RequestParam(value = "page", defaultValue = "1") Integer page) {
+
+        String mappingLabel = "";
+        List<String> mappingValue = Arrays.asList("0");
+
+        try {
+            String[] query = mappingQuery.get().split(":");
+            mappingLabel = mappingQuery.get().split(":")[0];
+            mappingValue = Arrays.asList(query[1].trim());
+        } catch (Exception e) {
+        }
+
+        int size = 1000;
+        PaginationDTO result = mappingService.search(page, size, entityType.get(), mappingLabel,
+                                                     mappingValue, mappedTermLabel.get(), mapType.get(), mappedTermsOnly.get(), status.get());
+
+        List<MappingEntity> mappingEntities = mapper.convertValue(result.getAdditionalProperties().get("mappings"), List.class);
+
+        /*
+         *  Get Mapping Entity CSV Header
+         */
+        MappingEntity me = mappingEntities.get(0);
+        List<String> csvHead = csvHandler.getMappingEntityCSVHead(mappingEntities.get(0));
+
+        /*
+         *  Get Mapping Entity CSV Data Body
+         */
+        List<List<String>> mappingDataCSV = csvHandler.prepareMappingEntityForCSV(mappingEntities);
+
+
+        CsvMapper mapper = new CsvMapper();
+        CsvSchema.Builder builder = CsvSchema.builder();
+
+        for (String head : csvHead) {
+            builder.addColumn(head);
+        }
+        CsvSchema schema = builder.build().withHeader();
+
+        String csvReport = "CSV Report";
+        try {
+            csvReport = mapper.writer(schema).writeValueAsString(mappingDataCSV);
+        } catch (JsonProcessingException e) {
+        }
+
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=pdxAdmin-" + me.getStatus() + ".csv");
+        try {
+            response.getOutputStream().flush();
+        } catch (Exception e) {
+
+        }
+
+        return csvReport;
+    }
+
+
     /****************************************************************
      *                   INTERACTIONS WITH ZOOMA                    *
      ****************************************************************/
 
 
     @GetMapping("/zooma/transform")
-    public List<ZoomaEntity> transformAnnotationForZooma() {
+    public ResponseEntity<?> transformAnnotationForZooma() {
 
         List<ZoomaEntity> zoomaEntities = mappingService.transformMappingsForZooma();
-        return zoomaEntities; //new ResponseEntity<>(result, HttpStatus.OK);
+
+        return new ResponseEntity<>(zoomaEntities, HttpStatus.OK);
     }
 
 
@@ -212,14 +350,6 @@ public class AjaxController {
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
 
         return entity;
-    }
-
-
-    public String getCamelCase(String input) {
-
-        String output = StringUtils.capitalize(input.split("-")[0]) + StringUtils.capitalize(input.split("-")[1]);
-
-        return output;
     }
 
 

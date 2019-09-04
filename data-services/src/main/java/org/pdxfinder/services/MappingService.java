@@ -9,11 +9,14 @@ import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.admin.pojos.MappingContainer;
+import org.pdxfinder.graph.dao.OntologyTerm;
+import org.pdxfinder.graph.repositories.OntologyTermRepository;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.admin.zooma.*;
 import org.pdxfinder.graph.repositories.SampleRepository;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.dto.PaginationDTO;
+import org.pdxfinder.services.mapping.CSV;
 import org.pdxfinder.services.mapping.MappingEntityType;
 import org.pdxfinder.services.mapping.Status;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
@@ -66,16 +69,19 @@ public class MappingService {
     private UtilityService utilityService;
 
     private PaginationService paginationService;
+    private OntologyTermRepository ontologyTermRepository;
 
 
     @Autowired
     public MappingService(SampleRepository sampleRepository,
                           MappingEntityRepository mappingEntityRepository,
+                          OntologyTermRepository ontologyTermRepository,
                           UtilityService utilityService,
                           PaginationService paginationService) {
 
         this.sampleRepository = sampleRepository;
         this.mappingEntityRepository = mappingEntityRepository;
+        this.ontologyTermRepository = ontologyTermRepository;
         this.utilityService = utilityService;
         this.paginationService = paginationService;
         container = new MappingContainer();
@@ -702,9 +708,9 @@ public class MappingService {
         mappingLabels.add("TumorType");
 
         Map mappingValues = new HashMap();
-        mappingValues.put("OriginTissue", originTissue);
         mappingValues.put("DataSource", dataSource.toLowerCase());
         mappingValues.put("SampleDiagnosis", diagnosis);
+        mappingValues.put("OriginTissue", originTissue);
         mappingValues.put("TumorType", tumorType);
 
         MappingEntity mappingEntity = new MappingEntity(MappingEntityType.diagnosis.get(), mappingLabels, mappingValues);
@@ -776,6 +782,19 @@ public class MappingService {
     }
 
 
+
+    public void readArchive(String entityType) {
+
+
+        String jsonKey = "mappings";
+
+        String mappingDirectory = rootDir+"/mapping/backup/"+entityType;
+
+        utilityService.listAllFilesInADirectory(mappingDirectory);
+
+    }
+
+
     public void writeMappingsToFile(String entityType) {
 
 
@@ -836,6 +855,7 @@ public class MappingService {
 
         List<MappingEntity> mappingEntityList = new ArrayList<>();
 
+
         mappingEntityPage.forEach(mappingEntity -> {
 
             //get suggestions for missing mapping
@@ -849,7 +869,6 @@ public class MappingService {
 
             mappingEntityList.add(mappingEntity);
         });
-
 
         PaginationDTO paginationDto = paginationService.initializeDTO(mappingEntityPage);
         paginationDto.setAdditionalProperty("mappings", mappingEntityList);
@@ -896,6 +915,7 @@ public class MappingService {
     }
 
 
+
     public MappingEntity getMappingEntityById(Integer entityId) {
 
         Long id = Long.parseLong(String.valueOf(entityId));
@@ -915,10 +935,20 @@ public class MappingService {
     }
 
 
+
     public boolean checkExistence(Long entityId) {
 
         return mappingEntityRepository.exists(entityId);
 
+    }
+
+
+    public Optional<MappingEntity> getByMappingKeyAndEntityId(String mappingKey, Long entityId) {
+
+        Optional<MappingEntity> mappingEntity = mappingEntityRepository
+                .findByMappingKeyAndEntityId(mappingKey, entityId);
+
+        return mappingEntity;
     }
 
 
@@ -954,6 +984,61 @@ public class MappingService {
 
         return savedEntities;
     }
+
+
+    public List<OntologyTerm> getOntologyTermsByType(String type) {
+
+        return ontologyTermRepository.findByType(type);
+
+    }
+
+
+
+
+    public List<MappingEntity> processUploadedCSV(List<Map<String, String>> csvData) {
+
+
+        List<MappingEntity> savedEntities = new ArrayList<>();
+
+        csvData.forEach(eachData -> {
+
+            // Retrieve the entityId from the csv data
+            Long entityId = Long.parseLong(eachData.get(CSV.entityId.get()));
+
+
+            // Pull the data from h2 based on the entityId, update the data from csvData and save
+            MappingEntity updated = mappingEntityRepository.findByEntityId(entityId)
+                    .map(mappingEntity -> {
+
+                        /*
+                         *  Get Decision column of this csvData, if Yes, change Status to Validated
+                         *  If Decision column is NO, Pick content of ApprovedTerm column, replace maped term for that entity and set status as validated
+                         */
+                        if (eachData.get(CSV.decision.get()).equalsIgnoreCase(CSV.no.get())){
+
+                            mappingEntity.setMappedTermLabel(eachData.get(CSV.mappedTerm.get()));
+                            mappingEntity.setMappedTermUrl(eachData.get(CSV.mappedTermUrl.get()));
+                        }
+
+
+                        mappingEntity.setDateUpdated(new Date());
+                        mappingEntity.setStatus(Status.validated.get());
+                        return mappingEntityRepository.save(mappingEntity);
+                    })
+                    .orElseGet(() -> {
+                        return new MappingEntity();
+                    });
+
+            savedEntities.add(updated);
+
+        });
+
+        return savedEntities;
+
+    }
+
+
+
 
 
 }

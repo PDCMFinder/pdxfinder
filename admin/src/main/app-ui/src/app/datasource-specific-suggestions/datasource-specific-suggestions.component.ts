@@ -11,18 +11,25 @@ import {Mapping} from "../mapping-interface";
 })
 export class DatasourceSpecificSuggestionsComponent implements OnInit {
 
-    public entityId;
-    public selectedEntity = {};
+    private entityId;
+    private selectedEntity = {};
 
-    public dataLabels;
-    public columnHeaders = [];
+    private dataLabels;
+    private columnHeaders = [];
 
-    public data = {
+    private data = {
         DataSource: "",
         SampleDiagnosis : "",
         TumorType : "",
         OriginTissue : ""
     }
+
+    private clickedSuggestionId: number;
+    private showClickedDetails: boolean = false;
+    private selectedSuggestion: Mapping;
+    private clickedDetails;
+
+    private olsUrl = 'https://www.ebi.ac.uk/ols/ontologies/ncit/terms?iri=';
 
     constructor(private router: Router,
                 private route: ActivatedRoute,
@@ -30,9 +37,13 @@ export class DatasourceSpecificSuggestionsComponent implements OnInit {
 
     ngOnInit() {
 
+
         // From the current url snapshot, get the source parameter and assign to the dataSource property
         this.route.params.subscribe(
             params => {
+
+
+                this.toggleDetails(false);
 
                 this.entityId = params['id'];
 
@@ -70,5 +81,32 @@ export class DatasourceSpecificSuggestionsComponent implements OnInit {
     onSuggestionSubmit(suggestion){
         this._mappingService.componentsDataBus(suggestion);
     }
+
+
+    getClickedSuggestion(suggestion: Mapping) {
+
+        console.log(suggestion);
+
+
+        this.clickedSuggestionId = suggestion.entityId;
+        this.selectedSuggestion = suggestion;
+
+
+        this.clickedDetails = (suggestion.entityType == 'diagnosis') ?
+            suggestion.mappingValues.SampleDiagnosis : suggestion.mappingValues['TreatmentName'];
+
+
+        this.toggleDetails(true);
+
+        this._mappingService.eventDataBus('closeParentDetails');
+
+    }
+
+
+    toggleDetails(value: boolean) {
+
+        this.showClickedDetails = value;
+    }
+
 
 }

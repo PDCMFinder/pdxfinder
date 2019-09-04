@@ -20,8 +20,8 @@ declare function pdxFinderbarChart(title: String,
 })
 export class DatasourceSummaryComponent implements OnInit {
 
-    public mapType;
-    public mappingSummary = [];
+    private mapType;
+    private mappingSummary = [];
 
     constructor(private _mappingService: MappingService,
                 private router: Router,
@@ -71,7 +71,7 @@ export class DatasourceSummaryComponent implements OnInit {
 DEPRECATED BUT USEFUL
 
 
-    public pdxStatArray =  {
+    private pdxStatArray =  {
         source: [],
         missing: [],
         total: [],

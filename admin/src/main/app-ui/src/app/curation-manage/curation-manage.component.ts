@@ -5,7 +5,6 @@ import {Mapping, MappingInterface, MappingValues} from "../mapping-interface";
 import {GeneralService} from "../general.service";
 import {FormBuilder, FormGroup} from "@angular/forms";
 
-import { saveAs } from 'file-saver';
 
 declare var swal: any;
 
@@ -16,39 +15,41 @@ declare var swal: any;
 })
 export class CurationManageComponent implements OnInit {
 
-    public data;
-    public mappings = [];
+    private data;
+    private mappings = [];
 
-    public dataSource;
-    public entityType;
+    private dataSource;
+    private entityType;
 
-    public dataExists = false;
-    public dataLabels;
-    public columnHeaders = [];
+    private dataExists = false;
+    private dataLabels;
+    private columnHeaders = [];
 
-    public selectedRow;
-    public selectedEntity: any;
-    public report = null;
+    private selectedRow;
+    private selectedEntity: any;
+    private report = null;
 
-    public pageRange: number[];
+    private pageRange: number[];
 
     // Selected Fields
-    public selectedDetails: any;
-    public showNotif: boolean = false;
-    public showFilter: boolean = false;
+    private selectedDetails: any;
+    private showNotif: boolean = false;
+    private showFilter: boolean = false;
 
-    public pageSize;
-    public pageOptions = ['2', '3', '5', '10', '15', '20', '25'];
-    public userPage: number;
+    private pageSize;
+    private pageOptions = ['2', '3', '5', '10', '15', '20', '25'];
+    private userPage: number;
 
-    public mappingStatus: any;
-    public pageOptionSize: string;
+    private mappingStatus: any;
+    private pageOptionSize: string;
 
-    public dataTypes = [];
-    public statusList = [];
-    public providersList = [];
+    private dataTypes = [];
+    private statusList = [];
+    private providersList = [];
 
-    public providersList2 = [];
+    private providersList2 = [];
+
+    private csvURL = "";
 
     constructor(private router: Router,
                 private route: ActivatedRoute,
@@ -106,6 +107,11 @@ export class CurationManageComponent implements OnInit {
 
 
     manageCuratedData(page, size, type, status, source) {
+
+        this.csvURL = `${this._mappingService._exportUrl}?entity-type=${type}&page=${page}&status=${status}`
+
+
+        console.log(this.csvURL);
 
         this.columnHeaders = [];
         this.mappings = [];

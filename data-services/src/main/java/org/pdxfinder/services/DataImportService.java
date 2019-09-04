@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.graph.queryresults.MutatedMarkerData;
 import org.pdxfinder.graph.queryresults.TreatmentMappingData;
 import org.pdxfinder.graph.repositories.*;
 import org.pdxfinder.services.ds.Standardizer;
@@ -362,7 +363,7 @@ public class DataImportService {
     }
 
 
-    public Patient createPatient(String patientId, Group dataSource, String sex, String race, String ethnicity) {
+    public Patient createPatient(String patientId, Group dataSource, String sex, String race, String ethnicity){
 
         if(patientId == null || patientId.equals("")){
             log.warn("In DataImportService.createPatient() : the patientId is null or blank");
@@ -384,6 +385,7 @@ public class DataImportService {
 
         return patientRepository.findByExternalIdAndGroupWithSnapshots(patientId, group);
     }
+
 
     public void savePatient(Patient patient){
 
@@ -411,7 +413,6 @@ public class DataImportService {
         PatientSnapshot patientSnapshot;
 
         if (patient == null) {
-            log.info("Patient '{}' not found. Creating", externalId);
 
             patient = new Patient(externalId,sex,race,ethnicity,group);
 
@@ -493,6 +494,24 @@ public class DataImportService {
         }
         return ps;
     }
+
+
+
+    public Patient getPatient(String externalId, String sex, String race, String ethnicity, Group group) {
+
+        Patient patient = patientRepository.findByExternalIdAndGroup(externalId, group);
+
+        if (patient == null) {
+            log.info("Patient '{}' not found. Creating", externalId);
+
+            patient = new Patient(externalId, sex, race, ethnicity, group);
+
+            patientRepository.save(patient);
+        }
+
+        return patient;
+    }
+
 
     public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, String dataSource) {
 
@@ -735,6 +754,12 @@ public class DataImportService {
         return hostStrain;
     }
 
+    public HostStrain findHostStrain(String symbol){
+
+        return hostStrainRepository.findBySymbol(symbol);
+    }
+
+
     // is this bad? ... probably..
     public Marker getMarker(String symbol) {
         log.error("MARKER METHOD WAS CALLED!");
@@ -755,6 +780,10 @@ public class DataImportService {
         return marker;
     }
 
+    public List<MutatedMarkerData> getFrequentlyMutatedGenes(){
+
+        return markerRepository.countModelsByMarker();
+    }
 
     public Set<MarkerAssociation> findMarkerAssocsByMolChar(MolecularCharacterization mc){
 
@@ -904,10 +933,20 @@ public class DataImportService {
 
     }
 
+    public Collection<OntologyTerm> getAllOntologyTermsByTypeFromTo(String type, int from, int to) {
 
-    public void saveOntologyTerm(OntologyTerm ot){
+        return ontologyTermRepository.findAllByTypeFromTo(type, from, to);
 
-        ontologyTermRepository.save(ot);
+    }
+
+    public int getOntologyTermNumberByType(String type){
+
+        return ontologyTermRepository.getOntologyTermNumberByType(type);
+    }
+
+    public OntologyTerm saveOntologyTerm(OntologyTerm ot){
+
+        return ontologyTermRepository.save(ot);
     }
 
     public void deleteOntologyTermsWithoutMapping(){

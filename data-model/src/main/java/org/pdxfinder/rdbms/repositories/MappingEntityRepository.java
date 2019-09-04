@@ -24,6 +24,8 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
 
     Optional<MappingEntity> findByEntityId(Long entityId);
 
+    Optional<MappingEntity> findByMappingKeyAndEntityId(String mappingKey, Long entityId);
+
     List<MappingEntity> findByMappedTermLabel(String mappedTermLabel);
 
 
@@ -68,10 +70,10 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
     FROM MAPPING_ENTITY me JOIN MAPPING_VALUES mv on me.ENTITY_ID = mv.MAPPING_ENTITY_ID
     WHERE mv.MAPPING_VALUES_KEY = 'DataSource' AND ENTITY_TYPE='diagnosis'  GROUP BY lower(MAPPING_VALUES)
      */
-    @Query("SELECT distinct lower(mv), count(case when me.status = 'unmapped' THEN 1 END), " +
+    @Query("SELECT distinct lower(mv), count(case when me.status = 'unmapped' THEN 1 END) as unmapped, " +
             " count(case when me.status <> 'unmapped' THEN 1 END) from MappingEntity me join me.mappingValues mv " +
             " WHERE KEY(mv) = 'DataSource' " +
-            " AND ((lower(me.entityType) = lower(:entityType)) OR :entityType = '' ) group by lower(mv) order by lower(mv)")
+            " AND ((lower(me.entityType) = lower(:entityType)) OR :entityType = '' ) group by lower(mv) order by unmapped desc ")
     List<Object[]> findMissingMappingStat(@Param("entityType") String entityType);
 
 

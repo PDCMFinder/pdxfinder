@@ -1,0 +1,79 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta name="viewport" content="width=device-width"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Nanum+Gothic" rel="stylesheet" />
+</head>
+
+<body style="margin: 0; padding: 0; font-family: 'Nanum Gothic', sans-serif; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6; background-color: #f6f6f6;">
+
+<table style="background-color: #f6f6f6; width: 100%;">
+    <tr>
+        <td></td>
+        <td style="display: block !important; max-width: 600px !important; margin: 0 auto !important; clear: both !important;" width="600">
+            <div style="max-width: 600px;margin: 0 auto; display: block; padding: 20px;">
+                <table style="background: #fff; border: 1px solid #e9e9e9; border-radius: 3px;" width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="padding: 20px;">
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <div style=" padding: 20px; text-align: center; background: #fff;
+                                                color: white; font-family: 'Nanum Gothic', sans-serif;
+                                                margin-bottom: 20px; border: 1px solid #03369d;">
+                                            <img style="width:90px;" src="https://ebiwd.github.io/pdx-visual-framework/images/logo.png" />
+
+                                            <p style="margin: 10px; color: #000;"> There are <span th:text="${count}"> ... </span> new unmapped terms </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0 0 20px;">
+                                        <h3 style="margin: 10px 0 0;
+                                        line-height: 1.2; font-size: 18px;"> Dear Nathalie Conte, </h3>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0 0 20px;">
+                                        After the latest data loading on 19.08.2019, the PDX Finder ETL
+                                        found 70 unmapped Diagnosis and 16 unmapped treatment terms. You can login to the Admin Interface to
+                                        manage and map the unmapped terms to their corresponding ontology terms
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0 0 20px;">
+                                        You received this email to let you know of the data changes requiring your attention
+                                        from PDXFinder Admin Web application. If you don’t recognize this account,
+                                        it’s likely your email address was added in error. You can remove your email
+                                        address from the account.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="content-block" style="padding: 0 0 20px; text-align: center;">
+<a href="#" style="text-decoration: none; color: #1ab394; color: #FFF; background-color: #03369d; border: solid #03369d;border-width: 5px 10px; line-height: 2; font-weight: bold; text-align: center; cursor: pointer; display: inline-block; border-radius: 7px; text-transform: capitalize;">
+    Login to PDXFinder Admin</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <div style="width: 100%;
+                clear: both;
+                color: #999;
+                padding: 20px;">
+                    <table width="100%">
+                        <tr>
+                            <td style="font-size: 12px; text-align: center;">Follow <a href="https://twitter.com/pdxfinder" style="color: #999;">@PdxFinder</a> on Twitter.</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </td>
+        <td></td>
+    </tr>
+</table>
+
+</body>
+</html>

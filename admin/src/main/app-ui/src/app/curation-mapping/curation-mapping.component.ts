@@ -10,9 +10,9 @@ import {ActivatedRoute, Router} from '@angular/router';
 
 export class CurationMappingComponent implements OnInit {
 
-    public unmappedDiagnosisCnt: number;
-    public unmappedTreatmentCnt: number;
-    public orphanedTerms: number;
+    private unmappedDiagnosisCnt: number;
+    private unmappedTreatmentCnt: number;
+    private orphanedTerms: number;
 
     constructor(private _mappingService: MappingService,
                 private router: Router,
