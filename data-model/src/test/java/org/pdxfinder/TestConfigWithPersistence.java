@@ -20,7 +20,6 @@ public class TestConfigWithPersistence {
     public org.neo4j.ogm.config.Configuration getConfiguration() {
         org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration();
 
-        //   To persist the database, uncomment this section
         String pathToDb = Paths.get(".").toAbsolutePath().normalize().toString() + "/target/test_graph.db";
         config
                 .driverConfiguration()
