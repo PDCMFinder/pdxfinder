@@ -746,6 +746,8 @@ public class MappingService {
 
             mappingEntity.setEntityId(null);
             mappingEntity.setStatus(Status.validated.get());
+            mappingEntity.setEntityType(mappingEntity.getEntityType().toLowerCase());
+
             String mappingKey = mappingEntity.getMappingKey();
 
             MappingEntity entity = mappingEntityRepository.findByMappingKey(mappingKey);
@@ -987,11 +989,9 @@ public class MappingService {
     }
 
 
-    public Collection<OntologyTerm> getOntologyTermsByType(String type) {
+    public List<OntologyTerm> getOntologyTermsByType(String type) {
 
-      //  return ontologyTermRepository.findByType(type);
-
-        return ontologyTermRepository.findAll();
+        return ontologyTermRepository.findByType(type);
 
     }
 
