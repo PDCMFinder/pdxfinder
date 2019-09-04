@@ -181,7 +181,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void Given_getTreatmentString_WhenTreatmentComponentsWithNoControl_Then_returnConcatenatedStrings(){
+    public void Given_getTreatmentString_When_TreatmentComponentsWithNoControl_Then_returnConcatenatedStrings(){
 
         String treatmentString;
 
