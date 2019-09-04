@@ -1,6 +1,6 @@
 package org.pdxfinder;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import org.junit.Assert;
 import org.junit.Before;
