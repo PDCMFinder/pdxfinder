@@ -10,15 +10,9 @@ import org.neo4j.ogm.annotation.Relationship;
 @NodeEntity
 public class TreatmentComponent {
 
-    /**
-     * @param type                      Type of the treatment, ie drug/control
-     * @param duration                  For how long was the treatment administered
-     * @param frequency                 How often the treatment was administered
-     */
-
-
     @GraphId
     private Long id;
+
 
     private String dose;
 
