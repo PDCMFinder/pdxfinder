@@ -219,7 +219,7 @@ public class TreatmentProtocolTest extends BaseTest {
     }
 
     @Test
-    public void Given_getDostString_When_ControlFlagIsToggled_Then_returnAppropriateDoseString() {
+    public void Given_getDoseString_When_ControlFlagIsToggled_Then_returnAppropriateDoseString() {
 
         String doseStringWithControls;
         String doseStringWithoutControls;
