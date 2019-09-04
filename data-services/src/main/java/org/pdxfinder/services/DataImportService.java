@@ -403,7 +403,7 @@ public class DataImportService {
 
 
         if(externalId == null || externalId.equals("")){
-            log.warn("In DataImportService.createPatient() : patientId is null");
+            log.warn("In DataImportService.createPatient() : patientId is null or blank");
             throw new NullPointerException();
         }
 
