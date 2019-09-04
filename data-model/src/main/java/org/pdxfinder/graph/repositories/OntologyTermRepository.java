@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,6 +21,9 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
 
     @Query("MATCH (o:OntologyTerm) WHERE toLower(o.label) = toLower({label}) AND o.type = {type} return o")
     OntologyTerm findByLabelAndType(@Param("label") String label, @Param("type") String type);
+
+    @Query("MATCH (o:OntologyTerm) WHERE o.type = {type} return o")
+    List<OntologyTerm> findByType(@Param("type") String type);
 
     @Query("MATCH (o:OntologyTerm) WHERE toLower(o.label) = toLower({label}) return o")
     OntologyTerm findByLabel(@Param("label") String label);

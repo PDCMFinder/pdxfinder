@@ -47,6 +47,7 @@ export class DatasourceSpecificComponent implements OnInit {
 
     options: string[] = ['One', 'Two', 'Three'];
 
+    private olsUrl = 'https://www.ebi.ac.uk/ols/ontologies/ncit/terms?iri=';
     private autoSuggestTextBox: string;
 
     private dataList = [];
@@ -344,9 +345,9 @@ export class DatasourceSpecificComponent implements OnInit {
             }
         });
 
-        console.log(validatedTerms);
+       // console.log(validatedTerms);
 
-       // this.sendDataForUpdate(validatedTerms);
+        this.sendDataForUpdate(validatedTerms);
     }
 
 

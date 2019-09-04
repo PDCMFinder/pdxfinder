@@ -29,6 +29,8 @@ export class DatasourceSpecificSuggestionsComponent implements OnInit {
     private selectedSuggestion: Mapping;
     private clickedDetails;
 
+    private olsUrl = 'https://www.ebi.ac.uk/ols/ontologies/ncit/terms?iri=';
+
     constructor(private router: Router,
                 private route: ActivatedRoute,
                 private _mappingService: MappingService) { }

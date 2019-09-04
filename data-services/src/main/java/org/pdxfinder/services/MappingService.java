@@ -986,9 +986,9 @@ public class MappingService {
     }
 
 
-    public Collection<OntologyTerm> getAllOntologyTerms() {
+    public List<OntologyTerm> getOntologyTermsByType(String type) {
 
-        return ontologyTermRepository.findAll();
+        return ontologyTermRepository.findByType(type);
 
     }
 
