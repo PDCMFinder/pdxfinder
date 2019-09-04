@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.graph.queryresults.MutatedMarkerData;
 import org.pdxfinder.graph.queryresults.TreatmentMappingData;
 import org.pdxfinder.graph.repositories.*;
 import org.pdxfinder.services.ds.Standardizer;
@@ -766,6 +767,10 @@ public class DataImportService {
         return marker;
     }
 
+    public List<MutatedMarkerData> getFrequentlyMutatedGenes(){
+
+        return markerRepository.countModelsByMarker();
+    }
 
     public Set<MarkerAssociation> findMarkerAssocsByMolChar(MolecularCharacterization mc){
 

@@ -2,6 +2,7 @@ package org.pdxfinder.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.graph.queryresults.MutatedMarkerData;
 import org.pdxfinder.services.*;
 import org.pdxfinder.services.ds.AutoCompleteOption;
 import org.pdxfinder.services.dto.*;
@@ -113,7 +114,7 @@ public class AjaxController {
     }
 
     @RequestMapping(value = "/modelcountpergene")
-    public Iterable<Map<String, Object>> getModelCountByMarker() {
+    public List<MutatedMarkerData> getModelCountByMarker() {
 
         return  graphService.getModelCountByGene();
     }

@@ -3,9 +3,11 @@ package org.pdxfinder.postload;
 import com.google.gson.Gson;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dataloaders.UniversalLoader;
 import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.graph.queryresults.MutatedMarkerData;
 import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.DrugService;
@@ -76,6 +78,8 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
     private Map<String, List<DataAvailableDTO>> dataAvailableDP = new HashMap<>();
 
+    private List<MutatedMarkerData> frequentlyMutatedMarkers = null;
+
     protected static ApplicationContext context;
 
     @Autowired
@@ -105,17 +109,19 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
             reportManager = (ReportManager) context.getBean("ReportManager");
 
-            createMutationDataProjection();
+            //createMutationDataProjection();
 
-            createModelForQueryDataProjection();
+            //createModelForQueryDataProjection();
 
-            createModelDrugResponseDataProjection();
+            //createModelDrugResponseDataProjection();
 
-            createImmunoHistoChemistryDataProjection();
+            //createImmunoHistoChemistryDataProjection();
 
-            createCNADataProjection();
+            //createCNADataProjection();
 
-            createDataAvailableDataProjection();
+            //createDataAvailableDataProjection();
+
+            createFrequentlyMutatedGenesDataProjection();
 
             saveDataProjections();
 
@@ -1151,6 +1157,17 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
     }
 
+
+    private void createFrequentlyMutatedGenesDataProjection(){
+
+        log.info("Creating Frequently Mutated Genes DP");
+        frequentlyMutatedMarkers = dataImportService.getFrequentlyMutatedGenes();
+
+
+    }
+
+
+
     private void addToModelDrugResponseDP(Long modelId, String drugName, String responseVal){
 
         if(modelId != null && drugName != null && !drugName.isEmpty() && responseVal != null && !responseVal.isEmpty()){
@@ -1243,8 +1260,16 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             daDP.setLabel("data available");
         }
 
+        DataProjection fmgDP = dataImportService.findDataProjectionByLabel("frequently mutated genes");
+
+        if(fmgDP == null){
+            fmgDP = new DataProjection();
+            fmgDP.setLabel("frequently mutated genes");
+        }
+
 
         JSONObject j1 ,j2, j3, j4, j5, j6;
+        JSONArray ja1;
 
         try{
             j1 = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
@@ -1301,6 +1326,16 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             log.error(dataAvailableDP.toString());
         }
 
+        try{
+            //ja1 = new JSONArray(frequentlyMutatedMarkers.toString());
+            fmgDP.setValue(frequentlyMutatedMarkers.toString());
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+            log.error(frequentlyMutatedMarkers.toString());
+        }
+
 
 
 
@@ -1310,6 +1345,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         dataImportService.saveDataProjection(ihcDP);
         dataImportService.saveDataProjection(cnaDP);
         dataImportService.saveDataProjection(daDP);
+        dataImportService.saveDataProjection(fmgDP);
 
     }
 
