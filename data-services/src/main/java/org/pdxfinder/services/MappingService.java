@@ -734,8 +734,11 @@ public class MappingService {
         if (entity == null) {
 
             mappingEntityRepository.save(mappingEntity);
+
+            log.info("UNMAPPED TERM WAS SAVED: {}", mappingEntity.generateMappingKey());
+
         } else {
-            log.warn("NOT SAVED: {}_{}_{}_{} was found in the Database", mappingEntity.generateMappingKey());
+            log.warn("NOT SAVED: {} was found in the Database", mappingEntity.generateMappingKey());
         }
     }
 
