@@ -374,6 +374,7 @@ public class DataImportService {
 
         if(patient == null){
 
+            log.info("Patient not found. Creating: " + patientId );
             patient = new Patient(patientId,sex,race,ethnicity,dataSource);
             patientRepository.save(patient);
         }
