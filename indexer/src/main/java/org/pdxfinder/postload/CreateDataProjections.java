@@ -80,6 +80,9 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
     private List<MutatedMarkerData> frequentlyMutatedMarkersDP = null;
 
+    //"treatment name"=>"set of model ids"
+    private Map<String, Set<Long>> patientTreatmentDP = new HashMap<>();
+
     protected static ApplicationContext context;
 
     @Autowired
@@ -114,6 +117,8 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             createModelForQueryDataProjection();
 
             createModelDrugResponseDataProjection();
+
+            createPatientTreatmentDataProjection();
 
             createImmunoHistoChemistryDataProjection();
 
@@ -1158,6 +1163,59 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
     }
 
 
+    private void createPatientTreatmentDataProjection(){
+
+        log.info("Creating patient treatment DP");
+
+        List<TreatmentSummary> treatmentSummaries = drugService.getPatientTreatmentSummariesWithDrug();
+
+        for(TreatmentSummary ts : treatmentSummaries){
+
+            ModelCreation model = dataImportService.findModelByTreatmentSummary(ts);
+
+            //check if treatment is linked to a model
+            if(model != null){
+
+                Long modelId = model.getId();
+
+                for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
+
+                    //this bit adds the drugA + drugB + drugC etc to the options
+                    String drugName = tp.getTreatmentString(true);
+                    String response = tp.getResponse().getDescription();
+                    addToModelDrugResponseDP(modelId, drugName, response);
+
+
+                    //we also need to deal with regimens
+                    for(TreatmentComponent tc: tp.getComponents()){
+
+                        Treatment t = tc.getTreatment();
+                        OntologyTerm ot = t.getTreatmentToOntologyRelationship().getOntologyTerm();
+
+                        if(ot.getType().equals("treatment regimen") && ot.getSubclassOf() != null && !ot.getSubclassOf().isEmpty()){
+
+                            List<String> regimenDrugs = new ArrayList<>();
+
+                            for(OntologyTerm ot2: ot.getSubclassOf()){
+
+                                regimenDrugs.add(ot2.getLabel());
+
+                            }
+                            //sort them alphabetically
+                            Collections.sort(regimenDrugs);
+                            drugName = String.join(" and ", regimenDrugs);
+                            addToModelDrugResponseDP(modelId, drugName, response);
+                        }
+                    }
+                }
+            }
+        }
+
+
+    }
+
+
+
     private void createFrequentlyMutatedGenesDataProjection(){
 
         log.info("Creating Frequently Mutated Genes DP");
@@ -1267,9 +1325,17 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             fmgDP.setLabel("frequently mutated genes");
         }
 
+        DataProjection ptDP = dataImportService.findDataProjectionByLabel("patient treatment");
+
+        if(ptDP == null){
+            ptDP = new DataProjection();
+            ptDP.setLabel("patient treatment");
+        }
+
+
 
         JSONObject j1 ,j2, j3, j4, j5, j6;
-        JSONArray ja1;
+
 
         try{
             j1 = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
@@ -1336,6 +1402,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             log.error(frequentlyMutatedMarkersDP.toString());
         }
 
+        ptDP.setValue(patientTreatmentDP.toString());
 
 
 
@@ -1346,6 +1413,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         dataImportService.saveDataProjection(cnaDP);
         dataImportService.saveDataProjection(daDP);
         dataImportService.saveDataProjection(fmgDP);
+        dataImportService.saveDataProjection(ptDP);
 
     }
 

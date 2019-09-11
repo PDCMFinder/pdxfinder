@@ -73,6 +73,11 @@ public class DrugService {
         return treatmentSummaryRepository.findAllMouseTreatments();
     }
 
+    public List<TreatmentSummary> getPatientTreatmentSummariesWithDrug(){
+
+        return treatmentSummaryRepository.findAllPatientTreatments();
+    }
+
     public int getTotalSummaryNumber(){
 
         return treatmentSummaryRepository.findTotalSummaryNumber();
