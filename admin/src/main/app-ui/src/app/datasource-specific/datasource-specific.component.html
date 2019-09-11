@@ -41,7 +41,7 @@
             <span class="pull-right"> Manual Curation </span> <strong> Justification </strong>
         </li>
         <li class="list-group-item fist-item">
-            <span class="pull-right"> Direct </span> <strong> Map Type </strong>
+            <span class="pull-right"> Inferred </span> <strong> Map Type </strong>
         </li>
     </ul>
 
@@ -119,12 +119,12 @@
                                     </thead>
                                     <tbody>
 
-                                    <tr class="pdxfinder-clickable-rows2" *ngFor="let mapping of mappings; index as i"
-                                        [routerLink]="['suggested-mapping',mapping.entityId ]"
-                                        (click)="getClickedRow(mapping)"
+                                    <tr *ngFor="let mapping of mappings; index as i"
                                         [class.active]="mapping.entityId == selectedRow">
 
-                                        <td> {{mapping.entityId}} </td>
+                                        <td class="pdxfinder-clickable-rows2"
+                                            [routerLink]="['suggested-mapping',mapping.entityId ]"
+                                            (click)="getClickedRow(mapping)"> <i class="ti-hand-point-up"></i> <!--{{mapping.entityId}} --> </td>
 
                                         <td *ngFor="let dataLabel of dataLabels ">
 
@@ -135,7 +135,7 @@
 
                                         <td><input type="text" name="{{'mappedTermLabel'+i}}" class="editableField"
                                                    [(ngModel)]="mapping.mappedTermLabel"
-                                                   value="{{ mapping.mappedTermLabel }}">
+                                                   value="{{ mapping.mappedTermLabel }}" readonly>
                                         </td><!-- required
                                                    [class.is-invalid]="'mappedTermLabel'+i.invalid && 'mappedTerm'+i.dirty" -->
 

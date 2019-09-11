@@ -130,7 +130,7 @@
     border-radius: 2px;
     box-shadow: 0 0 14px rgba(0, 0, 0, 0.24);
     /*position: absolute;*/
-    top: 15px;
+    top: 50px;
     right: 15px;
     transition: .3s;
     margin-left: 10px;
@@ -232,7 +232,7 @@ button a {
 
 
 .clipText {
-    max-width: 300px;
+    max-width: 150px;
     white-space: nowrap;
     overflow: hidden;
     display: inline-block;

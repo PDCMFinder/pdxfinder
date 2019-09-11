@@ -236,7 +236,7 @@ export class DatasourceSpecificComponent implements OnInit {
 
                         this.mappings[i].mappedTermLabel = suggestion.data.label;
                         this.mappings[i].mappedTermUrl = suggestion.data.url;
-                        this.mappings[i].mapType = 'Direct';
+                        this.mappings[i].mapType = 'Inferred';
                         this.mappings[i].justification = 'Manual Curation';
 
                         this.selectedURL = suggestion.data.url;
@@ -345,7 +345,7 @@ export class DatasourceSpecificComponent implements OnInit {
             }
         });
 
-       // console.log(validatedTerms);
+        console.log(validatedTerms);
 
         this.sendDataForUpdate(validatedTerms);
     }
