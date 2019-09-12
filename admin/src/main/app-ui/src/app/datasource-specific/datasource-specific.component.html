@@ -29,7 +29,7 @@
 
     <div class="form-group" style="margin-top: -10px;">
         <label> Insert Mapped Term : </label>
-        <input (click)="ontologySuggest()" type="text" placeholder="Search OLS" class="autocomplete android" [(ngModel)]="autoSuggestTextBox">
+        <input (click)="ontologySuggest(entityType)" type="text" placeholder="Search OLS" class="autocomplete android" [(ngModel)]="autoSuggestTextBox">
     </div>
 
 
@@ -68,15 +68,6 @@
                 <form #mappingForm="ngForm" (ngSubmit)="updateMappingEntity()" novalidate>
                     <div class="pdxfinder float-e-margins" style="border: 1px solid rgba(3, 54, 157, 1);">
 
-                        <!--
-                        <div class="pdxfinder-title">
-                            <h5 class="testMobile"> Unmapped {{entityType | titlecase}} Summary </h5>
-
-                            <button *ngIf="report == null" style="float: right; margin-top:-7px;" class="btn btn-primary btn-sm" type="submit">
-                                <i class="ti-cloud-up"></i> &nbsp; Submit Curation &nbsp;
-                            </button>
-
-                        </div> -->
 
                         <div class="pdxfinder-content pdxfinder-heading">
                             <h3><i class="ti-agenda"></i> <span style="color: #03369D"> {{dataSource | uppercase}}  </span> Mapping </h3>
@@ -124,9 +115,12 @@
 
                                         <td class="pdxfinder-clickable-rows2"
                                             [routerLink]="['suggested-mapping',mapping.entityId ]"
-                                            (click)="getClickedRow(mapping)"> <i class="ti-hand-point-up"></i> <!--{{mapping.entityId}} --> </td>
+                                            (click)="getClickedRow(mapping)">  {{mapping.entityId}} </td>
 
-                                        <td *ngFor="let dataLabel of dataLabels ">
+                                        <td class="pdxfinder-clickable-rows2"
+                                            *ngFor="let dataLabel of dataLabels"
+                                            [routerLink]="['suggested-mapping',mapping.entityId ]"
+                                            (click)="getClickedRow(mapping)">
 
                                             <span *ngIf="dataLabel == 'DataSource'" class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | uppercase }} </span>
                                             <span *ngIf="dataLabel != 'DataSource'" class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] }} </span>

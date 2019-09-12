@@ -200,9 +200,10 @@ public class AjaxController {
     }
 
     @GetMapping("/mappings/ontologies")
-    public Object getOntologies(){
+    public Object getOntologies(@RequestParam(value = "type", defaultValue = "diagnosis") Optional<String> dataType){
 
-        return mappingService.getOntologyTermsByType("diagnosis");
+        String entityType = dataType.get();
+        return mappingService.getOntologyTermsByType(entityType);
     }
 
 

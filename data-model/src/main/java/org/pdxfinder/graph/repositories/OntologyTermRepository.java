@@ -22,7 +22,7 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
     @Query("MATCH (o:OntologyTerm) WHERE toLower(o.label) = toLower({label}) AND o.type = {type} return o")
     OntologyTerm findByLabelAndType(@Param("label") String label, @Param("type") String type);
 
-    @Query("MATCH (o:OntologyTerm) WHERE o.type = {type} return o")
+    @Query("MATCH (o:OntologyTerm) WHERE o.type CONTAINS toLower({type}) return o")
     List<OntologyTerm> findByType(@Param("type") String type);
 
     @Query("MATCH (o:OntologyTerm) WHERE toLower(o.label) = toLower({label}) return o")

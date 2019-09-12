@@ -11,7 +11,7 @@ import {SummaryInterface} from "./summary-interface";
 export class MappingService {
 
     private devServer = "http://ves-ebi-bc.ebi.ac.uk:8081";
-    private serverUrl = this.devServer; //"http://localhost:8081";
+    private serverUrl = "http://localhost:8081"; // this.devServer; //
 
     private _summaryUrl = this.serverUrl+"/api/mappings/summary";
     private _mappingsUrl = this.serverUrl+"/api/mappings";
@@ -90,9 +90,9 @@ export class MappingService {
         return this.http.get<Mapping>(url);
     }
 
-    getOLS(): Observable<any>{
+    getOLS(entityId: string): Observable<any>{
 
-        let url = `${this._mappingsUrl}/ontologies`;
+        let url = `${this._mappingsUrl}/ontologies?type=${entityId}`;
 
         return this.http.get<any>(url);
     }

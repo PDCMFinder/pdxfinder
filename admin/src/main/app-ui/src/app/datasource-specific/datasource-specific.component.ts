@@ -50,7 +50,8 @@ export class DatasourceSpecificComponent implements OnInit {
     private olsUrl = 'https://www.ebi.ac.uk/ols/ontologies/ncit/terms?iri=';
     private autoSuggestTextBox: string;
 
-    private dataList = [];
+    private diagnosisOntology = [];
+    private treatmentOntology = [];
 
 
     constructor(private router: Router,
@@ -63,8 +64,6 @@ export class DatasourceSpecificComponent implements OnInit {
     }
 
     ngOnInit() {
-
-        this.getOLSTerms();
 
         // From the current url snapshot, get the source parameter and assign to the dataSource property
         this.dataSource = this.route.snapshot.paramMap.get('source');
@@ -127,21 +126,31 @@ export class DatasourceSpecificComponent implements OnInit {
             }
         )
 
+
+
+        this.getOLSTerms(this.entityType.toLowerCase());
+
     };
 
 
 
 
 
-    getOLSTerms() {
+    getOLSTerms(entityType) {
 
-        this._mappingService.getOLS()
+        this._mappingService.getOLS(entityType)
             .subscribe(
                 data => {
 
                     console.log(data);
 
-                    this.dataList = data;
+                    if (entityType == 'diagnosis'){
+
+                        this.diagnosisOntology = data;
+                    }else {
+
+                        this.treatmentOntology = data;
+                    }
 
                     // transfer data out of observable
                     // localStorage.setItem('thisMapping', JSON.stringify(this.mappings));
@@ -207,14 +216,18 @@ export class DatasourceSpecificComponent implements OnInit {
 
 
 
-    ontologySuggest(){
+    ontologySuggest(entityType){
+
+        console.log(entityType);
+
+        var presentOntology = (entityType == 'diagnosis') ? this.diagnosisOntology : this.treatmentOntology;
 
         var data = this.mappings;
         var selectedId = this.selectedEntityId;
 
         var componentSelector = 'autocomplete';
 
-        var dataArray = this.dataList.map(
+        var dataArray = presentOntology.map(
             (data) => {
                 return { value: data.label, data: data };
             }
