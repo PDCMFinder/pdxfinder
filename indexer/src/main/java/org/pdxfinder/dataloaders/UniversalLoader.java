@@ -1097,7 +1097,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
             model.setExternalUrls(externalUrls);
 
 
-            if (!projectName.isEmpty()) {
+            if (projectName != null && !projectName.isEmpty()) {
 
                 Group project = dataImportService.getProjectGroup(projectName);
                 model.addGroup(project);
@@ -1108,7 +1108,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 Group access = dataImportService.getAccessibilityGroup(modelAccessibility, accessModalities);
                 model.addGroup(access);
             }
-
             dataImportService.saveModelCreation(model);
 
             //Update datasource

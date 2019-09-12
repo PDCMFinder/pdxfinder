@@ -374,6 +374,7 @@ public class DataImportService {
 
         if(patient == null){
 
+            log.info("Patient not found. Creating: " + patientId );
             patient = new Patient(patientId,sex,race,ethnicity,dataSource);
             patientRepository.save(patient);
         }
@@ -1154,6 +1155,10 @@ public class DataImportService {
         return modelCreationRepository.findByTreatmentSummary(ts);
     }
 
+    public ModelCreation findModelByPatientTreatmentSummary(TreatmentSummary ts){
+
+        return modelCreationRepository.findByPatientTreatmentSummary(ts);
+    }
 
     public String getDrugDosingUrlByDataSource(String dataSource){
 
