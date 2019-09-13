@@ -11,7 +11,7 @@ import {SummaryInterface} from "./summary-interface";
 export class MappingService {
 
     private devServer = "http://ves-ebi-bc.ebi.ac.uk:8081";
-    private serverUrl = "http://localhost:8081"; // this.devServer; //
+    private serverUrl = this.devServer; //  "http://localhost:8081"; //
 
     private _summaryUrl = this.serverUrl+"/api/mappings/summary";
     private _mappingsUrl = this.serverUrl+"/api/mappings";
@@ -42,9 +42,9 @@ export class MappingService {
 
 
 
-    getUnmappedTerms(entityType: string, dataSource: string, page: string, size: string): Observable<MappingInterface[]>{
+    getTerms(status: string, entityType: string, dataSource: string, page: string, size: string): Observable<MappingInterface[]>{
 
-        const url = `${this._mappingsUrl}?mq=datasource:${dataSource}&entity-type=${entityType}&status=unmapped&page=${page}&size=${size}`;
+        const url = `${this._mappingsUrl}?mq=datasource:${dataSource}&entity-type=${entityType}&status=${status}&page=${page}&size=${size}`;
 
         return this.http.get<MappingInterface[]>(url);
     }

@@ -45,8 +45,10 @@ export class DatasourceSummaryComponent implements OnInit {
             );
     }
 
-    onSelect(source){
-        var datasourceSpecific = `${source}/1`
+    onSelect(source, mappingStatusToGet){
+
+        var datasourceSpecific = `${source}/${mappingStatusToGet}-1`
+
         this.router.navigate([datasourceSpecific],{relativeTo: this.route})
     }
 

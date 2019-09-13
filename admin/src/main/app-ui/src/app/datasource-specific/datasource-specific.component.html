@@ -1,6 +1,6 @@
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-8">
-        <h2> {{dataSource | uppercase}} Unmapped {{entityType | titlecase}} Summary</h2>
+        <h2> {{dataSource | uppercase}} {{mappingStatusToGet | titlecase}} {{entityType | titlecase}} Summary</h2>
         <ol class="breadcrumb">
             <li>
                 <a routerLink="/dashboard">...</a>
@@ -162,13 +162,13 @@
                                     <li [ngClass]="{'disabled': data.page == 1 }">
                                         <span *ngIf="data.page == 1"> First « </span>
                                         <a *ngIf="data.page != 1"
-                                           [routerLink]="['../1']"> First « </a>
+                                           [routerLink]="['../'+mappingStatusToGet+'-1']"> First « </a>
                                         <!--    href="/{{'curation/'+entityTypeUrl+'/'+dataSource+'/1'}}" -->
                                     </li>
 
                                     <li *ngFor="let count of pageRange " [ngClass]="{'active': data.page == count }">
 
-                                        <a [routerLink]="['../'+count]"> {{count }} </a>
+                                        <a [routerLink]="['../'+mappingStatusToGet+'-'+count]"> {{count }} </a>
                                         <!--     href="/{{'curation/'+entityTypeUrl+'/'+dataSource+'/'+count}}" -->
                                     </li>
 
@@ -176,7 +176,7 @@
                                     <li [ngClass]="{'disabled': data.page == data.totaPages }">
                                         <span *ngIf="data.page == data.totaPages"> Last « </span>
                                         <a *ngIf="data.page != data.totaPages"
-                                           [routerLink]="['../'+data.totaPages]"> Last
+                                           [routerLink]="['../'+mappingStatusToGet+'-'+data.totaPages]"> Last
                                             « </a>  <!--  href="/{{'curation/'+entityTypeUrl+'/'+dataSource+'/'+data.totaPages}}"  -->
                                     </li>
 

@@ -53,6 +53,8 @@ export class DatasourceSpecificComponent implements OnInit {
     private diagnosisOntology = [];
     private treatmentOntology = [];
 
+    private mappingStatusToGet;
+
 
     constructor(private router: Router,
                 private route: ActivatedRoute,
@@ -76,7 +78,8 @@ export class DatasourceSpecificComponent implements OnInit {
         this.route.paramMap.subscribe(
             params => {
 
-                page = params.get('page');
+                this.mappingStatusToGet = params.get('page').split('-')[0];
+                page = params.get('page').split('-')[1];
 
                 // If no page value submitted, set page value as first page
                 page = (page == null) ? "1" : page;
@@ -89,6 +92,8 @@ export class DatasourceSpecificComponent implements OnInit {
             }
         )
 
+
+        console.log(this.mappingStatusToGet);
 
         // Get Data from Child Component
         this._mappingService.dataSubject.subscribe(
@@ -171,7 +176,7 @@ export class DatasourceSpecificComponent implements OnInit {
         this.columnHeaders = [];
         this.mappings = [];
 
-        this._mappingService.getUnmappedTerms(this.entityType, this.dataSource, page, this.pageSize)
+        this._mappingService.getTerms(this.mappingStatusToGet, this.entityType, this.dataSource, page, this.pageSize)
             .subscribe(
                 data => {
 
@@ -217,8 +222,6 @@ export class DatasourceSpecificComponent implements OnInit {
 
 
     ontologySuggest(entityType){
-
-        console.log(entityType);
 
         var presentOntology = (entityType == 'diagnosis') ? this.diagnosisOntology : this.treatmentOntology;
 
