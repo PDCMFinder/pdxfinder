@@ -58,6 +58,7 @@
                         <th>TOTAL MAPPED</th>
                         <th>VALIDATED</th>
                         <th>UNVALIDATED</th>
+                        <th>ORPHANED</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -68,8 +69,9 @@
 
                         <td class="clickTd" (click)="onSelect(summary.DataSource, 'unmapped')"> {{ summary.Unmapped }} </td>
                         <td class="clickTd" (click)="onSelect(summary.DataSource, 'mapped')"> {{ summary.Mapped }} </td>
-                        <td class="clickTd" (click)="onSelect(summary.DataSource, 'validated')"> {{ summary.Mapped }} </td>
-                        <td class="clickTd" (click)="onSelect(summary.DataSource, 'created')"> {{ '0' }} </td>
+                        <td class="clickTd" (click)="onSelect(summary.DataSource, 'validated')"> {{ summary.Validated }} </td>
+                        <td class="clickTd" (click)="onSelect(summary.DataSource, 'created')"> {{ summary.Created }} </td>
+                        <td class="clickTd" (click)="onSelect(summary.DataSource, 'orphaned')"> {{ summary.Orphaned }} </td>
                     </tr>
 
                     <!--<tr class="pdxfinder-clickable-rows" *ngFor=" let source of pdxStatArray.source; index as i " (click)="onSelect(source)">

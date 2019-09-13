@@ -915,7 +915,7 @@ public class MappingService {
 
         List<Object[]> summary = mappingEntityRepository.findMissingMappingStat(entityType);
 
-        List<String> resultColumns = Arrays.asList("DataSource", "Unmapped", "Mapped", "Validated", "Unvalidated", "Orphaned");
+        List<String> resultColumns = Arrays.asList("DataSource", "Unmapped", "Mapped", "Validated", "Created", "Orphaned");
 
         List<Map> mappingSummary = utilityService.objectArrayListToMapList(summary, resultColumns);
 

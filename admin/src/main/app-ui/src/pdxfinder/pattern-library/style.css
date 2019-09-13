@@ -492,6 +492,12 @@ a,tr {
     cursor: pointer;
 }
 
+.clickTd:hover {
+
+    cursor: pointer;
+    background-color: rgba(3, 54, 157, 0.3);
+}
+
 
 .pdxfinder-clickable-rows2{
     cursor: pointer; /*context-menu;*/
