@@ -69,9 +69,25 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
 
     FROM MAPPING_ENTITY me JOIN MAPPING_VALUES mv on me.ENTITY_ID = mv.MAPPING_ENTITY_ID
     WHERE mv.MAPPING_VALUES_KEY = 'DataSource' AND ENTITY_TYPE='diagnosis'  GROUP BY lower(MAPPING_VALUES)
+
+    SELECT DISTINCT lower(MAPPING_VALUES),
+                    COUNT(CASE WHEN STATUS = 'unmapped' THEN 1 END) AS UNMAPPED,
+                    COUNT(CASE WHEN STATUS <> 'unmapped' AND STATUS <> 'orphaned' THEN 1 END) AS MAPPED,
+                    COUNT(CASE WHEN STATUS = 'validated' THEN 1 END) AS VALIDATED,
+                    COUNT(CASE WHEN STATUS = 'created' THEN 1 END) AS UNVALIDATED,
+                    COUNT(CASE WHEN STATUS = 'orphaned' THEN 1 END) AS ORPHANED
+
+    FROM MAPPING_ENTITY me JOIN MAPPING_VALUES mv on me.ENTITY_ID = mv.MAPPING_ENTITY_ID
+    WHERE mv.MAPPING_VALUES_KEY = 'DataSource' AND ENTITY_TYPE='treatment'  GROUP BY lower(MAPPING_VALUES) ORDER BY UNMAPPED desc
+
      */
-    @Query("SELECT distinct lower(mv), count(case when me.status = 'unmapped' THEN 1 END) as unmapped, " +
-            " count(case when me.status <> 'unmapped' THEN 1 END) from MappingEntity me join me.mappingValues mv " +
+    @Query("SELECT distinct lower(mv), " +
+            " count(case when me.status = 'unmapped' THEN 1 END) as unmapped, " +
+            " count(case when me.status <> 'unmapped' AND me.status <> 'orphaned'  THEN 1 END) as mapped, " +
+            " count(case when me.status = 'validated' THEN 1 END) as validated, " +
+            " count(case when me.status = 'created' THEN 1 END) as created, " +
+            " count(case when me.status = 'orphaned' THEN 1 END) as orphaned " +
+            " from MappingEntity me join me.mappingValues mv " +
             " WHERE KEY(mv) = 'DataSource' " +
             " AND ((lower(me.entityType) = lower(:entityType)) OR :entityType = '' ) group by lower(mv) order by unmapped desc ")
     List<Object[]> findMissingMappingStat(@Param("entityType") String entityType);

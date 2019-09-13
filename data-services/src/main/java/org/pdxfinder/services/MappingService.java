@@ -32,6 +32,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -914,7 +915,7 @@ public class MappingService {
 
         List<Object[]> summary = mappingEntityRepository.findMissingMappingStat(entityType);
 
-        List<String> resultColumns = Arrays.asList("DataSource", "Unmapped", "Mapped");
+        List<String> resultColumns = Arrays.asList("DataSource", "Unmapped", "Mapped", "Validated", "Unvalidated", "Orphaned");
 
         List<Map> mappingSummary = utilityService.objectArrayListToMapList(summary, resultColumns);
 
