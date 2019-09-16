@@ -78,7 +78,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
     private Map<String, List<DataAvailableDTO>> dataAvailableDP = new HashMap<>();
 
-    private List<MutatedMarkerData> frequentlyMutatedMarkersDP = null;
+    private List<MutatedMarkerData> frequentlyMutatedMarkersDP = new ArrayList<>();
 
     //"treatment name"=>"set of model ids"
     private Map<String, Set<Long>> patientTreatmentDP = new HashMap<>();
@@ -584,6 +584,22 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             log.error("Missing files for creating CRL CNA projection.");
         }
     }
+
+    private void addToOneParamDP(Map<String, Set<Long>> collection, String key, Long modelId){
+
+        if(key == null || key.isEmpty()) return;
+
+        if(collection.containsKey(key)) {
+            collection.get(key).add(modelId);
+        }
+        else{
+
+            Set<Long> s = new HashSet();
+            s.add(modelId);
+            collection.put(key, s);
+        }
+    }
+
 
     private void addToTwoParamDP(Map<String, Map<String, Set<Long>>> collection, String key1, String key2, Long modelId){
 
@@ -1135,6 +1151,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
 
                     //we also need to deal with regimens
+                    List<String> regimenDrugs = new ArrayList<>();
                     for(TreatmentComponent tc: tp.getComponents()){
 
                         Treatment t = tc.getTreatment();
@@ -1142,19 +1159,24 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
                         if(ot.getType().equals("treatment regimen") && ot.getSubclassOf() != null && !ot.getSubclassOf().isEmpty()){
 
-                            List<String> regimenDrugs = new ArrayList<>();
+
 
                             for(OntologyTerm ot2: ot.getSubclassOf()){
 
                                 regimenDrugs.add(ot2.getLabel());
 
                             }
-                            //sort them alphabetically
-                            Collections.sort(regimenDrugs);
-                            drugName = String.join(" and ", regimenDrugs);
-                            addToModelDrugResponseDP(modelId, drugName, response);
+
                         }
                     }
+
+                    //sort them alphabetically
+                    if(regimenDrugs.size() != 0){
+                        Collections.sort(regimenDrugs);
+                        drugName = String.join(" and ", regimenDrugs);
+                        addToModelDrugResponseDP(modelId, drugName, response);
+                    }
+
                 }
             }
         }
@@ -1171,7 +1193,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
         for(TreatmentSummary ts : treatmentSummaries){
 
-            ModelCreation model = dataImportService.findModelByTreatmentSummary(ts);
+            ModelCreation model = dataImportService.findModelByPatientTreatmentSummary(ts);
 
             //check if treatment is linked to a model
             if(model != null){
@@ -1182,11 +1204,14 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
                     //this bit adds the drugA + drugB + drugC etc to the options
                     String drugName = tp.getTreatmentString(true);
-                    String response = tp.getResponse().getDescription();
-                    addToModelDrugResponseDP(modelId, drugName, response);
+                    //String response = tp.getResponse().getDescription();
+                    drugName = drugName.replaceAll("/", "");
+                    addToOneParamDP(patientTreatmentDP, drugName, modelId);
 
 
                     //we also need to deal with regimens
+                    List<String> regimenDrugs = new ArrayList<>();
+
                     for(TreatmentComponent tc: tp.getComponents()){
 
                         Treatment t = tc.getTreatment();
@@ -1194,18 +1219,21 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
                         if(ot.getType().equals("treatment regimen") && ot.getSubclassOf() != null && !ot.getSubclassOf().isEmpty()){
 
-                            List<String> regimenDrugs = new ArrayList<>();
-
                             for(OntologyTerm ot2: ot.getSubclassOf()){
 
                                 regimenDrugs.add(ot2.getLabel());
 
                             }
-                            //sort them alphabetically
-                            Collections.sort(regimenDrugs);
-                            drugName = String.join(" and ", regimenDrugs);
-                            addToModelDrugResponseDP(modelId, drugName, response);
+
                         }
+                    }
+
+                    //sort them alphabetically
+                    if(regimenDrugs.size() != 0){
+                        Collections.sort(regimenDrugs);
+                        drugName = String.join(" and ", regimenDrugs);
+                        drugName = drugName.replaceAll("/", "");
+                        addToOneParamDP(patientTreatmentDP, drugName, modelId);
                     }
                 }
             }
@@ -1334,7 +1362,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
 
 
-        JSONObject j1 ,j2, j3, j4, j5, j6;
+        JSONObject j1 ,j2, j3, j4, j5, j6, j7;
 
 
         try{
@@ -1393,6 +1421,17 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
 
         try{
+            j7 = new JSONObject(patientTreatmentDP.toString());
+            ptDP.setValue(j7.toString());
+            System.out.println();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(patientTreatmentDP.toString());
+        }
+
+
+        try{
             //ja1 = new JSONArray(frequentlyMutatedMarkersDP.toString());
             fmgDP.setValue(frequentlyMutatedMarkersDP.toString());
         }
@@ -1401,9 +1440,6 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             e.printStackTrace();
             log.error(frequentlyMutatedMarkersDP.toString());
         }
-
-        ptDP.setValue(patientTreatmentDP.toString());
-
 
 
         dataImportService.saveDataProjection(pmvmDP);
