@@ -119,7 +119,7 @@ public class SearchDS {
         molecularDataSection.setName("MOLECULAR DATA");
 
         WebFacetSection treatmentInfoSection = new WebFacetSection();
-        treatmentInfoSection.setName("TREATMENT INFORMATION");
+        treatmentInfoSection.setName("TREATMENT/DRUG DOSING");
 
         //cancer by system filter def
         List<FacetOption> cancerBySystemOptions = new ArrayList<>();
@@ -186,17 +186,6 @@ public class SearchDS {
         ageOptions, new ArrayList<>());
         patientTumorSection.addComponent(age);
         facetOptionMap.put("patient_age",ageOptions);
-
-        //treatment status filter
-        List<FacetOption> patientTreatmentStatusOptions = new ArrayList<>();
-        patientTreatmentStatusOptions.add(new FacetOption("Treatment Naive", "treatment_naive"));
-        patientTreatmentStatusOptions.add(new FacetOption("Not Treatment Naive", "not_treatment_naive"));
-        patientTreatmentStatusOptions.add(new FacetOption("Not Specified", "Not_Specified"));
-
-        OneParamCheckboxFilter patientTreatmentStatus = new OneParamCheckboxFilter("TREATMENT STATUS", "patient_treatment_status", false,
-                FilterType.OneParamCheckboxFilter.get(), patientTreatmentStatusOptions, new ArrayList<>());
-        patientTumorSection.addComponent(patientTreatmentStatus);
-        facetOptionMap.put("patient_treatment_status", patientTreatmentStatusOptions);
 
         //datasource filter def
         Set<String> datasourceSet = models.stream()
@@ -296,12 +285,32 @@ public class SearchDS {
         facetOptionMap.put("breast_cancer_markers",breastCancerMarkerOptions);
 
 
+        //treatment status filter
+        List<FacetOption> patientTreatmentStatusOptions = new ArrayList<>();
+        patientTreatmentStatusOptions.add(new FacetOption("Treatment Naive", "treatment_naive"));
+        patientTreatmentStatusOptions.add(new FacetOption("Not Treatment Naive", "not_treatment_naive"));
+        patientTreatmentStatusOptions.add(new FacetOption("Not Specified", "Not_Specified"));
+
+        OneParamCheckboxFilter patientTreatmentStatus = new OneParamCheckboxFilter("PATIENT TREATMENT STATUS", "patient_treatment_status", false,
+                FilterType.OneParamCheckboxFilter.get(), patientTreatmentStatusOptions, new ArrayList<>());
+        treatmentInfoSection.addComponent(patientTreatmentStatus);
+        facetOptionMap.put("patient_treatment_status", patientTreatmentStatusOptions);
+
+
+        //patient treatment filter
+
+        OneParamTextFilter patientTreatment = new OneParamTextFilter("PATIENT TREATMENT", "patient_treatment",
+                false, FilterType.OneParamTextFilter.get(), "TREATMENT", getPatientTreatmentOptions(), new ArrayList<>());
+
+
+        treatmentInfoSection.addComponent(patientTreatment);
+
         //model dosing study def
 
         Map<String, Map<String, Set<Long>>> modelDrugResponses = getModelDrugResponsesFromDP();
         List<String> drugNames = new ArrayList<>(modelDrugResponses.keySet());
 
-        TwoParamUnlinkedFilter modelDosingStudy = new TwoParamUnlinkedFilter("MODEL DOSING STUDY", "drug", false, FilterType.TwoParamUnlinkedFilter.get(), "DRUG", "RESPONSE", drugNames, Arrays.asList(
+        TwoParamUnlinkedFilter modelDosingStudy = new TwoParamUnlinkedFilter("PDX MODEL DOSING", "drug", false, FilterType.TwoParamUnlinkedFilter.get(), "DRUG", "RESPONSE", drugNames, Arrays.asList(
                 "Complete Response",
                 "Partial Response",
                 "Progressive Disease",
@@ -309,6 +318,8 @@ public class SearchDS {
                 "Stable Disease And Complete Response"
         ), new HashMap<>());
         treatmentInfoSection.addComponent(modelDosingStudy);
+
+
 
 
         webFacetContainer.addSection(pdxModelSection);
@@ -933,6 +944,40 @@ public class SearchDS {
         return data;
     }
 
+    private Map<String, Set<Long>> getPatientTreatmentsFromDP(){
+
+        Map<String, Set<Long>> data = new HashMap<>();
+
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("patient treatment");
+
+        String responses = "{}";
+
+        if(dataProjection != null){
+
+            responses = dataProjection.getValue();
+        }
+
+        try{
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            data = mapper.readValue(responses, new TypeReference<Map<String, Set<Long>>>(){});
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
+
+        return data;
+    }
+
+    private List<String> getPatientTreatmentOptions(){
+
+        Map<String, Set<Long>> data = getPatientTreatmentsFromDP();
+        List<String> options = new ArrayList<>(data.keySet());
+
+        return options;
+    }
 
     private List<String> getCopyNumberAlterationOptions(){
 
