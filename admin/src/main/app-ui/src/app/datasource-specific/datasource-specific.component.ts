@@ -315,7 +315,7 @@ export class DatasourceSpecificComponent implements OnInit {
         //  Auto-Navigate away on page size change
         let newPage = (this.userPage <= 1) ? this.userPage + 1 : 1;
 
-        this.router.navigate([`curation/${this.entityTypeUrl}/${this.dataSource}/${newPage}`])
+        this.router.navigate([`curation/${this.entityTypeUrl}/${this.dataSource}/${this.mappingStatusToGet}-${newPage}`])
 
     }
 
