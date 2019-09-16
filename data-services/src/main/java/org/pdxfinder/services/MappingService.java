@@ -931,13 +931,15 @@ public class MappingService {
         MappingEntity mappingEntity = mappingEntityRepository.findByEntityId(id).get();
 
         //Get suggestions only if mapped term is missing
-        if (mappingEntity.getMappedTermLabel().equals("-")) {
+        MappingContainer mappingContainer = getMappedEntitiesByType(mappingEntity.getEntityType());
 
-            mappingEntity
-                    .setSuggestedMappings(getSuggestionsForUnmappedEntity(
-                            mappingEntity,
-                            getMappedEntitiesByType(mappingEntity.getEntityType())));
-        }
+        // Remove present mappingEntity from mappingContainer to be used for suggestion
+        mappingContainer.getMappings().remove(mappingEntity.getMappingKey());
+
+        mappingEntity
+                .setSuggestedMappings(getSuggestionsForUnmappedEntity(
+                        mappingEntity,
+                        mappingContainer));
 
         return mappingEntity;
     }
