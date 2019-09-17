@@ -31,7 +31,7 @@ public class Ontolia {
     private static final String pharmaSubstanceBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1909";
     private static final String physiologyBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1899";
     private static final String hematopoieticBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C15431";
-    private static final String therapeuticProceduresBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C49236 ";
+    private static final String therapeuticProceduresBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C49236";
 
 
     private static final String regimenBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C12218";
