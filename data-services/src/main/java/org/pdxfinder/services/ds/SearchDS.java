@@ -67,6 +67,9 @@ public class SearchDS {
      */
     private OneParamTextSearch copyNumberAlterationSearch;
 
+
+    private OneParamTextSearch patientTreatmentSearch;
+
     /**
      * Three param search object for performing a search on gene mutations
      */
@@ -352,6 +355,7 @@ public class SearchDS {
 
         copyNumberAlterationSearch = new OneParamTextSearch("copyNumberAlteration", "copy_number_alteration", getCopyNumberAlterationDP());
 
+        patientTreatmentSearch = new OneParamTextSearch("patientTreatment", "patient_treatment", getPatientTreatmentsFromDP());
 
         INITIALIZED = true;
     }
@@ -523,6 +527,9 @@ public class SearchDS {
         //reset copy number alteration values
         result.forEach(x -> x.setCnaMarkers(new ArrayList<>()));
 
+        //reset patient treatments
+        result.forEach(x -> x.setPatientTreatments(new ArrayList<>()));
+
         // If no filters have been specified, return the complete set
         if (filters == null) {
             return result;
@@ -620,6 +627,9 @@ public class SearchDS {
                     result = copyNumberAlterationSearch.search(filters.get(SearchFacetName.copy_number_alteration), result, ModelForQuery::addCnaMarker, ComparisonOperator.OR);
                     break;
 
+                case patient_treatment:
+                    result = patientTreatmentSearch.search(filters.get(SearchFacetName.patient_treatment), result, ModelForQuery::addPatientTreatment, ComparisonOperator.OR);
+                    break;
                 default:
                     //undexpected filter option
                     log.warn("Unrecognised facet {} passed to search, skipping", facet.getName());
@@ -802,7 +812,6 @@ public class SearchDS {
         return resultMap;
     }
 
-
     private List<String> getMutationOptions(){
 
         Map<String,Set<String>> tempResults = getMutationOptionsFromDP();
@@ -816,8 +825,6 @@ public class SearchDS {
 
         return resultList;
     }
-
-
 
     private Map<String, Set<String>> getMutationOptionsFromDP(){
 
@@ -851,8 +858,6 @@ public class SearchDS {
         return tempResults;
     }
 
-
-
     private Map<String, Map<String, Set<Long>>> getModelDrugResponsesFromDP(){
 
         log.info("Initializing model drug responses");
@@ -883,7 +888,6 @@ public class SearchDS {
 
         return modelDrugResponses;
     }
-
 
     private Map<String, Map<String, Set<Long>>> getBreastCancerMarkersFromDP(){
 

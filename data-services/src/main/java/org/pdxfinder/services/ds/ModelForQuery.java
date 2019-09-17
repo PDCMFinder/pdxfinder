@@ -46,7 +46,7 @@ public class ModelForQuery {
 
 
     private List<String> drugWithResponse;
-
+    private List<String> patientTreatments;
     private List<String> cnaMarkers;
 
     private List<String> projects;
@@ -424,6 +424,20 @@ public class ModelForQuery {
             breastCancerMarkers = new ArrayList<>();
         }
         breastCancerMarkers.add(m);
+    }
+
+    public void addPatientTreatment(String t){
+
+        if(patientTreatments == null) patientTreatments = new ArrayList<>();
+        patientTreatments.add(t);
+    }
+
+    public List<String> getPatientTreatments() {
+        return patientTreatments;
+    }
+
+    public void setPatientTreatments(List<String> patientTreatments) {
+        this.patientTreatments = patientTreatments;
     }
 
     public String getModelAccessibility() {
