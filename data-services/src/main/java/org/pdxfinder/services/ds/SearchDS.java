@@ -195,17 +195,13 @@ public class SearchDS {
 
         for(ModelForQuery mfq: models){
 
-            dataSourcesWithNames.put(mfq.getDatasourceName(), mfq.getDatasource());
+            if(mfq.getDatasource() != null && mfq.getDatasourceName() != null) {
+                dataSourcesWithNames.put(mfq.getDatasourceName(), mfq.getDatasource());
+            }
         }
 
 
-        Map<String, String> dataSourcesWithNamesOrdered;
-        if(dataSourcesWithNames != null){
-            dataSourcesWithNamesOrdered = new TreeMap<String, String>(dataSourcesWithNames);
-        }
-        else{
-            dataSourcesWithNamesOrdered = new TreeMap<>();
-        }
+        Map<String, String> dataSourcesWithNamesOrdered = new TreeMap<>(dataSourcesWithNames);
 
         List<FacetOption> datasourceOptions = new ArrayList<>();
 
