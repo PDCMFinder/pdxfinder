@@ -702,7 +702,11 @@ public class SearchDS {
 
                 mfq.setModelId(parseLong(j.getString("modelId")));
                 mfq.setDatasource(j.getString("datasource"));
-                mfq.setDatasourceName(j.getString("datasourceName"));
+
+                if(j.has("datasourceName")){
+                    mfq.setDatasourceName(j.getString("datasourceName"));
+                }
+
                 mfq.setExternalId(j.getString("externalId"));
                 if(j.has("patientAge")){
                     mfq.setPatientAge(j.getString("patientAge"));
