@@ -17,6 +17,7 @@ public class ModelForQuery {
 
     private Long modelId;
     private String datasource;
+    private String datasourceName;
     private String externalId;
     private String patientAge;
     private String patientTreatmentStatus;
@@ -230,6 +231,14 @@ public class ModelForQuery {
 
     public void setDatasource(String datasource) {
         this.datasource = datasource;
+    }
+
+    public String getDatasourceName() {
+        return datasourceName;
+    }
+
+    public void setDatasourceName(String datasourceName) {
+        this.datasourceName = datasourceName;
     }
 
     public List<String> getCancerSystem() {

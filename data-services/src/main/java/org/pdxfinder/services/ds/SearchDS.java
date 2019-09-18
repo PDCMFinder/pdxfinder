@@ -191,8 +191,23 @@ public class SearchDS {
         facetOptionMap.put("patient_age",ageOptions);
 
         //datasource filter def
+        Map<String, String> dataSourcesWithNames = new HashMap<>();
+
+        for(ModelForQuery mfq: models){
+            dataSourcesWithNames.put(mfq.getDatasourceName(), mfq.getDatasource());
+        }
+
+        Map<String, String> dataSourcesWithNamesOrdered = new TreeMap<String, String>(dataSourcesWithNames);
+        List<FacetOption> datasourceOptions = new ArrayList<>();
+
+
+        for(Map.Entry<String, String> entry : dataSourcesWithNamesOrdered.entrySet()){
+            datasourceOptions.add(new FacetOption(entry.getKey(), entry.getValue()));
+        }
+
+        /*
         Set<String> datasourceSet = models.stream()
-                .map(ModelForQuery::getDatasource)
+                .map(ModelForQuery::getDatasourceName)
                 .collect(Collectors.toSet());
 
         List<String> datasourceList = new ArrayList<>();
@@ -203,6 +218,7 @@ public class SearchDS {
         for(String ds : datasourceList){
             datasourceOptions.add(new FacetOption(ds, ds));
         }
+        */
 
         //dataset available filter def
         List<FacetOption> datasetAvailableOptions = new ArrayList<>();
@@ -548,8 +564,9 @@ public class SearchDS {
                     result = oneParamCheckboxSearch.searchOnCollection(facetOptionMap.get("query"), filters.get(SearchFacetName.query), result, ModelForQuery::getAllOntologyTermAncestors);
                     break;
 
+                //We don't need to provide a replacement string list for datasource, since it is already using the datasource abbrev as key!
                 case datasource:
-                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("datasource"), filters.get(SearchFacetName.datasource), result, ModelForQuery::getDatasource);
+                    result = oneParamCheckboxSearch.searchOnString(null, filters.get(SearchFacetName.datasource), result, ModelForQuery::getDatasource);
                     break;
 
                 case diagnosis:
@@ -685,6 +702,7 @@ public class SearchDS {
 
                 mfq.setModelId(parseLong(j.getString("modelId")));
                 mfq.setDatasource(j.getString("datasource"));
+                mfq.setDatasourceName(j.getString("datasourceName"));
                 mfq.setExternalId(j.getString("externalId"));
                 if(j.has("patientAge")){
                     mfq.setPatientAge(j.getString("patientAge"));

@@ -462,7 +462,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
         log.info("Loading additional datasets for CRL.");
 
-        String templateFileStr = finderRootDir + "/data/UPDOG/CRL/template.xlsx";
+        String templateFileStr = finderRootDir + "/data/UPDOG/CRL/metadata.xlsx";
         String markerTemplateFileStr = finderRootDir + "/data/UPDOG/CRL/cna_tested_markers/list.csv";
 
         File markerListFile = new File(markerTemplateFileStr);
@@ -776,8 +776,15 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         Map<Long, List<String>> mutationPlatformsByModel = new HashMap<>();
         Map<Long, List<String>> cnaPlatformsByModel = new HashMap<>();
         Map<Long, List<String>> cytogeneticsPlatformsByModel = new HashMap<>();
+        Map<String, String> datasourceToDatasourceNameMap = new HashMap<>();
 
 
+        List<Group> providerGroups = dataImportService.getAllProviderGroups();
+
+        for(Group g: providerGroups){
+
+            datasourceToDatasourceNameMap.put(g.getAbbreviation(), g.getName());
+        }
 
         Collection<ModelCreation> allModelsWithPlatforms = dataImportService.findAllModelsPlatforms();
 
@@ -893,8 +900,9 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             ModelForQuery mfq = new ModelForQuery();
             mfq.setModelId(mc.getId());
             mfq.setExternalId(mc.getSourcePdxId());
-            mfq.setDatasource(mc.getDataSource());
 
+            mfq.setDatasource(mc.getDataSource());
+            mfq.setDatasourceName(datasourceToDatasourceNameMap.get(mc.getDataSource()));
 
             Set<String> dataAvailable = new HashSet<>();
 
@@ -1065,7 +1073,6 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                         }
 
                     }
-
                 }
             }
 
