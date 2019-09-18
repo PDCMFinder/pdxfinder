@@ -32,10 +32,10 @@ public class Ontolia {
     private static final String physiologyBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1899";
     private static final String hematopoieticBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C15431";
     private static final String therapeuticProceduresBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C49236";
-
+    private static final String clinicalStudyBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C15206";
+    private static final String geneProductBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C26548";
 
     private static final String regimenBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C12218";
-    private static final String geneProductBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C26548";
 
     private static final String ontologyUrl = "https://www.ebi.ac.uk/ols/api/ontologies/ncit/terms/";
 
@@ -103,6 +103,9 @@ public class Ontolia {
 
         log.info("Loading Therapeutic Procedures from NCIT.");
         loadNCITTermsFromBranch("treatment", therapeuticProceduresBranchUrl, true);
+
+        log.info("Loading Clinical Studies from NCIT.");
+        loadNCITTermsFromBranch("treatment", clinicalStudyBranchUrl, true);
 
         log.info("Loading regimens from NCIT.");
         loadNCITLeafDrugs("treatment regimen", regimenBranchUrl, false);
