@@ -47,13 +47,14 @@ public class ExportMappings implements CommandLineRunner {
     private void exportMappings(){
 
 
-        String fileName = "/Users/csaba/Downloads/saved_mappings.json";
+        String diagnosisFileName = "/Users/csaba/Downloads/diagnosis_mappings.json";
+        String treatmentFileName = "/Users/csaba/Downloads/treatment_mappings.json";
 
         List<String> dataSourcesToExport = new ArrayList<>(Arrays.asList("TRACE", "IRCC-CRC", "IRCC-GC", "Curie-LC", "Curie-BC"));
 
-        mappingService.saveMappingsToFile(fileName, mappingService.getDiagnosisMappingsByDS(dataSourcesToExport).getEntityList());
+        mappingService.saveMappingsToFile(diagnosisFileName, mappingService.getMappingsByDSAndType(dataSourcesToExport, "diagnosis").getEntityList());
 
-
+        mappingService.saveMappingsToFile(treatmentFileName, mappingService.getMappingsByDSAndType(dataSourcesToExport, "treatment").getEntityList());
 
     }
 
