@@ -1,9 +1,12 @@
 package org.pdxfinder.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.services.TransformerService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +17,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -57,6 +63,12 @@ public class CreateLocalFeeds implements CommandLineRunner {
     @Value("${jaxpdx.histology.url}")
     private String jaxHistologyURL;
 
+    @Value("${jaxpdx.cna.url}")
+    private String jaxCnaURL;
+
+    @Value("${jaxpdx.rnaseq.url}")
+    private String jaxRnaseqURL;
+
     //IRCC-CRC
     @Value("${irccpdx.url}")
     private String irccUrlStr;
@@ -88,6 +100,9 @@ public class CreateLocalFeeds implements CommandLineRunner {
     @Autowired
     private UtilityService utilityService;
 
+    @Autowired
+    private TransformerService dataTransformer;
+
     @Override
     public void run(String... args) throws Exception {
 
@@ -103,15 +118,15 @@ public class CreateLocalFeeds implements CommandLineRunner {
 
             createJAXFeeds();
 
-            createIRCCFeeds();
+          //  createIRCCFeeds();
 
-            createHCIFeeds();
+          //  createHCIFeeds();
 
-            createMDAFeeds();
+          //  createMDAFeeds();
 
-            createWistarFeeds();
+          //  createWistarFeeds();
 
-            createWustlFeeds();
+          //  createWustlFeeds();
 
         }
 
@@ -146,6 +161,13 @@ public class CreateLocalFeeds implements CommandLineRunner {
 
                 String histology = utilityService.parseURL(jaxHistologyURL + modelId);
                 saveFile(finderRootDir +"/data/JAX/hist/", modelId+".json", histology);
+
+                String cna = utilityService.parseURL(jaxCnaURL + modelId);
+                cna =dataTransformer.transformJAXCNV(cna);
+                saveFile(finderRootDir +"/data/JAX/cna/", modelId+".json", cna);
+
+                String rnaseq = utilityService.parseURL(jaxRnaseqURL + modelId);
+                saveFile(finderRootDir +"/data/JAX/rnaseq/", modelId+".json", rnaseq);
 
             }
 
