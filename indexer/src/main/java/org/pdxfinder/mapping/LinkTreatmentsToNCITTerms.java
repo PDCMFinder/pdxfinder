@@ -92,7 +92,14 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
 
             int maxTreatmentNumber = dataImportService.findPatientTreatmentNumber(dataSource);
 
-            if(maxTreatmentNumber > 0) log.info("Mapping patient treatments for "+dataSource);
+            if(maxTreatmentNumber > 0) {
+                log.info("Mapping patient treatments for "+dataSource + ", "+maxTreatmentNumber+" patient treatment summaries.");
+            }
+            else{
+
+                log.info("No patient treatment data for "+dataSource);
+
+            }
 
             while(startNode < maxTreatmentNumber){
 

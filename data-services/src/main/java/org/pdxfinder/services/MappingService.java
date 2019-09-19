@@ -739,8 +739,6 @@ public class MappingService {
 
             log.info("UNMAPPED TERM WAS SAVED: {}", mappingEntity.generateMappingKey());
 
-        } else {
-            log.warn("NOT SAVED: {} was found in the Database", mappingEntity.generateMappingKey());
         }
     }
 

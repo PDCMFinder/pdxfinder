@@ -33,16 +33,16 @@ public interface TreatmentRepository extends Neo4jRepository<Treatment, Long> {
 
 
     @Query("MATCH (ps:PatientSnapshot)--(ts:TreatmentSummary)" +
-            "WITH ts "+
+            "WITH ts  SKIP {from} LIMIT {batch}"+
             "MATCH (ts)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) "+
-            "RETURN tr SKIP {from} LIMIT {batch}")
+            "RETURN tr")
     Collection<Treatment> getPatientTreatmentFrom(@Param("from") int from, @Param("batch") int batch);
 
-    @Query("MATCH (gr:Group)--(p:Patient)--(ps:PatientSnapshot)--(ts:TreatmentSummary)" +
+    @Query("MATCH (gr:Group)--(p:Patient)--(ps:PatientSnapshot)--(ts:TreatmentSummary) " +
             "WHERE gr.type='Provider' AND gr.abbreviation = {ds} "+
-            "WITH ts "+
+            "WITH ts SKIP {from} LIMIT {batch}"+
             "MATCH (ts)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) "+
-            "RETURN tr SKIP {from} LIMIT {batch}")
+            "RETURN tr ")
     Collection<Treatment> getPatientTreatmentFromByDS(@Param("from") int from, @Param("batch") int batch, @Param("ds") String ds);
 
     @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary) " +
