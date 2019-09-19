@@ -6,6 +6,7 @@ import org.pdxfinder.services.MappingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -19,42 +20,51 @@ import java.util.List;
 @Component
 public class ExportMappings implements CommandLineRunner {
 
-
     @Autowired
     MappingService mappingService;
     Logger logger = LoggerFactory.getLogger(ExportMappings.class);
 
-
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     @Override
     public void run(String... args) throws Exception {
 
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("exportMappings", "Exporting mapping rules to a file");
+        parser.accepts("exportEuroPdxMappings", "Exporting mapping rules to a file");
         OptionSet options = parser.parse(args);
 
-        if (options.has("exportMappings")) {
-
-            exportMappings();
-
+        if (options.has("exportEuroPdxMappings")) {
+            exportEuroPdxMappings();
         }
     }
 
+    private void exportEuroPdxMappings(){
 
+        String diagnosisFileName = "%s/mappings_out//diagnosis_mappings.json".format(finderRootDir);
+        String treatmentFileName = "%s/mappings_out/treatment_mappings.json".format(finderRootDir);
+        List<String> dataSourcesToExport = new ArrayList<>(Arrays.asList(
+            "Curie-BC",
+            "Curie-LC",
+            "Curie-OC",
+            "IRCC-CRC",
+            "IRCC-GC",
+            "TRACE",
+            "UOC-BC",
+            "UOM-BC",
+            "VHIO-BC",
+            "VHIO-CRC"
+        ));
 
-
-    private void exportMappings(){
-
-
-        String diagnosisFileName = "/Users/csaba/Downloads/diagnosis_mappings.json";
-        String treatmentFileName = "/Users/csaba/Downloads/treatment_mappings.json";
-
-        List<String> dataSourcesToExport = new ArrayList<>(Arrays.asList("TRACE", "IRCC-CRC", "IRCC-GC", "Curie-LC", "Curie-BC"));
-
-        mappingService.saveMappingsToFile(diagnosisFileName, mappingService.getMappingsByDSAndType(dataSourcesToExport, "diagnosis").getEntityList());
-
-        mappingService.saveMappingsToFile(treatmentFileName, mappingService.getMappingsByDSAndType(dataSourcesToExport, "treatment").getEntityList());
+        mappingService.saveMappingsToFile(
+            diagnosisFileName,
+            mappingService.getMappingsByDSAndType(dataSourcesToExport, "diagnosis").getEntityList()
+        );
+        mappingService.saveMappingsToFile(
+            treatmentFileName,
+            mappingService.getMappingsByDSAndType(dataSourcesToExport, "treatment").getEntityList()
+        );
 
     }
 
