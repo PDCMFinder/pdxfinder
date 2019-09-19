@@ -1,4 +1,4 @@
-package org.pdxfinder.transdatamodel;
+package org.pdxfinder.rdbms.dao;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

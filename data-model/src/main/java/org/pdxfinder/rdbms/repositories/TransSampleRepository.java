@@ -1,6 +1,6 @@
-package org.pdxfinder.transrepository;
+package org.pdxfinder.rdbms.repositories;
 
-import org.pdxfinder.transdatamodel.Sample;
+import org.pdxfinder.rdbms.dao.Sample;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -63,13 +63,7 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
 
 
     /*
-    Query: SELECT DISTINCT lower(MAPPING_VALUES),
-                    COUNT(CASE WHEN STATUS = 'unmapped' THEN 1 END) AS UNMAPPED,
-                    COUNT(CASE WHEN STATUS <> 'unmapped' THEN 1 END) AS MAPPED
-
-    FROM MAPPING_ENTITY me JOIN MAPPING_VALUES mv on me.ENTITY_ID = mv.MAPPING_ENTITY_ID
-    WHERE mv.MAPPING_VALUES_KEY = 'DataSource' AND ENTITY_TYPE='diagnosis'  GROUP BY lower(MAPPING_VALUES)
-
+    Query:
     SELECT DISTINCT lower(MAPPING_VALUES),
                     COUNT(CASE WHEN STATUS = 'unmapped' THEN 1 END) AS UNMAPPED,
                     COUNT(CASE WHEN STATUS <> 'unmapped' AND STATUS <> 'orphaned' THEN 1 END) AS MAPPED,

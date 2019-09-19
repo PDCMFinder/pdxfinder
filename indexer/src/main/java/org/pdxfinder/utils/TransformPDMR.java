@@ -1,9 +1,10 @@
-package org.pdxfinder.transcommands;
+package org.pdxfinder.utils;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
+import org.pdxfinder.services.TransformerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class TransformPDMR implements CommandLineRunner {
 
     private Options options;
     private CommandLineParser parser;
-    private DataTransformerService dataTransformerService;
+    private TransformerService transformerService;
 
     @Value("${pdxfinder.data.root.dir}")
     private String dataRootDir;
@@ -26,8 +27,8 @@ public class TransformPDMR implements CommandLineRunner {
 
 
     @Autowired
-    public TransformPDMR(DataTransformerService dataTransformerService){
-        this.dataTransformerService = dataTransformerService;
+    public TransformPDMR(TransformerService transformerService){
+        this.transformerService = transformerService;
     }
 
 
@@ -46,7 +47,7 @@ public class TransformPDMR implements CommandLineRunner {
             if (dataRootDir != null) {
                 log.info("Loading from URL " + dataRootDir);
 
-                dataTransformerService.transformDataAndSave();
+                transformerService.transformDataAndSave();
             } else {
                 log.error("No mydatasource.url1 or mydatasource.url2 provided in properties");
             }

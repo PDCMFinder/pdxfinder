@@ -1,4 +1,4 @@
-package org.pdxfinder.admin.pojos;
+package org.pdxfinder.services.mapping;
 
 import org.pdxfinder.rdbms.dao.MappingEntity;
 

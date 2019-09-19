@@ -1,29 +1,21 @@
-package org.pdxfinder.transcommands;
+package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.pdxfinder.controller.TransController;
-import org.pdxfinder.services.UtilityService;
-import org.pdxfinder.transdatamodel.PdmrPdxInfo;
-import org.pdxfinder.transdatamodel.Sample;
-import org.pdxfinder.transdatamodel.Treatment;
-import org.pdxfinder.transdatamodel.Validation;
-import org.pdxfinder.transrepository.TransPdxInfoRepository;
-import org.pdxfinder.transrepository.TransSampleRepository;
-import org.pdxfinder.transrepository.TransTreatmentRepository;
-import org.pdxfinder.transrepository.TransValidationRepository;
+import org.pdxfinder.rdbms.dao.PdmrPdxInfo;
+import org.pdxfinder.rdbms.dao.Sample;
+import org.pdxfinder.rdbms.dao.Treatment;
+import org.pdxfinder.rdbms.dao.Validation;
+import org.pdxfinder.rdbms.repositories.TransPdxInfoRepository;
+import org.pdxfinder.rdbms.repositories.TransSampleRepository;
+import org.pdxfinder.rdbms.repositories.TransTreatmentRepository;
+import org.pdxfinder.rdbms.repositories.TransValidationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -31,10 +23,11 @@ import java.util.*;
  */
 
 @Service
-public class DataTransformerService {
+public class TransformerService {
 
 
-    private final static Logger log = LoggerFactory.getLogger(TransController.class);
+    private final static Logger log = LoggerFactory.getLogger(TransformerService.class);
+
     ObjectMapper mapper = new ObjectMapper();
     private TransPdxInfoRepository transPdxInfoRepository;
     private TransTreatmentRepository transTreatmentRepository;
@@ -85,10 +78,10 @@ public class DataTransformerService {
     private String patientInfoUrl = RAW_DATA_URL+"/PDMR_PATIENTINFO.json";
 
 
-    public DataTransformerService(TransPdxInfoRepository transPdxInfoRepository,
-                                  TransTreatmentRepository transTreatmentRepository,
-                                  TransValidationRepository transValidationRepository,
-                                  TransSampleRepository transSampleRepository) {
+    public TransformerService(TransPdxInfoRepository transPdxInfoRepository,
+                              TransTreatmentRepository transTreatmentRepository,
+                              TransValidationRepository transValidationRepository,
+                              TransSampleRepository transSampleRepository) {
         this.transPdxInfoRepository = transPdxInfoRepository;
         this.transTreatmentRepository = transTreatmentRepository;
         this.transValidationRepository = transValidationRepository;

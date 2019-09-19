@@ -1,4 +1,4 @@
-package org.pdxfinder.controller;
+package org.pdxfinder.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.ListUtils;
@@ -6,9 +6,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.UtilityService;
-import org.pdxfinder.transcommands.DataTransformerService;
-import org.pdxfinder.transdatamodel.PdmrPdxInfo;
-import org.pdxfinder.transdatamodel.PdxInfo;
+import org.pdxfinder.services.TransformerService;
+import org.pdxfinder.rdbms.dao.PdmrPdxInfo;
+import org.pdxfinder.rdbms.dao.PdxInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
 import java.util.*;
 
 
@@ -36,7 +34,7 @@ public class TransController {
 
     private RestTemplate restTemplate = new RestTemplate();
     private ObjectMapper mapper = new ObjectMapper();
-    private DataTransformerService dataTransformerService;
+    private TransformerService transformerService;
     @Autowired
     private UtilityService utilityService;
     @Autowired
@@ -44,8 +42,8 @@ public class TransController {
 
 
 
-    public TransController(DataTransformerService dataTransformerService, RestTemplateBuilder restTemplateBuilder){
-        this.dataTransformerService = dataTransformerService;
+    public TransController(TransformerService transformerService, RestTemplateBuilder restTemplateBuilder){
+        this.transformerService = transformerService;
         this.restTemplate = restTemplateBuilder.build();
     }
 
@@ -53,7 +51,7 @@ public class TransController {
     @GetMapping("/view-data")
     public PdxInfo getAllPdmr()
     {
-        List<PdmrPdxInfo> pdmrPdxInfos = dataTransformerService.getAllPdmr();
+        List<PdmrPdxInfo> pdmrPdxInfos = transformerService.getAllPdmr();
 
         PdxInfo pdxInfo = new PdxInfo();
         pdxInfo.setPdxInfo(pdmrPdxInfos);
@@ -65,13 +63,13 @@ public class TransController {
     @GetMapping("/drugs")
     public String getAllPdmrDrugs()
     {
-        List<PdmrPdxInfo> pdmrPdxInfos = dataTransformerService.getAllPdmr();
+        List<PdmrPdxInfo> pdmrPdxInfos = transformerService.getAllPdmr();
 
         String drugList = "";
 
         for (PdmrPdxInfo pdmrPdxInfo : pdmrPdxInfos){
 
-            drugList += dataTransformerService.getDrugs(pdmrPdxInfo);
+            drugList += transformerService.getDrugs(pdmrPdxInfo);
         }
 
         return drugList;
@@ -82,7 +80,7 @@ public class TransController {
     @GetMapping("/transform-pdmr-data")
     public List<Map> connectPdmr(){
 
-        List<Map> mappingList = dataTransformerService.transformDataAndSave();
+        List<Map> mappingList = transformerService.transformDataAndSave();
         return mappingList;
 
     }
@@ -129,10 +127,11 @@ public class TransController {
     }
 
 
-    private String omicFile= System.getProperty("user.home") + "/Downloads/NGS-LOADER/ncicancergenepaneldata_MARCH2019.csv";
 
     @RequestMapping("/rewrite-pdmr-omic-data")
     public Object downloads() {
+
+        String omicFile= System.getProperty("user.home") + "/Downloads/NGS-LOADER/ncicancergenepaneldata_MARCH2019.csv";
 
         List<Map<String, String>> dataList = utilityService.serializeCSVToMaps(omicFile);
 
@@ -145,7 +144,7 @@ public class TransController {
                 String modelID = data.get("Model_ID");
                 String sampleID = data.get("Sample_ID");
 
-                String passage = dataTransformerService.getPassageByModelIDAndSampleID(modelID, sampleID);
+                String passage = transformerService.getPassageByModelIDAndSampleID(modelID, sampleID);
 
                 data.put("Passage", passage);
 
@@ -236,39 +235,6 @@ public class TransController {
             newDataList.add(newData);
         }
 
-
-        /*
-
-            "datasource": "IRCC-CRC",
-            "Model_ID": "CRC0112LM",                                Model ID
-            "Sample_ID": "CRC0112LMH0000000000D01000",              Sample ID
-            "sample_origin": "patient tumor",                       modelId+"H" [patient Tumor] , modelId+"X" [Xenograft]
-            "Passage": "",                                          null
-            "host_strain_name": "",                                 "" *****
-            "hgnc_symbol": "A2M",                                   Gene
-            "amino_acid_change": "R823W",                           Protein
-            "nucleotide_change": "",                                "" *****
-            "consequence": "Missense_Mutation",                     Effect
-            "read_depth": "",                                       "" *****
-            "Allele_frequency": "",                                 VAF
-            "chromosome": "12",                                     Chrom
-            "seq_start_position": "9243799",                        Pos *****
-            "ref_allele": "",                                       Ref
-            "alt_allele": "",                                       Alt
-            "ucsc_gene_id": "",                                     "" *****
-            "ncbi_gene_id": "2",                                    "" *****
-            "ensembl_gene_id": "",                                  "" *****
-            "ensembl_transcript_id": "",                            "" *****
-            "rs_id_Variant": "",                                    avsnp147
-            "genome_assembly": "37",
-            "Platform": "whole exome sequencing                     TargetedNGS_MUT   ... platformURL.get("targetedNgsPlatformURL")
-
-
-
-            ma.setCdsChange(variation.getString("CDS"));
-            ma.setType(type);
-
-        */
 
 
         // Get Exome Template
