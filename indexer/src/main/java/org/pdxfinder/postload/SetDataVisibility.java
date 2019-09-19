@@ -65,7 +65,8 @@ public class SetDataVisibility implements CommandLineRunner{
 
     private void applyDataVisibilityRules(String datasourceAbbrev){
 
-        //get all charles river molchars
+        log.info("Disabling data visibility for "+datasourceAbbrev);
+
         List<MolecularCharacterization> molChars = dataImportService.findAllMolcharByDataSource(datasourceAbbrev);
 
         for(MolecularCharacterization mc:molChars){
