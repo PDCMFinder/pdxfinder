@@ -1200,49 +1200,68 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
         for(TreatmentSummary ts : treatmentSummaries){
 
-            ModelCreation model = dataImportService.findModelByPatientTreatmentSummary(ts);
+            Collection<ModelCreation> models = null;
+
+            try{
+               models = dataImportService.findModelByPatientTreatmentSummary(ts);
+            }
+            catch (Exception e){
+
+                e.printStackTrace();
+                log.error("TS exception: "+ ts.getId().toString());
+            }
 
             //check if treatment is linked to a model
-            if(model != null){
+            if(models != null && models.size() > 0 ){
 
-                Long modelId = model.getId();
+                for(ModelCreation model : models){
 
-                for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
+                    Long modelId = model.getId();
 
-                    //this bit adds the drugA + drugB + drugC etc to the options
-                    String drugName = tp.getTreatmentString(true);
-                    //String response = tp.getResponse().getDescription();
-                    drugName = drugName.replaceAll("/", "");
-                    addToOneParamDP(patientTreatmentDP, drugName, modelId);
+                    for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
 
-
-                    //we also need to deal with regimens
-                    List<String> regimenDrugs = new ArrayList<>();
-
-                    for(TreatmentComponent tc: tp.getComponents()){
-
-                        Treatment t = tc.getTreatment();
-                        OntologyTerm ot = t.getTreatmentToOntologyRelationship().getOntologyTerm();
-
-                        if(ot.getType().equals("treatment regimen") && ot.getSubclassOf() != null && !ot.getSubclassOf().isEmpty()){
-
-                            for(OntologyTerm ot2: ot.getSubclassOf()){
-
-                                regimenDrugs.add(ot2.getLabel());
-
-                            }
-
-                        }
-                    }
-
-                    //sort them alphabetically
-                    if(regimenDrugs.size() != 0){
-                        Collections.sort(regimenDrugs);
-                        drugName = String.join(" and ", regimenDrugs);
+                        //this bit adds the drugA + drugB + drugC etc to the options
+                        String drugName = tp.getTreatmentString(true);
+                        //String response = tp.getResponse().getDescription();
                         drugName = drugName.replaceAll("/", "");
                         addToOneParamDP(patientTreatmentDP, drugName, modelId);
+
+
+                        //we also need to deal with regimens
+                        List<String> regimenDrugs = new ArrayList<>();
+
+                        for(TreatmentComponent tc: tp.getComponents()){
+
+                            Treatment t = tc.getTreatment();
+                            OntologyTerm ot = t.getTreatmentToOntologyRelationship().getOntologyTerm();
+
+                            if(ot.getType().equals("treatment regimen") && ot.getSubclassOf() != null && !ot.getSubclassOf().isEmpty()){
+
+                                for(OntologyTerm ot2: ot.getSubclassOf()){
+
+                                    regimenDrugs.add(ot2.getLabel());
+
+                                }
+                            }
+                        }
+
+                        //sort them alphabetically
+                        if(regimenDrugs.size() != 0){
+                            Collections.sort(regimenDrugs);
+                            drugName = String.join(" and ", regimenDrugs);
+                            drugName = drugName.replaceAll("/", "");
+                            addToOneParamDP(patientTreatmentDP, drugName, modelId);
+                        }
+
                     }
+
                 }
+
+
+
+            }
+            else{
+                log.error("Cannot find model corresponding for patient treatmentSummary, TS id= "+ts.getId());
             }
         }
 
