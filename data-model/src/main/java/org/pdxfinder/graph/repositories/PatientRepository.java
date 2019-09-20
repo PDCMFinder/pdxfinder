@@ -111,14 +111,14 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
 
             "OPTIONAL MATCH (ps)-[st:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-" +
             "    (tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[treatr:TREATMENT]-" +
-            "    (treat:Treatment)--(treatoterm:OntologyTerm) " +
+            "    (treat:Treatment)-[mpt:MAPPED_TO]-(treatoterm:OntologyTerm) " +
             "OPTIONAL MATCH (tp)-[rsp:RESPONSE]-(resp:Response)" +
             "OPTIONAL MATCH (tp)-[cur:CURRENT_TREATMENT]-(curt:CurrentTreatment)" +
 
             "OPTIONAL MATCH (hs)-[char:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mk:MARKER]-(gene:Marker) " +
             "OPTIONAL MATCH (hs)-[ot:OF_TYPE]-(tt:TumorType) " +
 
-            "RETURN  pat, cev, ps, sfrm, hs, ss, tiss, st, ts, tpr, tp, tcr, tc, treatr, treatoterm, cur, curt, rsp, resp, char, mc, aw, ma, mk, gene, ot, tt, mto, oterm")
+            "RETURN  pat, cev, ps, sfrm, hs, ss, tiss, st, ts, tpr, tp, tcr, tc, treatr, treatoterm, cur, curt, rsp, resp, char, mc, aw, ma, mk, gene, ot, tt, mto, oterm, mpt")
     Patient findByPatientByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
 
