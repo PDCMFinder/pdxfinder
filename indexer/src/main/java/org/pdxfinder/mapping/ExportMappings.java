@@ -42,8 +42,8 @@ public class ExportMappings implements CommandLineRunner {
 
     private void exportEuroPdxMappings(){
 
-        String diagnosisFileName = "%s/mappings_out/diagnosis_mappings.json".format(finderRootDir);
-        String treatmentFileName = "%s/mappings_out/treatment_mappings.json".format(finderRootDir);
+        String diagnosisFileName = String.format("%s/mappings_out/diagnosis_mappings.json", finderRootDir);
+        String treatmentFileName = String.format("%s/mappings_out/treatment_mappings.json", finderRootDir);
 
 
 
