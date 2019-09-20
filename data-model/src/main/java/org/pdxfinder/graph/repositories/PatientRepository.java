@@ -118,7 +118,7 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
             "OPTIONAL MATCH (hs)-[char:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mk:MARKER]-(gene:Marker) " +
             "OPTIONAL MATCH (hs)-[ot:OF_TYPE]-(tt:TumorType) " +
 
-            "RETURN  pat,cev,ps,sfrm,hs,ss,tiss,  st,ts,tpr,tp,tcr,tc,treatr,treatoterm   cur,curt,   rsp,resp,   char,mc,aw,ma,mk,gene,   ot,tt, mto, oterm,")
+            "RETURN  pat, cev, ps, sfrm, hs, ss, tiss, st, ts, tpr, tp, tcr, tc, treatr, treatoterm, cur, curt, rsp, resp, char, mc, aw, ma, mk, gene, ot, tt, mto, oterm")
     Patient findByPatientByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
 
