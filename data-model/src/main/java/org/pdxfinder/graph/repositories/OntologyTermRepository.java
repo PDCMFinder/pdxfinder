@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -18,10 +19,17 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
 
     OntologyTerm findById();
 
+    @Query("MATCH (o:OntologyTerm) WHERE toLower(o.label) = toLower({label}) AND o.type = {type} return o")
+    OntologyTerm findByLabelAndType(@Param("label") String label, @Param("type") String type);
+
+    @Query("MATCH (o:OntologyTerm) WHERE o.type CONTAINS toLower({type}) return o")
+    List<OntologyTerm> findByType(@Param("type") String type);
+
     @Query("MATCH (o:OntologyTerm) WHERE toLower(o.label) = toLower({label}) return o")
     OntologyTerm findByLabel(@Param("label") String label);
 
-    OntologyTerm findByUrl(String url);
+    @Query("MATCH (ot:OntologyTerm) WHERE ot.url = {url} RETURN ot")
+    OntologyTerm findByUrl(@Param("url")String url);
 
     //AUTO-SUGGEST: Returns all OntologyTerms that have indirect/direct samples mapped to
     @Query("MATCH (st:OntologyTerm) " +
@@ -45,8 +53,14 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
     @Query("MATCH (o:OntologyTerm) RETURN count(o)")
     int getOntologyTermNumber();
 
+    @Query("MATCH (o:OntologyTerm) WHERE o.type = {type} RETURN count(o)")
+    int getOntologyTermNumberByType(@Param("type") String type);
+
     @Query("match (o:OntologyTerm) RETURN o SKIP {from} LIMIT {to}")
     Collection<OntologyTerm> findAllFromTo(@Param("from") int from, @Param("to") int to);
+
+    @Query("match (o:OntologyTerm) WHERE o.type = {type} RETURN o SKIP {from} LIMIT {to}")
+    Collection<OntologyTerm> findAllByTypeFromTo(@Param("type") String type, @Param("from") int from, @Param("to") int to);
 
     @Query("MATCH (parent:OntologyTerm)<-[:SUBCLASS_OF]-(child:OntologyTerm) " +
             "WHERE child.url = {url} " +

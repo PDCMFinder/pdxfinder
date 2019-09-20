@@ -18,11 +18,13 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
     @Query("MATCH (p:Patient)--(g:Group) WHERE p.externalId = {externalId} AND id(g) = {g} RETURN p")
     Patient findByExternalIdAndGroup(@Param("externalId") String externalId, @Param("g") Group g);
 
+
     @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
             "MATCH (s:Sample)-[sf:SAMPLED_FROM]-(ps:PatientSnapshot)-[pt:PATIENT]-(p:Patient) " +
             "WHERE mod.sourcePdxId = {modelId} " +
             "RETURN mod, ii, s, ps, p, sf, pt")
     Patient findByModelId(@Param("modelId") String modelId);
+
 
     @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
             "MATCH (s:Sample)--(ps:PatientSnapshot)--(p:Patient) " +
@@ -39,7 +41,6 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
 
             "RETURN s, ps, p, sf, pt, ext, extdsos")
     Patient findByDataSourceAndModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
-
 
 
     @Query("MATCH(pat:Patient)-[patRel:COLLECTION_EVENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
@@ -63,9 +64,6 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
                                                        @Param("lim") int lim);
 
 
-
-
-
     @Query("MATCH(pat:Patient)-[patRel:PATIENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
             "WITH pat,patRel,ps,sfrm,psamp,char,molch,mAss,m " +
             "Match (psamp)-[imp:IMPLANTED_IN]-(mc:ModelCreation) " +
@@ -81,7 +79,6 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
                                                       @Param("modelId") String modelId,
                                                       @Param("tech") String tech,
                                                       @Param("search") String search);
-
 
 
     @Query("MATCH (p:Patient)--(ps:PatientSnapshot)--(s:Sample)--(mod:ModelCreation) " +
@@ -102,25 +99,26 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
     Patient findByExternalIdAndGroupWithSnapshots(@Param("externalId") String externalId, @Param("g") Group g);
 
 
-
     @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
-            "            WHERE mod.sourcePdxId = {modelId} " +
-            "            AND toLower(mod.dataSource) = toLower({dataSource}) "+
-            "            WITH s " +
-            "            MATCH (s)-[sf:SAMPLED_FROM]-(pst:PatientSnapshot)--(pat:Patient) " +
-            "            WITH pat " +
-            "            MATCH (pat)-[cev:COLLECTION_EVENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(hs:Sample)-[ss:SAMPLE_SITE]-(tiss:Tissue) " +
-            "            WITH pat, cev, ps, sfrm, hs, ss, tiss "+
-            "            MATCH (hs)-[mto:MAPPED_TO]-(oterm:OntologyTerm)"+
+            "WHERE mod.sourcePdxId = {modelId} " +
+            "AND toLower(mod.dataSource) = toLower({dataSource}) "+
+            "WITH s " +
+            "MATCH (s)-[sf:SAMPLED_FROM]-(pst:PatientSnapshot)--(pat:Patient) " +
+            "WITH pat " +
+            "MATCH (pat)-[cev:COLLECTION_EVENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(hs:Sample)-[ss:SAMPLE_SITE]-(tiss:Tissue) " +
+            "WITH pat, cev, ps, sfrm, hs, ss, tiss "+
+            "MATCH (hs)-[mto:MAPPED_TO]-(oterm:OntologyTerm)"+
 
-            "            OPTIONAL MATCH (ps)-[st:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[drr:DRUG]-(dr:Drug) " +
-            "            OPTIONAL MATCH (tp)-[rsp:RESPONSE]-(resp:Response)" +
-            "            OPTIONAL MATCH (tp)-[cur:CURRENT_TREATMENT]-(curt:CurrentTreatment)" +
+            "OPTIONAL MATCH (ps)-[st:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-" +
+            "    (tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[treatr:TREATMENT]-" +
+            "    (treat:Treatment)-[mpt:MAPPED_TO]-(treatoterm:OntologyTerm) " +
+            "OPTIONAL MATCH (tp)-[rsp:RESPONSE]-(resp:Response)" +
+            "OPTIONAL MATCH (tp)-[cur:CURRENT_TREATMENT]-(curt:CurrentTreatment)" +
 
-            "            OPTIONAL MATCH (hs)-[char:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mk:MARKER]-(gene:Marker) " +
-            "            OPTIONAL MATCH (hs)-[ot:OF_TYPE]-(tt:TumorType) " +
+            "OPTIONAL MATCH (hs)-[char:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[aw:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mk:MARKER]-(gene:Marker) " +
+            "OPTIONAL MATCH (hs)-[ot:OF_TYPE]-(tt:TumorType) " +
 
-            "RETURN  pat,cev,ps,sfrm,hs,ss,tiss,  st,ts,tpr,tp,tcr,tc ,drr,dr,   cur,curt,   rsp,resp,   char,mc,aw,ma,mk,gene,   ot,tt, mto, oterm")
+            "RETURN  pat, cev, ps, sfrm, hs, ss, tiss, st, ts, tpr, tp, tcr, tc, treatr, treatoterm, cur, curt, rsp, resp, char, mc, aw, ma, mk, gene, ot, tt, mto, oterm, mpt")
     Patient findByPatientByModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
 

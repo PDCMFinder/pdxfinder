@@ -1,7 +1,11 @@
 package org.pdxfinder.services;
 
+import org.neo4j.ogm.json.JSONArray;
+import org.neo4j.ogm.json.JSONObject;
+import org.pdxfinder.graph.dao.DataProjection;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.dao.Sample;
+import org.pdxfinder.graph.queryresults.MutatedMarkerData;
 import org.pdxfinder.graph.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +27,17 @@ public class GraphService {
     private OntologyTermRepository ontologyTermRepository;
     private GroupRepository groupRepository;
     private MarkerRepository markerRepository;
+    private DataProjectionRepository dataProjectionRepository;
 
     public GraphService(SampleRepository sampleRepository,
                         OntologyTermRepository ontologyTermRepository,
                         GroupRepository groupRepository,
-                        MarkerRepository markerRepository) {
+                        MarkerRepository markerRepository, DataProjectionRepository dataProjectionRepository) {
         this.sampleRepository = sampleRepository;
         this.ontologyTermRepository = ontologyTermRepository;
         this.groupRepository = groupRepository;
         this.markerRepository = markerRepository;
+        this.dataProjectionRepository = dataProjectionRepository;
     }
 
     public Set<String> getMappedDOTerms() {
@@ -226,13 +232,38 @@ public class GraphService {
         return groupRepository.findAllAbbreviations();
     }
 
+    public List<MutatedMarkerData> getModelCountByGene(){
 
-    public Iterable<Map<String, Object>> getModelCountByGene(){
+        DataProjection dp = dataProjectionRepository.findByLabel("frequently mutated genes");
 
-        Iterable<Map<String, Object>> iterableResults = markerRepository.countModelsByMarker().queryResults();
+        List<MutatedMarkerData> result = new ArrayList<>();
 
-        return iterableResults;
+        if(dp != null){
 
+            String markerJsonString = dp.getValue();
+
+            try {
+                JSONArray jarray = new JSONArray(markerJsonString);
+
+                for(int i=0; i<jarray.length(); i++){
+
+                    JSONObject j = jarray.getJSONObject(i);
+
+                    MutatedMarkerData mmd = new MutatedMarkerData();
+                    mmd.setGene_name(j.getString("gene_name"));
+                    mmd.setNumber_of_models(Integer.parseInt(j.getString("number_of_models")));
+
+                    result.add(mmd);
+                }
+            }
+            catch (Exception e){
+
+                e.printStackTrace();
+                return result;
+            }
+        }
+
+        return result;
     }
 
 

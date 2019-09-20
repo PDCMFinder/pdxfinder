@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Interface describing operations for adding/finding/deleting PDX strain records
@@ -182,6 +183,11 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN model")
     ModelCreation findByTreatmentSummary(@Param("ts") TreatmentSummary ts);
 
+    @Query("MATCH (model:ModelCreation)--(s:Sample)--(ps:PatientSnapshot)--(ts:TreatmentSummary) " +
+            "WHERE id(ts) = {ts} " +
+            "RETURN model")
+    Collection<ModelCreation> findByPatientTreatmentSummary(@Param("ts") TreatmentSummary ts);
+
 
     @Query("MATCH (model:ModelCreation) WHERE model.sourcePdxId = {modelId} AND model.dataSource = {dataSource} " +
             "WITH model " +
@@ -208,6 +214,10 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN model, msr, samp, cby, molchar, asw, massoc, mark, marker")
     List<ModelCreation> findByMolcharType(@Param("molcharType") String molcharType);
 
+    @Query("MATCH (mod:ModelCreation)-[tsr:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(d:Treatment)-[mt:MAPPED_TO]-(ot:OntologyTerm) " +
+            "WHERE tc.type = {type} " +
+            "RETURN mod, tsr, ts, tpr, tp, tcr, tc, dr, d, mt, ot")
+    Set<ModelCreation> getModelsTreatmentsAndDrugs(@Param("type") String type);
 
 }
 

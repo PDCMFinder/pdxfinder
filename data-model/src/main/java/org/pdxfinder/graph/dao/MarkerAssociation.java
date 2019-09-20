@@ -68,10 +68,18 @@ public class MarkerAssociation {
     private String cnaCopyNumberStatus;
     private String cnaGisticValue;
     private String cnaPicnicValue;
+    private String fold_change;
 
     private String cytoGenFishResult;
 
-
+    protected String rnaSeqCoverage;
+    protected String rnaSeqFPKM;
+    protected String rnaSeqTPM;
+    protected String rnaSeqCount;
+    protected String affyHGEAProbeId;
+    protected String affyHGEAExpressionValue;
+    protected String illuminaHGEAProbeId;
+    protected String illuminaHGEAExpressionValue;
 
 
     public MarkerAssociation() {
@@ -397,5 +405,77 @@ public class MarkerAssociation {
 
     public void setCytoGenFishResult(String cytoGenFishResult) {
         this.cytoGenFishResult = cytoGenFishResult;
+    }
+
+    public String getRnaSeqCoverage() {
+        return rnaSeqCoverage;
+    }
+
+    public void setRnaSeqCoverage(String rnaSeqCoverage) {
+        this.rnaSeqCoverage = rnaSeqCoverage;
+    }
+
+    public String getRnaSeqFPKM() {
+        return rnaSeqFPKM;
+    }
+
+    public void setRnaSeqFPKM(String rnaSeqFPKM) {
+        this.rnaSeqFPKM = rnaSeqFPKM;
+    }
+
+    public String getRnaSeqTPM() {
+        return rnaSeqTPM;
+    }
+
+    public void setRnaSeqTPM(String rnaSeqTPM) {
+        this.rnaSeqTPM = rnaSeqTPM;
+    }
+
+    public String getRnaSeqCount() {
+        return rnaSeqCount;
+    }
+
+    public void setRnaSeqCount(String rnaSeqCount) {
+        this.rnaSeqCount = rnaSeqCount;
+    }
+
+    public String getAffyHGEAProbeId() {
+        return affyHGEAProbeId;
+    }
+
+    public void setAffyHGEAProbeId(String affyHGEAProbeId) {
+        this.affyHGEAProbeId = affyHGEAProbeId;
+    }
+
+    public String getAffyHGEAExpressionValue() {
+        return affyHGEAExpressionValue;
+    }
+
+    public void setAffyHGEAExpressionValue(String affyHGEAExpressionValue) {
+        this.affyHGEAExpressionValue = affyHGEAExpressionValue;
+    }
+
+    public String getIlluminaHGEAProbeId() {
+        return illuminaHGEAProbeId;
+    }
+
+    public void setIlluminaHGEAProbeId(String illuminaHGEAProbeId) {
+        this.illuminaHGEAProbeId = illuminaHGEAProbeId;
+    }
+
+    public String getIlluminaHGEAExpressionValue() {
+        return illuminaHGEAExpressionValue;
+    }
+
+    public void setIlluminaHGEAExpressionValue(String illuminaHGEAExpressionValue) {
+        this.illuminaHGEAExpressionValue = illuminaHGEAExpressionValue;
+    }
+
+    public String getFold_change() {
+        return fold_change;
+    }
+
+    public void setFold_change(String fold_change) {
+        this.fold_change = fold_change;
     }
 }

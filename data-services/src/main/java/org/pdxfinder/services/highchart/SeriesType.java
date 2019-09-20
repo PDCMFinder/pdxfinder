@@ -7,7 +7,8 @@ public enum SeriesType {
 
     SPLINE("spline"),
     COLUMN("column"),
-    PIE("pie");
+    PIE("pie"),
+    BAR("bar");
 
     private String value;
 

@@ -5,6 +5,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /*
@@ -102,36 +103,46 @@ public class TreatmentProtocol {
         this.treatmentDate = treatmentDate;
     }
 
-    public String getDrugString(boolean includeControlDrugs){
+    public String getTreatmentString(boolean includeControlDrugs){
+
+        List<String> result = new ArrayList<>();
 
         String ret = "";
 
         for(TreatmentComponent comp:components){
 
-            String drugName = comp.getDrug().getName();
+            String drugName;
+
+            if(
+                comp.getTreatment() != null && 
+                comp.getTreatment().getTreatmentToOntologyRelationship() != null && 
+                comp.getTreatment().getTreatmentToOntologyRelationship().getOntologyTerm() != null
+            ){
+
+                drugName = comp.getTreatment().getTreatmentToOntologyRelationship().getOntologyTerm().getLabel();
+            }
+            else{
+                continue;
+            }
 
             if(includeControlDrugs){
-                if(!ret.isEmpty()){
-                    ret+=" and ";
-                }
-                ret+=drugName;
+                result.add(drugName);
             }
             //include only Drugs but no Controls
             else{
 
                 if(comp.getType().equals("Drug")){
 
-                    if(!ret.isEmpty()){
-                        ret+=" and ";
-                    }
-                    ret+=drugName;
+                    result.add(drugName);
                 }
 
             }
 
         }
 
-        return ret;
+        Collections.sort(result);
+
+        return String.join(" and ", result);
     }
 
 

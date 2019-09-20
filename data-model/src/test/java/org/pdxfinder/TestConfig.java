@@ -15,22 +15,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @ComponentScan(value = "org.pdxfinder")
 @EnableNeo4jRepositories("org.pdxfinder.graph.repositories")
-public class TestConfig {
+public class TestConfig{
 
     @Bean
     public org.neo4j.ogm.config.Configuration getConfiguration() {
-        org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration();
-
-        // To persist the database, uncomment this section
-//        String pathToDb = Paths.get(".").toAbsolutePath().normalize().toString() + "/target/test_graph.db";
-//        config
-//                .driverConfiguration()
-//                .setDriverClassName("org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver")
-//                .setURI("file://" + pathToDb);
-//
-//        System.out.println(config);
-
-        return config;
+        return new org.neo4j.ogm.config.Configuration();
     }
 
     @Bean
@@ -42,5 +31,4 @@ public class TestConfig {
     public Neo4jTransactionManager transactionManager() {
         return new Neo4jTransactionManager(sessionFactory());
     }
-
 }

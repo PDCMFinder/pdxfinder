@@ -273,6 +273,7 @@
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'DRUG AND RESPONSE')}">DRUG AND RESPONSE</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'BREAST CANCER MARKERS')}">BREAST CANCER MARKERS</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'PATIENT TREATMENT STATUS')}">TREATMENT STATUS</th>
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'PATIENT TREATMENT')}">PATIENT TREATMENT</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'COPY NUMBER ALTERATION')}">COPY NUMBER ALTERATION</th>
                             </tr>
                             </thead>
@@ -338,7 +339,17 @@
 
                                 <td data-title="PATIENT TREATMENT STATUS" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'PATIENT TREATMENT STATUS')}">
 
+
                                         <span th:text="${model.patientTreatmentStatus}"></span>
+
+                                </td>
+
+                                <td data-title="PATIENT TREATMENT" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'PATIENT TREATMENT')}">
+
+                                    <div th:each="patientTreatment : ${model.patientTreatments}">
+                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#patients'}"
+                                           th:utext="${patientTreatment}"></a>
+                                    </div>
 
                                 </td>
 

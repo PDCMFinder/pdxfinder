@@ -25,6 +25,8 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 /*
  * Created by abayomi on 12/02/2019.
@@ -62,7 +64,7 @@ public class UtilityService {
             csvMaps = serializeCSVToMaps(fileName);
         }else if (fileExtension.equals("json")) {
 
-            csvMaps = serializeJSONToMaps(fileName);
+            csvMaps = (List) serializeJSONToMaps(fileName);
         } else {
 
             csvMaps = serializeExcelDataNoIterator(fileName,0,1);
@@ -86,7 +88,7 @@ public class UtilityService {
                 break;
 
             case "json":
-                csvMaps = serializeJSONToMaps(fileName);
+                csvMaps = (List) serializeJSONToMaps(fileName);
                 break;
 
             case "xlsx":
@@ -177,7 +179,9 @@ public class UtilityService {
             }
 
             inputStream.close();
-        } catch (Exception ex) { }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         return csvMap;
     }
@@ -189,6 +193,12 @@ public class UtilityService {
     public List<Map<String, String>> serializeExcelDataNoIterator(String excelURL, int sheet, int startRow) {
 
         FileInputStream inputStream = convertFileToStream(excelURL);
+
+        return serializeExcelDataNoIterator(inputStream, sheet, startRow);
+
+    }
+
+    public List<Map<String, String>> serializeExcelDataNoIterator(InputStream inputStream, int sheet, int startRow) {
 
         List<String> tableHead = new ArrayList<>();
         List<Map<String, String>> csvMap = new ArrayList<>();
@@ -203,12 +213,11 @@ public class UtilityService {
             Iterator<Row> rowIterator = spreadsheet.iterator();
 
 
-
             while (rowIterator.hasNext()) // Read the head row
             {
                 row = rowIterator.next();
 
-                if (rowCount == startRow){
+                if (rowCount == startRow) {
 
                     Iterator<Cell> cellIterator = row.cellIterator();
                     tableHead = getXlsTableHeadData(cellIterator);
@@ -220,7 +229,7 @@ public class UtilityService {
             rowCount = 0;
             for (Row dRow : spreadsheet) {
 
-                if (rowCount <= startRow){
+                if (rowCount <= startRow) {
                     rowCount++;
                     continue;
                 }
@@ -243,21 +252,24 @@ public class UtilityService {
                         rowMap.put(key, data);
                         rowDataTracker += data;
 
-                    }else{
+                    } else {
                         if (!key.equals("")) rowMap.put(key, "");
                     }
                 }
 
-                if (rowDataTracker.length() !=0) csvMap.add(rowMap);
+                if (rowDataTracker.length() != 0) csvMap.add(rowMap);
 
                 rowCount++;
             }
 
             inputStream.close();
-        } catch (Exception ex) { ex.printStackTrace(); }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         return csvMap;
     }
+
 
 
 
@@ -453,6 +465,34 @@ public class UtilityService {
      *                                           CSV FILE HANDLER SECTION                                      *
      ************************************************************************************************************/
 
+    public List<Map<String, String>> serializeMultipartFile(MultipartFile multipartFile) {
+
+        String[] stringArr = multipartFile.getOriginalFilename().split("\\.");
+        String type = stringArr[stringArr.length - 1];
+
+        // multipartFile.getContentType()
+
+        InputStream inputStream = null;
+        List<Map<String, String>> dataList = new ArrayList<>();
+
+        try {
+            inputStream = multipartFile.getInputStream();
+        } catch (Exception e) {
+        }
+
+        if (type.equals("xlsx")) {
+
+            dataList = serializeExcelDataNoIterator(inputStream, 0, 1);
+
+        } else if (type.equals("csv")) {
+
+            DataInputStream csvData = new DataInputStream(inputStream);
+            dataList = serializeCSVToMaps(csvData);
+        }
+
+        return dataList;
+    }
+
 
     // SERIALIZE CSV TO LIST OF MAPS
     public List<Map<String, String>> serializeCSVToMaps(String csvFile) {
@@ -460,9 +500,15 @@ public class UtilityService {
         FileInputStream fileStream = null;
         try {
             fileStream = new FileInputStream(csvFile);
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
         DataInputStream csvData = new DataInputStream(fileStream);
 
+        return serializeCSVToMaps(csvData);
+    }
+
+
+    public List<Map<String, String>> serializeCSVToMaps(DataInputStream csvData) {
 
         int row = 0;
         String thisLine;
@@ -486,14 +532,18 @@ public class UtilityService {
                     Map<String, String> rowMap = new LinkedHashMap<>();
                     for (String columnHead : tableHead) {
 
-                        rowMap.put(columnHead.trim(), rowDataArr[column].trim());
+                        String dKey = columnHead.trim().replaceAll("\"","");
+                        String dValue = rowDataArr[column].trim().replaceAll("\"","");
+
+                        rowMap.put(dKey, dValue);
                         column++;
                     }
                     csvMap.add(rowMap);
                 }
                 row++;
             }
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
 
         return csvMap;
 
@@ -597,6 +647,26 @@ public class UtilityService {
     }
 
 
+    public void writeCsvFile(List<String> headers, List<List<String>> dataList, String destination){
+
+        List<Map<String, String>> mapList = new ArrayList<>();
+
+        for(int i = 0; i < dataList.size(); i++){
+
+            Map<String, String> rowMap = new HashMap<>();
+
+            List<String> row = dataList.get(i);
+
+            for(int j = 0; j < row.size(); j++){
+
+                rowMap.put(headers.get(j), row.get(j));
+            }
+
+            mapList.add(rowMap);
+        }
+
+        writeCsvFile(mapList, destination);
+    }
 
 
 
@@ -610,11 +680,11 @@ public class UtilityService {
      ************************************************************************************************************/
 
     // SERIALIZER : CONVERT JSON URL TO JAVA MAPS
-    public List<Map<String, String>> serializeJSONToMaps(String jsonFile) {
+    public List<Map<String, Object>> serializeJSONToMaps(String jsonFile) {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        List<Map<String, String>> data;
+        List<Map<String, Object>> data;
 
         JsonNode node = readJsonLocal(jsonFile);
         try {
@@ -637,7 +707,7 @@ public class UtilityService {
 
 
     // SERIALIZER : CONVERT JSON URL TO JAVA MAPS
-    public List<Map<String, String>> serializeJSONToMaps(String jsonFile,String jsonKey) {
+    public List<Map<String, Object>> serializeJSONToMaps(String jsonFile,String jsonKey) {
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -645,7 +715,7 @@ public class UtilityService {
 
         Map<String, Object> json = mapper.convertValue(node, Map.class);
 
-        List<Map<String, String>> data = (List) json.get(jsonKey);
+        List<Map<String, Object>> data = (List) json.get(jsonKey);
 
         return data;
     }
@@ -781,14 +851,12 @@ public class UtilityService {
     }
 
 
-    // FILE WRITE: WRITE STRIN DATA TO FILE
-    public void writeToFile(String data, String name){
-
-        String fileName = homeDir+"/Documents/"+name;
+    // FILE WRITE: WRITE STRING DATA TO FILE
+    public void writeToFile(String data, String destination, Boolean shouldAppend){
 
         // Write to the file using BufferedReader and FileWriter
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(destination, shouldAppend));
             writer.append(data);
             writer.close();
 
@@ -864,6 +932,29 @@ public class UtilityService {
      *                                          OTHER UTILITIES                                                  *
      ************************************************************************************************************/
 
+    public String camelCaseToSentence(String s) {
+
+        String converted = s.replaceAll(
+                String.format("%s|%s|%s",
+                              "(?<=[A-Z])(?=[A-Z][a-z])",
+                              "(?<=[^A-Z])(?=[A-Z])",
+                              "(?<=[A-Za-z])(?=[^A-Za-z])"
+                ),
+                " "
+        );
+
+        // Fix situations when non camel case is sent, remove double spaces generated
+        return converted.trim().replaceAll(" +", " ");
+    }
+
+
+    public String sentenceToCamelCase(String input) {
+
+        String output = StringUtils.capitalize(input.split("-")[0]) + StringUtils.capitalize(input.split("-")[1]);
+
+        return output;
+    }
+
 
     public String splitText(String data, String delim, String seperator){
 
@@ -883,12 +974,30 @@ public class UtilityService {
     // File to Byte
     public void moveFile(String source,String destination){
 
+        // Create Directory if it does not exist
+        this.mkDirectoryFromFilePathName(destination);
+
         byte[] bytes = convertLocalFileToByte(source);
 
         Path path = Paths.get(destination);
         try{
             Files.write(path, bytes);
         }catch (Exception e){}
+
+    }
+
+
+    public void mkDirectoryFromFilePathName(String filePath){
+
+        // Get Directory from file path string
+        String directoryName = filePath.substring(0, filePath.lastIndexOf("/"));
+
+        // Create Directory if it does not exist
+        File directory = new File(directoryName);
+
+        if (!directory.exists()){
+            directory.mkdirs();
+        }
     }
 
 
@@ -910,9 +1019,25 @@ public class UtilityService {
 
 
 
-    public String log(){
-        return "Working";
+    public List<Map> objectArrayListToMapList(List<Object[]> dataList, List<String> keys){
+
+        List<Map> result = new ArrayList<>();
+
+        for (Object[] data : dataList) {
+
+            Map<String, Object> dataMap = new LinkedHashMap<>();
+            int count = 0;
+            for (Object content : data){
+
+                dataMap.put(keys.get(count), content);
+                count++;
+            }
+            result.add(dataMap);
+        }
+        return result;
     }
+
+
 
 
 

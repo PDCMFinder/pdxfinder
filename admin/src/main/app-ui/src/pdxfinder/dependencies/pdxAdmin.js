@@ -13,22 +13,22 @@ $(document).ready(function () {
     // MetsiMenu
     $('#side-menu').metisMenu();
 
-    // Collapse ibox function
+    // Collapse pdxfinder function
     $('.collapse-link').click(function () {
-        var ibox = $(this).closest('div.ibox');
+        var pdxfinder = $(this).closest('div.pdxfinder');
         var button = $(this).find('i');
-        var content = ibox.find('div.ibox-content');
+        var content = pdxfinder.find('div.pdxfinder-content');
         content.slideToggle(200);
-        button.toggleClass('fa-chevron-up').toggleClass('fa-chevron-down');
-        ibox.toggleClass('').toggleClass('border-bottom');
+        button.toggleClass('ti-angle-double-up').toggleClass('ti-angle-double-down');
+        pdxfinder.toggleClass('').toggleClass('border-bottom');
         setTimeout(function () {
-            ibox.resize();
-            ibox.find('[id^=map-]').resize();
+            pdxfinder.resize();
+            pdxfinder.find('[id^=map-]').resize();
         }, 50);
     });
 
     $('.close-link').click(function () {
-        var content = $(this).closest('div.ibox');
+        var content = $(this).closest('div.pdxfinder');
         content.remove();
     });
 
@@ -38,14 +38,6 @@ $(document).ready(function () {
         SmoothlyMenu();
     });
 
-    // Small todo handler
-    $('.check-link').click(function () {
-        var button = $(this).find('i');
-        var label = $(this).next('span');
-        button.toggleClass('fa-check-square').toggleClass('fa-square-o');
-        label.toggleClass('todo-completed');
-        return false;
-    });
 
     // Minimalize menu
     $('.navbar-minimalize').click(function () {

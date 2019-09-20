@@ -14,25 +14,56 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "text"
+        "chart",
+        "title",
+        "xAxis",
+        "yAxis",
+        "plotOptions",
+        "series",
+        "labels"
 })
 public class ChartData {
 
     private Chart chart;
     private Title title;
+    private Subtitle subtitle;
     private XAxis xAxis;
-    private Labels labels;
+    private List<YAxis> yAxis;
+    private PlotOptions plotOptions;
     private List<Series> series;
+    private Labels labels;
+    private List<String> colors;
+
+    private ToolTip tooltip;
+
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    public ChartData() {
+    }
+
+    public ChartData(Title title, XAxis xAxis, List<Series> series) {
+        this.title = title;
+        this.xAxis = xAxis;
+        this.series = series;
+    }
 
     public ChartData(Title title, XAxis xAxis, Labels labels, List<Series> series) {
         this.title = title;
         this.xAxis = xAxis;
         this.labels = labels;
         this.series = series;
+    }
+
+
+    public ChartData(Chart chart, Title title, XAxis xAxis, List<Series> series, List<YAxis> yAxis, PlotOptions plotOptions) {
+        this.chart = chart;
+        this.title = title;
+        this.xAxis = xAxis;
+        this.series = series;
+        this.yAxis = yAxis;
+        this.plotOptions = plotOptions;
     }
 
     public Chart getChart() {
@@ -51,12 +82,29 @@ public class ChartData {
         this.title = title;
     }
 
+    public Subtitle getSubtitle() {
+        return subtitle;
+    }
+
+    public void setSubtitle(Subtitle subtitle) {
+        this.subtitle = subtitle;
+    }
+
     public XAxis getxAxis() {
         return xAxis;
     }
 
     public void setxAxis(XAxis xAxis) {
         this.xAxis = xAxis;
+    }
+
+
+    public List<YAxis> getyAxis() {
+        return yAxis;
+    }
+
+    public void setyAxis(List<YAxis> yAxis) {
+        this.yAxis = yAxis;
     }
 
     public Labels getLabels() {
@@ -73,6 +121,30 @@ public class ChartData {
 
     public void setSeries(List<Series> series) {
         this.series = series;
+    }
+
+    public PlotOptions getPlotOptions() {
+        return plotOptions;
+    }
+
+    public void setPlotOptions(PlotOptions plotOptions) {
+        this.plotOptions = plotOptions;
+    }
+
+    public List<String> getColors() {
+        return colors;
+    }
+
+    public void setColors(List<String> colors) {
+        this.colors = colors;
+    }
+
+    public ToolTip getTooltip() {
+        return tooltip;
+    }
+
+    public void setTooltip(ToolTip tooltip) {
+        this.tooltip = tooltip;
     }
 
     @JsonAnyGetter

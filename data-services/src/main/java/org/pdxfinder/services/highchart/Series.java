@@ -19,7 +19,7 @@ public class Series {
     private String type;
     private String name;
     private Object data;
-    private String color;
+    private Object color;
     private Marker marker;
     private String dashStyle;
     private Double opacity;
@@ -32,6 +32,9 @@ public class Series {
     private Integer size;
     private Boolean showInLegend;
     private DataLabels dataLabels;
+
+    private String stacking;
+    private Boolean colorByPoint;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -53,6 +56,17 @@ public class Series {
         this.color = color;
     }
 
+    public Series(String type, String name, Object data, Object color, Double opacity, Double pointPadding, Double pointPlacement, Integer yAxis) {
+        this.type = type;
+        this.name = name;
+        this.data = data;
+        this.color = color;
+        this.opacity = opacity;
+        this.pointPadding = pointPadding;
+        this.pointPlacement = pointPlacement;
+        this.yAxis = yAxis;
+    }
+
     public Series(String type, String name, Object data, List<Integer> center, Integer size, Boolean showInLegend) {
         this.type = type;
         this.name = name;
@@ -60,6 +74,10 @@ public class Series {
         this.center = center;
         this.size = size;
         this.showInLegend = showInLegend;
+    }
+
+    public Series(Map<String, Object> additionalProperties) {
+        this.additionalProperties = additionalProperties;
     }
 
     public String getType() {
@@ -86,11 +104,11 @@ public class Series {
         this.data = data;
     }
 
-    public String getColor() {
+    public Object getColor() {
         return color;
     }
 
-    public void setColor(String color) {
+    public void setColor(Object color) {
         this.color = color;
     }
 
@@ -181,6 +199,14 @@ public class Series {
 
     public void setDataLabels(DataLabels dataLabels) {
         this.dataLabels = dataLabels;
+    }
+
+    public String getStacking() {
+        return stacking;
+    }
+
+    public void setStacking(String stacking) {
+        this.stacking = stacking;
     }
 
     @JsonAnyGetter
