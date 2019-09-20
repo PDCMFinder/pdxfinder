@@ -22,7 +22,8 @@ public enum SearchFacetName {
     data_available,
     breast_cancer_markers,
     access_modalities,
-    copy_number_alteration;
+    copy_number_alteration,
+    patient_treatment;
 
     public String getName() {
         return name();

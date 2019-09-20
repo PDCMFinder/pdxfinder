@@ -18,12 +18,11 @@ public class MappingContainer {
     /**
      * A container holding mapped and unmapped entities
      */
-    private TreeMap<Long, MappingEntity> mappings;
+    private TreeMap<String, MappingEntity> mappings;
 
 
 
-    public MappingContainer(TreeMap<Long, MappingEntity> mappings) {
-        this.mappings = new TreeMap<>();
+    public MappingContainer(TreeMap<String, MappingEntity> mappings) {
         this.mappings = mappings;
         size = mappings.size();
     }
@@ -34,17 +33,17 @@ public class MappingContainer {
         size = 0;
     }
 
-    public TreeMap<Long, MappingEntity> getMappings() {
+    public TreeMap<String, MappingEntity> getMappings() {
         return mappings;
     }
 
-    public void setMappings(TreeMap<Long, MappingEntity> mappings) {
+    public void setMappings(TreeMap<String, MappingEntity> mappings) {
         this.mappings = mappings;
     }
 
 
 
-    public MappingEntity getEntityById(Long id){
+    public MappingEntity getEntityById(String id){
 
         if(mappings.containsKey(id)) return mappings.get(id);
 
@@ -57,10 +56,14 @@ public class MappingContainer {
     }
 
 
-    public void add(MappingEntity me){
+    public void addEntity(MappingEntity me){
 
-        mappings.put(me.getEntityId(), me);
-        size += 1;
+        if(!mappings.containsKey(me.getMappingKey())){
+
+            mappings.put(me.getMappingKey(), me);
+            size += 1;
+        }
+
     }
 
     public int getSize() {
@@ -73,7 +76,7 @@ public class MappingContainer {
 
 
     //method to transform the container something more processable by the frontend
-    public Map<String, List<MappingEntity>> getEntityList(){
+    public Map<String, List<MappingEntity>> getEntityMap(){
 
         List<MappingEntity> list = mappings.values().stream().collect(Collectors.toList());
 
@@ -82,5 +85,23 @@ public class MappingContainer {
 
 
         return entityMap;
+    }
+
+
+    //method to transform the container something more processable by the frontend
+    public List<MappingEntity> getEntityList(){
+
+        List<MappingEntity> list = mappings.values().stream().collect(Collectors.toList());
+
+
+        return list;
+    }
+
+
+    @Override
+    public String toString() {
+        return "[" +
+                  mappings +
+                ']';
     }
 }

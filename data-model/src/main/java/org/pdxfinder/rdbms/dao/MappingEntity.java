@@ -1,10 +1,13 @@
 package org.pdxfinder.rdbms.dao;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /*
  * Created by csaba on 18/06/2018.
@@ -51,6 +54,8 @@ public class MappingEntity {
      * entity is not mapped to anything yet) or an existing ontology term.
      */
     private String mappedTermLabel;
+
+
 
 
     /**
@@ -103,6 +108,7 @@ public class MappingEntity {
     /**
      * The unique String that identifies a Mapping
      */
+    @JsonIgnore
     @Column(unique = true, nullable = false, columnDefinition="Text")
     private String mappingKey;
 
@@ -241,5 +247,68 @@ public class MappingEntity {
 
     public void setMappingKey(String mappingKey) {
         this.mappingKey = mappingKey;
+    }
+
+    public String generateMappingKey(){
+
+        String key = entityType;
+
+        for(String label : mappingLabels){
+
+            key += "__" + mappingValues.get(label);
+        }
+
+        key = key.replaceAll("[^a-zA-Z0-9 _-]","");
+
+        return key.toLowerCase();
+
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n {");
+        sb.append("\"entityId\":" + entityId + ", \n");
+        sb.append("\"entityType\": \"" + entityType + "\", \n");
+        sb.append("\"mappingLabels\":");
+
+        sb.append(mappingLabels.stream()
+                .map(n -> "\""+n+"\"")
+                .collect(Collectors.joining(",", "[", "]")));
+        sb.append(", \n");
+
+        sb.append("\"mappingValues\":");
+        sb.append(mappingLabels.stream()
+                .map(n -> "\""+n+"\":\"" +mappingValues.get(n)+"\"")
+                .collect(Collectors.joining(",", "{", "}")));
+        sb.append(", \n");
+        sb.append("\"mappedTermLabel\": \"" + mappedTermLabel + "\", \n");
+        sb.append("\"mappedTermUrl\": \"" + mappedTermUrl + "\", \n");
+        sb.append("\"mapType\": \"" + mapType + "\", \n");
+        sb.append("\"justification\": \"" + justification + "\", \n");
+        sb.append("\"status\": \"" + status + "\", \n");
+        sb.append("\"suggestedMappings\": " + suggestedMappings + " \n");
+
+        sb.append("}");
+
+        return sb.toString();
+
+
+        /*
+        return "{" +
+                "\"entityId\":" + entityId + ", \n" +
+                "\"entityType\": \"" + entityType + "\", \n" +
+                ", mappingLabels:" + mappingLabels +
+                ", mappingValues:" + mappingValues +
+                ", mappedTermLabel:'" + mappedTermLabel + '\'' +
+                ", mappedTermUrl:'" + mappedTermUrl + '\'' +
+                ", mapType:'" + mapType + '\'' +
+                ", justification:'" + justification + '\'' +
+                ", status:'" + status + '\'' +
+                ", suggestedMappings:" + suggestedMappings +
+                '}';
+
+                */
     }
 }

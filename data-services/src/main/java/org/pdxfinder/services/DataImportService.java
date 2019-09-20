@@ -10,22 +10,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.graph.queryresults.MutatedMarkerData;
+import org.pdxfinder.graph.queryresults.TreatmentMappingData;
 import org.pdxfinder.graph.repositories.*;
-import org.pdxfinder.services.ds.Harmonizer;
 import org.pdxfinder.services.ds.Standardizer;
-import org.pdxfinder.services.dto.LoaderDTO;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.pdxfinder.services.reporting.LogEntity;
-import org.pdxfinder.services.reporting.LogEntityType;
 import org.pdxfinder.services.reporting.MarkerLogEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import org.springframework.cache.annotation.Cacheable;
-import java.io.File;
+
+import javax.management.RuntimeErrorException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -68,6 +67,7 @@ public class DataImportService {
     private CurrentTreatmentRepository currentTreatmentRepository;
     private ExternalUrlRepository externalUrlRepository;
     private DrugRepository drugRepository;
+    private TreatmentRepository treatmentRepository;
 
     private final static Logger log = LoggerFactory.getLogger(DataImportService.class);
 
@@ -100,7 +100,8 @@ public class DataImportService {
                              TreatmentProtocolRepository treatmentProtocolRepository,
                              CurrentTreatmentRepository currentTreatmentRepository,
                              ExternalUrlRepository externalUrlRepository,
-                             DrugRepository drugRepository) {
+                             DrugRepository drugRepository,
+                             TreatmentRepository treatmentRepository) {
 
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null");
         Assert.notNull(hostStrainRepository, "hostStrainRepository cannot be null");
@@ -143,6 +144,8 @@ public class DataImportService {
         this.currentTreatmentRepository = currentTreatmentRepository;
         this.externalUrlRepository = externalUrlRepository;
         this.drugRepository = drugRepository;
+        this.treatmentRepository = treatmentRepository;
+
 
         this.markersBySymbol = new HashMap<>();
         this.markersByPrevSymbol = new HashMap<>();
@@ -362,11 +365,17 @@ public class DataImportService {
 
     public Patient createPatient(String patientId, Group dataSource, String sex, String race, String ethnicity){
 
+        if(patientId == null || patientId.equals("")){
+            log.warn("In DataImportService.createPatient() : the patientId is null or blank");
+            throw new NullPointerException();
+        }
+
         Patient patient = findPatient(patientId, dataSource);
 
         if(patient == null){
 
-            patient = this.getPatient(patientId, sex, race, ethnicity, dataSource);
+            log.info("Patient not found. Creating: " + patientId );
+            patient = new Patient(patientId,sex,race,ethnicity,dataSource);
             patientRepository.save(patient);
         }
 
@@ -395,13 +404,18 @@ public class DataImportService {
 
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, Group group) {
 
+
+        if(externalId == null || externalId.equals("")){
+            log.warn("In DataImportService.createPatient() : patientId is null or blank");
+            throw new NullPointerException();
+        }
+
         Patient patient = patientRepository.findByExternalIdAndGroup(externalId, group);
         PatientSnapshot patientSnapshot;
 
         if (patient == null) {
-            log.info("Patient '{}' not found. Creating", externalId);
 
-            patient = this.getPatient(externalId, sex, race, ethnicity, group);
+            patient = new Patient(externalId,sex,race,ethnicity,group);
 
             patientSnapshot = new PatientSnapshot(patient, age);
             patientSnapshotRepository.save(patientSnapshot);
@@ -741,6 +755,12 @@ public class DataImportService {
         return hostStrain;
     }
 
+    public HostStrain findHostStrain(String symbol){
+
+        return hostStrainRepository.findBySymbol(symbol);
+    }
+
+
     // is this bad? ... probably..
     public Marker getMarker(String symbol) {
         log.error("MARKER METHOD WAS CALLED!");
@@ -761,6 +781,10 @@ public class DataImportService {
         return marker;
     }
 
+    public List<MutatedMarkerData> getFrequentlyMutatedGenes(){
+
+        return markerRepository.countModelsByMarker();
+    }
 
     public Set<MarkerAssociation> findMarkerAssocsByMolChar(MolecularCharacterization mc){
 
@@ -860,6 +884,13 @@ public class DataImportService {
         return ot;
     }
 
+    public OntologyTerm findOntologyTermByLabelAndType(String label, String type){
+
+
+        return ontologyTermRepository.findByLabelAndType(label, type);
+
+    }
+
     public OntologyTerm findOntologyTermByUrl(String url){
 
         return ontologyTermRepository.findByUrl(url);
@@ -903,10 +934,20 @@ public class DataImportService {
 
     }
 
+    public Collection<OntologyTerm> getAllOntologyTermsByTypeFromTo(String type, int from, int to) {
 
-    public void saveOntologyTerm(OntologyTerm ot){
+        return ontologyTermRepository.findAllByTypeFromTo(type, from, to);
 
-        ontologyTermRepository.save(ot);
+    }
+
+    public int getOntologyTermNumberByType(String type){
+
+        return ontologyTermRepository.getOntologyTermNumberByType(type);
+    }
+
+    public OntologyTerm saveOntologyTerm(OntologyTerm ot){
+
+        return ontologyTermRepository.save(ot);
     }
 
     public void deleteOntologyTermsWithoutMapping(){
@@ -1029,6 +1070,76 @@ public class DataImportService {
         return false;
     }
 
+    public int findPatientTreatmentNumber(String dataSource){
+
+        if(dataSource == null || dataSource.isEmpty()){
+
+            return treatmentRepository.findPatientTreatmentNumber();
+        }
+        else{
+
+            return treatmentRepository.findPatientTreatmentNumberByDS(dataSource);
+        }
+
+
+
+    }
+
+    public int findModelTreatmentNumber(String dataSource){
+
+        if(dataSource == null || dataSource.isEmpty()){
+
+            return treatmentRepository.findModelTreatmentNumber();
+        }
+        else{
+
+            return treatmentRepository.findModelTreatmentNumberByDS(dataSource);
+        }
+
+
+    }
+
+
+    public Collection<Treatment> getPatientTreatmentFrom(int from, int batch, String dataSource){
+
+        if(dataSource == null || dataSource.isEmpty()){
+
+            return treatmentRepository.getPatientTreatmentFrom(from, batch);
+        }
+        else{
+
+            return treatmentRepository.getPatientTreatmentFromByDS(from, batch, dataSource);
+        }
+
+
+    }
+
+
+    public Collection<Treatment> getModelTreatmentFrom(int from, int batch, String dataSource){
+
+        if(dataSource == null || dataSource.isEmpty()){
+
+            return treatmentRepository.getModelTreatmentFrom(from, batch);
+        }
+        else{
+
+            return treatmentRepository.getModelTreatmentFromByDS(from, batch, dataSource);
+        }
+
+    }
+
+
+    public TreatmentMappingData getUnmappedPatientTreatments(){
+
+        return treatmentRepository.getUnmappedPatientTreatments();
+    }
+
+
+    public void saveTreatment(Treatment t){
+
+        treatmentRepository.save(t);
+    }
+
     public int findDrugDosingStudyNumberByDataSource(String datasource){
 
         return treatmentSummaryRepository.findDrugDosingStudyNumberByDataSource(datasource);
@@ -1044,19 +1155,14 @@ public class DataImportService {
         return modelCreationRepository.findByTreatmentSummary(ts);
     }
 
+    public Collection<ModelCreation> findModelByPatientTreatmentSummary(TreatmentSummary ts){
+
+        return modelCreationRepository.findByPatientTreatmentSummary(ts);
+    }
 
     public String getDrugDosingUrlByDataSource(String dataSource){
 
         return treatmentSummaryRepository.findPlatformUrlByDataSource(dataSource);
-    }
-
-    public Drug getStandardizedDrug(String drugString){
-
-        Drug d = new Drug();
-        d.setName(Standardizer.getDrugName(drugString));
-        if(d.getName().equals("Not Specified")) log.error("Unrecognised drug string: "+drugString);
-
-        return d;
     }
 
     public CurrentTreatment getCurrentTreatment(String name){
@@ -1085,7 +1191,7 @@ public class DataImportService {
      * @param response
      * @return
      *
-     * Creates a (tp:TreatmentProtocol)--(tc:TreatmentComponent)--(d:Drug)
+     * Creates a (tp:TreatmentProtocol)--(tc:TreatmentComponent)--(t:Treatment)
      *           (tp)--(r:Response) node
      *
      * If drug names are separated with + it will create multiple components to represent drug combos
@@ -1107,19 +1213,16 @@ public class DataImportService {
 
                 for(int i=0;i<drugArray.length;i++){
 
-                    Drug d = getStandardizedDrug(drugArray[i].trim());
-                    TreatmentComponent tc = new TreatmentComponent();
-                    tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
-                    tc.setDose(doseArray[i].trim());
-                    //don't load unknown drugs
-                    if(!d.getName().equals("Not Specified")){
-                        tc.setDrug(d);
-                        tp.addTreatmentComponent(tc);
-                    }
-                    else{
-                        log.warn("Unrecognised drug name, skipping: "+drugString);
 
-                    }
+                    Treatment treatment = new Treatment();
+                    treatment.setName(drugArray[i].trim());
+                    TreatmentComponent tc = new TreatmentComponent();
+                    tc.setDose(doseArray[i].trim());
+
+
+                    tc.setTreatment(treatment);
+                    tp.addTreatmentComponent(tc);
+
 
                 }
 
@@ -1131,19 +1234,14 @@ public class DataImportService {
 
                 for(int i=0;i<drugArray.length;i++){
 
-                    Drug d = getStandardizedDrug(drugArray[i].trim());
-                    TreatmentComponent tc = new TreatmentComponent();
-                    tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
-                    tc.setDose(doseArray[0].trim());
-                    //don't load unknown drugs
-                    if(!d.getName().equals("Not Specified")){
-                        tc.setDrug(d);
-                        tp.addTreatmentComponent(tc);
-                    }
-                    else{
-                        log.warn("Unrecognised drug name, skipping: "+drugString);
+                    Treatment treatment = new Treatment();
+                    treatment.setName(drugArray[i].trim());
 
-                    }
+                    TreatmentComponent tc = new TreatmentComponent();
+                    tc.setDose(doseArray[0].trim());
+
+                    tc.setTreatment(treatment);
+                    tp.addTreatmentComponent(tc);
 
                 }
 
@@ -1162,20 +1260,13 @@ public class DataImportService {
 
                     for(int i=0;i<drugArray.length;i++){
 
-                        Drug d = getStandardizedDrug(drugArray[i].trim());
+                        Treatment treatment = new Treatment();
+                        treatment.setName(drugArray[i].trim());
                         TreatmentComponent tc = new TreatmentComponent();
-                        tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                         tc.setDose(doseArray[i].trim());
 
-                        //don't load unknown drugs
-                        if(!d.getName().equals("Not Specified")){
-                            tc.setDrug(d);
-                            tp.addTreatmentComponent(tc);
-                        }
-                        else{
-                            log.warn("Unrecognised drug name, skipping: "+drugString);
-
-                        }
+                        tc.setTreatment(treatment);
+                        tp.addTreatmentComponent(tc);
 
                     }
 
@@ -1190,19 +1281,12 @@ public class DataImportService {
 
                 for(int i=0;i<drugArray.length;i++){
 
-                    Drug d = getStandardizedDrug(drugArray[i].trim());
+                    Treatment treatment = new Treatment();
+                    treatment.setName(drugArray[i].trim());
                     TreatmentComponent tc = new TreatmentComponent();
-                    tc.setType(Standardizer.getTreatmentComponentType(drugArray[i]));
                     tc.setDose(doseString.trim());
-                    //don't load unknown drugs
-                    if(!d.getName().equals("Not Specified")){
-                        tc.setDrug(d);
-                        tp.addTreatmentComponent(tc);
-                    }
-                    else{
-                        log.warn("Unrecognised drug name, skipping: "+drugString);
-
-                    }
+                    tc.setTreatment(treatment);
+                    tp.addTreatmentComponent(tc);
                 }
             }
 
@@ -1210,25 +1294,20 @@ public class DataImportService {
         //one drug only
         else{
 
-            Drug d = getStandardizedDrug(drugString.trim());
+
+            Treatment treatment = new Treatment();
+            treatment.setName(drugString.trim());
             TreatmentComponent tc = new TreatmentComponent();
-            tc.setType(Standardizer.getTreatmentComponentType(drugString));
-            tc.setDrug(d);
+
             if(doseString != null) {
                 tc.setDose(doseString.trim());
             }
             else{
                 tc.setDose("");
             }
-            //don't load unknown drugs
-            if(!d.getName().equals("Not Specified")){
-                tc.setDrug(d);
-                tp.addTreatmentComponent(tc);
-            }
-            else{
-                log.warn("Unrecognised drug name, skipping: "+drugString);
 
-            }
+            tc.setTreatment(treatment);
+            tp.addTreatmentComponent(tc);
         }
 
         Response r = new Response();

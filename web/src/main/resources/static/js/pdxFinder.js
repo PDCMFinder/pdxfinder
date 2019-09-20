@@ -45,8 +45,6 @@ function redirectPage(webFacetSections) {
     });
 
 
-    //  alert("JESUS IS LORD")
-
     var twoParamUnlinkedFilters = getFiltersFromWebFacetSection(webFacetSections, 'TwoParamUnlinkedFilter');
     twoParamUnlinkedFilters.forEach(function (filterComponent) {
 
@@ -463,7 +461,10 @@ function linkCivicdb(){
     });
     variants.each(function() {
         var symbol = $(this).html();
-        linkVariantCivicdb(this, symbol);
+        symbol = symbol.replace(/\s+/g,'');
+        if(!(symbol === '')) {
+            linkVariantCivicdb(this, symbol);
+        }
     });
 }
 

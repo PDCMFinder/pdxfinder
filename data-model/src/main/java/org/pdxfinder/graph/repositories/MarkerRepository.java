@@ -3,6 +3,7 @@ package org.pdxfinder.graph.repositories;
 import org.neo4j.ogm.model.Result;
 import org.pdxfinder.graph.dao.Marker;
 import org.pdxfinder.graph.dao.MarkerAssociation;
+import org.pdxfinder.graph.queryresults.MutatedMarkerData;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -45,7 +46,7 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
     @Query("MATCH (mod:ModelCreation)--(spec:Specimen)--(msamp:Sample)--(molchar:MolecularCharacterization)-->(mAss:MarkerAssociation)--(marker:Marker) " +
             "RETURN marker.hgncSymbol AS gene_name, COUNT(DISTINCT mod.sourcePdxId) as number_of_models " +
             "ORDER BY number_of_models DESC")
-    Result countModelsByMarker();
+    List<MutatedMarkerData> countModelsByMarker();
 
 
     @Query("MATCH (m:Marker) WHERE {synonym} IN m.aliasSymbols RETURN m")

@@ -9,8 +9,9 @@ export interface Mapping {
     entityId: number;
     entityType: string;
     mappingLabels: string[];
+    mappedTermUrl: string;
     mappingValues: MappingValues;
-    mappedTerm?: any;
+    mappedTermLabel?: any;
     mapType?: any;
     justification?: any;
     status: string;
@@ -20,7 +21,14 @@ export interface Mapping {
 }
 
 export interface MappingInterface {
+
     mappings: Mapping[];
+
+    size: number;
+    totalElements: number;
+    totaPages: number;
+    page: number;
+    beginIndex: number;
+    endIndex: number;
+    currentIndex: number;
 }
-
-

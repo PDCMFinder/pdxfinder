@@ -71,4 +71,8 @@ public class TreatmentSummary {
     public void setUrl(String url) {
         this.url = url;
     }
+
+    public Long getId() {
+        return id;
+    }
 }
