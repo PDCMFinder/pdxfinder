@@ -98,7 +98,7 @@ public class PatientService {
 
 
 
-                String drugName = "";
+                String mappedTreatmentName = "";
                 String treatmentDose = "-";
                 String treatmentResponse = "";
                 String treatmentDuration = "";
@@ -110,7 +110,7 @@ public class PatientService {
                     // Aggregate the treatment summaries for this Treatment Protocol
                     for (TreatmentProtocol protocol : ps.getTreatmentSummary().getTreatmentProtocols()){
 
-                        drugName = protocol.getTreatmentString(false);
+                        mappedTreatmentName = protocol.getTreatmentString(false);
                         treatmentResponse = protocol.getResponse().getDescription();
                         treatmentDose = notEmpty(protocol.getDoseString(false));
                         treatmentDuration = protocol.getDurationString(false);
@@ -123,7 +123,7 @@ public class PatientService {
                             current = false;
                         }
 
-                        treatmentSummaries.add(new TreatmentSummaryDTO(treatmentDate,drugName, treatmentDose, treatmentResponse, treatmentDuration, current));
+                        treatmentSummaries.add(new TreatmentSummaryDTO(treatmentDate,mappedTreatmentName, treatmentDose, treatmentResponse, treatmentDuration, current));
                         treatmentExists = true;
                     }
 
