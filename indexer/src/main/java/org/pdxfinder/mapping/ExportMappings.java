@@ -42,8 +42,12 @@ public class ExportMappings implements CommandLineRunner {
 
     private void exportEuroPdxMappings(){
 
-        String diagnosisFileName = "%s/mappings_out//diagnosis_mappings.json".format(finderRootDir);
+        String diagnosisFileName = "%s/mappings_out/diagnosis_mappings.json".format(finderRootDir);
         String treatmentFileName = "%s/mappings_out/treatment_mappings.json".format(finderRootDir);
+
+
+
+
         List<String> dataSourcesToExport = new ArrayList<>(Arrays.asList(
             "Curie-BC",
             "Curie-LC",
@@ -56,11 +60,12 @@ public class ExportMappings implements CommandLineRunner {
             "VHIO-BC",
             "VHIO-CRC"
         ));
-
+        logger.info("Exporting diagnosis mappings to :"+diagnosisFileName);
         mappingService.saveMappingsToFile(
             diagnosisFileName,
             mappingService.getMappingsByDSAndType(dataSourcesToExport, "diagnosis").getEntityList()
         );
+        logger.info("Exporting treatment mappings to "+treatmentFileName);
         mappingService.saveMappingsToFile(
             treatmentFileName,
             mappingService.getMappingsByDSAndType(dataSourcesToExport, "treatment").getEntityList()
