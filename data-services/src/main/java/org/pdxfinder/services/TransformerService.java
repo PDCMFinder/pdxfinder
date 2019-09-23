@@ -28,20 +28,18 @@ public class TransformerService {
 
     private final static Logger log = LoggerFactory.getLogger(TransformerService.class);
 
-    ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = new ObjectMapper();
     private TransPdxInfoRepository transPdxInfoRepository;
     private TransTreatmentRepository transTreatmentRepository;
     private TransValidationRepository transValidationRepository;
     private TransSampleRepository transSampleRepository;
     private String homeDir = System.getProperty("user.home");
 
-
-    @Autowired
     private UtilityService util;
 
     private String DATASOURCE_URL_PREFIX = "https://pdmdb.cancer.gov/pls/apex/f?p=101:4:0::NO:4:P4_SPECIMENSEQNBR:";
 
-    @Value("${pdxfinder.data.root.dir}")
+    @Value("${pdxfinder.root.dir}")
     private String dataRootDir = System.getProperty("user.home")+"/PDXFinder/data";
 
 
@@ -81,55 +79,57 @@ public class TransformerService {
     public TransformerService(TransPdxInfoRepository transPdxInfoRepository,
                               TransTreatmentRepository transTreatmentRepository,
                               TransValidationRepository transValidationRepository,
-                              TransSampleRepository transSampleRepository) {
+                              TransSampleRepository transSampleRepository,
+                              UtilityService util) {
         this.transPdxInfoRepository = transPdxInfoRepository;
         this.transTreatmentRepository = transTreatmentRepository;
         this.transValidationRepository = transValidationRepository;
         this.transSampleRepository = transSampleRepository;
+        this.util = util;
     }
 
     //Transformation rule as specified here: https://docs.google.com/spreadsheets/d/1buUu5yj3Xq8tbEtL1l2UILV9kLnouGqF0vIjFlGGbEE
     public List<Map> transformDataAndSave() {
 
         String unKnown = "Not Specified";
-        String modelID = "";
-        String patientID = "";
-        String gender = "";
-        String age = "";
-        String race = "";
-        String ethnicity = "";
-        String specimenSite = "";
-        String primarySite = "";
-        String initialDiagnosis = "";
-        String clinicalDiagnosis = "";
-        String tumorType = "";
-        String stageClassification = "";
-        String stageValue = "";
-        String gradeClassification = "";
-        String gradeValue = "";
-        String sampleType = "";
-        String strain = "";
-        String mouseSex = "";
-        String treatmentNaive = "";
-        String engraftmentSite = "";
+        String modelID;
+        String patientID;
+        String gender;
+        String age;
+        String race;
+        String ethnicity;
+        String specimenSite;
+        String primarySite;
+        String initialDiagnosis;
+        String clinicalDiagnosis;
+        String tumorType;
+        String stageClassification;
+        String stageValue ;
+        String gradeClassification;
+        String gradeValue;
+        String sampleType;
+        String strain;
+        String mouseSex;
+        String treatmentNaive;
+        String engraftmentSite;
         String engraftmentType = "";
-        String sourceUrl = "";
-        String extractionMethod = "";
-        String dateAtCollection = "";
-        String accessibility = "";
+        String sourceUrl;
+        String extractionMethod;
+        String dateAtCollection;
+        String accessibility;
 
         String drug = "";
-        String startingDate = "";
-        String priorDate = "";
+        String startingDate;
+        String priorDate;
         String response = "";
         String duration = unKnown;
 
 
-        String sampleId = "";
-        String sampleTumorType = "";
-        String samplePassage = "";
-        String wholeExomeSeqYn = "";
-        String rnaSeqYn = "";
+        String sampleId;
+        String sampleTumorType;
+        String samplePassage;
+        String wholeExomeSeqYn;
+        String rnaSeqYn;
 
 
         String report = "";
@@ -194,7 +194,7 @@ public class TransformerService {
 
             // CHECK IF THIS MODEL HAS BEEN TREATED :
             String checkIfExist = modelID;
-            Boolean done = modelIDList.stream().anyMatch(str -> str.equals(checkIfExist));
+            boolean done = modelIDList.stream().anyMatch(str -> str.equals(checkIfExist));
 
             if (done) {
                 continue;
@@ -674,6 +674,66 @@ public class TransformerService {
         util.writeToFile(drugLista,drugList, false);
 
         return drugLista.replace("\n","<br>");
+    }
+
+
+    public String transformJAXCNV(String cnaStringData) {
+
+        Map<String, List<Map>> dataMap;
+        dataMap = mapper.convertValue(util.jsonStringToNode(cnaStringData), Map.class);
+        String mapToString = "";
+
+        List<Map> newList = new ArrayList<>();
+
+        dataMap.get("data").forEach(data -> {
+
+            data.put("model id", data.remove("model"));
+            data.put("passage num", data.remove("passage"));
+            data.put("gene symbol", data.remove("gene"));
+            data.put("log2R_cna", data.remove("logratio_ploidy"));
+            data.put("genome assembly", "GRCh38");
+
+            newList.add(data);
+        });
+
+        dataMap.put("data", newList);
+
+        try {
+            mapToString = mapper.writeValueAsString(dataMap);
+        } catch (Exception e) {
+        }
+
+        return mapToString;
+    }
+
+
+    public String transformJaxRNASeq(String transStringData) {
+
+        Map<String, List<Map>> dataMap;
+        dataMap = mapper.convertValue(util.jsonStringToNode(transStringData), Map.class);
+        String mapToString = "";
+
+        List<Map> newList = new ArrayList<>();
+
+        dataMap.get("data").forEach(data -> {
+
+            data.put("model id", data.remove("model"));
+            data.put("passage num", data.remove("passage"));
+            data.put("gene symbol", data.remove("gene"));
+            data.put("z_score", data.remove("z_score_percentile_rank"));
+            data.put("genome assembly", "GRCh38");
+
+            newList.add(data);
+        });
+
+        dataMap.put("data", newList);
+
+        try {
+            mapToString = mapper.writeValueAsString(dataMap);
+        } catch (Exception e) {
+        }
+
+        return mapToString;
     }
 
 }

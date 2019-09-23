@@ -163,11 +163,12 @@ public class CreateLocalFeeds implements CommandLineRunner {
                 saveFile(finderRootDir +"/data/JAX/hist/", modelId+".json", histology);
 
                 String cna = utilityService.parseURL(jaxCnaURL + modelId);
-                cna =dataTransformer.transformJAXCNV(cna);
+                cna = dataTransformer.transformJAXCNV(cna);
                 saveFile(finderRootDir +"/data/JAX/cna/", modelId+".json", cna);
 
-                String rnaseq = utilityService.parseURL(jaxRnaseqURL + modelId);
-                saveFile(finderRootDir +"/data/JAX/rnaseq/", modelId+".json", rnaseq);
+                String trans = utilityService.parseURL(jaxRnaseqURL + modelId);
+                trans = dataTransformer.transformJaxRNASeq(trans);
+                saveFile(finderRootDir +"/data/JAX/trans/", modelId+".json", trans);
 
             }
 

@@ -1039,6 +1039,19 @@ public class UtilityService {
 
 
 
+    public JsonNode jsonStringToNode(String jsonString){
+
+        JsonNode jsonNode = null;
+
+        try {
+            jsonNode = mapper.readTree(jsonString);
+        } catch (Exception e) { }
+
+        return jsonNode;
+    }
+
+
+
 
 
 }
