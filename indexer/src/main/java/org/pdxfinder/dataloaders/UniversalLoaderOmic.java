@@ -221,6 +221,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             //STEP 1: GET THE PLATFORM AND CACHE IT
             String platformName = data.get(omicPlatform);
+            String platformNameKey = dataSourceAbbreviation+"__" + platformName +"__"+dataType;
 
             //Skip loading fish!
             if(platformName.equals("Other:_FISH")){
@@ -229,9 +230,9 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             }
 
             Platform platform;
-            if(platformMap.containsKey(platformName)){
+            if(platformMap.containsKey(platformNameKey)){
 
-                platform = platformMap.get(platformName);
+                platform = platformMap.get(platformNameKey);
             }
             else{
 
@@ -239,7 +240,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
                 platform = dataImportService.getPlatform(platformName, providerGroup);
                 platform.setUrl(platformURL.get(platformURLKey));
-                platformMap.put(platformName, platform);
+                platformMap.put(platformNameKey, platform);
             }
 
 
@@ -271,7 +272,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
 
             //step 3: get the marker suggestion from the service
-            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, modelCreation.getSourcePdxId(), data.get(omicHgncSymbol), dataType, platformName);
+            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, modelCreation.getSourcePdxId(), data.get(omicHgncSymbol), dataType, platformNameKey);
 
             Marker marker;
 
