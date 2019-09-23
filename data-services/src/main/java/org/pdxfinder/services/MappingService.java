@@ -8,11 +8,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.admin.pojos.MappingContainer;
+import org.pdxfinder.services.mapping.MappingContainer;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.repositories.OntologyTermRepository;
 import org.pdxfinder.rdbms.dao.MappingEntity;
-import org.pdxfinder.admin.zooma.*;
+import org.pdxfinder.services.zooma.*;
 import org.pdxfinder.graph.repositories.SampleRepository;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.dto.PaginationDTO;
@@ -32,7 +32,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 

@@ -39,41 +39,37 @@ public class TransformerService {
 
     private String DATASOURCE_URL_PREFIX = "https://pdmdb.cancer.gov/pls/apex/f?p=101:4:0::NO:4:P4_SPECIMENSEQNBR:";
 
-    @Value("${pdxfinder.root.dir}")
-    private String dataRootDir = System.getProperty("user.home")+"/PDXFinder/data";
+    private String dataRootDir;
 
+    private String specimenSearchUrl = "/PDMR/raw/PDMR_SPECIMENSEARCH.json";
 
-    private String RAW_DATA_URL = dataRootDir+"//PDMR/raw";
+    private String specimenUrl = "/PDMR/raw/PDMR_SPECIMEN.json";
 
-    private String specimenSearchUrl = RAW_DATA_URL+"/PDMR_SPECIMENSEARCH.json";
+    private String tissueOriginsUrl = "/PDMR/raw/PDMR_PROVIDEDTISSUEORIGINS.json";
 
-    private String specimenUrl = RAW_DATA_URL+"/PDMR_SPECIMEN.json";
+    private String tumoGradeStateTypesUrl = "/PDMR/raw/PDMR_TUMORGRADESTAGETYPES.json";
 
-    private String tissueOriginsUrl = RAW_DATA_URL+"/PDMR_PROVIDEDTISSUEORIGINS.json";
+    private String mouseStrainsUrl = "/PDMR/raw/PDMR_MOUSESTRAINS.json";
 
-    private String tumoGradeStateTypesUrl = RAW_DATA_URL+"/PDMR_TUMORGRADESTAGETYPES.json";
+    private String implantationSitesUrl = "/PDMR/raw/PDMR_IMPLANTATIONSITES.json";
 
-    private String mouseStrainsUrl = RAW_DATA_URL+"/PDMR_MOUSESTRAINS.json";
+    private String tissueTypeUrl = "/PDMR/raw/PDMR_TISSUETYPES.json";
 
-    private String implantationSitesUrl = RAW_DATA_URL+"/PDMR_IMPLANTATIONSITES.json";
+    private String histologyUrl = "/PDMR/raw/PDMR_HISTOLOGY.json";
 
-    private String tissueTypeUrl = RAW_DATA_URL+"/PDMR_TISSUETYPES.json";
+    private String tumorGradeUrl = "/PDMR/raw/PDMR_TUMORGRADES.json";
 
-    private String histologyUrl = RAW_DATA_URL+"/PDMR_HISTOLOGY.json";
+    private String samplesUrl = "/PDMR/raw/PDMR_SAMPLE.json";
 
-    private String tumorGradeUrl = RAW_DATA_URL+"/PDMR_TUMORGRADES.json";
+    private String currentTherapyUrl = "/PDMR/raw/PDMR_CURRENTTHERAPY.json";
 
-    private String samplesUrl = RAW_DATA_URL+"/PDMR_SAMPLE.json";
+    private String standardRegimensUrl = "/PDMR/raw/PDMR_STANDARDIZEDREGIMENS.json";
 
-    private String currentTherapyUrl = RAW_DATA_URL+"/PDMR_CURRENTTHERAPY.json";
+    private String clinicalResponseUrl = "/PDMR/raw/PDMR_CLINICALRESPONSES.json";
 
-    private String standardRegimensUrl = RAW_DATA_URL+"/PDMR_STANDARDIZEDREGIMENS.json";
+    private String priorTherapyUrl = "/PDMR/raw/PDMR_PRIORTHERAPIES.json";
 
-    private String clinicalResponseUrl = RAW_DATA_URL+"/PDMR_CLINICALRESPONSES.json";
-
-    private String priorTherapyUrl = RAW_DATA_URL+"/PDMR_PRIORTHERAPIES.json";
-
-    private String patientInfoUrl = RAW_DATA_URL+"/PDMR_PATIENTINFO.json";
+    private String patientInfoUrl = "/PDMR/raw/PDMR_PATIENTINFO.json";
 
 
     public TransformerService(TransPdxInfoRepository transPdxInfoRepository,
@@ -88,9 +84,13 @@ public class TransformerService {
         this.util = util;
     }
 
+    public void setDataRootDir(String dataRootDir) {
+        this.dataRootDir = dataRootDir;
+    }
+
     //Transformation rule as specified here: https://docs.google.com/spreadsheets/d/1buUu5yj3Xq8tbEtL1l2UILV9kLnouGqF0vIjFlGGbEE
     public List<Map> transformDataAndSave() {
-
+        
         String unKnown = "Not Specified";
         String modelID;
         String patientID;
@@ -134,38 +134,40 @@ public class TransformerService {
 
         String report = "";
 
+        log.info(specimenSearchUrl);
+
         //If seqnumber is ) input in finder "Heterotopic" else if (1,2,3,4,5,6) put "Orthotopic" else(99) put not specified
 
         // Read the whole JSON as a JsonNode type & Retrieve each specimen search record as a Map (key value type) type
-        JsonNode rootArray = util.readJsonLocal(specimenSearchUrl);
+        JsonNode rootArray = util.readJsonLocal(this.dataRootDir+specimenSearchUrl);
 
-        JsonNode pdmrSpecimenData = util.readJsonLocal(specimenUrl);
+        JsonNode pdmrSpecimenData = util.readJsonLocal(this.dataRootDir+specimenUrl);
 
-        JsonNode tissueOrigins = util.readJsonLocal(tissueOriginsUrl);
+        JsonNode tissueOrigins = util.readJsonLocal(this.dataRootDir+tissueOriginsUrl);
 
-        JsonNode tumorGradeStageTypes = util.readJsonLocal(tumoGradeStateTypesUrl);
+        JsonNode tumorGradeStageTypes = util.readJsonLocal(this.dataRootDir+tumoGradeStateTypesUrl);
 
-        JsonNode mouseStrains = util.readJsonLocal(mouseStrainsUrl);
+        JsonNode mouseStrains = util.readJsonLocal(this.dataRootDir+mouseStrainsUrl);
 
-        JsonNode impantationSites = util.readJsonLocal(implantationSitesUrl);
+        JsonNode impantationSites = util.readJsonLocal(this.dataRootDir+implantationSitesUrl);
 
-        JsonNode tissueTypes = util.readJsonLocal(tissueTypeUrl);
+        JsonNode tissueTypes = util.readJsonLocal(this.dataRootDir+tissueTypeUrl);
 
-        JsonNode samples = util.readJsonLocal(samplesUrl);
+        JsonNode samples = util.readJsonLocal(this.dataRootDir+samplesUrl);
 
-        JsonNode histologies = util.readJsonLocal(histologyUrl);
+        JsonNode histologies = util.readJsonLocal(this.dataRootDir+histologyUrl);
 
-        JsonNode tumorGrades = util.readJsonLocal(tumorGradeUrl);
+        JsonNode tumorGrades = util.readJsonLocal(this.dataRootDir+tumorGradeUrl);
 
-        JsonNode currentTherapies = util.readJsonLocal(currentTherapyUrl);
+        JsonNode currentTherapies = util.readJsonLocal(this.dataRootDir+currentTherapyUrl);
 
-        JsonNode standardRegimens = util.readJsonLocal(standardRegimensUrl);
+        JsonNode standardRegimens = util.readJsonLocal(this.dataRootDir+standardRegimensUrl);
 
-        JsonNode clinicalResponses = util.readJsonLocal(clinicalResponseUrl);
+        JsonNode clinicalResponses = util.readJsonLocal(this.dataRootDir+clinicalResponseUrl);
 
-        JsonNode priorTherapies = util.readJsonLocal(priorTherapyUrl);
+        JsonNode priorTherapies = util.readJsonLocal(this.dataRootDir+priorTherapyUrl);
 
-        JsonNode patientInfo = util.readJsonLocal(patientInfoUrl);
+        JsonNode patientInfo = util.readJsonLocal(this.dataRootDir+patientInfoUrl);
         List<Map<String, Object>> patientList = mapper.convertValue(patientInfo, List.class);
 
 

@@ -21,12 +21,10 @@ public class TransformPDMR implements CommandLineRunner {
     private CommandLineParser parser;
     private TransformerService transformerService;
 
-    @Value("${pdxfinder.data.root.dir}")
+    @Value("${pdxfinder.root.dir}")
     private String dataRootDir;
 
 
-
-    @Autowired
     public TransformPDMR(TransformerService transformerService){
         this.transformerService = transformerService;
     }
@@ -47,6 +45,7 @@ public class TransformPDMR implements CommandLineRunner {
             if (dataRootDir != null) {
                 log.info("Loading from URL " + dataRootDir);
 
+                transformerService.setDataRootDir(dataRootDir+"/data");
                 transformerService.transformDataAndSave();
             } else {
                 log.error("No mydatasource.url1 or mydatasource.url2 provided in properties");

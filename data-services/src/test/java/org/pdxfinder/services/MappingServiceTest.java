@@ -1,5 +1,6 @@
 package org.pdxfinder.services;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.pdxfinder.BaseTest;
@@ -27,11 +28,13 @@ public class MappingServiceTest extends BaseTest {
     private MappingEntityRepository mappingEntityRepository;
 
     @Test
+    @Ignore
     public void testGetMappingEntityById(){
 
         MappingEntity mappingEntity = new MappingEntity();
         mappingEntity.setEntityId(1L);
         mappingEntity.setMappedTermLabel("Melanoma");
+        //Set Mapping Key
 
         Long id = mappingEntity.getEntityId();
         Optional<MappingEntity> mockEntity = Optional.of(mappingEntity);
