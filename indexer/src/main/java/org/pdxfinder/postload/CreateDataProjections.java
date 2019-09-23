@@ -83,6 +83,10 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
     //"treatment name"=>"set of model ids"
     private Map<String, Set<Long>> patientTreatmentDP = new HashMap<>();
 
+
+    //"transcriptomics"=>set of model ids
+    private Map<String, Set<Long>> transcriptomicsDP = new HashMap<>();
+
     protected static ApplicationContext context;
 
     @Autowired
@@ -123,6 +127,8 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             createImmunoHistoChemistryDataProjection();
 
             createCNADataProjection();
+
+            createTranscriptomicsDataProjection();
 
             createDataAvailableDataProjection();
 
@@ -334,6 +340,10 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         //log.info(immunoHistoChemistryDP.toString());
     }
 
+
+
+
+
     private void createCNADataProjection(){
 
 
@@ -376,6 +386,43 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
 
     }
+
+    private void createTranscriptomicsDataProjection(){
+
+
+        Collection<MolecularCharacterization> transMolchars = dataImportService.findMolCharsByType("transcriptomics");
+        log.info("Looking at "+transMolchars.size()+" Transcriptomics MolChar objects. This may take a while folks...");
+
+        int count = 0;
+
+        for(MolecularCharacterization mc:transMolchars) {
+
+            ModelCreation model = dataImportService.findModelWithSampleByMolChar(mc);
+            Long modelId = model.getId();
+
+            Set<Marker> mas = dataImportService.findAllDistinctMarkersByMolCharId(mc.getId());
+            for(Marker m : mas){
+
+                if(transcriptomicsDP.containsKey(m.getHgncSymbol())){
+
+                    transcriptomicsDP.get(m.getHgncSymbol()).add(modelId);
+                }
+                else{
+
+                    Set<Long> newSet = new HashSet<>();
+                    newSet.add(modelId);
+                    transcriptomicsDP.put(m.getHgncSymbol(), newSet);
+                }
+            }
+
+        }
+
+        count++;
+        if(count%100 == 0) {log.info("Processed "+count+" Transcriptomics molchar objects");
+        }
+
+    }
+
 
     private void createDataAvailableDataProjection(){
         log.info("Creating data available projections");
@@ -760,6 +807,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         Map<Long, List<String>> mutationPlatformsByModel = new HashMap<>();
         Map<Long, List<String>> cnaPlatformsByModel = new HashMap<>();
         Map<Long, List<String>> cytogeneticsPlatformsByModel = new HashMap<>();
+        Map<Long, List<String>> transcriptomicsPlatformsByModel = new HashMap<>();
 
 
 
@@ -805,6 +853,15 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                                             }
 
                                             cytogeneticsPlatformsByModel.get(mc.getId()).add(platformName);
+                                        }
+                                        else if (molc.getType().toLowerCase().equals("transcriptomics")) {
+
+                                            if (!transcriptomicsPlatformsByModel.containsKey(mc.getId())) {
+
+                                                transcriptomicsPlatformsByModel.put(mc.getId(), new ArrayList<>());
+                                            }
+
+                                            transcriptomicsPlatformsByModel.get(mc.getId()).add(platformName);
                                         }
 
                                     //}
@@ -899,6 +956,11 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             if(cytogeneticsPlatformsByModel.containsKey(mc.getId())){
                 dataAvailable.add("Cytogenetics");
             }
+
+            if(transcriptomicsPlatformsByModel.containsKey(mc.getId())){
+                dataAvailable.add("Transcriptomics");
+            }
+
 
             try {
                 if (dataImportService.isTreatmentSummaryAvailableOnPatient(mc.getDataSource(), mc.getSourcePdxId())) {
@@ -1308,6 +1370,15 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         if(cnaDP == null){
             cnaDP = new DataProjection();
             cnaDP.setLabel("copy number alteration");
+        }
+
+
+        DataProjection transDP = dataImportService.findDataProjectionByLabel("transcriptomics");
+
+
+        if(transDP == null){
+            transDP = new DataProjection();
+            transDP.setLabel("transcriptomics");
         }
 
 
