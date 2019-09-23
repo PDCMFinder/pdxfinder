@@ -160,7 +160,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
                 if (mc != null && mc.getPlatform() != null){
 
-                    String molcharKey = modelCreation.getSample().getSourceSampleId() + "__" + passage + "__" + mc.getPlatform().getName()+ "__patient";
+                    String molcharKey = modelCreation.getSample().getSourceSampleId() + "__" + passage + "__" + mc.getPlatform().getName()+ "__patient__"+mc.getType();
                     existingMolcharNodes.put(molcharKey, mc);
                 }
             }
@@ -184,7 +184,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
                         if(mc.getPlatform().getName() == null) log.error("Missing platform name for "+modelID);
 
-                        String molcharKey = sample.getSourceSampleId() + "__" + sp.getPassage() + "__" + mc.getPlatform().getName()+ "__xenograft";
+                        String molcharKey = sample.getSourceSampleId() + "__" + sp.getPassage() + "__" + mc.getPlatform().getName()+ "__xenograft__"+mc.getType();
                         existingMolcharNodes.put(molcharKey, mc);
                     }
                 }
@@ -248,7 +248,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             passage = (data.get(omicPassage) == null) ? findMyPassage(modelCreation, data.get(omicSampleID), data.get(omicSampleOrigin)) : data.get(omicPassage);
 
 
-            String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "__" + data.get(omicSampleOrigin);
+            String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "__" + data.get(omicSampleOrigin)+"__"+dataType;
 
 
 
