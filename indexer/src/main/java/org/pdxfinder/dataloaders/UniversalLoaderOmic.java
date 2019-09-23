@@ -45,15 +45,19 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         List<Map<String, String>> dataList = new ArrayList<>();
 
         String omicDir = null;
+        String platformTag = "";
 
         if(dataType.equals("mutation")){
             omicDir = "mut";
+            platformTag = "mut";
         }
         else if(dataType.equals("copy number alteration")){
             omicDir = "cna";
+            platformTag = "cna";
         }
         else if(dataType.equals("transcriptomics")){
             omicDir = "trans";
+            platformTag = "trans";
         }
 
         if(omicDir == null) {
@@ -128,23 +132,6 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
 
 
-/*
-        if (omicDataFilesType.equals("ONE_FILE_PER_MODEL")){
-
-            // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS 100s OF CSV/JSON WITH ONE_FILE_PER_MODEL
-            String modelID = modelCreation.getSourcePdxId();
-            dataList = utilityService.serializeDataToMaps(providerRootDirectory+"/"+dataSourceAbbreviation+"/"+omicDir+"/"+modelID+"."+omicFileExtension);
-
-        }else {
-
-            // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS A SINGLE CSV/JSON WITH ALL_MODELS_IN_ONE_FILE
-            String variationURLStr = providerRootDirectory+"/"+dataSourceAbbreviation+"/"+omicDir+"/data."+omicFileExtension;
-            Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(variationURLStr,omicModelID);
-
-            dataList = fullData.get(modelCreation.getSourcePdxId());
-        }
-
-*/
 
         String modelID = modelCreation.getSourcePdxId();
         Map<String, Platform> platformMap = new HashMap<>();
@@ -221,7 +208,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             //STEP 1: GET THE PLATFORM AND CACHE IT
             String platformName = data.get(omicPlatform);
-            String platformNameKey = dataSourceAbbreviation+"__" + platformName +"__"+dataType;
+            String platformNameKey = dataSourceAbbreviation+"__" + platformName+"_"+platformTag +"__"+dataType;
 
             //Skip loading fish!
             if(platformName.equals("Other:_FISH")){
@@ -236,9 +223,9 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             }
             else{
 
-                String platformURLKey = platformName.replaceAll("\\s","_");
+                String platformURLKey = platformName+"_"+platformTag.replaceAll("\\s","_");
 
-                platform = dataImportService.getPlatform(platformName, providerGroup);
+                platform = dataImportService.getPlatform(platformName + "_"+platformTag, providerGroup);
                 platform.setUrl(platformURL.get(platformURLKey));
                 platformMap.put(platformNameKey, platform);
             }
@@ -248,8 +235,8 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             MolecularCharacterization molecularCharacterization = null;
             passage = (data.get(omicPassage) == null) ? findMyPassage(modelCreation, data.get(omicSampleID), data.get(omicSampleOrigin)) : data.get(omicPassage);
 
-
-            String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "__" + data.get(omicSampleOrigin)+"__"+dataType;
+            String origin = data.get("_origin").trim().toLowerCase();
+            String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "_" + platformTag +"__" + origin+"__"+dataType;
 
 
 

@@ -773,6 +773,19 @@ public class UniversalLoader extends UniversalLoaderOmic {
             Sample sample;
             Platform platform;
 
+            String platformTag = "";
+
+            if(molCharType.equals("mutation")){
+                platformTag = "mut";
+            }
+            else if(molCharType.equals("copy number alteration")){
+                platformTag = "cna";
+            }
+            else if(molCharType.equals("transcriptomics")){
+                platformTag = "trans";
+            }
+
+
             //patient sample
             if (origin.toLowerCase().equals("patient")) {
 
@@ -780,7 +793,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 if (sample != null) {
 
-                    platform = dataImportService.getPlatform(platformName, ds);
+                    platform = dataImportService.getPlatform(platformName+"_"+platformTag, ds);
 
                     if ((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3) {
                         log.info("Saved platform:" + platform.getName() + " Url: " + (platform.getUrl() == null ? "null" : platform.getUrl()) + " Url in file: " + platformUrl);
@@ -789,7 +802,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                         log.info("Updating platform url");
                     } else {
 
-                        log.warn("Platform " + platform.getName() + " was not updated. ");
+                        log.warn("Platform " + platform.getName()+"_"+platformTag + " was not updated. ");
                     }
 
                     MolecularCharacterization mc = new MolecularCharacterization();
@@ -886,8 +899,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 }
 
-                platform = dataImportService.getPlatform(platformName, ds);
 
+                platform = dataImportService.getPlatform(platformName+"_"+platformTag, ds);
 
                 if ((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3) {
                     log.info("Saved platform:" + platform.getName() + " Url: " + (platform.getUrl() == null ? "null" : platform.getUrl()) + " Url in file: " + platformUrl);
