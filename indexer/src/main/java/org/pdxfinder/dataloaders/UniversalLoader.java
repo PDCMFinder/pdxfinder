@@ -1139,25 +1139,30 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             String passage = dataRow.get(2);
             String modelId = dataRow.get(4);
+            String origin = dataRow.get(1);
 
-            String pass = passage;
 
-            try {
-                int passageInt = (int) Float.parseFloat(pass);
-                passage = String.valueOf(passageInt);
-            } catch (NumberFormatException | NullPointerException nfe) {
+            if(origin.toLowerCase().equals("xenograft")) {
+                String pass = passage;
 
-                log.error("Invalid passage "+passage +" for model:"+modelId);
+
+                try {
+                    int passageInt = (int) Float.parseFloat(pass);
+                    passage = String.valueOf(passageInt);
+                } catch (NumberFormatException | NullPointerException nfe) {
+
+                    log.error("Invalid passage " + passage + " for model:" + modelId);
+                }
+
             }
-
-            if(passage != null && passage.matches("\\d+")){
-
-                int passageInt = Integer.parseInt(passage);
-                passage = String.valueOf(passageInt);
-            }
-
 
             ModelCreation modelCreation = dataImportService.findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(modelId, ds.getAbbreviation());
+
+            if(modelCreation == null){
+                log.error("Missing model +"+modelId + " in row "+row);
+                row++;
+                continue;
+            }
 
             if(modelCreation.getSample().getMolecularCharacterizations() != null){
 
@@ -1197,7 +1202,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 }
             }
 
-
+            row++;
         }
 
 
@@ -1224,15 +1229,18 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 continue;
             }
 
-            String pass = passage;
+            if(origin.toLowerCase().equals("xenograft")) {
+                String pass = passage;
 
-            try {
-                int passageInt = (int) Float.parseFloat(pass);
-                passage = String.valueOf(passageInt);
-            } catch (NumberFormatException | NullPointerException nfe) {
+                try {
+                    int passageInt = (int) Float.parseFloat(pass);
+                    passage = String.valueOf(passageInt);
+                } catch (NumberFormatException | NullPointerException nfe) {
 
-                log.error("Invalid passage "+passage +" for model:"+modelId);
+                    log.error("Invalid passage "+passage +" for model:"+modelId);
+                }
             }
+
 
             MolecularCharacterization mc;
             Platform pl;
@@ -1313,6 +1321,11 @@ public class UniversalLoader extends UniversalLoaderOmic {
             String sampleOrigin = mcKeyArr[4];
 
             ModelCreation modelCreation = dataImportService.findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(modelId, ds.getAbbreviation());
+
+            if(modelCreation == null){
+                log.error("Missing model: "+modelId);
+                continue;
+            }
 
             boolean foundSpecimen = false;
 
