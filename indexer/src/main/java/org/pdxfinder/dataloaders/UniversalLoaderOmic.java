@@ -42,6 +42,8 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
         reportManager = (ReportManager) context.getBean("ReportManager");
 
+        log.info("Loading {} data for model {} ", dataType, modelCreation.getSourcePdxId());
+
         List<Map<String, String>> dataList = new ArrayList<>();
 
         String omicDir = null;
@@ -55,6 +57,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         else if(dataType.equals("transcriptomics")){
             omicDir = "trans";
         }
+
 
         if(omicDir == null) {
             log.error("Cannot determine directory for datatype: "+dataType);
@@ -127,24 +130,6 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         }
 
 
-
-/*
-        if (omicDataFilesType.equals("ONE_FILE_PER_MODEL")){
-
-            // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS 100s OF CSV/JSON WITH ONE_FILE_PER_MODEL
-            String modelID = modelCreation.getSourcePdxId();
-            dataList = utilityService.serializeDataToMaps(providerRootDirectory+"/"+dataSourceAbbreviation+"/"+omicDir+"/"+modelID+"."+omicFileExtension);
-
-        }else {
-
-            // THIS HANDLES SITUATIONS WHERE OMIC DATA IS PROVIDED AS A SINGLE CSV/JSON WITH ALL_MODELS_IN_ONE_FILE
-            String variationURLStr = providerRootDirectory+"/"+dataSourceAbbreviation+"/"+omicDir+"/data."+omicFileExtension;
-            Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(variationURLStr,omicModelID);
-
-            dataList = fullData.get(modelCreation.getSourcePdxId());
-        }
-
-*/
 
         String modelID = modelCreation.getSourcePdxId();
         Map<String, Platform> platformMap = new HashMap<>();
@@ -300,7 +285,8 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 if (dataType.equals("mutation")){
 
                     ma = setVariationProperties(data, marker);
-                }else if(dataType.equals("copy number alteration")) {
+                }
+                else if(dataType.equals("copy number alteration")) {
 
                     ma = setCNAProperties(data, marker);
                 }
@@ -312,6 +298,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 molecularCharacterization.addMarkerAssociation(ma);
 
             }
+
 
             count++;
             if (count % 100 == 0) {
@@ -460,6 +447,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         ma.setIlluminaHGEAProbeId(data.get(illuminaHGEAProbeId));
         ma.setIlluminaHGEAExpressionValue(data.get(illuminaHGEAExpressionValue));
         ma.setGenomeAssembly(data.get(omicGenomeAssembly));
+        ma.setZscore(data.get(omicZscore));
 
         ma.setMarker(marker);
 

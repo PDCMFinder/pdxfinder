@@ -274,9 +274,13 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step16LoadVariationData() {
 
-        log.info("Loading WGS for model " + dto.getModelCreation().getSourcePdxId());
+        String dataDirectory = finderRootDir+"/data/"+dataSourceAbbreviation;
 
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation", finderRootDir+"/data/"+dataSourceAbbreviation);
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation", dataDirectory);
+
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"copy number alteration", dataDirectory);
+
+        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"transcriptomics", dataDirectory);
 
     }
 
