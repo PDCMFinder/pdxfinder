@@ -315,7 +315,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 String gradeClassification = patientTumorRow.get(13);
                 String virologyStatus = patientTumorRow.get(14);
                 String treatmentNaive = patientTumorRow.get(16);
-
+                sampleId = sampleId.trim();
 
                 if (modelId == null) {
                     log.error("Missing corresponding Model ID in row " + row);
@@ -768,7 +768,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 continue;
             }
 
-
+            sampleId = sampleId.trim();
             ModelCreation model;
             Sample sample;
             Platform platform;
@@ -988,7 +988,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
         affyHGEAExpressionValue = "Affy_HGEA_expressionValue";
         illuminaHGEAProbeId = "Illumina_HGEA_probeID";
         illuminaHGEAExpressionValue = "Illumina_HGEA_expressionValue";
-        omicSampleOrigin = "_origin";
+
 
 
         platformURL = new HashMap<>();
