@@ -776,16 +776,13 @@ public class UniversalLoader extends UniversalLoaderOmic {
             String platformTag = "";
 
             if(molCharType.equals("mutation")){
-                platformTag = "mut";
+                platformTag = "_mut";
             }
             else if(molCharType.equals("copy number alteration")){
-                platformTag = "cna";
+                platformTag = "_cna";
             }
             else if(molCharType.equals("transcriptomics")){
-                platformTag = "trans";
-            }
-            else if(platformName.toLowerCase().equals("immunohistochemistry")){
-                platformTag = "ihc";
+                platformTag = "_trans";
             }
 
 
@@ -796,7 +793,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 if (sample != null) {
 
-                    platform = dataImportService.getPlatform(platformName+"_"+platformTag, ds);
+                    platform = dataImportService.getPlatform(platformName+platformTag, ds);
 
                     if ((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3) {
                         log.info("Saved platform:" + platform.getName() + " Url: " + (platform.getUrl() == null ? "null" : platform.getUrl()) + " Url in file: " + platformUrl);
@@ -805,7 +802,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                         log.info("Updating platform url");
                     } else {
 
-                        log.warn("Platform " + platform.getName()+"_"+platformTag + " was not updated. ");
+                        log.warn("Platform " + platform.getName()+platformTag + " was not updated. ");
                     }
 
                     MolecularCharacterization mc = new MolecularCharacterization();
@@ -903,7 +900,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 }
 
 
-                platform = dataImportService.getPlatform(platformName+"_"+platformTag, ds);
+                platform = dataImportService.getPlatform(platformName+platformTag, ds);
 
                 if ((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3) {
                     log.info("Saved platform:" + platform.getName() + " Url: " + (platform.getUrl() == null ? "null" : platform.getUrl()) + " Url in file: " + platformUrl);
@@ -1246,8 +1243,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 row++;
                 continue;
             }
-
-            technique +="_ihc";
 
             if(origin.toLowerCase().equals("xenograft")) {
                 String pass = passage;
