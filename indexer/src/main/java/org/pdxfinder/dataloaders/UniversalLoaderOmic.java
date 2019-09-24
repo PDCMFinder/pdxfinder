@@ -235,7 +235,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             MolecularCharacterization molecularCharacterization = null;
             passage = (data.get(omicPassage) == null) ? findMyPassage(modelCreation, data.get(omicSampleID), data.get(omicSampleOrigin)) : data.get(omicPassage);
 
-            String origin = data.get("_origin").trim().toLowerCase();
+            String origin = data.get(omicSampleOrigin).trim().toLowerCase();
             String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "_" + platformTag +"__" + origin+"__"+dataType;
 
 

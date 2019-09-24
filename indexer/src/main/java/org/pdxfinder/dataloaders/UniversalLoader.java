@@ -988,7 +988,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
         affyHGEAExpressionValue = "Affy_HGEA_expressionValue";
         illuminaHGEAProbeId = "Illumina_HGEA_probeID";
         illuminaHGEAExpressionValue = "Illumina_HGEA_expressionValue";
-
+        omicSampleOrigin = "_origin";
 
 
         platformURL = new HashMap<>();
