@@ -784,6 +784,9 @@ public class UniversalLoader extends UniversalLoaderOmic {
             else if(molCharType.equals("transcriptomics")){
                 platformTag = "trans";
             }
+            else if(platformName.toLowerCase().equals("immunohistochemistry")){
+                platformTag = "ihc";
+            }
 
 
             //patient sample
@@ -1236,11 +1239,15 @@ public class UniversalLoader extends UniversalLoaderOmic {
             String platform = dataRow.get(9);
             String characterizationType = "Unknown";
 
+
+
             if (origin == null || modelId == null || markerSymbol == null || markerStatus == null || technique == null) {
                 log.error("Missing essential value in row " + row);
                 row++;
                 continue;
             }
+
+            technique +="_ihc";
 
             if(origin.toLowerCase().equals("xenograft")) {
                 String pass = passage;
