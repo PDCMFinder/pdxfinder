@@ -17,12 +17,14 @@ public class liftOverTests extends BaseTest {
     public void init() {
     }
 
-    @Ignore
-    @Test
-    public void Given_noChainFileGiven_When_liftOverIsCalled_returnBlankMapAndLogError(){
 
+    @Test(expected = NullPointerException.class)
+    public void Given_noChainFileGiven_When_liftOverIsCalled_throwRuntimeException(){
+
+        Map<String, int[]> genomeCoordinates = new LinkedHashMap<String, int[]>()
+            {{
+                put("chr1", new int[]{10000, 10000});
+            }};
+        pdxliftover.liftOverGenomeCoordinates(genomeCoordinates);
     }
-
-
-
 }
