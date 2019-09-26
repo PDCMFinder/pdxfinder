@@ -1155,7 +1155,7 @@ public class DataImportService {
         return modelCreationRepository.findByTreatmentSummary(ts);
     }
 
-    public ModelCreation findModelByPatientTreatmentSummary(TreatmentSummary ts){
+    public Collection<ModelCreation> findModelByPatientTreatmentSummary(TreatmentSummary ts){
 
         return modelCreationRepository.findByPatientTreatmentSummary(ts);
     }
