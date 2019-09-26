@@ -1,4 +1,4 @@
-package org.pdxfinder.dataloaders;
+package org.pdxfinder;
 
 import org.junit.Before;
 import org.junit.Ignore;
