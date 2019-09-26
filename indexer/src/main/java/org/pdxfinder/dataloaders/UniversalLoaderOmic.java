@@ -208,7 +208,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             //STEP 1: GET THE PLATFORM AND CACHE IT
             String platformName = data.get(omicPlatform);
-            String platformNameKey = dataSourceAbbreviation+"__" + platformName+"_"+platformTag +"__"+dataType;
+            String platformNameKey = dataSourceAbbreviation+"__" + platformName +"__"+dataType;
 
             //Skip loading fish!
             if(platformName.equals("Other:_FISH")){
@@ -223,9 +223,9 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             }
             else{
 
-                String platformURLKey = platformName+"_"+platformTag.replaceAll("\\s","_");
+                String platformURLKey = platformName+"_"+dataType;
 
-                platform = dataImportService.getPlatform(platformName + "_"+platformTag, providerGroup);
+                platform = dataImportService.getPlatform(platformName, dataType, providerGroup);
                 platform.setUrl(platformURL.get(platformURLKey));
                 platformMap.put(platformNameKey, platform);
             }

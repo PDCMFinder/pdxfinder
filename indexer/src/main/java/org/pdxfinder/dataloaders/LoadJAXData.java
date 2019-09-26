@@ -176,7 +176,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                 NodeSuggestionDTO nsdto;
 
                 MolecularCharacterization mc = new MolecularCharacterization();
-                mc.setPlatform(dataImportService.getPlatform("Not Specified", dto.getProviderGroup()));
+                mc.setPlatform(dataImportService.getPlatform("Not Specified", "cytogenetics", dto.getProviderGroup()));
                 mc.setType("cytogenetics");
 
                 //we know these markers exist so no need to check for null

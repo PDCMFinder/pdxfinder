@@ -793,7 +793,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 if (sample != null) {
 
-                    platform = dataImportService.getPlatform(platformName+platformTag, ds);
+                    platform = dataImportService.getPlatform(platformName, molCharType, ds);
 
                     if ((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3) {
                         log.info("Saved platform:" + platform.getName() + " Url: " + (platform.getUrl() == null ? "null" : platform.getUrl()) + " Url in file: " + platformUrl);
@@ -900,7 +900,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 }
 
 
-                platform = dataImportService.getPlatform(platformName+platformTag, ds);
+                platform = dataImportService.getPlatform(platformName, molCharType, ds);
 
                 if ((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3) {
                     log.info("Saved platform:" + platform.getName() + " Url: " + (platform.getUrl() == null ? "null" : platform.getUrl()) + " Url in file: " + platformUrl);
@@ -1292,7 +1292,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     //log.info(existingMolcharNodes.keySet().toString());
                     molecularCharacterization = new MolecularCharacterization();
                     molecularCharacterization.setType("cytogenetics");
-                    molecularCharacterization.setPlatform(dataImportService.getPlatform(technique, ds));
+                    molecularCharacterization.setPlatform(dataImportService.getPlatform(technique,"cytogenetics", ds));
                     toBeCreatedMolcharNodes.put(molcharKey, molecularCharacterization);
                 }
 
