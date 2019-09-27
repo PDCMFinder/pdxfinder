@@ -1,23 +1,17 @@
 package org.pdxfinder.preload;
 
-import org.pdxfinder.dataloaders.LoadUniversal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 
-import javax.mail.Folder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class omicDataCrawler {
+public class OmicDataCrawler {
 
-    Logger log = LoggerFactory.getLogger(omicDataCrawler.class);
-
-    @Value("${pdxfinder.root.dir}")
-    private String finderRootDir;
+    Logger log = LoggerFactory.getLogger(OmicDataCrawler.class);
 
 
     public List<File> searchFileTreeForOmicData(File rootDir) {

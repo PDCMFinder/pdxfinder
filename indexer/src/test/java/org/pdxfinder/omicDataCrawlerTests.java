@@ -2,7 +2,7 @@ package org.pdxfinder;
 
 import org.junit.*;
 
-import org.pdxfinder.preload.omicDataCrawler;
+import org.pdxfinder.preload.OmicDataCrawler;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.util.List;
 
 
 
-public class omicDataCrawlerTests extends BaseTest{
+public class omicDataCrawlerTests {
 
     private String finderRootDir;
 
@@ -30,29 +30,30 @@ public class omicDataCrawlerTests extends BaseTest{
     @Before
     public void buildTestStructure() throws IOException {
 
-        Path tmpRootDir = Files.createTempDirectory("TEST");
+        tmpRootDir = Files.createTempDirectory("TEST");
 
-        Path provider1 = Files.createDirectory(Paths.get(tmpRootDir.toString() + "/provider1"));
-        Path provider2 = Files.createDirectory(Paths.get(tmpRootDir.toString() + "/provider2"));
+        provider1 = Files.createDirectory(Paths.get(tmpRootDir.toString() + "/provider1"));
+        provider2 = Files.createDirectory(Paths.get(tmpRootDir.toString() + "/provider2"));
 
-        Path mut = Files.createFile(Paths.get(provider1.toString() + "/mut"));
-        Path metadata = Files.createFile(Paths.get(provider1.toString() + "/metadata"));
-        Path cyto = Files.createFile(Paths.get(provider1.toString() + "/cyto"));
+        mut = Files.createFile(Paths.get(provider1.toString() + "/mut"));
+        metadata = Files.createFile(Paths.get(provider1.toString() + "/metadata"));
+        cyto = Files.createFile(Paths.get(provider1.toString() + "/cyto"));
 
-        Path mut2 = Files.createFile(Paths.get(provider2.toString() + "/mut"));
-        Path metadata2 = Files.createFile(Paths.get(provider2.toString() + "/metadata"));
-        Path cyto2 = Files.createFile(Paths.get(provider2.toString() + "/cyto"));
+        mut2 = Files.createFile(Paths.get(provider2.toString() + "/mut"));
+        metadata2 = Files.createFile(Paths.get(provider2.toString() + "/metadata"));
+        cyto2 = Files.createFile(Paths.get(provider2.toString() + "/cyto"));
 
 
         tmpRootDir.toFile().deleteOnExit();
     }
 
     @Test
-    public void Given_nonExistantRootFolder_When_crawlerIsCalled_returnNullFolder(){
+    public void Given_nonExistantRootFolder_When_crawlerIsCalled_returnDoNothingAndLogMessage(){
 
-        omicDataCrawler crawler = new omicDataCrawler();
-        crawler.searchFileTreeForOmicData(new File(""));
+        //when
+        initCrawlersAndPassRootFile(new File(""));
     }
+
 
     @Test
     public void Given_MultipleProvidersWithMutCytoAndMeta_When_crawlerIsCalled_returnListOfOnlyMut(){
@@ -61,17 +62,18 @@ public class omicDataCrawlerTests extends BaseTest{
         //init()
 
         //when
-        List<File> actualFiles = initCrawlersAndPassRootFile();
+        List<File> actualFiles = initCrawlersAndPassRootFile(tmpRootDir.toFile());
 
         //then
         Assert.assertTrue(actualFiles.size() == 2);
-        Assert.assertEquals(actualFiles.get(0),mut.toFile());
-        Assert.assertEquals(actualFiles.get(1),mut.toFile());
+        Assert.assertEquals(actualFiles.get(0).getName(),mut.toFile().getName());
+        Assert.assertEquals(actualFiles.get(1).getName(),mut2.toFile().getName());
+
     }
 
-    private List<File> initCrawlersAndPassRootFile(){
+    private List<File> initCrawlersAndPassRootFile(File rootDir){
 
-        omicDataCrawler crawler = new omicDataCrawler();
-        return crawler.searchFileTreeForOmicData(tmpRootDir.toFile());
+        OmicDataCrawler crawler = new OmicDataCrawler();
+        return crawler.searchFileTreeForOmicData(rootDir);
     }
 }

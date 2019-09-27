@@ -3,21 +3,16 @@ package org.pdxfinder;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.pdxfinder.BaseTest;
-import org.pdxfinder.preload.pdxLiftOver;
+import org.pdxfinder.preload.PDXLiftOver;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class liftOverTests extends BaseTest {
 
-    pdxLiftOver pdxliftover = new pdxLiftOver();
+    private PDXLiftOver pdxliftover = new PDXLiftOver();
 
-    @Before
-    public void init() {
-    }
-
-
+    @Ignore
     @Test(expected = NullPointerException.class)
     public void Given_noChainFileGiven_When_liftOverIsCalled_throwRuntimeException(){
 

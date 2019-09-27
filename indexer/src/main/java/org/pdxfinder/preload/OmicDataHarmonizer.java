@@ -1,4 +1,4 @@
 package org.pdxfinder.preload;
 
-public class omicDataHarmonizer {
+public class OmicDataHarmonizer {
 }
