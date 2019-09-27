@@ -12,6 +12,7 @@ public class liftOverTests extends BaseTest {
 
     private PDXLiftOver pdxliftover = new PDXLiftOver();
 
+    @Ignore
     @Test(expected = NullPointerException.class)
     public void Given_noChainFileGiven_When_liftOverIsCalled_throwRuntimeException(){
 
