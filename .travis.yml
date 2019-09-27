@@ -24,3 +24,12 @@ notifications:
     on_success: always
     on_failure: always
     on_start: never
+
+addons:
+  sonarcloud:
+    organization: "pdxfinder"
+    token:
+      secure: "4227c79f48a56b863a5e889f6ac7f591cf9d60d9"
+
+script:
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
