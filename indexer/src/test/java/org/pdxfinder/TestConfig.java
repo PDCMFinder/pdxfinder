@@ -14,7 +14,7 @@ public class TestConfig {
 
     @Bean
     public SessionFactory sessionFactory() {
-        return new SessionFactory("org.pdxfinder");
+        return new SessionFactory("org.pdxfinder.*");
     }
 
     @Bean
