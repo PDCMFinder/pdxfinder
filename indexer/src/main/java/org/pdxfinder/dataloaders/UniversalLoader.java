@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.preload.CustomXlsxReader;
 import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
@@ -177,17 +178,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 //getCellTypeEnum will be renamed to getCellType starting from version 4.0
 
                 String value = null;
-                switch (currentCell.getCellType()) {
-                    case Cell.CELL_TYPE_STRING:
-                        value = currentCell.getStringCellValue();
-                        break;
-                    case Cell.CELL_TYPE_BOOLEAN:
-                        value = String.valueOf(currentCell.getBooleanCellValue());
-                        break;
-                    case Cell.CELL_TYPE_NUMERIC:
-                        value = String.valueOf(currentCell.getNumericCellValue());
-                        break;
-                }
+                value = CustomXlsxReader.getString(currentCell, value);
 
                 dataRow.add(value);
             }

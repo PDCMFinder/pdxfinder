@@ -1,30 +1,42 @@
 package org.pdxfinder.preload;
 
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import tech.tablesaw.api.Table;
+import tech.tablesaw.io.xlsx.*;
+
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class OmicDataCrawler {
 
     Logger log = LoggerFactory.getLogger(OmicDataCrawler.class);
 
-    public List<File> searchFileTreeForOmicData(File rootDir) {
+    public ArrayList<File>  CrawlVariantDataFiles() throws IOException {
 
-        List<File> providersData = new ArrayList<File>();
-        List<File> variantData = new ArrayList<File>();
+        return searchFileTreeForOmicData(new File("/home/afollette/Documents/data/UPDOG"));
+    }
 
-        if(rootFolderExists(rootDir)) {
+    public ArrayList<File> searchFileTreeForOmicData(File rootDir) {
+
+        ArrayList<File> providersData = new ArrayList<File>();
+        ArrayList<File> variantData = new ArrayList<File>();
+
+        if(folderExists(rootDir)) {
 
             List<File> providerFolders = Arrays.asList(rootDir.listFiles());
 
             providersData = returnMutAndCNASubFolders(providerFolders);
 
-            variantData = returnMutAndCNAFiles(providersData);
+            variantData = getVariantdata(providersData);
 
         } else
 
@@ -33,9 +45,9 @@ public class OmicDataCrawler {
         return variantData;
     }
 
-    private List<File> returnMutAndCNASubFolders(List<File> rootDir){
+    private ArrayList<File> returnMutAndCNASubFolders(List<File> rootDir){
 
-        List<File> providersData = new ArrayList<File>();
+        ArrayList<File> providersData = new ArrayList<File>();
 
         rootDir.forEach(f -> {
 
@@ -45,20 +57,31 @@ public class OmicDataCrawler {
                             .collect(Collectors.toCollection(ArrayList::new)));
 
         });
-
         return providersData;
-
     }
 
-    private List<File> returnMutAndCNAFiles(List<File> providersData) {
+    private ArrayList<File> returnMutAndCNAFiles(List<File> providersData) {
 
-       return providersData.stream()
-                .filter(t -> t.getName().matches("(mut|cna)"))
-                .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<File> variantData = new ArrayList<File>();
+
+        providersData.forEach(f -> {
+
+            variantData.addAll
+                    (Arrays.stream(f.listFiles())
+                            .collect(Collectors.toCollection(ArrayList::new)));
+
+        });
+
+        return variantData;
     }
 
-    private boolean rootFolderExists(File rootDir){
+    private ArrayList<File> getVariantdata(ArrayList<File> providersData) {
+
+        if( ! providersData.isEmpty()) return returnMutAndCNAFiles(providersData);
+        else return new ArrayList<File>();
+    }
+
+    private boolean folderExists(File rootDir){
         return rootDir.exists();
     }
-
 }

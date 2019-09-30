@@ -1,20 +1,18 @@
-package org.pdxfinder;
+package org.pdxfinder.preloader;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.pdxfinder.BaseTest;
 import org.pdxfinder.preload.PDXLiftOver;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class liftOverTests extends BaseTest {
+public class LiftOverTests extends BaseTest {
 
-    private PDXLiftOver pdxliftover = new PDXLiftOver();
-
-    @Ignore
     @Test(expected = NullPointerException.class)
     public void Given_noChainFileGiven_When_liftOverIsCalled_throwRuntimeException(){
+
+        PDXLiftOver pdxliftover = new PDXLiftOver();
 
         Map<String, int[]> genomeCoordinates = new LinkedHashMap<String, int[]>()
             {{
