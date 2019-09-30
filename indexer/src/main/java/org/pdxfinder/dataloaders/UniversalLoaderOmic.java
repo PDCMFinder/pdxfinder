@@ -45,19 +45,17 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         List<Map<String, String>> dataList = new ArrayList<>();
 
         String omicDir = null;
-        String platformTag = "";
 
         if(dataType.equals("mutation")){
             omicDir = "mut";
-            platformTag = "mut";
+
         }
         else if(dataType.equals("copy number alteration")){
             omicDir = "cna";
-            platformTag = "cna";
+
         }
         else if(dataType.equals("transcriptomics")){
             omicDir = "trans";
-            platformTag = "trans";
         }
 
         if(omicDir == null) {
@@ -217,6 +215,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             }
 
             Platform platform;
+
             if(platformMap.containsKey(platformNameKey)){
 
                 platform = platformMap.get(platformNameKey);
@@ -237,7 +236,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             String origin = (data.get(omicSampleOrigin) == null)? "":data.get(omicSampleOrigin).toLowerCase().trim();
 
-            String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "_" + platformTag +"__" + origin+"__"+dataType;
+            String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "__" + origin+"__"+dataType;
 
 
 
