@@ -371,7 +371,6 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
 
         count++;
-        if(count%100 == 0) {log.info("Processed "+count+" CNA molchar objects");
         }
 
         try {
