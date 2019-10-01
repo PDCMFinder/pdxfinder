@@ -78,9 +78,9 @@ public class TransController {
 
 
     @GetMapping("/transform-pdmr-data")
-    public List<Map> connectPdmr(){
+    public Object connectPdmr(){
 
-        List<Map> mappingList = transformerService.transformDataAndSave();
+        List<Map<String, String>> mappingList = transformerService.transformDataAndSave();
         return mappingList;
 
     }

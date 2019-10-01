@@ -371,7 +371,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
 
         count++;
-        }
+
 
         try {
             addCharlesRiverCNA();
@@ -412,7 +412,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
 
         count++;
-        }
+
 
     }
 
