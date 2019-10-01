@@ -33,7 +33,7 @@ public class PrintReport implements CommandLineRunner, ApplicationContextAware {
     ReportManager reportManager;
 
 
-    @Value("${pdxfinder.log.dir}")
+    @Value("${pdxfinder.root.dir}")
     private String finderLogDir;
 
     private UtilityService utilityService;
@@ -46,12 +46,13 @@ public class PrintReport implements CommandLineRunner, ApplicationContextAware {
     @Override
     public void run(String... strings) throws Exception {
 
+
         printReport();
-        saveReportInCsv();
+        //saveReportInCsv();
     }
 
 
-    private void printReport(){
+    private void printReport() {
 
         reportManager = (ReportManager) context.getBean("ReportManager");
         reportManager.printMessages("ERROR");
@@ -60,24 +61,26 @@ public class PrintReport implements CommandLineRunner, ApplicationContextAware {
     }
 
 
-    private void saveReportInCsv(){
+    private void saveReportInCsv() {
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
-        String logFile = finderLogDir + "/logs/markerlog_"+timeStamp+".csv";
+        String logFile = finderLogDir + "/logs/markerlog_" + timeStamp + ".csv";
 
-        File logDir = new File(finderLogDir+ "/logs");
+        File logDir = new File(finderLogDir + "/logs");
 
-        if(logDir.canWrite()){
+        List<List<String>> markerReportMessages = reportManager.getMarkerHarmonizationMessagesInList();
+
+        if (markerReportMessages.size() == 0) return;
+
+        if (logDir.canWrite()) {
 
             List<String> headers = new ArrayList<>();
             headers.addAll(Arrays.asList("Type", "Reporter", "DataSource", "Model", "MolChar", "Platform", "MarkerInFile", "HarmonizedMarker", "ReasonOfChange", "Message"));
-            utilityService.writeCsvFile(headers, reportManager.getMarkerHarmonizationMessagesInList(), logFile);
-            log.info("Saving log file to: "+finderLogDir + "/logs");
-        }
-        else{
+            utilityService.writeCsvFile(headers, markerReportMessages, logFile);
+            log.info("Saving log file to: " + finderLogDir + "/logs");
+        } else {
 
-            log.warn("Cannot save log file, need write permission to "+finderLogDir + "/logs");
+            log.warn("Cannot save log file, need write permission to " + finderLogDir + "/logs");
         }
-
 
 
     }
@@ -87,5 +90,4 @@ public class PrintReport implements CommandLineRunner, ApplicationContextAware {
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         context = applicationContext;
     }
-
 }

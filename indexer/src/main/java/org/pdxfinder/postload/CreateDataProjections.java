@@ -78,7 +78,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
     private Map<String, List<DataAvailableDTO>> dataAvailableDP = new HashMap<>();
 
-    private List<MutatedMarkerData> frequentlyMutatedMarkersDP = null;
+    private List<MutatedMarkerData> frequentlyMutatedMarkersDP = new ArrayList<>();
 
     //"treatment name"=>"set of model ids"
     private Map<String, Set<Long>> patientTreatmentDP = new HashMap<>();
@@ -340,10 +340,6 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         //log.info(immunoHistoChemistryDP.toString());
     }
 
-
-
-
-
     private void createCNADataProjection(){
 
 
@@ -361,22 +357,22 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             for(Marker m : mas){
 
 
-                    if(copyNumberAlterationDP.containsKey(m.getHgncSymbol())){
+                if(copyNumberAlterationDP.containsKey(m.getHgncSymbol())){
 
-                        copyNumberAlterationDP.get(m.getHgncSymbol()).add(modelId);
-                    }
-                    else{
-
-                        Set<Long> newSet = new HashSet<>();
-                        newSet.add(modelId);
-                        copyNumberAlterationDP.put(m.getHgncSymbol(), newSet);
-                    }
+                    copyNumberAlterationDP.get(m.getHgncSymbol()).add(modelId);
                 }
+                else{
 
+                    Set<Long> newSet = new HashSet<>();
+                    newSet.add(modelId);
+                    copyNumberAlterationDP.put(m.getHgncSymbol(), newSet);
+                }
             }
 
-            count++;
-            if(count%100 == 0) {log.info("Processed "+count+" CNA molchar objects");
+        }
+
+        count++;
+        if(count%100 == 0) {log.info("Processed "+count+" CNA molchar objects");
         }
 
         try {
@@ -509,7 +505,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
         log.info("Loading additional datasets for CRL.");
 
-        String templateFileStr = finderRootDir + "/data/UPDOG/CRL/template.xlsx";
+        String templateFileStr = finderRootDir + "/data/UPDOG/CRL/metadata.xlsx";
         String markerTemplateFileStr = finderRootDir + "/data/UPDOG/CRL/cna_tested_markers/list.csv";
 
         File markerListFile = new File(markerTemplateFileStr);
@@ -632,12 +628,28 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
     }
 
+    private void addToOneParamDP(Map<String, Set<Long>> collection, String key, Long modelId){
+
+        if(key == null || key.isEmpty()) return;
+
+        if(collection.containsKey(key)) {
+            collection.get(key).add(modelId);
+        }
+        else{
+
+            Set<Long> s = new HashSet();
+            s.add(modelId);
+            collection.put(key, s);
+        }
+    }
+
+
     private void addToTwoParamDP(Map<String, Map<String, Set<Long>>> collection, String key1, String key2, Long modelId){
 
         if(collection.containsKey(key1)){
 
             if(collection.get(key1).containsKey(key2)){
-             collection.get(key1).get(key2).add(modelId);
+                collection.get(key1).get(key2).add(modelId);
 
             }
             else{
@@ -808,8 +820,15 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         Map<Long, List<String>> cnaPlatformsByModel = new HashMap<>();
         Map<Long, List<String>> cytogeneticsPlatformsByModel = new HashMap<>();
         Map<Long, List<String>> transcriptomicsPlatformsByModel = new HashMap<>();
+        Map<String, String> datasourceToDatasourceNameMap = new HashMap<>();
 
 
+        List<Group> providerGroups = dataImportService.getAllProviderGroups();
+
+        for(Group g: providerGroups){
+
+            datasourceToDatasourceNameMap.put(g.getAbbreviation(), g.getName());
+        }
 
         Collection<ModelCreation> allModelsWithPlatforms = dataImportService.findAllModelsPlatforms();
 
@@ -824,49 +843,49 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
                         for(MolecularCharacterization molc : s.getMolecularCharacterizations()){
 
-                                if (molc.getPlatform() != null && !molc.getType().isEmpty()) {
-                                    String platformName = molc.getPlatform().getName();
+                            if (molc.getPlatform() != null && !molc.getType().isEmpty()) {
+                                String platformName = molc.getPlatform().getName();
 
-                                    //if (dataImportService.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), mc.getDataSource(), platformName) > 0) {
+                                //if (dataImportService.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), mc.getDataSource(), platformName) > 0) {
 
-                                        if (molc.getType().toLowerCase().equals("mutation")) {
+                                if (molc.getType().toLowerCase().equals("mutation")) {
 
-                                            if (!mutationPlatformsByModel.containsKey(mc.getId())) {
-                                                mutationPlatformsByModel.put(mc.getId(), new ArrayList<>());
-                                            }
+                                    if (!mutationPlatformsByModel.containsKey(mc.getId())) {
+                                        mutationPlatformsByModel.put(mc.getId(), new ArrayList<>());
+                                    }
 
-                                            mutationPlatformsByModel.get(mc.getId()).add(platformName);
-                                        } else if (molc.getType().toLowerCase().equals("copy number alteration")) {
+                                    mutationPlatformsByModel.get(mc.getId()).add(platformName);
+                                } else if (molc.getType().toLowerCase().equals("copy number alteration")) {
 
-                                            if (!cnaPlatformsByModel.containsKey(mc.getId())) {
+                                    if (!cnaPlatformsByModel.containsKey(mc.getId())) {
 
-                                                cnaPlatformsByModel.put(mc.getId(), new ArrayList<>());
-                                            }
+                                        cnaPlatformsByModel.put(mc.getId(), new ArrayList<>());
+                                    }
 
-                                            cnaPlatformsByModel.get(mc.getId()).add(platformName);
-                                        }
-                                        else if (molc.getType().toLowerCase().equals("cytogenetics")) {
-
-                                            if (!cytogeneticsPlatformsByModel.containsKey(mc.getId())) {
-
-                                                cytogeneticsPlatformsByModel.put(mc.getId(), new ArrayList<>());
-                                            }
-
-                                            cytogeneticsPlatformsByModel.get(mc.getId()).add(platformName);
-                                        }
-                                        else if (molc.getType().toLowerCase().equals("transcriptomics")) {
-
-                                            if (!transcriptomicsPlatformsByModel.containsKey(mc.getId())) {
-
-                                                transcriptomicsPlatformsByModel.put(mc.getId(), new ArrayList<>());
-                                            }
-
-                                            transcriptomicsPlatformsByModel.get(mc.getId()).add(platformName);
-                                        }
-
-                                    //}
-
+                                    cnaPlatformsByModel.get(mc.getId()).add(platformName);
                                 }
+                                else if (molc.getType().toLowerCase().equals("cytogenetics")) {
+
+                                    if (!cytogeneticsPlatformsByModel.containsKey(mc.getId())) {
+
+                                        cytogeneticsPlatformsByModel.put(mc.getId(), new ArrayList<>());
+                                    }
+
+                                    cytogeneticsPlatformsByModel.get(mc.getId()).add(platformName);
+                                }
+                                else if (molc.getType().toLowerCase().equals("transcriptomics")) {
+
+                                    if (!transcriptomicsPlatformsByModel.containsKey(mc.getId())) {
+
+                                        transcriptomicsPlatformsByModel.put(mc.getId(), new ArrayList<>());
+                                    }
+
+                                    transcriptomicsPlatformsByModel.get(mc.getId()).add(platformName);
+                                }
+
+                                //}
+
+                            }
 
                         }
 
@@ -881,10 +900,8 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             if (!mutationPlatformsByModel.containsKey(mc.getId())) {
                 mutationPlatformsByModel.put(mc.getId(), new ArrayList<>());
             }
-
             // Are there any molecular characterizations associated to this model?
             if (mc.getRelatedSamples().stream().map(Sample::getMolecularCharacterizations).mapToLong(Collection::size).sum() > 0) {
-
                 // Get all molecular characterizations platforms into a list
                 mutationPlatformsByModel.get(mc.getId()).addAll(
                         mc.getRelatedSamples().stream()
@@ -899,10 +916,6 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                                 })
                                 .distinct()
                                 .collect(Collectors.toList()));
-
-
-
-
             }
             */
 
@@ -934,8 +947,9 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             ModelForQuery mfq = new ModelForQuery();
             mfq.setModelId(mc.getId());
             mfq.setExternalId(mc.getSourcePdxId());
-            mfq.setDatasource(mc.getDataSource());
 
+            mfq.setDatasource(mc.getDataSource());
+            mfq.setDatasourceName(datasourceToDatasourceNameMap.get(mc.getDataSource()));
 
             Set<String> dataAvailable = new HashSet<>();
 
@@ -1111,7 +1125,6 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                         }
 
                     }
-
                 }
             }
 
@@ -1197,6 +1210,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
 
                     //we also need to deal with regimens
+                    List<String> regimenDrugs = new ArrayList<>();
                     for(TreatmentComponent tc: tp.getComponents()){
 
                         Treatment t = tc.getTreatment();
@@ -1204,19 +1218,24 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
                         if(ot.getType().equals("treatment regimen") && ot.getSubclassOf() != null && !ot.getSubclassOf().isEmpty()){
 
-                            List<String> regimenDrugs = new ArrayList<>();
+
 
                             for(OntologyTerm ot2: ot.getSubclassOf()){
 
                                 regimenDrugs.add(ot2.getLabel());
 
                             }
-                            //sort them alphabetically
-                            Collections.sort(regimenDrugs);
-                            drugName = String.join(" and ", regimenDrugs);
-                            addToModelDrugResponseDP(modelId, drugName, response);
+
                         }
                     }
+
+                    //sort them alphabetically
+                    if(regimenDrugs.size() != 0){
+                        Collections.sort(regimenDrugs);
+                        drugName = String.join(" and ", regimenDrugs);
+                        addToModelDrugResponseDP(modelId, drugName, response);
+                    }
+
                 }
             }
         }
@@ -1233,43 +1252,68 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
         for(TreatmentSummary ts : treatmentSummaries){
 
-            ModelCreation model = dataImportService.findModelByTreatmentSummary(ts);
+            Collection<ModelCreation> models = null;
+
+            try{
+                models = dataImportService.findModelByPatientTreatmentSummary(ts);
+            }
+            catch (Exception e){
+
+                e.printStackTrace();
+                log.error("TS exception: "+ ts.getId().toString());
+            }
 
             //check if treatment is linked to a model
-            if(model != null){
+            if(models != null && models.size() > 0 ){
 
-                Long modelId = model.getId();
+                for(ModelCreation model : models){
 
-                for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
+                    Long modelId = model.getId();
 
-                    //this bit adds the drugA + drugB + drugC etc to the options
-                    String drugName = tp.getTreatmentString(true);
-                    String response = tp.getResponse().getDescription();
-                    addToModelDrugResponseDP(modelId, drugName, response);
+                    for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
+
+                        //this bit adds the drugA + drugB + drugC etc to the options
+                        String drugName = tp.getTreatmentString(true);
+                        //String response = tp.getResponse().getDescription();
+                        drugName = drugName.replaceAll("/", "");
+                        addToOneParamDP(patientTreatmentDP, drugName, modelId);
 
 
-                    //we also need to deal with regimens
-                    for(TreatmentComponent tc: tp.getComponents()){
+                        //we also need to deal with regimens
+                        List<String> regimenDrugs = new ArrayList<>();
 
-                        Treatment t = tc.getTreatment();
-                        OntologyTerm ot = t.getTreatmentToOntologyRelationship().getOntologyTerm();
+                        for(TreatmentComponent tc: tp.getComponents()){
 
-                        if(ot.getType().equals("treatment regimen") && ot.getSubclassOf() != null && !ot.getSubclassOf().isEmpty()){
+                            Treatment t = tc.getTreatment();
+                            OntologyTerm ot = t.getTreatmentToOntologyRelationship().getOntologyTerm();
 
-                            List<String> regimenDrugs = new ArrayList<>();
+                            if(ot.getType().equals("treatment regimen") && ot.getSubclassOf() != null && !ot.getSubclassOf().isEmpty()){
 
-                            for(OntologyTerm ot2: ot.getSubclassOf()){
+                                for(OntologyTerm ot2: ot.getSubclassOf()){
 
-                                regimenDrugs.add(ot2.getLabel());
+                                    regimenDrugs.add(ot2.getLabel());
 
+                                }
                             }
-                            //sort them alphabetically
+                        }
+
+                        //sort them alphabetically
+                        if(regimenDrugs.size() != 0){
                             Collections.sort(regimenDrugs);
                             drugName = String.join(" and ", regimenDrugs);
-                            addToModelDrugResponseDP(modelId, drugName, response);
+                            drugName = drugName.replaceAll("/", "");
+                            addToOneParamDP(patientTreatmentDP, drugName, modelId);
                         }
+
                     }
+
                 }
+
+
+
+            }
+            else{
+                log.error("Cannot find model corresponding for patient treatmentSummary, TS id= "+ts.getId());
             }
         }
 
@@ -1405,7 +1449,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
 
 
-        JSONObject j1 ,j2, j3, j4, j5, j6;
+        JSONObject j1 ,j2, j3, j4, j5, j6, j7;
 
 
         try{
@@ -1464,6 +1508,17 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
 
         try{
+            j7 = new JSONObject(patientTreatmentDP.toString());
+            ptDP.setValue(j7.toString());
+            System.out.println();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(patientTreatmentDP.toString());
+        }
+
+
+        try{
             //ja1 = new JSONArray(frequentlyMutatedMarkersDP.toString());
             fmgDP.setValue(frequentlyMutatedMarkersDP.toString());
         }
@@ -1472,8 +1527,6 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             e.printStackTrace();
             log.error(frequentlyMutatedMarkersDP.toString());
         }
-
-        ptDP.setValue(patientTreatmentDP.toString());
 
 
         dataImportService.saveDataProjection(pmvmDP);
@@ -1486,6 +1539,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         dataImportService.saveDataProjection(ptDP);
 
     }
+
 
 
     private String createJsonString(Object jstring){
