@@ -1476,7 +1476,6 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         ptDP.setValue(patientTreatmentDP.toString());
 
 
-
         dataImportService.saveDataProjection(pmvmDP);
         dataImportService.saveDataProjection(mvDP);
         dataImportService.saveDataProjection(drugDP);
@@ -1487,7 +1486,6 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         dataImportService.saveDataProjection(ptDP);
 
     }
-
 
 
     private String createJsonString(Object jstring){

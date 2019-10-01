@@ -58,7 +58,6 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             omicDir = "trans";
         }
 
-
         if(omicDir == null) {
             log.error("Cannot determine directory for datatype: "+dataType);
             return;

@@ -46,7 +46,6 @@ public class PrintReport implements CommandLineRunner, ApplicationContextAware {
     @Override
     public void run(String... strings) throws Exception {
 
-
         printReport();
         saveReportInCsv();
     }
