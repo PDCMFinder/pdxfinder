@@ -12,8 +12,6 @@ import org.pdxfinder.rdbms.repositories.TransTreatmentRepository;
 import org.pdxfinder.rdbms.repositories.TransValidationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -57,7 +55,7 @@ public class TransformerService {
     }
 
     //Transformation rule as specified here: https://docs.google.com/spreadsheets/d/1buUu5yj3Xq8tbEtL1l2UILV9kLnouGqF0vIjFlGGbEE
-    public List<Map> transformDataAndSave() {
+    public List<Map<String, String>> transformDataAndSave() {
         
         String unKnown = "Not Specified";
         String modelID;
@@ -69,7 +67,7 @@ public class TransformerService {
         String specimenSite;
         String primarySite;
         String initialDiagnosis;
-        String clinicalDiagnosis;
+        StringBuilder clinicalDiagnosis;
         String tumorType;
         String stageClassification;
         String stageValue ;
@@ -100,7 +98,7 @@ public class TransformerService {
         String rnaSeqYn;
 
 
-        String report = "";
+        StringBuilder report = new StringBuilder();
 
         String specimenSearchUrl = "/PDMR/raw/PDMR_SPECIMENSEARCH.json";
         log.info(specimenSearchUrl);
@@ -151,7 +149,7 @@ public class TransformerService {
 
         String patientInfoUrl = "/PDMR/raw/PDMR_PATIENTINFO.json";
         JsonNode patientInfo = util.readJsonLocal(this.dataRootDir+ patientInfoUrl);
-        List<Map<String, Object>> patientList = mapper.convertValue(patientInfo, List.class);
+        List patientList = mapper.convertValue(patientInfo, List.class);
 
 
         //engraftmentType
@@ -159,13 +157,13 @@ public class TransformerService {
         Set<PdmrPdxInfo> pdmrPdxInfoList = new HashSet<>();
 
         List<String> modelIDList = new ArrayList<>();
-        List<Map> mappingList = new ArrayList<>();
+        List<Map<String, String>> mappingList = new ArrayList<Map<String, String>>();
 
         for (JsonNode node : rootArray) {
 
             count++;
 
-            Map<String, Object> specimenSearch = mapper.convertValue(node, Map.class);
+            Map specimenSearch = mapper.convertValue(node, Map.class);
 
             Object pdmTypeDesc = specimenSearch.get("PDMTYPEDESCRIPTION");
             Object tissueTypeDesc = specimenSearch.get("TISSUETYPEDESCRIPTION");
@@ -218,25 +216,27 @@ public class TransformerService {
             specimenSite = "";
 
 
-            clinicalDiagnosis = specimenSearch.get("MEDDRADESCRIPTION") + "";
+            clinicalDiagnosis = new StringBuilder(specimenSearch.get("MEDDRADESCRIPTION") + "");
 
-            for (Map patient : patientList) {
+            for (Object patientObject : patientList) {
+
+                Map patient = mapper.convertValue(patientObject, Map.class);
 
                 if (specimenSearch.get("PATIENTSEQNBR").equals(patient.get("PATIENTSEQNBR"))) {
 
                     // Retrieve Diagnosis Subtype data
                     if (patient.get("DIAGNOSISSUBTYPE") != null){
-                        clinicalDiagnosis += " | "+patient.get("DIAGNOSISSUBTYPE");
+                        clinicalDiagnosis.append(" | ").append(patient.get("DIAGNOSISSUBTYPE"));
                     }
 
                     // Retrieve Additional Medical History data
                     if (patient.get("ADDITIONALMEDICALHISTORY") != null){
-                        clinicalDiagnosis += " | "+patient.get("ADDITIONALMEDICALHISTORY");
+                        clinicalDiagnosis.append(" | ").append(patient.get("ADDITIONALMEDICALHISTORY"));
                     }
 
                     // Retrieve Notes data
                     if (patient.get("NOTES") != null){
-                        clinicalDiagnosis += " | "+ patient.get("NOTES");
+                        clinicalDiagnosis.append(" | ").append(patient.get("NOTES"));
                     }
                 }
 
@@ -244,10 +244,10 @@ public class TransformerService {
             }
             //clinicalDiagnosis = clinicalDiagnosis.replaceAll("\\r|\\\"|\\n", "");
 
-            clinicalDiagnosis = clinicalDiagnosis.replaceAll("[^a-zA-Z,0-9 +_-]", "").trim();
-            clinicalDiagnosis = clinicalDiagnosis.replaceAll("\\s\\s", " ");
+            clinicalDiagnosis = new StringBuilder(clinicalDiagnosis.toString().replaceAll("[^a-zA-Z,0-9 +_-]", "").trim());
+            clinicalDiagnosis = new StringBuilder(clinicalDiagnosis.toString().replaceAll("\\s\\s", " "));
 
-            log.info(clinicalDiagnosis);
+            log.info(clinicalDiagnosis.toString());
 
             // Treatment naive
             /*try {
@@ -266,7 +266,7 @@ public class TransformerService {
             List<Sample> sampleList = new ArrayList<>();
 
             for (JsonNode sample : samples) {
-                Map<String, Object> dSample = mapper.convertValue(sample, Map.class);
+                Map dSample = mapper.convertValue(sample, Map.class);
 
                 if (specimenSearch.get("SPECIMENSEQNBR").equals(dSample.get("SPECIMENSEQNBR"))) {
 
@@ -295,13 +295,13 @@ public class TransformerService {
 
                     // Retrieve Grade Value
                     for (JsonNode histology : histologies) {
-                        Map<String, Object> dHistology = mapper.convertValue(histology, Map.class);
+                        Map dHistology = mapper.convertValue(histology, Map.class);
 
                         if (dSample.get("SAMPLESEQNBR").equals(dHistology.get("SAMPLESEQNBR"))) {
 
 
                             for (JsonNode tumorGrade : tumorGrades) {
-                                Map<String, Object> dTumorGrade = mapper.convertValue(tumorGrade, Map.class);
+                                Map dTumorGrade = mapper.convertValue(tumorGrade, Map.class);
 
                                 if (dHistology.get("TUMORGRADESEQNBR").equals(dTumorGrade.get("TUMORGRADESEQNBR"))) {
 
@@ -334,7 +334,7 @@ public class TransformerService {
             List<Treatment> treatments = new ArrayList<>();
 
             for (JsonNode currentTherapy : currentTherapies) {
-                Map<String, Object> dCurrentTherapy = mapper.convertValue(currentTherapy, Map.class);
+                Map dCurrentTherapy = mapper.convertValue(currentTherapy, Map.class);
 
 
                 if (specimenSearch.get("PATIENTSEQNBR").equals(dCurrentTherapy.get("PATIENTSEQNBR"))) {
@@ -348,7 +348,7 @@ public class TransformerService {
 
 
                     for (JsonNode standardregimen : standardRegimens) {
-                        Map<String, Object> dStandardregimen = mapper.convertValue(standardregimen, Map.class);
+                        Map dStandardregimen = mapper.convertValue(standardregimen, Map.class);
 
                         if (dCurrentTherapy.get("STANDARDIZEDREGIMENSEQNBR").equals(dStandardregimen.get("REGIMENSEQNBR"))) {
                             drug = dStandardregimen.get("DISPLAYEDREGIMEN").toString().replace(","," +");
@@ -357,7 +357,7 @@ public class TransformerService {
 
 
                     for (JsonNode clinicalResponse : clinicalResponses) {
-                        Map<String, Object> dClinicalResponse = mapper.convertValue(clinicalResponse, Map.class);
+                        Map dClinicalResponse = mapper.convertValue(clinicalResponse, Map.class);
 
                         if (dCurrentTherapy.get("BESTRESPONSESEQNBR").equals(dClinicalResponse.get("CLINICALRESPONSESEQNBR"))) {
                             response = dClinicalResponse.get("CLINICALRESPONSEDESCRIPTION")+"";
@@ -377,7 +377,7 @@ public class TransformerService {
 
 
             for (JsonNode priorTherapy : priorTherapies) {
-                Map<String, Object> dPriorTherapy = mapper.convertValue(priorTherapy, Map.class);
+                Map dPriorTherapy = mapper.convertValue(priorTherapy, Map.class);
 
                 if (specimenSearch.get("PATIENTSEQNBR").equals(dPriorTherapy.get("PATIENTSEQNBR"))) {
 
@@ -389,7 +389,7 @@ public class TransformerService {
                     duration = dPriorTherapy.get("DURATIONMONTHS")+" Months";
 
                     for (JsonNode standardregimen : standardRegimens) {
-                        Map<String, Object> dStandardregimen = mapper.convertValue(standardregimen, Map.class);
+                        Map dStandardregimen = mapper.convertValue(standardregimen, Map.class);
 
                         if (dPriorTherapy.get("STANDARDIZEDREGIMENSEQNBR").equals(dStandardregimen.get("REGIMENSEQNBR"))) {
                             drug = dStandardregimen.get("DISPLAYEDREGIMEN").toString().replace(","," +");
@@ -398,7 +398,7 @@ public class TransformerService {
 
 
                     for (JsonNode clinicalResponse : clinicalResponses) {
-                        Map<String, Object> dClinicalResponse = mapper.convertValue(clinicalResponse, Map.class);
+                        Map dClinicalResponse = mapper.convertValue(clinicalResponse, Map.class);
 
                         if (dClinicalResponse.get("CLINICALRESPONSESEQNBR").equals(dPriorTherapy.get("BESTRESPONSESEQNBR"))) {
                             response = dClinicalResponse.get("CLINICALRESPONSEDESCRIPTION")+"";
@@ -420,7 +420,7 @@ public class TransformerService {
 
             for (JsonNode tumorGradeStageType : tumorGradeStageTypes) {
 
-                Map<String, Object> dTumorGradeStageType = mapper.convertValue(tumorGradeStageType, Map.class);
+                Map dTumorGradeStageType = mapper.convertValue(tumorGradeStageType, Map.class);
 
                 if (specimenSearch.get("TUMORGRADESTAGESEQNBR").equals(dTumorGradeStageType.get("TUMORGRADESTAGESEQNBR"))) {
 
@@ -442,7 +442,7 @@ public class TransformerService {
 
             for (JsonNode tissueType : tissueTypes)
             {
-                Map<String, Object> dTissueType = mapper.convertValue(tissueType, Map.class);
+                Map dTissueType = mapper.convertValue(tissueType, Map.class);
 
                 if (specimenSearch.get("TISSUETYPESHORTNAME").equals(dTissueType.get("TISSUETYPESHORTNAME"))) {
                     extractionMethod = dTissueType.get("TISSUETYPEDESCRIPTION") + "";
@@ -453,7 +453,7 @@ public class TransformerService {
 
             for (JsonNode pdmrSpecimen : pdmrSpecimenData) {
 
-                Map<String, Object> specimen = mapper.convertValue(pdmrSpecimen, Map.class);
+                Map specimen = mapper.convertValue(pdmrSpecimen, Map.class);
 
                 if (specimenSearch.get("SPECIMENID").equals(specimen.get("SPECIMENID"))) {
 
@@ -473,7 +473,7 @@ public class TransformerService {
 
 
                     for (JsonNode mouseStrain : mouseStrains) {
-                        Map<String, Object> dMouseStrains = mapper.convertValue(mouseStrain, Map.class);
+                        Map dMouseStrains = mapper.convertValue(mouseStrain, Map.class);
 
                         if (specimen.get("MOUSESTRAINSEQNBR").equals(dMouseStrains.get("MOUSESTRAINSEQNBR"))) {
                             strain = dMouseStrains.get("MOUSESTRAINDESCRIPT") + "";
@@ -482,7 +482,7 @@ public class TransformerService {
 
 
                     for (JsonNode impantationSite : impantationSites) {
-                        Map<String, Object> dImpantationSites = mapper.convertValue(impantationSite, Map.class);
+                        Map dImpantationSites = mapper.convertValue(impantationSite, Map.class);
 
                         if (specimen.get("IMPLANTATIONSITESEQNBR").equals(dImpantationSites.get("IMPLANTATIONSITESEQNBR"))) {
                             engraftmentSite = dImpantationSites.get("IMPLANTATIONSITEDESCRIPTION") + "";
@@ -504,7 +504,7 @@ public class TransformerService {
 
                     // Retrieve details of specimen.get("PROVIDEDTISSUEORIGINSEQNBR").
                     for (JsonNode tissueOrigin : tissueOrigins) {
-                        Map<String, Object> tissue = mapper.convertValue(tissueOrigin, Map.class);
+                        Map tissue = mapper.convertValue(tissueOrigin, Map.class);
                         if (specimen.get("PROVIDEDTISSUEORIGINSEQNBR").equals(tissue.get("PROVIDEDTISSUEORIGINSEQNBR"))) {
                             tumorType = tissue.get("PROVIDEDTISSUEORIGINDESCRIPT") + "";
                             tumorType = tumorType.equals("Metastatic Site") ? "Metastatic" : tumorType;
@@ -529,13 +529,13 @@ public class TransformerService {
             try {
 
                 PdmrPdxInfo pdmrPdxInfo = new PdmrPdxInfo(modelID, patientID, gender, age, race, ethnicity, specimenSite, primarySite, initialDiagnosis,
-                        clinicalDiagnosis, tumorType, stageClassification, stageValue, gradeClassification, gradeValue, sampleType, strain, mouseSex,
-                        treatmentNaive, engraftmentSite, engraftmentType, sourceUrl, extractionMethod, dateAtCollection, accessibility,treatments,validations, sampleList);
+                                                          clinicalDiagnosis.toString(), tumorType, stageClassification, stageValue, gradeClassification, gradeValue, sampleType, strain, mouseSex,
+                                                          treatmentNaive, engraftmentSite, engraftmentType, sourceUrl, extractionMethod, dateAtCollection, accessibility, treatments, validations, sampleList);
 
                 // GENERATE DATA FOR MAPPING
-                Map mappingData = new LinkedHashMap();
+                Map<String, String> mappingData = new LinkedHashMap<String, String>();
                 mappingData.put("MODEL ID",modelID);
-                mappingData.put("DIAGNOSIS", clinicalDiagnosis);
+                mappingData.put("DIAGNOSIS", clinicalDiagnosis.toString());
                 mappingData.put("PRIMARY TISSUE", primarySite);
                 mappingData.put("TUMOR TYPE", tumorType);
                 mappingList.add(mappingData);
@@ -566,7 +566,7 @@ public class TransformerService {
                 log.info("Record for Patient" + specimenSearch.get("PATIENTID") + "Not Loaded");
             }
 
-            report += "Loaded Record for Patient " + specimenSearch.get("PATIENTID") + "<br>";
+            report.append("Loaded Record for Patient ").append(specimenSearch.get("PATIENTID")).append("<br>");
 
             // if (count == 40){ break; }
         }
@@ -596,9 +596,8 @@ public class TransformerService {
 
 
     public List<PdmrPdxInfo> getAllPdmr() {
-        List<PdmrPdxInfo> pdmrPdxInfos = transPdxInfoRepository.findAll();
 
-        return pdmrPdxInfos;
+        return transPdxInfoRepository.findAll();
     }
 
 
@@ -638,28 +637,32 @@ public class TransformerService {
 
         List<Treatment> treatments = pdmrPdxInfo.getTreatments();
 
-        String drugLista = "";
+        StringBuilder drugLista = new StringBuilder();
 
         for (Treatment treatment : treatments){
 
-            try{
-                if (!(treatment.getCurrentDrug() == null)){
-                    drugLista += util.splitText(treatment.getCurrentDrug(),"\\+","\n");
+            try {
+                if (!(treatment.getCurrentDrug() == null)) {
+                    drugLista.append(util.splitText(treatment.getCurrentDrug(), "\\+", "\n"));
                 }
-            }catch (Exception e){}
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
 
-            try{
-                if (!(treatment.getPriorDrug() == null)){
-                    drugLista += util.splitText(treatment.getPriorDrug(),"\\+","\n");
+            try {
+                if (!(treatment.getPriorDrug() == null)) {
+                    drugLista.append(util.splitText(treatment.getPriorDrug(), "\\+", "\n"));
                 }
-            }catch (Exception e){}
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
         }
 
         String drugList = homeDir+"/Documents/"+(new Date())+"_pdmrDrug.csv";
 
-        util.writeToFile(drugLista,drugList, false);
+        util.writeToFile(drugLista.toString(), drugList, false);
 
-        return drugLista.replace("\n","<br>");
+        return drugLista.toString().replace("\n", "<br>");
     }
 
 
