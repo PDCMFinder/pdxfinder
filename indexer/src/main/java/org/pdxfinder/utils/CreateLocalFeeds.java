@@ -118,16 +118,6 @@ public class CreateLocalFeeds implements CommandLineRunner {
 
             createJAXFeeds();
 
-          //  createIRCCFeeds();
-
-          //  createHCIFeeds();
-
-          //  createMDAFeeds();
-
-          //  createWistarFeeds();
-
-          //  createWustlFeeds();
-
         }
 
         long endTime = System.currentTimeMillis();
