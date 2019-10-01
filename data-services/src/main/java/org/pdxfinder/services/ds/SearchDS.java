@@ -67,6 +67,9 @@ public class SearchDS {
      */
     private OneParamTextSearch copyNumberAlterationSearch;
 
+
+    private OneParamTextSearch patientTreatmentSearch;
+
     /**
      * Three param search object for performing a search on gene mutations
      */
@@ -119,7 +122,7 @@ public class SearchDS {
         molecularDataSection.setName("MOLECULAR DATA");
 
         WebFacetSection treatmentInfoSection = new WebFacetSection();
-        treatmentInfoSection.setName("TREATMENT INFORMATION");
+        treatmentInfoSection.setName("TREATMENT/DRUG DOSING");
 
         //cancer by system filter def
         List<FacetOption> cancerBySystemOptions = new ArrayList<>();
@@ -187,20 +190,29 @@ public class SearchDS {
         patientTumorSection.addComponent(age);
         facetOptionMap.put("patient_age",ageOptions);
 
-        //treatment status filter
-        List<FacetOption> patientTreatmentStatusOptions = new ArrayList<>();
-        patientTreatmentStatusOptions.add(new FacetOption("Treatment Naive", "treatment_naive"));
-        patientTreatmentStatusOptions.add(new FacetOption("Not Treatment Naive", "not_treatment_naive"));
-        patientTreatmentStatusOptions.add(new FacetOption("Not Specified", "Not_Specified"));
-
-        OneParamCheckboxFilter patientTreatmentStatus = new OneParamCheckboxFilter("TREATMENT STATUS", "patient_treatment_status", false,
-                FilterType.OneParamCheckboxFilter.get(), patientTreatmentStatusOptions, new ArrayList<>());
-        patientTumorSection.addComponent(patientTreatmentStatus);
-        facetOptionMap.put("patient_treatment_status", patientTreatmentStatusOptions);
-
         //datasource filter def
+        Map<String, String> dataSourcesWithNames = new HashMap<>();
+
+        for(ModelForQuery mfq: models){
+
+            if(mfq.getDatasource() != null && mfq.getDatasourceName() != null) {
+                dataSourcesWithNames.put(mfq.getDatasourceName(), mfq.getDatasource());
+            }
+        }
+
+
+        Map<String, String> dataSourcesWithNamesOrdered = new TreeMap<>(dataSourcesWithNames);
+
+        List<FacetOption> datasourceOptions = new ArrayList<>();
+
+
+        for(Map.Entry<String, String> entry : dataSourcesWithNamesOrdered.entrySet()){
+            datasourceOptions.add(new FacetOption(entry.getKey(), entry.getValue()));
+        }
+
+        /*
         Set<String> datasourceSet = models.stream()
-                .map(ModelForQuery::getDatasource)
+                .map(ModelForQuery::getDatasourceName)
                 .collect(Collectors.toSet());
 
         List<String> datasourceList = new ArrayList<>();
@@ -211,6 +223,7 @@ public class SearchDS {
         for(String ds : datasourceList){
             datasourceOptions.add(new FacetOption(ds, ds));
         }
+        */
 
         //dataset available filter def
         List<FacetOption> datasetAvailableOptions = new ArrayList<>();
@@ -297,12 +310,32 @@ public class SearchDS {
         facetOptionMap.put("breast_cancer_markers",breastCancerMarkerOptions);
 
 
+        //treatment status filter
+        List<FacetOption> patientTreatmentStatusOptions = new ArrayList<>();
+        patientTreatmentStatusOptions.add(new FacetOption("Treatment Naive", "treatment_naive"));
+        patientTreatmentStatusOptions.add(new FacetOption("Not Treatment Naive", "not_treatment_naive"));
+        patientTreatmentStatusOptions.add(new FacetOption("Not Specified", "Not_Specified"));
+
+        OneParamCheckboxFilter patientTreatmentStatus = new OneParamCheckboxFilter("PATIENT TREATMENT STATUS", "patient_treatment_status", false,
+                FilterType.OneParamCheckboxFilter.get(), patientTreatmentStatusOptions, new ArrayList<>());
+        treatmentInfoSection.addComponent(patientTreatmentStatus);
+        facetOptionMap.put("patient_treatment_status", patientTreatmentStatusOptions);
+
+
+        //patient treatment filter
+
+        OneParamTextFilter patientTreatment = new OneParamTextFilter("PATIENT TREATMENT", "patient_treatment",
+                false, FilterType.OneParamTextFilter.get(), "TREATMENT", getPatientTreatmentOptions(), new ArrayList<>());
+
+
+        treatmentInfoSection.addComponent(patientTreatment);
+
         //model dosing study def
 
         Map<String, Map<String, Set<Long>>> modelDrugResponses = getModelDrugResponsesFromDP();
         List<String> drugNames = new ArrayList<>(modelDrugResponses.keySet());
 
-        TwoParamUnlinkedFilter modelDosingStudy = new TwoParamUnlinkedFilter("MODEL DOSING STUDY", "drug", false, FilterType.TwoParamUnlinkedFilter.get(), "DRUG", "RESPONSE", drugNames, Arrays.asList(
+        TwoParamUnlinkedFilter modelDosingStudy = new TwoParamUnlinkedFilter("PDX MODEL DOSING", "drug", false, FilterType.TwoParamUnlinkedFilter.get(), "DRUG", "RESPONSE", drugNames, Arrays.asList(
                 "Complete Response",
                 "Partial Response",
                 "Progressive Disease",
@@ -310,6 +343,8 @@ public class SearchDS {
                 "Stable Disease And Complete Response"
         ), new HashMap<>());
         treatmentInfoSection.addComponent(modelDosingStudy);
+
+
 
 
         webFacetContainer.addSection(pdxModelSection);
@@ -342,6 +377,7 @@ public class SearchDS {
 
         copyNumberAlterationSearch = new OneParamTextSearch("copyNumberAlteration", "copy_number_alteration", getCopyNumberAlterationDP());
 
+        patientTreatmentSearch = new OneParamTextSearch("patientTreatment", "patient_treatment", getPatientTreatmentsFromDP());
 
         INITIALIZED = true;
     }
@@ -513,6 +549,9 @@ public class SearchDS {
         //reset copy number alteration values
         result.forEach(x -> x.setCnaMarkers(new ArrayList<>()));
 
+        //reset patient treatments
+        result.forEach(x -> x.setPatientTreatments(new ArrayList<>()));
+
         // If no filters have been specified, return the complete set
         if (filters == null) {
             return result;
@@ -531,8 +570,9 @@ public class SearchDS {
                     result = oneParamCheckboxSearch.searchOnCollection(facetOptionMap.get("query"), filters.get(SearchFacetName.query), result, ModelForQuery::getAllOntologyTermAncestors);
                     break;
 
+                //We don't need to provide a replacement string list for datasource, since it is already using the datasource abbrev as key!
                 case datasource:
-                    result = oneParamCheckboxSearch.searchOnString(facetOptionMap.get("datasource"), filters.get(SearchFacetName.datasource), result, ModelForQuery::getDatasource);
+                    result = oneParamCheckboxSearch.searchOnString(null, filters.get(SearchFacetName.datasource), result, ModelForQuery::getDatasource);
                     break;
 
                 case diagnosis:
@@ -610,6 +650,9 @@ public class SearchDS {
                     result = copyNumberAlterationSearch.search(filters.get(SearchFacetName.copy_number_alteration), result, ModelForQuery::addCnaMarker, ComparisonOperator.OR);
                     break;
 
+                case patient_treatment:
+                    result = patientTreatmentSearch.search(filters.get(SearchFacetName.patient_treatment), result, ModelForQuery::addPatientTreatment, ComparisonOperator.OR);
+                    break;
                 default:
                     //undexpected filter option
                     log.warn("Unrecognised facet {} passed to search, skipping", facet.getName());
@@ -665,6 +708,11 @@ public class SearchDS {
 
                 mfq.setModelId(parseLong(j.getString("modelId")));
                 mfq.setDatasource(j.getString("datasource"));
+
+                if(j.has("datasourceName")){
+                    mfq.setDatasourceName(j.getString("datasourceName"));
+                }
+
                 mfq.setExternalId(j.getString("externalId"));
                 if(j.has("patientAge")){
                     mfq.setPatientAge(j.getString("patientAge"));
@@ -792,7 +840,6 @@ public class SearchDS {
         return resultMap;
     }
 
-
     private List<String> getMutationOptions(){
 
         Map<String,Set<String>> tempResults = getMutationOptionsFromDP();
@@ -806,8 +853,6 @@ public class SearchDS {
 
         return resultList;
     }
-
-
 
     private Map<String, Set<String>> getMutationOptionsFromDP(){
 
@@ -841,8 +886,6 @@ public class SearchDS {
         return tempResults;
     }
 
-
-
     private Map<String, Map<String, Set<Long>>> getModelDrugResponsesFromDP(){
 
         log.info("Initializing model drug responses");
@@ -873,7 +916,6 @@ public class SearchDS {
 
         return modelDrugResponses;
     }
-
 
     private Map<String, Map<String, Set<Long>>> getBreastCancerMarkersFromDP(){
 
@@ -934,6 +976,40 @@ public class SearchDS {
         return data;
     }
 
+    private Map<String, Set<Long>> getPatientTreatmentsFromDP(){
+
+        Map<String, Set<Long>> data = new HashMap<>();
+
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("patient treatment");
+
+        String responses = "{}";
+
+        if(dataProjection != null){
+
+            responses = dataProjection.getValue();
+        }
+
+        try{
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            data = mapper.readValue(responses, new TypeReference<Map<String, Set<Long>>>(){});
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
+        }
+
+        return data;
+    }
+
+    private List<String> getPatientTreatmentOptions(){
+
+        Map<String, Set<Long>> data = getPatientTreatmentsFromDP();
+        List<String> options = new ArrayList<>(data.keySet());
+
+        return options;
+    }
 
     private List<String> getCopyNumberAlterationOptions(){
 

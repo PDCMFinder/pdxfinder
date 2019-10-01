@@ -38,6 +38,7 @@ public class SearchController {
                   @RequestParam("datasource") Optional<List<String>> datasource,
                   @RequestParam("diagnosis") Optional<List<String>> diagnosis,
                   @RequestParam("patient_age") Optional<List<String>> patient_age,
+                  @RequestParam("patient_treatment") Optional<List<String>> patient_treatment,
                   @RequestParam("patient_treatment_status") Optional<List<String>> patient_treatment_status,
                   @RequestParam("patient_gender") Optional<List<String>> patient_gender,
                   @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
@@ -53,7 +54,7 @@ public class SearchController {
 
 
         ExportDTO eDTO = searchService.export(query, datasource,
-                diagnosis, patient_age, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
+                diagnosis, patient_age, patient_treatment, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
                 sample_tumor_type, mutation, drug, project, data_available, breast_cancer_markers, copy_number_alteration);
 
         Set<ModelForQueryExport> exportResults = eDTO.getResults().stream().map(ModelForQueryExport::new).collect(Collectors.toSet());
@@ -88,6 +89,7 @@ public class SearchController {
                    @RequestParam("datasource") Optional<List<String>> datasource,
                    @RequestParam("diagnosis") Optional<List<String>> diagnosis,
                    @RequestParam("patient_age") Optional<List<String>> patient_age,
+                   @RequestParam("patient_treatment") Optional<List<String>> patient_treatment,
                    @RequestParam("patient_treatment_status") Optional<List<String>> patient_treatment_status,
                    @RequestParam("patient_gender") Optional<List<String>> patient_gender,
                    @RequestParam("sample_origin_tissue") Optional<List<String>> sample_origin_tissue,
@@ -103,7 +105,7 @@ public class SearchController {
                    @RequestParam(value = "size", defaultValue = "10") Integer size){
 
         model.addAttribute("websearch", searchService.webSearch(query, datasource,
-                diagnosis, patient_age, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
+                diagnosis, patient_age, patient_treatment, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
                 sample_tumor_type, mutation, drug, project, data_available, breast_cancer_markers, copy_number_alteration, page, size));
 
         return "search";

@@ -396,7 +396,7 @@ public class MappingService {
 */
 
 
-    public MappingContainer getDiagnosisMappingsByDS(List<String> ds) {
+    public MappingContainer getMappingsByDSAndType(List<String> ds, String type) {
 
 
         if (!INITIALIZED) {
@@ -409,7 +409,7 @@ public class MappingService {
 
         for (MappingEntity me : container.getMappings().values()) {
 
-            if (me.getEntityType().toLowerCase().equals(MappingEntityType.diagnosis.get())) {
+            if (me.getEntityType().toLowerCase().equals(type.toLowerCase())) {
 
                 for (String dataSource : ds) {
 
@@ -426,7 +426,7 @@ public class MappingService {
                         me2.setJustification(me.getJustification());
                         me2.setStatus(me.getStatus());
                         me2.setSuggestedMappings(me.getSuggestedMappings());
-
+                        me2.setMappingKey(me.getMappingKey());
                         mc.addEntity(me2);
                     }
                 }
@@ -738,8 +738,6 @@ public class MappingService {
 
             log.info("UNMAPPED TERM WAS SAVED: {}", mappingEntity.generateMappingKey());
 
-        } else {
-            log.warn("NOT SAVED: {} was found in the Database", mappingEntity.generateMappingKey());
         }
     }
 

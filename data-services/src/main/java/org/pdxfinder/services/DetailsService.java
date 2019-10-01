@@ -291,6 +291,7 @@ public class DetailsService {
 
 
         List<QualityAssurance> qaList = pdx.getQualityAssurance();
+        if(qaList == null) qaList = new ArrayList<>();
 
         List<QualityControlDTO> qcontrolList = new ArrayList<>();
         for(QualityAssurance qa: qaList){

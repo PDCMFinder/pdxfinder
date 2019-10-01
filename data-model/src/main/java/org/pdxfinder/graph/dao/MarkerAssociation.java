@@ -69,6 +69,7 @@ public class MarkerAssociation {
     private String cnaCopyNumberStatus;
     private String cnaGisticValue;
     private String cnaPicnicValue;
+    private String fold_change;
 
     private String cytoGenFishResult;
 
@@ -477,5 +478,13 @@ public class MarkerAssociation {
 
     public void setIlluminaHGEAExpressionValue(String illuminaHGEAExpressionValue) {
         this.illuminaHGEAExpressionValue = illuminaHGEAExpressionValue;
+    }
+
+    public String getFold_change() {
+        return fold_change;
+    }
+
+    public void setFold_change(String fold_change) {
+        this.fold_change = fold_change;
     }
 }

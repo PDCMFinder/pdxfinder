@@ -82,6 +82,7 @@ public class SearchService {
                                   Optional<List<String>> datasource,
                                   Optional<List<String>> diagnosis,
                                   Optional<List<String>> patient_age,
+                                  Optional<List<String>> patient_treatment,
                                   Optional<List<String>> patient_treatment_status,
                                   Optional<List<String>> patient_gender,
                                   Optional<List<String>> sample_origin_tissue,
@@ -102,6 +103,7 @@ public class SearchService {
                 datasource,
                 diagnosis,
                 patient_age,
+                patient_treatment,
                 patient_treatment_status,
                 patient_gender,
                 sample_origin_tissue,
@@ -182,6 +184,7 @@ public class SearchService {
                             Optional<List<String>> datasource,
                             Optional<List<String>> diagnosis,
                             Optional<List<String>> patient_age,
+                            Optional<List<String>> patient_treatment,
                             Optional<List<String>> patient_treatment_status,
                             Optional<List<String>> patient_gender,
                             Optional<List<String>> sample_origin_tissue,
@@ -199,6 +202,7 @@ public class SearchService {
                 datasource,
                 diagnosis,
                 patient_age,
+                patient_treatment,
                 patient_treatment_status,
                 patient_gender,
                 sample_origin_tissue,
@@ -227,6 +231,7 @@ public class SearchService {
             Optional<List<String>> datasource,
             Optional<List<String>> diagnosis,
             Optional<List<String>> patientAge,
+            Optional<List<String>> patientTreatment,
             Optional<List<String>> patientTreatmentStatus,
             Optional<List<String>> patientGender,
             Optional<List<String>> sampleOriginTissue,
@@ -274,6 +279,13 @@ public class SearchService {
             configuredFacets.put(SearchFacetName.patient_treatment_status, new ArrayList<>());
             for (String s : patientTreatmentStatus.get()) {
                 configuredFacets.get(SearchFacetName.patient_treatment_status).add(s);
+            }
+        }
+
+        if (patientTreatment.isPresent() && !patientTreatment.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.patient_treatment, new ArrayList<>());
+            for (String s : patientTreatment.get()) {
+                configuredFacets.get(SearchFacetName.patient_treatment).add(s);
             }
         }
 
@@ -442,6 +454,10 @@ public class SearchService {
 
                 case breast_cancer_markers:
                     headers.add("BREAST CANCER MARKERS");
+                    break;
+
+                case patient_treatment:
+                    headers.add("PATIENT TREATMENT");
                     break;
 
                 case patient_treatment_status:

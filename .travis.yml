@@ -24,3 +24,12 @@ notifications:
     on_success: always
     on_failure: always
     on_start: never
+
+addons:
+  sonarcloud:
+    organization: "pdxfinder"
+    token:
+      secure: "haNM1MPf0SFy/Zt3MO2bVFfUeliSHB1SgQ4YEEEK8lvX4Rb/plTN1HoO16290QUmvj9bXiJpb/co3509Q5OojMJVWnYX8/1Mlv/ygkqZUE0ZTxb9x4RA+JNxpm4FmeVVgLcoOOv+Jt/WmecZAJ2mHsZ/iQ8rypiMNsxcH33B/naj/K4rFQDc2eiPVtvf1r08zWDVuYyI4XE2WCulH5whlbw3M2p1/N682l998shzHRcJtUMLuhrmjjHBHrSSIpyudmYArM6NhbnNNfVtVEYA+TugE1nA7OaW+HmN+IEKkIhe0T10fzvPCnTHdXX4+d8DkPpFIP+ZufsxVvtid9aY6WaBEmREMH9U5Gk+/ScMksSQQZklJM8xLP3sl1o/qsgVeeSNWw+8XO5+/1Hvlt2YPSxYy3BJdkxRNuxRFkIRfuz2zW49Hu501mb4bHwY3fzR5bZGaWbpGxl94Y2MSgDjjXPmSUUgtze9bInHw3/4odWVLifzK+HfmUtfPug64V/mCiVkOB/SFWDEf/2bw+pHD5zhqnJN74N9HfqS24xh9L1Wj9By20d6rRP5D5Lvi9BSjXaK2n6iv78FshkcETL/okkbfE2yV0z0uVdz30JSMAsO9hJcqfGV6+IvuCAYMPfTGgCLmnMDau9f+Ubu36hZlQN6TxwNbVFYfA7oc0YoDGs="
+
+script:
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=pdxfinder

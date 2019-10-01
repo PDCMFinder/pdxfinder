@@ -47,7 +47,9 @@ public class SetDataVisibility implements CommandLineRunner{
 
             log.info("Applying data visibility rules");
 
-            applyDataVisibilityRules();
+
+            applyDataVisibilityRules("IRCC-GC");
+            applyDataVisibilityRules("CRL");
         }
 
         long endTime = System.currentTimeMillis();
@@ -61,10 +63,11 @@ public class SetDataVisibility implements CommandLineRunner{
     }
 
 
-    private void applyDataVisibilityRules(){
+    private void applyDataVisibilityRules(String datasourceAbbrev){
 
-        //get all charles river molchars
-        List<MolecularCharacterization> molChars = dataImportService.findAllMolcharByDataSource("CRL");
+        log.info("Disabling data visibility for "+datasourceAbbrev);
+
+        List<MolecularCharacterization> molChars = dataImportService.findAllMolcharByDataSource(datasourceAbbrev);
 
         for(MolecularCharacterization mc:molChars){
 
