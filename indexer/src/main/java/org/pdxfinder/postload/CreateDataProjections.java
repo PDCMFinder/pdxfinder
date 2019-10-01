@@ -84,7 +84,6 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
     private Map<String, Set<Long>> patientTreatmentDP = new HashMap<>();
 
 
-    //"transcriptomics"=>set of model ids
     private Map<String, Set<Long>> transcriptomicsDP = new HashMap<>();
 
     protected static ApplicationContext context;
