@@ -37,39 +37,7 @@ public class TransformerService {
 
     private UtilityService util;
 
-    private String DATASOURCE_URL_PREFIX = "https://pdmdb.cancer.gov/pls/apex/f?p=101:4:0::NO:4:P4_SPECIMENSEQNBR:";
-
     private String dataRootDir;
-
-    private String specimenSearchUrl = "/PDMR/raw/PDMR_SPECIMENSEARCH.json";
-
-    private String specimenUrl = "/PDMR/raw/PDMR_SPECIMEN.json";
-
-    private String tissueOriginsUrl = "/PDMR/raw/PDMR_PROVIDEDTISSUEORIGINS.json";
-
-    private String tumoGradeStateTypesUrl = "/PDMR/raw/PDMR_TUMORGRADESTAGETYPES.json";
-
-    private String mouseStrainsUrl = "/PDMR/raw/PDMR_MOUSESTRAINS.json";
-
-    private String implantationSitesUrl = "/PDMR/raw/PDMR_IMPLANTATIONSITES.json";
-
-    private String tissueTypeUrl = "/PDMR/raw/PDMR_TISSUETYPES.json";
-
-    private String histologyUrl = "/PDMR/raw/PDMR_HISTOLOGY.json";
-
-    private String tumorGradeUrl = "/PDMR/raw/PDMR_TUMORGRADES.json";
-
-    private String samplesUrl = "/PDMR/raw/PDMR_SAMPLE.json";
-
-    private String currentTherapyUrl = "/PDMR/raw/PDMR_CURRENTTHERAPY.json";
-
-    private String standardRegimensUrl = "/PDMR/raw/PDMR_STANDARDIZEDREGIMENS.json";
-
-    private String clinicalResponseUrl = "/PDMR/raw/PDMR_CLINICALRESPONSES.json";
-
-    private String priorTherapyUrl = "/PDMR/raw/PDMR_PRIORTHERAPIES.json";
-
-    private String patientInfoUrl = "/PDMR/raw/PDMR_PATIENTINFO.json";
 
 
     public TransformerService(TransPdxInfoRepository transPdxInfoRepository,
@@ -134,40 +102,55 @@ public class TransformerService {
 
         String report = "";
 
+        String specimenSearchUrl = "/PDMR/raw/PDMR_SPECIMENSEARCH.json";
         log.info(specimenSearchUrl);
 
         //If seqnumber is ) input in finder "Heterotopic" else if (1,2,3,4,5,6) put "Orthotopic" else(99) put not specified
 
         // Read the whole JSON as a JsonNode type & Retrieve each specimen search record as a Map (key value type) type
-        JsonNode rootArray = util.readJsonLocal(this.dataRootDir+specimenSearchUrl);
+        JsonNode rootArray = util.readJsonLocal(this.dataRootDir+ specimenSearchUrl);
 
-        JsonNode pdmrSpecimenData = util.readJsonLocal(this.dataRootDir+specimenUrl);
+        String specimenUrl = "/PDMR/raw/PDMR_SPECIMEN.json";
+        JsonNode pdmrSpecimenData = util.readJsonLocal(this.dataRootDir+ specimenUrl);
 
-        JsonNode tissueOrigins = util.readJsonLocal(this.dataRootDir+tissueOriginsUrl);
+        String tissueOriginsUrl = "/PDMR/raw/PDMR_PROVIDEDTISSUEORIGINS.json";
+        JsonNode tissueOrigins = util.readJsonLocal(this.dataRootDir+ tissueOriginsUrl);
 
-        JsonNode tumorGradeStageTypes = util.readJsonLocal(this.dataRootDir+tumoGradeStateTypesUrl);
+        String tumoGradeStateTypesUrl = "/PDMR/raw/PDMR_TUMORGRADESTAGETYPES.json";
+        JsonNode tumorGradeStageTypes = util.readJsonLocal(this.dataRootDir+ tumoGradeStateTypesUrl);
 
-        JsonNode mouseStrains = util.readJsonLocal(this.dataRootDir+mouseStrainsUrl);
+        String mouseStrainsUrl = "/PDMR/raw/PDMR_MOUSESTRAINS.json";
+        JsonNode mouseStrains = util.readJsonLocal(this.dataRootDir+ mouseStrainsUrl);
 
-        JsonNode impantationSites = util.readJsonLocal(this.dataRootDir+implantationSitesUrl);
+        String implantationSitesUrl = "/PDMR/raw/PDMR_IMPLANTATIONSITES.json";
+        JsonNode impantationSites = util.readJsonLocal(this.dataRootDir+ implantationSitesUrl);
 
-        JsonNode tissueTypes = util.readJsonLocal(this.dataRootDir+tissueTypeUrl);
+        String tissueTypeUrl = "/PDMR/raw/PDMR_TISSUETYPES.json";
+        JsonNode tissueTypes = util.readJsonLocal(this.dataRootDir+ tissueTypeUrl);
 
-        JsonNode samples = util.readJsonLocal(this.dataRootDir+samplesUrl);
+        String samplesUrl = "/PDMR/raw/PDMR_SAMPLE.json";
+        JsonNode samples = util.readJsonLocal(this.dataRootDir+ samplesUrl);
 
-        JsonNode histologies = util.readJsonLocal(this.dataRootDir+histologyUrl);
+        String histologyUrl = "/PDMR/raw/PDMR_HISTOLOGY.json";
+        JsonNode histologies = util.readJsonLocal(this.dataRootDir+ histologyUrl);
 
-        JsonNode tumorGrades = util.readJsonLocal(this.dataRootDir+tumorGradeUrl);
+        String tumorGradeUrl = "/PDMR/raw/PDMR_TUMORGRADES.json";
+        JsonNode tumorGrades = util.readJsonLocal(this.dataRootDir+ tumorGradeUrl);
 
-        JsonNode currentTherapies = util.readJsonLocal(this.dataRootDir+currentTherapyUrl);
+        String currentTherapyUrl = "/PDMR/raw/PDMR_CURRENTTHERAPY.json";
+        JsonNode currentTherapies = util.readJsonLocal(this.dataRootDir+ currentTherapyUrl);
 
-        JsonNode standardRegimens = util.readJsonLocal(this.dataRootDir+standardRegimensUrl);
+        String standardRegimensUrl = "/PDMR/raw/PDMR_STANDARDIZEDREGIMENS.json";
+        JsonNode standardRegimens = util.readJsonLocal(this.dataRootDir+ standardRegimensUrl);
 
-        JsonNode clinicalResponses = util.readJsonLocal(this.dataRootDir+clinicalResponseUrl);
+        String clinicalResponseUrl = "/PDMR/raw/PDMR_CLINICALRESPONSES.json";
+        JsonNode clinicalResponses = util.readJsonLocal(this.dataRootDir+ clinicalResponseUrl);
 
-        JsonNode priorTherapies = util.readJsonLocal(this.dataRootDir+priorTherapyUrl);
+        String priorTherapyUrl = "/PDMR/raw/PDMR_PRIORTHERAPIES.json";
+        JsonNode priorTherapies = util.readJsonLocal(this.dataRootDir+ priorTherapyUrl);
 
-        JsonNode patientInfo = util.readJsonLocal(this.dataRootDir+patientInfoUrl);
+        String patientInfoUrl = "/PDMR/raw/PDMR_PATIENTINFO.json";
+        JsonNode patientInfo = util.readJsonLocal(this.dataRootDir+ patientInfoUrl);
         List<Map<String, Object>> patientList = mapper.convertValue(patientInfo, List.class);
 
 
@@ -224,6 +207,7 @@ public class TransformerService {
             strain = "";
             mouseSex = "";
             engraftmentSite = "";
+            String DATASOURCE_URL_PREFIX = "https://pdmdb.cancer.gov/pls/apex/f?p=101:4:0::NO:4:P4_SPECIMENSEQNBR:";
             sourceUrl = DATASOURCE_URL_PREFIX + specimenSearch.get("SPECIMENSEQNBR");
             extractionMethod = "";
             dateAtCollection = "";
@@ -659,13 +643,13 @@ public class TransformerService {
         for (Treatment treatment : treatments){
 
             try{
-                if (!treatment.getCurrentDrug().equals(null)){
+                if (!(treatment.getCurrentDrug() == null)){
                     drugLista += util.splitText(treatment.getCurrentDrug(),"\\+","\n");
                 }
             }catch (Exception e){}
 
             try{
-                if (!treatment.getPriorDrug().equals(null)){
+                if (!(treatment.getPriorDrug() == null)){
                     drugLista += util.splitText(treatment.getPriorDrug(),"\\+","\n");
                 }
             }catch (Exception e){}

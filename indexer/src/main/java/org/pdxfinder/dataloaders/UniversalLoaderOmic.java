@@ -505,7 +505,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 }
             }
 
-            if (passage.equals(null)){
+            if (passage == null){
                 log.error("Passage not found for Xenograft Sample {} both in the data File and database, Wrong Data", sampleId);
             }
         }
