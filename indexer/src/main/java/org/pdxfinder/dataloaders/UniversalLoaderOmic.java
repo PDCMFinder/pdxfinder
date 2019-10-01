@@ -42,7 +42,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
         reportManager = (ReportManager) context.getBean("ReportManager");
 
-        log.info("Loading {} data for model {} ", dataType, modelCreation.getSourcePdxId());
+        log.trace("Loading {} data for model {} ", dataType, modelCreation.getSourcePdxId());
 
         List<Map<String, String>> dataList = new ArrayList<>();
 
