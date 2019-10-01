@@ -332,7 +332,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             boolean foundSpecimen = false;
 
-            if(sampleOrigin.toLowerCase().equals("patient tumor")){
+            if(sampleOrigin.toLowerCase().equals("patient tumor") || sampleOrigin.toLowerCase().equals("patient")){
 
                 Sample patientSample = modelCreation.getSample();
                 patientSample.setSourceSampleId(sampleId);
