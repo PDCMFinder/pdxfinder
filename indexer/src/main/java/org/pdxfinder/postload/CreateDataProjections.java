@@ -846,7 +846,6 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                             if (molc.getPlatform() != null && !molc.getType().isEmpty()) {
                                 String platformName = molc.getPlatform().getName();
 
-                                //if (dataImportService.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), mc.getDataSource(), platformName) > 0) {
 
                                 if (molc.getType().toLowerCase().equals("mutation")) {
 
