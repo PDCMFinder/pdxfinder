@@ -1,12 +1,10 @@
-package org.pdxfinder.preloader;
+package org.pdxfinder.preload;
 
 import org.junit.*;
 
 import org.mockito.Mock;
-import org.pdxfinder.preload.OmicDataCrawler;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +14,7 @@ import java.util.List;
 import static org.mockito.Mockito.mock;
 
 
-public class OmicDataCrawlerTests {
+public class OmicCrawlerTests {
 
     private String finderRootDir;
 
@@ -117,7 +115,7 @@ public class OmicDataCrawlerTests {
 
     private List<File> initCrawlersAndPassRootFile(File rootDir){
 
-        OmicDataCrawler crawler = new OmicDataCrawler();
+        OmicCrawler crawler = new OmicCrawler();
         return crawler.searchFileTreeForOmicData(rootDir);
     }
 }

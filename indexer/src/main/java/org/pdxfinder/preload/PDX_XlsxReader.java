@@ -18,9 +18,9 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CustomXlsxReader {
+public class PDX_XlsxReader {
 
-    Logger log = LoggerFactory.getLogger(CustomXlsxReader.class);
+    Logger log = LoggerFactory.getLogger(PDX_XlsxReader.class);
 
     Optional<Workbook> xslxSheet;
     List<List<String>> sheetData = null;
@@ -115,7 +115,7 @@ public class CustomXlsxReader {
     }
 
     private static String cleanFloat(String floatValue) {
-        String regex = "(\\d.+)\\.\\d";
+        String regex = "(\\d.+)\\.[0]+";
         return floatValue.replaceAll(regex, "$1");
     }
 

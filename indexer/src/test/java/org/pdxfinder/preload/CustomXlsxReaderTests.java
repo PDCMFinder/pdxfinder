@@ -1,4 +1,4 @@
-package org.pdxfinder.preloader;
+package org.pdxfinder.preload;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -8,7 +8,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.pdxfinder.preload.CustomXlsxReader;
 
 
 import java.util.List;
@@ -25,7 +24,7 @@ public class CustomXlsxReaderTests {
     private String moreSpaces = "    ";
     private String blank = "";
 
-    CustomXlsxReader xlsxReader = new CustomXlsxReader();
+    PDX_XlsxReader xlsxReader = new PDX_XlsxReader();
 
     @Before
     public void init(){

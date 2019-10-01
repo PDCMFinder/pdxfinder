@@ -1,8 +1,7 @@
-package org.pdxfinder.preloader;
+package org.pdxfinder.preload;
 
 import org.junit.Test;
 import org.pdxfinder.BaseTest;
-import org.pdxfinder.preload.PDXLiftOver;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

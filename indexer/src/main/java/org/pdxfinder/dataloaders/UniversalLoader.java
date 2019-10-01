@@ -7,7 +7,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.pdxfinder.graph.dao.*;
-import org.pdxfinder.preload.CustomXlsxReader;
+import org.pdxfinder.preload.PDX_XlsxReader;
 import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
@@ -178,7 +178,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 //getCellTypeEnum will be renamed to getCellType starting from version 4.0
 
                 String value = null;
-                value = CustomXlsxReader.getString(currentCell, value);
+                value = PDX_XlsxReader.getString(currentCell, value);
 
                 dataRow.add(value);
             }

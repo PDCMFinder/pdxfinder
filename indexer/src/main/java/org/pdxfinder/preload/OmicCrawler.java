@@ -1,28 +1,20 @@
 package org.pdxfinder.preload;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import tech.tablesaw.api.Table;
-import tech.tablesaw.io.xlsx.*;
-
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class OmicDataCrawler {
+public class OmicCrawler {
 
-    Logger log = LoggerFactory.getLogger(OmicDataCrawler.class);
+    Logger log = LoggerFactory.getLogger(OmicCrawler.class);
 
-    public ArrayList<File>  CrawlVariantDataFiles() throws IOException {
+    public ArrayList<File> run(File UPDOG) throws IOException {
 
-        return searchFileTreeForOmicData(new File("/home/afollette/Documents/data/UPDOG"));
+        return searchFileTreeForOmicData(UPDOG);
     }
 
     public ArrayList<File> searchFileTreeForOmicData(File rootDir) {
