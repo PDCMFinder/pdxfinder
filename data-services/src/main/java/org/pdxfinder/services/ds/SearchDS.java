@@ -232,6 +232,7 @@ public class SearchDS {
         datasetAvailableOptions.add(new FacetOption("Copy Number Alteration", "Copy_Number_Alteration"));
         datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
         datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
+        datasetAvailableOptions.add(new FacetOption("Transcriptomics", "Transcriptomics"));
 
         OneParamCheckboxFilter datasetAvailable = new OneParamCheckboxFilter("DATASET AVAILABLE", "data_available", false, FilterType.OneParamCheckboxFilter.get(),
                 datasetAvailableOptions, new ArrayList<>());

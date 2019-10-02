@@ -8,17 +8,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.admin.pojos.MappingContainer;
+import org.pdxfinder.services.mapping.MappingContainer;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.repositories.OntologyTermRepository;
 import org.pdxfinder.rdbms.dao.MappingEntity;
-import org.pdxfinder.admin.zooma.*;
 import org.pdxfinder.graph.repositories.SampleRepository;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.dto.PaginationDTO;
 import org.pdxfinder.services.mapping.CSV;
 import org.pdxfinder.services.mapping.MappingEntityType;
 import org.pdxfinder.services.mapping.Status;
+import org.pdxfinder.services.zooma.*;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -929,13 +928,15 @@ public class MappingService {
         MappingEntity mappingEntity = mappingEntityRepository.findByEntityId(id).get();
 
         //Get suggestions only if mapped term is missing
-        if (mappingEntity.getMappedTermLabel().equals("-")) {
+        MappingContainer mappingContainer = getMappedEntitiesByType(mappingEntity.getEntityType());
 
-            mappingEntity
-                    .setSuggestedMappings(getSuggestionsForUnmappedEntity(
-                            mappingEntity,
-                            getMappedEntitiesByType(mappingEntity.getEntityType())));
-        }
+        // Remove present mappingEntity from mappingContainer to be used for suggestion
+        mappingContainer.getMappings().remove(mappingEntity.getMappingKey());
+
+        mappingEntity
+                .setSuggestedMappings(getSuggestionsForUnmappedEntity(
+                        mappingEntity,
+                        mappingContainer));
 
         return mappingEntity;
     }

@@ -523,6 +523,10 @@ public class DetailsService {
                 tableHeadersSet.add("hgncsymbol");
             }
 
+            if(ma.getZscore() != null && !ma.getZscore().isEmpty()){
+                tableHeadersSet.add("zscore");
+            }
+
             if(ma.getAminoAcidChange() != null && !ma.getAminoAcidChange().isEmpty()){
                 tableHeadersSet.add("aminoacidchange");
             }
@@ -713,6 +717,11 @@ public class DetailsService {
             tableHeaders.add("Ncbi Gene Id");
         }
 
+
+        if(tableHeadersSet.contains("zscore")){
+            tableHeaders.add("Z-Score");
+        }
+
         if(tableHeadersSet.contains("genomeassembly")){
             tableHeaders.add("Genome Assembly");
         }
@@ -817,6 +826,10 @@ public class DetailsService {
 
             if(tableHeadersSet.contains("ncbigeneid")){
                 row.add((ma.getMarker().getNcbiGeneId() == null ? "" : ma.getMarker().getNcbiGeneId()));
+            }
+
+            if(tableHeadersSet.contains("zscore")){
+                row.add((ma.getZscore() == null ? "" : ma.getZscore()));
             }
 
             if(tableHeadersSet.contains("genomeassembly")){

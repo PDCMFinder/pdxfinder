@@ -44,6 +44,7 @@ public class MarkerAssociation {
     private String readDepth;
     private String alleleFrequency;
     private String genomeAssembly; //NCBI_build in ircc
+    private String zscore;
 
     private String seqStartPosition;
     private String seqEndPosition;
@@ -260,6 +261,14 @@ public class MarkerAssociation {
      */
     public void setGenomeAssembly(String genomeAssembly) {
         this.genomeAssembly = genomeAssembly;
+    }
+
+    public String getZscore() {
+        return zscore;
+    }
+
+    public void setZscore(String zscore) {
+        this.zscore = zscore;
     }
 
     public String getSeqStartPosition() {

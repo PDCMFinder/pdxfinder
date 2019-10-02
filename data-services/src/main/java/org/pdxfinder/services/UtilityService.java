@@ -766,7 +766,9 @@ public class UtilityService {
             BufferedReader br = new BufferedReader(new FileReader(jsonFileLink));
             jsonNode = mapper.readTree(br);
 
-        }catch (Exception e) {}
+        }catch (Exception e) {
+            log.error("Hey, could not read local directory: {}", jsonFileLink);
+        }
 
         return jsonNode;
     }
@@ -1035,6 +1037,19 @@ public class UtilityService {
             result.add(dataMap);
         }
         return result;
+    }
+
+
+
+    public JsonNode jsonStringToNode(String jsonString){
+
+        JsonNode jsonNode = null;
+
+        try {
+            jsonNode = mapper.readTree(jsonString);
+        } catch (Exception e) { }
+
+        return jsonNode;
     }
 
 

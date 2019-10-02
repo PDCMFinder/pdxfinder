@@ -42,6 +42,8 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
         reportManager = (ReportManager) context.getBean("ReportManager");
 
+        log.trace("Loading {} data for model {} ", dataType, modelCreation.getSourcePdxId());
+
         List<Map<String, String>> dataList = new ArrayList<>();
 
         String omicDir = null;
@@ -314,7 +316,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         log.info("Saving existing molchars for model "+modelID);
         for(Map.Entry<String, MolecularCharacterization> mcEntry : existingMolcharNodes.entrySet()){
 
-               dataImportService.saveMolecularCharacterization(mcEntry.getValue());
+            dataImportService.saveMolecularCharacterization(mcEntry.getValue());
 
         }
 
@@ -449,6 +451,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         ma.setIlluminaHGEAProbeId(data.get(illuminaHGEAProbeId));
         ma.setIlluminaHGEAExpressionValue(data.get(illuminaHGEAExpressionValue));
         ma.setGenomeAssembly(data.get(omicGenomeAssembly));
+        ma.setZscore(data.get(omicZscore));
 
         ma.setMarker(marker);
 
@@ -502,7 +505,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 }
             }
 
-            if (passage.equals(null)){
+            if (passage == null){
                 log.error("Passage not found for Xenograft Sample {} both in the data File and database, Wrong Data", sampleId);
             }
         }
