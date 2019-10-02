@@ -170,7 +170,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
         if (file.exists()) {
 
-            Platform pl = dataImportService.getPlatform("ImmunoHistoChemistry", dto.getProviderGroup());
+            Platform pl = dataImportService.getPlatform("immunohistochemistry","cytogenetics", dto.getProviderGroup());
 
             String currentLine = "";
             int currentLineCounter = 1;
