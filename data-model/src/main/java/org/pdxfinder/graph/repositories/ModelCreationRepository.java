@@ -2,6 +2,7 @@ package org.pdxfinder.graph.repositories;
 
 import org.pdxfinder.graph.dao.ModelCreation;
 import org.pdxfinder.graph.dao.MolecularCharacterization;
+import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.dao.TreatmentSummary;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
@@ -47,9 +48,9 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     int getModelCountByDataSource(@Param("datasource") String dataSource);
 
     @Query("MATCH (s:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
-            "WHERE s.sourceSampleId = {sampleId} " +
+            "WHERE id(s) = {sample} " +
             "RETURN mod")
-    ModelCreation findBySampleId(@Param("sampleId") String sampleId);
+    ModelCreation findBySample(@Param("sample") Sample sample);
 
 
     //disable filtering on markers
