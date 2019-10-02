@@ -1003,6 +1003,7 @@ public class DataImportService {
             p.setGroup(group);
             p.setType(type);
             p.setUrl(platformUrl);
+            platformRepository.save(p);
         }
 
         return p;
