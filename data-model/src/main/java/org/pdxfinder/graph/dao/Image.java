@@ -3,13 +3,17 @@ package org.pdxfinder.graph.dao;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 /**
  * Created by jmason on 06/06/2017.
  */
 @NodeEntity
 public class Image {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     Long id;
 
     private String url;

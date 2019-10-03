@@ -3,13 +3,17 @@ package org.pdxfinder.graph.dao;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 /**
  * Represents a background strain
  */
 @NodeEntity
 public class HostStrain {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
 
     /**

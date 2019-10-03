@@ -3,14 +3,18 @@ package org.pdxfinder.graph.dao;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 /**
  * Created by jmason on 17/03/2017.
  */
 @NodeEntity
 public class QualityAssurance {
 
-    @GraphId
-    Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
     private String technology;
     private String description;

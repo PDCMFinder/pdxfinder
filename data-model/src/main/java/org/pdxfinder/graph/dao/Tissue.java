@@ -3,13 +3,17 @@ package org.pdxfinder.graph.dao;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 /**
  * Tissue represents a human tissue associated with a tumor
  */
 @NodeEntity
 public class Tissue {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String name;

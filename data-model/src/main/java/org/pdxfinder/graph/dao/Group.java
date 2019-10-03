@@ -7,11 +7,15 @@ package org.pdxfinder.graph.dao;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 
 @NodeEntity
 public class Group {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String name; //The name of the group, ie: The Jackson Laboratory

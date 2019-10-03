@@ -4,6 +4,8 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +26,8 @@ public class TreatmentProtocol {
      * @param passages                  The list of passages at which this treatment was applied
      */
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
 
     @Relationship(type = "TREATMENT_COMPONENT")

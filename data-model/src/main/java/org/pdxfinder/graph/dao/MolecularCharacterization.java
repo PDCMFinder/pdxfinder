@@ -5,6 +5,8 @@ import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +16,9 @@ import java.util.List;
 @NodeEntity
 public class MolecularCharacterization {
 
-    @GraphId
-    Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
     @Deprecated
     private String technology;

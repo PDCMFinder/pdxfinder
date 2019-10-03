@@ -4,6 +4,8 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,7 +17,8 @@ import java.util.Set;
 @NodeEntity
 public class Sample {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String sourceSampleId;
