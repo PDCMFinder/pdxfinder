@@ -92,7 +92,8 @@ public class ModelDetails {
 
         List<Integer> intList = new ArrayList<>();
         for(String p : passages){
-            intList.add(Integer.valueOf(p));
+
+            if(!p.equals("")) intList.add(Integer.valueOf(p));
         }
 
         Collections.sort(intList);

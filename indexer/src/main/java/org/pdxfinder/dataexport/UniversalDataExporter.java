@@ -256,18 +256,21 @@ public class UniversalDataExporter {
             String modelId = model.getSourcePdxId();
 
             String pubmedIDs = "";
-            for(Group g : model.getGroups()){
+            if(model.getGroups() != null){
 
-                if(g.getType().equals("Publication")){
+                for(Group g : model.getGroups()){
 
-                    if(!pubmedIDs.equals("")){
-                        pubmedIDs += ",";
+                    if(g.getType().equals("Publication")){
+
+                        if(!pubmedIDs.equals("")){
+                            pubmedIDs += ",";
+                        }
+
+                        pubmedIDs += g.getPubMedId();
                     }
-
-                    pubmedIDs += g.getPubMedId();
                 }
-
             }
+
 
 
             Map<String, ModelDetails> specimenMap = new HashMap<>();
@@ -280,10 +283,26 @@ public class UniversalDataExporter {
                 String hostStrainName = specimen.getHostStrain().getName();
                 String hostStrainNomenclature = specimen.getHostStrain().getSymbol();
 
-                String engraftmentSite = specimen.getEngraftmentSite().getName();
-                String engraftmentType = specimen.getEngraftmentType().getName();
-                String engraftmentMaterial = specimen.getEngraftmentMaterial().getName();
-                String engraftmentMaterialStatus = specimen.getEngraftmentMaterial().getState();
+                String engraftmentSite = "Not Specified";
+
+                if(specimen.getEngraftmentSite() != null ){
+                    engraftmentSite = specimen.getEngraftmentSite().getName();
+                }
+
+                String engraftmentType ="Not Specified";
+
+                if(specimen.getEngraftmentType() != null){
+                   engraftmentType = specimen.getEngraftmentType().getName();
+                }
+
+                String engraftmentMaterial ="Not Specified";
+                String engraftmentMaterialStatus = "Not Specified";
+
+                if(specimen.getEngraftmentMaterial() != null){
+                    engraftmentMaterial = specimen.getEngraftmentMaterial().getName();
+                    engraftmentMaterialStatus = specimen.getEngraftmentMaterial().getState();
+                }
+
 
                 String specimenMapKey = hostStrainName + hostStrainNomenclature + engraftmentSite + engraftmentType + engraftmentMaterial + engraftmentMaterialStatus;
 
