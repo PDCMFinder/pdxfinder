@@ -335,6 +335,10 @@ public class DataImportService {
         return this.modelCreationRepository.findModelsWithSpecimensAndQAByDS(ds);
     }
 
+    public List<ModelCreation> findModelsWithSharingAndContactByDS(String ds){
+
+        return modelCreationRepository.findModelsWithSharingAndContactByDS(ds);
+    }
 
     public ModelCreation findModelByIdAndDataSource(String modelId, String dataSource){
 

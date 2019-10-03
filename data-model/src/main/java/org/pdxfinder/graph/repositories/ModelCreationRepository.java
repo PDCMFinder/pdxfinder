@@ -50,6 +50,16 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN model, spr, sp, hsr, hs, itr, isr, it, is, qar, qa, url, ext_url, ism, im ORDER by model.sourcePdxId")
     List<ModelCreation> findModelsWithSpecimensAndQAByDS(@Param("ds") String ds);
 
+
+    @Query("MATCH (model:ModelCreation) WHERE model.dataSource = {ds} " +
+            "WITH model " +
+
+            "OPTIONAL MATCH (model)-[url:EXTERNAL_URL]-(ext_url:ExternalUrl) "+
+            "OPTIONAL MATCH (model)-[gr:GROUP]-(g:Group) "+
+
+            "RETURN model, url, ext_url, gr, g ORDER by model.sourcePdxId")
+    List<ModelCreation> findModelsWithSharingAndContactByDS(@Param("ds") String ds);
+
     @Query("MATCH (model:ModelCreation) WHERE model.sourcePdxId = {modelId} AND model.dataSource = {dataSource} RETURN model ")
     ModelCreation findBySourcePdxIdAndDataSource(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
 

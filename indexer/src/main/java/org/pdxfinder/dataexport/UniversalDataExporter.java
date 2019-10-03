@@ -263,11 +263,13 @@ public class UniversalDataExporter {
 
         for(ModelCreation model : models){
 
-            List<String> dataRow = new ArrayList<>();
+
 
             String modelId = model.getSourcePdxId();
 
             for(QualityAssurance qa : model.getQualityAssurance()){
+
+                List<String> dataRow = new ArrayList<>();
 
                 String validationTechnique = qa.getTechnology();
                 String validationDescription = qa.getDescription();
@@ -290,6 +292,110 @@ public class UniversalDataExporter {
     private void initSharingAndContact(){
 
         if (ds == null) return;
+
+        List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(ds.getAbbreviation());
+
+        for(ModelCreation model : models){
+
+
+            String modelId = model.getSourcePdxId();
+
+            Group providerGroup  = ds;
+            Group accessGroup = null;
+            Group projectGroup = null;
+
+            if(model.getGroups() != null){
+
+                for(Group g : model.getGroups()){
+
+                    if(g.getType().equals("Provider")){
+                        providerGroup = g;
+                    }
+                    else if(g.getType().equals("Project")){
+                        projectGroup = g;
+                    }
+                    else if(g.getType().equals("Accessibility")){
+                        accessGroup = g;
+                    }
+                }
+
+            }
+
+
+            String providerType = "";
+            String providerName = "";
+            String providerAbbrev = "";
+
+            if(providerGroup != null){
+
+                providerType = providerGroup.getProviderType();
+                providerName = providerGroup.getName();
+                providerAbbrev = providerGroup.getAbbreviation();
+            }
+
+            String modelAccessibility = "";
+            String accessModalities = "";
+
+            if(accessGroup != null){
+
+                modelAccessibility = accessGroup.getAccessibility();
+                accessModalities = accessGroup.getAccessModalities();
+            }
+
+            String projectName = "";
+
+            if(projectGroup != null){
+
+                projectName = projectGroup.getName();
+            }
+
+            String contactEmail = "";
+            String contactName = "";
+            String contactLink = "";
+            String modelLink = "";
+
+            for(ExternalUrl ex: model.getExternalUrls()){
+
+                if(ex.getType().equals("contact")){
+
+                    if(ex.getUrl()!= null && ex.getUrl().contains("@")){
+                        contactEmail = ex.getUrl();
+                    }
+                    else{
+                        contactLink = ex.getUrl();
+                    }
+                }
+
+
+                if(ex.getType().equals("source")){
+
+                    if(ex.getUrl()!= null){
+                        modelLink = ex.getUrl();
+                    }
+                }
+            }
+
+
+            List<String> dataRow = new ArrayList<>();
+
+            dataRow.add(modelId);
+            dataRow.add(providerType);
+            dataRow.add(modelAccessibility);
+            dataRow.add(accessModalities);
+            dataRow.add(contactEmail);
+            dataRow.add(contactName);
+            dataRow.add(contactLink);
+            dataRow.add(modelLink);
+            dataRow.add(providerName);
+            dataRow.add(providerAbbrev);
+            dataRow.add(projectName);
+
+            sharingAndContactSheetData.add(dataRow);
+
+
+        }
+
+
     }
 
 
