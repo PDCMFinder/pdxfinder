@@ -233,8 +233,13 @@ public class UniversalDataExporter {
                     String treatmentNaive = patientSnapshot.getTreatmentNaive();
                     String isPatientTreated = "";
                     String wasPatientTreated = "";
-                    String modelId = dataImportService.findModelBySample(sample).getSourcePdxId();
-
+                    String modelId = "";
+                    try {
+                        modelId = dataImportService.findModelBySample(sample).getSourcePdxId();
+                    }
+                    catch (Exception e){
+                        log.error("Sample: "+sampleId);
+                    }
 
                     dataRow.add(patientId);
                     dataRow.add(sampleId);

@@ -66,7 +66,7 @@ public class ExportDataToTemplate implements CommandLineRunner {
     private void export(){
 
 
-        Group traceDS = dataImportService.findProviderGroupByAbbrev("TRACE");
+        Group traceDS = dataImportService.findProviderGroupByAbbrev("JAX");
 
         UniversalDataExporter downDog = new UniversalDataExporter(dataImportService, utilityService);
         downDog.setTemplateFile(finderRootDir + "/template/metadata.xlsx");

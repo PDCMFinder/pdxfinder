@@ -571,7 +571,7 @@ public class DataImportService {
         TumorType type = this.getTumorType(typeStr);
         Tissue origin = this.getTissue(originStr);
         Tissue sampleSite = this.getTissue(sampleSiteStr);
-        Sample sample = sampleRepository.findBySourceSampleIdAndDataSource(sourceSampleId, dataSource);
+        Sample sample = sampleRepository.findHumanSampleBySampleIdAndDataSource(sourceSampleId, dataSource);
 
         String updatedDiagnosis = diagnosis;
 
