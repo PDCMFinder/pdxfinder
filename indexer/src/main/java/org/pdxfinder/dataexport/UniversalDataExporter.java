@@ -238,11 +238,8 @@ public class UniversalDataExporter {
                     patientTumorSheetData.add(dataRow);
                 }
             }
-
-
-
         }
-        log.info("");
+
     }
 
 
@@ -319,12 +316,7 @@ public class UniversalDataExporter {
 
                 pdxModelSheetData.add(dataRow);
             }
-
-
-
         }
-
-
     }
 
     private void initPdxModelValidations(){
@@ -334,8 +326,6 @@ public class UniversalDataExporter {
         List<ModelCreation> models = dataImportService.findModelsWithSpecimensAndQAByDS(ds.getAbbreviation());
 
         for(ModelCreation model : models){
-
-
 
             String modelId = model.getSourcePdxId();
 
@@ -463,17 +453,20 @@ public class UniversalDataExporter {
             dataRow.add(projectName);
 
             sharingAndContactSheetData.add(dataRow);
-
-
         }
-
-
     }
 
 
     private void initLoaderRelatedData(){
 
         if (ds == null) return;
+
+        List<String> dataRow = new ArrayList<>();
+        dataRow.add(ds.getName());
+        dataRow.add(ds.getAbbreviation());
+        dataRow.add(ds.getUrl());
+
+        loaderRelatedDataSheetData.add(dataRow);
 
     }
 
