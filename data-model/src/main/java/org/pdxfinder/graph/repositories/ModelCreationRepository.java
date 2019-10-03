@@ -38,16 +38,17 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     ModelCreation findByDataSourceAndSourcePdxId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
 
     @Query("MATCH (model:ModelCreation) WHERE model.dataSource = {ds} " +
-            "WITH model " +
+            "WITH model ORDER by model.sourcePdxId" +
             "OPTIONAL MATCH (model)-[spr:SPECIMENS]-(sp:Specimen)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
             "OPTIONAL MATCH (model)-[qar:QUALITY_ASSURED_BY]-(qa:QualityAssurance) "+
             "OPTIONAL MATCH (model)-[url:EXTERNAL_URL]-(ext_url:ExternalUrl) "+
-            "WITH model, spr, sp, hsr, hs, qar, qa, url, ext_url " +
+            "OPTIONAL MATCH (model)-[gr:GROUP]-(g:Group) "+
+            "WITH model, spr, sp, hsr, hs, qar, qa, url, ext_url, gr, g " +
             "OPTIONAL MATCH (sp)-[itr:ENGRAFTMENT_TYPE]-(it:EngraftmentType) "+
             "OPTIONAL MATCH (sp)-[isr:ENGRAFTMENT_SITE]-(is:EngraftmentSite) "+
             "OPTIONAL MATCH (sp)-[ism:ENGRAFTMENT_MATERIAL]-(im:EngraftmentMaterial) "+
 
-            "RETURN model, spr, sp, hsr, hs, itr, isr, it, is, qar, qa, url, ext_url, ism, im ORDER by model.sourcePdxId")
+            "RETURN model, spr, sp, hsr, hs, itr, isr, it, is, qar, qa, url, ext_url, ism, im, gr, g ")
     List<ModelCreation> findModelsWithSpecimensAndQAByDS(@Param("ds") String ds);
 
 

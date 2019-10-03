@@ -13,9 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.util.ArrayList;
-
-import java.util.List;
+import java.util.*;
 
 
 /*
@@ -252,6 +250,80 @@ public class UniversalDataExporter {
     private void initPdxModelDetails(){
 
         if (ds == null) return;
+
+
+        List<ModelCreation> models = dataImportService.findModelsWithSpecimensAndQAByDS(ds.getAbbreviation());
+
+        for(ModelCreation model : models){
+
+            String modelId = model.getSourcePdxId();
+
+            String pubmedIDs = "";
+            for(Group g : model.getGroups()){
+
+                if(g.getType().equals("Publication")){
+
+                    if(!pubmedIDs.equals("")){
+                        pubmedIDs += ",";
+                    }
+
+                    pubmedIDs += g.getPubMedId();
+                }
+
+            }
+
+
+            Map<String, ModelDetails> specimenMap = new HashMap<>();
+
+            for(Specimen specimen : model.getSpecimens()){
+
+
+                String passage = specimen.getPassage();
+
+                String hostStrainName = specimen.getHostStrain().getName();
+                String hostStrainNomenclature = specimen.getHostStrain().getSymbol();
+
+                String engraftmentSite = specimen.getEngraftmentSite().getName();
+                String engraftmentType = specimen.getEngraftmentType().getName();
+                String engraftmentMaterial = specimen.getEngraftmentMaterial().getName();
+                String engraftmentMaterialStatus = specimen.getEngraftmentMaterial().getState();
+
+                String specimenMapKey = hostStrainName + hostStrainNomenclature + engraftmentSite + engraftmentType + engraftmentMaterial + engraftmentMaterialStatus;
+
+
+                if(specimenMap.containsKey(specimenMapKey)){
+
+                    specimenMap.get(specimenMapKey).getPassages().add(passage);
+                }
+                else{
+
+                    ModelDetails md = new ModelDetails(hostStrainName, hostStrainNomenclature, engraftmentSite, engraftmentType, engraftmentMaterial, engraftmentMaterialStatus, passage);
+                    specimenMap.put(specimenMapKey, md);
+                }
+            }
+
+            for(Map.Entry<String, ModelDetails> entry : specimenMap.entrySet()){
+
+                ModelDetails md = entry.getValue();
+                List<String> dataRow = new ArrayList<>();
+
+                dataRow.add(modelId);
+                dataRow.add(md.getHostStrainName());
+                dataRow.add(md.getHostStrainNomenclature());
+                dataRow.add(md.getEngraftmentSite());
+                dataRow.add(md.getEngraftmentType());
+                dataRow.add(md.getEngraftmentMaterial());
+                dataRow.add(md.getEngraftmentMaterialStatus());
+                dataRow.add(md.getSortedPassages());
+                dataRow.add(pubmedIDs);
+
+                pdxModelSheetData.add(dataRow);
+            }
+
+
+
+        }
+
 
     }
 
