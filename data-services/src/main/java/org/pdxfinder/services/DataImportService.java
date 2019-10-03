@@ -330,6 +330,12 @@ public class DataImportService {
         return this.modelCreationRepository.findAllModels();
     }
 
+    public List<ModelCreation> findModelsWithSpecimensAndQAByDS(String ds){
+
+        return this.modelCreationRepository.findModelsWithSpecimensAndQAByDS(ds);
+    }
+
+
     public ModelCreation findModelByIdAndDataSource(String modelId, String dataSource){
 
         return modelCreationRepository.findBySourcePdxIdAndDataSource(modelId, dataSource);

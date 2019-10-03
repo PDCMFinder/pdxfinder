@@ -1,27 +1,22 @@
 package org.pdxfinder.dataexport;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.pdxfinder.graph.dao.Group;
-import org.pdxfinder.graph.dao.Patient;
-import org.pdxfinder.graph.dao.PatientSnapshot;
-import org.pdxfinder.graph.dao.Sample;
+import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Iterator;
+
 import java.util.List;
-import java.util.Optional;
+
 
 /*
  * Created by csaba on 02/10/2019.
@@ -85,19 +80,29 @@ public class UniversalDataExporter {
 
     public void export(String exportFile){
 
-
+        //:: Methods to initialize the data lists
         initPatientData();
         initPatientTumorAtCollection();
+        initPdxModelDetails();
+        initPdxModelValidations();
+        initSharingAndContact();
+        initLoaderRelatedData();
 
+        //get the template with the headers
         Workbook workbook = getWorkbook(templateFile);
 
+        //insert data from the datalists to the template
         if(workbook != null){
 
             updateSheetWithData(workbook.getSheetAt(1), patientSheetData);
             updateSheetWithData(workbook.getSheetAt(2), patientTumorSheetData);
+            updateSheetWithData(workbook.getSheetAt(3), pdxModelSheetData);
+            updateSheetWithData(workbook.getSheetAt(4), pdxModelValidationSheetData);
+            updateSheetWithData(workbook.getSheetAt(5), sharingAndContactSheetData);
+            updateSheetWithData(workbook.getSheetAt(6), loaderRelatedDataSheetData);
         }
 
-        // Write the output to a file
+        // Write the output to a new file
         FileOutputStream fileOut = null;
         try {
             fileOut = new FileOutputStream(exportFile);
@@ -117,37 +122,7 @@ public class UniversalDataExporter {
 
 
 
-    private void updateSheetWithData(Sheet sheet, List<List<String>> data){
 
-        int startRow = 6;
-
-        for(int i = 0; i < data.size(); i++){
-
-            int rowIndex = startRow + i - 1;
-            sheet.createRow(rowIndex);
-
-            for(int j = 0; j < data.get(i).size(); j++){
-
-
-                int columnIndex = j +1;
-                sheet.getRow(rowIndex).createCell(columnIndex);
-
-
-                Cell cell = null;
-                try{
-                    cell = sheet.getRow(rowIndex).getCell(columnIndex);
-                    cell.setCellValue(data.get(i).get(j));
-                }
-                catch (Exception e){
-
-                    log.error("Exception in "+sheet.getSheetName()+" :"+ rowIndex+":"+columnIndex);
-                }
-
-
-            }
-        }
-
-    }
 
 
     private Workbook getWorkbook(String templatePath) {
@@ -261,20 +236,102 @@ public class UniversalDataExporter {
                     dataRow.add(isPatientTreated);
                     dataRow.add(wasPatientTreated);
                     dataRow.add(modelId);
+
+                    patientTumorSheetData.add(dataRow);
                 }
             }
 
-            patientTumorSheetData.add(dataRow);
+
 
         }
-
         log.info("");
+    }
+
+
+
+    private void initPdxModelDetails(){
+
+        if (ds == null) return;
+
+    }
+
+    private void initPdxModelValidations(){
+
+        if (ds == null) return;
+
+        List<ModelCreation> models = dataImportService.findModelsWithSpecimensAndQAByDS(ds.getAbbreviation());
+
+        for(ModelCreation model : models){
+
+            List<String> dataRow = new ArrayList<>();
+
+            String modelId = model.getSourcePdxId();
+
+            for(QualityAssurance qa : model.getQualityAssurance()){
+
+                String validationTechnique = qa.getTechnology();
+                String validationDescription = qa.getDescription();
+                String passages = qa.getPassages();
+                String nomenclature = qa.getValidationHostStrain();
+
+                dataRow.add(modelId);
+                dataRow.add(validationTechnique);
+                dataRow.add(validationDescription);
+                dataRow.add(passages);
+                dataRow.add(nomenclature);
+
+                pdxModelValidationSheetData.add(dataRow);
+
+            }
+        }
+    }
+
+
+    private void initSharingAndContact(){
+
+        if (ds == null) return;
+    }
+
+
+    private void initLoaderRelatedData(){
+
+        if (ds == null) return;
 
     }
 
 
 
 
+
+    private void updateSheetWithData(Sheet sheet, List<List<String>> data){
+
+        int startRow = 6;
+
+        for(int i = 0; i < data.size(); i++){
+
+            int rowIndex = startRow + i - 1;
+            sheet.createRow(rowIndex);
+
+            for(int j = 0; j < data.get(i).size(); j++){
+
+
+                int columnIndex = j +1;
+                sheet.getRow(rowIndex).createCell(columnIndex);
+
+
+                Cell cell = null;
+                try{
+                    cell = sheet.getRow(rowIndex).getCell(columnIndex);
+                    cell.setCellValue(data.get(i).get(j));
+                }
+                catch (Exception e){
+
+                    log.error("Exception in "+sheet.getSheetName()+" :"+ rowIndex+":"+columnIndex);
+                }
+            }
+        }
+
+    }
 
 
 }
