@@ -335,6 +335,11 @@ public class DataImportService {
         return this.modelCreationRepository.findModelsWithSpecimensAndQAByDS(ds);
     }
 
+    public List<ModelCreation> findModelXenograftPlatformSampleByDS(String ds){
+
+        return modelCreationRepository.findModelPlatformSampleByDS(ds);
+    }
+
     public List<ModelCreation> findModelsWithSharingAndContactByDS(String ds){
 
         return modelCreationRepository.findModelsWithSharingAndContactByDS(ds);

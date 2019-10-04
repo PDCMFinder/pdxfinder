@@ -28,7 +28,7 @@ public class UniversalDataExporter {
 
     protected DataImportService dataImportService;
 
-    protected String templateFile;
+    protected String templateDir;
 
     private List<List<String>> patientSheetData;
     private List<List<String>> patientTumorSheetData;
@@ -46,10 +46,9 @@ public class UniversalDataExporter {
 
     public UniversalDataExporter(DataImportService dataImportService, UtilityService utilityService) {
 
-        this.templateFile = templateFile;
+        this.templateDir = templateDir;
         this.dataImportService = dataImportService;
         this.utilityService = utilityService;
-
 
         patientSheetData = new ArrayList<>();
         patientTumorSheetData = new ArrayList<>();
@@ -57,6 +56,8 @@ public class UniversalDataExporter {
         pdxModelValidationSheetData = new ArrayList<>();
         sharingAndContactSheetData = new ArrayList<>();
         loaderRelatedDataSheetData = new ArrayList<>();
+
+        samplePlatformDescriptionSheetData = new ArrayList<>();
     }
 
 
@@ -68,15 +69,15 @@ public class UniversalDataExporter {
         this.ds = ds;
     }
 
-    public String getTemplateFile() {
-        return templateFile;
+    public String getTemplateDir() {
+        return templateDir;
     }
 
-    public void setTemplateFile(String templateFile) {
-        this.templateFile = templateFile;
+    public void setTemplateDir(String templateDir) {
+        this.templateDir = templateDir;
     }
 
-    public void export(String exportFile){
+    public void export(String exportDir){
 
         //:: Methods to initialize the data lists
         initPatientData();
@@ -86,26 +87,40 @@ public class UniversalDataExporter {
         initSharingAndContact();
         initLoaderRelatedData();
 
-        //get the template with the headers
-        Workbook workbook = getWorkbook(templateFile);
+        initSamplePlatformDescription();
+
+        //get the templates with the headers
+        Workbook metadataWorkbook = getWorkbook(templateDir+"/metadata_template.xlsx");
+        Workbook samplePlatformWorkbook = getWorkbook(templateDir+"/sampleplatform_template.xlsx");
 
         //insert data from the datalists to the template
-        if(workbook != null){
+        if(metadataWorkbook != null){
 
-            updateSheetWithData(workbook.getSheetAt(1), patientSheetData);
-            updateSheetWithData(workbook.getSheetAt(2), patientTumorSheetData);
-            updateSheetWithData(workbook.getSheetAt(3), pdxModelSheetData);
-            updateSheetWithData(workbook.getSheetAt(4), pdxModelValidationSheetData);
-            updateSheetWithData(workbook.getSheetAt(5), sharingAndContactSheetData);
-            updateSheetWithData(workbook.getSheetAt(6), loaderRelatedDataSheetData);
+            updateSheetWithData(metadataWorkbook.getSheetAt(1), patientSheetData);
+            updateSheetWithData(metadataWorkbook.getSheetAt(2), patientTumorSheetData);
+            updateSheetWithData(metadataWorkbook.getSheetAt(3), pdxModelSheetData);
+            updateSheetWithData(metadataWorkbook.getSheetAt(4), pdxModelValidationSheetData);
+            updateSheetWithData(metadataWorkbook.getSheetAt(5), sharingAndContactSheetData);
+            updateSheetWithData(metadataWorkbook.getSheetAt(6), loaderRelatedDataSheetData);
         }
+
+        if(samplePlatformWorkbook != null){
+
+            updateSheetWithData(samplePlatformWorkbook.getSheetAt(0), samplePlatformDescriptionSheetData);
+        }
+
 
         // Write the output to a new file
         FileOutputStream fileOut = null;
         try {
-            fileOut = new FileOutputStream(exportFile);
-            workbook.write(fileOut);
+            fileOut = new FileOutputStream(exportDir+"/metadata_export.xlsx");
+            metadataWorkbook.write(fileOut);
             fileOut.close();
+
+            fileOut = new FileOutputStream(exportDir+"/sampleplatform_export.xlsx");
+            samplePlatformWorkbook.write(fileOut);
+            fileOut.close();
+
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -490,6 +505,117 @@ public class UniversalDataExporter {
     }
 
 
+
+    private void initSamplePlatformDescription(){
+
+        if (ds == null) return;
+
+        List<ModelCreation> models = dataImportService.findModelXenograftPlatformSampleByDS(ds.getAbbreviation());
+
+        for(ModelCreation model : models){
+
+            String modelId = model.getSourcePdxId();
+
+
+            //get the patient sample related molchars first
+            if(model.getSample() != null){
+
+                if(model.getSample().getMolecularCharacterizations() != null){
+
+                    for(MolecularCharacterization mc : model.getSample().getMolecularCharacterizations()){
+
+                        List<String> dataRow = new ArrayList<>();
+
+                        dataRow.add(model.getSample().getSourceSampleId());
+                        dataRow.add("patient");
+                        dataRow.add("NA");
+                        dataRow.add("");
+                        dataRow.add(modelId);
+                        dataRow.add("");
+                        dataRow.add("");
+
+                        dataRow.add(mc.getType());
+                        dataRow.add(mc.getPlatform().getName());
+                        dataRow.add(mc.getTechnology());
+                        dataRow.add("");
+                        dataRow.add("");
+                        dataRow.add("");
+                        dataRow.add("");
+                        dataRow.add("");
+                        dataRow.add(mc.getPlatform().getUrl());
+
+                        samplePlatformDescriptionSheetData.add(dataRow);
+                    }
+                }
+            }
+
+            //then add the xenograft related molchars
+
+            if(model.getSpecimens() != null){
+
+                for(Specimen sp : model.getSpecimens()){
+
+                    String passage = sp.getPassage();
+
+                    String hostStrainName = "";
+                    String hostStrainNomenclature = "";
+
+                    if(sp.getHostStrain() != null){
+
+                        hostStrainName = (sp.getHostStrain().getName() == null?"":sp.getHostStrain().getName());
+                        hostStrainNomenclature = (sp.getHostStrain().getSymbol() == null?"":sp.getHostStrain().getSymbol());
+                    }
+
+
+                    Sample sample = sp.getSample();
+
+                    for(MolecularCharacterization mc : sample.getMolecularCharacterizations()){
+
+                        List<String> dataRow = new ArrayList<>();
+
+                        dataRow.add(sample.getSourceSampleId());
+                        dataRow.add("xenograft");
+                        dataRow.add(passage);
+                        dataRow.add("");
+                        dataRow.add(modelId);
+                        dataRow.add(hostStrainName);
+                        dataRow.add(hostStrainNomenclature);
+
+                        dataRow.add(mc.getType());
+                        dataRow.add(mc.getPlatform().getName());
+                        dataRow.add(mc.getTechnology());
+                        dataRow.add("");
+                        dataRow.add("");
+                        dataRow.add("");
+                        dataRow.add("");
+                        dataRow.add("");
+                        dataRow.add(mc.getPlatform().getUrl());
+
+                        samplePlatformDescriptionSheetData.add(dataRow);
+                    }
+
+
+
+
+
+
+                }
+
+
+
+
+
+            }
+
+
+        }
+
+
+        log.info("");
+
+
+
+    }
 
 
 
