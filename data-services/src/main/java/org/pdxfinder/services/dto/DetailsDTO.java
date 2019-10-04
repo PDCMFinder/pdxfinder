@@ -22,6 +22,7 @@ public class DetailsDTO {
     private String contactProviderUrl;
     private String viewDataAtLabel;
     private String viewDataAtUrl;
+    private String pubMedId;
 
 
     /************************

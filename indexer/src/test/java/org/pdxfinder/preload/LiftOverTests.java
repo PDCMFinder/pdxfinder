@@ -17,6 +17,6 @@ public class LiftOverTests extends BaseTest {
             {{
                 put("chr1", new int[]{10000, 10000});
             }};
-        pdxliftover.liftOverGenomeCoordinates(genomeCoordinates);
+        pdxliftover.liftOverCoordinates(genomeCoordinates);
     }
 }

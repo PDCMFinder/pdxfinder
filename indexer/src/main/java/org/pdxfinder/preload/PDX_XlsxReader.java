@@ -37,7 +37,21 @@ public class PDX_XlsxReader {
         return sheetData;
     }
 
-    public List<List<String>> iterateThroughSheet(Sheet xslxSheet) {
+    private Optional<Workbook> getWorkbook(File file) {
+
+        if (!file.exists()) return Optional.empty();
+
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
+            XSSFWorkbook workbook = new XSSFWorkbook(fileInputStream);
+            return Optional.of(workbook);
+
+        } catch (IOException e) {
+            log.error("There was a problem accessing the file: {}", e);
+        }
+        return Optional.empty();
+    }
+
+    protected List<List<String>> iterateThroughSheet(Sheet xslxSheet) {
 
         List<List<String>> listOfCellLists = new ArrayList<>();
 
@@ -110,27 +124,13 @@ public class PDX_XlsxReader {
         return value;
     }
 
-    private static String cleanSpaces(String stringToClean) {
-        return stringToClean.trim();
-    }
-
     private static String cleanFloat(String floatValue) {
         String regex = "(\\d.+)\\.[0]+";
         return floatValue.replaceAll(regex, "$1");
     }
 
-    public Optional<Workbook> getWorkbook(File file) {
-
-        if (!file.exists()) return Optional.empty();
-
-        try (FileInputStream fileInputStream = new FileInputStream(file)) {
-            XSSFWorkbook workbook = new XSSFWorkbook(fileInputStream);
-            return Optional.of(workbook);
-
-        } catch (IOException e) {
-            log.error("There was a problem accessing the file: {}", e);
-        }
-        return Optional.empty();
+        private static String cleanSpaces(String stringToClean) {
+        return stringToClean.trim();
     }
 
     private Sheet getSheet(Optional<Workbook> workbook) {
