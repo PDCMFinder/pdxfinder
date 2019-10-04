@@ -69,10 +69,10 @@ public class ExportDataToTemplate implements CommandLineRunner {
         Group traceDS = dataImportService.findProviderGroupByAbbrev("JAX");
 
         UniversalDataExporter downDog = new UniversalDataExporter(dataImportService, utilityService);
-        downDog.setTemplateFile(finderRootDir + "/template/metadata.xlsx");
+        downDog.setTemplateDir(finderRootDir + "/template");
 
         downDog.setDs(traceDS);
-        downDog.export("/Users/csaba/PDXFinder_testload/template/export1.xlsx");
+        downDog.export("/Users/csaba/PDXFinder_testload/template");
 
 
     }
