@@ -340,6 +340,11 @@ public class DataImportService {
         return modelCreationRepository.findModelPlatformSampleByDS(ds);
     }
 
+    public ModelCreation findModelWithMolecularDataByDSAndIdAndMolcharType(String dataSource, String modelId, String molcharType){
+
+        return modelCreationRepository.findModelWithMolecularDataByDSAndIdAndMolcharType(dataSource, modelId, molcharType);
+    }
+
     public List<ModelCreation> findModelsWithSharingAndContactByDS(String ds){
 
         return modelCreationRepository.findModelsWithSharingAndContactByDS(ds);

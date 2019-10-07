@@ -206,6 +206,20 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     List<ModelCreation> findModelPlatformSampleByDS(@Param("dataSource") String dataSource);
 
 
+    @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource}) and mod.sourcePdxId = {modelId} " +
+            "WITH mod " +
+            "OPTIONAL MATCH (mod)-[iir:IMPLANTED_IN]-(psamp:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
+            "WHERE mc.type = {type}  "+
+            "WITH mod, iir, psamp, cbr, mc, assoc, mAss, aw, m " +
+            "OPTIONAL MATCH (mod)-[spr:SPECIMENS]-(sp:Specimen)-[sfr:SAMPLED_FROM]-(s:Sample)-[cbr2:CHARACTERIZED_BY]-(mc2:MolecularCharacterization)-[assoc2:ASSOCIATED_WITH]->(mAss2:MarkerAssociation)-[aw2:MARKER]-(m2:Marker) " +
+            "WHERE mc2.type = {type} "+
+            "WITH mod, iir, psamp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, assoc, mAss, aw, m, assoc2, mAss2, aw2, m2 " +
+            "OPTIONAL MATCH (sp)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
+            "OPTIONAL MATCH (mc)-[pur:PLATFORM_USED]-(pl:Platform) " +
+            "OPTIONAL MATCH (mc2)-[pur2:PLATFORM_USED]-(pl2:Platform) " +
+            "RETURN mod, iir, psamp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, pur, pl, pur2, pl2, assoc, mAss, aw, m, assoc2, mAss2, aw2, m2, hsr, hs ")
+    ModelCreation findModelWithMolecularDataByDSAndIdAndMolcharType(@Param("dataSource") String dataSource, @Param("modelId") String modelId, @Param("type") String type);
+
     @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource})  " +
             "WITH mod SKIP {from} LIMIT {to}" +
             "MATCH (mod)-[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)--(ma:MarkerAssociation) " +

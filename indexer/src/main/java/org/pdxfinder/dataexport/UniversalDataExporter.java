@@ -41,6 +41,8 @@ public class UniversalDataExporter {
     private List<List<String>> loaderRelatedDataSheetData;
     private List<List<String>> drugDosingSheetData;
 
+    private List<List<String>> mutationSheetData;
+
     private Group ds;
 
 
@@ -58,6 +60,8 @@ public class UniversalDataExporter {
         loaderRelatedDataSheetData = new ArrayList<>();
 
         samplePlatformDescriptionSheetData = new ArrayList<>();
+
+        mutationSheetData = new ArrayList<>();
     }
 
 
@@ -80,6 +84,8 @@ public class UniversalDataExporter {
     public void export(String exportDir){
 
         //:: Methods to initialize the data lists
+
+        /*
         initPatientData();
         initPatientTumorAtCollection();
         initPdxModelDetails();
@@ -88,6 +94,10 @@ public class UniversalDataExporter {
         initLoaderRelatedData();
 
         initSamplePlatformDescription();
+*/
+        initMutationData();
+
+
 
         //get the templates with the headers
         Workbook metadataWorkbook = getWorkbook(templateDir+"/metadata_template.xlsx");
@@ -593,31 +603,123 @@ public class UniversalDataExporter {
 
                         samplePlatformDescriptionSheetData.add(dataRow);
                     }
-
-
-
-
-
-
                 }
-
-
-
-
-
             }
-
-
         }
-
-
-        log.info("");
-
-
 
     }
 
 
+    private void initMutationData(){
+
+        String molcharType = "mutation";
+
+        List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(ds.getAbbreviation());
+
+        for(ModelCreation m: models){
+
+            ModelCreation model = dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(ds.getAbbreviation(), m.getSourcePdxId(), molcharType);
+
+            String modelId = model.getSourcePdxId();
+
+            //check for molchars on patient sample
+            if(model.getSample() != null && model.getSample().getMolecularCharacterizations() != null){
+
+                String sampleId = model.getSample().getSourceSampleId();
+
+                for(MolecularCharacterization mc : model.getSample().getMolecularCharacterizations()){
+
+                    insertOmicDataToSheet(modelId, sampleId,"patient", molcharType, null, mc, mutationSheetData);
+                }
+            }
+
+            //then look for xenograft molchars
+            if(model.getSpecimens()!= null){
+
+                for(Specimen sp : model.getSpecimens()){
+
+                    if(sp.getSample() != null && sp.getSample().getMolecularCharacterizations() != null){
+
+                        String sampleId = sp.getSample().getSourceSampleId();
+
+                        for(MolecularCharacterization mc: sp.getSample().getMolecularCharacterizations()){
+
+                            insertOmicDataToSheet(modelId, sampleId,"xenograft", molcharType, sp, mc, mutationSheetData);
+                        }
+                    }
+                }
+                log.info("");
+            }
+
+
+
+        }
+    }
+
+
+
+
+
+
+
+    private void insertOmicDataToSheet(String modelId, String sampleId, String sampleOrigin, String molcharType, Specimen specimen, MolecularCharacterization mc, List<List<String>> sheetData){
+
+        for(MarkerAssociation ma: mc.getMarkerAssociations()){
+
+            List<String> rowData = new ArrayList<>();
+
+            rowData.add(modelId);
+            rowData.add(sampleId);
+            rowData.add(sampleOrigin);
+
+            if(sampleOrigin.equals("patient")){
+                //no passage, host strain for patient samples
+                rowData.add("");
+                rowData.add("");
+            }
+            else{
+
+                rowData.add(specimen.getHostStrain().getSymbol());
+                rowData.add(specimen.getPassage());
+            }
+
+            //then get the MA data inserted
+
+            if(molcharType.equals("mutation")){
+
+                rowData.add(ma.getAminoAcidChange());
+                rowData.add(ma.getNucleotideChange());
+                rowData.add(ma.getConsequence());
+                rowData.add(ma.getReadDepth());
+                rowData.add(ma.getAlleleFrequency());
+                rowData.add(ma.getChromosome());
+                rowData.add(ma.getSeqStartPosition());
+                rowData.add(ma.getRefAllele());
+                rowData.add(ma.getAltAllele());
+                rowData.add(ma.getMarker().getUcscGeneId());
+                rowData.add(ma.getMarker().getNcbiGeneId());
+                rowData.add(ma.getMarker().getEnsemblGeneId());
+                //no transcript id
+                rowData.add("");
+                rowData.add(ma.getRsIdVariants());
+                rowData.add(ma.getGenomeAssembly());
+                rowData.add(mc.getPlatform().getName());
+
+            }else if(molcharType.equals("copy number alteration")){
+
+
+            }
+
+            sheetData.add(rowData);
+
+
+
+
+
+
+        }
+
+    }
 
     private void updateSheetWithData(Sheet sheet, List<List<String>> data){
 
