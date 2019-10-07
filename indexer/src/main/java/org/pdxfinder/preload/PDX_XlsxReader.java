@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.neo4j.cypher.internal.compiler.v2_3.planner.logical.cardinality.DelegatingSelectivityEstimator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,27 +14,22 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PDX_XlsxReader {
 
     Logger log = LoggerFactory.getLogger(PDX_XlsxReader.class);
 
-    Optional<Workbook> xslxSheet;
-    List<List<String>> sheetData = null;
+    Optional<Workbook> xslxWorkbook;
+    ArrayList<ArrayList<String>> sheetData = null;
 
-    public List<List<String>> readFirstSheet(File xlsx) throws IOException {
+    public ArrayList<ArrayList<String>> readFirstSheet(File xlsx) throws IOException {
 
-        xslxSheet = getWorkbook(xlsx);
+        xslxWorkbook = getWorkbook(xlsx);
 
-        if( xslxSheet.isPresent() ){
-
-            sheetData = iterateThroughSheet(getSheet(xslxSheet));
+        if( xslxWorkbook.isPresent() ){
+            sheetData = iterateThroughSheet(getSheet(xslxWorkbook));
         }
-
         return sheetData;
     }
 
@@ -51,9 +47,9 @@ public class PDX_XlsxReader {
         return Optional.empty();
     }
 
-    protected List<List<String>> iterateThroughSheet(Sheet xslxSheet) {
+    protected ArrayList<ArrayList<String>> iterateThroughSheet(Sheet xslxSheet) {
 
-        List<List<String>> listOfCellLists = new ArrayList<>();
+        ArrayList<ArrayList<String>> listOfCellLists = new ArrayList<>();
 
         Iterator<Row> iterator = xslxSheet.iterator();
         int rowCounter = 0;
@@ -79,27 +75,29 @@ public class PDX_XlsxReader {
         Iterator<Cell> cellIterator = currentRow.cellIterator();
         ArrayList<String> cellValues = new ArrayList<>();
 
-        cellIterator.forEachRemaining(c -> {
+        for(int i = 0; i < currentRow.getLastCellNum(); i++) {
 
-            cellValues.add(
-                    getCellValueAsString(c)
-            );
-
-        });
-
+            Cell cell = (currentRow.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+            if(cellIsNotNullOrEmpty(cell))
+                cellValues.add("");
+            else
+                cellValues.add(getString(cell));
+        }
         return cellValues;
     }
 
-    private String getCellValueAsString(Cell currentCell) {
-
-        String value = "";
-
-        value = getString(currentCell, value);
-
-        return value;
+    private boolean cellIsNotNullOrEmpty(Cell cell){
+        if (cell.getCellType() == Cell.CELL_TYPE_BLANK) return true;
+        else return false;
     }
 
-    public static String getString(Cell currentCell, String value) {
+    private String getCellValueAsString(Cell currentCell) {
+        return getString(currentCell);
+    }
+
+    public static String getString(Cell currentCell) {
+
+        String value;
 
         switch (currentCell.getCellType()) {
             case Cell.CELL_TYPE_STRING:
@@ -114,11 +112,15 @@ public class PDX_XlsxReader {
                 value = cleanFloat(
                             cleanSpaces(
                                 (String.valueOf
-                                    (currentCell.getNumericCellValue()
+                                    ((int) currentCell.getNumericCellValue()
                                     )
                                 )
                             )
                 );
+                break;
+
+            default:
+                value = "";
                 break;
         }
         return value;
@@ -134,6 +136,6 @@ public class PDX_XlsxReader {
     }
 
     private Sheet getSheet(Optional<Workbook> workbook) {
-        return xslxSheet.get().getSheetAt(1);
+        return xslxWorkbook.get().getSheetAt(0);
     }
 }

@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CustomXlsxReaderTests {
@@ -44,7 +45,7 @@ public class CustomXlsxReaderTests {
         fillRowWithIntegers(thirdDataRow, expectedInteger);
 
         //When
-        List<List<String>> actualList = xlsxReader.iterateThroughSheet(sheet);
+        ArrayList<ArrayList<String>> actualList = xlsxReader.iterateThroughSheet(sheet);
 
         //Then
         Assert.assertEquals(3,actualList.size());
@@ -69,7 +70,7 @@ public class CustomXlsxReaderTests {
         }
 
         //When
-        List<List<String>> actualList = xlsxReader.iterateThroughSheet(sheet);
+        ArrayList<ArrayList<String>> actualList = xlsxReader.iterateThroughSheet(sheet);
 
         //Then
         AssertSizeAndEachStringIsBlank(actualList);
@@ -85,11 +86,31 @@ public class CustomXlsxReaderTests {
         }
 
         //When
-        List<List<String>> actualList = xlsxReader.iterateThroughSheet(sheet);
+        ArrayList<ArrayList<String>> actualList = xlsxReader.iterateThroughSheet(sheet);
 
         //Then
         AssertSizeAndEachStringIsBlank(actualList);
     }
+
+    @Test
+    public void Given_blankCells_When_IterateThroughSheetIsCalled_Then_returnCorrectCellCount(){
+
+        //given init()
+        int expectedSize =24;
+        String empty = "";
+
+        for(int i = 0; i < expectedSize+1; i++){
+            Cell newCell = secondDataRow.createCell(i);
+            newCell.setCellValue("");
+        }
+
+        //When
+        ArrayList<ArrayList<String>> actualList = xlsxReader.iterateThroughSheet(sheet);
+
+        //Then
+        Assert.assertEquals(expectedSize, actualList.get(1).size());
+    }
+
 
     private void fillRowWithCharacters(Row row, String fill){
 
@@ -107,7 +128,7 @@ public class CustomXlsxReaderTests {
         }
     }
 
-    private void AssertSizeAndEachStringIsBlank(List<List<String>> actualList){
+    private void AssertSizeAndEachStringIsBlank(ArrayList<ArrayList<String>> actualList){
         Assert.assertEquals(3,actualList.size());
         List<String> actualSecondRow = actualList.get(1);
         AssertEachElementEqualsString(actualSecondRow, blank);

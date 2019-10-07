@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -74,7 +75,7 @@ public class OmicHarmonizerTests {
     }
 
     @Test
-    public void Given_Headers_When_getHeadersIsCalled_Then_returnFirstRow(){
+    public void Given_Headers_When_getHeadersIsCalled_Then_returnHeadersRow(){
 
         //Given
         testData.add(fillNewList("HEADER",MUTCOLUMNSIZE));
@@ -121,7 +122,7 @@ public class OmicHarmonizerTests {
     }
 
     @Test
-    public void Given_OmicSheet_When_AssemblyIsBlank_Then_returnBlankSheet(){
+    public void Given_OmicSheet_When_AssemblyIsBlank_Then_returnBlankSheet() throws IOException {
 
         String assembly = "genome_assembly";
         int expectedCol = 18;
@@ -142,7 +143,7 @@ public class OmicHarmonizerTests {
     }
 
     @Test
-    public void Given_OmicSheet_When_AssemblyIs37_Then_returnAddRowToOutputWithCorrectSize(){
+    public void Given_OmicSheet_When_AssemblyIs37_Then_returnAddRowToOutputWithCorrectSize() throws IOException {
 
         String assembly = "genome_assembly";
         String chromo = "chromosome";
@@ -152,7 +153,7 @@ public class OmicHarmonizerTests {
         int seqStartCol = 17;
 
         //Given
-        createHeadersWithAssemChromoAndStartSeq(expectedCol,chromoCol,seqStartCol);
+        createHeadersWithAssemChromoAndStartSeq(expectedCol,chromoCol,seqStartCol, MUTCOLUMNSIZE);
 
         ArrayList<String> firstDataRow = (fillNewList("10",MUTCOLUMNSIZE));
         firstDataRow.set(expectedCol, "37");
@@ -167,33 +168,7 @@ public class OmicHarmonizerTests {
     }
 
     @Test
-    public void Given_OmicSheet_When_AssemblyIs37_Then_ColumnsArePlaceCorrectly(){
-
-
-        String cellTestValue = "10";
-        int expectedCol = 18;
-        int chromoCol = 16;
-        int seqStartCol = 17;
-
-        //Given
-        createHeadersWithAssemChromoAndStartSeq(expectedCol,chromoCol,seqStartCol);
-
-        ArrayList<String> firstDataRow = (fillNewList("10",MUTCOLUMNSIZE));
-        firstDataRow.set(expectedCol, "37");
-        testData.add(firstDataRow);
-
-        //When
-        harmonizer.setOmicSheet(testData);
-        ArrayList<ArrayList<String>> actualList = harmonizer.runLiftOver(CHAINFILE);
-
-        Assert.assertEquals(1, actualList.size());
-        Assert.assertEquals(MUTCOLUMNSIZE,actualList.get(0).size());
-        Assert.assertEquals(cellTestValue, actualList.get(0).get(16));
-        Assert.assertEquals(cellTestValue,actualList.get(0).get(17));
-    }
-
-    @Test
-    public void Given_OmicSheet_When_AssemblyIs38_Then_blankList(){
+    public void Given_OmicSheet_When_AssemblyIs38_Then_blankList() throws IOException {
 
         int expectedCol = 18;
 
@@ -213,7 +188,7 @@ public class OmicHarmonizerTests {
     }
 
     @Test
-    public void Given_realHgCNAdataIsUsed_When_runLiftOverIsCalled_Then_liftedPointsAreProvided() {
+    public void Given_realHgCNAdataIsUsed_When_runLiftOverIsCalled_Then_pointsAreLiftedAndMerged() throws IOException {
 
         // {"chr6",32188823,32188823,"6",32221046,32221046},
 
@@ -227,10 +202,10 @@ public class OmicHarmonizerTests {
         String expectedStartSeq = "32221046";
         String expectedSeqEnd = "32221046";
 
-        int assemblyCol = 15;
-        int chromoCol = 16;
-        int seqStartCol = 17;
-        int seqEndCol = 18;
+        int assemblyCol = 16;
+        int chromoCol = 17;
+        int seqStartCol = 18;
+        int seqEndCol = 19;
 
         //Given
         ArrayList<String> headers = fillNewList("HEADER", CNACOLUMNSIZE);
@@ -253,20 +228,62 @@ public class OmicHarmonizerTests {
 
         Assert.assertEquals(actualList.get(0).get(chromoCol), expectedChromo);
         Assert.assertEquals(actualList.get(0).get(seqStartCol), expectedStartSeq);
+        assertArraysAreCopies(testData.get(1), actualList.get(0), 16);
     }
 
-    private void createHeadersWithAssemChromoAndStartSeq(int expectedCol,int chromoCol,int seqStartCol){
+    @Test
+    public void Given_realMUTnoENDSEQ_When_runLiftOverIsCalled_Then_EndSeqIsHasNoPOS() throws IOException {
 
-        ArrayList<String> headers = fillNewList("HEADER",CNACOLUMNSIZE);
+        // {"chr6",32188823,32188823,"6",32221046,32221046},
+
+        String cellTestValue = "10";
+
+        String providedChromo = "chr6";
+        String providedStartSeq = "32188823";
+
+        String expectedChromo = "6";
+        String expectedStartSeq = "32221046";
+
+
+        int assemblyCol = 19;
+        int chromoCol = 20;
+        int seqStartCol = 21;
+        int seqEndCol = 22;
+
+        //Given
+        ArrayList<String> headers = fillNewList("HEADER", MUTCOLUMNSIZE);
+        headers.set(assemblyCol, assemblyHeader);
+        headers.set(chromoCol, chromoHeader);
+        headers.set(seqStartCol, seqStartHeader);
+        testData.add(headers);
+
+        ArrayList<String> firstDataRow = (fillNewList(cellTestValue, MUTCOLUMNSIZE));
+        firstDataRow.set(assemblyCol, "37");
+        firstDataRow.set(chromoCol, providedChromo);
+        firstDataRow.set(seqStartCol, providedStartSeq);
+        testData.add(firstDataRow);
+
+        //When
+        harmonizer.setOmicSheet(testData);
+        ArrayList<ArrayList<String>> actualList = harmonizer.runLiftOver(CHAINFILE);
+
+        Assert.assertEquals(actualList.get(0).get(chromoCol), expectedChromo);
+        Assert.assertEquals(actualList.get(0).get(seqStartCol), expectedStartSeq);
+        assertArraysAreCopies(testData.get(1), actualList.get(0), 19);
+    }
+
+    private void createHeadersWithAssemChromoAndStartSeq(int expectedCol,int chromoCol,int seqStartCol,int columnSize){
+
+        ArrayList<String> headers = fillNewList("HEADER",columnSize);
         headers.set(expectedCol,assemblyHeader);
         headers.set(chromoCol,chromoHeader);
         headers.set(seqStartCol, seqStartHeader);
         testData.add(headers);
     }
 
-    private void assertArraysAreCopies(ArrayList<String> expected, ArrayList<String> actual){
+    private void assertArraysAreCopies(ArrayList<String> expected, ArrayList<String> actual, int size){
 
-        for(int i = 0; i < actual.size(); i++){
+        for(int i = 0; i < size; i++){
             Assert.assertEquals
                     (actual.get(i),expected.get(i));
         }
@@ -280,6 +297,4 @@ public class OmicHarmonizerTests {
         }
         return newList;
     }
-
-
 }

@@ -13,9 +13,9 @@ public class LiftOverTests extends BaseTest {
 
         PDXLiftOver pdxliftover = new PDXLiftOver();
 
-        Map<String, int[]> genomeCoordinates = new LinkedHashMap<String, int[]>()
+        Map<String, long[]> genomeCoordinates = new LinkedHashMap<String, long[]>()
             {{
-                put("chr1", new int[]{10000, 10000});
+                put("chr1", new long[]{10000, 10000});
             }};
         pdxliftover.liftOverCoordinates(genomeCoordinates);
     }

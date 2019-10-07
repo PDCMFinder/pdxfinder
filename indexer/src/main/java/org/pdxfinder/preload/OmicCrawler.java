@@ -60,6 +60,7 @@ public class OmicCrawler {
 
             variantData.addAll
                     (Arrays.stream(f.listFiles())
+                            .filter(t -> t.getName().matches("data.xlsx"))
                             .collect(Collectors.toCollection(ArrayList::new)));
 
         });

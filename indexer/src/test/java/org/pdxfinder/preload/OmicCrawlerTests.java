@@ -56,11 +56,6 @@ public class OmicCrawlerTests {
         cnaFolder2 = Files.createDirectory(Paths.get(provider2.toString() + "/cna"));
         cytoFolder2 = Files.createDirectory(Paths.get(provider2.toString() + "/cyto"));
 
-        mut = Files.createFile(Paths.get(mutFolder.toString() + "/data.xlsx"));
-        metadata = Files.createFile(Paths.get(provider1.toString() + "/metadata.xlsx"));
-        cyto = Files.createFile(Paths.get(cytoFolder.toString() + "/data.xlsx"));
-        cna = Files.createFile(Paths.get(cnaFolder.toString() + "/data.xlsx"));
-
         mut2 = Files.createFile(Paths.get(mutFolder2.toString() + "/data.xlsx"));
         metadata2 = Files.createFile(Paths.get(provider2.toString() + "/metadata.xlsx"));
         cyto2 = Files.createFile(Paths.get(cytoFolder2.toString() + "/data.xlsx"));
@@ -70,13 +65,9 @@ public class OmicCrawlerTests {
     @After
     public void deleteFiles() {
 
-        mut.toFile().delete();
-        metadata.toFile().delete();
-        cyto.toFile().delete();
         mut2.toFile().delete();
         metadata2.toFile().delete();
         cyto2.toFile().delete();
-        cna.toFile().delete();
         cna1.toFile().delete();
         mutFolder.toFile().delete();
         cnaFolder.toFile().delete();
@@ -97,10 +88,15 @@ public class OmicCrawlerTests {
     }
 
     @Test
-    public void Given_productionFileSchema_When_crawlerIsCalled_returnListOfOnlyMutAndCNA(){
+    public void Given_productionFileSchema_When_crawlerIsCalled_returnListOfOnlyMutAndCNA() throws IOException {
 
         //given
         //init()
+        mut = Files.createFile(Paths.get(mutFolder.toString() + "/data.xlsx"));
+        metadata = Files.createFile(Paths.get(provider1.toString() + "/metadata.xlsx"));
+        cyto = Files.createFile(Paths.get(cytoFolder.toString() + "/data.xlsx"));
+        cna = Files.createFile(Paths.get(cnaFolder.toString() + "/data.xlsx"));
+
 
         //when
         List<File> actualFiles = initCrawlersAndPassRootFile(tmpRootDir.toFile());
@@ -110,6 +106,26 @@ public class OmicCrawlerTests {
         Assert.assertTrue(actualFiles.contains(mut.toFile()));
         Assert.assertTrue(actualFiles.contains(mut2.toFile()));
         Assert.assertTrue(actualFiles.contains(cna.toFile()));
+        Assert.assertTrue(actualFiles.contains(cna1.toFile()));
+    }
+
+    @Test
+    public void Given_invalidfileName_When_crawlerIsCalled_returnOnlyValidNameMutAndCNA() throws IOException {
+
+        //given
+        mut = Files.createFile(Paths.get(mutFolder.toString() + "/TESTdata.xlsx"));
+        metadata = Files.createFile(Paths.get(provider1.toString() + "/metadata.xlsx"));
+        cyto = Files.createFile(Paths.get(cytoFolder.toString() + "/datahello.xlsx"));
+        cna = Files.createFile(Paths.get(cnaFolder.toString() + "/'~data.xlsx'"));
+
+        //when
+        List<File> actualFiles = initCrawlersAndPassRootFile(tmpRootDir.toFile());
+
+        //then
+        Assert.assertEquals(2, actualFiles.size());
+        Assert.assertFalse(actualFiles.contains(mut.toFile()));
+        Assert.assertTrue(actualFiles.contains(mut2.toFile()));
+        Assert.assertFalse(actualFiles.contains(cna.toFile()));
         Assert.assertTrue(actualFiles.contains(cna1.toFile()));
     }
 

@@ -177,8 +177,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 //getCellTypeEnum shown as deprecated for version 3.15
                 //getCellTypeEnum will be renamed to getCellType starting from version 4.0
 
-                String value = null;
-                value = PDX_XlsxReader.getString(currentCell, value);
+                String value = PDX_XlsxReader.getString(currentCell);
 
                 dataRow.add(value);
             }
