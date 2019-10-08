@@ -22,24 +22,24 @@ import java.util.Arrays;
 @Component
 public class PreloadRunner implements CommandLineRunner {
 
-    public PreloadRunner() throws IOException {
-    }
-
     @Value("${pdxfinder.root.dir}")
     private String finderRootDir;
 
     @Value("${pdxfinder.root.out}")
     private String finderOutput;
 
-    Logger log = LoggerFactory.getLogger(PreloadRunner.class);
+    private Logger log = LoggerFactory.getLogger(PreloadRunner.class);
 
-    ArrayList<File> omicFiles;
-    OmicCrawler crawler = new OmicCrawler();
-    PDX_XlsxReader reader = new PDX_XlsxReader();
-    OmicHarmonizer harmonizer = new OmicHarmonizer(CHAINFILE);
-    UtilityService utilityService = new UtilityService();
+    private ArrayList<File> omicFiles;
+    private OmicCrawler crawler = new OmicCrawler();
+    private PDX_XlsxReader reader = new PDX_XlsxReader();
+    private OmicHarmonizer harmonizer = new OmicHarmonizer(CHAINFILE);
+    private UtilityService utilityService = new UtilityService();
 
     private static final String CHAINFILE = "src/main/resources/LiftOverResources/hg19ToHg38.over.chain.gz";
+
+    public PreloadRunner() throws IOException {
+    }
 
     @Override
     public void run(String... args) throws Exception {
@@ -62,19 +62,20 @@ public class PreloadRunner implements CommandLineRunner {
 
             OmicHarmonizer.OMIC dataType = determineOmicType(f);
             ArrayList<ArrayList<String>> sheet = getSheet(f);
-            ArrayList<ArrayList<String>> outFile = null;
+            ArrayList<ArrayList<String>> outFile;
 
             try {
-
 
                 outFile = harmonizer.runLiftOver(sheet, dataType);
                 if (!(outFile.size() == 1 || outFile.isEmpty()))
                     makeOutFileDirAndSave(f, outFile);
                 else
-                    log.info("No data lifted for " + f.getPath());
+                    log.info("No data lifted for " + f.getName());
 
             } catch (IOException e) {
+
                 e.printStackTrace();
+
             }
         });
     }

@@ -10,17 +10,16 @@ import java.util.stream.Collectors;
 
 public class OmicCrawler {
 
+    ArrayList<File> providersData;
+    ArrayList<File> variantData;
+
     Logger log = LoggerFactory.getLogger(OmicCrawler.class);
 
     public ArrayList<File> run(File UPDOG) throws IOException {
-
         return searchFileTreeForOmicData(UPDOG);
     }
 
-    public ArrayList<File> searchFileTreeForOmicData(File rootDir) {
-
-        ArrayList<File> providersData = new ArrayList<File>();
-        ArrayList<File> variantData = new ArrayList<File>();
+    public ArrayList<File> searchFileTreeForOmicData(File rootDir) throws IOException {
 
         if(folderExists(rootDir)) {
 
@@ -32,6 +31,7 @@ public class OmicCrawler {
 
         } else
 
+            throw new IOException("Error root directory could not be found by the OmicCrawler");
             log.error("Error root directory could not be found by the OmicCrawler");
 
         return variantData;
@@ -39,17 +39,25 @@ public class OmicCrawler {
 
     private ArrayList<File> returnMutAndCNASubFolders(List<File> rootDir){
 
-        ArrayList<File> providersData = new ArrayList<File>();
+        ArrayList<File> providers = new ArrayList<File>();
 
         rootDir.forEach(f -> {
 
-            providersData.addAll
+            providers.addAll
                     (Arrays.stream(f.listFiles())
                             .filter(t -> t.getName().matches("(mut|cna)"))
                             .collect(Collectors.toCollection(ArrayList::new)));
 
         });
-        return providersData;
+        return providers;
+    }
+
+    private ArrayList<File> getVariantdata(ArrayList<File> providersData) {
+
+        if( ! providersData.isEmpty())
+            return returnMutAndCNAFiles(providersData);
+        else
+            return new ArrayList<File>();
     }
 
     private ArrayList<File> returnMutAndCNAFiles(List<File> providersData) {
@@ -66,12 +74,6 @@ public class OmicCrawler {
         });
 
         return variantData;
-    }
-
-    private ArrayList<File> getVariantdata(ArrayList<File> providersData) {
-
-        if( ! providersData.isEmpty()) return returnMutAndCNAFiles(providersData);
-        else return new ArrayList<File>();
     }
 
     private boolean folderExists(File rootDir){

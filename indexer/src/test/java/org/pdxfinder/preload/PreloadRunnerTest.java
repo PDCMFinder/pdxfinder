@@ -8,8 +8,9 @@ import java.io.IOException;
 
 public class PreloadRunnerTest extends BaseTest {
 
+    @Ignore
     @Test
-    public void areYouAlive() throws IOException {
+    public void TestRunner() throws IOException {
 
         PreloadRunner runner = new PreloadRunner();
         runner.setFinderRootDir("/home/afollette/Documents/data/UPDOG");

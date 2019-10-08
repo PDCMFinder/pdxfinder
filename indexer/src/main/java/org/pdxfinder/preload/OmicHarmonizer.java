@@ -53,6 +53,7 @@ public class OmicHarmonizer {
     }
 
     private void initHeaders() {
+
         findLastHeaderColumn();
         chromosomeColumn = getColumnByHeader(CHROMOSOME);
         seq_start_positionCol = getColumnByHeader(SEQ_START_POS);

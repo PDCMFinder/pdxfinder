@@ -17,13 +17,16 @@ public class CustomXlsxReaderTests {
 
     private Workbook workbook;
     private Sheet sheet;
-    private String expectedString = "9999";
-    private int expectedInteger = 9999;
+
     private Row secondDataRow;
     private Row thirdDataRow;
-    private String ASpace = " ";
-    private String moreSpaces = "    ";
+
+    private String expectedString = "9999";
+    private String multipleSpaces = "    ";
     private String blank = "";
+
+    int expectedSize = 13;
+    private int expectedInteger = 9999;
 
     PDX_XlsxReader xlsxReader = new PDX_XlsxReader();
 
@@ -60,15 +63,10 @@ public class CustomXlsxReaderTests {
     }
 
     @Test
-    public void Given_WithEmptySpaces_When_IterateThroughSheetIsCalled_Then_returnCleanToBlankStrings(){
+    public void Given_SheetWithMultipleSpacesInCell_When_IterateThroughSheetIsCalled_Then_returnCleanToBlankStrings(){
 
         //given init()
-
-        for(int i = 0; i < 13; i++){
-            Cell newCell = secondDataRow.createCell(i);
-            newCell.setCellValue(" ");
-        }
-
+        fillRowWithCharacters(secondDataRow, multipleSpaces);
         //When
         ArrayList<ArrayList<String>> actualList = xlsxReader.iterateThroughSheet(sheet);
 
@@ -77,32 +75,10 @@ public class CustomXlsxReaderTests {
     }
 
     @Test
-    public void Given_WithMultipleEmptySpaces_When_IterateThroughSheetIsCalled_Then_returnCleanToBlankStrings(){
+    public void Given_nullCells_When_IterateThroughSheetIsCalled_Then_returnCorrectCellCount(){
 
         //given init()
-        for(int i = 0; i < 13; i++){
-            Cell newCell = secondDataRow.createCell(i);
-            newCell.setCellValue(moreSpaces);
-        }
-
-        //When
-        ArrayList<ArrayList<String>> actualList = xlsxReader.iterateThroughSheet(sheet);
-
-        //Then
-        AssertSizeAndEachStringIsBlank(actualList);
-    }
-
-    @Test
-    public void Given_blankCells_When_IterateThroughSheetIsCalled_Then_returnCorrectCellCount(){
-
-        //given init()
-        int expectedSize =24;
-        String empty = "";
-
-        for(int i = 0; i < expectedSize+1; i++){
-            Cell newCell = secondDataRow.createCell(i);
-            newCell.setCellValue("");
-        }
+        fillRowWithCharacters(secondDataRow, null);
 
         //When
         ArrayList<ArrayList<String>> actualList = xlsxReader.iterateThroughSheet(sheet);
@@ -111,10 +87,9 @@ public class CustomXlsxReaderTests {
         Assert.assertEquals(expectedSize, actualList.get(1).size());
     }
 
-
     private void fillRowWithCharacters(Row row, String fill){
 
-        for(int i = 0; i < 13; i++){
+        for(int i = 0; i < expectedSize; i++){
             Cell newCell = row.createCell(i);
             newCell.setCellValue(fill);
         }
@@ -122,7 +97,7 @@ public class CustomXlsxReaderTests {
 
     private void fillRowWithIntegers(Row row, int fill){
 
-        for(int i = 0; i < 13; i++){
+        for(int i = 0; i < expectedSize; i++){
             Cell newCell = row.createCell(i);
             newCell.setCellValue(fill);
         }

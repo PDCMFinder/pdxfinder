@@ -7,7 +7,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.pdxfinder.graph.dao.*;
-import org.pdxfinder.preload.PDX_XlsxReader;
 import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
@@ -177,7 +176,18 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 //getCellTypeEnum shown as deprecated for version 3.15
                 //getCellTypeEnum will be renamed to getCellType starting from version 4.0
 
-                String value = PDX_XlsxReader.getString(currentCell);
+                String value = null;
+                switch (currentCell.getCellType()) {
+                    case Cell.CELL_TYPE_STRING:
+                        value = currentCell.getStringCellValue();
+                        break;
+                    case Cell.CELL_TYPE_BOOLEAN:
+                        value = String.valueOf(currentCell.getBooleanCellValue());
+                        break;
+                    case Cell.CELL_TYPE_NUMERIC:
+                        value = String.valueOf(currentCell.getNumericCellValue());
+                        break;
+                }
 
                 dataRow.add(value);
             }
@@ -305,7 +315,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 String gradeClassification = patientTumorRow.get(13);
                 String virologyStatus = patientTumorRow.get(14);
                 String treatmentNaive = patientTumorRow.get(16);
-                sampleId = sampleId.trim();
+
 
                 if (modelId == null) {
                     log.error("Missing corresponding Model ID in row " + row);
@@ -758,23 +768,10 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 continue;
             }
 
-            sampleId = sampleId.trim();
+
             ModelCreation model;
             Sample sample;
             Platform platform;
-
-            String platformTag = "";
-
-            if(molCharType.equals("mutation")){
-                platformTag = "_mut";
-            }
-            else if(molCharType.equals("copy number alteration")){
-                platformTag = "_cna";
-            }
-            else if(molCharType.equals("transcriptomics")){
-                platformTag = "_trans";
-            }
-
 
             //patient sample
             if (origin.toLowerCase().equals("patient")) {
@@ -783,7 +780,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 if (sample != null) {
 
-                    platform = dataImportService.getPlatform(platformName+platformTag, ds);
+                    platform = dataImportService.getPlatform(platformName, ds);
 
                     if ((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3) {
                         log.info("Saved platform:" + platform.getName() + " Url: " + (platform.getUrl() == null ? "null" : platform.getUrl()) + " Url in file: " + platformUrl);
@@ -792,7 +789,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                         log.info("Updating platform url");
                     } else {
 
-                        log.warn("Platform " + platform.getName()+platformTag + " was not updated. ");
+                        log.warn("Platform " + platform.getName() + " was not updated. ");
                     }
 
                     MolecularCharacterization mc = new MolecularCharacterization();
@@ -889,8 +886,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 }
 
+                platform = dataImportService.getPlatform(platformName, ds);
 
-                platform = dataImportService.getPlatform(platformName+platformTag, ds);
 
                 if ((platform.getUrl() == null || platform.getUrl().isEmpty()) && platformUrl != null && platformUrl.length() > 3) {
                     log.info("Saved platform:" + platform.getName() + " Url: " + (platform.getUrl() == null ? "null" : platform.getUrl()) + " Url in file: " + platformUrl);
@@ -982,8 +979,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
 
         platformURL = new HashMap<>();
-        //platformURL.put("CRL__CGH_array", "/platform/curie-lc-cna/");
-        //platformURL.put("CRL__Targeted_NGS", "/platform/curie-lc-mutation/");
+        platformURL.put("CGH_array", "/platform/curie-lc-cna/");
+        platformURL.put("Targeted_NGS", "/platform/curie-lc-mutation/");
 
         if (dataSourceAbbreviation.equals("CRL")) {
             omicDataFilesType = "ONE_FILE_PER_MODEL";
@@ -1100,7 +1097,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
             model.setExternalUrls(externalUrls);
 
 
-            if (projectName != null && !projectName.isEmpty()) {
+            if (!projectName.isEmpty()) {
 
                 Group project = dataImportService.getProjectGroup(projectName);
                 model.addGroup(project);
@@ -1111,6 +1108,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 Group access = dataImportService.getAccessibilityGroup(modelAccessibility, accessModalities);
                 model.addGroup(access);
             }
+
             dataImportService.saveModelCreation(model);
 
             //Update datasource
@@ -1135,80 +1133,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
         int row = 6;
 
-        Map<String, MolecularCharacterization> existingMolcharNodes = new HashMap<>();
-        Map<String, MolecularCharacterization> toBeCreatedMolcharNodes = new HashMap<>();
-
-        for (List<String> dataRow : cytogeneticsSheetData) {
-
-            String passage = dataRow.get(2);
-            String modelId = dataRow.get(4);
-            String origin = dataRow.get(1);
-
-
-            if(origin.toLowerCase().equals("xenograft")) {
-                String pass = passage;
-
-
-                try {
-                    int passageInt = (int) Float.parseFloat(pass);
-                    passage = String.valueOf(passageInt);
-                } catch (NumberFormatException | NullPointerException nfe) {
-
-                    log.error("Invalid passage " + passage + " for model:" + modelId);
-                }
-
-            }
-
-            ModelCreation modelCreation = dataImportService.findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(modelId, ds.getAbbreviation());
-
-            if(modelCreation == null){
-                log.error("Missing model +"+modelId + " in row "+row);
-                row++;
-                continue;
-            }
-
-            if(modelCreation.getSample().getMolecularCharacterizations() != null){
-
-                for(MolecularCharacterization mc : modelCreation.getSample().getMolecularCharacterizations()){
-
-                    if (mc != null && mc.getPlatform() != null){
-
-                        String molcharKey = modelCreation.getSourcePdxId()+ "__"+modelCreation.getSample().getSourceSampleId() + "__" + passage + "__" + mc.getPlatform().getName()+ "__patient__"+mc.getType();
-                        existingMolcharNodes.put(molcharKey, mc);
-                    }
-                }
-            }
-
-
-            //then all molchars related to xenograft samples
-
-            if(modelCreation.getSpecimens()!= null){
-
-                for(Specimen sp: modelCreation.getSpecimens()){
-
-                    Sample sample = sp.getSample();
-
-                    if(sample != null && sample.getMolecularCharacterizations() != null){
-
-                        for(MolecularCharacterization mc: sample.getMolecularCharacterizations()){
-
-                            if(sample.getSourceSampleId() == null ) log.error("Missing sampleid for "+modelId);
-                            if(sp.getPassage() == null) log.error("Missing passage for "+modelId);
-                            if(mc.getPlatform() == null) log.error("Missing platform for "+modelId);
-
-                            if(mc.getPlatform().getName() == null) log.error("Missing platform name for "+modelId);
-
-                            String molcharKey = modelCreation.getSourcePdxId()+ "__"+ sample.getSourceSampleId() + "__" + sp.getPassage() + "__" + mc.getPlatform().getName()+ "__xenograft__"+mc.getType();
-                            existingMolcharNodes.put(molcharKey, mc);
-                        }
-                    }
-                }
-            }
-
-            row++;
-        }
-
-
+        Map<String, MolecularCharacterization> patientMolChars = new HashMap<>();
+        Map<String, MolecularCharacterization> xenoMolChars = new HashMap<>();
 
         //TODO: At some point deal with micro-satelite instability. Currently those rows are skipped. We don't want instability in our lives just yet.
 
@@ -1226,26 +1152,11 @@ public class UniversalLoader extends UniversalLoaderOmic {
             String platform = dataRow.get(9);
             String characterizationType = "Unknown";
 
-
-
             if (origin == null || modelId == null || markerSymbol == null || markerStatus == null || technique == null) {
                 log.error("Missing essential value in row " + row);
                 row++;
                 continue;
             }
-
-            if(origin.toLowerCase().equals("xenograft")) {
-                String pass = passage;
-
-                try {
-                    int passageInt = (int) Float.parseFloat(pass);
-                    passage = String.valueOf(passageInt);
-                } catch (NumberFormatException | NullPointerException nfe) {
-
-                    log.error("Invalid passage "+passage +" for model:"+modelId);
-                }
-            }
-
 
             MolecularCharacterization mc;
             Platform pl;
@@ -1266,37 +1177,83 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 marker = (Marker) nsdto.getNode();
 
-                MolecularCharacterization molecularCharacterization;
+                if (origin.toLowerCase().equals("patient")) {
 
-                String molcharKey = modelId + "__"+ sampleId + "__" + passage + "__" + technique + "__" +origin.toLowerCase() + "__cytogenetics";
+                    //for patient related molchars it is sufficient to use the model + platform as the key
+                    String mapKey = modelId + "___" + technique;
 
-                if(existingMolcharNodes.containsKey(molcharKey)){
-                    molecularCharacterization = existingMolcharNodes.get(molcharKey);
+                    if (patientMolChars.containsKey(mapKey)) {
+                        //get a previously created mc object = platform and type are already set
+                        mc = patientMolChars.get(mapKey);
+                    } else {
+                        //new mc object, need to set the platform, too
+                        pl = dataImportService.getPlatform(technique, ds);
+
+                        mc = new MolecularCharacterization();
+                        mc.setPlatform(pl);
+                        mc.setType(getMolcharType(technique));
+                    }
+
+
+                    MarkerAssociation ma = new MarkerAssociation();
+                    ma.setMarker(marker);
+
+                    if (technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")) {
+
+                        ma.setCytogeneticsResult(markerStatus);
+                    }
+                    //what if it is not ihc?
+
+                    mc.addMarkerAssociation(ma);
+
+                    //put molchar in the map if it was just created, but don't store molchars without type
+                    if (!patientMolChars.containsKey(mapKey) && mc.getType() != null) {
+                        patientMolChars.put(mapKey, mc);
+                    }
+
+
+                } else if (origin.toLowerCase().equals("xenograft") || origin.toLowerCase().equals("engrafted tumor") || origin.toLowerCase().equals("engrafted tumour")) {
+
+                    //need this trick to get rid of 0.0 if there is any
+                    int passageInt = (int) Float.parseFloat(passage);
+                    passage = String.valueOf(passageInt);
+
+                    //for xenograft molchars use the combination of the modelid, nomenclature, passage and technique as the key
+                    String mapKey = modelId + "___" + nomenclature + "___" + passage + "___" + technique;
+
+                    if (xenoMolChars.containsKey(mapKey)) {
+                        //get a previously created mc object = platform and type are already set
+                        mc = xenoMolChars.get(mapKey);
+                    } else {
+                        //new mc object, need to set the platform, too
+                        pl = dataImportService.getPlatform(technique, ds);
+
+                        mc = new MolecularCharacterization();
+                        mc.setPlatform(pl);
+                        mc.setType(getMolcharType(technique));
+
+                    }
+
+
+                    MarkerAssociation ma = new MarkerAssociation();
+                    ma.setMarker(marker);
+
+                    if (technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")) {
+
+                        ma.setCytogeneticsResult(markerStatus);
+                    }
+                    //what if it is not ihc? Would our world collapse entirely?
+
+                    mc.addMarkerAssociation(ma);
+                    //but don't store molchars without type
+                    if (!xenoMolChars.containsKey(mapKey) && mc.getType() != null) {
+                        xenoMolChars.put(mapKey, mc);
+                    }
+
+                } else {
+                    //origin is not patient nor xenograft
+                    log.error("Unknown sample origin in row " + row);
                 }
-                else if(toBeCreatedMolcharNodes.containsKey(molcharKey)){
-                    molecularCharacterization = toBeCreatedMolcharNodes.get(molcharKey);
-                }
-                else{
-                    log.info("Looking at molchar "+molcharKey);
-                    //log.info("Existing keys: ");
-                    //log.info(existingMolcharNodes.keySet().toString());
-                    molecularCharacterization = new MolecularCharacterization();
-                    molecularCharacterization.setType("cytogenetics");
-                    molecularCharacterization.setPlatform(dataImportService.getPlatform(technique, ds));
-                    toBeCreatedMolcharNodes.put(molcharKey, molecularCharacterization);
-                }
-
-
-                MarkerAssociation ma = new MarkerAssociation();
-                ma.setMarker(marker);
-
-                if (technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")) {
-
-                    ma.setCytogeneticsResult(markerStatus);
-                }
-                //what if it is not ihc?
-
-                molecularCharacterization.addMarkerAssociation(ma);
 
             }
 
@@ -1306,87 +1263,77 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
 
         //get the corresponding samples for the molchar objects, link them and save them.
-        for(Map.Entry<String, MolecularCharacterization> mcEntry : existingMolcharNodes.entrySet()){
+        //patient samples
+        for (Map.Entry<String, MolecularCharacterization> entry : patientMolChars.entrySet()) {
+            //key = model ID + "___" + platform
+            String[] keyArr = entry.getKey().split("___");
+            String key = keyArr[0];
 
-            dataImportService.saveMolecularCharacterization(mcEntry.getValue());
+            MolecularCharacterization mc = entry.getValue();
+
+            Sample patientSample = dataImportService.findHumanSample(key, ds.getAbbreviation());
+
+            if (patientSample != null) {
+
+                patientSample.addMolecularCharacterization(mc);
+                dataImportService.saveSample(patientSample);
+            } else {
+
+                log.error("Failed to create molchar for patient sample! Model:" + key);
+            }
+
         }
 
+        //xeno samples
+        for (Map.Entry<String, MolecularCharacterization> entry : xenoMolChars.entrySet()) {
+            //key =  modelId + "___" + nomenclature + "___" + passage + "___" + platform
 
-        //PHASE 3: get objects from cache and persist them
-        for(Map.Entry<String, MolecularCharacterization> mcEntry : toBeCreatedMolcharNodes.entrySet()){
+            MolecularCharacterization mc = entry.getValue();
+            String[] keyArr = entry.getKey().split("___");
 
-            String mcKey = mcEntry.getKey();
-            MolecularCharacterization mc = mcEntry.getValue();
+            String modelId = keyArr[0];
+            String nomenclature = keyArr[1];
+            String passage = keyArr[2];
 
-            String[] mcKeyArr = mcKey.split("__");
-            //String molcharKey = modelId + "__"+ sampleId + "__" + passage + "__" + technique + "__" +origin.toLowerCase() + "__cytogenetics";
-            String modelId = mcKeyArr[0];
-            String sampleId = mcKeyArr[1];
-            String pass = getPassage(mcKeyArr[2]);
-            String sampleOrigin = mcKeyArr[4];
-
-            ModelCreation modelCreation = dataImportService.findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(modelId, ds.getAbbreviation());
-
-            if(modelCreation == null){
-                log.error("Missing model: "+modelId);
+            ModelCreation model = dataImportService.findModelByIdAndDataSource(modelId, ds.getAbbreviation());
+            if (model == null) {
+                log.error("Cannot load markers, model not found: " + modelId);
                 continue;
-            }
-
-            boolean foundSpecimen = false;
-
-            if(sampleOrigin.toLowerCase().equals("patient")){
-
-                Sample patientSample = modelCreation.getSample();
-                patientSample.setSourceSampleId(sampleId);
-                patientSample.addMolecularCharacterization(mc);
 
             }
-            //xenograft
-            else if(sampleOrigin.toLowerCase().equals("xenograft")){
 
-                if(modelCreation.getSpecimens() != null){
+            Specimen specimen = dataImportService.findSpecimenByModelAndPassageAndNomenclature(model, passage, nomenclature);
 
-                    for(Specimen specimen : modelCreation.getSpecimens()){
+            if (specimen == null) {
 
-                        if(specimen.getPassage().equals(pass)){
 
-                            if(specimen.getSample() != null && specimen.getSample().getSourceSampleId().equals(sampleId)){
+                HostStrain hostStrain = dataImportService.findHostStrain(nomenclature);
 
-                                Sample xenograftSample = specimen.getSample();
-                                xenograftSample.addMolecularCharacterization(mc);
+                if (hostStrain != null) {
 
-                                foundSpecimen = true;
-                            }
-                        }
-                    }
+                    specimen = new Specimen();
+                    specimen.setHostStrain(hostStrain);
+                    specimen.setPassage(passage);
+
+                } else {
+
+                    log.error("Cannot save cytogenetics for Model: "+modelId +" Failed to get hoststrain "+nomenclature);
+                    continue;
                 }
+            }
 
+            Sample xenoSample = specimen.getSample();
 
-                //this passage is either not present yet or the linked sample has a different ID, create a specimen with sample and link mc
-                if(!foundSpecimen){
-                    log.info("Creating new specimen for "+mcKey);
-
-                    Sample xenograftSample = new Sample();
-                    xenograftSample.setSourceSampleId(sampleId);
-                    xenograftSample.addMolecularCharacterization(mc);
-
-                    Specimen specimen = new Specimen();
-                    specimen.setPassage(pass);
-                    specimen.setSample(xenograftSample);
-
-
-                    modelCreation.addRelatedSample(xenograftSample);
-                    modelCreation.addSpecimen(specimen);
-                }
-
+            if (xenoSample == null) {
+                xenoSample = new Sample();
 
             }
 
-
-
-            dataImportService.saveModelCreation(modelCreation);
-
-
+            xenoSample.addMolecularCharacterization(mc);
+            specimen.setSample(xenoSample);
+            model.addRelatedSample(xenoSample);
+            dataImportService.saveSpecimen(specimen);
+            dataImportService.saveModelCreation(model);
 
         }
 
@@ -1422,8 +1369,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
     public static String stripTrailingSlash(String filePath) {
         return filePath.endsWith("/") ?
-                filePath.replaceFirst("/$", "") :
-                filePath;
+            filePath.replaceFirst("/$", "") :
+            filePath;
     }
 
 

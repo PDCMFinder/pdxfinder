@@ -1,18 +1,12 @@
 package org.pdxfinder.preload;
 
 import org.junit.*;
-
-import org.mockito.Mock;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
-import static org.mockito.Mockito.mock;
-
 
 public class OmicCrawlerTests {
 
@@ -35,10 +29,6 @@ public class OmicCrawlerTests {
     private Path mutFolder2;
     private Path cnaFolder2;
     private Path cytoFolder2;
-
-
-    @Mock
-    File xlsxOmicData = mock(File.class);
 
     @Before
     public void buildTestStructure() throws IOException {
@@ -80,8 +70,8 @@ public class OmicCrawlerTests {
         provider2.toFile().delete();
     }
 
-    @Test
-    public void Given_nonExistantRootFolder_When_crawlerIsCalled_returnDoNothingAndLogMessage(){
+    @Test(expected = IOException.class)
+    public void Given_nonExistentRootFolder_When_crawlerIsCalled_throwIOError() throws IOException {
 
         //when
         initCrawlersAndPassRootFile(new File(""));
@@ -129,9 +119,9 @@ public class OmicCrawlerTests {
         Assert.assertTrue(actualFiles.contains(cna1.toFile()));
     }
 
-    private List<File> initCrawlersAndPassRootFile(File rootDir){
+    private List<File> initCrawlersAndPassRootFile(File rootDir) throws IOException {
 
         OmicCrawler crawler = new OmicCrawler();
-        return crawler.searchFileTreeForOmicData(rootDir);
+        return crawler.run(rootDir);
     }
 }

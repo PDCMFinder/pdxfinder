@@ -5,7 +5,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.neo4j.cypher.internal.compiler.v2_3.planner.logical.cardinality.DelegatingSelectivityEstimator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,26 +46,16 @@ public class PDX_XlsxReader {
         return Optional.empty();
     }
 
-    protected ArrayList<ArrayList<String>> iterateThroughSheet(Sheet xslxSheet) {
+    protected ArrayList<ArrayList<String>> iterateThroughSheet(Sheet sheet) {
 
         ArrayList<ArrayList<String>> listOfCellLists = new ArrayList<>();
 
-        Iterator<Row> iterator = xslxSheet.iterator();
-        int rowCounter = 0;
-
-        iterator.hasNext();
-
-        while (iterator.hasNext()) {
-
-            Row currentRow = iterator.next();
+        for (Row currentRow : sheet) {
 
             ArrayList<String> cellValues = getCellValues(currentRow);
 
             listOfCellLists.add(cellValues);
-
-            rowCounter++;
         }
-
         return listOfCellLists;
     }
 
@@ -102,20 +91,14 @@ public class PDX_XlsxReader {
         switch (currentCell.getCellType()) {
             case Cell.CELL_TYPE_STRING:
                 value = cleanSpaces(
-                            currentCell.getStringCellValue(
-                            )
-                );
-
+                            currentCell.getStringCellValue());
                 break;
 
             case Cell.CELL_TYPE_NUMERIC:
                 value = cleanFloat(
                             cleanSpaces(
                                 (String.valueOf
-                                    ((int) currentCell.getNumericCellValue()
-                                    )
-                                )
-                            )
+                                    ((int) currentCell.getNumericCellValue())))
                 );
                 break;
 
