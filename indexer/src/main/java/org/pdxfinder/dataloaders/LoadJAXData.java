@@ -132,7 +132,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     protected void step09LoadPatientData() {
-
+        if(dto.isSkipModel()) return ;
         dto.setHistologyMap(getHistologyImageMap(dto.getModelID()));
 
         //Check if model exists in DB, if yes, do not load duplicates
@@ -145,6 +145,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         if(dto.getDiagnosis().toLowerCase().contains("unknown") ||
                 dto.getDiagnosis().toLowerCase().contains("not specified")){
             log.info("Skipping model "+dto.getModelID()+" with diagnosis:"+dto.getDiagnosis());
+            dto.setSkipModel(true);
             return;
         }
 
@@ -156,7 +157,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     protected void step10LoadExternalURLs() {
-
+        if(dto.isSkipModel()) return ;
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
 
         loadExternalURLs(dataSourceContact+dto.getModelID(), dataSourceURL+dto.getModelID());
@@ -168,7 +169,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step11LoadBreastMarkers() {
 
-
+        if(dto.isSkipModel()) return ;
         //create breast cancer markers manually if they are present
         if(!dto.getModelTag().equals(Standardizer.NOT_SPECIFIED)){
 
@@ -216,7 +217,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     protected void step12CreateModels() throws Exception  {
-
+        if(dto.isSkipModel()) return ;
         // JAX - Updates Patient Sample b4 model Creation
         dto.getPatientSample().setExtractionMethod(dto.getExtractionMethod());
 
@@ -237,7 +238,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     protected void step13LoadSpecimens() {
-
+        if(dto.isSkipModel()) return ;
         Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(), dto.getModelID(), dto.getProviderGroup().getAbbreviation(), "");
         specimen.setHostStrain(dto.getNodScidGamma());
         EngraftmentSite engraftmentSite = dataImportService.getImplantationSite(dto.getImplantationSiteStr());
@@ -273,7 +274,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     protected void step16LoadVariationData() {
-
+        if(dto.isSkipModel()) return ;
         String dataDirectory = finderRootDir+"/data/"+dataSourceAbbreviation;
 
         loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation", dataDirectory);
@@ -287,7 +288,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     void step17LoadModelDosingStudies() throws Exception {
-
+        if(dto.isSkipModel()) return ;
         loadModelDosingStudies();
 
     }

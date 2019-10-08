@@ -59,6 +59,8 @@ public class LoaderDTO {
 
     private HashMap<String, Image> histologyMap;
 
+    private boolean skipModel;
+
 
     public LoaderDTO() {
     }
@@ -389,5 +391,13 @@ public class LoaderDTO {
 
     public void setModelDosingStudies(JSONArray modelDosingStudies) {
         this.modelDosingStudies = modelDosingStudies;
+    }
+
+    public boolean isSkipModel() {
+        return skipModel;
+    }
+
+    public void setSkipModel(boolean skipModel) {
+        this.skipModel = skipModel;
     }
 }
