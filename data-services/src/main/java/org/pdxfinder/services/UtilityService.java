@@ -272,7 +272,44 @@ public class UtilityService {
 
 
 
+    // EXCEL WRITER : CREATE .XLSX FILE
+    public void writeXLSXFile2(ArrayList<ArrayList<String>> dataList, String fileName, String sheetName) {
 
+        XSSFWorkbook wb = new XSSFWorkbook();
+        XSSFSheet sheet = wb.createSheet(sheetName) ;
+
+        CellStyle headerCellStyle = setXLSFont(wb, 14, IndexedColors.BROWN);
+
+        //iterating r number of rows
+        int rowCount = 0;
+        for (ArrayList<String> data : dataList){
+
+            XSSFRow row = sheet.createRow(rowCount);
+
+            int columnCount = 0;
+            for (String cellData : data ) {
+
+                XSSFCell cell = row.createCell(columnCount);
+
+                if (rowCount == 0){
+
+                    cell.setCellValue(cellData);
+                    cell.setCellStyle(headerCellStyle);
+
+                    sheet.autoSizeColumn(columnCount);
+                }else {
+
+                    cell.setCellValue(cellData);
+                }
+                columnCount++;
+            }
+
+            rowCount++;
+        }
+
+        writeWorkbookToFile(wb,fileName);
+
+   }
 
     // EXCEL WRITER : CREATE .XLSX FILE
     public void writeXLSXFile(List<Map<String, String>> dataList,String fileName, String sheetName) {
@@ -310,22 +347,23 @@ public class UtilityService {
 
             rowCount++;
         }
+        writeWorkbookToFile(wb, excelFileName);
+    }
 
+    private void writeWorkbookToFile(XSSFWorkbook wb, String fileName) {
 
         FileOutputStream fileOut;
         try {
-            fileOut = new FileOutputStream(excelFileName);
+            fileOut = new FileOutputStream(fileName);
 
             //write this workbook to an Outputstream.
             wb.write(fileOut);
             fileOut.flush();
             fileOut.close();
 
-        }catch (Exception e){ }
-
+        } catch (Exception e) {
+        }
     }
-
-
 
     // EXCEL WRITER : CREATE .XLS FILE
     public void writeXLSFile() throws IOException {

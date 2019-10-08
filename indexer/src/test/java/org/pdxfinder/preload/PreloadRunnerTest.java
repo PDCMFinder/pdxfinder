@@ -13,6 +13,7 @@ public class PreloadRunnerTest extends BaseTest {
 
         PreloadRunner runner = new PreloadRunner();
         runner.setFinderRootDir("/home/afollette/Documents/data/UPDOG");
+        runner.setFinderOutput("/home/afollette/Documents/dataOutput");
         runner.runLiftOver();
     }
 

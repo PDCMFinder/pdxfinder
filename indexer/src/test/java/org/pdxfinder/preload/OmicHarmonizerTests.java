@@ -6,14 +6,14 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class OmicHarmonizerTests {
 
     private ArrayList<ArrayList<String>> testData;
-    private OmicHarmonizer harmonizer = new OmicHarmonizer();
-    private static final String expectedMut = "MUT";
-    private static final String expectedCNA = "CNA";
+ 
+    
+    private static final OmicHarmonizer.OMIC expectedMut = OmicHarmonizer.OMIC.MUT;
+    private static final OmicHarmonizer.OMIC expectedCNA = OmicHarmonizer.OMIC.CNA;
     private static final String expectedUndefined = "undefined";
     private static final String UNIQUE_HEADER = "chromosome";
     private static final String assemblyHeader = "genome_assembly";
@@ -25,6 +25,10 @@ public class OmicHarmonizerTests {
     private static final int MUTCOLUMNSIZE = 23;
     private static final int CNACOLUMNSIZE = 20;
     private static final String CHAINFILE = "/home/afollette/IdeaProjects/pdxFinder/indexer/src/main/resources/LiftOverResources/hg19ToHg38.over.chain.gz";
+    private OmicHarmonizer harmonizer = new OmicHarmonizer(CHAINFILE);
+    
+    public OmicHarmonizerTests() throws IOException {
+    }
 
 
     @Before
@@ -40,7 +44,6 @@ public class OmicHarmonizerTests {
 
         //when
         harmonizer.setOmicSheet(testData);
-        harmonizer.determineDataType();
 
         //then
         Assert.assertEquals(expectedMut, harmonizer.getOmicType());
@@ -54,7 +57,7 @@ public class OmicHarmonizerTests {
 
         //when
         harmonizer.setOmicSheet(testData);
-        harmonizer.determineDataType();
+       
 
         //then
         Assert.assertEquals(expectedCNA, harmonizer.getOmicType());
@@ -68,7 +71,7 @@ public class OmicHarmonizerTests {
 
         //when
         harmonizer.setOmicSheet(testData);
-        harmonizer.determineDataType();
+        
 
         //then
         Assert.assertEquals(expectedUndefined, harmonizer.getOmicType());
@@ -137,7 +140,7 @@ public class OmicHarmonizerTests {
 
         //When
         harmonizer.setOmicSheet(testData);
-        int actualSize = harmonizer.runLiftOver(CHAINFILE).size();
+        int actualSize = Integer.parseInt(null);
 
         Assert.assertEquals(0, actualSize);
     }
@@ -161,7 +164,7 @@ public class OmicHarmonizerTests {
 
         //When
         harmonizer.setOmicSheet(testData);
-        ArrayList<ArrayList<String>> actualList = harmonizer.runLiftOver(CHAINFILE);
+        ArrayList<ArrayList<String>> actualList =null;
 
         Assert.assertEquals(1, actualList.size());
         Assert.assertEquals(MUTCOLUMNSIZE,actualList.get(0).size());
@@ -182,7 +185,7 @@ public class OmicHarmonizerTests {
 
         //When
         harmonizer.setOmicSheet(testData);
-        ArrayList<ArrayList<String>> actualList = harmonizer.runLiftOver(CHAINFILE);
+        ArrayList<ArrayList<String>> actualList =null;
 
         Assert.assertEquals(0, actualList.size());
     }
@@ -224,7 +227,7 @@ public class OmicHarmonizerTests {
 
         //When
         harmonizer.setOmicSheet(testData);
-        ArrayList<ArrayList<String>> actualList = harmonizer.runLiftOver(CHAINFILE);
+        ArrayList<ArrayList<String>> actualList =null;
 
         Assert.assertEquals(actualList.get(0).get(chromoCol), expectedChromo);
         Assert.assertEquals(actualList.get(0).get(seqStartCol), expectedStartSeq);
@@ -265,7 +268,7 @@ public class OmicHarmonizerTests {
 
         //When
         harmonizer.setOmicSheet(testData);
-        ArrayList<ArrayList<String>> actualList = harmonizer.runLiftOver(CHAINFILE);
+        ArrayList<ArrayList<String>> actualList =null;
 
         Assert.assertEquals(actualList.get(0).get(chromoCol), expectedChromo);
         Assert.assertEquals(actualList.get(0).get(seqStartCol), expectedStartSeq);
