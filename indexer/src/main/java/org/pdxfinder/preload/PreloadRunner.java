@@ -35,7 +35,7 @@ public class PreloadRunner implements CommandLineRunner {
     private OmicHarmonizer harmonizer = new OmicHarmonizer(CHAINFILE);
     private UtilityService utilityService = new UtilityService();
 
-    private static final String CHAINFILE = "src/main/resources/LiftOverResources/hg19ToHg38.over.chain.gz";
+    private static final String CHAINFILE = "indexer/src/main/resources/LiftOverResources/hg19ToHg38.over.chain.gz";
 
     @Override
     public void run(String... args) throws Exception {
@@ -46,7 +46,7 @@ public class PreloadRunner implements CommandLineRunner {
         OptionSet options = parser.parse(args);
         finderRootDir = UniversalLoader.stripTrailingSlash(finderRootDir);
 
-        if (options.has("liftOver")) runLiftOver();
+        if (options.has("LIFT")) runLiftOver();
     }
 
     public void runLiftOver() throws IOException {
@@ -74,8 +74,8 @@ public class PreloadRunner implements CommandLineRunner {
 
     private void makeOutFileDirAndSave(File f,ArrayList<ArrayList<String>> liftedSheet) throws IOException {
 
-        String sourceNameRegex = "(?i).{50}UPDOG/(.{10})/.{10}}";
-        String datatypeRegex = "(?i).{50}UPDOG/.{10}/(.{3})";
+        String sourceNameRegex = "(?i).{1,150}UPDOG/(.{1,10})/.{1,3}";
+        String datatypeRegex = "(?i).{1,50}UPDOG/.{1,10}/(.{1,3})";
         String sourceDir = f.getParent().replaceAll(sourceNameRegex, "$1");
         String dataType = f.getParent().replaceAll(datatypeRegex, "$1");
 

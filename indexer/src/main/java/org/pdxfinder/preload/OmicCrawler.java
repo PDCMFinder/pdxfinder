@@ -23,7 +23,9 @@ public class OmicCrawler {
 
         if(folderExists(rootDir)) {
 
-            List<File> providerFolders = Arrays.asList(rootDir.listFiles());
+            String updog = String.format("%s/data/UPDOG", rootDir);
+
+            List<File> providerFolders = Arrays.asList(new File(updog).listFiles());
 
             providersData = returnMutAndCNASubFolders(providerFolders);
 

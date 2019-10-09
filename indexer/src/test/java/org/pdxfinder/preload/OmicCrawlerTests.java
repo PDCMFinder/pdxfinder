@@ -12,7 +12,10 @@ public class OmicCrawlerTests {
 
     private String finderRootDir;
 
-    private Path tmpRootDir;
+
+    private Path rootDir;
+    private Path dataDir;
+    private Path updogDir;
     private Path provider1;
     private Path provider2;
     private Path mut;
@@ -33,10 +36,12 @@ public class OmicCrawlerTests {
     @Before
     public void buildTestStructure() throws IOException {
 
-        tmpRootDir = Files.createTempDirectory("TEST");
+        rootDir = Files.createTempDirectory(("TEST"));
+        dataDir = Files.createDirectory(Paths.get(rootDir.toString() + "/data"));
+        updogDir = Files.createDirectory(Paths.get(dataDir.toString() + "/UPDOG"));
 
-        provider1 = Files.createDirectory(Paths.get(tmpRootDir.toString() + "/provider1"));
-        provider2 = Files.createDirectory(Paths.get(tmpRootDir.toString() + "/provider2"));
+        provider1 = Files.createDirectory(Paths.get(updogDir.toString() + "/provider1"));
+        provider2 = Files.createDirectory(Paths.get(updogDir.toString() + "/provider2"));
 
         mutFolder = Files.createDirectory(Paths.get(provider1.toString() + "/mut"));
         cnaFolder = Files.createDirectory(Paths.get(provider1.toString() + "/cna"));
@@ -65,9 +70,10 @@ public class OmicCrawlerTests {
         mutFolder2.toFile().delete();
         cnaFolder2.toFile().delete();
         cytoFolder2.toFile().delete();
-        tmpRootDir.toFile().delete();
         provider1.toFile().delete();
         provider2.toFile().delete();
+        dataDir.toFile().delete();
+        updogDir.toFile().delete();
     }
 
     @Test(expected = IOException.class)
@@ -89,7 +95,7 @@ public class OmicCrawlerTests {
 
 
         //when
-        List<File> actualFiles = initCrawlersAndPassRootFile(tmpRootDir.toFile());
+        List<File> actualFiles = initCrawlersAndPassRootFile(rootDir.toFile());
 
         //then
         Assert.assertEquals(4, actualFiles.size());
@@ -109,7 +115,7 @@ public class OmicCrawlerTests {
         cna = Files.createFile(Paths.get(cnaFolder.toString() + "/'~data.xlsx'"));
 
         //when
-        List<File> actualFiles = initCrawlersAndPassRootFile(tmpRootDir.toFile());
+        List<File> actualFiles = initCrawlersAndPassRootFile(rootDir.toFile());
 
         //then
         Assert.assertEquals(2, actualFiles.size());

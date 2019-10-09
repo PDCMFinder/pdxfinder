@@ -74,11 +74,11 @@ public class OmicHarmonizer {
 
         for (ArrayList<String> row : omicSheet)
 
-            if ((!row.isEmpty()) && isHg37(row)) {
+            if (((!row.isEmpty()) && row.size() > genomeAssemblyCol) && isHg37(row)) {
 
                 Map<String, long[]> liftedData = lifter.liftOverCoordinates(getRowsGenomicCoor(row));
                 if ((liftedData.isEmpty()||liftedData.containsKey(ERRORSTR)||liftedData.containsValue(-1))) {
-                    logLiftError(row);
+                    logLiftInfo(row);
 
                 } else {
                     harmonizeData(liftedData, row);
@@ -86,9 +86,9 @@ public class OmicHarmonizer {
             }
     }
 
-    private void logLiftError(ArrayList<String> row) {
-        String errorMSG = String.format("Genomic coordinates not lifted. Chro %s start %s %n", row.get(chromosomeColumn), row.get(seqStartPositionCol));
-        log.warn(errorMSG);
+    private void logLiftInfo(ArrayList<String> row) {
+        String infoMSG = String.format("Genomic coordinates not lifted for row at index: %s. %n Row data : %s", omicSheet.indexOf(row), Arrays.toString(row.toArray()));
+        log.info(infoMSG);
     }
 
     private void harmonizeData(Map<String,long[]> liftedData, ArrayList<String> row){
@@ -99,12 +99,21 @@ public class OmicHarmonizer {
 
     private Map<String, long[]> getRowsGenomicCoor(ArrayList<String> row){
 
-        String rowChromosome = row.get(chromosomeColumn);
-        long rowStartPos = getAndValidateNum(row, seqStartPositionCol);
-        long rowEndPos = getSeqEndPosition(row);
+        String rowChromosome = "";
+        long rowStartPos = -1;
+        long endPos = -1;
+
+        if(row.size() > chromosomeColumn && row.size() > seqStartPositionCol && row.size() > seqEndPositionCol) {
+             rowChromosome = row.get(chromosomeColumn);
+             rowStartPos = getAndValidateNum(row, seqStartPositionCol);
+             endPos = getSeqEndPosition(row);
+        } else log.error("Error column size is less then header at index: " + omicSheet.indexOf(row));
+
+        if(rowChromosome.equals("")) log.info("No Chromsome information found for index" + omicSheet.indexOf(row));
+        if(rowStartPos == -1 || endPos == -1) log.info("Start or end pos missing in " + omicSheet.indexOf(row));
 
          Map<String, long[]> genomCoors = new LinkedHashMap<>();
-         genomCoors.put(rowChromosome, new long[] { rowStartPos, rowEndPos});
+         genomCoors.put(rowChromosome, new long[] { rowStartPos, endPos});
 
          return genomCoors;
     }
