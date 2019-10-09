@@ -50,21 +50,6 @@ public class OmicHarmonizerTests {
     }
 
     @Test
-    public void Given_Headers_When_getHeadersIsCalled_Then_returnHeadersRow(){
-
-        //Given
-        testData.add(fillNewList("HEADER",MUTCOLUMNSIZE));
-        testData.add(fillNewList("TEST",MUTCOLUMNSIZE));
-
-        //when
-        harmonizer.setOmicSheet(testData);
-        ArrayList<String> actualList = harmonizer.getHeaders();
-
-        //Then
-        Assert.assertEquals(actualList, testData.get(0));
-    }
-
-    @Test
     public void Given_Headers_When_getHeadersIsCalled_Then_returnCorrectColumnNumber(){
 
         int expectedCol = 7;
@@ -122,7 +107,7 @@ public class OmicHarmonizerTests {
         //Given
         createHeadersWithAssemChromoAndStartSeq(expectedCol,chromoCol,seqStartCol, MUTCOLUMNSIZE);
 
-        ArrayList<String> firstDataRow = (fillNewList("10",MUTCOLUMNSIZE));
+        ArrayList<String> firstDataRow = (fillNewList("1500",MUTCOLUMNSIZE));
         firstDataRow.set(expectedCol, "37");
         testData.add(firstDataRow);
 
@@ -131,6 +116,7 @@ public class OmicHarmonizerTests {
 
         Assert.assertEquals(1, actualList.size());
         Assert.assertEquals(MUTCOLUMNSIZE,actualList.get(0).size());
+
     }
 
     @Test

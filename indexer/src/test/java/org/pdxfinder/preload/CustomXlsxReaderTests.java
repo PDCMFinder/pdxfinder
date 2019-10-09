@@ -28,7 +28,7 @@ public class CustomXlsxReaderTests {
     int expectedSize = 13;
     private int expectedInteger = 9999;
 
-    PDX_XlsxReader xlsxReader = new PDX_XlsxReader();
+    PreloaderXlsxReader xlsxReader = new PreloaderXlsxReader();
 
     @Before
     public void init(){

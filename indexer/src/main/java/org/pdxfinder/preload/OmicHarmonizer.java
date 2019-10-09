@@ -11,28 +11,27 @@ public class OmicHarmonizer {
     enum OMIC {
         MUT,
         CNA
-    };
+    }
 
     private OMIC omicType;
     private ArrayList<ArrayList<String>> omicSheet;
     private ArrayList<ArrayList<String>> outputSheet;
     private int chromosomeColumn;
-    private int seq_start_positionCol = -1;
-    private int seq_end_positionCol = -1;
+    private int seqStartPositionCol = -1;
+    private int seqEndPositionCol = -1;
     private int genomeAssemblyCol = -1;
-    private int endCol = -1;
 
     private static final String CHROMOSOME = "chromosome";
-    private static final String SEQ_START_POS = "seq_start_position";
-    private static final String SEQ_END_POS = "seq_end_position";
-    private static final String GENOME_ASSEMBLY = "genome_assembly";
-    private final static String errorStr = "ERROR LIFTING";
+    private static final String SEQSTARTPOS = "seq_start_position";
+    private static final String SEQENDPOS = "seq_end_position";
+    private static final String GENOMEASSEMBLY = "genome_assembly";
+    private static final String ERRORSTR = "ERROR LIFTING";
 
     private PDXLiftOver lifter = new PDXLiftOver();
 
     Logger log = LoggerFactory.getLogger(OmicHarmonizer.class);
 
-    OmicHarmonizer(String chain) throws IOException {
+    OmicHarmonizer(String chain) {
         lifter.setChainFileURI(chain);
     }
 
@@ -56,15 +55,15 @@ public class OmicHarmonizer {
 
         findLastHeaderColumn();
         chromosomeColumn = getColumnByHeader(CHROMOSOME);
-        seq_start_positionCol = getColumnByHeader(SEQ_START_POS);
+        seqStartPositionCol = getColumnByHeader(SEQSTARTPOS);
 
-        genomeAssemblyCol = getColumnByHeader(GENOME_ASSEMBLY);
-        if (omicType.equals(OMIC.CNA)) seq_end_positionCol = getColumnByHeader(SEQ_END_POS);
+        genomeAssemblyCol = getColumnByHeader(GENOMEASSEMBLY);
+        if (omicType.equals(OMIC.CNA)) seqEndPositionCol = getColumnByHeader(SEQENDPOS);
     }
 
     private void findLastHeaderColumn(){
 
-        endCol = getHeaders().size();
+        int endCol = getHeaders().size();
 
         for(int i = 0; i < endCol; i++) {
             if (getHeaders().get(i).trim().equals("")) endCol = i;
@@ -77,9 +76,8 @@ public class OmicHarmonizer {
 
             if ((!row.isEmpty()) && isHg37(row)) {
 
-                //System.out.println("Lifting over row index: " + omicSheet.indexOf(row));
                 Map<String, long[]> liftedData = lifter.liftOverCoordinates(getRowsGenomicCoor(row));
-                if ((liftedData.isEmpty()||liftedData.containsKey(errorStr)||liftedData.containsValue(-1))) {
+                if ((liftedData.isEmpty()||liftedData.containsKey(ERRORSTR)||liftedData.containsValue(-1))) {
                     logLiftError(row);
 
                 } else {
@@ -89,7 +87,8 @@ public class OmicHarmonizer {
     }
 
     private void logLiftError(ArrayList<String> row) {
-        log.warn("Genomic coordinates not lifted. Chro " + row.get(chromosomeColumn) + " start " + row.get(seq_start_positionCol) + "\n");
+        String errorMSG = String.format("Genomic coordinates not lifted. Chro %s start %s %n", row.get(chromosomeColumn), row.get(seqStartPositionCol));
+        log.warn(errorMSG);
     }
 
     private void harmonizeData(Map<String,long[]> liftedData, ArrayList<String> row){
@@ -101,33 +100,33 @@ public class OmicHarmonizer {
     private Map<String, long[]> getRowsGenomicCoor(ArrayList<String> row){
 
         String rowChromosome = row.get(chromosomeColumn);
-        long rowStartPos = getAndValidateNum(row, seq_start_positionCol);
+        long rowStartPos = getAndValidateNum(row, seqStartPositionCol);
         long rowEndPos = getSeqEndPosition(row);
 
-        return new LinkedHashMap<String, long[]>() {{
-            put(rowChromosome,
-                new long[] { rowStartPos, rowEndPos});
-        }};
+         Map<String, long[]> genomCoors = new LinkedHashMap<>();
+         genomCoors.put(rowChromosome, new long[] { rowStartPos, rowEndPos});
+
+         return genomCoors;
     }
 
     private long getAndValidateNum(ArrayList<String> row, int colNum){
         return Long.parseLong(validateNumStr(row.get(colNum)));
     }
 
-    private String validateNumStr(String NumStr){
-        return NumStr.trim().equals("") ? "-1" : NumStr;
+    private String validateNumStr(String numStr){
+        return numStr.trim().equals("") ? "-1" : numStr;
     }
 
     private long getSeqEndPosition(ArrayList<String> row) {
 
         long endPos = -1;
-        if(omicType.equals(OMIC.CNA)) endPos = getAndValidateNum(row, seq_end_positionCol);
-        else if(omicType.equals(OMIC.MUT)) endPos = getAndValidateNum(row, seq_start_positionCol);
+        if(omicType.equals(OMIC.CNA)) endPos = getAndValidateNum(row, seqEndPositionCol);
+        else if(omicType.equals(OMIC.MUT)) endPos = getAndValidateNum(row, seqStartPositionCol);
         return endPos;
     }
 
     private void setSeqEndPos(ArrayList<String> row, String endPos){
-        if (omicType.equals(OMIC.CNA)) row.set(seq_end_positionCol, endPos);
+        if (omicType.equals(OMIC.CNA)) row.set(seqEndPositionCol, endPos);
     }
 
     private void mergeLiftDataWithRowData(Map<String,long[]> liftedData, ArrayList<String>row) {
@@ -138,7 +137,7 @@ public class OmicHarmonizer {
         for(Map.Entry<String,long[]> entry : list ){
 
             row.set(chromosomeColumn,entry.getKey());
-            row.set(seq_start_positionCol,String.valueOf(entry.getValue()[0]));
+            row.set(seqStartPositionCol,String.valueOf(entry.getValue()[0]));
 
             setSeqEndPos(row, String.valueOf(entry.getValue()[1]));
         }
@@ -168,8 +167,9 @@ public class OmicHarmonizer {
         }while(iterator.hasNext() && ! foundMatch);
 
         if(foundMatch)
-        return index;
-        else return errorFlag;
+            return index;
+        else
+            return errorFlag;
 
     }
 
@@ -178,7 +178,7 @@ public class OmicHarmonizer {
     }
 
     protected boolean headersAreNotMissing(){
-        return (chromosomeColumn != -1 && genomeAssemblyCol != -1 &&  seq_start_positionCol != -1);
+        return (chromosomeColumn != -1 && genomeAssemblyCol != -1 &&  seqStartPositionCol != -1);
     }
 
     public void setOmicSheet(ArrayList<ArrayList<String>> omicSheet) {

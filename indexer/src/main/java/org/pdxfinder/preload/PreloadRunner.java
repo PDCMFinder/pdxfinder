@@ -17,7 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class PreloadRunner implements CommandLineRunner {
@@ -30,16 +30,12 @@ public class PreloadRunner implements CommandLineRunner {
 
     private Logger log = LoggerFactory.getLogger(PreloadRunner.class);
 
-    private ArrayList<File> omicFiles;
     private OmicCrawler crawler = new OmicCrawler();
-    private PDX_XlsxReader reader = new PDX_XlsxReader();
+    private PreloaderXlsxReader reader = new PreloaderXlsxReader();
     private OmicHarmonizer harmonizer = new OmicHarmonizer(CHAINFILE);
     private UtilityService utilityService = new UtilityService();
 
     private static final String CHAINFILE = "src/main/resources/LiftOverResources/hg19ToHg38.over.chain.gz";
-
-    public PreloadRunner() throws IOException {
-    }
 
     @Override
     public void run(String... args) throws Exception {
@@ -56,7 +52,7 @@ public class PreloadRunner implements CommandLineRunner {
     public void runLiftOver() throws IOException {
 
 
-        omicFiles = crawler.run(new File(finderRootDir));
+        List<File> omicFiles = crawler.run(new File(finderRootDir));
 
         omicFiles.forEach(f -> {
 
@@ -65,41 +61,37 @@ public class PreloadRunner implements CommandLineRunner {
             ArrayList<ArrayList<String>> outFile;
 
             try {
-
                 outFile = harmonizer.runLiftOver(sheet, dataType);
                 if (!(outFile.size() == 1 || outFile.isEmpty()))
                     makeOutFileDirAndSave(f, outFile);
                 else
-                    log.info("No data lifted for " + f.getName());
-
+                    log.info(String.format("No data lifted for %s",f.getName()));
             } catch (IOException e) {
-
-                e.printStackTrace();
-
+                log.error(e.toString());
             }
         });
     }
 
     private void makeOutFileDirAndSave(File f,ArrayList<ArrayList<String>> liftedSheet) throws IOException {
 
-        String sourceNameRegex = "(?i).+UPDOG/(.+)/.+";
-        String datatypeRegex = "(?i).+UPDOG/.+/(.+)";
+        String sourceNameRegex = "(?i).{50}UPDOG/(.{10})/.{10}}";
+        String datatypeRegex = "(?i).{50}UPDOG/.{10}/(.{3})";
         String sourceDir = f.getParent().replaceAll(sourceNameRegex, "$1");
         String dataType = f.getParent().replaceAll(datatypeRegex, "$1");
 
         Path outputRoot = Paths.get(URI.create("file://" + finderOutput));
-        Path UPDOG = Paths.get(outputRoot.toString() + "/UPDOG");
-        Path sourceFolder = Paths.get(UPDOG.toString() + "/" + sourceDir);
+        Path updog = Paths.get(outputRoot.toString() + "/UPDOG");
+        Path sourceFolder = Paths.get(updog.toString() + "/" + sourceDir);
         Path sourceData = Paths.get(sourceFolder.toString() + "/" + dataType);
         Path outFile = Paths.get(sourceData.toString() + "/data.xlsx");
 
-        if(Files.notExists(outputRoot))
+        if(!outputRoot.toFile().exists())
             Files.createDirectory(outputRoot);
-        if(Files.notExists(UPDOG))
-            Files.createDirectory(UPDOG);
-        if(Files.notExists(sourceFolder))
+        if(!updog.toFile().exists())
+            Files.createDirectory(updog);
+        if(!sourceFolder.toFile().exists())
             Files.createDirectory(sourceFolder);
-        if(Files.notExists(sourceData))
+        if(!sourceData.toFile().exists())
             Files.createDirectory(sourceData);
 
         utilityService.writeXLSXFile2(liftedSheet, outFile.toString(), "Omic");
@@ -116,19 +108,11 @@ public class PreloadRunner implements CommandLineRunner {
         ArrayList<ArrayList<String>> sheet = null;
         try {
             sheet = reader.readFirstSheet(f);
-            System.out.println("lifting file " + f.getCanonicalPath());
+            log.info(String.format("Lifting file %s", f.getCanonicalFile()));
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.toString());
         }
         return sheet;
-    }
-
-    private void printSheets(ArrayList<ArrayList<String>> outFile){
-
-        for(int i = 0; i < outFile.size(); i++){
-
-            System.out.println(Arrays.toString(outFile.get(i).toArray()));
-        }
     }
 
     public void setFinderRootDir(String finderRootDir) {

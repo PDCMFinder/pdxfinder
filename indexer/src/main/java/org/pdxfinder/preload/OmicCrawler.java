@@ -11,15 +11,15 @@ import java.util.stream.Collectors;
 public class OmicCrawler {
 
     ArrayList<File> providersData;
-    ArrayList<File> variantData;
+    ArrayList<File> variantData = new ArrayList<>();
 
     Logger log = LoggerFactory.getLogger(OmicCrawler.class);
 
-    public ArrayList<File> run(File UPDOG) throws IOException {
+    public List<File> run(File UPDOG) throws IOException {
         return searchFileTreeForOmicData(UPDOG);
     }
 
-    public ArrayList<File> searchFileTreeForOmicData(File rootDir) throws IOException {
+    public List<File> searchFileTreeForOmicData(File rootDir) throws IOException {
 
         if(folderExists(rootDir)) {
 
@@ -29,26 +29,23 @@ public class OmicCrawler {
 
             variantData = getVariantdata(providersData);
 
-        } else
-
-            throw new IOException("Error root directory could not be found by the OmicCrawler");
-            log.error("Error root directory could not be found by the OmicCrawler");
+        } else throw new IOException("Error root directory could not be found by the OmicCrawler");
 
         return variantData;
     }
 
     private ArrayList<File> returnMutAndCNASubFolders(List<File> rootDir){
 
-        ArrayList<File> providers = new ArrayList<File>();
+        ArrayList<File> providers = new ArrayList<>();
 
-        rootDir.forEach(f -> {
+        rootDir.forEach(f ->
 
             providers.addAll
                     (Arrays.stream(f.listFiles())
                             .filter(t -> t.getName().matches("(mut|cna)"))
-                            .collect(Collectors.toCollection(ArrayList::new)));
+                            .collect(Collectors.toCollection(ArrayList::new)))
 
-        });
+        );
         return providers;
     }
 
@@ -57,21 +54,18 @@ public class OmicCrawler {
         if( ! providersData.isEmpty())
             return returnMutAndCNAFiles(providersData);
         else
-            return new ArrayList<File>();
+            return new ArrayList<>();
     }
 
     private ArrayList<File> returnMutAndCNAFiles(List<File> providersData) {
 
-        ArrayList<File> variantData = new ArrayList<File>();
-
-        providersData.forEach(f -> {
+        providersData.forEach(f ->
 
             variantData.addAll
                     (Arrays.stream(f.listFiles())
-                            .filter(t -> t.getName().matches("data.xlsx"))
-                            .collect(Collectors.toCollection(ArrayList::new)));
-
-        });
+                            .filter(t -> t.getName().equals("data.xlsx"))
+                            .collect(Collectors.toCollection(ArrayList::new)))
+        );
 
         return variantData;
     }

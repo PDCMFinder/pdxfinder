@@ -12,17 +12,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Optional;
 
-public class PDX_XlsxReader {
+public class PreloaderXlsxReader {
 
-    Logger log = LoggerFactory.getLogger(PDX_XlsxReader.class);
+    Logger log = LoggerFactory.getLogger(PreloaderXlsxReader.class);
 
     Optional<Workbook> xslxWorkbook;
     ArrayList<ArrayList<String>> sheetData = null;
 
-    public ArrayList<ArrayList<String>> readFirstSheet(File xlsx) throws IOException {
+    public ArrayList<ArrayList<String>> readFirstSheet(File xlsx) {
 
         xslxWorkbook = getWorkbook(xlsx);
 
@@ -61,7 +60,6 @@ public class PDX_XlsxReader {
 
     private ArrayList<String> getCellValues(Row currentRow){
 
-        Iterator<Cell> cellIterator = currentRow.cellIterator();
         ArrayList<String> cellValues = new ArrayList<>();
 
         for(int i = 0; i < currentRow.getLastCellNum(); i++) {
@@ -76,8 +74,7 @@ public class PDX_XlsxReader {
     }
 
     private boolean cellIsNotNullOrEmpty(Cell cell){
-        if (cell.getCellType() == Cell.CELL_TYPE_BLANK) return true;
-        else return false;
+        return (cell.getCellType() == Cell.CELL_TYPE_BLANK);
     }
 
     private String getCellValueAsString(Cell currentCell) {
@@ -110,7 +107,7 @@ public class PDX_XlsxReader {
     }
 
     private static String cleanFloat(String floatValue) {
-        String regex = "(\\d.+)\\.[0]+";
+        String regex = "(\\d.{1,20})\\.[0]{1,20}";
         return floatValue.replaceAll(regex, "$1");
     }
 
@@ -119,6 +116,6 @@ public class PDX_XlsxReader {
     }
 
     private Sheet getSheet(Optional<Workbook> workbook) {
-        return xslxWorkbook.get().getSheetAt(0);
+        return workbook.get().getSheetAt(0);
     }
 }

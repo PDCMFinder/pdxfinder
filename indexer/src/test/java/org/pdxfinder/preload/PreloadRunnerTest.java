@@ -8,7 +8,6 @@ import java.io.IOException;
 
 public class PreloadRunnerTest extends BaseTest {
 
-    @Ignore
     @Test
     public void TestRunner() throws IOException {
 
@@ -16,6 +15,7 @@ public class PreloadRunnerTest extends BaseTest {
         runner.setFinderRootDir("/home/afollette/Documents/data/UPDOG");
         runner.setFinderOutput("/home/afollette/Documents/dataOutput");
         runner.runLiftOver();
+
     }
 
 }
