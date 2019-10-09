@@ -1166,7 +1166,9 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                     log.error("Invalid passage " + passage + " for model:" + modelId);
                 }
-
+            }
+            else{
+                passage = "NA";
             }
 
             ModelCreation modelCreation = dataImportService.findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(modelId, ds.getAbbreviation());
@@ -1177,6 +1179,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 continue;
             }
 
+            //get all molchars related to patient sample
             if(modelCreation.getSample().getMolecularCharacterizations() != null){
 
                 for(MolecularCharacterization mc : modelCreation.getSample().getMolecularCharacterizations()){
@@ -1254,6 +1257,10 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                     log.error("Invalid passage "+passage +" for model:"+modelId);
                 }
+            }
+            else{
+
+                passage = "NA";
             }
 
 
