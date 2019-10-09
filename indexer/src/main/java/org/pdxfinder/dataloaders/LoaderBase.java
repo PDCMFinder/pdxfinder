@@ -81,14 +81,18 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
         try {
             HostStrain nsgBS = dataImportService.getHostStrain(nsgBsName, nsgBsSymbol, nsgbsURL, nsgBsName);
             dto.setNodScidGamma(nsgBS);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            log.error("Failed to create NSG hoststrain", e);
+        }
     }
 
     void step05CreateNSHostStrain(){
         try {
             HostStrain nsBS = dataImportService.getHostStrain(nsBsName, nsBsSymbol, nsBsURL, nsBsName);
             dto.setNodScid(nsBS);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            log.error("Failed to create NS hoststrain", e);
+        }
     }
 
     void step06SetProjectGroup(){
@@ -145,10 +149,17 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
         dto.setModelDosingStudies(Harmonizer.getModelDosingStudies(data, ds));
         dto.setSamplesArr(Harmonizer.getSamplesArr(data, ds));
         dto.setValidationsArr(Harmonizer.getValidationsArr(data, ds));
+        dto.setPatient(null);
+        dto.setPatientSample(null);
+        dto.setModelCreation(null);
+        dto.setPatientSample(null);
+        dto.setSkipModel(false);
 
     }
 
     void step09LoadPatientData(){
+
+        if(dto.isSkipModel()) return ;
 
         Group dataSource = dto.getProviderGroup();
         Patient patient = dataImportService.getPatientWithSnapshots(dto.getPatientId(), dataSource);
@@ -175,6 +186,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
     abstract void step11LoadBreastMarkers();
 
     void step12CreateModels() throws Exception {
+        if(dto.isSkipModel()) return ;
         ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls());
         dto.setModelCreation(modelCreation);
     }
