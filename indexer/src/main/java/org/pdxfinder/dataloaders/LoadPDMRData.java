@@ -100,6 +100,9 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
         jsonFile = finderRootDir +"/data/"+dataSourceAbbreviation+"/pdx/models.json";
         dataSource = dataSourceAbbreviation;
+
+        platformURL = new HashMap<>();
+        platformURL.put("NCI cancer gene panel_mutation","/platform/pdmr-mut-ts");
     }
 
 
