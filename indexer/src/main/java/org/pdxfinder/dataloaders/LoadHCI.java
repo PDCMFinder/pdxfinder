@@ -164,7 +164,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step15LoadImmunoHistoChemistry() {
 
-        String ihcFileStr = finderRootDir + dataSourceAbbreviation + "/ihc/ihc.txt";
+        String ihcFileStr = finderRootDir + "/data/" + dataSourceAbbreviation + "/ihc/ihc.txt";
 
         File file = new File(ihcFileStr);
 
