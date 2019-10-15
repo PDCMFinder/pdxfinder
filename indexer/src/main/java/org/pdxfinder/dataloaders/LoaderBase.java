@@ -34,6 +34,11 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
     protected ReportManager reportManager;
     protected Boolean skipThis = false;
 
+    protected Group providerDS;
+    protected Group projectDS;
+    protected HostStrain nsgBS;
+    protected HostStrain nsBS;
+
     public LoaderBase(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
     }
@@ -73,14 +78,14 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
 
 
     void step03CreateProviderGroup(){
-        Group providerDS = dataImportService.getProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription, providerType, dataSourceContact, sourceURL);
-        dto.setProviderGroup(providerDS);
+        providerDS = dataImportService.getProviderGroup(dataSourceName, dataSourceAbbreviation, dataSourceDescription, providerType, dataSourceContact, sourceURL);
+
     }
 
     void step04CreateNSGammaHostStrain(){
         try {
-            HostStrain nsgBS = dataImportService.getHostStrain(nsgBsName, nsgBsSymbol, nsgbsURL, nsgBsName);
-            dto.setNodScidGamma(nsgBS);
+
+            nsgBS = dataImportService.getHostStrain(nsgBsName, nsgBsSymbol, nsgbsURL, nsgBsName);
         } catch (Exception e) {
             log.error("Failed to create NSG hoststrain", e);
         }
@@ -88,16 +93,14 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
 
     void step05CreateNSHostStrain(){
         try {
-            HostStrain nsBS = dataImportService.getHostStrain(nsBsName, nsBsSymbol, nsBsURL, nsBsName);
-            dto.setNodScid(nsBS);
+            nsBS = dataImportService.getHostStrain(nsBsName, nsBsSymbol, nsBsURL, nsBsName);
         } catch (Exception e) {
             log.error("Failed to create NS hoststrain", e);
         }
     }
 
     void step06SetProjectGroup(){
-        Group group = dataImportService.getProjectGroup(projectGroup);
-        dto.setProjectGroup(group);
+        projectDS = dataImportService.getProjectGroup(projectGroup);
     }
 
     void step07GetPDXModels(){
@@ -111,6 +114,8 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
     }
 
     void step08GetMetaData() throws Exception {
+
+        dto = new LoaderDTO();
 
         JSONObject data = this.jsonData;
         String ds = dataSourceAbbreviation;
@@ -149,10 +154,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
         dto.setModelDosingStudies(Harmonizer.getModelDosingStudies(data, ds));
         dto.setSamplesArr(Harmonizer.getSamplesArr(data, ds));
         dto.setValidationsArr(Harmonizer.getValidationsArr(data, ds));
-        dto.setPatient(null);
-        dto.setPatientSample(null);
-        dto.setModelCreation(null);
-        dto.setPatientSample(null);
+
         dto.setSkipModel(false);
 
     }
@@ -161,11 +163,10 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
 
         if(dto.isSkipModel()) return ;
 
-        Group dataSource = dto.getProviderGroup();
-        Patient patient = dataImportService.getPatientWithSnapshots(dto.getPatientId(), dataSource);
+        Patient patient = dataImportService.getPatientWithSnapshots(dto.getPatientId(), providerDS);
 
         if(patient == null){
-            patient = dataImportService.createPatient(dto.getPatientId(), dataSource, dto.getGender(), "", Standardizer.getEthnicity(dto.getEthnicity()));
+            patient = dataImportService.createPatient(dto.getPatientId(), providerDS, dto.getGender(), "", Standardizer.getEthnicity(dto.getEthnicity()));
         }
         dto.setPatient(patient);
 
@@ -173,7 +174,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
         PatientSnapshot pSnap = dataImportService.getPatientSnapshot(patient, dto.getAge(), "", "", "");
         dto.setPatientSnapshot(pSnap);
 
-        Sample patientSample = dataImportService.getSample(dto.getSampleID(), dataSource.getAbbreviation(), dto.getTumorType(), dto.getDiagnosis(), dto.getPrimarySite(),
+        Sample patientSample = dataImportService.getSample(dto.getSampleID(), providerDS.getAbbreviation(), dto.getTumorType(), dto.getDiagnosis(), dto.getPrimarySite(),
                 dto.getSampleSite(), dto.getExtractionMethod(), false, dto.getStage(), "", dto.getGrade(), "");
 
         dto.setPatientSample(patientSample);
@@ -187,7 +188,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
 
     void step12CreateModels() throws Exception {
         if(dto.isSkipModel()) return ;
-        ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls());
+        ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), providerDS.getAbbreviation(), dto.getPatientSample(), dto.getQualityAssurance(), dto.getExternalUrls());
         dto.setModelCreation(modelCreation);
     }
 
@@ -214,7 +215,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
         step07GetPDXModels();
 
         for (int i = 0; i < jsonArray.length(); i++) {
-
+            dto = new LoaderDTO();
             this.jsonData = jsonArray.getJSONObject(i);
 
             step08GetMetaData();
@@ -296,7 +297,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
                 } catch (Exception e) {
                     // default is 0
                 }
-                Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(), dto.getModelCreation().getSourcePdxId(), dto.getProviderGroup().getAbbreviation(), passage);
+                Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(), dto.getModelCreation().getSourcePdxId(), providerDS.getAbbreviation(), passage);
                 specimen.setHostStrain(bs);
 
                 if (ds.equals("wustl")){

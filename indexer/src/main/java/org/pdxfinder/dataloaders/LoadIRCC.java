@@ -127,7 +127,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step13LoadSpecimens()throws Exception {
 
-        dto.getModelCreation().addGroup(dto.getProjectGroup());
+        dto.getModelCreation().addGroup(providerDS);
 
         JSONArray specimens = dto.getSpecimens();
 
@@ -138,9 +138,9 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
             Specimen specimen = dataImportService.getSpecimen(
                 dto.getModelCreation(),
                 specimenId,
-                dto.getProviderGroup().getAbbreviation(),
+                providerDS.getAbbreviation(),
                 specimenJSON.getString("Passage"));
-            specimen.setHostStrain(dto.getNodScidGamma());
+            specimen.setHostStrain(nsgBS);
 
             EngraftmentSite is = dataImportService.getImplantationSite(specimenJSON.getString("Engraftment Site"));
             specimen.setEngraftmentSite(is);
@@ -152,7 +152,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
             Sample specSample = new Sample();
             specSample.setSourceSampleId(specimenId);
-            specSample.setDataSource(dto.getProviderGroup().getAbbreviation());
+            specSample.setDataSource(providerDS.getAbbreviation());
 
             specimen.setSample(specSample);
 
@@ -175,8 +175,8 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step16LoadVariationData() {
         log.info(String.format("Loading WGS for model %s", dto.getModelCreation().getSourcePdxId()));
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation", finderRootDir+"/data/"+dataSource);
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"copy number alteration", finderRootDir+"/data/"+dataSource);
+        loadOmicData(dto.getModelCreation(), providerDS,"mutation", finderRootDir+"/data/"+dataSource);
+        loadOmicData(dto.getModelCreation(), providerDS,"copy number alteration", finderRootDir+"/data/"+dataSource);
     }
 
     @Override
@@ -229,8 +229,8 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
             JSONObject job = new JSONObject(utilityService.parseFile(variationURLStr));
             JSONArray jarray = job.getJSONArray("IRCCVariation");
 
-            Platform platform = dataImportService.getPlatform(tech, "mutation", dto.getProviderGroup(), platformURL.get("targetedNgsPlatformURL"));
-            platform.setGroup(dto.getProviderGroup());
+            Platform platform = dataImportService.getPlatform(tech, "mutation", providerDS, platformURL.get("targetedNgsPlatformURL"));
+            platform.setGroup(providerDS);
             dataImportService.savePlatform(platform);
 
             for (int i = 0; i < jarray.length(); i++) {
