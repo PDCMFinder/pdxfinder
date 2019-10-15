@@ -229,6 +229,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 platform = dataImportService.getPlatform(platformName, dataType, providerGroup);
 
                 if(platform.getUrl()== null || platform.getUrl().isEmpty()){
+
                     platform.setUrl(platformURL.get(platformURLKey));
                 }
 

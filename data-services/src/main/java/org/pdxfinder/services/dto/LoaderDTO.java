@@ -48,12 +48,6 @@ public class LoaderDTO {
     private EngraftmentSite engraftmentSite;
     private EngraftmentType engraftmentType;
 
-    private HostStrain nodScidGamma;
-    private HostStrain nodScid;
-
-    private Group projectGroup;
-    private Group providerGroup;
-
     private ModelCreation modelCreation;
     private Patient patient;
 
@@ -287,38 +281,6 @@ public class LoaderDTO {
 
     public void setEngraftmentType(EngraftmentType engraftmentType) {
         this.engraftmentType = engraftmentType;
-    }
-
-    public HostStrain getNodScidGamma() {
-        return nodScidGamma;
-    }
-
-    public void setNodScidGamma(HostStrain nodScidGamma) {
-        this.nodScidGamma = nodScidGamma;
-    }
-
-    public HostStrain getNodScid() {
-        return nodScid;
-    }
-
-    public void setNodScid(HostStrain nodScid) {
-        this.nodScid = nodScid;
-    }
-
-    public Group getProjectGroup() {
-        return projectGroup;
-    }
-
-    public void setProjectGroup(Group projectGroup) {
-        this.projectGroup = projectGroup;
-    }
-
-    public Group getProviderGroup() {
-        return providerGroup;
-    }
-
-    public void setProviderGroup(Group providerGroup) {
-        this.providerGroup = providerGroup;
     }
 
     public ModelCreation getModelCreation() {

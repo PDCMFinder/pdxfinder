@@ -100,6 +100,10 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         jsonFile = finderRootDir + "/data/" + dataSourceAbbreviation+"/pdx/models.json";
         dataSource = dataSourceAbbreviation;
 
+        platformURL = new HashMap<>();
+        platformURL.put("CTP_mutation","/platform/jax-ctp/");
+        platformURL.put("Truseq_JAX_mutation","/platform/jax-truseq/");
+        platformURL.put("Whole_Exome_mutation","/platform/jax-whole-exome/");
     }
 
 
@@ -177,7 +181,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                 NodeSuggestionDTO nsdto;
 
                 MolecularCharacterization mc = new MolecularCharacterization();
-                mc.setPlatform(dataImportService.getPlatform("Not Specified", "cytogenetics", dto.getProviderGroup()));
+                mc.setPlatform(dataImportService.getPlatform("Not Specified", "cytogenetics", providerDS));
                 mc.setType("cytogenetics");
 
                 //we know these markers exist so no need to check for null
@@ -239,8 +243,8 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step13LoadSpecimens() {
         if(dto.isSkipModel()) return ;
-        Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(), dto.getModelID(), dto.getProviderGroup().getAbbreviation(), "");
-        specimen.setHostStrain(dto.getNodScidGamma());
+        Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(), dto.getModelID(), providerDS.getAbbreviation(), "");
+        specimen.setHostStrain(nsgBS);
         EngraftmentSite engraftmentSite = dataImportService.getImplantationSite(dto.getImplantationSiteStr());
         EngraftmentType engraftmentType = dataImportService.getImplantationType(Standardizer.NOT_SPECIFIED);
         specimen.setEngraftmentSite(engraftmentSite);
@@ -277,11 +281,11 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         if(dto.isSkipModel()) return ;
         String dataDirectory = finderRootDir+"/data/"+dataSourceAbbreviation;
 
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation", dataDirectory);
+        loadOmicData(dto.getModelCreation(), providerDS,"mutation", dataDirectory);
 
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"copy number alteration", dataDirectory);
+        loadOmicData(dto.getModelCreation(), providerDS,"copy number alteration", dataDirectory);
 
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"transcriptomics", dataDirectory);
+        loadOmicData(dto.getModelCreation(), providerDS,"transcriptomics", dataDirectory);
 
     }
 
