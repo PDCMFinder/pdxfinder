@@ -1105,7 +1105,14 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             //Add contact provider and view data
             List<ExternalUrl> externalUrls = new ArrayList<>();
-            externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contactEmail));
+            if(contactEmail != null && !contactEmail.isEmpty()){
+                externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contactEmail));
+            }
+
+            if(contactFormLink != null && !contactFormLink.isEmpty()){
+                externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contactFormLink));
+            }
+
             externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, modelLinkToDB));
             model.setExternalUrls(externalUrls);
 
