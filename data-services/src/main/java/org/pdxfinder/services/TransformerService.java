@@ -10,6 +10,8 @@ import org.pdxfinder.rdbms.repositories.TransPdxInfoRepository;
 import org.pdxfinder.rdbms.repositories.TransSampleRepository;
 import org.pdxfinder.rdbms.repositories.TransTreatmentRepository;
 import org.pdxfinder.rdbms.repositories.TransValidationRepository;
+import org.pdxfinder.services.enums.OmicCSVColumn;
+import org.pdxfinder.services.enums.PdmrOmicCol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -620,7 +622,7 @@ public class TransformerService {
             }
         }catch (Exception e){
 
-            log.info("{} has no sample in the database", modelID);
+            log.trace("{} has no sample in the database", modelID);
         }
 
         return passage;
@@ -723,6 +725,109 @@ public class TransformerService {
         }
 
         return mapToString;
+    }
+
+
+    public List<Map<?, ?>> transformPDMRGenomics(List<Map<String, String>> untransformedGenomicData){
+
+        List<Map<?, ?>> transformedData = new ArrayList<>();
+
+        for (Map<String, String> data : untransformedGenomicData) {
+
+            Map<OmicCSVColumn, String> rowMap = new LinkedHashMap<>();
+
+
+            // Get Sample ID Column
+            rowMap.put(OmicCSVColumn.datasource, "PDMR");
+            rowMap.put(OmicCSVColumn.Model_ID, data.get(PdmrOmicCol.PATIENT_ID.get()).concat("-").concat(data.get(PdmrOmicCol.SPECIMEN_ID.get())));
+
+            // Get Sample ID Column
+            if (data.get(PdmrOmicCol.PDM_TYPE.get()).equals("PDX") || data.get(PdmrOmicCol.PDM_TYPE.get()).equals(PdmrOmicCol.PDM_TYPE_PATENT.get())){
+
+                rowMap.put(OmicCSVColumn.Sample_ID, data.get(PdmrOmicCol.Sample_ID.get()));
+            }else {
+                continue;
+            }
+
+            String modelID = rowMap.get(OmicCSVColumn.Model_ID);
+            String sampleID = rowMap.get(OmicCSVColumn.Sample_ID);
+
+            // Get Sample Origin and Passage Column
+            if (data.get(PdmrOmicCol.PDM_TYPE.get()).equals("PDX")){
+
+                rowMap.put(OmicCSVColumn.sample_origin, "engrafted tumor");
+
+                String passage = getPassageByModelIDAndSampleID(modelID, sampleID);
+                rowMap.put(OmicCSVColumn.Passage, passage);
+
+            }else if (data.get(PdmrOmicCol.PDM_TYPE.get()).equals(PdmrOmicCol.PDM_TYPE_PATENT.get())){
+
+                rowMap.put(OmicCSVColumn.sample_origin, "patient tumor");
+                rowMap.put(OmicCSVColumn.Passage, "");
+            }else {
+                continue;
+            }
+
+
+            // Get Host Strain name Column
+            rowMap.put(OmicCSVColumn.host_strain_name, "");
+
+            // Get Gene Symbol or HGNC Symbol
+            if (data.get(PdmrOmicCol.Gene.get()).equals("None Found")){
+
+                continue;
+            }else {
+                rowMap.put(OmicCSVColumn.hgnc_symbol, data.get(PdmrOmicCol.Gene.get()));
+            }
+
+            // Get Amino Acid Change
+            rowMap.put(OmicCSVColumn.amino_acid_change, data.get(PdmrOmicCol.AA_Change.get()));
+
+            // Get Nucleotide Change
+            rowMap.put(OmicCSVColumn.nucleotide_change, data.get(PdmrOmicCol.CodonChange.get()));
+
+            // Get Consequence Column
+            rowMap.put(OmicCSVColumn.consequence, data.get(PdmrOmicCol.Impact.get()));
+
+            // Read Depth
+            rowMap.put(OmicCSVColumn.read_depth, data.get(PdmrOmicCol.ReadDepth.get()));
+
+            // Get Allele Frequency
+            rowMap.put(OmicCSVColumn.Allele_frequency, data.get(PdmrOmicCol.AlleleFrequency.get()));
+
+            // Get Chromoseme Column
+            rowMap.put(OmicCSVColumn.chromosome, data.get(PdmrOmicCol.Chr.get()));
+
+            // Seq Start Position
+            rowMap.put(OmicCSVColumn.seq_start_position, data.get(PdmrOmicCol.Position.get()));
+
+            // Get Ref Allele
+            rowMap.put(OmicCSVColumn.REF_ALLELE, data.get(PdmrOmicCol.REF_ALLELE.get()));
+
+            // Get Alt Allele
+            rowMap.put(OmicCSVColumn.alt_allele, data.get(PdmrOmicCol.alt_allele.get()));
+
+            // Get Gene IDs
+            rowMap.put(OmicCSVColumn.ucsc_gene_id, "");
+            rowMap.put(OmicCSVColumn.ncbi_gene_id, "");
+            rowMap.put(OmicCSVColumn.ensembl_gene_id, "");
+            rowMap.put(OmicCSVColumn.ensembl_transcript_id, "");
+
+            // Get RS ID Variant
+            rowMap.put(OmicCSVColumn.rs_id_Variant, data.get(PdmrOmicCol.dbSNP_ID.get()));
+
+            // Get Genome Assembly
+            rowMap.put(OmicCSVColumn.genome_assembly, "hg19");
+
+            // Get Platform Column
+            rowMap.put(OmicCSVColumn.Platform, "NCI cancer gene panel");
+
+            transformedData.add(rowMap);
+
+        }
+
+
+        return transformedData;
     }
 
 }

@@ -32,6 +32,8 @@ public class TransController {
     private final static Logger log = LoggerFactory.getLogger(TransController.class);
     private String homeDir = System.getProperty("user.home");
 
+    private String pdmrRawFileDir = homeDir+"/finderroot/data/PDMR/raw/";
+
     private RestTemplate restTemplate = new RestTemplate();
     private ObjectMapper mapper = new ObjectMapper();
     private TransformerService transformerService;
@@ -80,6 +82,7 @@ public class TransController {
     @GetMapping("/transform-pdmr-data")
     public Object connectPdmr(){
 
+        transformerService.setDataRootDir(System.getProperty("user.home")+"/finderroot/data");
         List<Map<String, String>> mappingList = transformerService.transformDataAndSave();
         return mappingList;
 
@@ -128,47 +131,22 @@ public class TransController {
 
 
 
-    @RequestMapping("/rewrite-pdmr-omic-data")
-    public Object downloads() {
+    @RequestMapping("/pdmr/genomics")
+    public Object transformPdmrGenomicData() {
 
-        String omicFile= System.getProperty("user.home") + "/Downloads/NGS-LOADER/ncicancergenepaneldata_MARCH2019.csv";
+        List<Map<String, String>> dataList = utilityService.serializeCSVToMaps(pdmrRawFileDir+"ncicancergenepaneldata-8.csv");
 
-        List<Map<String, String>> dataList = utilityService.serializeCSVToMaps(omicFile);
+        List<Map<?, ?>> transformedData = transformerService.transformPDMRGenomics(dataList);
 
+        String destination = pdmrRawFileDir+"transformed-nci-gene-panel.csv";
 
-        List removedList = new ArrayList();
-        for (Map<String, String> data : dataList) {
-
-            if ( !data.get("Sample_ID").equals("ORIGINATOR") ){
-
-                String modelID = data.get("Model_ID");
-                String sampleID = data.get("Sample_ID");
-
-                String passage = transformerService.getPassageByModelIDAndSampleID(modelID, sampleID);
-
-                data.put("Passage", passage);
-
-                /*if (passage.equals("XXXX")){
-                    removedList.add(data);
-                }*/
-            }
-
-
-            if ( data.get("hgnc_symbol").equals("None Found") ){
-
-                removedList.add(data);
-            }
-
-        }
-
-        dataList.removeAll(removedList);
-
-
-        String destination = homeDir+"/Downloads/data.csv";
-        utilityService.writeCsvFile(dataList, destination);
+        utilityService.writeCsvFileGenerics(transformedData, destination);
 
         return dataList;
     }
+
+
+
 
 
 
@@ -176,7 +154,7 @@ public class TransController {
     public Object irccCNA() {
 
         // Get CNA xls Template
-        String cnaFile = System.getProperty("user.home") + "/PDXFinder/data/IRCC-CRC/cna/CNA- IRCC-CRC template.xlsx";
+        String cnaFile = homeDir+"/PDXFinder/data/IRCC-CRC/cna/CNA- IRCC-CRC template.xlsx";
 
         List<Map<String, String>> dataList = utilityService.serializeExcelDataNoIterator(cnaFile,0,1);
 
@@ -188,7 +166,7 @@ public class TransController {
     @RequestMapping("/rewrite-ircc-json")
     public Object irccTransformJson() {
 
-        String jsonFile= System.getProperty("user.home") + "/PDXFinder/data/IRCC-CRC/mut/old.json";
+        String jsonFile= homeDir+"/PDXFinder/data/IRCC-CRC/mut/old.json";
 
         List<Map<String, String>> dataList = (List) utilityService.serializeJSONToMaps(jsonFile, "IRCCVariation");
         List<Map<String, String>> newDataList = new ArrayList<>();
@@ -238,7 +216,7 @@ public class TransController {
 
 
         // Get Exome Template
-        String exomeFile = System.getProperty("user.home") + "/PDXFinder/data/IRCC-CRC/exome_IRCC-CRC template.xlsx";
+        String exomeFile = homeDir+"/PDXFinder/data/IRCC-CRC/exome_IRCC-CRC template.xlsx";
 
         List<Map<String, String>> dataList2 = utilityService.serializeExcelDataNoIterator(exomeFile,0,1);
 
@@ -253,7 +231,7 @@ public class TransController {
     @RequestMapping("/rewrite-curie-lc-cna")
     public Object curieTransform() {
 
-        String cnaFile= System.getProperty("user.home") + "/Downloads/curie-cna.xlsx";
+        String cnaFile= homeDir+"/Downloads/curie-cna.xlsx";
 
         List<Map<String, String>> dataList = utilityService.serializeExcelDataNoIterator(cnaFile,0,1);
 
@@ -319,7 +297,7 @@ public class TransController {
 
 
         // UPDATE DERIVED DATA SHEET
-        String templateFile= System.getProperty("user.home") + "/Downloads/DATA/crl.xlsx";
+        String templateFile= homeDir+ "/Downloads/DATA/crl.xlsx";
         List<Map<String, String>> derivedDataSheet = utilityService.serializeExcelDataNoIterator(templateFile,6,4);
 
         List removedList = new ArrayList();
@@ -431,7 +409,7 @@ public class TransController {
 
 
 
-        String templateFile= System.getProperty("user.home") + "/Downloads/template.xlsx";
+        String templateFile= homeDir+ "/Downloads/template.xlsx";
         List<Map<String, String>> data = utilityService.serializeExcelDataNoIterator(templateFile,6,4);
         data.remove(data.get(0));
 
@@ -444,9 +422,9 @@ public class TransController {
             String destinationDir = sourceDir+"2";
             String fileSuffix = (dataType.equals("Mutation")) ? "_mutation_list_pdxfinder.csv" : "_cna_list_pdxfinder.csv";
 
-            String source = System.getProperty("user.home") + "/Downloads/TEMP/"+sourceDir+"/"+sampleID+fileSuffix;
+            String source = homeDir+ "/Downloads/TEMP/"+sourceDir+"/"+sampleID+fileSuffix;
 
-            String destination = System.getProperty("user.home") + "/Downloads/TEMP/"+destinationDir+"/"+sampleID+fileSuffix;
+            String destination = homeDir+ "/Downloads/TEMP/"+destinationDir+"/"+sampleID+fileSuffix;
 
             utilityService.moveFile(source,destination);
 
@@ -466,8 +444,8 @@ public class TransController {
 
 
         List<String> csvHead = Arrays.asList("datasource","Model_ID","Sample_ID","sample_origin","Passage","host_strain_name","hgnc_symbol","amino_acid_change","nucleotide_change",
-                "consequence","read_depth","Allele_frequency","chromosome","seq_start_position","ref_allele","alt_allele","ucsc_gene_id",
-                "ncbi_gene_id","ensembl_gene_id","ensembl_transcript_id","rs_id_Variant","genome_assembly","Platform");
+                                             "consequence","read_depth","Allele_frequency","chromosome","seq_start_position","ref_allele","alt_allele","ucsc_gene_id",
+                                             "ncbi_gene_id","ensembl_gene_id","ensembl_transcript_id","rs_id_Variant","genome_assembly","Platform");
 
 
         String templateFile= homeDir + "/Downloads/template.xlsx";
@@ -572,12 +550,3 @@ public class TransController {
 
 
 }
-
-
-
-
-
-
-
-
-
