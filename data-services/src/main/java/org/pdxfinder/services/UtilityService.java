@@ -210,12 +210,11 @@ public class UtilityService {
             int rowCount = 0;
             Workbook workbook = WorkbookFactory.create(inputStream);
             Sheet spreadsheet = workbook.getSheetAt(sheet);
-            Iterator<Row> rowIterator = spreadsheet.iterator();
 
 
-            while (rowIterator.hasNext()) // Read the head row
-            {
-                row = rowIterator.next();
+            // Read the head row
+            for (Row cells : spreadsheet) {
+                row = cells;
 
                 if (rowCount == startRow) {
 
@@ -237,7 +236,7 @@ public class UtilityService {
                 //isAllowed = validURls.stream().anyMatch(str -> str.equals(dRequestUrl));
 
                 Map<String, String> rowMap = new LinkedHashMap<>();
-                String rowDataTracker = "";
+                StringBuilder rowDataTracker = new StringBuilder();
 
                 for (int i = 0; i < tableHead.size(); i++) {
 
@@ -250,7 +249,7 @@ public class UtilityService {
                         String data = nameCell.getStringCellValue();
 
                         rowMap.put(key, data);
-                        rowDataTracker += data;
+                        rowDataTracker.append(data);
 
                     } else {
                         if (!key.equals("")) rowMap.put(key, "");
@@ -321,7 +320,7 @@ public class UtilityService {
             fileOut.flush();
             fileOut.close();
 
-        }catch (Exception e){ }
+        }catch (Exception e){ log.error(e.getMessage());}
 
     }
 
@@ -372,25 +371,23 @@ public class UtilityService {
             Row row;
             Workbook workbook = WorkbookFactory.create(inputStream);
             Sheet spreadsheet = workbook.getSheetAt(sheet);
-            Iterator<Row> rowIterator = spreadsheet.iterator();
 
-            while (rowIterator.hasNext())
-            {
-                row = rowIterator.next();
+            for (Row cells : spreadsheet) {
+                row = cells;
 
                 Iterator<Cell> cellIterator = row.cellIterator();
                 tableHead = getXlsTableHeadData(cellIterator);
                 break;
             }
 
-        }catch (Exception e){}
+        }catch (Exception e){ log.error(e.getMessage());}
 
         return tableHead;
     }
 
 
     // GET SMALL SECTIONS OF EXCEL: RETRIEVE FIRST ROW OF EXCEL SHEET
-    public List<String> getXlsTableHeadData(Iterator<Cell> cellIterator){
+    private List<String> getXlsTableHeadData(Iterator<Cell> cellIterator){
 
         List<String> data = new ArrayList<>();
 
@@ -502,6 +499,7 @@ public class UtilityService {
             fileStream = new FileInputStream(csvFile);
         } catch (Exception e) {
         }
+        assert fileStream != null;
         DataInputStream csvData = new DataInputStream(fileStream);
 
         return serializeCSVToMaps(csvData);
@@ -590,6 +588,31 @@ public class UtilityService {
         return dataArrayList;
     }
 
+
+
+
+
+    public void writeCsvFileGenerics(List<Map<?, ?>> genericMapList, String destination) {
+
+        List<Map<String, String>> stringMapList = new ArrayList<>();
+
+        // Convert the generic key and value types to string data types
+        genericMapList.forEach(genericMap->{
+
+            // Empty map of strings to temporarily hold retrieved string data
+            Map<String, String> temp = new LinkedHashMap<>();
+
+            // Get Map of Generics, stringify the keys and values and put in stringMapList
+            genericMap.entrySet().forEach(map -> {
+                temp.put(String.valueOf(map.getKey()), String.valueOf(map.getValue()));
+            });
+
+            stringMapList.add(temp);
+        });
+
+        // write to csv at the specified destination
+        writeCsvFile(stringMapList, destination);
+    }
 
 
     // CREATE CSV FILE
