@@ -88,39 +88,6 @@ public class TransController {
 
     }
 
-    /*
-    Test Saving Mapping Entity in H2 Database */
-
-    @GetMapping("/mapping")
-    public List<MappingEntity> saveMapping(){
-
-        ArrayList<String> mappingLabels = new ArrayList<>();
-        mappingLabels.add("DataSource");
-        mappingLabels.add("SampleDiagnosis");
-        mappingLabels.add("TumorType");
-        mappingLabels.add("OriginTissue");
-
-        Map mappingValues = new HashMap();
-        mappingValues.put("OriginTissue","blood");
-        mappingValues.put("TumorType","primary");
-        mappingValues.put("SampleDiagnosis","acute myeloid leukemia");
-        mappingValues.put("DataSource","jax");
-
-        MappingEntity mappingEntity = new MappingEntity("DIAGNOSIS", mappingLabels, mappingValues);
-
-        mappingEntity.setMappedTermLabel("Acute Myeloid Leukemia");
-        mappingEntity.setStatus("Created");
-        mappingEntity.setDateCreated(new Date());
-        mappingEntity.setMappedTermUrl("http://purl.obolibrary.org/obo/NCIT_C3171");
-        mappingEntity.setMapType("direct");
-        mappingEntity.setJustification("0");
-
-        //mappingEntityRepository.save(mappingEntity);
-
-        return mappingEntityRepository.findAll();
-
-    }
-
 
     @GetMapping("/get-mapping")
     public List<MappingEntity> getMapping(){
