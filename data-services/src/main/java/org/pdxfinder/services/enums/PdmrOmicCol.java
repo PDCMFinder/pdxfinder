@@ -6,19 +6,18 @@ public enum PdmrOmicCol {
     SPECIMEN_ID("Specimen ID"),
     PDM_TYPE("PDM Type"),
     PDM_TYPE_PATENT("Patient/Originator Specimen"),
-    Sample_ID("Sample ID"),
-    PDM_Type("PDM Type"),
-    Gene("Gene"),
-    AA_Change("AA Change(canonical transcript)"),
-    CodonChange("CodonChange"),
-    Impact("Impact"),
-    ReadDepth("ReadDepth"),
-    AlleleFrequency("AlleleFrequency"),
-    Chr("Chr"),
+    SAMPLE_ID("Sample ID"),
+    GENE("Gene"),
+    AA_CHANGE("AA Change(canonical transcript)"),
+    CODON_CHANGE("CodonChange"),
+    IMPACT("Impact"),
+    READ_DEPTH("ReadDepth"),
+    ALLELE_FREQUENCY("AlleleFrequency"),
+    CHR("Chr"),
     REF_ALLELE("REF(hg19)"),
-    alt_allele("ALT(tumor)"),
-    dbSNP_ID("dbSNP ID"),
-    Position("Position");
+    ALT_ALLELE("ALT(tumor)"),
+    DB_SNP_ID("dbSNP ID"),
+    POSITION("Position");
 
 
     private String value;
@@ -29,5 +28,10 @@ public enum PdmrOmicCol {
 
     public String get() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return this.get();
     }
 }

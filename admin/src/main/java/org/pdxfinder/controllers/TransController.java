@@ -9,6 +9,7 @@ import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.TransformerService;
 import org.pdxfinder.rdbms.dao.PdmrPdxInfo;
 import org.pdxfinder.rdbms.dao.PdxInfo;
+import org.pdxfinder.services.enums.OmicCSVColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,7 +104,7 @@ public class TransController {
 
         List<Map<String, String>> dataList = utilityService.serializeCSVToMaps(pdmrRawFileDir+"ncicancergenepaneldata-8.csv");
 
-        List<Map<?, ?>> transformedData = transformerService.transformPDMRGenomics(dataList);
+        List transformedData = transformerService.transformPDMRGenomics(dataList);
 
         String destination = pdmrRawFileDir+"transformed-nci-gene-panel.csv";
 

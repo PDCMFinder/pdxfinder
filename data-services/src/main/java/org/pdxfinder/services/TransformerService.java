@@ -728,101 +728,103 @@ public class TransformerService {
     }
 
 
-    public List<Map<?, ?>> transformPDMRGenomics(List<Map<String, String>> untransformedGenomicData){
+    public List transformPDMRGenomics(List<Map<String, String>> untransformedGenomicData){
 
-        List<Map<?, ?>> transformedData = new ArrayList<>();
+        List<Map<OmicCSVColumn, String>> transformedData = new ArrayList<>();
 
         for (Map<String, String> data : untransformedGenomicData) {
 
+            boolean validData = true;
             Map<OmicCSVColumn, String> rowMap = new LinkedHashMap<>();
 
 
             // Get Sample ID Column
-            rowMap.put(OmicCSVColumn.datasource, "PDMR");
-            rowMap.put(OmicCSVColumn.Model_ID, data.get(PdmrOmicCol.PATIENT_ID.get()).concat("-").concat(data.get(PdmrOmicCol.SPECIMEN_ID.get())));
+            rowMap.put(OmicCSVColumn.DATASOURCE, "PDMR");
+            rowMap.put(OmicCSVColumn.MODEL_ID, data.get(PdmrOmicCol.PATIENT_ID.get()).concat("-").concat(data.get(PdmrOmicCol.SPECIMEN_ID.get())));
 
             // Get Sample ID Column
             if (data.get(PdmrOmicCol.PDM_TYPE.get()).equals("PDX") || data.get(PdmrOmicCol.PDM_TYPE.get()).equals(PdmrOmicCol.PDM_TYPE_PATENT.get())){
 
-                rowMap.put(OmicCSVColumn.Sample_ID, data.get(PdmrOmicCol.Sample_ID.get()));
+                rowMap.put(OmicCSVColumn.SAMPLE_ID, data.get(PdmrOmicCol.SAMPLE_ID.get()));
             }else {
-                continue;
+                validData = false;
             }
 
-            String modelID = rowMap.get(OmicCSVColumn.Model_ID);
-            String sampleID = rowMap.get(OmicCSVColumn.Sample_ID);
+            String modelID = rowMap.get(OmicCSVColumn.MODEL_ID);
+            String sampleID = rowMap.get(OmicCSVColumn.SAMPLE_ID);
 
             // Get Sample Origin and Passage Column
             if (data.get(PdmrOmicCol.PDM_TYPE.get()).equals("PDX")){
 
-                rowMap.put(OmicCSVColumn.sample_origin, "engrafted tumor");
+                rowMap.put(OmicCSVColumn.SAMPLE_ORIGIN, "engrafted tumor");
 
                 String passage = getPassageByModelIDAndSampleID(modelID, sampleID);
-                rowMap.put(OmicCSVColumn.Passage, passage);
+                rowMap.put(OmicCSVColumn.PASSAGE, passage);
 
             }else if (data.get(PdmrOmicCol.PDM_TYPE.get()).equals(PdmrOmicCol.PDM_TYPE_PATENT.get())){
 
-                rowMap.put(OmicCSVColumn.sample_origin, "patient tumor");
-                rowMap.put(OmicCSVColumn.Passage, "");
+                rowMap.put(OmicCSVColumn.SAMPLE_ORIGIN, "patient tumor");
+                rowMap.put(OmicCSVColumn.PASSAGE, "");
             }else {
-                continue;
+                validData = false;
             }
 
 
             // Get Host Strain name Column
-            rowMap.put(OmicCSVColumn.host_strain_name, "");
+            rowMap.put(OmicCSVColumn.HOST_STRAIN_NAME, "");
 
             // Get Gene Symbol or HGNC Symbol
-            if (data.get(PdmrOmicCol.Gene.get()).equals("None Found")){
+            if (data.get(PdmrOmicCol.GENE.get()).equals("None Found")){
 
-                continue;
+                validData = false;
             }else {
-                rowMap.put(OmicCSVColumn.hgnc_symbol, data.get(PdmrOmicCol.Gene.get()));
+                rowMap.put(OmicCSVColumn.HGNC_SYMBOL, data.get(PdmrOmicCol.GENE.get()));
             }
 
             // Get Amino Acid Change
-            rowMap.put(OmicCSVColumn.amino_acid_change, data.get(PdmrOmicCol.AA_Change.get()));
+            rowMap.put(OmicCSVColumn.AMINO_ACID_CHANGE, data.get(PdmrOmicCol.AA_CHANGE.get()));
 
             // Get Nucleotide Change
-            rowMap.put(OmicCSVColumn.nucleotide_change, data.get(PdmrOmicCol.CodonChange.get()));
+            rowMap.put(OmicCSVColumn.NUCLEOTIDE_CHANGE, data.get(PdmrOmicCol.CODON_CHANGE.get()));
 
             // Get Consequence Column
-            rowMap.put(OmicCSVColumn.consequence, data.get(PdmrOmicCol.Impact.get()));
+            rowMap.put(OmicCSVColumn.CONSEQUENCE, data.get(PdmrOmicCol.IMPACT.get()));
 
             // Read Depth
-            rowMap.put(OmicCSVColumn.read_depth, data.get(PdmrOmicCol.ReadDepth.get()));
+            rowMap.put(OmicCSVColumn.READ_DEPTH, data.get(PdmrOmicCol.READ_DEPTH.get()));
 
             // Get Allele Frequency
-            rowMap.put(OmicCSVColumn.Allele_frequency, data.get(PdmrOmicCol.AlleleFrequency.get()));
+            rowMap.put(OmicCSVColumn.ALLELE_FREQUENCY, data.get(PdmrOmicCol.ALLELE_FREQUENCY.get()));
 
             // Get Chromoseme Column
-            rowMap.put(OmicCSVColumn.chromosome, data.get(PdmrOmicCol.Chr.get()));
+            rowMap.put(OmicCSVColumn.CHROMOSOME, data.get(PdmrOmicCol.CHR.get()));
 
             // Seq Start Position
-            rowMap.put(OmicCSVColumn.seq_start_position, data.get(PdmrOmicCol.Position.get()));
+            rowMap.put(OmicCSVColumn.SEQ_START_POSITION, data.get(PdmrOmicCol.POSITION.get()));
 
             // Get Ref Allele
             rowMap.put(OmicCSVColumn.REF_ALLELE, data.get(PdmrOmicCol.REF_ALLELE.get()));
 
             // Get Alt Allele
-            rowMap.put(OmicCSVColumn.alt_allele, data.get(PdmrOmicCol.alt_allele.get()));
+            rowMap.put(OmicCSVColumn.ALT_ALLELE, data.get(PdmrOmicCol.ALT_ALLELE.get()));
 
             // Get Gene IDs
-            rowMap.put(OmicCSVColumn.ucsc_gene_id, "");
-            rowMap.put(OmicCSVColumn.ncbi_gene_id, "");
-            rowMap.put(OmicCSVColumn.ensembl_gene_id, "");
-            rowMap.put(OmicCSVColumn.ensembl_transcript_id, "");
+            rowMap.put(OmicCSVColumn.UCSC_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.NCBI_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.ENSEMBL_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.ENSEMBL_TRANSCRIPT_ID, "");
 
             // Get RS ID Variant
-            rowMap.put(OmicCSVColumn.rs_id_Variant, data.get(PdmrOmicCol.dbSNP_ID.get()));
+            rowMap.put(OmicCSVColumn.RS_ID_VARIANT, data.get(PdmrOmicCol.DB_SNP_ID.get()));
 
             // Get Genome Assembly
-            rowMap.put(OmicCSVColumn.genome_assembly, "hg19");
+            rowMap.put(OmicCSVColumn.GENOME_ASSEMBLY, "hg19");
 
             // Get Platform Column
-            rowMap.put(OmicCSVColumn.Platform, "NCI cancer gene panel");
+            rowMap.put(OmicCSVColumn.PLATFORM, "NCI cancer gene panel");
 
-            transformedData.add(rowMap);
+            if (validData)
+                transformedData.add(rowMap);
 
         }
 
