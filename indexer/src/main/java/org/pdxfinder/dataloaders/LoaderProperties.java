@@ -58,6 +58,7 @@ public class LoaderProperties {
     protected String omicEnsemblTranscriptId;
     protected String omicRsIdVariants;
     protected String omicGenomeAssembly;
+    protected String omicZscore;
     protected String omicPlatform;
 
     protected String omicSeqEndPosition;
@@ -439,6 +440,14 @@ public class LoaderProperties {
 
     public void setOmicGenomeAssembly(String omicGenomeAssembly) {
         this.omicGenomeAssembly = omicGenomeAssembly.trim();
+    }
+
+    public String getOmicZscore() {
+        return omicZscore;
+    }
+
+    public void setOmicZscore(String omicZscore) {
+        this.omicZscore = omicZscore;
     }
 
     public String getOmicPlatform() {

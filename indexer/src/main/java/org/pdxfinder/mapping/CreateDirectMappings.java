@@ -2,7 +2,7 @@ package org.pdxfinder.mapping;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.pdxfinder.admin.pojos.MappingContainer;
+import org.pdxfinder.services.mapping.MappingContainer;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.queryresults.TreatmentMappingData;
 import org.pdxfinder.rdbms.dao.MappingEntity;

@@ -58,6 +58,8 @@
 
 
 
+
+
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="p-w-md m-t-sm col-lg-10 col-lg-offset-1">
 
@@ -124,7 +126,6 @@
 
                                             <span *ngIf="dataLabel == 'DataSource'" class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] | uppercase }} </span>
                                             <span *ngIf="dataLabel != 'DataSource'" class="clipText overflow-ellipsis"> {{ mapping.mappingValues[dataLabel] }} </span>
-
                                         </td>
 
                                         <td><input type="text" name="{{'mappedTermLabel'+i}}" class="editableField"
@@ -179,7 +180,6 @@
                                            [routerLink]="['../'+mappingStatusToGet+'-'+data.totaPages]"> Last
                                             « </a>  <!--  href="/{{'curation/'+entityTypeUrl+'/'+dataSource+'/'+data.totaPages}}"  -->
                                     </li>
-
 
                                 </ul>
 

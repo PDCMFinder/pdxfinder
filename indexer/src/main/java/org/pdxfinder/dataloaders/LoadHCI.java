@@ -109,7 +109,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     protected void step13LoadSpecimens() {
 
         dto.getModelCreation().addRelatedSample(dto.getPatientSample());
-        dto.getModelCreation().addGroup(dto.getProjectGroup());
+        dto.getModelCreation().addGroup(providerDS);
 
         dataImportService.saveSample(dto.getPatientSample());
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
@@ -121,12 +121,12 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
         ArrayList<HostStrain> strainList= new ArrayList();
         String strains = dto.getStrain();
         if(strains.contains(" and ")){
-            strainList.add(dto.getNodScidGamma());
-            strainList.add(dto.getNodScid());
+            strainList.add(nsgBS);
+            strainList.add(nsBS);
         }else if(strains.contains("gamma")){
-            strainList.add(dto.getNodScid());
+            strainList.add(nsBS);
         }else{
-            strainList.add(dto.getNodScid());
+            strainList.add(nsBS);
         }
 
         int count = 0;
@@ -164,13 +164,13 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step15LoadImmunoHistoChemistry() {
 
-        String ihcFileStr = finderRootDir + dataSourceAbbreviation + "/ihc/ihc.txt";
+        String ihcFileStr = String.format("%s/data/%s/ihc/ihc.txt", finderRootDir, dataSourceAbbreviation);
 
         File file = new File(ihcFileStr);
 
         if (file.exists()) {
 
-            Platform pl = dataImportService.getPlatform("ImmunoHistoChemistry", dto.getProviderGroup());
+            Platform pl = dataImportService.getPlatform("immunohistochemistry","cytogenetics", providerDS);
 
             String currentLine = "";
             int currentLineCounter = 1;
@@ -276,7 +276,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
                 String sampleId = modAndSamp[1];
 
                 //Sample sample = dataImportService.findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(modelId, hciDS.getAbbreviation(), sampleId);
-                Sample sample = dataImportService.findHumanSampleWithMolcharByModelIdAndDataSource(modelId, dto.getProviderGroup().getAbbreviation());
+                Sample sample = dataImportService.findHumanSampleWithMolcharByModelIdAndDataSource(modelId, providerDS.getAbbreviation());
 
                 if (sample == null) {
                     log.warn("Missing model or sample: " + modelId + " " + sampleId);

@@ -42,22 +42,22 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
         reportManager = (ReportManager) context.getBean("ReportManager");
 
+        log.trace("Loading {} data for model {} ", dataType, modelCreation.getSourcePdxId());
+
         List<Map<String, String>> dataList = new ArrayList<>();
 
         String omicDir = null;
-        String platformTag = "";
 
         if(dataType.equals("mutation")){
             omicDir = "mut";
-            platformTag = "mut";
+
         }
         else if(dataType.equals("copy number alteration")){
             omicDir = "cna";
-            platformTag = "cna";
+
         }
         else if(dataType.equals("transcriptomics")){
             omicDir = "trans";
-            platformTag = "trans";
         }
 
         if(omicDir == null) {
@@ -208,7 +208,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             //STEP 1: GET THE PLATFORM AND CACHE IT
             String platformName = data.get(omicPlatform);
-            String platformNameKey = dataSourceAbbreviation+"__" + platformName+"_"+platformTag +"__"+dataType;
+            String platformNameKey = dataSourceAbbreviation+"__" + platformName +"__"+dataType;
 
             //Skip loading fish!
             if(platformName.equals("Other:_FISH")){
@@ -217,16 +217,22 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             }
 
             Platform platform;
+
             if(platformMap.containsKey(platformNameKey)){
 
                 platform = platformMap.get(platformNameKey);
             }
             else{
 
-                String platformURLKey = platformName+"_"+platformTag.replaceAll("\\s","_");
+                String platformURLKey = platformName+"_"+dataType;
 
-                platform = dataImportService.getPlatform(platformName + "_"+platformTag, providerGroup);
-                platform.setUrl(platformURL.get(platformURLKey));
+                platform = dataImportService.getPlatform(platformName, dataType, providerGroup);
+
+                if(platform.getUrl()== null || platform.getUrl().isEmpty()){
+
+                    platform.setUrl(platformURL.get(platformURLKey));
+                }
+
                 platformMap.put(platformNameKey, platform);
             }
 
@@ -237,7 +243,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             String origin = (data.get(omicSampleOrigin) == null)? "":data.get(omicSampleOrigin).toLowerCase().trim();
 
-            String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "_" + platformTag +"__" + origin+"__"+dataType;
+            String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "__" + origin+"__"+dataType;
 
 
 
@@ -314,7 +320,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         log.info("Saving existing molchars for model "+modelID);
         for(Map.Entry<String, MolecularCharacterization> mcEntry : existingMolcharNodes.entrySet()){
 
-               dataImportService.saveMolecularCharacterization(mcEntry.getValue());
+            dataImportService.saveMolecularCharacterization(mcEntry.getValue());
 
         }
 
@@ -333,7 +339,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             boolean foundSpecimen = false;
 
-            if(sampleOrigin.toLowerCase().equals("patient tumor")){
+            if(sampleOrigin.equalsIgnoreCase("patient tumor") || sampleOrigin.equalsIgnoreCase("patient")){
 
                 Sample patientSample = modelCreation.getSample();
                 patientSample.setSourceSampleId(sampleId);
@@ -416,7 +422,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         //setHostStrain Name
         ma.setChromosome(data.get(omicChromosome));
         ma.setSeqStartPosition(data.get(omicSeqStartPosition));
-        ma.setSeqEndPosition(data.get(omicSeqStartPosition));
+        ma.setSeqEndPosition(data.get(omicSeqEndPosition));
         ma.setCnaLog10RCNA(data.get(omicCnaLog10RCNA));
         ma.setCnaLog2RCNA(data.get(omicCnaLog2RCNA));
         ma.setCnaCopyNumberStatus(data.get(omicCnaCopyNumberStatus));
@@ -449,6 +455,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         ma.setIlluminaHGEAProbeId(data.get(illuminaHGEAProbeId));
         ma.setIlluminaHGEAExpressionValue(data.get(illuminaHGEAExpressionValue));
         ma.setGenomeAssembly(data.get(omicGenomeAssembly));
+        ma.setZscore(data.get(omicZscore));
 
         ma.setMarker(marker);
 
@@ -502,7 +509,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 }
             }
 
-            if (passage.equals(null)){
+            if (passage == null){
                 log.error("Passage not found for Xenograft Sample {} both in the data File and database, Wrong Data", sampleId);
             }
         }

@@ -100,6 +100,10 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         jsonFile = finderRootDir + "/data/" + dataSourceAbbreviation+"/pdx/models.json";
         dataSource = dataSourceAbbreviation;
 
+        platformURL = new HashMap<>();
+        platformURL.put("CTP_mutation","/platform/jax-ctp/");
+        platformURL.put("Truseq_JAX_mutation","/platform/jax-truseq/");
+        platformURL.put("Whole_Exome_mutation","/platform/jax-whole-exome/");
     }
 
 
@@ -132,7 +136,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     protected void step09LoadPatientData() {
-
+        if(dto.isSkipModel()) return ;
         dto.setHistologyMap(getHistologyImageMap(dto.getModelID()));
 
         //Check if model exists in DB, if yes, do not load duplicates
@@ -145,6 +149,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         if(dto.getDiagnosis().toLowerCase().contains("unknown") ||
                 dto.getDiagnosis().toLowerCase().contains("not specified")){
             log.info("Skipping model "+dto.getModelID()+" with diagnosis:"+dto.getDiagnosis());
+            dto.setSkipModel(true);
             return;
         }
 
@@ -156,7 +161,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     protected void step10LoadExternalURLs() {
-
+        if(dto.isSkipModel()) return ;
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
 
         loadExternalURLs(dataSourceContact+dto.getModelID(), dataSourceURL+dto.getModelID());
@@ -168,7 +173,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step11LoadBreastMarkers() {
 
-
+        if(dto.isSkipModel()) return ;
         //create breast cancer markers manually if they are present
         if(!dto.getModelTag().equals(Standardizer.NOT_SPECIFIED)){
 
@@ -176,7 +181,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                 NodeSuggestionDTO nsdto;
 
                 MolecularCharacterization mc = new MolecularCharacterization();
-                mc.setPlatform(dataImportService.getPlatform("Not Specified", dto.getProviderGroup()));
+                mc.setPlatform(dataImportService.getPlatform("Not Specified", "cytogenetics", providerDS));
                 mc.setType("cytogenetics");
 
                 //we know these markers exist so no need to check for null
@@ -216,7 +221,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     protected void step12CreateModels() throws Exception  {
-
+        if(dto.isSkipModel()) return ;
         // JAX - Updates Patient Sample b4 model Creation
         dto.getPatientSample().setExtractionMethod(dto.getExtractionMethod());
 
@@ -237,9 +242,9 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     protected void step13LoadSpecimens() {
-
-        Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(), dto.getModelID(), dto.getProviderGroup().getAbbreviation(), "");
-        specimen.setHostStrain(dto.getNodScidGamma());
+        if(dto.isSkipModel()) return ;
+        Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(), dto.getModelID(), providerDS.getAbbreviation(), "");
+        specimen.setHostStrain(nsgBS);
         EngraftmentSite engraftmentSite = dataImportService.getImplantationSite(dto.getImplantationSiteStr());
         EngraftmentType engraftmentType = dataImportService.getImplantationType(Standardizer.NOT_SPECIFIED);
         specimen.setEngraftmentSite(engraftmentSite);
@@ -273,17 +278,21 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     protected void step16LoadVariationData() {
+        if(dto.isSkipModel()) return ;
+        String dataDirectory = finderRootDir+"/data/"+dataSourceAbbreviation;
 
-        log.info("Loading WGS for model " + dto.getModelCreation().getSourcePdxId());
+        loadOmicData(dto.getModelCreation(), providerDS,"mutation", dataDirectory);
 
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(),"mutation", finderRootDir+"/data/"+dataSourceAbbreviation);
+        loadOmicData(dto.getModelCreation(), providerDS,"copy number alteration", dataDirectory);
+
+        loadOmicData(dto.getModelCreation(), providerDS,"transcriptomics", dataDirectory);
 
     }
 
 
     @Override
     void step17LoadModelDosingStudies() throws Exception {
-
+        if(dto.isSkipModel()) return ;
         loadModelDosingStudies();
 
     }

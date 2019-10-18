@@ -48,16 +48,12 @@ public class LoaderDTO {
     private EngraftmentSite engraftmentSite;
     private EngraftmentType engraftmentType;
 
-    private HostStrain nodScidGamma;
-    private HostStrain nodScid;
-
-    private Group projectGroup;
-    private Group providerGroup;
-
     private ModelCreation modelCreation;
     private Patient patient;
 
     private HashMap<String, Image> histologyMap;
+
+    private boolean skipModel;
 
 
     public LoaderDTO() {
@@ -287,38 +283,6 @@ public class LoaderDTO {
         this.engraftmentType = engraftmentType;
     }
 
-    public HostStrain getNodScidGamma() {
-        return nodScidGamma;
-    }
-
-    public void setNodScidGamma(HostStrain nodScidGamma) {
-        this.nodScidGamma = nodScidGamma;
-    }
-
-    public HostStrain getNodScid() {
-        return nodScid;
-    }
-
-    public void setNodScid(HostStrain nodScid) {
-        this.nodScid = nodScid;
-    }
-
-    public Group getProjectGroup() {
-        return projectGroup;
-    }
-
-    public void setProjectGroup(Group projectGroup) {
-        this.projectGroup = projectGroup;
-    }
-
-    public Group getProviderGroup() {
-        return providerGroup;
-    }
-
-    public void setProviderGroup(Group providerGroup) {
-        this.providerGroup = providerGroup;
-    }
-
     public ModelCreation getModelCreation() {
         return modelCreation;
     }
@@ -389,5 +353,13 @@ public class LoaderDTO {
 
     public void setModelDosingStudies(JSONArray modelDosingStudies) {
         this.modelDosingStudies = modelDosingStudies;
+    }
+
+    public boolean isSkipModel() {
+        return skipModel;
+    }
+
+    public void setSkipModel(boolean skipModel) {
+        this.skipModel = skipModel;
     }
 }

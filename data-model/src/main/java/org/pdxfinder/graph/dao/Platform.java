@@ -16,6 +16,7 @@ public class Platform {
     private Long id;
     private String name;
     private String url;
+    private String type;
 
     @Relationship(type = "GROUP", direction = Relationship.INCOMING)
     private Group group;
@@ -60,5 +61,13 @@ public class Platform {
 
     public void setGroup(Group group) {
         this.group = group;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

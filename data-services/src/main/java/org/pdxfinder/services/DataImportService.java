@@ -972,16 +972,17 @@ public class DataImportService {
         return markerRepository.findDistinctByMolCharId(id);
     }
 
-    public Platform getPlatform(String name, Group group) {
+    public Platform getPlatform(String name, String type, Group group) {
 
         //remove special characters from platform name
         name = name.replaceAll("[^A-Za-z0-9 _-]", "");
 
 
-        Platform p = platformRepository.findByNameAndDataSource(name, group.getName());
+        Platform p = platformRepository.findByNameAndTypeAndDataSource(name, type, group.getName());
         if (p == null) {
             p = new Platform();
             p.setName(name);
+            p.setType(type);
             p.setGroup(group);
             platformRepository.save(p);
         }
@@ -989,18 +990,20 @@ public class DataImportService {
         return p;
     }
 
-    public Platform getPlatform(String name, Group group, String platformUrl) {
+    public Platform getPlatform(String name, String type, Group group, String platformUrl) {
 
         //remove special characters from platform name
         name = name.replaceAll("[^A-Za-z0-9 _-]", "");
 
-        Platform p = platformRepository.findByNameAndDataSourceAndUrl(name, group.getName(), platformUrl);
+        Platform p = platformRepository.findByNameAndTypeAndDataSourceAndUrl(name, type, group.getName(), platformUrl);
 
         if (p == null) {
             p = new Platform();
             p.setName(name);
             p.setGroup(group);
+            p.setType(type);
             p.setUrl(platformUrl);
+            platformRepository.save(p);
         }
 
         return p;
