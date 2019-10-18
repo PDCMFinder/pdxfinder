@@ -88,7 +88,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
             step13LoadSpecimens();
             step17LoadModelDosingStudies();
             step16LoadVariationData();
-            step18SetAccessGroup();
+            step18SetAdditionalGroups();
         }
     }
 
@@ -213,12 +213,16 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     }
 
     @Override
-    protected void step18SetAccessGroup() {
+    protected void step18SetAdditionalGroups() {
         Group access = dataImportService.getAccessibilityGroup(
             validateAccessibility(""),
             validateModality("transnational access")
         );
+
+        Group project = dataImportService.getProjectGroup("EurOPDX");
+
         dto.getModelCreation().addGroup(access);
+        dto.getModelCreation().addGroup(project);
         dataImportService.saveModelCreation(dto.getModelCreation());
     }
 
