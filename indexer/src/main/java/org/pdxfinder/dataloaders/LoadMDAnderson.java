@@ -178,6 +178,6 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
     }
 
     @Override
-    void step18SetAccessGroup() {}
+    void step18SetAdditionalGroups() {}
 
 }
