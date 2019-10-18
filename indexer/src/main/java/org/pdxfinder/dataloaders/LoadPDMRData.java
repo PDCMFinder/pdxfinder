@@ -306,6 +306,8 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     }
 
     @Override
-    void step18SetAdditionalGroups() {}
+    void step18SetAdditionalGroups() {
+        throw new UnsupportedOperationException();
+    }
 
 }
