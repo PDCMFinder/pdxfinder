@@ -1,7 +1,6 @@
 package org.pdxfinder.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.queryresults.MutatedMarkerData;
 import org.pdxfinder.services.*;
 import org.pdxfinder.services.ds.AutoCompleteOption;
@@ -233,14 +232,14 @@ public class AjaxController {
         String subtitle   = "";
 
         if (param.equals("models") ){
-            chartTitle = "PDx Model Data";
-            subtitle   = "PDX-Model Per Data Release";
-            data = statistics.mockDataTreatmentPatients();
+            chartTitle = "PDX Models Drug Dosing Data";
+            subtitle   = "PDX Models Having Drug Dosing Data Per Data Source";
+            data = statistics.pdxCountHavingDrugDataPerDataSource();
         }else if (param.equals("drugs")) {
 
-            chartTitle = "Drug Data";
-            subtitle   = "Drug Count Per Data Release";
-            data = statistics.mockDataDrugDosing();
+            chartTitle = "Drug Data Count";
+            subtitle   = "Drug Data Count Per Data Source";
+            data = statistics.drugCountPerDataSource();
         }else{
 
         }
@@ -259,14 +258,14 @@ public class AjaxController {
         String subtitle   = "";
 
         if (param.equals("patients") ){
-            chartTitle = "Patient Data";
-            subtitle   = "Patient Count Per Data Release";
-            data = statistics.mockDataTreatmentPatients();
+            chartTitle = "PDX Models Treatment Data";
+            subtitle   = "PDX Models Having Treatment Data Per Data Source";
+            data = statistics.pdxCountHavingTreatmentDataPerDataSource();
         }else if (param.equals("treatments")) {
 
-            chartTitle = "Treatment Data";
-            subtitle   = "Treatment Count Per Data Release";
-            data = statistics.mockDataDrugDosing();
+            chartTitle = "Treatment Data Count";
+            subtitle   = "Treatment Data Count Per Data Source";
+            data = statistics.treatmentsCountPerDataSource();
         }else{ }
 
         return statistics.clusteredColumnChart(data, chartTitle, subtitle);
@@ -277,7 +276,7 @@ public class AjaxController {
     @GetMapping("/statistics/model")
     public Object getModelStat(){
 
-        List<CountDTO> data = statistics.modelCountData();
+        List<CountDTO> data = statistics.modelCount();
 
         String chartTitle  = "Model Count Data";
         String subtitle   = "Model Count Per Data Release";
@@ -289,7 +288,7 @@ public class AjaxController {
     @GetMapping("/statistics/providers")
     public Object getProvidersStat(){
 
-        List<CountDTO> data = statistics.providersCountData();
+        List<CountDTO> data = statistics.providersCount();
 
         String chartTitle  = "Data Providers";
         String subtitle   = "Providers Count Per Data Release";
