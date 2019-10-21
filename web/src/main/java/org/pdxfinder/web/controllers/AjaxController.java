@@ -55,52 +55,6 @@ public class AjaxController {
     }
 
 
-    @GetMapping("/cytogenetics")
-    public String getCytogeneticsCombination(){
-
-
-        String modelID = "";
-        List<String> results = new ArrayList<>();
-
-        String rowData = "";
-
-        List<String> markerFilter = Arrays.asList("ERBB2","PGR","ESR1");
-
-        List<ModelCreation> models = searchService.getModelsByMolcharType("cytogenetics");
-
-        for(ModelCreation modelCreation : models){
-
-            modelID = modelCreation.getSourcePdxId();
-
-            Set<Sample> samples = modelCreation.getRelatedSamples();
-
-            for (Sample sample : samples){
-
-                Set<MolecularCharacterization> molchars = sample.getMolecularCharacterizations();
-
-                for (MolecularCharacterization molchar : molchars){
-
-                    List<MarkerAssociation> markerAssocs = molchar.getMarkerAssociations();
-
-                    results = new ArrayList<>();
-
-                    for (MarkerAssociation mAssoc : markerAssocs){
-
-                        boolean inTheList = markerFilter.stream().anyMatch(str -> str.equals(mAssoc.getMarker().getHgncSymbol()));
-
-                        if (inTheList) {
-                            results.add(mAssoc.getMarker().getHgncSymbol() + " " + mAssoc.getCytogeneticsResult());
-                        }
-                    }
-                }
-            }
-
-            rowData += results+"<br>";
-        }
-
-        return rowData;
-    }
-
     @RequestMapping(value = "/drugnames")
     List<String> getDrugnames(){
 
@@ -147,80 +101,6 @@ public class AjaxController {
         return  platformService.getAvailableDataBySource(dataSrc);
     }
 
-
-   /*  @RequestMapping(value = "/modeldata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public VariationDataDTO postVariationDataByPlatform(@PathVariable String dataSrc,
-                                                        @PathVariable String modelId,
-                                                        @RequestParam(value="platform", required = false) String platform,
-                                                        @RequestParam(value="passage", required = false) String passage,
-                                                        @RequestBody MultiValueMap data) {
-
-        int draw = Integer.parseInt(data.getFirst("draw").toString());
-        String searchText = data.getFirst("search[value]").toString();
-        String sortColumn = data.getFirst("order[0][column]").toString();
-        String sortDir = data.getFirst("order[0][dir]").toString();
-        int start = Integer.parseInt(data.getFirst("start").toString());
-        int size = Integer.parseInt(data.getFirst("length").toString());
-        sortColumn = getSortColumn(sortColumn);
-
-        String dPlatform = (platform == null) ? "" : platform;
-        String dPassage = (passage == null) ? "" : passage;
-        start = (int) Math.ceil(start / 108.0);
-
-        VariationDataDTO variationDataDTO = detailsService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,searchText,draw,sortColumn,sortDir);
-
-
-        return variationDataDTO;
-
-    }
-
-
-   @RequestMapping(value = "/patientdata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public VariationDataDTO postPatientVariationData(@PathVariable String dataSrc,
-                                                     @PathVariable String modelId,
-                                                     @RequestParam(value="platform", required = false) String platform,
-                                                     @RequestBody MultiValueMap data) {
-
-        int draw = Integer.parseInt(data.getFirst("draw").toString());
-        String searchText = data.getFirst("search[value]").toString();
-        String sortColumn = data.getFirst("order[0][column]").toString();
-        String sortDir = data.getFirst("order[0][dir]").toString();
-        int start = Integer.parseInt(data.getFirst("start").toString());
-        int size = Integer.parseInt(data.getFirst("length").toString());
-
-        sortColumn = getSortColumn(sortColumn);
-        start = (int) Math.ceil(start / 108.0);
-
-        String dPlatform = (platform == null) ? "" : platform;
-        VariationDataDTO variationDataDTO = detailsService.patientVariationDataByPlatform(dataSrc,modelId,dPlatform,searchText,draw,sortColumn,sortDir,start,size);
-
-        return variationDataDTO;
-
-    }
-
-
-    @RequestMapping(value = "/getxdata/{dataSrc}/{modelId}")
-    public VariationDataDTO getXenoVariationData(@PathVariable String dataSrc,
-                                                 @PathVariable String modelId,
-                                                 @RequestParam(value="page", required = false) Integer page,
-                                                 @RequestParam(value="size", required = false) Integer pageSize,
-                                                 @RequestParam(value="passage", required = false) String passage,
-                                                 @RequestParam(value="platform", required = false) String platform,
-                                                 @RequestParam(value="sortcolumn", required = false) String sortColumn) {
-
-        int start = (page == null || page < 1) ? 0 : page - 1;
-        int size = (pageSize == null || pageSize < 1) ? 20 : pageSize;
-
-        String dPlatform = (platform == null) ? "" : platform;
-        String dPassage = (passage == null) ? "" : passage;
-        String dSortColumn = (passage == null) ? "1" : sortColumn;
-
-        VariationDataDTO variationDataDTO = detailsService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,"",1,"mAss.chromosome","asc");
-
-        return variationDataDTO;
-
-    }
-    */
 
     @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
     public DetailsDTO details(@PathVariable String dataSrc,
