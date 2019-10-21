@@ -197,7 +197,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
     abstract void step15LoadImmunoHistoChemistry();
     abstract void step16LoadVariationData();
     abstract void step17LoadModelDosingStudies() throws Exception;
-    abstract void step18SetAccessGroup();
+    abstract void step18SetAdditionalGroups();
 
     /*****************************************************************************************************
      *     SKELETON OF LOADING ALGORITHM STANDARDIZED IN A TEMPLATE METHOD        *

@@ -92,7 +92,7 @@ public class LoadIRCCTest extends BaseTest {
 
         ModelCreation mc = new ModelCreation();
         loader.dto.setModelCreation(mc);
-        loader.step18SetAccessGroup();
+        loader.step18SetAdditionalGroups();
 
         assertThat(loader.dto.getModelCreation().getGroups().contains(transnationalAccess), is(true));
         assertThat(loader.dto.getModelCreation().getGroups().contains(badAccess), is(false));
