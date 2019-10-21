@@ -100,6 +100,12 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
         dataSource = dataSourceAbbreviation;
         filesDirectory = "";
+
+        platformURL = new HashMap<>();
+        platformURL.put("whole exome sequencing_mutation","/platform/whole-exome-sequencing/");
+        platformURL.put("TargetedNGS_MUT_mutation","/platform/ircc-gene-panel/");
+        platformURL.put("Targeted Next Generation Sequencing_copy number alteration","/platform/ircc-gene-panel/");
+
     }
 
     @Override
