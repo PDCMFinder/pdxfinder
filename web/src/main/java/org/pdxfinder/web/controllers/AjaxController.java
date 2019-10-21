@@ -1,7 +1,6 @@
 package org.pdxfinder.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.queryresults.MutatedMarkerData;
 import org.pdxfinder.services.*;
 import org.pdxfinder.services.ds.AutoCompleteOption;
@@ -14,7 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Arrays;
 
 /*
  * Created by csaba on 03/05/2018.
@@ -55,71 +58,25 @@ public class AjaxController {
     }
 
 
-    @GetMapping("/cytogenetics")
-    public String getCytogeneticsCombination(){
-
-
-        String modelID = "";
-        List<String> results = new ArrayList<>();
-
-        String rowData = "";
-
-        List<String> markerFilter = Arrays.asList("ERBB2","PGR","ESR1");
-
-        List<ModelCreation> models = searchService.getModelsByMolcharType("cytogenetics");
-
-        for(ModelCreation modelCreation : models){
-
-            modelID = modelCreation.getSourcePdxId();
-
-            Set<Sample> samples = modelCreation.getRelatedSamples();
-
-            for (Sample sample : samples){
-
-                Set<MolecularCharacterization> molchars = sample.getMolecularCharacterizations();
-
-                for (MolecularCharacterization molchar : molchars){
-
-                    List<MarkerAssociation> markerAssocs = molchar.getMarkerAssociations();
-
-                    results = new ArrayList<>();
-
-                    for (MarkerAssociation mAssoc : markerAssocs){
-
-                        boolean inTheList = markerFilter.stream().anyMatch(str -> str.equals(mAssoc.getMarker().getHgncSymbol()));
-
-                        if (inTheList) {
-                            results.add(mAssoc.getMarker().getHgncSymbol() + " " + mAssoc.getCytogeneticsResult());
-                        }
-                    }
-                }
-            }
-
-            rowData += results+"<br>";
-        }
-
-        return rowData;
-    }
-
-    @RequestMapping(value = "/drugnames")
+    @GetMapping("/drugnames")
     List<String> getDrugnames(){
 
         return drugService.getDrugNames();
     }
 
-    @RequestMapping(value = "/modelcountperdrug")
+    @GetMapping("/modelcountperdrug")
     public List<CountDTO> getModelCountByDrug() {
 
         return  drugService.getModelCountByDrugAndComponentType("Drug");
     }
 
-    @RequestMapping(value = "/modelcountpergene")
+    @GetMapping("/modelcountpergene")
     public List<MutatedMarkerData> getModelCountByMarker() {
 
         return  graphService.getModelCountByGene();
     }
 
-    @RequestMapping(value = "/autosuggests")
+    @GetMapping("/autosuggests")
     List<AutoCompleteOption> getAutoSuggestList(){
 
         List<String> autoSuggestions = autoCompleteService.getAutoSuggestions();
@@ -133,14 +90,14 @@ public class AjaxController {
     }
 
 
-    @RequestMapping(value = "/platform/{dataSrc}")
+    @GetMapping("/platform/{dataSrc}")
     public Map findPlatformBySource(@PathVariable String dataSrc) {
 
         return  platformService.getPlatformCountBySource(dataSrc);
     }
 
 
-    @RequestMapping(value = "/platformdata/{dataSrc}")
+    @GetMapping("/platformdata/{dataSrc}")
     public List<DataAvailableDTO> findPlatformDataBySource(@PathVariable String dataSrc) {
 
         //populate list with data [{dataType:"mutation",platform:"CTP", models:20},{},{}]
@@ -148,81 +105,7 @@ public class AjaxController {
     }
 
 
-   /*  @RequestMapping(value = "/modeldata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public VariationDataDTO postVariationDataByPlatform(@PathVariable String dataSrc,
-                                                        @PathVariable String modelId,
-                                                        @RequestParam(value="platform", required = false) String platform,
-                                                        @RequestParam(value="passage", required = false) String passage,
-                                                        @RequestBody MultiValueMap data) {
-
-        int draw = Integer.parseInt(data.getFirst("draw").toString());
-        String searchText = data.getFirst("search[value]").toString();
-        String sortColumn = data.getFirst("order[0][column]").toString();
-        String sortDir = data.getFirst("order[0][dir]").toString();
-        int start = Integer.parseInt(data.getFirst("start").toString());
-        int size = Integer.parseInt(data.getFirst("length").toString());
-        sortColumn = getSortColumn(sortColumn);
-
-        String dPlatform = (platform == null) ? "" : platform;
-        String dPassage = (passage == null) ? "" : passage;
-        start = (int) Math.ceil(start / 108.0);
-
-        VariationDataDTO variationDataDTO = detailsService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,searchText,draw,sortColumn,sortDir);
-
-
-        return variationDataDTO;
-
-    }
-
-
-   @RequestMapping(value = "/patientdata/{dataSrc}/{modelId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public VariationDataDTO postPatientVariationData(@PathVariable String dataSrc,
-                                                     @PathVariable String modelId,
-                                                     @RequestParam(value="platform", required = false) String platform,
-                                                     @RequestBody MultiValueMap data) {
-
-        int draw = Integer.parseInt(data.getFirst("draw").toString());
-        String searchText = data.getFirst("search[value]").toString();
-        String sortColumn = data.getFirst("order[0][column]").toString();
-        String sortDir = data.getFirst("order[0][dir]").toString();
-        int start = Integer.parseInt(data.getFirst("start").toString());
-        int size = Integer.parseInt(data.getFirst("length").toString());
-
-        sortColumn = getSortColumn(sortColumn);
-        start = (int) Math.ceil(start / 108.0);
-
-        String dPlatform = (platform == null) ? "" : platform;
-        VariationDataDTO variationDataDTO = detailsService.patientVariationDataByPlatform(dataSrc,modelId,dPlatform,searchText,draw,sortColumn,sortDir,start,size);
-
-        return variationDataDTO;
-
-    }
-
-
-    @RequestMapping(value = "/getxdata/{dataSrc}/{modelId}")
-    public VariationDataDTO getXenoVariationData(@PathVariable String dataSrc,
-                                                 @PathVariable String modelId,
-                                                 @RequestParam(value="page", required = false) Integer page,
-                                                 @RequestParam(value="size", required = false) Integer pageSize,
-                                                 @RequestParam(value="passage", required = false) String passage,
-                                                 @RequestParam(value="platform", required = false) String platform,
-                                                 @RequestParam(value="sortcolumn", required = false) String sortColumn) {
-
-        int start = (page == null || page < 1) ? 0 : page - 1;
-        int size = (pageSize == null || pageSize < 1) ? 20 : pageSize;
-
-        String dPlatform = (platform == null) ? "" : platform;
-        String dPassage = (passage == null) ? "" : passage;
-        String dSortColumn = (passage == null) ? "1" : sortColumn;
-
-        VariationDataDTO variationDataDTO = detailsService.variationDataByPlatform(dataSrc,modelId,dPlatform,dPassage,start,size,"",1,"mAss.chromosome","asc");
-
-        return variationDataDTO;
-
-    }
-    */
-
-    @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
+    @GetMapping("/modeldetails/{dataSrc}/{modelId}")
     public DetailsDTO details(@PathVariable String dataSrc,
                               @PathVariable String modelId,
                               @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -238,7 +121,7 @@ public class AjaxController {
 
 
 
-    @RequestMapping(value = "/modeltech/{dataSrc}/{modelId}")
+    @GetMapping("/modeltech/{dataSrc}/{modelId}")
     public Map findModelTechnology(@PathVariable String dataSrc, @PathVariable String modelId,
                                    @RequestParam(value="passage", required = false) String passage) {
 
@@ -247,14 +130,14 @@ public class AjaxController {
     }
 
 
-    @RequestMapping(value = "/patienttech/{dataSrc}/{modelId}")
+    @GetMapping("/patienttech/{dataSrc}/{modelId}")
     public Map findPatientTechnology(@PathVariable String dataSrc, @PathVariable String modelId) {
 
         return  detailsService.findPatientPlatforms(dataSrc,modelId);
     }
 
 
-    @RequestMapping(value = "/getmutatedmarkerswithvariants")
+    @GetMapping("/getmutatedmarkerswithvariants")
     public Object getMutatedMarkersWithVariants(){
 
         ObjectMapper mapper = new ObjectMapper();
@@ -326,7 +209,7 @@ public class AjaxController {
     @GetMapping("/statistics/test")
     public Object doTest(){
 
-        List dataLabels = Arrays.asList("IRC-CRC","JAX","CRL","TRACE-PDTX","CURIE-LC","CURIE-BC");
+        List dataLabels = Arrays.asList("IRC-CRC", "JAX", "CRL", "TRACE-PDTX", "CURIE-LC", "CURIE-BC");
         List dataValues = Arrays.asList(1300, 375, 500, 450, 313, 1000);
         String chartTitle  = "PDX Finder Data Deposit Statistics";
         String subtitle   = "As per statistics data 2019";
@@ -353,21 +236,17 @@ public class AjaxController {
         String subtitle   = "";
 
         if (param.equals("models") ){
-            chartTitle = "PDx Model Data";
-            subtitle   = "PDX-Model Per Data Release";
-            data = statistics.mockDataTreatmentPatients();
+            chartTitle = "PDX Models Drug Dosing Data";
+            subtitle   = "PDX Models Having Drug Dosing Data Per Data Source";
+            data = statistics.pdxCountHavingDrugDataPerDataSource();
         }else if (param.equals("drugs")) {
 
-            chartTitle = "Drug Data";
-            subtitle   = "Drug Count Per Data Release";
-            data = statistics.mockDataDrugDosing();
-        }else{
-
+            chartTitle = "Drug Data Count";
+            subtitle   = "Drug Data Count Per Data Source";
+            data = statistics.drugCountPerDataSource();
         }
 
         return statistics.clusteredColumnChart(data, chartTitle, subtitle);
-        // Map<String, List<StatisticsDTO>> data = statistics.groupedData();
-       // return statistics.clusteredColumnChart(data, "Patient Treatments Data");
 
     }
 
@@ -379,15 +258,15 @@ public class AjaxController {
         String subtitle   = "";
 
         if (param.equals("patients") ){
-            chartTitle = "Patient Data";
-            subtitle   = "Patient Count Per Data Release";
-            data = statistics.mockDataTreatmentPatients();
+            chartTitle = "PDX Models Treatment Data";
+            subtitle   = "PDX Models Having Treatment Data Per Data Source";
+            data = statistics.pdxCountHavingTreatmentDataPerDataSource();
         }else if (param.equals("treatments")) {
 
-            chartTitle = "Treatment Data";
-            subtitle   = "Treatment Count Per Data Release";
-            data = statistics.mockDataDrugDosing();
-        }else{ }
+            chartTitle = "Treatment Data Count";
+            subtitle   = "Treatment Data Count Per Data Source";
+            data = statistics.treatmentsCountPerDataSource();
+        }
 
         return statistics.clusteredColumnChart(data, chartTitle, subtitle);
     }
@@ -397,7 +276,7 @@ public class AjaxController {
     @GetMapping("/statistics/model")
     public Object getModelStat(){
 
-        List<CountDTO> data = statistics.modelCountData();
+        List<CountDTO> data = statistics.modelCount();
 
         String chartTitle  = "Model Count Data";
         String subtitle   = "Model Count Per Data Release";
@@ -409,14 +288,13 @@ public class AjaxController {
     @GetMapping("/statistics/providers")
     public Object getProvidersStat(){
 
-        List<CountDTO> data = statistics.providersCountData();
+        List<CountDTO> data = statistics.providersCount();
 
         String chartTitle  = "Data Providers";
         String subtitle   = "Providers Count Per Data Release";
 
         return statistics.basicColumnChart(data, chartTitle, subtitle, HexColors.BLACK);
     }
-
 
 
 
