@@ -26,7 +26,7 @@ import java.util.*;
 public class TransformerService {
 
 
-    private final static Logger log = LoggerFactory.getLogger(TransformerService.class);
+    private static final Logger log = LoggerFactory.getLogger(TransformerService.class);
 
     private ObjectMapper mapper = new ObjectMapper();
     private TransPdxInfoRepository transPdxInfoRepository;
@@ -105,8 +105,6 @@ public class TransformerService {
         String specimenSearchUrl = "/PDMR/raw/PDMR_SPECIMENSEARCH.json";
         log.info(specimenSearchUrl);
 
-        //If seqnumber is ) input in finder "Heterotopic" else if (1,2,3,4,5,6) put "Orthotopic" else(99) put not specified
-
         // Read the whole JSON as a JsonNode type & Retrieve each specimen search record as a Map (key value type) type
         JsonNode rootArray = util.readJsonLocal(this.dataRootDir+ specimenSearchUrl);
 
@@ -154,16 +152,11 @@ public class TransformerService {
         List patientList = mapper.convertValue(patientInfo, List.class);
 
 
-        //engraftmentType
-        int count = 0;
-        Set<PdmrPdxInfo> pdmrPdxInfoList = new HashSet<>();
 
         List<String> modelIDList = new ArrayList<>();
-        List<Map<String, String>> mappingList = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> mappingList = new ArrayList<>();
 
         for (JsonNode node : rootArray) {
-
-            count++;
 
             Map specimenSearch = mapper.convertValue(node, Map.class);
 
@@ -242,27 +235,10 @@ public class TransformerService {
                     }
                 }
 
-               // index++; \r\n\r\n \"
             }
-            //clinicalDiagnosis = clinicalDiagnosis.replaceAll("\\r|\\\"|\\n", "");
 
             clinicalDiagnosis = new StringBuilder(clinicalDiagnosis.toString().replaceAll("[^a-zA-Z,0-9 +_-]", "").trim());
             clinicalDiagnosis = new StringBuilder(clinicalDiagnosis.toString().replaceAll("\\s\\s", " "));
-
-            log.info(clinicalDiagnosis.toString());
-
-            // Treatment naive
-            /*try {
-                if (specimenSearch.get("CURRENTREGIMEN").toString().equalsIgnoreCase("Treatment naive")) {
-                    treatmentNaive = "Treatment Naive";
-                }
-            } catch (Exception e) {
-            }*/
-
-            // From specimensearch table - pick SPECIMENSEQNBR column
-            // Look SAMPLE table for key SPECIMENSEQNBR and retrieve the SAMPLESEQNBR column
-            // Look HISTOLOGY table for key SAMPLESEQNBR and retrieve TUMORGRADESEQNBR
-            // Look TumorGrade  table for key TUMORGRADESEQNBR and set Grade as retrieved TUMORGRADESHORTNAME
 
 
             List<Sample> sampleList = new ArrayList<>();
@@ -292,7 +268,6 @@ public class TransformerService {
                         samplePassage = dSample.get("PASSAGEOFTHISSAMPLE")+"";
                     }
                     sampleList.add(new Sample(sampleId,sampleTumorType,samplePassage,wholeExomeSeqYn,wholeExomeSeqYn,wholeExomeSeqYn,rnaSeqYn,rnaSeqYn));
-                    sampleId = ""; sampleTumorType = ""; samplePassage = ""; wholeExomeSeqYn=""; rnaSeqYn="";
 
 
                     // Retrieve Grade Value
@@ -319,19 +294,6 @@ public class TransformerService {
 
 
 
-                    /*
-                        model ID - mpdelID
-                        diagnosis - clinicalDiagnosis
-                        primary tissue - primarySite
-                        tumour type - tumorType
-                     */
-
-            // From specimensearch table - pick PATIENTSEQNBR column
-            //Look CURRENTTHERAPY table for key PATIENTSEQNBR and retrieve the STANDARDIZEDREGIMENSEQNBR column
-            // Look STANDARDIZEDREGIMENS table for key STANDARDIZEDREGIMENSEQNBR and retrieve DISPLAYEDREGIMEN
-
-            //From CURRENTTHERAPY table also retrieve the BESTRESPONSESEQNBR column
-            // Look CLINICALRESPONSES table for key CLINICALRESPONSESEQNBR (->BESTRESPONSESEQNBR) and retrieve CLINICALRESPONSEDESCRIPTION
 
             List<Treatment> treatments = new ArrayList<>();
 
@@ -345,7 +307,9 @@ public class TransformerService {
                     startingDate = dCurrentTherapy.get("DATEREGIMENSTARTED")+"";
                     try {
                         startingDate = startingDate.equals("null") ? unKnown : startingDate.substring(0, 10);
-                    } catch (Exception e) {}
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
+                    }
 
 
 
@@ -370,7 +334,7 @@ public class TransformerService {
                     treatments.add(new Treatment(cleanDrugs(drug),null,null,null,duration,null,
                             null,response,null,startingDate,null));
 
-                    drug=""; duration = unKnown; response=""; startingDate = "";
+                    drug=""; duration = unKnown; response="";
                 }
 
             }
@@ -386,7 +350,7 @@ public class TransformerService {
                     priorDate = dPriorTherapy.get("DATEREGIMENSTARTED")+"";
                     try {
                         priorDate = priorDate.equals("null") ? unKnown : priorDate.substring(0, 10);
-                    } catch (Exception e) {}
+                    } catch (Exception e) { log.error(e.getMessage());}
 
                     duration = dPriorTherapy.get("DURATIONMONTHS")+" Months";
 
@@ -414,7 +378,7 @@ public class TransformerService {
                     treatments.add(new Treatment(null,cleanDrugs(drug),null,null,duration,null,
                             null,response,null,null,priorDate));
 
-                    drug=""; duration = unKnown; response=""; priorDate = "";
+                    drug=""; duration = unKnown; response="";
                 }
             }
 
@@ -462,11 +426,7 @@ public class TransformerService {
                     age = specimen.get("AGEATSAMPLING") + "";
                     specimenSite = specimen.get("BIOPSYSITE") + "";
 
-                    dateAtCollection = specimen.get("COLLECTIONDATE") + "";
-                    try {
-                        dateAtCollection = dateAtCollection.substring(0, 10);
-                    } catch (Exception e) {
-                    }
+                    dateAtCollection = specimen.get("COLLECTIONDATE").toString().substring(0, 10);
 
                     accessibility = specimen.get("PUBLICACCESSYN") + "";
                     if (accessibility.equals("Y")) {
@@ -535,7 +495,7 @@ public class TransformerService {
                                                           treatmentNaive, engraftmentSite, engraftmentType, sourceUrl, extractionMethod, dateAtCollection, accessibility, treatments, validations, sampleList);
 
                 // GENERATE DATA FOR MAPPING
-                Map<String, String> mappingData = new LinkedHashMap<String, String>();
+                Map<String, String> mappingData = new LinkedHashMap<>();
                 mappingData.put("MODEL ID",modelID);
                 mappingData.put("DIAGNOSIS", clinicalDiagnosis.toString());
                 mappingData.put("PRIMARY TISSUE", primarySite);
@@ -570,7 +530,6 @@ public class TransformerService {
 
             report.append("Loaded Record for Patient ").append(specimenSearch.get("PATIENTID")).append("<br>");
 
-            // if (count == 40){ break; }
         }
 
         return mappingList;
