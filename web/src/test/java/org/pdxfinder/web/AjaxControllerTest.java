@@ -59,9 +59,9 @@ public class AjaxControllerTest extends BaseTests {
                 .andExpect(jsonPath("$.title.text", is("")))
                 .andExpect(jsonPath("$.xAxis").exists())
                 .andExpect(jsonPath("$.xAxis.categories[*]").isNotEmpty())
-                .andExpect(jsonPath("$.xAxis.categories[*]", hasItem("JAN 2019")))
+                .andExpect(jsonPath("$.xAxis.categories[*]", hasItem("APR 2019")))
                 .andExpect(jsonPath("$.series").exists())
-                .andExpect(jsonPath("$.series", hasSize(5)))
+                .andExpect(jsonPath("$.series", hasSize(7)))
                 .andExpect(jsonPath("$.series[*].type", hasItem("spline")))
                 .andExpect(jsonPath("$.series[*].name", hasItem("Total Data Per Release"))).andDo(print());
 
@@ -80,14 +80,14 @@ public class AjaxControllerTest extends BaseTests {
         this.mockMvc.perform(get(urlTemplate)).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.title").exists())
-                .andExpect(jsonPath("$.title.text").value("Patient Data"))
+                .andExpect(jsonPath("$.title.text").value("PDX Models Treatment Data"))
                 .andExpect(jsonPath("$.xAxis").exists())
                 .andExpect(jsonPath("$.xAxis.categories[*]").isNotEmpty())
                 .andExpect(jsonPath("$.yAxis").exists())
                 .andExpect(jsonPath("$.series").exists())
                 //.andExpect(jsonPath("$.series", hasSize(5)))
                 .andExpect(jsonPath("$.series[*].data[*]").isNotEmpty())
-                .andExpect(jsonPath("$.subtitle.text", is("Patient Count Per Data Release")));
+                .andExpect(jsonPath("$.subtitle.text", is("PDX Models Having Treatment Data Per Data Source")));
     }
 
 

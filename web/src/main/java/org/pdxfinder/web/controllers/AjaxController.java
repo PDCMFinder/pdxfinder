@@ -13,7 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Arrays;
 
 /*
  * Created by csaba on 03/05/2018.
@@ -54,25 +58,25 @@ public class AjaxController {
     }
 
 
-    @RequestMapping(value = "/drugnames")
+    @GetMapping("/drugnames")
     List<String> getDrugnames(){
 
         return drugService.getDrugNames();
     }
 
-    @RequestMapping(value = "/modelcountperdrug")
+    @GetMapping("/modelcountperdrug")
     public List<CountDTO> getModelCountByDrug() {
 
         return  drugService.getModelCountByDrugAndComponentType("Drug");
     }
 
-    @RequestMapping(value = "/modelcountpergene")
+    @GetMapping("/modelcountpergene")
     public List<MutatedMarkerData> getModelCountByMarker() {
 
         return  graphService.getModelCountByGene();
     }
 
-    @RequestMapping(value = "/autosuggests")
+    @GetMapping("/autosuggests")
     List<AutoCompleteOption> getAutoSuggestList(){
 
         List<String> autoSuggestions = autoCompleteService.getAutoSuggestions();
@@ -86,14 +90,14 @@ public class AjaxController {
     }
 
 
-    @RequestMapping(value = "/platform/{dataSrc}")
+    @GetMapping("/platform/{dataSrc}")
     public Map findPlatformBySource(@PathVariable String dataSrc) {
 
         return  platformService.getPlatformCountBySource(dataSrc);
     }
 
 
-    @RequestMapping(value = "/platformdata/{dataSrc}")
+    @GetMapping("/platformdata/{dataSrc}")
     public List<DataAvailableDTO> findPlatformDataBySource(@PathVariable String dataSrc) {
 
         //populate list with data [{dataType:"mutation",platform:"CTP", models:20},{},{}]
@@ -101,7 +105,7 @@ public class AjaxController {
     }
 
 
-    @RequestMapping(value = "/modeldetails/{dataSrc}/{modelId}")
+    @GetMapping("/modeldetails/{dataSrc}/{modelId}")
     public DetailsDTO details(@PathVariable String dataSrc,
                               @PathVariable String modelId,
                               @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -117,7 +121,7 @@ public class AjaxController {
 
 
 
-    @RequestMapping(value = "/modeltech/{dataSrc}/{modelId}")
+    @GetMapping("/modeltech/{dataSrc}/{modelId}")
     public Map findModelTechnology(@PathVariable String dataSrc, @PathVariable String modelId,
                                    @RequestParam(value="passage", required = false) String passage) {
 
@@ -126,14 +130,14 @@ public class AjaxController {
     }
 
 
-    @RequestMapping(value = "/patienttech/{dataSrc}/{modelId}")
+    @GetMapping("/patienttech/{dataSrc}/{modelId}")
     public Map findPatientTechnology(@PathVariable String dataSrc, @PathVariable String modelId) {
 
         return  detailsService.findPatientPlatforms(dataSrc,modelId);
     }
 
 
-    @RequestMapping(value = "/getmutatedmarkerswithvariants")
+    @GetMapping("/getmutatedmarkerswithvariants")
     public Object getMutatedMarkersWithVariants(){
 
         ObjectMapper mapper = new ObjectMapper();
@@ -205,7 +209,7 @@ public class AjaxController {
     @GetMapping("/statistics/test")
     public Object doTest(){
 
-        List dataLabels = Arrays.asList("IRC-CRC","JAX","CRL","TRACE-PDTX","CURIE-LC","CURIE-BC");
+        List dataLabels = Arrays.asList("IRC-CRC", "JAX", "CRL", "TRACE-PDTX", "CURIE-LC", "CURIE-BC");
         List dataValues = Arrays.asList(1300, 375, 500, 450, 313, 1000);
         String chartTitle  = "PDX Finder Data Deposit Statistics";
         String subtitle   = "As per statistics data 2019";
@@ -240,13 +244,9 @@ public class AjaxController {
             chartTitle = "Drug Data Count";
             subtitle   = "Drug Data Count Per Data Source";
             data = statistics.drugCountPerDataSource();
-        }else{
-
         }
 
         return statistics.clusteredColumnChart(data, chartTitle, subtitle);
-        // Map<String, List<StatisticsDTO>> data = statistics.groupedData();
-       // return statistics.clusteredColumnChart(data, "Patient Treatments Data");
 
     }
 
@@ -266,7 +266,7 @@ public class AjaxController {
             chartTitle = "Treatment Data Count";
             subtitle   = "Treatment Data Count Per Data Source";
             data = statistics.treatmentsCountPerDataSource();
-        }else{ }
+        }
 
         return statistics.clusteredColumnChart(data, chartTitle, subtitle);
     }
@@ -295,7 +295,6 @@ public class AjaxController {
 
         return statistics.basicColumnChart(data, chartTitle, subtitle, HexColors.BLACK);
     }
-
 
 
 
