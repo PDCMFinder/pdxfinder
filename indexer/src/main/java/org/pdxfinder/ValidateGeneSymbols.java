@@ -44,10 +44,10 @@ public class ValidateGeneSymbols implements CommandLineRunner{
     @Autowired
     private UtilityService utilityService;
 
-    @Value("${jaxpdx.cnv.url}")
+    @Value("${jaxpdx.cna.url}")
     private String cnvURL;
 
-    @Value("${jadpdx.rnaseq.url}")
+    @Value("${jaxpdx.rnaseq.url}")
     private String rnaSeqURL;
 
     @Autowired

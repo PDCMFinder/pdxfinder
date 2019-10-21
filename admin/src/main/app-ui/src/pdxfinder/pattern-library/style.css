@@ -1,3 +1,6 @@
+thead tr th {  position: relative;}
+span.ui-column-resizer {  display: block;  position: absolute;  top: 0;  right: 0;  margin: 0;  width: 8px;  height: 100%;  padding: 0;  cursor: col-resize;  border: 1px solid transparent;}
+
 
 .styleFile{ padding:0 0 15px; border-bottom:1px solid rgba(3, 54, 157, 0.9); color:#666; margin:20px 10px 0 0; font-weight: normal; }
 

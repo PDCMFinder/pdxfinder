@@ -68,7 +68,7 @@
                         <td> {{ summary.DataSource | uppercase }} </td>
 
                         <td class="clickTd" (click)="onSelect(summary.DataSource, 'unmapped')"> {{ summary.Unmapped }} </td>
-                        <td class="clickTd" (click)="onSelect(summary.DataSource, 'mapped')"> {{ summary.Mapped }} </td>
+                        <td class="clickTd" (click)="onSelect(summary.DataSource, 'created,validated')"> {{ summary.Mapped }} </td>
                         <td class="clickTd" (click)="onSelect(summary.DataSource, 'validated')"> {{ summary.Validated }} </td>
                         <td class="clickTd" (click)="onSelect(summary.DataSource, 'created')"> {{ summary.Created }} </td>
                         <td class="clickTd" (click)="onSelect(summary.DataSource, 'orphaned')"> {{ summary.Orphaned }} </td>

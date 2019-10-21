@@ -18,11 +18,11 @@ public interface PlatformRepository extends PagingAndSortingRepository<Platform,
 
     Platform findByName(@Param("name") String name);
 
-    @Query("MATCH (p:Platform)-[]-(g:Group) where p.name = {name} and g.name={dataSource} and g.type='Provider' return p")
-    Platform findByNameAndDataSource(@Param("name") String name, @Param("dataSource") String dataSource);
+    @Query("MATCH (p:Platform)-[]-(g:Group) where p.name = {name} and p.type = {type} and g.name={dataSource} and g.type='Provider' return p")
+    Platform findByNameAndTypeAndDataSource(@Param("name") String name, @Param("type") String type, @Param("dataSource") String dataSource);
 
-    @Query("MATCH (p:Platform)-[]-(g:Group) where p.name = {name} and g.name={dataSource} and g.type='Provider' and p.url = {url} return p")
-    Platform findByNameAndDataSourceAndUrl(@Param("name") String name, @Param("dataSource") String dataSource, @Param("url") String url);
+    @Query("MATCH (p:Platform)-[]-(g:Group) where p.name = {name} and p.type = {type} and g.name={dataSource} and g.type='Provider' and p.url = {url} return p")
+    Platform findByNameAndTypeAndDataSourceAndUrl(@Param("name") String name, @Param("type") String type, @Param("dataSource") String dataSource, @Param("url") String url);
 
 
 

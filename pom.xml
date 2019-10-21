@@ -22,7 +22,6 @@
         <module>web</module>
         <module>data-services</module>
         <module>admin</module>
-        <module>data-transformer</module>
     </modules>
 
     <properties>

@@ -34,7 +34,7 @@ public class PrintReport implements CommandLineRunner, ApplicationContextAware {
 
 
     @Value("${pdxfinder.root.dir}")
-    private String finderRootDir;
+    private String finderLogDir;
 
     private UtilityService utilityService;
 
@@ -52,7 +52,7 @@ public class PrintReport implements CommandLineRunner, ApplicationContextAware {
     }
 
 
-    private void printReport(){
+    private void printReport() {
 
         reportManager = (ReportManager) context.getBean("ReportManager");
         reportManager.printMessages("ERROR");
@@ -61,28 +61,26 @@ public class PrintReport implements CommandLineRunner, ApplicationContextAware {
     }
 
 
-    private void saveReportInCsv(){
+    private void saveReportInCsv() {
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
-        String logFile = finderRootDir + "/logs/markerlog_"+timeStamp+".csv";
+        String logFile = finderLogDir + "/logs/markerlog_" + timeStamp + ".csv";
 
-        File logDir = new File(finderRootDir+ "/logs");
+        File logDir = new File(finderLogDir + "/logs");
 
         List<List<String>> markerReportMessages = reportManager.getMarkerHarmonizationMessagesInList();
 
-        if(markerReportMessages.size() == 0) return;
+        if (markerReportMessages.size() == 0) return;
 
-        if(logDir.canWrite()){
+        if (logDir.canWrite()) {
 
             List<String> headers = new ArrayList<>();
             headers.addAll(Arrays.asList("Type", "Reporter", "DataSource", "Model", "MolChar", "Platform", "MarkerInFile", "HarmonizedMarker", "ReasonOfChange", "Message"));
             utilityService.writeCsvFile(headers, markerReportMessages, logFile);
-            log.info("Saving log file to: "+finderRootDir + "/logs");
-        }
-        else{
+            log.info("Saving log file to: " + finderLogDir + "/logs");
+        } else {
 
-            log.warn("Cannot save log file, need write permission to "+finderRootDir + "/logs");
+            log.warn("Cannot save log file, need write permission to " + finderLogDir + "/logs");
         }
-
 
 
     }
@@ -92,5 +90,4 @@ public class PrintReport implements CommandLineRunner, ApplicationContextAware {
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         context = applicationContext;
     }
-
 }

@@ -100,6 +100,9 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
         jsonFile = finderRootDir +"/data/"+dataSourceAbbreviation+"/pdx/models.json";
         dataSource = dataSourceAbbreviation;
+
+        platformURL = new HashMap<>();
+        platformURL.put("NCI cancer gene panel_mutation","/platform/pdmr-mut-ts");
     }
 
 
@@ -126,7 +129,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step09LoadPatientData() {
 
-        if (dataImportService.isExistingModel(dto.getProviderGroup().getAbbreviation(), dto.getModelID())) return;
+        if (dataImportService.isExistingModel(providerDS.getAbbreviation(), dto.getModelID())) return;
         super.step09LoadPatientData();
     }
 
@@ -160,7 +163,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
             }
         }
 
-        ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), dto.getProviderGroup().getAbbreviation(), dto.getPatientSample(), validationList, dto.getExternalUrls());
+        ModelCreation modelCreation = dataImportService.createModelCreation(dto.getModelID(), providerDS.getAbbreviation(), dto.getPatientSample(), validationList, dto.getExternalUrls());
         modelCreation.addRelatedSample(dto.getPatientSample());
         dto.setModelCreation(modelCreation);
     }
@@ -183,9 +186,9 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
                     String passage = sampleObj.getString("Passage");
 
                     Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(),
-                            specimenId, dto.getProviderGroup().getAbbreviation(), passage);
+                            specimenId, providerDS.getAbbreviation(), passage);
 
-                    specimen.setHostStrain(dto.getNodScidGamma());
+                    specimen.setHostStrain(nsgBS);
 
                     EngraftmentSite es = dataImportService.getImplantationSite(dto.getImplantationSiteStr());
                     specimen.setEngraftmentSite(es);
@@ -196,7 +199,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
                     Sample specSample = new Sample();
 
                     specSample.setSourceSampleId(specimenId);
-                    specSample.setDataSource(dto.getProviderGroup().getAbbreviation());
+                    specSample.setDataSource(providerDS.getAbbreviation());
 
                     specimen.setSample(specSample);
 
@@ -293,7 +296,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
         log.info("Loading NGS for model " + dto.getModelCreation().getSourcePdxId());
 
-        loadOmicData(dto.getModelCreation(), dto.getProviderGroup(), "mutation",finderRootDir+"/data/"+dataSourceAbbreviation);
+        loadOmicData(dto.getModelCreation(), providerDS, "mutation",finderRootDir+"/data/"+dataSourceAbbreviation);
     }
 
 
@@ -303,6 +306,8 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     }
 
     @Override
-    void step18SetAccessGroup() {}
+    void step18SetAdditionalGroups() {
+        throw new UnsupportedOperationException();
+    }
 
 }
