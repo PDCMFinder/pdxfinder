@@ -253,7 +253,8 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "WITH model, spr, sp, hsr, hs, psamp, ir " +
             "OPTIONAL MATCH (sp)-[sfr:SAMPLED_FROM]-(s:Sample) " +
             "OPTIONAL MATCH (s)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[pur:PLATFORM_USED]-(pl:Platform) " +
-            "RETURN model, spr, sp, hsr, hs, sfr, s, psamp, ir, cbr, mc, pur, pl")
+            "OPTIONAL MATCH (psamp)-[cbr2:CHARACTERIZED_BY]-(mc2:MolecularCharacterization)-[pur2:PLATFORM_USED]-(pl2:Platform) " +
+            "RETURN model, spr, sp, hsr, hs, sfr, s, psamp, ir, cbr, mc, pur, pl, cbr2, mc2, pur2, pl2")
     ModelCreation findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
 
     @Query("CREATE INDEX ON :ModelCreation(dataSource, sourcePdxId)")

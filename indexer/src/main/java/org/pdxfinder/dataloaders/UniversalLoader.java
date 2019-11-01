@@ -1105,7 +1105,14 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             //Add contact provider and view data
             List<ExternalUrl> externalUrls = new ArrayList<>();
-            externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contactEmail));
+            if(contactEmail != null && !contactEmail.isEmpty()){
+                externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contactEmail));
+            }
+
+            if(contactFormLink != null && !contactFormLink.isEmpty()){
+                externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, contactFormLink));
+            }
+
             externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, modelLinkToDB));
             model.setExternalUrls(externalUrls);
 
@@ -1166,7 +1173,9 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                     log.error("Invalid passage " + passage + " for model:" + modelId);
                 }
-
+            }
+            else{
+                passage = "NA";
             }
 
             ModelCreation modelCreation = dataImportService.findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(modelId, ds.getAbbreviation());
@@ -1177,6 +1186,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 continue;
             }
 
+            //get all molchars related to patient sample
             if(modelCreation.getSample().getMolecularCharacterizations() != null){
 
                 for(MolecularCharacterization mc : modelCreation.getSample().getMolecularCharacterizations()){
@@ -1254,6 +1264,10 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                     log.error("Invalid passage "+passage +" for model:"+modelId);
                 }
+            }
+            else{
+
+                passage = "NA";
             }
 
 

@@ -23,7 +23,7 @@ public class LoadIRCCTest extends BaseTest {
     private Group transnationalAccess;
     private Group badAccess;
 
-    private Group provider;
+
 
     @Before public void init() {
         MockitoAnnotations.initMocks(this);
@@ -32,13 +32,15 @@ public class LoadIRCCTest extends BaseTest {
         badAccess = new Group();
         badAccess.setName("another group");
 
-        provider = new Group(
+        loader.providerDS = new Group(
             "Test IRCC Provider",
             "IRCC-CRC",
             "Test provider description",
             "Academia",
             "Joe Bloggs",
             "ircc.example.com");
+
+
     }
 
     @MockBean UtilityService utilityService;
@@ -68,12 +70,12 @@ public class LoadIRCCTest extends BaseTest {
 
         loader.dto.setModelCreation(modelCreation);
         loader.dto.setSpecimens(specimens);
-        loader.dto.setProviderGroup(provider);
+
 
         when(dataImportService.getSpecimen(
             modelCreation,
             json.getString("Specimen ID"),
-            loader.dto.getProviderGroup().getAbbreviation(),
+            loader.providerDS.getAbbreviation(),
             json.getString("Passage"))
         ).thenReturn(specimen);
 
