@@ -161,7 +161,7 @@ public class LoadNCIT implements CommandLineRunner {
                     String termLabel = term.getString("label");
 
                     //do not load this branch
-                    if(termLabel.equals("Neoplasm by Special Category")) continue;
+                    //if(termLabel.equals("Neoplasm by Special Category")) continue;
 
                     log.debug("TERM: "+termLabel);
 
