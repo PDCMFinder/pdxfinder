@@ -72,7 +72,7 @@ public class ExportDataToTemplate implements CommandLineRunner {
         downDog.setTemplateDir(finderRootDir + "/template");
 
         downDog.setDs(traceDS);
-        downDog.export("/Users/csaba/PDXFinder_testload/template");
+        downDog.export(finderRootDir + "/export");
 
 
     }
