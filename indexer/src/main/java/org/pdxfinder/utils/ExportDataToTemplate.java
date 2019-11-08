@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 @Order(value = 0)
 public class ExportDataToTemplate implements CommandLineRunner {
 
-    private final static Logger log = LoggerFactory.getLogger(ExportDataToTemplate.class);
+    private static final Logger log = LoggerFactory.getLogger(ExportDataToTemplate.class);
 
 
     @Autowired
@@ -57,7 +57,7 @@ public class ExportDataToTemplate implements CommandLineRunner {
         int seconds = (int) (totalTime / 1000) % 60;
         int minutes = (int) ((totalTime / (1000 * 60)) % 60);
 
-        log.info(this.getClass().getSimpleName() + " finished after " + minutes + " minute(s) and " + seconds + " second(s)");
+        log.info("{} finished after {} minutes and {} second(s)",this.getClass().getSimpleName(), minutes, seconds);
     }
 
 
@@ -66,12 +66,11 @@ public class ExportDataToTemplate implements CommandLineRunner {
     private void export(){
 
 
-        Group traceDS = dataImportService.findProviderGroupByAbbrev("JAX");
+        Group ds = dataImportService.findProviderGroupByAbbrev("IRCC-CRC");
 
         UniversalDataExporter downDog = new UniversalDataExporter(dataImportService, utilityService);
-        downDog.setTemplateDir(finderRootDir + "/template");
 
-        downDog.setDs(traceDS);
+        downDog.init(finderRootDir + "/template", ds);
         downDog.export(finderRootDir + "/export");
 
 
