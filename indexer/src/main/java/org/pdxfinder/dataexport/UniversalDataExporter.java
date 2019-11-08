@@ -93,15 +93,15 @@ public class UniversalDataExporter {
 
         initPatientData();
         initPatientTumorAtCollection();
-        initPdxModelDetails();
-        initPdxModelValidations();
-        initSharingAndContact();
-        initLoaderRelatedData();
+        //initPdxModelDetails();
+        //initPdxModelValidations();
+        //initSharingAndContact();
+        //initLoaderRelatedData();
 
-        initSamplePlatformDescription();
+        //initSamplePlatformDescription();
 
-        initMutationData();
-        initCNAData();
+        //initMutationData();
+        //initCNAData();
 
     }
 
@@ -568,7 +568,7 @@ public class UniversalDataExporter {
 
                 if(g.getType().equals("Publication")){
 
-                    if(!pubmedIDs.equals("")){
+                    if(pubmedIDs.length() != 0){
                         pubmedIDs.append(",");
                     }
 
@@ -823,4 +823,52 @@ public class UniversalDataExporter {
         }
     }
 
+
+    public List<List<String>> getPatientSheetData() {
+        return patientSheetData;
+    }
+
+    public List<List<String>> getPatientTumorSheetData() {
+        return patientTumorSheetData;
+    }
+
+    public List<List<String>> getPatientTreatmentSheetData() {
+        return patientTreatmentSheetData;
+    }
+
+    public List<List<String>> getPdxModelSheetData() {
+        return pdxModelSheetData;
+    }
+
+    public List<List<String>> getPdxModelValidationSheetData() {
+        return pdxModelValidationSheetData;
+    }
+
+    public List<List<String>> getSamplePlatformDescriptionSheetData() {
+        return samplePlatformDescriptionSheetData;
+    }
+
+    public List<List<String>> getSharingAndContactSheetData() {
+        return sharingAndContactSheetData;
+    }
+
+    public List<List<String>> getCytogeneticsSheetData() {
+        return cytogeneticsSheetData;
+    }
+
+    public List<List<String>> getLoaderRelatedDataSheetData() {
+        return loaderRelatedDataSheetData;
+    }
+
+    public List<List<String>> getDrugDosingSheetData() {
+        return drugDosingSheetData;
+    }
+
+    public List<List<String>> getMutationSheetData() {
+        return mutationSheetData;
+    }
+
+    public List<List<String>> getCnaSheetData() {
+        return cnaSheetData;
+    }
 }
