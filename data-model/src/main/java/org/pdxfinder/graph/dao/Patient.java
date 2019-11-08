@@ -268,5 +268,11 @@ public class Patient {
         return latestPS;
     }
 
+    public void addSnapshot(PatientSnapshot ps){
+
+        if(snapshots == null) snapshots = new HashSet<>();
+        snapshots.add(ps);
+    }
+
 }
 
