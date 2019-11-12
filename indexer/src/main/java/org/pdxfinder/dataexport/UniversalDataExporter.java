@@ -93,15 +93,15 @@ public class UniversalDataExporter {
 
         initPatientData();
         initPatientTumorAtCollection();
-        //initPdxModelDetails();
-        //initPdxModelValidations();
-        //initSharingAndContact();
-        //initLoaderRelatedData();
+        initPdxModelDetails();
+        initPdxModelValidations();
+        initSharingAndContact();
+        initLoaderRelatedData();
 
-        //initSamplePlatformDescription();
+        initSamplePlatformDescription();
 
-        //initMutationData();
-        //initCNAData();
+        initMutationData();
+        initCNAData();
 
     }
 
@@ -446,11 +446,15 @@ public class UniversalDataExporter {
 
             ModelCreation model = dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(ds.getAbbreviation(), m.getSourcePdxId(), molcharType);
 
-            String modelId = model.getSourcePdxId();
-            log.info("Exporting data for {}", modelId);
+            if(model != null){
 
-            initPatientGenomicData(model, sheetData);
-            initXenoGenomicData(model, sheetData);
+                String modelId = model.getSourcePdxId();
+                log.info("Exporting data for {}", modelId);
+
+                initPatientGenomicData(model, sheetData);
+                initXenoGenomicData(model, sheetData);
+            }
+
         }
 
     }
