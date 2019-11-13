@@ -2,15 +2,13 @@ package org.pdxfinder.dataexport;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.*;
@@ -19,7 +17,7 @@ import java.util.*;
 /*
  * Created by csaba on 02/10/2019.
  */
-@Component
+
 public class UniversalDataExporter {
 
     private static final Logger log = LoggerFactory.getLogger(UniversalDataExporter.class);
@@ -45,18 +43,13 @@ public class UniversalDataExporter {
     private List<List<String>> mutationSheetData;
     private List<List<String>> cnaSheetData;
 
-
-    //workbooks
-    private XSSFWorkbook metadataWorkbook;
-    private XSSFWorkbook samplePlatformWorkbook;
-    private XSSFWorkbook mutationWorkbook;
-    private XSSFWorkbook cnaWorkbook;
-
     private Group ds;
-
 
     private static String notSpecified = "Not Specified";
     private static String patientOrigin = "patient";
+
+    public UniversalDataExporter() {
+    }
 
     public UniversalDataExporter(DataImportService dataImportService, UtilityService utilityService) {
 
@@ -115,20 +108,74 @@ public class UniversalDataExporter {
 
     public void export(String exportDir){
 
-        getWorkbookTemplates();
+        //get the templates with the headers
+        XSSFWorkbook metadataWorkbook = getWorkbook(templateDir+"/metadata_template.xlsx");
+        XSSFWorkbook samplePlatformWorkbook = getWorkbook(templateDir+"/sampleplatform_template.xlsx");
+        XSSFWorkbook mutationWorkbook = getWorkbook(templateDir+"/mutation_template.xlsx");
+        XSSFWorkbook cnaWorkbook = getWorkbook(templateDir+"/cna_template.xlsx");
 
-        updateWorkbooks();
 
-        saveWorkbooksToFile(exportDir);
+        //insert data from the datalists to the template
+        if(metadataWorkbook != null){
+
+            updateSheetWithData(metadataWorkbook.getSheetAt(1), patientSheetData, 6, 2);
+            updateSheetWithData(metadataWorkbook.getSheetAt(2), patientTumorSheetData,6, 2);
+            updateSheetWithData(metadataWorkbook.getSheetAt(3), pdxModelSheetData,6, 2);
+            updateSheetWithData(metadataWorkbook.getSheetAt(4), pdxModelValidationSheetData, 6, 2);
+            updateSheetWithData(metadataWorkbook.getSheetAt(5), sharingAndContactSheetData, 6, 2 );
+            updateSheetWithData(metadataWorkbook.getSheetAt(6), loaderRelatedDataSheetData, 6, 2);
+        }
+
+        if(samplePlatformWorkbook != null){
+
+            updateSheetWithData(samplePlatformWorkbook.getSheetAt(0), samplePlatformDescriptionSheetData, 6, 1);
+        }
+
+        if(mutationWorkbook != null){
+
+            updateSheetWithData(mutationWorkbook.getSheetAt(0), mutationSheetData, 2, 1);
+        }
+
+        if(cnaWorkbook != null){
+
+            updateSheetWithData(cnaWorkbook.getSheetAt(0), cnaSheetData, 2, 1);
+        }
+
+
+        // Write the output to a new file
+        FileOutputStream fileOut = null;
+        try {
+
+            if(metadataWorkbook != null){
+                fileOut = new FileOutputStream(exportDir+"/metadata_export.xlsx");
+                metadataWorkbook.write(fileOut);
+                fileOut.close();
+            }
+
+            if(samplePlatformWorkbook != null){
+                fileOut = new FileOutputStream(exportDir+"/sampleplatform_export.xlsx");
+                samplePlatformWorkbook.write(fileOut);
+                fileOut.close();
+            }
+
+            if(mutationWorkbook != null){
+                fileOut = new FileOutputStream(exportDir+"/mutation_export.xlsx");
+                mutationWorkbook.write(fileOut);
+                fileOut.close();
+            }
+
+            if(cnaWorkbook != null){
+                fileOut = new FileOutputStream(exportDir+"/cna_export.xlsx");
+                cnaWorkbook.write(fileOut);
+                fileOut.close();
+            }
+
+
+        } catch (Exception e) {
+            log.error("error", e);
+        }
+
     }
-
-
-
-
-
-
-
-
 
     public void initPatientData() {
 
@@ -461,7 +508,7 @@ public class UniversalDataExporter {
         }
     }
 
-    private void updateSheetWithData(Sheet sheet, List<List<String>> data, int startRow, int startColumn){
+    public void updateSheetWithData(Sheet sheet, List<List<String>> data, int startRow, int startColumn){
 
         //Workbook rows and cells start at index 0
 
@@ -777,82 +824,6 @@ public class UniversalDataExporter {
         return null;
     }
 
-    private void getWorkbookTemplates(){
-        //get the templates with the headers
-        metadataWorkbook = getWorkbook(templateDir+"/metadata_template.xlsx");
-        samplePlatformWorkbook = getWorkbook(templateDir+"/sampleplatform_template.xlsx");
-        mutationWorkbook = getWorkbook(templateDir+"/mutation_template.xlsx");
-        cnaWorkbook = getWorkbook(templateDir+"/cna_template.xlsx");
-    }
-
-    public void updateWorkbooks(){
-
-        //insert data from the datalists to the template
-        if(metadataWorkbook != null){
-
-            updateSheetWithData(metadataWorkbook.getSheetAt(1), patientSheetData, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(2), patientTumorSheetData,6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(3), pdxModelSheetData,6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(4), pdxModelValidationSheetData, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(5), sharingAndContactSheetData, 6, 2 );
-            updateSheetWithData(metadataWorkbook.getSheetAt(6), loaderRelatedDataSheetData, 6, 2);
-        }
-
-        if(samplePlatformWorkbook != null){
-
-            updateSheetWithData(samplePlatformWorkbook.getSheetAt(0), samplePlatformDescriptionSheetData, 6, 1);
-        }
-
-        if(mutationWorkbook != null){
-
-            updateSheetWithData(mutationWorkbook.getSheetAt(0), mutationSheetData, 2, 1);
-        }
-
-        if(cnaWorkbook != null){
-
-            updateSheetWithData(cnaWorkbook.getSheetAt(0), cnaSheetData, 2, 1);
-        }
-
-    }
-
-    public void saveWorkbooksToFile(String exportDir){
-
-
-        // Write the output to a new file
-        FileOutputStream fileOut = null;
-        try {
-
-            if(metadataWorkbook != null){
-                fileOut = new FileOutputStream(exportDir+"/metadata_export.xlsx");
-                metadataWorkbook.write(fileOut);
-                fileOut.close();
-            }
-
-            if(samplePlatformWorkbook != null){
-                fileOut = new FileOutputStream(exportDir+"/sampleplatform_export.xlsx");
-                samplePlatformWorkbook.write(fileOut);
-                fileOut.close();
-            }
-
-            if(mutationWorkbook != null){
-                fileOut = new FileOutputStream(exportDir+"/mutation_export.xlsx");
-                mutationWorkbook.write(fileOut);
-                fileOut.close();
-            }
-
-            if(cnaWorkbook != null){
-                fileOut = new FileOutputStream(exportDir+"/cna_export.xlsx");
-                cnaWorkbook.write(fileOut);
-                fileOut.close();
-            }
-
-
-        } catch (Exception e) {
-            log.error("error", e);
-        }
-    }
-
-
     private String getHostStrainName(Specimen sp){
 
         return sp.getHostStrain().getName() == null?"":sp.getHostStrain().getName();
@@ -911,19 +882,5 @@ public class UniversalDataExporter {
         return cnaSheetData;
     }
 
-    public void setMetadataWorkbook(XSSFWorkbook metadataWorkbook) {
-        this.metadataWorkbook = metadataWorkbook;
-    }
 
-    public void setSamplePlatformWorkbook(XSSFWorkbook samplePlatformWorkbook) {
-        this.samplePlatformWorkbook = samplePlatformWorkbook;
-    }
-
-    public void setMutationWorkbook(XSSFWorkbook mutationWorkbook) {
-        this.mutationWorkbook = mutationWorkbook;
-    }
-
-    public void setCnaWorkbook(XSSFWorkbook cnaWorkbook) {
-        this.cnaWorkbook = cnaWorkbook;
-    }
 }
