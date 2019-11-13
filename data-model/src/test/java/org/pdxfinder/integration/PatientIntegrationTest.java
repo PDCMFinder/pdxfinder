@@ -24,6 +24,9 @@ public class PatientIntegrationTest extends BaseTest {
     GroupRepository groupRepository;
 
 
+    Patient patient;
+    Group providerGroup;
+
     @Before
     public void setupDB(){
 
@@ -31,9 +34,9 @@ public class PatientIntegrationTest extends BaseTest {
         patientSnapshotRepository.deleteAll();
         groupRepository.deleteAll();
 
-        Group providerGroup = new Group("testgroup", "tg", "groupdescription", "academia", "", "");
+        providerGroup = new Group("testgroup", "tg", "groupdescription", "academia", "", "");
 
-        Patient p = new Patient("p1", "male", "-", "-", providerGroup);
+        patient = new Patient("p1", "male", "-", "-", providerGroup);
 
         PatientSnapshot ps1 = new PatientSnapshot();
         ps1.setAgeAtCollection("40");
@@ -41,23 +44,18 @@ public class PatientIntegrationTest extends BaseTest {
         PatientSnapshot ps2 = new PatientSnapshot();
         ps2.setAgeAtCollection("45");
 
-        p.addSnapshot(ps1);
-        p.addSnapshot(ps2);
+        patient.addSnapshot(ps1);
+        patient.addSnapshot(ps2);
 
-        patientRepository.save(p);
 
     }
 
     @Test
     public void PatientTest(){
 
-
-        Group g = groupRepository.findByAbbrevAndType("tg", "Provider");
-        Patient p = patientRepository.findByExternalIdAndGroup("p1", g);
-
-        Assert.assertEquals(p.getExternalId(), "p1");
-        Assert.assertEquals(p.getProviderGroup().getAbbreviation(), g.getAbbreviation());
-        Assert.assertEquals(p.getLastSnapshot().getAgeAtCollection(), "45");
+        Assert.assertEquals(patient.getExternalId(), "p1");
+        Assert.assertEquals(patient.getProviderGroup().getAbbreviation(), providerGroup.getAbbreviation());
+        Assert.assertEquals(patient.getLastSnapshot().getAgeAtCollection(), "45");
 
     }
 
