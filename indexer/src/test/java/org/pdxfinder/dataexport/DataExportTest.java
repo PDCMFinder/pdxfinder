@@ -1,8 +1,8 @@
 package org.pdxfinder.dataexport;
 
-import org.apache.poi.ss.SpreadsheetVersion;
-import org.apache.poi.ss.formula.udf.UDFFinder;
+
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,13 +11,9 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
-
 import static org.mockito.Mockito.when;
 
 public class DataExportTest extends BaseTest {
@@ -47,8 +43,6 @@ public class DataExportTest extends BaseTest {
 
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initPatientData();
-        initWorkbooks();
-        universalDataExporter.updateWorkbooks();
         List<List<String>> patientData = universalDataExporter.getPatientSheetData();
 
         Assert.assertEquals("p123", patientData.get(0).get(0));
@@ -85,7 +79,6 @@ public class DataExportTest extends BaseTest {
 
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initPatientTumorAtCollection();
-        universalDataExporter.updateWorkbooks();
 
         List<List<String>> patientTumorAtCollection = universalDataExporter.getPatientTumorSheetData();
         Assert.assertEquals("p123", patientTumorAtCollection.get(0).get(0));
@@ -99,7 +92,6 @@ public class DataExportTest extends BaseTest {
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initPdxModelDetails();
         universalDataExporter.initPdxModelValidations();
-        universalDataExporter.updateWorkbooks();
 
         List<List<String>> pdxModelDetails = universalDataExporter.getPdxModelSheetData();
         List<List<String>> pdxModelValidations = universalDataExporter.getPdxModelValidationSheetData();
@@ -119,7 +111,6 @@ public class DataExportTest extends BaseTest {
 
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initSharingAndContact();
-        universalDataExporter.updateWorkbooks();
 
         List<List<String>> sharingAndContact = universalDataExporter.getSharingAndContactSheetData();
 
@@ -133,7 +124,6 @@ public class DataExportTest extends BaseTest {
 
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initLoaderRelatedData();
-        universalDataExporter.updateWorkbooks();
 
         List<List<String>> loaderRelatedData = universalDataExporter.getLoaderRelatedDataSheetData();
 
@@ -149,7 +139,6 @@ public class DataExportTest extends BaseTest {
 
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initSamplePlatformDescription();
-        universalDataExporter.updateWorkbooks();
 
         List<List<String>> samplePlatformDescription = universalDataExporter.getSamplePlatformDescriptionSheetData();
 
@@ -168,7 +157,6 @@ public class DataExportTest extends BaseTest {
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initMutationData();
         universalDataExporter.initCNAData();
-        universalDataExporter.updateWorkbooks();
 
         List<List<String>> mutationData = universalDataExporter.getMutationSheetData();
         List<List<String>> cnaData = universalDataExporter.getCnaSheetData();
@@ -179,6 +167,22 @@ public class DataExportTest extends BaseTest {
         Assert.assertEquals("m123", cnaData.get(0).get(1));
         Assert.assertEquals("markersymbol", cnaData.get(0).get(6));
 
+    }
+
+
+    @Test
+    public void TestUpdateSheet(){
+
+        Workbook wb = new XSSFWorkbook();
+        Sheet sheet1 = wb.createSheet("Sheet1");
+
+        List<String> rowData = new ArrayList<>(Arrays.asList("1","2","3","4"));
+        List<List<String>> data = new ArrayList<>();
+        data.add(rowData);
+
+        universalDataExporter.updateSheetWithData(sheet1, data, 1, 1);
+
+        Assert.assertEquals("2", sheet1.getRow(0).getCell(1).getStringCellValue());
     }
 
 
@@ -248,6 +252,7 @@ public class DataExportTest extends BaseTest {
         //setting up cna data
         MolecularCharacterization molecularCharacterization2 = new MolecularCharacterization();
         molecularCharacterization2.setType("copy number alteration");
+        molecularCharacterization2.setPlatform(platform);
         MarkerAssociation ma2 = new MarkerAssociation();
         ma2.setCnaCopyNumberStatus("cnaStatus");
         Marker m2 = new Marker("markersymbol", "markername");
@@ -273,10 +278,5 @@ public class DataExportTest extends BaseTest {
         return patientList;
     }
 
-    private void initWorkbooks(){
-
-
-
-    }
 
 }
