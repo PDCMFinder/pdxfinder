@@ -249,13 +249,8 @@ public class Patient {
                 latestPS = ps;
             }
             else{
-                //compare age at collection
-                if(latestPS.getAgeAtCollection().compareTo(ps.getAgeAtCollection()) < 0 ){
-
-                    latestPS = ps;
-                }
-                //compare date collection
-                else if(latestPS.getDateAtCollection().compareTo(ps.getDateAtCollection()) < 0){
+                //compare age at collection and date at collection
+                if(latestPS.getAgeAtCollection().compareTo(ps.getAgeAtCollection()) < 0 || latestPS.getDateAtCollection().compareTo(ps.getDateAtCollection()) < 0){
 
                     latestPS = ps;
                 }
