@@ -47,10 +47,10 @@ public class UniversalDataExporter {
 
 
     //workbooks
-    private Workbook metadataWorkbook;
-    private Workbook samplePlatformWorkbook;
-    private Workbook mutationWorkbook;
-    private Workbook cnaWorkbook;
+    private XSSFWorkbook metadataWorkbook;
+    private XSSFWorkbook samplePlatformWorkbook;
+    private XSSFWorkbook mutationWorkbook;
+    private XSSFWorkbook cnaWorkbook;
 
     private Group ds;
 
@@ -757,7 +757,7 @@ public class UniversalDataExporter {
     }
 
 
-    private Workbook getWorkbook(String templatePath) {
+    private XSSFWorkbook getWorkbook(String templatePath) {
 
         File file = new File(templatePath);
         log.debug("Loading template {}", templatePath);
@@ -911,19 +911,19 @@ public class UniversalDataExporter {
         return cnaSheetData;
     }
 
-    public void setMetadataWorkbook(Workbook metadataWorkbook) {
+    public void setMetadataWorkbook(XSSFWorkbook metadataWorkbook) {
         this.metadataWorkbook = metadataWorkbook;
     }
 
-    public void setSamplePlatformWorkbook(Workbook samplePlatformWorkbook) {
+    public void setSamplePlatformWorkbook(XSSFWorkbook samplePlatformWorkbook) {
         this.samplePlatformWorkbook = samplePlatformWorkbook;
     }
 
-    public void setMutationWorkbook(Workbook mutationWorkbook) {
+    public void setMutationWorkbook(XSSFWorkbook mutationWorkbook) {
         this.mutationWorkbook = mutationWorkbook;
     }
 
-    public void setCnaWorkbook(Workbook cnaWorkbook) {
+    public void setCnaWorkbook(XSSFWorkbook cnaWorkbook) {
         this.cnaWorkbook = cnaWorkbook;
     }
 }
