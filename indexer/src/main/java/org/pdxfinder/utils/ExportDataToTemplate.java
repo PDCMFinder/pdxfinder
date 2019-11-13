@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
  * Created by csaba on 02/10/2019.
  */
 @Component
-@Order(value = 0)
 public class ExportDataToTemplate implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(ExportDataToTemplate.class);
