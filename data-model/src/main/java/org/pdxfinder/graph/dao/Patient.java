@@ -242,25 +242,74 @@ public class Patient {
 
         if(snapshots == null) return null;
 
-        PatientSnapshot latestPS = null;
-        for(PatientSnapshot ps: snapshots){
+        PatientSnapshot latestPSByAge = getLastSnapshotByAge();
+        PatientSnapshot latestPSByDate = getLastSnapshotByDate();
 
-            if(latestPS == null){
-                latestPS = ps;
-            }
-            else{
-                //compare age at collection and date at collection
-                if((latestPS.getAgeAtCollection() != null && ps.getAgeAtCollection() != null && latestPS.getAgeAtCollection().compareTo(ps.getAgeAtCollection()) < 0)
-                        || (latestPS != null && ps.getDateAtCollection() != null && latestPS.getDateAtCollection().compareTo(ps.getDateAtCollection()) < 0)){
+        if(latestPSByAge != null ) {
 
-                    latestPS = ps;
-                }
-            }
+            return latestPSByAge;
+        }
+        else if(latestPSByDate != null){
 
+            return latestPSByDate;
+        }
+        else{
+
+            return null;
         }
 
-        return latestPS;
     }
+
+
+    private PatientSnapshot getLastSnapshotByAge(){
+
+        PatientSnapshot latestPSByAge = null;
+
+        for(PatientSnapshot ps: snapshots){
+
+            if(latestPSByAge == null){
+                latestPSByAge = ps;
+            }
+            else{
+                if(latestPSByAge.getAgeAtCollection() != null && ps.getAgeAtCollection() != null && latestPSByAge.getAgeAtCollection().compareTo(ps.getAgeAtCollection()) < 0){
+
+                    latestPSByAge = ps;
+                }
+            }
+        }
+
+        if(latestPSByAge != null) {
+            return latestPSByAge;
+        }
+
+        return null;
+    }
+
+    private PatientSnapshot getLastSnapshotByDate(){
+
+        PatientSnapshot latestPSByDate = null;
+
+        for(PatientSnapshot ps: snapshots){
+
+            if(latestPSByDate == null){
+                latestPSByDate = ps;
+            }
+            else{
+                if(latestPSByDate.getDateAtCollection() != null && ps.getDateAtCollection() != null && latestPSByDate.getDateAtCollection().compareTo(ps.getDateAtCollection()) < 0){
+
+                    latestPSByDate = ps;
+                }
+            }
+        }
+
+        if(latestPSByDate != null) {
+            return latestPSByDate;
+        }
+
+        return null;
+    }
+
+
 
     public void addSnapshot(PatientSnapshot ps){
 
