@@ -37,7 +37,7 @@ public class DataExportTest extends BaseTest {
     }
 
     @Test
-    public void TestPatient() {
+    public void Given_PatientAndProvider_When_GetPatientSheetIsCalled_Then_PatientDataIsInRowOne() {
 
         when(dataImportService.findPatientsByGroup(providerGroup)).thenReturn(getPatientListForTest());
 
@@ -49,7 +49,7 @@ public class DataExportTest extends BaseTest {
     }
 
     @Test
-    public void TestPatientTumorAtCollection(){
+    public void Given_PatientAndModelAndSample_When_PatientTumorSheetIsCalled_Then_PatientDataIsInRowOne(){
 
         Patient patient = new Patient("p123", "male", "", "", providerGroup);
         PatientSnapshot patientSnapshot = new PatientSnapshot();
@@ -85,7 +85,7 @@ public class DataExportTest extends BaseTest {
     }
 
     @Test
-    public void TestPdxModelDetailsAndValidations(){
+    public void Given_ModelWithDetails_When_GetModelDetailsIsCalled_Then_ModelDataIsInRowOne(){
 
         when( dataImportService.findModelsWithSpecimensAndQAByDS(providerGroup.getAbbreviation())).thenReturn(getModelListForTest());
 
@@ -105,7 +105,7 @@ public class DataExportTest extends BaseTest {
     }
 
     @Test
-    public void TestSharingAndContact(){
+    public void Given_Provider_When_GetSharingAndContactSheetIsCalled_Then_SharingAndContactDataIsInRowOne(){
 
         when(dataImportService.findModelsWithSharingAndContactByDS(providerGroup.getAbbreviation())).thenReturn(getModelListForTest());
 
@@ -120,7 +120,7 @@ public class DataExportTest extends BaseTest {
     }
 
     @Test
-    public void TestLoaderRelatedData(){
+    public void Given_Provider_When_GetLoaderRelatedSheetIsCalled_Then_DataIsInRowOne(){
 
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initLoaderRelatedData();
@@ -133,7 +133,7 @@ public class DataExportTest extends BaseTest {
     }
 
     @Test
-    public void TestSamplePlatformDescription(){
+    public void Given_ModelWithMolecularData_When_GetSamplePlatformSheetIsCalled_Then_SamplePlatformDataIsInRowOne(){
 
         when(dataImportService.findModelXenograftPlatformSampleByDS(providerGroup.getAbbreviation())).thenReturn(getModelListForTest());
 
@@ -148,7 +148,7 @@ public class DataExportTest extends BaseTest {
     }
 
     @Test
-    public void TestGenomicData(){
+    public void Given_ModelsWithOmic_When_GetOmicSheetsAreCalled_Then_DataIsInRowOne(){
 
         when(
                 dataImportService
@@ -178,7 +178,7 @@ public class DataExportTest extends BaseTest {
 
 
     @Test
-    public void TestUpdateSheet(){
+    public void Given_SheetRowData_When_UpdateSheetIsCalled_Then_SheetIsUpdated(){
 
         Workbook wb = new XSSFWorkbook();
         Sheet sheet1 = wb.createSheet("Sheet1");
