@@ -150,7 +150,14 @@ public class DataExportTest extends BaseTest {
     @Test
     public void TestGenomicData(){
 
-        when(dataImportService.findModelsWithSharingAndContactByDS(providerGroup.getAbbreviation())).thenReturn(getModelListForTest());
+        when(
+                dataImportService
+                .findModelsWithSharingAndContactByDS(
+                        providerGroup.getAbbreviation()
+                )
+        ).thenReturn(
+                getModelListForTest()
+        );
         when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(providerGroup.getAbbreviation(), "m123", "mutation")).thenReturn(getModelListForTest().get(0));
         when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(providerGroup.getAbbreviation(), "m123", "copy number alteration")).thenReturn(getModelListForTest().get(0));
 
