@@ -42,10 +42,14 @@ public class ExportDataToTemplate implements CommandLineRunner {
         OptionSet options = parser.parse(args);
         long startTime = System.currentTimeMillis();
 
-        if (options.has("exportToTemplate")) {
+        if (options.has("exportToTemplate") && args.length > 1) {
 
+            log.info("Exporting data from {}", args[1]);
+            export(args[1]);
 
-            export();
+        }
+        else if(options.has("exportToTemplate") && args.length <= 1){
+            log.error("Missing provider abbrev. Cannot export data.");
 
         }
 
@@ -61,10 +65,15 @@ public class ExportDataToTemplate implements CommandLineRunner {
 
 
 
-    private void export(){
+    private void export(String dataSourceAbbrev){
 
 
-        Group ds = dataImportService.findProviderGroupByAbbrev("IRCC-CRC");
+        Group ds = dataImportService.findProviderGroupByAbbrev(dataSourceAbbrev);
+
+        if(ds == null) {
+            log.error("Datasource {} not found. ",dataSourceAbbrev);
+            return;
+        }
 
         UniversalDataExporter downDog = new UniversalDataExporter(dataImportService, utilityService);
 
