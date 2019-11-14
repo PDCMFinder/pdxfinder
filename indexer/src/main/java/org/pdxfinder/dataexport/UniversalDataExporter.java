@@ -621,10 +621,20 @@ public class UniversalDataExporter {
 
     private void getGroupData(LinkedHashMap<String, String> map, Group providerGroup, Group accessGroup, Group projectGroup){
 
-        map.put("providerType", providerGroup.getProviderType());
-        map.put("providerName",  providerGroup.getName());
-        map.put("providerAbbrev", providerGroup.getAbbreviation());
 
+
+        if(providerGroup != null) {
+
+            map.put("providerType", providerGroup.getProviderType());
+            map.put("providerName", providerGroup.getName());
+            map.put("providerAbbrev", providerGroup.getAbbreviation());
+        }
+        else{
+
+            map.put("providerType", "");
+            map.put("providerName", "");
+            map.put("providerAbbrev", "");
+        }
         if(accessGroup != null){
 
             map.put("modelAccessibility", accessGroup.getAccessibility());
