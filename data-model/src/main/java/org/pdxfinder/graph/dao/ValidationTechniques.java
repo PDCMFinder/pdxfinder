@@ -12,7 +12,7 @@ public enum ValidationTechniques {
 
     private String technique;
 
-    private ValidationTechniques(String s) {
+    ValidationTechniques(String s) {
         technique = s;
     }
 

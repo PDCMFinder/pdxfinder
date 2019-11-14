@@ -1,7 +1,6 @@
 package org.pdxfinder.graph.dao;
 
 import org.neo4j.ogm.annotation.*;
-
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 

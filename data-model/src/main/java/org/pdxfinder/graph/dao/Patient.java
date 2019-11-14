@@ -249,14 +249,7 @@ public class Patient {
 
             return latestPSByAge;
         }
-        else if(latestPSByDate != null){
-
-            return latestPSByDate;
-        }
-        else{
-
-            return null;
-        }
+        else return latestPSByDate;
 
     }
 
@@ -278,11 +271,7 @@ public class Patient {
             }
         }
 
-        if(latestPSByAge != null) {
-            return latestPSByAge;
-        }
-
-        return null;
+        return latestPSByAge;
     }
 
     private PatientSnapshot getLastSnapshotByDate(){
@@ -302,11 +291,7 @@ public class Patient {
             }
         }
 
-        if(latestPSByDate != null) {
-            return latestPSByDate;
-        }
-
-        return null;
+        return latestPSByDate;
     }
 
 

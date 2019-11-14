@@ -58,7 +58,7 @@ public class ExternalUrl {
 
         private String value;
 
-        private Type(String val) {
+        Type(String val) {
             value = val;
         }
 
