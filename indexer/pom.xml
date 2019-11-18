@@ -43,11 +43,6 @@
             <artifactId>data-services</artifactId>
         </dependency>
 
-        <!-- For loading excel documents -->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.poi</groupId>-->
-<!--            <artifactId>poi-ooxml</artifactId>-->
-<!--        </dependency>-->
 
     </dependencies>
 

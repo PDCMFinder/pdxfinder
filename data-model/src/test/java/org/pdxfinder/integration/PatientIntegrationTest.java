@@ -53,9 +53,9 @@ public class PatientIntegrationTest extends BaseTest {
     @Test
     public void PatientTest(){
 
-        Assert.assertEquals(patient.getExternalId(), "p1");
-        Assert.assertEquals(patient.getProviderGroup().getAbbreviation(), providerGroup.getAbbreviation());
-        Assert.assertEquals(patient.getLastSnapshot().getAgeAtCollection(), "45");
+        Assert.assertEquals("p1", patient.getExternalId());
+        Assert.assertEquals(providerGroup.getAbbreviation(), patient.getProviderGroup().getAbbreviation());
+        Assert.assertEquals("45", patient.getLastSnapshot().getAgeAtCollection() );
 
     }
 
