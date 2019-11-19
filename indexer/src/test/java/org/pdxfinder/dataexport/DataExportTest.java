@@ -39,7 +39,8 @@ public class DataExportTest extends BaseTest {
     @Test
     public void Given_PatientAndProvider_When_GetPatientSheetIsCalled_Then_PatientDataIsInRowOne() {
 
-        when(dataImportService.findPatientsByGroup(providerGroup)).thenReturn(getPatientListForTest());
+        when(dataImportService.findPatientsByGroup(providerGroup))
+          .thenReturn(getPatientListForTest());
 
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initPatientData();
@@ -74,8 +75,10 @@ public class DataExportTest extends BaseTest {
         ModelCreation modelCreation = new ModelCreation();
         modelCreation.setSourcePdxId("m123");
 
-        when(dataImportService.findPatientTumorAtCollectionDataByDS(providerGroup)).thenReturn(patientList);
-        when(dataImportService.findModelBySample(sample)).thenReturn(modelCreation);
+        when(dataImportService.findPatientTumorAtCollectionDataByDS(providerGroup))
+          .thenReturn(patientList);
+        when(dataImportService.findModelBySample(sample))
+          .thenReturn(modelCreation);
 
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initPatientTumorAtCollection();
@@ -87,7 +90,8 @@ public class DataExportTest extends BaseTest {
     @Test
     public void Given_ModelWithDetails_When_GetModelDetailsIsCalled_Then_ModelDataIsInRowOne(){
 
-        when( dataImportService.findModelsWithSpecimensAndQAByDS(providerGroup.getAbbreviation())).thenReturn(getModelListForTest());
+        when( dataImportService.findModelsWithSpecimensAndQAByDS(providerGroup.getAbbreviation()))
+          .thenReturn(getModelListForTest());
 
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initPdxModelDetails();
@@ -107,7 +111,8 @@ public class DataExportTest extends BaseTest {
     @Test
     public void Given_Provider_When_GetSharingAndContactSheetIsCalled_Then_SharingAndContactDataIsInRowOne(){
 
-        when(dataImportService.findModelsWithSharingAndContactByDS(providerGroup.getAbbreviation())).thenReturn(getModelListForTest());
+        when(dataImportService.findModelsWithSharingAndContactByDS(providerGroup.getAbbreviation()))
+          .thenReturn(getModelListForTest());
 
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initSharingAndContact();
@@ -135,7 +140,8 @@ public class DataExportTest extends BaseTest {
     @Test
     public void Given_ModelWithMolecularData_When_GetSamplePlatformSheetIsCalled_Then_SamplePlatformDataIsInRowOne(){
 
-        when(dataImportService.findModelXenograftPlatformSampleByDS(providerGroup.getAbbreviation())).thenReturn(getModelListForTest());
+        when(dataImportService.findModelXenograftPlatformSampleByDS(providerGroup.getAbbreviation()))
+          .thenReturn(getModelListForTest());
 
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initSamplePlatformDescription();
@@ -150,16 +156,12 @@ public class DataExportTest extends BaseTest {
     @Test
     public void Given_ModelsWithOmic_When_GetOmicSheetsAreCalled_Then_DataIsInRowOne(){
 
-        when(
-                dataImportService
-                .findModelsWithSharingAndContactByDS(
-                        providerGroup.getAbbreviation()
-                )
-        ).thenReturn(
-                getModelListForTest()
-        );
-        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(providerGroup.getAbbreviation(), "m123", "mutation")).thenReturn(getModelListForTest().get(0));
-        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(providerGroup.getAbbreviation(), "m123", "copy number alteration")).thenReturn(getModelListForTest().get(0));
+        when(dataImportService.findModelsWithSharingAndContactByDS(providerGroup.getAbbreviation()))
+          .thenReturn(getModelListForTest());
+        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(providerGroup.getAbbreviation(), "m123", "mutation"))
+          .thenReturn(getModelListForTest().get(0));
+        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(providerGroup.getAbbreviation(), "m123", "copy number alteration"))
+          .thenReturn(getModelListForTest().get(0));
 
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initMutationData();
