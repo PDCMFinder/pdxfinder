@@ -44,7 +44,7 @@ public class DataExportTest extends BaseTest {
 
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initPatientData();
-        List<List<String>> patientData = universalDataExporter.getPatientSheetData();
+        List<List<String>> patientData = universalDataExporter.getPatientSheetDataExport();
 
         Assert.assertEquals("p123", patientData.get(0).get(0));
     }
@@ -83,7 +83,7 @@ public class DataExportTest extends BaseTest {
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initPatientTumorAtCollection();
 
-        List<List<String>> patientTumorAtCollection = universalDataExporter.getPatientTumorSheetData();
+        List<List<String>> patientTumorAtCollection = universalDataExporter.getPatientTumorSheetDataExport();
         Assert.assertEquals("p123", patientTumorAtCollection.get(0).get(0));
     }
 
@@ -97,8 +97,8 @@ public class DataExportTest extends BaseTest {
         universalDataExporter.initPdxModelDetails();
         universalDataExporter.initPdxModelValidations();
 
-        List<List<String>> pdxModelDetails = universalDataExporter.getPdxModelSheetData();
-        List<List<String>> pdxModelValidations = universalDataExporter.getPdxModelValidationSheetData();
+        List<List<String>> pdxModelDetails = universalDataExporter.getPdxModelSheetDataExport();
+        List<List<String>> pdxModelValidations = universalDataExporter.getPdxModelValidationSheetDataExport();
 
         Assert.assertEquals("m123", pdxModelDetails.get(0).get(0));
         Assert.assertEquals("hsname", pdxModelDetails.get(0).get(1));
@@ -117,7 +117,7 @@ public class DataExportTest extends BaseTest {
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initSharingAndContact();
 
-        List<List<String>> sharingAndContact = universalDataExporter.getSharingAndContactSheetData();
+        List<List<String>> sharingAndContact = universalDataExporter.getSharingAndContactSheetDataExport();
 
         Assert.assertEquals("m123", sharingAndContact.get(0).get(0));
         Assert.assertEquals("Academia", sharingAndContact.get(0).get(1));
@@ -130,7 +130,7 @@ public class DataExportTest extends BaseTest {
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initLoaderRelatedData();
 
-        List<List<String>> loaderRelatedData = universalDataExporter.getLoaderRelatedDataSheetData();
+        List<List<String>> loaderRelatedData = universalDataExporter.getLoaderRelatedDataSheetDataExport();
 
         Assert.assertEquals("TG", loaderRelatedData.get(0).get(1));
 
@@ -146,7 +146,7 @@ public class DataExportTest extends BaseTest {
         universalDataExporter.setDs(providerGroup);
         universalDataExporter.initSamplePlatformDescription();
 
-        List<List<String>> samplePlatformDescription = universalDataExporter.getSamplePlatformDescriptionSheetData();
+        List<List<String>> samplePlatformDescription = universalDataExporter.getSamplePlatformDescriptionSheetDataExport();
 
         Assert.assertEquals("s123", samplePlatformDescription.get(0).get(0));
         Assert.assertEquals("xs123", samplePlatformDescription.get(1).get(0));
@@ -167,8 +167,8 @@ public class DataExportTest extends BaseTest {
         universalDataExporter.initMutationData();
         universalDataExporter.initCNAData();
 
-        List<List<String>> mutationData = universalDataExporter.getMutationSheetData();
-        List<List<String>> cnaData = universalDataExporter.getCnaSheetData();
+        List<List<String>> mutationData = universalDataExporter.getMutationSheetDataExport();
+        List<List<String>> cnaData = universalDataExporter.getCnaSheetDataExport();
 
         Assert.assertEquals("m123", mutationData.get(0).get(1));
         Assert.assertEquals("markersymbol", mutationData.get(0).get(6));

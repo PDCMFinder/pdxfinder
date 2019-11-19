@@ -28,19 +28,19 @@ public class UniversalDataExporter {
 
     protected String templateDir;
 
-    private List<List<String>> patientSheetData;
-    private List<List<String>> patientTumorSheetData;
-    private List<List<String>> patientTreatmentSheetData;
-    private List<List<String>> pdxModelSheetData;
-    private List<List<String>> pdxModelValidationSheetData;
-    private List<List<String>> samplePlatformDescriptionSheetData;
-    private List<List<String>> sharingAndContactSheetData;
-    private List<List<String>> cytogeneticsSheetData;
-    private List<List<String>> loaderRelatedDataSheetData;
-    private List<List<String>> drugDosingSheetData;
+    private List<List<String>> patientSheetDataExport;
+    private List<List<String>> patientTumorSheetDataExport;
+    private List<List<String>> patientTreatmentSheetDataExport;
+    private List<List<String>> pdxModelSheetDataExport;
+    private List<List<String>> pdxModelValidationSheetDataExport;
+    private List<List<String>> samplePlatformDescriptionSheetDataExport;
+    private List<List<String>> sharingAndContactSheetDataExport;
+    private List<List<String>> cytogeneticsSheetDataExport;
+    private List<List<String>> loaderRelatedDataSheetDataExport;
+    private List<List<String>> drugDosingSheetDataExport;
 
-    private List<List<String>> mutationSheetData;
-    private List<List<String>> cnaSheetData;
+    private List<List<String>> mutationSheetDataExport;
+    private List<List<String>> cnaSheetDataExport;
 
     private Group ds;
 
@@ -55,17 +55,17 @@ public class UniversalDataExporter {
         this.dataImportService = dataImportService;
         this.utilityService = utilityService;
 
-        patientSheetData = new ArrayList<>();
-        patientTumorSheetData = new ArrayList<>();
-        pdxModelSheetData = new ArrayList<>();
-        pdxModelValidationSheetData = new ArrayList<>();
-        sharingAndContactSheetData = new ArrayList<>();
-        loaderRelatedDataSheetData = new ArrayList<>();
+        patientSheetDataExport = new ArrayList<>();
+        patientTumorSheetDataExport = new ArrayList<>();
+        pdxModelSheetDataExport = new ArrayList<>();
+        pdxModelValidationSheetDataExport = new ArrayList<>();
+        sharingAndContactSheetDataExport = new ArrayList<>();
+        loaderRelatedDataSheetDataExport = new ArrayList<>();
 
-        samplePlatformDescriptionSheetData = new ArrayList<>();
+        samplePlatformDescriptionSheetDataExport = new ArrayList<>();
 
-        mutationSheetData = new ArrayList<>();
-        cnaSheetData = new ArrayList<>();
+        mutationSheetDataExport = new ArrayList<>();
+        cnaSheetDataExport = new ArrayList<>();
     }
 
     public Group getDs() {
@@ -112,24 +112,24 @@ public class UniversalDataExporter {
 
 
         if(metadataWorkbook != null){
-            updateSheetWithData(metadataWorkbook.getSheetAt(1), patientSheetData, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(2), patientTumorSheetData,6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(3), pdxModelSheetData,6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(4), pdxModelValidationSheetData, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(5), sharingAndContactSheetData, 6, 2 );
-            updateSheetWithData(metadataWorkbook.getSheetAt(6), loaderRelatedDataSheetData, 6, 2);
+            updateSheetWithData(metadataWorkbook.getSheetAt(1), patientSheetDataExport, 6, 2);
+            updateSheetWithData(metadataWorkbook.getSheetAt(2), patientTumorSheetDataExport,6, 2);
+            updateSheetWithData(metadataWorkbook.getSheetAt(3), pdxModelSheetDataExport,6, 2);
+            updateSheetWithData(metadataWorkbook.getSheetAt(4), pdxModelValidationSheetDataExport, 6, 2);
+            updateSheetWithData(metadataWorkbook.getSheetAt(5), sharingAndContactSheetDataExport, 6, 2 );
+            updateSheetWithData(metadataWorkbook.getSheetAt(6), loaderRelatedDataSheetDataExport, 6, 2);
         }
 
         if(samplePlatformWorkbook != null){
-            updateSheetWithData(samplePlatformWorkbook.getSheetAt(0), samplePlatformDescriptionSheetData, 6, 1);
+            updateSheetWithData(samplePlatformWorkbook.getSheetAt(0), samplePlatformDescriptionSheetDataExport, 6, 1);
         }
 
         if(mutationWorkbook != null){
-            updateSheetWithData(mutationWorkbook.getSheetAt(0), mutationSheetData, 2, 1);
+            updateSheetWithData(mutationWorkbook.getSheetAt(0), mutationSheetDataExport, 2, 1);
         }
 
         if(cnaWorkbook != null){
-            updateSheetWithData(cnaWorkbook.getSheetAt(0), cnaSheetData, 2, 1);
+            updateSheetWithData(cnaWorkbook.getSheetAt(0), cnaSheetDataExport, 2, 1);
         }
 
 
@@ -192,7 +192,7 @@ public class UniversalDataExporter {
             dataRow.add(firstDiagnosis);
             dataRow.add(ageAtFirstDiagnosis);
 
-            patientSheetData.add(dataRow);
+            patientSheetDataExport.add(dataRow);
         }
     }
 
@@ -259,7 +259,7 @@ public class UniversalDataExporter {
                     dataRow.add(wasPatientTreated);
                     dataRow.add(modelId);
 
-                    patientTumorSheetData.add(dataRow);
+                    patientTumorSheetDataExport.add(dataRow);
                 }
             }
         }
@@ -340,7 +340,7 @@ public class UniversalDataExporter {
                 dataRow.add(passages);
                 dataRow.add(nomenclature);
 
-                pdxModelValidationSheetData.add(dataRow);
+                pdxModelValidationSheetDataExport.add(dataRow);
 
             }
         }
@@ -380,7 +380,7 @@ public class UniversalDataExporter {
         dataRow.add(ds.getAbbreviation());
         dataRow.add(ds.getUrl());
 
-        loaderRelatedDataSheetData.add(dataRow);
+        loaderRelatedDataSheetDataExport.add(dataRow);
 
     }
 
@@ -400,13 +400,13 @@ public class UniversalDataExporter {
 
     public void initMutationData(){
 
-        initGenomicData(mutationSheetData, "mutation");
+        initGenomicData(mutationSheetDataExport, "mutation");
 
     }
 
     public void initCNAData(){
 
-        initGenomicData(cnaSheetData, "copy number alteration");
+        initGenomicData(cnaSheetDataExport, "copy number alteration");
     }
 
     private void initGenomicData(List<List<String>> sheetData, String molcharType){
@@ -588,7 +588,7 @@ public class UniversalDataExporter {
             dataRow.add(md.getSortedPassages());
             dataRow.add(pubmedIDs);
 
-            pdxModelSheetData.add(dataRow);
+            pdxModelSheetDataExport.add(dataRow);
         }
     }
 
@@ -608,7 +608,7 @@ public class UniversalDataExporter {
         dataRow.add(sharingAndContactRow.get("providerAbbrev"));
         dataRow.add(sharingAndContactRow.get("projectName"));
 
-        sharingAndContactSheetData.add(dataRow);
+        sharingAndContactSheetDataExport.add(dataRow);
     }
 
     private Group getGroupByType(ModelCreation model, String type){
@@ -741,7 +741,7 @@ public class UniversalDataExporter {
                 dataRow.add("");
                 dataRow.add(mc.getPlatform().getUrl());
 
-                samplePlatformDescriptionSheetData.add(dataRow);
+                samplePlatformDescriptionSheetDataExport.add(dataRow);
             }
         }
     }
@@ -787,7 +787,7 @@ public class UniversalDataExporter {
                     dataRow.add("");
                     dataRow.add(mc.getPlatform().getUrl());
 
-                    samplePlatformDescriptionSheetData.add(dataRow);
+                    samplePlatformDescriptionSheetDataExport.add(dataRow);
                 }
             }
         }
@@ -858,52 +858,52 @@ public class UniversalDataExporter {
         return sp.getHostStrain().getSymbol() == null?"":sp.getHostStrain().getSymbol();
     }
 
-    public List<List<String>> getPatientSheetData() {
-        return patientSheetData;
+    public List<List<String>> getPatientSheetDataExport() {
+        return patientSheetDataExport;
     }
 
-    public List<List<String>> getPatientTumorSheetData() {
-        return patientTumorSheetData;
+    public List<List<String>> getPatientTumorSheetDataExport() {
+        return patientTumorSheetDataExport;
     }
 
-    public List<List<String>> getPatientTreatmentSheetData() {
-        return patientTreatmentSheetData;
+    public List<List<String>> getPatientTreatmentSheetDataExport() {
+        return patientTreatmentSheetDataExport;
     }
 
-    public List<List<String>> getPdxModelSheetData() {
-        return pdxModelSheetData;
+    public List<List<String>> getPdxModelSheetDataExport() {
+        return pdxModelSheetDataExport;
     }
 
-    public List<List<String>> getPdxModelValidationSheetData() {
-        return pdxModelValidationSheetData;
+    public List<List<String>> getPdxModelValidationSheetDataExport() {
+        return pdxModelValidationSheetDataExport;
     }
 
-    public List<List<String>> getSamplePlatformDescriptionSheetData() {
-        return samplePlatformDescriptionSheetData;
+    public List<List<String>> getSamplePlatformDescriptionSheetDataExport() {
+        return samplePlatformDescriptionSheetDataExport;
     }
 
-    public List<List<String>> getSharingAndContactSheetData() {
-        return sharingAndContactSheetData;
+    public List<List<String>> getSharingAndContactSheetDataExport() {
+        return sharingAndContactSheetDataExport;
     }
 
-    public List<List<String>> getCytogeneticsSheetData() {
-        return cytogeneticsSheetData;
+    public List<List<String>> getCytogeneticsSheetDataExport() {
+        return cytogeneticsSheetDataExport;
     }
 
-    public List<List<String>> getLoaderRelatedDataSheetData() {
-        return loaderRelatedDataSheetData;
+    public List<List<String>> getLoaderRelatedDataSheetDataExport() {
+        return loaderRelatedDataSheetDataExport;
     }
 
-    public List<List<String>> getDrugDosingSheetData() {
-        return drugDosingSheetData;
+    public List<List<String>> getDrugDosingSheetDataExport() {
+        return drugDosingSheetDataExport;
     }
 
-    public List<List<String>> getMutationSheetData() {
-        return mutationSheetData;
+    public List<List<String>> getMutationSheetDataExport() {
+        return mutationSheetDataExport;
     }
 
-    public List<List<String>> getCnaSheetData() {
-        return cnaSheetData;
+    public List<List<String>> getCnaSheetDataExport() {
+        return cnaSheetDataExport;
     }
 
 
