@@ -12,6 +12,11 @@ import org.pdxfinder.graph.repositories.PatientRepository;
 import org.pdxfinder.graph.repositories.PatientSnapshotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class PatientIntegrationTest extends BaseTest {
 
     @Autowired
@@ -25,6 +30,8 @@ public class PatientIntegrationTest extends BaseTest {
 
 
     Patient patient;
+    Patient patient2;
+
     Group providerGroup;
 
     @Before
@@ -48,6 +55,24 @@ public class PatientIntegrationTest extends BaseTest {
         patient.addSnapshot(ps2);
 
 
+        patient2 = new Patient();
+        patient2.setExternalId("p2");
+        patient2.setSex("female");
+        patient2.setRace("-");
+        patient2.setEthnicity("-");
+
+        PatientSnapshot ps3 = new PatientSnapshot();
+        ps3.setAgeAtCollection("76");
+        Set<PatientSnapshot> psSet = new HashSet<>();
+        psSet.add(ps3);
+        patient2.setSnapshots(psSet);
+        List<Group> groups = new ArrayList<>();
+        groups.add(providerGroup);
+        patient2.setGroups(groups);
+        patient2.setFirstDiagnosis("firstdiag");
+        patient2.setAgeAtFirstDiagnosis("68");
+
+
     }
 
     @Test
@@ -59,6 +84,12 @@ public class PatientIntegrationTest extends BaseTest {
 
     }
 
+    @Test
+    public void Given_Patient_When_PatientDetailsChecked_Then_PatientFirstDiagAndAgeIsCorrect(){
 
+        Assert.assertEquals("firstdiag", patient2.getFirstDiagnosis());
+        Assert.assertEquals("68", patient2.getAgeAtFirstDiagnosis() );
+
+    }
 
 }
