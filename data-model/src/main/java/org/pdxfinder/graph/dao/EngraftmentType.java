@@ -1,7 +1,8 @@
 package org.pdxfinder.graph.dao;
 
-import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 /**
  * Represents the type of implantation. e.g. Orthotopic, Heterotopic
@@ -9,7 +10,8 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public class EngraftmentType {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String name;

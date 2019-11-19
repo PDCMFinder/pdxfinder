@@ -1,8 +1,9 @@
 package org.pdxfinder.graph.dao;
 
-
-import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 /**
  * ExternalUrl represents external urls of the data provider
@@ -10,7 +11,8 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public class ExternalUrl {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
     private String type;
     private String url;
@@ -54,7 +56,7 @@ public class ExternalUrl {
 
         private String value;
 
-        private Type(String val) {
+        Type(String val) {
             value = val;
         }
 

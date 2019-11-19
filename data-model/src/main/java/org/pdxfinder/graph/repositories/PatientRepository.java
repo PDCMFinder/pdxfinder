@@ -19,6 +19,21 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
     Patient findByExternalIdAndGroup(@Param("externalId") String externalId, @Param("g") Group g);
 
 
+    @Query("MATCH (ps:PatientSnapshot)-[patRel:COLLECTION_EVENT]-(p:Patient)--(g:Group) WHERE id(g) = {g} RETURN p, patRel, ps ORDER BY p.externalId")
+    List<Patient> findByGroup(@Param("g") Group g);
+
+
+    @Query("MATCH (g:Group)--(p:Patient)-[patRel:COLLECTION_EVENT]-(ps:PatientSnapshot)-[sf:SAMPLED_FROM]-(s:Sample)-[ii:IMPLANTED_IN]-(mod:ModelCreation) " +
+            "WHERE id(g) = {g} " +
+            "WITH p, patRel, ps, sf, s, ii, mod " +
+            "MATCH (s)-[o:ORIGIN_TISSUE]-(t:Tissue) "+
+            "MATCH (s)-[ot:OF_TYPE]-(tt:TumorType) " +
+            "MATCH (s)-[ssr:SAMPLE_SITE]-(ss:Tissue) "+
+            "RETURN p, patRel, ps, sf, s, ii, mod, o, t, ot, tt, ssr, ss ORDER BY p.externalId")
+    List<Patient> findPatientTumorAtCollectionDataByDS(@Param("g") Group g);
+
+
+
     @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
             "MATCH (s:Sample)-[sf:SAMPLED_FROM]-(ps:PatientSnapshot)-[pt:PATIENT]-(p:Patient) " +
             "WHERE mod.sourcePdxId = {modelId} " +
