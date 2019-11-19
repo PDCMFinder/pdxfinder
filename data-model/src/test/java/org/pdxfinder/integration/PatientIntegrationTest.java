@@ -32,6 +32,7 @@ public class PatientIntegrationTest extends BaseTest {
     Patient patient;
     Patient patient2;
     Patient patient3;
+    Patient patient4;
 
     Group providerGroup;
 
@@ -79,7 +80,10 @@ public class PatientIntegrationTest extends BaseTest {
         patient2.setCancerRelevantHistory("-");
 
         patient3 = new Patient();
+        patient3.setGroups(new ArrayList<>());
 
+
+        patient4 = new Patient();
     }
 
     @Test
@@ -89,7 +93,7 @@ public class PatientIntegrationTest extends BaseTest {
         Assert.assertEquals(providerGroup.getAbbreviation(), patient.getProviderGroup().getAbbreviation());
         Assert.assertEquals("45", patient.getLastSnapshot().getAgeAtCollection() );
         Assert.assertEquals(null, patient3.getProviderGroup());
-
+        Assert.assertEquals(null, patient4.getProviderGroup());
     }
 
     @Test
@@ -103,7 +107,7 @@ public class PatientIntegrationTest extends BaseTest {
 
 
     @Test
-    public void Given_PatientWithSnapshot_When_PatientSnapshotGetByCollection_Then_CorrectSnapshotIsReturned(){
+    public void Given_PatientWithSnapshot_When_GetPatientSnapshot_Then_CorrectSnapshotIsReturned(){
 
 
         Assert.assertEquals("76", patient2.getSnapShotByCollection("76", "2000-01-01", "event1", "0").getAgeAtCollection() );
@@ -111,6 +115,8 @@ public class PatientIntegrationTest extends BaseTest {
 
         Assert.assertEquals(null, patient3.getSnapShotByCollection("76", "2000-01-01", "event1", "0"));
         Assert.assertEquals(null, patient3.getSnapshotByDate("2000-01-01"));
+
+
     }
 
 }
