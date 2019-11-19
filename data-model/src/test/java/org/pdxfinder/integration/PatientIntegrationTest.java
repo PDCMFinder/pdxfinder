@@ -51,7 +51,7 @@ public class PatientIntegrationTest extends BaseTest {
     }
 
     @Test
-    public void PatientTest(){
+    public void Given_PatientWithProvider_When_PatientAndSnapshotPresent_Then_PatientIdAndAgeIsCorrect(){
 
         Assert.assertEquals("p1", patient.getExternalId());
         Assert.assertEquals(providerGroup.getAbbreviation(), patient.getProviderGroup().getAbbreviation());

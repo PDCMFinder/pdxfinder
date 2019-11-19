@@ -90,8 +90,6 @@ public class UniversalDataExporter {
         this.templateDir = templateDir;
         this.ds = ds;
 
-        //:: Methods to initialize the data lists
-
         initPatientData();
         initPatientTumorAtCollection();
         initPdxModelDetails();
@@ -108,14 +106,12 @@ public class UniversalDataExporter {
 
     public void export(String exportDir){
 
-        //get the templates with the headers
         XSSFWorkbook metadataWorkbook = getWorkbook(templateDir+"/metadata_template.xlsx");
         XSSFWorkbook samplePlatformWorkbook = getWorkbook(templateDir+"/sampleplatform_template.xlsx");
         XSSFWorkbook mutationWorkbook = getWorkbook(templateDir+"/mutation_template.xlsx");
         XSSFWorkbook cnaWorkbook = getWorkbook(templateDir+"/cna_template.xlsx");
 
 
-        //insert data from the datalists to the template
         if(metadataWorkbook != null){
 
             updateSheetWithData(metadataWorkbook.getSheetAt(1), patientSheetData, 6, 2);

@@ -22,7 +22,7 @@ public class ExportDataToTemplate implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(ExportDataToTemplate.class);
 
-    private String EXPORTTOTEMPLATE = "exportToTemplate";
+    private String exportTemplate = "exportToTemplate";
 
     @Autowired
     private UtilityService utilityService;
@@ -43,13 +43,13 @@ public class ExportDataToTemplate implements CommandLineRunner {
         OptionSet options = parser.parse(args);
         long startTime = System.currentTimeMillis();
 
-        if (options.has(EXPORTTOTEMPLATE) && args.length > 1) {
+        if (options.has(exportTemplate) && args.length > 1) {
 
             log.info("Exporting data from {}", args[1]);
             export(args[1]);
 
         }
-        else if(options.has(EXPORTTOTEMPLATE) && args.length <= 1){
+        else if(options.has(exportTemplate) && args.length <= 1){
             log.error("Missing provider abbrev. Cannot export data.");
 
         }
