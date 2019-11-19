@@ -63,6 +63,9 @@ public class PatientIntegrationTest extends BaseTest {
 
         PatientSnapshot ps3 = new PatientSnapshot();
         ps3.setAgeAtCollection("76");
+        ps3.setDateAtCollection("2000-01-01");
+        ps3.setCollectionEvent("event1");
+        ps3.setElapsedTime("0");
         Set<PatientSnapshot> psSet = new HashSet<>();
         psSet.add(ps3);
         patient2.setSnapshots(psSet);
@@ -71,6 +74,8 @@ public class PatientIntegrationTest extends BaseTest {
         patient2.setGroups(groups);
         patient2.setFirstDiagnosis("firstdiag");
         patient2.setAgeAtFirstDiagnosis("68");
+        patient2.setDataSource(providerGroup.getAbbreviation());
+        patient2.setCancerRelevantHistory("-");
 
 
     }
@@ -89,7 +94,17 @@ public class PatientIntegrationTest extends BaseTest {
 
         Assert.assertEquals("firstdiag", patient2.getFirstDiagnosis());
         Assert.assertEquals("68", patient2.getAgeAtFirstDiagnosis() );
+        Assert.assertEquals("-", patient2.getCancerRelevantHistory());
 
+    }
+
+
+    @Test
+    public void Given_PatientWithSnapshot_When_PatientSnapshotGetByCollection_Then_CorrectSnapshotIsReturned(){
+
+
+        Assert.assertEquals("76", patient2.getSnapShotByCollection("76", "2000-01-01", "event1", "0").getAgeAtCollection() );
+        Assert.assertEquals("2000-01-01", patient2.getSnapshotByDate("2000-01-01").getDateAtCollection());
     }
 
 }
