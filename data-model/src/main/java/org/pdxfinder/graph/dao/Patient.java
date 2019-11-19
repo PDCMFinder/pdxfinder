@@ -174,8 +174,10 @@ public class Patient {
 
     public Group getProviderGroup(){
 
+        if(groups == null) return null;
+
         for(Group g : groups){
-            if(g != null && g.getType().equals("Provider")) return g;
+            if(g.getType().equals("Provider")) return g;
         }
 
         return null;
