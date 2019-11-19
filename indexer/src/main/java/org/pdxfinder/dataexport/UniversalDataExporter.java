@@ -28,7 +28,6 @@ public class UniversalDataExporter {
 
     protected String templateDir;
 
-    //data lists
     private List<List<String>> patientSheetData;
     private List<List<String>> patientTumorSheetData;
     private List<List<String>> patientTreatmentSheetData;
@@ -90,8 +89,6 @@ public class UniversalDataExporter {
         this.templateDir = templateDir;
         this.ds = ds;
 
-        //:: Methods to initialize the data lists
-
         initPatientData();
         initPatientTumorAtCollection();
         initPdxModelDetails();
@@ -117,7 +114,6 @@ public class UniversalDataExporter {
 
         //insert data from the datalists to the template
         if(metadataWorkbook != null){
-
             updateSheetWithData(metadataWorkbook.getSheetAt(1), patientSheetData, 6, 2);
             updateSheetWithData(metadataWorkbook.getSheetAt(2), patientTumorSheetData,6, 2);
             updateSheetWithData(metadataWorkbook.getSheetAt(3), pdxModelSheetData,6, 2);
@@ -127,17 +123,14 @@ public class UniversalDataExporter {
         }
 
         if(samplePlatformWorkbook != null){
-
             updateSheetWithData(samplePlatformWorkbook.getSheetAt(0), samplePlatformDescriptionSheetData, 6, 1);
         }
 
         if(mutationWorkbook != null){
-
             updateSheetWithData(mutationWorkbook.getSheetAt(0), mutationSheetData, 2, 1);
         }
 
         if(cnaWorkbook != null){
-
             updateSheetWithData(cnaWorkbook.getSheetAt(0), cnaSheetData, 2, 1);
         }
 
@@ -309,7 +302,14 @@ public class UniversalDataExporter {
                     engraftmentMaterialStatus = specimen.getEngraftmentMaterial().getState();
                 }
 
-                addEntryToSpecimenMap(specimenMap, specimen.getHostStrain(), engraftmentSite, engraftmentType, engraftmentMaterial, engraftmentMaterialStatus, passage);
+                addEntryToSpecimenMap(
+                    specimenMap,
+                    specimen.getHostStrain(),
+                    engraftmentSite,
+                    engraftmentType,
+                    engraftmentMaterial,
+                    engraftmentMaterialStatus,
+                    passage);
             }
 
             insertModelSheetDataFromSpecimenMap(specimenMap, model);
@@ -366,8 +366,6 @@ public class UniversalDataExporter {
 
             getGroupData(sharingAndContactRow, providerGroup, accessGroup, projectGroup);
 
-
-
             getExternalUrlData(sharingAndContactRow, model.getExternalUrls());
 
             insertSharingAndContactDataForModel(sharingAndContactRow);
@@ -420,7 +418,11 @@ public class UniversalDataExporter {
 
         for(ModelCreation m: models){
 
-            ModelCreation model = dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(ds.getAbbreviation(), m.getSourcePdxId(), molcharType);
+            ModelCreation model = dataImportService.
+              findModelWithMolecularDataByDSAndIdAndMolcharType(
+                  ds.getAbbreviation(),
+                  m.getSourcePdxId(),
+                  molcharType);
 
             if(model != null){
 
@@ -435,7 +437,14 @@ public class UniversalDataExporter {
 
     }
 
-    private void insertOmicDataToSheet(ModelCreation model, String sampleId, String sampleOrigin, String molcharType, Specimen specimen, MolecularCharacterization mc, List<List<String>> sheetData){
+    private void insertOmicDataToSheet(
+        ModelCreation model,
+        String sampleId,
+        String sampleOrigin,
+        String molcharType,
+        Specimen specimen,
+        MolecularCharacterization mc,
+        List<List<String>> sheetData){
 
         for(MarkerAssociation ma: mc.getMarkerAssociations()){
 
@@ -621,22 +630,17 @@ public class UniversalDataExporter {
 
     private void getGroupData(LinkedHashMap<String, String> map, Group providerGroup, Group accessGroup, Group projectGroup){
 
-
-
         if(providerGroup != null) {
-
             map.put("providerType", providerGroup.getProviderType());
             map.put("providerName", providerGroup.getName());
             map.put("providerAbbrev", providerGroup.getAbbreviation());
         }
         else{
-
             map.put("providerType", "");
             map.put("providerName", "");
             map.put("providerAbbrev", "");
         }
         if(accessGroup != null){
-
             map.put("modelAccessibility", accessGroup.getAccessibility());
             map.put("accessModalities", accessGroup.getAccessModalities());
         }
@@ -646,7 +650,6 @@ public class UniversalDataExporter {
         }
 
         if(projectGroup != null){
-
             map.put("projectName", projectGroup.getName());
         }
         else {
@@ -655,7 +658,6 @@ public class UniversalDataExporter {
     }
 
     private void getExternalUrlData(LinkedHashMap map, Collection<ExternalUrl> urls){
-
 
         map.put("contactEmail",  "");
         map.put("contactName",  "");
@@ -675,25 +677,41 @@ public class UniversalDataExporter {
             }
 
             else if(ex.getType().equals("source") && ex.getUrl() != null){
-
                 map.put("modelLink", ex.getUrl());
             }
         }
     }
 
-    private void addEntryToSpecimenMap(Map<String, ModelDetails> specimenMap, HostStrain hostStrain, String engraftmentSite, String engraftmentType,
-                                       String engraftmentMaterial, String engraftmentMaterialStatus, String passage){
+    private void addEntryToSpecimenMap(
+        Map<String, ModelDetails> specimenMap,
+        HostStrain hostStrain,
+        String engraftmentSite,
+        String engraftmentType,
+        String engraftmentMaterial,
+        String engraftmentMaterialStatus,
+        String passage){
 
-        String specimenMapKey = hostStrain.getName() + hostStrain.getSymbol() + engraftmentSite + engraftmentType + engraftmentMaterial + engraftmentMaterialStatus;
-
+        String specimenMapKey = String.join(
+            hostStrain.getName(),
+            hostStrain.getSymbol(),
+            engraftmentSite,
+            engraftmentType,
+            engraftmentMaterial,
+            engraftmentMaterialStatus);
 
         if(specimenMap.containsKey(specimenMapKey)){
-
             specimenMap.get(specimenMapKey).getPassages().add(passage);
         }
         else{
 
-            ModelDetails md = new ModelDetails(hostStrain.getName(), hostStrain.getSymbol(), engraftmentSite, engraftmentType, engraftmentMaterial, engraftmentMaterialStatus, passage);
+            ModelDetails md = new ModelDetails(
+                hostStrain.getName(),
+                hostStrain.getSymbol(),
+                engraftmentSite,
+                engraftmentType,
+                engraftmentMaterial,
+                engraftmentMaterialStatus,
+                passage);
             specimenMap.put(specimenMapKey, md);
         }
     }
@@ -742,7 +760,6 @@ public class UniversalDataExporter {
                 String hostStrainNomenclature = "";
 
                 if(sp.getHostStrain() != null){
-
                     hostStrainName = getHostStrainName(sp);
                     hostStrainNomenclature = getHostStrainNomenclature(sp);
                 }
@@ -840,7 +857,6 @@ public class UniversalDataExporter {
     }
 
     private String getHostStrainNomenclature(Specimen sp){
-
         return sp.getHostStrain().getSymbol() == null?"":sp.getHostStrain().getSymbol();
     }
 
