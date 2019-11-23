@@ -25,6 +25,7 @@ public class EmailConfig {
 
     @Bean("pdxfinderMailBean")
     public JavaMailSenderImpl javaMailSender() {
+        //JavaMailSender
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(host);
         mailSender.setPassword(password);
