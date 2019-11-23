@@ -11,10 +11,8 @@ public enum CSV {
     sampleDiagnosis("Sample Diagnosis"),
     originTissue("Origin Tissue"),
     tumorType("Tumor Type"),
-
     // Treatment csv Header Strings
     treatmentName("Treatment Name"),
-
     // CSV Header Strings common to all entity types
     mappedTerm("Mapped Term"),
     mappedTermUrl("Mapped Term URL"),
@@ -22,12 +20,8 @@ public enum CSV {
     justification("Justification"),
     decision("Decision (Yes or No)"),
     validTerm("Valid Term"),
-
-
     yes("yes"),
     no("no");
-
-
 
     private String value;
 
@@ -39,6 +33,4 @@ public enum CSV {
         return value;
     }
 
-
 }
-

@@ -3,6 +3,7 @@ package org.pdxfinder.postload;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.pdxfinder.services.EmailService;
+import org.pdxfinder.services.email.MailRecipient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -43,8 +44,14 @@ public class SendNotifications implements CommandLineRunner{
             log.info("Creating and sending email notifications");
 
             getUnmappedSamples();
+           MailRecipient mailRecipient = MailRecipient.builder()
+               .recipientMail("nconte@ebi.ac.uk")
+               .recipientName("recipientName")
+               .subject("URGENT: UNMAPPED TERMS FOUND")
+               .missingCount("86")
+               .build();
 
-            sendEmail("nconte@ebi.ac.uk", "NathalieConte", "URGENT: UNMAPPED TERMS FOUND", "86");
+            sendEmail(mailRecipient);
         }
 
     }
@@ -59,12 +66,9 @@ public class SendNotifications implements CommandLineRunner{
     }
 
 
-    private void sendEmail(String recipientMail,
-                           String recipientName,
-                           String subject,
-                           String missingCount){
+    private void sendEmail(MailRecipient mailRecipient){
 
-        emailService.sendMail(recipientMail, recipientName, subject, missingCount);
+        emailService.sendMail(mailRecipient);
 
     }
 

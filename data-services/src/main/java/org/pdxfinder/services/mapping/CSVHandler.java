@@ -38,8 +38,7 @@ public class CSVHandler {
         /*
          * Validation 1: Ensure csv data is not an empty, if empty return error report
          */
-        if (csvData.size() < 1 ) {
-
+        if(csvData.isEmpty()){
             report.add("Empty File Data");
             return report;
         }

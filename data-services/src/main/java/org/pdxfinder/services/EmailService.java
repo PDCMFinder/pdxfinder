@@ -1,5 +1,6 @@
 package org.pdxfinder.services;
 
+import java.io.UnsupportedEncodingException;
 import org.neo4j.cypher.internal.frontend.v2_3.ast.functions.Str;
 import org.pdxfinder.services.email.Mail;
 import org.slf4j.Logger;
@@ -15,8 +16,11 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import javax.mail.MessagingException;
+import org.pdxfinder.services.email.EmailException;
+import org.pdxfinder.services.email.EmailHelpers;
+import org.pdxfinder.services.email.MailRecipient;
+import org.springframework.mail.MailException;
 
 
 /*
@@ -32,48 +36,31 @@ public class EmailService {
     private JavaMailSender emailSender;
 
     @Autowired
+    private EmailHelpers mailHelper;
+
+    @Autowired
     private SpringTemplateEngine templateEngine;
+    //takes email config, AutoWire JavamailSender, and send mails.
 
-    public void sendMail(String recipientMail,
-                         String recipientName,
-                         String subject,
-                         String missingCount){
+    public void sendMail(MailRecipient mailRecipient) {
 
-        log.info("Sending MultiPart Email to {}", recipientMail);
-
-        Mail mail = new Mail();
-        mail.setSenderMail("nonreply@pdxfinder.org");
-        mail.setSenderName("PDX FINDER ADMIN");
-
-        mail.setRecipientMail(recipientMail);
-        mail.setRecipientName(recipientName);
-
-        mail.setSubject(subject);
-
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put("date", "xxxx");
-        model.put("count", missingCount);
-        mail.setModel(model);
-
+        log.info("Sending MultiPart Email to {}", mailRecipient.getRecipientMail());
+        Mail mail = mailHelper.BuildMail(mailRecipient, null);
         pdxFinderMailEngine(mail);
     }
 
-
-
-    public void pdxFinderMailEngine(Mail mail)  {
+    private void pdxFinderMailEngine(Mail mail) {
 
         try {
 
             InternetAddress senderAddress = new InternetAddress(mail.getSenderMail(), mail.getSenderName());
             InternetAddress receiverAddress = new InternetAddress(mail.getRecipientMail(), mail.getRecipientName());
-
             MimeMessage message = emailSender.createMimeMessage();
             message.setSender(senderAddress);
 
-
             MimeMessageHelper helper = new MimeMessageHelper(message,
-                                                             MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                                                             StandardCharsets.UTF_8.name());
+                MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                StandardCharsets.UTF_8.name());
 
             Context context = new Context();
             context.setVariables(mail.getModel());
@@ -86,7 +73,10 @@ public class EmailService {
 
             emailSender.send(message);
 
-        }catch (Exception e){  }
+        } catch (MailException | UnsupportedEncodingException | MessagingException e) {
+            log.warn(e.getMessage());
+            throw new EmailException(e.getMessage(), e);
+        }
 
     }
 

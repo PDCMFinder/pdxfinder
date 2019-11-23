@@ -39,7 +39,6 @@ public class AjaxController {
     private final String ZOOMA_URL = "http://scrappy.ebi.ac.uk:8080/annotations";
     private String errReport = "";
 
-
     @Autowired
     private UtilityService utilityService;
     private MappingService mappingService;
@@ -47,39 +46,41 @@ public class AjaxController {
 
     @Autowired
     public AjaxController(MappingService mappingService,
-                          RestTemplateBuilder restTemplateBuilder,
-                          CSVHandler csvHandler) {
+        RestTemplateBuilder restTemplateBuilder,
+        CSVHandler csvHandler) {
 
         this.csvHandler = csvHandler;
         this.mappingService = mappingService;
         this.restTemplate = restTemplateBuilder.build();
     }
 
-
     /**
-     * Provides entry point to query the MappingEntity data store
-     * E.g : .../api/mappings?map-terms-only=true&mq=datasource:jax&entity-type=treatment
+     * Provides entry point to query the MappingEntity data store E.g :
+     * .../api/mappings?map-terms-only=true&mq=datasource:jax&entity-type=treatment
      *
-     * @param mappingQuery    - Key value map of mappingValues e.g to filter by DataSource:jax, ...?mq=datasource:jax
-     * @param mappedTermLabel - Filters the data for missing mappings e.g To find missing mappings, ...?mapped-term=-
-     * @param entityType      - Search by entityType e.g find unmapped treatment entities ...?entity-type=treatment&mapped-term=-
-     * @param mappedTermsOnly - Search for mapped terms only ... map-terms-only=true
-     * @param mapType         - Search data by mapType e.g ...?map-type=direct
-     * @param status          - Search data by mapping status e.g ...?status=unmapped
-     * @param page            - Allows client to submit offset value e.g ...?page=10
-     * @param size            - Allows client to submit size limit values e.g ...?size=5
+     * @param mappingQuery - Key value map of mappingValues e.g to filter by
+     * DataSource:jax, ...?mq=datasource:jax
+     * @param mappedTermLabel - Filters the data for missing mappings e.g To
+     * find missing mappings, ...?mapped-term=-
+     * @param entityType - Search by entityType e.g find unmapped treatment
+     * entities ...?entity-type=treatment&mapped-term=-
+     * @param mappedTermsOnly - Search for mapped terms only ...
+     * map-terms-only=true
+     * @param mapType - Search data by mapType e.g ...?map-type=direct
+     * @param status - Search data by mapping status e.g ...?status=unmapped
+     * @param page - Allows client to submit offset value e.g ...?page=10
+     * @param size - Allows client to submit size limit values e.g ...?size=5
      * @return - Mapping Entities with data count, offset and limit Values
      */
     @GetMapping("/mappings")
     public ResponseEntity<?> getMappings(@RequestParam("mq") Optional<String> mappingQuery,
-                                         @RequestParam(value = "mapped-term", defaultValue = "") Optional<String> mappedTermLabel,
-                                         @RequestParam(value = "map-terms-only", defaultValue = "") Optional<String> mappedTermsOnly,
-                                         @RequestParam(value = "entity-type", defaultValue = "0") Optional<List<String>> entityType,
-                                         @RequestParam(value = "map-type", defaultValue = "") Optional<String> mapType,
-                                         @RequestParam(value = "status", defaultValue = "0") Optional<List<String>> status,
-
-                                         @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                         @RequestParam(value = "size", defaultValue = "10") Integer size) {
+        @RequestParam(value = "mapped-term", defaultValue = "") Optional<String> mappedTermLabel,
+        @RequestParam(value = "map-terms-only", defaultValue = "") Optional<String> mappedTermsOnly,
+        @RequestParam(value = "entity-type", defaultValue = "0") Optional<List<String>> entityType,
+        @RequestParam(value = "map-type", defaultValue = "") Optional<String> mapType,
+        @RequestParam(value = "status", defaultValue = "0") Optional<List<String>> status,
+        @RequestParam(value = "page", defaultValue = "1") Integer page,
+        @RequestParam(value = "size", defaultValue = "10") Integer size) {
 
         String mappingLabel = "";
         List<String> mappingValue = Arrays.asList("0");
@@ -89,16 +90,14 @@ public class AjaxController {
             mappingLabel = query[0];
             mappingValue = Arrays.asList(query[1].trim());
 
-
         } catch (Exception e) {
         }
 
         PaginationDTO result = mappingService.search(page, size, entityType.get(), mappingLabel,
-                                                     mappingValue, mappedTermLabel.get(), mapType.get(), mappedTermsOnly.get(), status.get());
+            mappingValue, mappedTermLabel.get(), mapType.get(), mappedTermsOnly.get(), status.get());
 
         return new ResponseEntity<Object>(result, HttpStatus.OK);
     }
-
 
     @GetMapping("/mappings/{entityId}")
     public ResponseEntity<?> getOneMapping(@PathVariable Optional<Integer> entityId) {
@@ -113,7 +112,6 @@ public class AjaxController {
         return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST.getReasonPhrase(), HttpStatus.BAD_REQUEST);
     }
 
-
     @GetMapping("/mappings/summary")
     public ResponseEntity<?> getMappingStatSummary(@RequestParam(value = "entity-type", defaultValue = "") Optional<String> entityType) {
 
@@ -121,7 +119,6 @@ public class AjaxController {
 
         return new ResponseEntity<Object>(result, HttpStatus.OK);
     }
-
 
     /**
      * Bulk update of Records
@@ -143,7 +140,6 @@ public class AjaxController {
 
     }
 
-
     @GetMapping("/mappings/archive")
     public ResponseEntity<?> readArchive(@RequestParam("entity-type") String entityType) {
 
@@ -152,10 +148,9 @@ public class AjaxController {
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
-
     @PostMapping("/mappings/uploads")
     public ResponseEntity<?> uploadData(@RequestParam("uploads") Optional<MultipartFile> uploads,
-                                        @RequestParam(value = "entity-type", defaultValue = "") Optional<String> entityType) {
+        @RequestParam(value = "entity-type", defaultValue = "") Optional<String> entityType) {
 
         Object responseBody = "";
         HttpStatus responseStatus = HttpStatus.OK;
@@ -174,7 +169,7 @@ public class AjaxController {
             try {
 
                 report = csvHandler.validateUploadedCSV(csvData);
-            }catch (Exception e){
+            } catch (Exception e) {
 
                 report.add(HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase());
             }
@@ -186,7 +181,7 @@ public class AjaxController {
 
                 responseBody = updatedData;
                 responseStatus = HttpStatus.OK;
-            }else {
+            } else {
 
                 responseBody = report;
                 responseStatus = HttpStatus.UNPROCESSABLE_ENTITY;
@@ -200,23 +195,22 @@ public class AjaxController {
     }
 
     @GetMapping("/mappings/ontologies")
-    public Object getOntologies(@RequestParam(value = "type", defaultValue = "diagnosis") Optional<String> dataType){
+    public Object getOntologies(@RequestParam(value = "type", defaultValue = "diagnosis") Optional<String> dataType) {
 
         String entityType = dataType.get();
         return mappingService.getOntologyTermsByType(entityType);
     }
 
-
     @GetMapping("/mappings/export")
     @ResponseBody
     public Object exportMappingData(HttpServletResponse response,
-                                    @RequestParam("mq") Optional<String> mappingQuery,
-                                    @RequestParam(value = "mapped-term", defaultValue = "") Optional<String> mappedTermLabel,
-                                    @RequestParam(value = "map-terms-only", defaultValue = "") Optional<String> mappedTermsOnly,
-                                    @RequestParam(value = "entity-type", defaultValue = "0") Optional<List<String>> entityType,
-                                    @RequestParam(value = "map-type", defaultValue = "") Optional<String> mapType,
-                                    @RequestParam(value = "status", defaultValue = "0") Optional<List<String>> status,
-                                    @RequestParam(value = "page", defaultValue = "1") Integer page) {
+        @RequestParam("mq") Optional<String> mappingQuery,
+        @RequestParam(value = "mapped-term", defaultValue = "") Optional<String> mappedTermLabel,
+        @RequestParam(value = "map-terms-only", defaultValue = "") Optional<String> mappedTermsOnly,
+        @RequestParam(value = "entity-type", defaultValue = "0") Optional<List<String>> entityType,
+        @RequestParam(value = "map-type", defaultValue = "") Optional<String> mapType,
+        @RequestParam(value = "status", defaultValue = "0") Optional<List<String>> status,
+        @RequestParam(value = "page", defaultValue = "1") Integer page) {
 
         String mappingLabel = "";
         List<String> mappingValue = Arrays.asList("0");
@@ -230,7 +224,7 @@ public class AjaxController {
 
         int size = 1000;
         PaginationDTO result = mappingService.search(page, size, entityType.get(), mappingLabel,
-                                                     mappingValue, mappedTermLabel.get(), mapType.get(), mappedTermsOnly.get(), status.get());
+            mappingValue, mappedTermLabel.get(), mapType.get(), mappedTermsOnly.get(), status.get());
 
         List<MappingEntity> mappingEntities = mapper.convertValue(result.getAdditionalProperties().get("mappings"), List.class);
 
@@ -244,7 +238,6 @@ public class AjaxController {
          *  Get Mapping Entity CSV Data Body
          */
         List<List<String>> mappingDataCSV = csvHandler.prepareMappingEntityForCSV(mappingEntities);
-
 
         CsvMapper mapper = new CsvMapper();
         CsvSchema.Builder builder = CsvSchema.builder();
@@ -271,12 +264,11 @@ public class AjaxController {
         return csvReport;
     }
 
-
-    /****************************************************************
-     *                   INTERACTIONS WITH ZOOMA                    *
-     ****************************************************************/
-
-
+    /**
+     * **************************************************************
+     * INTERACTIONS WITH ZOOMA *
+     ***************************************************************
+     */
     @GetMapping("/zooma/transform")
     public ResponseEntity<?> transformAnnotationForZooma() {
 
@@ -284,7 +276,6 @@ public class AjaxController {
 
         return new ResponseEntity<>(zoomaEntities, HttpStatus.OK);
     }
-
 
     @GetMapping("/zooma")
     public ResponseEntity<?> writeAllAnnotationsToZooma() {
@@ -323,7 +314,6 @@ public class AjaxController {
         return new ResponseEntity<>(report, HttpStatus.OK);
     }
 
-
     public Boolean writeToZooma(ZoomaEntity zoomaEntity) {
 
         HttpEntity<String> entity = BuildHttpHeader();
@@ -342,7 +332,6 @@ public class AjaxController {
         return report;
     }
 
-
     public HttpEntity<String> BuildHttpHeader() {
 
         HttpHeaders headers = new HttpHeaders();
@@ -352,7 +341,6 @@ public class AjaxController {
 
         return entity;
     }
-
 
     public List validateEntities(List<MappingEntity> mappingEntities) {
 
@@ -368,6 +356,5 @@ public class AjaxController {
         }
         return errors;
     }
-
 
 }

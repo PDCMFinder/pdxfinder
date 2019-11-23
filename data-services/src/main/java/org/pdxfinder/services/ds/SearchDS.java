@@ -20,14 +20,12 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-
 import static java.lang.Long.parseLong;
 
 
 /*
  * Created by csaba on 19/01/2018.
  */
-
 @Component
 public class SearchDS {
 
@@ -39,15 +37,15 @@ public class SearchDS {
      */
     private boolean INITIALIZED = false;
 
-
     /**
-     * A set of MFQ objects. These objects are being returned after performing a search.
+     * A set of MFQ objects. These objects are being returned after performing a
+     * search.
      */
     private Set<ModelForQuery> models;
 
-
     /**
-     * This container has the definition of the structure and the content of the filters as well as has info on what filter is selected
+     * This container has the definition of the structure and the content of the
+     * filters as well as has info on what filter is selected
      */
     private WebFacetContainer webFacetContainer;
 
@@ -55,18 +53,17 @@ public class SearchDS {
     private Map<String, List<FacetOption>> facetOptionMap;
 
     // SEARCH OBJECTS:
-
-
     /**
-     * A general one param search object that is being used when search is performed on a MFQ object field
+     * A general one param search object that is being used when search is
+     * performed on a MFQ object field
      */
     private OneParamCheckboxSearch oneParamCheckboxSearch;
 
     /**
-     * A general one param search object that is being used when search is performed on a MFQ object field
+     * A general one param search object that is being used when search is
+     * performed on a MFQ object field
      */
     private OneParamTextSearch copyNumberAlterationSearch;
-
 
     private OneParamTextSearch patientTreatmentSearch;
 
@@ -80,12 +77,10 @@ public class SearchDS {
      */
     private TwoParamUnlinkedSearch dosingStudySearch;
 
-
     /**
      * Two param linked search to perform search on breastCancerBioMarkers
      */
     private TwoParamLinkedSearch breastCancerMarkersSearch;
-
 
     public SearchDS(DataProjectionRepository dataProjectionRepository) {
         Assert.notNull(dataProjectionRepository, "Data projection repository cannot be null");
@@ -95,20 +90,20 @@ public class SearchDS {
     }
 
     /**
-     * Initializes the searchDS, creates filter structure and links search objects to them
+     * Initializes the searchDS, creates filter structure and links search
+     * objects to them
      */
-    public void init(){
-
+    public void init() {
 
         //INITIALIZE MODEL FOR QUERY OBJECTS FIRST
         initializeModels();
         //now we can use MFQ objects to get additional values for filters
 
-
-        /****************************************************************
-         *     INITIALIZE FILTER OPTIONS AND FILTER STRUCTURE           *
-         ****************************************************************/
-
+        /**
+         * **************************************************************
+         * INITIALIZE FILTER OPTIONS AND FILTER STRUCTURE *
+         ***************************************************************
+         */
         webFacetContainer = new WebFacetContainer();
         facetOptionMap = new HashMap<>();
 
@@ -144,7 +139,7 @@ public class SearchDS {
         cancerBySystemOptions.add(new FacetOption("Unclassified", "Unclassified"));
 
         OneParamCheckboxFilter cancerBySystem = new OneParamCheckboxFilter("CANCER BY SYSTEM", "cancer_system", false, FilterType.OneParamCheckboxFilter.get(),
-                cancerBySystemOptions, new ArrayList<>());
+            cancerBySystemOptions, new ArrayList<>());
         patientTumorSection.addComponent(cancerBySystem);
         facetOptionMap.put("cancer_system", cancerBySystemOptions);
 
@@ -157,7 +152,7 @@ public class SearchDS {
         tumorTypeOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
         OneParamCheckboxFilter tumorType = new OneParamCheckboxFilter("TUMOR_TYPE", "sample_tumor_type", false, FilterType.OneParamCheckboxFilter.get(),
-                tumorTypeOptions, new ArrayList<>());
+            tumorTypeOptions, new ArrayList<>());
         patientTumorSection.addComponent(tumorType);
         facetOptionMap.put("sample_tumor_type", tumorTypeOptions);
 
@@ -167,7 +162,7 @@ public class SearchDS {
         patientSexOptions.add(new FacetOption("Female", "Female"));
         patientSexOptions.add(new FacetOption("Not Specified", "Not_Specified"));
         OneParamCheckboxFilter sex = new OneParamCheckboxFilter("SEX", "patient_gender", false, FilterType.OneParamCheckboxFilter.get(),
-                patientSexOptions, new ArrayList<>());
+            patientSexOptions, new ArrayList<>());
         patientTumorSection.addComponent(sex);
         facetOptionMap.put("patient_gender", patientSexOptions);
 
@@ -186,27 +181,25 @@ public class SearchDS {
         ageOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
         OneParamCheckboxFilter age = new OneParamCheckboxFilter("AGE", "patient_age", false, FilterType.OneParamCheckboxFilter.get(),
-                ageOptions, new ArrayList<>());
+            ageOptions, new ArrayList<>());
         patientTumorSection.addComponent(age);
-        facetOptionMap.put("patient_age",ageOptions);
+        facetOptionMap.put("patient_age", ageOptions);
 
         //datasource filter def
         Map<String, String> dataSourcesWithNames = new HashMap<>();
 
-        for(ModelForQuery mfq: models){
+        for (ModelForQuery mfq : models) {
 
-            if(mfq.getDatasource() != null && mfq.getDatasourceName() != null) {
+            if (mfq.getDatasource() != null && mfq.getDatasourceName() != null) {
                 dataSourcesWithNames.put(mfq.getDatasourceName(), mfq.getDatasource());
             }
         }
-
 
         Map<String, String> dataSourcesWithNamesOrdered = new TreeMap<>(dataSourcesWithNames);
 
         List<FacetOption> datasourceOptions = new ArrayList<>();
 
-
-        for(Map.Entry<String, String> entry : dataSourcesWithNamesOrdered.entrySet()){
+        for (Map.Entry<String, String> entry : dataSourcesWithNamesOrdered.entrySet()) {
             datasourceOptions.add(new FacetOption(entry.getKey(), entry.getValue()));
         }
 
@@ -223,8 +216,7 @@ public class SearchDS {
         for(String ds : datasourceList){
             datasourceOptions.add(new FacetOption(ds, ds));
         }
-        */
-
+         */
         //dataset available filter def
         List<FacetOption> datasetAvailableOptions = new ArrayList<>();
         datasetAvailableOptions.add(new FacetOption("Gene Mutation", "Gene_Mutation"));
@@ -235,7 +227,7 @@ public class SearchDS {
         datasetAvailableOptions.add(new FacetOption("Transcriptomics", "Transcriptomics"));
 
         OneParamCheckboxFilter datasetAvailable = new OneParamCheckboxFilter("DATASET AVAILABLE", "data_available", false, FilterType.OneParamCheckboxFilter.get(),
-                datasetAvailableOptions, new ArrayList<>());
+            datasetAvailableOptions, new ArrayList<>());
 
         pdxModelSection.addComponent(datasetAvailable);
         facetOptionMap.put("data_available", datasetAvailableOptions);
@@ -244,13 +236,12 @@ public class SearchDS {
         pdxModelSection.addComponent(datasource);
         facetOptionMap.put("datasource", datasourceOptions);
 
-
         //project filter def
         Set<String> projectsSet = new HashSet<>();
-        for(ModelForQuery mfk : models){
+        for (ModelForQuery mfk : models) {
 
-            if(mfk.getProjects() != null){
-                for(String s: mfk.getProjects()){
+            if (mfk.getProjects() != null) {
+                for (String s : mfk.getProjects()) {
                     projectsSet.add(s);
                 }
             }
@@ -259,30 +250,27 @@ public class SearchDS {
         Collections.sort(projectList);
 
         //TODO: skip filter if no projects were defined?
-
         List<FacetOption> projectOptions = new ArrayList<>();
 
-        for(String p: projectList){
+        for (String p : projectList) {
             projectOptions.add(new FacetOption(p, p));
         }
         OneParamCheckboxFilter projects = new OneParamCheckboxFilter("PROJECT", "project", false,
-                FilterType.OneParamCheckboxFilter.get(), projectOptions, new ArrayList<>());
+            FilterType.OneParamCheckboxFilter.get(), projectOptions, new ArrayList<>());
         pdxModelSection.addComponent(projects);
         facetOptionMap.put("project", projectOptions);
 
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
         TwoParamLinkedFilter geneMutation = new TwoParamLinkedFilter("GENE MUTATION", "mutation", false, FilterType.TwoParamLinkedFilter.get(),
-                "GENE", "VARIANT",getMutationOptions(), getMutationAndVariantOptions(), new HashMap<>());
+            "GENE", "VARIANT", getMutationOptions(), getMutationAndVariantOptions(), new HashMap<>());
 
         molecularDataSection.addComponent(geneMutation);
 
-        OneParamTextFilter copyNumberAlteration= new OneParamTextFilter("COPY NUMBER ALTERATION", "copy_number_alteration",
-                false, FilterType.OneParamTextFilter.get(), "GENE", getCopyNumberAlterationOptions(), new ArrayList<>());
-
+        OneParamTextFilter copyNumberAlteration = new OneParamTextFilter("COPY NUMBER ALTERATION", "copy_number_alteration",
+            false, FilterType.OneParamTextFilter.get(), "GENE", getCopyNumberAlterationOptions(), new ArrayList<>());
 
         molecularDataSection.addComponent(copyNumberAlteration);
-
 
         //Breast cancer markers
         //labelIDs should be alphabetically ordered(ER, HER, PR) as per dataprojection requirement
@@ -305,10 +293,9 @@ public class SearchDS {
         breastCancerMarkerOptions.add(new FacetOption("PR/PGR positive", "PGRpos"));
 
         OneParamCheckboxFilter breastCancerMarkers = new OneParamCheckboxFilter("BREAST CANCER BIOMARKERS", "breast_cancer_markers", false, FilterType.OneParamCheckboxFilter.get(),
-                breastCancerMarkerOptions, new ArrayList<>());
+            breastCancerMarkerOptions, new ArrayList<>());
         molecularDataSection.addComponent(breastCancerMarkers);
-        facetOptionMap.put("breast_cancer_markers",breastCancerMarkerOptions);
-
+        facetOptionMap.put("breast_cancer_markers", breastCancerMarkerOptions);
 
         //treatment status filter
         List<FacetOption> patientTreatmentStatusOptions = new ArrayList<>();
@@ -317,46 +304,39 @@ public class SearchDS {
         patientTreatmentStatusOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
         OneParamCheckboxFilter patientTreatmentStatus = new OneParamCheckboxFilter("PATIENT TREATMENT STATUS", "patient_treatment_status", false,
-                FilterType.OneParamCheckboxFilter.get(), patientTreatmentStatusOptions, new ArrayList<>());
+            FilterType.OneParamCheckboxFilter.get(), patientTreatmentStatusOptions, new ArrayList<>());
         treatmentInfoSection.addComponent(patientTreatmentStatus);
         facetOptionMap.put("patient_treatment_status", patientTreatmentStatusOptions);
 
-
         //patient treatment filter
-
         OneParamTextFilter patientTreatment = new OneParamTextFilter("PATIENT TREATMENT", "patient_treatment",
-                false, FilterType.OneParamTextFilter.get(), "TREATMENT", getPatientTreatmentOptions(), new ArrayList<>());
-
+            false, FilterType.OneParamTextFilter.get(), "TREATMENT", getPatientTreatmentOptions(), new ArrayList<>());
 
         treatmentInfoSection.addComponent(patientTreatment);
 
         //model dosing study def
-
         Map<String, Map<String, Set<Long>>> modelDrugResponses = getModelDrugResponsesFromDP();
         List<String> drugNames = new ArrayList<>(modelDrugResponses.keySet());
 
         TwoParamUnlinkedFilter modelDosingStudy = new TwoParamUnlinkedFilter("PDX MODEL DOSING", "drug", false, FilterType.TwoParamUnlinkedFilter.get(), "DRUG", "RESPONSE", drugNames, Arrays.asList(
-                "Complete Response",
-                "Partial Response",
-                "Progressive Disease",
-                "Stable Disease",
-                "Stable Disease And Complete Response"
+            "Complete Response",
+            "Partial Response",
+            "Progressive Disease",
+            "Stable Disease",
+            "Stable Disease And Complete Response"
         ), new HashMap<>());
         treatmentInfoSection.addComponent(modelDosingStudy);
-
-
-
 
         webFacetContainer.addSection(pdxModelSection);
         webFacetContainer.addSection(molecularDataSection);
         webFacetContainer.addSection(treatmentInfoSection);
         webFacetContainer.addSection(patientTumorSection);
 
-        /****************************************************************
-         *            INITIALIZE SEARCH OBJECTS                         *
-         ****************************************************************/
-
-
+        /**
+         * **************************************************************
+         * INITIALIZE SEARCH OBJECTS *
+         ***************************************************************
+         */
         //one general search object for searching on MFQ object fields
         oneParamCheckboxSearch = new OneParamCheckboxSearch(null, null);
 
@@ -370,7 +350,6 @@ public class SearchDS {
 
         geneMutationSearch.setData(getMutationsFromDP());
 
-
         //breast cancer markers search initialization
         breastCancerMarkersSearch = new TwoParamLinkedSearch("breastCancerMarkers", "breast_cancer_markers");
         breastCancerMarkersSearch.setData(getBreastCancerMarkersFromDP());
@@ -382,9 +361,7 @@ public class SearchDS {
         INITIALIZED = true;
     }
 
-
-    public WebFacetContainer getUpdatedSelectedFilters(Map<SearchFacetName, List<String>> filters){
-
+    public WebFacetContainer getUpdatedSelectedFilters(Map<SearchFacetName, List<String>> filters) {
 
         //use a clone to avoid keeping filters from previous iterations
         WebFacetContainer webFacetContainerClone = new WebFacetContainer();
@@ -392,92 +369,82 @@ public class SearchDS {
         webFacetContainerClone.setWebFacetSections(sections);
 
         //reset all previously selected fields and make the component inactive
-        for(WebFacetSection wfs :webFacetContainerClone.getWebFacetSections()){
-            for(GeneralFilter filter: wfs.getFilterComponents()){
+        for (WebFacetSection wfs : webFacetContainerClone.getWebFacetSections()) {
+            for (GeneralFilter filter : wfs.getFilterComponents()) {
                 filter.setActive(false);
 
-                if(filter instanceof OneParamCheckboxFilter){
+                if (filter instanceof OneParamCheckboxFilter) {
 
-                    OneParamCheckboxFilter f = (OneParamCheckboxFilter)filter;
+                    OneParamCheckboxFilter f = (OneParamCheckboxFilter) filter;
                     f.setSelected(new ArrayList<>());
 
-                }
-                else if(filter instanceof OneParamTextFilter){
+                } else if (filter instanceof OneParamTextFilter) {
 
                     OneParamTextFilter f = (OneParamTextFilter) filter;
                     f.setSelected(new ArrayList<>());
 
-
-                }
-                else if(filter instanceof TwoParamUnlinkedFilter){
+                } else if (filter instanceof TwoParamUnlinkedFilter) {
 
                     TwoParamUnlinkedFilter f = (TwoParamUnlinkedFilter) filter;
                     f.setSelected(new HashMap<>());
 
-                }
-                else if(filter instanceof TwoParamLinkedFilter){
+                } else if (filter instanceof TwoParamLinkedFilter) {
                     TwoParamLinkedFilter f = (TwoParamLinkedFilter) filter;
                     f.setSelected(new HashMap<>());
                 }
             }
         }
 
-
         //loop through the selected filters, make them active and initialize their selected list/map
-        for(Map.Entry<SearchFacetName, List<String>> facet: filters.entrySet()){
+        for (Map.Entry<SearchFacetName, List<String>> facet : filters.entrySet()) {
 
             String facetName = facet.getKey().getName();
             List<String> selected = facet.getValue();
 
             List<String> decodedSelected = new ArrayList<>();
             //if there is an overwrite rule for the filter, replace the selected values with the replacement
-            if(facetOptionMap.get(facetName) != null){
+            if (facetOptionMap.get(facetName) != null) {
 
-                for(FacetOption fo: facetOptionMap.get(facetName)){
+                for (FacetOption fo : facetOptionMap.get(facetName)) {
 
-                    if(selected.contains(fo.getLabelId()))
+                    if (selected.contains(fo.getLabelId())) {
                         decodedSelected.add(fo.getLabelId());
+                    }
                 }
-            }
-            //no overwrite rule
-            else{
+            } //no overwrite rule
+            else {
                 decodedSelected = selected;
             }
 
+            for (WebFacetSection wfs : webFacetContainerClone.getWebFacetSections()) {
+                for (GeneralFilter filter : wfs.getFilterComponents()) {
 
-            for(WebFacetSection wfs :webFacetContainerClone.getWebFacetSections()){
-                for(GeneralFilter filter: wfs.getFilterComponents()){
-
-
-                    if(filter.getUrlParam().equals(facetName)){
+                    if (filter.getUrlParam().equals(facetName)) {
                         filter.setActive(true);
 
-                        if(filter instanceof OneParamCheckboxFilter){
+                        if (filter instanceof OneParamCheckboxFilter) {
 
-                            OneParamCheckboxFilter f = (OneParamCheckboxFilter)filter;
+                            OneParamCheckboxFilter f = (OneParamCheckboxFilter) filter;
                             f.setSelected(decodedSelected);
 
-                        }
-                        else if(filter instanceof OneParamTextFilter){
+                        } else if (filter instanceof OneParamTextFilter) {
 
                             OneParamTextFilter f = (OneParamTextFilter) filter;
                             f.setSelected(decodedSelected);
 
-                        }
-                        else if(filter instanceof TwoParamUnlinkedFilter){
+                        } else if (filter instanceof TwoParamUnlinkedFilter) {
 
                             TwoParamUnlinkedFilter f = (TwoParamUnlinkedFilter) filter;
 
-                            Map<String,List<String>> selectedMap = new HashMap<>();
+                            Map<String, List<String>> selectedMap = new HashMap<>();
 
-                            for(String opt:decodedSelected){
+                            for (String opt : decodedSelected) {
 
                                 String[] optArr = opt.split("___");
 
-                                if(selectedMap.containsKey(optArr[0])){
+                                if (selectedMap.containsKey(optArr[0])) {
                                     selectedMap.get(optArr[0]).add(optArr[1]);
-                                }
-                                else{
+                                } else {
                                     List<String> arrList = new ArrayList<>();
                                     arrList.add(optArr[1]);
                                     selectedMap.put(optArr[0], arrList);
@@ -488,20 +455,18 @@ public class SearchDS {
 
                             f.setSelected(selectedMap);
 
-                        }
-                        else if(filter instanceof TwoParamLinkedFilter){
+                        } else if (filter instanceof TwoParamLinkedFilter) {
                             TwoParamLinkedFilter f = (TwoParamLinkedFilter) filter;
 
-                            Map<String,List<String>> selectedMap = new HashMap<>();
+                            Map<String, List<String>> selectedMap = new HashMap<>();
 
-                            for(String opt:decodedSelected){
+                            for (String opt : decodedSelected) {
 
                                 String[] optArr = opt.split("___");
 
-                                if(selectedMap.containsKey(optArr[0])){
+                                if (selectedMap.containsKey(optArr[0])) {
                                     selectedMap.get(optArr[0]).add(optArr[1]);
-                                }
-                                else{
+                                } else {
                                     List<String> arrList = new ArrayList<>();
                                     arrList.add(optArr[1]);
                                     selectedMap.put(optArr[0], arrList);
@@ -515,22 +480,18 @@ public class SearchDS {
 
                     }
 
-
                 }
             }
-
 
         }
 
         return webFacetContainerClone;
     }
 
+    public Set<ModelForQuery> search(Map<SearchFacetName, List<String>> filters) {
 
-
-    public Set<ModelForQuery> search(Map<SearchFacetName, List<String>> filters){
-
-        synchronized (this){
-            if(! INITIALIZED ) {
+        synchronized (this) {
+            if (!INITIALIZED) {
                 init();
             }
         }
@@ -544,7 +505,7 @@ public class SearchDS {
         result.forEach(x -> x.setDrugWithResponse(new ArrayList<>()));
 
         //reset breast cancer markers
-        result.forEach(x ->x.setBreastCancerMarkers(new ArrayList<>()));
+        result.forEach(x -> x.setBreastCancerMarkers(new ArrayList<>()));
 
         //reset copy number alteration values
         result.forEach(x -> x.setCnaMarkers(new ArrayList<>()));
@@ -557,13 +518,13 @@ public class SearchDS {
             return result;
         }
 
-        OneParamCheckboxSearch oneParamCheckboxSearch = new OneParamCheckboxSearch("search","search");
+        OneParamCheckboxSearch oneParamCheckboxSearch = new OneParamCheckboxSearch("search", "search");
 
         for (SearchFacetName facet : filters.keySet()) {
 
-            log.info("Models:"+result.size()+" before applying filter: "+facet.getName());
+            log.info("Models:" + result.size() + " before applying filter: " + facet.getName());
 
-            switch(facet){
+            switch (facet) {
 
                 case query:
                     //List<String> searchParams, Set<ModelForQuery> mfqSet, Function<ModelForQuery, List<String>> searchFunc
@@ -658,23 +619,19 @@ public class SearchDS {
                     log.warn("Unrecognised facet {} passed to search, skipping", facet.getName());
                     break;
 
-
             }
 
-            log.info("After applying filter: "+result.size());
+            log.info("After applying filter: " + result.size());
 
         }
-
-
 
         return result;
     }
 
-
     public Set<ModelForQuery> getModels() {
 
-        synchronized (this){
-            if(! INITIALIZED ) {
+        synchronized (this) {
+            if (!INITIALIZED) {
                 init();
             }
         }
@@ -686,14 +643,11 @@ public class SearchDS {
         this.models = models;
     }
 
-
-
-
     /**
-     * This method loads the ModelForQuery Data Projection object and initializes the models
+     * This method loads the ModelForQuery Data Projection object and
+     * initializes the models
      */
     private void initializeModels() {
-
 
         String modelJson = dataProjectionRepository.findByLabel("ModelForQuery").getValue();
 
@@ -709,21 +663,20 @@ public class SearchDS {
                 mfq.setModelId(parseLong(j.getString("modelId")));
                 mfq.setDatasource(j.getString("datasource"));
 
-                if(j.has("datasourceName")){
+                if (j.has("datasourceName")) {
                     mfq.setDatasourceName(j.getString("datasourceName"));
                 }
 
                 mfq.setExternalId(j.getString("externalId"));
-                if(j.has("patientAge")){
+                if (j.has("patientAge")) {
                     mfq.setPatientAge(j.getString("patientAge"));
-                }
-                else{
+                } else {
                     mfq.setPatientAge("Not Specified");
                 }
 
                 mfq.setPatientGender(j.getString("patientGender"));
 
-                if(j.has("patientEthnicity")){
+                if (j.has("patientEthnicity")) {
                     mfq.setPatientEthnicity(j.getString("patientEthnicity"));
                 }
 
@@ -735,11 +688,9 @@ public class SearchDS {
                 mfq.setDiagnosis(j.getString("diagnosis"));
                 mfq.setMappedOntologyTerm(j.getString("mappedOntologyTerm"));
 
-                if(j.has("patientTreatmentStatus")){
+                if (j.has("patientTreatmentStatus")) {
                     mfq.setPatientTreatmentStatus(j.getString("patientTreatmentStatus"));
                 }
-
-
 
                 JSONArray ja = j.getJSONArray("cancerSystem");
                 List<String> cancerSystem = new ArrayList<>();
@@ -760,11 +711,11 @@ public class SearchDS {
 
                 mfq.setAllOntologyTermAncestors(ancestors);
 
-                if(j.has("dataAvailable")){
+                if (j.has("dataAvailable")) {
                     ja = j.getJSONArray("dataAvailable");
                     List<String> dataAvailable = new ArrayList<>();
 
-                    for(int k=0; k<ja.length(); k++){
+                    for (int k = 0; k < ja.length(); k++) {
 
                         dataAvailable.add(ja.getString(k));
                     }
@@ -772,27 +723,24 @@ public class SearchDS {
                     mfq.setDataAvailable(dataAvailable);
                 }
 
-                if(j.has("projects")){
+                if (j.has("projects")) {
 
                     ja = j.getJSONArray("projects");
 
-                    for(int k = 0; k < ja.length(); k++){
+                    for (int k = 0; k < ja.length(); k++) {
                         mfq.addProject(ja.getString(k));
                     }
 
                 }
 
-                if(j.has("accessModalities")){
+                if (j.has("accessModalities")) {
                     mfq.setAccessModalities(j.getString("accessModalities"));
-                }
-                else{
+                } else {
                     mfq.setAccessModalities("");
                 }
 
-
                 this.models.add(mfq);
             }
-
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -800,8 +748,7 @@ public class SearchDS {
 
     }
 
-
-    private Map<String, Map<String, Map<String, Set<Long>>>> getMutationsFromDP(){
+    private Map<String, Map<String, Map<String, Set<Long>>>> getMutationsFromDP() {
 
         log.info("Initializing mutations");
         //platform=> marker=> variant=>{set of model ids}
@@ -809,16 +756,15 @@ public class SearchDS {
 
         String mut = dataProjectionRepository.findByLabel("PlatformMarkerVariantModel").getValue();
 
-        try{
+        try {
 
             ObjectMapper mapper = new ObjectMapper();
 
-            mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<Long>>>>>(){});
+            mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<Long>>>>>() {
+            });
 
             //log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
-
-        }
-        catch(Exception e){
+        } catch (Exception e) {
 
             e.printStackTrace();
         }
@@ -826,13 +772,13 @@ public class SearchDS {
         return mutations;
     }
 
-    private Map<String, List<String>> getMutationAndVariantOptions(){
+    private Map<String, List<String>> getMutationAndVariantOptions() {
 
-        Map<String,Set<String>> tempResults = getMutationOptionsFromDP();
+        Map<String, Set<String>> tempResults = getMutationOptionsFromDP();
 
         Map<String, List<String>> resultMap = new HashMap<>();
 
-        for(Map.Entry<String, Set<String>> entry : tempResults.entrySet()){
+        for (Map.Entry<String, Set<String>> entry : tempResults.entrySet()) {
 
             resultMap.put(entry.getKey(), new ArrayList<>(new TreeSet<>(entry.getValue())));
         }
@@ -840,13 +786,13 @@ public class SearchDS {
         return resultMap;
     }
 
-    private List<String> getMutationOptions(){
+    private List<String> getMutationOptions() {
 
-        Map<String,Set<String>> tempResults = getMutationOptionsFromDP();
+        Map<String, Set<String>> tempResults = getMutationOptionsFromDP();
 
         List<String> resultList = new ArrayList<>();
 
-        for(Map.Entry<String, Set<String>> entry : tempResults.entrySet()){
+        for (Map.Entry<String, Set<String>> entry : tempResults.entrySet()) {
 
             resultList.add(entry.getKey());
         }
@@ -854,25 +800,24 @@ public class SearchDS {
         return resultList;
     }
 
-    private Map<String, Set<String>> getMutationOptionsFromDP(){
+    private Map<String, Set<String>> getMutationOptionsFromDP() {
 
         Map<String, Map<String, Map<String, Set<Long>>>> mutations = getMutationsFromDP();
 
-        Map<String,Set<String>> tempResults = new HashMap<>();
+        Map<String, Set<String>> tempResults = new HashMap<>();
 
-        for(Map.Entry<String, Map<String, Map<String, Set<Long>>>> platform:mutations.entrySet()){
+        for (Map.Entry<String, Map<String, Map<String, Set<Long>>>> platform : mutations.entrySet()) {
 
-            for(Map.Entry<String, Map<String, Set<Long>>> marker:platform.getValue().entrySet()){
+            for (Map.Entry<String, Map<String, Set<Long>>> marker : platform.getValue().entrySet()) {
 
-                for(Map.Entry<String, Set<Long>> variant:marker.getValue().entrySet()){
+                for (Map.Entry<String, Set<Long>> variant : marker.getValue().entrySet()) {
 
                     String m = marker.getKey();
                     String v = variant.getKey();
 
-                    if(tempResults.containsKey(m)){
+                    if (tempResults.containsKey(m)) {
                         tempResults.get(m).add(v);
-                    }
-                    else{
+                    } else {
                         Set<String> set = new HashSet<>();
                         set.add(v);
                         tempResults.put(m, set);
@@ -886,7 +831,7 @@ public class SearchDS {
         return tempResults;
     }
 
-    private Map<String, Map<String, Set<Long>>> getModelDrugResponsesFromDP(){
+    private Map<String, Map<String, Set<Long>>> getModelDrugResponsesFromDP() {
 
         log.info("Initializing model drug responses");
 
@@ -895,21 +840,20 @@ public class SearchDS {
         DataProjection dataProjection = dataProjectionRepository.findByLabel("ModelDrugData");
         String responses = "{}";
 
-        if(dataProjection != null){
+        if (dataProjection != null) {
 
             responses = dataProjection.getValue();
         }
 
-        try{
+        try {
 
             ObjectMapper mapper = new ObjectMapper();
 
-            modelDrugResponses = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
+            modelDrugResponses = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>() {
+            });
 
             //log.info("Lookup: "+modelDrugResponses.get("doxorubicincyclophosphamide").get("progressive disease").toString());
-
-        }
-        catch(Exception e){
+        } catch (Exception e) {
 
             e.printStackTrace();
         }
@@ -917,7 +861,7 @@ public class SearchDS {
         return modelDrugResponses;
     }
 
-    private Map<String, Map<String, Set<Long>>> getBreastCancerMarkersFromDP(){
+    private Map<String, Map<String, Set<Long>>> getBreastCancerMarkersFromDP() {
 
         log.info("Initializing breast cancer markers ");
 
@@ -926,20 +870,19 @@ public class SearchDS {
         DataProjection dataProjection = dataProjectionRepository.findByLabel("cytogenetics");
         String responses = "{}";
 
-        if(dataProjection != null){
+        if (dataProjection != null) {
 
             responses = dataProjection.getValue();
         }
 
-        try{
+        try {
 
             ObjectMapper mapper = new ObjectMapper();
 
-            data = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
+            data = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>() {
+            });
 
-
-        }
-        catch(Exception e){
+        } catch (Exception e) {
 
             e.printStackTrace();
         }
@@ -947,7 +890,7 @@ public class SearchDS {
         return data;
     }
 
-    private Map<String, Set<Long>> getCopyNumberAlterationDP(){
+    private Map<String, Set<Long>> getCopyNumberAlterationDP() {
 
         Map<String, Set<Long>> data = new HashMap<>();
 
@@ -955,20 +898,19 @@ public class SearchDS {
 
         String responses = "{}";
 
-        if(dataProjection != null){
+        if (dataProjection != null) {
 
             responses = dataProjection.getValue();
         }
 
-        try{
+        try {
 
             ObjectMapper mapper = new ObjectMapper();
 
-            data = mapper.readValue(responses, new TypeReference<Map<String, Set<Long>>>(){});
+            data = mapper.readValue(responses, new TypeReference<Map<String, Set<Long>>>() {
+            });
 
-
-        }
-        catch(Exception e){
+        } catch (Exception e) {
 
             e.printStackTrace();
         }
@@ -976,7 +918,7 @@ public class SearchDS {
         return data;
     }
 
-    private Map<String, Set<Long>> getPatientTreatmentsFromDP(){
+    private Map<String, Set<Long>> getPatientTreatmentsFromDP() {
 
         Map<String, Set<Long>> data = new HashMap<>();
 
@@ -984,18 +926,18 @@ public class SearchDS {
 
         String responses = "{}";
 
-        if(dataProjection != null){
+        if (dataProjection != null) {
 
             responses = dataProjection.getValue();
         }
 
-        try{
+        try {
 
             ObjectMapper mapper = new ObjectMapper();
 
-            data = mapper.readValue(responses, new TypeReference<Map<String, Set<Long>>>(){});
-        }
-        catch(Exception e){
+            data = mapper.readValue(responses, new TypeReference<Map<String, Set<Long>>>() {
+            });
+        } catch (Exception e) {
 
             e.printStackTrace();
         }
@@ -1003,7 +945,7 @@ public class SearchDS {
         return data;
     }
 
-    private List<String> getPatientTreatmentOptions(){
+    private List<String> getPatientTreatmentOptions() {
 
         Map<String, Set<Long>> data = getPatientTreatmentsFromDP();
         List<String> options = new ArrayList<>(data.keySet());
@@ -1011,7 +953,7 @@ public class SearchDS {
         return options;
     }
 
-    private List<String> getCopyNumberAlterationOptions(){
+    private List<String> getCopyNumberAlterationOptions() {
 
         Map<String, Set<Long>> data = getCopyNumberAlterationDP();
         List<String> options = new ArrayList<>(data.keySet());
@@ -1020,13 +962,14 @@ public class SearchDS {
     }
 
     /**
-     * getExactMatchDisjunctionPredicate returns a composed predicate with all the supplied filters "OR"ed together
-     * using an exact match
+     * getExactMatchDisjunctionPredicate returns a composed predicate with all
+     * the supplied filters "OR"ed together using an exact match
      * <p>
      * NOTE: This is a case sensitive match!
      *
      * @param filters the set of strings to match against
-     * @return a composed predicate case insensitive matching the supplied filters using disjunction (OR)
+     * @return a composed predicate case insensitive matching the supplied
+     * filters using disjunction (OR)
      */
     Predicate<String> getExactMatchDisjunctionPredicate(List<String> filters) {
         List<Predicate<String>> preds = new ArrayList<>();
@@ -1046,13 +989,14 @@ public class SearchDS {
     }
 
     /**
-     * getContainsMatchDisjunctionPredicate returns a composed predicate with all the supplied filters "OR"ed together
-     * using a contains match
+     * getContainsMatchDisjunctionPredicate returns a composed predicate with
+     * all the supplied filters "OR"ed together using a contains match
      * <p>
      * NOTE: This is a case insensitive match!
      *
      * @param filters the set of strings to match against
-     * @return a composed predicate case insensitive matching the supplied filters using disjunction (OR)
+     * @return a composed predicate case insensitive matching the supplied
+     * filters using disjunction (OR)
      */
     Predicate<String> getContainsMatchDisjunctionPredicate(List<String> filters) {
         List<Predicate<String>> preds = new ArrayList<>();
@@ -1071,7 +1015,7 @@ public class SearchDS {
         return preds.stream().reduce(Predicate::or).orElse(x -> false);
     }
 
-/*
+    /*
     public List<FacetOption> getFacetOptions(SearchFacetName facet,List<String> options, Map<SearchFacetName, List<String>> configuredFacets){
 
         List<FacetOption> facetOptions = new ArrayList<>();
@@ -1103,9 +1047,7 @@ public class SearchDS {
         return facetOptions;
     }
 
-*/
-
-
+     */
     /**
      * Get the count of models for each diagnosis (including children).
      * <p>
@@ -1120,7 +1062,6 @@ public class SearchDS {
 
         Map<String, Integer> map = new HashMap<>();
 
-
         // Get the list of diagnoses
         Set<String> allDiagnoses = allResults.stream().map(ModelForQuery::getMappedOntologyTerm).collect(Collectors.toSet());
 
@@ -1129,14 +1070,13 @@ public class SearchDS {
             Predicate<String> predicate = getContainsMatchDisjunctionPredicate(Arrays.asList(diagnosis));
 //            Long i = allResults.stream().map(x -> x.getAllOntologyTermAncestors().stream().filter(predicate).collect(Collectors.toSet())).map(x->((Set)x)).filter(x->x.size()>0).distinct().count();
             Long i = allResults.stream()
-                    .filter(x -> x.getAllOntologyTermAncestors().stream().filter(predicate).collect(Collectors.toSet()).size() > 0)
-                    .distinct().count();
+                .filter(x -> x.getAllOntologyTermAncestors().stream().filter(predicate).collect(Collectors.toSet()).size() > 0)
+                .distinct().count();
 //            Long i = allResults.stream().filter(x -> x.getAllOntologyTermAncestors().contains(diagnosis)).distinct().count();
             map.put(diagnosis, i.intValue());
         }
 
         return map;
     }
-
 
 }
