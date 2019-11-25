@@ -204,13 +204,15 @@ public class UniversalDataExporter {
 
         for(Patient patient : patients){
 
-            List<String> dataRow = new ArrayList<>();
+
 
             String patientId = patient.getExternalId();
 
             for(PatientSnapshot patientSnapshot : patient.getSnapshots()){
 
                 for(Sample sample : patientSnapshot.getSamples()){
+
+                    List<String> dataRow = new ArrayList<>();
 
                     String sampleId = sample.getSourceSampleId();
                     String collectionDate = patientSnapshot.getDateAtCollection();
