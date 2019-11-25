@@ -93,7 +93,13 @@ public class ModelDetails {
         List<Integer> intList = new ArrayList<>();
         for(String p : passages){
 
-            if(!p.equals("")) intList.add(Integer.valueOf(p));
+            try{
+                if(!p.equals("")) intList.add(Integer.valueOf(p));
+            }
+            catch(NumberFormatException e){
+
+            }
+
         }
 
         Collections.sort(intList);
