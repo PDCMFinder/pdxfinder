@@ -40,12 +40,16 @@ public class LoaderProperties {
     protected String omicModelID;
     protected String omicSampleID;
     protected String omicSampleOrigin;
-    protected String omicPassage;
     protected String omicHostStrainName;
+    protected String omicPassage;
     protected String omicHgncSymbol;
+    protected String omicBiotype;
+    protected String omicCodingSequenceChange;
+    protected String omicVariantClass;
+    protected String omicCodonChange;
     protected String omicAminoAcidChange;
-    protected String omicNucleotideChange;
     protected String omicConsequence;
+    protected String omicFunctionalPrediction;
     protected String omicReadDepth;
     protected String omicAlleleFrequency;
     protected String omicChromosome;
@@ -54,9 +58,10 @@ public class LoaderProperties {
     protected String omicAltAllele;
     protected String omicUcscGeneId;
     protected String omicNcbiGeneId;
+    protected String omicNcbiTranscriptId;
     protected String omicEnsemblGeneId;
     protected String omicEnsemblTranscriptId;
-    protected String omicRsIdVariants;
+    protected String omicExistingVariation;
     protected String omicGenomeAssembly;
     protected String omicZscore;
     protected String omicPlatform;
@@ -330,13 +335,7 @@ public class LoaderProperties {
         this.omicAminoAcidChange = omicAminoAcidChange.trim();
     }
 
-    public String getOmicNucleotideChange() {
-        return omicNucleotideChange;
-    }
 
-    public void setOmicNucleotideChange(String omicNucleotideChange) {
-        this.omicNucleotideChange = omicNucleotideChange.trim();
-    }
 
     public String getOmicConsequence() {
         return omicConsequence;
@@ -424,14 +423,6 @@ public class LoaderProperties {
 
     public void setOmicEnsemblTranscriptId(String omicEnsemblTranscriptId) {
         this.omicEnsemblTranscriptId = omicEnsemblTranscriptId.trim();
-    }
-
-    public String getOmicRsIdVariants() {
-        return omicRsIdVariants;
-    }
-
-    public void setOmicRsIdVariants(String omicRsIdVariants) {
-        this.omicRsIdVariants = omicRsIdVariants.trim();
     }
 
     public String getOmicGenomeAssembly() {

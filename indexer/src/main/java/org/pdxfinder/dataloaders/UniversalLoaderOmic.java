@@ -272,8 +272,6 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             if(nsdto.getNode() == null){
 
-                //log.info("Found an unrecognised Marker Symbol {} in Model: {}, Skipping This!!!! ", data.get(omicHgncSymbol), modelID);
-                //log.info(data.toString());
 
                 reportManager.addMessage(nsdto.getLogEntity());
                 count++;
@@ -394,19 +392,26 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
     private MarkerAssociation setVariationProperties(Map<String,String> data, Marker marker){
 
         MarkerAssociation ma = new MarkerAssociation();
+
+        ma.setBiotype(data.get(omicBiotype));
+        ma.setCodingSequenceChange(data.get(omicCodingSequenceChange));
+        ma.setVariantClass(data.get(omicVariantClass));
+        ma.setCodonChange(data.get(omicCodonChange));
         ma.setAminoAcidChange(data.get(omicAminoAcidChange));
         ma.setConsequence(data.get(omicConsequence));
+        ma.setFunctionalPrediction(data.get(omicFunctionalPrediction));
+        ma.setReadDepth(data.get(omicReadDepth));
         ma.setAlleleFrequency(data.get(omicAlleleFrequency));
         ma.setChromosome(data.get(omicChromosome));
-        ma.setReadDepth(data.get(omicReadDepth));
+        ma.setSeqStartPosition(data.get(omicSeqStartPosition));
         ma.setRefAllele(data.get(omicRefAllele));
         ma.setAltAllele(data.get(omicAltAllele));
-        ma.setGenomeAssembly(data.get(omicGenomeAssembly));
-        ma.setRsIdVariants(data.get(omicRsIdVariants));
-        ma.setSeqStartPosition(data.get(omicSeqStartPosition));
-
+        ma.setUcscTranscriptId(data.get(omicUcscGeneId));
+        ma.setNcbiTranscriptId(data.get(omicNcbiTranscriptId));
         ma.setEnsemblTranscriptId(data.get(omicEnsemblTranscriptId));
-        ma.setNucleotideChange(data.get(omicNucleotideChange));
+        ma.setExistingVariations(data.get(omicExistingVariation));
+        ma.setGenomeAssembly(data.get(omicGenomeAssembly));
+
         ma.setMarker(marker);
 
         return  ma;
