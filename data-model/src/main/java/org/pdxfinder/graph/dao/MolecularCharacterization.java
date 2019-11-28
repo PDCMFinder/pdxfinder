@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by jmason on 17/03/2017.
@@ -32,6 +33,9 @@ public class MolecularCharacterization {
 
     @Relationship(type = "ASSOCIATED_WITH")
     List<MarkerAssociation> markerAssociations;
+
+    private Set<String> markers;
+
 
     public MolecularCharacterization() {
         isVisible = true;
