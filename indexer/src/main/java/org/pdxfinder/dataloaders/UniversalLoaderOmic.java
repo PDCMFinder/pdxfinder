@@ -305,7 +305,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 }
 
 
-                molecularCharacterization.getMarkerAssociations().get(0).getMolecularData().add(md);
+                molecularCharacterization.getMarkerAssociations().get(0).getMolecularDataList().add(md);
 
             }
 

@@ -1,6 +1,5 @@
 package org.pdxfinder.services;
 
-import org.neo4j.ogm.json.JSONArray;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.repositories.PatientRepository;
 import org.pdxfinder.services.dto.CollectionEventsDTO;
@@ -88,7 +87,7 @@ public class PatientService {
                     try{
                         for (MolecularCharacterization molc : sample.getMolecularCharacterizations()){
                             for (MarkerAssociation mAssoc : molc.getMarkerAssociations() ){
-                                List<MolecularData> maData = mAssoc.getMolecularData();
+                                List<MolecularData> maData = mAssoc.getMolecularDataList();
                                 for(MolecularData md: maData){
                                     geneticMutations.add( md.getMarker() );
                                 }

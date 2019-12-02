@@ -452,8 +452,8 @@ public class UniversalDataExporter {
 
             List<MolecularData> molecularData;
             try{
-
-                molecularData = ma.getMolecularDataFromDataString();
+                ma.createMolecularDataListFromString();
+                molecularData = ma.getMolecularDataList();
             }
             catch (Exception e){
                 log.error("No molecular data");

@@ -3,7 +3,6 @@ package org.pdxfinder.postload;
 import com.google.gson.Gson;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dataloaders.UniversalLoader;
 import org.pdxfinder.graph.dao.*;
@@ -180,7 +179,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                     List<MolecularData> molecularData;
                     try{
 
-                      molecularData = ma.getMolecularDataFromDataString();
+                      molecularData = ma.createMolecularDataListFromString();
                     }
                     catch (Exception e){
                         log.error("No molecular data");
@@ -271,7 +270,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                     List<MolecularData> molecularData;
                     try{
 
-                        molecularData = ma.getMolecularDataFromDataString();
+                        molecularData = ma.createMolecularDataListFromString();
                     }
                     catch (Exception e){
                         log.error("No molecular data");

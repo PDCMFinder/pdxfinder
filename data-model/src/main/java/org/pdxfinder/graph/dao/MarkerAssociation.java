@@ -20,41 +20,35 @@ public class MarkerAssociation {
     @GeneratedValue
     private Long id;
 
-    private String data;
+    private String molecularDataString;
 
-    private List<MolecularData> molecularData = new ArrayList<>();
+    private List<MolecularData> molecularDataList = new ArrayList<>();
 
 
     public MarkerAssociation() {
     }
 
-    public List<MolecularData> getMolecularDataFromDataString() throws IOException {
+    public List<MolecularData> createMolecularDataListFromString() throws IOException {
 
         List<MolecularData> molecularData = new ArrayList<>();
 
-        if(data == null || data.isEmpty()) {
+        if(molecularDataString == null || molecularDataString.isEmpty()) {
             return molecularData;
         }
         else{
 
             ObjectMapper mapper = new ObjectMapper();
-            molecularData = mapper.readValue(data, new TypeReference<List<MolecularData>>(){});
+            molecularData = mapper.readValue(molecularDataString, new TypeReference<List<MolecularData>>(){});
 
             return molecularData;
         }
     }
 
-    public void setDataFromList(List<MolecularData> listData){
+    public void createMolecularDataStringFromList(){
 
-        data = new Gson().toJson(listData);
+        molecularDataString = new Gson().toJson(molecularDataList);
+        molecularDataList = null;
     }
-
-    public void setDataFromInternalList(){
-
-        data = new Gson().toJson(molecularData);
-        molecularData = null;
-    }
-
 
     public Long getId() {
         return id;
@@ -64,23 +58,23 @@ public class MarkerAssociation {
         this.id = id;
     }
 
-    public String getData() {
-        return data;
+    public String getMolecularDataString() {
+        return molecularDataString;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public void setMolecularDataString(String molecularDataString) {
+        this.molecularDataString = molecularDataString;
     }
 
-    public List<MolecularData> getMolecularData() {
-        return molecularData;
+    public List<MolecularData> getMolecularDataList() {
+        return molecularDataList;
     }
 
-    public void setMolecularData(List<MolecularData> molecularData) {
-        this.molecularData = molecularData;
+    public void setMolecularDataList(List<MolecularData> molecularDataList) {
+        this.molecularDataList = molecularDataList;
     }
 
     public void addMolecularData(MolecularData md){
-        this.molecularData.add(md);
+        this.molecularDataList.add(md);
     }
 }

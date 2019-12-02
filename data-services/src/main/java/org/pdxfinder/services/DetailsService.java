@@ -499,7 +499,7 @@ public class DetailsService {
         for(MarkerAssociation ma: associationList){
             List<MolecularData> molecularData;
             try {
-                molecularData = ma.getMolecularData();
+                molecularData = ma.getMolecularDataList();
             }
             catch(Exception e){
                 log.error("Error getting molecular data");
@@ -755,7 +755,7 @@ public class DetailsService {
 
             List<MolecularData> molecularData;
             try {
-                molecularData = ma.getMolecularData();
+                molecularData = ma.getMolecularDataList();
             }
             catch(Exception e){
                 log.error("Error getting molecular data");
@@ -1082,7 +1082,7 @@ public class DetailsService {
 
                     List<MolecularData> molecularData;
                     try {
-                        molecularData = markerAss.getMolecularData();
+                        molecularData = markerAss.getMolecularDataList();
                     }
                     catch(Exception e){
                         log.error("Error getting molecular data");

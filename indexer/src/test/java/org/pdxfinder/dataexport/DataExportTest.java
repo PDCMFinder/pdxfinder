@@ -198,6 +198,8 @@ public class DataExportTest extends BaseTest {
 
     private List<ModelCreation> getModelListForTest(){
 
+        List<ModelCreation> modelCreationList = new ArrayList<>();
+
         ModelCreation model = new ModelCreation();
         model.setSourcePdxId("m123");
 
@@ -247,7 +249,7 @@ public class DataExportTest extends BaseTest {
         xenoSample.addMolecularCharacterization(molecularCharacterization);
         model.addSpecimen(specimen);
 
-        List<ModelCreation> modelCreationList = new ArrayList<>();
+
         modelCreationList.add(model);
 
 
@@ -257,6 +259,7 @@ public class DataExportTest extends BaseTest {
         md.setAminoAcidChange("aminoacidchange");
         Marker m = new Marker("markersymbol", "markername");
         md.setMarker(m.getHgncSymbol());
+        ma.addMolecularData(md);
         molecularCharacterization.addMarkerAssociation(ma);
 
         //setting up cna data
@@ -268,6 +271,7 @@ public class DataExportTest extends BaseTest {
         md2.setCnaCopyNumberStatus("cnaStatus");
         Marker m2 = new Marker("markersymbol", "markername");
         md2.setMarker(m2.getHgncSymbol());
+        ma2.addMolecularData(md2);
         molecularCharacterization2.addMarkerAssociation(ma2);
         xenoSample.addMolecularCharacterization(molecularCharacterization2);
 
