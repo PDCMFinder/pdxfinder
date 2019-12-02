@@ -231,8 +231,8 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
 
                                     MarkerAssociation ma = new MarkerAssociation();
-                                    ma.setCytogeneticsResult(result);
-                                    ma.setMarker(marker);
+                                    //ma.setCytogeneticsResult(result);
+                                    //ma.setMarker(marker);
                                     mc.addMarkerAssociation(ma);
                                 }
                                 else {
@@ -242,8 +242,8 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
                                     mc.setPlatform(pl);
 
                                     MarkerAssociation ma = new MarkerAssociation();
-                                    ma.setCytogeneticsResult(result);
-                                    ma.setMarker(marker);
+                                    //ma.setCytogeneticsResult(result);
+                                    //ma.setMarker(marker);
                                     mc.addMarkerAssociation(ma);
 
                                     molCharMap.put(modelId + "---" + sampleId, mc);

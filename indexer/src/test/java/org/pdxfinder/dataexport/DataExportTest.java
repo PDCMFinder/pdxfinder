@@ -253,9 +253,10 @@ public class DataExportTest extends BaseTest {
 
         //setting up mutation data
         MarkerAssociation ma = new MarkerAssociation();
-        ma.setAminoAcidChange("aminoacidchange");
+        MolecularData md = new MolecularData();
+        md.setAminoAcidChange("aminoacidchange");
         Marker m = new Marker("markersymbol", "markername");
-        ma.setMarker(m);
+        md.setMarker(m.getHgncSymbol());
         molecularCharacterization.addMarkerAssociation(ma);
 
         //setting up cna data
@@ -263,9 +264,10 @@ public class DataExportTest extends BaseTest {
         molecularCharacterization2.setType("copy number alteration");
         molecularCharacterization2.setPlatform(platform);
         MarkerAssociation ma2 = new MarkerAssociation();
-        ma2.setCnaCopyNumberStatus("cnaStatus");
+        MolecularData md2 = new MolecularData();
+        md2.setCnaCopyNumberStatus("cnaStatus");
         Marker m2 = new Marker("markersymbol", "markername");
-        ma2.setMarker(m2);
+        md2.setMarker(m2.getHgncSymbol());
         molecularCharacterization2.addMarkerAssociation(ma2);
         xenoSample.addMolecularCharacterization(molecularCharacterization2);
 

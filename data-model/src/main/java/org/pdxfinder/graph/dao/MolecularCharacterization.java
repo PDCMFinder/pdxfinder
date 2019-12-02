@@ -105,4 +105,12 @@ public class MolecularCharacterization {
     public void setVisible(boolean visible) {
         isVisible = visible;
     }
+
+    public Set<String> getMarkers() {
+        return markers;
+    }
+
+    public void setMarkers(Set<String> markers) {
+        this.markers = markers;
+    }
 }

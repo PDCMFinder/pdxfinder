@@ -194,21 +194,26 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                 nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "PGR", "cytogenetics", "ImmunoHistoChemistry");
                 Marker pr = (Marker) nsdto.getNode(); //dataImportService.getMarker("PR", "PR");
 
-                MarkerAssociation her2a = new MarkerAssociation();
-                her2a.setMarker(her2);
+                MarkerAssociation ma = new MarkerAssociation();
+
+
+                MolecularData her2a = new MolecularData();
+                her2a.setMarker(her2.getHgncSymbol());
                 her2a.setCytogeneticsResult("negative");
 
-                MarkerAssociation era = new MarkerAssociation();
-                era.setMarker(er);
+                MolecularData era = new MolecularData();
+                era.setMarker(er.getHgncSymbol());
                 era.setCytogeneticsResult("negative");
 
-                MarkerAssociation pra = new MarkerAssociation();
-                pra.setMarker(pr);
+                MolecularData pra = new MolecularData();
+                pra.setMarker(pr.getHgncSymbol());
                 pra.setCytogeneticsResult("negative");
 
-                mc.addMarkerAssociation(her2a);
-                mc.addMarkerAssociation(era);
-                mc.addMarkerAssociation(pra);
+                ma.addMolecularData(her2a);
+                ma.addMolecularData(era);
+                ma.addMolecularData(pra);
+
+                mc.addMarkerAssociation(ma);
 
                 dto.getPatientSample().addMolecularCharacterization(mc);
             }

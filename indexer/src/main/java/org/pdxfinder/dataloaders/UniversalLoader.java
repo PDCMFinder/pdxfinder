@@ -1233,6 +1233,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
         //TODO: At some point deal with micro-satelite instability. Currently those rows are skipped. We don't want instability in our lives just yet.
 
         //first get all markers for the individual molchar objects
+        MarkerAssociation ma = new MarkerAssociation();
         for (List<String> dataRow : cytogeneticsSheetData) {
 
             String sampleId = dataRow.get(0);
@@ -1310,13 +1311,13 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     toBeCreatedMolcharNodes.put(molcharKey, molecularCharacterization);
                 }
 
+                MolecularData md = new MolecularData();
+                md.setMarker(marker.getHgncSymbol());
 
-                MarkerAssociation ma = new MarkerAssociation();
-                ma.setMarker(marker);
 
                 if (technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")) {
 
-                    ma.setCytogeneticsResult(markerStatus);
+                    md.setCytogeneticsResult(markerStatus);
                 }
                 //what if it is not ihc?
 

@@ -142,7 +142,7 @@ public class ModelIntegrationTest extends BaseTest {
         Marker marker = markerRepository.findBySymbol(markerSymbol);
 
         MarkerAssociation ma = new MarkerAssociation();
-        ma.setMarker(marker);
+        //ma.setMarker(marker);
         mc.setMarkerAssociations(Collections.singletonList(ma));
 
         Sample sample = new Sample("sample-1", tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false, group.getAbbreviation());

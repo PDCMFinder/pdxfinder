@@ -22,10 +22,13 @@ public class MarkerAssociation {
 
     private String data;
 
+    private List<MolecularData> molecularData = new ArrayList<>();
+
+
     public MarkerAssociation() {
     }
 
-    public List<MolecularData> getMolecularData() throws IOException {
+    public List<MolecularData> getMolecularDataFromDataString() throws IOException {
 
         List<MolecularData> molecularData = new ArrayList<>();
 
@@ -46,6 +49,13 @@ public class MarkerAssociation {
         data = new Gson().toJson(listData);
     }
 
+    public void setDataFromInternalList(){
+
+        data = new Gson().toJson(molecularData);
+        molecularData = null;
+    }
+
+
     public Long getId() {
         return id;
     }
@@ -60,5 +70,17 @@ public class MarkerAssociation {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public List<MolecularData> getMolecularData() {
+        return molecularData;
+    }
+
+    public void setMolecularData(List<MolecularData> molecularData) {
+        this.molecularData = molecularData;
+    }
+
+    public void addMolecularData(MolecularData md){
+        this.molecularData.add(md);
     }
 }
