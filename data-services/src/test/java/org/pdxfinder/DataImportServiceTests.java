@@ -35,7 +35,7 @@ public class DataImportServiceTests extends BaseTest {
     private static final String SEX = "Male";
     private static final String RACE = "Asian";
     private static final String ETHNICITY = "German";
-    private static final String ETHNICITY_ASSESSMENT = "NOT_SPECIFICED";
+    private static final String ETHNICITY_ASSESSMENT = "Not Specified";
 
     private static final String AGE_AT_COLLECTION = "99";
     private static final String COLLECTION_DATE = "TEST";
@@ -85,7 +85,7 @@ public class DataImportServiceTests extends BaseTest {
     @Test
     public void Given_GetPatientSnapshot4Param_When_ValidArg_Then_ReturnPSfromPatientWithEqualREF() {
 
-        Patient patientWithSnapshots = new Patient(EXTERNAL_ID, SEX, RACE, ETHNICITY, ETHNICITY_ASSESSMENT, GROUP);
+        Patient patientWithSnapshots = new Patient(EXTERNAL_ID, SEX, RACE, ETHNICITY,ETHNICITY_ASSESSMENT, GROUP);
 
         patientWithSnapshots.hasSnapshot(SNAPSHOT);
         SNAPSHOT.setPatient(patientWithSnapshots);

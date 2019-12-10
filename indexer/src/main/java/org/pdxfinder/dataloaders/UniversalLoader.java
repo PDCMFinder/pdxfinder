@@ -61,7 +61,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
 
-    public void initTemplates(String updogCurrDir) {
+    public void initTemplates(String updogCurrDir) throws Exception {
 
         log.info("******************************************************");
         log.info("* Initializing Sheet data                            *");
@@ -207,8 +207,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
      * Creates the provider group in the database
      */
     private void createDataSourceGroup() {
-
-        //TODO: this data has to come from the spreadsheet, I am using constants for now
 
         log.info("******************************************************");
         log.info("* Creating DataSource                                *");
@@ -502,8 +500,12 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
 
             //check if essential values are not empty
-            if (modelId.isEmpty() || hostStrainName.isEmpty() || hostStrainNomenclature.isEmpty() ||
-                    engraftmentSite.isEmpty() || engraftmentType.isEmpty() || engraftmentMaterial.isEmpty()) {
+
+
+
+
+            if ((modelId != null && modelId.isEmpty()) || (hostStrainName != null && hostStrainName.isEmpty()) || (hostStrainNomenclature != null &&hostStrainNomenclature.isEmpty()) ||
+                    (engraftmentSite != null && engraftmentSite.isEmpty()) || (engraftmentType != null && engraftmentType.isEmpty()) || (engraftmentMaterial != null && engraftmentMaterial.isEmpty())) {
 
                 log.error("Missing essential value in row: " + row);
                 row++;

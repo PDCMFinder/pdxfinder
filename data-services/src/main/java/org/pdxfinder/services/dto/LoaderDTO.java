@@ -100,10 +100,6 @@ public class LoaderDTO {
         this.ethnicity = ethnicity;
     }
 
-    public String getEthnicityAssessment() { return ethnicityAssessment; }
-
-    public void setEthnicityAssessment(String ethnicityAssessment) { this.ethnicityAssessment = ethnicityAssessment; }
-
     public String getStage() {
         return stage;
     }
@@ -366,6 +362,13 @@ public class LoaderDTO {
 
     public void setSkipModel(boolean skipModel) {
         this.skipModel = skipModel;
+    }
+    public String getEthnicityAssessment() {
+        return ethnicityAssessment;
+    }
+
+    public void setEthnicityAssessment(String ethnicityAssessment) {
+        this.ethnicityAssessment = ethnicityAssessment;
     }
 
 }

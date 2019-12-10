@@ -402,7 +402,7 @@ public class DataImportService {
 
 
 
-    public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String ethnicityAssessment, String age, Group group) {
+    public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity,String ethnicityAssessment, String age, Group group) {
 
 
         if(externalId == null || externalId.equals("")){
@@ -415,7 +415,7 @@ public class DataImportService {
 
         if (patient == null) {
 
-            patient = new Patient(externalId,sex,race,ethnicity, ethnicityAssessment,group);
+            patient = new Patient(externalId,sex,race,ethnicity,ethnicityAssessment,group);
 
             patientSnapshot = new PatientSnapshot(patient, age);
             patientSnapshotRepository.save(patientSnapshot);
@@ -498,14 +498,14 @@ public class DataImportService {
 
 
 
-    public Patient getPatient(String externalId, String sex, String race, String ethnicity, String ethnicityAssessment, Group group) {
+    public Patient getPatient(String externalId, String sex, String race, String ethnicity,String ethnicityAssessment, Group group) {
 
         Patient patient = patientRepository.findByExternalIdAndGroup(externalId, group);
 
         if (patient == null) {
             log.info("Patient '{}' not found. Creating", externalId);
 
-            patient = new Patient(externalId, sex, race, ethnicity, ethnicityAssessment, group);
+            patient = new Patient(externalId, sex, race, ethnicity,ethnicityAssessment, group);
 
             patientRepository.save(patient);
         }

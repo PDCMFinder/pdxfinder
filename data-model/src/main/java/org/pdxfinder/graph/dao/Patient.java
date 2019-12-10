@@ -50,7 +50,7 @@ public class Patient {
      * @param ethnicity The Patients origin either by birth e.g German or Spanish ancestry
      * @param group The source of the Patient's data (Provider)
      */
-    public Patient(String externalId, String sex, String race, String ethnicity, String ethnicityAssessment, Group group) {
+    public Patient(String externalId, String sex, String race, String ethnicity,String ethnicityAssessment, Group group) {
         this.externalId = externalId;
         this.sex = sex;
         this.race = race;
@@ -266,15 +266,6 @@ public class Patient {
 
         return latestPS;
     }
-
-    public String getEthnicityAssessment() {
-        return ethnicityAssessment;
-    }
-
-    public void setEthnicityAssessment(String ethnicityAssessment) {
-        this.ethnicityAssessment = ethnicityAssessment;
-    }
-
 
 }
 
