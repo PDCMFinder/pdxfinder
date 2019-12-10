@@ -166,7 +166,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
         Patient patient = dataImportService.getPatientWithSnapshots(dto.getPatientId(), providerDS);
 
         if(patient == null){
-            patient = dataImportService.createPatient(dto.getPatientId(), providerDS, dto.getGender(), "", Standardizer.getEthnicity(dto.getEthnicity()));
+            patient = dataImportService.createPatient(dto.getPatientId(), providerDS, dto.getGender(), "", Standardizer.getEthnicity(dto.getEthnicity()),dto.getEthnicityAssessment());
         }
         dto.setPatient(patient);
 

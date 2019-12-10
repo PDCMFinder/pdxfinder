@@ -49,7 +49,7 @@ public class PatientRepositoryTest extends BaseTest {
 
         Group group = groupRepository.findByNameAndType(extDsName, "Provider");
 
-        Patient femalePatient = new Patient("-9999", "F", null, null, group);
+        Patient femalePatient = new Patient("-9999", "F", null, null, null, group);
         patientRepository.save(femalePatient);
 
         Patient foundFemalePatient = patientRepository.findBySex("F").iterator().next();

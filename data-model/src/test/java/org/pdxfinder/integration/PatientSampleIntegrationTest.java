@@ -140,7 +140,7 @@ public class PatientSampleIntegrationTest extends BaseTest {
             Sample sample = new Sample("sample-" + i, tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false ,group.getAbbreviation());
             sampleRepository.save(sample);
 
-            Patient patient = new Patient(Double.toString(Math.pow(i, age)), sex, null, null, group);
+            Patient patient = new Patient(Double.toString(Math.pow(i, age)), sex, null, null, null, group);
             PatientSnapshot ps = new PatientSnapshot(patient, "67");
             patient.hasSnapshot(ps);
             Sample s = new Sample("test", tumorType, "adinocarcinoma", tissue, null, "Surgical Resection", "F", false,group.getAbbreviation());

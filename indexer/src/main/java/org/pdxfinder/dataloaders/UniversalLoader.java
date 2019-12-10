@@ -61,7 +61,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
 
-    public void initTemplates(String updogCurrDir) throws Exception {
+    public void initTemplates(String updogCurrDir) {
 
         log.info("******************************************************");
         log.info("* Initializing Sheet data                            *");
@@ -254,12 +254,13 @@ public class UniversalLoader extends UniversalLoaderOmic {
             String sex = patientRow.get(1);
             String cancerHistory = patientRow.get(2);
             String ethnicity = patientRow.get(3);
-            String firstDiagnosis = patientRow.get(4);
-            String ageAtFirstDiagnosis = patientRow.get(5);
+            String ethnicityAssessment = patientRow.get(4);
+            String firstDiagnosis = patientRow.get(5);
+            String ageAtFirstDiagnosis = patientRow.get(6);
 
             if (patientId != null && ds != null) {
 
-                Patient patient = dataImportService.createPatient(patientId, ds, sex, "", Standardizer.getEthnicity(ethnicity));
+                Patient patient = dataImportService.createPatient(patientId, ds, sex, "", Standardizer.getEthnicity(ethnicity),ethnicityAssessment);
                 patient.setCancerRelevantHistory(cancerHistory);
                 patient.setFirstDiagnosis(firstDiagnosis);
                 patient.setAgeAtFirstDiagnosis(ageAtFirstDiagnosis);

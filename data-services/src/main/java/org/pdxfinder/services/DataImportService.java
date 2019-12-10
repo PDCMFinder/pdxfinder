@@ -363,7 +363,7 @@ public class DataImportService {
     }
 
 
-    public Patient createPatient(String patientId, Group dataSource, String sex, String race, String ethnicity){
+    public Patient createPatient(String patientId, Group dataSource, String sex, String race, String ethnicity, String ethnicityAssessment){
 
         if(patientId == null || patientId.equals("")){
             log.warn("In DataImportService.createPatient() : the patientId is null or blank");
@@ -375,7 +375,7 @@ public class DataImportService {
         if(patient == null){
 
             log.info("Patient not found. Creating: " + patientId );
-            patient = new Patient(patientId,sex,race,ethnicity,dataSource);
+            patient = new Patient(patientId,sex,race,ethnicity,ethnicityAssessment, dataSource);
             patientRepository.save(patient);
         }
 
@@ -402,7 +402,7 @@ public class DataImportService {
 
 
 
-    public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, Group group) {
+    public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String ethnicityAssessment, String age, Group group) {
 
 
         if(externalId == null || externalId.equals("")){
@@ -415,7 +415,7 @@ public class DataImportService {
 
         if (patient == null) {
 
-            patient = new Patient(externalId,sex,race,ethnicity,group);
+            patient = new Patient(externalId,sex,race,ethnicity, ethnicityAssessment,group);
 
             patientSnapshot = new PatientSnapshot(patient, age);
             patientSnapshotRepository.save(patientSnapshot);
@@ -498,14 +498,14 @@ public class DataImportService {
 
 
 
-    public Patient getPatient(String externalId, String sex, String race, String ethnicity, Group group) {
+    public Patient getPatient(String externalId, String sex, String race, String ethnicity, String ethnicityAssessment, Group group) {
 
         Patient patient = patientRepository.findByExternalIdAndGroup(externalId, group);
 
         if (patient == null) {
             log.info("Patient '{}' not found. Creating", externalId);
 
-            patient = new Patient(externalId, sex, race, ethnicity, group);
+            patient = new Patient(externalId, sex, race, ethnicity, ethnicityAssessment, group);
 
             patientRepository.save(patient);
         }

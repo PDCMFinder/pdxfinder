@@ -13,6 +13,7 @@ public class LoaderDTO {
     private String diagnosis;
     private String patientId;
     private String ethnicity;
+    private String ethnicityAssessment;
     private String stage;
     private String grade;
     private String classification;
@@ -98,6 +99,10 @@ public class LoaderDTO {
     public void setEthnicity(String ethnicity) {
         this.ethnicity = ethnicity;
     }
+
+    public String getEthnicityAssessment() { return ethnicityAssessment; }
+
+    public void setEthnicityAssessment(String ethnicityAssessment) { this.ethnicityAssessment = ethnicityAssessment; }
 
     public String getStage() {
         return stage;
@@ -362,4 +367,5 @@ public class LoaderDTO {
     public void setSkipModel(boolean skipModel) {
         this.skipModel = skipModel;
     }
+
 }

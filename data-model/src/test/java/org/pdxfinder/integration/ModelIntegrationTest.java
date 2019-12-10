@@ -148,7 +148,7 @@ public class ModelIntegrationTest extends BaseTest {
         Sample sample = new Sample("sample-1", tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false, group.getAbbreviation());
         sampleRepository.save(sample);
 
-        Patient patient = new Patient("patient_id_1", "F", null, null, group);
+        Patient patient = new Patient("patient_id_1", "F", null, null,null, group);
         PatientSnapshot ps = new PatientSnapshot(patient, "67");
         patient.hasSnapshot(ps);
 
