@@ -182,6 +182,7 @@ public class UniversalDataExporter {
             String sex = patient.getSex();
             String cancerHistory = patient.getCancerRelevantHistory();
             String ethnicity = patient.getEthnicity();
+            String ethnicityAssessment = patient.getEthnicityAssessment();
             String firstDiagnosis = patient.getFirstDiagnosis();
             String ageAtFirstDiagnosis = patient.getAgeAtFirstDiagnosis();
 
@@ -189,6 +190,7 @@ public class UniversalDataExporter {
             dataRow.add(sex);
             dataRow.add(cancerHistory);
             dataRow.add(ethnicity);
+            dataRow.add(ethnicityAssessment);
             dataRow.add(firstDiagnosis);
             dataRow.add(ageAtFirstDiagnosis);
 
