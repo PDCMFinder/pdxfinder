@@ -24,6 +24,7 @@ public class Patient {
     private String sex;
     private String race;
     private String ethnicity;
+    private String ethnicityAssessment;
     private String dataSource;
     private String cancerRelevantHistory;
     private String firstDiagnosis;
@@ -302,6 +303,14 @@ public class Patient {
 
         if(snapshots == null) snapshots = new HashSet<>();
         snapshots.add(ps);
+    }
+
+    public String getEthnicityAssessment() {
+        return ethnicityAssessment;
+    }
+
+    public void setEthnicityAssessment(String ethnicityAssessment) {
+        this.ethnicityAssessment = ethnicityAssessment;
     }
 
 }
