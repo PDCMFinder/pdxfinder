@@ -254,14 +254,12 @@ public class UniversalLoader extends UniversalLoaderOmic {
             String sex = patientRow.get(1);
             String cancerHistory = patientRow.get(2);
             String ethnicity = patientRow.get(3);
-            String ethnicityAssessment = patientRow.get(4);
-            String firstDiagnosis = patientRow.get(5);
-            String ageAtFirstDiagnosis = patientRow.get(6);
+            String firstDiagnosis = patientRow.get(4);
+            String ageAtFirstDiagnosis = patientRow.get(5);
 
             if (patientId != null && ds != null) {
 
                 Patient patient = dataImportService.createPatient(patientId, ds, sex, "", Standardizer.getEthnicity(ethnicity));
-                patient.setEthnicityAssessment(ethnicityAssessment);
                 patient.setCancerRelevantHistory(cancerHistory);
                 patient.setFirstDiagnosis(firstDiagnosis);
                 patient.setAgeAtFirstDiagnosis(ageAtFirstDiagnosis);

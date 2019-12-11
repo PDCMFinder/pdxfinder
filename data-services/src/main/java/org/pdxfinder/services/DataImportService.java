@@ -184,12 +184,6 @@ public class DataImportService {
         return g;
     }
 
-    public Group findProviderGroupByAbbrev(String abbrev){
-
-        return groupRepository.findByAbbrevAndType(abbrev, "Provider");
-    }
-
-
     public Group getPublicationGroup(String publicationId){
 
         Group g = groupRepository.findByPubmedIdAndType(publicationId, "Publication");
@@ -303,13 +297,6 @@ public class DataImportService {
         return true;
     }
 
-
-    public ModelCreation findModelBySample(Sample sample){
-
-        return modelCreationRepository.findBySample(sample);
-    }
-
-
     public Collection<ModelCreation> findAllModelsPlatforms(){
 
         return modelCreationRepository.findAllModelsPlatforms();
@@ -328,26 +315,6 @@ public class DataImportService {
     public Collection<ModelCreation> findAllModels(){
 
         return this.modelCreationRepository.findAllModels();
-    }
-
-    public List<ModelCreation> findModelsWithSpecimensAndQAByDS(String ds){
-
-        return this.modelCreationRepository.findModelsWithSpecimensAndQAByDS(ds);
-    }
-
-    public List<ModelCreation> findModelXenograftPlatformSampleByDS(String ds){
-
-        return modelCreationRepository.findModelPlatformSampleByDS(ds);
-    }
-
-    public ModelCreation findModelWithMolecularDataByDSAndIdAndMolcharType(String dataSource, String modelId, String molcharType){
-
-        return modelCreationRepository.findModelWithMolecularDataByDSAndIdAndMolcharType(dataSource, modelId, molcharType);
-    }
-
-    public List<ModelCreation> findModelsWithSharingAndContactByDS(String ds){
-
-        return modelCreationRepository.findModelsWithSharingAndContactByDS(ds);
     }
 
     public ModelCreation findModelByIdAndDataSource(String modelId, String dataSource){
@@ -420,10 +387,6 @@ public class DataImportService {
         return patientRepository.findByExternalIdAndGroupWithSnapshots(patientId, group);
     }
 
-    public List<Patient> findPatientsByGroup(Group ds){
-
-        return patientRepository.findByGroup(ds);
-    }
 
     public void savePatient(Patient patient){
 
@@ -437,11 +400,6 @@ public class DataImportService {
 
     }
 
-
-    public List<Patient> findPatientTumorAtCollectionDataByDS(Group ds){
-
-        return patientRepository.findPatientTumorAtCollectionDataByDS(ds);
-    }
 
 
     public PatientSnapshot getPatientSnapshot(String externalId, String sex, String race, String ethnicity, String age, Group group) {
@@ -591,7 +549,7 @@ public class DataImportService {
         TumorType type = this.getTumorType(typeStr);
         Tissue origin = this.getTissue(originStr);
         Tissue sampleSite = this.getTissue(sampleSiteStr);
-        Sample sample = sampleRepository.findHumanSampleBySampleIdAndDataSource(sourceSampleId, dataSource);
+        Sample sample = sampleRepository.findBySourceSampleIdAndDataSource(sourceSampleId, dataSource);
 
         String updatedDiagnosis = diagnosis;
 

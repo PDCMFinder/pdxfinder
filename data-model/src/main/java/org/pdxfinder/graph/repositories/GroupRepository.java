@@ -16,9 +16,6 @@ public interface GroupRepository extends PagingAndSortingRepository<Group, Long>
     @Query("MATCH (g:Group) WHERE g.name = {name} AND g.type = {type} RETURN g")
     Group findByNameAndType(@Param("name") String name, @Param("type") String type);
 
-    @Query("MATCH (g:Group) WHERE g.abbreviation = {abbrev} AND g.type = {type} RETURN g")
-    Group findByAbbrevAndType(@Param("abbrev") String abbrev, @Param("type") String type);
-
     @Query("MATCH (g:Group) WHERE g.pubMedId = {pubMedId} AND g.type = {type} RETURN g")
     Group findByPubmedIdAndType(@Param("pubMedId") String pubMedId, @Param("type") String type);
 

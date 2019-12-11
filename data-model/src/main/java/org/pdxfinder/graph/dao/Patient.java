@@ -1,10 +1,10 @@
+
 package org.pdxfinder.graph.dao;
 
+import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,8 +15,7 @@ import java.util.Set;
 @NodeEntity
 public class Patient {
 
-    @Id
-    @GeneratedValue
+    @GraphId
     private Long id;
 
 
@@ -24,7 +23,6 @@ public class Patient {
     private String sex;
     private String race;
     private String ethnicity;
-    private String ethnicityAssessment;
     private String dataSource;
     private String cancerRelevantHistory;
     private String firstDiagnosis;
@@ -39,7 +37,7 @@ public class Patient {
     /**
      * Empty constructor required as of Neo4j API 2.0.5
      */
-    public Patient() {
+    private Patient() {
 
     }
 
@@ -175,10 +173,8 @@ public class Patient {
 
     public Group getProviderGroup(){
 
-        if(groups == null) return null;
-
         for(Group g : groups){
-            if(g.getType().equals("Provider")) return g;
+            if(g != null && g.getType().equals("Provider")) return g;
         }
 
         return null;
@@ -245,72 +241,28 @@ public class Patient {
 
         if(snapshots == null) return null;
 
-        PatientSnapshot latestPSByAge = getLastSnapshotByAge();
-        PatientSnapshot latestPSByDate = getLastSnapshotByDate();
-
-        if(latestPSByAge != null ) {
-
-            return latestPSByAge;
-        }
-        else return latestPSByDate;
-
-    }
-
-
-    private PatientSnapshot getLastSnapshotByAge(){
-
-        PatientSnapshot latestPSByAge = null;
-
+        PatientSnapshot latestPS = null;
         for(PatientSnapshot ps: snapshots){
 
-            if(latestPSByAge == null){
-                latestPSByAge = ps;
+            if(latestPS == null){
+                latestPS = ps;
             }
             else{
-                if(latestPSByAge.getAgeAtCollection() != null && ps.getAgeAtCollection() != null && latestPSByAge.getAgeAtCollection().compareTo(ps.getAgeAtCollection()) < 0){
+                //compare age at collection
+                if(latestPS.getAgeAtCollection().compareTo(ps.getAgeAtCollection()) < 0 ){
 
-                    latestPSByAge = ps;
+                    latestPS = ps;
+                }
+                //compare date collection
+                else if(latestPS.getDateAtCollection().compareTo(ps.getDateAtCollection()) < 0){
+
+                    latestPS = ps;
                 }
             }
+
         }
 
-        return latestPSByAge;
-    }
-
-    private PatientSnapshot getLastSnapshotByDate(){
-
-        PatientSnapshot latestPSByDate = null;
-
-        for(PatientSnapshot ps: snapshots){
-
-            if(latestPSByDate == null){
-                latestPSByDate = ps;
-            }
-            else{
-                if(latestPSByDate.getDateAtCollection() != null && ps.getDateAtCollection() != null && latestPSByDate.getDateAtCollection().compareTo(ps.getDateAtCollection()) < 0){
-
-                    latestPSByDate = ps;
-                }
-            }
-        }
-
-        return latestPSByDate;
-    }
-
-
-
-    public void addSnapshot(PatientSnapshot ps){
-
-        if(snapshots == null) snapshots = new HashSet<>();
-        snapshots.add(ps);
-    }
-
-    public String getEthnicityAssessment() {
-        return ethnicityAssessment;
-    }
-
-    public void setEthnicityAssessment(String ethnicityAssessment) {
-        this.ethnicityAssessment = ethnicityAssessment;
+        return latestPS;
     }
 
 }

@@ -1,9 +1,8 @@
 package org.pdxfinder.graph.dao;
 
+import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 
 /**
  * Created by csaba on 25/04/2017.
@@ -11,9 +10,8 @@ import javax.persistence.Id;
 @NodeEntity
 public class MarkerAssociation {
 
-    @Id
-    @GeneratedValue
-    private Long id;
+    @GraphId
+    Long id;
 
     String description;
 

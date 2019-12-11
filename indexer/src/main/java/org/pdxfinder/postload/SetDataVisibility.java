@@ -47,6 +47,8 @@ public class SetDataVisibility implements CommandLineRunner{
 
             log.info("Applying data visibility rules");
 
+
+            applyDataVisibilityRules("IRCC-GC");
             applyDataVisibilityRules("CRL");
         }
 
