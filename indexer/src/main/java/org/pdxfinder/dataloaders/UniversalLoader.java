@@ -503,8 +503,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
 
             //check if essential values are not empty
-            if (modelId.isEmpty() || hostStrainName.isEmpty() || hostStrainNomenclature.isEmpty() ||
-                    engraftmentSite.isEmpty() || engraftmentType.isEmpty() || engraftmentMaterial.isEmpty()) {
+            if (isNullOrEmpty(modelId) || isNullOrEmpty(hostStrainName) || isNullOrEmpty(hostStrainNomenclature) ||
+                    isNullOrEmpty(engraftmentSite) || isNullOrEmpty(engraftmentType) || isNullOrEmpty(engraftmentMaterial)) {
 
                 log.error("Missing essential value in row: " + row);
                 row++;
@@ -543,58 +543,63 @@ public class UniversalLoader extends UniversalLoaderOmic {
             }
 
             // passage = 1,3,5
-            if (passage.contains(",")) {
+            if (passage != null) {
+                if (passage.contains(",")) {
 
-                String[] passageArr = passage.split(",");
+                    String[] passageArr = passage.split(",");
 
-                for (int i = 0; i < passageArr.length; i++) {
+                    for (int i = 0; i < passageArr.length; i++) {
+
+                        //create specimens with engraftment data
+                        Specimen specimen = new Specimen();
+                        specimen.setPassage(passageArr[i].trim());
+                        specimen.setEngraftmentSite(es);
+                        specimen.setEngraftmentType(et);
+                        specimen.setEngraftmentMaterial(em);
+                        specimen.setHostStrain(hostStrain);
+
+                        model.addSpecimen(specimen);
+                    }
+                }
+                //the passage is a single number
+                else if (passage.matches("\\d+")) {
+
+                    //need this trick to get rid of fractures if there is any
+                    int passageInt = Integer.parseInt(passage);
+                    passage = String.valueOf(passageInt);
 
                     //create specimens with engraftment data
                     Specimen specimen = new Specimen();
-                    specimen.setPassage(passageArr[i].trim());
+                    specimen.setPassage(passage);
                     specimen.setEngraftmentSite(es);
                     specimen.setEngraftmentType(et);
                     specimen.setEngraftmentMaterial(em);
                     specimen.setHostStrain(hostStrain);
 
                     model.addSpecimen(specimen);
+
+                } else if (passage.matches("[+-]?([0-9]*[.])?[0-9]+")) {
+
+                    //need this trick to get rid of fractures if there is any
+                    double passageDouble = Double.parseDouble(passage);
+                    passage = String.valueOf((int) passageDouble);
+
+                    //create specimens with engraftment data
+                    Specimen specimen = new Specimen();
+                    specimen.setPassage(passage);
+                    specimen.setEngraftmentSite(es);
+                    specimen.setEngraftmentType(et);
+                    specimen.setEngraftmentMaterial(em);
+                    specimen.setHostStrain(hostStrain);
+
+                    model.addSpecimen(specimen);
+                } else {
+
+                    log.error("Not supported value(" + passage + ") for passage at row " + row);
                 }
             }
-            //the passage is a single number
-            else if (passage.matches("\\d+")) {
-
-                //need this trick to get rid of fractures if there is any
-                int passageInt = Integer.parseInt(passage);
-                passage = String.valueOf(passageInt);
-
-                //create specimens with engraftment data
-                Specimen specimen = new Specimen();
-                specimen.setPassage(passage);
-                specimen.setEngraftmentSite(es);
-                specimen.setEngraftmentType(et);
-                specimen.setEngraftmentMaterial(em);
-                specimen.setHostStrain(hostStrain);
-
-                model.addSpecimen(specimen);
-
-            } else if (passage.matches("[+-]?([0-9]*[.])?[0-9]+")) {
-
-                //need this trick to get rid of fractures if there is any
-                double passageDouble = Double.parseDouble(passage);
-                passage = String.valueOf((int)passageDouble);
-
-                //create specimens with engraftment data
-                Specimen specimen = new Specimen();
-                specimen.setPassage(passage);
-                specimen.setEngraftmentSite(es);
-                specimen.setEngraftmentType(et);
-                specimen.setEngraftmentMaterial(em);
-                specimen.setHostStrain(hostStrain);
-
-                model.addSpecimen(specimen);
-            } else {
-
-                log.error("Not supported value(" + passage + ") for passage at row " + row);
+            else {
+                log.error("Null essential value of passage in row " + row);
             }
 
             //CREATE PUBLICATION GROUPS
@@ -630,6 +635,11 @@ public class UniversalLoader extends UniversalLoaderOmic {
     /**
      * Targets existing model to add validation (QA) nodes
      */
+    private Boolean isNullOrEmpty(String stringToCheck){
+        return (stringToCheck == null || stringToCheck.isEmpty());
+    }
+
+
     private void createPdxModelValidations() {
 
         if (stopLoading) return;
