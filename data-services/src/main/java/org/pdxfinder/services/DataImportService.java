@@ -489,7 +489,7 @@ public class DataImportService {
         return patientSnapshot;
     }
 
-    public PatientSnapshot getPatientSnapshot(Patient patient, String ageAtCollection, String collectionDate, String collectionEvent, String ellapsedTime){
+    public PatientSnapshot getPatientSnapshot(Patient patient, String ageAtCollection, String collectionDate, String collectionEvent, String elapsedTime){
 
         PatientSnapshot ps;
 
@@ -497,18 +497,23 @@ public class DataImportService {
 
             for(PatientSnapshot psnap : patient.getSnapshots()){
 
-                if(psnap.getAgeAtCollection().equals(ageAtCollection) && psnap.getDateAtCollection().equals(collectionDate) &&
-                        psnap.getCollectionEvent().equals(collectionEvent) && psnap.getElapsedTime().equals(ellapsedTime)){
+               boolean doesAgeAtCollectionMatch = psnap.getAgeAtCollection() != null && psnap.getAgeAtCollection().equals(ageAtCollection);
+               boolean doesDateAtCollectionMatch =  psnap.getDateAtCollection() != null && psnap.getDateAtCollection().equals(collectionDate);
+               boolean doesCollectionEvenMatch = psnap.getCollectionEvent() != null && psnap.getCollectionEvent().equals(collectionEvent);
+               boolean doesElapsedTimeMatch = psnap.getElapsedTime() != null && psnap.getElapsedTime().equals(elapsedTime);
+
+                if(doesAgeAtCollectionMatch && doesDateAtCollectionMatch &&
+                        doesCollectionEvenMatch && doesElapsedTimeMatch){
 
                     return psnap;
                 }
 
             }
 
-            //ps = patient.getSnapShotByCollection(ageAtCollection, collectionDate, collectionEvent, ellapsedTime);
+            //ps = patient.getSnapShotByCollection(ageAtCollection, collectionDate, collectionEvent, elapsedTime);
         }
         //create new snapshot and save it with the patient
-        ps = new PatientSnapshot(patient, ageAtCollection, collectionDate, collectionEvent, ellapsedTime);
+        ps = new PatientSnapshot(patient, ageAtCollection, collectionDate, collectionEvent, elapsedTime);
         patient.hasSnapshot(ps);
         ps.setPatient(patient);
         patientRepository.save(patient);
