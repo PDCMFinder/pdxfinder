@@ -11,7 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.nio.file.Files;
 
 
 /*
@@ -103,7 +106,7 @@ public class UniversalDataExporter {
 
     }
 
-    public void export(String exportDir){
+    public void export(String exportDir) throws IOException {
 
         XSSFWorkbook metadataWorkbook = getWorkbook(templateDir+"/metadata_template.xlsx");
         XSSFWorkbook samplePlatformWorkbook = getWorkbook(templateDir+"/sampleplatform_template.xlsx");
@@ -135,28 +138,40 @@ public class UniversalDataExporter {
 
         // Write the output to a new file
         FileOutputStream fileOut = null;
+
+        Path exportProviderDir = Paths.get(exportDir +"/"+ ds.getAbbreviation());
+        if (!Files.exists(exportProviderDir)){
+            Files.createDirectory(exportProviderDir);
+        }
+
         try {
 
             if(metadataWorkbook != null){
-                fileOut = new FileOutputStream(exportDir+"/metadata_export.xlsx");
+                fileOut = new FileOutputStream(exportProviderDir+"/metadata.xlsx");
                 metadataWorkbook.write(fileOut);
                 fileOut.close();
             }
 
             if(samplePlatformWorkbook != null){
-                fileOut = new FileOutputStream(exportDir+"/sampleplatform_export.xlsx");
+                fileOut = new FileOutputStream(exportProviderDir+"/sampleplatform.xlsx");
                 samplePlatformWorkbook.write(fileOut);
                 fileOut.close();
             }
 
             if(mutationWorkbook != null){
-                fileOut = new FileOutputStream(exportDir+"/mutation_export.xlsx");
+                if (!Files.exists(Paths.get(exportProviderDir + "/mut"))){
+                    Files.createDirectory(Paths.get(exportProviderDir + "/mut"));
+                }
+                fileOut = new FileOutputStream(exportProviderDir+"/mut/data.xlsx");
                 mutationWorkbook.write(fileOut);
                 fileOut.close();
             }
 
             if(cnaWorkbook != null){
-                fileOut = new FileOutputStream(exportDir+"/cna_export.xlsx");
+                if (!Files.exists(Paths.get(exportProviderDir + "/cna"))){
+                    Files.createDirectory(Paths.get(exportProviderDir + "/cna"));
+                }
+                fileOut = new FileOutputStream(exportProviderDir+"/cna/data.xlsx");
                 cnaWorkbook.write(fileOut);
                 fileOut.close();
             }
