@@ -11,9 +11,18 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class DataExportTest extends BaseTest {
@@ -193,6 +202,58 @@ public class DataExportTest extends BaseTest {
 
         Assert.assertEquals("2", sheet1.getRow(0).getCell(1).getStringCellValue());
     }
+
+    @Test
+    public void Given_dataIsReadyToExport_When_exportIsCalled_Then_createCorrectFileStructure() throws IOException {
+
+        Path metaData = Paths.get( "/tmp/metadata_template.xlsx");
+        Path samplePlatform = Paths.get("/tmp/sampleplatform_template.xlsx" );
+        Path mutation = Paths.get("/tmp/mutation_template.xlsx");
+        Path cnaTemplate = Paths.get("/tmp/cna_template.xlsx");
+
+        Workbook metaDataXlsx = new XSSFWorkbook();
+        Workbook samplePlatformXlsx = new XSSFWorkbook();
+        Workbook mutationXlsx = new XSSFWorkbook();                                                           
+        Workbook cnaTemplateXlsx = new XSSFWorkbook();
+
+        for(int i = 0; i < 7; i++) {
+            metaDataXlsx.createSheet(String.format("%s", i));
+        }
+
+        samplePlatformXlsx.createSheet("0");
+        mutationXlsx.createSheet("0");
+        cnaTemplateXlsx.createSheet("0");
+
+        metaDataXlsx.write(new FileOutputStream(metaData.toFile()));
+        samplePlatformXlsx.write(new FileOutputStream(samplePlatform.toFile()));
+        mutationXlsx.write(new FileOutputStream(mutation.toFile()));
+        cnaTemplateXlsx.write(new FileOutputStream(cnaTemplate.toFile()));
+
+        try {
+            universalDataExporter.setTemplateDir("/tmp");
+            universalDataExporter.setDs(providerGroup);
+            universalDataExporter.initPatientData();
+            universalDataExporter.export("/tmp");
+        } finally {
+
+            Files.delete(metaData);
+            Files.delete(samplePlatform);
+            Files.delete(mutation);
+            Files.delete(cnaTemplate);
+        }
+
+        Path expectedProviderDir = Paths.get("/tmp/TG");
+        Path expectedCnaDir = Paths.get("/tmp/TG/cna");
+        Path expectedMutDir = Paths.get("/tmp/TG/mut");
+        Path expectedMetaData = Paths.get("/tmp/TG/metadata.xlsx");
+
+        Assert.assertTrue(expectedProviderDir.toFile().exists());
+        Assert.assertTrue(expectedCnaDir.toFile().exists());
+        Assert.assertTrue(expectedMutDir.toFile().exists());
+        Assert.assertTrue(expectedMetaData.toFile().exists());
+
+    }
+
 
 
 
