@@ -1,16 +1,16 @@
 package org.pdxfinder.dataloaders;
 
 import org.apache.poi.ss.usermodel.Workbook;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.pdxfinder.BaseTest;
+import org.pdxfinder.dataloaders.updog.PdxDataTable;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class UniversalLoaderTest extends BaseTest {
 
@@ -19,12 +19,11 @@ public class UniversalLoaderTest extends BaseTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    @InjectMocks
-    private UniversalLoader loader;
+    @InjectMocks private UniversalLoader loader;
 
     @Test
     public void Given_BaseFilePathContainsTrailingSlash_WhenLoading_PathIsCleaned() {
-        Assert.assertEquals("file/path", UniversalLoader.stripTrailingSlash("file/path/"));
+        assertEquals("file/path", UniversalLoader.stripTrailingSlash("file/path/"));
     }
 
     @Test
