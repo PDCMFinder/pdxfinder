@@ -140,7 +140,7 @@ public class UniversalDataExporter {
         FileOutputStream fileOut = null;
 
         Path exportProviderDir = Paths.get(exportDir +"/"+ ds.getAbbreviation());
-        if (!Files.exists(exportProviderDir)){
+        if (!exportProviderDir.toFile().exists()){
             Files.createDirectory(exportProviderDir);
         }
 
@@ -159,7 +159,7 @@ public class UniversalDataExporter {
             }
 
             if(mutationWorkbook != null){
-                if (!Files.exists(Paths.get(exportProviderDir + "/mut"))){
+                if (!Paths.get(exportProviderDir + "/mut").toFile().exists()){
                     Files.createDirectory(Paths.get(exportProviderDir + "/mut"));
                 }
                 fileOut = new FileOutputStream(exportProviderDir+"/mut/data.xlsx");
@@ -168,7 +168,7 @@ public class UniversalDataExporter {
             }
 
             if(cnaWorkbook != null){
-                if (!Files.exists(Paths.get(exportProviderDir + "/cna"))){
+                if (!Paths.get(exportProviderDir + "/cna").toFile().exists()){
                     Files.createDirectory(Paths.get(exportProviderDir + "/cna"));
                 }
                 fileOut = new FileOutputStream(exportProviderDir+"/cna/data.xlsx");
