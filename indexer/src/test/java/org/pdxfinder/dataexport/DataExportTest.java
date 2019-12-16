@@ -245,10 +245,12 @@ public class DataExportTest extends BaseTest {
         Path expectedProviderDir = Paths.get("/tmp/TG");
         Path expectedCnaDir = Paths.get("/tmp/TG/cna");
         Path expectedMutDir = Paths.get("/tmp/TG/mut");
+        Path expectedMetaData = Paths.get("/tmp/TG/metadata.xlsx");
 
         Assert.assertTrue(expectedProviderDir.toFile().exists());
         Assert.assertTrue(expectedCnaDir.toFile().exists());
         Assert.assertTrue(expectedMutDir.toFile().exists());
+        Assert.assertTrue(expectedMetaData.toFile().exists());
 
     }
 
