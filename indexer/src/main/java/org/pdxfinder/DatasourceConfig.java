@@ -47,7 +47,7 @@ public class DatasourceConfig {
             .setDriverClassName("org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver")
             .setURI(embeddedDataDir);
     config.autoIndexConfiguration().setAutoIndex("assert");
-    return new SessionFactory(config, "org.pdxfinder");
+    return new SessionFactory(config, "org.pdxfinder.*");
   }
 
 
