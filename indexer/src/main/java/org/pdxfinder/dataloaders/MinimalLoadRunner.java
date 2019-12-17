@@ -13,11 +13,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextAware {
 
-    @Value("${pdxfinder.root.dir}") private String finderRootDir;
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     @Override
     public void run(String... args) throws Exception {
         OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
         parser.accepts("loadUniversalRefactor");
         OptionSet options = parser.parse(args);
         finderRootDir = UniversalLoader.stripTrailingSlash(finderRootDir);
