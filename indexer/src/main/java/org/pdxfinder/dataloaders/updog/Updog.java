@@ -1,9 +1,8 @@
 package org.pdxfinder.dataloaders.updog;
 
-import com.ibm.icu.impl.LocaleDisplayNamesImpl;
-import org.hibernate.sql.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.tablesaw.api.Table;
 
 import java.util.Map;
 
@@ -17,15 +16,18 @@ public class Updog {
 
     private static final Logger log = LoggerFactory.getLogger(Updog.class);
 
-    private Map<String, PdxDataTable> pdxDataTables;
+    private Map<String, Table> pdxDataTables;
     private Map<String, Object> domainObjects;
 
+    public void run() {
+        readPdxDataTable();
+//        validateTemplate();
+//        load();
+    }
 
     private void readPdxDataTable() {
-
-
-        PdxDataTable pdxDataTables = new PdxDataTable(provider);
-        pdxDataTables.readData();
+        TemplateReader templateReader = new TemplateReader(provider);
+        pdxDataTables = templateReader.read();
     }
 
     public boolean validateTemplate(){

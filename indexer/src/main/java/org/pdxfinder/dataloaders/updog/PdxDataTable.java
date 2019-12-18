@@ -10,11 +10,8 @@ import java.io.IOException;
 
 public class PdxDataTable {
 
-    private static String provider;
-    private static File dataDirectory;
-
-
-    private Table patient;
+    private String provider;
+    private final String[] ignoredFilenames = new String[]{"checklist"};
 
     private final static Logger log = LoggerFactory.getLogger(PdxDataTable.class);
 
@@ -22,37 +19,19 @@ public class PdxDataTable {
         this.provider = provider;
     }
 
-    public void readData() {
-         readPatient(dataDirectory);
+    public static Table readTsvFile(File file) {
+        Table dataTable = Table.create();
+        try { dataTable = readTsv(file); }
+        catch (IOException e) { log.error("There was an error reading the file" , e); }
+        return dataTable;
     }
 
-    void readPatient(File updogDirectory) {
-        try {
-            File file;
-            file = new File(updogDirectory + provider );
-            Table dataTable = readTsv(file);
-            setPatient(dataTable);
-        }
-        catch (IOException e) {
-            log.error("There was an error reading the file" , e);
-        }
-    }
-
-    Table readTsv(File file) throws IOException {
+    public static Table readTsv(File file) throws IOException {
         CsvReadOptions.Builder builder = CsvReadOptions
             .builder(file)
             .separator('\t');
         CsvReadOptions options = builder.build();
-        Table dataTable = Table.read().usingOptions(options);
-        return dataTable;
-    }
-
-    public Table getPatient() {
-        return patient;
-    }
-
-    public void setPatient(Table patient) {
-        this.patient = patient;
+        return Table.read().usingOptions(options);
     }
 
 }
