@@ -2,9 +2,9 @@ package org.pdxfinder.dataloaders.updog;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.tablesaw.api.Table;
 
 import java.util.Map;
-import java.util.Set;
 
 public class Updog {
 
@@ -16,18 +16,21 @@ public class Updog {
 
     private static final Logger log = LoggerFactory.getLogger(Updog.class);
 
-    private Map<String, PdxDataTable> pdxDataTables;
-    private Map<String, Set<Object>> domainObjects;
+    private Map<String, Table> pdxDataTables;
+    private Map<String, Object> domainObjects;
 
-
-    private void readPdxDataTable() {
-
-
-        PdxDataTable pdxDataTables = new PdxDataTable(provider);
-        pdxDataTables.readData();
+    public void run() {
+        readPdxDataForProvider();
+        validatePdxDataTables();
+        load();
     }
 
-    public boolean validateTemplate(){
+    private void readPdxDataForProvider() {
+        TemplateReader templateReader = new TemplateReader(provider);
+        pdxDataTables = templateReader.read();
+    }
+
+    public boolean validatePdxDataTables(){
 
         //instantiate a validator class
         TemplateValidator templateValidator = new TemplateValidator();
@@ -38,7 +41,7 @@ public class Updog {
     public void load(){
 
         //create domain objects database nodes
-        DomainObjectCreator doc = new DomainObjectCreator(pdxDataTables);
+        DomainObjectCreator doc = new DomainObjectCreator();
         //save db
 
 

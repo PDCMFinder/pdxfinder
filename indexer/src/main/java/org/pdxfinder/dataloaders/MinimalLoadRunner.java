@@ -29,6 +29,7 @@ public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextA
 
         if (options.has("loadUniversalRefactor")) {
             Updog updog = new Updog(provider);
+            updog.run();
         }
     }
 
