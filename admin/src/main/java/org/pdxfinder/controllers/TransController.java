@@ -133,7 +133,7 @@ public class TransController {
 
         String omicFile= System.getProperty("user.home") + "/Downloads/NGS-LOADER/ncicancergenepaneldata_MARCH2019.csv";
 
-        List<Map<String, String>> dataList = utilityService.serializeCSVToMaps(omicFile);
+        List<Map<String, String>> dataList = utilityService.serializeCSVToMaps(omicFile, ",");
 
 
         List removedList = new ArrayList();
@@ -492,7 +492,7 @@ public class TransController {
 
             log.info(source);
 
-            List<Map<String, String>> dataList = utilityService.serializeCSVToMaps(source);
+            List<Map<String, String>> dataList = utilityService.serializeCSVToMaps(source, ",");
 
 
             String modelID = "";

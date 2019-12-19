@@ -87,6 +87,9 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 String singleDataCsv = omicDataRootDirUrl + "/data.csv";
                 File singleDataCsvFile = new File(singleDataCsv);
 
+                String singleDataTsv = omicDataRootDirUrl + "/data.tsv";
+                File singleDataTsvFile = new File(singleDataTsv);
+
                 //look for modelid.json
                 String modelDataJson = omicDataRootDirUrl + "/" + modelCreation.getSourcePdxId() + ".json";
                 File modelDataJsonFile = new File(modelDataJson);
@@ -94,6 +97,9 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 //look for modelid.csv
                 String modelDataCsv = omicDataRootDirUrl + "/" + modelCreation.getSourcePdxId() + ".csv";
                 File modelDataCsvFile = new File(modelDataCsv);
+
+                String modelDataTsv = omicDataRootDirUrl + "/" + modelCreation.getSourcePdxId() + ".tsv";
+                File modelDataTsvFile = new File(modelDataTsv);
 
                 if(singleDataXlsFile.exists()){
 
@@ -105,11 +111,21 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                     Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(singleDataCsv,omicModelID);
                     dataList = fullData.get(modelCreation.getSourcePdxId());
                 }
+                else if(singleDataTsvFile.exists()){
+
+                    Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(singleDataCsv,omicModelID);
+                    dataList = fullData.get(modelCreation.getSourcePdxId());
+                }
+
                 else if(singleDataJsonFile.exists()){
 
                     Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(singleDataJson,omicModelID);
                     dataList = fullData.get(modelCreation.getSourcePdxId());
                 }
+                else if(modelDataTsvFile.exists()){
+                    dataList = utilityService.serializeDataToMaps(modelDataTsv);
+                }
+
                 else if(modelDataJsonFile.exists()){
 
                     dataList = utilityService.serializeDataToMaps(modelDataJson);
