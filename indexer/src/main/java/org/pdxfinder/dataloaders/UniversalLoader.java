@@ -689,24 +689,27 @@ public class UniversalLoader extends UniversalLoaderOmic {
             }
 
             //need this trick to get rid of 0.0 if there is any
-            String[] passageArr = passages.split(",");
-            passages = "";
+            if(passages != null) {
+                String[] passageArr = passages.split(",");
+                passages = "";
 
-            for (int i = 0; i < passageArr.length; i++) {
+                for (int i = 0; i < passageArr.length; i++) {
 
-                String pass;
-                try {
-                    int passageInt = (int) Float.parseFloat(passageArr[i]);
-                    pass = String.valueOf(passageInt);
-                } catch (NumberFormatException | NullPointerException nfe) {
+                    String pass;
+                    try {
+                        int passageInt = (int) Float.parseFloat(passageArr[i]);
+                        pass = String.valueOf(passageInt);
+                    } catch (NumberFormatException | NullPointerException nfe) {
 
-                    pass = passageArr[i];
+                        pass = passageArr[i];
+                    }
+
+                    passages += pass + ",";
                 }
-
-                passages += pass + ",";
+                //remove that last comma
+                passages = passages.substring(0, passages.length() - 1);
             }
-            //remove that last comma
-            passages = passages.substring(0, passages.length() - 1);
+            else passages = "";
 
             QualityAssurance qa = new QualityAssurance();
             qa.setTechnology(validationTechnique);
