@@ -1,11 +1,10 @@
 package org.pdxfinder.dataloaders.updog;
 
-import com.ibm.icu.impl.LocaleDisplayNamesImpl;
-import org.hibernate.sql.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Set;
 
 public class Updog {
 
@@ -18,7 +17,7 @@ public class Updog {
     private static final Logger log = LoggerFactory.getLogger(Updog.class);
 
     private Map<String, PdxDataTable> pdxDataTables;
-    private Map<String, Object> domainObjects;
+    private Map<String, Set<Object>> domainObjects;
 
 
     private void readPdxDataTable() {
@@ -39,7 +38,7 @@ public class Updog {
     public void load(){
 
         //create domain objects database nodes
-        DomainObjectCreator doc = new DomainObjectCreator();
+        DomainObjectCreator doc = new DomainObjectCreator(pdxDataTables);
         //save db
 
 
