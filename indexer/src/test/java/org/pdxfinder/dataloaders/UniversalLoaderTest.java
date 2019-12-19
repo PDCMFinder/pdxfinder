@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.pdxfinder.BaseTest;
-import org.pdxfinder.dataloaders.updog.PdxDataTable;
 
 import java.util.Optional;
 

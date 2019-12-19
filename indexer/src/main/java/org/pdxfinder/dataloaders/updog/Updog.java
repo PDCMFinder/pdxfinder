@@ -20,17 +20,17 @@ public class Updog {
     private Map<String, Object> domainObjects;
 
     public void run() {
-        readPdxDataTable();
-//        validateTemplate();
-//        load();
+        readPdxDataForProvider();
+        validatePdxDataTables();
+        load();
     }
 
-    private void readPdxDataTable() {
+    private void readPdxDataForProvider() {
         TemplateReader templateReader = new TemplateReader(provider);
         pdxDataTables = templateReader.read();
     }
 
-    public boolean validateTemplate(){
+    public boolean validatePdxDataTables(){
 
         //instantiate a validator class
         TemplateValidator templateValidator = new TemplateValidator();
