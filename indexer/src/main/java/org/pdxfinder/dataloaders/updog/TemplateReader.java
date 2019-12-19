@@ -1,5 +1,6 @@
 package org.pdxfinder.dataloaders.updog;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -21,15 +22,20 @@ import java.util.stream.Stream;
 @Component
 public class TemplateReader {
 
-    public TemplateReader(String provider) {
-        setProvider(provider);
-    }
-
     @Value("${pdxfinder.root.dir}")
+    private String rootDirectory;
+    //this is root dir + / + provider + /data
     private String dataDirectory = "data/";
+
     private String provider;
     private Path providerDirectory;
     private static final Logger log = LoggerFactory.getLogger(TemplateReader.class);
+
+    @Autowired
+    public TemplateReader() {
+
+    }
+
 
 
     public Map<String, Table> read(){

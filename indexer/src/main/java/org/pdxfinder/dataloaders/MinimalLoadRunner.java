@@ -28,7 +28,8 @@ public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextA
         provider = "UOC-BC";
 
         if (options.has("loadUniversalRefactor")) {
-            Updog updog = new Updog(provider);
+            Updog updog = new Updog();
+            updog.setProvider(provider);
             updog.run();
         }
     }
