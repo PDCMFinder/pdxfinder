@@ -3,7 +3,10 @@ package org.pdxfinder.dataloaders;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.pdxfinder.dataloaders.updog.Updog;
+import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.UtilityService;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
@@ -15,6 +18,11 @@ public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextA
 
     @Value("${pdxfinder.root.dir}")
     private String finderRootDir;
+
+    @Autowired
+    private DataImportService dataImportService;
+    @Autowired
+    private UtilityService utilityService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -28,7 +36,7 @@ public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextA
         provider = "UOC-BC";
 
         if (options.has("loadUniversalRefactor")) {
-            Updog updog = new Updog();
+            Updog updog = new Updog(dataImportService, utilityService);
             updog.setProvider(provider);
             updog.run();
         }
