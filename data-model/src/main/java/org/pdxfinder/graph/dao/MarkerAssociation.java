@@ -37,7 +37,7 @@ public class MarkerAssociation {
     *
     * */
 
-
+    private String biotype;
     private String codingSequenceChange;
     private String variantClass;
     private String codonChange;
@@ -505,8 +505,6 @@ public class MarkerAssociation {
     public void setBiotype(String biotype) {
         this.biotype = biotype;
     }
-
-    private String biotype;
 
     public String getCodingSequenceChange() {
         return codingSequenceChange;

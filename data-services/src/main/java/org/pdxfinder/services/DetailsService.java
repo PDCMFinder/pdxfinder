@@ -540,8 +540,8 @@ public class DetailsService {
             }
 
 
-            if(ma.getRsIdVariants() != null && !ma.getRsIdVariants().isEmpty()){
-                tableHeadersSet.add("rsidvariants");
+            if(ma.getExistingVariations() != null && !ma.getExistingVariations().isEmpty()){
+                tableHeadersSet.add("existingvariations");
             }
 
             if(ma.getNucleotideChange() != null && !ma.getNucleotideChange().isEmpty()){
@@ -620,6 +620,25 @@ public class DetailsService {
                 tableHeadersSet.add("cnapicnicvalue");
             }
 
+            if(ma.getBiotype() != null && !ma.getBiotype().isEmpty()){
+                tableHeadersSet.add("biotype");
+            }
+
+            if(ma.getCodingSequenceChange() != null && !ma.getCodingSequenceChange().isEmpty()){
+                tableHeadersSet.add("codingsequencechange");
+            }
+            if(ma.getVariantClass() != null && !ma.getVariantClass().isEmpty()){
+                tableHeadersSet.add("variantclass");
+            }
+            if(ma.getCodonChange() != null && !ma.getCodonChange().isEmpty()){
+                tableHeadersSet.add("codonchange");
+            }
+            if(ma.getFunctionalPrediction() != null && !ma.getFunctionalPrediction().isEmpty()){
+                tableHeadersSet.add("functionalprediction");
+            }
+
+
+
         }
 
 
@@ -628,10 +647,6 @@ public class DetailsService {
         // (But if you REALLY need to change the order, don't forget to change it at step 3, too!!!)
 
 
-
-        if(tableHeadersSet.contains("sampleid")){
-            tableHeaders.add("Sample Id");
-        }
 
         if(tableHeadersSet.contains("hgncsymbol")){
             tableHeaders.add("HGNC Symbol");
@@ -697,8 +712,8 @@ public class DetailsService {
             tableHeaders.add("Alt Allele");
         }
 
-        if(tableHeadersSet.contains("rsidvariants")){
-            tableHeaders.add("Rs Id Variant");
+        if(tableHeadersSet.contains("existingvariations")){
+            tableHeaders.add("Existing Variations");
         }
 
         if(tableHeadersSet.contains("ensembltranscriptid")){
@@ -739,10 +754,6 @@ public class DetailsService {
 
             List<String> row = new ArrayList<>();
 
-
-            if(tableHeadersSet.contains("sampleid")){
-                row.add(sampleId);
-            }
 
             if(tableHeadersSet.contains("hgncsymbol")){
                 row.add(ma.getMarker().getHgncSymbol());
@@ -808,8 +819,8 @@ public class DetailsService {
                 row.add((ma.getAltAllele() == null ? "" : ma.getAltAllele()));
             }
 
-            if(tableHeadersSet.contains("rsidvariants")){
-                row.add((ma.getRsIdVariants() == null ? "" : ma.getRsIdVariants()));
+            if(tableHeadersSet.contains("existingvariations")){
+                row.add((ma.getExistingVariations() == null ? "" : ma.getExistingVariations()));
             }
 
             if(tableHeadersSet.contains("ensembltranscriptid")){
@@ -1058,7 +1069,7 @@ public class DetailsService {
                         dData.add(markerAss.getAminoAcidChange());
                         dData.add(markerAss.getReadDepth());
                         dData.add(markerAss.getAlleleFrequency());
-                        dData.add(markerAss.getRsIdVariants());
+                        dData.add(markerAss.getExistingVariations());
                         dData.add(markerAss.getChromosome());
                         dData.add(markerAss.getSeqStartPosition());
                         dData.add(markerAss.getRefAllele());
