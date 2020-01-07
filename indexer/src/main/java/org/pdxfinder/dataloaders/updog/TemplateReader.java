@@ -22,13 +22,8 @@ import java.util.stream.Stream;
 @Component
 public class TemplateReader {
 
-    @Value("${pdxfinder.root.dir}")
-    private String rootDirectory;
-    //this is root dir + / + provider + /data
-    private String dataDirectory = "data/";
+    Path targetDirectory;
 
-    private String provider;
-    private Path providerDirectory;
     private static final Logger log = LoggerFactory.getLogger(TemplateReader.class);
 
     @Autowired
@@ -40,20 +35,19 @@ public class TemplateReader {
 
     public Map<String, Table> read(){
         HashMap<String, Table> emptyHashMap = new HashMap<>();
-        providerDirectory = Paths.get(dataDirectory, "data", "UPDOG", provider);
         return directoryExists() ? collectDataTables() : emptyHashMap;
     }
 
     private boolean directoryExists() {
-        return providerDirectory.toFile().exists();
+        return targetDirectory.toFile().exists();
     }
 
     private HashMap<String, Table> collectDataTables() {
         HashMap<String, Table> dataTableHashMap = new HashMap<>();
-        final PathMatcher onlyMetadataTsv = providerDirectory
+        final PathMatcher onlyMetadataTsv = targetDirectory
             .getFileSystem()
             .getPathMatcher("glob:**metadata-*.tsv");
-        try (final Stream<Path> stream = Files.list(providerDirectory)) {
+        try (final Stream<Path> stream = Files.list(targetDirectory)) {
             stream
                 .filter(onlyMetadataTsv::matches)
                 .forEach(path -> dataTableHashMap.put(
@@ -81,6 +75,11 @@ public class TemplateReader {
         return Table.read().usingOptions(options);
     }
 
-    public void setProvider(String provider) { this.provider = provider; }
+    public Path getTargetDirectory() {
+        return targetDirectory;
+    }
 
+    public void setTargetDirectory(Path targetDirectory) {
+        this.targetDirectory = targetDirectory;
+    }
 }

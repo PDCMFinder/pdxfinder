@@ -7,11 +7,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import tech.tablesaw.api.Table;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 public class Updog {
 
     private String provider;
+    private String updogDir;
     private UtilityService utilityService;
     private DataImportService dataImportService;
 
@@ -33,8 +36,11 @@ public class Updog {
     }
 
     private void readPdxDataForProvider() {
+
+        Path path = Paths.get(updogDir, provider);
         TemplateReader templateReader = new TemplateReader();
-        templateReader.setProvider(provider);
+        templateReader.setTargetDirectory(path);
+
         pdxDataTables = templateReader.read();
     }
 
@@ -62,5 +68,13 @@ public class Updog {
 
     public void setProvider(String provider) {
         this.provider = provider;
+    }
+
+    public String getUpdogDir() {
+        return updogDir;
+    }
+
+    public void setUpdogDir(String updogDir) {
+        this.updogDir = updogDir;
     }
 }

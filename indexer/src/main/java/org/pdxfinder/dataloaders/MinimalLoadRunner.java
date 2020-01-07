@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextAware {
 
-    @Value("${pdxfinder.root.dir}")
-    private String finderRootDir;
+    @Value("${data.directory}")
+    private String dataDirectory;
 
     @Autowired
     private DataImportService dataImportService;
@@ -30,7 +30,7 @@ public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextA
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadUniversalRefactor");
         OptionSet options = parser.parse(args);
-        finderRootDir = UniversalLoader.stripTrailingSlash(finderRootDir);
+        dataDirectory = UniversalLoader.stripTrailingSlash(dataDirectory);
 
         String provider;
         provider = "UOC-BC";
@@ -38,6 +38,7 @@ public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextA
         if (options.has("loadUniversalRefactor")) {
             Updog updog = new Updog(dataImportService, utilityService);
             updog.setProvider(provider);
+            updog.setUpdogDir(dataDirectory+"/data/UPDOG");
             updog.run();
         }
     }
