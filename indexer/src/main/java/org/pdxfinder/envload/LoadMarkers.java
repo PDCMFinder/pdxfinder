@@ -3,10 +3,9 @@ package org.pdxfinder.envload;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.pdxfinder.graph.dao.Marker;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.utils.Cmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,21 +18,18 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
 /*
  * Created by csaba on 26/02/2019.
  */
 @Component
 @Order(value = -70)
-public class LoadMarkers implements CommandLineRunner{
+public class LoadMarkers implements CommandLineRunner {
 
 
-    //private static final String DATA_FILE_URL = "http://www.genenames.org/cgi-bin/download?col=gd_hgnc_id&col=gd_app_sym&col=gd_prev_sym&col=gd_aliases&col=md_eg_id&col=md_ensembl_id&status=Approved&status_opt=2&where=&order_by=gd_app_sym_sort&format=text&limit=&hgnc_dbtag=on&submit=submit";
     private static final String DATA_FILE_URL = "https://www.genenames.org/cgi-bin/download/custom?col=gd_hgnc_id&col=gd_app_sym&col=gd_app_name&col=gd_status&col=gd_prev_sym&col=gd_aliases&col=gd_pub_acc_ids&col=gd_pub_refseq_ids&col=gd_name_aliases&col=gd_pub_ensembl_id&status=Approved&hgnc_dbtag=on&order_by=gd_app_sym_sort&format=text&submit=submit";
-    private final static Logger log = LoggerFactory.getLogger(LoadMarkers.class);
+    private static final Logger log = LoggerFactory.getLogger(LoadMarkers.class);
     private DataImportService dataImportService;
 
     @Autowired
@@ -46,19 +42,21 @@ public class LoadMarkers implements CommandLineRunner{
 
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("loadMarkers", "Create Markers");
-        parser.accepts("reloadCache", "Catches Markers and Ontologies");
-        parser.accepts("loadALL", "Load all, including creating markers");
-        parser.accepts("loadEssentials", "Loading essentials");
+        parser.accepts(Cmd.loadMarkers.get(), Cmd.Create_Markers.get());
+        parser.accepts(Cmd.reloadCache.get(), Cmd.Catches_Markers_and_Ontologies.get());
+        parser.accepts(Cmd.loadALL.get(), Cmd.Load_all_including_creating_markers.get());
+        parser.accepts(Cmd.loadEssentials.get(), Cmd.Loading_essentials.get());
+
         OptionSet options = parser.parse(args);
 
         long startTime = System.currentTimeMillis();
 
-        if (options.has("loadMarkers") || options.has("reloadCache") || options.has("loadALL") || options.has("loadEssentials")) {
+        if (options.has(Cmd.reloadCache.get()) ||
+                options.has(Cmd.loadMarkers.get()) ||
+                options.has(Cmd.loadEssentials.get()) ||
+                (options.has(Cmd.loadALL.get()) && dataImportService.countAllMarkers() == 0)) {
 
-            if ( options.has("reloadCache") || dataImportService.countAllMarkers() == 0){
-                loadMarkers();
-            }
+            loadMarkers();
         }
 
         long endTime = System.currentTimeMillis();
@@ -67,16 +65,12 @@ public class LoadMarkers implements CommandLineRunner{
         int seconds = (int) (totalTime / 1000) % 60;
         int minutes = (int) ((totalTime / (1000 * 60)) % 60);
 
-        log.info(this.getClass().getSimpleName() + " finished after " + minutes + " minute(s) and " + seconds + " second(s)");
+        log.info(" {} finished after {} minute(s) and {} second(s)", this.getClass().getSimpleName(), minutes, seconds);
 
     }
 
 
-
-
-
-
-    private void loadMarkers(){
+    private void loadMarkers() {
 
 
         log.info("******************************************************");
@@ -87,55 +81,53 @@ public class LoadMarkers implements CommandLineRunner{
         String[] prevSymbols;
         String[] synonyms;
 
-        String symbol, hgncId, entrezId, ensemblId = "";
+        String symbol, hgncId, entrezId, ensemblId;
 
         int rows = 0;
         int symbolConflicts = 0;
         String symbolConf = "";
 
-        try{
+        try {
 
             URL url = new URL(DATA_FILE_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             //conn.addRequestProperty("Enctype","application/x-www-form-urlencoded");
 
-            if(conn.getResponseCode() != 200){
+            if (conn.getResponseCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode());
+                                                   + conn.getResponseCode());
             }
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     (conn.getInputStream())));
 
-            String line = reader.readLine();
-            while((line = reader.readLine()) != null){
+            reader.readLine();
+            String line;
+            while ((line = reader.readLine()) != null) {
                 //HGNC_ID APPR_SYMBOL PREV_SYMBOLS SYNONYMS ENTREZ_ID ENSEMBL_ID
                 //HGNC ID[0]	Approved symbol[1]	Approved name[2]	Status[3]	Previous symbols[4]	Synonyms[5]	Accession numbers[6]	RefSeq IDs[7]	Name synonyms[8]	Ensembl gene ID[9]
                 rowData = line.split("\t");
                 //rowData[1] = symbol, if it is not empty and if it is not a withdrawn symbol
-                if(rowData[1] != null && !rowData[1].isEmpty() ){
+                if (rowData[1] != null && !rowData[1].isEmpty()) {
 
                     symbol = rowData[1];
 
-                    if(rowData[0] != null && !rowData[0].isEmpty()){
+                    if (rowData[0] != null && !rowData[0].isEmpty()) {
                         hgncId = rowData[0];
-                    }
-                    else{
+                    } else {
                         hgncId = "";
                     }
 
-                    if(rowData.length>4 && rowData[4] != null && !rowData[4].isEmpty()){
+                    if (rowData.length > 4 && rowData[4] != null && !rowData[4].isEmpty()) {
                         prevSymbols = rowData[4].split(", ");
-                    }
-                    else{
-                        prevSymbols= new String[0];
+                    } else {
+                        prevSymbols = new String[0];
                     }
 
-                    if(rowData.length>5 && rowData[5] != null && !rowData[5].isEmpty()){
+                    if (rowData.length > 5 && rowData[5] != null && !rowData[5].isEmpty()) {
                         synonyms = rowData[5].split(", ");
-                    }
-                    else{
+                    } else {
                         synonyms = new String[0];
                     }
 /*
@@ -146,47 +138,44 @@ public class LoadMarkers implements CommandLineRunner{
                         entrezId = "";
                     }
 */
-                    if(rowData.length>9 && rowData[9] != null && !rowData[9].isEmpty()){
+                    if (rowData.length > 9 && rowData[9] != null && !rowData[9].isEmpty()) {
                         ensemblId = rowData[9];
-                    }
-                    else{
+                    } else {
                         ensemblId = "";
                     }
 
                     //put it in the hashmap with all of its prev symbols
 
 
-                    if(!symbol.isEmpty()){
+                    if (!symbol.isEmpty()) {
 
                         Marker m = new Marker();
                         m.setHgncSymbol(symbol);
 
-                        if(!ensemblId.isEmpty()){
+                        if (!ensemblId.isEmpty()) {
                             m.setEnsemblGeneId(ensemblId);
                         }
-                        if(!hgncId.isEmpty()){
+                        if (!hgncId.isEmpty()) {
                             m.setHgncId(hgncId);
                         }
 
-                        if(synonyms.length>0){
+                        if (synonyms.length > 0) {
 
                             m.setAliasSymbols(new HashSet<>(Arrays.asList(synonyms)));
                         }
 
-                        if(prevSymbols.length>0){
+                        if (prevSymbols.length > 0) {
 
                             m.setPrevSymbols(new HashSet<>(Arrays.asList(prevSymbols)));
                         }
 
                         dataImportService.saveMarker(m);
 
-                    }
-                    else{
-                        log.error("Empty symbol found in row "+rows);
+                    } else {
+                        log.error("Empty symbol found in row " + rows);
                     }
 
-                    if(rows !=0 && rows%200 == 0) log.info("Loaded "+rows +" markers");
-
+                    if (rows != 0 && rows % 200 == 0) log.info("Loaded " + rows + " markers");
 
 
                 }
@@ -194,10 +183,9 @@ public class LoadMarkers implements CommandLineRunner{
                 rows++;
             }
 
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            log.error(rowData.toString());
+            log.error(Arrays.toString(rowData));
         }
 
         log.info("******************************************************");

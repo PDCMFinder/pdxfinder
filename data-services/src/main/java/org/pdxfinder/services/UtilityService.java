@@ -40,7 +40,7 @@ public class UtilityService {
     private final static Logger log = LoggerFactory.getLogger(UtilityService.class);
     private ObjectMapper mapper = new ObjectMapper();
 
-    private Boolean shouldLoad = false;
+    private Boolean loadCache = false;
 
     //Delimiter used in CSV file
     private static final String COMMA_DELIMITER = ",";
@@ -59,7 +59,7 @@ public class UtilityService {
 
         String fileExtension = getFileExtension(fileName);
 
-        List<Map<String, String>> csvMaps = new ArrayList<>();
+        List<Map<String, String>> csvMaps;
 
         if (fileExtension.equals("csv")) {
 
@@ -412,7 +412,7 @@ public class UtilityService {
 
 
     // GET SMALL SECTIONS OF EXCEL: RETRIEVE BODY ROWS OF EXCEL SHEET
-    public Map<String, String> getXlsCellData(Iterator<Cell> cellIterator, List<String> tableHead){
+    private Map<String, String> getXlsCellData(Iterator<Cell> cellIterator, List<String> tableHead){
 
         Map<String, String> rowMap = new HashMap();
 
@@ -479,7 +479,7 @@ public class UtilityService {
 
         try {
             inputStream = multipartFile.getInputStream();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         if (type.equals("xlsx")) {
@@ -488,6 +488,7 @@ public class UtilityService {
 
         } else if (type.equals("csv")) {
 
+            assert inputStream != null;
             DataInputStream csvData = new DataInputStream(inputStream);
             dataList = serializeCSVToMaps(csvData);
         }
@@ -962,16 +963,16 @@ public class UtilityService {
 
     public String splitText(String data, String delim, String seperator){
 
-        String result = "";
+        StringBuilder result = new StringBuilder();
 
         String[] splits = data.split(delim);
 
         for (String split : splits){
 
-            result += split.trim()+seperator;
+            result.append(split.trim()).append(seperator);
         }
 
-        return result;
+        return result.toString();
     }
 
 
@@ -1023,7 +1024,7 @@ public class UtilityService {
 
 
 
-    public List<Map> objectArrayListToMapList(List<Object[]> dataList, List<String> keys){
+    List<Map> objectArrayListToMapList(List<Object[]> dataList, List<String> keys){
 
         List<Map> result = new ArrayList<>();
 
@@ -1049,17 +1050,17 @@ public class UtilityService {
 
         try {
             jsonNode = mapper.readTree(jsonString);
-        } catch (Exception e) { }
+        } catch (Exception ignored) { }
 
         return jsonNode;
     }
 
 
-    public Boolean getShouldLoad() {
-        return shouldLoad;
+    public Boolean getLoadCache() {
+        return loadCache;
     }
 
-    public void setShouldLoad(Boolean shouldLoad) {
-        this.shouldLoad = shouldLoad;
+    public void setLoadCache(Boolean loadCache) {
+        this.loadCache = loadCache;
     }
 }

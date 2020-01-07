@@ -1,9 +1,5 @@
 package org.pdxfinder.envload;
 
-/**
- * Created by csaba on 07/05/2019.
- */
-
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.pdxfinder.services.DataImportService;
@@ -51,7 +47,7 @@ public class LoadNCITDrugs implements CommandLineRunner {
 
         if (options.has("reloadCache") || options.has("loadALL")  || options.has("loadEssentials")) {
 
-            if ( options.has("loadNCITDrugs")  || utilityService.getShouldLoad() == true){
+            if ( options.has("loadNCITDrugs")  || utilityService.getLoadCache()){
 
                 Ontolia ontolia = new Ontolia(utilityService, dataImportService);
                 ontolia.run();

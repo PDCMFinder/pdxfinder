@@ -160,7 +160,7 @@ public class DataImportService {
         Group g = groupRepository.findByNameAndType(name, type);
 
         if(g == null){
-            log.info("Group not found. Creating", name);
+            log.info("Group not found. Creating {}", name);
 
             g = new Group(name, abbrev, type);
             groupRepository.save(g);
@@ -175,7 +175,7 @@ public class DataImportService {
         Group g = groupRepository.findByNameAndType(name, "Provider");
 
         if(g == null){
-            log.info("Provider group not found. Creating", name);
+            log.info("Provider group not found. Creating {}", name);
 
             g = new Group(name, abbrev, description, providerType, contact, url);
             groupRepository.save(g);
@@ -196,7 +196,7 @@ public class DataImportService {
 
 
         if(g == null){
-            log.info("Publication group not found. Creating", publicationId);
+            log.info("Publication group not found. Creating {}", publicationId);
 
             g = new Group();
             g.setType("Publication");
@@ -213,7 +213,7 @@ public class DataImportService {
         Group g = groupRepository.findByNameAndType(groupName, "Project");
 
         if(g == null){
-            log.info("Project group not found. Creating", groupName);
+            log.info("Project group not found. Creating {}", groupName);
 
             g = new Group();
             g.setType("Project");
@@ -299,8 +299,7 @@ public class DataImportService {
 
         ModelCreation modelCreation = modelCreationRepository.findBySourcePdxIdAndDataSource(modelId, dataSource);
 
-        if(modelCreation == null) return false;
-        return true;
+        return modelCreation != null;
     }
 
 
@@ -477,7 +476,7 @@ public class DataImportService {
         for (PatientSnapshot ps : pSnaps) {
             if (ps.getAgeAtCollection().equals(age)) {
                 patientSnapshot = ps;
-                break loop;
+                break;
             }
         }
         if (patientSnapshot == null) {
@@ -520,9 +519,7 @@ public class DataImportService {
 
     public PatientSnapshot getPatientSnapshot(String patientId, String age, String dataSource){
 
-        PatientSnapshot ps = patientSnapshotRepository.findByPatientIdAndDataSourceAndAge(patientId, dataSource, age);
-
-        return ps;
+        return patientSnapshotRepository.findByPatientIdAndDataSourceAndAge(patientId, dataSource, age);
 
     }
 
@@ -631,7 +628,7 @@ public class DataImportService {
     public Sample getMouseSample(ModelCreation model, String specimenId, String dataSource, String passage, String sampleId){
 
         Specimen specimen = this.getSpecimen(model, specimenId, dataSource, passage);
-        Sample sample = null;
+        Sample sample;
 
         if(specimen.getSample() == null){
             sample = new Sample();
@@ -749,7 +746,7 @@ public class DataImportService {
 
     }
 
-    public Tissue getTissue(String t) {
+    private Tissue getTissue(String t) {
         Tissue tissue = tissueRepository.findByName(t);
         if (tissue == null) {
             log.info("Tissue '{}' not found. Creating.", t);
@@ -916,13 +913,15 @@ public class DataImportService {
 
     public OntologyTerm getOntologyTerm(String url){
 
-        OntologyTerm ot = ontologyTermRepository.findByUrl(url);
+        OntologyTerm ot;
+        ot = ontologyTermRepository.findByUrl(url);
         return ot;
     }
 
     public OntologyTerm findOntologyTermByLabel(String label){
 
-        OntologyTerm ot = ontologyTermRepository.findByLabel(label);
+        OntologyTerm ot;
+        ot = ontologyTermRepository.findByLabel(label);
         return ot;
     }
 
@@ -1071,12 +1070,14 @@ public class DataImportService {
         if (p == null) {
             System.out.println("Platform is null");
         }
+        assert p != null;
         if (p.getGroup() == null) {
             System.out.println("P.EDS is null");
         }
         if (m == null) {
             System.out.println("Marker is null");
         }
+        assert m != null;
         PlatformAssociation pa = platformAssociationRepository.findByPlatformAndMarker(p.getName(), p.getGroup().getName(), m.getHgncSymbol());
         if (pa == null) {
             pa = new PlatformAssociation();
@@ -1107,21 +1108,14 @@ public class DataImportService {
 
         TreatmentSummary ts = treatmentSummaryRepository.findModelTreatmentByDataSourceAndModelId(dataSource, modelId);
 
-        if(ts != null && ts.getTreatmentProtocols() != null){
-            return true;
-        }
-        return false;
+        return ts != null && ts.getTreatmentProtocols() != null;
     }
 
     public boolean isTreatmentSummaryAvailableOnPatient(String dataSource, String modelId){
 
         TreatmentSummary ts = treatmentSummaryRepository.findPatientTreatmentByDataSourceAndModelId(dataSource, modelId);
 
-        if(ts != null && ts.getTreatmentProtocols() != null){
-            return true;
-        }
-
-        return false;
+        return ts != null && ts.getTreatmentProtocols() != null;
     }
 
     public int findPatientTreatmentNumber(String dataSource){
@@ -1219,7 +1213,7 @@ public class DataImportService {
         return treatmentSummaryRepository.findPlatformUrlByDataSource(dataSource);
     }
 
-    public CurrentTreatment getCurrentTreatment(String name){
+    private CurrentTreatment getCurrentTreatment(String name){
 
         CurrentTreatment ct = currentTreatmentRepository.findByName(name);
 
@@ -1286,10 +1280,10 @@ public class DataImportService {
 
                 //use the same dosing for all drugs
 
-                for(int i=0;i<drugArray.length;i++){
+                for (String s : drugArray) {
 
                     Treatment treatment = new Treatment();
-                    treatment.setName(drugArray[i].trim());
+                    treatment.setName(s.trim());
 
                     TreatmentComponent tc = new TreatmentComponent();
                     tc.setDose(doseArray[0].trim());
@@ -1333,10 +1327,10 @@ public class DataImportService {
 
                 String[] drugArray = drugString.split("\\+");
 
-                for(int i=0;i<drugArray.length;i++){
+                for (String s : drugArray) {
 
                     Treatment treatment = new Treatment();
-                    treatment.setName(drugArray[i].trim());
+                    treatment.setName(s.trim());
                     TreatmentComponent tc = new TreatmentComponent();
                     tc.setDose(doseString.trim());
                     tc.setTreatment(treatment);
@@ -1499,7 +1493,7 @@ public class DataImportService {
                     // NOTE:  IRCC uses passage 0 to mean Patient Tumor, so we need to harmonize according to the other
                     // sources.  Subtract 1 from every passage.
                     for (String p : passages) {
-                        Integer intPassage = Integer.parseInt(p);
+                        int intPassage = Integer.parseInt(p);
                         passageInts.add(intPassage - 1);
                     }
 
@@ -1541,7 +1535,7 @@ public class DataImportService {
         NodeSuggestionDTO nsdto = new NodeSuggestionDTO();
         LogEntity le;
         Marker m;
-        List<Marker> markerSuggestionList = null;
+        List<Marker> markerSuggestionList;
         boolean ready = false;
 
         //check if marker is cached
@@ -1651,3 +1645,35 @@ public class DataImportService {
 
 
 }
+
+
+/*
+
+ CLASSIFYING WITH K NEAREST NEIGHBOUR (KNN):
+ Have you ever seen movies categorized into genres? What defines these genres, and who says which movie goes into what genre? The movies in one genre are similar but based on what? I’m sure if you asked the people involved with making the mov- ies, they wouldn’t say that their movie is just like someone else’s movie, but in some way you know they’re similar. What makes an action movie similar to another action movie and dissimilar to a romance movie? Do people kiss in action movies, and do people kick in romance movies? Yes, but there’s probably more kissing in romance movies and more kicking in action movies. Perhaps if you measured kisses, kicks, and other things per movie, you could automatically figure out what genre a movie belongs to. I’ll use movies to explain some of the concepts of k-Nearest Neighbors; then we will move on to other applications.
+
+ We’ll discuss our first machine-learning algorithm: k-Nearest Neighbors.
+ > k-Nearest Neighbors is easy to grasp and very effective.
+ > We’ll first discuss the theory and how you can use the concept of a distance measurement to classify items.
+ > Next, you’ll see how to easily import and parse data from text files using Python.
+ > We’ll address some common pitfalls when working with distance calculations and data coming from numerous sources.
+ > We’ll put all of this into action in examples for improving results from a dating website and recognizing handwritten digits.
+
+
+    About K Nearest Neighbour:
+    Pros: High accuracy, insensitive to outliers, no assumptions about data
+    Cons: Computationally expensive, requires a lot of memory
+    Works with: Numeric values, nominal values
+
+ How KNN Works:
+  > We have an existing set of example data, called the training data set.
+  > We have labels for all of this data
+  > We know what class each piece of the data should fall into.
+  > When we’re given a new piece of data without a label.
+  > We compare that new piece of data to the existing data
+  > We then take the most similar pieces of data (the nearest neighbors) and look at their labels.
+  > We look at the top k most similar pieces of data from our known dataset; this is where the k comes from.
+  > k is an integer and it’s usually less than 20.
+  > Lastly, we take a majority vote from the k most similar pieces of data, and the majority is the new class we assign to the data we were asked to classify.
+
+ */
