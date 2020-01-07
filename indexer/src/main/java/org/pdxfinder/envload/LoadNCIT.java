@@ -62,6 +62,7 @@ public class LoadNCIT implements CommandLineRunner {
         parser.accepts("loadNCIT", "Load NCIT all ontology");
         parser.accepts("loadNCITPreDef", "Load predefined NCIT ontology");
         parser.accepts("loadALL", "Load all, including NCiT ontology");
+        parser.accepts("reloadCache", "Catches Markers and Ontologies");
         parser.accepts("loadSlim", "Load slim, then link samples to NCIT terms");
         parser.accepts("loadEssentials", "Loading essentials");
         OptionSet options = parser.parse(args);
@@ -73,16 +74,17 @@ public class LoadNCIT implements CommandLineRunner {
             log.warn("Select one or the other of: -loadNCIT, -loadNCITPreDef");
             log.warn("Not loading ", this.getClass().getName());
 
-        } else if (options.has("loadNCIT") || options.has("loadALL")  || options.has("loadSlim") || options.has("loadEssentials")) {
+        } else if (options.has("loadNCIT") || options.has("reloadCache")  || options.has("loadALL")  || options.has("loadSlim") || options.has("loadEssentials")) {
 
-            log.info("Loading all Neoplasm subnodes.");
-            loadNCIT();
+            if ( options.has("reloadCache") || dataImportService.countAllOntologyTerms() == 0){
+
+                loadNCIT();
+                utilityService.setShouldLoad(true);
+            }
 
         } else if (options.has("loadNCITPreDef")) {
 
-            log.info("Loading predefined nodes from NCIT.");
             loadNCITPreDef();
-
         }
 
         long endTime = System.currentTimeMillis();
@@ -98,6 +100,8 @@ public class LoadNCIT implements CommandLineRunner {
 
 
     private void loadNCIT(){
+
+        log.info("Loading all Neoplasm subnodes.");
 
         Set<String> loadedTerms = new HashSet<>();
         Set<OntologyTerm> discoveredTerms = new HashSet<>();
@@ -216,6 +220,9 @@ public class LoadNCIT implements CommandLineRunner {
 
 
     private void loadNCITPreDef(){
+
+
+        log.info("Loading predefined nodes from NCIT.");
 
         String currentLine;
         long currentLineCounter = 1;

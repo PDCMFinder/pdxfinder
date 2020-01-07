@@ -3,6 +3,8 @@ package org.pdxfinder.envload;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.pdxfinder.graph.dao.Marker;
 import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
@@ -17,7 +19,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 /*
  * Created by csaba on 26/02/2019.
@@ -43,24 +47,18 @@ public class LoadMarkers implements CommandLineRunner{
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadMarkers", "Create Markers");
+        parser.accepts("reloadCache", "Catches Markers and Ontologies");
         parser.accepts("loadALL", "Load all, including creating markers");
         parser.accepts("loadEssentials", "Loading essentials");
         OptionSet options = parser.parse(args);
 
         long startTime = System.currentTimeMillis();
 
-        if (options.has("loadMarkers") || options.has("loadALL") || options.has("loadEssentials")) {
+        if (options.has("loadMarkers") || options.has("reloadCache") || options.has("loadALL") || options.has("loadEssentials")) {
 
-
-            log.info("******************************************************");
-            log.info("* Creating Markers                                   *");
-            log.info("******************************************************");
-
-            loadMarkers();
-
-            log.info("******************************************************");
-            log.info("* Finished creating markers                          *");
-            log.info("******************************************************");
+            if ( options.has("reloadCache") || dataImportService.countAllMarkers() == 0){
+                loadMarkers();
+            }
         }
 
         long endTime = System.currentTimeMillis();
@@ -80,6 +78,10 @@ public class LoadMarkers implements CommandLineRunner{
 
     private void loadMarkers(){
 
+
+        log.info("******************************************************");
+        log.info("* Creating Markers                                   *");
+        log.info("******************************************************");
 
         String[] rowData = new String[0];
         String[] prevSymbols;
@@ -198,7 +200,9 @@ public class LoadMarkers implements CommandLineRunner{
             log.error(rowData.toString());
         }
 
-
+        log.info("******************************************************");
+        log.info("* Finished creating markers                          *");
+        log.info("******************************************************");
 
     }
 }

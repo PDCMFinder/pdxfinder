@@ -40,6 +40,8 @@ public class UtilityService {
     private final static Logger log = LoggerFactory.getLogger(UtilityService.class);
     private ObjectMapper mapper = new ObjectMapper();
 
+    private Boolean shouldLoad = false;
+
     //Delimiter used in CSV file
     private static final String COMMA_DELIMITER = ",";
     private static final String NEW_LINE_SEPARATOR = "\n";
@@ -1053,7 +1055,11 @@ public class UtilityService {
     }
 
 
+    public Boolean getShouldLoad() {
+        return shouldLoad;
+    }
 
-
-
+    public void setShouldLoad(Boolean shouldLoad) {
+        this.shouldLoad = shouldLoad;
+    }
 }

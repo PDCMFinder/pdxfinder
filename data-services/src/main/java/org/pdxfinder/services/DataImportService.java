@@ -987,6 +987,11 @@ public class DataImportService {
         return ontologyTermRepository.getOntologyTermNumberByType(type);
     }
 
+    public int countAllOntologyTerms(){
+
+        return ontologyTermRepository.getOntologyTermNumber();
+    }
+
     public OntologyTerm saveOntologyTerm(OntologyTerm ot){
 
         return ontologyTermRepository.save(ot);
@@ -1003,6 +1008,10 @@ public class DataImportService {
 
     public Collection<Marker> getAllMarkers() {
         return markerRepository.findAllMarkers();
+    }
+
+    public Integer countAllMarkers() {
+        return markerRepository.countAllMarkers();
     }
 
     public Collection<Marker> getAllHumanMarkers() {

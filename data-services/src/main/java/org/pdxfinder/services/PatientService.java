@@ -13,9 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/*
- * Created by abayomi on 13/09/2018.
- */
+
 @Service
 public class PatientService {
 
