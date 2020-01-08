@@ -5,6 +5,7 @@ import joptsimple.OptionSet;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ontology.Ontolia;
+import org.pdxfinder.utils.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -15,10 +16,10 @@ import org.springframework.stereotype.Component;
 @Order(value = -65)
 public class LoadNCITDrugs implements CommandLineRunner {
 
-    private final static Logger log = LoggerFactory.getLogger(LoadNCIT.class);
+    private static final Logger log = LoggerFactory.getLogger(LoadNCITDrugs.class);
 
-    private static final String drugsBranchUrl = "http://purl.obolibrary.org/obo/NCIT_C1908";
-    private static final String ontologyUrl = "https://www.ebi.ac.uk/ols/api/ontologies/ncit/terms/";
+    //DRUGS_BRANCH_URL=http://purl.obolibrary.org/obo/NCIT_C1908
+    //ONTOLOGY_URL=https://www.ebi.ac.uk/ols/api/ontologies/ncit/terms/
 
     private DataImportService dataImportService;
 
@@ -37,21 +38,21 @@ public class LoadNCITDrugs implements CommandLineRunner {
 
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("loadNCITDrugs", "Load NCIT drugs");
-        parser.accepts("loadALL", "Load all, including NCiT drug ontology");
-        parser.accepts("reloadCache", "Catches Markers and Ontologies");
-        parser.accepts("loadEssentials", "Loading essentials");
+        parser.accepts(Option.loadNCITDrugs.get());
+        parser.accepts(Option.loadALL.get());
+        parser.accepts(Option.reloadCache.get());
+        parser.accepts(Option.loadEssentials.get());
         OptionSet options = parser.parse(args);
 
         long startTime = System.currentTimeMillis();
 
-        if (options.has("reloadCache") || options.has("loadALL")  || options.has("loadEssentials")) {
-
-            if ( options.has("loadNCITDrugs")  || utilityService.getLoadCache()){
+        if (options.has(Option.reloadCache.get()) ||
+                options.has(Option.loadALL.get())  ||
+                options.has(Option.loadEssentials.get()) ||
+                (options.has(Option.loadNCITDrugs.get())  || utilityService.getLoadCache())) {
 
                 Ontolia ontolia = new Ontolia(utilityService, dataImportService);
                 ontolia.run();
-            }
 
         }
 
@@ -61,7 +62,7 @@ public class LoadNCITDrugs implements CommandLineRunner {
         int seconds = (int) (totalTime / 1000) % 60;
         int minutes = (int) ((totalTime / (1000 * 60)) % 60);
 
-        log.info(this.getClass().getSimpleName() + " finished after " + minutes + " minute(s) and " + seconds + " second(s)");
+        log.info(" finished after {} {} minute(s) and {} second(s)", this.getClass().getSimpleName(), minutes, seconds);
 
     }
 
