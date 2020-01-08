@@ -2,17 +2,15 @@ package org.pdxfinder.envload;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-
 import org.pdxfinder.graph.dao.Marker;
 import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.utils.Cmd;
+import org.pdxfinder.utils.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -42,19 +40,19 @@ public class LoadMarkers implements CommandLineRunner {
 
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts(Cmd.loadMarkers.get(), Cmd.Create_Markers.get());
-        parser.accepts(Cmd.reloadCache.get(), Cmd.Catches_Markers_and_Ontologies.get());
-        parser.accepts(Cmd.loadALL.get(), Cmd.Load_all_including_creating_markers.get());
-        parser.accepts(Cmd.loadEssentials.get(), Cmd.Loading_essentials.get());
+        parser.accepts(Option.loadMarkers.get());
+        parser.accepts(Option.reloadCache.get());
+        parser.accepts(Option.loadALL.get());
+        parser.accepts(Option.loadEssentials.get());
 
         OptionSet options = parser.parse(args);
 
         long startTime = System.currentTimeMillis();
 
-        if (options.has(Cmd.reloadCache.get()) ||
-                options.has(Cmd.loadMarkers.get()) ||
-                options.has(Cmd.loadEssentials.get()) ||
-                (options.has(Cmd.loadALL.get()) && dataImportService.countAllMarkers() == 0)) {
+        if (options.has(Option.reloadCache.get()) ||
+                options.has(Option.loadMarkers.get()) ||
+                options.has(Option.loadEssentials.get()) ||
+                (options.has(Option.loadALL.get()) && dataImportService.countAllMarkers() == 0)) {
 
             loadMarkers();
         }
@@ -73,36 +71,31 @@ public class LoadMarkers implements CommandLineRunner {
     private void loadMarkers() {
 
 
-        log.info("******************************************************");
-        log.info("* Creating Markers                                   *");
-        log.info("******************************************************");
+        log.info("************************* Creating Markers ***************************** ");
 
         String[] rowData = new String[0];
         String[] prevSymbols;
         String[] synonyms;
 
-        String symbol, hgncId, entrezId, ensemblId;
+        String symbol;
+        String hgncId;
+        String ensemblId;
 
         int rows = 0;
-        int symbolConflicts = 0;
-        String symbolConf = "";
 
         try {
 
             URL url = new URL(DATA_FILE_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            //conn.addRequestProperty("Enctype","application/x-www-form-urlencoded");
 
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : "
-                                                   + conn.getResponseCode());
+                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
             }
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     (conn.getInputStream())));
 
-            reader.readLine();
             String line;
             while ((line = reader.readLine()) != null) {
                 //HGNC_ID APPR_SYMBOL PREV_SYMBOLS SYNONYMS ENTREZ_ID ENSEMBL_ID
@@ -130,14 +123,7 @@ public class LoadMarkers implements CommandLineRunner {
                     } else {
                         synonyms = new String[0];
                     }
-/*
-                    if(rowData.length>4 && rowData[4] != null && !rowData[4].isEmpty()){
-                        entrezId = rowData[4];
-                    }
-                    else{
-                        entrezId = "";
-                    }
-*/
+
                     if (rowData.length > 9 && rowData[9] != null && !rowData[9].isEmpty()) {
                         ensemblId = rowData[9];
                     } else {
@@ -145,7 +131,6 @@ public class LoadMarkers implements CommandLineRunner {
                     }
 
                     //put it in the hashmap with all of its prev symbols
-
 
                     if (!symbol.isEmpty()) {
 
@@ -172,10 +157,10 @@ public class LoadMarkers implements CommandLineRunner {
                         dataImportService.saveMarker(m);
 
                     } else {
-                        log.error("Empty symbol found in row " + rows);
+                        log.error("Empty symbol found in row {} ", rows);
                     }
 
-                    if (rows != 0 && rows % 200 == 0) log.info("Loaded " + rows + " markers");
+                    if (rows != 0 && rows % 200 == 0) log.info("Loaded {} markers", rows);
 
 
                 }
