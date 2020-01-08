@@ -27,7 +27,7 @@ public class Updog {
     private static final Logger log = LoggerFactory.getLogger(Updog.class);
 
     private Map<String, Table> pdxDataTables;
-    private Map<String, Object> domainObjects;
+
 
     public void run() {
         readPdxDataForProvider();
@@ -57,7 +57,7 @@ public class Updog {
         //create domain objects database nodes
         DomainObjectCreator doc = new DomainObjectCreator(dataImportService, utilityService, pdxDataTables);
         //save db
-
+        doc.loadDomainObjects();
 
     }
 

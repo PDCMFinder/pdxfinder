@@ -425,9 +425,9 @@ public class DataImportService {
         return patientRepository.findByGroup(ds);
     }
 
-    public void savePatient(Patient patient){
+    public Patient savePatient(Patient patient){
 
-        patientRepository.save(patient);
+        return patientRepository.save(patient);
     }
 
 
