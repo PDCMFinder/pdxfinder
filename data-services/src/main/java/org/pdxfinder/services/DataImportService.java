@@ -1645,35 +1645,3 @@ public class DataImportService {
 
 
 }
-
-
-/*
-
- CLASSIFYING WITH K NEAREST NEIGHBOUR (KNN):
- Have you ever seen movies categorized into genres? What defines these genres, and who says which movie goes into what genre? The movies in one genre are similar but based on what? I’m sure if you asked the people involved with making the mov- ies, they wouldn’t say that their movie is just like someone else’s movie, but in some way you know they’re similar. What makes an action movie similar to another action movie and dissimilar to a romance movie? Do people kiss in action movies, and do people kick in romance movies? Yes, but there’s probably more kissing in romance movies and more kicking in action movies. Perhaps if you measured kisses, kicks, and other things per movie, you could automatically figure out what genre a movie belongs to. I’ll use movies to explain some of the concepts of k-Nearest Neighbors; then we will move on to other applications.
-
- We’ll discuss our first machine-learning algorithm: k-Nearest Neighbors.
- > k-Nearest Neighbors is easy to grasp and very effective.
- > We’ll first discuss the theory and how you can use the concept of a distance measurement to classify items.
- > Next, you’ll see how to easily import and parse data from text files using Python.
- > We’ll address some common pitfalls when working with distance calculations and data coming from numerous sources.
- > We’ll put all of this into action in examples for improving results from a dating website and recognizing handwritten digits.
-
-
-    About K Nearest Neighbour:
-    Pros: High accuracy, insensitive to outliers, no assumptions about data
-    Cons: Computationally expensive, requires a lot of memory
-    Works with: Numeric values, nominal values
-
- How KNN Works:
-  > We have an existing set of example data, called the training data set.
-  > We have labels for all of this data
-  > We know what class each piece of the data should fall into.
-  > When we’re given a new piece of data without a label.
-  > We compare that new piece of data to the existing data
-  > We then take the most similar pieces of data (the nearest neighbors) and look at their labels.
-  > We look at the top k most similar pieces of data from our known dataset; this is where the k comes from.
-  > k is an integer and it’s usually less than 20.
-  > Lastly, we take a majority vote from the k most similar pieces of data, and the majority is the new class we assign to the data we were asked to classify.
-
- */

@@ -38,6 +38,7 @@ public class LoadMarkers implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
+
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts(Option.loadMarkers.get());
@@ -168,8 +169,7 @@ public class LoadMarkers implements CommandLineRunner {
                 rows++;
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
             log.error(Arrays.toString(rowData));
         }
 
