@@ -134,9 +134,8 @@ public class LoadNCIT implements CommandLineRunner {
                 parentUrlEncoded = URLEncoder.encode(parentUrlEncoded, UTF8);
 
             } catch (UnsupportedEncodingException e) {
-                log.error(e.getMessage());
+                e.printStackTrace();
             }
-
             String url = ONTOLOGY_URL + parentUrlEncoded + "/hierarchicalChildren?size=200";
 
             log.debug("Getting data from {}", url);
@@ -201,6 +200,7 @@ public class LoadNCIT implements CommandLineRunner {
 
             } catch (Exception e) {
                 log.error("", e);
+
             }
 
         }
@@ -223,7 +223,7 @@ public class LoadNCIT implements CommandLineRunner {
 
         Map<String, OntologyTerm> ncitLoaded = new HashMap<>();
 
-        try (BufferedReader buf = new BufferedReader(new FileReader(ncitFile));) {
+        try(BufferedReader buf = new BufferedReader(new FileReader(ncitFile));) {
 
             while (true) {
                 currentLine = buf.readLine();
@@ -246,7 +246,7 @@ public class LoadNCIT implements CommandLineRunner {
                 currentLineCounter++;
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            e.printStackTrace();
         }
 
 
@@ -262,9 +262,8 @@ public class LoadNCIT implements CommandLineRunner {
                 parentUrlEncoded = URLEncoder.encode(parentUrlEncoded, UTF8);
 
             } catch (UnsupportedEncodingException e) {
-                log.error(e.getMessage());
+                e.printStackTrace();
             }
-
             String url = ONTOLOGY_URL + parentUrlEncoded + "/hierarchicalChildren?size=100";
 
             log.debug("Getting data from {}", url);
