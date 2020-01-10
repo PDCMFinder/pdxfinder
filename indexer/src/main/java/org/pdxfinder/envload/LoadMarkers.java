@@ -90,7 +90,7 @@ public class LoadMarkers implements CommandLineRunner {
             conn.setRequestMethod("GET");
 
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+                log.error("Failed : HTTP error code : {}", conn.getResponseCode());
             }
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(
