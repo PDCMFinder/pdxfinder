@@ -54,7 +54,7 @@ public class DomainObjectCreator {
         Table finderRelatedTable = pdxDataTables.get("metadata-loader.tsv");
         Row row = finderRelatedTable.row(5);
 
-        Group providerGroup = dataImportService.getProviderGroup(row.getString(1), row.getString(2), "", "", "", row.getString(3));
+        Group providerGroup = dataImportService.getProviderGroup(row.getString("name"), row.getString("abbreviation"), "", "", "", row.getString("internal_url"));
         List<Object> groupList = new ArrayList<>();
         groupList.add(providerGroup);
 
@@ -74,12 +74,11 @@ public class DomainObjectCreator {
             if(i < 4) continue;
 
             Row row = patientTable.row(i);
-            System.out.println(row.getText(1));
 
-            Patient patient = dataImportService.createPatient(row.getText(1), (Group) domainObjects.get("groups").get(0), row.getText(2), "", row.getText(4));
-            patient.setCancerRelevantHistory(row.getText(3));
-            patient.setFirstDiagnosis(row.getText(6));
-            patient.setAgeAtFirstDiagnosis(row.getText(7));
+            Patient patient = dataImportService.createPatient(row.getText("patient_id"), (Group) domainObjects.get("groups").get(0), row.getText("sex"), "", row.getText("ethnicity"));
+            patient.setCancerRelevantHistory(row.getText("history"));
+            patient.setFirstDiagnosis(row.getText("initial_diagnosis"));
+            patient.setAgeAtFirstDiagnosis(row.getText("age_at_initial_diagnosis"));
 
             addToDomainObjects("patient", dataImportService.savePatient(patient));
 
