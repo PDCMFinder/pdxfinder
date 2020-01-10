@@ -439,7 +439,8 @@ public class Statistics {
 
         List<CountDTO> count1 = Arrays.asList(
                 new CountDTO("IRCC-CRC", 275),
-                new CountDTO("JAX", 81)
+                new CountDTO("JAX", 81),
+                new CountDTO("PDXNet-HCI-BCM", 0)
         );
 
         List<CountDTO> count2 = Arrays.asList(
@@ -468,7 +469,8 @@ public class Statistics {
 
         List<CountDTO> count1 = Arrays.asList(
                 new CountDTO("IRCC-CRC", 1),
-                new CountDTO("JAX", 20)
+                new CountDTO("JAX", 20),
+                new CountDTO("PDXNet-HCI-BCM", 0)
         );
 
         List<CountDTO> count2 = Arrays.asList(
@@ -501,7 +503,8 @@ public class Statistics {
                 new CountDTO("IRCC-GC", 26),
                 new CountDTO("PDMR", 529),
                 new CountDTO("CRL", 142),
-                new CountDTO("TRACE", 75)
+                new CountDTO("TRACE", 75),
+                new CountDTO("UOM-BC", 0)
         );
 
         List<CountDTO> count2 = Arrays.asList(
