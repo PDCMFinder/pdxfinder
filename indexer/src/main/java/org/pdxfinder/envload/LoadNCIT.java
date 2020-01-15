@@ -160,7 +160,7 @@ public class LoadNCIT implements CommandLineRunner {
                     JSONObject term = terms.getJSONObject(i);
                     String termLabel = term.getString("label");
 
-                    //do not load this branch
+                    //do not createPdxObjects this branch
                     //if(termLabel.equals("Neoplasm by Special Category")) continue;
 
                     log.debug("TERM: "+termLabel);

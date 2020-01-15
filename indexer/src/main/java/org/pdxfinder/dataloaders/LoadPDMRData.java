@@ -173,7 +173,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
     @Override
     protected void step13LoadSpecimens()throws Exception {
 
-        //load specimens
+        //createPdxObjects specimens
         if(dto.getSamplesArr().length() > 0){
             for(int i=0; i<dto.getSamplesArr().length();i++){
 

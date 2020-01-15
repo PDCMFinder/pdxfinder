@@ -1048,7 +1048,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             } else {
 
-                log.error("Cannot load omic data for missing model: " + modelId);
+                log.error("Cannot createPdxObjects omic data for missing model: " + modelId);
             }
 
         }

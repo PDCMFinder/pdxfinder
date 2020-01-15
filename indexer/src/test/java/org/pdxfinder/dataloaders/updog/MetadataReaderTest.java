@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class TemplateReaderTest {
+public class MetadataReaderTest {
 
     @Test
     public void read() {
