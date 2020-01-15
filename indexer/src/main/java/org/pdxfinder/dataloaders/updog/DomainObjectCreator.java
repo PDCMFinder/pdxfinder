@@ -168,6 +168,8 @@ public class DomainObjectCreator {
             sample.setGrade(grade);
             sample.setGradeClassification(gradingSystem);
 
+            patientSnapshot.addSample(sample);
+
             ModelCreation modelCreation = (ModelCreation) getExistingDomainObject("model", modelId);
 
             modelCreation.setSample(sample);
