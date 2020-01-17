@@ -39,6 +39,10 @@ public enum TSV {
     sample_type,
     sample_state,
     passage_number,
-    publications
+    publications,
+    validation_technique,
+    description,
+    passages_tested,
+    validation_host_strain_full
 
 }

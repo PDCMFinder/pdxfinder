@@ -2,6 +2,8 @@ package org.pdxfinder.dataloaders.updog;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
@@ -14,13 +16,18 @@ public class DomainObjectCreator {
     private Map<String, Map<String, Object>> domainObjects;
     private UtilityService utilityService;
     private DataImportService dataImportService;
-
+    private final static Logger log = LoggerFactory.getLogger(DomainObjectCreator.class);
 
     private String patientKey = "patient";
     private String providerKey = "provider_group";
     private String modelKey = "model";
     private String tumorTypeKey = "tumor_type";
     private String tissueKey = "tissue";
+    private String hostStrainKey = "hoststrain";
+    private String engraftmentSiteKey = "engraftment_site";
+    private String engraftmentTypeKey = "engraftment_type";
+    private String engraftmentMaterialKey = "engraftment_material";
+
 
     public DomainObjectCreator(DataImportService dataImportService, UtilityService utilityService,
                                Map<String, Table> pdxDataTables) {
@@ -40,32 +47,22 @@ public class DomainObjectCreator {
         loadModelData();
         loadSampleData();
 
+        persistNodes();
+
     }
 
 
-    private void addToDomainObjects(String key1, String key2, Object object){
 
-        if(domainObjects.containsKey(key1)){
-
-            domainObjects.get(key1).put(key2, object);
-        }
-        else{
-
-            Map map = new HashMap();
-            map.put(key2,object);
-            domainObjects.put(key1, map);
-        }
-    }
 
     private void loadProvider(){
 
         Table finderRelatedTable = pdxDataTables.get("metadata-loader.tsv");
-        Row row = finderRelatedTable.row(5);
+        Row row = finderRelatedTable.row(4);
         Group providerGroup = dataImportService.getProviderGroup(row.getString(TSV.name.name()),
                 row.getString(TSV.abbreviation.name()), "", "", "",
                 row.getString(TSV.internal_url.name()));
 
-        addToDomainObjects(providerKey, null, providerGroup);
+        addDomainObject(providerKey, null, providerGroup);
     }
 
 
@@ -81,14 +78,26 @@ public class DomainObjectCreator {
 
             Row row = patientTable.row(i);
 
-            Patient patient = dataImportService.createPatient(row.getText(TSV.patient_id.name()),
-                    (Group) getExistingDomainObject(TSV.provider_group.name(), null), row.getText(TSV.sex.name()),
-                    "", row.getText(TSV.ethnicity.name()));
-            patient.setCancerRelevantHistory(row.getText(TSV.history.name()));
-            patient.setFirstDiagnosis(row.getText(TSV.initial_diagnosis.name()));
-            patient.setAgeAtFirstDiagnosis(row.getText(TSV.age_at_initial_diagnosis.name()));
+            String patientId = row.getText(TSV.patient_id.name());
 
-            addToDomainObjects(patientKey, row.getText(TSV.patient_id.name()), dataImportService.savePatient(patient));
+            if(patientId == null || patientId.isEmpty()){
+                continue;
+            }
+
+            try {
+                Patient patient = dataImportService.createPatient(row.getText(TSV.patient_id.name()),
+                        (Group) getDomainObject(TSV.provider_group.name(), null), row.getText(TSV.sex.name()),
+                        "", row.getText(TSV.ethnicity.name()));
+                patient.setCancerRelevantHistory(row.getText(TSV.history.name()));
+                patient.setFirstDiagnosis(row.getText(TSV.initial_diagnosis.name()));
+                patient.setAgeAtFirstDiagnosis(row.getText(TSV.age_at_initial_diagnosis.name()));
+
+                addDomainObject(patientKey, row.getText(TSV.patient_id.name()), dataImportService.savePatient(patient));
+            }
+            catch(Exception e){
+
+                log.error("Error loading patient {} at row {}", row.getText(TSV.patient_id.name()), i);
+            }
 
         }
 
@@ -131,8 +140,14 @@ public class DomainObjectCreator {
             String treated = row.getString(TSV.treated.name());
             String priorTreatment = row.getString(TSV.prior_treatment.name());
 
+            //temporary check to escape empty rows
+            //TODO:remove this when validation filters out empty rows
+            if(primarySiteName == null || primarySiteName.isEmpty()) {
 
-            Patient patient = (Patient) getExistingDomainObject(patientKey, patientId);
+                continue;
+            }
+
+            Patient patient = (Patient) getDomainObject(patientKey, patientId);
 
             PatientSnapshot patientSnapshot = patient.getSnapShotByCollection(ageAtCollection, dateOfCollection, collectionEvent, elapsedTime);
 
@@ -144,28 +159,28 @@ public class DomainObjectCreator {
                 patient.addSnapshot(patientSnapshot);
             }
 
-            Tissue primarySite = (Tissue) getExistingDomainObject(tissueKey, primarySiteName);
+            Tissue primarySite = (Tissue) getDomainObject(tissueKey, primarySiteName);
 
             if(primarySite == null){
 
                 primarySite = dataImportService.getTissue(primarySiteName);
-                addToDomainObjects(tissueKey, primarySiteName, primarySite);
+                addDomainObject(tissueKey, primarySiteName, primarySite);
             }
 
-            Tissue collectionSite = (Tissue) getExistingDomainObject(tissueKey, collectionSiteName);
+            Tissue collectionSite = (Tissue) getDomainObject(tissueKey, collectionSiteName);
 
             if(collectionSite == null){
 
                 collectionSite = dataImportService.getTissue(collectionSiteName);
-                addToDomainObjects(tissueKey, collectionSiteName, collectionSite);
+                addDomainObject(tissueKey, collectionSiteName, collectionSite);
             }
 
-            TumorType tumorType = (TumorType) getExistingDomainObject(tumorTypeKey, tumorTypeName);
+            TumorType tumorType = (TumorType) getDomainObject(tumorTypeKey, tumorTypeName);
 
             if(tumorType == null){
 
                 tumorType = dataImportService.getTumorType(tumorTypeName);
-                addToDomainObjects(tumorTypeKey, tumorTypeName, tumorType);
+                addDomainObject(tumorTypeKey, tumorTypeName, tumorType);
 
             }
 
@@ -180,7 +195,7 @@ public class DomainObjectCreator {
 
             patientSnapshot.addSample(sample);
 
-            ModelCreation modelCreation = (ModelCreation) getExistingDomainObject(modelKey, modelId);
+            ModelCreation modelCreation = (ModelCreation) getDomainObject(modelKey, modelId);
 
             modelCreation.setSample(sample);
             modelCreation.addRelatedSample(sample);
@@ -196,6 +211,8 @@ public class DomainObjectCreator {
         Table modelTable = pdxDataTables.get("metadata-model.tsv");
         int rowCount = modelTable.rowCount();
 
+        Group providerGroup = (Group) domainObjects.get(providerKey).get(null);
+
         //start this from 1, row 0 is the header
         for (int i = 1; i < rowCount; i++) {
 
@@ -204,24 +221,168 @@ public class DomainObjectCreator {
             Row row = modelTable.row(i);
 
             String modelId = row.getString(TSV.model_id.name());
-            String hostStrainName = row.getString(TSV.host_strain.name());
             String hostStrainNomenclature = row.getString(TSV.host_strain_full.name());
-            String engraftmentSiteName = row.getString(TSV.engraftment_site.name());
-            String engraftmentTypeName = row.getString(TSV.engraftment_type.name());
-            String sampleType = row.getString(TSV.sample_type.name());
-            String sampleState = row.getString(TSV.sample_state.name());
             String passageNum = row.getString(TSV.passage_number.name());
             String publications = row.getString(TSV.publications.name());
 
+            //temporary check to escape empty rows
+            //TODO:remove this when validation filters out empty rows
+            if(modelId == null || modelId.isEmpty()) continue;
+
+            ModelCreation modelCreation = new ModelCreation();
+            modelCreation.setSourcePdxId(modelId);
+            modelCreation.setDataSource(providerGroup.getAbbreviation());
+
+            addDomainObject(modelKey,modelId, modelCreation);
+
+            Specimen specimen = modelCreation.getSpecimenByPassageAndHostStrain(passageNum, hostStrainNomenclature);
+
+            if(specimen == null){
+
+                specimen = createSpecimen(row);
+                modelCreation.addSpecimen(specimen);
+                modelCreation.addRelatedSample(specimen.getSample());
+            }
         }
 
+        Table modelValidationTable = pdxDataTables.get("metadata-model_validation.tsv");
+        rowCount = modelValidationTable.rowCount();
+
+        for (int i = 1; i < rowCount; i++) {
+
+            if (i < 4) continue;
+
+            Row row = modelValidationTable.row(i);
+
+            String modelId = row.getString(TSV.model_id.name());
+            String validationTechnique = row.getString(TSV.validation_technique.name());
+            String description = row.getString(TSV.description.name());
+            String passagesTested = row.getString(TSV.passages_tested.name());
+            String hostStrainFull = row.getString(TSV.validation_host_strain_full.name());
+
+            //temporary check to escape empty rows
+            //TODO:remove this when validation filters out empty rows
+            if(modelId == null || modelId.isEmpty()) continue;
+
+            ModelCreation modelCreation = (ModelCreation) getDomainObject(modelKey, modelId);
+
+            QualityAssurance qa = new QualityAssurance();
+            qa.setTechnology(validationTechnique);
+            qa.setDescription(description);
+            qa.setPassages(passagesTested);
+            qa.setValidationHostStrain(hostStrainFull);
+
+            modelCreation.addQualityAssurance(qa);
+        }
+    }
+
+
+
+    private Specimen createSpecimen(Row row){
+
+        String hostStrainName = row.getString(TSV.host_strain.name());
+        String hostStrainNomenclature = row.getString(TSV.host_strain_full.name());
+        String engraftmentSiteName = row.getString(TSV.engraftment_site.name());
+        String engraftmentTypeName = row.getString(TSV.engraftment_type.name());
+        String sampleType = row.getString(TSV.sample_type.name());
+        String passageNum = row.getString(TSV.passage_number.name());
+
+        HostStrain hostStrain = (HostStrain) getDomainObject(hostStrainKey, hostStrainNomenclature);
+
+        if(hostStrain == null){
+            try {
+                hostStrain = dataImportService.getHostStrain(hostStrainName, hostStrainNomenclature, "", "");
+                addDomainObject(hostStrainKey, hostStrainNomenclature, hostStrain);
+            }
+            catch(Exception e){
+
+            }
+        }
+
+        EngraftmentSite engraftmentSite = (EngraftmentSite) getDomainObject(engraftmentSiteKey, engraftmentSiteName);
+
+        if(engraftmentSite == null){
+
+            engraftmentSite = dataImportService.getImplantationSite(engraftmentSiteName);
+            addDomainObject(engraftmentSiteKey, engraftmentSiteName, engraftmentSite);
+        }
+
+        EngraftmentType engraftmentType = (EngraftmentType) getDomainObject(engraftmentTypeKey, engraftmentTypeName);
+
+        if(engraftmentType == null){
+
+            engraftmentType = dataImportService.getImplantationType(engraftmentTypeName);
+            addDomainObject(engraftmentTypeKey, engraftmentTypeName, engraftmentType);
+        }
+
+        EngraftmentMaterial engraftmentMaterial = (EngraftmentMaterial) getDomainObject(engraftmentMaterialKey, sampleType);
+
+        if(engraftmentMaterial == null){
+
+            engraftmentMaterial = dataImportService.getEngraftmentMaterial(sampleType);
+            addDomainObject(engraftmentMaterialKey, sampleType, engraftmentMaterial);
+        }
+
+        Sample xenoSample = new Sample();
+
+        Specimen specimen = new Specimen();
+        specimen.setPassage(passageNum);
+        specimen.setHostStrain(hostStrain);
+        specimen.setEngraftmentMaterial(engraftmentMaterial);
+        specimen.setEngraftmentSite(engraftmentSite);
+        specimen.setEngraftmentType(engraftmentType);
+        specimen.setSample(xenoSample);
+
+        return specimen;
+    }
+
+
+
+
+    private void persistNodes(){
+
+
+        Map<String, Object> patients = domainObjects.get(patientKey);
+
+        for(Object value : patients.values()){
+
+            dataImportService.savePatient((Patient) value);
+
+        }
+
+        Map<String, Object> models = domainObjects.get(modelKey);
+
+        for(Object value : models.values()){
+
+            dataImportService.saveModelCreation((ModelCreation) value);
+
+        }
 
     }
 
 
-    private Object getExistingDomainObject(String key1,  String key2){
+    private void addDomainObject(String key1, String key2, Object object){
 
-        return domainObjects.get(key1).get(key2);
+        if(domainObjects.containsKey(key1)){
+
+            domainObjects.get(key1).put(key2, object);
+        }
+        else{
+
+            Map map = new HashMap();
+            map.put(key2,object);
+            domainObjects.put(key1, map);
+        }
+    }
+
+    private Object getDomainObject(String key1, String key2){
+
+        if(domainObjects.containsKey(key1) && domainObjects.get(key1).containsKey(key2)){
+
+            return domainObjects.get(key1).get(key2);
+        }
+
+        return null;
     }
 
 }
