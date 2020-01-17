@@ -1,14 +1,11 @@
 package org.pdxfinder.dataloaders.updog;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
-public class MetadataValidator implements TableCollectionValidator {
+public class MetadataValidator {
 
     private final List<String> requiredDataTables = Arrays.asList(
         "patient",
@@ -19,13 +16,12 @@ public class MetadataValidator implements TableCollectionValidator {
         "loader"
     );
 
-    @Autowired
-    public MetadataValidator() {
-    }
+    public MetadataValidator(
+        Map<String, Table> pdxDataTables,
+        Map<String, List<String>> columnSpecification) { }
 
 
-    @Override
-    public boolean passesValidation(Map<String, Table> pdxDataTables) {
+    public boolean validate(Map<String, Table> pdxDataTables) {
         if (pdxDataTables.isEmpty()) return false;
         if (isMissingRequiredTables(pdxDataTables)) return false;
 
@@ -43,4 +39,5 @@ public class MetadataValidator implements TableCollectionValidator {
             .map(s -> String.format("metadata-%s.tsv", s))
             .collect(Collectors.toCollection(ArrayList::new));
     }
+
 }

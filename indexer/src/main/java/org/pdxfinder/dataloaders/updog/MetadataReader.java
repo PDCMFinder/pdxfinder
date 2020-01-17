@@ -1,6 +1,5 @@
 package org.pdxfinder.dataloaders.updog;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import org.slf4j.Logger;
@@ -14,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @Component
@@ -21,9 +21,7 @@ public class MetadataReader {
 
     private static final Logger log = LoggerFactory.getLogger(MetadataReader.class);
 
-    @Autowired public MetadataReader() {}
-
-    public HashMap<String, Table> readMetadataTsvs(Path targetDirectory) {
+    public Map<String, Table> readMetadataTsvs(Path targetDirectory) {
         HashMap<String, Table> metaDataTables = new HashMap<>();
         final PathMatcher onlyMetadataTsv = targetDirectory
             .getFileSystem()

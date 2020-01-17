@@ -10,14 +10,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
 
 public class MetadataValidatorTest {
 
     public Map<String, Table> completeFileSet = new HashMap<>();
 
-    @Before
-    public void setUp() {
+    @Before public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         Arrays.asList(
@@ -32,34 +32,29 @@ public class MetadataValidatorTest {
 
     }
 
-    @InjectMocks
-    private MetadataValidator metadataValidator;
+    @InjectMocks private MetadataValidator metadataValidator;
 
-    @Test
-    public void Given_EmptyMap_WhenValidating_FailsValidation() {
+    @Test public void Given_EmptyMap_WhenValidating_FailsValidation() {
         Map<String, Table> emptyHashMap = new HashMap<>();
-        assertEquals(false, metadataValidator.passesValidation(emptyHashMap));
+        assertThat(metadataValidator.validate(emptyHashMap), is(false));
     }
 
-    @Test
-    public void Given_IncompleteMap_WhenValidating_FailsValidation() {
+    @Test public void Given_IncompleteMap_WhenValidating_FailsValidation() {
         Map<String, Table> incompleteFileSet;
         incompleteFileSet = completeFileSet;
         incompleteFileSet.remove("metadata-patient.tsv");
-        assertEquals(false, metadataValidator.passesValidation(incompleteFileSet));
+        assertThat(metadataValidator.validate(incompleteFileSet), is(false));
     }
 
-    @Test
-    public void Given_CompleteMap_WhenValidating_PassesValidation() {
-        assertEquals(true, metadataValidator.passesValidation(completeFileSet));
+    @Test public void Given_CompleteMap_WhenValidating_PassesValidation() {
+        assertThat(metadataValidator.validate(completeFileSet), is(true));
     }
 
-    @Test
-    public void Given_ExtraTableInMap_WhenValidating_PassesValidation() {
+    @Test public void Given_ExtraTableInMap_WhenValidating_PassesValidation() {
         Map<String, Table> completeFileSetPlusOne;
         completeFileSetPlusOne = completeFileSet;
         completeFileSetPlusOne.put("extra-file.tsv", Table.create());
-        assertEquals(true, metadataValidator.passesValidation(completeFileSetPlusOne));
+        assertThat(metadataValidator.validate(completeFileSetPlusOne), is(true));
     }
 
 
