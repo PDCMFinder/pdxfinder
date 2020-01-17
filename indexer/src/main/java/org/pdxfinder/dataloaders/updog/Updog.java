@@ -57,7 +57,7 @@ public class Updog {
     }
 
     public boolean validatePdxDataTables(Map<String, Table> pdxDataTables){
-        return metadataValidator.passesValidation(pdxDataTables);
+        return metadataValidator.validate(pdxDataTables);
     }
 
 
