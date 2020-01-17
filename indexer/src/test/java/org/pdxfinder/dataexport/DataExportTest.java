@@ -157,8 +157,8 @@ public class DataExportTest extends BaseTest {
 
         List<List<String>> samplePlatformDescription = universalDataExporter.getSamplePlatformDescriptionSheetDataExport();
 
-        Assert.assertEquals("s123", samplePlatformDescription.get(0).get(0));
-        Assert.assertEquals("xs123", samplePlatformDescription.get(1).get(0));
+        Assert.assertEquals("s123", samplePlatformDescription.get(0).get(1));
+        Assert.assertEquals("xs123", samplePlatformDescription.get(1).get(1));
 
     }
 
