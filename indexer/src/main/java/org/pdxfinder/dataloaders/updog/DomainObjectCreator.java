@@ -14,9 +14,9 @@ public class DomainObjectCreator {
     private Map<String, Table> pdxDataTables;
     //nodeType=>ID=>NodeObject
     private Map<String, Map<String, Object>> domainObjects;
-    private UtilityService utilityService;
+
     private DataImportService dataImportService;
-    private final static Logger log = LoggerFactory.getLogger(DomainObjectCreator.class);
+    private static final Logger log = LoggerFactory.getLogger(DomainObjectCreator.class);
 
     private String patientKey = "patient";
     private String providerKey = "provider_group";
@@ -29,10 +29,10 @@ public class DomainObjectCreator {
     private String engraftmentMaterialKey = "engraftment_material";
 
 
-    public DomainObjectCreator(DataImportService dataImportService, UtilityService utilityService,
+    public DomainObjectCreator(DataImportService dataImportService,
                                Map<String, Table> pdxDataTables) {
         this.dataImportService = dataImportService;
-        this.utilityService = utilityService;
+
         this.pdxDataTables = pdxDataTables;
         domainObjects = new HashMap<>();
     }

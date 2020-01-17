@@ -64,7 +64,7 @@ public class Updog {
     public void createPdxObjects(){
 
         //create domain objects database nodes
-        DomainObjectCreator doc = new DomainObjectCreator(dataImportService, utilityService, pdxDataTables);
+        DomainObjectCreator doc = new DomainObjectCreator(dataImportService, pdxDataTables);
         //save db
         doc.loadDomainObjects();
 
