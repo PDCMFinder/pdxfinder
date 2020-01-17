@@ -221,12 +221,7 @@ public class DomainObjectCreator {
             Row row = modelTable.row(i);
 
             String modelId = row.getString(TSV.model_id.name());
-            String hostStrainName = row.getString(TSV.host_strain.name());
             String hostStrainNomenclature = row.getString(TSV.host_strain_full.name());
-            String engraftmentSiteName = row.getString(TSV.engraftment_site.name());
-            String engraftmentTypeName = row.getString(TSV.engraftment_type.name());
-            String sampleType = row.getString(TSV.sample_type.name());
-            String sampleState = row.getString(TSV.sample_state.name());
             String passageNum = row.getString(TSV.passage_number.name());
             String publications = row.getString(TSV.publications.name());
 
@@ -240,10 +235,6 @@ public class DomainObjectCreator {
 
             addDomainObject(modelKey,modelId, modelCreation);
 
-
-
-
-
             Specimen specimen = modelCreation.getSpecimenByPassageAndHostStrain(passageNum, hostStrainNomenclature);
 
             if(specimen == null){
@@ -251,18 +242,39 @@ public class DomainObjectCreator {
                 specimen = createSpecimen(row);
                 modelCreation.addSpecimen(specimen);
                 modelCreation.addRelatedSample(specimen.getSample());
-
             }
-
-
-
-
         }
 
+        Table modelValidationTable = pdxDataTables.get("metadata-model_validation.tsv");
+        rowCount = modelValidationTable.rowCount();
 
+        for (int i = 1; i < rowCount; i++) {
+
+            if (i < 4) continue;
+
+            Row row = modelValidationTable.row(i);
+
+            String modelId = row.getString(TSV.model_id.name());
+            String validationTechnique = row.getString(TSV.validation_technique.name());
+            String description = row.getString(TSV.description.name());
+            String passagesTested = row.getString(TSV.passages_tested.name());
+            String hostStrainFull = row.getString(TSV.validation_host_strain_full.name());
+
+            //temporary check to escape empty rows
+            //TODO:remove this when validation filters out empty rows
+            if(modelId == null || modelId.isEmpty()) continue;
+
+            ModelCreation modelCreation = (ModelCreation) getDomainObject(modelKey, modelId);
+
+            QualityAssurance qa = new QualityAssurance();
+            qa.setTechnology(validationTechnique);
+            qa.setDescription(description);
+            qa.setPassages(passagesTested);
+            qa.setValidationHostStrain(hostStrainFull);
+
+            modelCreation.addQualityAssurance(qa);
+        }
     }
-
-
 
 
 

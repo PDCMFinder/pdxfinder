@@ -18,7 +18,8 @@ public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextA
 
     private Updog updog;
     private String provider;
-    @Value("${data.directory}") private String dataDirectory;
+    @Value("${data.directory}")
+    private String dataDirectory;
     private Path updogDirectory;
 
     @Autowired
@@ -26,7 +27,7 @@ public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextA
         this.updog = updog;
     }
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data.directory}")
     private String finderRootDir;
 
     @Override
@@ -40,7 +41,7 @@ public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextA
 
         finderRootDir = (String) options.valueOf("pdxfinder.root.dir");
         provider = (String) options.valueOf("provider");
-        updogDirectory = Paths.get(finderRootDir, "/data/UPDOG", provider);
+        updogDirectory = Paths.get(dataDirectory, "/data/UPDOG", provider);
 
         if (options.has("loadUniversalRefactor")) {
             updog.run(updogDirectory);
