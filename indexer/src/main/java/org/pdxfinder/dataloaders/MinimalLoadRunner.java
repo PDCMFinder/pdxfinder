@@ -3,9 +3,6 @@ package org.pdxfinder.dataloaders;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.pdxfinder.dataloaders.updog.Updog;
-import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.services.UtilityService;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -13,38 +10,45 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @Component
 public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextAware {
 
-    @Value("${data.directory}")
-    private String dataDirectory;
+    private Updog updog;
+    private String provider;
+    @Value("${data.directory}") private String dataDirectory;
+    private Path updogDirectory;
 
     @Autowired
-    private DataImportService dataImportService;
-    @Autowired
-    private UtilityService utilityService;
+    public MinimalLoadRunner(Updog updog) {
+        this.updog = updog;
+    }
+
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     @Override
     public void run(String... args) throws Exception {
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadUniversalRefactor");
+        parser.accepts("provider").withRequiredArg();
+        parser.accepts("pdxfinder.root.dir").withRequiredArg();
         OptionSet options = parser.parse(args);
-        dataDirectory = UniversalLoader.stripTrailingSlash(dataDirectory);
 
-        String provider;
-        provider = "UOC-BC";
+        finderRootDir = (String) options.valueOf("pdxfinder.root.dir");
+        provider = (String) options.valueOf("provider");
+        updogDirectory = Paths.get(finderRootDir, "/data/UPDOG", provider);
 
         if (options.has("loadUniversalRefactor")) {
-            Updog updog = new Updog(dataImportService, utilityService);
-            updog.setProvider(provider);
-            updog.setUpdogDir(dataDirectory+"/data/UPDOG");
-            updog.run();
+            updog.run(updogDirectory);
         }
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) {
         // Blank override
     }
 }

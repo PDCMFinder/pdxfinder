@@ -1,7 +1,6 @@
 package org.pdxfinder.dataloaders.updog;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import org.slf4j.Logger;
@@ -14,56 +13,39 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Stream;
 
 @Component
-public class TemplateReader {
+public class MetadataReader {
 
-    Path targetDirectory;
+    private static final Logger log = LoggerFactory.getLogger(MetadataReader.class);
 
-    private static final Logger log = LoggerFactory.getLogger(TemplateReader.class);
+    @Autowired public MetadataReader() {}
 
-    @Autowired
-    public TemplateReader() {
-
-    }
-
-
-
-    public Map<String, Table> read(){
-        HashMap<String, Table> emptyHashMap = new HashMap<>();
-        return directoryExists() ? collectDataTables() : emptyHashMap;
-    }
-
-    private boolean directoryExists() {
-        return targetDirectory.toFile().exists();
-    }
-
-    private HashMap<String, Table> collectDataTables() {
-        HashMap<String, Table> dataTableHashMap = new HashMap<>();
+    public HashMap<String, Table> readMetadataTsvs(Path targetDirectory) {
+        HashMap<String, Table> metaDataTables = new HashMap<>();
         final PathMatcher onlyMetadataTsv = targetDirectory
             .getFileSystem()
             .getPathMatcher("glob:**metadata-*.tsv");
         try (final Stream<Path> stream = Files.list(targetDirectory)) {
             stream
                 .filter(onlyMetadataTsv::matches)
-                .forEach(path -> dataTableHashMap.put(
+                .forEach(path -> metaDataTables.put(
                     path.getFileName().toString(),
-                    readTsvFile(path.toFile()))
+                    readTsvOrReturnEmpty(path.toFile()))
                 );
         } catch (IOException e) {
-            log.error("There was an error reading the templates: " , e);
+            log.error("There was an error reading the metadata files", e);
         }
-        return dataTableHashMap;
+        return metaDataTables;
     }
 
-    private static Table readTsvFile(File file) {
+    private static Table readTsvOrReturnEmpty(File file) {
         Table dataTable = Table.create();
+        log.trace("Reading tsv file {}", file);
         try { dataTable = readTsv(file); }
-        catch (IOException e) { log.error("There was an error reading the file:" , e); }
+        catch (IOException e) { log.error("There was an error reading the tsv file" , e); }
         return dataTable;
     }
 
@@ -75,11 +57,4 @@ public class TemplateReader {
         return Table.read().usingOptions(options);
     }
 
-    public Path getTargetDirectory() {
-        return targetDirectory;
-    }
-
-    public void setTargetDirectory(Path targetDirectory) {
-        this.targetDirectory = targetDirectory;
-    }
 }
