@@ -226,5 +226,18 @@ public class ModelCreation {
         this.groups.add(g);
     }
 
+    public Specimen getSpecimenByPassageAndHostStrain(String passage, String hostStrain){
+
+        if(specimens == null || specimens.size() == 0) return null;
+
+        for(Specimen sp : specimens){
+
+            if(sp != null && sp.getPassage() != null && sp.getPassage().equals(passage) && sp.getHostStrain() != null &&
+                    sp.getHostStrain().getSymbol().equals(hostStrain)) return sp;
+
+        }
+
+        return null;
+    }
 
 }
