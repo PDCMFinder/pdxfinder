@@ -65,6 +65,8 @@ public class LoaderProperties {
     protected String omicGenomeAssembly;
     protected String omicZscore;
     protected String omicPlatform;
+    protected String omicNucleotideChange;
+    protected String omicRsIdVariants;
 
     protected String omicSeqEndPosition;
     protected String omicCnaLog10RCNA;

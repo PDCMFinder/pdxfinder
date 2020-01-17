@@ -775,7 +775,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
             //check essential values
 
             if (sampleId == null || origin == null || modelId == null
-                    || molCharType == null || platformName == null || platformTechnology == null || platformDescription == null
+                    || molCharType == null || platformName == null
                     ) {
 
                 log.error("Missing essential value in row " + row);
