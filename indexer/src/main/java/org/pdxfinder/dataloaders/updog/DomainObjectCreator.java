@@ -1,7 +1,6 @@
 package org.pdxfinder.dataloaders.updog;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.tablesaw.api.Row;
@@ -14,9 +13,9 @@ public class DomainObjectCreator {
     private Map<String, Table> pdxDataTables;
     //nodeType=>ID=>NodeObject
     private Map<String, Map<String, Object>> domainObjects;
-    private UtilityService utilityService;
+
     private DataImportService dataImportService;
-    private final static Logger log = LoggerFactory.getLogger(DomainObjectCreator.class);
+    private static final Logger log = LoggerFactory.getLogger(DomainObjectCreator.class);
 
     private String patientKey = "patient";
     private String providerKey = "provider_group";
@@ -29,10 +28,10 @@ public class DomainObjectCreator {
     private String engraftmentMaterialKey = "engraftment_material";
 
 
-    public DomainObjectCreator(DataImportService dataImportService, UtilityService utilityService,
+    public DomainObjectCreator(DataImportService dataImportService,
                                Map<String, Table> pdxDataTables) {
         this.dataImportService = dataImportService;
-        this.utilityService = utilityService;
+
         this.pdxDataTables = pdxDataTables;
         domainObjects = new HashMap<>();
     }
@@ -80,6 +79,8 @@ public class DomainObjectCreator {
 
             String patientId = row.getText(TSV.patient_id.name());
 
+            //temporary check to escape empty rows
+            //TODO:remove this when validation filters out empty rows
             if(patientId == null || patientId.isEmpty()){
                 continue;
             }
@@ -117,28 +118,15 @@ public class DomainObjectCreator {
             Row row = sampleTable.row(i);
 
             String patientId = row.getString(TSV.patient_id.name());
-            String sampleId = row.getString(TSV.sample_id.name());
+
             String modelId = row.getString(TSV.model_id.name());
             String dateOfCollection = row.getString(TSV.collection_date.name());
             String ageAtCollection = row.getString(TSV.age_in_years_at_collection.name());
             String collectionEvent = row.getString(TSV.collection_event.name());
             String elapsedTime = row.getString(TSV.months_since_collection_1.name());
-            String diagnosis = row.getString(TSV.diagnosis.name());
-
-
-            String tumorTypeName = row.getString(TSV.tumour_type.name());
             String primarySiteName = row.getString(TSV.primary_site.name());
-            String collectionSiteName = row.getString(TSV.collection_site.name());
-
-            String stage = row.getString(TSV.stage.name());
-            String stagingSystem = row.getString(TSV.staging_system.name());
-            String grade = row.getString(TSV.grade.name());
-            String gradingSystem = row.getString(TSV.grading_system.name());
             String virologyStatus = row.getString(TSV.virology_status.name());
-            String sharable = row.getString(TSV.sharable.name());
             String treatmentNaive = row.getString(TSV.treatment_naive_at_collection.name());
-            String treated = row.getString(TSV.treated.name());
-            String priorTreatment = row.getString(TSV.prior_treatment.name());
 
             //temporary check to escape empty rows
             //TODO:remove this when validation filters out empty rows
@@ -148,6 +136,8 @@ public class DomainObjectCreator {
             }
 
             Patient patient = (Patient) getDomainObject(patientKey, patientId);
+
+            if(patient == null) throw new NullPointerException();
 
             PatientSnapshot patientSnapshot = patient.getSnapShotByCollection(ageAtCollection, dateOfCollection, collectionEvent, elapsedTime);
 
@@ -159,43 +149,14 @@ public class DomainObjectCreator {
                 patient.addSnapshot(patientSnapshot);
             }
 
-            Tissue primarySite = (Tissue) getDomainObject(tissueKey, primarySiteName);
 
-            if(primarySite == null){
-
-                primarySite = dataImportService.getTissue(primarySiteName);
-                addDomainObject(tissueKey, primarySiteName, primarySite);
-            }
-
-            Tissue collectionSite = (Tissue) getDomainObject(tissueKey, collectionSiteName);
-
-            if(collectionSite == null){
-
-                collectionSite = dataImportService.getTissue(collectionSiteName);
-                addDomainObject(tissueKey, collectionSiteName, collectionSite);
-            }
-
-            TumorType tumorType = (TumorType) getDomainObject(tumorTypeKey, tumorTypeName);
-
-            if(tumorType == null){
-
-                tumorType = dataImportService.getTumorType(tumorTypeName);
-                addDomainObject(tumorTypeKey, tumorTypeName, tumorType);
-
-            }
-
-
-            Sample sample = new Sample();
-            sample.setSourceSampleId(sampleId);
-            sample.setDiagnosis(diagnosis);
-            sample.setStage(stage);
-            sample.setStageClassification(stagingSystem);
-            sample.setGrade(grade);
-            sample.setGradeClassification(gradingSystem);
+            Sample sample = createPatientSample(row);
 
             patientSnapshot.addSample(sample);
 
             ModelCreation modelCreation = (ModelCreation) getDomainObject(modelKey, modelId);
+
+            if(modelCreation == null) throw new NullPointerException();
 
             modelCreation.setSample(sample);
             modelCreation.addRelatedSample(sample);
@@ -239,7 +200,7 @@ public class DomainObjectCreator {
 
             if(specimen == null){
 
-                specimen = createSpecimen(row);
+                specimen = createSpecimen(row, i);
                 modelCreation.addSpecimen(specimen);
                 modelCreation.addRelatedSample(specimen.getSample());
             }
@@ -266,6 +227,8 @@ public class DomainObjectCreator {
 
             ModelCreation modelCreation = (ModelCreation) getDomainObject(modelKey, modelId);
 
+            if(modelCreation == null) throw new NullPointerException();
+
             QualityAssurance qa = new QualityAssurance();
             qa.setTechnology(validationTechnique);
             qa.setDescription(description);
@@ -278,7 +241,7 @@ public class DomainObjectCreator {
 
 
 
-    private Specimen createSpecimen(Row row){
+    private Specimen createSpecimen(Row row, int rowCounter){
 
         String hostStrainName = row.getString(TSV.host_strain.name());
         String hostStrainNomenclature = row.getString(TSV.host_strain_full.name());
@@ -295,7 +258,7 @@ public class DomainObjectCreator {
                 addDomainObject(hostStrainKey, hostStrainNomenclature, hostStrain);
             }
             catch(Exception e){
-
+                log.error("Host strain symbol is empty in row {}", rowCounter);
             }
         }
 
@@ -336,6 +299,53 @@ public class DomainObjectCreator {
         return specimen;
     }
 
+    private Sample createPatientSample(Row row){
+
+        String diagnosis = row.getString(TSV.diagnosis.name());
+        String sampleId = row.getString(TSV.sample_id.name());
+        String tumorTypeName = row.getString(TSV.tumour_type.name());
+        String primarySiteName = row.getString(TSV.primary_site.name());
+        String collectionSiteName = row.getString(TSV.collection_site.name());
+        String stage = row.getString(TSV.stage.name());
+        String stagingSystem = row.getString(TSV.staging_system.name());
+        String grade = row.getString(TSV.grade.name());
+        String gradingSystem = row.getString(TSV.grading_system.name());
+
+        Tissue primarySite = (Tissue) getDomainObject(tissueKey, primarySiteName);
+
+        if(primarySite == null){
+
+            primarySite = dataImportService.getTissue(primarySiteName);
+            addDomainObject(tissueKey, primarySiteName, primarySite);
+        }
+
+        Tissue collectionSite = (Tissue) getDomainObject(tissueKey, collectionSiteName);
+
+        if(collectionSite == null){
+
+            collectionSite = dataImportService.getTissue(collectionSiteName);
+            addDomainObject(tissueKey, collectionSiteName, collectionSite);
+        }
+
+        TumorType tumorType = (TumorType) getDomainObject(tumorTypeKey, tumorTypeName);
+
+        if(tumorType == null){
+
+            tumorType = dataImportService.getTumorType(tumorTypeName);
+            addDomainObject(tumorTypeKey, tumorTypeName, tumorType);
+
+        }
+
+        Sample sample = new Sample();
+        sample.setSourceSampleId(sampleId);
+        sample.setDiagnosis(diagnosis);
+        sample.setStage(stage);
+        sample.setStageClassification(stagingSystem);
+        sample.setGrade(grade);
+        sample.setGradeClassification(gradingSystem);
+
+        return sample;
+    }
 
 
 
