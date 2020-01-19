@@ -15,22 +15,38 @@ public class MetadataValidator {
         "sharing",
         "loader"
     );
+    private ArrayList<TableValidationError> validationErrors;
 
     public MetadataValidator(
         Map<String, Table> pdxDataTables,
-        Map<String, List<String>> columnSpecification) { }
+        Map<String, List<String>> columnSpecification) {
+        this.validationErrors = new ArrayList<>();
+    }
 
 
     public boolean validate(Map<String, Table> pdxDataTables) {
-        if (pdxDataTables.isEmpty()) return false;
         if (isMissingRequiredTables(pdxDataTables)) return false;
 
         return true;
     }
 
+    public ArrayList<TableValidationError> validateAndGetErrors(Map<String, Table> pdxDataTables) {
+        if (isMissingRequiredTables(pdxDataTables)) {
+            getMissingFilesFrom(pdxDataTables).forEach(
+                f -> validationErrors.add(TableValidationError.create(f))
+            );
+        }
+        return validationErrors;
+    }
+
     private boolean isMissingRequiredTables(Map<String, Table> pdxDataTables) {
-        List<String> requiredFiles = getRequiredFiles();
-        return !pdxDataTables.keySet().containsAll(requiredFiles);
+        return !getMissingFilesFrom(pdxDataTables).isEmpty();
+    }
+
+    private List<String> getMissingFilesFrom(Map<String, Table> pdxDataTablesToBeValidated) {
+        List<String> missingFiles = getRequiredFiles();
+        missingFiles.removeAll(pdxDataTablesToBeValidated.keySet());
+        return missingFiles;
     }
 
     private ArrayList<String> getRequiredFiles() {
@@ -38,6 +54,10 @@ public class MetadataValidator {
             .stream()
             .map(s -> String.format("metadata-%s.tsv", s))
             .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public ArrayList<TableValidationError> getValidationErrors() {
+        return validationErrors;
     }
 
 }

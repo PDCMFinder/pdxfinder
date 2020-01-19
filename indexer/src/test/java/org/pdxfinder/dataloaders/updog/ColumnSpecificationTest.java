@@ -32,18 +32,18 @@ public class ColumnSpecificationTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    @Test public void Given_ColumnSpecificationAndValidTableCols_WhenValidating_PassesValidation() {
+    @Test public void containsRequiredColumns_givenColumnSpecificationAndValidCols_passesValidation() {
         assertThat(twoColumnSpecification.containsRequiredColumns(twoColumnTable), is(true));
     }
 
-    @Test public void GivenColumnSpecificationAndMissingColInTable_WhenValidating_FailsValidation() {
+    @Test public void containsRequiredColumns_givenColumnSpecificationAndMissingColInTable_failsValidation() {
         Table tableMissingColumn = twoColumnTable;
         tableMissingColumn.removeColumns(fieldName1);
         assertThat(twoColumnSpecification.containsRequiredColumns(tableMissingColumn), is(false));
 
     }
 
-    @Test public void GivenColumnSpecificationAndMissingColInTable_WhenValidating_ReturnsMissingCol() {
+    @Test public void getMissingColumnsFrom_givenColumnSpecificationAndMissingColInTable_returnsMissingCol(){
         Table tableMissingColumn = twoColumnTable;
         tableMissingColumn.removeColumns(fieldName1);
         assertEquals(
@@ -52,7 +52,7 @@ public class ColumnSpecificationTest {
         );
     }
 
-    @Test public void GivenColumnSpecificationAndCompleteTable_WhenValidating_ReturnsNoMissingCols() {
+    @Test public void getMissingColumnsFrom_givenColumnsSpecificationAndCompleteTable_returnsNoMissingCols() {
         Table completeTable = twoColumnTable;
         assertEquals(
             emptyList,
@@ -60,7 +60,7 @@ public class ColumnSpecificationTest {
         );
     }
 
-    @Test public void GivenColumnSpecificationAndExtraColInTable_WhenValidating_ReturnsNoMissingCols() {
+    @Test public void getMissingColumnsFrom_givenColumnSpecificationAndExtraColInTable_returnsNoMissingCols() {
         Table completeTableWithExtraColumn = twoColumnTable;
         completeTableWithExtraColumn.addColumns(StringColumn.create("field_3"));
         assertEquals(
