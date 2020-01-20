@@ -113,7 +113,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 }
                 else if(singleDataTsvFile.exists()){
 
-                    Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(singleDataCsv,omicModelID);
+                    Map<String, List<Map<String, String>> > fullData = utilityService.serializeAndGroupFileContent(singleDataTsv,omicModelID);
                     dataList = fullData.get(modelCreation.getSourcePdxId());
                 }
 
