@@ -44,7 +44,7 @@ public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextA
         updogDirectory = Paths.get(dataDirectory, "/data/UPDOG", provider);
 
         if (options.has("loadUniversalRefactor")) {
-            updog.run(updogDirectory);
+            updog.run(updogDirectory, provider);
         }
     }
 

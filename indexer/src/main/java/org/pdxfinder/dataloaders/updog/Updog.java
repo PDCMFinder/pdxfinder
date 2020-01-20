@@ -21,23 +21,27 @@ public class Updog {
     private MetadataReader metadataReader;
     private MetadataValidator metadataValidator;
     private Map<String, Table> pdxDataTables;
+    private String provider;
 
     @Autowired
     public Updog(
             DataImportService dataImportService,
             UtilityService utilityService,
             MetadataReader metadataReader,
-            MetadataValidator metadataValidator) {
+            MetadataValidator metadataValidator,
+            String provider) {
 
         Assert.notNull(dataImportService, "dataImportService cannot be null");
         Assert.notNull(utilityService, "utilityService cannot be null");
         Assert.notNull(metadataReader, "metadataReader cannot be null");
+        Assert.notNull(provider, "provider cannot be null");
         Assert.notNull(metadataValidator, "templateValidator cannot be null");
 
         this.dataImportService = dataImportService;
         this.utilityService = utilityService;
         this.metadataReader = metadataReader;
         this.metadataValidator = metadataValidator;
+        this.provider = provider;
         this.pdxDataTables = new HashMap<>();
     }
 
@@ -45,10 +49,10 @@ public class Updog {
     private static final Logger log = LoggerFactory.getLogger(Updog.class);
 
 
-    public void run(Path updogDir) {
+    public void run(Path updogDir, String provider) {
         log.debug("Running UPDOG on [{}]", updogDir);
         pdxDataTables = readPdxDataFromPath(updogDir);
-        validatePdxDataTables(pdxDataTables);
+        validatePdxDataTables(pdxDataTables, provider);
         createPdxObjects();
     }
 
@@ -56,8 +60,8 @@ public class Updog {
         return metadataReader.readMetadataTsvs(updogDir);
     }
 
-    public boolean validatePdxDataTables(Map<String, Table> pdxDataTables){
-        return metadataValidator.validate(pdxDataTables);
+    public boolean validatePdxDataTables(Map<String, Table> pdxDataTables, String provider){
+        return metadataValidator.passesValidation(pdxDataTables, provider);
     }
 
 
