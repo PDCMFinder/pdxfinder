@@ -506,7 +506,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
             if (isNullOrEmpty(modelId) || isNullOrEmpty(hostStrainName) || isNullOrEmpty(hostStrainNomenclature) ||
                     isNullOrEmpty(engraftmentSite) || isNullOrEmpty(engraftmentType) || isNullOrEmpty(engraftmentMaterial)) {
 
-                log.error("Missing essential value in row: " + row);
+                log.error("Missing essential value in row: " + row + " in model sheets");
                 row++;
                 continue;
 
@@ -778,7 +778,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     || molCharType == null || platformName == null
                     ) {
 
-                log.error("Missing essential value in row " + row);
+                log.error("Missing essential value in row " + row + "in platforms");
                 row++;
                 continue;
             }
@@ -966,15 +966,20 @@ public class UniversalLoader extends UniversalLoaderOmic {
         finderRootDir = stripTrailingSlash(finderRootDir);
         dataRootDirectory = finderRootDir + "/data/UPDOG";
 
-        omicModelID = "Model_ID";
-        omicSampleID = "Sample_ID";
+        omicModelID = "model_id";
+        omicSampleID = "sample_id";
         omicSampleOrigin = "sample_origin";
-        omicPassage = "Passage";
-        omicHostStrainName = "host_strain_name";
-        omicHgncSymbol = "hgnc_symbol";
+        omicHostStrainName = "host_strain_nomenclature";
+        omicPassage = "passage";
+        omicHgncSymbol = "symbol";
+        omicBiotype = "biotype";
+        omicCodingSequenceChange = "coding_sequence_change";
+        omicVariantClass = "variant_class";
+        omicCodonChange = "codon_change";
         omicAminoAcidChange = "amino_acid_change";
         omicNucleotideChange = "nucleotide_change";
         omicConsequence = "consequence";
+        omicFunctionalPrediction = "functional_prediction";
         omicReadDepth = "read_depth";
         omicAlleleFrequency = "Allele_frequency";
         omicChromosome = "chromosome";
@@ -983,11 +988,12 @@ public class UniversalLoader extends UniversalLoaderOmic {
         omicAltAllele = "alt_allele";
         omicUcscGeneId = "ucsc_gene_id";
         omicNcbiGeneId = "ncbi_gene_id";
+        omicNcbiTranscriptId = "ncbi_transcript_id";
         omicEnsemblGeneId = "ensembl_gene_id";
         omicEnsemblTranscriptId = "ensembl_transcript_id";
-        omicRsIdVariants = "rs_id_Variant";
+        omicRsIdVariants = "variation_id";
         omicGenomeAssembly = "genome_assembly";
-        omicPlatform = "Platform";
+        omicPlatform = "platform";
 
         omicSeqEndPosition = "seq_end_position";
         omicCnaLog10RCNA = "log10R_cna";
@@ -1012,15 +1018,15 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
         if (dataSourceAbbreviation.equals("CRL")) {
             omicDataFilesType = "ONE_FILE_PER_MODEL";
-            omicFileExtension = "csv";
+            omicFileExtension = "tsv";
         }
         else if(dataSourceAbbreviation.equals("UOM-BC")){
             omicDataFilesType = "ONE_FILE_PER_MODEL";
-            omicFileExtension = "xlsx";
+            omicFileExtension = "tsv";
         }
         else {
             omicDataFilesType = "ALL_MODELS_IN_ONE_FILE";
-            omicFileExtension = "xlsx";
+            omicFileExtension = "tsv";
         }
 
 
@@ -1264,7 +1270,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
 
             if (origin == null || modelId == null || markerSymbol == null || markerStatus == null || technique == null) {
-                log.error("Missing essential value in row " + row);
+                log.error("Missing essential value in row " + row + "in cytogenetics");
                 row++;
                 continue;
             }
