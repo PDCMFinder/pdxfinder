@@ -56,7 +56,21 @@ public class DomainObjectCreatorTest extends BaseTest {
     }
 
 
+    @Test
+    public void Given_PatientTable_When_CreatePatient_Then_PatientNodeIsInMap(){
 
+        domainObjectCreator.addDomainObject("provider_group", null, providerGroup);
+        when(dataImportService.createPatient("patient1", providerGroup, "female", "", "ethnicity")).thenReturn(testPatient);
+        when(dataImportService.savePatient(testPatient)).thenReturn(testPatient);
+
+        domainObjectCreator.createPatientData();
+
+        Patient patient = (Patient) domainObjectCreator.getDomainObject("patient", "patient1");
+
+        Assert.assertEquals("patient1", patient.getExternalId());
+        Assert.assertEquals("female", patient.getSex());
+
+    }
 
 
 
