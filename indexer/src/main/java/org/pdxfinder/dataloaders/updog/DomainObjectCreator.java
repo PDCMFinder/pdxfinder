@@ -41,10 +41,11 @@ public class DomainObjectCreator {
 
 
         //: Do not change the order of these unless you want to risk 1. the universe to collapse OR 2. missing nodes in the db
-        loadProvider();
-        loadPatientData();
-        loadModelData();
-        loadSampleData();
+        createProvider();
+        createPatientData();
+        createModelData();
+        createSampleData();
+        createSharingData();
 
         persistNodes();
 
@@ -53,7 +54,7 @@ public class DomainObjectCreator {
 
 
 
-    private void loadProvider(){
+    private void createProvider(){
 
         Table finderRelatedTable = pdxDataTables.get("metadata-loader.tsv");
         Row row = finderRelatedTable.row(4);
@@ -65,7 +66,7 @@ public class DomainObjectCreator {
     }
 
 
-    private void loadPatientData() {
+    private void createPatientData() {
 
         Table patientTable = pdxDataTables.get("metadata-patient.tsv");
         int rowCount = patientTable.rowCount();
@@ -104,7 +105,7 @@ public class DomainObjectCreator {
 
     }
 
-    private void loadSampleData(){
+    private void createSampleData(){
 
 
         Table sampleTable = pdxDataTables.get("metadata-sample.tsv");
@@ -166,8 +167,7 @@ public class DomainObjectCreator {
 
     }
 
-
-    private void loadModelData(){
+    private void createModelData(){
 
         Table modelTable = pdxDataTables.get("metadata-model.tsv");
         int rowCount = modelTable.rowCount();
@@ -184,7 +184,6 @@ public class DomainObjectCreator {
             String modelId = row.getString(TSV.model_id.name());
             String hostStrainNomenclature = row.getString(TSV.host_strain_full.name());
             String passageNum = row.getString(TSV.passage_number.name());
-            String publications = row.getString(TSV.publications.name());
 
             //temporary check to escape empty rows
             //TODO:remove this when validation filters out empty rows
@@ -237,6 +236,76 @@ public class DomainObjectCreator {
 
             modelCreation.addQualityAssurance(qa);
         }
+
+    }
+
+
+    private void createSharingData(){
+
+        Table modelTable = pdxDataTables.get("metadata-sharing.tsv");
+        int rowCount = modelTable.rowCount();
+
+        Group providerGroup = (Group) domainObjects.get(providerKey).get(null);
+        if(providerGroup == null) throw new NullPointerException();
+
+
+        //start this from 1, row 0 is the header
+        for (int i = 1; i < rowCount; i++) {
+
+            if (i < 4) continue;
+
+            Row row = modelTable.row(i);
+
+            String modelId = row.getString(TSV.model_id.name());
+            String providerType = row.getString(TSV.provider_type.name());
+            String accessibility = row.getString(TSV.accessibility.name());
+            String europdxAccessModality = row.getString(TSV.europdx_access_modality.name());
+            String email = row.getString(TSV.email.name());
+            String formUrl = row.getString(TSV.form_url.name());
+            String databaseUrl = row.getString(TSV.database_url.name());
+            String project = row.getString(TSV.project.name());
+
+
+            //temporary check to escape empty rows
+            //TODO:remove this when validation filters out empty rows
+            if(modelId == null || modelId.isEmpty()) continue;
+
+            ModelCreation modelCreation = (ModelCreation) getDomainObject(modelKey, modelId);
+
+            if(modelCreation == null) throw new NullPointerException();
+
+            //Add contact provider and view data
+            List<ExternalUrl> externalUrls = new ArrayList<>();
+            if (email != null && !email.isEmpty()) {
+                externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, email));
+            }
+
+            if (formUrl != null && !formUrl.isEmpty()) {
+                externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, formUrl));
+            }
+
+            externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, databaseUrl));
+            modelCreation.setExternalUrls(externalUrls);
+
+
+            if (project != null && !project.isEmpty()) {
+
+                Group projectGroup = dataImportService.getProjectGroup(project);
+                modelCreation.addGroup(projectGroup);
+            }
+
+            if ((accessibility != null && !accessibility.isEmpty()) || (europdxAccessModality != null && !europdxAccessModality.isEmpty())) {
+
+                Group access = dataImportService.getAccessibilityGroup(accessibility, europdxAccessModality);
+                modelCreation.addGroup(access);
+            }
+
+            //Update datasource
+            providerGroup.setProviderType(providerType);
+            providerGroup.setContact(email);
+
+        }
+
     }
 
 
