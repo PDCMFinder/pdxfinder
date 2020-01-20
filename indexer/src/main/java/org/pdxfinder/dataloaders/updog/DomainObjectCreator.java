@@ -54,19 +54,24 @@ public class DomainObjectCreator {
 
 
 
-    private void createProvider(){
+    public void createProvider(){
 
         Table finderRelatedTable = pdxDataTables.get("metadata-loader.tsv");
         Row row = finderRelatedTable.row(4);
-        Group providerGroup = dataImportService.getProviderGroup(row.getString(TSV.name.name()),
-                row.getString(TSV.abbreviation.name()), "", "", "",
-                row.getString(TSV.internal_url.name()));
+
+        String providerName = row.getString(TSV.name.name());
+        String abbrev = row.getString(TSV.abbreviation.name());
+        String internalUrl = row.getString(TSV.internal_url.name());
+
+        Group providerGroup = dataImportService.getProviderGroup(providerName,
+                abbrev, "", "", "",
+                internalUrl);
 
         addDomainObject(providerKey, null, providerGroup);
     }
 
 
-    private void createPatientData() {
+    public void createPatientData() {
 
         Table patientTable = pdxDataTables.get("metadata-patient.tsv");
         int rowCount = patientTable.rowCount();
@@ -90,6 +95,7 @@ public class DomainObjectCreator {
                 Patient patient = dataImportService.createPatient(row.getText(TSV.patient_id.name()),
                         (Group) getDomainObject(TSV.provider_group.name(), null), row.getText(TSV.sex.name()),
                         "", row.getText(TSV.ethnicity.name()));
+
                 patient.setCancerRelevantHistory(row.getText(TSV.history.name()));
                 patient.setFirstDiagnosis(row.getText(TSV.initial_diagnosis.name()));
                 patient.setAgeAtFirstDiagnosis(row.getText(TSV.age_at_initial_diagnosis.name()));
@@ -105,7 +111,7 @@ public class DomainObjectCreator {
 
     }
 
-    private void createSampleData(){
+    public void createSampleData(){
 
 
         Table sampleTable = pdxDataTables.get("metadata-sample.tsv");
@@ -167,7 +173,7 @@ public class DomainObjectCreator {
 
     }
 
-    private void createModelData(){
+    public void createModelData(){
 
         Table modelTable = pdxDataTables.get("metadata-model.tsv");
         int rowCount = modelTable.rowCount();
@@ -240,7 +246,7 @@ public class DomainObjectCreator {
     }
 
 
-    private void createSharingData(){
+    public void createSharingData(){
 
         Table modelTable = pdxDataTables.get("metadata-sharing.tsv");
         int rowCount = modelTable.rowCount();
@@ -440,7 +446,7 @@ public class DomainObjectCreator {
     }
 
 
-    private void addDomainObject(String key1, String key2, Object object){
+    public void addDomainObject(String key1, String key2, Object object){
 
         if(domainObjects.containsKey(key1)){
 
@@ -454,7 +460,7 @@ public class DomainObjectCreator {
         }
     }
 
-    private Object getDomainObject(String key1, String key2){
+    public Object getDomainObject(String key1, String key2){
 
         if(domainObjects.containsKey(key1) && domainObjects.get(key1).containsKey(key2)){
 
