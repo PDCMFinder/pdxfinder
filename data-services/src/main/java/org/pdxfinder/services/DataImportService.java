@@ -1001,8 +1001,8 @@ public class DataImportService {
         ontologyTermRepository.deleteTermsWithZeroMappings();
     }
 
-    public void saveMarker(Marker marker) {
-        markerRepository.save(marker);
+    public Marker saveMarker(Marker marker) {
+        return markerRepository.save(marker);
     }
 
     public Collection<Marker> getAllMarkers() {
