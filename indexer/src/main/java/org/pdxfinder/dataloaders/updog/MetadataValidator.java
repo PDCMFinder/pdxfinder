@@ -2,11 +2,15 @@ package org.pdxfinder.dataloaders.updog;
 
 import tech.tablesaw.api.Table;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MetadataValidator {
 
+    private ArrayList<TableValidationError> validationErrors;
     private final List<String> requiredDataTables = Arrays.asList(
         "patient",
         "sample",
@@ -15,31 +19,32 @@ public class MetadataValidator {
         "sharing",
         "loader"
     );
-    private ArrayList<TableValidationError> validationErrors;
 
-    public MetadataValidator(
-        Map<String, Table> pdxDataTables,
-        Map<String, List<String>> columnSpecification) {
+    public MetadataValidator() {
         this.validationErrors = new ArrayList<>();
     }
 
-
-    public boolean validate(Map<String, Table> pdxDataTables) {
-        if (isMissingRequiredTables(pdxDataTables)) return false;
-
-        return true;
-    }
-
-    public ArrayList<TableValidationError> validateAndGetErrors(Map<String, Table> pdxDataTables) {
-        if (isMissingRequiredTables(pdxDataTables)) {
-            getMissingFilesFrom(pdxDataTables).forEach(
-                f -> validationErrors.add(TableValidationError.create(f))
-            );
-        }
+    public List<TableValidationError> validate(Map<String, Table> pdxDataTables, String provider) {
+        checkAllRequiredFilesPresent(pdxDataTables, provider);
         return validationErrors;
     }
 
-    private boolean isMissingRequiredTables(Map<String, Table> pdxDataTables) {
+    private void checkAllRequiredFilesPresent(Map<String, Table> pdxDataTables, String provider) {
+        if (isMissingRequiredFiles(pdxDataTables)) {
+            getMissingFilesFrom(pdxDataTables).forEach(
+                f -> validationErrors.add(
+                    TableValidationError
+                        .create(f)
+                        .setProvider(provider)
+                        .setType("Missing file")));
+        }
+    }
+
+    public boolean passesValidation(Map<String, Table> pdxDataTables, String provider) {
+        return validate(pdxDataTables, provider).isEmpty();
+    }
+
+    private boolean isMissingRequiredFiles(Map<String, Table> pdxDataTables) {
         return !getMissingFilesFrom(pdxDataTables).isEmpty();
     }
 
@@ -56,7 +61,7 @@ public class MetadataValidator {
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public ArrayList<TableValidationError> getValidationErrors() {
+    public List<TableValidationError> getValidationErrors() {
         return validationErrors;
     }
 
