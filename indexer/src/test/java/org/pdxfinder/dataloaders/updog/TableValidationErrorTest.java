@@ -8,11 +8,11 @@ public class TableValidationErrorTest {
 
     @Test
     public void setColumn() {
-//        fail();
+        fail();
     }
 
     @Test
     public void equals1() {
-//        fail();
+        fail();
     }
 }

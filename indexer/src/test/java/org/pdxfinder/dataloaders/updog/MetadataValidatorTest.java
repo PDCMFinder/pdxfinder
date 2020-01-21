@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class MetadataValidatorTest {
     }
 
     @Test public void validate_givenCompleteFileSet_producesEmptyErrorList() {
-        assertThat(metadataValidator.validate(completeFileSet, provider).isEmpty(), is(true));
+        assertThat(metadataValidator.validate(completeFileSet, new HashMap<>(), provider).isEmpty(), is(true));
     }
 
     @Test public void validate_givenIncompleteFileSet_addsErrorWithCorrectContextToErrorList() {
@@ -66,17 +67,30 @@ public class MetadataValidatorTest {
                 .setType("Missing file")));
         assertEquals(
             expected.get(0).getErrorType(),
-            metadataValidator.validate(incompleteFileSet, provider).get(0).getErrorType()
+            metadataValidator.validate(incompleteFileSet, new HashMap<>(), provider).get(0).getErrorType()
         );
         assertEquals(
             expected.get(0).getProvider(),
-            metadataValidator.validate(incompleteFileSet, provider).get(0).getProvider()
+            metadataValidator.validate(incompleteFileSet, new HashMap<>(), provider).get(0).getProvider()
         );
     }
 
-//    @Test public void validate_givenCompleteFileSetWithMissingColumn_addsMissingColErrorTotErrorList() {
-//        fail();
-//    }
+    @Test public void validate_givenMissingColumnDefinedInColSpec_addsMissingColErrorTotErrorList() {
+        ArrayList<TableValidationError> expected = new ArrayList<>(
+            Arrays.asList(TableValidationError.create("metadata-patient.tsv")
+                .setProvider(provider)
+                .setType("Missing column")
+                .setColumn("missing_field")));
+        Map<String, ColumnSpecification> columnSpecifications = new HashMap<>();
+        Arrays.asList("metadata-patient.tsv").stream().forEach(
+            s -> columnSpecifications.put(s, new ColumnSpecification(
+                Table.create().addColumns(StringColumn.create("missing_field"))
+            )));
+        assertEquals(
+            expected.get(0).getColumn(),
+            metadataValidator.validate(completeFileSet, columnSpecifications, provider).get(0).getColumn()
+        );
+    }
 
     private Map<String, Table> makeCompleteFileSet() {
         Map<String, Table> completeFileSet = new HashMap<>();
