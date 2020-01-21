@@ -12,7 +12,14 @@ import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
 
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.doAnswer;
 
 
 public class LoadMarkerTest extends BaseTest {
@@ -25,8 +32,6 @@ public class LoadMarkerTest extends BaseTest {
 
     private String hgncName = "TEST_MARKER_NAME";
     private String hgncSymbol = "TEST_MARKER_SYMBOL";
-
-    private String malformedGeneURL = "genemaes.org";
 
     private Marker marker = new Marker();
 
@@ -43,19 +48,24 @@ public class LoadMarkerTest extends BaseTest {
 
 
     @Test
-    public void given_DataImportServiceMocked_When_LoadGenesInvoked_Then_saveMarkers() {
+    public void given_MarkerDataUrl_When_LoadGenesInvoked_Then_saveMarkers() {
+
+        // given
+        String markerDataUrl = DataUrl.HUGO_FILE_URL.get();
 
         // When
-        loadMarkers.loadGenes(DataUrl.HUGO_FILE_URL.get());
+        loadMarkers.loadGenes(markerDataUrl);
 
         // Then
         verify(dataImportService, atLeast(100)).saveMarker(any(Marker.class));
 
     }
 
-
     @Test
-    public void given_When_LoadGenesInvokedWithMalformedURL_then_noMarkerIsSaved() {
+    public void given_WrongUrl_When_LoadGenesInvokedWithMalformedURL_then_noMarkerIsSaved() {
+
+        // given
+        String malformedGeneURL = "genemaes.org";
 
         // When
         loadMarkers.loadGenes(malformedGeneURL);
@@ -67,74 +77,4 @@ public class LoadMarkerTest extends BaseTest {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*
-
-
-       // when(this.dataImportService.saveMarker(marker)).thenReturn(marker);
-
-
-    @Test
-    public void when_ReloadCacheCommand_then_loadMarkers() throws Exception {
-
-        loadMarkers.run("-reloadCache");
-
-    }
-
-
-    @Test
-    public void loadMarkerTest() {
-
-        when(this.dataImportService.saveMarker(marker)).thenReturn(marker);
-
-        //Marker marker = dataImportService.saveMarker(this.marker);
-
-        loadMarkers.loadMarkers();
-
-     //   assertEquals(marker, this.marker);
-    }
-
-
-    @Test
-    public void markerSaveTest() {
-
-        when(markerRepository.save(marker)).thenReturn(marker);
-
-        Marker marker = dataImportService.saveMarker(this.marker);
-
-       // assertEquals(marker, this.marker);
-    }
-
-
-
-
-
-
-
-        @Mock
-    private Reader reader;
-
-    @Mock
-    private Writer writer;
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNoArgs() throws Exception {
-        app.run();
-    }
-     */
 }
