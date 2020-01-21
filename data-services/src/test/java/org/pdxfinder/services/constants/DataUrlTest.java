@@ -15,7 +15,7 @@ public class DataUrlTest extends BaseTest {
     @Test
     public void given_DataUrlEnumListCount_EnsureListIntegrity() {
 
-        final int DATA_URL_COUNT = 8;
+        final int DATA_URL_COUNT = 3;
 
         assertEquals(DATA_URL_COUNT, DataUrl.values().length);
     }
