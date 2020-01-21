@@ -1,16 +1,11 @@
-package org.pdxfinder.envload;
+package org.pdxfinder.services.loader.envload;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import org.pdxfinder.graph.dao.Marker;
 import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.utils.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -18,58 +13,22 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
 
-/*
- * Created by csaba on 26/02/2019.
- */
-@Component
-@Order(value = -70)
-public class LoadMarkers implements CommandLineRunner {
 
+@Service
+public class LoadMarkers {
 
-    private static final String DATA_FILE_URL = "https://www.genenames.org/cgi-bin/download/custom?col=gd_hgnc_id&col=gd_app_sym&col=gd_app_name&col=gd_status&col=gd_prev_sym&col=gd_aliases&col=gd_pub_acc_ids&col=gd_pub_refseq_ids&col=gd_name_aliases&col=gd_pub_ensembl_id&status=Approved&hgnc_dbtag=on&order_by=gd_app_sym_sort&format=text&submit=submit";
-    private static final Logger log = LoggerFactory.getLogger(LoadMarkers.class);
+    Logger log = LoggerFactory.getLogger(LoadMarkers.class);
+
     private DataImportService dataImportService;
 
-    @Autowired
     public LoadMarkers(DataImportService dataImportService) {
         this.dataImportService = dataImportService;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts(Option.loadMarkers.get());
-        parser.accepts(Option.reloadCache.get());
-        parser.accepts(Option.loadALL.get());
-        parser.accepts(Option.loadEssentials.get());
-
-        OptionSet options = parser.parse(args);
+    public void loadGenes(String dataURL) {
 
         long startTime = System.currentTimeMillis();
-
-        if (options.has(Option.reloadCache.get()) ||
-                options.has(Option.loadMarkers.get()) ||
-                options.has(Option.loadEssentials.get()) ||
-                (options.has(Option.loadALL.get()) && dataImportService.countAllMarkers() == 0)) {
-
-            loadMarkers();
-        }
-
-        long endTime = System.currentTimeMillis();
-        long totalTime = endTime - startTime;
-
-        int seconds = (int) (totalTime / 1000) % 60;
-        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
-
-        log.info(" {} finished after {} minute(s) and {} second(s)", this.getClass().getSimpleName(), minutes, seconds);
-
-    }
-
-
-    private void loadMarkers() {
-
 
         log.info("************************* Creating Markers ***************************** ");
 
@@ -85,7 +44,7 @@ public class LoadMarkers implements CommandLineRunner {
 
         try {
 
-            URL url = new URL(DATA_FILE_URL);
+            URL url = new URL(dataURL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
 
@@ -162,20 +121,28 @@ public class LoadMarkers implements CommandLineRunner {
 
                     if (rows != 0 && rows % 200 == 0) log.info("Loaded {} markers", rows);
 
-
                 }
 
                 rows++;
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn(e.getMessage());
             log.error(Arrays.toString(rowData));
         }
 
         log.info("******************************************************");
         log.info("* Finished creating markers                          *");
         log.info("******************************************************");
+
+
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+
+        int seconds = (int) (totalTime / 1000) % 60;
+        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
+
+        log.info(" {} finished after {} minute(s) and {} second(s)", this.getClass().getSimpleName(), minutes, seconds);
 
     }
 }

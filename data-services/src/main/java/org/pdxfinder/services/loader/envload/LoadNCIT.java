@@ -1,20 +1,14 @@
-package org.pdxfinder.envload;
+package org.pdxfinder.services.loader.envload;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
-import org.pdxfinder.utils.Option;
+import org.pdxfinder.services.constants.DataUrl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -25,83 +19,29 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@Component
-@Order(value = -65)
-public class LoadNCIT implements CommandLineRunner {
+@Service
+public class LoadNCIT {
+
 
     private static final Logger log = LoggerFactory.getLogger(LoadNCIT.class);
 
-    private static final String DISEASES_BRANCH_URL = "http://purl.obolibrary.org/obo/NCIT_C3262";
-    private static final String ONTOLOGY_URL = "https://www.ebi.ac.uk/ols/api/ontologies/ncit/terms/";
     private static final String UTF8 = "UTF-8";
     private static final String EMBEDDED = "_embedded";
-
-
-    @Value("${ncitpredef.file}")
-    private String ncitFile;
 
     private DataImportService dataImportService;
     private UtilityService utilityService;
 
-    @Autowired
     public LoadNCIT(DataImportService dataImportService, UtilityService utilityService) {
         this.dataImportService = dataImportService;
         this.utilityService = utilityService;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
 
-
-        //http://www.ebi.ac.uk/ols/api/ontologies/ncit/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FNCIT_C7057/hierarchicalChildren
-        //http://www.ebi.ac.uk/ols/api/ontologies/doid/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FNCIT_C7057/hierarchicalChildren
-
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts(Option.loadNCIT.get());
-        parser.accepts(Option.loadNCITPreDef.get());
-        parser.accepts(Option.loadALL.get());
-        parser.accepts(Option.reloadCache.get());
-        parser.accepts(Option.loadSlim.get());
-        parser.accepts(Option.loadEssentials.get());
-        OptionSet options = parser.parse(args);
+    public void loadOntology(String branchUrl){
 
         long startTime = System.currentTimeMillis();
 
-        if (options.has(Option.loadNCIT.get()) && options.has(Option.loadNCITPreDef.get())) {
-
-            log.warn("Select one or the other of: -loadNCIT, -loadNCITPreDef");
-            log.warn("Not loading {} ", this.getClass().getName());
-
-        } else if (options.has(Option.loadNCIT.get()) ||
-                options.has(Option.reloadCache.get()) ||
-                options.has(Option.loadSlim.get()) ||
-                options.has(Option.loadEssentials.get()) ||
-                (options.has(Option.loadALL.get()) && dataImportService.countAllOntologyTerms() == 0)) {
-
-
-            loadNCIT();
-            utilityService.setLoadCache(true);
-
-        } else if (options.has(Option.loadNCITPreDef.get())) {
-
-            loadNCITPreDef();
-        }
-
-        long endTime = System.currentTimeMillis();
-        long totalTime = endTime - startTime;
-
-        int seconds = (int) (totalTime / 1000) % 60;
-        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
-
-        log.info("{} finished after {} minute(s) and {} second(s)", this.getClass().getSimpleName(), minutes, seconds);
-
-    }
-
-
-    private void loadNCIT() {
-
-        log.info("Loading all Neoplasm subnodes.");
+        log.info("Loading all Neoplasm subnodes. ");
 
         Set<String> loadedTerms = new HashSet<>();
         Set<OntologyTerm> discoveredTerms = new HashSet<>();
@@ -111,19 +51,19 @@ public class LoadNCIT implements CommandLineRunner {
         int requestCounter = 0;
 
         //create cancer root term
-        OntologyTerm ot = dataImportService.getOntologyTerm(DISEASES_BRANCH_URL, diseaseRootLabel);
+        OntologyTerm ot = dataImportService.getOntologyTerm(branchUrl,diseaseRootLabel);
         ot.setType("diagnosis");
         log.debug("Creating node: {}", diseaseRootLabel);
 
         discoveredTerms.add(ot);
 
-        while (discoveredTerms.isEmpty()) {
+        while(discoveredTerms.size()>0){
             //get term from notVisited
 
             OntologyTerm notYetVisitedTerm = discoveredTerms.iterator().next();
             discoveredTerms.remove(notYetVisitedTerm);
 
-            if (loadedTerms.contains(notYetVisitedTerm.getUrl())) continue;
+            if(loadedTerms.contains(notYetVisitedTerm.getUrl())) continue;
 
             loadedTerms.add(notYetVisitedTerm.getUrl());
 
@@ -136,14 +76,14 @@ public class LoadNCIT implements CommandLineRunner {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            String url = ONTOLOGY_URL + parentUrlEncoded + "/hierarchicalChildren?size=200";
+            String url = DataUrl.ONTOLOGY_URL.get()+parentUrlEncoded+"/hierarchicalChildren?size=200";
 
             log.debug("Getting data from {}", url);
 
             String json = utilityService.parseURL(url);
             requestCounter++;
 
-            if (requestCounter % 200 == 0) {
+            if(requestCounter%200 == 0){
                 log.info("Terms loaded: {}", requestCounter);
             }
 
@@ -156,6 +96,7 @@ public class LoadNCIT implements CommandLineRunner {
 
                 JSONObject job2 = new JSONObject(embedded);
                 JSONArray terms = job2.getJSONArray("terms");
+
 
                 for (int i = 0; i < terms.length(); i++) {
 
@@ -183,7 +124,7 @@ public class LoadNCIT implements CommandLineRunner {
                     JSONArray synonyms = term.getJSONArray("synonyms");
                     Set<String> synonymsSet = new HashSet<>();
 
-                    for (int j = 0; j < synonyms.length(); j++) {
+                    for(int j=0; j<synonyms.length();j++){
                         synonymsSet.add(synonyms.getString(j));
                     }
 
@@ -199,23 +140,30 @@ public class LoadNCIT implements CommandLineRunner {
                 }
 
             } catch (Exception e) {
-                log.error("", e);
-
+                log.error(" {} ", e.getMessage());
             }
-
         }
 
-        if (requestCounter % 200 != 0) {
+        if(requestCounter%200 != 0){
             log.info("Terms loaded: {}", requestCounter);
         }
+
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+
+        int seconds = (int) (totalTime / 1000) % 60;
+        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
+
+        log.info("{} finished after {} minute(s) and {} second(s)", this.getClass().getSimpleName(), minutes, seconds);
 
     }
 
 
-    private void loadNCITPreDef() {
 
 
-        log.info("Loading predefined nodes from NCIT.");
+
+
+    public void loadNCITPreDef(String ncitFile){
 
         String currentLine;
         long currentLineCounter = 1;
@@ -223,7 +171,8 @@ public class LoadNCIT implements CommandLineRunner {
 
         Map<String, OntologyTerm> ncitLoaded = new HashMap<>();
 
-        try(BufferedReader buf = new BufferedReader(new FileReader(ncitFile));) {
+        try {
+            BufferedReader buf = new BufferedReader(new FileReader(ncitFile));
 
             while (true) {
                 currentLine = buf.readLine();
@@ -241,7 +190,7 @@ public class LoadNCIT implements CommandLineRunner {
                     OntologyTerm ot = dataImportService.getOntologyTerm(url, label);
                     ncitLoaded.put(url, ot);
 
-                    log.info("Creating {}", label);
+                    log.info("Creating "+label);
                 }
                 currentLineCounter++;
             }
@@ -251,7 +200,7 @@ public class LoadNCIT implements CommandLineRunner {
 
 
         for (Map.Entry<String, OntologyTerm> entry : ncitLoaded.entrySet()) {
-
+            String key = entry.getKey();
             OntologyTerm parentTerm = entry.getValue();
 
 
@@ -264,9 +213,9 @@ public class LoadNCIT implements CommandLineRunner {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            String url = ONTOLOGY_URL + parentUrlEncoded + "/hierarchicalChildren?size=100";
+            String url = DataUrl.ONTOLOGY_URL.get()+parentUrlEncoded+"/hierarchicalChildren?size=100";
 
-            log.debug("Getting data from {}", url);
+            log.debug("Getting data from "+url);
 
             String json = utilityService.parseURL(url);
 
@@ -287,14 +236,14 @@ public class LoadNCIT implements CommandLineRunner {
 
                     String childTermUrl = term.getString("iri");
 
-                    if (!ncitLoaded.containsKey(childTermUrl)) continue;
+                    if(!ncitLoaded.containsKey(childTermUrl)) continue;
 
                     OntologyTerm childTerm = ncitLoaded.get(childTermUrl);
 
                     JSONArray synonyms = term.getJSONArray("synonyms");
                     Set<String> synonymsSet = new HashSet<>();
 
-                    for (int j = 0; j < synonyms.length(); j++) {
+                    for(int j=0; j<synonyms.length();j++){
                         synonymsSet.add(synonyms.getString(j));
                     }
 
@@ -304,14 +253,10 @@ public class LoadNCIT implements CommandLineRunner {
                     dataImportService.saveOntologyTerm(childTerm);
 
                 }
-
             } catch (Exception e) {
                 log.error("", e);
-
             }
-
         }
-
     }
 
 
