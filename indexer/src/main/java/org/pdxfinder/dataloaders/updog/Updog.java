@@ -28,21 +28,18 @@ public class Updog {
             DataImportService dataImportService,
             UtilityService utilityService,
             MetadataReader metadataReader,
-            MetadataValidator metadataValidator,
-            String provider) {
+            MetadataValidator metadataValidator) {
 
         Assert.notNull(dataImportService, "dataImportService cannot be null");
         Assert.notNull(utilityService, "utilityService cannot be null");
         Assert.notNull(metadataReader, "metadataReader cannot be null");
-        Assert.notNull(provider, "provider cannot be null");
         Assert.notNull(metadataValidator, "templateValidator cannot be null");
 
         this.dataImportService = dataImportService;
         this.utilityService = utilityService;
         this.metadataReader = metadataReader;
         this.metadataValidator = metadataValidator;
-        this.provider = provider;
-        this.pdxDataTables = new HashMap<>();
+
     }
 
 
@@ -50,7 +47,10 @@ public class Updog {
 
 
     public void run(Path updogDir, String provider) {
+        Assert.notNull(provider, "provider cannot be null");
+
         log.debug("Running UPDOG on [{}]", updogDir);
+
         pdxDataTables = readPdxDataFromPath(updogDir);
         validatePdxDataTables(pdxDataTables, provider);
         createPdxObjects();

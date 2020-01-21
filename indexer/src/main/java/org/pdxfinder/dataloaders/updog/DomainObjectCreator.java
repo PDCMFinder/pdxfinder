@@ -41,10 +41,11 @@ public class DomainObjectCreator {
 
 
         //: Do not change the order of these unless you want to risk 1. the universe to collapse OR 2. missing nodes in the db
-        loadProvider();
-        loadPatientData();
-        loadModelData();
-        loadSampleData();
+        createProvider();
+        createPatientData();
+        createModelData();
+        createSampleData();
+        createSharingData();
 
         persistNodes();
 
@@ -53,19 +54,24 @@ public class DomainObjectCreator {
 
 
 
-    private void loadProvider(){
+    public void createProvider(){
 
         Table finderRelatedTable = pdxDataTables.get("metadata-loader.tsv");
         Row row = finderRelatedTable.row(4);
-        Group providerGroup = dataImportService.getProviderGroup(row.getString(TSV.name.name()),
-                row.getString(TSV.abbreviation.name()), "", "", "",
-                row.getString(TSV.internal_url.name()));
+
+        String providerName = row.getString(TSV.name.name());
+        String abbrev = row.getString(TSV.abbreviation.name());
+        String internalUrl = row.getString(TSV.internal_url.name());
+
+        Group providerGroup = dataImportService.getProviderGroup(providerName,
+                abbrev, "", "", "",
+                internalUrl);
 
         addDomainObject(providerKey, null, providerGroup);
     }
 
 
-    private void loadPatientData() {
+    public void createPatientData() {
 
         Table patientTable = pdxDataTables.get("metadata-patient.tsv");
         int rowCount = patientTable.rowCount();
@@ -89,6 +95,7 @@ public class DomainObjectCreator {
                 Patient patient = dataImportService.createPatient(row.getText(TSV.patient_id.name()),
                         (Group) getDomainObject(TSV.provider_group.name(), null), row.getText(TSV.sex.name()),
                         "", row.getText(TSV.ethnicity.name()));
+
                 patient.setCancerRelevantHistory(row.getText(TSV.history.name()));
                 patient.setFirstDiagnosis(row.getText(TSV.initial_diagnosis.name()));
                 patient.setAgeAtFirstDiagnosis(row.getText(TSV.age_at_initial_diagnosis.name()));
@@ -104,7 +111,7 @@ public class DomainObjectCreator {
 
     }
 
-    private void loadSampleData(){
+    public void createSampleData(){
 
 
         Table sampleTable = pdxDataTables.get("metadata-sample.tsv");
@@ -166,8 +173,7 @@ public class DomainObjectCreator {
 
     }
 
-
-    private void loadModelData(){
+    public void createModelData(){
 
         Table modelTable = pdxDataTables.get("metadata-model.tsv");
         int rowCount = modelTable.rowCount();
@@ -184,7 +190,6 @@ public class DomainObjectCreator {
             String modelId = row.getString(TSV.model_id.name());
             String hostStrainNomenclature = row.getString(TSV.host_strain_full.name());
             String passageNum = row.getString(TSV.passage_number.name());
-            String publications = row.getString(TSV.publications.name());
 
             //temporary check to escape empty rows
             //TODO:remove this when validation filters out empty rows
@@ -237,6 +242,76 @@ public class DomainObjectCreator {
 
             modelCreation.addQualityAssurance(qa);
         }
+
+    }
+
+
+    public void createSharingData(){
+
+        Table modelTable = pdxDataTables.get("metadata-sharing.tsv");
+        int rowCount = modelTable.rowCount();
+
+        Group providerGroup = (Group) domainObjects.get(providerKey).get(null);
+        if(providerGroup == null) throw new NullPointerException();
+
+
+        //start this from 1, row 0 is the header
+        for (int i = 1; i < rowCount; i++) {
+
+            if (i < 4) continue;
+
+            Row row = modelTable.row(i);
+
+            String modelId = row.getString(TSV.model_id.name());
+            String providerType = row.getString(TSV.provider_type.name());
+            String accessibility = row.getString(TSV.accessibility.name());
+            String europdxAccessModality = row.getString(TSV.europdx_access_modality.name());
+            String email = row.getString(TSV.email.name());
+            String formUrl = row.getString(TSV.form_url.name());
+            String databaseUrl = row.getString(TSV.database_url.name());
+            String project = row.getString(TSV.project.name());
+
+
+            //temporary check to escape empty rows
+            //TODO:remove this when validation filters out empty rows
+            if(modelId == null || modelId.isEmpty()) continue;
+
+            ModelCreation modelCreation = (ModelCreation) getDomainObject(modelKey, modelId);
+
+            if(modelCreation == null) throw new NullPointerException();
+
+            //Add contact provider and view data
+            List<ExternalUrl> externalUrls = new ArrayList<>();
+            if (email != null && !email.isEmpty()) {
+                externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, email));
+            }
+
+            if (formUrl != null && !formUrl.isEmpty()) {
+                externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, formUrl));
+            }
+
+            externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, databaseUrl));
+            modelCreation.setExternalUrls(externalUrls);
+
+
+            if (project != null && !project.isEmpty()) {
+
+                Group projectGroup = dataImportService.getProjectGroup(project);
+                modelCreation.addGroup(projectGroup);
+            }
+
+            if ((accessibility != null && !accessibility.isEmpty()) || (europdxAccessModality != null && !europdxAccessModality.isEmpty())) {
+
+                Group access = dataImportService.getAccessibilityGroup(accessibility, europdxAccessModality);
+                modelCreation.addGroup(access);
+            }
+
+            //Update datasource
+            providerGroup.setProviderType(providerType);
+            providerGroup.setContact(email);
+
+        }
+
     }
 
 
@@ -371,7 +446,7 @@ public class DomainObjectCreator {
     }
 
 
-    private void addDomainObject(String key1, String key2, Object object){
+    public void addDomainObject(String key1, String key2, Object object){
 
         if(domainObjects.containsKey(key1)){
 
@@ -385,7 +460,7 @@ public class DomainObjectCreator {
         }
     }
 
-    private Object getDomainObject(String key1, String key2){
+    public Object getDomainObject(String key1, String key2){
 
         if(domainObjects.containsKey(key1) && domainObjects.get(key1).containsKey(key2)){
 

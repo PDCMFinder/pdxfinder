@@ -43,6 +43,18 @@ public enum TSV {
     validation_technique,
     description,
     passages_tested,
-    validation_host_strain_full
+    validation_host_strain_full,
+    provider_name,
+    provider_abbreviation,
+    project,
+    provider_type,
+    accessibility,
+    europdx_access_modality,
+    email,
+    form_url,
+    database_url
+
+
+
 
 }
