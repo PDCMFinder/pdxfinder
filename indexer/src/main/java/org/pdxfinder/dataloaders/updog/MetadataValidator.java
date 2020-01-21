@@ -5,6 +5,7 @@ import tech.tablesaw.api.Table;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,9 +26,37 @@ public class MetadataValidator {
         this.validationErrors = new ArrayList<>();
     }
 
-    public List<TableValidationError> validate(Map<String, Table> pdxDataTables, String provider) {
+    public List<TableValidationError> validate(
+        Map<String, Table> pdxDataTables,
+        Map<String, ColumnSpecification> columnSpecification,
+        String provider
+    ) {
         checkAllRequiredFilesPresent(pdxDataTables, provider);
+        checkAllRequiredColumnsPresent(pdxDataTables, columnSpecification, provider);
         return validationErrors;
+    }
+
+    private void checkAllRequiredColumnsPresent(
+        Map<String, Table> pdxDataTables,
+        Map<String, ColumnSpecification> columnSpecification,
+        String provider
+    ) {
+        String key;
+        ColumnSpecification value;
+        List<String> missingCols;
+        for (Map.Entry<String, ColumnSpecification> entry : columnSpecification.entrySet()) {
+            key = entry.getKey();
+            value = entry.getValue();
+            missingCols = value.getMissingColumnsFrom(pdxDataTables.get(key));
+            for (String missingCol : missingCols) {
+                validationErrors.add(TableValidationError
+                    .create(key)
+                    .setColumn(missingCol)
+                    .setProvider(provider)
+                    .setType("Missing column"));
+            }
+        }
+
     }
 
     private void checkAllRequiredFilesPresent(Map<String, Table> pdxDataTables, String provider) {
@@ -42,7 +71,7 @@ public class MetadataValidator {
     }
 
     public boolean passesValidation(Map<String, Table> pdxDataTables, String provider) {
-        return validate(pdxDataTables, provider).isEmpty();
+        return validate(pdxDataTables, new HashMap<>(), provider).isEmpty();
     }
 
     private boolean isMissingRequiredFiles(Map<String, Table> pdxDataTables) {
