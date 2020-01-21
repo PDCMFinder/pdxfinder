@@ -41,8 +41,6 @@ public class UtilityService {
     private static final Logger log = LoggerFactory.getLogger(UtilityService.class);
     private ObjectMapper mapper = new ObjectMapper();
 
-    private Boolean loadCache = false;
-
     //Delimiter used in CSV file
     private static final String COMMA_DELIMITER = ",";
     private static final String NEW_LINE_SEPARATOR = "\n";
@@ -237,6 +235,7 @@ public class UtilityService {
 
                 Map<String, String> rowMap = new LinkedHashMap<>();
                 String rowDataTracker = "";
+                StringBuilder rowBuilder = new StringBuilder();
 
                 for (int i = 0; i < tableHead.size(); i++) {
 
@@ -249,13 +248,14 @@ public class UtilityService {
                         String data = nameCell.getStringCellValue();
 
                         rowMap.put(key, data);
-                        rowDataTracker += data;
+                        rowBuilder.append(data);
 
                     } else {
                         if (!key.equals("")) rowMap.put(key, "");
                     }
                 }
 
+                rowDataTracker = rowBuilder.toString();
                 if (rowDataTracker.length() != 0) csvMap.add(rowMap);
 
                 rowCount++;
@@ -549,6 +549,7 @@ public class UtilityService {
                 row++;
             }
         } catch (Exception e) {
+            log.warn(e.getMessage());
         }
 
         return csvMap;
@@ -568,7 +569,7 @@ public class UtilityService {
         }
 
         String thisLine;
-        int i=0;
+
         ArrayList lineList = null;
         List<List<String>> dataArrayList = new ArrayList<>();
 
@@ -583,7 +584,6 @@ public class UtilityService {
                     lineList.add(strar[j]);
                 }
                 dataArrayList.add(lineList);
-                i++;
             }
 
         }catch (IOException e){
@@ -799,7 +799,7 @@ public class UtilityService {
             while ((inputLine = in.readLine()) != null) {
                 sb.append(inputLine);
             }
-            in.close();
+
         } catch (Exception e) {
             log.error("Unable to read from URL " + urlStr, e);
         }
@@ -1042,12 +1042,4 @@ public class UtilityService {
         return jsonNode;
     }
 
-
-    public Boolean getLoadCache() {
-        return loadCache;
-    }
-
-    public void setLoadCache(Boolean loadCache) {
-        this.loadCache = loadCache;
-    }
 }

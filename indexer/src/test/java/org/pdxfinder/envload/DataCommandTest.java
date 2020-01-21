@@ -5,7 +5,7 @@ import static org.hamcrest.CoreMatchers.allOf;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;;
+import org.mockito.Mock;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.constants.DataUrl;
@@ -16,7 +16,15 @@ import org.pdxfinder.services.loader.envload.LoadNCITDrugs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class DataCommandTest extends BaseTest {
