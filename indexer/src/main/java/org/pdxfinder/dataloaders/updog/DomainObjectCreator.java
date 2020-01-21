@@ -168,6 +168,7 @@ public class DomainObjectCreator {
             modelCreation.setSample(sample);
             modelCreation.addRelatedSample(sample);
 
+
         }
 
 
@@ -412,6 +413,10 @@ public class DomainObjectCreator {
         }
 
         Sample sample = new Sample();
+        sample.setType(tumorType);
+        sample.setSampleSite(collectionSite);
+        sample.setOriginTissue(primarySite);
+
         sample.setSourceSampleId(sampleId);
         sample.setDiagnosis(diagnosis);
         sample.setStage(stage);
