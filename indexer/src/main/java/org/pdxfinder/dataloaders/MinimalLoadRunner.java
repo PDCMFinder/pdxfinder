@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextAware {
 
     private Updog updog;
+    @Value("${provider}")
     private String provider;
     @Value("${data.directory}")
     private String dataDirectory;
