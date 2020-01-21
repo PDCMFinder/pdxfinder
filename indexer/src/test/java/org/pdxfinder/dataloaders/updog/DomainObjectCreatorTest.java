@@ -115,6 +115,7 @@ public class DomainObjectCreatorTest extends BaseTest {
         domainObjectCreator.addDomainObject("model", "model1", testModel);
 
         when(dataImportService.getProjectGroup("EuroPDX")).thenReturn(getProjectGroup("EuroPDX"));
+        when(dataImportService.getAccessibilityGroup("academia", "collaboration only")).thenReturn(getAccessGroup("academia", "collaboration only"));
 
         domainObjectCreator.createSharingData();
 
@@ -123,13 +124,17 @@ public class DomainObjectCreatorTest extends BaseTest {
         Set<Group> groups = model.getGroups();
 
         Group projectGroup = new Group();
+        Group accessGroup = new Group();
+
         for(Group group : groups){
 
             if(group != null && group.getType().equals("Project")) projectGroup = group;
+            if(group != null && group.getType().equals("Accessibility")) accessGroup = group;
         }
 
         Assert.assertEquals("EuroPDX", projectGroup.getName());
-
+        Assert.assertEquals("academia", accessGroup.getAccessibility());
+        Assert.assertEquals("collaboration only", accessGroup.getAccessModalities());
     }
 
 
@@ -281,6 +286,16 @@ public class DomainObjectCreatorTest extends BaseTest {
         group.setName(name);
 
         return group;
+    }
+
+    private Group getAccessGroup(String accessibility, String accessModalities){
+
+        Group group = new Group(accessibility, accessModalities);
+        group.setType("Accessibility");
+
+
+        return group;
+
     }
 
 }
