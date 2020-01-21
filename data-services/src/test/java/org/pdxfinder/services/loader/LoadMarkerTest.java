@@ -5,7 +5,7 @@ import static org.hamcrest.CoreMatchers.allOf;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;;
+import org.mockito.Mock;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.graph.dao.Marker;
 import org.pdxfinder.services.DataImportService;

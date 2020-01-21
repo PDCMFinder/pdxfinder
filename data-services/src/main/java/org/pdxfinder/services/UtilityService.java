@@ -991,7 +991,8 @@ public class UtilityService {
     public  byte[] convertLocalFileToByte(String filePath) {
 
         byte[] fileData = null;
-        File file = new File(filePath);
+        Path path = Paths.get(filePath);
+        File file = path.toFile();
 
         try (FileInputStream inputStream = new FileInputStream(file)) {
 

@@ -57,7 +57,7 @@ public class LoadNCIT {
 
         discoveredTerms.add(ot);
 
-        while(discoveredTerms.size()>0){
+        while(!discoveredTerms.isEmpty()){
             //get term from notVisited
 
             OntologyTerm notYetVisitedTerm = discoveredTerms.iterator().next();
@@ -74,7 +74,7 @@ public class LoadNCIT {
                 parentUrlEncoded = URLEncoder.encode(parentUrlEncoded, UTF8);
 
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+               log.warn(e.getMessage());
             }
             String url = DataUrl.ONTOLOGY_URL.get()+parentUrlEncoded+"/hierarchicalChildren?size=200";
 
@@ -195,7 +195,7 @@ public class LoadNCIT {
                 currentLineCounter++;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn(e.getMessage());
         }
 
 
@@ -211,7 +211,7 @@ public class LoadNCIT {
                 parentUrlEncoded = URLEncoder.encode(parentUrlEncoded, UTF8);
 
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                log.warn(e.getMessage());
             }
             String url = DataUrl.ONTOLOGY_URL.get()+parentUrlEncoded+"/hierarchicalChildren?size=100";
 
