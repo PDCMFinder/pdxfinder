@@ -1,4 +1,4 @@
-package org.pdxfinder.utils;
+package org.pdxfinder.constants;
 
 public enum Option {
 
