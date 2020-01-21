@@ -15,6 +15,7 @@ import tech.tablesaw.api.Table;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class DomainObjectCreatorTest extends BaseTest {
 
@@ -107,8 +108,29 @@ public class DomainObjectCreatorTest extends BaseTest {
 
     }
 
+    @Test
+    public void Given_SharingTable_When_CreateSharing_Then_SharingInfoAdded(){
 
+        domainObjectCreator.addDomainObject("provider_group", null, providerGroup);
+        domainObjectCreator.addDomainObject("model", "model1", testModel);
 
+        when(dataImportService.getProjectGroup("EuroPDX")).thenReturn(getProjectGroup("EuroPDX"));
+
+        domainObjectCreator.createSharingData();
+
+        ModelCreation model = (ModelCreation) domainObjectCreator.getDomainObject("model", "model1");
+
+        Set<Group> groups = model.getGroups();
+
+        Group projectGroup = new Group();
+        for(Group group : groups){
+
+            if(group != null && group.getType().equals("Project")) projectGroup = group;
+        }
+
+        Assert.assertEquals("EuroPDX", projectGroup.getName());
+
+    }
 
 
 
@@ -227,8 +249,38 @@ public class DomainObjectCreatorTest extends BaseTest {
 
         tableMap.put("metadata-sample.tsv", sampleTable);
 
+        String[] shareCol1 = {"v1", "v2", "v3", "v4","model1"};
+        String[] shareCol2 = {"v1", "v2", "v3", "v4","academia"};
+        String[] shareCol3 = {"v1", "v2", "v3", "v4","academia"};
+        String[] shareCol4 = {"v1", "v2", "v3", "v4","collaboration only"};
+        String[] shareCol5 = {"v1", "v2", "v3", "v4","test@test.com"};
+        String[] shareCol6 = {"v1", "v2", "v3", "v4","Test Contact"};
+        String[] shareCol7 = {"v1", "v2", "v3", "v4",""};
+        String[] shareCol8 = {"v1", "v2", "v3", "v4","EuroPDX"};
+
+
+        Table shareTable = Table.create("metadata-sharing.tsv").addColumns(
+                StringColumn.create("model_id", shareCol1),
+                StringColumn.create("provider_type", shareCol2),
+                StringColumn.create("accessibility", shareCol3),
+                StringColumn.create("europdx_access_modality", shareCol4),
+                StringColumn.create("email", shareCol5),
+                StringColumn.create("form_url", shareCol6),
+                StringColumn.create("database_url", shareCol7),
+                StringColumn.create("project", shareCol8)
+        );
+        tableMap.put("metadata-sharing.tsv", shareTable);
 
         return tableMap;
+    }
+
+    private Group getProjectGroup(String name){
+
+        Group group = new Group();
+        group.setType("Project");
+        group.setName(name);
+
+        return group;
     }
 
 }
