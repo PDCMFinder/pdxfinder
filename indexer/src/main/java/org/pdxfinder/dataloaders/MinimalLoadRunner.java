@@ -37,11 +37,11 @@ public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextA
         parser.allowsUnrecognizedOptions();
         parser.accepts("loadUniversalRefactor");
         parser.accepts("provider").withRequiredArg();
-        parser.accepts("pdxfinder.root.dir").withRequiredArg();
+        parser.accepts("dataDirectory").withRequiredArg();
         OptionSet options = parser.parse(args);
 
-        finderRootDir = (String) options.valueOf("pdxfinder.root.dir");
-        provider = (String) options.valueOf("provider");
+        dataDirectory = options.valueOf("dataDirectory").toString();
+        provider = options.valueOf("provider").toString();
         updogDirectory = Paths.get(dataDirectory, "/data/UPDOG", provider);
 
         if (options.has("loadUniversalRefactor")) {
