@@ -335,30 +335,28 @@ public class UtilityService {
 
         String sheetName = "Sheet1";//name of sheet
 
-        HSSFWorkbook wb = new HSSFWorkbook();
-        HSSFSheet sheet = wb.createSheet(sheetName) ;
+        try (HSSFWorkbook wb = new HSSFWorkbook()) {
+            HSSFSheet sheet = wb.createSheet(sheetName);
 
-        //iterating r number of rows
-        for (int r=0;r < 5; r++ )
-        {
-            HSSFRow row = sheet.createRow(r);
+            //iterating r number of rows
+            for (int r = 0; r < 5; r++) {
+                HSSFRow row = sheet.createRow(r);
 
-            //iterating c number of columns
-            for (int c=0;c < 5; c++ )
-            {
-                HSSFCell cell = row.createCell(c);
+                //iterating c number of columns
+                for (int c = 0; c < 5; c++) {
+                    HSSFCell cell = row.createCell(c);
 
-                cell.setCellValue("Cell "+r+" "+c);
+                    cell.setCellValue("Cell " + r + " " + c);
+                }
             }
+
+            FileOutputStream fileOut = new FileOutputStream(excelFileName);
+
+            //write this workbook to an Outputstream.
+            wb.write(fileOut);
+            fileOut.flush();
+            fileOut.close();
         }
-
-        FileOutputStream fileOut = new FileOutputStream(excelFileName);
-
-        //write this workbook to an Outputstream.
-        wb.write(fileOut);
-        fileOut.flush();
-        fileOut.close();
-        wb.close();
     }
 
 
