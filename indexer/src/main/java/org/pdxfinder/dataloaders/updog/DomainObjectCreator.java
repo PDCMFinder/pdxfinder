@@ -59,9 +59,9 @@ public class DomainObjectCreator {
         Table finderRelatedTable = pdxDataTables.get("metadata-loader.tsv");
         Row row = finderRelatedTable.row(4);
 
-        String providerName = row.getString(TSV.name.name());
-        String abbrev = row.getString(TSV.abbreviation.name());
-        String internalUrl = row.getString(TSV.internal_url.name());
+        String providerName = row.getString(TSV.Metadata.name.name());
+        String abbrev = row.getString(TSV.Metadata.abbreviation.name());
+        String internalUrl = row.getString(TSV.Metadata.internal_url.name());
 
         Group providerGroup = dataImportService.getProviderGroup(providerName,
                 abbrev, "", "", "",
@@ -83,7 +83,7 @@ public class DomainObjectCreator {
 
             Row row = patientTable.row(i);
 
-            String patientId = row.getText(TSV.patient_id.name());
+            String patientId = row.getText(TSV.Metadata.patient_id.name());
 
             //temporary check to escape empty rows
             //TODO:remove this when validation filters out empty rows
@@ -92,19 +92,19 @@ public class DomainObjectCreator {
             }
 
             try {
-                Patient patient = dataImportService.createPatient(row.getText(TSV.patient_id.name()),
-                        (Group) getDomainObject(TSV.provider_group.name(), null), row.getText(TSV.sex.name()),
-                        "", row.getText(TSV.ethnicity.name()));
+                Patient patient = dataImportService.createPatient(row.getText(TSV.Metadata.patient_id.name()),
+                        (Group) getDomainObject(TSV.Metadata.provider_group.name(), null), row.getText(TSV.Metadata.sex.name()),
+                        "", row.getText(TSV.Metadata.ethnicity.name()));
 
-                patient.setCancerRelevantHistory(row.getText(TSV.history.name()));
-                patient.setFirstDiagnosis(row.getText(TSV.initial_diagnosis.name()));
-                patient.setAgeAtFirstDiagnosis(row.getText(TSV.age_at_initial_diagnosis.name()));
+                patient.setCancerRelevantHistory(row.getText(TSV.Metadata.history.name()));
+                patient.setFirstDiagnosis(row.getText(TSV.Metadata.initial_diagnosis.name()));
+                patient.setAgeAtFirstDiagnosis(row.getText(TSV.Metadata.age_at_initial_diagnosis.name()));
 
-                addDomainObject(patientKey, row.getText(TSV.patient_id.name()), dataImportService.savePatient(patient));
+                addDomainObject(patientKey, row.getText(TSV.Metadata.patient_id.name()), dataImportService.savePatient(patient));
             }
             catch(Exception e){
 
-                log.error("Error loading patient {} at row {}", row.getText(TSV.patient_id.name()), i);
+                log.error("Error loading patient {} at row {}", row.getText(TSV.Metadata.patient_id.name()), i);
             }
 
         }
@@ -124,16 +124,16 @@ public class DomainObjectCreator {
 
             Row row = sampleTable.row(i);
 
-            String patientId = row.getString(TSV.patient_id.name());
+            String patientId = row.getString(TSV.Metadata.patient_id.name());
 
-            String modelId = row.getString(TSV.model_id.name());
-            String dateOfCollection = row.getString(TSV.collection_date.name());
-            String ageAtCollection = row.getString(TSV.age_in_years_at_collection.name());
-            String collectionEvent = row.getString(TSV.collection_event.name());
-            String elapsedTime = row.getString(TSV.months_since_collection_1.name());
-            String primarySiteName = row.getString(TSV.primary_site.name());
-            String virologyStatus = row.getString(TSV.virology_status.name());
-            String treatmentNaive = row.getString(TSV.treatment_naive_at_collection.name());
+            String modelId = row.getString(TSV.Metadata.model_id.name());
+            String dateOfCollection = row.getString(TSV.Metadata.collection_date.name());
+            String ageAtCollection = row.getString(TSV.Metadata.age_in_years_at_collection.name());
+            String collectionEvent = row.getString(TSV.Metadata.collection_event.name());
+            String elapsedTime = row.getString(TSV.Metadata.months_since_collection_1.name());
+            String primarySiteName = row.getString(TSV.Metadata.primary_site.name());
+            String virologyStatus = row.getString(TSV.Metadata.virology_status.name());
+            String treatmentNaive = row.getString(TSV.Metadata.treatment_naive_at_collection.name());
 
             //temporary check to escape empty rows
             //TODO:remove this when validation filters out empty rows
@@ -188,9 +188,9 @@ public class DomainObjectCreator {
 
             Row row = modelTable.row(i);
 
-            String modelId = row.getString(TSV.model_id.name());
-            String hostStrainNomenclature = row.getString(TSV.host_strain_full.name());
-            String passageNum = row.getString(TSV.passage_number.name());
+            String modelId = row.getString(TSV.Metadata.model_id.name());
+            String hostStrainNomenclature = row.getString(TSV.Metadata.host_strain_full.name());
+            String passageNum = row.getString(TSV.Metadata.passage_number.name());
 
             //temporary check to escape empty rows
             //TODO:remove this when validation filters out empty rows
@@ -221,11 +221,11 @@ public class DomainObjectCreator {
 
             Row row = modelValidationTable.row(i);
 
-            String modelId = row.getString(TSV.model_id.name());
-            String validationTechnique = row.getString(TSV.validation_technique.name());
-            String description = row.getString(TSV.description.name());
-            String passagesTested = row.getString(TSV.passages_tested.name());
-            String hostStrainFull = row.getString(TSV.validation_host_strain_full.name());
+            String modelId = row.getString(TSV.Metadata.model_id.name());
+            String validationTechnique = row.getString(TSV.Metadata.validation_technique.name());
+            String description = row.getString(TSV.Metadata.description.name());
+            String passagesTested = row.getString(TSV.Metadata.passages_tested.name());
+            String hostStrainFull = row.getString(TSV.Metadata.validation_host_strain_full.name());
 
             //temporary check to escape empty rows
             //TODO:remove this when validation filters out empty rows
@@ -263,14 +263,14 @@ public class DomainObjectCreator {
 
             Row row = modelTable.row(i);
 
-            String modelId = row.getString(TSV.model_id.name());
-            String providerType = row.getString(TSV.provider_type.name());
-            String accessibility = row.getString(TSV.accessibility.name());
-            String europdxAccessModality = row.getString(TSV.europdx_access_modality.name());
-            String email = row.getString(TSV.email.name());
-            String formUrl = row.getString(TSV.form_url.name());
-            String databaseUrl = row.getString(TSV.database_url.name());
-            String project = row.getString(TSV.project.name());
+            String modelId = row.getString(TSV.Metadata.model_id.name());
+            String providerType = row.getString(TSV.Metadata.provider_type.name());
+            String accessibility = row.getString(TSV.Metadata.accessibility.name());
+            String europdxAccessModality = row.getString(TSV.Metadata.europdx_access_modality.name());
+            String email = row.getString(TSV.Metadata.email.name());
+            String formUrl = row.getString(TSV.Metadata.form_url.name());
+            String databaseUrl = row.getString(TSV.Metadata.database_url.name());
+            String project = row.getString(TSV.Metadata.project.name());
 
 
             //temporary check to escape empty rows
@@ -319,12 +319,12 @@ public class DomainObjectCreator {
 
     private Specimen createSpecimen(Row row, int rowCounter){
 
-        String hostStrainName = row.getString(TSV.host_strain.name());
-        String hostStrainNomenclature = row.getString(TSV.host_strain_full.name());
-        String engraftmentSiteName = row.getString(TSV.engraftment_site.name());
-        String engraftmentTypeName = row.getString(TSV.engraftment_type.name());
-        String sampleType = row.getString(TSV.sample_type.name());
-        String passageNum = row.getString(TSV.passage_number.name());
+        String hostStrainName = row.getString(TSV.Metadata.host_strain.name());
+        String hostStrainNomenclature = row.getString(TSV.Metadata.host_strain_full.name());
+        String engraftmentSiteName = row.getString(TSV.Metadata.engraftment_site.name());
+        String engraftmentTypeName = row.getString(TSV.Metadata.engraftment_type.name());
+        String sampleType = row.getString(TSV.Metadata.sample_type.name());
+        String passageNum = row.getString(TSV.Metadata.passage_number.name());
 
         HostStrain hostStrain = (HostStrain) getDomainObject(hostStrainKey, hostStrainNomenclature);
 
@@ -377,15 +377,15 @@ public class DomainObjectCreator {
 
     private Sample createPatientSample(Row row){
 
-        String diagnosis = row.getString(TSV.diagnosis.name());
-        String sampleId = row.getString(TSV.sample_id.name());
-        String tumorTypeName = row.getString(TSV.tumour_type.name());
-        String primarySiteName = row.getString(TSV.primary_site.name());
-        String collectionSiteName = row.getString(TSV.collection_site.name());
-        String stage = row.getString(TSV.stage.name());
-        String stagingSystem = row.getString(TSV.staging_system.name());
-        String grade = row.getString(TSV.grade.name());
-        String gradingSystem = row.getString(TSV.grading_system.name());
+        String diagnosis = row.getString(TSV.Metadata.diagnosis.name());
+        String sampleId = row.getString(TSV.Metadata.sample_id.name());
+        String tumorTypeName = row.getString(TSV.Metadata.tumour_type.name());
+        String primarySiteName = row.getString(TSV.Metadata.primary_site.name());
+        String collectionSiteName = row.getString(TSV.Metadata.collection_site.name());
+        String stage = row.getString(TSV.Metadata.stage.name());
+        String stagingSystem = row.getString(TSV.Metadata.staging_system.name());
+        String grade = row.getString(TSV.Metadata.grade.name());
+        String gradingSystem = row.getString(TSV.Metadata.grading_system.name());
 
         Tissue primarySite = (Tissue) getDomainObject(tissueKey, primarySiteName);
 
