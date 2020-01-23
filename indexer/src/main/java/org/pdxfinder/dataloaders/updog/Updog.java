@@ -9,18 +9,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import tech.tablesaw.api.Table;
 
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.nio.file.PathMatcher;
 import java.util.Map;
 
 @Component
 public class Updog {
 
+    private static final Logger log = LoggerFactory.getLogger(Updog.class);
     private UtilityService utilityService;
     private DataImportService dataImportService;
     private MetadataReader metadataReader;
     private MetadataValidator metadataValidator;
     private Map<String, Table> pdxDataTables;
+    private Map<String, Table> omicsTables;
     private String provider;
 
     @Autowired
@@ -42,30 +45,32 @@ public class Updog {
 
     }
 
-
-    private static final Logger log = LoggerFactory.getLogger(Updog.class);
-
-
     public void run(Path updogDir, String provider) {
         Assert.notNull(provider, "provider cannot be null");
-
-        log.debug("Running UPDOG on [{}]", updogDir);
+        log.debug("Using UPDOG to import {} from [{}]", provider, updogDir);
 
         pdxDataTables = readPdxDataFromPath(updogDir);
+        omicsTables = readOmicsDataFromPath(updogDir);
         validatePdxDataTables(pdxDataTables, provider);
         createPdxObjects();
     }
 
-    private Map<String, Table> readPdxDataFromPath(Path updogDir) {
-        return metadataReader.readMetadataTsvs(updogDir);
+    private Map<String, Table> readOmicsDataFromPath(Path updogDir) {
+        // Only cytogenetics import supported so far
+        PathMatcher allTsvFiles = FileSystems.getDefault().getPathMatcher("glob:**/cyto/*.tsv");
+        return metadataReader.readAllOmicsFilesIn(updogDir, allTsvFiles);
     }
 
-    public boolean validatePdxDataTables(Map<String, Table> pdxDataTables, String provider){
+    private Map<String, Table> readPdxDataFromPath(Path updogDir) {
+        PathMatcher metadataFiles = FileSystems.getDefault().getPathMatcher("glob:**metadata-*.tsv");
+        return metadataReader.readAllTsvFilesIn(updogDir, metadataFiles);
+    }
+
+    private boolean validatePdxDataTables(Map<String, Table> pdxDataTables, String provider){
         return metadataValidator.passesValidation(pdxDataTables, provider);
     }
 
-
-    public void createPdxObjects(){
+    private void createPdxObjects(){
 
         //create domain objects database nodes
         DomainObjectCreator doc = new DomainObjectCreator(dataImportService, pdxDataTables);
