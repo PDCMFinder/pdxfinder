@@ -171,8 +171,7 @@ public class LoadNCIT {
 
         Map<String, OntologyTerm> ncitLoaded = new HashMap<>();
 
-        try {
-            BufferedReader buf = new BufferedReader(new FileReader(ncitFile));
+        try(BufferedReader buf = new BufferedReader(new FileReader(ncitFile))) {
 
             while (true) {
                 currentLine = buf.readLine();

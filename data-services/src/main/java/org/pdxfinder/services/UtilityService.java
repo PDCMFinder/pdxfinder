@@ -880,21 +880,16 @@ public class UtilityService {
             log.warn("No subdirs found for the universal loader, skipping");
         }
         else {
-
             StringBuilder stringBuilder = new StringBuilder();
             for (File file : filDir) {
 
                 if (file.isFile()) {
-
                     stringBuilder.append(file.getName()).append("\n");
-
                 }
             }
             fileNames = stringBuilder.toString();
         }
-
         log.info(fileNames);
-
     }
 
 
@@ -991,18 +986,17 @@ public class UtilityService {
     public  byte[] convertLocalFileToByte(String filePath) {
 
         byte[] fileData = null;
-        Path path = Paths.get(filePath);
-        File file = path.toFile();
+        File file = new File(filePath);
 
-        try (FileInputStream inputStream = new FileInputStream(file)) {
+        if (file.exists()){
+            try (FileInputStream inputStream = new FileInputStream(file)) {
 
-            fileData = new byte[(int) file.length()];
+                fileData = new byte[(int) file.length()];
+                //inputStream . read( fileData )
 
-            if (inputStream.read(fileData) > 0) {
-                inputStream.read(fileData);
+            } catch (IOException e) {
+                log.warn(e.getMessage());
             }
-        } catch (IOException e) {
-            log.warn(e.getMessage());
         }
 
         return fileData;
@@ -1010,7 +1004,7 @@ public class UtilityService {
 
 
 
-    List<Map> objectArrayListToMapList(List<Object[]> dataList, List<String> keys){
+    public List<Map> objectArrayListToMapList(List<Object[]> dataList, List<String> keys){
 
         List<Map> result = new ArrayList<>();
 
@@ -1030,6 +1024,7 @@ public class UtilityService {
 
 
 
+
     public JsonNode jsonStringToNode(String jsonString){
 
         JsonNode jsonNode = null;
@@ -1042,5 +1037,4 @@ public class UtilityService {
 
         return jsonNode;
     }
-
 }
