@@ -1,7 +1,5 @@
 package org.pdxfinder.dataloaders.updog;
 
-import org.pdxfinder.services.pdf.Table;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -48,6 +46,11 @@ public class TableValidationError {
     public TableValidationError setType(String errorType) {
         this.errorType = Optional.of(errorType);
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Error in %s: ", getTable());
     }
 
     @Override

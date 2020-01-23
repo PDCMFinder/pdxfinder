@@ -13,33 +13,30 @@ import static org.mockito.Mockito.when;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class DomainObjectCreatorTest extends BaseTest {
 
-
     @MockBean
     private DataImportService dataImportService;
-
     private DomainObjectCreator domainObjectCreator;
 
     private Group providerGroup;
     private Patient testPatient;
     private ModelCreation testModel;
 
-
     @Before
     public void setUp(){
-        Map<String, Table> pdxDataTables = getTestDataTable();
+        Map<String, Table> pdxDataTables = getTestPdxDataTables();
         domainObjectCreator = new DomainObjectCreator(dataImportService, pdxDataTables);
 
-        providerGroup = new Group("TestProvider", "TP", "description", "",
-                "", "");
+        providerGroup = new Group("TestProvider", "TP", "description", "", "", "");
         providerGroup.setType("Provider");
 
-        testPatient = new Patient("patient1", "female", "-", "ethnicity",providerGroup );
+        testPatient = new Patient("patient 1", "female", "-", "ethnicity",providerGroup );
         testModel = new ModelCreation("model1");
     }
 
@@ -47,9 +44,9 @@ public class DomainObjectCreatorTest extends BaseTest {
     @Test
     public void Given_ProviderTable_When_CreateProviderIsCalled_Then_ProviderNodeIsInDomainMap(){
 
-        when(dataImportService.getProviderGroup(anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(providerGroup);
-
-
+        when(dataImportService.getProviderGroup(
+            anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+            .thenReturn(providerGroup);
         domainObjectCreator.createProvider();
 
         Group provider = (Group) domainObjectCreator.getDomainObject("provider_group", null);
@@ -61,28 +58,26 @@ public class DomainObjectCreatorTest extends BaseTest {
     public void Given_PatientTable_When_CreatePatient_Then_PatientNodeIsInMap(){
 
         domainObjectCreator.addDomainObject("provider_group", null, providerGroup);
-        when(dataImportService.createPatient("patient1", providerGroup, "female", "", "ethnicity")).thenReturn(testPatient);
-        when(dataImportService.savePatient(testPatient)).thenReturn(testPatient);
+        when(dataImportService.createPatient("patient 1", providerGroup, "female", "", "ethnicity"))
+            .thenReturn(testPatient);
+        when(dataImportService.savePatient(testPatient))
+            .thenReturn(testPatient);
 
         domainObjectCreator.createPatientData();
 
-        Patient patient = (Patient) domainObjectCreator.getDomainObject("patient", "patient1");
+        Patient patient = (Patient) domainObjectCreator.getDomainObject("patient", "patient 1");
 
-        Assert.assertEquals("patient1", patient.getExternalId());
+        Assert.assertEquals("patient 1", patient.getExternalId());
         Assert.assertEquals("female", patient.getSex());
-
     }
 
     @Test
     public void Given_ModelTable_When_CreateModel_Then_ModelNodeIsInMap(){
 
         domainObjectCreator.addDomainObject("provider_group", null, providerGroup);
-
         domainObjectCreator.createModelData();
-
-        ModelCreation model = (ModelCreation) domainObjectCreator.getDomainObject("model", "model1");
-
-        Assert.assertEquals("model1", model.getSourcePdxId());
+        ModelCreation model = (ModelCreation) domainObjectCreator.getDomainObject("model", "model 1");
+        Assert.assertEquals("model 1", model.getSourcePdxId());
 
     }
 
@@ -90,49 +85,47 @@ public class DomainObjectCreatorTest extends BaseTest {
     public void Given_SampleTable_When_CreateSample_Then_SampleIsInMap(){
 
         domainObjectCreator.addDomainObject("provider_group", null, providerGroup);
-        domainObjectCreator.addDomainObject("patient", "patient1", testPatient);
-        domainObjectCreator.addDomainObject("model", "model1", testModel);
+        domainObjectCreator.addDomainObject("patient", "patient 1", testPatient);
+        domainObjectCreator.addDomainObject("model", "model 1", testModel);
 
         when(dataImportService.getTumorType("Primary")).thenReturn(new TumorType("Primary"));
 
         domainObjectCreator.createSampleData();
 
-        ModelCreation model = (ModelCreation) domainObjectCreator.getDomainObject("model", "model1");
-        Patient patient = (Patient) domainObjectCreator.getDomainObject("patient", "patient1");
+        ModelCreation model = (ModelCreation) domainObjectCreator.getDomainObject("model", "model 1");
+        Patient patient = (Patient) domainObjectCreator.getDomainObject("patient", "patient 1");
 
         Sample sample = model.getSample();
 
-        Assert.assertEquals("sample1", sample.getSourceSampleId());
-        Assert.assertEquals("70",patient.getSnapshotByDate("01/01/1900").getAgeAtCollection());
+        Assert.assertEquals("sample 1", sample.getSourceSampleId());
+        Assert.assertEquals("70", patient.getSnapshotByDate("01/01/1900").getAgeAtCollection());
         Assert.assertEquals("Primary", sample.getType().getName());
-
     }
 
     @Test
     public void Given_SharingTable_When_CreateSharing_Then_SharingInfoAdded(){
 
         domainObjectCreator.addDomainObject("provider_group", null, providerGroup);
-        domainObjectCreator.addDomainObject("model", "model1", testModel);
+        domainObjectCreator.addDomainObject("model", "model 1", testModel);
 
-        when(dataImportService.getProjectGroup("EuroPDX")).thenReturn(getProjectGroup("EuroPDX"));
-        when(dataImportService.getAccessibilityGroup("academia", "collaboration only")).thenReturn(getAccessGroup("academia", "collaboration only"));
+        when(dataImportService.getProjectGroup("project 1")).thenReturn(getProjectGroup("project 1"));
+        when(dataImportService.getAccessibilityGroup("academia", "collaboration only"))
+            .thenReturn(getAccessGroup("academia", "collaboration only"));
 
         domainObjectCreator.createSharingData();
 
-        ModelCreation model = (ModelCreation) domainObjectCreator.getDomainObject("model", "model1");
-
+        ModelCreation model = (ModelCreation) domainObjectCreator.getDomainObject("model", "model 1");
         Set<Group> groups = model.getGroups();
 
         Group projectGroup = new Group();
         Group accessGroup = new Group();
 
         for(Group group : groups){
-
             if(group != null && group.getType().equals("Project")) projectGroup = group;
             if(group != null && group.getType().equals("Accessibility")) accessGroup = group;
         }
 
-        Assert.assertEquals("EuroPDX", projectGroup.getName());
+        Assert.assertEquals("project 1", projectGroup.getName());
         Assert.assertEquals("academia", accessGroup.getAccessibility());
         Assert.assertEquals("collaboration only", accessGroup.getAccessModalities());
     }
@@ -141,162 +134,98 @@ public class DomainObjectCreatorTest extends BaseTest {
     @Test
     public void Given_DataTable_When_LoadDomainObjectsIsCalled_Then_CorrectObjectsInMap(){
 
-        when(dataImportService.getProviderGroup(anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(providerGroup);
-        when(dataImportService.createPatient("patient1", providerGroup, "female", "", "ethnicity")).thenReturn(testPatient);
-        when(dataImportService.savePatient(testPatient)).thenReturn(testPatient);
+        when(dataImportService.getProviderGroup(
+            anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+            .thenReturn(providerGroup);
+        when(dataImportService.createPatient("patient 1", providerGroup, "female", "", "ethnicity"))
+            .thenReturn(testPatient);
+        when(dataImportService.savePatient(testPatient))
+            .thenReturn(testPatient);
 
         domainObjectCreator.loadDomainObjects();
 
-        Patient patient = (Patient)domainObjectCreator.getDomainObject("patient", "patient1");
+        Patient patient = (Patient)domainObjectCreator.getDomainObject("patient", "patient 1");
 
         Assert.assertNotNull(patient);
         Assert.assertNotNull(patient.getLastSnapshot());
         Assert.assertNotNull(patient.getLastSnapshot().getSamples());
-        Assert.assertNotNull(domainObjectCreator.getDomainObject("model", "model1"));
-        Assert.assertNull(domainObjectCreator.getDomainObject("dummykey", "dummyid"));
-
+        Assert.assertNotNull(domainObjectCreator.getDomainObject("model", "model 1"));
+        Assert.assertNull(domainObjectCreator.getDomainObject("dummy key", "dummy id"));
     }
 
 
+    private Map<String, Table> getTestPdxDataTables(){
 
+        String loader = "metadata-loader.tsv";
+        String patient = "metadata-patient.tsv";
+        String model = "metadata-model.tsv";
+        String modelValidation = "metadata-model_validation.tsv";
+        String sample = "metadata-sample.tsv";
+        String sharing = "metadata-sharing.tsv";
 
-    private Map<String, Table> getTestDataTable(){
+        Map<String, Table> pdxDataTables = new HashMap<>();
+        pdxDataTables.put(loader, Table.create(loader).addColumns(
+            StringColumn.create("name", Collections.singletonList("Test Provider")),
+            StringColumn.create("abbreviation", Collections.singletonList("TP")),
+            StringColumn.create("internal_url", Collections.singletonList("/source/test")),
+            StringColumn.create("internal_dosing_url", Collections.singletonList(""))
+        ));
+        pdxDataTables.put(patient, Table.create(patient).addColumns(
+            StringColumn.create("patient_id", Collections.singletonList("patient 1")),
+            StringColumn.create("sex", Collections.singletonList("female")),
+            StringColumn.create("history", Collections.singletonList("history")),
+            StringColumn.create("ethnicity", Collections.singletonList("ethnicity")),
+            StringColumn.create("initial_diagnosis", Collections.singletonList("initial diagnosis")),
+            StringColumn.create("age_at_initial_diagnosis", Collections.singletonList("age at initial diagnosis"))
+        ));
+        pdxDataTables.put(model, Table.create(model).addColumns(
+            StringColumn.create("model_id", Collections.singletonList("model 1")),
+            StringColumn.create("host_strain",Collections.singletonList("host strain name 1")),
+            StringColumn.create("host_strain_full",Collections.singletonList("host strain nomenclature 1")),
+            StringColumn.create("engraftment_site",Collections.singletonList("engraftment site 1")),
+            StringColumn.create("engraftment_type",Collections.singletonList("engraftment type 1")),
+            StringColumn.create("sample_type",Collections.singletonList("sample type 1")),
+            StringColumn.create("sample_state",Collections.singletonList("sample state 1")),
+            StringColumn.create("passage_number",Collections.singletonList("1")),
+            StringColumn.create("publications",Collections.singletonList("publications 1"))
+        ));
+        pdxDataTables.put(modelValidation, Table.create(modelValidation).addColumns(
+            StringColumn.create("model_id", Collections.singletonList("model 1")),
+            StringColumn.create("validation_technique", Collections.singletonList("technique")),
+            StringColumn.create("description", Collections.singletonList("description 1")),
+            StringColumn.create("passages_tested", Collections.singletonList("passage 1")),
+            StringColumn.create("validation_host_strain_full", Collections.singletonList("host strain 1"))
+        ));
+        pdxDataTables.put(sample, Table.create(sample).addColumns(
+            StringColumn.create("patient_id", Collections.singletonList("patient 1")),
+            StringColumn.create("sample_id", Collections.singletonList("sample 1")),
+            StringColumn.create("collection_date", Collections.singletonList("01/01/1900")),
+            StringColumn.create("age_in_years_at_collection", Collections.singletonList("70")),
+            StringColumn.create("diagnosis", Collections.singletonList("Cancer")),
+            StringColumn.create("tumour_type", Collections.singletonList("Primary")),
+            StringColumn.create("primary_site", Collections.singletonList("Breast")),
+            StringColumn.create("collection_site", Collections.singletonList("Breast")),
+            StringColumn.create("model_id", Collections.singletonList("model 1")),
+            StringColumn.create("collection_event", Collections.singletonList("")),
+            StringColumn.create("months_since_collection_1", Collections.singletonList("")),
+            StringColumn.create("virology_status", Collections.singletonList("")),
+            StringColumn.create("stage", Collections.singletonList("")),
+            StringColumn.create("staging_system", Collections.singletonList("")),
+            StringColumn.create("grade", Collections.singletonList("")),
+            StringColumn.create("grading_system", Collections.singletonList("")),
+            StringColumn.create("treatment_naive_at_collection", Collections.singletonList(""))
+        ));
+        pdxDataTables.put(sharing, Table.create(sharing).addColumns(
+            StringColumn.create("model_id", Collections.singletonList("model 1")),
+            StringColumn.create("provider_type", Collections.singletonList("academia")),
+            StringColumn.create("accessibility", Collections.singletonList("academia")),
+            StringColumn.create("europdx_access_modality", Collections.singletonList("collaboration only")),
+            StringColumn.create("email", Collections.singletonList("test@test.com")),
+            StringColumn.create("form_url", Collections.singletonList("www.test.com")),
+            StringColumn.create("database_url", Collections.singletonList("www.test.com")),
+            StringColumn.create("project", Collections.singletonList("project 1"))));
 
-        Map<String, Table> tableMap = new HashMap<>();
-
-        String[] loaderCol1 = {"v1", "v2", "v3", "v4", "Test Provider"};
-        String[] loaderCol2 = {"v1", "v2", "v3", "v4", "TP"};
-        String[] loaderCol3 = {"v1", "v2", "v3", "v4", "/source/test"};
-        String[] loaderCol4 = {"v1", "v2", "v3", "v4", ""};
-
-        Table loaderTable = Table.create("metadata-loader.tsv").addColumns(
-                StringColumn.create("name", loaderCol1),
-                StringColumn.create("abbreviation", loaderCol2),
-                StringColumn.create("internal_url", loaderCol3),
-                StringColumn.create("internal_dosing_url", loaderCol4)
-        );
-
-        tableMap.put("metadata-loader.tsv", loaderTable);
-
-        String[] patientCol1 = {"v1", "v2", "v3", "v4","patient1"};
-        String[] patientCol2 = {"v1", "v2", "v3", "v4","female"};
-        String[] patientCol3 = {"v1", "v2", "v3", "v4","history"};
-        String[] patientCol4 = {"v1", "v2", "v3", "v4","ethnicity"};
-        String[] patientCol5 = {"v1", "v2", "v3", "v4","initial diagnosis"};
-        String[] patientCol6 = {"v1", "v2", "v3", "v4","age at initial diagnosis"};
-
-        Table patientTable = Table.create("metadata-patient.tsv").addColumns(
-                StringColumn.create("patient_id", patientCol1),
-                StringColumn.create("sex", patientCol2),
-                StringColumn.create("history", patientCol3),
-                StringColumn.create("ethnicity", patientCol4),
-                StringColumn.create("initial_diagnosis", patientCol5),
-                StringColumn.create("age_at_initial_diagnosis", patientCol6)
-        );
-
-        tableMap.put("metadata-patient.tsv", patientTable);
-
-
-        String[] modelCol1 = {"v1", "v2", "v3", "v4","model1"};
-        String[] modelCol2 = {"v1", "v2", "v3", "v4","hoststrainname1"};
-        String[] modelCol3 = {"v1", "v2", "v3", "v4","hoststrainnomenclature1"};
-        String[] modelCol4 = {"v1", "v2", "v3", "v4","engraftmentsite1"};
-        String[] modelCol5 = {"v1", "v2", "v3", "v4","engraftmenttype1"};
-        String[] modelCol6 = {"v1", "v2", "v3", "v4","sampletype1"};
-        String[] modelCol7 = {"v1", "v2", "v3", "v4","samplestate1"};
-        String[] modelCol8 = {"v1", "v2", "v3", "v4","1"};
-        String[] modelCol9 = {"v1", "v2", "v3", "v4","publications1"};
-
-        Table modelTable = Table.create("metadata-model.tsv").addColumns(
-                StringColumn.create("model_id", modelCol1),
-                StringColumn.create("host_strain", modelCol2),
-                StringColumn.create("host_strain_full", modelCol3),
-                StringColumn.create("engraftment_site", modelCol4),
-                StringColumn.create("engraftment_type", modelCol5),
-                StringColumn.create("sample_type", modelCol6),
-                StringColumn.create("sample_state", modelCol7),
-                StringColumn.create("passage_number", modelCol8),
-                StringColumn.create("publications", modelCol9)
-
-        );
-
-        tableMap.put("metadata-model.tsv", modelTable);
-
-
-        String[] modelValCol1 = {"v1", "v2", "v3", "v4","model1"};
-        String[] modelValCol2 = {"v1", "v2", "v3", "v4","techique1"};
-        String[] modelValCol3 = {"v1", "v2", "v3", "v4","description1"};
-        String[] modelValCol4 = {"v1", "v2", "v3", "v4","passage1"};
-        String[] modelValCol5 = {"v1", "v2", "v3", "v4","hoststrain1"};
-
-        Table modelValidationTable = Table.create("metadata-model_validation.tsv").addColumns(
-                StringColumn.create("model_id", modelValCol1),
-                StringColumn.create("validation_technique", modelValCol2),
-                StringColumn.create("description", modelValCol3),
-                StringColumn.create("passages_tested", modelValCol4),
-                StringColumn.create("validation_host_strain_full", modelValCol5)
-        );
-
-        tableMap.put("metadata-model_validation.tsv", modelValidationTable);
-
-
-
-        String[] sampleCol1 = {"v1", "v2", "v3", "v4","patient1"};
-        String[] sampleCol2 = {"v1", "v2", "v3", "v4","sample1"};
-        String[] sampleCol3 = {"v1", "v2", "v3", "v4","01/01/1900"};
-        String[] sampleColEmpty = {"v1", "v2", "v3", "v4",""};
-        String[] sampleCol6 = {"v1", "v2", "v3", "v4","70"};
-        String[] sampleCol7 = {"v1", "v2", "v3", "v4","Cancer"};
-        String[] sampleCol8 = {"v1", "v2", "v3", "v4","Primary"};
-        String[] sampleCol9 = {"v1", "v2", "v3", "v4","Breast"};
-        String[] sampleCol10 = {"v1", "v2", "v3", "v4","Breast"};
-        String[] sampleCol11 = {"v1", "v2", "v3", "v4","model1"};
-
-        Table sampleTable = Table.create("metadata-sample.tsv").addColumns(
-                StringColumn.create("patient_id", sampleCol1),
-                StringColumn.create("sample_id", sampleCol2),
-                StringColumn.create("collection_date", sampleCol3),
-                StringColumn.create("age_in_years_at_collection", sampleCol6),
-                StringColumn.create("diagnosis", sampleCol7),
-                StringColumn.create("tumour_type", sampleCol8),
-                StringColumn.create("primary_site", sampleCol9),
-                StringColumn.create("collection_site", sampleCol10),
-                StringColumn.create("model_id", sampleCol11),
-                StringColumn.create("collection_event", sampleColEmpty),
-                StringColumn.create("months_since_collection_1", sampleColEmpty),
-                StringColumn.create("virology_status", sampleColEmpty),
-                StringColumn.create("stage", sampleColEmpty),
-                StringColumn.create("staging_system", sampleColEmpty),
-                StringColumn.create("grade", sampleColEmpty),
-                StringColumn.create("grading_system", sampleColEmpty),
-                StringColumn.create("treatment_naive_at_collection", sampleColEmpty)
-        );
-
-        tableMap.put("metadata-sample.tsv", sampleTable);
-
-        String[] shareCol1 = {"v1", "v2", "v3", "v4","model1"};
-        String[] shareCol2 = {"v1", "v2", "v3", "v4","academia"};
-        String[] shareCol3 = {"v1", "v2", "v3", "v4","academia"};
-        String[] shareCol4 = {"v1", "v2", "v3", "v4","collaboration only"};
-        String[] shareCol5 = {"v1", "v2", "v3", "v4","test@test.com"};
-        String[] shareCol6 = {"v1", "v2", "v3", "v4","Test Contact"};
-        String[] shareCol7 = {"v1", "v2", "v3", "v4",""};
-        String[] shareCol8 = {"v1", "v2", "v3", "v4","EuroPDX"};
-
-
-        Table shareTable = Table.create("metadata-sharing.tsv").addColumns(
-                StringColumn.create("model_id", shareCol1),
-                StringColumn.create("provider_type", shareCol2),
-                StringColumn.create("accessibility", shareCol3),
-                StringColumn.create("europdx_access_modality", shareCol4),
-                StringColumn.create("email", shareCol5),
-                StringColumn.create("form_url", shareCol6),
-                StringColumn.create("database_url", shareCol7),
-                StringColumn.create("project", shareCol8)
-        );
-        tableMap.put("metadata-sharing.tsv", shareTable);
-
-        return tableMap;
+        return pdxDataTables;
     }
 
     private Group getProjectGroup(String name){
@@ -304,7 +233,6 @@ public class DomainObjectCreatorTest extends BaseTest {
         Group group = new Group();
         group.setType("Project");
         group.setName(name);
-
         return group;
     }
 
@@ -312,10 +240,7 @@ public class DomainObjectCreatorTest extends BaseTest {
 
         Group group = new Group(accessibility, accessModalities);
         group.setType("Accessibility");
-
-
         return group;
-
     }
 
 }

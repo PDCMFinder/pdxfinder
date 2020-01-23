@@ -13,6 +13,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class Updog {
@@ -63,7 +64,37 @@ public class Updog {
 
     private Map<String, Table> readPdxDataFromPath(Path updogDir) {
         PathMatcher metadataFiles = FileSystems.getDefault().getPathMatcher("glob:**metadata-*.tsv");
-        return metadataReader.readAllTsvFilesIn(updogDir, metadataFiles);
+        return cleanPdxDataTables(metadataReader.readAllTsvFilesIn(updogDir, metadataFiles));
+    }
+
+    private Map<String, Table> cleanPdxDataTables(Map<String, Table> pdxDataTables) {
+        pdxDataTables.remove("metadata-checklist.tsv");
+        removeDescriptionColumn(pdxDataTables);
+        pdxDataTables = removePdxHeaderRows(pdxDataTables);
+        pdxDataTables = removeBlankRows(pdxDataTables);
+        return pdxDataTables;
+    }
+
+    private Map<String, Table> removePdxHeaderRows(Map<String, Table> pdxDataTables) {
+        return pdxDataTables.entrySet().stream().collect(
+            Collectors.toMap(
+                e -> e.getKey(),
+                e -> TableUtilities.removeHeaderRows(e.getValue(), 4)
+            ));
+    }
+
+    private Map<String, Table> removeBlankRows(Map<String, Table> pdxDataTables) {
+        return pdxDataTables.entrySet().stream().collect(
+            Collectors.toMap(
+                e -> e.getKey(),
+                e -> TableUtilities.removeRowsMissingRequiredColumnValue(
+                    e.getValue(),
+                    e.getValue().column(0).asStringColumn())
+            ));
+    }
+
+    private void removeDescriptionColumn(Map<String, Table> pdxDataTables) {
+        pdxDataTables.values().forEach(t -> t.removeColumns("Field"));
     }
 
     private boolean validatePdxDataTables(Map<String, Table> pdxDataTables, String provider){

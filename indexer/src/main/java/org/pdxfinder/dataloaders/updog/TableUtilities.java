@@ -2,6 +2,7 @@ package org.pdxfinder.dataloaders.updog;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.selection.Selection;
@@ -42,6 +43,10 @@ public class TableUtilities {
     public static Table removeRowsMissingRequiredColumnValue(Table table, String requiredColumn) {
         Selection missing = table.column(requiredColumn).isMissing();
         return table.dropWhere(missing);
+    }
+
+    public static Table removeRowsMissingRequiredColumnValue(Table table, StringColumn requiredColumn) {
+        return removeRowsMissingRequiredColumnValue(table, requiredColumn.name());
     }
 
 }

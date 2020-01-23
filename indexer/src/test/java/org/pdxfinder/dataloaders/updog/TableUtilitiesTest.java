@@ -106,5 +106,21 @@ public class TableUtilitiesTest {
             removeRowsMissingRequiredColumnValue(table, "required_column_1").toString()
         );
     }
+    @Test public void removeRowsMissingRequiredColumnValue_givenColumnObject_removesInvalidRow() {
+        Table table = Table.create().addColumns(
+            StringColumn.create("required_column_1", Arrays.asList("value_1", "")),
+            StringColumn.create("column_2", Arrays.asList("value2", "value_3")));
+        Table expected = Table.create().addColumns(
+            StringColumn.create("required_column_1", Arrays.asList("value_1")),
+            StringColumn.create("column_2", Arrays.asList("value2")));
+        assertEquals(
+            expected.toString(),
+            removeRowsMissingRequiredColumnValue(
+                table,
+                table.column("required_column_1").asStringColumn()
+            ).toString()
+        );
+    }
+
 
 }
