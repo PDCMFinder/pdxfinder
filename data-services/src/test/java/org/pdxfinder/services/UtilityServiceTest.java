@@ -23,6 +23,9 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +42,10 @@ public class UtilityServiceTest extends BaseTest {
     private static final String JSON_IRI_VALUE = "http://purl.obolibrary.org/obo/NCIT_C4741";
     private static final String JSON_LABEL_KEY = "label";
     private static final String JSON_LABEL_VALUE = "Neoplasm by Morphology";
+
+
+    private String camelCaseString = "TheMethodWillConvertTheCamelCaseCsvHeaderIntoUserReadableSentence";
+    private String sentenceString = "The Method Will Convert The Camel Case Csv Header Into User Readable Sentence";
 
     @InjectMocks
     private UtilityService utilityService;
@@ -143,9 +150,10 @@ public class UtilityServiceTest extends BaseTest {
     public void given_FilePath_When_MkDirectoryFromFilePathNameInvoked_Then_CreateDirectory() throws IOException {
 
         // given temporary test folder
+        String newDirectory = "testDirectory";
         File volatileTestFolder = temporaryFolder.newFolder("subfolder");
 
-        String directoryNameToCreate = volatileTestFolder.getAbsolutePath() + "/testDirectory/";
+        String directoryNameToCreate = String.format("%s/%s/", volatileTestFolder.getAbsolutePath(), newDirectory);
 
         // when ... call the utility service to create a directory "testDirectory" inside the "volatileTestFolder"
         utilityService.mkDirectoryFromFilePathName(directoryNameToCreate);
@@ -163,6 +171,128 @@ public class UtilityServiceTest extends BaseTest {
                 .getRoot().toPath()
                 .resolve(folder)
                 .toString();
+    }
+
+
+
+    @Test
+    public void given_SourceAndDestination_When_MoveFileInvoked_Then_FileIsMoved() throws IOException {
+
+        // given
+        String fileName = "output.txt";
+        String fileContent = "file content string";
+        String newFolderName = "subfolder";
+
+        // create source file in a temp directory
+        File sourceFile = temporaryFolder.newFile(fileName);
+
+        // Write data into the temp file.
+        FileUtils.writeStringToFile(sourceFile, fileContent);
+        String source = sourceFile.getPath();
+
+
+        // build a destination String without creating the file
+        File expectedDestination = temporaryFolder.newFolder(newFolderName)
+                .toPath()
+                .resolve(fileName)
+                .toFile();
+
+
+        // when
+        // ... call moveFile method to move the file from source to destination, create destination directory and move file there
+        utilityService.moveFile(source, expectedDestination.getPath());
+
+        // Read the moved file content
+        String actual = FileUtils.readFileToString(expectedDestination);
+
+        // Then
+        assertTrue(expectedDestination.exists());
+        assertThat(expectedDestination).hasName(fileName).hasContent(actual).hasParent(resolvePath(newFolderName));
+    }
+
+
+
+
+    @Test
+    public void given_FileDir_When_ListAllFilesInADirectoryInvoked_Then_FileIsMoved() throws IOException {
+
+        // given
+        String fileNamePrefix = "tempFile";
+
+        // create five files in a temp directory
+        File tempFile1 = temporaryFolder.newFile(String.format("%s1.txt", fileNamePrefix));
+        File tempFile2 = temporaryFolder.newFile(String.format("%s2.txt", fileNamePrefix));
+        File tempFile3 = temporaryFolder.newFile(String.format("%s3.txt", fileNamePrefix));
+        File tempFile4 = temporaryFolder.newFile(String.format("%s4.txt", fileNamePrefix));
+        File tempFile5 = temporaryFolder.newFile(String.format("%s5.txt", fileNamePrefix));
+
+        List<String> expectedFiles = Arrays.asList(tempFile1.getName(),
+                                      tempFile2.getName(),
+                                      tempFile3.getName(),
+                                      tempFile4.getName(),
+                                      tempFile5.getName()
+        );
+        Set<String> expected = new HashSet<>(expectedFiles);
+
+        // Retrieve the temp directory where the files are stored
+        String tempDir = tempFile1.getParent();
+
+        // when
+        Set<String> actual = new HashSet<>(
+                utilityService.listAllFilesInADirectory(tempDir)
+        );
+
+        // Then
+        assertEquals(expected, actual);
+    }
+
+
+
+
+    @Test
+    public void given_CamelCaseString_When_CamelCaseToSentenceInvoked_Then_ReturnReadableSentence(){
+
+        // given
+        String camelCaseString = this.camelCaseString;
+        String expected = this.sentenceString;
+
+        // when
+        String actual = utilityService.camelCaseToSentence(camelCaseString);
+
+        // Then
+        assertEquals(expected, actual);
+    }
+
+
+    @Test
+    public void given_SentenceString_When_SentenceToCamelCaseInvoked_Then_ReturnCamelCase(){
+
+        // given
+        String sentenceString = this.sentenceString;
+        String expected = this.camelCaseString;
+
+        // when
+        String actual = utilityService.sentenceToCamelCase(sentenceString);
+
+        // Then
+        assertEquals(expected, actual);
+    }
+
+
+    @Test
+    public void given_DelimitedString_When_SplitTextInvoked_Then_ReturnExpected() throws IOException {
+
+        // given
+        String data = "Sample string,will,be,tokenized,on,pipe,and,replaced,with,space";
+        String delimiter = ",";
+        String separator = " ";
+        String expected = "Sample string will be tokenized on pipe and replaced with space";
+
+        // when
+        String actual = utilityService.splitText(data, delimiter, separator);
+
+        // Then
+        assertEquals(expected, actual);
     }
 
 }

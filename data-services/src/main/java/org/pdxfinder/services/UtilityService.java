@@ -864,9 +864,9 @@ public class UtilityService {
     }
 
 
-    public void listAllFilesInADirectory(String directory) {
+    public List<String> listAllFilesInADirectory(String directory) {
 
-        String fileNames = "";
+        List<String> fileNames = new ArrayList<>();
 
         File folder = new File(directory);
 
@@ -878,16 +878,17 @@ public class UtilityService {
             log.warn("No subdirs found for the universal loader, skipping");
         }
         else {
-            StringBuilder stringBuilder = new StringBuilder();
+
             for (File file : filDir) {
 
                 if (file.isFile()) {
-                    stringBuilder.append(file.getName()).append("\n");
+                    log.info(file.getName());
+                    fileNames.add(file.getName());
                 }
             }
-            fileNames = stringBuilder.toString();
         }
-        log.info(fileNames);
+
+        return fileNames;
     }
 
 
@@ -929,7 +930,14 @@ public class UtilityService {
 
     public String sentenceToCamelCase(String input) {
 
-        return StringUtils.capitalize(input.split("-")[0]) + StringUtils.capitalize(input.split("-")[1]);
+        StringBuilder result = new StringBuilder();
+
+        for (String s : input.split("\\s+")){
+
+            result.append(StringUtils.capitalize(s));
+        }
+
+        return result.toString();
 
     }
 
@@ -945,7 +953,7 @@ public class UtilityService {
             result.append(split.trim()).append(seperator);
         }
 
-        return result.toString();
+        return result.toString().trim();
     }
 
 
