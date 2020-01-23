@@ -5,9 +5,7 @@ import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.tablesaw.api.Table;
-import tech.tablesaw.io.csv.CsvReadOptions;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,7 +30,7 @@ public class MetadataReader {
                 .filter(filter::matches)
                 .forEach(path -> tables.put(
                     path.getFileName().toString(),
-                    readTsvOrReturnEmpty(path.toFile()))
+                    TableUtilities.readTsvOrReturnEmpty(path.toFile()))
                 );
         } catch (IOException e) {
             log.error("There was an error reading the metadata files", e);
@@ -55,27 +53,9 @@ public class MetadataReader {
 
     Optional<Path> getOmicsDirectory(Path targetDirectory, String omicsDirectoryName) {
         Optional omicsDirectory;
-        if (targetDirectory.resolve(omicsDirectoryName).toFile().exists()) {
-            return Optional.of(targetDirectory.resolve(omicsDirectoryName));
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    private static Table readTsvOrReturnEmpty(File file) {
-        Table dataTable = Table.create();
-        log.trace("Reading tsv file {}", file);
-        try { dataTable = readTsv(file); }
-        catch (IOException e) { log.error("There was an error reading the tsv file" , e); }
-        return dataTable;
-    }
-
-    private static Table readTsv(File file) throws IOException {
-        CsvReadOptions.Builder builder = CsvReadOptions
-            .builder(file)
-            .separator('\t');
-        CsvReadOptions options = builder.build();
-        return Table.read().usingOptions(options);
+        return targetDirectory.resolve(omicsDirectoryName).toFile().exists() ?
+            Optional.of(targetDirectory.resolve(omicsDirectoryName)) :
+            Optional.empty();
     }
 
 }
