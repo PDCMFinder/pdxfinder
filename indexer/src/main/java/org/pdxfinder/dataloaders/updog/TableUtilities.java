@@ -4,13 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
+import tech.tablesaw.selection.Selection;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 
 public class TableUtilities {
 
@@ -33,9 +30,18 @@ public class TableUtilities {
     }
 
     public static Table removeHeaderRows(Table table, int numberOfRows) {
-        return table.rowCount() <= numberOfRows ?
-            table.emptyCopy() :
-            table.dropRange(numberOfRows);
+        return doesNotHaveEnoughRows(table, numberOfRows)
+            ? table.emptyCopy()
+            : table.dropRange(numberOfRows);
+    }
+
+    private static boolean doesNotHaveEnoughRows(Table table, int numberOfRows) {
+        return table.rowCount() <= numberOfRows;
+    }
+
+    public static Table removeRowsMissingRequiredColumnValue(Table table, String requiredColumn) {
+        Selection missing = table.column(requiredColumn).isMissing();
+        return table.dropWhere(missing);
     }
 
 }

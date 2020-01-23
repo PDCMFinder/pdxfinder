@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.pdxfinder.dataloaders.updog.TableUtilities.removeHeaderRows;
+import static org.pdxfinder.dataloaders.updog.TableUtilities.removeRowsMissingRequiredColumnValue;
 
 public class TableUtilitiesTest {
 
@@ -59,6 +60,50 @@ public class TableUtilitiesTest {
         assertEquals(
             expected.toString(),
             removeHeaderRows(table, 4).toString()
+        );
+    }
+
+    @Test public void removeRowsMissingRequiredColumnValue_givenTableWithOnlyOneEmptyRow_returnEmptyTable() {
+        Table table = Table.create().addColumns(
+            StringColumn.create("required_column_1", Arrays.asList("")));
+        Table expected = table.emptyCopy();
+        assertEquals(
+            expected.toString(),
+            removeRowsMissingRequiredColumnValue(table, "required_column_1").toString()
+        );
+    }
+
+    @Test public void removeRowsMissingRequiredColumnValue_givenTableWithOneEmptyRow_removeEmptyRow() {
+        Table table = Table.create().addColumns(
+            StringColumn.create("required_column_1", Arrays.asList("value_1", "")));
+        Table expected = Table.create().addColumns(
+            StringColumn.create("required_column_1", Arrays.asList("value_1")));
+        assertEquals(
+            expected.toString(),
+            removeRowsMissingRequiredColumnValue(table, "required_column_1").toString()
+        );
+    }
+
+    @Test public void removeRowsMissingRequiredColumnValue_givenTableWithOneMissingValue_doesNotRemoveRow() {
+        Table table = Table.create().addColumns(
+            StringColumn.create("required_column_1", Arrays.asList("value_1", "value_2")),
+            StringColumn.create("column_2", Arrays.asList("value_3", "")));
+        assertEquals(
+            table.toString(),
+            removeRowsMissingRequiredColumnValue(table, "required_column_1").toString()
+        );
+    }
+
+    @Test public void removeRowsMissingRequiredColumnValue_givenTableWithOneMissingValueInRequired_removesInvalidRow() {
+        Table table = Table.create().addColumns(
+            StringColumn.create("required_column_1", Arrays.asList("value_1", "")),
+            StringColumn.create("column_2", Arrays.asList("value2", "value_3")));
+        Table expected = Table.create().addColumns(
+            StringColumn.create("required_column_1", Arrays.asList("value_1")),
+            StringColumn.create("column_2", Arrays.asList("value2")));
+        assertEquals(
+            expected.toString(),
+            removeRowsMissingRequiredColumnValue(table, "required_column_1").toString()
         );
     }
 
