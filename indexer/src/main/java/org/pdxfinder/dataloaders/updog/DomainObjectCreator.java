@@ -214,7 +214,7 @@ public class DomainObjectCreator {
                     modelCreation.addGroup(projectGroup);
                 });
 
-            if (bothPresent(accessibility, europdxAccessModality)) {
+            if (eitherIsPresent(accessibility, europdxAccessModality)) {
                 Group access = dataImportService.getAccessibilityGroup(accessibility, europdxAccessModality);
                 modelCreation.addGroup(access);
             }
@@ -224,9 +224,9 @@ public class DomainObjectCreator {
         }
     }
 
-    private boolean bothPresent(String string, String anotherString) {
+    private boolean eitherIsPresent(String string, String anotherString) {
         return (
-            Optional.ofNullable(string).isPresent() &&
+            Optional.ofNullable(string).isPresent() ||
             Optional.ofNullable(anotherString).isPresent()
         );
     }
