@@ -13,9 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/*
- * Created by abayomi on 13/09/2018.
- */
+
 @Service
 public class PatientService {
 
@@ -33,8 +31,8 @@ public class PatientService {
         PatientDTO patientDTO =  new PatientDTO();
 
         List<CollectionEventsDTO> collectionEvents = new ArrayList<>();
-        Boolean treatmentExists = false;
-        Boolean currentTreatmentExists = false;
+        boolean treatmentExists = false;
+        boolean currentTreatmentExists = false;
 
 
         if (patient != null){
@@ -65,23 +63,23 @@ public class PatientService {
 
                     try {
                         age = ps.getAgeAtCollection();
-                    } catch (Exception e) {}
+                    } catch (NullPointerException ignored) {}
 
                     try {
                         diagnosis = sample.getSampleToOntologyRelationship().getOntologyTerm().getLabel();
-                    } catch (Exception e) {}
+                    } catch (NullPointerException ignored) {}
 
                     try {
                         tumorType = sample.getType().getName();
-                    } catch (Exception e) {}
+                    } catch (NullPointerException ignored) {}
 
                     try {
                         pdxMouse = patientRepository.getModelIdByDataSourceAndPatientSampleId(dataSource, sample.getSourceSampleId());
-                    } catch (Exception e) {}
+                    } catch (Exception ignored) {}
 
                     try {
                         collectionSite = notEmpty(sample.getSampleSite().getName());
-                    } catch (Exception e) {}
+                    } catch (Exception ignored) {}
 
 
                     try{
@@ -90,24 +88,22 @@ public class PatientService {
                                 geneticMutations.add( mAssoc.getMarker().getHgncSymbol() );
                             }
                         }
-                    }catch (Exception e) {}
+                    }catch (Exception ignored) {}
 
 
                     collectionEvents.add(new CollectionEventsDTO(age, diagnosis, tumorType, pdxMouse, data, collectionSite));
                 }
 
 
-
-                String mappedTreatmentName = "";
-                String treatmentDose = "-";
-                String treatmentResponse = "";
-                String treatmentDuration = "";
-                String treatmentDate = "";
-
                 boolean current = false;
                 try{
 
                     // Aggregate the treatment summaries for this Treatment Protocol
+                    String mappedTreatmentName = "";
+                    String treatmentResponse = "";
+                    String treatmentDate = "";
+                    String treatmentDuration = "";
+                    String treatmentDose = "-";
                     for (TreatmentProtocol protocol : ps.getTreatmentSummary().getTreatmentProtocols()){
 
                         mappedTreatmentName = protocol.getTreatmentString(false);
@@ -127,7 +123,7 @@ public class PatientService {
                         treatmentExists = true;
                     }
 
-                }catch (Exception e){}
+                }catch (Exception ignored){}
 
             }
 
@@ -146,7 +142,7 @@ public class PatientService {
     }
 
 
-    public String notEmpty(String input){
+    private String notEmpty(String input){
 
         String output = (input == null) ? "Not Specified" : input;
         output = output.equals("null") ? "Not Specified" : output;
