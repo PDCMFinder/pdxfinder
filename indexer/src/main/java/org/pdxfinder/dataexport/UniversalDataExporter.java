@@ -742,6 +742,7 @@ public class UniversalDataExporter {
 
                 List<String> dataRow = new ArrayList<>();
 
+                dataRow.add("");
                 dataRow.add(model.getSample().getSourceSampleId());
                 dataRow.add(patientOrigin);
                 dataRow.add("NA");
@@ -788,6 +789,7 @@ public class UniversalDataExporter {
 
                     List<String> dataRow = new ArrayList<>();
 
+                    dataRow.add("");
                     dataRow.add(sample.getSourceSampleId());
                     dataRow.add("xenograft");
                     dataRow.add(passage);
