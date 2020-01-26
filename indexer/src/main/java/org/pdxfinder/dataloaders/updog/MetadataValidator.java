@@ -51,9 +51,10 @@ public class MetadataValidator {
             for (String missingCol : missingCols) {
                 validationErrors.add(TableValidationError
                     .create(key)
+                    .setType(TableValidationError.Type.MISSING_COL)
                     .setColumn(missingCol)
                     .setProvider(provider)
-                    .setType("Missing column"));
+                );
             }
         }
 
@@ -66,7 +67,7 @@ public class MetadataValidator {
                     TableValidationError
                         .create(f)
                         .setProvider(provider)
-                        .setType("Missing file")));
+                        .setType(TableValidationError.Type.MISSING_FILE)));
         }
     }
 

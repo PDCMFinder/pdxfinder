@@ -64,7 +64,7 @@ public class MetadataValidatorTest {
             Arrays.asList(TableValidationError
                 .create("metadata-patient.tsv")
                 .setProvider("PROVIDER")
-                .setType("Missing file")));
+                .setType(TableValidationError.Type.MISSING_FILE)));
         assertEquals(
             expected.get(0).getErrorType(),
             metadataValidator.validate(incompleteFileSet, new HashMap<>(), provider).get(0).getErrorType()
@@ -79,7 +79,7 @@ public class MetadataValidatorTest {
         ArrayList<TableValidationError> expected = new ArrayList<>(
             Arrays.asList(TableValidationError.create("metadata-patient.tsv")
                 .setProvider(provider)
-                .setType("Missing column")
+                .setType(TableValidationError.Type.MISSING_COL)
                 .setColumn("missing_field")));
         Map<String, ColumnSpecification> columnSpecifications = new HashMap<>();
         Arrays.asList("metadata-patient.tsv").stream().forEach(
