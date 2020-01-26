@@ -49,12 +49,7 @@ public class MetadataValidator {
             value = entry.getValue();
             missingCols = value.getMissingColumnsFrom(pdxDataTables.get(key));
             for (String missingCol : missingCols) {
-                validationErrors.add(TableValidationError
-                    .create(key)
-                    .setType(TableValidationError.Type.MISSING_COL)
-                    .setColumn(missingCol)
-                    .setProvider(provider)
-                );
+                validationErrors.add(TableValidationError.missingColumn(key, missingCol).setProvider(provider));
             }
         }
 
@@ -63,11 +58,7 @@ public class MetadataValidator {
     private void checkAllRequiredFilesPresent(Map<String, Table> pdxDataTables, String provider) {
         if (isMissingRequiredFiles(pdxDataTables)) {
             getMissingFilesFrom(pdxDataTables).forEach(
-                f -> validationErrors.add(
-                    TableValidationError
-                        .create(f)
-                        .setProvider(provider)
-                        .setType(TableValidationError.Type.MISSING_FILE)));
+                f -> validationErrors.add(TableValidationError.missingFile(f).setProvider(provider)));
         }
     }
 
