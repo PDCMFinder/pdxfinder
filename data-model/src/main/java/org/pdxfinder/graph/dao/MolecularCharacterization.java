@@ -38,7 +38,9 @@ public class MolecularCharacterization {
 
 
     public MolecularCharacterization() {
+
         isVisible = true;
+        markerAssociations = new ArrayList<>();
     }
 
     public MolecularCharacterization(String technology) {

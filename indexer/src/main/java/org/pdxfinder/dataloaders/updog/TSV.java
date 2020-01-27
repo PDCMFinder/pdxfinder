@@ -56,10 +56,49 @@ public class TSV {
     }
 
     public enum Mutation{
-
-
-
+        model_id,
+        sample_id,
+        sample_origin,
+        host_strain_nomenclature,
+        passage,
+        symbol,
+        biotype,
+        coding_sequence_change,
+        variant_class,
+        codon_change,
+        amino_acid_change,
+        consequence,
+        functional_prediction,
+        read_depth,
+        allele_frequency,
+        chromosome,
+        seq_start_position,
+        ref_allele,
+        alt_allele,
+        ucsc_gene_id,
+        ncbi_gene_id,
+        ncbi_transcript_id,
+        ensembl_gene_id,
+        ensemble_transcript_id,
+        variation_id,
+        genome_assembly,
+        platform
     }
 
+
+    public enum SamplePlatform{
+
+        sample_id,
+        sample_origin,
+        passage,
+        engrafted_tumor_collection_site,
+        model_id,
+        host_strain_name,
+        host_strain_nomenclature,
+        molecular_characterisation_type,
+        platform,
+        internal_protocol_url
+
+    }
 
 }

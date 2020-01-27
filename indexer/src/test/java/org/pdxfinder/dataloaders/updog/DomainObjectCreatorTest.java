@@ -162,6 +162,7 @@ public class DomainObjectCreatorTest extends BaseTest {
         String modelValidation = "metadata-model_validation.tsv";
         String sample = "metadata-sample.tsv";
         String sharing = "metadata-sharing.tsv";
+        String samplePlatform = "sampleplatform-data.tsv";
 
         Map<String, Table> pdxDataTables = new HashMap<>();
         pdxDataTables.put(loader, Table.create(loader).addColumns(
@@ -224,6 +225,17 @@ public class DomainObjectCreatorTest extends BaseTest {
             StringColumn.create("form_url", Collections.singletonList("www.test.com")),
             StringColumn.create("database_url", Collections.singletonList("www.test.com")),
             StringColumn.create("project", Collections.singletonList("project 1"))));
+
+        pdxDataTables.put(samplePlatform, Table.create(samplePlatform).addColumns(
+                StringColumn.create("sample_id", Collections.singletonList("sample 1")),
+                StringColumn.create("sample_origin", Collections.singletonList("patient")),
+                StringColumn.create("passage", Collections.singletonList("")),
+                StringColumn.create("model_id", Collections.singletonList("model 1")),
+                StringColumn.create("host_strain_name", Collections.singletonList("")),
+                StringColumn.create("host_strain_nomenclature", Collections.singletonList("")),
+                StringColumn.create("molecular_characterisation_type", Collections.singletonList("mutation")),
+                StringColumn.create("platform", Collections.singletonList("Next Generation Sequencing"))
+        ));
 
         return pdxDataTables;
     }

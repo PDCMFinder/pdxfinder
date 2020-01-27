@@ -242,4 +242,23 @@ public class Sample {
     public void setGradeClassification(String gradeClassification) {
         this.gradeClassification = gradeClassification;
     }
+
+    public MolecularCharacterization getMolecularCharacterization(String type, String platformName){
+
+        if(molecularCharacterizations == null) return null;
+
+        for(MolecularCharacterization mc : molecularCharacterizations){
+
+            if(mc.getType().equals(type)){
+
+                if(mc.getPlatform() != null && mc.getPlatform().getName().equals(platformName)) {
+
+                    return mc;
+                }
+
+            }
+        }
+
+        return null;
+    }
 }

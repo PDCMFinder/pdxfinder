@@ -26,6 +26,9 @@ public class DomainObjectCreator {
     private static final String ENGRAFTMENT_SITE_KEY = "engraftment_site";
     private static final String ENGRAFTMENT_TYPE_KEY = "engraftment_type";
     private static final String ENGRAFTMENT_MATERIAL_KEY = "engraftment_material";
+    private static final String PLATFORM_KEY = "platform";
+
+    private static final String NOT_SPECIFIED = "Not Specified";
 
 
     public DomainObjectCreator(
@@ -43,6 +46,10 @@ public class DomainObjectCreator {
         createModelData();
         createSampleData();
         createSharingData();
+
+        createSamplePlatformData();
+
+        //createMolecularData();
 
         persistNodes();
     }
@@ -163,7 +170,7 @@ public class DomainObjectCreator {
         createModelValidationData();
     }
 
-    private void createModelValidationData() {
+    void createModelValidationData() {
 
         Table modelValidationTable = pdxDataTables.get("metadata-model_validation.tsv");
         for (Row row : modelValidationTable) {
@@ -222,6 +229,154 @@ public class DomainObjectCreator {
             providerGroup.setProviderType(providerType);
             providerGroup.setContact(email);
         }
+    }
+
+    void createSamplePlatformData(){
+
+        Table samplePlatformTable = pdxDataTables.get("sampleplatform-data.tsv");
+
+
+        for(Row row : samplePlatformTable){
+
+
+            String sampleOrigin = row.getString(TSV.SamplePlatform.sample_origin.name());
+            String platformName = row.getString(TSV.SamplePlatform.platform.name());
+            String molCharType = row.getString(TSV.SamplePlatform.molecular_characterisation_type.name());
+
+            Sample sample = null;
+
+            if(sampleOrigin.equals("patient")){
+
+                sample = getPatientSample(row);
+            }
+            else if(sampleOrigin.equals("xenograft")){
+
+                sample = getOrCreateSpecimen(row).getSample();
+            }
+
+            if(sample == null) throw new NullPointerException();
+
+
+            getOrCreateMolecularCharacterization(sample, platformName, molCharType);
+
+        }
+
+    }
+
+    void createMolecularData(){
+
+        Table mutationTable = pdxDataTables.get("mutation.tsv");
+        String molCharType = "mutation";
+        for(Row row:mutationTable){
+
+            String sampleOrigin = row.getString(TSV.Mutation.sample_origin.name());
+            String platformName = row.getString(TSV.Mutation.platform.name());
+
+            Sample sample = null;
+
+            if(sampleOrigin.equals("patient")){
+
+                sample = getPatientSample(row);
+            }
+            else if(sampleOrigin.equals("xenograft")){
+
+                sample = getOrCreateSpecimen(row).getSample();
+            }
+
+            if(sample == null) throw new NullPointerException();
+
+
+            MolecularCharacterization molecularCharacterization = getOrCreateMolecularCharacterization(sample, platformName, molCharType);
+
+            addMutationData(molecularCharacterization, row);
+
+        }
+
+
+    }
+
+
+
+    private Sample getPatientSample(Row row){
+
+        String modelId = row.getString(TSV.Mutation.model_id.name());
+        ModelCreation modelCreation = (ModelCreation) getDomainObject(MODEL_KEY, modelId);
+        if(modelCreation == null) throw new NullPointerException();
+
+        return modelCreation.getSample();
+    }
+
+    private Specimen getOrCreateSpecimen(Row row){
+
+        String modelId = row.getString(TSV.Mutation.model_id.name());
+        String hostStrainSymbol = row.getString(TSV.Mutation.host_strain_nomenclature.name());
+        String passage = row.getString(TSV.Mutation.passage.name());
+        String sampleId = row.getString(TSV.Mutation.sample_id.name());
+
+        ModelCreation modelCreation = (ModelCreation) getDomainObject(MODEL_KEY, modelId);
+        if(modelCreation == null) throw new NullPointerException();
+
+        Specimen specimen = modelCreation.getSpecimenByPassageAndHostStrain(passage, hostStrainSymbol);
+
+        if(specimen == null){
+            specimen = new Specimen();
+            specimen.setPassage(passage);
+
+            HostStrain hostStrain = getOrCreateHostStrain(NOT_SPECIFIED, hostStrainSymbol, row.getRowNumber());
+            specimen.setHostStrain(hostStrain);
+
+            Sample sample = new Sample();
+            sample.setSourceSampleId(sampleId);
+            specimen.setSample(sample);
+            modelCreation.addRelatedSample(sample);
+        }
+
+        return specimen;
+    }
+
+    private MolecularCharacterization getOrCreateMolecularCharacterization(Sample sample, String platformName, String molCharType){
+
+        MolecularCharacterization molecularCharacterization = sample.getMolecularCharacterization(molCharType, platformName);
+
+        if(molecularCharacterization == null){
+
+            molecularCharacterization = new MolecularCharacterization();
+            molecularCharacterization.setType(molCharType);
+            molecularCharacterization.setPlatform(getOrCreatePlatform(platformName, molCharType));
+            sample.addMolecularCharacterization(molecularCharacterization);
+
+        }
+
+        return molecularCharacterization;
+    }
+
+
+    private Platform getOrCreatePlatform(String platformName, String molCharType){
+
+        Group providerGroup = (Group) getDomainObject(PROVIDER_KEY, null);
+        String platformId = molCharType+platformName;
+        Platform platform = (Platform) getDomainObject(PLATFORM_KEY, platformId);
+
+        if(platform == null){
+
+            platform = new Platform();
+            platform.setGroup(providerGroup);
+            platform.setName(platformName);
+
+            addDomainObject(PLATFORM_KEY, platformId, platform);
+        }
+
+        return platform;
+    }
+
+
+
+    private void addMutationData(MolecularCharacterization molecularCharacterization, Row row){
+
+        MarkerAssociation markerAssociation = molecularCharacterization.getMarkerAssociations().get(0);
+
+
+
     }
 
     private boolean eitherIsPresent(String string, String anotherString) {
