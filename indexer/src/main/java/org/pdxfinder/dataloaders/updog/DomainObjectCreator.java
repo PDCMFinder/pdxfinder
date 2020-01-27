@@ -44,7 +44,6 @@ public class DomainObjectCreator {
         createSampleData();
         createSharingData();
 
-        createMolecularData();
         persistNodes();
     }
 
@@ -215,7 +214,7 @@ public class DomainObjectCreator {
                     modelCreation.addGroup(projectGroup);
                 });
 
-            if (bothPresent(accessibility, europdxAccessModality)) {
+            if (eitherIsPresent(accessibility, europdxAccessModality)) {
                 Group access = dataImportService.getAccessibilityGroup(accessibility, europdxAccessModality);
                 modelCreation.addGroup(access);
             }
@@ -225,26 +224,9 @@ public class DomainObjectCreator {
         }
     }
 
-
-    void createMolecularData(){
-
-        Table mutationTable = pdxDataTables.get("mutation.tsv");
-        for(Row row:mutationTable){
-
-            String modelId = row.getString(TSV.Mutation.model_id.name());
-            String sampleId = row.getString(TSV.Mutation.sample_id.name());
-            String sampleOrigin = row.getString(TSV.Mutation.sample_origin.name());
-
-
-
-        }
-
-
-    }
-
-    private boolean bothPresent(String string, String anotherString) {
+    private boolean eitherIsPresent(String string, String anotherString) {
         return (
-            Optional.ofNullable(string).isPresent() &&
+            Optional.ofNullable(string).isPresent() ||
             Optional.ofNullable(anotherString).isPresent()
         );
     }
