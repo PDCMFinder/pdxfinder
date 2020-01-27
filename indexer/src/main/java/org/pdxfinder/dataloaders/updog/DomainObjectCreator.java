@@ -44,6 +44,7 @@ public class DomainObjectCreator {
         createSampleData();
         createSharingData();
 
+        createMolecularData();
         persistNodes();
     }
 
@@ -222,6 +223,23 @@ public class DomainObjectCreator {
             providerGroup.setProviderType(providerType);
             providerGroup.setContact(email);
         }
+    }
+
+
+    void createMolecularData(){
+
+        Table mutationTable = pdxDataTables.get("mutation.tsv");
+        for(Row row:mutationTable){
+
+            String modelId = row.getString(TSV.Mutation.model_id.name());
+            String sampleId = row.getString(TSV.Mutation.sample_id.name());
+            String sampleOrigin = row.getString(TSV.Mutation.sample_origin.name());
+
+
+
+        }
+
+
     }
 
     private boolean bothPresent(String string, String anotherString) {
