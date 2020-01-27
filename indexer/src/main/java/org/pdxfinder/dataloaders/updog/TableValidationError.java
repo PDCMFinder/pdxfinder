@@ -112,9 +112,9 @@ public class TableValidationError {
                 message.add(String.format("Missing column: [%s]", getColumn().orElse("not specified")));
             } else if (getErrorType().get().equals(Type.MISSING_REQ_VALUE.toString())) {
                 message.add(String.format(
-                    "Missing value in required column: [%s], line [%s]",
+                    "Missing value in required column: [%s], data row [%s]",
                     getColumn().get(),
-                    getRow().get().getRowNumber()));
+                    toOneBasedIndex(getRow().get().getRowNumber())));
             } else {
                 message.add(getErrorType().get());
             }
@@ -124,6 +124,10 @@ public class TableValidationError {
         }
         message.add(formatDescription());
         return message.toString();
+    }
+
+    private int toOneBasedIndex(int number) {
+        return number + 1;
     }
 
     private String formatDescription() {

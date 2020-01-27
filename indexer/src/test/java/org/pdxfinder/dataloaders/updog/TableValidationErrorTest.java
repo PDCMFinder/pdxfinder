@@ -1,10 +1,8 @@
 package org.pdxfinder.dataloaders.updog;
 
 import org.junit.Test;
-import tech.tablesaw.api.Row;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
-import tech.tablesaw.selection.Selection;
 
 import java.util.Arrays;
 
@@ -70,12 +68,28 @@ public class TableValidationErrorTest {
     }
 
     @Test public void toString_givenRequiredColumnHasMissingValue_returnsAppropriateMessage() {
-        String expected = "Error in table: Missing value in required column: [required_col], line [0]" +
-            "\n required_col  |\n" +
+        String expected = "Error in table: Missing value in required column: [required_col], data row [1]\n" +
+            " required_col  |\n" +
             "----------------\n" +
             "               |";
         Table table = Table.create().addColumns(StringColumn.create("required_col", Arrays.asList("")));
         TableValidationError error = TableValidationError.missingRequiredValue("table", "required_col", table.row(0));
+        assertEquals(
+            expected,
+            error.toString()
+        );
+    }
+
+    @Test public void toString_givenRequiredColumnHasMissingValueInRow1_returnsAppropriateMessage() {
+        String expected = "Error in table: Missing value in required column: [required_col], data row [2]\n" +
+            " required_col  |  optional_col  |\n" +
+            "---------------------------------\n" +
+            "               |       value 2  |";
+        Table table = Table.create().addColumns(
+            StringColumn.create("required_col", Arrays.asList("value 1", "")),
+            StringColumn.create("optional_col", Arrays.asList("value 1", "value 2"))
+        );
+        TableValidationError error = TableValidationError.missingRequiredValue("table", "required_col", table.row(1));
         assertEquals(
             expected,
             error.toString()
