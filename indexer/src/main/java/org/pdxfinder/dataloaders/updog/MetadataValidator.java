@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @Component
@@ -18,21 +17,33 @@ public class MetadataValidator {
 
     public List<TableValidationError> validate(
         Map<String, Table> pdxDataTables,
-        FileSetSpecification fileSetSpecification, Map<String, ColumnSpecification> columnSpecification,
+        FileSetSpecification fileSetSpecification,
         String provider) {
         checkAllRequiredFilesPresent(pdxDataTables, fileSetSpecification, provider);
-        checkAllRequiredColumnsPresent(pdxDataTables, columnSpecification, provider);
+        checkAllRequiredColumnsPresent(pdxDataTables, fileSetSpecification, provider);
         return validationErrors;
     }
 
     private void checkAllRequiredColumnsPresent(
         Map<String, Table> pdxDataTables,
-        Map<String, ColumnSpecification> columnSpecification,
+        FileSetSpecification fileSetSpecification,
         String provider
     ) {
+        if (fileSetSpecification.hasRequiredColumns()) {
+            createValidationErrorsForMissingRequiredColumns(pdxDataTables, fileSetSpecification, provider);
+        }
+
+    }
+
+    private void createValidationErrorsForMissingRequiredColumns(
+        Map<String, Table> pdxDataTables,
+        FileSetSpecification fileSetSpecification,
+        String provider) {
+
         String key;
         ColumnSpecification value;
         List<String> missingCols;
+        Map<String, ColumnSpecification> columnSpecification = fileSetSpecification.getColumnSpecification();
         for (Map.Entry<String, ColumnSpecification> entry : columnSpecification.entrySet()) {
             key = entry.getKey();
             value = entry.getValue();
@@ -41,7 +52,6 @@ public class MetadataValidator {
                 validationErrors.add(TableValidationError.missingColumn(key, missingCol).setProvider(provider));
             }
         }
-
     }
 
     private void checkAllRequiredFilesPresent(Map<String, Table> pdxDataTables, FileSetSpecification fileSetSpecification, String provider) {
@@ -52,7 +62,7 @@ public class MetadataValidator {
     }
 
     public boolean passesValidation(Map<String, Table> pdxDataTables, FileSetSpecification fileSetSpecification, String provider) {
-        return validate(pdxDataTables, fileSetSpecification, new HashMap<>(), provider).isEmpty();
+        return validate(pdxDataTables, fileSetSpecification, provider).isEmpty();
     }
 
     private boolean isMissingRequiredFiles(Map<String, Table> pdxDataTables, FileSetSpecification fileSetSpecification) {

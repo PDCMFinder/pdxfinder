@@ -15,6 +15,7 @@ import java.nio.file.PathMatcher;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class Updog {
@@ -104,7 +105,7 @@ public class Updog {
 
     private FileSetSpecification fileSetSpecification() {
         return FileSetSpecification.create().addRequiredFileList(
-            Arrays.asList(
+            Stream.of(
                 "metadata-loader.tsv",
                 "metadata-checklist.tsv",
                 "metadata-sharing.tsv",
@@ -112,7 +113,7 @@ public class Updog {
                 "metadata-patient.tsv",
                 "metadata-model.tsv",
                 "metadata-sample.tsv"
-            ));
+            ).collect(Collectors.toSet()));
     }
 
     private void createPdxObjects(){
