@@ -12,6 +12,7 @@ import tech.tablesaw.api.Table;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -98,7 +99,20 @@ public class Updog {
     }
 
     private boolean validatePdxDataTables(Map<String, Table> pdxDataTables, String provider){
-        return metadataValidator.passesValidation(pdxDataTables, provider);
+        return metadataValidator.passesValidation(pdxDataTables, fileSetSpecification(), provider);
+    }
+
+    private FileSetSpecification fileSetSpecification() {
+        return FileSetSpecification.create().addRequiredFileList(
+            Arrays.asList(
+                "metadata-loader.tsv",
+                "metadata-checklist.tsv",
+                "metadata-sharing.tsv",
+                "metadata-model_validation.tsv",
+                "metadata-patient.tsv",
+                "metadata-model.tsv",
+                "metadata-sample.tsv"
+            ));
     }
 
     private void createPdxObjects(){

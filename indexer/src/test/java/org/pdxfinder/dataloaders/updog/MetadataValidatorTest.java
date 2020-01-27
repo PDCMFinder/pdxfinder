@@ -10,6 +10,7 @@ import tech.tablesaw.api.Table;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -33,22 +34,28 @@ public class MetadataValidatorTest {
 
     @Test public void passesValidation_givenEmptyFileSet_failsValidation() {
         Map<String, Table> emptyHashMap = new HashMap<>();
-        assertThat(metadataValidator.passesValidation(emptyHashMap, provider), is(false));
+        assertThat(metadataValidator.passesValidation(emptyHashMap, fileSetSpecification, provider), is(false));
+    }
+
+    @Test public void passesValidation_givenEmptyFileSetAndEmptySpecificaiton_passesValidation() {
+        Map<String, Table> emptyHashMap = new HashMap<>();
+        FileSetSpecification emptyFileSetSpecification = FileSetSpecification.create();
+        assertThat(metadataValidator.passesValidation(emptyHashMap, emptyFileSetSpecification, provider), is(true));
     }
 
     @Test public void passesValidation_givenIncompleteFileSet_failsValidation() {
-        assertThat(metadataValidator.passesValidation(incompleteFileSet, provider), is(false));
+        assertThat(metadataValidator.passesValidation(incompleteFileSet, fileSetSpecification, provider), is(false));
     }
 
     @Test public void passesValidation_givenCompleteFileSet_passesValidation() {
-        assertThat(metadataValidator.passesValidation(completeFileSet, provider), is(true));
+        assertThat(metadataValidator.passesValidation(completeFileSet, fileSetSpecification, provider), is(true));
     }
 
     @Test public void passesValidation_givenExtraFileInFileSet_passesValidation() {
         Map<String, Table> completeFileSetPlusOne = new HashMap<>();
         completeFileSetPlusOne.putAll(completeFileSet);
         completeFileSetPlusOne.put("extra-file.tsv", Table.create());
-        assertThat(metadataValidator.passesValidation(completeFileSetPlusOne, provider), is(true));
+        assertThat(metadataValidator.passesValidation(completeFileSetPlusOne, fileSetSpecification, provider), is(true));
     }
 
     @Test public void validate_givenNoValidation_producesEmptyErrorList() {
@@ -56,7 +63,7 @@ public class MetadataValidatorTest {
     }
 
     @Test public void validate_givenCompleteFileSet_producesEmptyErrorList() {
-        assertThat(metadataValidator.validate(completeFileSet, new HashMap<>(), provider).isEmpty(), is(true));
+        assertThat(metadataValidator.validate(completeFileSet, fileSetSpecification, new HashMap<>(), provider).isEmpty(), is(true));
     }
 
     @Test public void validate_givenIncompleteFileSet_addsErrorWithCorrectContextToErrorList() {
@@ -66,7 +73,7 @@ public class MetadataValidatorTest {
                 .setProvider("PROVIDER")));
         assertEquals(
             expected.toString(),
-            metadataValidator.validate(incompleteFileSet, new HashMap<>(), provider).toString()
+            metadataValidator.validate(incompleteFileSet, fileSetSpecification, new HashMap<>(), provider).toString()
         );
     }
 
@@ -83,21 +90,30 @@ public class MetadataValidatorTest {
             )));
         assertEquals(
             expected.toString(),
-            metadataValidator.validate(completeFileSet, columnSpecifications, provider).toString()
+            metadataValidator.validate(completeFileSet, fileSetSpecification, columnSpecifications, provider).toString()
         );
     }
 
+    @Test public void checkAllRequiredValuesPresent_givenMissingValue_addsMissingValueErrorToErrorList() {
+
+    }
+
+    private List<String> requiredFiles = Arrays.asList(
+        "metadata-loader.tsv",
+        "metadata-sharing.tsv",
+        "metadata-model_validation.tsv",
+        "metadata-patient.tsv",
+        "metadata-model.tsv",
+        "metadata-sample.tsv"
+    );
+
+    private FileSetSpecification fileSetSpecification = FileSetSpecification
+        .create()
+        .addRequiredFileList(requiredFiles);
+
     private Map<String, Table> makeCompleteFileSet() {
         Map<String, Table> completeFileSet = new HashMap<>();
-        Arrays.asList(
-            "metadata-loader.tsv",
-            "metadata-checklist.tsv",
-            "metadata-sharing.tsv",
-            "metadata-model_validation.tsv",
-            "metadata-patient.tsv",
-            "metadata-model.tsv",
-            "metadata-sample.tsv"
-        ).stream().forEach(s -> completeFileSet.put(s, Table.create()));
+        requiredFiles.stream().forEach(s -> completeFileSet.put(s, Table.create()));
         return completeFileSet;
     }
 

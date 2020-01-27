@@ -4,23 +4,13 @@ import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 @Component
 public class MetadataValidator {
 
     private ArrayList<TableValidationError> validationErrors;
-    private final List<String> requiredDataTables = Arrays.asList(
-        "patient",
-        "sample",
-        "model",
-        "model_validation",
-        "sharing",
-        "loader"
-    );
 
     public MetadataValidator() {
         this.validationErrors = new ArrayList<>();
@@ -28,10 +18,9 @@ public class MetadataValidator {
 
     public List<TableValidationError> validate(
         Map<String, Table> pdxDataTables,
-        Map<String, ColumnSpecification> columnSpecification,
-        String provider
-    ) {
-        checkAllRequiredFilesPresent(pdxDataTables, provider);
+        FileSetSpecification fileSetSpecification, Map<String, ColumnSpecification> columnSpecification,
+        String provider) {
+        checkAllRequiredFilesPresent(pdxDataTables, fileSetSpecification, provider);
         checkAllRequiredColumnsPresent(pdxDataTables, columnSpecification, provider);
         return validationErrors;
     }
@@ -55,32 +44,19 @@ public class MetadataValidator {
 
     }
 
-    private void checkAllRequiredFilesPresent(Map<String, Table> pdxDataTables, String provider) {
-        if (isMissingRequiredFiles(pdxDataTables)) {
-            getMissingFilesFrom(pdxDataTables).forEach(
+    private void checkAllRequiredFilesPresent(Map<String, Table> pdxDataTables, FileSetSpecification fileSetSpecification, String provider) {
+        if (isMissingRequiredFiles(pdxDataTables, fileSetSpecification)) {
+            fileSetSpecification.getMissingFilesFrom(pdxDataTables).forEach(
                 f -> validationErrors.add(TableValidationError.missingFile(f).setProvider(provider)));
         }
     }
 
-    public boolean passesValidation(Map<String, Table> pdxDataTables, String provider) {
-        return validate(pdxDataTables, new HashMap<>(), provider).isEmpty();
+    public boolean passesValidation(Map<String, Table> pdxDataTables, FileSetSpecification fileSetSpecification, String provider) {
+        return validate(pdxDataTables, fileSetSpecification, new HashMap<>(), provider).isEmpty();
     }
 
-    private boolean isMissingRequiredFiles(Map<String, Table> pdxDataTables) {
-        return !getMissingFilesFrom(pdxDataTables).isEmpty();
-    }
-
-    private List<String> getMissingFilesFrom(Map<String, Table> pdxDataTablesToBeValidated) {
-        List<String> missingFiles = getRequiredFiles();
-        missingFiles.removeAll(pdxDataTablesToBeValidated.keySet());
-        return missingFiles;
-    }
-
-    private ArrayList<String> getRequiredFiles() {
-        return requiredDataTables
-            .stream()
-            .map(s -> String.format("metadata-%s.tsv", s))
-            .collect(Collectors.toCollection(ArrayList::new));
+    private boolean isMissingRequiredFiles(Map<String, Table> pdxDataTables, FileSetSpecification fileSetSpecification) {
+        return !fileSetSpecification.getMissingFilesFrom(pdxDataTables).isEmpty();
     }
 
     public List<TableValidationError> getValidationErrors() {
