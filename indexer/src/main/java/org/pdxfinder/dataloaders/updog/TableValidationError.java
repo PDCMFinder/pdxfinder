@@ -1,5 +1,7 @@
 package org.pdxfinder.dataloaders.updog;
 
+import tech.tablesaw.api.Row;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -7,8 +9,9 @@ import java.util.StringJoiner;
 public class TableValidationError {
     private String table;
     private Optional<String> provider = Optional.empty();
-    private Optional<String> column = Optional.empty();
     private Optional<String> errorType = Optional.empty();
+    private Optional<String> column = Optional.empty();
+    private Optional<Row> row = Optional.empty();
     private Optional<String> description = Optional.empty();
 
     public enum Type {
@@ -47,6 +50,10 @@ public class TableValidationError {
         return provider;
     }
 
+    public Optional<Row> getRow() {
+        return row;
+    }
+
     private TableValidationError(String table) {
         this.table = table;
     }
@@ -61,6 +68,14 @@ public class TableValidationError {
 
     public static TableValidationError missingFile(String tableName) {
         return new TableValidationError(tableName).setType(Type.MISSING_FILE);
+    }
+
+    public static TableValidationError missingRequiredValue(String tableName, String columnName, Row row) {
+        return new TableValidationError(tableName)
+            .setType(Type.MISSING_REQ_VALUE)
+            .setColumn(columnName)
+            .setRow(row)
+            .setDescription(row.toString());
     }
 
     public TableValidationError setDescription(String description) {
@@ -83,6 +98,11 @@ public class TableValidationError {
         return this;
     }
 
+    private TableValidationError setRow(Row row) {
+        this.row = Optional.of(row);
+        return this;
+    }
+
     @Override
     public String toString() {
         StringJoiner message = new StringJoiner("");
@@ -90,15 +110,32 @@ public class TableValidationError {
         if (getErrorType().isPresent()) {
             if (getErrorType().get().equals(Type.MISSING_COL.toString())) {
                 message.add(String.format("Missing column: [%s]", getColumn().orElse("not specified")));
+            } else if (getErrorType().get().equals(Type.MISSING_REQ_VALUE.toString())) {
+                message.add(String.format(
+                    "Missing value in required column: [%s], data row [%s]",
+                    getColumn().get(),
+                    toOneBasedIndex(getRow().get().getRowNumber())));
             } else {
                 message.add(getErrorType().get());
             }
         }
         if (getProvider().isPresent()) {
-            message.add(String.format(" For provider [%s].", getProvider().get()));
+            message.add(String.format(" for provider [%s].", getProvider().get()));
         }
-        message.add(getDescription().orElse(""));
+        message.add(formatDescription());
         return message.toString();
+    }
+
+    private int toOneBasedIndex(int number) {
+        return number + 1;
+    }
+
+    private String formatDescription() {
+        if (getDescription().isPresent()) {
+            return String.format("%n%s", getDescription().get());
+        } else {
+            return"";
+        }
     }
 
     @Override
