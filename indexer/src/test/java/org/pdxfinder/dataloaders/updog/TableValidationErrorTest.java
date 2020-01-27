@@ -1,6 +1,12 @@
 package org.pdxfinder.dataloaders.updog;
 
 import org.junit.Test;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.StringColumn;
+import tech.tablesaw.api.Table;
+import tech.tablesaw.selection.Selection;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.isA;
@@ -53,10 +59,23 @@ public class TableValidationErrorTest {
     }
 
     @Test public void toString_givenMissingColumnErrorWithProvider_returnsAppropriateMessageWithProvider() {
-        String expected = "Error in table: Missing column: [required_col] For provider [Example provider].";
+        String expected = "Error in table: Missing column: [required_col] for provider [Example provider].";
         TableValidationError error = TableValidationError
             .missingColumn("table", "required_col")
             .setProvider("Example provider");
+        assertEquals(
+            expected,
+            error.toString()
+        );
+    }
+
+    @Test public void toString_givenRequiredColumnHasMissingValue_returnsAppropriateMessage() {
+        String expected = "Error in table: Missing value in required column: [required_col], line [0]" +
+            "\n required_col  |\n" +
+            "----------------\n" +
+            "               |";
+        Table table = Table.create().addColumns(StringColumn.create("required_col", Arrays.asList("")));
+        TableValidationError error = TableValidationError.missingRequiredValue("table", "required_col", table.row(0));
         assertEquals(
             expected,
             error.toString()
