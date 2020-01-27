@@ -507,7 +507,7 @@ public class UniversalDataExporter {
                 rowData.add(ma.getMarker().getEnsemblGeneId());
                 //no transcript id
                 rowData.add("");
-                rowData.add(ma.getRsIdVariants());
+                rowData.add(ma.getExistingVariations());
                 rowData.add(ma.getGenomeAssembly());
                 rowData.add(mc.getPlatform().getName());
 

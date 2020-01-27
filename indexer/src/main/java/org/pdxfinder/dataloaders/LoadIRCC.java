@@ -276,7 +276,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
                 ma.setAltAllele(variation.getString("Alt"));
                 ma.setAminoAcidChange(variation.getString("Protein"));
                 ma.setAlleleFrequency(variation.getString("VAF"));
-                ma.setRsIdVariants(variation.getString("avsnp147"));
+                ma.setExistingVariations(variation.getString("avsnp147"));
 
                 PlatformAssociation pa = dataImportService.createPlatformAssociation(platform, marker);
                 dataImportService.savePlatformAssociation(pa);
