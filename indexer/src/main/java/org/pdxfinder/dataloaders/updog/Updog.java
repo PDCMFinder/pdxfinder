@@ -63,7 +63,7 @@ public class Updog {
     }
 
     private Map<String, Table> readPdxDataFromPath(Path updogDir) {
-        PathMatcher metadataFiles = FileSystems.getDefault().getPathMatcher("glob:**metadata-*.tsv");
+        PathMatcher metadataFiles = FileSystems.getDefault().getPathMatcher("glob:**{metadata-,sampleplatform}*.tsv");
         return cleanPdxDataTables(metadataReader.readAllTsvFilesIn(updogDir, metadataFiles));
     }
 
