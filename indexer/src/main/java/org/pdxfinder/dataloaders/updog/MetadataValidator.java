@@ -1,11 +1,14 @@
 package org.pdxfinder.dataloaders.updog;
 
+import javafx.util.Pair;
 import org.springframework.stereotype.Component;
+import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 @Component
 public class MetadataValidator {
 
@@ -21,6 +24,7 @@ public class MetadataValidator {
         String provider) {
         checkAllRequiredFilesPresent(pdxDataTables, fileSetSpecification, provider);
         checkAllRequiredColumnsPresent(pdxDataTables, fileSetSpecification, provider);
+        checkAllRequiredValuesPresent(pdxDataTables, fileSetSpecification, provider);
         return validationErrors;
     }
 
@@ -32,7 +36,6 @@ public class MetadataValidator {
         if (fileSetSpecification.hasRequiredColumns()) {
             createValidationErrorsForMissingRequiredColumns(pdxDataTables, fileSetSpecification, provider);
         }
-
     }
 
     private void createValidationErrorsForMissingRequiredColumns(
@@ -67,6 +70,25 @@ public class MetadataValidator {
 
     private boolean isMissingRequiredFiles(Map<String, Table> pdxDataTables, FileSetSpecification fileSetSpecification) {
         return !fileSetSpecification.getMissingFilesFrom(pdxDataTables).isEmpty();
+    }
+
+    private void checkAllRequiredValuesPresent(
+        Map<String, Table> pdxDataTables,
+        FileSetSpecification fileSetSpecification,
+        String provider) {
+        List<Pair<String, String>> requiredTableColumns = fileSetSpecification.getRequiredColumns();
+        for (Pair<String, String> tableColumn : requiredTableColumns) {
+            String table = tableColumn.getKey();
+            String column = tableColumn.getValue();
+            Table missing = pdxDataTables.get(table).where(
+                pdxDataTables.get(table).stringColumn(column).isMissing());
+            for (Row row : missing) {
+                validationErrors.add(
+                    TableValidationError.missingRequiredValue(table, column, row).setProvider(provider));
+            }
+
+        }
+
     }
 
     public List<TableValidationError> getValidationErrors() {

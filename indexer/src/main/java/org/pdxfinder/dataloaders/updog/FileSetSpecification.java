@@ -1,8 +1,11 @@
 package org.pdxfinder.dataloaders.updog;
 
+import javafx.util.Pair;
 import tech.tablesaw.api.Table;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,9 +13,11 @@ public class FileSetSpecification {
 
     private HashSet<String> requiredFileList;
     private Map<String, ColumnSpecification> columnSpecification;
+    private List<Pair<String, String>> requiredColumns;
 
     private FileSetSpecification() {
         this.requiredFileList = new HashSet<>();
+        this.requiredColumns = new ArrayList<>();
     }
 
     public static FileSetSpecification create() {
@@ -33,8 +38,22 @@ public class FileSetSpecification {
         return this;
     }
 
+    public FileSetSpecification addRequiredColumns(Pair<String, String> tableColumn) {
+        this.requiredColumns.add(tableColumn);
+        return this;
+    }
+
+    public FileSetSpecification addRequiredColumns(List<Pair<String, String>> tableColumns) {
+        this.requiredColumns.addAll(tableColumns);
+        return this;
+    }
+
     public Map<String, ColumnSpecification> getColumnSpecification() {
         return this.columnSpecification;
+    }
+
+    public List<Pair<String, String>> getRequiredColumns() {
+        return this.requiredColumns;
     }
 
     public boolean hasRequiredColumns() {
