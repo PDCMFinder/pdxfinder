@@ -86,4 +86,19 @@ public class TSV {
     }
 
 
+    public enum SamplePlatform{
+
+        sample_id,
+        sample_origin,
+        passage,
+        engrafted_tumor_collection_site,
+        model_id,
+        host_strain_name,
+        host_strain_nomenclature,
+        molecular_characterisation_type,
+        platform,
+        internal_protocol_url
+
+    }
+
 }
