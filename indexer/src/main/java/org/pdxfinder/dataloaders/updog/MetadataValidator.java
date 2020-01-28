@@ -1,6 +1,6 @@
 package org.pdxfinder.dataloaders.updog;
 
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
@@ -86,7 +86,6 @@ public class MetadataValidator {
                 validationErrors.add(
                     TableValidationError.missingRequiredValue(table, column, row).setProvider(provider));
             }
-
         }
 
     }

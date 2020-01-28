@@ -1,6 +1,6 @@
 package org.pdxfinder.dataloaders.updog;
 
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -111,7 +111,7 @@ public class MetadataValidatorTest {
 
         FileSetSpecification fileSetSpecification =  FileSetSpecification
             .create()
-            .addRequiredColumns(new Pair<>("metadata-patient.tsv", "required_col"));
+            .addRequiredColumns(Pair.of("metadata-patient.tsv", "required_col"));
 
         ArrayList<TableValidationError> expected = new ArrayList<>(
             Collections.singletonList(
@@ -135,7 +135,7 @@ public class MetadataValidatorTest {
 
         FileSetSpecification fileSetSpecification =  FileSetSpecification
             .create()
-            .addRequiredColumns(new Pair<>("metadata-patient.tsv", "required_col"));
+            .addRequiredColumns(Pair.of("metadata-patient.tsv", "required_col"));
 
         ArrayList<TableValidationError> expected = new ArrayList<>(
             Collections.singletonList(

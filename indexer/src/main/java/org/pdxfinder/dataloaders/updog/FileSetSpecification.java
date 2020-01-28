@@ -1,6 +1,6 @@
 package org.pdxfinder.dataloaders.updog;
 
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import tech.tablesaw.api.Table;
 
 import java.util.ArrayList;
