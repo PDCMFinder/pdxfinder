@@ -9,21 +9,21 @@ import java.util.stream.Stream;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.*;
 
-public class FileSetSpecificationTest {
+public class TableSetSpecificationTest {
 
     @Test
     public void builderMethods_givenInstantiation_allReturnInstanceOfThisClass() {
-        FileSetSpecification fileSetSpecification = FileSetSpecification.create();
-        assertThat(fileSetSpecification, isA(FileSetSpecification.class));
+        TableSetSpecification tableSetSpecification = TableSetSpecification.create();
+        assertThat(tableSetSpecification, isA(TableSetSpecification.class));
     }
 
     @Test public void builderMethods_givenRequiredFileSetList_setsRequiredFiles() {
-        FileSetSpecification fileSetSpecification = FileSetSpecification.create();
+        TableSetSpecification tableSetSpecification = TableSetSpecification.create();
         assertEquals(
             requiredFileSet,
-            fileSetSpecification
+            tableSetSpecification
                 .addRequiredFileList(requiredFileSet)
-                .build().getRequiredFileList()
+                .getRequiredFileList()
         );
     }
 

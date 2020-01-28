@@ -9,47 +9,53 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class FileSetSpecification {
+public class TableSetSpecification {
 
     private HashSet<String> requiredFileList;
     private Map<String, ColumnSpecification> columnSpecification;
     private List<Pair<String, String>> requiredColumns;
+    private String provider = "Not Specified";
 
-    private FileSetSpecification() {
+    private TableSetSpecification() {
         this.requiredFileList = new HashSet<>();
         this.requiredColumns = new ArrayList<>();
     }
 
-    public static FileSetSpecification create() {
-        return new FileSetSpecification();
+    public static TableSetSpecification create() {
+        return new TableSetSpecification();
     }
 
-    public final FileSetSpecification build() {
-        return this;
-    }
-
-    public FileSetSpecification addRequiredFileList(Set<String> requiredFileList) {
+    public TableSetSpecification addRequiredFileList(Set<String> requiredFileList) {
         this.requiredFileList.addAll(requiredFileList);
         return this;
     }
 
-    public FileSetSpecification addRequiredColumnSets(Map<String, ColumnSpecification> columnSpecification) {
+    public TableSetSpecification addRequiredColumnSets(Map<String, ColumnSpecification> columnSpecification) {
         this.columnSpecification = columnSpecification;
         return this;
     }
 
-    public FileSetSpecification addRequiredColumns(Pair<String, String> tableColumn) {
+    public TableSetSpecification addRequiredColumns(Pair<String, String> tableColumn) {
         this.requiredColumns.add(tableColumn);
         return this;
     }
 
-    public FileSetSpecification addRequiredColumns(List<Pair<String, String>> tableColumns) {
+    public TableSetSpecification addRequiredColumns(List<Pair<String, String>> tableColumns) {
         this.requiredColumns.addAll(tableColumns);
         return this;
     }
 
     public Map<String, ColumnSpecification> getColumnSpecification() {
         return this.columnSpecification;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public TableSetSpecification setProvider(String provider) {
+        this.provider = provider;
+        return this;
     }
 
     public List<Pair<String, String>> getRequiredColumns() {

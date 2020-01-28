@@ -12,7 +12,6 @@ import tech.tablesaw.api.Table;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,70 +22,69 @@ public class Updog {
     private static final Logger log = LoggerFactory.getLogger(Updog.class);
     private UtilityService utilityService;
     private DataImportService dataImportService;
-    private MetadataReader metadataReader;
-    private MetadataValidator metadataValidator;
-    private Map<String, Table> pdxDataTables;
-    private Map<String, Table> omicsTables;
-    private String provider;
+    private Reader reader;
+    private Validator validator;
 
     @Autowired
     public Updog(
-            DataImportService dataImportService,
-            UtilityService utilityService,
-            MetadataReader metadataReader,
-            MetadataValidator metadataValidator) {
+        DataImportService dataImportService,
+        UtilityService utilityService,
+        Reader reader,
+        Validator validator) {
 
         Assert.notNull(dataImportService, "dataImportService cannot be null");
         Assert.notNull(utilityService, "utilityService cannot be null");
-        Assert.notNull(metadataReader, "metadataReader cannot be null");
-        Assert.notNull(metadataValidator, "templateValidator cannot be null");
+        Assert.notNull(reader, "reader cannot be null");
+        Assert.notNull(validator, "validator cannot be null");
 
         this.dataImportService = dataImportService;
         this.utilityService = utilityService;
-        this.metadataReader = metadataReader;
-        this.metadataValidator = metadataValidator;
+        this.reader = reader;
+        this.validator = validator;
 
     }
 
-    public void run(Path updogDir, String provider) {
+    public void run(Path updogProviderDirectory, String provider) {
         Assert.notNull(provider, "provider cannot be null");
-        log.debug("Using UPDOG to import {} from [{}]", provider, updogDir);
+        log.debug("Using UPDOG to import {} PDX data from [{}]", provider, updogProviderDirectory);
 
-        pdxDataTables = readPdxDataFromPath(updogDir);
-        omicsTables = readOmicsDataFromPath(updogDir);
-        validatePdxDataTables(pdxDataTables, provider);
-        createPdxObjects();
+        Map<String, Table> pdxTableSet, omicsTableSet;
+        pdxTableSet = readPdxTablesFromPath(updogProviderDirectory);
+        pdxTableSet = cleanPdxTableSet(pdxTableSet);
+        omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
+        validatePdxDataTables(pdxTableSet, provider);
+        createPdxObjects(pdxTableSet);
     }
 
-    private Map<String, Table> readOmicsDataFromPath(Path updogDir) {
+    private Map<String, Table> readOmicsTablesFromPath(Path updogProviderDirectory) {
         // Only cytogenetics import supported so far
         PathMatcher allTsvFiles = FileSystems.getDefault().getPathMatcher("glob:**/cyto/*.tsv");
-        return metadataReader.readAllOmicsFilesIn(updogDir, allTsvFiles);
+        return reader.readAllOmicsFilesIn(updogProviderDirectory, allTsvFiles);
     }
 
-    private Map<String, Table> readPdxDataFromPath(Path updogDir) {
+    private Map<String, Table> readPdxTablesFromPath(Path updogProviderDirectory) {
         PathMatcher metadataFiles = FileSystems.getDefault().getPathMatcher("glob:**{metadata-,sampleplatform}*.tsv");
-        return cleanPdxDataTables(metadataReader.readAllTsvFilesIn(updogDir, metadataFiles));
+        return reader.readAllTsvFilesIn(updogProviderDirectory, metadataFiles);
     }
 
-    private Map<String, Table> cleanPdxDataTables(Map<String, Table> pdxDataTables) {
-        pdxDataTables.remove("metadata-checklist.tsv");
-        removeDescriptionColumn(pdxDataTables);
-        pdxDataTables = removePdxHeaderRows(pdxDataTables);
-        pdxDataTables = removeBlankRows(pdxDataTables);
-        return pdxDataTables;
+    private Map<String, Table> cleanPdxTableSet(Map<String, Table> pdxTableSet) {
+        pdxTableSet.remove("metadata-checklist.tsv");
+        removeDescriptionColumn(pdxTableSet);
+        pdxTableSet = removeHeaderRows(pdxTableSet);
+        pdxTableSet = removeBlankRows(pdxTableSet);
+        return pdxTableSet;
     }
 
-    private Map<String, Table> removePdxHeaderRows(Map<String, Table> pdxDataTables) {
-        return pdxDataTables.entrySet().stream().collect(
+    private Map<String, Table> removeHeaderRows(Map<String, Table> tableSet) {
+        return tableSet.entrySet().stream().collect(
             Collectors.toMap(
                 e -> e.getKey(),
                 e -> TableUtilities.removeHeaderRows(e.getValue(), 4)
             ));
     }
 
-    private Map<String, Table> removeBlankRows(Map<String, Table> pdxDataTables) {
-        return pdxDataTables.entrySet().stream().collect(
+    private Map<String, Table> removeBlankRows(Map<String, Table> tableSet) {
+        return tableSet.entrySet().stream().collect(
             Collectors.toMap(
                 e -> e.getKey(),
                 e -> TableUtilities.removeRowsMissingRequiredColumnValue(
@@ -95,31 +93,33 @@ public class Updog {
             ));
     }
 
-    private void removeDescriptionColumn(Map<String, Table> pdxDataTables) {
-        pdxDataTables.values().forEach(t -> t.removeColumns("Field"));
+    private void removeDescriptionColumn(Map<String, Table> tableSet) {
+        tableSet.values().forEach(t -> t.removeColumns("Field"));
     }
 
-    private boolean validatePdxDataTables(Map<String, Table> pdxDataTables, String provider){
-        return metadataValidator.passesValidation(pdxDataTables, fileSetSpecification(), provider);
+    private boolean validatePdxDataTables(Map<String, Table> tableSet, String provider){
+        return validator.passesValidation(tableSet, tableSetSpecification(provider));
     }
 
-    private FileSetSpecification fileSetSpecification() {
-        return FileSetSpecification.create().addRequiredFileList(
-            Stream.of(
-                "metadata-loader.tsv",
-                "metadata-checklist.tsv",
-                "metadata-sharing.tsv",
-                "metadata-model_validation.tsv",
-                "metadata-patient.tsv",
-                "metadata-model.tsv",
-                "metadata-sample.tsv"
-            ).collect(Collectors.toSet()));
+    private TableSetSpecification tableSetSpecification(String provider) {
+        return TableSetSpecification.create()
+            .addRequiredFileList(
+                Stream.of(
+                    "metadata-loader.tsv",
+                    "metadata-checklist.tsv",
+                    "metadata-sharing.tsv",
+                    "metadata-model_validation.tsv",
+                    "metadata-patient.tsv",
+                    "metadata-model.tsv",
+                    "metadata-sample.tsv"
+                ).collect(Collectors.toSet()))
+            .setProvider(provider);
     }
 
-    private void createPdxObjects(){
+    private void createPdxObjects(Map<String, Table> pdxTableSet){
 
         //create domain objects database nodes
-        DomainObjectCreator doc = new DomainObjectCreator(dataImportService, pdxDataTables);
+        DomainObjectCreator doc = new DomainObjectCreator(dataImportService, pdxTableSet);
         //save db
         doc.loadDomainObjects();
 

@@ -22,60 +22,60 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-public class MetadataValidatorTest {
+public class ValidatorTest {
 
-    private Map<String, Table> completeFileSet = new HashMap<>();
-    private Map<String, Table> incompleteFileSet = new HashMap<>();
+    private Map<String, Table> completeTableSet = new HashMap<>();
+    private Map<String, Table> incompleteTableSet = new HashMap<>();
     private final String PROVIDER = "PROVIDER";
 
     @Before public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        completeFileSet = makeCompleteFileSet();
-        incompleteFileSet = makeIncompleteFileSet();
+        completeTableSet = makeCompleteTableSet();
+        incompleteTableSet = makeIncompleteTableSet();
     }
 
-    @InjectMocks private MetadataValidator metadataValidator;
+    @InjectMocks private Validator validator;
 
     @Test public void passesValidation_givenEmptyFileSet_failsValidation() {
         Map<String, Table> emptyHashMap = new HashMap<>();
-        assertThat(metadataValidator.passesValidation(emptyHashMap, basicFileSetSpecification, PROVIDER), is(false));
+        assertThat(validator.passesValidation(emptyHashMap, basicTableSetSpecification), is(false));
     }
 
     @Test public void passesValidation_givenEmptyFileSetAndEmptySpecificaiton_passesValidation() {
         Map<String, Table> emptyHashMap = new HashMap<>();
-        FileSetSpecification emptyFileSetSpecification = FileSetSpecification.create();
-        assertThat(metadataValidator.passesValidation(emptyHashMap, emptyFileSetSpecification, PROVIDER), is(true));
+        TableSetSpecification emptyTableSetSpecification = TableSetSpecification.create();
+        assertThat(validator.passesValidation(emptyHashMap, emptyTableSetSpecification), is(true));
     }
 
     @Test public void passesValidation_givenIncompleteFileSet_failsValidation() {
-        assertThat(metadataValidator.passesValidation(incompleteFileSet, basicFileSetSpecification, PROVIDER), is(false));
+        assertThat(validator.passesValidation(incompleteTableSet, basicTableSetSpecification), is(false));
     }
 
     @Test public void passesValidation_givenCompleteFileSet_passesValidation() {
-        assertThat(metadataValidator.passesValidation(completeFileSet, basicFileSetSpecification, PROVIDER), is(true));
+        assertThat(validator.passesValidation(completeTableSet, basicTableSetSpecification), is(true));
     }
 
     @Test public void passesValidation_givenExtraFileInFileSet_passesValidation() {
-        Map<String, Table> completeFileSetPlusOne = new HashMap<>(completeFileSet);
+        Map<String, Table> completeFileSetPlusOne = new HashMap<>(completeTableSet);
         completeFileSetPlusOne.put("extra-file.tsv", Table.create());
-        assertThat(metadataValidator.passesValidation(completeFileSetPlusOne, basicFileSetSpecification, PROVIDER), is(true));
+        assertThat(validator.passesValidation(completeFileSetPlusOne, basicTableSetSpecification), is(true));
     }
 
     @Test public void validate_givenNoValidation_producesEmptyErrorList() {
-        assertThat(metadataValidator.getValidationErrors().isEmpty(), is(true));
+        assertThat(validator.getValidationErrors().isEmpty(), is(true));
     }
 
     @Test public void validate_givenCompleteFileSet_producesEmptyErrorList() {
-        assertThat(metadataValidator.validate(completeFileSet, basicFileSetSpecification, PROVIDER).isEmpty(), is(true));
+        assertThat(validator.validate(completeTableSet, basicTableSetSpecification).isEmpty(), is(true));
     }
 
     @Test public void validate_givenIncompleteFileSet_addsErrorWithCorrectContextToErrorList() {
         ArrayList<TableValidationError> expected = new ArrayList<>(
-            Collections.singletonList(TableValidationError.missingFile("metadata-patient.tsv").setProvider("PROVIDER")));
+            Collections.singletonList(TableValidationError.missingFile("metadata-patient.tsv").setProvider(PROVIDER)));
         assertEquals(
             expected.toString(),
-            metadataValidator.validate(incompleteFileSet, basicFileSetSpecification, PROVIDER).toString()
+            validator.validate(incompleteTableSet, basicTableSetSpecification).toString()
         );
     }
 
@@ -90,29 +90,29 @@ public class MetadataValidatorTest {
             s -> columnSpecifications.put(s, new ColumnSpecification(
                 Table.create().addColumns(StringColumn.create("missing_column"))
             )));
-        FileSetSpecification fileSetSpecification = FileSetSpecification
+        TableSetSpecification tableSetSpecification = TableSetSpecification
             .create()
             .addRequiredColumnSets(columnSpecifications)
-            .build();
+            .setProvider(PROVIDER);
         assertEquals(
             expected.toString(),
-            metadataValidator.validate(completeFileSet, fileSetSpecification, PROVIDER).toString()
+            validator.validate(completeTableSet, tableSetSpecification).toString()
         );
     }
 
     @Test public void checkAllRequiredValuesPresent_givenMissingValue_addsMissingValueErrorToErrorList() {
         Map<String, Table> fileSetWithInvalidTable = new HashMap<>();
-        Table tableWithMissingValue = completeFileSet.get("metadata-patient.tsv").addColumns(
+        Table tableWithMissingValue = completeTableSet.get("metadata-patient.tsv").addColumns(
             StringColumn.create("required_col", Collections.singletonList("")));
         fileSetWithInvalidTable.put("metadata-patient.tsv", tableWithMissingValue);
 
         Set<String> requiredFile = new HashSet<>();
         requiredFile.add("metadata-patient.tsv");
 
-        FileSetSpecification fileSetSpecification =  FileSetSpecification
+        TableSetSpecification tableSetSpecification =  TableSetSpecification
             .create()
-            .addRequiredColumns(Pair.of("metadata-patient.tsv", "required_col"));
-
+            .addRequiredColumns(Pair.of("metadata-patient.tsv", "required_col"))
+            .setProvider(PROVIDER);
         ArrayList<TableValidationError> expected = new ArrayList<>(
             Collections.singletonList(
                 TableValidationError
@@ -120,22 +120,23 @@ public class MetadataValidatorTest {
                     .setProvider(PROVIDER)));
         assertEquals(
             expected,
-            metadataValidator.validate(fileSetWithInvalidTable, fileSetSpecification,PROVIDER)
+            validator.validate(fileSetWithInvalidTable, tableSetSpecification)
         );
     }
 
     @Test public void checkAllRequiredValuesPresent_givenMissingValueInRow2_addsMissingValueErrorToErrorList() {
         Map<String, Table> fileSetWithInvalidTable = new HashMap<>();
-        Table tableWithMissingValue = completeFileSet.get("metadata-patient.tsv").addColumns(
+        Table tableWithMissingValue = completeTableSet.get("metadata-patient.tsv").addColumns(
             StringColumn.create("required_col", Arrays.asList("value_1", "")));
         fileSetWithInvalidTable.put("metadata-patient.tsv", tableWithMissingValue);
 
         Set<String> requiredFile = new HashSet<>();
         requiredFile.add("metadata-patient.tsv");
 
-        FileSetSpecification fileSetSpecification =  FileSetSpecification
+        TableSetSpecification tableSetSpecification =  TableSetSpecification
             .create()
-            .addRequiredColumns(Pair.of("metadata-patient.tsv", "required_col"));
+            .addRequiredColumns(Pair.of("metadata-patient.tsv", "required_col"))
+            .setProvider(PROVIDER);
 
         ArrayList<TableValidationError> expected = new ArrayList<>(
             Collections.singletonList(
@@ -144,7 +145,7 @@ public class MetadataValidatorTest {
                     .setProvider(PROVIDER)));
         assertEquals(
             expected,
-            metadataValidator.validate(fileSetWithInvalidTable, fileSetSpecification,PROVIDER)
+            validator.validate(fileSetWithInvalidTable, tableSetSpecification)
         );
     }
     private Set<String> requiredFiles = Stream.of(
@@ -156,18 +157,19 @@ public class MetadataValidatorTest {
         "metadata-sample.tsv"
     ).collect(Collectors.toSet());
 
-    private FileSetSpecification basicFileSetSpecification = FileSetSpecification
+    private TableSetSpecification basicTableSetSpecification = TableSetSpecification
         .create()
-        .addRequiredFileList(requiredFiles);
+        .addRequiredFileList(requiredFiles)
+        .setProvider(PROVIDER);
 
-    private Map<String, Table> makeCompleteFileSet() {
+    private Map<String, Table> makeCompleteTableSet() {
         Map<String, Table> completeFileSet = new HashMap<>();
         requiredFiles.forEach(s -> completeFileSet.put(s, Table.create()));
         return completeFileSet;
     }
 
-    private Map<String, Table> makeIncompleteFileSet() {
-        Map<String, Table> incompleteFileSet = new HashMap<>(completeFileSet);
+    private Map<String, Table> makeIncompleteTableSet() {
+        Map<String, Table> incompleteFileSet = new HashMap<>(completeTableSet);
         incompleteFileSet.remove("metadata-patient.tsv");
         return incompleteFileSet;
     }

@@ -18,9 +18,9 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 @Component
-public class MetadataReader {
+public class Reader {
 
-    private static final Logger log = LoggerFactory.getLogger(MetadataReader.class);
+    private static final Logger log = LoggerFactory.getLogger(Reader.class);
     private static final List<String> allowedOmicData = Arrays.asList("cna", "cyto", "mut");
 
     Map<String, Table> readAllTsvFilesIn(Path targetDirectory, PathMatcher filter) {
