@@ -6,8 +6,10 @@ import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Component
 public class Validator {
@@ -22,10 +24,26 @@ public class Validator {
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        checkAllRequiredFilesPresent(tableSet, tableSetSpecification);
+        checkAllRequiredTablesPresent(tableSet, tableSetSpecification);
         checkAllRequiredColumnsPresent(tableSet, tableSetSpecification);
         checkAllRequiredValuesPresent(tableSet, tableSetSpecification);
+        checkAllUniqueValuesForDuplicates(tableSet, tableSetSpecification);
         return validationErrors;
+    }
+
+    private void checkAllRequiredTablesPresent(
+        Map<String, Table> tableSet,
+        TableSetSpecification tableSetSpecification
+    ) {
+        if (isMissingRequiredTables(tableSet, tableSetSpecification)) {
+            tableSetSpecification.getMissingFilesFrom(tableSet).forEach(
+                f -> validationErrors.add(
+                    TableValidationError.missingFile(f).setProvider(tableSetSpecification.getProvider())));
+        }
+    }
+
+    private boolean isMissingRequiredTables(Map<String, Table> tableSet, TableSetSpecification tableSetSpecification) {
+        return !tableSetSpecification.getMissingFilesFrom(tableSet).isEmpty();
     }
 
     private void checkAllRequiredColumnsPresent(
@@ -33,11 +51,11 @@ public class Validator {
         TableSetSpecification tableSetSpecification
     ) {
         if (tableSetSpecification.hasRequiredColumns()) {
-            createValidationErrorsForMissingRequiredColumns(tableSet, tableSetSpecification);
+            createValidationErrorsForMissingColumns(tableSet, tableSetSpecification);
         }
     }
 
-    private void createValidationErrorsForMissingRequiredColumns(
+    private void createValidationErrorsForMissingColumns(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
@@ -55,25 +73,6 @@ public class Validator {
                     .setProvider(tableSetSpecification.getProvider()));
             }
         }
-    }
-
-    private void checkAllRequiredFilesPresent(
-        Map<String, Table> tableSet,
-        TableSetSpecification tableSetSpecification
-    ) {
-        if (isMissingRequiredFiles(tableSet, tableSetSpecification)) {
-            tableSetSpecification.getMissingFilesFrom(tableSet).forEach(
-                f -> validationErrors.add(
-                    TableValidationError.missingFile(f).setProvider(tableSetSpecification.getProvider())));
-        }
-    }
-
-    public boolean passesValidation(Map<String, Table> tableSet, TableSetSpecification tableSetSpecification) {
-        return validate(tableSet, tableSetSpecification).isEmpty();
-    }
-
-    private boolean isMissingRequiredFiles(Map<String, Table> tableSet, TableSetSpecification tableSetSpecification) {
-        return !tableSetSpecification.getMissingFilesFrom(tableSet).isEmpty();
     }
 
     private void checkAllRequiredValuesPresent(
@@ -96,7 +95,39 @@ public class Validator {
         }
     }
 
-    public List<TableValidationError> getValidationErrors() {
+    private void checkAllUniqueValuesForDuplicates(
+        Map<String, Table> tableSet,
+        TableSetSpecification tableSetSpecification
+    ) {
+        List<Pair<String, String>> uniqueTableColumns = tableSetSpecification.getUniqueColumns();
+        for (Pair<String, String> tableColumn : uniqueTableColumns) {
+            String tableName = tableColumn.getKey();
+            String columnName = tableColumn.getValue();
+            Table table = tableSet.get(tableName);
+            Set<String> duplicates = findDuplicates(table.stringColumn(columnName).asList());
+            if (!duplicates.isEmpty()) {
+                validationErrors.add(
+                    TableValidationError
+                        .duplicateValue(tableName, columnName, duplicates)
+                        .setProvider(tableSetSpecification.getProvider()));
+            }
+        }
+    }
+
+    private Set<String> findDuplicates(List<String> listContainingDuplicates) {
+        final Set<String> setToReturn = new HashSet<>();
+        final Set<String> set1 = new HashSet<>();
+        for (String string : listContainingDuplicates) {
+            if (!set1.add(string))  setToReturn.add(string);
+        }
+        return setToReturn;
+    }
+
+    boolean passesValidation(Map<String, Table> tableSet, TableSetSpecification tableSetSpecification) {
+        return validate(tableSet, tableSetSpecification).isEmpty();
+    }
+
+    List<TableValidationError> getValidationErrors() {
         return validationErrors;
     }
 

@@ -30,7 +30,7 @@ public class TableValidationErrorTest {
     }
 
     @Test public void toString_givenInstantiation_returnsBasicErrorString() {
-        String expected = "Error in table: ";
+        String expected = "Error in [table]: ";
         TableValidationError error = createBasicError();
         assertEquals(
             expected,
@@ -39,7 +39,7 @@ public class TableValidationErrorTest {
     }
 
     @Test public void toString_givenErrorType_returnsAppropriateMessage() {
-        String expected = "Error in table: Missing column: [not specified]";
+        String expected = "Error in [table]: Missing column: [not specified]";
         TableValidationError error = createBasicError().setType(TableValidationError.Type.MISSING_COL);
         assertEquals(
             expected,
@@ -48,7 +48,7 @@ public class TableValidationErrorTest {
     }
 
     @Test public void toString_givenMissingColumnErrorWithValue_returnsAppropriateMessage() {
-        String expected = "Error in table: Missing column: [required_col]";
+        String expected = "Error in [table]: Missing column: [required_col]";
         TableValidationError error = TableValidationError.missingColumn("table", "required_col");
         assertEquals(
             expected,
@@ -57,7 +57,7 @@ public class TableValidationErrorTest {
     }
 
     @Test public void toString_givenMissingColumnErrorWithProvider_returnsAppropriateMessageWithProvider() {
-        String expected = "Error in table: Missing column: [required_col] for provider [Example provider].";
+        String expected = "Error in [table] for provider [Example provider]: Missing column: [required_col]";
         TableValidationError error = TableValidationError
             .missingColumn("table", "required_col")
             .setProvider("Example provider");
@@ -68,7 +68,7 @@ public class TableValidationErrorTest {
     }
 
     @Test public void toString_givenRequiredColumnHasMissingValue_returnsAppropriateMessage() {
-        String expected = "Error in table: Missing value in required column: [required_col], data row [1]\n" +
+        String expected = "Error in [table]: Missing value in required column: [required_col], data row [1]\n" +
             " required_col  |\n" +
             "----------------\n" +
             "               |";
@@ -81,7 +81,7 @@ public class TableValidationErrorTest {
     }
 
     @Test public void toString_givenRequiredColumnHasMissingValueInRow1_returnsAppropriateMessage() {
-        String expected = "Error in table: Missing value in required column: [required_col], data row [2]\n" +
+        String expected = "Error in [table]: Missing value in required column: [required_col], data row [2]\n" +
             " required_col  |  optional_col  |\n" +
             "---------------------------------\n" +
             "               |       value 2  |";

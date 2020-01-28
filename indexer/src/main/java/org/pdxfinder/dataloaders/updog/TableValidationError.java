@@ -2,8 +2,10 @@ package org.pdxfinder.dataloaders.updog;
 
 import tech.tablesaw.api.Row;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.StringJoiner;
 
 public class TableValidationError {
@@ -17,7 +19,8 @@ public class TableValidationError {
     public enum Type {
         MISSING_COL("Missing column"),
         MISSING_FILE("Missing file"),
-        MISSING_REQ_VALUE("Missing required value");
+        MISSING_REQ_VALUE("Missing required value(s) found"),
+        DUPLICATE_VALUE("Duplicate value(s) found");
 
         private String name;
         Type(String name) {
@@ -62,12 +65,12 @@ public class TableValidationError {
         return new TableValidationError(table);
     }
 
-    public static TableValidationError missingColumn(String tableName, String columnName) {
-        return new TableValidationError(tableName).setType(Type.MISSING_COL).setColumn(columnName);
-    }
-
     public static TableValidationError missingFile(String tableName) {
         return new TableValidationError(tableName).setType(Type.MISSING_FILE);
+    }
+
+    public static TableValidationError missingColumn(String tableName, String columnName) {
+        return new TableValidationError(tableName).setType(Type.MISSING_COL).setColumn(columnName);
     }
 
     public static TableValidationError missingRequiredValue(String tableName, String columnName, Row row) {
@@ -76,6 +79,13 @@ public class TableValidationError {
             .setColumn(columnName)
             .setRow(row)
             .setDescription(row.toString());
+    }
+
+    public static TableValidationError duplicateValue(String tableName, String columnName, Set duplicateValues) {
+        return new TableValidationError(tableName)
+            .setType(Type.DUPLICATE_VALUE)
+            .setColumn(columnName)
+            .setDescription(duplicateValues.toString());
     }
 
     public TableValidationError setDescription(String description) {
@@ -106,7 +116,11 @@ public class TableValidationError {
     @Override
     public String toString() {
         StringJoiner message = new StringJoiner("");
-        message.add(String.format("Error in %s: ", getTable()));
+        message.add(String.format("Error in [%s]", getTable()));
+        if (getProvider().isPresent()) {
+            message.add(String.format(" for provider [%s]", getProvider().get()));
+        }
+        message.add(": ");
         if (getErrorType().isPresent()) {
             if (getErrorType().get().equals(Type.MISSING_COL.toString())) {
                 message.add(String.format("Missing column: [%s]", getColumn().orElse("not specified")));
@@ -118,9 +132,6 @@ public class TableValidationError {
             } else {
                 message.add(getErrorType().get());
             }
-        }
-        if (getProvider().isPresent()) {
-            message.add(String.format(" for provider [%s].", getProvider().get()));
         }
         message.add(formatDescription());
         return message.toString();

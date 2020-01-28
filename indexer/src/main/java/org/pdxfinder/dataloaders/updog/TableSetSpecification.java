@@ -14,11 +14,13 @@ public class TableSetSpecification {
     private HashSet<String> requiredFileList;
     private Map<String, ColumnSpecification> columnSpecification;
     private List<Pair<String, String>> requiredColumns;
+    private List<Pair<String, String>> uniqueColumns;
     private String provider = "Not Specified";
 
     private TableSetSpecification() {
         this.requiredFileList = new HashSet<>();
         this.requiredColumns = new ArrayList<>();
+        this.uniqueColumns = new ArrayList<>();
     }
 
     public static TableSetSpecification create() {
@@ -45,6 +47,16 @@ public class TableSetSpecification {
         return this;
     }
 
+    public TableSetSpecification addUniqueColumns(Pair<String, String> tableColumn) {
+        this.uniqueColumns.add(tableColumn);
+        return this;
+    }
+
+    public TableSetSpecification addUniqueColumns(List<Pair<String, String>> tableColumns) {
+        this.uniqueColumns.addAll(tableColumns);
+        return this;
+    }
+
     public Map<String, ColumnSpecification> getColumnSpecification() {
         return this.columnSpecification;
     }
@@ -60,6 +72,10 @@ public class TableSetSpecification {
 
     public List<Pair<String, String>> getRequiredColumns() {
         return this.requiredColumns;
+    }
+
+    public List<Pair<String, String>> getUniqueColumns() {
+        return this.uniqueColumns;
     }
 
     public boolean hasRequiredColumns() {
