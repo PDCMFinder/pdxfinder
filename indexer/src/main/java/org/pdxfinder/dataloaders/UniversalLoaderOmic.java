@@ -425,7 +425,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         ma.setUcscTranscriptId(data.get(omicUcscGeneId));
         ma.setNcbiTranscriptId(data.get(omicNcbiTranscriptId));
         ma.setEnsemblTranscriptId(data.get(omicEnsemblTranscriptId));
-        ma.setExistingVariations(data.get(omicExistingVariation));
+        ma.setExistingVariations(data.get(omicVariationId));
         ma.setGenomeAssembly(data.get(omicGenomeAssembly));
 
         ma.setMarker(marker);

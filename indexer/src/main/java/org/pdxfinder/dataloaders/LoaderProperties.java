@@ -61,7 +61,7 @@ public class LoaderProperties {
     protected String omicNcbiTranscriptId;
     protected String omicEnsemblGeneId;
     protected String omicEnsemblTranscriptId;
-    protected String omicExistingVariation;
+    protected String omicVariationId;
     protected String omicGenomeAssembly;
     protected String omicZscore;
     protected String omicPlatform;

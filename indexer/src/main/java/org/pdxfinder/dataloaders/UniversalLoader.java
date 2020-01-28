@@ -991,7 +991,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
         omicNcbiTranscriptId = "ncbi_transcript_id";
         omicEnsemblGeneId = "ensembl_gene_id";
         omicEnsemblTranscriptId = "ensembl_transcript_id";
-        omicRsIdVariants = "variation_id";
+        omicVariationId = "variation_id";
         omicGenomeAssembly = "genome_assembly";
         omicPlatform = "platform";
 
@@ -1016,17 +1016,15 @@ public class UniversalLoader extends UniversalLoaderOmic {
         //platformURL.put("CRL__CGH_array", "/platform/curie-lc-cna/");
         //platformURL.put("CRL__Targeted_NGS", "/platform/curie-lc-mutation/");
 
+        omicFileExtension = "tsv";
         if (dataSourceAbbreviation.equals("CRL")) {
             omicDataFilesType = "ONE_FILE_PER_MODEL";
-            omicFileExtension = "tsv";
         }
         else if(dataSourceAbbreviation.equals("UOM-BC")){
             omicDataFilesType = "ONE_FILE_PER_MODEL";
-            omicFileExtension = "tsv";
         }
         else {
             omicDataFilesType = "ALL_MODELS_IN_ONE_FILE";
-            omicFileExtension = "tsv";
         }
 
 
