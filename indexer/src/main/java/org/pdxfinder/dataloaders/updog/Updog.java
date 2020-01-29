@@ -12,6 +12,7 @@ import tech.tablesaw.api.Table;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,17 +49,24 @@ public class Updog {
         Assert.notNull(provider, "provider cannot be null");
         log.debug("Using UPDOG to import {} PDX data from [{}]", provider, updogProviderDirectory);
 
-        Map<String, Table> pdxTableSet, omicsTableSet;
+        Map<String, Table> pdxTableSet = new HashMap<>();
+        Map<String, Table> omicsTableSet = new HashMap<>();
+        Map<String, Table> combinedTableSet = new HashMap<>();
+
         pdxTableSet = readPdxTablesFromPath(updogProviderDirectory);
         pdxTableSet = cleanPdxTableSet(pdxTableSet);
         omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
-        validatePdxDataTables(pdxTableSet, provider);
-        createPdxObjects(pdxTableSet);
+
+        combinedTableSet.putAll(pdxTableSet);
+        combinedTableSet.putAll(omicsTableSet);
+        validatePdxDataTables(combinedTableSet, provider);
+
+        createPdxObjects(combinedTableSet);
     }
 
     private Map<String, Table> readOmicsTablesFromPath(Path updogProviderDirectory) {
-        // Only cytogenetics import supported so far
-        PathMatcher allTsvFiles = FileSystems.getDefault().getPathMatcher("glob:**/cyto/*.tsv");
+        // Only cytogenetics and mutation import supported so far
+        PathMatcher allTsvFiles = FileSystems.getDefault().getPathMatcher("glob:**/{cyto,mut}/*.tsv");
         return reader.readAllOmicsFilesIn(updogProviderDirectory, allTsvFiles);
     }
 
