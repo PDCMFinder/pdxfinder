@@ -1,8 +1,8 @@
 package org.pdxfinder.dataloaders.updog;
 
+import org.apache.commons.lang3.tuple.Pair;
 import tech.tablesaw.api.Row;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -18,9 +18,10 @@ public class TableValidationError {
 
     public enum Type {
         MISSING_COL("Missing column"),
-        MISSING_FILE("Missing file"),
+        MISSING_TABLE("Missing table"),
         MISSING_REQ_VALUE("Missing required value(s) found"),
-        DUPLICATE_VALUE("Duplicate value(s) found");
+        DUPLICATE_VALUE("Duplicate value(s) found"),
+        BROKEN_RELATION("Broken relation found");
 
         private String name;
         Type(String name) {
@@ -66,7 +67,7 @@ public class TableValidationError {
     }
 
     public static TableValidationError missingFile(String tableName) {
-        return new TableValidationError(tableName).setType(Type.MISSING_FILE);
+        return new TableValidationError(tableName).setType(Type.MISSING_TABLE);
     }
 
     public static TableValidationError missingColumn(String tableName, String columnName) {
@@ -86,6 +87,15 @@ public class TableValidationError {
             .setType(Type.DUPLICATE_VALUE)
             .setColumn(columnName)
             .setDescription(duplicateValues.toString());
+    }
+
+    public static TableValidationError brokenRelation(
+        Pair<Pair<String, String>, Pair<String, String>> relation,
+        String description
+    ) {
+        return new TableValidationError(relation.toString())
+            .setType(Type.BROKEN_RELATION)
+            .setDescription(description);
     }
 
     public TableValidationError setDescription(String description) {

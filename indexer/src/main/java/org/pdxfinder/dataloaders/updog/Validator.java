@@ -26,8 +26,9 @@ public class Validator {
     ) {
         checkAllRequiredTablesPresent(tableSet, tableSetSpecification);
         checkAllRequiredColumnsPresent(tableSet, tableSetSpecification);
-        checkAllRequiredValuesPresent(tableSet, tableSetSpecification);
+        checkAllNonEmptyValuesPresent(tableSet, tableSetSpecification);
         checkAllUniqueValuesForDuplicates(tableSet, tableSetSpecification);
+        checkOneToManyRelationsValid(tableSet, tableSetSpecification);
         return validationErrors;
     }
 
@@ -35,15 +36,9 @@ public class Validator {
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        if (isMissingRequiredTables(tableSet, tableSetSpecification)) {
-            tableSetSpecification.getMissingFilesFrom(tableSet).forEach(
-                f -> validationErrors.add(
-                    TableValidationError.missingFile(f).setProvider(tableSetSpecification.getProvider())));
-        }
-    }
-
-    private boolean isMissingRequiredTables(Map<String, Table> tableSet, TableSetSpecification tableSetSpecification) {
-        return !tableSetSpecification.getMissingFilesFrom(tableSet).isEmpty();
+        tableSetSpecification.getMissingTablesFrom(tableSet).forEach(
+            f -> validationErrors.add(
+                TableValidationError.missingFile(f).setProvider(tableSetSpecification.getProvider())));
     }
 
     private void checkAllRequiredColumnsPresent(
@@ -75,22 +70,21 @@ public class Validator {
         }
     }
 
-    private void checkAllRequiredValuesPresent(
+    private void checkAllNonEmptyValuesPresent(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        List<Pair<String, String>> requiredTableColumns = tableSetSpecification.getRequiredColumns();
-        for (Pair<String, String> tableColumn : requiredTableColumns) {
+        List<Pair<String, String>> nonEmptyTableColumns = tableSetSpecification.getNonEmptyColumns();
+        for (Pair<String, String> tableColumn : nonEmptyTableColumns) {
             String tableName = tableColumn.getKey();
             String columnName = tableColumn.getValue();
             Table table = tableSet.get(tableName);
             Table missing = table.where(
                 table.stringColumn(columnName).isMissing());
             for (Row row : missing) {
-                validationErrors.add(
-                    TableValidationError
-                        .missingRequiredValue(tableName, columnName, row)
-                        .setProvider(tableSetSpecification.getProvider()));
+                validationErrors.add(TableValidationError
+                    .missingRequiredValue(tableName, columnName, row)
+                    .setProvider(tableSetSpecification.getProvider()));
             }
         }
     }
@@ -106,10 +100,9 @@ public class Validator {
             Table table = tableSet.get(tableName);
             Set<String> duplicates = findDuplicates(table.stringColumn(columnName).asList());
             if (!duplicates.isEmpty()) {
-                validationErrors.add(
-                    TableValidationError
-                        .duplicateValue(tableName, columnName, duplicates)
-                        .setProvider(tableSetSpecification.getProvider()));
+                validationErrors.add(TableValidationError
+                    .duplicateValue(tableName, columnName, duplicates)
+                    .setProvider(tableSetSpecification.getProvider()));
             }
         }
     }
@@ -121,6 +114,33 @@ public class Validator {
             if (!set1.add(string))  setToReturn.add(string);
         }
         return setToReturn;
+    }
+
+    private void checkOneToManyRelationsValid(
+        Map<String, Table> tableSet,
+        TableSetSpecification tableSetSpecification
+    ) {
+        for (Pair<Pair<String, String>, Pair<String, String>> relation
+            : tableSetSpecification.getOneToManyRelations()) {
+            String leftTableName = relation.getLeft().getLeft();
+            String leftColumnName = relation.getLeft().getRight();
+            String rightTableName = relation.getRight().getLeft();
+            String rightColumnName = relation.getRight().getRight();
+            if (tableMissingColumn(tableSet.get(leftTableName), leftColumnName)) {
+                validationErrors.add(TableValidationError
+                    .brokenRelation(relation, "Missing column in the left table")
+                    .setProvider(tableSetSpecification.getProvider()));
+            }
+            if (tableMissingColumn(tableSet.get(rightTableName), rightColumnName)) {
+                validationErrors.add(TableValidationError
+                    .brokenRelation(relation, "Missing column in the right table")
+                    .setProvider(tableSetSpecification.getProvider()));
+            }
+        }
+    }
+
+    private boolean tableMissingColumn(Table table, String columnName) {
+        return !table.columnNames().contains(columnName);
     }
 
     boolean passesValidation(Map<String, Table> tableSet, TableSetSpecification tableSetSpecification) {

@@ -11,24 +11,41 @@ import java.util.Set;
 
 public class TableSetSpecification {
 
-    private HashSet<String> requiredFileList;
+    private HashSet<String> requiredTables;
     private Map<String, ColumnSpecification> columnSpecification;
-    private List<Pair<String, String>> requiredColumns;
+    private List<Pair<String, String>> nonEmptyColumns;
     private List<Pair<String, String>> uniqueColumns;
+    private List<Pair<Pair<String, String>, Pair<String, String>>> oneToManyRelations;
     private String provider = "Not Specified";
 
     private TableSetSpecification() {
-        this.requiredFileList = new HashSet<>();
-        this.requiredColumns = new ArrayList<>();
+        this.requiredTables = new HashSet<>();
+        this.nonEmptyColumns = new ArrayList<>();
         this.uniqueColumns = new ArrayList<>();
+        this.oneToManyRelations = new ArrayList<>();
     }
 
     public static TableSetSpecification create() {
         return new TableSetSpecification();
     }
 
-    public TableSetSpecification addRequiredFileList(Set<String> requiredFileList) {
-        this.requiredFileList.addAll(requiredFileList);
+    public TableSetSpecification addHasOneToManyRelation(
+        Pair<String, String> leftTable,
+        Pair<String, String> rightTable
+    ) {
+        this.oneToManyRelations.add(Pair.of(leftTable, rightTable));
+        return this;
+    }
+
+    public TableSetSpecification addHasOneToManyRelation(
+        List<Pair<Pair<String, String>, Pair<String, String>>> relation
+    ) {
+        this.oneToManyRelations.addAll(relation);
+        return this;
+    }
+
+    public TableSetSpecification addRequiredTables(Set<String> requiredTables) {
+        this.requiredTables.addAll(requiredTables);
         return this;
     }
 
@@ -38,12 +55,12 @@ public class TableSetSpecification {
     }
 
     public TableSetSpecification addRequiredColumns(Pair<String, String> tableColumn) {
-        this.requiredColumns.add(tableColumn);
+        this.nonEmptyColumns.add(tableColumn);
         return this;
     }
 
     public TableSetSpecification addRequiredColumns(List<Pair<String, String>> tableColumns) {
-        this.requiredColumns.addAll(tableColumns);
+        this.nonEmptyColumns.addAll(tableColumns);
         return this;
     }
 
@@ -70,8 +87,8 @@ public class TableSetSpecification {
         return this;
     }
 
-    public List<Pair<String, String>> getRequiredColumns() {
-        return this.requiredColumns;
+    public List<Pair<String, String>> getNonEmptyColumns() {
+        return this.nonEmptyColumns;
     }
 
     public List<Pair<String, String>> getUniqueColumns() {
@@ -82,12 +99,16 @@ public class TableSetSpecification {
         return (columnSpecification != null);
     }
 
-    public Set<String> getRequiredFileList() {
-        return requiredFileList;
+    public Set<String> getRequiredTables() {
+        return requiredTables;
     }
 
-    public Set<String> getMissingFilesFrom(Map<String, Table> fileList) {
-        Set<String> missingFiles = requiredFileList;
+    public List<Pair<Pair<String, String>, Pair<String, String>>> getOneToManyRelations() {
+        return oneToManyRelations;
+    }
+
+    public Set<String> getMissingTablesFrom(Map<String, Table> fileList) {
+        Set<String> missingFiles = requiredTables;
         missingFiles.removeAll(fileList.keySet());
         return missingFiles;
     }

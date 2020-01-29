@@ -22,8 +22,8 @@ public class TableSetSpecificationTest {
         assertEquals(
             requiredFileSet,
             tableSetSpecification
-                .addRequiredFileList(requiredFileSet)
-                .getRequiredFileList()
+                .addRequiredTables(requiredFileSet)
+                .getRequiredTables()
         );
     }
 
