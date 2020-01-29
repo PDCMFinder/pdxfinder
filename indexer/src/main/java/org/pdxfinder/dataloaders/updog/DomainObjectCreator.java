@@ -49,7 +49,7 @@ public class DomainObjectCreator {
 
         createSamplePlatformData();
 
-        //createMolecularData();
+        createMolecularData();
 
         persistNodes();
     }
@@ -266,35 +266,37 @@ public class DomainObjectCreator {
     void createMolecularData(){
 
         Table mutationTable = pdxDataTables.get("mutation.tsv");
-        String molCharType = "mutation";
+
         for(Row row:mutationTable){
 
-            String sampleOrigin = row.getString(TSV.Mutation.sample_origin.name());
-            String platformName = row.getString(TSV.Mutation.platform.name());
+            MolecularCharacterization molecularCharacterization = getMolcharByType(row, "mutation");
 
-            Sample sample = null;
-
-            if(sampleOrigin.equals("patient")){
-
-                sample = getPatientSample(row);
-            }
-            else if(sampleOrigin.equals("xenograft")){
-
-                sample = getOrCreateSpecimen(row).getSample();
-            }
-
-            if(sample == null) throw new NullPointerException();
-
-
-            MolecularCharacterization molecularCharacterization = getOrCreateMolecularCharacterization(sample, platformName, molCharType);
-
-            addMutationData(molecularCharacterization, row);
-
+            addMolecularData(molecularCharacterization, row);
         }
+
 
 
     }
 
+    private MolecularCharacterization getMolcharByType(Row row, String molCharType){
+
+        String sampleOrigin = row.getString("sample_origin");
+        String platformName = row.getString("platform");
+        Sample sample = null;
+
+        if(sampleOrigin.equals("patient")){
+
+            sample = getPatientSample(row);
+        }
+        else if(sampleOrigin.equals("xenograft")){
+
+            sample = getOrCreateSpecimen(row).getSample();
+        }
+
+        if(sample == null) throw new NullPointerException();
+
+        return getOrCreateMolecularCharacterization(sample, platformName, molCharType);
+    }
 
 
     private Sample getPatientSample(Row row){
@@ -343,6 +345,9 @@ public class DomainObjectCreator {
             molecularCharacterization = new MolecularCharacterization();
             molecularCharacterization.setType(molCharType);
             molecularCharacterization.setPlatform(getOrCreatePlatform(platformName, molCharType));
+            MarkerAssociation markerAssociation = new MarkerAssociation();
+            molecularCharacterization.addMarkerAssociation(markerAssociation);
+
             sample.addMolecularCharacterization(molecularCharacterization);
 
         }
@@ -371,13 +376,40 @@ public class DomainObjectCreator {
 
 
 
-    private void addMutationData(MolecularCharacterization molecularCharacterization, Row row){
+    private void addMolecularData(MolecularCharacterization molecularCharacterization, Row row){
 
         MarkerAssociation markerAssociation = molecularCharacterization.getMarkerAssociations().get(0);
+
+        if(markerAssociation == null){
+            markerAssociation = new MarkerAssociation();
+            molecularCharacterization.addMarkerAssociation(markerAssociation);
+        }
 
 
 
     }
+/*
+    private MolecularData setMutationProperties(Row row, Marker marker){
+
+        MolecularData ma = new MolecularData();
+        ma.setAminoAcidChange(data.get(omicAminoAcidChange));
+        ma.setConsequence(data.get(omicConsequence));
+        ma.setAlleleFrequency(data.get(omicAlleleFrequency));
+        ma.setChromosome(data.get(omicChromosome));
+        ma.setReadDepth(data.get(omicReadDepth));
+        ma.setRefAllele(data.get(omicRefAllele));
+        ma.setAltAllele(data.get(omicAltAllele));
+        ma.setGenomeAssembly(data.get(omicGenomeAssembly));
+        ma.setRsIdVariants(data.get(omicRsIdVariants));
+        ma.setSeqStartPosition(data.get(omicSeqStartPosition));
+
+        ma.setEnsemblTranscriptId(data.get(omicEnsemblTranscriptId));
+        ma.setNucleotideChange(data.get(omicNucleotideChange));
+        ma.setMarker(marker.getHgncSymbol());
+
+        return  ma;
+    }
+*/
 
     private boolean eitherIsPresent(String string, String anotherString) {
         return (
