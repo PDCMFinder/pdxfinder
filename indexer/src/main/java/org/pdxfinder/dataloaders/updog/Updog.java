@@ -103,7 +103,7 @@ public class Updog {
 
     private TableSetSpecification tableSetSpecification(String provider) {
         return TableSetSpecification.create()
-            .addRequiredFileList(
+            .addRequiredTables(
                 Stream.of(
                     "metadata-loader.tsv",
                     "metadata-checklist.tsv",
