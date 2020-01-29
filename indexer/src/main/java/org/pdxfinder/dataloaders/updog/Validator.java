@@ -14,7 +14,7 @@ import java.util.Set;
 @Component
 public class Validator {
 
-    private ArrayList<TableValidationError> validationErrors;
+    private List<TableValidationError> validationErrors;
 
     public Validator() {
         this.validationErrors = new ArrayList<>();

@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
@@ -20,6 +21,7 @@ import java.util.stream.Stream;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.*;
 
 public class ValidatorTest {
 
@@ -27,6 +29,8 @@ public class ValidatorTest {
     private Map<String, Table> incompleteTableSet = new HashMap<>();
     private final String TABLE_1 = "table_1.tsv";
     private final String TABLE_2 = "table_2.tsv";
+    private final Pair<Pair<String, String>, Pair<String, String>> RELATION =
+        Pair.of(Pair.of(TABLE_1, "id"), Pair.of(TABLE_2, "table_1_id"));
     private final String PROVIDER = "PROVIDER-BC";
 
     @Before public void setUp() {
@@ -161,63 +165,35 @@ public class ValidatorTest {
     }
 
     @Test public void checkJoin_givenValidOneToManyJoin_emptyErrorList() {
-        Table leftTable = Table.create(TABLE_1).addColumns(
-            StringColumn.create("id", Collections.singletonList("1")));
-        Table rightTable = Table.create(TABLE_2).addColumns(
-            StringColumn.create("table_1_id", Collections.singletonList("1")));
-        Map<String, Table> tableSetWithSimpleJoin = new HashMap<>();
-        tableSetWithSimpleJoin.put(TABLE_1, leftTable);
-        tableSetWithSimpleJoin.put(TABLE_2, rightTable);
-
-        TableSetSpecification tableSetSpecification = TableSetSpecification.create().setProvider(PROVIDER)
-            .addHasOneToManyRelation(Pair.of(TABLE_1, "id"), Pair.of(TABLE_2, "table_1_id"));
-
-        assertThat(validator.validate(tableSetWithSimpleJoin, tableSetSpecification).isEmpty(), is(true));
+        Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
+        assertThat(validator.validate(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).isEmpty(), is(true));
     }
 
     @Test public void checkJoin_givenNoLeftTable_ErrorListWithMissingRequiredCol() {
-        Table leftTable = Table.create(TABLE_1);
-        Table rightTable = Table.create(TABLE_2).addColumns(
-            StringColumn.create("table_1_id", Collections.singletonList("1")));
-        Map<String, Table> tableSetWithSimpleJoin = new HashMap<>();
-        tableSetWithSimpleJoin.put(TABLE_1, leftTable);
-        tableSetWithSimpleJoin.put(TABLE_2, rightTable);
-
-        TableSetSpecification tableSetSpecification = TableSetSpecification.create().setProvider(PROVIDER)
-            .addHasOneToManyRelation(Pair.of(TABLE_1, "id"), Pair.of(TABLE_2, "table_1_id"));
+        Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
+        tableSetWithSimpleJoin.get(TABLE_1).removeColumns("id");
 
         TableValidationError expected = TableValidationError
-            .brokenRelation(
-                Pair.of(Pair.of(TABLE_1, "id"), Pair.of(TABLE_2, "table_1_id")),
-                "Missing column in the left table"
-            ).setProvider(PROVIDER);
+            .brokenRelation(RELATION, "Missing column in the left table")
+            .setProvider(PROVIDER);
 
         assertEquals(
             Collections.singletonList(expected),
-            validator.validate(tableSetWithSimpleJoin, tableSetSpecification)
+            validator.validate(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION)
         );
     }
 
     @Test public void checkJoin_givenNoRightTable_ErrorListWithMissingRequiredCol() {
-        Table leftTable = Table.create(TABLE_1).addColumns(
-            StringColumn.create("id", Collections.singletonList("1")));
-        Table rightTable = Table.create(TABLE_2);
-        Map<String, Table> tableSetWithSimpleJoin = new HashMap<>();
-        tableSetWithSimpleJoin.put(TABLE_1, leftTable);
-        tableSetWithSimpleJoin.put(TABLE_2, rightTable);
-
-        TableSetSpecification tableSetSpecification = TableSetSpecification.create().setProvider(PROVIDER)
-            .addHasOneToManyRelation(Pair.of(TABLE_1, "id"), Pair.of(TABLE_2, "table_1_id"));
+        Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
+        tableSetWithSimpleJoin.get(TABLE_2).removeColumns("table_1_id");
 
         TableValidationError expected = TableValidationError
-            .brokenRelation(
-                Pair.of(Pair.of(TABLE_1, "id"), Pair.of(TABLE_2, "table_1_id")),
-                "Missing column in the right table"
-            ).setProvider(PROVIDER);
+            .brokenRelation(RELATION, "Missing column in the right table")
+            .setProvider(PROVIDER);
 
         assertEquals(
             Collections.singletonList(expected),
-            validator.validate(tableSetWithSimpleJoin, tableSetSpecification)
+            validator.validate(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION)
         );
     }
 
@@ -241,4 +217,17 @@ public class ValidatorTest {
         return incompleteFileSet;
     }
 
+    private Map<String, Table> makeTableSetWithSimpleJoin() {
+        Table leftTable = Table.create(TABLE_1).addColumns(
+            StringColumn.create("id", Collections.singletonList("1")));
+        Table rightTable = Table.create(TABLE_2).addColumns(
+            StringColumn.create("table_1_id", Collections.singletonList("1")));
+        Map<String, Table> tableSetWithSimpleJoin = new HashMap<>();
+        tableSetWithSimpleJoin.put(TABLE_1, leftTable);
+        tableSetWithSimpleJoin.put(TABLE_2, rightTable);
+        return tableSetWithSimpleJoin;
+    }
+
+    private final TableSetSpecification SIMPLE_JOIN_SPECIFICATION = TableSetSpecification.create().setProvider(PROVIDER)
+        .addHasOneToManyRelation(RELATION.getKey(), RELATION.getValue());
 }
