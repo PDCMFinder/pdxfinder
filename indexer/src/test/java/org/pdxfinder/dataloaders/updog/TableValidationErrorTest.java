@@ -23,24 +23,13 @@ public class TableValidationErrorTest {
     @Test public void builderMethods_givenInstantiation_allReturnInstanceOfThisClass() {
         TableValidationError error = createBasicError();
         assertThat(error, isA(TableValidationError.class));
-        assertThat(error.setType(TableValidationError.Type.MISSING_COL), isA(TableValidationError.class));
         assertThat(error.setProvider("provider"), isA(TableValidationError.class));
-        assertThat(error.setColumn("required_col"), isA(TableValidationError.class));
         assertThat(error.setDescription("Custom description of the error"), isA(TableValidationError.class));
     }
 
     @Test public void toString_givenInstantiation_returnsBasicErrorString() {
-        String expected = "Error in [table]: ";
-        TableValidationError error = createBasicError();
-        assertEquals(
-            expected,
-            error.toString()
-        );
-    }
-
-    @Test public void toString_givenErrorType_returnsAppropriateMessage() {
-        String expected = "Error in [table]: Missing column: [not specified]";
-        TableValidationError error = createBasicError().setType(TableValidationError.Type.MISSING_COL);
+        String expected = "Error in [table]: Generic error: Custom description";
+        TableValidationError error = createBasicError().setDescription("Custom description");
         assertEquals(
             expected,
             error.toString()
@@ -68,12 +57,16 @@ public class TableValidationErrorTest {
     }
 
     @Test public void toString_givenRequiredColumnHasMissingValue_returnsAppropriateMessage() {
-        String expected = "Error in [table]: Missing value in required column: [required_col], data row [1]\n" +
+        String expected = "Error in [table]: Missing value(s) in required column [required_col]:\n" +
             " required_col  |\n" +
             "----------------\n" +
             "               |";
         Table table = Table.create().addColumns(StringColumn.create("required_col", Arrays.asList("")));
-        TableValidationError error = TableValidationError.missingRequiredValue("table", "required_col", table.row(0));
+        TableValidationError error = TableValidationError
+            .missingRequiredValue(
+                "table",
+                "required_col",
+                table.where(table.stringColumn("required_col").isEqualTo("")));
         assertEquals(
             expected,
             error.toString()
@@ -81,7 +74,7 @@ public class TableValidationErrorTest {
     }
 
     @Test public void toString_givenRequiredColumnHasMissingValueInRow1_returnsAppropriateMessage() {
-        String expected = "Error in [table]: Missing value in required column: [required_col], data row [2]\n" +
+        String expected = "Error in [table]: Missing value(s) in required column [required_col]:\n" +
             " required_col  |  optional_col  |\n" +
             "---------------------------------\n" +
             "               |       value 2  |";
@@ -89,7 +82,12 @@ public class TableValidationErrorTest {
             StringColumn.create("required_col", Arrays.asList("value 1", "")),
             StringColumn.create("optional_col", Arrays.asList("value 1", "value 2"))
         );
-        TableValidationError error = TableValidationError.missingRequiredValue("table", "required_col", table.row(1));
+        TableValidationError error = TableValidationError
+            .missingRequiredValue(
+                "table",
+                "required_col",
+                table.rows(1)
+            );
         assertEquals(
             expected,
             error.toString()
@@ -97,7 +95,7 @@ public class TableValidationErrorTest {
     }
 
     private TableValidationError createBasicError() {
-        return TableValidationError.create("table");
+        return TableValidationError.generic("table");
     }
 
 }

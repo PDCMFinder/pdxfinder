@@ -108,7 +108,10 @@ public class ValidatorTest {
 
         List<TableValidationError> expected = Collections.singletonList(
                 TableValidationError
-                    .missingRequiredValue(TABLE_1, "required_col", tableWithMissingValue.row(0))
+                    .missingRequiredValue(
+                        TABLE_1,
+                        "required_col",
+                        tableWithMissingValue)
                     .setProvider(PROVIDER));
         assertEquals(
             expected.toString(),
@@ -126,7 +129,10 @@ public class ValidatorTest {
 
         List<TableValidationError> expected = Collections.singletonList(
             TableValidationError
-                .missingRequiredValue(TABLE_1, "required_col", tableWithMissingValue.row(1))
+                .missingRequiredValue(
+                    TABLE_1,
+                    "required_col",
+                    tableWithMissingValue.where(tableWithMissingValue.stringColumn("required_col").isEqualTo("")))
                 .setProvider(PROVIDER));
         assertEquals(
             expected.toString(),
@@ -211,7 +217,6 @@ public class ValidatorTest {
 
         assertEquals(
             Collections.singletonList(expected).toString(),
-//            "",
             validator.validate(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
         );
     }
