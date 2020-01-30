@@ -135,10 +135,7 @@ public class TableValidationError {
             if (getErrorType().get().equals(Type.MISSING_COL.toString())) {
                 message.add(String.format("Missing column: [%s]", getColumn().orElse("not specified")));
             } else if (getErrorType().get().equals(Type.MISSING_REQ_VALUE.toString())) {
-                message.add(String.format(
-                    "Missing value in required column: [%s], data row [%s]",
-                    getColumn().get(),
-                    toOneBasedIndex(getRow().get().getRowNumber())));
+                message.add(String.format("Missing value in required column: [%s]", getColumn().get()));
             } else {
                 message.add(getErrorType().get());
             }
@@ -159,17 +156,4 @@ public class TableValidationError {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TableValidationError that = (TableValidationError) o;
-        return table.equals(that.table) &&
-            column.equals(that.column);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(table, column);
-    }
 }

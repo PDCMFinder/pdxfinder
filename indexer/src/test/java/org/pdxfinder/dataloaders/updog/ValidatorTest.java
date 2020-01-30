@@ -100,7 +100,7 @@ public class ValidatorTest {
         );
     }
 
-    @Test public void checkAllRequiredValuesPresent_givenMissingValue_addsMissingValueErrorToErrorList() {
+    @Test public void checkAllNonEmptyValuesPresent_givenMissingValue_addsMissingValueErrorToErrorList() {
         Map<String, Table> fileSetWithInvalidTable = new HashMap<>();
         Table tableWithMissingValue = completeTableSet.get(TABLE_1).addColumns(
             StringColumn.create("required_col", Collections.singletonList("")));
@@ -111,24 +111,26 @@ public class ValidatorTest {
                     .missingRequiredValue(TABLE_1, "required_col", tableWithMissingValue.row(0))
                     .setProvider(PROVIDER));
         assertEquals(
-            expected,
-            validator.validate(fileSetWithInvalidTable, requireColumn)
+            expected.toString(),
+            validator.validate(fileSetWithInvalidTable, requireColumn).toString()
         );
     }
 
-    @Test public void checkAllRequiredValuesPresent_givenMissingValueInRow2_addsMissingValueErrorToErrorList() {
+    @Test public void checkAllNonEmptyValuesPresent_givenMissingValueInRow2_addsMissingValueErrorToErrorList() {
         Map<String, Table> fileSetWithInvalidTable = new HashMap<>();
         Table tableWithMissingValue = completeTableSet.get(TABLE_1).addColumns(
-            StringColumn.create("required_col", Arrays.asList("value_1", "")));
+            StringColumn.create("required_col", Arrays.asList("value_1", "")),
+            StringColumn.create("other_col", Arrays.asList("", "This is the invalid row"))
+        );
         fileSetWithInvalidTable.put(TABLE_1, tableWithMissingValue);
 
         List<TableValidationError> expected = Collections.singletonList(
-                TableValidationError
-                    .missingRequiredValue(TABLE_1, "required_col", tableWithMissingValue.row(1))
-                    .setProvider(PROVIDER));
+            TableValidationError
+                .missingRequiredValue(TABLE_1, "required_col", tableWithMissingValue.row(1))
+                .setProvider(PROVIDER));
         assertEquals(
-            expected,
-            validator.validate(fileSetWithInvalidTable, requireColumn)
+            expected.toString(),
+            validator.validate(fileSetWithInvalidTable, requireColumn).toString()
         );
     }
 
@@ -155,21 +157,21 @@ public class ValidatorTest {
 
         Set<String> duplicateValue = Stream.of("1").collect(Collectors.toSet());
         List<TableValidationError> expected = Arrays.asList(
-            TableValidationError.duplicateValue(TABLE_1, "unique_col", duplicateValue)
+            TableValidationError.duplicateValue(TABLE_1, "unique_col", duplicateValue).setProvider(PROVIDER)
         );
 
         assertEquals(
-            expected,
-            validator.validate(tableSetWithDuplicateValues, tableSetSpecification)
+            expected.toString(),
+            validator.validate(tableSetWithDuplicateValues, tableSetSpecification).toString()
         );
     }
 
-    @Test public void checkJoin_givenValidOneToManyJoin_emptyErrorList() {
+    @Test public void checkOneToManyRelationsValid_givenValidOneToManyJoin_emptyErrorList() {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         assertThat(validator.validate(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).isEmpty(), is(true));
     }
 
-    @Test public void checkJoin_givenNoLeftTable_ErrorListWithMissingRequiredCol() {
+    @Test public void checkOneToManyRelationsValid_givenNoLeftTable_ErrorListWithMissingRequiredCol() {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.get(TABLE_1).removeColumns("id");
 
@@ -178,12 +180,12 @@ public class ValidatorTest {
             .setProvider(PROVIDER);
 
         assertEquals(
-            Collections.singletonList(expected),
-            validator.validate(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION)
+            Collections.singletonList(expected).toString(),
+            validator.validate(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
         );
     }
 
-    @Test public void checkJoin_givenNoRightTable_ErrorListWithMissingRequiredCol() {
+    @Test public void checkOneToManyRelationsValid_givenNoRightTable_ErrorListWithMissingRequiredCol() {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.get(TABLE_2).removeColumns("table_1_id");
 
@@ -192,8 +194,25 @@ public class ValidatorTest {
             .setProvider(PROVIDER);
 
         assertEquals(
-            Collections.singletonList(expected),
-            validator.validate(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION)
+            Collections.singletonList(expected).toString(),
+            validator.validate(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
+        );
+    }
+
+    @Test public void checkOneToManyRelationsValid_givenMissingValueInRightColumn_ErrorListWithMissingValueRow() {
+        Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
+        tableSetWithSimpleJoin.get(TABLE_2).replaceColumn(
+            StringColumn.create("table_1_id", Arrays.asList("not 1", "not 1"))
+        );
+
+        TableValidationError expected = TableValidationError
+            .brokenRelation(RELATION, String.format("2 orphan row(s) found in [%s]", TABLE_2))
+            .setProvider(PROVIDER);
+
+        assertEquals(
+            Collections.singletonList(expected).toString(),
+//            "",
+            validator.validate(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
         );
     }
 

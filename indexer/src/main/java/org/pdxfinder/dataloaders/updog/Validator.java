@@ -3,9 +3,11 @@ package org.pdxfinder.dataloaders.updog;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Row;
+import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -120,23 +122,80 @@ public class Validator {
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
+        String provider = tableSetSpecification.getProvider();
         for (Pair<Pair<String, String>, Pair<String, String>> relation
             : tableSetSpecification.getOneToManyRelations()) {
-            String leftTableName = relation.getLeft().getLeft();
-            String leftColumnName = relation.getLeft().getRight();
-            String rightTableName = relation.getRight().getLeft();
-            String rightColumnName = relation.getRight().getRight();
-            if (tableMissingColumn(tableSet.get(leftTableName), leftColumnName)) {
+            reportMissingColumnsInOneToManyRelation(tableSet, relation, provider);
+            reportMissingValuesInOneToManyRelation(tableSet, relation, provider);
+
+        }
+    }
+
+    private void reportMissingColumnsInOneToManyRelation(
+        Map<String, Table> tableSet,
+        Pair<Pair<String, String>, Pair<String, String>> relation,
+        String provider
+    ) {
+        if (missingLeftColumn(tableSet, relation)) {
+            validationErrors.add(TableValidationError
+                .brokenRelation(relation, "Missing column in the left table")
+                .setProvider(provider));
+        }
+        if (missingRightColumn(tableSet, relation)) {
+            validationErrors.add(TableValidationError
+                .brokenRelation(relation, "Missing column in the right table")
+                .setProvider(provider));
+        }
+    }
+
+    private void reportMissingValuesInOneToManyRelation(
+        Map<String, Table> tableSet,
+        Pair<Pair<String, String>, Pair<String, String>> relation,
+        String provider
+    ) {
+        String leftTableName = relation.getLeft().getLeft();
+        String leftColumnName = relation.getLeft().getRight();
+        String rightTableName = relation.getRight().getLeft();
+        String rightColumnName = relation.getRight().getRight();
+        if (bothColumnsPresent(tableSet, relation)) {
+            Set<String> uniqueLeftValues = tableSet.get(leftTableName).stringColumn(leftColumnName).asSet();
+            Table rightTable = tableSet.get(rightTableName);
+            StringColumn rightCol = rightTable.stringColumn(rightColumnName);
+            Table orphanRightTableRows = rightTable.where(rightCol.isNotIn(uniqueLeftValues));
+            if(!orphanRightTableRows.isEmpty()) {
                 validationErrors.add(TableValidationError
-                    .brokenRelation(relation, "Missing column in the left table")
-                    .setProvider(tableSetSpecification.getProvider()));
-            }
-            if (tableMissingColumn(tableSet.get(rightTableName), rightColumnName)) {
-                validationErrors.add(TableValidationError
-                    .brokenRelation(relation, "Missing column in the right table")
-                    .setProvider(tableSetSpecification.getProvider()));
+                    .brokenRelation(relation,
+                        String.format("%s orphan row(s) found in [%s]",
+                            orphanRightTableRows.rowCount(),
+                            rightTableName))
+                    .setProvider(provider));
             }
         }
+    }
+
+    private boolean bothColumnsPresent(
+        Map<String, Table> tableSet,
+        Pair<Pair<String, String>, Pair<String, String>> relation
+    ) {
+        return (!missingLeftColumn(tableSet, relation) && !missingRightColumn(tableSet, relation));
+    }
+
+    private boolean missingLeftColumn(
+        Map<String, Table> tableSet,
+        Pair<Pair<String, String>, Pair<String, String>> relation
+    ) {
+        return tableMissingColumn(
+            tableSet.get(relation.getLeft().getLeft()),
+            relation.getLeft().getRight());
+    }
+
+    private boolean missingRightColumn(
+        Map<String, Table> tableSet,
+        Pair<Pair<String, String>, Pair<String, String>> relation
+    ) {
+        return tableMissingColumn(
+            tableSet.get(relation.getRight().getLeft()),
+            relation.getRight().getRight());
     }
 
     private boolean tableMissingColumn(Table table, String columnName) {
