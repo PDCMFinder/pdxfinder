@@ -1,27 +1,28 @@
 package org.pdxfinder.dataloaders.updog;
 
 import org.apache.commons.lang3.tuple.Pair;
-import tech.tablesaw.api.Row;
+import tech.tablesaw.api.Table;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 
 public class TableValidationError {
     private String table;
-    private Optional<String> provider = Optional.empty();
-    private Optional<String> errorType = Optional.empty();
-    private Optional<String> column = Optional.empty();
-    private Optional<Row> row = Optional.empty();
-    private Optional<String> description = Optional.empty();
+    private String provider;
+    private Type errorType;
+    private String column;
+    private int rowNumber;
+    private Table invalidRows;
+    private String description;
 
     public enum Type {
+        GENERIC("Generic error"),
         MISSING_COL("Missing column"),
         MISSING_TABLE("Missing table"),
-        MISSING_REQ_VALUE("Missing required value(s) found"),
-        DUPLICATE_VALUE("Duplicate value(s) found"),
-        BROKEN_RELATION("Broken relation found");
+        MISSING_REQ_VALUE("Missing required value(s)"),
+        DUPLICATE_VALUE("Duplicate value(s)"),
+        BROKEN_RELATION("Broken relation");
 
         private String name;
         Type(String name) {
@@ -39,31 +40,31 @@ public class TableValidationError {
     }
 
     public Optional<String> getColumn() {
-        return column;
+        return Optional.ofNullable(column);
     }
 
     public Optional<String> getDescription() {
-        return description;
+        return Optional.ofNullable(description);
     }
 
-    public Optional<String> getErrorType() {
-        return errorType;
+    public Optional<Type> getErrorType() {
+        return Optional.ofNullable(errorType);
     }
 
     public Optional<String> getProvider() {
-        return provider;
+        return Optional.ofNullable(provider);
     }
 
-    public Optional<Row> getRow() {
-        return row;
+    public Optional<Table> getInvalidRows() {
+        return Optional.ofNullable(invalidRows);
     }
 
     private TableValidationError(String table) {
         this.table = table;
     }
 
-    public static TableValidationError create(String table) {
-        return new TableValidationError(table);
+    public static TableValidationError generic(String table) {
+        return new TableValidationError(table).setType(Type.GENERIC);
     }
 
     public static TableValidationError missingFile(String tableName) {
@@ -74,12 +75,15 @@ public class TableValidationError {
         return new TableValidationError(tableName).setType(Type.MISSING_COL).setColumn(columnName);
     }
 
-    public static TableValidationError missingRequiredValue(String tableName, String columnName, Row row) {
+    public static TableValidationError missingRequiredValue(
+        String tableName,
+        String columnName,
+        Table invalidRows
+    ) {
         return new TableValidationError(tableName)
             .setType(Type.MISSING_REQ_VALUE)
             .setColumn(columnName)
-            .setRow(row)
-            .setDescription(row.toString());
+            .setInvalidRows(invalidRows);
     }
 
     public static TableValidationError duplicateValue(String tableName, String columnName, Set duplicateValues) {
@@ -99,27 +103,32 @@ public class TableValidationError {
     }
 
     public TableValidationError setDescription(String description) {
-        this.description = Optional.of(description);
+        this.description = description;
+        return this;
+    }
+
+    private TableValidationError setInvalidRows(Table invalidRows) {
+        this.invalidRows = invalidRows;
         return this;
     }
 
     public TableValidationError setProvider(String provider) {
-        this.provider = Optional.of(provider);
+        this.provider = provider;
         return this;
     }
 
-    public TableValidationError setColumn(String columnName) {
-        this.column = Optional.of(columnName);
+    private TableValidationError setColumn(String columnName) {
+        this.column = columnName;
         return this;
     }
 
-    public TableValidationError setType(Type type) {
-        this.errorType = Optional.of(type.toString());
+    private TableValidationError setType(Type type) {
+        this.errorType = type;
         return this;
     }
 
-    private TableValidationError setRow(Row row) {
-        this.row = Optional.of(row);
+    private TableValidationError setRowNumber(Integer rowNumber) {
+        this.rowNumber = rowNumber;
         return this;
     }
 
@@ -127,33 +136,29 @@ public class TableValidationError {
     public String toString() {
         StringJoiner message = new StringJoiner("");
         message.add(String.format("Error in [%s]", getTable()));
-        if (getProvider().isPresent()) {
-            message.add(String.format(" for provider [%s]", getProvider().get()));
-        }
+        getProvider().ifPresent(s -> message.add(String.format(" for provider [%s]", s)));
         message.add(": ");
-        if (getErrorType().isPresent()) {
-            if (getErrorType().get().equals(Type.MISSING_COL.toString())) {
+        Type type = getErrorType().orElse(Type.GENERIC);
+        switch(type) {
+            case MISSING_COL:
                 message.add(String.format("Missing column: [%s]", getColumn().orElse("not specified")));
-            } else if (getErrorType().get().equals(Type.MISSING_REQ_VALUE.toString())) {
-                message.add(String.format("Missing value in required column: [%s]", getColumn().get()));
-            } else {
-                message.add(getErrorType().get());
-            }
+                break;
+            case MISSING_REQ_VALUE:
+                message.add(String.format(
+                    "Missing value(s) in required column [%s]",
+                    getColumn().orElse("not specified")));
+                break;
+            case GENERIC:
+                message.add("Generic error");
+                break;
         }
-        message.add(formatDescription());
+        getDescription().ifPresent(s -> message.add(String.format(": %s", s)));
+        getInvalidRows().ifPresent( t -> message.add(String.format(":%n%s", t.toString())));
         return message.toString();
     }
 
     private int toOneBasedIndex(int number) {
         return number + 1;
-    }
-
-    private String formatDescription() {
-        if (getDescription().isPresent()) {
-            return String.format("%n%s", getDescription().get());
-        } else {
-            return"";
-        }
     }
 
 }
