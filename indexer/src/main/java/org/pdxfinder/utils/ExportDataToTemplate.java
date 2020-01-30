@@ -58,10 +58,10 @@ public class ExportDataToTemplate implements CommandLineRunner {
         else if(options.has(exportTemplate) && args.length <= 1){
             log.error("Missing provider abbrev. Cannot export data.");
 
-        } else if(options.has(exportAll))
+        } else if(options.has(exportAll)) {
             log.info("Exporting All datasets");
             exportAllGroups();
-
+        }
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
 

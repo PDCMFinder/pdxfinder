@@ -996,8 +996,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
         omicPlatform = "platform";
 
         omicSeqEndPosition = "seq_end_position";
-        omicCnaLog10RCNA = "log10R_cna";
-        omicCnaLog2RCNA = "log2R_cna";
+        omicCnaLog10RCNA = "log10r_cna";
+        omicCnaLog2RCNA = "log2r_cna";
         omicCnaCopyNumberStatus = "copy_number_status";
         omicCnaGisticvalue = "gistic_value_cna";
         omicCnaPicnicValue = "picnic_value";
