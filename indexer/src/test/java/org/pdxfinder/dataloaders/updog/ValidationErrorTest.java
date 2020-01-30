@@ -14,7 +14,7 @@ public class ValidationErrorTest {
 
     @Test public void create_givenInstantiation_returnsValidationErrorWithTableNameMember() {
         String expected = "table";
-        ValidationError error = createBasicError();
+        ValidationError error = ValidationError.generic("table");
         assertEquals(
             expected,
             error.getTable()
@@ -22,7 +22,7 @@ public class ValidationErrorTest {
     }
 
     @Test public void builderMethods_givenInstantiation_allReturnInstanceOfThisClass() {
-        ValidationError error = createBasicError();
+        ValidationError error = ValidationError.generic("table");
         assertThat(error, isA(ValidationError.class));
         assertThat(error.setProvider("provider"), isA(ValidationError.class));
         assertThat(error.setDescription("Custom description of the error"), isA(ValidationError.class));
@@ -48,9 +48,7 @@ public class ValidationErrorTest {
 
     @Test public void toString_givenMissingColumnErrorWithProvider_returnsAppropriateMessageWithProvider() {
         String expected = "Error in [table] for provider [Example provider]: Missing column: [required_col]";
-        ValidationError error = ValidationError
-            .missingColumn("table", "required_col")
-            .setProvider("Example provider");
+        ValidationError error = ValidationError.missingColumn("table", "required_col").setProvider("Example provider");
         assertEquals(
             expected,
             error.toString()
@@ -83,12 +81,7 @@ public class ValidationErrorTest {
             StringColumn.create("required_col", Arrays.asList("value 1", "")),
             StringColumn.create("optional_col", Arrays.asList("value 1", "value 2"))
         );
-        ValidationError error = ValidationError
-            .missingRequiredValue(
-                "table",
-                "required_col",
-                table.rows(1)
-            );
+        ValidationError error = ValidationError.missingRequiredValue("table", "required_col", table.rows(1));
         assertEquals(
             expected,
             error.toString()
@@ -102,8 +95,7 @@ public class ValidationErrorTest {
         Pair<Pair<String, String>, Pair<String, String>> relation =
             Pair.of(Pair.of("foo.tsv", "foo_id"), Pair.of("bar.tsv", "foo_id"));
         Table tableMissingColumn = Table.create().addColumns(StringColumn.create("not_foo_id"));
-        ValidationError error = ValidationError
-            .brokenRelation("bar.tsv", relation, tableMissingColumn);
+        ValidationError error = ValidationError.brokenRelation("bar.tsv", relation, tableMissingColumn);
 
         assertEquals(
             expected,
@@ -136,9 +128,7 @@ public class ValidationErrorTest {
         );
     }
 
-
-
-        private ValidationError createBasicError() {
+    private ValidationError createBasicError() {
         return ValidationError.generic("table");
     }
 
