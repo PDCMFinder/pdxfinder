@@ -2,9 +2,6 @@ package org.pdxfinder.dataloaders.updog;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
-import tech.tablesaw.api.DoubleColumn;
-import tech.tablesaw.api.NumberColumn;
-import tech.tablesaw.api.Row;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
@@ -13,19 +10,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Component
 public class Validator {
 
-    private List<TableValidationError> validationErrors;
+    private List<ValidationError> validationErrors;
 
     public Validator() {
         this.validationErrors = new ArrayList<>();
     }
 
-    public List<TableValidationError> validate(
+    public List<ValidationError> validate(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
@@ -43,7 +38,7 @@ public class Validator {
     ) {
         tableSetSpecification.getMissingTablesFrom(tableSet).forEach(
             f -> validationErrors.add(
-                TableValidationError.missingFile(f).setProvider(tableSetSpecification.getProvider())));
+                ValidationError.missingFile(f).setProvider(tableSetSpecification.getProvider())));
     }
 
     private void checkAllRequiredColumnsPresent(
@@ -68,7 +63,7 @@ public class Validator {
             value = entry.getValue();
             missingCols = value.getMissingColumnsFrom(tableSet.get(key));
             for (String missingCol : missingCols) {
-                validationErrors.add(TableValidationError
+                validationErrors.add(ValidationError
                     .missingColumn(key, missingCol)
                     .setProvider(tableSetSpecification.getProvider()));
             }
@@ -86,7 +81,7 @@ public class Validator {
             Table table = tableSet.get(tableName);
             Table missing = table.where(
                 table.stringColumn(columnName).isMissing());
-            validationErrors.add(TableValidationError
+            validationErrors.add(ValidationError
                 .missingRequiredValue(tableName, columnName, missing)
                 .setProvider(tableSetSpecification.getProvider()));
         }
@@ -103,7 +98,7 @@ public class Validator {
             Table table = tableSet.get(tableName);
             Set<String> duplicates = findDuplicates(table.stringColumn(columnName).asList());
             if (!duplicates.isEmpty()) {
-                validationErrors.add(TableValidationError
+                validationErrors.add(ValidationError
                     .duplicateValue(tableName, columnName, duplicates)
                     .setProvider(tableSetSpecification.getProvider()));
             }
@@ -140,7 +135,7 @@ public class Validator {
         if (missingLeftColumn(tableSet, relation)) {
             String leftTableName = relation.getLeft().getLeft();
             String leftColName = relation.getLeft().getRight();
-            validationErrors.add(TableValidationError
+            validationErrors.add(ValidationError
                 .brokenRelation(leftTableName, relation, tableSet.get(leftTableName).emptyCopy())
                 .setDescription(String.format("because [%s] is missing column [%s]", leftTableName, leftColName))
                 .setProvider(provider));
@@ -148,7 +143,7 @@ public class Validator {
         if (missingRightColumn(tableSet, relation)) {
             String rightTableName = relation.getRight().getLeft();
             String rightColName = relation.getRight().getRight();
-            validationErrors.add(TableValidationError
+            validationErrors.add(ValidationError
                 .brokenRelation(rightTableName, relation, tableSet.get(rightTableName).emptyCopy())
                 .setDescription(String.format("because [%s] is missing column [%s]", rightTableName, rightColName))
                 .setProvider(provider));
@@ -170,7 +165,7 @@ public class Validator {
             StringColumn rightCol = rightTable.stringColumn(rightColumnName);
             Table orphanRightTableRows = rightTable.where(rightCol.isNotIn(uniqueLeftValues));
             if(!orphanRightTableRows.isEmpty()) {
-                validationErrors.add(TableValidationError
+                validationErrors.add(ValidationError
                     .brokenRelation(rightTableName, relation, orphanRightTableRows)
                     .setDescription(
                         String.format("%s orphan row(s) found in [%s]",
@@ -214,7 +209,7 @@ public class Validator {
         return validate(tableSet, tableSetSpecification).isEmpty();
     }
 
-    List<TableValidationError> getValidationErrors() {
+    List<ValidationError> getValidationErrors() {
         return validationErrors;
     }
 

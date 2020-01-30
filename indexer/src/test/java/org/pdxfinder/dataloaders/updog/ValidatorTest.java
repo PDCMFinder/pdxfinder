@@ -4,7 +4,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
@@ -21,7 +20,6 @@ import java.util.stream.Stream;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
 
 public class ValidatorTest {
 
@@ -76,8 +74,8 @@ public class ValidatorTest {
     }
 
     @Test public void validate_givenIncompleteFileSet_addsErrorWithCorrectContextToErrorList() {
-        List<TableValidationError> expected = Collections.singletonList(
-            TableValidationError.missingFile(TABLE_1).setProvider(PROVIDER));
+        List<ValidationError> expected = Collections.singletonList(
+            ValidationError.missingFile(TABLE_1).setProvider(PROVIDER));
         assertEquals(
             expected.toString(),
             validator.validate(incompleteTableSet, requireTable).toString()
@@ -85,8 +83,8 @@ public class ValidatorTest {
     }
 
     @Test public void checkAllRequiredColsPresent_givenMissingColumnDefinedInColSpec_addsMissingColErrorTotErrorList() {
-        List<TableValidationError> expected = Collections.singletonList(
-                TableValidationError.missingColumn(TABLE_1, "missing_column").setProvider(PROVIDER));
+        List<ValidationError> expected = Collections.singletonList(
+                ValidationError.missingColumn(TABLE_1, "missing_column").setProvider(PROVIDER));
         Map<String, ColumnSpecification> columnSpecifications = new HashMap<>();
         Collections.singletonList(TABLE_1).forEach(
             s -> columnSpecifications.put(s, new ColumnSpecification(
@@ -106,8 +104,8 @@ public class ValidatorTest {
             StringColumn.create("required_col", Collections.singletonList("")));
         fileSetWithInvalidTable.put(TABLE_1, tableWithMissingValue);
 
-        List<TableValidationError> expected = Collections.singletonList(
-                TableValidationError
+        List<ValidationError> expected = Collections.singletonList(
+                ValidationError
                     .missingRequiredValue(
                         TABLE_1,
                         "required_col",
@@ -127,8 +125,8 @@ public class ValidatorTest {
         );
         fileSetWithInvalidTable.put(TABLE_1, tableWithMissingValue);
 
-        List<TableValidationError> expected = Collections.singletonList(
-            TableValidationError
+        List<ValidationError> expected = Collections.singletonList(
+            ValidationError
                 .missingRequiredValue(
                     TABLE_1,
                     "required_col",
@@ -162,8 +160,8 @@ public class ValidatorTest {
             .addUniqueColumns(Pair.of(TABLE_1, "unique_col"));
 
         Set<String> duplicateValue = Stream.of("1").collect(Collectors.toSet());
-        List<TableValidationError> expected = Arrays.asList(
-            TableValidationError.duplicateValue(TABLE_1, "unique_col", duplicateValue).setProvider(PROVIDER)
+        List<ValidationError> expected = Arrays.asList(
+            ValidationError.duplicateValue(TABLE_1, "unique_col", duplicateValue).setProvider(PROVIDER)
         );
 
         assertEquals(
@@ -181,7 +179,7 @@ public class ValidatorTest {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.get(TABLE_1).removeColumns("id");
 
-        TableValidationError expected = TableValidationError
+        ValidationError expected = ValidationError
             .brokenRelation(TABLE_1, RELATION, tableSetWithSimpleJoin.get(TABLE_1).emptyCopy())
             .setDescription(String.format("because [%s] is missing column [%s]", TABLE_1, "id"))
             .setProvider(PROVIDER);
@@ -196,7 +194,7 @@ public class ValidatorTest {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.get(TABLE_2).removeColumns("table_1_id");
 
-        TableValidationError expected = TableValidationError
+        ValidationError expected = ValidationError
             .brokenRelation(TABLE_2, RELATION, tableSetWithSimpleJoin.get(TABLE_2).emptyCopy())
             .setDescription(String.format("because [%s] is missing column [%s]", TABLE_2, "table_1_id"))
             .setProvider(PROVIDER);
@@ -213,7 +211,7 @@ public class ValidatorTest {
             StringColumn.create("table_1_id", Arrays.asList("not 1", "not 1"))
         );
 
-        TableValidationError expected = TableValidationError
+        ValidationError expected = ValidationError
             .brokenRelation(TABLE_2, RELATION, tableSetWithSimpleJoin.get(TABLE_2))
             .setDescription(String.format("2 orphan row(s) found in [%s]", TABLE_2))
             .setProvider(PROVIDER);

@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 
-public class TableValidationError {
+public class ValidationError {
     private String table;
     private String provider;
     private Type errorType;
@@ -63,81 +63,81 @@ public class TableValidationError {
         return Optional.ofNullable(invalidRows);
     }
 
-    private TableValidationError(String table) {
+    private ValidationError(String table) {
         this.table = table;
     }
 
-    public static TableValidationError generic(String table) {
-        return new TableValidationError(table).setType(Type.GENERIC);
+    public static ValidationError generic(String table) {
+        return new ValidationError(table).setType(Type.GENERIC);
     }
 
-    public static TableValidationError missingFile(String tableName) {
-        return new TableValidationError(tableName).setType(Type.MISSING_TABLE);
+    public static ValidationError missingFile(String tableName) {
+        return new ValidationError(tableName).setType(Type.MISSING_TABLE);
     }
 
-    public static TableValidationError missingColumn(String tableName, String columnName) {
-        return new TableValidationError(tableName).setType(Type.MISSING_COL).setColumn(columnName);
+    public static ValidationError missingColumn(String tableName, String columnName) {
+        return new ValidationError(tableName).setType(Type.MISSING_COL).setColumn(columnName);
     }
 
-    public static TableValidationError missingRequiredValue(
+    public static ValidationError missingRequiredValue(
         String tableName,
         String columnName,
         Table invalidRows
     ) {
-        return new TableValidationError(tableName)
+        return new ValidationError(tableName)
             .setType(Type.MISSING_REQ_VALUE)
             .setColumn(columnName)
             .setInvalidRows(invalidRows);
     }
 
-    public static TableValidationError duplicateValue(
+    public static ValidationError duplicateValue(
         String tableName,
         String columnName,
         Set duplicateValues
     ) {
-        return new TableValidationError(tableName)
+        return new ValidationError(tableName)
             .setType(Type.DUPLICATE_VALUE)
             .setColumn(columnName)
             .setDescription(duplicateValues.toString());
     }
 
-    public static TableValidationError brokenRelation(
+    public static ValidationError brokenRelation(
         String tableName,
         Pair<Pair<String, String>, Pair<String, String>> relation,
         Table invalidRows
     ) {
-        return new TableValidationError(tableName)
+        return new ValidationError(tableName)
             .setType(Type.BROKEN_RELATION)
             .setRelation(relation)
             .setInvalidRows(invalidRows);
     }
 
-    public TableValidationError setDescription(String description) {
+    public ValidationError setDescription(String description) {
         this.description = description;
         return this;
     }
 
-    private TableValidationError setInvalidRows(Table invalidRows) {
+    private ValidationError setInvalidRows(Table invalidRows) {
         this.invalidRows = invalidRows;
         return this;
     }
 
-    public TableValidationError setProvider(String provider) {
+    public ValidationError setProvider(String provider) {
         this.provider = provider;
         return this;
     }
 
-    private TableValidationError setColumn(String columnName) {
+    private ValidationError setColumn(String columnName) {
         this.column = columnName;
         return this;
     }
 
-    private TableValidationError setType(Type type) {
+    private ValidationError setType(Type type) {
         this.errorType = type;
         return this;
     }
 
-    public TableValidationError setRelation(
+    public ValidationError setRelation(
         Pair<Pair<String, String>, Pair<String, String>> relation
     ) {
         this.relation = relation;
