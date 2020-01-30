@@ -65,7 +65,7 @@ public class UtilityServiceTest{
 
         List<Map<String,String>> actualMap = utilityService.serializeDataToMaps(csvFilePath.toString());
 
-        Assert.assertEquals(expectedMap, actualMap);
+        Assert.assertEquals(expectedMap, actualMap.get(0));
     }
 
     @Test
@@ -81,6 +81,6 @@ public class UtilityServiceTest{
 
         List<Map<String,String>> actualMap = utilityService.serializeDataToMaps(tsvFilePath.toString());
 
-        Assert.assertEquals(expectedMap, actualMap);
+        Assert.assertEquals(expectedMap, actualMap.get(0));
     }
 }
