@@ -2,16 +2,19 @@ package org.pdxfinder.dataloaders.updog;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.NumberColumn;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Component
 public class Validator {
@@ -135,13 +138,19 @@ public class Validator {
         String provider
     ) {
         if (missingLeftColumn(tableSet, relation)) {
+            String leftTableName = relation.getLeft().getLeft();
+            String leftColName = relation.getLeft().getRight();
             validationErrors.add(TableValidationError
-                .brokenRelation(relation, "Missing column in the left table")
+                .brokenRelation(leftTableName, relation, tableSet.get(leftTableName).emptyCopy())
+                .setDescription(String.format("because [%s] is missing column [%s]", leftTableName, leftColName))
                 .setProvider(provider));
         }
         if (missingRightColumn(tableSet, relation)) {
+            String rightTableName = relation.getRight().getLeft();
+            String rightColName = relation.getRight().getRight();
             validationErrors.add(TableValidationError
-                .brokenRelation(relation, "Missing column in the right table")
+                .brokenRelation(rightTableName, relation, tableSet.get(rightTableName).emptyCopy())
+                .setDescription(String.format("because [%s] is missing column [%s]", rightTableName, rightColName))
                 .setProvider(provider));
         }
     }
@@ -162,7 +171,8 @@ public class Validator {
             Table orphanRightTableRows = rightTable.where(rightCol.isNotIn(uniqueLeftValues));
             if(!orphanRightTableRows.isEmpty()) {
                 validationErrors.add(TableValidationError
-                    .brokenRelation(relation,
+                    .brokenRelation(rightTableName, relation, orphanRightTableRows)
+                    .setDescription(
                         String.format("%s orphan row(s) found in [%s]",
                             orphanRightTableRows.rowCount(),
                             rightTableName))

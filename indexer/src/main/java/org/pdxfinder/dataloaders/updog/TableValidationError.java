@@ -12,7 +12,7 @@ public class TableValidationError {
     private String provider;
     private Type errorType;
     private String column;
-    private int rowNumber;
+    private Pair<Pair<String, String>, Pair<String, String>> relation;
     private Table invalidRows;
     private String description;
 
@@ -55,6 +55,10 @@ public class TableValidationError {
         return Optional.ofNullable(provider);
     }
 
+    public Optional<Pair<Pair<String, String>, Pair<String, String>>> getRelation() {
+        return Optional.ofNullable(relation);
+    }
+
     public Optional<Table> getInvalidRows() {
         return Optional.ofNullable(invalidRows);
     }
@@ -86,7 +90,11 @@ public class TableValidationError {
             .setInvalidRows(invalidRows);
     }
 
-    public static TableValidationError duplicateValue(String tableName, String columnName, Set duplicateValues) {
+    public static TableValidationError duplicateValue(
+        String tableName,
+        String columnName,
+        Set duplicateValues
+    ) {
         return new TableValidationError(tableName)
             .setType(Type.DUPLICATE_VALUE)
             .setColumn(columnName)
@@ -94,12 +102,14 @@ public class TableValidationError {
     }
 
     public static TableValidationError brokenRelation(
+        String tableName,
         Pair<Pair<String, String>, Pair<String, String>> relation,
-        String description
+        Table invalidRows
     ) {
-        return new TableValidationError(relation.toString())
+        return new TableValidationError(tableName)
             .setType(Type.BROKEN_RELATION)
-            .setDescription(description);
+            .setRelation(relation)
+            .setInvalidRows(invalidRows);
     }
 
     public TableValidationError setDescription(String description) {
@@ -127,8 +137,10 @@ public class TableValidationError {
         return this;
     }
 
-    private TableValidationError setRowNumber(Integer rowNumber) {
-        this.rowNumber = rowNumber;
+    public TableValidationError setRelation(
+        Pair<Pair<String, String>, Pair<String, String>> relation
+    ) {
+        this.relation = relation;
         return this;
     }
 
@@ -147,6 +159,10 @@ public class TableValidationError {
                 message.add(String.format(
                     "Missing value(s) in required column [%s]",
                     getColumn().orElse("not specified")));
+                break;
+            case BROKEN_RELATION:
+                message.add(String.format(
+                    "Broken relation [%s]", relation.toString()));
                 break;
             case GENERIC:
                 message.add("Generic error");

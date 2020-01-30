@@ -3,6 +3,7 @@ package org.pdxfinder.dataloaders.updog;
 import org.junit.Test;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
 
@@ -94,7 +95,50 @@ public class TableValidationErrorTest {
         );
     }
 
-    private TableValidationError createBasicError() {
+    @Test public void toString_givenMissingRightColumn_returnsAppropriateMessage() {
+        String expected = "Error in [bar.tsv]: Broken relation [((foo.tsv,foo_id),(bar.tsv,foo_id))]:\n" +
+            " not_foo_id  |\n" +
+            "--------------";
+        Pair<Pair<String, String>, Pair<String, String>> relation =
+            Pair.of(Pair.of("foo.tsv", "foo_id"), Pair.of("bar.tsv", "foo_id"));
+        Table tableMissingColumn = Table.create().addColumns(StringColumn.create("not_foo_id"));
+        TableValidationError error = TableValidationError
+            .brokenRelation("bar.tsv", relation, tableMissingColumn);
+
+        assertEquals(
+            expected,
+            error.toString()
+        );
+    }
+
+
+    @Test public void toString_givenOrphanIdsInRightColumn_returnsAppropriateMessage() {
+        String expected = "Error in [bar.tsv] for provider [PROVIDER-BC]: " +
+            "Broken relation [((foo.tsv,foo_id),(bar.tsv,foo_id))]: " +
+            "2 orphan row(s) found in [bar.tsv]:\n" +
+            " foo_id  |\n" +
+            "----------\n" +
+            "      1  |\n" +
+            "      1  |";
+
+        Pair<Pair<String, String>, Pair<String, String>> relation =
+            Pair.of(Pair.of("foo.tsv", "foo_id"), Pair.of("bar.tsv", "foo_id"));
+        Table tableMissingValues = Table.create().addColumns(
+            StringColumn.create("foo_id", Arrays.asList("1", "1")));
+        TableValidationError error = TableValidationError
+            .brokenRelation("bar.tsv", relation, tableMissingValues)
+            .setDescription("2 orphan row(s) found in [bar.tsv]")
+            .setProvider("PROVIDER-BC");
+
+        assertEquals(
+            expected,
+            error.toString()
+        );
+    }
+
+
+
+        private TableValidationError createBasicError() {
         return TableValidationError.generic("table");
     }
 

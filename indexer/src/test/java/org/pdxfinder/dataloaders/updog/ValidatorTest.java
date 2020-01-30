@@ -182,7 +182,8 @@ public class ValidatorTest {
         tableSetWithSimpleJoin.get(TABLE_1).removeColumns("id");
 
         TableValidationError expected = TableValidationError
-            .brokenRelation(RELATION, "Missing column in the left table")
+            .brokenRelation(TABLE_1, RELATION, tableSetWithSimpleJoin.get(TABLE_1).emptyCopy())
+            .setDescription(String.format("because [%s] is missing column [%s]", TABLE_1, "id"))
             .setProvider(PROVIDER);
 
         assertEquals(
@@ -196,7 +197,8 @@ public class ValidatorTest {
         tableSetWithSimpleJoin.get(TABLE_2).removeColumns("table_1_id");
 
         TableValidationError expected = TableValidationError
-            .brokenRelation(RELATION, "Missing column in the right table")
+            .brokenRelation(TABLE_2, RELATION, tableSetWithSimpleJoin.get(TABLE_2).emptyCopy())
+            .setDescription(String.format("because [%s] is missing column [%s]", TABLE_2, "table_1_id"))
             .setProvider(PROVIDER);
 
         assertEquals(
@@ -212,7 +214,8 @@ public class ValidatorTest {
         );
 
         TableValidationError expected = TableValidationError
-            .brokenRelation(RELATION, String.format("2 orphan row(s) found in [%s]", TABLE_2))
+            .brokenRelation(TABLE_2, RELATION, tableSetWithSimpleJoin.get(TABLE_2))
+            .setDescription(String.format("2 orphan row(s) found in [%s]", TABLE_2))
             .setProvider(PROVIDER);
 
         assertEquals(
