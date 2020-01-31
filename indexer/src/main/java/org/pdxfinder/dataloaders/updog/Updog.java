@@ -1,5 +1,6 @@
 package org.pdxfinder.dataloaders.updog;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
@@ -12,8 +13,12 @@ import tech.tablesaw.api.Table;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,18 +54,18 @@ public class Updog {
         Assert.notNull(provider, "provider cannot be null");
         log.debug("Using UPDOG to import {} PDX data from [{}]", provider, updogProviderDirectory);
 
-        Map<String, Table> pdxTableSet = new HashMap<>();
-        Map<String, Table> omicsTableSet = new HashMap<>();
+        Map<String, Table> pdxTableSet;
+        Map<String, Table> omicsTableSet;
         Map<String, Table> combinedTableSet = new HashMap<>();
 
         pdxTableSet = readPdxTablesFromPath(updogProviderDirectory);
-        pdxTableSet = cleanPdxTableSet(pdxTableSet);
+        pdxTableSet = TableSetUtilities.cleanPdxTableSet(pdxTableSet);
         omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
-        omicsTableSet = removeBlankRows(omicsTableSet);
+        omicsTableSet = TableSetUtilities.removeBlankRows(omicsTableSet);
 
         combinedTableSet.putAll(pdxTableSet);
         combinedTableSet.putAll(omicsTableSet);
-        validatePdxDataTables(combinedTableSet, provider);
+        List<ValidationError> validationErrors =  validatePdxDataTables(combinedTableSet, provider);
 
         createPdxObjects(combinedTableSet);
     }
@@ -76,62 +81,130 @@ public class Updog {
         return reader.readAllTsvFilesIn(updogProviderDirectory, metadataFiles);
     }
 
-    private Map<String, Table> cleanPdxTableSet(Map<String, Table> pdxTableSet) {
-        pdxTableSet.remove("metadata-checklist.tsv");
-        removeDescriptionColumn(pdxTableSet);
-        pdxTableSet = removeHeaderRows(pdxTableSet);
-        pdxTableSet = removeBlankRows(pdxTableSet);
-        return pdxTableSet;
-    }
-
-    private Map<String, Table> removeHeaderRows(Map<String, Table> tableSet) {
-        return tableSet.entrySet().stream().collect(
-            Collectors.toMap(
-                e -> e.getKey(),
-                e -> TableUtilities.removeHeaderRows(e.getValue(), 4)
-            ));
-    }
-
-    private Map<String, Table> removeBlankRows(Map<String, Table> tableSet) {
-        return tableSet.entrySet().stream().collect(
-            Collectors.toMap(
-                e -> e.getKey(),
-                e -> TableUtilities.removeRowsMissingRequiredColumnValue(
-                    e.getValue(),
-                    e.getValue().column(0).asStringColumn())
-            ));
-    }
-
-    private void removeDescriptionColumn(Map<String, Table> tableSet) {
-        tableSet.values().forEach(t -> t.removeColumns("Field"));
-    }
-
-    private boolean validatePdxDataTables(Map<String, Table> tableSet, String provider){
-        return validator.passesValidation(tableSet, tableSetSpecification(provider));
-    }
-
-    private TableSetSpecification tableSetSpecification(String provider) {
-        return TableSetSpecification.create()
-            .addRequiredTables(
-                Stream.of(
-                    "metadata-loader.tsv",
-                    "metadata-checklist.tsv",
-                    "metadata-sharing.tsv",
-                    "metadata-model_validation.tsv",
-                    "metadata-patient.tsv",
-                    "metadata-model.tsv",
-                    "metadata-sample.tsv"
-                ).collect(Collectors.toSet()))
-            .setProvider(provider);
+    private List<ValidationError> validatePdxDataTables(Map<String, Table> tableSet, String provider){
+        return validator.validate(tableSet, tableSetSpecification(columns(), provider));
     }
 
     private void createPdxObjects(Map<String, Table> pdxTableSet){
-
-        //create domain objects database nodes
         DomainObjectCreator doc = new DomainObjectCreator(dataImportService, pdxTableSet);
-        //save db
         doc.loadDomainObjects();
-
     }
+
+    private TableSetSpecification tableSetSpecification(
+        List<Pair<String, String>> columns,
+        String provider
+    ) {
+        Set<String> metadataTables = columns.stream()
+            .map(Pair::getKey)
+            .filter(s -> s.contains("metadata"))
+            .collect(Collectors.toSet());
+
+        List<Pair<String, String>> idColumns = columns.stream()
+            .filter(p -> p.getValue().contains("_id"))
+            .collect(Collectors.toList());
+
+        List<Pair<String, String>> sampleColumns = columns.stream()
+            .filter(p -> p.getKey().contains("sample"))
+            .filter(p -> containsAny(p.getValue(), new String[]{"tumour", "_site"}))
+            .collect(Collectors.toList());
+
+        List<Pair<String, String>> requiredColumns = Stream.concat(
+            idColumns.stream(),
+            sampleColumns.stream()
+        ).collect(Collectors.toList());
+
+        return TableSetSpecification.create()
+            .addRequiredTables(metadataTables)
+            .addRequiredColumns(requiredColumns)
+            .addUniqueColumns(idColumns)
+            .addHasOneToManyRelation(Arrays.asList(
+                relation("metadata-patient.tsv", "metadata-sample.tsv", "patient_id")
+            ))
+            .setProvider(provider);
+    }
+
+    private static boolean containsAny(String inputStr, String[] items) {
+        return Arrays.stream(items).parallel().anyMatch(inputStr::contains);
+    }
+
+    private Pair<Pair<String, String>, Pair<String, String>> relation(
+        String from, String to, String columnName
+    ) {
+        return Pair.of(Pair.of(from, columnName), Pair.of(to, columnName));
+    }
+
+    private List<Pair<String, String>> columns() {
+        List<Pair<String, String>> tableColumns = new ArrayList<>();
+        Arrays.asList(
+            "patient_id",
+            "sex",
+            "history",
+            "ethnicity",
+            "ethnicity_assessment_method",
+            "initial_diagnosis",
+            "age_at_initial_diagnosis"
+        ).forEach(s -> tableColumns.add(Pair.of("metadata-patient.tsv", s)));
+        Arrays.asList(
+            "patient_id",
+            "sample_id",
+            "collection_date",
+            "collection_event",
+            "months_since_collection_1",
+            "age_in_years_at_collection",
+            "diagnosis",
+            "tumour_type",
+            "primary_site",
+            "collection_site",
+            "stage",
+            "staging_system",
+            "grade",
+            "grading_system",
+            "virology_status",
+            "sharable",
+            "treatment_naive_at_collection",
+            "treated",
+            "prior_treatment",
+            "model_id"
+        ).forEach(s -> tableColumns.add(Pair.of("metadata-sample.tsv", s)));
+        Arrays.asList(
+            "model_id",
+            "host_strain",
+            "host_strain_full",
+            "engraftment_site",
+            "engraftment_type",
+            "sample_type",
+            "sample_state",
+            "passage_number",
+            "publications"
+        ).forEach(s -> tableColumns.add(Pair.of("metadata-model.tsv", s)));
+        Arrays.asList(
+            "model_id",
+            "validation_technique",
+            "description",
+            "passages_tested",
+            "validation_host_strain_full"
+        ).forEach(s -> tableColumns.add(Pair.of("metadata-model_validation.tsv", s)));
+        Arrays.asList(
+            "model_id",
+            "provider_type",
+            "accessibility",
+            "europdx_access_modality",
+            "email",
+            "name",
+            "form_url",
+            "database_url",
+            "provider_name",
+            "provider_abbreviation",
+            "project"
+        ).forEach(s -> tableColumns.add(Pair.of("metadata-sharing.tsv", s)));
+        Arrays.asList(
+            "name",
+            "abbreviation",
+            "internal_url",
+            "internal_dosing_url"
+        ).forEach(s -> tableColumns.add(Pair.of("metadata-loader.tsv", s)));
+        return tableColumns;
+    }
+
 
 }

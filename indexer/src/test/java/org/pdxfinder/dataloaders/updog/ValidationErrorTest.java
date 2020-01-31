@@ -88,7 +88,7 @@ public class ValidationErrorTest {
         );
     }
 
-    @Test public void toString_givenMissingRightColumn_returnsAppropriateMessage() {
+    @Test public void toString_givenBrokenRelationMissingRightColumn_returnsAppropriateMessage() {
         String expected = "Error in [bar.tsv]: Broken relation [((foo.tsv,foo_id),(bar.tsv,foo_id))]:\n" +
             " not_foo_id  |\n" +
             "--------------";
@@ -104,7 +104,7 @@ public class ValidationErrorTest {
     }
 
 
-    @Test public void toString_givenOrphanIdsInRightColumn_returnsAppropriateMessage() {
+    @Test public void toString_givenBrokenRelationOrphanIdsInRightColumn_returnsAppropriateMessage() {
         String expected = "Error in [bar.tsv] for provider [PROVIDER-BC]: " +
             "Broken relation [((foo.tsv,foo_id),(bar.tsv,foo_id))]: " +
             "2 orphan row(s) found in [bar.tsv]:\n" +

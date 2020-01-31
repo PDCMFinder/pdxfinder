@@ -81,9 +81,11 @@ public class Validator {
             Table table = tableSet.get(tableName);
             Table missing = table.where(
                 table.stringColumn(columnName).isMissing());
-            validationErrors.add(ValidationError
-                .missingRequiredValue(tableName, columnName, missing)
-                .setProvider(tableSetSpecification.getProvider()));
+            if (missing.rowCount() > 0) {
+                validationErrors.add(ValidationError
+                    .missingRequiredValue(tableName, columnName, missing)
+                    .setProvider(tableSetSpecification.getProvider()));
+            }
         }
     }
 
