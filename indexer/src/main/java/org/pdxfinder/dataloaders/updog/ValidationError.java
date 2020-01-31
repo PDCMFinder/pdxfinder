@@ -144,25 +144,45 @@ public class ValidationError {
         return this;
     }
 
+    private String prettyPrintRelation(
+        Pair<Pair<String, String>, Pair<String, String>> relation
+    ) {
+        return String.format(
+            "(%s) %s -> %s (%s)",
+            relation.getLeft().getKey(),
+            relation.getLeft().getValue(),
+            relation.getRight().getValue(),
+            relation.getRight().getKey());
+    }
+
     @Override
     public String toString() {
+        String notSpecified = "not specified";
         StringJoiner message = new StringJoiner("");
         message.add(String.format("Error in [%s]", getTable()));
         getProvider().ifPresent(s -> message.add(String.format(" for provider [%s]", s)));
         message.add(": ");
         Type type = getErrorType().orElse(Type.GENERIC);
         switch(type) {
+            case MISSING_TABLE:
+                message.add("Missing required table");
+                break;
             case MISSING_COL:
-                message.add(String.format("Missing column: [%s]", getColumn().orElse("not specified")));
+                message.add(String.format("Missing column: [%s]", getColumn().orElse(notSpecified)));
                 break;
             case MISSING_REQ_VALUE:
                 message.add(String.format(
                     "Missing value(s) in required column [%s]",
-                    getColumn().orElse("not specified")));
+                    getColumn().orElse(notSpecified)));
+                break;
+            case DUPLICATE_VALUE:
+                message.add(String.format(
+                    "Duplicate value(s) in required column [%s]",
+                    getColumn().orElse(notSpecified)));
                 break;
             case BROKEN_RELATION:
                 message.add(String.format(
-                    "Broken relation [%s]", relation.toString()));
+                    "Broken relation [%s]", prettyPrintRelation(relation)));
                 break;
             case GENERIC:
                 message.add("Generic error");

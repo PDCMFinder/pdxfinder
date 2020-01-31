@@ -6,6 +6,9 @@ import tech.tablesaw.api.Table;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.isA;
@@ -55,8 +58,19 @@ public class ValidationErrorTest {
         );
     }
 
+    @Test public void toString_givenDDuplicateValue_returnsAppropriateMessage() {
+        String expected = "Error in [table]: Duplicate value(s) in required column [required_col]: [bar, foo]";
+        Set<String> duplicates = new HashSet<>(Arrays.asList("foo", "bar"));
+        ValidationError error = ValidationError.duplicateValue("table", "required_col", duplicates);
+        assertEquals(
+            expected,
+            error.toString()
+        );
+    }
+
     @Test public void toString_givenRequiredColumnHasMissingValue_returnsAppropriateMessage() {
-        String expected = "Error in [table]: Missing value(s) in required column [required_col]:\n" +
+        String expected =
+            "Error in [table]: Missing value(s) in required column [required_col]:\n" +
             " required_col  |\n" +
             "----------------\n" +
             "               |";
@@ -73,7 +87,8 @@ public class ValidationErrorTest {
     }
 
     @Test public void toString_givenRequiredColumnHasMissingValueInRow1_returnsAppropriateMessage() {
-        String expected = "Error in [table]: Missing value(s) in required column [required_col]:\n" +
+        String expected =
+            "Error in [table]: Missing value(s) in required column [required_col]:\n" +
             " required_col  |  optional_col  |\n" +
             "---------------------------------\n" +
             "               |       value 2  |";
@@ -89,7 +104,8 @@ public class ValidationErrorTest {
     }
 
     @Test public void toString_givenBrokenRelationMissingRightColumn_returnsAppropriateMessage() {
-        String expected = "Error in [bar.tsv]: Broken relation [((foo.tsv,foo_id),(bar.tsv,foo_id))]:\n" +
+        String expected =
+            "Error in [bar.tsv]: Broken relation [(foo.tsv) foo_id -> foo_id (bar.tsv)]:\n" +
             " not_foo_id  |\n" +
             "--------------";
         Pair<Pair<String, String>, Pair<String, String>> relation =
@@ -105,14 +121,14 @@ public class ValidationErrorTest {
 
 
     @Test public void toString_givenBrokenRelationOrphanIdsInRightColumn_returnsAppropriateMessage() {
-        String expected = "Error in [bar.tsv] for provider [PROVIDER-BC]: " +
-            "Broken relation [((foo.tsv,foo_id),(bar.tsv,foo_id))]: " +
-            "2 orphan row(s) found in [bar.tsv]:\n" +
-            " foo_id  |\n" +
-            "----------\n" +
-            "      1  |\n" +
-            "      1  |";
-
+        String expected =
+            "Error in [bar.tsv] for provider [PROVIDER-BC]: " +
+                "Broken relation [(foo.tsv) foo_id -> foo_id (bar.tsv)]: " +
+                "2 orphan row(s) found in [bar.tsv]:\n" +
+                " foo_id  |\n" +
+                "----------\n" +
+                "      1  |\n" +
+                "      1  |";
         Pair<Pair<String, String>, Pair<String, String>> relation =
             Pair.of(Pair.of("foo.tsv", "foo_id"), Pair.of("bar.tsv", "foo_id"));
         Table tableMissingValues = Table.create().addColumns(
