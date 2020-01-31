@@ -26,6 +26,7 @@ public class MarkerAssociation {
 
 
     public MarkerAssociation() {
+        molecularDataList = new ArrayList<>();
     }
 
     public List<MolecularData> createMolecularDataListFromString() throws IOException {

@@ -1,8 +1,14 @@
 package org.pdxfinder.dataloaders.updog;
 import org.pdxfinder.graph.dao.*;
+import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
@@ -37,10 +43,13 @@ public class DomainObjectCreator {
         this.dataImportService = dataImportService;
         this.pdxDataTables = pdxDataTables;
         domainObjects = new HashMap<>();
+
+
     }
 
     public void loadDomainObjects(){
         //: Do not change the order of these unless you want to risk 1. the universe to collapse OR 2. missing nodes in the db
+
         createProvider();
         createPatientData();
         createModelData();
@@ -49,7 +58,7 @@ public class DomainObjectCreator {
 
         createSamplePlatformData();
 
-        //createMolecularData();
+        createMolecularData();
 
         persistNodes();
     }
@@ -266,35 +275,37 @@ public class DomainObjectCreator {
     void createMolecularData(){
 
         Table mutationTable = pdxDataTables.get("mutation.tsv");
-        String molCharType = "mutation";
+
         for(Row row:mutationTable){
 
-            String sampleOrigin = row.getString(TSV.Mutation.sample_origin.name());
-            String platformName = row.getString(TSV.Mutation.platform.name());
+            MolecularCharacterization molecularCharacterization = getMolcharByType(row, "mutation");
 
-            Sample sample = null;
-
-            if(sampleOrigin.equals("patient")){
-
-                sample = getPatientSample(row);
-            }
-            else if(sampleOrigin.equals("xenograft")){
-
-                sample = getOrCreateSpecimen(row).getSample();
-            }
-
-            if(sample == null) throw new NullPointerException();
-
-
-            MolecularCharacterization molecularCharacterization = getOrCreateMolecularCharacterization(sample, platformName, molCharType);
-
-            addMutationData(molecularCharacterization, row);
-
+            addMolecularData(molecularCharacterization, row);
         }
+
 
 
     }
 
+    private MolecularCharacterization getMolcharByType(Row row, String molCharType){
+
+        String sampleOrigin = row.getString("sample_origin");
+        String platformName = row.getString("platform");
+        Sample sample = null;
+
+        if(sampleOrigin.equals("patient")){
+
+            sample = getPatientSample(row);
+        }
+        else if(sampleOrigin.equals("xenograft")){
+
+            sample = getOrCreateSpecimen(row).getSample();
+        }
+
+        if(sample == null) throw new NullPointerException();
+
+        return getOrCreateMolecularCharacterization(sample, platformName, molCharType);
+    }
 
 
     private Sample getPatientSample(Row row){
@@ -343,6 +354,9 @@ public class DomainObjectCreator {
             molecularCharacterization = new MolecularCharacterization();
             molecularCharacterization.setType(molCharType);
             molecularCharacterization.setPlatform(getOrCreatePlatform(platformName, molCharType));
+            MarkerAssociation markerAssociation = new MarkerAssociation();
+            molecularCharacterization.addMarkerAssociation(markerAssociation);
+
             sample.addMolecularCharacterization(molecularCharacterization);
 
         }
@@ -371,13 +385,80 @@ public class DomainObjectCreator {
 
 
 
-    private void addMutationData(MolecularCharacterization molecularCharacterization, Row row){
+    private void addMolecularData(MolecularCharacterization molecularCharacterization, Row row){
 
         MarkerAssociation markerAssociation = molecularCharacterization.getMarkerAssociations().get(0);
 
+        if(markerAssociation == null){
+            markerAssociation = new MarkerAssociation();
+            molecularCharacterization.addMarkerAssociation(markerAssociation);
+        }
+
+        String hgncSymbol = row.getString("hgnc_symbol");
+        String modelId = row.getString("model_id");
+        Group provider = (Group) domainObjects.get(PROVIDER_KEY).get(null);
+        String dataSource = provider.getAbbreviation();
+
+        NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(),
+                dataSource,
+                modelId,
+                hgncSymbol,
+                molecularCharacterization.getType(),
+                molecularCharacterization.getPlatform().getName());
+
+        Marker marker;
+
+        if(nsdto.getNode() == null){
+
+            //log.info("Found an unrecognised Marker Symbol {} in Model: {}, Skipping This!!!! ", data.get(omicHgncSymbol), modelID);
+            //log.info(data.toString());
+            log.error(nsdto.getLogEntity().getMessage());
+            return;
+        }
+        else {
 
 
+            // step 4: assemble the MarkerAssoc object and add it to molchar
+            marker = (Marker) nsdto.getNode();
+
+            //if we have any message regarding the suggested marker, ie: prev symbol, synonym, etc, add it to the report
+            if (nsdto.getLogEntity() != null) {
+                log.info(nsdto.getLogEntity().getMessage());
+            }
+
+            MolecularData molecularData = null;
+
+            if(molecularCharacterization.getType().equals("mutation")){
+
+                molecularData = getMutationProperties(row, marker);
+            }
+
+            markerAssociation.addMolecularData(molecularData);
+
+        }
     }
+
+    private MolecularData getMutationProperties(Row row, Marker marker){
+
+        MolecularData ma = new MolecularData();
+        ma.setAminoAcidChange(row.getString(TSV.Mutation.amino_acid_change.name()));
+        ma.setConsequence(row.getString(TSV.Mutation.consequence.name()));
+        ma.setAlleleFrequency(row.getString(TSV.Mutation.allele_frequency.name()));
+        ma.setChromosome(row.getString(TSV.Mutation.chromosome.name()));
+        ma.setReadDepth(row.getString(TSV.Mutation.read_depth.name()));
+        ma.setRefAllele(row.getString(TSV.Mutation.ref_allele.name()));
+        ma.setAltAllele(row.getString(TSV.Mutation.alt_allele.name()));
+        ma.setGenomeAssembly(row.getString(TSV.Mutation.genome_assembly.name()));
+        ma.setRsIdVariants(row.getString(TSV.Mutation.variation_id.name()));
+        ma.setSeqStartPosition(row.getString(TSV.Mutation.seq_start_position.name()));
+
+        ma.setEnsemblTranscriptId(row.getString(TSV.Mutation.ensemble_transcript_id.name()));
+        ma.setNucleotideChange("");
+        ma.setMarker(marker.getHgncSymbol());
+
+        return  ma;
+    }
+
 
     private boolean eitherIsPresent(String string, String anotherString) {
         return (
@@ -552,5 +633,6 @@ public class DomainObjectCreator {
     private boolean containsBothKeys(String key1, String key2) {
         return domainObjects.containsKey(key1) && domainObjects.get(key1).containsKey(key2);
     }
+
 
 }
