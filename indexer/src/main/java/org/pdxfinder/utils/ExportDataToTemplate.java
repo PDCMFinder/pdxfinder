@@ -74,11 +74,17 @@ public class ExportDataToTemplate implements CommandLineRunner {
     private void exportAllGroups(){
 
         List<Group> allProviders = dataImportService.getAllProviderGroups();
-        allProviders.forEach(g -> export(g.getAbbreviation()));
+        allProviders.forEach(g -> {
+            try {
+                export(g.getAbbreviation());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
 
-    private void export(String dataSourceAbbrev){
+    private void export(String dataSourceAbbrev) throws IOException {
 
 
         Group ds = dataImportService.findProviderGroupByAbbrev(dataSourceAbbrev);
