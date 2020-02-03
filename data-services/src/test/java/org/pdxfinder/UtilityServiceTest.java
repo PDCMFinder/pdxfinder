@@ -3,35 +3,30 @@ package org.pdxfinder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.pdxfinder.services.UtilityService;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UtilityServiceTest{
+
+public class UtilityServiceTest {
 
     private UtilityService utilityService = new UtilityService();
 
-    Path csvFilePath;
-    Path tsvFilePath;
+    File csvFilePath;
+    File tsvFilePath;
 
     @Before
-    public void init() throws IOException {
+    public void initUtilityTests() throws IOException {
 
-        //final TemporaryFolder testFolder = new TemporaryFolder();
-        //testFolder.create();
 
-        Path tmpPath = Paths.get("/tmp/");
-        csvFilePath = Files.createTempFile(tmpPath,"test",".csv");
-        tsvFilePath = Files.createTempFile(tmpPath, "test2",".tsv");
+        csvFilePath = File.createTempFile("test",".csv");
+        tsvFilePath = File.createTempFile( "test2",".tsv");
 
         String csvContentKey = "Key1,Key2,Key3,Key4,Key5\n";
         String csvContentValue = "Value1,Value2,Value3,Value4,Value5\n";
