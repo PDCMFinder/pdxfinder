@@ -12,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-import sun.jvm.hotspot.oops.Mark;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
