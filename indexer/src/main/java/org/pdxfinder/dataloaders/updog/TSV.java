@@ -79,7 +79,7 @@ public class TSV {
         ncbi_gene_id,
         ncbi_transcript_id,
         ensembl_gene_id,
-        ensemble_transcript_id,
+        ensembl_transcript_id,
         variation_id,
         genome_assembly,
         platform

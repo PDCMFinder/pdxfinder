@@ -1,14 +1,9 @@
 package org.pdxfinder.dataloaders.updog;
 import org.pdxfinder.graph.dao.*;
-import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
@@ -452,7 +447,7 @@ public class DomainObjectCreator {
         ma.setRsIdVariants(row.getString(TSV.Mutation.variation_id.name()));
         ma.setSeqStartPosition(row.getString(TSV.Mutation.seq_start_position.name()));
 
-        ma.setEnsemblTranscriptId(row.getString(TSV.Mutation.ensemble_transcript_id.name()));
+        ma.setEnsemblTranscriptId(row.getString(TSV.Mutation.ensembl_transcript_id.name()));
         ma.setNucleotideChange("");
         ma.setMarker(marker.getHgncSymbol());
 
