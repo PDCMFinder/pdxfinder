@@ -2,7 +2,6 @@ package org.pdxfinder.services;
 
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.europepmc.Publication;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,11 +13,12 @@ import java.util.List;
 public class PublicationService {
 
     private RestTemplate restTemplate;
+
     private static final String PUBLICATION_PREFIX = "PMID:";
     private static final String EMPTY_STRING = "";
 
-    public PublicationService(RestTemplateBuilder restTemplateBuilder) {
-        this.restTemplate = restTemplateBuilder.build();
+    public PublicationService(RestTemplate restTemplate) {
+      this.restTemplate = restTemplate;
     }
 
     public List<Publication> getEuropePmcPublications(List<String> pubMedIds) {
@@ -60,4 +60,5 @@ public class PublicationService {
 
         return cleanedPubMedIds;
     }
+
 }

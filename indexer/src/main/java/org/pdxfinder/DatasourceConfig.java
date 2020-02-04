@@ -97,12 +97,6 @@ public class DatasourceConfig {
     );
   }
 
-  @Bean
-  public RestTemplate restTemplate() {
-    return new RestTemplate();
-  }
-
-
 }
 
 
