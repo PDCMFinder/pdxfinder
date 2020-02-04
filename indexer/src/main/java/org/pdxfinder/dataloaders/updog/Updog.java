@@ -117,8 +117,11 @@ public class Updog {
             .addRequiredTables(metadataTables)
             .addRequiredColumns(requiredColumns)
             .addUniqueColumns(idColumns)
-            .addHasOneToManyRelation(Arrays.asList(
-                relation("metadata-patient.tsv", "metadata-sample.tsv", "patient_id")
+            .addHasRelations(Arrays.asList(
+                relation("metadata-patient.tsv", "metadata-sample.tsv", "patient_id"),
+                relation("metadata-sample.tsv", "metadata-model.tsv", "model_id"),
+                relation("metadata-model.tsv", "metadata-model_validation.tsv", "model_id"),
+                relation("metadata-model.tsv", "metadata-sharing.tsv", "model_id")
             ))
             .setProvider(provider);
     }

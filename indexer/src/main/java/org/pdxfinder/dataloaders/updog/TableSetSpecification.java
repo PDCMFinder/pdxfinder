@@ -29,7 +29,7 @@ public class TableSetSpecification {
         return new TableSetSpecification();
     }
 
-    public TableSetSpecification addHasOneToManyRelation(
+    public TableSetSpecification addHasRelations(
         Pair<String, String> leftTable,
         Pair<String, String> rightTable
     ) {
@@ -37,7 +37,7 @@ public class TableSetSpecification {
         return this;
     }
 
-    public TableSetSpecification addHasOneToManyRelation(
+    public TableSetSpecification addHasRelations(
         List<Pair<Pair<String, String>, Pair<String, String>>> relation
     ) {
         this.oneToManyRelations.addAll(relation);

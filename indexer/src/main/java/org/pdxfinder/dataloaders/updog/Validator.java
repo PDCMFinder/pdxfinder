@@ -1,6 +1,8 @@
 package org.pdxfinder.dataloaders.updog;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
@@ -14,6 +16,7 @@ import java.util.Set;
 @Component
 public class Validator {
 
+    private static final Logger log = LoggerFactory.getLogger(Validator.class);
     private List<ValidationError> validationErrors;
 
     public Validator() {
@@ -28,7 +31,7 @@ public class Validator {
         checkAllRequiredColumnsPresent(tableSet, tableSetSpecification);
         checkAllNonEmptyValuesPresent(tableSet, tableSetSpecification);
         checkAllUniqueValuesForDuplicates(tableSet, tableSetSpecification);
-        checkOneToManyRelationsValid(tableSet, tableSetSpecification);
+        checkRelationsValid(tableSet, tableSetSpecification);
         return validationErrors;
     }
 
@@ -116,20 +119,20 @@ public class Validator {
         return setToReturn;
     }
 
-    private void checkOneToManyRelationsValid(
+    private void checkRelationsValid(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
         String provider = tableSetSpecification.getProvider();
         for (Pair<Pair<String, String>, Pair<String, String>> relation
             : tableSetSpecification.getOneToManyRelations()) {
-            reportMissingColumnsInOneToManyRelation(tableSet, relation, provider);
+            reportMissingColumnsInRelation(tableSet, relation, provider);
             reportOrphanRowsWhenMissingValuesInRelation(tableSet, relation, provider);
 
         }
     }
 
-    private void reportMissingColumnsInOneToManyRelation(
+    private void reportMissingColumnsInRelation(
         Map<String, Table> tableSet,
         Pair<Pair<String, String>, Pair<String, String>> relation,
         String provider
@@ -236,7 +239,12 @@ public class Validator {
     }
 
     private boolean tableMissingColumn(Table table, String columnName) {
-        return !table.columnNames().contains(columnName);
+        try {
+            return !table.columnNames().contains(columnName);
+        } catch (NullPointerException e) {
+            log.error("Couldn't access table {} {}", e, table);
+            return true;
+        }
     }
 
     boolean passesValidation(Map<String, Table> tableSet, TableSetSpecification tableSetSpecification) {

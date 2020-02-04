@@ -290,5 +290,5 @@ public class ValidatorTest {
     }
 
     private final TableSetSpecification SIMPLE_JOIN_SPECIFICATION = TableSetSpecification.create().setProvider(PROVIDER)
-        .addHasOneToManyRelation(RELATION.getKey(), RELATION.getValue());
+        .addHasRelations(RELATION.getKey(), RELATION.getValue());
 }
