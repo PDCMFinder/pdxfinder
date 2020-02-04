@@ -17,6 +17,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
 
@@ -96,6 +97,10 @@ public class DatasourceConfig {
     );
   }
 
+  @Bean
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
 
 
 }
