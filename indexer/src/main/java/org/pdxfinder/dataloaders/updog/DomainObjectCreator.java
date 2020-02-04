@@ -476,6 +476,46 @@ public class DomainObjectCreator {
     }
 
 
+    private MolecularData getCNAProperties(Row row, Marker marker){
+
+        MolecularData ma = new MolecularData();
+
+        ma.setChromosome("");
+        ma.setSeqStartPosition("");
+        ma.setSeqEndPosition("");
+        ma.setCnaLog10RCNA("");
+        ma.setCnaLog2RCNA("");
+        ma.setCnaCopyNumberStatus("");
+        ma.setCnaGisticValue("");
+        ma.setCnaPicnicValue("");
+        ma.setGenomeAssembly("");
+
+        ma.setMarker(marker.getHgncSymbol());
+        return  ma;
+    }
+
+    private MolecularData getTranscriptomicProperties(Row row, Marker marker){
+
+        MolecularData ma = new MolecularData();
+        ma.setChromosome("");
+        ma.setSeqStartPosition("");
+        ma.setSeqEndPosition("");
+        ma.setRnaSeqCoverage("");
+        ma.setRnaSeqFPKM("");
+        ma.setRnaSeqTPM("");
+        ma.setRnaSeqCount("");
+        ma.setAffyHGEAProbeId("");
+        ma.setAffyHGEAExpressionValue("");
+        ma.setIlluminaHGEAProbeId("");
+        ma.setIlluminaHGEAExpressionValue("");
+        ma.setGenomeAssembly("");
+        ma.setZscore("");
+
+        ma.setMarker(marker.getHgncSymbol());
+        return  ma;
+    }
+
+
     private MolecularData getCytogeneticsProperties(Row row, Marker marker){
 
         MolecularData ma = new MolecularData();
