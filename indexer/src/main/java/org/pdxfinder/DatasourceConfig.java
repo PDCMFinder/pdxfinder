@@ -17,7 +17,6 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
 
@@ -77,8 +76,7 @@ public class DatasourceConfig {
 
   @Autowired
   @Bean(name = "h2TransactionManager")
-  public JpaTransactionManager h2TransactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory)
-          throws Exception {
+  public JpaTransactionManager h2TransactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory) {
     return new JpaTransactionManager(entityManagerFactory.getObject());
   }
 
