@@ -124,7 +124,7 @@ public class Validator {
         for (Pair<Pair<String, String>, Pair<String, String>> relation
             : tableSetSpecification.getOneToManyRelations()) {
             reportMissingColumnsInOneToManyRelation(tableSet, relation, provider);
-            reportMissingValuesInOneToManyRelation(tableSet, relation, provider);
+            reportOrphanRowsWhenMissingValuesInRelation(tableSet, relation, provider);
 
         }
     }
@@ -152,7 +152,7 @@ public class Validator {
         }
     }
 
-    private void reportMissingValuesInOneToManyRelation(
+    private void reportOrphanRowsWhenMissingValuesInRelation(
         Map<String, Table> tableSet,
         Pair<Pair<String, String>, Pair<String, String>> relation,
         String provider
@@ -162,20 +162,52 @@ public class Validator {
         String rightTableName = relation.getRight().getLeft();
         String rightColumnName = relation.getRight().getRight();
         if (bothColumnsPresent(tableSet, relation)) {
-            Set<String> uniqueLeftValues = tableSet.get(leftTableName).stringColumn(leftColumnName).asSet();
-            Table rightTable = tableSet.get(rightTableName);
-            StringColumn rightCol = rightTable.stringColumn(rightColumnName);
-            Table orphanRightTableRows = rightTable.where(rightCol.isNotIn(uniqueLeftValues));
-            if(!orphanRightTableRows.isEmpty()) {
-                validationErrors.add(ValidationError
-                    .brokenRelation(rightTableName, relation, orphanRightTableRows)
-                    .setDescription(
-                        String.format("%s orphan row(s) found in [%s]",
-                            orphanRightTableRows.rowCount(),
-                            rightTableName))
-                    .setProvider(provider));
-            }
+            reportOrphanRowsFor(tableSet, relation, provider, leftTableName, leftColumnName);
+            reportOrphanRowsFor(tableSet, relation, provider, rightTableName, rightColumnName);
         }
+    }
+
+    private void reportOrphanRowsFor(
+        Map<String, Table> tableSet,
+        Pair<Pair<String, String>, Pair<String, String>> relation,
+        String provider,
+        String childTableName,
+        String childColName
+    ) {
+        Pair<String, String> otherColumn = getOtherColumn(childTableName, childColName, relation);
+        String parentTableName = otherColumn.getKey();
+        String parentColName = otherColumn.getValue();
+        Table orphanTable = getTableOfOrphanRows(
+            tableSet.get(childTableName),
+            tableSet.get(childTableName).stringColumn(childColName),
+            tableSet.get(parentTableName).stringColumn(parentColName)
+        );
+        if (orphanTable.rowCount() > 0) {
+            validationErrors.add(ValidationError
+                .brokenRelation(parentTableName, relation, orphanTable)
+                .setDescription(
+                    String.format("%s orphan row(s) found in [%s]",
+                        orphanTable.rowCount(),
+                        childTableName))
+                .setProvider(provider));
+        }
+    }
+
+    private Pair<String, String> getOtherColumn(
+        String tableName,
+        String columnName,
+        Pair<Pair<String, String>, Pair<String, String>> relation
+        ) {
+        if (tableName.equals(relation.getLeft().getLeft()) && columnName.equals(relation.getLeft().getRight())) {
+            return Pair.of(relation.getRight().getLeft(), relation.getRight().getRight());
+        } else {
+            return Pair.of(relation.getLeft().getLeft(), relation.getLeft().getRight());
+        }
+    }
+
+    private Table getTableOfOrphanRows(Table childTable, StringColumn child, StringColumn parent) {
+        Set<String> parentSet = parent.asSet();
+        return childTable.where(child.isNotIn(parentSet));
     }
 
     private boolean bothColumnsPresent(
