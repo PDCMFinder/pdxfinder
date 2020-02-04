@@ -99,6 +99,14 @@ public class ValidatorTest {
         );
     }
 
+    @Test public void checkAllNonEmptyValuesPresent_givenNoMissingValues_emptyErrorList() {
+        Map<String, Table> fileSetWithValidTable = new HashMap<>();
+        Table tableWithNoMissingValues = completeTableSet.get(TABLE_1).addColumns(
+            StringColumn.create("required_col", Collections.singletonList("required_value")));
+        fileSetWithValidTable.put(TABLE_1, tableWithNoMissingValues);
+        assertThat(validator.validate(fileSetWithValidTable, requireColumn).isEmpty(), is(true));
+    }
+
     @Test public void checkAllNonEmptyValuesPresent_givenMissingValue_addsMissingValueErrorToErrorList() {
         Map<String, Table> fileSetWithInvalidTable = new HashMap<>();
         Table tableWithMissingValue = completeTableSet.get(TABLE_1).addColumns(
@@ -171,12 +179,12 @@ public class ValidatorTest {
         );
     }
 
-    @Test public void checkOneToManyRelationsValid_givenValidOneToManyJoin_emptyErrorList() {
+    @Test public void checkRelationsValid_givenValidOneToManyJoin_emptyErrorList() {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         assertThat(validator.validate(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).isEmpty(), is(true));
     }
 
-    @Test public void checkOneToManyRelationsValid_givenNoLeftTable_ErrorListWithMissingRequiredCol() {
+    @Test public void checkRelationsValid_givenNoLeftTable_ErrorListWithMissingRequiredCol() {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.get(LEFT_TABLE).removeColumns("id");
 
@@ -191,7 +199,7 @@ public class ValidatorTest {
         );
     }
 
-    @Test public void checkOneToManyRelationsValid_givenNoRightTable_ErrorListWithMissingRequiredCol() {
+    @Test public void checkRelationsValid_givenNoRightTable_ErrorListWithMissingRequiredCol() {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.get(RIGHT_TABLE).removeColumns("table_1_id");
 
@@ -206,7 +214,7 @@ public class ValidatorTest {
         );
     }
 
-    @Test public void checkOneToManyRelationsValid_givenMissingValueInRightColumn_ErrorListWithOrphanLeftRows() {
+    @Test public void checkRelationsValid_givenMissingValueInRightColumn_ErrorListWithOrphanLeftRows() {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.get(RIGHT_TABLE).replaceColumn(
             StringColumn.create("table_1_id", Collections.EMPTY_LIST)
@@ -221,7 +229,7 @@ public class ValidatorTest {
         );
     }
 
-    @Test public void checkOneToManyRelationsValid_givenMissingValuesInLeftColumn_ErrorListWithOrphanRightRows() {
+    @Test public void checkRelationsValid_givenMissingValuesInLeftColumn_ErrorListWithOrphanRightRows() {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.get(LEFT_TABLE).replaceColumn(
             StringColumn.create("id", Collections.EMPTY_LIST)
@@ -236,7 +244,7 @@ public class ValidatorTest {
         );
     }
 
-    @Test public void checkOneToManyRelationsValid_givenMissingValueInLeftAndRightColumn_ErrorListWithMissingValueRows() {
+    @Test public void checkRelationsValid_givenMissingValueInLeftAndRightColumn_ErrorListWithMissingValueRows() {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.get(RIGHT_TABLE).replaceColumn(
             StringColumn.create("table_1_id", Arrays.asList("not 1", "not 1"))
