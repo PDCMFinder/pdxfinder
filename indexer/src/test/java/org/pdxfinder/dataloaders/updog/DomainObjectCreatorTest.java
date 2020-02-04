@@ -168,6 +168,7 @@ public class DomainObjectCreatorTest extends BaseTest {
         String sharing = "metadata-sharing.tsv";
         String samplePlatform = "sampleplatform-data.tsv";
         String mutation = "mutation.tsv";
+        String cytogenetics = "cytogenetics-Sheet1.tsv";
 
         Map<String, Table> pdxDataTables = new HashMap<>();
         pdxDataTables.put(loader, Table.create(loader).addColumns(
@@ -263,6 +264,16 @@ public class DomainObjectCreatorTest extends BaseTest {
                 StringColumn.create("platform", Collections.singletonList("Next Generation Sequencing"))
         ));
 
+        pdxDataTables.put(cytogenetics, Table.create(cytogenetics).addColumns(
+                StringColumn.create("sample_id", Collections.singletonList("sample 1")),
+                StringColumn.create("sample_origin", Collections.singletonList("xenograft")),
+                StringColumn.create("passage", Collections.singletonList("0")),
+                StringColumn.create("host_strain_nomenclature", Collections.singletonList("host strain nomenclature 1")),
+                StringColumn.create("model_id", Collections.singletonList("model 1")),
+                StringColumn.create("hgnc_symbol", Collections.singletonList("ERBB2")),
+                StringColumn.create("marker_status", Collections.singletonList("KRAS")),
+                StringColumn.create("platform", Collections.singletonList("ImmunoHistoChemistry"))
+        ));
 
         return pdxDataTables;
     }

@@ -249,7 +249,7 @@ public class DomainObjectCreator {
 
             Sample sample = null;
 
-            if (sampleOrigin.equals("patient")) {
+            if (sampleOrigin.equals(PATIENT_KEY)) {
 
                 sample = getPatientSample(row);
             } else if (sampleOrigin.equals("xenograft")) {
@@ -270,11 +270,25 @@ public class DomainObjectCreator {
 
         Table mutationTable = pdxDataTables.get("mutation.tsv");
 
-        for (Row row : mutationTable) {
+        if(mutationTable != null){
 
-            MolecularCharacterization molecularCharacterization = getMolcharByType(row, "mutation");
+            for (Row row : mutationTable) {
 
-            addMolecularData(molecularCharacterization, row);
+                MolecularCharacterization molecularCharacterization = getMolcharByType(row, "mutation");
+                addMolecularData(molecularCharacterization, row);
+            }
+        }
+
+
+        Table cytoTable = pdxDataTables.get("cytogenetics-Sheet1.tsv");
+
+        if(cytoTable != null){
+
+            for (Row row : cytoTable) {
+
+                MolecularCharacterization molecularCharacterization = getMolcharByType(row, "cytogenetics");
+                addMolecularData(molecularCharacterization, row);
+            }
         }
 
 
@@ -283,7 +297,7 @@ public class DomainObjectCreator {
     private MolecularCharacterization getMolcharByType(Row row, String molCharType) {
 
         String sampleOrigin = row.getString("sample_origin");
-        String platformName = row.getString("platform");
+        String platformName = row.getString(PLATFORM_KEY);
         Sample sample = null;
 
         if (sampleOrigin.equals("patient")) {
@@ -409,10 +423,7 @@ public class DomainObjectCreator {
 
         if (nsdto.getNode() == null) {
 
-            //log.info("Found an unrecognised Marker Symbol {} in Model: {}, Skipping This!!!! ", data.get(omicHgncSymbol), modelID);
-            //log.info(data.toString());
             log.error(nsdto.getLogEntity().getMessage());
-            return;
         } else {
 
 
@@ -429,6 +440,10 @@ public class DomainObjectCreator {
             if (molecularCharacterization.getType().equals("mutation")) {
 
                 molecularData = getMutationProperties(row, marker);
+            }
+            else if (molecularCharacterization.getType().equals("cytogenetics")) {
+
+                molecularData = getCytogeneticsProperties(row, marker);
             }
 
             markerAssociation.addMolecularData(molecularData);
@@ -453,6 +468,19 @@ public class DomainObjectCreator {
 
             ma.setEnsemblTranscriptId(row.getString(TSV.Mutation.ensembl_transcript_id.name()));
             ma.setNucleotideChange("");
+            ma.setMarker(marker.getHgncSymbol());
+        } catch (Exception e) {
+
+        }
+        return ma;
+    }
+
+
+    private MolecularData getCytogeneticsProperties(Row row, Marker marker){
+
+        MolecularData ma = new MolecularData();
+        try {
+
             ma.setMarker(marker.getHgncSymbol());
         } catch (Exception e) {
 
@@ -615,7 +643,6 @@ public class DomainObjectCreator {
                 for(Specimen specimen:specimenSet){
 
                     convertMarkerAssociations(specimen.getSample());
-
                 }
             }
 
