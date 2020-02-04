@@ -6,10 +6,12 @@ import org.junit.Test;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
+
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
@@ -142,6 +144,8 @@ public class DomainObjectCreatorTest extends BaseTest {
         when(dataImportService.savePatient(testPatient))
             .thenReturn(testPatient);
 
+        when(dataImportService.getSuggestedMarker(anyString(), anyString(), anyString(),anyString(), anyString(), anyString())).thenReturn(getSuggestedMarker());
+
         domainObjectCreator.loadDomainObjects();
 
         Patient patient = (Patient)domainObjectCreator.getDomainObject("patient", "patient 1");
@@ -163,6 +167,7 @@ public class DomainObjectCreatorTest extends BaseTest {
         String sample = "metadata-sample.tsv";
         String sharing = "metadata-sharing.tsv";
         String samplePlatform = "sampleplatform-data.tsv";
+        String mutation = "mutation.tsv";
 
         Map<String, Table> pdxDataTables = new HashMap<>();
         pdxDataTables.put(loader, Table.create(loader).addColumns(
@@ -237,6 +242,28 @@ public class DomainObjectCreatorTest extends BaseTest {
                 StringColumn.create("platform", Collections.singletonList("Next Generation Sequencing"))
         ));
 
+        pdxDataTables.put(mutation, Table.create(mutation).addColumns(
+                StringColumn.create("model_id", Collections.singletonList("model 1")),
+                StringColumn.create("sample_id", Collections.singletonList("sample 1")),
+                StringColumn.create("sample_origin", Collections.singletonList("xenograft")),
+                StringColumn.create("host_strain_nomenclature", Collections.singletonList("host strain nomenclature 1")),
+                StringColumn.create("passage", Collections.singletonList("0")),
+                StringColumn.create("hgnc_symbol", Collections.singletonList("KRAS")),
+                StringColumn.create("amino_acid_change", Collections.singletonList("L22F1")),
+                StringColumn.create("consequence", Collections.singletonList("")),
+                StringColumn.create("allele_frequency", Collections.singletonList("")),
+                StringColumn.create("chromosome", Collections.singletonList("")),
+                StringColumn.create("read_depth", Collections.singletonList("")),
+                StringColumn.create("ref_allele", Collections.singletonList("")),
+                StringColumn.create("alt_allele", Collections.singletonList("")),
+                StringColumn.create("genome_assembly", Collections.singletonList("")),
+                StringColumn.create("variation_id", Collections.singletonList("")),
+                StringColumn.create("seq_start_position", Collections.singletonList("")),
+                StringColumn.create("ensembl_transcript_id", Collections.singletonList("")),
+                StringColumn.create("platform", Collections.singletonList("Next Generation Sequencing"))
+        ));
+
+
         return pdxDataTables;
     }
 
@@ -255,4 +282,15 @@ public class DomainObjectCreatorTest extends BaseTest {
         return group;
     }
 
+
+    private NodeSuggestionDTO getSuggestedMarker(){
+
+        Marker marker = new Marker();
+        marker.setHgncSymbol("KRAS");
+
+        NodeSuggestionDTO nsdto = new NodeSuggestionDTO();
+        nsdto.setNode(marker);
+
+        return nsdto;
+    }
 }
