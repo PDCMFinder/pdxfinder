@@ -115,11 +115,7 @@ public class ValidatorTest {
 
         List<ValidationError> expected = Collections.singletonList(
                 ValidationError
-                    .missingRequiredValue(
-                        TABLE_1,
-                        "required_col",
-                        tableWithMissingValue)
-                    .setProvider(PROVIDER));
+                    .missingRequiredValue(TABLE_1, "required_col", tableWithMissingValue).setProvider(PROVIDER));
         assertEquals(
             expected.toString(),
             validator.validate(fileSetWithInvalidTable, requireColumn).toString()
