@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import static org.junit.Assert.*;
 
-public class UniversalLoaderTest extends BaseTest {
+public class UniversalLoaderTest {
 
     @Before
     public void setUp() {

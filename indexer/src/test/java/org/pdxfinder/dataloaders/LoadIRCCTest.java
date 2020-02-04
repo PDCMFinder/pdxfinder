@@ -3,6 +3,7 @@ package org.pdxfinder.dataloaders;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
@@ -11,14 +12,13 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.repositories.SpecimenRepository;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
-public class LoadIRCCTest extends BaseTest {
+public class LoadIRCCTest {
 
     private Group transnationalAccess;
     private Group badAccess;
@@ -43,9 +43,9 @@ public class LoadIRCCTest extends BaseTest {
 
     }
 
-    @MockBean UtilityService utilityService;
-    @MockBean DataImportService dataImportService;
-    @MockBean SpecimenRepository specimenRepository;
+    @Mock UtilityService utilityService;
+    @Mock DataImportService dataImportService;
+    @Mock SpecimenRepository specimenRepository;
     @InjectMocks private LoadIRCC loader;
 
     @Test
@@ -83,6 +83,7 @@ public class LoadIRCCTest extends BaseTest {
 
         assertEquals( "CRCTEST", loader.dto.getSpecimens().getJSONObject(0).getString("Specimen ID"));
         assertThat(loader.dto.getModelCreation().getSpecimens().contains(specimen), is(true));
+
     }
 
     @Test
@@ -96,6 +97,7 @@ public class LoadIRCCTest extends BaseTest {
 
         assertThat(loader.dto.getModelCreation().getGroups().contains(transnationalAccess), is(true));
         assertThat(loader.dto.getModelCreation().getGroups().contains(badAccess), is(false));
+
     }
 
 }
