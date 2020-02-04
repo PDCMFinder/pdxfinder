@@ -6,6 +6,7 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -37,7 +38,7 @@ public class UtilityService {
 
 
     private String homeDir = System.getProperty("user.home");
-    private final static Logger log = LoggerFactory.getLogger(UtilityService.class);
+    private static final Logger log = LoggerFactory.getLogger(UtilityService.class);
     private ObjectMapper mapper = new ObjectMapper();
 
     //Delimiter used in CSV file
@@ -57,7 +58,7 @@ public class UtilityService {
 
         String fileExtension = getFileExtension(fileName);
 
-        List<Map<String, String>> csvMaps = new ArrayList<>();
+        List<Map<String, String>> csvMaps;
 
         switch (fileExtension) {
             case "csv":
@@ -106,13 +107,13 @@ public class UtilityService {
             case "xlsx":
                 csvMaps = serializeExcelDataNoIterator(fileName,0,1);
                 break;
+            default:
+                break;
 
         }
-        if(csvMaps == null) log.error("Map is null for "+fileName +" in groupCol " +groupColumn);
+        if(csvMaps == null) log.error("Map is null for {} in groupCol {}", fileName, groupColumn);
 
-        Map<String, List<Map<String, String>> > groupedMap = groupDataByColumn(csvMaps, groupColumn);
-
-        return groupedMap;
+        return groupDataByColumn(csvMaps, groupColumn);
     }
 
 
@@ -169,9 +170,8 @@ public class UtilityService {
         List<String> tableHead = new ArrayList<>();
         List<Map<String, String>> csvMap = new ArrayList<>();
 
-        try {
+        try(Workbook workbook = WorkbookFactory.create(inputStream)) {
             Row row;
-            Workbook workbook = WorkbookFactory.create(inputStream);
             Sheet spreadsheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = spreadsheet.iterator();
 
@@ -191,8 +191,8 @@ public class UtilityService {
             }
 
             inputStream.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (IOException | InvalidFormatException ex) {
+            log.warn(ex.getMessage());
         }
 
         return csvMap;
@@ -217,10 +217,9 @@ public class UtilityService {
 
         startRow--;
 
-        try {
+        try (Workbook workbook = WorkbookFactory.create(inputStream)){
             Row row;
             int rowCount = 0;
-            Workbook workbook = WorkbookFactory.create(inputStream);
             Sheet spreadsheet = workbook.getSheetAt(sheet);
             Iterator<Row> rowIterator = spreadsheet.iterator();
 
@@ -246,10 +245,9 @@ public class UtilityService {
                     continue;
                 }
 
-                //isAllowed = validURls.stream().anyMatch(str -> str.equals(dRequestUrl));
-
                 Map<String, String> rowMap = new LinkedHashMap<>();
                 String rowDataTracker = "";
+                StringBuilder rowBuilder = new StringBuilder();
 
                 for (int i = 0; i < tableHead.size(); i++) {
 
@@ -262,21 +260,22 @@ public class UtilityService {
                         String data = nameCell.getStringCellValue();
 
                         rowMap.put(key, data);
-                        rowDataTracker += data;
+                        rowBuilder.append(data);
 
                     } else {
                         if (!key.equals("")) rowMap.put(key, "");
                     }
                 }
 
+                rowDataTracker = rowBuilder.toString();
                 if (rowDataTracker.length() != 0) csvMap.add(rowMap);
 
                 rowCount++;
             }
 
             inputStream.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (IOException | InvalidFormatException ex) {
+            log.warn(ex.getMessage());
         }
 
         return csvMap;
@@ -333,7 +332,9 @@ public class UtilityService {
             fileOut.flush();
             fileOut.close();
 
-        }catch (Exception e){ }
+        }catch (Exception e){
+            log.warn(e.getMessage());
+        }
 
     }
 
@@ -346,29 +347,28 @@ public class UtilityService {
 
         String sheetName = "Sheet1";//name of sheet
 
-        HSSFWorkbook wb = new HSSFWorkbook();
-        HSSFSheet sheet = wb.createSheet(sheetName) ;
+        try (HSSFWorkbook wb = new HSSFWorkbook()) {
+            HSSFSheet sheet = wb.createSheet(sheetName);
 
-        //iterating r number of rows
-        for (int r=0;r < 5; r++ )
-        {
-            HSSFRow row = sheet.createRow(r);
+            //iterating r number of rows
+            for (int r = 0; r < 5; r++) {
+                HSSFRow row = sheet.createRow(r);
 
-            //iterating c number of columns
-            for (int c=0;c < 5; c++ )
-            {
-                HSSFCell cell = row.createCell(c);
+                //iterating c number of columns
+                for (int c = 0; c < 5; c++) {
+                    HSSFCell cell = row.createCell(c);
 
-                cell.setCellValue("Cell "+r+" "+c);
+                    cell.setCellValue("Cell " + r + " " + c);
+                }
             }
+
+            FileOutputStream fileOut = new FileOutputStream(excelFileName);
+
+            //write this workbook to an Outputstream.
+            wb.write(fileOut);
+            fileOut.flush();
+            fileOut.close();
         }
-
-        FileOutputStream fileOut = new FileOutputStream(excelFileName);
-
-        //write this workbook to an Outputstream.
-        wb.write(fileOut);
-        fileOut.flush();
-        fileOut.close();
     }
 
 
@@ -380,9 +380,8 @@ public class UtilityService {
 
         List<String> tableHead = new ArrayList<>();
 
-        try {
+        try(Workbook workbook = WorkbookFactory.create(inputStream)) {
             Row row;
-            Workbook workbook = WorkbookFactory.create(inputStream);
             Sheet spreadsheet = workbook.getSheetAt(sheet);
             Iterator<Row> rowIterator = spreadsheet.iterator();
 
@@ -395,7 +394,9 @@ public class UtilityService {
                 break;
             }
 
-        }catch (Exception e){}
+        }catch (Exception e){
+            log.warn(e.getMessage());
+        }
 
         return tableHead;
     }
@@ -422,7 +423,7 @@ public class UtilityService {
 
 
     // GET SMALL SECTIONS OF EXCEL: RETRIEVE BODY ROWS OF EXCEL SHEET
-    public Map<String, String> getXlsCellData(Iterator<Cell> cellIterator, List<String> tableHead){
+    private Map<String, String> getXlsCellData(Iterator<Cell> cellIterator, List<String> tableHead){
 
         Map<String, String> rowMap = new HashMap();
 
@@ -489,7 +490,8 @@ public class UtilityService {
 
         try {
             inputStream = multipartFile.getInputStream();
-        } catch (Exception e) {
+        } catch (IOException e) {
+            log.warn(e.getMessage());
         }
 
         if (type.equals("xlsx")) {
@@ -498,6 +500,7 @@ public class UtilityService {
 
         } else if (type.equals("csv")) {
 
+            assert inputStream != null;
             DataInputStream csvData = new DataInputStream(inputStream);
             dataList = serializeCSVToMaps(csvData, ",");
         }
@@ -513,6 +516,7 @@ public class UtilityService {
         try {
             fileStream = new FileInputStream(csvFile);
         } catch (Exception e) {
+            log.warn(e.getMessage());
         }
         DataInputStream csvData = new DataInputStream(fileStream);
 
@@ -530,7 +534,9 @@ public class UtilityService {
         try {
 
             while ((thisLine = csvData.readLine()) != null) {
-                String rowDataArr[] = thisLine.split(delimiter);
+
+              String[] rowDataArr = thisLine.split(delimiter);
+
                 int column = 0;
 
                 if (row == 0) {
@@ -555,6 +561,7 @@ public class UtilityService {
                 row++;
             }
         } catch (Exception e) {
+            log.warn(e.getMessage());
         }
 
         return csvMap;
@@ -569,33 +576,30 @@ public class UtilityService {
         FileInputStream fileStream = null;
         try{
             fileStream = new FileInputStream(dataFile);
-        }catch (Exception e){
-            e.printStackTrace();
+        }catch (IOException e){
+            log.warn(e.getMessage());
         }
-        DataInputStream myInput = new DataInputStream(fileStream);
-
 
         String thisLine;
-        int i=0;
+
         ArrayList lineList = null;
         List<List<String>> dataArrayList = new ArrayList<>();
 
-        try {
+        try(DataInputStream myInput = new DataInputStream(fileStream)) {
 
             while ((thisLine = myInput.readLine()) != null)
             {
                 lineList = new ArrayList();
-                String strar[] = thisLine.split(",");
+                String[] strar = thisLine.split(",");
                 for(int j=0;j<strar.length;j++)
                 {
                     lineList.add(strar[j]);
                 }
                 dataArrayList.add(lineList);
-                i++;
             }
 
-        }catch (Exception e){
-            e.printStackTrace();
+        }catch (IOException e){
+            log.warn(e.getMessage());
         }
 
 
@@ -607,11 +611,7 @@ public class UtilityService {
     // CREATE CSV FILE
     public void writeCsvFile(List<Map<String, String>> dataList, String destination) {
 
-        FileWriter fileWriter = null;
-
-        try {
-
-            fileWriter = new FileWriter(destination);
+        try (FileWriter fileWriter = new FileWriter(destination)){
 
             //Write the CSV file header
             List<String> csvHead = new ArrayList<>();
@@ -620,7 +620,6 @@ public class UtilityService {
             for (Map.Entry<String, String> entry : refData.entrySet() ) {      // GET THE JSON KEY
                 csvHead.add(entry.getKey());
             }
-            //log.info(csvHead.toString()); System.exit(0);
 
             fileWriter.append(String.join(COMMA_DELIMITER,csvHead));
 
@@ -643,18 +642,7 @@ public class UtilityService {
             log.info("CSV file was created successfully !!!");
 
         } catch (Exception e) {
-            log.info("Error in CsvFileWriter !!!");
-            e.printStackTrace();
-        } finally {
-
-            try {
-                fileWriter.flush();
-                fileWriter.close();
-            } catch (IOException e) {
-                log.info("Error while flushing/closing fileWriter !!!");
-                e.printStackTrace();
-            }
-
+            log.warn(e.getMessage());
         }
     }
 
@@ -694,8 +682,6 @@ public class UtilityService {
     // SERIALIZER : CONVERT JSON URL TO JAVA MAPS
     public List<Map<String, Object>> serializeJSONToMaps(String jsonFile) {
 
-        ObjectMapper mapper = new ObjectMapper();
-
         List<Map<String, Object>> data;
 
         JsonNode node = readJsonLocal(jsonFile);
@@ -721,15 +707,12 @@ public class UtilityService {
     // SERIALIZER : CONVERT JSON URL TO JAVA MAPS
     public List<Map<String, Object>> serializeJSONToMaps(String jsonFile,String jsonKey) {
 
-        ObjectMapper mapper = new ObjectMapper();
-
         JsonNode node = readJsonLocal(jsonFile);
 
         Map<String, Object> json = mapper.convertValue(node, Map.class);
 
-        List<Map<String, Object>> data = (List) json.get(jsonKey);
+        return (List) json.get(jsonKey);
 
-        return data;
     }
 
 
@@ -738,8 +721,6 @@ public class UtilityService {
     public JsonNode readJsonURL(String apiLink) {
 
         JsonNode jsonNode = null;
-        ObjectMapper mapper = new ObjectMapper();
-
         try {
 
             URL url = new URL(apiLink);
@@ -748,7 +729,7 @@ public class UtilityService {
             conn.setRequestProperty("Accept", "application/json");
 
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+                log.error("Failed : HTTP error code : {}", conn.getResponseCode());
             }
 
             BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
@@ -756,10 +737,8 @@ public class UtilityService {
             jsonNode = mapper.readTree(br);
             conn.disconnect();
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn(e.getMessage());
         }
 
         return jsonNode;
@@ -771,7 +750,6 @@ public class UtilityService {
     public JsonNode readJsonLocal(String jsonFileLink) {
 
         JsonNode jsonNode = null;
-        ObjectMapper mapper = new ObjectMapper();
 
         try {
 
@@ -807,7 +785,7 @@ public class UtilityService {
             inputStream = new FileInputStream(new File(filePath));
             log.info("Loading template from : {}", filePath);
         }catch (Exception e) {
-            log.error("UtilityService convertFileToStream says Data File "+filePath+" Not Found");
+            log.error("UtilityService convertFileToStream says Data File {} Not Found", filePath);
         }
 
         return inputStream;
@@ -820,14 +798,20 @@ public class UtilityService {
 
         StringBuilder sb = new StringBuilder();
 
+        URL url = null;
         try {
-            URL url = new URL(urlStr);
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            url = new URL(urlStr);
+        } catch (MalformedURLException e) {
+            log.warn(e.getMessage());
+        }
+
+        assert url != null;
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))){
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 sb.append(inputLine);
             }
-            in.close();
+
         } catch (Exception e) {
             log.error("Unable to read from URL " + urlStr, e);
         }
@@ -841,8 +825,7 @@ public class UtilityService {
 
         StringBuilder sb = new StringBuilder();
 
-        try {
-            Stream<String> stream = Files.lines(Paths.get(path));
+        try (Stream<String> stream = Files.lines(Paths.get(path))){
 
             Iterator itr = stream.iterator();
             while (itr.hasNext()) {
@@ -856,12 +839,11 @@ public class UtilityService {
 
 
     // GET THE EXTENSION OF A FILE
-    public String getFileExtension(String fileName){
+    private String getFileExtension(String fileName){
 
         String[] check = fileName.split("\\.");
-        String fileExtension = check[check.length-1];
+        return check[check.length-1];
 
-        return fileExtension;
     }
 
 
@@ -869,12 +851,11 @@ public class UtilityService {
     public void writeToFile(String data, String destination, Boolean shouldAppend){
 
         // Write to the file using BufferedReader and FileWriter
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(destination, shouldAppend));
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(destination, shouldAppend))){
             writer.append(data);
-            writer.close();
-
-        } catch (Exception e) {}
+        } catch (IOException e) {
+            log.warn(e.getMessage());
+        }
 
     }
 
@@ -882,7 +863,7 @@ public class UtilityService {
     // DELETE FILE FROM A LOCAL DIRECTORY
     public Boolean deleteFile(String localDirectory) {
 
-        Boolean report = false;
+        boolean report = false;
         try {
 
             Path path = Paths.get(localDirectory);
@@ -890,39 +871,38 @@ public class UtilityService {
 
             report = true;
         } catch (Exception e) {
+            log.warn(e.getMessage());
         }
 
         return report;
     }
 
 
-    public String listAllFilesInADirectory(String directory) {
+    public List<String> listAllFilesInADirectory(String directory) {
 
-        String fileNames = "";
+        List<String> fileNames = new ArrayList<>();
 
         File folder = new File(directory);
 
         File[] filDir = folder.listFiles();
 
+        assert filDir != null;
         if (filDir.length == 0) {
 
             log.warn("No subdirs found for the universal loader, skipping");
         }
         else {
 
-            for (int i = 0; i < filDir.length; i++) {
+            for (File file : filDir) {
 
-                if (filDir[i].isFile()) {
-
-                    fileNames += filDir[i].getName()+"\n";
-
+                if (file.isFile()) {
+                    log.info(file.getName());
+                    fileNames.add(file.getName());
                 }
             }
         }
 
-        log.info(fileNames);
-
-        return "";
+        return fileNames;
     }
 
 
@@ -964,24 +944,30 @@ public class UtilityService {
 
     public String sentenceToCamelCase(String input) {
 
-        String output = StringUtils.capitalize(input.split("-")[0]) + StringUtils.capitalize(input.split("-")[1]);
+        StringBuilder result = new StringBuilder();
 
-        return output;
+        for (String s : input.split("\\s+")){
+
+            result.append(StringUtils.capitalize(s));
+        }
+
+        return result.toString();
+
     }
 
 
     public String splitText(String data, String delim, String seperator){
 
-        String result = "";
+        StringBuilder result = new StringBuilder();
 
         String[] splits = data.split(delim);
 
         for (String split : splits){
 
-            result += split.trim()+seperator;
+            result.append(split.trim()).append(seperator);
         }
 
-        return result;
+        return result.toString().trim();
     }
 
 
@@ -996,7 +982,9 @@ public class UtilityService {
         Path path = Paths.get(destination);
         try{
             Files.write(path, bytes);
-        }catch (Exception e){}
+        }catch (IOException e){
+            log.warn(e.getMessage());
+        }
 
     }
 
@@ -1004,7 +992,7 @@ public class UtilityService {
     public void mkDirectoryFromFilePathName(String filePath){
 
         // Get Directory from file path string
-        String directoryName = filePath.substring(0, filePath.lastIndexOf("/"));
+        String directoryName = filePath.substring(0, filePath.lastIndexOf('/'));
 
         // Create Directory if it does not exist
         File directory = new File(directoryName);
@@ -1017,15 +1005,18 @@ public class UtilityService {
 
     public  byte[] convertLocalFileToByte(String filePath) {
 
-        byte fileData[] = null;
+        byte[] fileData = null;
         File file = new File(filePath);
 
-        try (FileInputStream inputStream = new FileInputStream(file)) {
+        if (file.exists()){
+            try (FileInputStream inputStream = new FileInputStream(file)) {
 
-            fileData = new byte[(int) file.length()];
-            inputStream.read(fileData);
-        } catch (Exception e) {
-            System.out.println("Exception while reading the file " + e);
+                fileData = new byte[(int) file.length()];
+                //inputStream . read( fileData )
+
+            } catch (IOException e) {
+                log.warn(e.getMessage());
+            }
         }
 
         return fileData;
@@ -1053,19 +1044,17 @@ public class UtilityService {
 
 
 
+
     public JsonNode jsonStringToNode(String jsonString){
 
         JsonNode jsonNode = null;
 
         try {
             jsonNode = mapper.readTree(jsonString);
-        } catch (Exception e) { }
+        } catch (IOException e) {
+            log.warn(e.getMessage());
+        }
 
         return jsonNode;
     }
-
-
-
-
-
 }
