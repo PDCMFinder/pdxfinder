@@ -50,7 +50,7 @@ public class TestConfig {
 
   @Bean
   public SessionFactory sessionFactory() {
-    return new SessionFactory(getConfiguration(), "org.pdxfinder");
+    return new SessionFactory((org.neo4j.ogm.config.Configuration) null, "org.pdxfinder");
   }
 
   @Bean

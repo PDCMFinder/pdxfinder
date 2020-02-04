@@ -5,6 +5,9 @@ import org.neo4j.ogm.annotation.Relationship;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 /**
  * Created by csaba on 25/04/2017.
  */
@@ -34,26 +37,31 @@ public class MarkerAssociation {
     *
     * */
 
-
-    private String chromosome;
-    private String seqPosition; //in jax use seqStartPosition instead of this
-    private String refAllele;
-    private String altAllele;
-    private String nucleotideChange;
-    private String consequence; // variant_classification in ircc
-    private String aminoAcidChange; //use hgvsp short, remove p. in ircc
-    private String rsIdVariants;
+    private String biotype;
+    private String codingSequenceChange;
+    private String variantClass;
+    private String codonChange;
+    private String aminoAcidChange;
+    private String consequence;
+    private String functionalPrediction;
     private String readDepth;
     private String alleleFrequency;
-    private String genomeAssembly; //NCBI_build in ircc
+    private String chromosome;
+    private String seqStartPosition;
+    private String refAllele;
+    private String altAllele;
+    private String ncbiTranscriptId;
+    private String ucscTranscriptId;
+    private String ensemblTranscriptId;
+    private String existingVariations;
+    private String genomeAssembly;
+    private String nucleotideChange;
+
     private String zscore;
 
-    private String seqStartPosition;
+    private String seqPosition; //in jax use seqStartPosition instead of this
     private String seqEndPosition;
     private String strand;
-    private String ensemblTranscriptId;
-    private String ucscTranscriptId;
-    private String ncbiTranscriptId;
 
     private String cdsChange;
     private String type; //Substitution
@@ -190,15 +198,15 @@ public class MarkerAssociation {
     /**
      * @return the rsIdVariants
      */
-    public String getRsIdVariants() {
-        return rsIdVariants;
+    public String getExistingVariations() {
+        return existingVariations;
     }
 
     /**
-     * @param rsIdVariants the rsIdVariants to set
+     * @param existingVariations the rsIdVariants to set
      */
-    public void setRsIdVariants(String rsIdVariants) {
-        this.rsIdVariants = rsIdVariants;
+    public void setExistingVariations(String existingVariations) {
+        this.existingVariations = existingVariations;
     }
 
     /**
@@ -489,4 +497,45 @@ public class MarkerAssociation {
     public void setFold_change(String fold_change) {
         this.fold_change = fold_change;
     }
+
+    public String getBiotype() {
+        return biotype;
+    }
+
+    public void setBiotype(String biotype) {
+        this.biotype = biotype;
+    }
+
+    public String getCodingSequenceChange() {
+        return codingSequenceChange;
+    }
+
+    public void setCodingSequenceChange(String codingSequenceChange) {
+        this.codingSequenceChange = codingSequenceChange;
+    }
+
+    public String getVariantClass() {
+        return variantClass;
+    }
+
+    public void setVariantClass(String variantClass) {
+        this.variantClass = variantClass;
+    }
+
+    public String getCodonChange() {
+        return codonChange;
+    }
+
+    public void setCodonChange(String codonChange) {
+        this.codonChange = codonChange;
+    }
+
+    public String getFunctionalPrediction() {
+        return functionalPrediction;
+    }
+
+    public void setFunctionalPrediction(String functionalPrediction) {
+        this.functionalPrediction = functionalPrediction;
+    }
+
 }

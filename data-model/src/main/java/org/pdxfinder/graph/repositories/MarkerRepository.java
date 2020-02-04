@@ -1,6 +1,5 @@
 package org.pdxfinder.graph.repositories;
 
-import org.neo4j.ogm.model.Result;
 import org.pdxfinder.graph.dao.Marker;
 import org.pdxfinder.graph.dao.MarkerAssociation;
 import org.pdxfinder.graph.queryresults.MutatedMarkerData;

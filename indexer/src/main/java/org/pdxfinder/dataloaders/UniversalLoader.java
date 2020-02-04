@@ -503,10 +503,10 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
 
             //check if essential values are not empty
-            if (modelId.isEmpty() || hostStrainName.isEmpty() || hostStrainNomenclature.isEmpty() ||
-                    engraftmentSite.isEmpty() || engraftmentType.isEmpty() || engraftmentMaterial.isEmpty()) {
+            if (isNullOrEmpty(modelId) || isNullOrEmpty(hostStrainName) || isNullOrEmpty(hostStrainNomenclature) ||
+                    isNullOrEmpty(engraftmentSite) || isNullOrEmpty(engraftmentType) || isNullOrEmpty(engraftmentMaterial)) {
 
-                log.error("Missing essential value in row: " + row);
+                log.error("Missing essential value in row: " + row + " in model sheets");
                 row++;
                 continue;
 
@@ -543,58 +543,63 @@ public class UniversalLoader extends UniversalLoaderOmic {
             }
 
             // passage = 1,3,5
-            if (passage.contains(",")) {
+            if (passage != null) {
+                if (passage.contains(",")) {
 
-                String[] passageArr = passage.split(",");
+                    String[] passageArr = passage.split(",");
 
-                for (int i = 0; i < passageArr.length; i++) {
+                    for (int i = 0; i < passageArr.length; i++) {
+
+                        //create specimens with engraftment data
+                        Specimen specimen = new Specimen();
+                        specimen.setPassage(passageArr[i].trim());
+                        specimen.setEngraftmentSite(es);
+                        specimen.setEngraftmentType(et);
+                        specimen.setEngraftmentMaterial(em);
+                        specimen.setHostStrain(hostStrain);
+
+                        model.addSpecimen(specimen);
+                    }
+                }
+                //the passage is a single number
+                else if (passage.matches("\\d+")) {
+
+                    //need this trick to get rid of fractures if there is any
+                    int passageInt = Integer.parseInt(passage);
+                    passage = String.valueOf(passageInt);
 
                     //create specimens with engraftment data
                     Specimen specimen = new Specimen();
-                    specimen.setPassage(passageArr[i].trim());
+                    specimen.setPassage(passage);
                     specimen.setEngraftmentSite(es);
                     specimen.setEngraftmentType(et);
                     specimen.setEngraftmentMaterial(em);
                     specimen.setHostStrain(hostStrain);
 
                     model.addSpecimen(specimen);
+
+                } else if (passage.matches("[+-]?([0-9]*[.])?[0-9]+")) {
+
+                    //need this trick to get rid of fractures if there is any
+                    double passageDouble = Double.parseDouble(passage);
+                    passage = String.valueOf((int) passageDouble);
+
+                    //create specimens with engraftment data
+                    Specimen specimen = new Specimen();
+                    specimen.setPassage(passage);
+                    specimen.setEngraftmentSite(es);
+                    specimen.setEngraftmentType(et);
+                    specimen.setEngraftmentMaterial(em);
+                    specimen.setHostStrain(hostStrain);
+
+                    model.addSpecimen(specimen);
+                } else {
+
+                    log.error("Not supported value(" + passage + ") for passage at row " + row);
                 }
             }
-            //the passage is a single number
-            else if (passage.matches("\\d+")) {
-
-                //need this trick to get rid of fractures if there is any
-                int passageInt = Integer.parseInt(passage);
-                passage = String.valueOf(passageInt);
-
-                //create specimens with engraftment data
-                Specimen specimen = new Specimen();
-                specimen.setPassage(passage);
-                specimen.setEngraftmentSite(es);
-                specimen.setEngraftmentType(et);
-                specimen.setEngraftmentMaterial(em);
-                specimen.setHostStrain(hostStrain);
-
-                model.addSpecimen(specimen);
-
-            } else if (passage.matches("[+-]?([0-9]*[.])?[0-9]+")) {
-
-                //need this trick to get rid of fractures if there is any
-                double passageDouble = Double.parseDouble(passage);
-                passage = String.valueOf((int)passageDouble);
-
-                //create specimens with engraftment data
-                Specimen specimen = new Specimen();
-                specimen.setPassage(passage);
-                specimen.setEngraftmentSite(es);
-                specimen.setEngraftmentType(et);
-                specimen.setEngraftmentMaterial(em);
-                specimen.setHostStrain(hostStrain);
-
-                model.addSpecimen(specimen);
-            } else {
-
-                log.error("Not supported value(" + passage + ") for passage at row " + row);
+            else {
+                log.error("Null essential value of passage in row " + row);
             }
 
             //CREATE PUBLICATION GROUPS
@@ -630,6 +635,11 @@ public class UniversalLoader extends UniversalLoaderOmic {
     /**
      * Targets existing model to add validation (QA) nodes
      */
+    private Boolean isNullOrEmpty(String stringToCheck){
+        return (stringToCheck == null || stringToCheck.isEmpty());
+    }
+
+
     private void createPdxModelValidations() {
 
         if (stopLoading) return;
@@ -679,24 +689,27 @@ public class UniversalLoader extends UniversalLoaderOmic {
             }
 
             //need this trick to get rid of 0.0 if there is any
-            String[] passageArr = passages.split(",");
-            passages = "";
+            if(passages != null) {
+                String[] passageArr = passages.split(",");
+                passages = "";
 
-            for (int i = 0; i < passageArr.length; i++) {
+                for (int i = 0; i < passageArr.length; i++) {
 
-                String pass;
-                try {
-                    int passageInt = (int) Float.parseFloat(passageArr[i]);
-                    pass = String.valueOf(passageInt);
-                } catch (NumberFormatException | NullPointerException nfe) {
+                    String pass;
+                    try {
+                        int passageInt = (int) Float.parseFloat(passageArr[i]);
+                        pass = String.valueOf(passageInt);
+                    } catch (NumberFormatException | NullPointerException nfe) {
 
-                    pass = passageArr[i];
+                        pass = passageArr[i];
+                    }
+
+                    passages += pass + ",";
                 }
-
-                passages += pass + ",";
+                //remove that last comma
+                passages = passages.substring(0, passages.length() - 1);
             }
-            //remove that last comma
-            passages = passages.substring(0, passages.length() - 1);
+            else passages = "";
 
             QualityAssurance qa = new QualityAssurance();
             qa.setTechnology(validationTechnique);
@@ -762,10 +775,10 @@ public class UniversalLoader extends UniversalLoaderOmic {
             //check essential values
 
             if (sampleId == null || origin == null || modelId == null
-                    || molCharType == null || platformName == null || platformTechnology == null || platformDescription == null
+                    || molCharType == null || platformName == null
                     ) {
 
-                log.error("Missing essential value in row " + row);
+                log.error("Missing essential value in row " + row + "in platforms");
                 row++;
                 continue;
             }
@@ -953,15 +966,20 @@ public class UniversalLoader extends UniversalLoaderOmic {
         finderRootDir = stripTrailingSlash(finderRootDir);
         dataRootDirectory = finderRootDir + "/data/UPDOG";
 
-        omicModelID = "Model_ID";
-        omicSampleID = "Sample_ID";
+        omicModelID = "model_id";
+        omicSampleID = "sample_id";
         omicSampleOrigin = "sample_origin";
-        omicPassage = "Passage";
-        omicHostStrainName = "host_strain_name";
-        omicHgncSymbol = "hgnc_symbol";
+        omicHostStrainName = "host_strain_nomenclature";
+        omicPassage = "passage";
+        omicHgncSymbol = "symbol";
+        omicBiotype = "biotype";
+        omicCodingSequenceChange = "coding_sequence_change";
+        omicVariantClass = "variant_class";
+        omicCodonChange = "codon_change";
         omicAminoAcidChange = "amino_acid_change";
         omicNucleotideChange = "nucleotide_change";
         omicConsequence = "consequence";
+        omicFunctionalPrediction = "functional_prediction";
         omicReadDepth = "read_depth";
         omicAlleleFrequency = "Allele_frequency";
         omicChromosome = "chromosome";
@@ -970,15 +988,16 @@ public class UniversalLoader extends UniversalLoaderOmic {
         omicAltAllele = "alt_allele";
         omicUcscGeneId = "ucsc_gene_id";
         omicNcbiGeneId = "ncbi_gene_id";
+        omicNcbiTranscriptId = "ncbi_transcript_id";
         omicEnsemblGeneId = "ensembl_gene_id";
         omicEnsemblTranscriptId = "ensembl_transcript_id";
-        omicRsIdVariants = "rs_id_Variant";
+        omicVariationId = "variation_id";
         omicGenomeAssembly = "genome_assembly";
-        omicPlatform = "Platform";
+        omicPlatform = "platform";
 
         omicSeqEndPosition = "seq_end_position";
-        omicCnaLog10RCNA = "log10R_cna";
-        omicCnaLog2RCNA = "log2R_cna";
+        omicCnaLog10RCNA = "log10r_cna";
+        omicCnaLog2RCNA = "log2r_cna";
         omicCnaCopyNumberStatus = "copy_number_status";
         omicCnaGisticvalue = "gistic_value_cna";
         omicCnaPicnicValue = "picnic_value";
@@ -997,17 +1016,15 @@ public class UniversalLoader extends UniversalLoaderOmic {
         //platformURL.put("CRL__CGH_array", "/platform/curie-lc-cna/");
         //platformURL.put("CRL__Targeted_NGS", "/platform/curie-lc-mutation/");
 
+        omicFileExtension = "tsv";
         if (dataSourceAbbreviation.equals("CRL")) {
             omicDataFilesType = "ONE_FILE_PER_MODEL";
-            omicFileExtension = "csv";
         }
         else if(dataSourceAbbreviation.equals("UOM-BC")){
             omicDataFilesType = "ONE_FILE_PER_MODEL";
-            omicFileExtension = "xlsx";
         }
         else {
             omicDataFilesType = "ALL_MODELS_IN_ONE_FILE";
-            omicFileExtension = "xlsx";
         }
 
 
@@ -1251,7 +1268,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
 
             if (origin == null || modelId == null || markerSymbol == null || markerStatus == null || technique == null) {
-                log.error("Missing essential value in row " + row);
+                log.error("Missing essential value in row " + row + "in cytogenetics");
                 row++;
                 continue;
             }

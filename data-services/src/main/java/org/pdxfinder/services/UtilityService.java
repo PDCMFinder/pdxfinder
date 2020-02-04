@@ -60,15 +60,23 @@ public class UtilityService {
 
         List<Map<String, String>> csvMaps;
 
-        if (fileExtension.equals("csv")) {
+        switch (fileExtension) {
+            case "csv":
 
-            csvMaps = serializeCSVToMaps(fileName);
-        }else if (fileExtension.equals("json")) {
+                csvMaps = serializeCSVToMaps(fileName, ",");
+                break;
+            case "tsv":
 
-            csvMaps = (List) serializeJSONToMaps(fileName);
-        } else {
+                csvMaps = serializeCSVToMaps(fileName, "\t");
+                break;
+            case "json":
 
-            csvMaps = serializeExcelDataNoIterator(fileName,0,1);
+                csvMaps = (List) serializeJSONToMaps(fileName);
+                break;
+            default:
+
+                csvMaps = serializeExcelDataNoIterator(fileName, 0, 1);
+                break;
         }
 
         return csvMaps;
@@ -85,7 +93,11 @@ public class UtilityService {
         switch (fileExtension){
 
             case "csv":
-                csvMaps = serializeCSVToMaps(fileName);
+                csvMaps = serializeCSVToMaps(fileName, ",");
+                break;
+
+            case "tsv":
+                csvMaps = serializeCSVToMaps(fileName, "\t");
                 break;
 
             case "json":
@@ -490,7 +502,7 @@ public class UtilityService {
 
             assert inputStream != null;
             DataInputStream csvData = new DataInputStream(inputStream);
-            dataList = serializeCSVToMaps(csvData);
+            dataList = serializeCSVToMaps(csvData, ",");
         }
 
         return dataList;
@@ -498,7 +510,7 @@ public class UtilityService {
 
 
     // SERIALIZE CSV TO LIST OF MAPS
-    public List<Map<String, String>> serializeCSVToMaps(String csvFile) {
+    public List<Map<String, String>> serializeCSVToMaps(String csvFile, String delimiter) {
 
         FileInputStream fileStream = null;
         try {
@@ -508,11 +520,11 @@ public class UtilityService {
         }
         DataInputStream csvData = new DataInputStream(fileStream);
 
-        return serializeCSVToMaps(csvData);
+        return serializeCSVToMaps(csvData, delimiter);
     }
 
 
-    public List<Map<String, String>> serializeCSVToMaps(DataInputStream csvData) {
+    public List<Map<String, String>> serializeCSVToMaps(DataInputStream csvData, String delimiter) {
 
         int row = 0;
         String thisLine;
@@ -522,7 +534,9 @@ public class UtilityService {
         try {
 
             while ((thisLine = csvData.readLine()) != null) {
-                String[] rowDataArr = thisLine.split(",");
+
+              String[] rowDataArr = thisLine.split(delimiter);
+
                 int column = 0;
 
                 if (row == 0) {

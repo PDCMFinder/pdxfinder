@@ -1,16 +1,12 @@
 package org.pdxfinder.services;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.graph.dao.MarkerAssociation;
 import org.pdxfinder.graph.dao.ModelCreation;
 import org.pdxfinder.graph.dao.MolecularCharacterization;
-import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.repositories.ModelCreationRepository;
 import org.pdxfinder.graph.repositories.OntologyTermRepository;
-import org.pdxfinder.services.ds.FacetOption;
 import org.pdxfinder.services.ds.ModelForQuery;
 import org.pdxfinder.services.ds.SearchDS;
 import org.pdxfinder.services.ds.SearchFacetName;
