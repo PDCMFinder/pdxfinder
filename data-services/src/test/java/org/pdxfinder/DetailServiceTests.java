@@ -29,12 +29,11 @@ public class DetailServiceTests extends BaseTest {
         testMa = new MarkerAssociation();
         testMarker = new Marker();
         testPlatform = new Platform();
-        MaList = Collections.singletonList(testMa);
         McSet = new HashSet<>();
 
-        testMarker.setHgncSymbol("testSymbol");
-        testPlatform.setName("test");
-        testSample.setSourceSampleId("testId");
+        testMarker.setHgncSymbol("TEST");
+        testPlatform.setName("TEST");
+        testSample.setSourceSampleId("TEST");
 
         testMc.setPlatform(testPlatform);
         testMa.setMarker(testMarker);
@@ -42,26 +41,29 @@ public class DetailServiceTests extends BaseTest {
     }
 
     @Test
-    public void Given_NodesExistButValuesAreEmpty_When_Called_ReturnReturnBasicData() {
+    public void Given_NodesExistButNoMolCharIspassed_When_Called_ReturnReturnBasicData() {
 
         long expectedReturnSize = 5;
 
         McSet.add(testMc);
+        MaList = Collections.singletonList(testMa);
         testMc.setMarkerAssociations(MaList);
         testSample.setMolecularCharacterizations(McSet);
 
-        String expectedSampleName = "testId";
-        String expectedPatientTumor = "Patient Tumor";
-        String testPassage = "";
-        String testMappedOntologyTermLabel = "";
-        String testMolCharType = "";
-        String expectedPlatformName = "test";
-        String expectedMarkerHGNCSymbol = "testSymbol";
+        String expectedSampleName = "TEST";
+        String expectedPassage = "TEST";
+        String expectedMappedOntologyTermLabel = "TEST";
+        String expectedMolCharType = "test";
 
-        List<String> expectedList = Arrays.asList(expectedSampleName, expectedPatientTumor, testPassage, testMappedOntologyTermLabel,
-                testMolCharType, expectedPlatformName, expectedMarkerHGNCSymbol);
+        String expectedPatientTumor = "Xenograft";
+        String expectedCapatalizedMolCharType = "Test";
+        String expectedPlatformName = "TEST";
+        String expectedMarkerHGNCSymbol = "TEST";
 
-        List<List<String>> actualReturnData = detailsService.buildUpDTO(testSample,testPassage,testMappedOntologyTermLabel,testMolCharType);
+        List<String> expectedList = Arrays.asList(expectedSampleName, expectedPatientTumor, expectedPassage, expectedMappedOntologyTermLabel,
+                expectedCapatalizedMolCharType, expectedPlatformName, expectedMarkerHGNCSymbol);
+
+        List<List<String>> actualReturnData = detailsService.buildUpDTO(testSample,expectedPassage,expectedMappedOntologyTermLabel,expectedMolCharType);
         Assert.assertNotNull(actualReturnData);
         Assert.assertEquals(expectedList, actualReturnData.get(0));
     }
@@ -69,17 +71,60 @@ public class DetailServiceTests extends BaseTest {
     @Test
     public void Given_MutationDataExistsWithNoData_When_buildUpDtoIsCalled_doNotReturnNull(){
 
-        testMc.setType("mutation");
+        List<String> expectedList = new LinkedList<>();
+
+        testMa.setNucleotideChange("TEST");
+        testMa.setAminoAcidChange("TEST");
+        testMa.setReadDepth("TEST");
+        testMa.setAlleleFrequency("TEST");
+        testMa.setExistingVariations("TEST");
+        testMa.setChromosome("TEST");
+        testMa.setSeqStartPosition("TEST");
+        testMa.setRefAllele("TEST");
+        testMa.setAltAllele("TEST");
+        testMa.setConsequence("TEST");
+        testMa.setGenomeAssembly("TEST");
+
+        MaList = Collections.singletonList(testMa);
+        testMc.setMarkerAssociations(MaList);
+
         McSet.add(testMc);
+        testSample.setMolecularCharacterizations(McSet);
+
+        String testPassage = "TEST";
+        String testMappedOntologyTermLabel = "TEST";
+        String testMolCharType = "mutation";
+
+
+
+        for(int i = 0; i < 18; i++){
+            expectedList.add("TEST");
+        }
+
+
+        List<List<String>> actualList = detailsService.buildUpDTO(testSample,testPassage,testMappedOntologyTermLabel,testMolCharType);
+
+        for(int i = 0; i < 18; i++){
+            if(i == 1) Assert.assertEquals("Xenograft", actualList.get(0).get(1));
+            else if(i == 4)Assert.assertEquals("Mutation", actualList.get(0).get(4));
+            else Assert.assertEquals(expectedList.get(i), actualList.get(0).get(i));
+        }
+
+    }
+
+    @Test
+    public void Given_MutationDataExistsWithData_When_buildUpDtoISCalled_returnData(){
+
+        McSet.add(testMc);
+        MaList = Collections.singletonList(testMa);
         testMc.setMarkerAssociations(MaList);
         testSample.setMolecularCharacterizations(McSet);
 
+        String molCharType = "mutation";
+        String testMappedOntologyTermLabel = "TEST";
         String testPassage = "";
-        String testMappedOntologyTermLabel = "";
-        String testMolCharType = "";
 
-        List<List<String>> actualReturnData = detailsService.buildUpDTO(testSample,testPassage,testMappedOntologyTermLabel,testMolCharType);
-        Assert.assertNotNull(actualReturnData);
+        List<List<String>> actualList = detailsService.buildUpDTO(testSample,testPassage,testMappedOntologyTermLabel,molCharType);
     }
 
 }
