@@ -13,10 +13,11 @@ class TableSetUtilities {
     }
 
     static Map<String, Table> cleanPdxTableSet(Map<String, Table> pdxTableSet) {
+        pdxTableSet = removeProviderNameFromFilename(pdxTableSet);
         pdxTableSet.remove("metadata-checklist.tsv");
         removeDescriptionColumn(pdxTableSet);
         pdxTableSet = removeHeaderRows(pdxTableSet);
-        pdxTableSet = removeProviderNameFromFilename(pdxTableSet);
+        pdxTableSet = removeBlankRows(pdxTableSet);
         return pdxTableSet;
     }
 
