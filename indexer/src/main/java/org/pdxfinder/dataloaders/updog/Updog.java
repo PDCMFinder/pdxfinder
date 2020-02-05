@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class Updog {
         pdxTableSet = readPdxTablesFromPath(updogProviderDirectory);
         pdxTableSet = TableSetUtilities.cleanPdxTableSet(pdxTableSet);
         omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
-        omicsTableSet = TableSetUtilities.removeBlankRows(omicsTableSet);
+        omicsTableSet = TableSetUtilities.removeProviderNameFromFilename(omicsTableSet);
 
         combinedTableSet.putAll(pdxTableSet);
         combinedTableSet.putAll(omicsTableSet);
@@ -103,28 +104,76 @@ public class Updog {
             .filter(p -> p.getValue().contains("_id"))
             .collect(Collectors.toList());
 
-        List<Pair<String, String>> sampleColumns = columns.stream()
-            .filter(p -> p.getKey().contains("sample"))
-            .filter(p -> containsAny(p.getValue(), new String[]{"tumour", "_site"}))
+        List<Pair<String, String>> hostStrainColumns = columns.stream()
+            .filter(p -> p.getValue().contains("host_strain"))
             .collect(Collectors.toList());
 
-        List<Pair<String, String>> requiredColumns = Stream.concat(
-            idColumns.stream(),
-            sampleColumns.stream()
-        ).collect(Collectors.toList());
+        List<Pair<String, String>> sampleColumns = columns.stream()
+            .filter(p -> p.getKey().contains("sample"))
+            .filter(p -> containsAny(
+                p.getValue(),
+                new String[]{"age_in_years", "diagnosis", "tumour", "_site", "treatment_naive"}))
+            .collect(Collectors.toList());
+
+        List<Pair<String, String>> modelColumns = columns.stream()
+            .filter(p -> p.getKey().contains("model."))
+            .filter(p -> containsAny(
+                p.getValue(),
+                new String[]{"engraftment_", "sample_type", "passage_number"}))
+            .collect(Collectors.toList());
+
+        List<Pair<String, String>> modelValidationColumns = columns.stream()
+            .filter(p -> p.getKey().contains("model_validation"))
+            .filter(p -> containsAny(
+                p.getValue(),
+                new String[]{"validation_technique", "description", "passages_tested"}))
+            .collect(Collectors.toList());
+
+        List<Pair<String, String>> sharingColumns = columns.stream()
+            .filter(p -> p.getKey().contains("sharing"))
+            .filter(p -> containsAny(
+                p.getValue(),
+                new String[]{"provider_", "access", "email", "name", "project"}))
+            .collect(Collectors.toList());
+
+        List<Pair<String, String>> loaderColumns = columns.stream()
+            .filter(p -> p.getKey().contains("loader"))
+            .filter(p -> containsAny(
+                p.getValue(),
+                new String[]{"name", "abbreviation"}))
+            .collect(Collectors.toList());
+
+        List<Pair<String, String>> requiredColumns = concatenate(
+            idColumns,
+            hostStrainColumns,
+            sampleColumns,
+            modelColumns,
+            modelValidationColumns,
+            sharingColumns,
+            loaderColumns
+        );
 
         return TableSetSpecification.create()
             .addRequiredTables(metadataTables)
             .addRequiredColumns(requiredColumns)
             .addUniqueColumns(idColumns)
-            .addHasOneToManyRelation(Arrays.asList(
-                relation("metadata-patient.tsv", "metadata-sample.tsv", "patient_id")
+            .addHasRelations(Arrays.asList(
+                relation("metadata-patient.tsv", "metadata-sample.tsv", "patient_id"),
+                relation("metadata-sample.tsv", "metadata-model.tsv", "model_id"),
+                relation("metadata-model.tsv", "metadata-model_validation.tsv", "model_id"),
+                relation("metadata-model.tsv", "metadata-sharing.tsv", "model_id")
             ))
             .setProvider(provider);
     }
 
     private static boolean containsAny(String inputStr, String[] items) {
         return Arrays.stream(items).parallel().anyMatch(inputStr::contains);
+    }
+
+    public static<T> List<T> concatenate(List<T>... lists) {
+        return Stream.of(lists)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
     }
 
     private Pair<Pair<String, String>, Pair<String, String>> relation(
