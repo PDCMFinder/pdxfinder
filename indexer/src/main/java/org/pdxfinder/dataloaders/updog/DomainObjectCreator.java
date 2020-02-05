@@ -5,6 +5,7 @@ import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.tablesaw.api.ColumnType;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
@@ -53,6 +54,8 @@ public class DomainObjectCreator {
         createSharingData();
 
         createSamplePlatformData();
+
+        createTreatmentData();
 
         createMolecularData();
 
@@ -266,6 +269,34 @@ public class DomainObjectCreator {
 
     }
 
+    void createTreatmentData(){
+
+        Table treatmentTable = pdxDataTables.get("patienttreatment-Sheet1.tsv");
+
+        if(treatmentTable != null){
+
+           for(Row row : treatmentTable){
+
+                String patientId = getStringFromRowAndColumn(row, TSV.Metadata.patient_id.name());
+
+                Patient patient = (Patient) getDomainObject(PATIENT_KEY, patientId);
+
+                if(patient == null) throw new NullPointerException();
+
+                PatientSnapshot patientSnapshot = patient.getLastSnapshot();
+
+                TreatmentProtocol treatmentProtocol = getTreatmentProtocol(row);
+                patientSnapshot.addTreatmentProtocol(treatmentProtocol);
+
+           }
+        }
+
+    }
+
+    void createDrugDosingData(){
+
+    }
+
     void createMolecularData() {
 
         Table mutationTable = pdxDataTables.get("mutation.tsv");
@@ -327,13 +358,8 @@ public class DomainObjectCreator {
 
         String modelId = row.getString(TSV.Mutation.model_id.name());
         String hostStrainSymbol = row.getString(TSV.Mutation.host_strain_nomenclature.name());
-        String passage = "";
-        try {
-            passage = row.getString(TSV.Mutation.passage.name());
-        } catch (Exception e) {
-            int passageInt = row.getInt(TSV.Mutation.passage.name());
-            passage = Integer.toString(passageInt);
-        }
+        String passage = getStringFromRowAndColumn(row, TSV.Mutation.passage.name());
+
 
         String sampleId = row.getString(TSV.Mutation.sample_id.name());
 
@@ -726,6 +752,73 @@ public class DomainObjectCreator {
             }
         }
     }
+
+
+
+    private TreatmentProtocol getTreatmentProtocol(Row row){
+
+        String drugString = "";
+        String doseString = "";
+        String response = "";
+        String responseClassification = "";
+
+        String[] drugArray = drugString.split("\\+");
+        String[] doseArray = doseString.split(";");
+
+        TreatmentProtocol tp = new TreatmentProtocol();
+        if(drugArray.length == doseArray.length){
+
+            for(int i=0;i<drugArray.length;i++){
+
+                Treatment treatment = new Treatment();
+                treatment.setName(drugArray[i].trim());
+                TreatmentComponent tc = new TreatmentComponent();
+                tc.setDose(doseArray[i].trim());
+
+                tc.setTreatment(treatment);
+                tp.addTreatmentComponent(tc);
+            }
+            return tp;
+        }
+
+        else if(drugArray.length != doseArray.length && doseArray.length == 1){
+
+            for(int i=0;i<drugArray.length;i++){
+
+                Treatment treatment = new Treatment();
+                treatment.setName(drugArray[i].trim());
+
+                TreatmentComponent tc = new TreatmentComponent();
+                tc.setDose(doseArray[0].trim());
+
+                tc.setTreatment(treatment);
+                tp.addTreatmentComponent(tc);
+
+            }
+            return tp;
+        }
+
+        return null;
+    }
+
+
+    private String getStringFromRowAndColumn(Row row, String columnName){
+
+        if(row.getColumnType(columnName) == ColumnType.STRING) {
+            return row.getString(columnName);
+        }
+        else if(row.getColumnType(columnName) == ColumnType.DOUBLE){
+
+            return Double.toString(row.getDouble(columnName));
+        }
+        else if(row.getColumnType(columnName) == ColumnType.INTEGER){
+
+            return Integer.toString(row.getInt(columnName));
+        }
+
+        return null;
+    }
+
 
 
 }
