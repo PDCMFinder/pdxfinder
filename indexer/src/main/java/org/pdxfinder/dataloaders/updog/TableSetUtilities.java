@@ -47,7 +47,7 @@ class TableSetUtilities {
         return tableSet.entrySet().stream().collect(
             Collectors.toMap(
                 e -> StringUtils.substringAfter(e.getKey(), "_"),
-                Map.Entry::getValue
+                e -> e.getValue().setName(StringUtils.substringAfter(e.getKey(), "_"))
             ));
     }
 
