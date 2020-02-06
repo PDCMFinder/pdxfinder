@@ -66,7 +66,7 @@ public class Updog {
 
         combinedTableSet.putAll(pdxTableSet);
         combinedTableSet.putAll(omicsTableSet);
-        List<ValidationError> validationErrors =  validatePdxDataTables(combinedTableSet, provider);
+        List<ValidationError> validationErrors = validatePdxDataTables(combinedTableSet, provider);
 
         createPdxObjects(combinedTableSet);
     }
@@ -83,7 +83,7 @@ public class Updog {
     }
 
     private List<ValidationError> validatePdxDataTables(Map<String, Table> tableSet, String provider){
-        return validator.validate(tableSet, tableSetSpecification(columns(), provider));
+        return validator.validate(tableSet, createTableSetSpecification(createColumns(), provider));
     }
 
     private void createPdxObjects(Map<String, Table> pdxTableSet){
@@ -91,7 +91,7 @@ public class Updog {
         doc.loadDomainObjects();
     }
 
-    private TableSetSpecification tableSetSpecification(
+    private TableSetSpecification createTableSetSpecification(
         List<Pair<String, String>> columns,
         String provider
     ) {
@@ -100,48 +100,19 @@ public class Updog {
             .filter(s -> s.contains("metadata"))
             .collect(Collectors.toSet());
 
-        List<Pair<String, String>> idColumns = columns.stream()
-            .filter(p -> p.getValue().contains("_id"))
-            .collect(Collectors.toList());
+        List<Pair<String, String>> idColumns = matchingColumnsFromAnyTable(columns, "_id");
+        List<Pair<String, String>> hostStrainColumns = matchingColumnsFromAnyTable(columns, "host_strain");
 
-        List<Pair<String, String>> hostStrainColumns = columns.stream()
-            .filter(p -> p.getValue().contains("host_strain"))
-            .collect(Collectors.toList());
-
-        List<Pair<String, String>> sampleColumns = columns.stream()
-            .filter(p -> p.getKey().contains("sample"))
-            .filter(p -> containsAny(
-                p.getValue(),
-                new String[]{"age_in_years", "diagnosis", "tumour", "_site", "treatment_naive"}))
-            .collect(Collectors.toList());
-
-        List<Pair<String, String>> modelColumns = columns.stream()
-            .filter(p -> p.getKey().contains("model."))
-            .filter(p -> containsAny(
-                p.getValue(),
-                new String[]{"engraftment_", "sample_type", "passage_number"}))
-            .collect(Collectors.toList());
-
-        List<Pair<String, String>> modelValidationColumns = columns.stream()
-            .filter(p -> p.getKey().contains("model_validation"))
-            .filter(p -> containsAny(
-                p.getValue(),
-                new String[]{"validation_technique", "description", "passages_tested"}))
-            .collect(Collectors.toList());
-
-        List<Pair<String, String>> sharingColumns = columns.stream()
-            .filter(p -> p.getKey().contains("sharing"))
-            .filter(p -> containsAny(
-                p.getValue(),
-                new String[]{"provider_", "access", "email", "name", "project"}))
-            .collect(Collectors.toList());
-
-        List<Pair<String, String>> loaderColumns = columns.stream()
-            .filter(p -> p.getKey().contains("loader"))
-            .filter(p -> containsAny(
-                p.getValue(),
-                new String[]{"name", "abbreviation"}))
-            .collect(Collectors.toList());
+        List<Pair<String, String>> sampleColumns = matchingColumnsFromTable(columns, "sample",
+            new String[]{"age_in_years", "diagnosis", "tumour", "_site", "treatment_naive"});
+        List<Pair<String, String>> modelColumns = matchingColumnsFromTable(columns, "model.",
+            new String[]{"engraftment_", "sample_type", "passage_number"});
+        List<Pair<String, String>> modelValidationColumns = matchingColumnsFromTable(columns, "model_validation",
+            new String[]{"validation_technique", "description", "passages_tested"});
+        List<Pair<String, String>> sharingColumns = matchingColumnsFromTable(columns, "sharing",
+            new String[]{"provider_", "access", "email", "name", "project"});
+        List<Pair<String, String>> loaderColumns = matchingColumnsFromTable(columns, "loader",
+            new String[]{"name", "abbreviation"});
 
         List<Pair<String, String>> requiredColumns = concatenate(
             idColumns,
@@ -166,6 +137,26 @@ public class Updog {
             .setProvider(provider);
     }
 
+    private List<Pair<String, String>> matchingColumnsFromTable(
+        List<Pair<String, String>> columns,
+        String tableName,
+        String[] columnNamePatterns) {
+        return columns
+            .stream()
+            .filter(p -> p.getKey().contains(tableName))
+            .filter(p -> containsAny(p.getValue(), columnNamePatterns))
+            .collect(Collectors.toList());
+    }
+
+    private List<Pair<String, String>> matchingColumnsFromAnyTable(
+        List<Pair<String, String>> columns,
+        String columnNamePattern
+    ) {
+        return columns.stream()
+            .filter(p -> p.getValue().contains(columnNamePattern))
+            .collect(Collectors.toList());
+    }
+
     private static boolean containsAny(String inputStr, String[] items) {
         return Arrays.stream(items).parallel().anyMatch(inputStr::contains);
     }
@@ -182,7 +173,7 @@ public class Updog {
         return Pair.of(Pair.of(from, columnName), Pair.of(to, columnName));
     }
 
-    private List<Pair<String, String>> columns() {
+    private List<Pair<String, String>> createColumns() {
         List<Pair<String, String>> tableColumns = new ArrayList<>();
         Arrays.asList(
             "patient_id",
