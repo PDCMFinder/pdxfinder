@@ -85,6 +85,29 @@ public class TSV {
         platform
     }
 
+    public enum CopyNumberAlteration{
+        model_id,
+        sample_id,
+        sample_origin,
+        passage,
+        host_strain_nomenclature,
+        chromosome,
+        seq_start_position,
+        seq_end_position,
+        symbol,
+        ucsc_gene_id,
+        ncbi_gene_id,
+        ensembl_gene_id,
+        log10r_cna,
+        log2r_cna,
+        fold_change,
+        copy_number_status,
+        gistic_value,
+        picnic_value,
+        genome_assembly,
+        platform
+
+    }
 
     public enum SamplePlatform{
 
