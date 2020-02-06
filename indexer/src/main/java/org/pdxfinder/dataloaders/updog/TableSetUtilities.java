@@ -8,9 +8,7 @@ import java.util.stream.Collectors;
 
 class TableSetUtilities {
 
-    private TableSetUtilities() {
-        throw new IllegalStateException("Utility class");
-    }
+    private TableSetUtilities() { throw new IllegalStateException("Utility class"); }
 
     static Map<String, Table> cleanPdxTableSet(Map<String, Table> pdxTableSet) {
         pdxTableSet = removeProviderNameFromFilename(pdxTableSet);
@@ -21,6 +19,13 @@ class TableSetUtilities {
         return pdxTableSet;
     }
 
+    static Map<String, Table> cleanOmicsTableSet(Map<String, Table> omicsTableSet) {
+        omicsTableSet = removeProviderNameFromFilename(omicsTableSet);
+        omicsTableSet = removeHeaderRowsIfPresent(omicsTableSet);
+        omicsTableSet = removeBlankRows(omicsTableSet);
+        return omicsTableSet;
+    }
+
     static Map<String, Table> removeHeaderRows(Map<String, Table> tableSet) {
         return tableSet.entrySet().stream().collect(
             Collectors.toMap(
@@ -29,6 +34,7 @@ class TableSetUtilities {
             ));
     }
 
+    @Deprecated
     static Map<String, Table> removeBlankRows(Map<String, Table> tableSet) {
         return tableSet.entrySet().stream().collect(
             Collectors.toMap(
@@ -37,6 +43,19 @@ class TableSetUtilities {
                     e.getValue(),
                     e.getValue().column(0).asStringColumn())
             ));
+    }
+
+    static Map<String, Table> removeHeaderRowsIfPresent(Map<String, Table> tableSet) {
+        return tableSet.entrySet().stream().collect(
+            Collectors.toMap(
+                Map.Entry::getKey,
+                e -> removeHeaderRowsIfPresent(e.getValue())));
+    }
+
+    static Table removeHeaderRowsIfPresent(Table table) {
+        return table.columnNames().contains("Field")
+            ? TableUtilities.removeHeaderRows(table, 4)
+            : table;
     }
 
     static void removeDescriptionColumn(Map<String, Table> tableSet) {

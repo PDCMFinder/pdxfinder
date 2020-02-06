@@ -62,7 +62,7 @@ public class Updog {
         pdxTableSet = readPdxTablesFromPath(updogProviderDirectory);
         pdxTableSet = TableSetUtilities.cleanPdxTableSet(pdxTableSet);
         omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
-        omicsTableSet = TableSetUtilities.removeProviderNameFromFilename(omicsTableSet);
+        omicsTableSet = TableSetUtilities.cleanOmicsTableSet(omicsTableSet);
 
         combinedTableSet.putAll(pdxTableSet);
         combinedTableSet.putAll(omicsTableSet);
