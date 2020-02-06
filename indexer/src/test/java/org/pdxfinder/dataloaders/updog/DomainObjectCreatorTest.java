@@ -169,6 +169,7 @@ public class DomainObjectCreatorTest extends BaseTest {
         String samplePlatform = "sampleplatform-data.tsv";
         String mutation = "mutation.tsv";
         String cytogenetics = "cytogenetics-Sheet1.tsv";
+        String cna = "cna.tsv";
 
         Map<String, Table> pdxDataTables = new HashMap<>();
         pdxDataTables.put(loader, Table.create(loader).addColumns(
@@ -270,10 +271,30 @@ public class DomainObjectCreatorTest extends BaseTest {
                 StringColumn.create("passage", Collections.singletonList("0")),
                 StringColumn.create("host_strain_nomenclature", Collections.singletonList("host strain nomenclature 1")),
                 StringColumn.create("model_id", Collections.singletonList("model 1")),
-                StringColumn.create("hgnc_symbol", Collections.singletonList("ERBB2")),
+                StringColumn.create("symbol", Collections.singletonList("ERBB2")),
                 StringColumn.create("marker_status", Collections.singletonList("KRAS")),
                 StringColumn.create("platform", Collections.singletonList("ImmunoHistoChemistry"))
         ));
+
+        pdxDataTables.put(cna, Table.create(cna).addColumns(
+                StringColumn.create("sample_id", Collections.singletonList("sample 1")),
+                StringColumn.create("sample_origin", Collections.singletonList("xenograft")),
+                StringColumn.create("passage", Collections.singletonList("0")),
+                StringColumn.create("host_strain_nomenclature", Collections.singletonList("host strain nomenclature 1")),
+                StringColumn.create("chromosome", Collections.singletonList("")),
+                StringColumn.create("seq_start_position", Collections.singletonList("")),
+                StringColumn.create("seq_end_position", Collections.singletonList("")),
+                StringColumn.create("log10r_cna", Collections.singletonList("")),
+                StringColumn.create("log2r_cna", Collections.singletonList("")),
+                StringColumn.create("copy_number_status", Collections.singletonList("")),
+                StringColumn.create("gistic_value", Collections.singletonList("")),
+                StringColumn.create("picnic_value", Collections.singletonList("")),
+                StringColumn.create("genome_assembly", Collections.singletonList("")),
+                StringColumn.create("symbol", Collections.singletonList("PTEN")),
+                StringColumn.create("platform", Collections.singletonList("Targeted Next Generation Sequencing")),
+                StringColumn.create("model_id", Collections.singletonList("model 1"))
+        ));
+
 
         return pdxDataTables;
     }

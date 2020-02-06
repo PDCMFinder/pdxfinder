@@ -121,7 +121,9 @@ public class DomainObjectCreator {
             String treatmentNaive = row.getString(TSV.Metadata.treatment_naive_at_collection.name());
 
             Patient patient = (Patient) getDomainObject(PATIENT_KEY, patientId);
-            if (patient == null) throw new NullPointerException();
+            if (patient == null) {
+                log.error("Patient not found {}", patientId);
+                throw new NullPointerException();}
 
             PatientSnapshot patientSnapshot = patient.getSnapShotByCollection(
                     ageAtCollection,
@@ -299,13 +301,25 @@ public class DomainObjectCreator {
 
     void createMolecularData() {
 
-        Table mutationTable = pdxDataTables.get("mutation.tsv");
+        Table mutationTable = pdxDataTables.get("mut.tsv");
 
         if(mutationTable != null){
 
             for (Row row : mutationTable) {
 
                 MolecularCharacterization molecularCharacterization = getMolcharByType(row, "mutation");
+                addMolecularData(molecularCharacterization, row);
+            }
+        }
+
+
+        Table cnaTable = pdxDataTables.get("cna.tsv");
+
+        if(cnaTable != null){
+
+            for (Row row : cnaTable) {
+
+                MolecularCharacterization molecularCharacterization = getMolcharByType(row, "copynumberalteration");
                 addMolecularData(molecularCharacterization, row);
             }
         }
@@ -331,10 +345,10 @@ public class DomainObjectCreator {
         String platformName = row.getString(PLATFORM_KEY);
         Sample sample = null;
 
-        if (sampleOrigin.equals("patient")) {
+        if (sampleOrigin.equalsIgnoreCase("patient")) {
 
             sample = getPatientSample(row);
-        } else if (sampleOrigin.equals("xenograft")) {
+        } else if (sampleOrigin.equalsIgnoreCase("xenograft")) {
 
             sample = getOrCreateSpecimen(row).getSample();
         }
@@ -433,7 +447,7 @@ public class DomainObjectCreator {
             molecularCharacterization.addMarkerAssociation(markerAssociation);
         }
 
-        String hgncSymbol = row.getString("hgnc_symbol");
+        String hgncSymbol = row.getString("symbol");
         String modelId = row.getString("model_id");
         Group provider = (Group) domainObjects.get(PROVIDER_KEY).get(null);
         String dataSource = provider.getAbbreviation();
@@ -471,6 +485,9 @@ public class DomainObjectCreator {
 
                 molecularData = getCytogeneticsProperties(row, marker);
             }
+            else if(molecularCharacterization.getType().equals("copynumberalteration")){
+                molecularData = getCNAProperties(row, marker);
+            }
 
             markerAssociation.addMolecularData(molecularData);
 
@@ -506,15 +523,15 @@ public class DomainObjectCreator {
 
         MolecularData ma = new MolecularData();
 
-        ma.setChromosome("");
-        ma.setSeqStartPosition("");
-        ma.setSeqEndPosition("");
-        ma.setCnaLog10RCNA("");
-        ma.setCnaLog2RCNA("");
-        ma.setCnaCopyNumberStatus("");
-        ma.setCnaGisticValue("");
-        ma.setCnaPicnicValue("");
-        ma.setGenomeAssembly("");
+        ma.setChromosome(row.getString(TSV.CopyNumberAlteration.chromosome.name()));
+        ma.setSeqStartPosition(row.getString(TSV.CopyNumberAlteration.seq_start_position.name()));
+        ma.setSeqEndPosition(row.getString(TSV.CopyNumberAlteration.seq_end_position.name()));
+        ma.setCnaLog10RCNA(row.getString(TSV.CopyNumberAlteration.log10r_cna.name()));
+        ma.setCnaLog2RCNA(row.getString(TSV.CopyNumberAlteration.log2r_cna.name()));
+        ma.setCnaCopyNumberStatus(row.getString(TSV.CopyNumberAlteration.copy_number_status.name()));
+        ma.setCnaGisticValue(row.getString(TSV.CopyNumberAlteration.gistic_value.name()));
+        ma.setCnaPicnicValue(row.getString(TSV.CopyNumberAlteration.picnic_value.name()));
+        ma.setGenomeAssembly(row.getString(TSV.CopyNumberAlteration.genome_assembly.name()));
 
         ma.setMarker(marker.getHgncSymbol());
         return  ma;
@@ -636,7 +653,7 @@ public class DomainObjectCreator {
                 hostStrain = dataImportService.getHostStrain(hostStrainName, hostStrainNomenclature, "", "");
                 addDomainObject(HOST_STRAIN_KEY, hostStrainNomenclature, hostStrain);
             } catch (Exception e) {
-                log.error("Host strain symbol is empty in row {}", rowNumber);
+                //log.error("Host strain symbol is empty in row {}", rowNumber);
             }
         }
         return hostStrain;
@@ -693,12 +710,35 @@ public class DomainObjectCreator {
 
     private void persistNodes() {
 
+        persistPatients();
+        persistModels();
 
+    }
+
+    public void persistPatients(){
+
+        log.info("Persisiting patients");
         Map<String, Object> patients = domainObjects.get(PATIENT_KEY);
-        for (Object patient : patients.values()) {
-            dataImportService.savePatient((Patient) patient);
-        }
+        for (Object pat : patients.values()) {
 
+            Patient patient = (Patient) pat;
+
+            Set<PatientSnapshot>  snapshots = patient.getSnapshots();
+            for(PatientSnapshot ps: snapshots){
+                Set<Sample> patientSamples = ps.getSamples();
+
+                for(Sample patientSample : patientSamples){
+                    convertMarkerAssociations(patientSample);
+                }
+            }
+
+            dataImportService.savePatient(patient);
+        }
+    }
+
+    public void persistModels(){
+
+        log.info("Persisiting models");
         Map<String, Object> models = domainObjects.get(MODEL_KEY);
         for (Object mod : models.values()) {
             ModelCreation model = (ModelCreation) mod;
@@ -715,6 +755,7 @@ public class DomainObjectCreator {
             dataImportService.saveModelCreation(model);
         }
     }
+
 
     public void addDomainObject(String key1, String key2, Object object) {
 

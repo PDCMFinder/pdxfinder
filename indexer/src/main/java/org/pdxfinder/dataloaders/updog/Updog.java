@@ -57,15 +57,19 @@ public class Updog {
 
         Map<String, Table> pdxTableSet;
         Map<String, Table> omicsTableSet;
+        Map<String, Table> treatmentTableSet;
         Map<String, Table> combinedTableSet = new HashMap<>();
 
         pdxTableSet = readPdxTablesFromPath(updogProviderDirectory);
         pdxTableSet = TableSetUtilities.cleanPdxTableSet(pdxTableSet);
         omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
         omicsTableSet = TableSetUtilities.cleanOmicsTableSet(omicsTableSet);
+        treatmentTableSet = readTreatmentTablesFromPath(updogProviderDirectory);
+
 
         combinedTableSet.putAll(pdxTableSet);
         combinedTableSet.putAll(omicsTableSet);
+        combinedTableSet.putAll(treatmentTableSet);
         List<ValidationError> validationErrors = validatePdxDataTables(combinedTableSet, provider);
 
         createPdxObjects(combinedTableSet);
@@ -80,6 +84,11 @@ public class Updog {
     private Map<String, Table> readPdxTablesFromPath(Path updogProviderDirectory) {
         PathMatcher metadataFiles = FileSystems.getDefault().getPathMatcher("glob:**{metadata-,sampleplatform}*.tsv");
         return reader.readAllTsvFilesIn(updogProviderDirectory, metadataFiles);
+    }
+
+    private Map<String, Table> readTreatmentTablesFromPath(Path updogProviderDirectory) {
+        PathMatcher metadataFiles = FileSystems.getDefault().getPathMatcher("glob:**{treatment,drug}*.tsv");
+        return reader.readAllTreatmentFilesIn(updogProviderDirectory, metadataFiles);
     }
 
     private List<ValidationError> validatePdxDataTables(Map<String, Table> tableSet, String provider){
