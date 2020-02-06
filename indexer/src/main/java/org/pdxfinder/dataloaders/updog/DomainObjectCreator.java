@@ -313,6 +313,18 @@ public class DomainObjectCreator {
         }
 
 
+        Table cnaTable = pdxDataTables.get("cna.tsv");
+
+        if(cnaTable != null){
+
+            for (Row row : cnaTable) {
+
+                MolecularCharacterization molecularCharacterization = getMolcharByType(row, "copynumberalteration");
+                addMolecularData(molecularCharacterization, row);
+            }
+        }
+
+
         Table cytoTable = pdxDataTables.get("cytogenetics-Sheet1.tsv");
 
         if(cytoTable != null){
@@ -473,6 +485,9 @@ public class DomainObjectCreator {
 
                 molecularData = getCytogeneticsProperties(row, marker);
             }
+            else if(molecularCharacterization.getType().equals("copynumberalteration")){
+                molecularData = getCNAProperties(row, marker);
+            }
 
             markerAssociation.addMolecularData(molecularData);
 
@@ -508,15 +523,15 @@ public class DomainObjectCreator {
 
         MolecularData ma = new MolecularData();
 
-        ma.setChromosome("");
-        ma.setSeqStartPosition("");
-        ma.setSeqEndPosition("");
-        ma.setCnaLog10RCNA("");
-        ma.setCnaLog2RCNA("");
-        ma.setCnaCopyNumberStatus("");
-        ma.setCnaGisticValue("");
-        ma.setCnaPicnicValue("");
-        ma.setGenomeAssembly("");
+        ma.setChromosome(row.getString(TSV.CopyNumberAlteration.chromosome.name()));
+        ma.setSeqStartPosition(row.getString(TSV.CopyNumberAlteration.seq_start_position.name()));
+        ma.setSeqEndPosition(row.getString(TSV.CopyNumberAlteration.seq_end_position.name()));
+        ma.setCnaLog10RCNA(row.getString(TSV.CopyNumberAlteration.log10r_cna.name()));
+        ma.setCnaLog2RCNA(row.getString(TSV.CopyNumberAlteration.log2r_cna.name()));
+        ma.setCnaCopyNumberStatus(row.getString(TSV.CopyNumberAlteration.copy_number_status.name()));
+        ma.setCnaGisticValue(row.getString(TSV.CopyNumberAlteration.gistic_value.name()));
+        ma.setCnaPicnicValue(row.getString(TSV.CopyNumberAlteration.picnic_value.name()));
+        ma.setGenomeAssembly(row.getString(TSV.CopyNumberAlteration.genome_assembly.name()));
 
         ma.setMarker(marker.getHgncSymbol());
         return  ma;
