@@ -57,15 +57,20 @@ public class Updog {
 
         Map<String, Table> pdxTableSet;
         Map<String, Table> omicsTableSet;
+        Map<String, Table> treatmentTableSet;
         Map<String, Table> combinedTableSet = new HashMap<>();
 
         pdxTableSet = readPdxTablesFromPath(updogProviderDirectory);
         pdxTableSet = TableSetUtilities.cleanPdxTableSet(pdxTableSet);
         omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
         omicsTableSet = TableSetUtilities.removeProviderNameFromFilename(omicsTableSet);
+        treatmentTableSet = readTreatmentTablesFromPath(updogProviderDirectory);
+        treatmentTableSet = TableSetUtilities.removeProviderNameFromFilename(treatmentTableSet);
+
 
         combinedTableSet.putAll(pdxTableSet);
         combinedTableSet.putAll(omicsTableSet);
+        combinedTableSet.putAll(treatmentTableSet);
         List<ValidationError> validationErrors =  validatePdxDataTables(combinedTableSet, provider);
 
         createPdxObjects(combinedTableSet);
@@ -75,6 +80,11 @@ public class Updog {
         // Only cytogenetics and mutation import supported so far
         PathMatcher allTsvFiles = FileSystems.getDefault().getPathMatcher("glob:**/{cyto,mut}/*.tsv");
         return reader.readAllOmicsFilesIn(updogProviderDirectory, allTsvFiles);
+    }
+
+    private Map<String, Table> readTreatmentTablesFromPath(Path updogProviderDirectory) {
+        PathMatcher treatmentFiles = FileSystems.getDefault().getPathMatcher("glob:**/{treatment,drug}/*.tsv");
+        return reader.readAllTreatmentFilesIn(updogProviderDirectory, treatmentFiles);
     }
 
     private Map<String, Table> readPdxTablesFromPath(Path updogProviderDirectory) {
