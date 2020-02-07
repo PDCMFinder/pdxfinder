@@ -65,7 +65,7 @@ public class Updog {
         omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
         omicsTableSet = TableSetUtilities.cleanOmicsTableSet(omicsTableSet);
         treatmentTableSet = readTreatmentTablesFromPath(updogProviderDirectory);
-
+        treatmentTableSet = TableSetUtilities.removeHeaderRowsIfPresent(treatmentTableSet);
 
         combinedTableSet.putAll(pdxTableSet);
         combinedTableSet.putAll(omicsTableSet);
