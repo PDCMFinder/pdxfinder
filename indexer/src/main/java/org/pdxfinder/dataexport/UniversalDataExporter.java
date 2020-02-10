@@ -42,6 +42,7 @@ public class UniversalDataExporter {
     private List<List<String>> loaderRelatedDataSheetDataExport;
     private List<List<String>> drugDosingSheetDataExport;
 
+
     private List<List<String>> mutationSheetDataExport;
     private List<List<String>> cnaSheetDataExport;
 
@@ -919,6 +920,10 @@ public class UniversalDataExporter {
         return drugDosingSheetDataExport;
     }
 
+    public void setMutationSheetDataExport(List<List<String>> mutationSheetDataExport) {
+        this.mutationSheetDataExport = mutationSheetDataExport;
+    }
+
     public List<List<String>> getMutationSheetDataExport() {
         return mutationSheetDataExport;
     }
@@ -926,6 +931,7 @@ public class UniversalDataExporter {
     public List<List<String>> getCnaSheetDataExport() {
         return cnaSheetDataExport;
     }
+
 
 
 }

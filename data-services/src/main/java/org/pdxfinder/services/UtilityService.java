@@ -2,6 +2,9 @@ package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonReader;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -11,6 +14,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.neo4j.ogm.json.JSONException;
+import org.neo4j.ogm.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -750,8 +755,31 @@ public class UtilityService {
     }
 
 
+    public List<List<Object>> serializeJsonToListOfLists(String templateDir) throws IOException, JSONException {
 
+        List<List<Object>> parsedJson = new ArrayList<>();
 
+        JSONObject jsObject = seralizeJsonURItoJsonObject(templateDir);
+        List<Object> jsonArray = jsObject.names().toList();
+        parsedJson.add(jsonArray);
+
+        return parsedJson;
+    }
+
+    public JSONObject seralizeJsonURItoJsonObject(String fileURI) throws IOException, JSONException {
+
+        JSONObject jsonObject = null;
+
+        try{
+            String fileString = new String(Files.readAllBytes(Paths.get(fileURI)));
+            jsonObject = new JSONObject(fileString);
+
+        } catch(Exception ex){
+            log.error("Json Failed to serialize. Check that JSON files exists");
+        }
+
+        return jsonObject;
+    }
 
 
 
