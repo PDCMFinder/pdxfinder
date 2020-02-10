@@ -298,6 +298,24 @@ public class DomainObjectCreator {
 
     void createDrugDosingData(){
 
+        Table drugdosingTable = pdxDataTables.get("drugdosing-Sheet1.tsv");
+
+        if(drugdosingTable != null){
+
+            for(Row row : drugdosingTable){
+
+                String modelId = getStringFromRowAndColumn(row, TSV.Metadata.model_id.name());
+
+               ModelCreation model = (ModelCreation) getDomainObject(MODEL_KEY, modelId);
+
+                if(model == null) throw new NullPointerException();
+
+                TreatmentProtocol treatmentProtocol = getTreatmentProtocol(row);
+                model.addTreatmentProtocol(treatmentProtocol);
+
+            }
+        }
+
     }
 
     void createMolecularData() {

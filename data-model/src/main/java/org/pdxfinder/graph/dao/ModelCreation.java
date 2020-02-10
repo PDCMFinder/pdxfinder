@@ -240,4 +240,14 @@ public class ModelCreation {
         return null;
     }
 
+    public void addTreatmentProtocol(TreatmentProtocol treatmentProtocol){
+
+        if(treatmentSummary == null){
+
+            treatmentSummary = new TreatmentSummary();
+        }
+
+        treatmentSummary.addTreatmentProtocol(treatmentProtocol);
+    }
+
 }
