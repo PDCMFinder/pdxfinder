@@ -244,6 +244,7 @@ public class DomainObjectCreator {
 
         Table samplePlatformTable = pdxDataTables.get("sampleplatform-data.tsv");
 
+        if (samplePlatformTable == null) return;
 
         for (Row row : samplePlatformTable) {
 
