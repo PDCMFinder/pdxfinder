@@ -34,7 +34,6 @@ public class PublicationService {
             publications.add(restTemplate.getForObject(api, Publication.class));
         });
 
-
         return publications;
     }
 

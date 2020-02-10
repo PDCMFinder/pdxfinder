@@ -48,10 +48,6 @@ public class PublicationServiceTest extends BaseTest {
     private MockRestServiceServer mockServer;
     private ObjectMapper mapper;
 
-
-    private List<String> pubmedIdsWithPrefix;
-    private List<String> pubmedIdsWithSpaces;
-    private List<String> pubmedIdsWithSemiColon;
     private List<String> expectedResults;
 
     @Before
@@ -106,10 +102,10 @@ public class PublicationServiceTest extends BaseTest {
     public void given_pubMedIdPrefixedWIthPMID_When_SanitizePubMedIdsInvoked_Then_PrefixRemoved() {
 
         // given
-        this.pubmedIdsWithPrefix = Arrays.asList("PMID:17606733","PMID:29463559","PMID:27374081");
+        List<String> pubmedIdsWithPrefix = Arrays.asList("PMID:17606733", "PMID:29463559", "PMID:27374081");
 
         // when
-        List<String> actualResults = publicationService.sanitizePubMedIds(this.pubmedIdsWithPrefix);
+        List<String> actualResults = publicationService.sanitizePubMedIds(pubmedIdsWithPrefix);
 
         // Then
         assertEquals(this.expectedResults, actualResults);
@@ -120,7 +116,7 @@ public class PublicationServiceTest extends BaseTest {
     public void given_pubMedIdPrefixedWIthSpaces_When_SanitizePubMedIdsInvoked_Then_SpacesRemoved() {
 
         // given
-        pubmedIdsWithSpaces = Arrays.asList("PMID: 17606733"," 29 4635 59 ","PMID: 27 37 4081 ");
+        List<String> pubmedIdsWithSpaces = Arrays.asList("PMID: 17606733", " 29 4635 59 ", "PMID: 27 37 4081 ");
 
         // when
         List<String> actualResults = publicationService.sanitizePubMedIds(pubmedIdsWithSpaces);
@@ -134,7 +130,7 @@ public class PublicationServiceTest extends BaseTest {
     public void given_pubMedIdContainsSemiColon_When_SanitizePubMedIdsInvoked_Then_ListCreated() {
 
         // given
-        pubmedIdsWithSemiColon= Arrays.asList("PMID:17606733; PMID:29463559","PMID:27374081");
+        List<String> pubmedIdsWithSemiColon = Arrays.asList("PMID:17606733; PMID:29463559", "PMID:27374081");
 
         // when
         List<String> actualResults = publicationService.sanitizePubMedIds(pubmedIdsWithSemiColon);

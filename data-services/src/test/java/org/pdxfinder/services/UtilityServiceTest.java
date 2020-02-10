@@ -13,15 +13,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.InjectMocks;
 import org.pdxfinder.BaseTest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -33,8 +27,6 @@ import static org.junit.Assert.*;
 
 
 public class UtilityServiceTest extends BaseTest {
-
-    private Logger log = LoggerFactory.getLogger(UtilityServiceTest.class);
 
     private ObjectMapper mapper;
 
@@ -136,7 +128,7 @@ public class UtilityServiceTest extends BaseTest {
 
 
     @Test(expected = StringIndexOutOfBoundsException.class)
-    public void given_WrongFilePath_When_MkDirectoryFromFilePathNameInvoked_Then_ThrowException() throws IOException {
+    public void given_WrongFilePath_When_MkDirectoryFromFilePathNameInvoked_Then_ThrowException() {
 
         // given
         String wrongFilePath = "fileDirectory";
@@ -280,7 +272,7 @@ public class UtilityServiceTest extends BaseTest {
 
 
     @Test
-    public void given_DelimitedString_When_SplitTextInvoked_Then_ReturnExpected() throws IOException {
+    public void given_DelimitedString_When_SplitTextInvoked_Then_ReturnExpected() {
 
         // given
         String data = "Sample string,will,be,tokenized,on,pipe,and,replaced,with,space";

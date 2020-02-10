@@ -63,6 +63,15 @@ public class Result {
     private String firstIndexDate;
     private String firstPublicationDate;
 
+    public Result() {
+    }
+
+    public Result(String title, String authorString, String journalTitle, String pubYear) {
+        this.title = title;
+        this.authorString = authorString;
+        this.journalTitle = journalTitle;
+        this.pubYear = pubYear;
+    }
 
     public String getId() {
         return id;

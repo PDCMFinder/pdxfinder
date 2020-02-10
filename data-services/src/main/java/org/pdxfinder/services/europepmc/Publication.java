@@ -16,42 +16,13 @@ import java.util.Map;
 })
 public class Publication {
 
-    private String version;
-    private Integer hitCount;
-    private String nextCursorMark;
-    private Request request;
     private Map<String, List<Result>> resultList;
 
-    public String getVersion() {
-        return version;
+    public Publication() {
     }
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public Integer getHitCount() {
-        return hitCount;
-    }
-
-    public void setHitCount(Integer hitCount) {
-        this.hitCount = hitCount;
-    }
-
-    public String getNextCursorMark() {
-        return nextCursorMark;
-    }
-
-    public void setNextCursorMark(String nextCursorMark) {
-        this.nextCursorMark = nextCursorMark;
-    }
-
-    public Request getRequest() {
-        return request;
-    }
-
-    public void setRequest(Request request) {
-        this.request = request;
+    public Publication(Map<String, List<Result>> resultList) {
+        this.resultList = resultList;
     }
 
     public Map<String, List<Result>> getResultList() {

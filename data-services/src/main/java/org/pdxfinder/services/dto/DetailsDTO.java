@@ -1,5 +1,7 @@
 package org.pdxfinder.services.dto;
 
+import org.pdxfinder.services.europepmc.Publication;
+
 import java.util.List;
 import java.util.Set;
 
@@ -75,81 +77,10 @@ public class DetailsDTO {
     private List<DrugSummaryDTO> dosingStudy;
     private int dosingStudyNumbers;
 
-
-
-
-    /*
-    // Disabled fields
-
-
-
-    private String externalId;
-    private String dataSource;
-    private String sourceDescription;
-    private String sourceName;
-    private String patientId;
-    private String gender;
-    private String ageAtCollection;
-    private String race;
-    private String ethnicity;
-
-    private String diagnosis;
-    private String tumorType;
-    private String originTissue;
-    private String sampleSite;
-
-    @Deprecated
-    private String classification;
-
-    private String stage;
-    private String grade;
-    private String stageClassification;
-    private String gradeClassification;
-
-    private String sampleType; //Engraftment Type
-    private String strain;
-    private String mouseSex;
-    private String engraftmentSite; // Engraftment Site
-
-
-    private String externalUrl;
-    private String externalUrlText;
-
-
-    private String contacts;
-    private String externalDataSourceDesc;
-    private String drugProtocolUrl;
-    private int totalPages;
-    private int presentPage;
-    private int variationDataCount;
-    private int drugSummaryRowNumber;
-
-
-
-
-
-    private List<String> cancerGenomics;
-    private List<Specimen> specimens;
-    private Set<Platform> platforms;
-    private Set<MolecularCharacterization>  molecularCharacterizations;
-    private Set< List<MarkerAssociation> > markerAssociations;
-
-    private Map<String, String> patientTech;
-    private Map<String, Set<String>> modelTechAndPassages;
-
-    private List<VariationDataDTO> variationDataDTOList;
-    private Map<String, String> techNPassToSampleId;
-    private Set<String> autoSuggestList;
-    private Map<String, String> platformsAndUrls;
-    private List<Map> dataSummary;
-    private int patientDataSize;
-    private int xenograftDataSize;
-
-    */
-
+    private List<Publication> publications;
 
     public DetailsDTO() {
-
+        // Empty Constructor
     }
 
 
@@ -383,5 +314,13 @@ public class DetailsDTO {
 
     public void setDataTypes(Set<String> dataTypes) {
         this.dataTypes = dataTypes;
+    }
+
+    public List<Publication> getPublications() {
+        return publications;
+    }
+
+    public void setPublications(List<Publication> publications) {
+        this.publications = publications;
     }
 }
