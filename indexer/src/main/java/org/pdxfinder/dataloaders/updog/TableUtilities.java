@@ -31,6 +31,7 @@ public class TableUtilities {
     public static Table readTsv(File file) throws IOException {
         CsvReadOptions.Builder builder = CsvReadOptions
             .builder(file)
+            .sample(false)
             .separator('\t');
         CsvReadOptions options = builder.build();
         return Table.read().usingOptions(options);

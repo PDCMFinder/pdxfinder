@@ -36,12 +36,11 @@ public class DomainObjectCreator {
 
     public DomainObjectCreator(
             DataImportService dataImportService,
-            Map<String, Table> pdxDataTables) {
+            Map<String, Table> pdxDataTables
+    ) {
         this.dataImportService = dataImportService;
         this.pdxDataTables = pdxDataTables;
         domainObjects = new HashMap<>();
-
-
     }
 
     public void loadDomainObjects() {
