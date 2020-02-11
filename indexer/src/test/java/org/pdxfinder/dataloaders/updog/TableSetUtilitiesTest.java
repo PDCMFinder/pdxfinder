@@ -64,7 +64,7 @@ public class TableSetUtilitiesTest {
         );
     }
 
-    @Test public void removeHeaderRowsIfPresetn_givenNoHeaders_returnTable() {
+    @Test public void removeHeaderRowsIfPresent_givenNoHeaders_returnTable() {
         Table table = Table.create().addColumns(
             StringColumn.create("required_column", Arrays.asList("1", "2", "3", "4", "5")));
         Table expected = table;
@@ -91,15 +91,43 @@ public class TableSetUtilitiesTest {
     }
 
     @Test public void removeProviderNameFromFilename_givenProviderInFilename_stripProvider() {
+        final String TABLE_NAME = "PROVIDER-BC_table_1.tsv";
+        final String NEW_TABLE_NAME = "table_1.tsv";
         Map<String, Table> tableSet = new HashMap<>();
-        Arrays.asList("PROVIDER-BC_table_1.tsv").forEach(
-            s -> tableSet.put(s, Table.create("PROVIDER-BC_table_1.tsv")));
+        Arrays.asList(TABLE_NAME).forEach(
+            s -> tableSet.put(s, Table.create(TABLE_NAME)));
         Map<String, Table> expected = new HashMap<>();
-        Arrays.asList("table_1.tsv").forEach(
-            s -> expected.put(s, Table.create("table_1.tsv")));
+        Arrays.asList(NEW_TABLE_NAME).forEach(
+            s -> expected.put(s, Table.create(NEW_TABLE_NAME)));
         assertEquals(
             expected.toString(),
             removeProviderNameFromFilename(tableSet).toString()
         );
     }
+
+    @Test public void removeProviderNameFromFilename_givenMultipleSep_stripProvider() {
+        final String TABLE_NAME = "PROVIDER_123_table_1.tsv";
+        final String NEW_TABLE_NAME = "123_table_1.tsv";
+        Map<String, Table> tableSet = new HashMap<>();
+        Arrays.asList(TABLE_NAME).forEach(
+            s -> tableSet.put(s, Table.create(TABLE_NAME)));
+        Map<String, Table> expected = new HashMap<>();
+        Arrays.asList(NEW_TABLE_NAME).forEach(
+            s -> expected.put(s, Table.create(NEW_TABLE_NAME)));
+        assertEquals(
+            expected.toString(),
+            removeProviderNameFromFilename(tableSet).toString()
+        );
+    }
+
+    @Test public void removeProviderNameFromFilename_givenNoSeparators_doNotStrip() {
+        Map<String, Table> expected = new HashMap<>();
+        Arrays.asList("table.tsv").forEach(
+            s -> expected.put(s, Table.create("table.tsv")));
+        assertEquals(
+            expected.toString(),
+            removeProviderNameFromFilename(expected).toString()
+        );
+    }
+
 }
