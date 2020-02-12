@@ -16,7 +16,7 @@ public class TumorType {
 
     private String name;
 
-    private TumorType() {
+    public TumorType() {
         // Empty constructor required as of Neo4j API 2.0.5
     }
 
