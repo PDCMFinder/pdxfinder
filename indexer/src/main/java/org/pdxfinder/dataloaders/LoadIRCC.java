@@ -1,7 +1,5 @@
 package org.pdxfinder.dataloaders;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONException;
 import org.neo4j.ogm.json.JSONObject;
@@ -12,33 +10,27 @@ import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
 
-@Component
-@Order(value = -19)
+@Component("LoadIRCC")
 @PropertySource("classpath:loader.properties")
 @ConfigurationProperties(prefix = "ircc")
-public class LoadIRCC extends LoaderBase implements CommandLineRunner {
+public class LoadIRCC extends LoaderBase {
     private static final Logger log = LoggerFactory.getLogger(LoadIRCC.class);
+
+    @Value("${pdxfinder.root.dir}") private String finderRootDir;
+    @Value("${irccpdx.variation.max}") private int variationMax;
 
     // samples -> markerAsssociations
     private HashMap<String, HashSet<MarkerAssociation>> markerAssociations = new HashMap();
     private HashMap<String, HashMap<String, String>> specimenSamples = new HashMap();
     private HashSet<Integer> loadedModelHashes = new HashSet<>();
-
-    @Value("${pdxfinder.root.dir}")
-    private String finderRootDir;
-
-    @Value("${irccpdx.variation.max}")
-    private int variationMax;
 
     @PostConstruct
     public void init() {
@@ -49,19 +41,9 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
         super(utilityService, dataImportService);
     }
 
-    @Override
     public void run(String... args) throws Exception {
-
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadIRCC", "Load IRCC PDX data");
-        parser.accepts("loadALL", "Load all, including IRCC PDX data");
-        OptionSet options = parser.parse(args);
-
-        if (options.has("loadIRCC") || options.has("loadALL")) {
-            initMethod();
-            irccAlgorithm();
-        }
+        initMethod();
+        irccAlgorithm();
     }
 
 
@@ -108,15 +90,8 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
 
     }
 
-    @Override
-    protected void step01GetMetaDataFolder() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected void step05CreateNSHostStrain() {
-        throw new UnsupportedOperationException();
-    }
+    @Override protected void step01GetMetaDataFolder() { throw new UnsupportedOperationException(); }
+    @Override protected void step05CreateNSHostStrain() { throw new UnsupportedOperationException(); }
 
     @Override
     protected void step10LoadExternalURLs() {
@@ -125,10 +100,7 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
         dataImportService.savePatientSnapshot(dto.getPatientSnapshot());
     }
 
-    @Override
-    protected void step11LoadBreastMarkers() {
-        throw new UnsupportedOperationException();
-    }
+    @Override protected void step11LoadBreastMarkers() { throw new UnsupportedOperationException(); }
 
     @Override
     protected void step13LoadSpecimens()throws Exception {
@@ -168,15 +140,8 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
         }
     }
 
-    @Override
-    protected void step14LoadPatientTreatments() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected void step15LoadImmunoHistoChemistry() {
-        throw new UnsupportedOperationException();
-    }
+    @Override protected void step14LoadPatientTreatments() { throw new UnsupportedOperationException(); }
+    @Override protected void step15LoadImmunoHistoChemistry() { throw new UnsupportedOperationException(); }
 
     @Override
     protected void step16LoadVariationData() {

@@ -1,11 +1,5 @@
 package org.pdxfinder.dataloaders;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.neo4j.ogm.session.Session;
@@ -18,83 +12,44 @@ import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.*;
 
-/**
- * Load data from JAX.
- */
-@Component
-@Order(value = -18)
+@Component("LoadJAX")
 @PropertySource("classpath:loader.properties")
 @ConfigurationProperties(prefix = "jax")
-public class LoadJAXData extends LoaderBase implements CommandLineRunner {
+public class LoadJAXData extends LoaderBase {
 
     private final static Logger log = LoggerFactory.getLogger(LoadJAXData.class);
-
-    private Options options;
-    private CommandLineParser parser;
-    private CommandLine cmd;
-    private HelpFormatter formatter;
-
     private Session session;
 
-    @Value("${jaxpdx.variation.max}")
-    private int maxVariations;
-
-    @Value("${jaxpdx.ref.assembly}")
-    private String refAssembly;
-
-    @Value("${pdxfinder.root.dir}")
-    private String finderRootDir;
+    @Value("${jaxpdx.variation.max}") private int maxVariations;
+    @Value("${jaxpdx.ref.assembly}") private String refAssembly;
+    @Value("${pdxfinder.root.dir}") private String finderRootDir;
 
     HashMap<String, String> passageMap = null;
-
     Map<String, Platform> platformMap = new HashMap<>();
 
     @PostConstruct
-    public void init() {
-        formatter = new HelpFormatter();
-    }
+    public void init() {}
 
     public LoadJAXData(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
     }
 
-    @Override
     public void run(String... args) throws Exception {
-
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadJAX", "Load JAX PDX data");
-        parser.accepts("loadALL", "Load all, including JAX PDX data");
-        parser.accepts("loadSlim", "Load slim, then link samples to NCIT terms");
-        OptionSet options = parser.parse(args);
-
-        if (options.has("loadJAX") || options.has("loadALL")  || options.has("loadSlim")) {
-
-            initMethod();
-
-            globalLoadingOrder();
-
-        }
+        initMethod();
+        globalLoadingOrder();
     }
-
-
-
 
     @Override
     protected void initMethod() {
-
         log.info("Loading JAX PDX data.");
-
         dto = new LoaderDTO();
 
         jsonFile = finderRootDir + "/data/" + dataSourceAbbreviation+"/pdx/models.json";
@@ -106,33 +61,9 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         platformURL.put("Whole_Exome_mutation","/platform/jax-whole-exome/");
     }
 
-
-
-    @Override
-    protected void step01GetMetaDataFolder() {
-
-    }
-
-
-
-    // JAX uses default implementation Steps step02GetMetaDataJSON
-
-
-    @Override
-    protected void step05CreateNSHostStrain() {
-
-    }
-
-
-    @Override
-    protected void step06SetProjectGroup() {
-
-    }
-
-
-    // JAX uses default implementation Steps step08GetMetaData
-
-
+    @Override protected void step01GetMetaDataFolder() { throw new UnsupportedOperationException(); }
+    @Override protected void step05CreateNSHostStrain() { throw new UnsupportedOperationException(); }
+    @Override protected void step06SetProjectGroup() { throw new UnsupportedOperationException(); }
 
     @Override
     protected void step09LoadPatientData() {
@@ -156,9 +87,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         super.step09LoadPatientData();
     }
 
-
-
-
     @Override
     protected void step10LoadExternalURLs() {
         if(dto.isSkipModel()) return ;
@@ -166,9 +94,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
         loadExternalURLs(dataSourceContact+dto.getModelID(), dataSourceURL+dto.getModelID());
     }
-
-
-
 
     @Override
     protected void step11LoadBreastMarkers() {
@@ -216,9 +141,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     }
 
-
-
-
     @Override
     protected void step12CreateModels() throws Exception  {
         if(dto.isSkipModel()) return ;
@@ -235,10 +157,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
         super.step12CreateModels();
 
     }
-
-
-
-
 
     @Override
     protected void step13LoadSpecimens() {
@@ -258,50 +176,25 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     }
 
-
-
-
-    @Override
-    protected void step14LoadPatientTreatments() {
-
-
-    }
-
-
-
-
-    @Override
-    protected void step15LoadImmunoHistoChemistry() {
-
-    }
-
+    @Override protected void step14LoadPatientTreatments() { throw new UnsupportedOperationException(); }
+    @Override protected void step15LoadImmunoHistoChemistry() { throw new UnsupportedOperationException(); }
 
     @Override
     protected void step16LoadVariationData() {
         if(dto.isSkipModel()) return ;
         String dataDirectory = finderRootDir+"/data/"+dataSourceAbbreviation;
-
         loadOmicData(dto.getModelCreation(), providerDS,"mutation", dataDirectory);
-
         loadOmicData(dto.getModelCreation(), providerDS,"copy number alteration", dataDirectory);
-
         loadOmicData(dto.getModelCreation(), providerDS,"transcriptomics", dataDirectory);
-
     }
-
 
     @Override
     void step17LoadModelDosingStudies() throws Exception {
         if(dto.isSkipModel()) return ;
         loadModelDosingStudies();
-
     }
 
-    @Override
-    void step18SetAdditionalGroups() {
-        throw new UnsupportedOperationException();
-    }
-
+    @Override void step18SetAdditionalGroups() { throw new UnsupportedOperationException(); }
 
     /*
     For a given model return a map of passage # or "Patient" -> histology image URL
@@ -356,9 +249,6 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                 }
 
             }
-
-
-
 
         return map;
     }

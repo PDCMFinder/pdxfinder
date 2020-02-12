@@ -1,8 +1,5 @@
 package org.pdxfinder.dataloaders;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.apache.commons.cli.HelpFormatter;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
@@ -12,61 +9,33 @@ import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.util.*;
 
-/**
- * Load data from HCI PDXNet.
- */
-@Component
-@Order(value = -20)
+@Component("LoadHCI")
 @PropertySource("classpath:loader.properties")
 @ConfigurationProperties(prefix = "hci")
-public class LoadHCI extends LoaderBase implements CommandLineRunner {
-
+public class LoadHCI extends LoaderBase {
 
     private final static Logger log = LoggerFactory.getLogger(LoadHCI.class);
-
-    private HelpFormatter formatter;
-
-    @Value("${pdxfinder.root.dir}")
-    private String finderRootDir;
+    @Value("${pdxfinder.root.dir}") private String finderRootDir;
 
     @PostConstruct
-    public void init() {
-        formatter = new HelpFormatter();
-    }
+    public void init() { }
 
     public LoadHCI(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
     }
 
-    @Override
     public void run(String... args) throws Exception {
-
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadHCI", "Load HCI PDX data");
-        parser.accepts("loadALL", "Load all, including HCI PDX data");
-        OptionSet options = parser.parse(args);
-
-        if (options.has("loadHCI") || options.has("loadALL")) {
-
-            initMethod();
-
-            globalLoadingOrder();
-
-        }
+        initMethod();
+        globalLoadingOrder();
     }
-
-
 
     @Override
     protected void initMethod() {
@@ -80,30 +49,14 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
         filesDirectory = "";
     }
 
-
-
-    @Override
-    protected void step01GetMetaDataFolder() { }
-
-
-
-    // HCI uses common implementation Steps step08GetMetaData,step09LoadPatientData default
-
+    @Override protected void step01GetMetaDataFolder() { throw new UnsupportedOperationException(); }
 
     @Override
     protected void step10LoadExternalURLs() {
-
         loadExternalURLs(dataSourceContact,Standardizer.NOT_SPECIFIED);
     }
 
-
-    @Override
-    protected void step11LoadBreastMarkers() {
-
-    }
-
-    // HCI uses common implementation Steps  step12CreateModels default
-
+    @Override protected void step11LoadBreastMarkers() { throw new UnsupportedOperationException(); }
 
     @Override
     protected void step13LoadSpecimens() {
@@ -149,17 +102,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
         dataImportService.saveModelCreation(dto.getModelCreation());
     }
 
-
-
-
-    @Override
-    protected void step14LoadPatientTreatments() {
-
-
-    }
-
-
-
+    @Override protected void step14LoadPatientTreatments() { throw new UnsupportedOperationException(); }
 
     @Override
     protected void step15LoadImmunoHistoChemistry() {
@@ -295,24 +238,13 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
 
     }
 
-
-
-    @Override
-    protected void step16LoadVariationData() { }
-
+    @Override protected void step16LoadVariationData() {  throw new UnsupportedOperationException(); }
 
     @Override
     void step17LoadModelDosingStudies() throws Exception {
-
         loadModelDosingStudies();
     }
 
-    @Override
-    void step18SetAdditionalGroups() {
-        throw new UnsupportedOperationException();
-    }
-
-
-
+    @Override void step18SetAdditionalGroups() { throw new UnsupportedOperationException(); }
 
 }
