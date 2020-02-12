@@ -374,6 +374,44 @@
 
                             </div>
 
+
+
+                            <div th:unless="${#lists.isEmpty(data.publications)}"
+                                 class="columns medium-12 small-12 margin-top-medium card-3">
+                                <div class="responsive-table top-space-20">
+
+                                    <table th:each="pub, iter : ${data.publications}" class="datatable-pdx table-borderedPdx pdx-table head-left">
+
+                                        <thead th:if="${iter.index == 0}">
+                                            <tr><th colspan="2"> Publications</th></tr>
+                                        </thead>
+
+                                        <tbody>
+                                        <tr>
+                                            <th class="text-left medium-4"> Title </th>
+                                            <td><a th:text="${#strings.capitalizeWords(pub.resultList.result[0].title)}"
+                                                   th:href="| https://europepmc.org/article/MED/${pub.resultList.result[0].pmid} |"
+                                                   target="_blank"> Title Text <i class="icon icon-generic" data-icon="x"> </i> </a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Authors</th>
+                                            <td th:text="${pub.resultList.result[0].authorString}">Bougherara H, Némati F, Nicolas A, ... Decaudin D.</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Publication year</th>
+                                            <td th:text="${pub.resultList.result[0].pubYear}"> 2017 </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4"> Journal</th>
+                                            <td th:text="${pub.resultList.result[0].journalTitle}">  Oncotarget </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+
                         </div>
 
 
