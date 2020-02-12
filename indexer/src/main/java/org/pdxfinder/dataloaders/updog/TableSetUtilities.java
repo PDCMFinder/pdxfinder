@@ -1,6 +1,7 @@
 package org.pdxfinder.dataloaders.updog;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.StringUtil;
 import tech.tablesaw.api.Table;
 
 import java.util.Map;
@@ -65,9 +66,15 @@ class TableSetUtilities {
     static Map<String, Table> removeProviderNameFromFilename(Map<String, Table> tableSet) {
         return tableSet.entrySet().stream().collect(
             Collectors.toMap(
-                e -> StringUtils.substringAfter(e.getKey(), "_"),
-                e -> e.getValue().setName(StringUtils.substringAfter(e.getKey(), "_"))
+                e -> substringAfterIfContainsSeparator(e.getKey(), "_"),
+                e -> e.getValue().setName(substringAfterIfContainsSeparator(e.getKey(), "_"))
             ));
+    }
+
+    static String substringAfterIfContainsSeparator(String string, String separator) {
+        return string.contains(separator)
+            ? StringUtils.substringAfter(string, separator)
+            : string;
     }
 
 }
