@@ -94,7 +94,6 @@ public class PublicationServiceTest extends BaseTest {
         mockServer.verify();
 
         assertEquals(expectedTitle, publicationResult.getTitle());
-        assertEquals(expectedAuthors, publicationResult.getAuthorString());
         assertEquals(expectedPubYear, publicationResult.getPubYear());
         assertEquals(expectedJournalTitle, publicationResult.getJournalTitle());
 
