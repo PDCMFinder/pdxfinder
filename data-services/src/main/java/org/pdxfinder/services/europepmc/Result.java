@@ -3,6 +3,10 @@ package org.pdxfinder.services.europepmc;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "id",
@@ -94,7 +98,16 @@ public class Result {
     }
 
     public String getAuthorString() {
-        return authorString;
+
+        String delimiter = ", ";
+        String first3Authors = Arrays.stream(this.authorString.split(delimiter))
+                .limit(3)
+                .map(Object::toString)
+                .collect(Collectors.joining(delimiter));
+
+        String lastAuthor = this.authorString.substring(this.authorString.lastIndexOf(delimiter) + 1);
+
+       return String.format("%s ... %s", first3Authors, lastAuthor);
     }
 
     public String getJournalTitle() {

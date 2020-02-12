@@ -60,7 +60,7 @@ public class PublicationServiceTest extends BaseTest {
     }
 
     @Test
-    public void givenMockingIsDoneByMockRestServiceServer_whenGetIsCalled_thenReturnsMockedObject() throws Exception {
+    public void givenPubMedIdAndApiUrl_whenGetEuropePmcPublicationsIsCalled_thenReturnEuropmcResult() throws Exception {
 
         // given
         String pubMedId = "29245952";
@@ -84,10 +84,13 @@ public class PublicationServiceTest extends BaseTest {
                                     .body(mapper.writeValueAsString(expectedPublication))
                 );
 
+        //when
         Result publicationResult = publicationService.getEuropePmcPublications(Collections.singletonList(pubMedId))
                 .get(0)
                 .getResultList().get("resultList").get(0);
 
+
+        //then
         mockServer.verify();
 
         assertEquals(expectedTitle, publicationResult.getTitle());

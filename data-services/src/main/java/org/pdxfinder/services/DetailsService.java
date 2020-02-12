@@ -7,6 +7,8 @@ import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.repositories.*;
 import org.pdxfinder.services.constants.MolCharTable;
 import org.pdxfinder.services.dto.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +16,6 @@ import java.util.*;
 
 @Service
 public class DetailsService {
-
 
     private SampleRepository sampleRepository;
 
@@ -30,7 +31,7 @@ public class DetailsService {
     private PatientService patientService;
     private PublicationService publicationService;
 
-    private final String NOT_SPECIFIED = "NOT_SPECIFIED";
+    private static final String NOT_SPECIFIED = "NOT_SPECIFIED";
 
     public DetailsService(SampleRepository sampleRepository,
                           PatientRepository patientRepository,
@@ -216,7 +217,7 @@ public class DetailsService {
                     );
 
                     edto.setEngraftmentMaterial(
-                            (sp.getEngraftmentMaterial() != null) ? notEmpty(sp.getEngraftmentMaterial().getName()) : NOT_SPECIFIED 
+                            (sp.getEngraftmentMaterial() != null) ? notEmpty(sp.getEngraftmentMaterial().getName()) : NOT_SPECIFIED
                     );
 
                     edto.setEngraftmentMaterialState(
@@ -333,8 +334,6 @@ public class DetailsService {
 
         for(Specimen sp: specimens){
 
-
-
             if(sp.getSample() != null){
 
                 Sample xenoSample = sp.getSample();
@@ -343,7 +342,7 @@ public class DetailsService {
 
                     MolecularDataEntryDTO mde = new MolecularDataEntryDTO();
 
-                    mde.setSampleId(xenoSample.getSourceSampleId()== null ? NOT_SPECIFIED:xenoSample.getSourceSampleId());
+                    mde.setSampleId(xenoSample.getSourceSampleId()== null ? NOT_SPECIFIED :xenoSample.getSourceSampleId());
                     mde.setSampleType("Engrafted Tumor");
                     mde.setEngraftedTumorPassage(sp.getPassage());
                     mde.setMolcharType(mc.getType());
@@ -380,15 +379,18 @@ public class DetailsService {
 
             // Get PDX Publication Data
             List<String> pubMedIds = new ArrayList<>();
-            for (Group group : pdx.getGroups()){
-                if (group.getType().equals("Publication")){
-                    pubMedIds.add(group.getPubMedId());
+            Optional<Set<Group>> optionalGroups = Optional.ofNullable(pdx.getGroups());
+
+            optionalGroups.ifPresent(groups -> {
+
+                for (Group group : groups){
+                    if (group.getType().equals("Publication")){
+                        pubMedIds.add(group.getPubMedId());
+                    }
                 }
-            }
+            });
 
             dto.setPublications(publicationService.getEuropePmcPublications(pubMedIds));
-
-
 
         }
 
@@ -901,7 +903,6 @@ public class DetailsService {
         if (ts != null && ts.getTreatmentProtocols() != null) {
 
             for (TreatmentProtocol tp : ts.getTreatmentProtocols()) {
-
 
 
                 DrugSummaryDTO dto = new DrugSummaryDTO();

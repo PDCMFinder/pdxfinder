@@ -1,7 +1,9 @@
 package org.pdxfinder.services.dto;
 
 import org.pdxfinder.services.europepmc.Publication;
+import org.pdxfinder.services.europepmc.Result;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -317,7 +319,7 @@ public class DetailsDTO {
     }
 
     public List<Publication> getPublications() {
-        return publications;
+        return this.publications;
     }
 
     public void setPublications(List<Publication> publications) {
