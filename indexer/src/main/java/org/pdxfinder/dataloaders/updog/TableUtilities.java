@@ -2,7 +2,6 @@ package org.pdxfinder.dataloaders.updog;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.tablesaw.api.ColumnType;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
@@ -11,7 +10,7 @@ import tech.tablesaw.selection.Selection;
 import java.io.File;
 import java.io.IOException;
 
-public class TableUtilities {
+public final class TableUtilities {
 
     private static final Logger log = LoggerFactory.getLogger(TableUtilities.class);
 

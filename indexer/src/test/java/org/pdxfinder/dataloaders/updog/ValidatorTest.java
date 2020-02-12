@@ -78,8 +78,8 @@ public class ValidatorTest {
         List<ValidationError> expected = Collections.singletonList(
             ValidationError.missingFile(TABLE_1).setProvider(PROVIDER));
         assertEquals(
-            expected.toString(),
-            validator.validate(incompleteTableSet, requireTable).toString()
+            expected,
+            validator.validate(incompleteTableSet, requireTable)
         );
     }
 
@@ -94,8 +94,8 @@ public class ValidatorTest {
         TableSetSpecification tableSetSpecification = TableSetSpecification.create().setProvider(PROVIDER)
             .addRequiredColumnSets(columnSpecifications);
         assertEquals(
-            expected.toString(),
-            validator.validate(completeTableSet, tableSetSpecification).toString()
+            expected,
+            validator.validate(completeTableSet, tableSetSpecification)
         );
     }
 

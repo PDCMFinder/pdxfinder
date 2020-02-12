@@ -3,6 +3,7 @@ package org.pdxfinder.dataloaders.updog;
 import org.apache.commons.lang3.tuple.Pair;
 import tech.tablesaw.api.Table;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -193,8 +194,30 @@ public class ValidationError {
         return message.toString();
     }
 
-    private int toOneBasedIndex(int number) {
-        return number + 1;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ValidationError that = (ValidationError) o;
+        return Objects.equals(getTable(), that.getTable()) &&
+            Objects.equals(getProvider(), that.getProvider()) &&
+            Objects.equals(getErrorType(), that.getErrorType()) &&
+            Objects.equals(getColumn(), that.getColumn()) &&
+            Objects.equals(getRelation(), that.getRelation()) &&
+            Objects.equals(getInvalidRows(), that.getInvalidRows()) &&
+            Objects.equals(getDescription(), that.getDescription());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+            getTable(),
+            getProvider(),
+            getErrorType(),
+            getColumn(),
+            getRelation(),
+            getInvalidRows(),
+            getDescription());
     }
 
 }
