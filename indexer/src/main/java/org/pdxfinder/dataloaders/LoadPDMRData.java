@@ -1,5 +1,11 @@
 package org.pdxfinder.dataloaders;
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
@@ -9,49 +15,116 @@ import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
 
-@Component("LoadPDMR")
+/**
+ * Load PDMR data
+ */
+@Component
+@Order(value = -16)
 @PropertySource("classpath:loader.properties")
 @ConfigurationProperties(prefix = "pdmr")
-public class LoadPDMRData extends LoaderBase {
+public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadPDMRData.class);
 
-    @Value("${pdxfinder.root.dir}") private String finderRootDir;
+    private Options options;
+    private CommandLineParser parser;
+    private CommandLine cmd;
+    private HelpFormatter formatter;
+
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
+
+
+    /*private Session session;
+
+    @Value("${pdmrpdx.variation.max}")
+    private int maxVariations;
+
+    @Value("${pdmrpdx.ref.assembly}")
+    private String refAssembly;
+
+    HashMap<String, String> passageMap = null;
+    HashMap<String, Image> histologyMap = null;
+    */
 
     @PostConstruct
     public void init() {
-        // Blank override - no initialisation behaviour required
+        formatter = new HelpFormatter();
     }
 
     public LoadPDMRData(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
     }
 
+
+
+    @Override
     public void run(String... args) throws Exception {
-        initMethod();
-        globalLoadingOrder();
+
+        OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
+        parser.accepts("loadPDMR", "Load PDMR PDX data");
+        parser.accepts("loadALL", "Load all, including PDMR PDX data");
+        OptionSet options = parser.parse(args);
+
+
+        if (options.has("loadPDMR") || options.has("loadALL")) {
+
+            initMethod();
+
+            globalLoadingOrder();
+        }
+
+
+
     }
+
+
+
 
     @Override
     protected void initMethod() {
+
         log.info("Loading PDMR PDX data.");
+
         dto = new LoaderDTO();
+
         jsonFile = finderRootDir +"/data/"+dataSourceAbbreviation+"/pdx/models.json";
         dataSource = dataSourceAbbreviation;
+
         platformURL = new HashMap<>();
         platformURL.put("NCI cancer gene panel_mutation","/platform/pdmr-mut-ts");
     }
 
-    @Override protected void step01GetMetaDataFolder() { throw new UnsupportedOperationException(); }
-    @Override protected void step05CreateNSHostStrain() { throw new UnsupportedOperationException(); }
-    @Override protected void step06SetProjectGroup() { throw new UnsupportedOperationException(); }
+
+    @Override
+    protected void step01GetMetaDataFolder() {
+
+    }
+
+    // PDMR uses default implementation Steps step02GetMetaDataJSON
+
+    @Override
+    protected void step05CreateNSHostStrain() {
+
+    }
+
+
+    @Override
+    protected void step06SetProjectGroup() {
+
+    }
+
+    // PDMR uses default implementation Steps step08GetMetaData
 
     @Override
     protected void step09LoadPatientData() {
@@ -60,6 +133,7 @@ public class LoadPDMRData extends LoaderBase {
         super.step09LoadPatientData();
     }
 
+
     @Override
     protected void step10LoadExternalURLs() {
 
@@ -67,7 +141,13 @@ public class LoadPDMRData extends LoaderBase {
         loadExternalURLs(dataSourceContact, dto.getSourceURL());
     }
 
-    @Override protected void step11LoadBreastMarkers() { throw new UnsupportedOperationException(); }
+
+    @Override
+    protected void step11LoadBreastMarkers() {
+
+    }
+
+
 
     @Override
     protected void step12CreateModels() throws Exception {
@@ -87,6 +167,8 @@ public class LoadPDMRData extends LoaderBase {
         modelCreation.addRelatedSample(dto.getPatientSample());
         dto.setModelCreation(modelCreation);
     }
+
+
 
     @Override
     protected void step13LoadSpecimens()throws Exception {
@@ -129,6 +211,9 @@ public class LoadPDMRData extends LoaderBase {
             }
         }
     }
+
+
+
 
     @Override
     protected void step14LoadPatientTreatments() throws Exception {
@@ -199,16 +284,30 @@ public class LoadPDMRData extends LoaderBase {
 
     }
 
-    @Override protected void step15LoadImmunoHistoChemistry() { throw new UnsupportedOperationException(); }
+
+    @Override
+    protected void step15LoadImmunoHistoChemistry() {
+
+    }
+
 
     @Override
     protected void step16LoadVariationData() {
 
         log.info("Loading NGS for model " + dto.getModelCreation().getSourcePdxId());
+
         loadOmicData(dto.getModelCreation(), providerDS, "mutation",finderRootDir+"/data/"+dataSourceAbbreviation);
     }
 
-    @Override void step17LoadModelDosingStudies() throws Exception { throw new UnsupportedOperationException(); }
-    @Override void step18SetAdditionalGroups() { throw new UnsupportedOperationException(); }
+
+    @Override
+    void step17LoadModelDosingStudies() throws Exception {
+
+    }
+
+    @Override
+    void step18SetAdditionalGroups() {
+        throw new UnsupportedOperationException();
+    }
 
 }

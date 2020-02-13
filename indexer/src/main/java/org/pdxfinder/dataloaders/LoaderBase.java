@@ -14,12 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.*;
 
-@Component
 public abstract class LoaderBase extends UniversalLoaderOmic implements ApplicationContextAware{
 
     private static final Logger log = LoggerFactory.getLogger(LoaderBase.class);

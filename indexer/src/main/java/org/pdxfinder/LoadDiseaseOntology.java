@@ -23,6 +23,7 @@ import java.util.Set;
  * Created by csaba on 12/06/2017.
  */
 @Component
+@Order(value = -100)
 public class LoadDiseaseOntology implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadDiseaseOntology.class);

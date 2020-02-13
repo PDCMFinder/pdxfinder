@@ -1,7 +1,14 @@
 package org.pdxfinder.dataloaders;
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
+import org.neo4j.ogm.session.Session;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
@@ -10,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +27,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component("LoadWISTAR")
-public class LoadWISTAR {
+/**
+ * Load models from WISTAR
+ */
+@Component
+@Order(value = -15)
+public class LoadWISTAR implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(LoadWISTAR.class);
 
@@ -41,28 +54,56 @@ public class LoadWISTAR {
     private Group wistarDS;
     private Group projectGroup;
 
-    private DataImportService dataImportService;
+    private Options options;
+    private CommandLineParser parser;
+    private CommandLine cmd;
+    private HelpFormatter formatter;
 
-    @Autowired private UtilityService utilityService;
-    @Value("${pdxfinder.root.dir}") private String finderRootDir;
+    private DataImportService dataImportService;
+    private Session session;
+
+    @Autowired
+    private UtilityService utilityService;
+
+
+    @Value("${pdxfinder.root.dir}")
+    private String finderRootDir;
 
     @PostConstruct
-    public void init() { }
+    public void init() {
+        formatter = new HelpFormatter();
+    }
 
     public LoadWISTAR(DataImportService dataImportService) {
         this.dataImportService = dataImportService;
     }
 
+    @Override
     public void run(String... args) throws Exception {
 
-        String urlStr = finderRootDir+ "/data/" +DATASOURCE_ABBREVIATION+"/pdx/models.json";
-        File file = new File(urlStr);
-        if(file.exists()){
-            log.info("Loading WISTAR PDX data from URL " + urlStr);
-            parseJSON(utilityService.parseFile(urlStr));
-        }
-        else{
-            log.info("No file found for "+DATASOURCE_ABBREVIATION+", skipping");
+        OptionParser parser = new OptionParser();
+        parser.allowsUnrecognizedOptions();
+        parser.accepts("loadWISTAR", "Load WISTAR PDX data");
+        parser.accepts("loadALL", "Load all, including WISTAR PDX data");
+        OptionSet options = parser.parse(args);
+
+        if (options.has("loadWISTAR") || options.has("loadALL")) {
+
+
+            String urlStr = finderRootDir+ "/data/" +DATASOURCE_ABBREVIATION+"/pdx/models.json";
+            File file = new File(urlStr);
+            if(file.exists()){
+
+                log.info("Loading WISTAR PDX data from URL " + urlStr);
+                parseJSON(utilityService.parseFile(urlStr));
+            }
+            else{
+
+                log.info("No file found for "+DATASOURCE_ABBREVIATION+", skipping");
+            }
+
+
+
         }
 
     }
@@ -152,6 +193,9 @@ public class LoadWISTAR {
         // String grade, String gradeClassification
         Sample sample = dataImportService.getSample(id, wistarDS.getAbbreviation(), tumorType, diagnosis, NOT_SPECIFIED,
                 NOT_SPECIFIED, extractionMethod, false, stage, "", grade, "");
+
+
+
 
         pSnap.addSample(sample);
 
