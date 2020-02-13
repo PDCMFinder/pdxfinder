@@ -118,9 +118,4 @@ public class DataProviders implements ApplicationContextAware {
 
     }
 
-//    public String getLoader(DataProvider provider) {
-//        Map<DataProvider, String> map;
-//    }
-//
-
 }

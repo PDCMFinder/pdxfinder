@@ -1,10 +1,10 @@
 package org.pdxfinder;
 
-import org.pdxfinder.envload.LoadMarkers;
-import org.pdxfinder.envload.LoadNCIT;
-import org.pdxfinder.envload.LoadNCITDrugs;
+import org.pdxfinder.services.constants.DataUrl;
+import org.pdxfinder.services.loader.envload.LoadMarkers;
+import org.pdxfinder.services.loader.envload.LoadNCIT;
+import org.pdxfinder.services.loader.envload.LoadNCITDrugs;
 import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.utils.DataProviders.DataProvider;
 import org.pdxfinder.utils.DataProviders.DataProviderGroup;
 import org.slf4j.Logger;
@@ -95,22 +95,11 @@ public class FinderCommandLine implements Callable<Integer> {
 
         @Override
         public Integer call() {
-            printCommandCalledWith();
             keepDatabaseIfRequested();
-
             loadOntologies();
             loadRequestedPDXData();
 
             return 33;
-        }
-
-        private void printCommandCalledWith() {
-            System.out.printf(
-                "\n\nindexer load was called with -d=%s --clear-cache=%s --keep-db=%s\n",
-                dataDirectory,
-                clearCacheRequested,
-                keepDatabaseRequested);
-            System.out.printf( "Loading data providers: %s%n\n", datasetRequested.getDataProvider() );
         }
 
         private void keepDatabaseIfRequested() {
@@ -124,7 +113,7 @@ public class FinderCommandLine implements Callable<Integer> {
         private void clearDatabase() {
             log.info("Deleting all nodes and edges in existing database [{}]", databasePath);
             try {
-                dataImportService.deleteAll();
+//                dataImportService.deleteAll();
             }
             catch (DataAccessException e) {
                 log.error("Failed to delete database nodes and edges: {}", e);
@@ -137,13 +126,13 @@ public class FinderCommandLine implements Callable<Integer> {
             try { loadDiseaseOntology.run(); }
             catch (Exception e) { log.error("Failed to load disease ontology: {}", e); }
 
-            try {loadMarkers.run(); }
+            try { loadMarkers.loadGenes(DataUrl.HUGO_FILE_URL.get()); }
             catch (Exception e) { log.error("Failed to load markers: {}", e); }
 
-            try {loadNCITDrugs.run(); }
+            try { loadNCITDrugs.loadRegimens(); }
             catch (Exception e) { log.error("Failed to load NCIT Drugs: {}", e); }
 
-            try {loadNCIT.run(); }
+            try { loadNCIT.loadOntology(DataUrl.DISEASES_BRANCH_URL.get()); }
             catch (Exception e) { log.error("Failed to load NCIT: {}", e); }
 
         }
