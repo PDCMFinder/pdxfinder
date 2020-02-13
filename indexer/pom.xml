@@ -48,12 +48,6 @@
             <artifactId>data-services</artifactId>
         </dependency>
 
-        <!-- For loading excel documents -->
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>3.15</version>
-        </dependency>
 
     </dependencies>
 
