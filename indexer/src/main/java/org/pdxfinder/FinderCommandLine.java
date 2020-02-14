@@ -46,7 +46,8 @@ public class FinderCommandLine implements Callable<Integer> {
 
         @Autowired private DataImportService dataImportService;
 
-        @Value("${spring.data.neo4j.uri}") private File databaseURI;
+        @Value("${spring.data.neo4j.uri}")
+        private File databaseURI;
 
         @Autowired private LoadDiseaseOntology loadDiseaseOntology;
         @Autowired private LoadMarkers loadMarkers;
@@ -112,7 +113,7 @@ public class FinderCommandLine implements Callable<Integer> {
             if (keepDatabaseRequested) {
                 log.info("Using existing database: {}", databaseURI);
             } else {
-                clearDatabase();
+//                clearDatabase();
             }
         }
 
@@ -121,18 +122,21 @@ public class FinderCommandLine implements Callable<Integer> {
             try {
                 dataImportService.deleteAll();
             } catch (DataAccessException e) {
-                log.error("Failed to delete database nodes and edges: {}", e);
+                log.error("Failed to delete database nodes and edges:", e);
             }
+        }
+
+        private void loadOntologiesIfRequested() {
+            if (clearCacheRequested) loadOntologies();
         }
 
         private void loadOntologies() {
             log.info("Loading ontologies...");
 
+            loadMarkers();
+
             try { loadDiseaseOntology.run(); }
             catch (Exception e) { log.error("Failed to load disease ontology: {}", e); }
-
-            try { loadMarkers.loadGenes(DataUrl.HUGO_FILE_URL.get()); }
-            catch (Exception e) { log.error("Failed to load markers: {}", e); }
 
             try { loadNCITDrugs.loadRegimens(); }
             catch (Exception e) { log.error("Failed to load NCIT Drugs: {}", e); }
@@ -140,6 +144,16 @@ public class FinderCommandLine implements Callable<Integer> {
             try { loadNCIT.loadOntology(DataUrl.DISEASES_BRANCH_URL.get()); }
             catch (Exception e) { log.error("Failed to load NCIT: {}", e); }
 
+        }
+
+        private void loadMarkers() {
+            if (dataImportService.markerCacheIsEmpty() || clearCacheRequested) {
+                try {
+                    loadMarkers.loadGenes(DataUrl.HUGO_FILE_URL.get());
+                } catch (Exception e) {
+                    log.error("Failed to load markers: {}", e);
+                }
+            }
         }
 
         private void loadRequestedPDXData() {
@@ -169,7 +183,7 @@ public class FinderCommandLine implements Callable<Integer> {
         exitCodeOnExecutionException = 34)
     static class Export implements Callable<Integer> {
 
-        Logger log = LoggerFactory.getLogger(FinderCommandLine.class);
+        Logger log = LoggerFactory.getLogger(Export.class);
 
         @Override
         public Integer call() {

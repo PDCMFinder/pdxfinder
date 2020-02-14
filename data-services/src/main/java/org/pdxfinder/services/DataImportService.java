@@ -1043,6 +1043,10 @@ public class DataImportService {
         return markerRepository.countAllMarkers();
     }
 
+    public boolean markerCacheIsEmpty() {
+        return countAllMarkers() == 0;
+    }
+
     public Collection<Marker> getAllHumanMarkers() {
         return markerRepository.findAllHumanMarkers();
     }

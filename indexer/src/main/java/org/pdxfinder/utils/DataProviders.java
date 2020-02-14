@@ -22,6 +22,8 @@ public class DataProviders implements ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
+    public DataProviders() {}
+
     public enum DataProviderGroup {
         All,
         EurOPDX,
@@ -109,6 +111,8 @@ public class DataProviders implements ApplicationContextAware {
         VHIO_CRC;
 
         Logger log = LoggerFactory.getLogger(DataProviders.class);
+
+        DataProvider() {}
 
         public void load() {
             LoadUniversal loadUniversal = (LoadUniversal) applicationContext.getBean("LoadUniversal");
