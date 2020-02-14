@@ -6,9 +6,10 @@ import tech.tablesaw.api.Table;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.isA;
@@ -24,7 +25,7 @@ public class ValidationErrorTest {
         );
     }
 
-    @Test public void builderMethods_givenInstantiation_allReturnInstanceOfThisClass() {
+    @Test public void factoryMethods_givenInstantiation_returnInstanceOfThisClass() {
         ValidationError error = ValidationError.generic("table");
         assertThat(error, isA(ValidationError.class));
         assertThat(error.setProvider("provider"), isA(ValidationError.class));
@@ -33,7 +34,7 @@ public class ValidationErrorTest {
 
     @Test public void toString_givenInstantiation_returnsBasicErrorString() {
         String expected = "Error in [table]: Generic error: Custom description";
-        ValidationError error = createBasicError().setDescription("Custom description");
+        ValidationError error = ValidationError.generic("table").setDescription("Custom description");
         assertEquals(
             expected,
             error.toString()
@@ -144,8 +145,24 @@ public class ValidationErrorTest {
         );
     }
 
-    private ValidationError createBasicError() {
-        return ValidationError.generic("table");
+    @Test public void equals_givenIdenticalObjects_symmetricallyEqual() {
+        ValidationError x = ValidationError.generic("table");
+        ValidationError y = ValidationError.generic("table");
+        assertTrue(x.equals(y) && y.equals(x));
+    }
+
+    @Test public void equals_givenIdenticalObjects_hashCodeIsEqual() {
+        ValidationError x = ValidationError.generic("table");
+        ValidationError y = ValidationError.generic("table");
+        assertEquals(x.hashCode(), y.hashCode());
+    }
+
+    @Test public void hashCode_givenObjectPutInMap_identicalKeyRetrievesTheValue() {
+        ValidationError x = ValidationError.generic("table");
+        ValidationError y = ValidationError.generic("table");
+        Map<ValidationError, String> map = new HashMap<>();
+        map.put(x, "this");
+        assertEquals("this", map.get(y));
     }
 
 }
