@@ -1526,8 +1526,8 @@ public class DataImportService {
                                                 String characterizationType, String platform){
 
         //not found key to avoid looking up not found symbols multiple times
-        //key: datasource + modelId + symbol
-        if(notFoundMarkerSymbols.containsKey(dataSource+modelId+symbol)) return notFoundMarkerSymbols.get(dataSource+modelId+symbol);
+        //key: symbol
+        if(notFoundMarkerSymbols.containsKey(symbol)) return notFoundMarkerSymbols.get(symbol);
 
         NodeSuggestionDTO nsdto = new NodeSuggestionDTO();
         LogEntity le;
@@ -1629,7 +1629,7 @@ public class DataImportService {
                     le.setMessage(symbol +" is an unrecognised symbol");
                     le.setType("ERROR");
                     nsdto.setLogEntity(le);
-                    notFoundMarkerSymbols.put(dataSource+modelId+symbol, nsdto);
+                    notFoundMarkerSymbols.put(symbol, nsdto);
                 }
             }
 
