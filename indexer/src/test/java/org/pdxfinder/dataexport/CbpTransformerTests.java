@@ -1,109 +1,62 @@
 package org.pdxfinder.dataexport;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mock;
-import org.neo4j.ogm.json.JSONException;
-import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.utils.CbpTransformer;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
+import java.io.*;
 
-import static org.junit.Assert.fail;
 
 public class CbpTransformerTests extends BaseTest {
 
-    private UtilityService utilityService = new UtilityService();
-    private CbpTransformer cbpTransformer = new CbpTransformer();
-
-    private File jsonDummy;
-
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
+
+    private CbpTransformer cbpTransformer = new CbpTransformer();
+    private File jsonDummy;
 
     @Before
     public void init() throws IOException {
         jsonDummy = folder.newFile("UtilityTest.json");
     }
 
-    @Test
-    public void Given_seralizeJsonUriToString_WhenBlankCalled_ReturnNull() throws IOException, JSONException {
-
-        JSONObject jsObject = utilityService.seralizeJsonURItoJsonObject(jsonDummy.getAbsolutePath());
-        Assert.assertNull(jsObject);
-    }
 
     @Test
-    public void Given_givenBasicJsonInFile_WhenSerializeJsonURItoJsonArray_ReturnBasicArray() throws IOException, JSONException {
+    public void Give_JsonArrayAndValidImportDirectory_When_exportsIsCalled__ThenNewMutDirExists() throws IOException {
+
+        String ns = "Not Specified";
+
+        TemporaryFolder rootFolder = new TemporaryFolder();
+        rootFolder.create();
+        File exportFolder = rootFolder.newFolder();
+        File templatesFolder = rootFolder.newFolder();
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        workbook.createSheet("Test");
+        FileOutputStream out = new FileOutputStream(new File(templatesFolder.getAbsoluteFile() + "/mutation_template.xlsx"));
+        workbook.write(out);
+        out.close();
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(jsonDummy));
-        writer.write("{}");
+        writer.write("[ { \"patientId\":\"1\", \"sampleId\":\"2\", \"chr\":\"3\", \"startPosition\":\"4\", \"referenceAllele\":\"5\", \"variantAllele\":\"6\", \"ncbiBuild\":\"7\"} ] ");
         writer.close();
 
-        JSONObject jsonObject = utilityService.seralizeJsonURItoJsonObject(jsonDummy.getAbsolutePath());
-        Assert.assertEquals(jsonObject.toString(), "{}");
+        cbpTransformer.exportCBP(exportFolder.getAbsolutePath(), templatesFolder.getAbsolutePath(), jsonDummy.getAbsolutePath());
 
+        File actualGroupFile = new File(exportFolder.getAbsoluteFile() + "/UtilityTest.json");
+        File actualMutFile = new File(actualGroupFile + "/mut");
+        File outputData = new File(actualMutFile + "/data.xlsx");
+
+        Assert.assertTrue(actualGroupFile.exists());
+        Assert.assertTrue(actualMutFile.exists());
+        Assert.assertTrue(outputData.exists());
     }
-
-
-    @Test
-    public void Given_BasicJsonContainingFile_When_SerializeJsonUriToJsonArrayIsCalled_ReturnJsonNodeContainingCorrectData() throws IOException, JSONException {
-
-        String expectedValueKeyTest1 = "1";
-        String expectedValueKeyTest2 = "2";
-        String expectedValueKeyTest3 = "3";
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter(jsonDummy));
-        writer.write("{ \"Test1\":\"1\", \"Test2\" : \"2\", \"Test3\" : \"3\" }");
-        writer.close();
-
-        JSONObject actuaObject = utilityService.seralizeJsonURItoJsonObject(jsonDummy.getAbsolutePath());
-
-        Assert.assertEquals(expectedValueKeyTest1, actuaObject.getString("Test1"));
-        Assert.assertEquals(expectedValueKeyTest2, actuaObject.getString("Test2"));
-        Assert.assertEquals(expectedValueKeyTest3, actuaObject.getString("Test3"));
-    }
-
-
-    @Test
-    public void Given_serializeJsonToListOfList_WhenBadUriIsCalled_Called_ReturnNull() throws IOException, JSONException {
-
-        List<List<Object>> actualSheet = utilityService.serializeJsonToListOfLists("Bad/URI");
-        Assert.assertNull(actualSheet);
-    }
-
-    @Test
-    public void Given_BasicEmptyFile_When_serializeJsonToListOfLists_ReturnEmptyListOfList() throws IOException, JSONException {
-
-        String expectedValueKeyTest1 = "1";
-        String expectedValueKeyTest2 = "2";
-        String expectedValueKeyTest3 = "3";
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter(jsonDummy));
-        writer.write("{ \"Test1\":\"1\", \"Test2\" : \"2\", \"Test3\" : \"3\" }");
-        writer.close();
-
-        List<List<Object>> actualList = utilityService.serializeJsonToListOfLists(jsonDummy.getAbsolutePath());
-        Assert.assertEquals(1,actualList.size());
-    }
-
-    @Test
-    public void Given_CalltoCbpTransformer_Fail() throws IOException {
-        cbpTransformer.exportCBP("/tmp","DummyJson" );
-    }
-
-
 }
+
+
