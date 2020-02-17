@@ -77,7 +77,7 @@ public class Updog {
 
     private Map<String, Table> readOmicsTablesFromPath(Path updogProviderDirectory) {
         // Only cytogenetics and mutation import supported so far
-        PathMatcher allTsvFiles = FileSystems.getDefault().getPathMatcher("glob:**/{cyto,mut}/*.tsv");
+        PathMatcher allTsvFiles = FileSystems.getDefault().getPathMatcher("glob:**/{cyto,mut,cna}/*.tsv");
         return reader.readAllOmicsFilesIn(updogProviderDirectory, allTsvFiles);
     }
 
