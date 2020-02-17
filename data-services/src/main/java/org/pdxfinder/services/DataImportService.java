@@ -1021,6 +1021,10 @@ public class DataImportService {
         return ontologyTermRepository.getOntologyTermNumber();
     }
 
+    public boolean ontologyCacheIsEmpty() {
+        return countAllOntologyTerms() == 0;
+    }
+
     public OntologyTerm saveOntologyTerm(OntologyTerm ot){
 
         return ontologyTermRepository.save(ot);

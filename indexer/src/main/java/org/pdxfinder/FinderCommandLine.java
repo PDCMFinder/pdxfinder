@@ -1,7 +1,6 @@
 package org.pdxfinder;
 
 import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
 import org.pdxfinder.services.loader.envload.LoadNCIT;
 import org.pdxfinder.services.loader.envload.LoadNCITDrugs;
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -44,15 +42,8 @@ public class FinderCommandLine implements Callable<Integer> {
 
         Logger log = LoggerFactory.getLogger(Load.class);
 
-        @Autowired private DataImportService dataImportService;
-
-        @Value("${spring.data.neo4j.uri}")
-        private File databaseURI;
-
-        @Autowired private LoadDiseaseOntology loadDiseaseOntology;
-        @Autowired private LoadMarkers loadMarkers;
-        @Autowired private LoadNCITDrugs loadNCITDrugs;
-        @Autowired private LoadNCIT loadNCIT;
+        @Autowired
+        private LoaderNew loaderNew;
 
         @Option(
             names = {"-d", "--data-dir"},
@@ -64,7 +55,7 @@ public class FinderCommandLine implements Callable<Integer> {
 
         @Option(
             names = {"-c", "--clear-cache"},
-            description = "Clear cached data and reload, including NCIT ontologies, etc.")
+            description = "Clear cached data and reload, including NCIT ontology terms, etc.")
         private boolean clearCacheRequested;
 
         @Option(
@@ -102,75 +93,14 @@ public class FinderCommandLine implements Callable<Integer> {
 
         @Override
         public Integer call() {
-            keepDatabaseIfRequested();
-            loadOntologies();
-            loadRequestedPDXData();
-
-            return 33;
-        }
-
-        private void keepDatabaseIfRequested() {
-            if (keepDatabaseRequested) {
-                log.info("Using existing database: {}", databaseURI);
-            } else {
-//                clearDatabase();
-            }
-        }
-
-        private void clearDatabase() {
-            log.info("Deleting all nodes and edges in existing database [{}]", databaseURI);
-            try {
-                dataImportService.deleteAll();
-            } catch (DataAccessException e) {
-                log.error("Failed to delete database nodes and edges:", e);
-            }
-        }
-
-        private void loadOntologiesIfRequested() {
-            if (clearCacheRequested) loadOntologies();
-        }
-
-        private void loadOntologies() {
-            log.info("Loading ontologies...");
-
-            loadMarkers();
-
-            try { loadDiseaseOntology.run(); }
-            catch (Exception e) { log.error("Failed to load disease ontology: {}", e); }
-
-            try { loadNCITDrugs.loadRegimens(); }
-            catch (Exception e) { log.error("Failed to load NCIT Drugs: {}", e); }
-
-            try { loadNCIT.loadOntology(DataUrl.DISEASES_BRANCH_URL.get()); }
-            catch (Exception e) { log.error("Failed to load NCIT: {}", e); }
-
-        }
-
-        private void loadMarkers() {
-            if (dataImportService.markerCacheIsEmpty() || clearCacheRequested) {
-                try {
-                    loadMarkers.loadGenes(DataUrl.HUGO_FILE_URL.get());
-                } catch (Exception e) {
-                    log.error("Failed to load markers: {}", e);
-                }
-            }
-        }
-
-        private void loadRequestedPDXData() {
             List<DataProvider> providersRequested = Arrays.asList(datasetRequested.getDataProvider());
-            log.info("Running requested PDX dataset loaders {}...", providersRequested);
-
-            for (DataProvider i : providersRequested) {
-                callRelevantLoader(i);
-            }
-        }
-
-        private void callRelevantLoader(DataProvider provider) {
-            try {
-                provider.load();
-            } catch (Exception e) {
-                log.error("Error calling loader for {}: {}", provider, e);
-            }
+            loaderNew.run(
+                providersRequested,
+                dataDirectory,
+                clearCacheRequested,
+                keepDatabaseRequested
+            );
+            return 33;
         }
 
     }
