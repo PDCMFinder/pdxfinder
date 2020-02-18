@@ -17,16 +17,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
 
-@Component
-@Order(value = -19)
+@Service
 @PropertySource("classpath:loader.properties")
 @ConfigurationProperties(prefix = "ircc")
-public class LoadIRCC extends LoaderBase implements CommandLineRunner {
+public class LoadIRCC extends LoaderBase {
     private static final Logger log = LoggerFactory.getLogger(LoadIRCC.class);
 
     // samples -> markerAsssociations
@@ -34,34 +34,20 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     private HashMap<String, HashMap<String, String>> specimenSamples = new HashMap();
     private HashSet<Integer> loadedModelHashes = new HashSet<>();
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     @Value("${irccpdx.variation.max}")
     private int variationMax;
 
-    @PostConstruct
-    public void init() {
-        // Blank override - no initialisation behaviour required
-    }
-
     public LoadIRCC(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void run() throws Exception {
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadIRCC", "Load IRCC PDX data");
-        parser.accepts("loadALL", "Load all, including IRCC PDX data");
-        OptionSet options = parser.parse(args);
-
-        if (options.has("loadIRCC") || options.has("loadALL")) {
             initMethod();
             irccAlgorithm();
-        }
     }
 
 

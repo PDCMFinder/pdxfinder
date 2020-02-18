@@ -1,8 +1,5 @@
 package org.pdxfinder.dataloaders;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.apache.commons.cli.HelpFormatter;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
@@ -12,60 +9,34 @@ import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.*;
 import java.util.*;
 
-/**
- * Load data from HCI PDXNet.
- */
-@Component
-@Order(value = -20)
+
+@Service
 @PropertySource("classpath:loader.properties")
 @ConfigurationProperties(prefix = "hci")
-public class LoadHCI extends LoaderBase implements CommandLineRunner {
-
+public class LoadHCI extends LoaderBase {
 
     private final static Logger log = LoggerFactory.getLogger(LoadHCI.class);
 
-    private HelpFormatter formatter;
-
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
-
-    @PostConstruct
-    public void init() {
-        formatter = new HelpFormatter();
-    }
 
     public LoadHCI(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void run() throws Exception {
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadHCI", "Load HCI PDX data");
-        parser.accepts("loadALL", "Load all, including HCI PDX data");
-        OptionSet options = parser.parse(args);
+        initMethod();
 
-        if (options.has("loadHCI") || options.has("loadALL")) {
-
-            initMethod();
-
-            globalLoadingOrder();
-
-        }
+        globalLoadingOrder();
     }
-
 
 
     @Override

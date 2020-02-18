@@ -1,14 +1,8 @@
 package org.pdxfinder.dataloaders;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
+
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
-import org.neo4j.ogm.session.Session;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
@@ -23,28 +17,20 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.*;
 
 /**
  * Load data from JAX.
  */
-@Component
-@Order(value = -18)
+@Service
 @PropertySource("classpath:loader.properties")
 @ConfigurationProperties(prefix = "jax")
-public class LoadJAXData extends LoaderBase implements CommandLineRunner {
+public class LoadJAXData extends LoaderBase {
 
     private final static Logger log = LoggerFactory.getLogger(LoadJAXData.class);
-
-    private Options options;
-    private CommandLineParser parser;
-    private CommandLine cmd;
-    private HelpFormatter formatter;
-
-    private Session session;
 
     @Value("${jaxpdx.variation.max}")
     private int maxVariations;
@@ -52,41 +38,23 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     @Value("${jaxpdx.ref.assembly}")
     private String refAssembly;
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     HashMap<String, String> passageMap = null;
 
     Map<String, Platform> platformMap = new HashMap<>();
 
-    @PostConstruct
-    public void init() {
-        formatter = new HelpFormatter();
-    }
-
     public LoadJAXData(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void run() throws Exception {
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadJAX", "Load JAX PDX data");
-        parser.accepts("loadALL", "Load all, including JAX PDX data");
-        parser.accepts("loadSlim", "Load slim, then link samples to NCIT terms");
-        OptionSet options = parser.parse(args);
+        initMethod();
 
-        if (options.has("loadJAX") || options.has("loadALL")  || options.has("loadSlim")) {
-
-            initMethod();
-
-            globalLoadingOrder();
-
-        }
+        globalLoadingOrder();
     }
-
 
 
 
