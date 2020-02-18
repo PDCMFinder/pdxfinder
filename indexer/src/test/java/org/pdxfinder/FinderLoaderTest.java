@@ -20,7 +20,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-public class LoaderNewTest extends BaseTest {
+public class FinderLoaderTest extends BaseTest {
 
     @Mock private LoadDiseaseOntology loadDiseaseOntology;
     @Mock private LoadMarkers loadMarkers;
@@ -29,7 +29,7 @@ public class LoaderNewTest extends BaseTest {
     @Mock private DataImportService dataImportService;
     @Mock private DataProviders.DataProvider dataProvider;
     @Mock private File dataDirectory;
-    @InjectMocks private LoaderNew loaderNew;
+    @InjectMocks private FinderLoader finderLoader;
 
     @Before
     public void setUp() throws Exception {
@@ -42,73 +42,73 @@ public class LoaderNewTest extends BaseTest {
     }
 
     @Test public void run_givenSingleProvider_callsRelevantLoader() {
-        loaderNew.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
         verify(this.dataProvider).load();
         verifyNoMoreInteractions(this.dataProvider);
     }
 
     @Test public void run_givenTwoProviders_callsRelevantLoaderForEach() {
-        loaderNew.run(Arrays.asList(dataProvider, dataProvider), dataDirectory, false, true);
+        finderLoader.run(Arrays.asList(dataProvider, dataProvider), dataDirectory, false, true);
         verify(this.dataProvider, times(2)).load();
         verifyNoMoreInteractions(this.dataProvider);
     }
 
     @Test public void load_givenMarkerCache_skipLoadingMarkers() {
         givenEmptyMarkerCache(false);
-        loaderNew.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
         verify(this.loadMarkers, never()).loadGenes(anyString());
     }
 
     @Test public void load_givenNoMarkerCache_loadMarkers() {
         givenEmptyMarkerCache(true);
-        loaderNew.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
         verify(this.loadMarkers).loadGenes(anyString());
         verifyNoMoreInteractions(this.loadMarkers);
     }
 
     @Test public void load_givenMarkerCacheButReloadRequested_reloadMarkers() {
         givenEmptyMarkerCache(false);
-        loaderNew.run(Collections.singletonList(dataProvider), dataDirectory, true, true);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, true, true);
         verify(this.loadMarkers).loadGenes(anyString());
         verifyNoMoreInteractions(this.loadMarkers);
     }
 
     @Test public void load_givenOntologyCache_skipLoadingOntologyTerms() {
         givenEmptyOntologyCache(false);
-        loaderNew.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
         verify(this.loadMarkers, never()).loadGenes(anyString());
     }
 
     @Test public void load_givenNoOntologyCache_loadOntologyTerms() {
         givenEmptyOntologyCache(true);
-        loaderNew.run(Collections.singletonList(dataProvider), dataDirectory,false, true);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory,false, true);
         verify(this.loadNCIT).loadOntology(DataUrl.DISEASES_BRANCH_URL.get());
         verifyNoMoreInteractions(this.loadNCIT);
     }
 
     @Test public void load_givenOntologyCacheButReloadRequested_reloadOntologyTerms() {
         givenEmptyOntologyCache(false);
-        loaderNew.run(Collections.singletonList(dataProvider), dataDirectory, true, true);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, true, true);
         verify(this.loadNCIT).loadOntology(anyString());
         verifyNoMoreInteractions(this.loadNCIT);
     }
 
     @Test public void load_givenOntologyCache_skipLoadingRegimens() {
         givenEmptyOntologyCache(false);
-        loaderNew.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
         verify(this.loadNCITDrugs, never()).loadRegimens();
     }
 
     @Test public void load_givenNoOntologyCache_loadRegimens() {
         givenEmptyOntologyCache(true);
-        loaderNew.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
         verify(this.loadNCITDrugs).loadRegimens();
         verifyNoMoreInteractions(this.loadNCITDrugs);
     }
 
     @Test public void load_givenOntologyCacheButReloadRequested_reloadRegimens() {
         givenEmptyOntologyCache(false);
-        loaderNew.run(Collections.singletonList(dataProvider), dataDirectory, true, true);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, true, true);
         verify(this.loadNCITDrugs).loadRegimens();
         verifyNoMoreInteractions(this.loadNCITDrugs);
     }

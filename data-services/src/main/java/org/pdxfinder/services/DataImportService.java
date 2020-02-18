@@ -155,36 +155,6 @@ public class DataImportService {
 
     }
 
-    public void deleteAll() {
-
-        tumorTypeRepository.deleteAll();
-        hostStrainRepository.deleteAll();
-        engraftmentTypeRepository.deleteAll();
-        engraftmentSiteRepository.deleteAll();
-        engraftmentMaterialRepository.deleteAll();
-        groupRepository.deleteAll();
-        patientRepository.deleteAll();
-        modelCreationRepository.deleteAll();
-        tissueRepository.deleteAll();
-        patientSnapshotRepository.deleteAll();
-        sampleRepository.deleteAll();
-        markerRepository.deleteAll();
-        markerAssociationRepository.deleteAll();
-        molecularCharacterizationRepository.deleteAll();
-        qualityAssuranceRepository.deleteAll();
-        ontologyTermRepository.deleteAll();
-        specimenRepository.deleteAll();
-        platformRepository.deleteAll();
-        platformAssociationRepository.deleteAll();
-        dataProjectionRepository.deleteAll();
-        treatmentSummaryRepository.deleteAll();
-        treatmentProtocolRepository.deleteAll();
-        currentTreatmentRepository.deleteAll();
-        externalUrlRepository.deleteAll();
-        drugRepository.deleteAll();
-        treatmentRepository.deleteAll();
-    }
-
     public Group getGroup(String name, String abbrev, String type){
 
         Group g = groupRepository.findByNameAndType(name, type);

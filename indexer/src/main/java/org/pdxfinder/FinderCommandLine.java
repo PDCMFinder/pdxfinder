@@ -38,7 +38,7 @@ public class FinderCommandLine implements Callable<Integer> {
         Logger log = LoggerFactory.getLogger(Load.class);
 
         @Autowired
-        private LoaderNew loaderNew;
+        private FinderLoader finderLoader;
 
         @Option(
             names = {"-d", "--data-dir"},
@@ -92,7 +92,7 @@ public class FinderCommandLine implements Callable<Integer> {
         public Integer call() {
             log.info("Loading using supplied parameters:\n{}", this);
             List<DataProvider> providersRequested = getListOfRequestedProviders();
-            loaderNew.run(
+            finderLoader.run(
                 providersRequested,
                 dataDirectory,
                 clearCacheRequested,

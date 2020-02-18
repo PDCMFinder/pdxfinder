@@ -16,13 +16,13 @@ import static org.mockito.Mockito.*;
 
 public class FinderCommandLineTest extends BaseTest {
 
-    @Mock private LoaderNew loaderNew;
+    @Mock private FinderLoader finderLoader;
     @InjectMocks private FinderCommandLine.Load load;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        doNothing().when(this.loaderNew).run(
+        doNothing().when(this.finderLoader).run(
             anyListOf(DataProviders.DataProvider.class),
             any(File.class),
             anyBoolean(),
@@ -35,26 +35,26 @@ public class FinderCommandLineTest extends BaseTest {
         String[] args = {"--only=Test_Minimal", "--data-dir=path/", "--keep-db"};
         int exitCode = new CommandLine(load).execute(args);
         assertEquals(0, exitCode);
-        verify(this.loaderNew).run(
+        verify(this.finderLoader).run(
             anyListOf(DataProviders.DataProvider.class),
             any(File.class),
             anyBoolean(),
             anyBoolean()
         );
-        verifyNoMoreInteractions(this.loaderNew);
+        verifyNoMoreInteractions(this.finderLoader);
     }
 
     @Test public void load_givenLoadAll_callsLoader() {
         String[] args = {"--group=All", "--data-dir=path/", "--keep-db"};
         int exitCode = new CommandLine(load).execute(args);
         assertEquals(0, exitCode);
-        verify(this.loaderNew).run(
+        verify(this.finderLoader).run(
             anyListOf(DataProviders.DataProvider.class),
             any(File.class),
             anyBoolean(),
             anyBoolean()
         );
-        verifyNoMoreInteractions(this.loaderNew);
+        verifyNoMoreInteractions(this.finderLoader);
     }
 
 }

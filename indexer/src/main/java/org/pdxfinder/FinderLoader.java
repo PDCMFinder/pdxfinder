@@ -10,14 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
 
 @Component
-public class LoaderNew {
+public class FinderLoader {
 
     private LoadMarkers loadMarkers;
     private LoadNCITDrugs loadNCITDrugs;
@@ -25,7 +24,7 @@ public class LoaderNew {
     private DataImportService dataImportService;
 
     @Autowired
-    public LoaderNew(
+    public FinderLoader(
         LoadMarkers loadMarkers,
         LoadNCIT loadNCIT,
         LoadNCITDrugs loadNCITDrugs,
@@ -37,7 +36,7 @@ public class LoaderNew {
         this.dataImportService = dataImportService;
     }
 
-    private Logger log = LoggerFactory.getLogger(LoaderNew.class);
+    private Logger log = LoggerFactory.getLogger(FinderLoader.class);
     @Value("${spring.data.neo4j.uri}") private File databaseURI;
     @Value("${ncitpredef.file}") private String ncitFile;
 
@@ -59,16 +58,6 @@ public class LoaderNew {
             throw new UnsupportedOperationException(
                 "Removing the database on load is not yet supported, " +
                     "please use `-k` or `--keep-db` for the time being.");
-//            clearDatabase();
-        }
-    }
-
-    private void clearDatabase() {
-        log.info("Deleting all nodes and edges in existing database [{}]", databaseURI);
-        try {
-            dataImportService.deleteAll();
-        } catch (DataAccessException e) {
-            log.error("Failed to delete database nodes and edges:", e);
         }
     }
 
