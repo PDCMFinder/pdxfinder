@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,52 +40,98 @@ public class CbpTransformer implements CommandLineRunner {
         parser.allowsUnrecognizedOptions();
         parser.accepts("TRANSFORM_CBP", "Ingest mut JSON and converts to templates");
 
-        String exportDir = finderRootDir + "/export/";
-
         OptionSet options = parser.parse(args);
         long startTime = System.currentTimeMillis();
 
         if (options.has(TRANSFORM_CBP) && args.length > 1) {
 
-            log.info("Exporting data from {}", args[1]);
-            exportCBP(exportDir,finderRootDir, args[1]);
-
+            log.info("Exporting data from {}", args[2]);
+            String templateDir = finderRootDir + "/template";
+            String exportDir = finderRootDir + "/export";
+            exportCBP(exportDir, templateDir, args[2], args[1]);
         }
     }
 
-    public void exportCBP(String exportDir,String templateDir, String pathToJson) throws IOException {
+    public void exportCBP(String exportDir,String templateDir, String pathToJson, String dataType) throws IOException {
 
-         Group jsonGroup = createGroupWithJsonsFilename(pathToJson);
+        if (!doesFileExist(exportDir) || !doesFileExist(templateDir) || !doesFileExist(pathToJson)) {
 
-         List<Map<String,Object>> listMapTable = utilityService.serializeJSONToMaps(pathToJson);
-         List<List<String>> CbpMutLists = CbpMutJsonMapsToSheet(listMapTable);
+            throw new IOException("A string argument passed to the exportCBP does not correspond to an existing file.");
+        }
 
-         universalDataExporter.setDs(jsonGroup);
-         universalDataExporter.setMutationSheetDataExport(CbpMutLists);
-         universalDataExporter.setTemplateDir(templateDir);
-         universalDataExporter.export(exportDir);
+            Group jsonGroup = createGroupWithJsonsFilename(pathToJson);
 
+            List<Map<String, Object>> listMapTable = utilityService.serializeJSONToMaps(pathToJson);
+            CbpMapsToSheetsByDataType(listMapTable, dataType);
+
+            universalDataExporter.setDs(jsonGroup);
+            universalDataExporter.setTemplateDir(templateDir);
+            universalDataExporter.export(exportDir);
     }
 
-    private List<List<String>> CbpMutJsonMapsToSheet(List<Map<String,Object>> jsonMap){
+
+    private void CbpMapsToSheetsByDataType(List<Map<String, Object>> listMapTable, String dataType){
+
+        List<List<String>> sheet;
+
+        if(dataType.equals("mut")){
+            sheet = CbpMutJsonMapsToSheet(listMapTable);
+            universalDataExporter.setMutationSheetDataExport(sheet);
+        }
+       else if(dataType.equals("gistic")) {
+            sheet = CbpGisticsonMapsToSheet(listMapTable);
+            universalDataExporter.setCnaSheetDataExport(sheet);
+        }
+    }
+
+    private List<List<String>> CbpMutJsonMapsToSheet(List<Map<String, Object>> jsonMap){
 
         List<List<String>> sheet = new ArrayList<>();
-        List<String> row = new LinkedList<>();
 
         jsonMap.forEach(f -> {
+
+            List<String> row = new LinkedList<>();
 
             row.add(f.get("patientId").toString());
             row.add(f.get("sampleId").toString());
             row.add("Not Specified");
             row.add("Not Specified");
             row.add("Not Specified");
-            addBlanksToList(row,13);
-            row.add("chr");
-            row.add("startPosition");
-            row.add("referenceAllele");
-            row.add("variantAllele");
+            addBlanksToList(row,10);
+            row.add(f.get("chr").toString());
+            row.add(f.get("startPosition").toString());
+            row.add(f.get("referenceAllele").toString());
+            row.add(f.get("variantAllele").toString());
             addBlanksToList(row,6);
-            row.add("ncbiBuild");
+            row.add(f.get("ncbiBuild").toString());
+            row.add("");
+
+            sheet.add(row);
+        });
+
+
+        return sheet;
+    }
+
+
+    private List<List<String>> CbpGisticsonMapsToSheet(List<Map<String,Object>> jsonMap){
+
+        List<List<String>> sheet = new ArrayList<>();
+
+        jsonMap.forEach(f -> {
+
+            List<String> row = new LinkedList<>();
+
+            row.add(f.get("patientId").toString());
+            row.add(f.get("sampleId").toString());
+            row.add("Not Specified");
+            row.add("Not Specified");
+            row.add("Not Specified");
+            addBlanksToList(row,6);
+            row.add(f.get("entrezGeneId").toString());
+            addBlanksToList(row, 3);
+            row.add(f.get("alteration").toString());
+
             row.add("");
 
             sheet.add(row);
@@ -112,7 +159,8 @@ public class CbpTransformer implements CommandLineRunner {
             row.add("");
         }
     }
-
-
+    private boolean doesFileExist(String fileURI){
+        return new File(fileURI).exists();
+    }
 
 }

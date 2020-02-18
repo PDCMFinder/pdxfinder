@@ -88,7 +88,7 @@ public class UniversalDataExporter {
         this.templateDir = templateDir;
     }
 
-    public void init(String templateDir, Group ds){
+    public void init(String templateDir, Group ds) {
 
         this.templateDir = templateDir;
         this.ds = ds;
@@ -109,72 +109,63 @@ public class UniversalDataExporter {
 
     public void export(String exportDir) throws IOException {
 
-        XSSFWorkbook metadataWorkbook = getWorkbook(templateDir+"/metadata_template.xlsx");
-        XSSFWorkbook samplePlatformWorkbook = getWorkbook(templateDir+"/sampleplatform_template.xlsx");
-        XSSFWorkbook mutationWorkbook = getWorkbook(templateDir+"/mutation_template.xlsx");
-        XSSFWorkbook cnaWorkbook = getWorkbook(templateDir+"/cna_template.xlsx");
+        XSSFWorkbook metadataWorkbook = getWorkbook(templateDir + "/metadata_template.xlsx");
+        XSSFWorkbook samplePlatformWorkbook = getWorkbook(templateDir + "/sampleplatform_template.xlsx");
+        XSSFWorkbook mutationWorkbook = getWorkbook(templateDir + "/mutation_template.xlsx");
+        XSSFWorkbook cnaWorkbook = getWorkbook(templateDir + "/cna_template.xlsx");
 
 
-        if(metadataWorkbook != null){
+        if (metadataWorkbook != null) {
             updateSheetWithData(metadataWorkbook.getSheetAt(1), patientSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(2), patientTumorSheetDataExport,6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(3), pdxModelSheetDataExport,6, 2);
+            updateSheetWithData(metadataWorkbook.getSheetAt(2), patientTumorSheetDataExport, 6, 2);
+            updateSheetWithData(metadataWorkbook.getSheetAt(3), pdxModelSheetDataExport, 6, 2);
             updateSheetWithData(metadataWorkbook.getSheetAt(4), pdxModelValidationSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(5), sharingAndContactSheetDataExport, 6, 2 );
+            updateSheetWithData(metadataWorkbook.getSheetAt(5), sharingAndContactSheetDataExport, 6, 2);
             updateSheetWithData(metadataWorkbook.getSheetAt(6), loaderRelatedDataSheetDataExport, 6, 2);
         }
 
-        if(samplePlatformWorkbook != null){
+        if (samplePlatformWorkbook != null) {
             updateSheetWithData(samplePlatformWorkbook.getSheetAt(0), samplePlatformDescriptionSheetDataExport, 6, 1);
         }
-
-        if(mutationWorkbook != null){
-            updateSheetWithData(mutationWorkbook.getSheetAt(0), mutationSheetDataExport, 2, 1);
-        }
-
-        if(cnaWorkbook != null){
-            updateSheetWithData(cnaWorkbook.getSheetAt(0), cnaSheetDataExport, 2, 1);
-        }
-
 
         // Write the output to a new file
         FileOutputStream fileOut = null;
 
-        Path exportProviderDir = Paths.get(exportDir +"/"+ ds.getAbbreviation());
-        if (!exportProviderDir.toFile().exists()){
+        Path exportProviderDir = Paths.get(exportDir + "/" + ds.getAbbreviation());
+        if (!exportProviderDir.toFile().exists()) {
             Files.createDirectory(exportProviderDir);
         }
 
         try {
 
-            if(metadataWorkbook != null){
-                fileOut = new FileOutputStream(exportProviderDir+"/metadata.xlsx");
+            if (metadataWorkbook != null) {
+                fileOut = new FileOutputStream(exportProviderDir + "/metadata.xlsx");
                 metadataWorkbook.write(fileOut);
                 fileOut.close();
             }
 
-            if(samplePlatformWorkbook != null){
-                fileOut = new FileOutputStream(exportProviderDir+"/sampleplatform.xlsx");
+            if (samplePlatformWorkbook != null) {
+                fileOut = new FileOutputStream(exportProviderDir + "/sampleplatform.xlsx");
                 samplePlatformWorkbook.write(fileOut);
                 fileOut.close();
             }
 
-            if(mutationWorkbook != null){
-                if (!Paths.get(exportProviderDir + "/mut").toFile().exists()){
+            if (mutationWorkbook != null) {
+                if (!Paths.get(exportProviderDir + "/mut").toFile().exists()) {
                     Files.createDirectory(Paths.get(exportProviderDir + "/mut"));
                 }
-                fileOut = new FileOutputStream(exportProviderDir+"/mut/data.xlsx");
-                mutationWorkbook.write(fileOut);
-                fileOut.close();
+
+                String mutFileExportURI = exportDir + "/" + ds.getAbbreviation() + "/mut/" + ds.getAbbreviation() + "_mut.tsv";
+                ReadSheetAndWriteOmicTsvFile(mutationWorkbook.getSheetAt(0),mutationSheetDataExport, mutFileExportURI);
             }
 
-            if(cnaWorkbook != null){
-                if (!Paths.get(exportProviderDir + "/cna").toFile().exists()){
+            if (cnaWorkbook != null) {
+                if (!Paths.get(exportProviderDir + "/cna").toFile().exists()) {
                     Files.createDirectory(Paths.get(exportProviderDir + "/cna"));
                 }
-                fileOut = new FileOutputStream(exportProviderDir+"/cna/data.xlsx");
-                cnaWorkbook.write(fileOut);
-                fileOut.close();
+                String cnaFileExportURI = exportDir + "/" + ds.getAbbreviation() + "/cna/" + ds.getAbbreviation() + "_cna.tsv";
+                ReadSheetAndWriteOmicTsvFile(cnaWorkbook.getSheetAt(0),cnaSheetDataExport, cnaFileExportURI);
+
             }
 
 
@@ -214,21 +205,20 @@ public class UniversalDataExporter {
         }
     }
 
-    public void initPatientTumorAtCollection(){
+    public void initPatientTumorAtCollection() {
 
         if (ds == null) return;
 
         List<Patient> patients = dataImportService.findPatientTumorAtCollectionDataByDS(ds);
 
-        for(Patient patient : patients){
-
+        for (Patient patient : patients) {
 
 
             String patientId = patient.getExternalId();
 
-            for(PatientSnapshot patientSnapshot : patient.getSnapshots()){
+            for (PatientSnapshot patientSnapshot : patient.getSnapshots()) {
 
-                for(Sample sample : patientSnapshot.getSamples()){
+                for (Sample sample : patientSnapshot.getSamples()) {
 
                     List<String> dataRow = new ArrayList<>();
 
@@ -253,8 +243,7 @@ public class UniversalDataExporter {
                     String modelId = "";
                     try {
                         modelId = dataImportService.findModelBySample(sample).getSourcePdxId();
-                    }
-                    catch (Exception e){
+                    } catch (Exception e) {
                         log.error("Sample: {}", sampleId);
                     }
 
@@ -286,48 +275,48 @@ public class UniversalDataExporter {
 
     }
 
-    public void initPdxModelDetails(){
+    public void initPdxModelDetails() {
 
         if (ds == null) return;
 
         List<ModelCreation> models = dataImportService.findModelsWithSpecimensAndQAByDS(ds.getAbbreviation());
 
-        for(ModelCreation model : models){
+        for (ModelCreation model : models) {
 
             Map<String, ModelDetails> specimenMap = new HashMap<>();
 
-            for(Specimen specimen : model.getSpecimens()){
+            for (Specimen specimen : model.getSpecimens()) {
 
                 String passage = specimen.getPassage();
 
                 String engraftmentSite = notSpecified;
 
-                if(specimen.getEngraftmentSite() != null ){
+                if (specimen.getEngraftmentSite() != null) {
                     engraftmentSite = specimen.getEngraftmentSite().getName();
                 }
 
                 String engraftmentType = notSpecified;
 
-                if(specimen.getEngraftmentType() != null){
-                   engraftmentType = specimen.getEngraftmentType().getName();
+                if (specimen.getEngraftmentType() != null) {
+                    engraftmentType = specimen.getEngraftmentType().getName();
                 }
 
                 String engraftmentMaterial = notSpecified;
                 String engraftmentMaterialStatus = notSpecified;
 
-                if(specimen.getEngraftmentMaterial() != null){
+                if (specimen.getEngraftmentMaterial() != null) {
                     engraftmentMaterial = specimen.getEngraftmentMaterial().getName();
                     engraftmentMaterialStatus = specimen.getEngraftmentMaterial().getState();
                 }
 
                 addEntryToSpecimenMap(
-                    specimenMap,
-                    specimen.getHostStrain(),
-                    engraftmentSite,
-                    engraftmentType,
-                    engraftmentMaterial,
-                    engraftmentMaterialStatus,
-                    passage);
+                        specimenMap,
+                        specimen.getHostStrain(),
+                        engraftmentSite,
+                        engraftmentType,
+                        engraftmentMaterial,
+                        engraftmentMaterialStatus,
+                        passage);
             }
 
             insertModelSheetDataFromSpecimenMap(specimenMap, model);
@@ -335,17 +324,17 @@ public class UniversalDataExporter {
         }
     }
 
-    public void initPdxModelValidations(){
+    public void initPdxModelValidations() {
 
         if (ds == null) return;
 
         List<ModelCreation> models = dataImportService.findModelsWithSpecimensAndQAByDS(ds.getAbbreviation());
 
-        for(ModelCreation model : models){
+        for (ModelCreation model : models) {
 
             String modelId = model.getSourcePdxId();
 
-            for(QualityAssurance qa : model.getQualityAssurance()){
+            for (QualityAssurance qa : model.getQualityAssurance()) {
 
                 List<String> dataRow = new ArrayList<>();
 
@@ -366,19 +355,19 @@ public class UniversalDataExporter {
         }
     }
 
-    public void initSharingAndContact(){
+    public void initSharingAndContact() {
 
         if (ds == null) return;
 
         List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(ds.getAbbreviation());
 
-        for(ModelCreation model : models){
+        for (ModelCreation model : models) {
 
             LinkedHashMap<String, String> sharingAndContactRow = new LinkedHashMap<>();
 
             sharingAndContactRow.put("modelId", model.getSourcePdxId());
 
-            Group providerGroup  = getGroupByType(model, "Provider");
+            Group providerGroup = getGroupByType(model, "Provider");
             Group accessGroup = getGroupByType(model, "Accessibility");
             Group projectGroup = getGroupByType(model, "Project");
 
@@ -391,7 +380,7 @@ public class UniversalDataExporter {
         }
     }
 
-    public void initLoaderRelatedData(){
+    public void initLoaderRelatedData() {
 
         if (ds == null) return;
 
@@ -404,13 +393,13 @@ public class UniversalDataExporter {
 
     }
 
-    public void initSamplePlatformDescription(){
+    public void initSamplePlatformDescription() {
 
         if (ds == null) return;
 
         List<ModelCreation> models = dataImportService.findModelXenograftPlatformSampleByDS(ds.getAbbreviation());
 
-        for(ModelCreation model : models){
+        for (ModelCreation model : models) {
 
             addPatientMolcharDataToSamplePlatform(model);
             addXenoMolcharDataToSamplePlatform(model);
@@ -418,31 +407,31 @@ public class UniversalDataExporter {
 
     }
 
-    public void initMutationData(){
+    public void initMutationData() {
 
         initGenomicData(mutationSheetDataExport, "mutation");
 
     }
 
-    public void initCNAData(){
+    public void initCNAData() {
 
         initGenomicData(cnaSheetDataExport, "copy number alteration");
     }
 
-    private void initGenomicData(List<List<String>> sheetData, String molcharType){
+    private void initGenomicData(List<List<String>> sheetData, String molcharType) {
 
 
         List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(ds.getAbbreviation());
 
-        for(ModelCreation m: models){
+        for (ModelCreation m : models) {
 
             ModelCreation model = dataImportService.
-              findModelWithMolecularDataByDSAndIdAndMolcharType(
-                  ds.getAbbreviation(),
-                  m.getSourcePdxId(),
-                  molcharType);
+                    findModelWithMolecularDataByDSAndIdAndMolcharType(
+                            ds.getAbbreviation(),
+                            m.getSourcePdxId(),
+                            molcharType);
 
-            if(model != null){
+            if (model != null) {
 
                 String modelId = model.getSourcePdxId();
                 log.info("Exporting data for {}", modelId);
@@ -456,15 +445,15 @@ public class UniversalDataExporter {
     }
 
     private void insertOmicDataToSheet(
-        ModelCreation model,
-        String sampleId,
-        String sampleOrigin,
-        String molcharType,
-        Specimen specimen,
-        MolecularCharacterization mc,
-        List<List<String>> sheetData){
+            ModelCreation model,
+            String sampleId,
+            String sampleOrigin,
+            String molcharType,
+            Specimen specimen,
+            MolecularCharacterization mc,
+            List<List<String>> sheetData) {
 
-        for(MarkerAssociation ma: mc.getMarkerAssociations()){
+        for (MarkerAssociation ma : mc.getMarkerAssociations()) {
 
             List<String> rowData = new ArrayList<>();
 
@@ -473,26 +462,24 @@ public class UniversalDataExporter {
             rowData.add(sampleId);
             rowData.add(sampleOrigin);
 
-            if(sampleOrigin.equals(patientOrigin)){
+            if (sampleOrigin.equals(patientOrigin)) {
                 //no passage, host strain for patient samples
                 rowData.add("");
                 rowData.add("");
-            }
-            else{
+            } else {
 
                 rowData.add(specimen.getPassage());
 
-                if(specimen.getHostStrain() != null && specimen.getHostStrain().getSymbol() != null){
+                if (specimen.getHostStrain() != null && specimen.getHostStrain().getSymbol() != null) {
                     rowData.add(specimen.getHostStrain().getSymbol());
-                }
-                else{
+                } else {
                     rowData.add("");
                 }
             }
 
             //then get the MA data inserted
 
-            if(molcharType.equals("mutation")){
+            if (molcharType.equals("mutation")) {
                 rowData.add(ma.getMarker().getHgncSymbol());
                 rowData.add(ma.getAminoAcidChange());
                 rowData.add(ma.getNucleotideChange());
@@ -512,7 +499,7 @@ public class UniversalDataExporter {
                 rowData.add(ma.getGenomeAssembly());
                 rowData.add(mc.getPlatform().getName());
 
-            }else if(molcharType.equals("copy number alteration")){
+            } else if (molcharType.equals("copy number alteration")) {
 
                 rowData.add(ma.getChromosome());
                 rowData.add(ma.getSeqStartPosition());
@@ -535,35 +522,75 @@ public class UniversalDataExporter {
         }
     }
 
-    public void updateSheetWithData(Sheet sheet, List<List<String>> data, int startRow, int startColumn){
+    public void updateSheetWithData(Sheet sheet, List<List<String>> data, int startRow, int startColumn) {
 
         //Workbook rows and cells start at index 0
+        if (data != null) {
 
-        for(int i = 0; i < data.size(); i++){
+            for (int i = 0; i < data.size(); i++) {
 
-            int rowIndex = startRow + i - 1;
-            sheet.createRow(rowIndex);
+                int rowIndex = startRow + i - 1;
+                sheet.createRow(rowIndex);
 
-            for(int j = 0; j < data.get(i).size(); j++){
-
-
-                int columnIndex = startColumn + j-1;
-                sheet.getRow(rowIndex).createCell(columnIndex);
+                for (int j = 0; j < data.get(i).size(); j++) {
 
 
-                Cell cell = null;
-                try{
-                    cell = sheet.getRow(rowIndex).getCell(columnIndex);
-                    cell.setCellValue(data.get(i).get(j));
-                }
-                catch (Exception e){
+                    int columnIndex = startColumn + j - 1;
+                    sheet.getRow(rowIndex).createCell(columnIndex);
 
-                    log.error("Exception in {}  {}:{}",sheet.getSheetName(), rowIndex, columnIndex);
+
+                    Cell cell = null;
+                    try {
+                        cell = sheet.getRow(rowIndex).getCell(columnIndex);
+                        cell.setCellValue(data.get(i).get(j));
+                    } catch (Exception e) {
+
+                        log.error("Exception in {}  {}:{}", sheet.getSheetName(), rowIndex, columnIndex);
+                    }
                 }
             }
         }
 
     }
+
+    public void ReadSheetAndWriteOmicTsvFile(Sheet sheet, List<List<String>> data, String omicTsvDir) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(omicTsvDir);
+
+        if (data != null) {
+
+            for (int j = 0; j < data.get(0).size(); j++) {
+                Cell cell = null;
+                try {
+                    cell = sheet.getRow(0).getCell(j);
+                    fileWriter.append(cell.toString());
+                    fileWriter.append("\t");
+                } catch (Exception e) {
+                    log.error("Exception in loading export headers");
+                }
+            }
+            fileWriter.append("\n");
+
+            for (int i = 0; i < data.size(); i++) {
+                int rowIndex = i;
+                for (int j = 0; j < data.get(i).size(); j++) {
+                    int columnIndex = j;
+                    try {
+                        fileWriter.append(data.get(i).get(j));
+                        fileWriter.append("\t");
+                    } catch (Exception e) {
+                        log.error("Exception in {}  {}:{}", sheet.getSheetName(), rowIndex, columnIndex);
+                    }
+
+                }
+                fileWriter.append("\n");
+            }
+
+                fileWriter.flush();
+                fileWriter.close();
+        }
+    }
+
 
     private String getPubmedIDs(ModelCreation model){
 
@@ -930,6 +957,10 @@ public class UniversalDataExporter {
 
     public List<List<String>> getCnaSheetDataExport() {
         return cnaSheetDataExport;
+    }
+
+    public void setCnaSheetDataExport(List<List<String>> cnaSheetDataExport) {
+        this.cnaSheetDataExport = cnaSheetDataExport;
     }
 
 
