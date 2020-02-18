@@ -24,7 +24,7 @@ public class FinderCommandLineTest extends BaseTest {
         MockitoAnnotations.initMocks(this);
         doNothing().when(this.loaderNew).run(
             anyListOf(DataProviders.DataProvider.class),
-            any(File.class),
+            any(String.class),
             anyBoolean(),
             anyBoolean()
         );
@@ -37,7 +37,7 @@ public class FinderCommandLineTest extends BaseTest {
         assertEquals(0, exitCode);
         verify(this.loaderNew).run(
             anyListOf(DataProviders.DataProvider.class),
-            any(File.class),
+            any(String.class),
             anyBoolean(),
             anyBoolean()
         );

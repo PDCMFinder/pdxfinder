@@ -28,7 +28,7 @@ public class LoaderNewTest extends BaseTest {
     @Mock private LoadNCITDrugs loadNCITDrugs;
     @Mock private DataImportService dataImportService;
     @Mock private DataProviders.DataProvider dataProvider;
-    @Mock private File dataDirectory;
+    private String dataDirectory;
     @InjectMocks private LoaderNew loaderNew;
 
     @Before
@@ -40,6 +40,7 @@ public class LoaderNewTest extends BaseTest {
         doNothing().when(this.loadNCITDrugs).loadRegimens();
         doNothing().when(this.dataProvider).load();
     }
+
 
     @Test public void run_givenSingleProvider_callsRelevantLoader() {
         loaderNew.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
@@ -116,6 +117,7 @@ public class LoaderNewTest extends BaseTest {
     private void givenEmptyOntologyCache(boolean b) {
         when(this.dataImportService.ontologyCacheIsEmpty()).thenReturn(b);
     }
+
 
     private void givenEmptyMarkerCache(boolean b) {
         when(this.dataImportService.markerCacheIsEmpty()).thenReturn(b);
