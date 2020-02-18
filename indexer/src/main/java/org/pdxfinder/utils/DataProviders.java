@@ -29,7 +29,7 @@ public class DataProviders implements ApplicationContextAware {
         EurOPDX,
     }
 
-    private static List<DataProvider> getProvidersFrom(DataProviderGroup group) {
+    public static List<DataProvider> getProvidersFrom(DataProviderGroup group) {
         EnumMap<DataProviderGroup, List<DataProvider>> map = new EnumMap<>(DataProviderGroup.class);
         map.put(DataProviderGroup.All, Arrays.asList(DataProvider.values()));
         map.put(DataProviderGroup.EurOPDX, Arrays.asList(
