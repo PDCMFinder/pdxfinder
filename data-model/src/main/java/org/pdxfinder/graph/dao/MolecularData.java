@@ -3,34 +3,40 @@ package org.pdxfinder.graph.dao;
 public class MolecularData {
 
 
-    private String chromosome;
-    private String seqPosition; //in jax use seqStartPosition instead of this
-    private String refAllele;
-    private String altAllele;
-    private String nucleotideChange;
-    private String consequence; // variant_classification in ircc
-    private String aminoAcidChange; //use hgvsp short, remove p. in ircc
-    private String rsIdVariants;
+    private String biotype;
+    private String codingSequenceChange;
+    private String variantClass;
+    private String codonChange;
+    private String aminoAcidChange;
+    private String consequence;
+    private String functionalPrediction;
     private String readDepth;
     private String alleleFrequency;
-    private String genomeAssembly; //NCBI_build in ircc
+    private String chromosome;
+    private String seqStartPosition;
+    private String refAllele;
+    private String altAllele;
+    private String ucscGeneId;
+    private String ncbiGeneId;
+    private String ncbiTranscriptId;
+    private String ensemblGeneId;
+    private String ensemblTranscriptId;
+    private String existingVariations;
+    private String genomeAssembly;
+    private String nucleotideChange;
+
     private String zscore;
 
-    private String seqStartPosition;
+    private String seqPosition;
     private String seqEndPosition;
     private String strand;
-    private String ensemblTranscriptId;
-    private String ucscTranscriptId;
-    private String ncbiTranscriptId;
 
     private String cdsChange;
-    private String type; //Substitution
+    private String type;
     private String annotation;
 
-    //maybe use marker status in the future to have a general approach?
     private String cytogeneticsResult;
     private String microsatelliteResult;
-
 
     private String probeIDAffymetrix;
 
@@ -43,15 +49,14 @@ public class MolecularData {
 
     private String cytoGenFishResult;
 
-    private String rnaSeqCoverage;
-    private String rnaSeqFPKM;
-    private String rnaSeqTPM;
-    private String rnaSeqCount;
-    private String affyHGEAProbeId;
-    private String affyHGEAExpressionValue;
-    private String illuminaHGEAProbeId;
-    private String illuminaHGEAExpressionValue;
-
+    protected String rnaSeqCoverage;
+    protected String rnaSeqFPKM;
+    protected String rnaSeqTPM;
+    protected String rnaSeqCount;
+    protected String affyHGEAProbeId;
+    protected String affyHGEAExpressionValue;
+    protected String illuminaHGEAProbeId;
+    protected String illuminaHGEAExpressionValue;
 
     private String marker;
 
@@ -134,15 +139,15 @@ public class MolecularData {
     /**
      * @return the rsIdVariants
      */
-    public String getRsIdVariants() {
-        return rsIdVariants;
+    public String getExistingVariations() {
+        return existingVariations;
     }
 
     /**
      * @param rsIdVariants the rsIdVariants to set
      */
-    public void setRsIdVariants(String rsIdVariants) {
-        this.rsIdVariants = rsIdVariants;
+    public void setExistingVariations(String rsIdVariants) {
+        this.existingVariations = rsIdVariants;
     }
 
     /**
@@ -249,12 +254,12 @@ public class MolecularData {
         this.ensemblTranscriptId = ensemblTranscriptId;
     }
 
-    public String getUcscTranscriptId() {
-        return ucscTranscriptId;
+    public String getUcscGeneId() {
+        return ucscGeneId;
     }
 
-    public void setUcscTranscriptId(String ucscTranscriptId) {
-        this.ucscTranscriptId = ucscTranscriptId;
+    public void setUcscGeneId(String ucscTranscriptId) {
+        this.ucscGeneId = ucscTranscriptId;
     }
 
     public String getNcbiTranscriptId() {
@@ -440,5 +445,61 @@ public class MolecularData {
 
     public void setMarker(String marker) {
         this.marker = marker;
+    }
+
+    public String getBiotype() {
+        return biotype;
+    }
+
+    public void setBiotype(String biotype) {
+        this.biotype = biotype;
+    }
+
+    public String getCodingSequenceChange() {
+        return codingSequenceChange;
+    }
+
+    public void setCodingSequenceChange(String codingSequenceChange) {
+        this.codingSequenceChange = codingSequenceChange;
+    }
+
+    public String getVariantClass() {
+        return variantClass;
+    }
+
+    public void setVariantClass(String variantClass) {
+        this.variantClass = variantClass;
+    }
+
+    public String getCodonChange() {
+        return codonChange;
+    }
+
+    public void setCodonChange(String codonChange) {
+        this.codonChange = codonChange;
+    }
+
+    public String getFunctionalPrediction() {
+        return functionalPrediction;
+    }
+
+    public void setFunctionalPrediction(String functionalPrediction) {
+        this.functionalPrediction = functionalPrediction;
+    }
+
+    public String getNcbiGeneId() {
+        return ncbiGeneId;
+    }
+
+    public void setNcbiGeneId(String ncbiGeneId) {
+        this.ncbiGeneId = ncbiGeneId;
+    }
+
+    public String getEnsemblGeneId() {
+        return ensemblGeneId;
+    }
+
+    public void setEnsemblGeneId(String ensemblGeneId) {
+        this.ensemblGeneId = ensemblGeneId;
     }
 }

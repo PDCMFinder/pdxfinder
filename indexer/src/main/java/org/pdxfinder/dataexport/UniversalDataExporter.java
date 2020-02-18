@@ -502,7 +502,7 @@ public class UniversalDataExporter {
                     rowData.add(md.getMarker());
                     //no transcript id
                     rowData.add("");
-                    rowData.add(md.getRsIdVariants());
+                    rowData.add(md.getExistingVariations());
                     rowData.add(md.getGenomeAssembly());
                     rowData.add(mc.getPlatform().getName());
 

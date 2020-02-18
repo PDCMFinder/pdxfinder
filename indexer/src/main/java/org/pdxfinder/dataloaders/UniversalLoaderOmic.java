@@ -403,7 +403,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         ma.setRefAllele(data.get(omicRefAllele));
         ma.setAltAllele(data.get(omicAltAllele));
         ma.setGenomeAssembly(data.get(omicGenomeAssembly));
-        ma.setRsIdVariants(data.get(omicRsIdVariants));
+        ma.setExistingVariations(data.get(omicRsIdVariants));
         ma.setSeqStartPosition(data.get(omicSeqStartPosition));
 
         ma.setEnsemblTranscriptId(data.get(omicEnsemblTranscriptId));
