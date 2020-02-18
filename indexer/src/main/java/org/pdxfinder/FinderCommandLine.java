@@ -22,8 +22,8 @@ import java.util.concurrent.Callable;
 
 @Component
 @Command(name = "indexer",
-    mixinStandardHelpOptions = true,
-    subcommands = {FinderCommandLine.Load.class, FinderCommandLine.Export.class})
+        mixinStandardHelpOptions = true,
+        subcommands = {FinderCommandLine.Load.class, FinderCommandLine.Export.class})
 @Order(value = -100)
 public class FinderCommandLine implements Callable<Integer> {
 
@@ -35,9 +35,9 @@ public class FinderCommandLine implements Callable<Integer> {
     @Component
     @Order(value = -100)
     @Command(name = "load",
-        description = "Loads and transforms data into the PDXFinder.",
-        mixinStandardHelpOptions = true,
-        exitCodeOnExecutionException = 34)
+            description = "Loads and transforms data into the PDXFinder.",
+            mixinStandardHelpOptions = true,
+            exitCodeOnExecutionException = 34)
     static class Load implements Callable<Integer> {
 
         Logger log = LoggerFactory.getLogger(Load.class);
@@ -45,22 +45,18 @@ public class FinderCommandLine implements Callable<Integer> {
         @Autowired
         private LoaderNew loaderNew;
 
-        @Option(
-            names = {"-d", "--data-dir"},
-            required = true,
-            description = "Path of the PDXFinder data directory " +
-                "(default: [${DEFAULT-VALUE}], set in application.properties)")
-        @Value("${pdxfinder.root.dir}")
-        private File dataDirectory;
+        @Option(names = {"-d", "--data-dir"},
+                required = true,
+                description = "Path of the PDXFinder data directory (default: [${DEFAULT-VALUE}], set in application.properties)")
+       // @Value("${pdxfinder.root.dir}")
+        private String dataDirectory;
 
-        @Option(
-            names = {"-c", "--clear-cache"},
-            description = "Clear cached data and reload, including NCIT ontology terms, etc.")
+        @Option(names = {"-c", "--clear-cache"},
+                description = "Clear cached data and reload, including NCIT ontology terms, etc.")
         private boolean clearCacheRequested;
 
-        @Option(
-            names = {"-k", "--keep-db"},
-            description = "Skips clearing of the database before loading new data.")
+        @Option(names = {"-k", "--keep-db"},
+                description = "Skips clearing of the database before loading new data.")
         private boolean keepDatabaseRequested;
 
         @Option(names = "--spring.config.location")
@@ -71,17 +67,14 @@ public class FinderCommandLine implements Callable<Integer> {
 
         static class Exclusive {
 
-            @Option(
-                names = {"-g", "--group"},
-                arity = "1",
-                description = "Load the data for groups of dataProvider (default: [${DEFAULT-VALUE}]). " +
-                    "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
+            @Option(names = {"-g", "--group"},
+                    arity = "1",
+                    description = "Load the data for groups of dataProvider (default: [${DEFAULT-VALUE}]). " +
+                            "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
             private DataProviderGroup dataProviderGroup = DataProviderGroup.All;
 
-            @Option(
-                names = {"-o", "--only"},
-                description = "Load only the data for the listed dataProvider. " +
-                    "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
+            @Option(names = {"-o", "--only"},
+                    description = "Load only the data for the listed dataProvider. Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
             private DataProvider[] dataProvider;
 
             public DataProviderGroup getDataProviderGroup() {
@@ -97,10 +90,10 @@ public class FinderCommandLine implements Callable<Integer> {
         public Integer call() {
             List<DataProvider> providersRequested = Arrays.asList(datasetRequested.getDataProvider());
             loaderNew.run(
-                providersRequested,
-                dataDirectory,
-                clearCacheRequested,
-                keepDatabaseRequested
+                    providersRequested,
+                    dataDirectory,
+                    clearCacheRequested,
+                    keepDatabaseRequested
             );
             return 0;
         }

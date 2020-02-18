@@ -53,57 +53,57 @@ public class DataProviders implements ApplicationContextAware {
         Curie_BC,
         Curie_LC,
         Curie_OV,
-        IRCC_CRC {
+        IRCC_CRC /*{
             @Override
             public void load() {
                 LoadIRCC loadIRCC = (LoadIRCC) applicationContext.getBean("LoadIRCC");
                 try { loadIRCC.run(); }
                 catch (Exception e) { log.error("{}", e); }
-            }},
+            }}*/,
         IRCC_GC,
-        JAX {
+        JAX /*{
             @Override
             public void load() {
                 LoadJAXData loadJAXData = (LoadJAXData) applicationContext.getBean("LoadJAX");
                 try { loadJAXData.run(); }
                 catch (Exception e) { log.error("{}", e); }
-        }},
-        PDMR {
+        }}*/,
+        PDMR /*{
             @Override
             public void load() {
                 LoadPDMRData loadPDMRData = (LoadPDMRData) applicationContext.getBean("LoadPDMR");
                 try { loadPDMRData.run(); }
                 catch (Exception e) { log.error("{}", e); }
-            }},
+            }}*/,
         PMLB,
-        PDXNet_HCI_BCM {
+        PDXNet_HCI_BCM /*{
             @Override
             public void load() {
                 LoadHCI loadHCI = (LoadHCI) applicationContext.getBean("LoadHCI");
                 try { loadHCI.run(); }
                 catch (Exception e) { log.error("{}", e); }
-            }},
-        PDXNet_MDAnderson {
+            }}*/,
+        PDXNet_MDAnderson /*{
             @Override
             public void load() {
                 LoadMDAnderson loadMDAnderson = (LoadMDAnderson) applicationContext.getBean("LoadMDAnderson");
                 try { loadMDAnderson.run(); }
                 catch (Exception e) { log.error("{}", e); }
-            }},
-        PDXNet_Wistar_MDAnderson_Penn {
+            }}*/,
+        PDXNet_Wistar_MDAnderson_Penn /*{
             @Override
             public void load() {
                 LoadWISTAR loadWISTAR = (LoadWISTAR) applicationContext.getBean("LoadWISTAR");
                 try { loadWISTAR.run(); }
                 catch (Exception e) { log.error("{}", e); }
-            }},
-        PDXNet_WUSTL {
+            }}*/,
+        PDXNet_WUSTL /*{
             @Override
             public void load() {
                 LoadWUSTL loadWUSTL = (LoadWUSTL) applicationContext.getBean("LoadWUSTL");
                 try { loadWUSTL.run(); }
                 catch (Exception e) { log.error("{}", e); }
-            }},
+            }}*/,
         TRACE,
         UOC_BC,
         UOM_BC,

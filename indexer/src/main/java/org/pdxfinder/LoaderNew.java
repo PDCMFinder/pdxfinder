@@ -1,5 +1,6 @@
 package org.pdxfinder;
 
+import org.pdxfinder.dataloaders.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
@@ -23,18 +24,37 @@ public class LoaderNew {
     private LoadNCITDrugs loadNCITDrugs;
     private LoadNCIT loadNCIT;
     private DataImportService dataImportService;
+    private LoadPDMRData loadPDMRData;
+    private LoadJAXData loadJAXData;
+    private LoadHCI loadHCI;
+    private LoadIRCC loadIRCC;
+    private LoadMDAnderson loadMDAnderson;
+    private LoadWISTAR loadWISTAR;
+    private LoadWUSTL loadWUSTL;
 
-    @Autowired
-    public LoaderNew(
-        LoadMarkers loadMarkers,
-        LoadNCIT loadNCIT,
-        LoadNCITDrugs loadNCITDrugs,
-        DataImportService dataImportService
-    ) {
+
+    public LoaderNew(LoadMarkers loadMarkers,
+                     LoadNCITDrugs loadNCITDrugs,
+                     LoadNCIT loadNCIT,
+                     DataImportService dataImportService,
+                     LoadPDMRData loadPDMRData,
+                     LoadJAXData loadJAXData,
+                     LoadHCI loadHCI,
+                     LoadIRCC loadIRCC,
+                     LoadMDAnderson loadMDAnderson,
+                     LoadWISTAR loadWISTAR,
+                     LoadWUSTL loadWUSTL) {
         this.loadMarkers = loadMarkers;
-        this.loadNCIT = loadNCIT;
         this.loadNCITDrugs = loadNCITDrugs;
+        this.loadNCIT = loadNCIT;
         this.dataImportService = dataImportService;
+        this.loadPDMRData = loadPDMRData;
+        this.loadJAXData = loadJAXData;
+        this.loadHCI = loadHCI;
+        this.loadIRCC = loadIRCC;
+        this.loadMDAnderson = loadMDAnderson;
+        this.loadWISTAR = loadWISTAR;
+        this.loadWUSTL = loadWUSTL;
     }
 
     private Logger log = LoggerFactory.getLogger(LoaderNew.class);
@@ -43,12 +63,12 @@ public class LoaderNew {
 
     void run(
         List<DataProvider> dataProviders,
-        File dataDirectory,
+        String dataDirectory,
         boolean clearCacheRequested,
-        boolean keepDatabaseRequested
-        ) {
+        boolean keepDatabaseRequested) {
+
         keepDatabaseIfRequested(keepDatabaseRequested);
-        loadOntologyTerms(clearCacheRequested);
+        //loadOntologyTerms(clearCacheRequested);
         loadRequestedPdxData(dataProviders);
     }
 
@@ -73,7 +93,7 @@ public class LoaderNew {
     }
 
     private void loadOntologyTerms(boolean clearCacheRequested) {
-        log.info("Loading ontology terms...");
+        log.info("Loading cache ...");
         loadMarkers(clearCacheRequested);
         loadDiseaseTerms(clearCacheRequested);
         loadRegimens(clearCacheRequested);
@@ -110,19 +130,61 @@ public class LoaderNew {
     }
 
     private void loadRequestedPdxData(List<DataProvider> providers) {
+
         log.debug("Running requested PDX dataset loaders {}...", providers);
         for (DataProvider i : providers) {
             callRelevantLoader(i);
         }
     }
 
+
+
+
     private void callRelevantLoader(DataProvider dataProvider) {
+
         try {
-            log.debug("Loading data for {}", dataProvider);
-            dataProvider.load();
+
+            switch (dataProvider) {
+
+                case PDMR:
+                    loadPDMRData.run();
+                    break;
+                case JAX:
+                    loadJAXData.run();
+                    break;
+                case PDXNet_HCI_BCM:
+                    loadHCI.run();
+                    break;
+                case IRCC_CRC:
+                    loadIRCC.run();
+                    break;
+                case PDXNet_MDAnderson:
+                    loadMDAnderson.run();
+                    break;
+                case PDXNet_Wistar_MDAnderson_Penn:
+                    loadWISTAR.run();
+                    break;
+                case PDXNet_WUSTL:
+                    loadWUSTL.run();
+                    break;
+                default:
+                    log.info("Error Loading {}", dataProvider);
+            }
+
         } catch (Exception e) {
             log.error("Error calling loader for {}:", dataProvider, e);
         }
+
+
+
+
+
+//        try {
+//            log.debug("Loading data for {}", dataProvider);
+//            dataProvider.load();
+//        } catch (Exception e) {
+//            log.error("Error calling loader for {}:", dataProvider, e);
+//        }
     }
 
 }
