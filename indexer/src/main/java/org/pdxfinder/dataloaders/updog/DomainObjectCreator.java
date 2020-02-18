@@ -386,9 +386,9 @@ public class DomainObjectCreator {
             for(Map.Entry<String, Object> entry : models.entrySet()){
 
                 ModelCreation modelCreation = (ModelCreation) entry.getValue();
-                String mutationModelId = "cna_"+modelCreation.getSourcePdxId()+".tsv";
+                String cnaModelId = "cna_"+modelCreation.getSourcePdxId()+".tsv";
 
-                cnaTable = pdxDataTables.get(mutationModelId);
+                cnaTable = pdxDataTables.get(cnaModelId);
 
                 if(cnaTable != null){
                     log.info(modelCreation.getSourcePdxId());
@@ -556,7 +556,7 @@ public class DomainObjectCreator {
 
             //if we have any message regarding the suggested marker, ie: prev symbol, synonym, etc, add it to the report
             if (nsdto.getLogEntity() != null) {
-                log.info(nsdto.getLogEntity().getMessage());
+                //log.info(nsdto.getLogEntity().getMessage());
             }
 
             MolecularData molecularData = null;
