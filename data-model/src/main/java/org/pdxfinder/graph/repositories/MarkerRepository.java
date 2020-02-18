@@ -63,4 +63,11 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
             "RETURN DISTINCT m")
     Set<Marker> findDistinctByMolCharId(@Param("id") Long id);
 
+    @Query("MATCH (m:Marker) return count(m)")
+    int getMarkerCount();
+
+    @Query("MATCH (m:Marker) return m SKIP {skip} LIMIT {limit}")
+    Collection<Marker> getAllMarkersSkipLimit(@Param("skip") int skip, @Param("limit") int limit);
+
+
 }
