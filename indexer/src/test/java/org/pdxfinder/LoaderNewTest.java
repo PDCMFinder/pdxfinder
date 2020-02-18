@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
 import org.pdxfinder.services.loader.envload.LoadNCIT;
 import org.pdxfinder.services.loader.envload.LoadNCITDrugs;
@@ -81,7 +82,7 @@ public class LoaderNewTest extends BaseTest {
     @Test public void load_givenNoOntologyCache_loadOntologyTerms() {
         givenEmptyOntologyCache(true);
         loaderNew.run(Collections.singletonList(dataProvider), dataDirectory,false, true);
-        verify(this.loadNCIT).loadOntology(anyString());
+        verify(this.loadNCIT).loadOntology(DataUrl.DISEASES_BRANCH_URL.get());
         verifyNoMoreInteractions(this.loadNCIT);
     }
 

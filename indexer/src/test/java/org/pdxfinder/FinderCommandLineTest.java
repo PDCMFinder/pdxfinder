@@ -34,7 +34,7 @@ public class FinderCommandLineTest extends BaseTest {
     @Test public void load_givenLoadOnlyMinimal_callsLoader() {
         String[] args = {"--only=Test_Minimal", "--data-dir=path/", "--keep-db"};
         int exitCode = new CommandLine(load).execute(args);
-        assertEquals(33, exitCode);
+        assertEquals(0, exitCode);
         verify(this.loaderNew).run(
             anyListOf(DataProviders.DataProvider.class),
             any(File.class),

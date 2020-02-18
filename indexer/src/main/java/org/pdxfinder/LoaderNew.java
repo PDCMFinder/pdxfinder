@@ -49,19 +49,16 @@ public class LoaderNew {
         ) {
         keepDatabaseIfRequested(keepDatabaseRequested);
         loadOntologyTerms(clearCacheRequested);
-        loadOntologyMap();
         loadRequestedPdxData(dataProviders);
-    }
-
-    private void loadOntologyMap() {
-
     }
 
     private void keepDatabaseIfRequested(boolean keepDatabaseRequested) {
         if (keepDatabaseRequested) {
             log.info("Using existing database: {}", databaseURI);
         } else {
-            log.info("Database deletion is not yet implemented");
+            throw new UnsupportedOperationException(
+                "Removing the database on load is not yet supported, " +
+                    "please use `-k` or `--keep-db` for the time being.");
 //            clearDatabase();
         }
     }

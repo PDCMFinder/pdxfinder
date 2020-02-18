@@ -63,6 +63,8 @@ public class FinderCommandLine implements Callable<Integer> {
             description = "Skips clearing of the database before loading new data.")
         private boolean keepDatabaseRequested;
 
+        @Option(names = "--spring.config.location")
+        private String springConfigLocation;
 
         @ArgGroup(multiplicity = "1")
         Exclusive datasetRequested;
@@ -100,7 +102,7 @@ public class FinderCommandLine implements Callable<Integer> {
                 clearCacheRequested,
                 keepDatabaseRequested
             );
-            return 33;
+            return 0;
         }
 
     }
