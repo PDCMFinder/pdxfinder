@@ -20,7 +20,7 @@ public class FinderCommandLineTest extends BaseTest {
     @InjectMocks private FinderCommandLine.Load load;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         doNothing().when(this.loaderNew).run(
             anyListOf(DataProviders.DataProvider.class),
@@ -33,6 +33,19 @@ public class FinderCommandLineTest extends BaseTest {
 
     @Test public void load_givenLoadOnlyMinimal_callsLoader() {
         String[] args = {"--only=Test_Minimal", "--data-dir=path/", "--keep-db"};
+        int exitCode = new CommandLine(load).execute(args);
+        assertEquals(0, exitCode);
+        verify(this.loaderNew).run(
+            anyListOf(DataProviders.DataProvider.class),
+            any(File.class),
+            anyBoolean(),
+            anyBoolean()
+        );
+        verifyNoMoreInteractions(this.loaderNew);
+    }
+
+    @Test public void load_givenLoadAll_callsLoader() {
+        String[] args = {"--group=All", "--data-dir=path/", "--keep-db"};
         int exitCode = new CommandLine(load).execute(args);
         assertEquals(0, exitCode);
         verify(this.loaderNew).run(

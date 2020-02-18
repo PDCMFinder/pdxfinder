@@ -1,9 +1,6 @@
 package org.pdxfinder;
 
-import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.services.loader.envload.LoadMarkers;
-import org.pdxfinder.services.loader.envload.LoadNCIT;
-import org.pdxfinder.services.loader.envload.LoadNCITDrugs;
+import org.pdxfinder.utils.DataProviders;
 import org.pdxfinder.utils.DataProviders.DataProvider;
 import org.pdxfinder.utils.DataProviders.DataProviderGroup;
 import org.slf4j.Logger;
@@ -21,9 +18,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 
 @Component
-@Command(name = "indexer",
-    mixinStandardHelpOptions = true,
-    subcommands = {FinderCommandLine.Load.class, FinderCommandLine.Export.class})
+@Command(name = "indexer", mixinStandardHelpOptions = true, subcommands = {FinderCommandLine.Load.class})
 @Order(value = -100)
 public class FinderCommandLine implements Callable<Integer> {
 
@@ -84,18 +79,19 @@ public class FinderCommandLine implements Callable<Integer> {
                     "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
             private DataProvider[] dataProvider;
 
-            public DataProviderGroup getDataProviderGroup() {
+            DataProviderGroup getDataProviderGroup() {
                 return dataProviderGroup;
             }
 
-            public DataProvider[] getDataProvider() {
+            DataProvider[] getDataProvider() {
                 return dataProvider;
             }
         }
 
         @Override
         public Integer call() {
-            List<DataProvider> providersRequested = Arrays.asList(datasetRequested.getDataProvider());
+            log.info("Loading using supplied parameters:\n{}", this);
+            List<DataProvider> providersRequested = getListOfRequestedProviders();
             loaderNew.run(
                 providersRequested,
                 dataDirectory,
@@ -105,24 +101,24 @@ public class FinderCommandLine implements Callable<Integer> {
             return 0;
         }
 
-    }
-
-    @Component
-    @Command(
-        name = "export",
-        description = "Exports data to template format.",
-        mixinStandardHelpOptions = true,
-        exitCodeOnExecutionException = 34)
-    static class Export implements Callable<Integer> {
-
-        Logger log = LoggerFactory.getLogger(Export.class);
+        List<DataProvider> getListOfRequestedProviders() {
+            if (datasetRequested.getDataProvider() != null) {
+                return Arrays.asList(datasetRequested.getDataProvider());
+            } else {
+                return DataProviders.getProvidersFrom(datasetRequested.getDataProviderGroup());
+            }
+        }
 
         @Override
-        public Integer call() {
-            log.error("This command is not yet implemented");
-            return 33;
+        public String toString() {
+            return new StringJoiner("\n", Load.class.getSimpleName() + "[\n", "\n]")
+                .add("dataDirectory=" + dataDirectory)
+                .add("clearCacheRequested=" + clearCacheRequested)
+                .add("keepDatabaseRequested=" + keepDatabaseRequested)
+                .add("springConfigLocation='" + springConfigLocation + "'")
+                .add("datasetRequested=" + getListOfRequestedProviders())
+                .toString();
         }
     }
-
 
 }
