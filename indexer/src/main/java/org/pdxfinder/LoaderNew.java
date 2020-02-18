@@ -68,7 +68,7 @@ public class LoaderNew {
         boolean keepDatabaseRequested) {
 
         keepDatabaseIfRequested(keepDatabaseRequested);
-        //loadOntologyTerms(clearCacheRequested);
+        loadOntologyTerms(clearCacheRequested);
         loadRequestedPdxData(dataProviders);
     }
 
@@ -140,7 +140,7 @@ public class LoaderNew {
 
 
 
-    private void callRelevantLoader(DataProvider dataProvider) {
+    public void callRelevantLoader(DataProvider dataProvider) {
 
         try {
 

@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
@@ -20,6 +21,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+
 public class LoaderNewTest extends BaseTest {
 
     @Mock private LoadDiseaseOntology loadDiseaseOntology;
@@ -27,9 +29,13 @@ public class LoaderNewTest extends BaseTest {
     @Mock private LoadNCIT loadNCIT;
     @Mock private LoadNCITDrugs loadNCITDrugs;
     @Mock private DataImportService dataImportService;
-    @Mock private DataProviders.DataProvider dataProvider;
+
+    private DataProviders.DataProvider dataProvider;
     private String dataDirectory;
-    @InjectMocks private LoaderNew loaderNew;
+
+    @Spy
+    @InjectMocks
+    private LoaderNew loaderNew;
 
     @Before
     public void setUp() throws Exception {
@@ -38,20 +44,24 @@ public class LoaderNewTest extends BaseTest {
         doNothing().when(this.loadMarkers).loadGenes(anyString());
         doNothing().when(this.loadNCIT).loadOntology(anyString());
         doNothing().when(this.loadNCITDrugs).loadRegimens();
-        doNothing().when(this.dataProvider).load();
+        //doNothing().when(this.dataProvider).load();
+        doNothing().when(this.loaderNew).callRelevantLoader(any(DataProviders.DataProvider.class));
+
+        this.dataDirectory = "~/finderroot";
     }
 
 
-    @Test public void run_givenSingleProvider_callsRelevantLoader() {
-        loaderNew.run(Collections.singletonList(dataProvider), dataDirectory, false, true);
-        verify(this.dataProvider).load();
-        verifyNoMoreInteractions(this.dataProvider);
+    @Test
+    public void run_givenSingleProvider_callsRelevantLoader() {
+        loaderNew.run(Collections.singletonList(dataProvider), this.dataDirectory, false, true);
+        verify(this.loaderNew).callRelevantLoader(this.dataProvider);
+       // verifyNoMoreInteractions(this.dataProvider);
     }
 
     @Test public void run_givenTwoProviders_callsRelevantLoaderForEach() {
         loaderNew.run(Arrays.asList(dataProvider, dataProvider), dataDirectory, false, true);
-        verify(this.dataProvider, times(2)).load();
-        verifyNoMoreInteractions(this.dataProvider);
+        verify(this.loaderNew, times(2)).callRelevantLoader(this.dataProvider);
+       // verifyNoMoreInteractions(this.dataProvider);
     }
 
     @Test public void load_givenMarkerCache_skipLoadingMarkers() {
