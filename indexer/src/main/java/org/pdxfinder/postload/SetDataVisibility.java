@@ -28,9 +28,6 @@ public class SetDataVisibility implements CommandLineRunner{
         this.dataImportService = dataImportService;
     }
 
-
-
-
     @Override
     public void run(String... args) throws Exception {
 
@@ -44,11 +41,7 @@ public class SetDataVisibility implements CommandLineRunner{
         long startTime = System.currentTimeMillis();
 
         if (options.has("setDataVisibility") || options.has("loadALL")  || options.has("loadEssentials")) {
-
             log.info("Applying data visibility rules");
-
-
-            applyDataVisibilityRules("IRCC-GC");
             applyDataVisibilityRules("CRL");
         }
 
