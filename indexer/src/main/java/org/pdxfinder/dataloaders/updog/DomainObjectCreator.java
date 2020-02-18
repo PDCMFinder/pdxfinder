@@ -341,11 +341,11 @@ public class DomainObjectCreator {
 
                 ModelCreation modelCreation = (ModelCreation) entry.getValue();
                 String mutationModelId = "mut_"+modelCreation.getSourcePdxId()+".tsv";
-                log.info(modelCreation.getSourcePdxId());
+
                 mutationTable = pdxDataTables.get(mutationModelId);
 
                 if(mutationTable != null){
-
+                    log.info(modelCreation.getSourcePdxId());
                     createMolecularCharacterization(mutationTable, "mutation");
                 }
 
@@ -375,9 +375,29 @@ public class DomainObjectCreator {
 
             for (Row row : cnaTable) {
 
-                MolecularCharacterization molecularCharacterization = getMolcharByType(row, "cna");
+                MolecularCharacterization molecularCharacterization = getMolcharByType(row, "copynumberalteration");
                 addMolecularData(molecularCharacterization, row);
             }
+        }
+        else{
+
+            Map<String, Object> models = domainObjects.get(MODEL_KEY);
+
+            for(Map.Entry<String, Object> entry : models.entrySet()){
+
+                ModelCreation modelCreation = (ModelCreation) entry.getValue();
+                String mutationModelId = "cna_"+modelCreation.getSourcePdxId()+".tsv";
+
+                cnaTable = pdxDataTables.get(mutationModelId);
+
+                if(cnaTable != null){
+                    log.info(modelCreation.getSourcePdxId());
+                    createMolecularCharacterization(cnaTable, "copynumberalteration");
+                }
+
+
+            }
+
         }
     }
 
@@ -587,15 +607,15 @@ public class DomainObjectCreator {
 
         MolecularData ma = new MolecularData();
 
-        ma.setChromosome(row.getString(TSV.CopyNumberAlteration.chromosome.name()));
-        ma.setSeqStartPosition(row.getString(TSV.CopyNumberAlteration.seq_start_position.name()));
-        ma.setSeqEndPosition(row.getString(TSV.CopyNumberAlteration.seq_end_position.name()));
-        ma.setCnaLog10RCNA(row.getString(TSV.CopyNumberAlteration.log10r_cna.name()));
-        ma.setCnaLog2RCNA(row.getString(TSV.CopyNumberAlteration.log2r_cna.name()));
-        ma.setCnaCopyNumberStatus(row.getString(TSV.CopyNumberAlteration.copy_number_status.name()));
-        ma.setCnaGisticValue(row.getString(TSV.CopyNumberAlteration.gistic_value.name()));
-        ma.setCnaPicnicValue(row.getString(TSV.CopyNumberAlteration.picnic_value.name()));
-        ma.setGenomeAssembly(row.getString(TSV.CopyNumberAlteration.genome_assembly.name()));
+        ma.setChromosome(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.chromosome.name()));
+        ma.setSeqStartPosition(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.seq_start_position.name()));
+        ma.setSeqEndPosition(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.seq_end_position.name()));
+        ma.setCnaLog10RCNA(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.log10r_cna.name()));
+        ma.setCnaLog2RCNA(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.log2r_cna.name()));
+        ma.setCnaCopyNumberStatus(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.copy_number_status.name()));
+        ma.setCnaGisticValue(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.gistic_value.name()));
+        ma.setCnaPicnicValue(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.picnic_value.name()));
+        ma.setGenomeAssembly(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.genome_assembly.name()));
 
         ma.setMarker(marker.getHgncSymbol());
         return  ma;
