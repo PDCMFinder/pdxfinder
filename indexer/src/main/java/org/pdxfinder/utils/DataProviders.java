@@ -4,7 +4,6 @@ import org.pdxfinder.dataloaders.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -18,7 +17,7 @@ public class DataProviders implements ApplicationContextAware {
     @Autowired protected static ApplicationContext applicationContext;
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
@@ -56,7 +55,7 @@ public class DataProviders implements ApplicationContextAware {
         IRCC_CRC {
             @Override
             public void load() {
-                LoadIRCC loadIRCC = (LoadIRCC) applicationContext.getBean("LoadIRCC");
+                LoadIRCC loadIRCC = (LoadIRCC) applicationContext.getBean("loadIRCC");
                 try { loadIRCC.run(); }
                 catch (Exception e) { log.error("{}", e); }
             }},
@@ -64,14 +63,14 @@ public class DataProviders implements ApplicationContextAware {
         JAX {
             @Override
             public void load() {
-                LoadJAXData loadJAXData = (LoadJAXData) applicationContext.getBean("LoadJAX");
+                LoadJAXData loadJAXData = (LoadJAXData) applicationContext.getBean("loadJAXData");
                 try { loadJAXData.run(); }
                 catch (Exception e) { log.error("{}", e); }
         }},
         PDMR {
             @Override
             public void load() {
-                LoadPDMRData loadPDMRData = (LoadPDMRData) applicationContext.getBean("LoadPDMR");
+                LoadPDMRData loadPDMRData = (LoadPDMRData) applicationContext.getBean("loadPDMRData");
                 try { loadPDMRData.run(); }
                 catch (Exception e) { log.error("{}", e); }
             }},
@@ -79,28 +78,28 @@ public class DataProviders implements ApplicationContextAware {
         PDXNet_HCI_BCM {
             @Override
             public void load() {
-                LoadHCI loadHCI = (LoadHCI) applicationContext.getBean("LoadHCI");
+                LoadHCI loadHCI = (LoadHCI) applicationContext.getBean("loadHCI");
                 try { loadHCI.run(); }
                 catch (Exception e) { log.error("{}", e); }
             }},
         PDXNet_MDAnderson {
             @Override
             public void load() {
-                LoadMDAnderson loadMDAnderson = (LoadMDAnderson) applicationContext.getBean("LoadMDAnderson");
+                LoadMDAnderson loadMDAnderson = (LoadMDAnderson) applicationContext.getBean("loadMDAnderson");
                 try { loadMDAnderson.run(); }
                 catch (Exception e) { log.error("{}", e); }
             }},
         PDXNet_Wistar_MDAnderson_Penn {
             @Override
             public void load() {
-                LoadWISTAR loadWISTAR = (LoadWISTAR) applicationContext.getBean("LoadWISTAR");
+                LoadWISTAR loadWISTAR = (LoadWISTAR) applicationContext.getBean("loadWISTAR");
                 try { loadWISTAR.run(); }
                 catch (Exception e) { log.error("{}", e); }
             }},
         PDXNet_WUSTL {
             @Override
             public void load() {
-                LoadWUSTL loadWUSTL = (LoadWUSTL) applicationContext.getBean("LoadWUSTL");
+                LoadWUSTL loadWUSTL = (LoadWUSTL) applicationContext.getBean("loadWUSTL");
                 try { loadWUSTL.run(); }
                 catch (Exception e) { log.error("{}", e); }
             }},

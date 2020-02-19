@@ -37,6 +37,7 @@ public class FinderLoader {
     }
 
     private Logger log = LoggerFactory.getLogger(FinderLoader.class);
+    @Value("${data-dir}") private String predefDataDirectory;
     @Value("${spring.data.neo4j.uri}") private File databaseURI;
     @Value("${ncitpredef.file}") private String ncitFile;
 
@@ -62,7 +63,7 @@ public class FinderLoader {
     }
 
     private void loadOntologyTerms(boolean clearCacheRequested) {
-        log.info("Loading ontology terms...");
+        log.info("Loading cache ...");
         loadMarkers(clearCacheRequested);
         loadDiseaseTerms(clearCacheRequested);
         loadRegimens(clearCacheRequested);
