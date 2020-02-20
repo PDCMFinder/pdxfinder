@@ -63,20 +63,19 @@ public class Validator {
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        String key;
-        ColumnSpecification value;
-        List<String> missingCols;
-        Map<String, ColumnSpecification> columnSpecification = tableSetSpecification.getColumnSpecification();
-        for (Map.Entry<String, ColumnSpecification> entry : columnSpecification.entrySet()) {
-            key = entry.getKey();
-            value = entry.getValue();
-            missingCols = value.getMissingColumnsFrom(tableSet.get(key));
-            for (String missingCol : missingCols) {
+        for (Pair<String, String> tableColumn : tableSetSpecification.getRequiredColumns()) {
+            String tableName = tableColumn.getKey();
+            String columnName = tableColumn.getValue();
+            if (tableIsMissingColumn(tableSet, tableName, columnName)) {
                 validationErrors.add(ValidationError
-                    .missingColumn(key, missingCol)
+                    .missingColumn(tableName, columnName)
                     .setProvider(tableSetSpecification.getProvider()));
             }
         }
+    }
+
+    private boolean tableIsMissingColumn(Map<String, Table> tableSet, String tableName, String columnName) {
+        return !tableSet.get(tableName).columnNames().contains(columnName);
     }
 
     private void checkAllNonEmptyValuesPresent(

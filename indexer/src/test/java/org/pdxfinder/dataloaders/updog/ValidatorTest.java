@@ -86,13 +86,9 @@ public class ValidatorTest {
     @Test public void checkAllRequiredColsPresent_givenMissingColumnDefinedInColSpec_addsMissingColErrorTotErrorList() {
         List<ValidationError> expected = Collections.singletonList(
                 ValidationError.missingColumn(TABLE_1, "missing_column").setProvider(PROVIDER));
-        Map<String, ColumnSpecification> columnSpecifications = new HashMap<>();
-        Collections.singletonList(TABLE_1).forEach(
-            s -> columnSpecifications.put(s, new ColumnSpecification(
-                Table.create().addColumns(StringColumn.create("missing_column"))
-            )));
+        Pair<String, String> requiredColumn = Pair.of(TABLE_1, "missing_column");
         TableSetSpecification tableSetSpecification = TableSetSpecification.create().setProvider(PROVIDER)
-            .addRequiredColumnSets(columnSpecifications);
+            .addRequiredColumns(requiredColumn);
         assertEquals(
             expected,
             validator.validate(completeTableSet, tableSetSpecification)
@@ -268,7 +264,7 @@ public class ValidatorTest {
         .addRequiredTables(minimalRequiredTable);
 
     private TableSetSpecification requireColumn = TableSetSpecification.create().setProvider(PROVIDER)
-        .addRequiredColumns(Pair.of(TABLE_1, "required_col"));
+        .addNonEmptyColumns(Pair.of(TABLE_1, "required_col"));
 
     private Map<String, Table> makeCompleteTableSet() {
         Map<String, Table> completeFileSet = new HashMap<>();

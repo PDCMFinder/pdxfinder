@@ -12,7 +12,7 @@ import java.util.Set;
 public class TableSetSpecification {
 
     private HashSet<String> requiredTables;
-    private Map<String, ColumnSpecification> columnSpecification;
+    private List<Pair<String, String>> requiredColumns;
     private List<Pair<String, String>> nonEmptyColumns;
     private List<Pair<String, String>> uniqueColumns;
     private List<Pair<Pair<String, String>, Pair<String, String>>> oneToManyRelations;
@@ -20,6 +20,7 @@ public class TableSetSpecification {
 
     private TableSetSpecification() {
         this.requiredTables = new HashSet<>();
+        this.requiredColumns = new ArrayList<>();
         this.nonEmptyColumns = new ArrayList<>();
         this.uniqueColumns = new ArrayList<>();
         this.oneToManyRelations = new ArrayList<>();
@@ -49,17 +50,22 @@ public class TableSetSpecification {
         return this;
     }
 
-    public TableSetSpecification addRequiredColumnSets(Map<String, ColumnSpecification> columnSpecification) {
-        this.columnSpecification = columnSpecification;
+    public TableSetSpecification addRequiredColumns(Pair<String, String> tableColumn) {
+        this.requiredColumns.add(tableColumn);
         return this;
     }
 
-    public TableSetSpecification addRequiredColumns(Pair<String, String> tableColumn) {
+    public TableSetSpecification addRequiredColumns(List<Pair<String, String>> tableColumn) {
+        this.requiredColumns.addAll(tableColumn);
+        return this;
+    }
+
+    public TableSetSpecification addNonEmptyColumns(Pair<String, String> tableColumn) {
         this.nonEmptyColumns.add(tableColumn);
         return this;
     }
 
-    public TableSetSpecification addRequiredColumns(List<Pair<String, String>> tableColumns) {
+    public TableSetSpecification addNonEmptyColumns(List<Pair<String, String>> tableColumns) {
         this.nonEmptyColumns.addAll(tableColumns);
         return this;
     }
@@ -72,10 +78,6 @@ public class TableSetSpecification {
     public TableSetSpecification addUniqueColumns(List<Pair<String, String>> tableColumns) {
         this.uniqueColumns.addAll(tableColumns);
         return this;
-    }
-
-    public Map<String, ColumnSpecification> getColumnSpecification() {
-        return this.columnSpecification;
     }
 
     public String getProvider() {
@@ -95,12 +97,16 @@ public class TableSetSpecification {
         return this.uniqueColumns;
     }
 
-    public boolean hasRequiredColumns() {
-        return (columnSpecification != null);
-    }
-
     public Set<String> getRequiredTables() {
         return requiredTables;
+    }
+
+    public List<Pair<String, String>> getRequiredColumns() {
+        return this.requiredColumns;
+    }
+
+    public boolean hasRequiredColumns() {
+        return getRequiredColumns() != null;
     }
 
     public List<Pair<Pair<String, String>, Pair<String, String>>> getOneToManyRelations() {

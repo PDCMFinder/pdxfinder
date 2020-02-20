@@ -1,10 +1,14 @@
 package org.pdxfinder.dataloaders.updog;
 
 import org.apache.commons.lang3.tuple.Pair;
+import tech.tablesaw.api.StringColumn;
+import tech.tablesaw.api.Table;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -111,7 +115,7 @@ public class PdxValidationRuleset implements ValidationRuleCreator {
         List<Pair<String, String>> loaderColumns = matchingColumnsFromTable(tableColumns, "loader",
             new String[]{"name", "abbreviation"});
 
-        List<Pair<String, String>> requiredColumns = TableSetUtilities.concatenate(
+        List<Pair<String, String>> nonEmptyColumns = TableSetUtilities.concatenate(
             idColumns,
             hostStrainColumns,
             sampleColumns,
@@ -123,7 +127,8 @@ public class PdxValidationRuleset implements ValidationRuleCreator {
 
         return TableSetSpecification.create()
             .addRequiredTables(metadataTables)
-            .addRequiredColumns(requiredColumns)
+            .addRequiredColumns(nonEmptyColumns)
+            .addNonEmptyColumns(nonEmptyColumns)
             .addUniqueColumns(idColumns)
             .addHasRelations(Arrays.asList(
                 relation("metadata-patient.tsv", "metadata-sample.tsv", "patient_id"),

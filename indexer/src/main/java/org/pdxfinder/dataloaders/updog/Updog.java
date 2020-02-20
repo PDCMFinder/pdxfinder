@@ -11,7 +11,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +55,7 @@ public class Updog {
         validationErrors.addAll(validateOmicsTables(omicsTableSet, provider));
 
         treatmentTableSet = readTreatmentTablesFromPath(updogProviderDirectory);
-        treatmentTableSet = TableSetUtilities.removeHeaderRowsIfPresent(treatmentTableSet);
+        treatmentTableSet = tableSetCleaner.cleanTreatmentTables(treatmentTableSet);
 
         combinedTableSet.putAll(pdxTableSet);
         combinedTableSet.putAll(omicsTableSet);
@@ -88,7 +87,9 @@ public class Updog {
 
     private List<ValidationError> validatePdxDataTables(Map<String, Table> tableSet, String provider){
         PdxValidationRuleset pdxValidationRuleset = new PdxValidationRuleset();
-        return validator.validate(tableSet, pdxValidationRuleset.generate(provider));
+        return validator.validate(
+            tableSet,
+            pdxValidationRuleset.generate(provider));
     }
 
     private void createPdxObjects(Map<String, Table> tableSet){

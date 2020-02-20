@@ -22,6 +22,9 @@ public class TableSetCleaner {
         omicsTableSet = TableSetUtilities.removeHeaderRowsIfPresent(omicsTableSet);
         omicsTableSet = TableSetUtilities.removeBlankRows(omicsTableSet);
         return omicsTableSet;
+    }
 
+    public Map<String, Table> cleanTreatmentTables(Map<String, Table> treatmentTableSet) {
+        return TableSetUtilities.removeHeaderRowsIfPresent(treatmentTableSet);
     }
 }
