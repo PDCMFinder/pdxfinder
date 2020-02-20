@@ -28,6 +28,12 @@ public class Validator {
         TableSetSpecification tableSetSpecification
     ) {
         checkAllRequiredTablesPresent(tableSet, tableSetSpecification);
+        if (!validationErrors.isEmpty()) {
+            log.error(
+                "Not all required tables where present for {}. Aborting further validation.",
+                tableSetSpecification.getProvider());
+            return validationErrors;
+        }
         checkAllRequiredColumnsPresent(tableSet, tableSetSpecification);
         checkAllNonEmptyValuesPresent(tableSet, tableSetSpecification);
         checkAllUniqueValuesForDuplicates(tableSet, tableSetSpecification);

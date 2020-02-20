@@ -14,22 +14,6 @@ class TableSetUtilities {
 
     private TableSetUtilities() { throw new IllegalStateException("Utility class"); }
 
-    static Map<String, Table> cleanPdxTableSet(Map<String, Table> pdxTableSet) {
-        pdxTableSet = removeProviderNameFromFilename(pdxTableSet);
-        pdxTableSet.remove("metadata-checklist.tsv");
-        removeDescriptionColumn(pdxTableSet);
-        pdxTableSet = removeHeaderRows(pdxTableSet);
-        pdxTableSet = removeBlankRows(pdxTableSet);
-        return pdxTableSet;
-    }
-
-    static Map<String, Table> cleanOmicsTableSet(Map<String, Table> omicsTableSet) {
-        omicsTableSet = removeProviderNameFromFilename(omicsTableSet);
-        omicsTableSet = removeHeaderRowsIfPresent(omicsTableSet);
-        omicsTableSet = removeBlankRows(omicsTableSet);
-        return omicsTableSet;
-    }
-
     static Map<String, Table> removeHeaderRows(Map<String, Table> tableSet) {
         return tableSet.entrySet().stream().collect(
             Collectors.toMap(

@@ -4,12 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 import tech.tablesaw.api.Table;
 
+import javax.annotation.Nonnull;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,47 +21,54 @@ public class Updog {
 
     private static final Logger log = LoggerFactory.getLogger(Updog.class);
     private Reader reader;
+    private TableSetCleaner tableSetCleaner;
     private Validator validator;
     private DomainObjectCreator domainObjectCreator;
 
     @Autowired
     public Updog(
-        Reader reader,
-        Validator validator,
-        DomainObjectCreator domainObjectCreator
+        @Nonnull Reader reader,
+        @Nonnull TableSetCleaner tableSetCleaner,
+        @Nonnull Validator validator,
+        @Nonnull DomainObjectCreator domainObjectCreator
     ) {
-
-        Assert.notNull(reader, "reader cannot be null");
-        Assert.notNull(validator, "validator cannot be null");
-        Assert.notNull(domainObjectCreator, "domainObjectCreator cannot be null");
-
         this.reader = reader;
+        this.tableSetCleaner = tableSetCleaner;
         this.validator = validator;
         this.domainObjectCreator = domainObjectCreator;
     }
 
-    public void run(Path updogProviderDirectory, String provider) {
-        Assert.notNull(provider, "provider cannot be null");
+    public void run(Path updogProviderDirectory, String provider, boolean validateOnly) {
         log.debug("Using UPDOG to import {} PDX data from [{}]", provider, updogProviderDirectory);
 
         Map<String, Table> pdxTableSet;
         Map<String, Table> omicsTableSet;
         Map<String, Table> treatmentTableSet;
         Map<String, Table> combinedTableSet = new HashMap<>();
+        List<ValidationError> validationErrors = new ArrayList<>();
 
         pdxTableSet = readPdxTablesFromPath(updogProviderDirectory);
-        pdxTableSet = TableSetUtilities.cleanPdxTableSet(pdxTableSet);
+        pdxTableSet = tableSetCleaner.cleanPdxTables(pdxTableSet);
+        validationErrors.addAll(validatePdxDataTables(pdxTableSet, provider));
+
         omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
-        omicsTableSet = TableSetUtilities.cleanOmicsTableSet(omicsTableSet);
+        omicsTableSet = tableSetCleaner.cleanOmicsTables(omicsTableSet);
+        validationErrors.addAll(validateOmicsTables(omicsTableSet, provider));
+
         treatmentTableSet = readTreatmentTablesFromPath(updogProviderDirectory);
         treatmentTableSet = TableSetUtilities.removeHeaderRowsIfPresent(treatmentTableSet);
 
         combinedTableSet.putAll(pdxTableSet);
         combinedTableSet.putAll(omicsTableSet);
         combinedTableSet.putAll(treatmentTableSet);
-        List<ValidationError> validationErrors = validatePdxDataTables(combinedTableSet, provider);
 
-        createPdxObjects(combinedTableSet);
+        if (!validateOnly) {
+            createPdxObjects(combinedTableSet);
+        }
+    }
+
+    private List<ValidationError> validateOmicsTables(Map<String, Table> omicsTableSet, String provider) {
+        return new ArrayList<>();
     }
 
     private Map<String, Table> readOmicsTablesFromPath(Path updogProviderDirectory) {
