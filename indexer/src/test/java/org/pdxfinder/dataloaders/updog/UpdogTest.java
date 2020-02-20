@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.pdxfinder.dataloaders.updog.Updog.concatenate;
+import static org.pdxfinder.dataloaders.updog.TableSetUtilities.concatenate;
 
 public class UpdogTest {
 
