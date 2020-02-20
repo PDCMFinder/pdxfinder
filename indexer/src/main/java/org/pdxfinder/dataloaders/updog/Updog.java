@@ -31,24 +31,28 @@ public class Updog {
     private DataImportService dataImportService;
     private Reader reader;
     private Validator validator;
+    private DomainObjectCreator domainObjectCreator;
 
     @Autowired
     public Updog(
         DataImportService dataImportService,
         UtilityService utilityService,
         Reader reader,
-        Validator validator) {
+        Validator validator,
+        DomainObjectCreator domainObjectCreator
+    ) {
 
         Assert.notNull(dataImportService, "dataImportService cannot be null");
         Assert.notNull(utilityService, "utilityService cannot be null");
         Assert.notNull(reader, "reader cannot be null");
         Assert.notNull(validator, "validator cannot be null");
+        Assert.notNull(domainObjectCreator, "domainObjectCreator cannot be null");
 
         this.dataImportService = dataImportService;
         this.utilityService = utilityService;
         this.reader = reader;
         this.validator = validator;
-
+        this.domainObjectCreator = domainObjectCreator;
     }
 
     public void run(Path updogProviderDirectory, String provider) {
@@ -96,8 +100,7 @@ public class Updog {
     }
 
     private void createPdxObjects(Map<String, Table> pdxTableSet){
-        DomainObjectCreator doc = new DomainObjectCreator(dataImportService, pdxTableSet);
-        doc.loadDomainObjects();
+        domainObjectCreator.loadDomainObjects(pdxTableSet);
     }
 
     private TableSetSpecification createTableSetSpecification(

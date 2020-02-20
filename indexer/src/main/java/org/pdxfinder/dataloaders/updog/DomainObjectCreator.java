@@ -5,12 +5,14 @@ import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import tech.tablesaw.api.ColumnType;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
 import java.util.*;
 
+@Service
 public class DomainObjectCreator {
 
     private Map<String, Table> pdxDataTables;
@@ -35,33 +37,31 @@ public class DomainObjectCreator {
 
 
     public DomainObjectCreator(
-            DataImportService dataImportService,
-            Map<String, Table> pdxDataTables
+            DataImportService dataImportService
     ) {
         this.dataImportService = dataImportService;
-        this.pdxDataTables = pdxDataTables;
         domainObjects = new HashMap<>();
     }
 
-    public void loadDomainObjects() {
+    public void loadDomainObjects(Map<String, Table> pdxDataTables) {
         //: Do not change the order of these unless you want to risk 1. the universe to collapse OR 2. missing nodes in the db
 
-        createProvider();
-        createPatientData();
-        createModelData();
-        createSampleData();
-        createSharingData();
+        createProvider(pdxDataTables);
+        createPatientData(pdxDataTables);
+        createModelData(pdxDataTables);
+        createSampleData(pdxDataTables);
+        createSharingData(pdxDataTables);
 
-        createSamplePlatformData();
+        createSamplePlatformData(pdxDataTables);
 
-        createTreatmentData();
+        createTreatmentData(pdxDataTables);
 
-        createMolecularData();
+        createMolecularData(pdxDataTables);
 
         persistNodes();
     }
 
-    void createProvider() {
+    void createProvider(Map<String, Table> pdxDataTables) {
         log.info("Creating provider");
         Table finderRelatedTable = pdxDataTables.get("metadata-loader.tsv");
         Row row = finderRelatedTable.row(0);
@@ -76,7 +76,7 @@ public class DomainObjectCreator {
         addDomainObject(PROVIDER_KEY, null, providerGroup);
     }
 
-    void createPatientData() {
+    void createPatientData(Map<String, Table> pdxDataTables) {
         log.info("Creating patient data");
         Table patientTable = pdxDataTables.get("metadata-patient.tsv");
         for (Row row : patientTable) {
@@ -105,7 +105,7 @@ public class DomainObjectCreator {
         }
     }
 
-    void createSampleData() {
+    void createSampleData(Map<String, Table> pdxDataTables) {
         log.info("Creating sample data");
         Table sampleTable = pdxDataTables.get("metadata-sample.tsv");
         for (Row row : sampleTable) {
@@ -154,7 +154,7 @@ public class DomainObjectCreator {
         }
     }
 
-    void createModelData() {
+    void createModelData(Map<String, Table> pdxDataTables) {
         log.info("Creating model data");
         Table modelTable = pdxDataTables.get("metadata-model.tsv");
         Group providerGroup = (Group) domainObjects.get(PROVIDER_KEY).get(null);
@@ -175,10 +175,10 @@ public class DomainObjectCreator {
                 modelCreation.addRelatedSample(specimen.getSample());
             }
         }
-        createModelValidationData();
+        createModelValidationData(pdxDataTables);
     }
 
-    void createModelValidationData() {
+    void createModelValidationData(Map<String, Table> pdxDataTables) {
 
         Table modelValidationTable = pdxDataTables.get("metadata-model_validation.tsv");
         for (Row row : modelValidationTable) {
@@ -200,7 +200,7 @@ public class DomainObjectCreator {
         }
     }
 
-    void createSharingData() {
+    void createSharingData(Map<String, Table> pdxDataTables) {
         log.info("Creating sharing data");
         Table sharingTable = pdxDataTables.get("metadata-sharing.tsv");
 
@@ -239,7 +239,7 @@ public class DomainObjectCreator {
         }
     }
 
-    void createSamplePlatformData() {
+    void createSamplePlatformData(Map<String, Table> pdxDataTables) {
         log.info("Creating sample platforms");
         Table samplePlatformTable = pdxDataTables.get("sampleplatform-data.tsv");
 
@@ -271,7 +271,7 @@ public class DomainObjectCreator {
 
     }
 
-    void createTreatmentData(){
+    void createTreatmentData(Map<String, Table> pdxDataTables){
         log.info("Creating patient treatments");
         Table treatmentTable = pdxDataTables.get("patienttreatment-Sheet1.tsv");
 
@@ -295,7 +295,7 @@ public class DomainObjectCreator {
 
     }
 
-    void createDrugDosingData(){
+    void createDrugDosingData(Map<String, Table> pdxDataTables){
 
         Table drugdosingTable = pdxDataTables.get("drugdosing-Sheet1.tsv");
 
@@ -317,15 +317,15 @@ public class DomainObjectCreator {
 
     }
 
-    void createMolecularData() {
+    void createMolecularData(Map<String, Table> pdxDataTables) {
         log.info("Creating molecular data");
-        createMutationData();
-        createCNAData();
-        createCytogeneticsData();
+        createMutationData(pdxDataTables);
+        createCNAData(pdxDataTables);
+        createCytogeneticsData(pdxDataTables);
 
     }
 
-    private void createMutationData(){
+    private void createMutationData(Map<String, Table> pdxDataTables){
 
         Table mutationTable = pdxDataTables.get("mut.tsv");
 
@@ -367,7 +367,7 @@ public class DomainObjectCreator {
     }
 
 
-    private void createCNAData(){
+    private void createCNAData(Map<String, Table> pdxDataTables){
 
         Table cnaTable = pdxDataTables.get("cna.tsv");
 
@@ -401,7 +401,7 @@ public class DomainObjectCreator {
         }
     }
 
-    private void createCytogeneticsData(){
+    private void createCytogeneticsData(Map<String, Table> pdxDataTables){
 
         Table cytoTable = pdxDataTables.get("cytogenetics-Sheet1.tsv");
 

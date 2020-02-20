@@ -22,6 +22,7 @@ public final class TableUtilities {
     public static Table readTsvOrReturnEmpty(File file) {
         Table dataTable = Table.create();
         log.trace("Reading tsv file {}", file);
+        System.out.print(String.format("Reading tsv file %s\r", file));
         try { dataTable = readTsv(file); }
         catch (IOException e) { log.error("There was an error reading the tsv file" , e); }
         return dataTable;

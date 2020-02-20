@@ -3,6 +3,8 @@ package org.pdxfinder.dataloaders.updog;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
@@ -22,9 +24,8 @@ import java.util.Set;
 
 public class DomainObjectCreatorTest extends BaseTest {
 
-    @MockBean
-    private DataImportService dataImportService;
-    private DomainObjectCreator domainObjectCreator;
+    @MockBean private DataImportService dataImportService;
+    @InjectMocks private DomainObjectCreator domainObjectCreator;
 
     private Group providerGroup;
     private Patient testPatient;
@@ -32,8 +33,8 @@ public class DomainObjectCreatorTest extends BaseTest {
 
     @Before
     public void setUp(){
+        MockitoAnnotations.initMocks(this);
         Map<String, Table> pdxDataTables = getTestPdxDataTables();
-        domainObjectCreator = new DomainObjectCreator(dataImportService, pdxDataTables);
 
         providerGroup = new Group("TestProvider", "TP", "description", "", "", "");
         providerGroup.setType("Provider");
@@ -49,7 +50,7 @@ public class DomainObjectCreatorTest extends BaseTest {
         when(dataImportService.getProviderGroup(
             anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
             .thenReturn(providerGroup);
-        domainObjectCreator.createProvider();
+        domainObjectCreator.createProvider(getTestPdxDataTables());
 
         Group provider = (Group) domainObjectCreator.getDomainObject("provider_group", null);
         Assert.assertEquals("TP", provider.getAbbreviation());
@@ -65,7 +66,7 @@ public class DomainObjectCreatorTest extends BaseTest {
         when(dataImportService.savePatient(testPatient))
             .thenReturn(testPatient);
 
-        domainObjectCreator.createPatientData();
+        domainObjectCreator.createPatientData(getTestPdxDataTables());
 
         Patient patient = (Patient) domainObjectCreator.getDomainObject("patient", "patient 1");
 
@@ -77,7 +78,7 @@ public class DomainObjectCreatorTest extends BaseTest {
     public void Given_ModelTable_When_CreateModel_Then_ModelNodeIsInMap(){
 
         domainObjectCreator.addDomainObject("provider_group", null, providerGroup);
-        domainObjectCreator.createModelData();
+        domainObjectCreator.createModelData(getTestPdxDataTables());
         ModelCreation model = (ModelCreation) domainObjectCreator.getDomainObject("model", "model 1");
         Assert.assertEquals("model 1", model.getSourcePdxId());
 
@@ -92,7 +93,7 @@ public class DomainObjectCreatorTest extends BaseTest {
 
         when(dataImportService.getTumorType("Primary")).thenReturn(new TumorType("Primary"));
 
-        domainObjectCreator.createSampleData();
+        domainObjectCreator.createSampleData(getTestPdxDataTables());
 
         ModelCreation model = (ModelCreation) domainObjectCreator.getDomainObject("model", "model 1");
         Patient patient = (Patient) domainObjectCreator.getDomainObject("patient", "patient 1");
@@ -114,7 +115,7 @@ public class DomainObjectCreatorTest extends BaseTest {
         when(dataImportService.getAccessibilityGroup("academia", "collaboration only"))
             .thenReturn(getAccessGroup("academia", "collaboration only"));
 
-        domainObjectCreator.createSharingData();
+        domainObjectCreator.createSharingData(getTestPdxDataTables());
 
         ModelCreation model = (ModelCreation) domainObjectCreator.getDomainObject("model", "model 1");
         Set<Group> groups = model.getGroups();
@@ -144,9 +145,11 @@ public class DomainObjectCreatorTest extends BaseTest {
         when(dataImportService.savePatient(testPatient))
             .thenReturn(testPatient);
 
-        when(dataImportService.getSuggestedMarker(anyString(), anyString(), anyString(),anyString(), anyString(), anyString())).thenReturn(getSuggestedMarker());
+        when(dataImportService.getSuggestedMarker(
+            anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+            .thenReturn(getSuggestedMarker());
 
-        domainObjectCreator.loadDomainObjects();
+        domainObjectCreator.loadDomainObjects(getTestPdxDataTables());
 
         Patient patient = (Patient)domainObjectCreator.getDomainObject("patient", "patient 1");
 
@@ -294,7 +297,6 @@ public class DomainObjectCreatorTest extends BaseTest {
                 StringColumn.create("platform", Collections.singletonList("Targeted Next Generation Sequencing")),
                 StringColumn.create("model_id", Collections.singletonList("model 1"))
         ));
-
 
         return pdxDataTables;
     }
