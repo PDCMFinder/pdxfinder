@@ -549,7 +549,7 @@ public class DetailsService {
                 }
 
 
-                if(md.getRsIdVariants() != null && !md.getRsIdVariants().isEmpty()){
+                if(md.getExistingVariations() != null && !md.getExistingVariations().isEmpty()){
                     tableHeadersSet.add("rsidvariants");
                 }
 
@@ -577,7 +577,7 @@ public class DetailsService {
                     tableHeadersSet.add("ensembltranscriptid");
                 }
 
-                if(md.getUcscTranscriptId() != null && !md.getUcscTranscriptId().isEmpty()){
+                if(md.getUcscGeneId() != null && !md.getUcscGeneId().isEmpty()){
                     tableHeadersSet.add("ucsctranscriptid");
                 }
 
@@ -834,7 +834,7 @@ public class DetailsService {
                 }
 
                 if(tableHeadersSet.contains("rsidvariants")){
-                    row.add((md.getRsIdVariants() == null ? "" : md.getRsIdVariants()));
+                    row.add((md.getExistingVariations() == null ? "" : md.getExistingVariations()));
                 }
 
                 if(tableHeadersSet.contains("ensembltranscriptid")){
@@ -1098,7 +1098,7 @@ public class DetailsService {
                             dData.add(md.getAminoAcidChange());
                             dData.add(md.getReadDepth());
                             dData.add(md.getAlleleFrequency());
-                            dData.add(md.getRsIdVariants());
+                            dData.add(md.getExistingVariations());
                             dData.add(md.getChromosome());
                             dData.add(md.getSeqStartPosition());
                             dData.add(md.getRefAllele());

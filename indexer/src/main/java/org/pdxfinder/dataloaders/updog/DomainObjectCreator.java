@@ -348,13 +348,8 @@ public class DomainObjectCreator {
                     log.info(modelCreation.getSourcePdxId());
                     createMolecularCharacterization(mutationTable, "mutation");
                 }
-
-
             }
-
         }
-
-
     }
 
     private void createMolecularCharacterization(Table table, String molcharType){
@@ -582,18 +577,27 @@ public class DomainObjectCreator {
 
         MolecularData ma = new MolecularData();
         try {
+            ma.setBiotype(getStringFromRowAndColumn(row,TSV.Mutation.biotype.name()));
+            ma.setCodingSequenceChange(getStringFromRowAndColumn(row,TSV.Mutation.coding_sequence_change.name()));
+            ma.setVariantClass(getStringFromRowAndColumn(row,TSV.Mutation.variant_class.name()));
+            ma.setCodonChange(getStringFromRowAndColumn(row,TSV.Mutation.codon_change.name()));
             ma.setAminoAcidChange(getStringFromRowAndColumn(row, TSV.Mutation.amino_acid_change.name()));
             ma.setConsequence(getStringFromRowAndColumn(row, TSV.Mutation.consequence.name()));
+            ma.setFunctionalPrediction(getStringFromRowAndColumn(row,TSV.Mutation.functional_prediction.name()));
+            ma.setReadDepth(getStringFromRowAndColumn(row, TSV.Mutation.read_depth.name()));
             ma.setAlleleFrequency(getStringFromRowAndColumn(row, TSV.Mutation.allele_frequency.name()));
             ma.setChromosome(getStringFromRowAndColumn(row, TSV.Mutation.chromosome.name()));
-            ma.setReadDepth(getStringFromRowAndColumn(row, TSV.Mutation.read_depth.name()));
+            ma.setSeqStartPosition(getStringFromRowAndColumn(row, TSV.Mutation.seq_start_position.name()));
             ma.setRefAllele(getStringFromRowAndColumn(row, TSV.Mutation.ref_allele.name()));
             ma.setAltAllele(getStringFromRowAndColumn(row, TSV.Mutation.alt_allele.name()));
-            ma.setGenomeAssembly(getStringFromRowAndColumn(row, TSV.Mutation.genome_assembly.name()));
-            ma.setRsIdVariants(getStringFromRowAndColumn(row, TSV.Mutation.variation_id.name()));
-            ma.setSeqStartPosition(getStringFromRowAndColumn(row, TSV.Mutation.seq_start_position.name()));
-
+            ma.setUcscGeneId(getStringFromRowAndColumn(row,TSV.Mutation.ucsc_gene_id.name()));
+            ma.setNcbiGeneId(getStringFromRowAndColumn(row,TSV.Mutation.ncbi_gene_id.name()));
+            ma.setNcbiTranscriptId(getStringFromRowAndColumn(row,TSV.Mutation.ncbi_transcript_id.name()));
             ma.setEnsemblTranscriptId(getStringFromRowAndColumn(row, TSV.Mutation.ensembl_transcript_id.name()));
+            ma.setExistingVariations(getStringFromRowAndColumn(row, TSV.Mutation.variation_id.name()));
+            ma.setGenomeAssembly(getStringFromRowAndColumn(row, TSV.Mutation.genome_assembly.name()));
+
+
             ma.setNucleotideChange("");
             ma.setMarker(marker.getHgncSymbol());
         } catch (Exception e) {
