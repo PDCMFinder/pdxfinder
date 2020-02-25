@@ -59,16 +59,32 @@ public class FinderCommandLine implements Callable<Integer> {
         @Option(names = "--spring.config.location")
         private String springConfigLocation;
 
-        @Option(names = {"-o", "--only"}, arity = "1..*",
-                description = "Load only the data for the listed dataProvider. Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
-        private DataProvider[] dataProvider;
+        @ArgGroup(multiplicity = "1")
+        Exclusive datasetRequested;
 
-        @Option(names = {"-g", "--group"},
-                arity = "1",
-                description = "Load the data for groups of dataProvider (default: [${DEFAULT-VALUE}]). " +
-                        "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
-        private DataProviderGroup dataProviderGroup = DataProviderGroup.All;
+        static class Exclusive {
 
+            @Option(
+                    names = {"-g", "--group"},
+                    arity = "1",
+                    description = "Load the data for groups of dataProvider (default: [${DEFAULT-VALUE}]). " +
+                            "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
+            private DataProviderGroup dataProviderGroup = DataProviderGroup.All;
+
+            @Option(
+                    names = {"-o", "--only"}, arity = "1..*",
+                    description = "Load only the data for the listed dataProvider. " +
+                            "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
+            private DataProvider[] dataProvider;
+
+            public DataProviderGroup getDataProviderGroup() {
+                return dataProviderGroup;
+            }
+
+            public DataProvider[] getDataProvider() {
+                return dataProvider;
+            }
+        }
 
         @Override
         public Integer call() {
@@ -87,8 +103,8 @@ public class FinderCommandLine implements Callable<Integer> {
 
         List<DataProvider> getListOfRequestedProviders() {
 
-            if (dataProvider != null) {
-                return Arrays.asList(dataProvider);
+            if (datasetRequested.getDataProvider() != null) {
+                return Arrays.asList(datasetRequested.getDataProvider());
             } else {
                 return new ArrayList<>();
             }
