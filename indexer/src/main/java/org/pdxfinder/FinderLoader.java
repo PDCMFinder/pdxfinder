@@ -1,6 +1,7 @@
 package org.pdxfinder;
 
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
 import org.pdxfinder.services.loader.envload.LoadNCIT;
@@ -24,12 +25,10 @@ public class FinderLoader {
     private DataImportService dataImportService;
 
     @Autowired
-    public FinderLoader(
-        LoadMarkers loadMarkers,
-        LoadNCIT loadNCIT,
-        LoadNCITDrugs loadNCITDrugs,
-        DataImportService dataImportService
-    ) {
+    public FinderLoader(LoadMarkers loadMarkers,
+                        LoadNCIT loadNCIT,
+                        LoadNCITDrugs loadNCITDrugs,
+                        DataImportService dataImportService) {
         this.loadMarkers = loadMarkers;
         this.loadNCIT = loadNCIT;
         this.loadNCITDrugs = loadNCITDrugs;
@@ -37,18 +36,21 @@ public class FinderLoader {
     }
 
     private Logger log = LoggerFactory.getLogger(FinderLoader.class);
-    @Value("${data-dir}") private String predefDataDirectory;
-    @Value("${spring.data.neo4j.uri}") private File databaseURI;
-    @Value("${ncitpredef.file}") private String ncitFile;
+    @Value("${data-dir}")
+    private String predefDataDirectory;
+    @Value("${spring.data.neo4j.uri}")
+    private File databaseURI;
+    @Value("${ncitpredef.file}")
+    private String ncitFile;
 
     void run(
         List<DataProvider> dataProviders,
         File dataDirectory,
-        boolean clearCacheRequested,
+        boolean loadCacheRequested,
         boolean keepDatabaseRequested
         ) {
         keepDatabaseIfRequested(keepDatabaseRequested);
-        loadOntologyTerms(clearCacheRequested);
+        loadCache(loadCacheRequested);
         loadRequestedPdxData(dataProviders);
     }
 
@@ -62,15 +64,15 @@ public class FinderLoader {
         }
     }
 
-    private void loadOntologyTerms(boolean clearCacheRequested) {
+    private void loadCache(boolean loadCacheRequested) {
         log.info("Loading cache ...");
-        loadMarkers(clearCacheRequested);
-        loadDiseaseTerms(clearCacheRequested);
-        loadRegimens(clearCacheRequested);
+        loadMarkers(loadCacheRequested);
+        loadDiseaseTerms(loadCacheRequested);
+        loadRegimens(loadCacheRequested);
     }
 
-    private void loadMarkers(boolean clearCacheRequested) {
-        if (dataImportService.markerCacheIsEmpty() || clearCacheRequested) {
+    private void loadMarkers(boolean loadCacheRequested) {
+        if (dataImportService.markerCacheIsEmpty() || loadCacheRequested) {
             try {
                 loadMarkers.loadGenes(DataUrl.HUGO_FILE_URL.get());
             } catch (Exception e) {
@@ -79,8 +81,8 @@ public class FinderLoader {
         }
     }
 
-    private void loadDiseaseTerms(boolean clearCacheRequested) {
-        if (dataImportService.ontologyCacheIsEmpty() || clearCacheRequested) {
+    private void loadDiseaseTerms(boolean loadCacheRequested) {
+        if (dataImportService.ontologyCacheIsEmpty() || loadCacheRequested) {
             try {
                 loadNCIT.loadOntology(DataUrl.DISEASES_BRANCH_URL.get());
             } catch (Exception e) {
@@ -89,8 +91,8 @@ public class FinderLoader {
         }
     }
 
-    private void loadRegimens(boolean clearCacheRequested) {
-        if (dataImportService.ontologyCacheIsEmpty() || clearCacheRequested) {
+    private void loadRegimens(boolean loadCacheRequested) {
+        if (dataImportService.ontologyCacheIsEmpty() || loadCacheRequested) {
             try {
                 loadNCITDrugs.loadRegimens();
             } catch (Exception e) {
@@ -100,6 +102,9 @@ public class FinderLoader {
     }
 
     private void loadRequestedPdxData(List<DataProvider> providers) {
+        if (providers.isEmpty()){
+            log.info("No PDX dataset loading at the moment because user did not request for any");
+        }
         log.debug("Running requested PDX dataset loaders {}...", providers);
         for (DataProvider i : providers) {
             callRelevantLoader(i);

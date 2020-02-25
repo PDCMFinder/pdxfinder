@@ -114,7 +114,7 @@ public class DataProviders implements ApplicationContextAware {
         DataProvider() {}
 
         public void load() {
-            LoadUniversal loadUniversal = (LoadUniversal) applicationContext.getBean("LoadUniversal");
+            LoadUniversal loadUniversal = (LoadUniversal) applicationContext.getBean("loadUniversal");
             try { loadUniversal.run(); }
             catch (Exception e) { log.error("{}", e); }
         }

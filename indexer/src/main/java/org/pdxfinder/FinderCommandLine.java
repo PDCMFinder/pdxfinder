@@ -48,9 +48,9 @@ public class FinderCommandLine implements Callable<Integer> {
                 "(default: [${DEFAULT-VALUE}], set in application.properties)")
         private File dataDirectory;
 
-        @Option(names = {"-c", "--clear-cache"},
+        @Option(names = {"-c", "--cache"},
                 description = "Clear cached data and reload, including NCIT ontology terms, etc.")
-        private boolean clearCacheRequested;
+        private boolean loadCacheRequested;
 
         @Option(names = {"-k", "--keep-db"},
                 description = "Skips clearing of the database before loading new data.")
@@ -59,48 +59,38 @@ public class FinderCommandLine implements Callable<Integer> {
         @Option(names = "--spring.config.location")
         private String springConfigLocation;
 
-        @ArgGroup(multiplicity = "1")
-        Exclusive datasetRequested;
+        @Option(names = {"-o", "--only"}, arity = "1..*",
+                description = "Load only the data for the listed dataProvider. Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
+        private DataProvider[] dataProvider;
 
-        static class Exclusive {
+        @Option(names = {"-g", "--group"},
+                arity = "1",
+                description = "Load the data for groups of dataProvider (default: [${DEFAULT-VALUE}]). " +
+                        "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
+        private DataProviderGroup dataProviderGroup = DataProviderGroup.All;
 
-            @Option(names = {"-g", "--group"},
-                    arity = "1",
-                    description = "Load the data for groups of dataProvider (default: [${DEFAULT-VALUE}]). " +
-                            "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
-            private DataProviderGroup dataProviderGroup = DataProviderGroup.All;
-
-            @Option(names = {"-o", "--only"},
-                    description = "Load only the data for the listed dataProvider. Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
-            private DataProvider[] dataProvider;
-
-            DataProviderGroup getDataProviderGroup() {
-                return dataProviderGroup;
-            }
-
-            DataProvider[] getDataProvider() {
-                return dataProvider;
-            }
-        }
 
         @Override
         public Integer call() {
+
             log.info("Loading using supplied parameters:\n{}", this);
             List<DataProvider> providersRequested = getListOfRequestedProviders();
+
             finderLoader.run(
                 providersRequested,
                 dataDirectory,
-                clearCacheRequested,
+                loadCacheRequested,
                 keepDatabaseRequested
             );
             return 0;
         }
 
         List<DataProvider> getListOfRequestedProviders() {
-            if (datasetRequested.getDataProvider() != null) {
-                return Arrays.asList(datasetRequested.getDataProvider());
+
+            if (dataProvider != null) {
+                return Arrays.asList(dataProvider);
             } else {
-                return DataProviders.getProvidersFrom(datasetRequested.getDataProviderGroup());
+                return new ArrayList<>();
             }
         }
 
@@ -108,7 +98,7 @@ public class FinderCommandLine implements Callable<Integer> {
         public String toString() {
             return new StringJoiner("\n", Load.class.getSimpleName() + "[\n", "\n]")
                 .add("dataDirectory=" + dataDirectory)
-                .add("clearCacheRequested=" + clearCacheRequested)
+                .add("clearCacheRequested=" + loadCacheRequested)
                 .add("keepDatabaseRequested=" + keepDatabaseRequested)
                 .add("springConfigLocation='" + springConfigLocation + "'")
                 .add("datasetRequested=" + getListOfRequestedProviders())
