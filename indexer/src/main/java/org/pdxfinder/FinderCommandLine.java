@@ -59,7 +59,7 @@ public class FinderCommandLine implements Callable<Integer> {
         @Option(names = "--spring.config.location")
         private String springConfigLocation;
 
-        @ArgGroup(multiplicity = "1")
+        @ArgGroup(multiplicity = "0..1")
         Exclusive datasetRequested;
 
         static class Exclusive {
