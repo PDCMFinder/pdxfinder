@@ -26,6 +26,7 @@ public class DataProviders implements ApplicationContextAware {
     public enum DataProviderGroup {
         All,
         EurOPDX,
+        UPDOG,
     }
 
     public static List<DataProvider> getProvidersFrom(DataProviderGroup group) {
@@ -38,6 +39,19 @@ public class DataProviders implements ApplicationContextAware {
                 DataProvider.IRCC_CRC,
                 DataProvider.IRCC_GC,
                 DataProvider.TRACE,
+                DataProvider.UOC_BC,
+                DataProvider.UOM_BC,
+                DataProvider.VHIO_BC,
+                DataProvider.VHIO_CRC
+        ));
+        map.put(DataProviderGroup.UPDOG, Arrays.asList(
+                DataProvider.IRCC_GC,
+                DataProvider.CRL,
+                DataProvider.TRACE,
+                DataProvider.Curie_BC,
+                DataProvider.Curie_LC,
+                DataProvider.Curie_OV,
+                DataProvider.PMLB,
                 DataProvider.UOC_BC,
                 DataProvider.UOM_BC,
                 DataProvider.VHIO_BC,
@@ -115,8 +129,11 @@ public class DataProviders implements ApplicationContextAware {
 
         public void load() {
             LoadUniversal loadUniversal = (LoadUniversal) applicationContext.getBean("loadUniversal");
-            try { loadUniversal.run(); }
-            catch (Exception e) { log.error("{}", e); }
+            try {
+                loadUniversal.run(this.name());
+            } catch (Exception e) {
+                log.error("{}", e);
+            }
         }
 
     }
