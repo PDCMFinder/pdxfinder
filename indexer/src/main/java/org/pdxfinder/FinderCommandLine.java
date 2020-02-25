@@ -101,13 +101,27 @@ public class FinderCommandLine implements Callable<Integer> {
             return 0;
         }
 
+
         List<DataProvider> getListOfRequestedProviders() {
 
-            if (datasetRequested.getDataProvider() != null) {
-                return Arrays.asList(datasetRequested.getDataProvider());
+            Optional<DataProvider[]> dataProviders = Optional.ofNullable(
+                    datasetRequested.getDataProvider()
+            );
+
+            Optional<DataProviderGroup> dataProviderGroup = Optional.ofNullable(
+                    datasetRequested.getDataProviderGroup()
+            );
+
+            if (dataProviders.isPresent()) {
+
+                return Arrays.asList(dataProviders.get());
+            } else if (dataProviderGroup.isPresent()) {
+
+                return DataProviders.getProvidersFrom(dataProviderGroup.get());
             } else {
                 return new ArrayList<>();
             }
+
         }
 
         @Override
