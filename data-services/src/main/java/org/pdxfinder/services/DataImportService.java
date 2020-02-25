@@ -159,7 +159,7 @@ public class DataImportService {
         Group g = groupRepository.findByNameAndType(name, type);
 
         if(g == null){
-            log.info("Group not found. Creating", name);
+            log.info("Group not found. Creating {}", name);
 
             g = new Group(name, abbrev, type);
             groupRepository.save(g);
@@ -174,7 +174,7 @@ public class DataImportService {
         Group g = groupRepository.findByNameAndType(name, "Provider");
 
         if(g == null){
-            log.info("Provider group not found. Creating", name);
+            log.info("Provider group not found. Creating {}", name);
 
             g = new Group(name, abbrev, description, providerType, contact, url);
             groupRepository.save(g);
@@ -195,7 +195,7 @@ public class DataImportService {
 
 
         if(g == null){
-            log.info("Publication group not found. Creating", publicationId);
+            log.info("Publication group not found. Creating {}", publicationId);
 
             g = new Group();
             g.setType("Publication");
@@ -212,7 +212,7 @@ public class DataImportService {
         Group g = groupRepository.findByNameAndType(groupName, "Project");
 
         if(g == null){
-            log.info("Project group not found. Creating", groupName);
+            log.info("Project group not found. Creating {}", groupName);
 
             g = new Group();
             g.setType("Project");
@@ -298,8 +298,7 @@ public class DataImportService {
 
         ModelCreation modelCreation = modelCreationRepository.findBySourcePdxIdAndDataSource(modelId, dataSource);
 
-        if(modelCreation == null) return false;
-        return true;
+        return modelCreation != null;
     }
 
 
@@ -472,11 +471,10 @@ public class DataImportService {
         PatientSnapshot patientSnapshot = null;
 
         Set<PatientSnapshot> pSnaps = patientSnapshotRepository.findByPatient(patient.getExternalId());
-        loop:
         for (PatientSnapshot ps : pSnaps) {
             if (ps.getAgeAtCollection().equals(age)) {
                 patientSnapshot = ps;
-                break loop;
+                break;
             }
         }
         if (patientSnapshot == null) {
@@ -519,9 +517,7 @@ public class DataImportService {
 
     public PatientSnapshot getPatientSnapshot(String patientId, String age, String dataSource){
 
-        PatientSnapshot ps = patientSnapshotRepository.findByPatientIdAndDataSourceAndAge(patientId, dataSource, age);
-
-        return ps;
+        return patientSnapshotRepository.findByPatientIdAndDataSourceAndAge(patientId, dataSource, age);
 
     }
 
@@ -630,7 +626,7 @@ public class DataImportService {
     public Sample getMouseSample(ModelCreation model, String specimenId, String dataSource, String passage, String sampleId){
 
         Specimen specimen = this.getSpecimen(model, specimenId, dataSource, passage);
-        Sample sample = null;
+        Sample sample;
 
         if(specimen.getSample() == null){
             sample = new Sample();
@@ -914,22 +910,15 @@ public class DataImportService {
     }
 
     public OntologyTerm getOntologyTerm(String url){
-
-        OntologyTerm ot = ontologyTermRepository.findByUrl(url);
-        return ot;
+        return ontologyTermRepository.findByUrl(url);
     }
 
     public OntologyTerm findOntologyTermByLabel(String label){
-
-        OntologyTerm ot = ontologyTermRepository.findByLabel(label);
-        return ot;
+        return ontologyTermRepository.findByLabel(label);
     }
 
     public OntologyTerm findOntologyTermByLabelAndType(String label, String type){
-
-
         return ontologyTermRepository.findByLabelAndType(label, type);
-
     }
 
     public OntologyTerm findOntologyTermByUrl(String url){
@@ -986,6 +975,10 @@ public class DataImportService {
         return ontologyTermRepository.getOntologyTermNumberByType(type);
     }
 
+    public int countAllOntologyTerms(){
+        return ontologyTermRepository.getOntologyTermNumber();
+    }
+
     public OntologyTerm saveOntologyTerm(OntologyTerm ot){
 
         return ontologyTermRepository.save(ot);
@@ -996,12 +989,16 @@ public class DataImportService {
         ontologyTermRepository.deleteTermsWithZeroMappings();
     }
 
-    public void saveMarker(Marker marker) {
-        markerRepository.save(marker);
+    public Marker saveMarker(Marker marker) {
+        return markerRepository.save(marker);
     }
 
     public Collection<Marker> getAllMarkers() {
         return markerRepository.findAllMarkers();
+    }
+
+    public Integer countAllMarkers() {
+        return markerRepository.countAllMarkers();
     }
 
     public Collection<Marker> getAllHumanMarkers() {
@@ -1061,12 +1058,14 @@ public class DataImportService {
         if (p == null) {
             System.out.println("Platform is null");
         }
+        assert p != null;
         if (p.getGroup() == null) {
             System.out.println("P.EDS is null");
         }
         if (m == null) {
             System.out.println("Marker is null");
         }
+        assert m != null;
         PlatformAssociation pa = platformAssociationRepository.findByPlatformAndMarker(p.getName(), p.getGroup().getName(), m.getHgncSymbol());
         if (pa == null) {
             pa = new PlatformAssociation();
@@ -1097,21 +1096,14 @@ public class DataImportService {
 
         TreatmentSummary ts = treatmentSummaryRepository.findModelTreatmentByDataSourceAndModelId(dataSource, modelId);
 
-        if(ts != null && ts.getTreatmentProtocols() != null){
-            return true;
-        }
-        return false;
+        return ts != null && ts.getTreatmentProtocols() != null;
     }
 
     public boolean isTreatmentSummaryAvailableOnPatient(String dataSource, String modelId){
 
         TreatmentSummary ts = treatmentSummaryRepository.findPatientTreatmentByDataSourceAndModelId(dataSource, modelId);
 
-        if(ts != null && ts.getTreatmentProtocols() != null){
-            return true;
-        }
-
-        return false;
+        return ts != null && ts.getTreatmentProtocols() != null;
     }
 
     public int findPatientTreatmentNumber(String dataSource){
@@ -1209,7 +1201,7 @@ public class DataImportService {
         return treatmentSummaryRepository.findPlatformUrlByDataSource(dataSource);
     }
 
-    public CurrentTreatment getCurrentTreatment(String name){
+    private CurrentTreatment getCurrentTreatment(String name){
 
         CurrentTreatment ct = currentTreatmentRepository.findByName(name);
 
@@ -1276,10 +1268,10 @@ public class DataImportService {
 
                 //use the same dosing for all drugs
 
-                for(int i=0;i<drugArray.length;i++){
+                for (String s : drugArray) {
 
                     Treatment treatment = new Treatment();
-                    treatment.setName(drugArray[i].trim());
+                    treatment.setName(s.trim());
 
                     TreatmentComponent tc = new TreatmentComponent();
                     tc.setDose(doseArray[0].trim());
@@ -1323,10 +1315,10 @@ public class DataImportService {
 
                 String[] drugArray = drugString.split("\\+");
 
-                for(int i=0;i<drugArray.length;i++){
+                for (String s : drugArray) {
 
                     Treatment treatment = new Treatment();
-                    treatment.setName(drugArray[i].trim());
+                    treatment.setName(s.trim());
                     TreatmentComponent tc = new TreatmentComponent();
                     tc.setDose(doseString.trim());
                     tc.setTreatment(treatment);
@@ -1489,7 +1481,7 @@ public class DataImportService {
                     // NOTE:  IRCC uses passage 0 to mean Patient Tumor, so we need to harmonize according to the other
                     // sources.  Subtract 1 from every passage.
                     for (String p : passages) {
-                        Integer intPassage = Integer.parseInt(p);
+                        int intPassage = Integer.parseInt(p);
                         passageInts.add(intPassage - 1);
                     }
 
@@ -1586,6 +1578,7 @@ public class DataImportService {
         LogEntity le = new LogEntity(reporter, dataSource, modelId);
         Marker m = null;
 
+        //check if marker is cached
         if(markersBySymbol.containsKey(symbol)){
             m = markersBySymbol.get(symbol);
             nsdto.setNode(m);

@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 
 /*
  * Created by csaba on 02/10/2019.
@@ -66,7 +68,7 @@ public class ExportDataToTemplate implements CommandLineRunner {
 
 
 
-    private void export(String dataSourceAbbrev){
+    private void export(String dataSourceAbbrev) throws IOException {
 
 
         Group ds = dataImportService.findProviderGroupByAbbrev(dataSourceAbbrev);

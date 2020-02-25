@@ -31,6 +31,10 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
     @Query("MATCH (m:Marker) RETURN m")
     Collection<Marker> findAllMarkers();
 
+    @Query("MATCH (m:Marker) RETURN count(m)")
+    Integer countAllMarkers();
+
+
     @Query("MATCH (m:Marker) " +
             "RETURN m")
     Collection<Marker> findAllHumanMarkers();
