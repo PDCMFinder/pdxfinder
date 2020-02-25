@@ -10,19 +10,19 @@ import javax.annotation.Nonnull;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Component
 public class Updog {
 
-    private static final Logger log = LoggerFactory.getLogger(Updog.class);
     private Reader reader;
     private TableSetCleaner tableSetCleaner;
     private Validator validator;
     private DomainObjectCreator domainObjectCreator;
+    private static final Logger log = LoggerFactory.getLogger(Updog.class);
 
     @Autowired
     public Updog(
@@ -44,15 +44,13 @@ public class Updog {
         Map<String, Table> omicsTableSet;
         Map<String, Table> treatmentTableSet;
         Map<String, Table> combinedTableSet = new HashMap<>();
-        List<ValidationError> validationErrors = new ArrayList<>();
+        List<ValidationError> validationErrors;
 
         pdxTableSet = readPdxTablesFromPath(updogProviderDirectory);
         pdxTableSet = tableSetCleaner.cleanPdxTables(pdxTableSet);
-        validationErrors.addAll(validatePdxDataTables(pdxTableSet, provider));
 
         omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
         omicsTableSet = tableSetCleaner.cleanOmicsTables(omicsTableSet);
-        validationErrors.addAll(validateOmicsTables(omicsTableSet, provider));
 
         treatmentTableSet = readTreatmentTablesFromPath(updogProviderDirectory);
         treatmentTableSet = tableSetCleaner.cleanTreatmentTables(treatmentTableSet);
@@ -61,13 +59,12 @@ public class Updog {
         combinedTableSet.putAll(omicsTableSet);
         combinedTableSet.putAll(treatmentTableSet);
 
+        validationErrors = validateTableSet(combinedTableSet, omicsTableSet.keySet(), provider);
+        log.info(validationErrors.toString());
+
         if (!validateOnly) {
             createPdxObjects(combinedTableSet);
         }
-    }
-
-    private List<ValidationError> validateOmicsTables(Map<String, Table> omicsTableSet, String provider) {
-        return new ArrayList<>();
     }
 
     private Map<String, Table> readOmicsTablesFromPath(Path updogProviderDirectory) {
@@ -85,15 +82,38 @@ public class Updog {
         return reader.readAllTreatmentFilesIn(updogProviderDirectory, metadataFiles);
     }
 
-    private List<ValidationError> validatePdxDataTables(Map<String, Table> tableSet, String provider){
-        PdxValidationRuleset pdxValidationRuleset = new PdxValidationRuleset();
-        return validator.validate(
-            tableSet,
-            pdxValidationRuleset.generate(provider));
+    private List<ValidationError> validateTableSet(
+        Map<String, Table> tableSet,
+        Set<String> omicTables,
+        String provider
+    ){
+        TableSetSpecification omicSpecifications = TableSetSpecification.create();
+        for (String tableName : omicTables) {
+            merge(omicSpecifications, new OmicValidationRuleset().generateForOmicTable(tableName, provider));
+        }
+
+        TableSetSpecification combinedValidationRuleset = merge(
+            new PdxValidationRuleset().generate(provider),
+            omicSpecifications
+        );
+        return validator.validate(tableSet, combinedValidationRuleset);
     }
 
     private void createPdxObjects(Map<String, Table> tableSet){
         domainObjectCreator.loadDomainObjects(tableSet);
+    }
+
+    static TableSetSpecification merge(TableSetSpecification ...tableSetSpecifications) {
+        TableSetSpecification mergedTableSetSpecifications = TableSetSpecification.create();
+        for (TableSetSpecification tss : tableSetSpecifications) {
+            mergedTableSetSpecifications.setProvider(tss.getProvider());
+            mergedTableSetSpecifications.addRequiredTables(tss.getRequiredTables());
+            mergedTableSetSpecifications.addRequiredColumns(tss.getRequiredColumns());
+            mergedTableSetSpecifications.addNonEmptyColumns(tss.getNonEmptyColumns());
+            mergedTableSetSpecifications.addUniqueColumns(tss.getUniqueColumns());
+            mergedTableSetSpecifications.addHasRelations(tss.getHasRelations());
+        }
+        return mergedTableSetSpecifications;
     }
 
 }

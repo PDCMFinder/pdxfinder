@@ -19,11 +19,8 @@ public class MarkerAssociation {
     @Id
     @GeneratedValue
     private Long id;
-
     private String molecularDataString;
-
     private List<MolecularData> molecularDataList = new ArrayList<>();
-
 
     public MarkerAssociation() {
         molecularDataList = new ArrayList<>();
@@ -32,7 +29,6 @@ public class MarkerAssociation {
     public List<MolecularData> createMolecularDataListFromString() throws IOException {
 
         List<MolecularData> molecularData = new ArrayList<>();
-
         if(molecularDataString == null || molecularDataString.isEmpty()) {
             return molecularData;
         }
@@ -46,8 +42,8 @@ public class MarkerAssociation {
     }
 
     public void createMolecularDataStringFromList(){
-
         molecularDataString = new Gson().toJson(molecularDataList);
+        // do something useful here
         molecularDataList = null;
     }
 

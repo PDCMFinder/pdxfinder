@@ -30,7 +30,7 @@ public class Validator {
         checkAllRequiredTablesPresent(tableSet, tableSetSpecification);
         if (!validationErrors.isEmpty()) {
             log.error(
-                "Not all required tables where present for {}. Aborting further validation.",
+                "Not all required tables where present for {}. Aborting further validation",
                 tableSetSpecification.getProvider());
             return validationErrors;
         }
@@ -82,7 +82,7 @@ public class Validator {
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        List<Pair<String, String>> nonEmptyTableColumns = tableSetSpecification.getNonEmptyColumns();
+        Set<Pair<String, String>> nonEmptyTableColumns = tableSetSpecification.getNonEmptyColumns();
         for (Pair<String, String> tableColumn : nonEmptyTableColumns) {
             String tableName = tableColumn.getKey();
             String columnName = tableColumn.getValue();
@@ -101,7 +101,7 @@ public class Validator {
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        List<Pair<String, String>> uniqueTableColumns = tableSetSpecification.getUniqueColumns();
+        Set<Pair<String, String>> uniqueTableColumns = tableSetSpecification.getUniqueColumns();
         for (Pair<String, String> tableColumn : uniqueTableColumns) {
             String tableName = tableColumn.getKey();
             String columnName = tableColumn.getValue();
@@ -130,7 +130,7 @@ public class Validator {
     ) {
         String provider = tableSetSpecification.getProvider();
         for (Pair<Pair<String, String>, Pair<String, String>> relation
-            : tableSetSpecification.getOneToManyRelations()) {
+            : tableSetSpecification.getHasRelations()) {
             reportMissingColumnsInRelation(tableSet, relation, provider);
             reportOrphanRowsWhenMissingValuesInRelation(tableSet, relation, provider);
 

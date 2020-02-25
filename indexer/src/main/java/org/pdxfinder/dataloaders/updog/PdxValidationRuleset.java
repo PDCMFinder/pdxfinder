@@ -1,27 +1,22 @@
 package org.pdxfinder.dataloaders.updog;
 
 import org.apache.commons.lang3.tuple.Pair;
-import tech.tablesaw.api.StringColumn;
-import tech.tablesaw.api.Table;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class PdxValidationRuleset implements ValidationRuleCreator {
+public class PdxValidationRuleset extends ValidationRuleCreator {
 
-    private List<Pair<String, String>> tableColumns;
+    private Set<Pair<String, String>> tableColumns;
 
     PdxValidationRuleset() {
         this.tableColumns = createColumns();
     }
 
-    private List<Pair<String, String>> createColumns() {
-        List<Pair<String, String>> tableColumns = new ArrayList<>();
+    private Set<Pair<String, String>> createColumns() {
+        Set<Pair<String, String>> tableColumns = new HashSet<>();
         Arrays.asList(
             "patient_id",
             "sex",
@@ -101,72 +96,42 @@ public class PdxValidationRuleset implements ValidationRuleCreator {
             .filter(s -> s.contains("metadata"))
             .collect(Collectors.toSet());
 
-        List<Pair<String, String>> idColumns = matchingColumnsFromAnyTable(tableColumns, "_id");
-        List<Pair<String, String>> hostStrainColumns = matchingColumnsFromAnyTable(tableColumns, "host_strain");
+        Set<Pair<String, String>> idColumns = matchingColumnsFromAnyTable(tableColumns, "_id");
+        Set<Pair<String, String>> hostStrainColumns = matchingColumnsFromAnyTable(tableColumns, "host_strain");
 
-        List<Pair<String, String>> sampleColumns = matchingColumnsFromTable(tableColumns, "sample",
+        Set<Pair<String, String>> essentialSampleColumns = matchingColumnsFromTable(tableColumns, "sample",
             new String[]{"age_in_years", "diagnosis", "tumour", "_site", "treatment_naive"});
-        List<Pair<String, String>> modelColumns = matchingColumnsFromTable(tableColumns, "model.",
+        Set<Pair<String, String>> essentialModelColumns = matchingColumnsFromTable(tableColumns, "model.",
             new String[]{"engraftment_", "sample_type", "passage_number"});
-        List<Pair<String, String>> modelValidationColumns = matchingColumnsFromTable(tableColumns, "model_validation",
+        Set<Pair<String, String>> essentialModelValidationColumns = matchingColumnsFromTable(tableColumns, "model_validation",
             new String[]{"validation_technique", "description", "passages_tested"});
-        List<Pair<String, String>> sharingColumns = matchingColumnsFromTable(tableColumns, "sharing",
+        Set<Pair<String, String>> essentialSharingColumns = matchingColumnsFromTable(tableColumns, "sharing",
             new String[]{"provider_", "access", "email", "name", "project"});
-        List<Pair<String, String>> loaderColumns = matchingColumnsFromTable(tableColumns, "loader",
+        Set<Pair<String, String>> essentialLoaderColumns = matchingColumnsFromTable(tableColumns, "loader",
             new String[]{"name", "abbreviation"});
 
-        List<Pair<String, String>> nonEmptyColumns = TableSetUtilities.concatenate(
+        Set<Pair<String, String>> essentialColumns = TableSetUtilities.concatenate(
             idColumns,
             hostStrainColumns,
-            sampleColumns,
-            modelColumns,
-            modelValidationColumns,
-            sharingColumns,
-            loaderColumns
+            essentialSampleColumns,
+            essentialModelColumns,
+            essentialModelValidationColumns,
+            essentialSharingColumns,
+            essentialLoaderColumns
         );
 
         return TableSetSpecification.create()
             .addRequiredTables(metadataTables)
-            .addRequiredColumns(nonEmptyColumns)
-            .addNonEmptyColumns(nonEmptyColumns)
+            .addRequiredColumns(essentialColumns)
+            .addNonEmptyColumns(essentialColumns)
             .addUniqueColumns(idColumns)
-            .addHasRelations(Arrays.asList(
+            .addHasRelations(new HashSet<>(Arrays.asList(
                 relation("metadata-patient.tsv", "metadata-sample.tsv", "patient_id"),
                 relation("metadata-sample.tsv", "metadata-model.tsv", "model_id"),
                 relation("metadata-model.tsv", "metadata-model_validation.tsv", "model_id"),
                 relation("metadata-model.tsv", "metadata-sharing.tsv", "model_id")
-            ))
+            )))
             .setProvider(provider);
-    }
-
-    private List<Pair<String, String>> matchingColumnsFromTable(
-        List<Pair<String, String>> columns,
-        String tableName,
-        String[] columnNamePatterns) {
-        return columns
-            .stream()
-            .filter(p -> p.getKey().contains(tableName))
-            .filter(p -> containsAny(p.getValue(), columnNamePatterns))
-            .collect(Collectors.toList());
-    }
-
-    private List<Pair<String, String>> matchingColumnsFromAnyTable(
-        List<Pair<String, String>> columns,
-        String columnNamePattern
-    ) {
-        return columns.stream()
-            .filter(p -> p.getValue().contains(columnNamePattern))
-            .collect(Collectors.toList());
-    }
-
-    private Pair<Pair<String, String>, Pair<String, String>> relation(
-        String from, String to, String columnName
-    ) {
-        return Pair.of(Pair.of(from, columnName), Pair.of(to, columnName));
-    }
-
-    private static boolean containsAny(String inputStr, String[] items) {
-        return Arrays.stream(items).parallel().anyMatch(inputStr::contains);
     }
 
 }

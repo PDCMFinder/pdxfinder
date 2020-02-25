@@ -3,27 +3,26 @@ package org.pdxfinder.dataloaders.updog;
 import org.apache.commons.lang3.tuple.Pair;
 import tech.tablesaw.api.Table;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 public class TableSetSpecification {
 
-    private HashSet<String> requiredTables;
-    private List<Pair<String, String>> requiredColumns;
-    private List<Pair<String, String>> nonEmptyColumns;
-    private List<Pair<String, String>> uniqueColumns;
-    private List<Pair<Pair<String, String>, Pair<String, String>>> oneToManyRelations;
+    private Set<String> requiredTables;
+    private Set<Pair<String, String>> requiredColumns;
+    private Set<Pair<String, String>> nonEmptyColumns;
+    private Set<Pair<String, String>> uniqueColumns;
+    private Set<Pair<Pair<String, String>, Pair<String, String>>> relations;
     private String provider = "Not Specified";
 
     private TableSetSpecification() {
         this.requiredTables = new HashSet<>();
-        this.requiredColumns = new ArrayList<>();
-        this.nonEmptyColumns = new ArrayList<>();
-        this.uniqueColumns = new ArrayList<>();
-        this.oneToManyRelations = new ArrayList<>();
+        this.requiredColumns = new HashSet<>();
+        this.nonEmptyColumns = new HashSet<>();
+        this.uniqueColumns = new HashSet<>();
+        this.relations = new HashSet<>();
     }
 
     public static TableSetSpecification create() {
@@ -34,14 +33,14 @@ public class TableSetSpecification {
         Pair<String, String> leftTable,
         Pair<String, String> rightTable
     ) {
-        this.oneToManyRelations.add(Pair.of(leftTable, rightTable));
+        this.relations.add(Pair.of(leftTable, rightTable));
         return this;
     }
 
     public TableSetSpecification addHasRelations(
-        List<Pair<Pair<String, String>, Pair<String, String>>> relation
+        Set<Pair<Pair<String, String>, Pair<String, String>>> relation
     ) {
-        this.oneToManyRelations.addAll(relation);
+        this.relations.addAll(relation);
         return this;
     }
 
@@ -55,7 +54,7 @@ public class TableSetSpecification {
         return this;
     }
 
-    public TableSetSpecification addRequiredColumns(List<Pair<String, String>> tableColumn) {
+    public TableSetSpecification addRequiredColumns(Set<Pair<String, String>> tableColumn) {
         this.requiredColumns.addAll(tableColumn);
         return this;
     }
@@ -65,7 +64,7 @@ public class TableSetSpecification {
         return this;
     }
 
-    public TableSetSpecification addNonEmptyColumns(List<Pair<String, String>> tableColumns) {
+    public TableSetSpecification addNonEmptyColumns(Set<Pair<String, String>> tableColumns) {
         this.nonEmptyColumns.addAll(tableColumns);
         return this;
     }
@@ -75,7 +74,7 @@ public class TableSetSpecification {
         return this;
     }
 
-    public TableSetSpecification addUniqueColumns(List<Pair<String, String>> tableColumns) {
+    public TableSetSpecification addUniqueColumns(Set<Pair<String, String>> tableColumns) {
         this.uniqueColumns.addAll(tableColumns);
         return this;
     }
@@ -89,19 +88,19 @@ public class TableSetSpecification {
         return this;
     }
 
-    public List<Pair<String, String>> getNonEmptyColumns() {
+    public Set<Pair<String, String>> getNonEmptyColumns() {
         return this.nonEmptyColumns;
     }
 
-    public List<Pair<String, String>> getUniqueColumns() {
+    public Set<Pair<String, String>> getUniqueColumns() {
         return this.uniqueColumns;
     }
 
     public Set<String> getRequiredTables() {
-        return requiredTables;
+        return this.requiredTables;
     }
 
-    public List<Pair<String, String>> getRequiredColumns() {
+    public Set<Pair<String, String>> getRequiredColumns() {
         return this.requiredColumns;
     }
 
@@ -109,8 +108,8 @@ public class TableSetSpecification {
         return getRequiredColumns() != null;
     }
 
-    public List<Pair<Pair<String, String>, Pair<String, String>>> getOneToManyRelations() {
-        return oneToManyRelations;
+    public Set<Pair<Pair<String, String>, Pair<String, String>>> getHasRelations() {
+        return this.relations;
     }
 
     public Set<String> getMissingTablesFrom(Map<String, Table> fileList) {
@@ -119,5 +118,56 @@ public class TableSetSpecification {
         return missingFiles;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        TableSetSpecification that = (TableSetSpecification) o;
+
+        if (getRequiredTables() != null
+            ? !getRequiredTables().equals(that.getRequiredTables())
+            : that.getRequiredTables() != null)
+            return false;
+        if (getRequiredColumns() != null
+            ? !getRequiredColumns().equals(that.getRequiredColumns())
+            : that.getRequiredColumns() != null)
+            return false;
+        if (getNonEmptyColumns() != null
+            ? !getNonEmptyColumns().equals(that.getNonEmptyColumns())
+            : that.getNonEmptyColumns() != null)
+            return false;
+        if (getUniqueColumns() != null
+            ? !getUniqueColumns().equals(that.getUniqueColumns())
+            : that.getUniqueColumns() != null)
+            return false;
+        if (getHasRelations() != null
+            ? !getHasRelations().equals(that.getHasRelations())
+            : that.getHasRelations() != null)
+            return false;
+        return getProvider().equals(that.getProvider());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getRequiredTables() != null ? getRequiredTables().hashCode() : 0;
+        result = 31 * result + (getRequiredColumns() != null ? getRequiredColumns().hashCode() : 0);
+        result = 31 * result + (getNonEmptyColumns() != null ? getNonEmptyColumns().hashCode() : 0);
+        result = 31 * result + (getUniqueColumns() != null ? getUniqueColumns().hashCode() : 0);
+        result = 31 * result + (getHasRelations() != null ? getHasRelations().hashCode() : 0);
+        result = 31 * result + getProvider().hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", TableSetSpecification.class.getSimpleName() + "[", "]")
+            .add("requiredTables=" + requiredTables)
+            .add("requiredColumns=" + requiredColumns)
+            .add("nonEmptyColumns=" + nonEmptyColumns)
+            .add("uniqueColumns=" + uniqueColumns)
+            .add("relations=" + relations)
+            .add("provider='" + provider + "'")
+            .toString();
+    }
 }

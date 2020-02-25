@@ -1,12 +1,14 @@
 package org.pdxfinder.dataloaders.updog;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.util.StringUtil;
 import tech.tablesaw.api.Table;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -69,4 +71,11 @@ class TableSetUtilities {
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
     }
+
+    public static<T> Set<T> concatenate(Set<T>... sets) {
+        return Stream.of(sets)
+            .flatMap(Set::stream)
+            .collect(Collectors.toSet());
+    }
+
 }
