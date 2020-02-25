@@ -60,7 +60,7 @@ public class FinderCommandLine implements Callable<Integer> {
         private String springConfigLocation;
 
         @ArgGroup(multiplicity = "0..1")
-        Exclusive datasetRequested;
+        Exclusive datasetRequested = new Exclusive();
 
         static class Exclusive {
 
@@ -69,7 +69,7 @@ public class FinderCommandLine implements Callable<Integer> {
                     arity = "1",
                     description = "Load the data for groups of dataProvider (default: [${DEFAULT-VALUE}]). " +
                             "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
-            private DataProviderGroup dataProviderGroup = DataProviderGroup.All;
+            private DataProviderGroup dataProviderGroup;
 
             @Option(
                     names = {"-o", "--only"}, arity = "1..*",
