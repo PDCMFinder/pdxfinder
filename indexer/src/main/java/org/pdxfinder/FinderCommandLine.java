@@ -56,8 +56,11 @@ public class FinderCommandLine implements Callable<Integer> {
                 description = "Skips clearing of the database before loading new data.")
         private boolean keepDatabaseRequested;
 
-        @Option(names = "--spring.config.location")
-        private String springConfigLocation;
+        @Option(names = { "--spring.data.neo4j.uri"}, paramLabel = "Neo4j DB Directory", description = "Embedded Neo4j Database location", required=false, hidden=true)
+        private String springDataNeo4jUri;
+
+        @Option(names = { "--spring.datasource.url"}, paramLabel = "H2 DB Directory", description = "Embedded H2 Database location", required=false, hidden=true)
+        private String springDatasourceUrl;
 
         @ArgGroup(multiplicity = "0..1")
         Exclusive datasetRequested = new Exclusive();
@@ -129,7 +132,6 @@ public class FinderCommandLine implements Callable<Integer> {
                 .add("dataDirectory=" + dataDirectory)
                 .add("clearCacheRequested=" + loadCacheRequested)
                 .add("keepDatabaseRequested=" + keepDatabaseRequested)
-                .add("springConfigLocation='" + springConfigLocation + "'")
                 .add("datasetRequested=" + getListOfRequestedProviders())
                 .toString();
         }
