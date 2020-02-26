@@ -199,4 +199,11 @@ public class PatientSnapshot {
 
         treatmentSummary.addTreatmentProtocol(treatmentProtocol);
     }
+
+
+    @Override
+    public String toString() {
+        return String.format("[%s at age %s]", getPatient(), getAgeAtCollection());
+    }
+
 }

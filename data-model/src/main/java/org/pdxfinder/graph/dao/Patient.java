@@ -309,6 +309,11 @@ public class Patient {
         return ethnicityAssessment;
     }
 
+    @Override
+    public String toString() {
+        return String.format("[%s]", externalId);
+    }
+
     public void setEthnicityAssessment(String ethnicityAssessment) {
         this.ethnicityAssessment = ethnicityAssessment;
     }

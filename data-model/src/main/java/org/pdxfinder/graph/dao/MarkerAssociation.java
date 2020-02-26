@@ -43,7 +43,6 @@ public class MarkerAssociation {
 
     public void createMolecularDataStringFromList(){
         molecularDataString = new Gson().toJson(molecularDataList);
-        // do something useful here
         molecularDataList = null;
     }
 

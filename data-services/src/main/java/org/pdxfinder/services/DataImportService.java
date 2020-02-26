@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.pdxfinder.services;
 
-//import org.apache.commons.cli.Option;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
@@ -24,22 +18,12 @@ import org.springframework.util.Assert;
 
 import org.springframework.cache.annotation.Cacheable;
 
-import javax.management.RuntimeErrorException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * The hope was to put a lot of reused repository actions into one place ie find
- * or create a node or create a node with that requires a number of 'child'
- * nodes that are terms
- *
- * @author sbn
- */
 @Component
 public class DataImportService {
-
-    //public static Option loadAll = new Option("LoadAll", false, "Load all PDX Finder data");
 
     private TumorTypeRepository tumorTypeRepository;
     private HostStrainRepository hostStrainRepository;
