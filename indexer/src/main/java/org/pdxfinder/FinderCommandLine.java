@@ -94,7 +94,6 @@ public class FinderCommandLine implements Callable<Integer> {
 
             finderLoader.run(
                 providersRequested,
-                dataDirectory,
                 loadCacheRequested,
                 keepDatabaseRequested
             );

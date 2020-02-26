@@ -45,7 +45,6 @@ public class FinderLoader {
 
     void run(
         List<DataProvider> dataProviders,
-        File dataDirectory,
         boolean loadCacheRequested,
         boolean keepDatabaseRequested
         ) {
