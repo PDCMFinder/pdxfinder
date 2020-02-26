@@ -1,18 +1,20 @@
-package org.pdxfinder.dataloaders.updog;
+package org.pdxfinder.dataloaders.updog.domainobjectcreation;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
@@ -24,20 +26,25 @@ import java.util.Set;
 
 public class DomainObjectCreatorTest extends BaseTest {
 
-    @MockBean private DataImportService dataImportService;
+    @Mock private DataImportService dataImportService;
+    @Mock private ProviderCreator providerCreator;
     @InjectMocks private DomainObjectCreator domainObjectCreator;
 
+    private Map<String, Table> pdxDataTables;
     private Group providerGroup;
+    private Group accessibilityGroup;
     private Patient testPatient;
     private ModelCreation testModel;
 
     @Before
     public void setUp(){
         MockitoAnnotations.initMocks(this);
-        Map<String, Table> pdxDataTables = getTestPdxDataTables();
+        pdxDataTables = getTestPdxDataTables();
 
-        providerGroup = new Group("TestProvider", "TP", "description", "", "", "");
+        providerGroup = Group.createProviderGroup("TestProvider", "TP", "description", "", "", "");
         providerGroup.setType("Provider");
+
+        accessibilityGroup = Group.createAccessibilityGroup("academia", "");
 
         testPatient = new Patient("patient 1", "female", "-", "ethnicity",providerGroup );
         testModel = new ModelCreation("model1");
@@ -113,7 +120,7 @@ public class DomainObjectCreatorTest extends BaseTest {
 
         when(dataImportService.getProjectGroup("project 1")).thenReturn(getProjectGroup("project 1"));
         when(dataImportService.getAccessibilityGroup("academia", "collaboration only"))
-            .thenReturn(getAccessGroup("academia", "collaboration only"));
+            .thenReturn(Group.createAccessibilityGroup("academia", "collaboration only"));
 
         domainObjectCreator.createSharingData(getTestPdxDataTables());
 
@@ -140,6 +147,8 @@ public class DomainObjectCreatorTest extends BaseTest {
         when(dataImportService.getProviderGroup(
             anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
             .thenReturn(providerGroup);
+        when(dataImportService.getAccessibilityGroup(anyString(), anyString()))
+            .thenReturn(accessibilityGroup);
         when(dataImportService.createPatient("patient 1", providerGroup, "female", "", "ethnicity"))
             .thenReturn(testPatient);
         when(dataImportService.savePatient(testPatient))
@@ -161,7 +170,7 @@ public class DomainObjectCreatorTest extends BaseTest {
     }
 
 
-    private Map<String, Table> getTestPdxDataTables(){
+    public static Map<String, Table> getTestPdxDataTables(){
 
         String loader = "metadata-loader.tsv";
         String patient = "metadata-patient.tsv";
@@ -309,14 +318,6 @@ public class DomainObjectCreatorTest extends BaseTest {
         return group;
     }
 
-    private Group getAccessGroup(String accessibility, String accessModalities){
-
-        Group group = new Group(accessibility, accessModalities);
-        group.setType("Accessibility");
-        return group;
-    }
-
-
     private NodeSuggestionDTO getSuggestedMarker(){
 
         Marker marker = new Marker();
@@ -327,4 +328,19 @@ public class DomainObjectCreatorTest extends BaseTest {
 
         return nsdto;
     }
+
+    @Test public void callCreators_givenTableSet_callsObjectCreationInCorrectOrder() {
+        // just checking the universe has not collapsed ;)
+        InOrder inOrder = inOrder(providerCreator);
+        domainObjectCreator.callCreators(pdxDataTables);
+
+        inOrder.verify(providerCreator).create(any());
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test public void callCreators_givenTableSet_callsCreateProvider() {
+        domainObjectCreator.callCreators(pdxDataTables);
+        verify(providerCreator).create(any());
+    }
+
 }

@@ -160,7 +160,7 @@ public class DataImportService {
         if(g == null){
             log.info("Provider group not found. Creating {}", name);
 
-            g = new Group(name, abbrev, description, providerType, contact, url);
+            g = Group.createProviderGroup(name, abbrev, description, providerType, contact, url);
             groupRepository.save(g);
 
         }
@@ -215,8 +215,7 @@ public class DataImportService {
         if(g == null){
             log.info("Access group not found. Creating " + accessibility + " " + accessModalities);
 
-            g = new Group(accessibility, accessModalities);
-            g.setType("Accessibility");
+            g = Group.createAccessibilityGroup(accessibility, accessModalities);
             groupRepository.save(g);
 
         }

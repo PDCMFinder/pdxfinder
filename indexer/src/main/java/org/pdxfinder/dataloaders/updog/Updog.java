@@ -1,5 +1,6 @@
 package org.pdxfinder.dataloaders.updog;
 
+import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -39,7 +39,7 @@ public class DataExportTest extends BaseTest {
     @Before
     public void setUp() {
 
-        providerGroup = new Group("TestGroup", "TG", "", "Academia", "Bob", "Bob's page");
+        providerGroup = Group.createProviderGroup("TestGroup", "TG", "", "Academia", "Bob", "Bob's page");
 
         universalDataExporter = new UniversalDataExporter(dataImportService, utilityService);
         //universalDataExporter.init("", providerGroup);
@@ -264,7 +264,7 @@ public class DataExportTest extends BaseTest {
         ModelCreation model = new ModelCreation();
         model.setSourcePdxId("m123");
 
-        Group accessGroup = new Group("Academia", "transnational");
+        Group accessGroup = Group.createAccessibilityGroup("Academia", "transnational");
         Group project = new Group("project1", "p1", "Project");
 
         Group publicationGroup = new Group();

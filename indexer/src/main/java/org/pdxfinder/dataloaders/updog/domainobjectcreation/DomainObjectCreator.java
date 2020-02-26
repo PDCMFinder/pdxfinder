@@ -1,5 +1,6 @@
-package org.pdxfinder.dataloaders.updog;
+package org.pdxfinder.dataloaders.updog.domainobjectcreation;
 
+import org.pdxfinder.dataloaders.updog.TSV;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
@@ -17,6 +18,7 @@ public class DomainObjectCreator {
 
     private Map<String, Map<String, Object>> domainObjects;
     private DataImportService dataImportService;
+    private ProviderCreator providerCreator;
     private static final Logger log = LoggerFactory.getLogger(DomainObjectCreator.class);
 
     private static final String PATIENTS = "patient";
@@ -32,14 +34,15 @@ public class DomainObjectCreator {
     private static final String NOT_SPECIFIED = "Not Specified";
 
     public DomainObjectCreator(
-            DataImportService dataImportService
+            DataImportService dataImportService,
+            ProviderCreator providerCreator
     ) {
         this.dataImportService = dataImportService;
+        this.providerCreator = providerCreator;
         domainObjects = new HashMap<>();
     }
 
     public void loadDomainObjects(Map<String, Table> pdxDataTables) {
-        Map<String, Set<Object>> domains = new HashMap<>();
         //: Do not change the order of these unless you want to risk 1. the universe to collapse OR 2. missing nodes in the db
 
         createProvider(pdxDataTables);
@@ -53,6 +56,10 @@ public class DomainObjectCreator {
         persistNodes();
     }
 
+    public void callCreators(Map<String, Table> tableSet) {
+        Set<Group> providerGroups = providerCreator.create(tableSet);
+    }
+
     void createProvider(Map<String, Table> pdxDataTables) {
         log.info("Creating provider");
         Table finderRelatedTable = pdxDataTables.get("metadata-loader.tsv");
@@ -62,7 +69,6 @@ public class DomainObjectCreator {
         String internalUrl = row.getString(TSV.Metadata.internal_url.name());
         Group providerGroup = dataImportService.getProviderGroup(
                 providerName, abbrev, "", "", "", internalUrl);
-
         addDomainObject(PROVIDER_GROUPS, null, providerGroup);
     }
 
@@ -218,6 +224,7 @@ public class DomainObjectCreator {
 
             if (eitherIsPresent(accessibility, europdxAccessModality)) {
                 Group access = dataImportService.getAccessibilityGroup(accessibility, europdxAccessModality);
+                access.setName("Has access information");
                 modelCreation.addGroup(access);
             }
 

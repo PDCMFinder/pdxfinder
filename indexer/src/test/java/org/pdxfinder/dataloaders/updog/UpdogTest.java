@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
 import tech.tablesaw.api.Table;
 
 import java.nio.file.Paths;

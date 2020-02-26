@@ -203,7 +203,7 @@ public class PatientSnapshot {
 
     @Override
     public String toString() {
-        return String.format("[%s at age %s]", getPatient(), getAgeAtCollection());
+        return String.format("[%s at age %s]", getPatient().getExternalId(), getAgeAtCollection());
     }
 
 }
