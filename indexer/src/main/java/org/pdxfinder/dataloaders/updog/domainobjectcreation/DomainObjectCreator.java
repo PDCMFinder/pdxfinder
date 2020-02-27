@@ -18,7 +18,8 @@ public class DomainObjectCreator {
 
     private Map<String, Map<String, Object>> domainObjects;
     private DataImportService dataImportService;
-    private ProviderCreator providerCreator;
+    private GroupCreator groupCreator;
+    private PatientCreator patientCreator;
     private static final Logger log = LoggerFactory.getLogger(DomainObjectCreator.class);
 
     private static final String PATIENTS = "patient";
@@ -34,11 +35,13 @@ public class DomainObjectCreator {
     private static final String NOT_SPECIFIED = "Not Specified";
 
     public DomainObjectCreator(
-            DataImportService dataImportService,
-            ProviderCreator providerCreator
+        DataImportService dataImportService,
+        GroupCreator groupCreator,
+        PatientCreator patientCreator
     ) {
         this.dataImportService = dataImportService;
-        this.providerCreator = providerCreator;
+        this.groupCreator = groupCreator;
+        this.patientCreator = patientCreator;
         domainObjects = new HashMap<>();
     }
 
@@ -57,7 +60,8 @@ public class DomainObjectCreator {
     }
 
     public void callCreators(Map<String, Table> tableSet) {
-        Set<Group> providerGroups = providerCreator.create(tableSet);
+        Group provider = patientCreator.createDependencies(tableSet);
+        Set<Patient> patients = patientCreator.create(tableSet, provider);
     }
 
     void createProvider(Map<String, Table> pdxDataTables) {

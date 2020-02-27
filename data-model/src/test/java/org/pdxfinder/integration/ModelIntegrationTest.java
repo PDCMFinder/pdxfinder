@@ -9,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Date;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 
@@ -150,7 +148,7 @@ public class ModelIntegrationTest extends BaseTest {
 
         Patient patient = new Patient("patient_id_1", "F", null, null, group);
         PatientSnapshot ps = new PatientSnapshot(patient, "67");
-        patient.hasSnapshot(ps);
+        patient.addSnapshot(ps);
 
         Sample s = new Sample("test", tumorType, "adinocarcinoma", tissue, null, "Surgical Resection", "F", false, group.getAbbreviation());
         s.setMolecularCharacterizations(new HashSet<>(Collections.singletonList(mc)));

@@ -27,7 +27,8 @@ import java.util.Set;
 public class DomainObjectCreatorTest extends BaseTest {
 
     @Mock private DataImportService dataImportService;
-    @Mock private ProviderCreator providerCreator;
+    @Mock private GroupCreator groupCreator;
+    @Mock private PatientCreator patientCreator;
     @InjectMocks private DomainObjectCreator domainObjectCreator;
 
     private Map<String, Table> pdxDataTables;
@@ -331,16 +332,17 @@ public class DomainObjectCreatorTest extends BaseTest {
 
     @Test public void callCreators_givenTableSet_callsObjectCreationInCorrectOrder() {
         // just checking the universe has not collapsed ;)
-        InOrder inOrder = inOrder(providerCreator);
+        InOrder inOrder = inOrder(patientCreator);
         domainObjectCreator.callCreators(pdxDataTables);
 
-        inOrder.verify(providerCreator).create(any());
+        inOrder.verify(patientCreator).createDependencies(any());
+        inOrder.verify(patientCreator).create(any(), any());
         inOrder.verifyNoMoreInteractions();
     }
 
-    @Test public void callCreators_givenTableSet_callsCreateProvider() {
+    @Test public void callCreators_givenTableSet_callsCreatePatient() {
         domainObjectCreator.callCreators(pdxDataTables);
-        verify(providerCreator).create(any());
+        verify(patientCreator).create(any(), any());
     }
 
 }

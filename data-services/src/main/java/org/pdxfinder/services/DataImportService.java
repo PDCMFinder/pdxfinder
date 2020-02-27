@@ -489,7 +489,7 @@ public class DataImportService {
         }
         //create new snapshot and save it with the patient
         ps = new PatientSnapshot(patient, ageAtCollection, collectionDate, collectionEvent, ellapsedTime);
-        patient.hasSnapshot(ps);
+        patient.addSnapshot(ps);
         ps.setPatient(patient);
         patientRepository.save(patient);
         patientSnapshotRepository.save(ps);

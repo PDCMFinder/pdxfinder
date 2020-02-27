@@ -379,7 +379,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 mc.setSample(sample);
                 mc.addRelatedSample(sample);
 
-                patient.hasSnapshot(ps);
+                patient.addSnapshot(ps);
 
                 dataImportService.savePatient(patient);
                 dataImportService.savePatientSnapshot(ps);

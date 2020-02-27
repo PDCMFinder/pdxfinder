@@ -25,7 +25,6 @@ public class Updog {
     private DomainObjectCreator domainObjectCreator;
     private static final Logger log = LoggerFactory.getLogger(Updog.class);
 
-    @Autowired
     public Updog(
         @Nonnull Reader reader,
         @Nonnull TableSetCleaner tableSetCleaner,

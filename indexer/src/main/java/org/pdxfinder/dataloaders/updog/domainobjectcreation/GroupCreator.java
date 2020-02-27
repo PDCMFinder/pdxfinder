@@ -14,11 +14,11 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class ProviderCreator {
+public class GroupCreator {
 
-    private static final Logger log = LoggerFactory.getLogger(ProviderCreator.class);
+    private static final Logger log = LoggerFactory.getLogger(GroupCreator.class);
 
-    Set<Group> create(Map<String, Table> tableSet) {
+    Set<Group> createProviderGroup(Map<String, Table> tableSet) {
         Row loaderData = tableSet.get("metadata-loader.tsv").row(0);
         String providerName = loaderData.getText(TSV.Metadata.name.name());
         String abbreviation = loaderData.getText(TSV.Metadata.abbreviation.name());
