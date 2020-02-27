@@ -1,5 +1,6 @@
 package org.pdxfinder.dataloaders;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContextAware;
 import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
@@ -21,26 +22,26 @@ public class LoadUniversal implements ApplicationContextAware {
 
     private Logger log = LoggerFactory.getLogger(LoadUniversal.class);
 
-    private ApplicationContext context;
+    private static ApplicationContext context;
 
+    private ReportManager reportManager;
+
+    @Autowired
     private DataImportService dataImportService;
 
+    @Autowired
     private UtilityService utilityService;
 
-    public LoadUniversal(DataImportService dataImportService, UtilityService utilityService) {
-        this.dataImportService = dataImportService;
-        this.utilityService = utilityService;
-    }
 
     public void run(String dataProvider) throws Exception {
 
         finderRootDir = UniversalLoader.stripTrailingSlash(finderRootDir);
 
-        String updogDir = String.format("%s/data/UPDOG/", finderRootDir);
+        String updogDir = String.format("%s/data/UPDOG", finderRootDir);
 
         String providerDir = String.format("%s/%s", updogDir, dataProvider.replace("_","-"));
 
-        ReportManager reportManager = (ReportManager) context.getBean("ReportManager");
+        reportManager = (ReportManager) context.getBean("ReportManager");
 
         File folder = new File(updogDir);
 

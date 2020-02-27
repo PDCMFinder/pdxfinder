@@ -35,7 +35,7 @@ public class DataProviders implements ApplicationContextAware {
         map.put(DataProviderGroup.EurOPDX, Arrays.asList(
                 DataProvider.Curie_BC,
                 DataProvider.Curie_LC,
-                DataProvider.Curie_OV,
+                DataProvider.Curie_OC,
                 DataProvider.IRCC_CRC,
                 DataProvider.IRCC_GC,
                 DataProvider.TRACE,
@@ -50,7 +50,7 @@ public class DataProviders implements ApplicationContextAware {
                 DataProvider.TRACE,
                 DataProvider.Curie_BC,
                 DataProvider.Curie_LC,
-                DataProvider.Curie_OV,
+                DataProvider.Curie_OC,
                 DataProvider.PMLB,
                 DataProvider.UOC_BC,
                 DataProvider.UOM_BC,
@@ -65,7 +65,7 @@ public class DataProviders implements ApplicationContextAware {
         CRL,
         Curie_BC,
         Curie_LC,
-        Curie_OV,
+        Curie_OC,
         IRCC_CRC {
             @Override
             public void load() {
