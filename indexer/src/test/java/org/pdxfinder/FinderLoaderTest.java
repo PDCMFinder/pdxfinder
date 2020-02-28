@@ -39,8 +39,6 @@ public class FinderLoaderTest extends BaseTest {
     @Mock private CreateDataProjections createDataProjections;
     @Mock private SetDataVisibility setDataVisibility;
     @Mock private ValidateDB validateDB;
-    @Mock private SendNotifications sendNotifications;
-    @Mock private ValidateGeneSymbols validateGeneSymbols;
 
     @InjectMocks private FinderLoader finderLoader;
 
@@ -57,8 +55,6 @@ public class FinderLoaderTest extends BaseTest {
         doNothing().when(this.createDataProjections).run();
         doNothing().when(this.setDataVisibility).run();
         doNothing().when(this.validateDB).run();
-        doNothing().when(this.sendNotifications).run();
-        doNothing().when(this.validateGeneSymbols).run();
     }
 
 

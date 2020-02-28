@@ -36,8 +36,6 @@ public class FinderLoader {
     private CreateDataProjections createDataProjections;
     private SetDataVisibility setDataVisibility;
     private ValidateDB validateDB;
-    private SendNotifications sendNotifications;
-    private ValidateGeneSymbols validateGeneSymbols;
 
     private DataImportService dataImportService;
 
@@ -50,8 +48,6 @@ public class FinderLoader {
                         CreateDataProjections createDataProjections,
                         SetDataVisibility setDataVisibility,
                         ValidateDB validateDB,
-                        SendNotifications sendNotifications,
-                        ValidateGeneSymbols validateGeneSymbols,
                         DataImportService dataImportService) {
         this.loadMarkers = loadMarkers;
         this.loadNCITDrugs = loadNCITDrugs;
@@ -61,8 +57,6 @@ public class FinderLoader {
         this.createDataProjections = createDataProjections;
         this.setDataVisibility = setDataVisibility;
         this.validateDB = validateDB;
-        this.sendNotifications = sendNotifications;
-        this.validateGeneSymbols = validateGeneSymbols;
         this.dataImportService = dataImportService;
     }
 
@@ -156,8 +150,7 @@ public class FinderLoader {
             linkTreatmentsToNCITTerms.run();
             createDataProjections.run();
             setDataVisibility.run();
-            validateDB.run();               //sendNotifications .run ()
-            validateGeneSymbols.run();
+            validateDB.run();
         }
 
 
