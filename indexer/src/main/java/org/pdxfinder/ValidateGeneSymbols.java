@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -26,13 +27,12 @@ import java.util.*;
 /**
  * Created by csaba on 21/08/2017.
  */
-@Component
+@Service
 @Order(value = 200)
-public class ValidateGeneSymbols implements CommandLineRunner{
+public class ValidateGeneSymbols {
 
 
     private static final String DATA_FILE_URL = "http://www.genenames.org/cgi-bin/download?col=gd_hgnc_id&col=gd_app_sym&col=gd_prev_sym&col=gd_aliases&col=md_eg_id&col=md_ensembl_id&status=Approved&status_opt=2&where=&order_by=gd_app_sym_sort&format=text&limit=&hgnc_dbtag=on&submit=submit";
-
 
     private final static Logger log = LoggerFactory.getLogger(ValidateGeneSymbols.class);
     private DataImportService dataImportService;
@@ -59,22 +59,12 @@ public class ValidateGeneSymbols implements CommandLineRunner{
         this.rnaseqSymbolsWithIssues = new ArrayList<>();
     }
 
-    @Override
-    public void run(String... args) throws Exception {
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("validateGeneSymbols", "Validate gene symbols");
-        parser.accepts("loadALL", "Load all, including validating gene symbols");
-        OptionSet options = parser.parse(args);
+    public void run() {
 
         long startTime = System.currentTimeMillis();
 
-        if (options.has("validateGeneSymbols")) {
-
-            validateSymbols();
-
-        }
+        validateSymbols();
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;

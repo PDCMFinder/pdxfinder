@@ -50,7 +50,7 @@ public class CreateLocalFeeds implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(CreateLocalFeeds.class);
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     //JAX

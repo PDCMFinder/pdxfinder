@@ -25,6 +25,7 @@ public class FinderCommandLineTest extends BaseTest {
         doNothing().when(this.finderLoader).run(
             anyListOf(DataProviders.DataProvider.class),
             anyBoolean(),
+            anyBoolean(),
             anyBoolean()
         );
 
@@ -37,6 +38,7 @@ public class FinderCommandLineTest extends BaseTest {
         verify(this.finderLoader).run(
             anyListOf(DataProviders.DataProvider.class),
             anyBoolean(),
+            anyBoolean(),
             anyBoolean()
         );
         verifyNoMoreInteractions(this.finderLoader);
@@ -48,6 +50,7 @@ public class FinderCommandLineTest extends BaseTest {
         assertEquals(0, exitCode);
         verify(this.finderLoader).run(
             anyListOf(DataProviders.DataProvider.class),
+            anyBoolean(),
             anyBoolean(),
             anyBoolean()
         );

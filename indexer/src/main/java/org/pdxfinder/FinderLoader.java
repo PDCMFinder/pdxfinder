@@ -1,5 +1,11 @@
 package org.pdxfinder;
 
+import org.pdxfinder.dataloaders.LoadAdditionalDatasets;
+import org.pdxfinder.mapping.LinkTreatmentsToNCITTerms;
+import org.pdxfinder.postload.CreateDataProjections;
+import org.pdxfinder.postload.SendNotifications;
+import org.pdxfinder.postload.SetDataVisibility;
+import org.pdxfinder.postload.ValidateDB;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.constants.DataUrl;
@@ -19,19 +25,44 @@ import java.util.List;
 @Component
 public class FinderLoader {
 
+    // Cache loading Components
     private LoadMarkers loadMarkers;
     private LoadNCITDrugs loadNCITDrugs;
     private LoadNCIT loadNCIT;
+
+    // PostLoad Components
+    private LoadAdditionalDatasets loadAdditionalDatasets;
+    private LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms;
+    private CreateDataProjections createDataProjections;
+    private SetDataVisibility setDataVisibility;
+    private ValidateDB validateDB;
+    private SendNotifications sendNotifications;
+    private ValidateGeneSymbols validateGeneSymbols;
+
     private DataImportService dataImportService;
 
     @Autowired
     public FinderLoader(LoadMarkers loadMarkers,
-                        LoadNCIT loadNCIT,
                         LoadNCITDrugs loadNCITDrugs,
+                        LoadNCIT loadNCIT,
+                        LoadAdditionalDatasets loadAdditionalDatasets,
+                        LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms,
+                        CreateDataProjections createDataProjections,
+                        SetDataVisibility setDataVisibility,
+                        ValidateDB validateDB,
+                        SendNotifications sendNotifications,
+                        ValidateGeneSymbols validateGeneSymbols,
                         DataImportService dataImportService) {
         this.loadMarkers = loadMarkers;
-        this.loadNCIT = loadNCIT;
         this.loadNCITDrugs = loadNCITDrugs;
+        this.loadNCIT = loadNCIT;
+        this.loadAdditionalDatasets = loadAdditionalDatasets;
+        this.linkTreatmentsToNCITTerms = linkTreatmentsToNCITTerms;
+        this.createDataProjections = createDataProjections;
+        this.setDataVisibility = setDataVisibility;
+        this.validateDB = validateDB;
+        this.sendNotifications = sendNotifications;
+        this.validateGeneSymbols = validateGeneSymbols;
         this.dataImportService = dataImportService;
     }
 
@@ -43,14 +74,15 @@ public class FinderLoader {
     @Value("${ncitpredef.file}")
     private String ncitFile;
 
-    void run(
-        List<DataProvider> dataProviders,
-        boolean loadCacheRequested,
-        boolean keepDatabaseRequested
-        ) {
-        keepDatabaseIfRequested(keepDatabaseRequested);
-        loadCache(loadCacheRequested);
-        loadRequestedPdxData(dataProviders);
+    void run(List<DataProvider> dataProviders,
+             boolean loadCacheRequested,
+             boolean keepDatabaseRequested,
+             boolean postLoadRequested) {
+
+        this.keepDatabaseIfRequested(keepDatabaseRequested);
+        this.loadCache(loadCacheRequested);
+        this.loadRequestedPdxData(dataProviders);
+        this.postLoad(dataProviders, postLoadRequested);
     }
 
     private void keepDatabaseIfRequested(boolean keepDatabaseRequested) {
@@ -108,6 +140,27 @@ public class FinderLoader {
         for (DataProvider i : providers) {
             callRelevantLoader(i);
         }
+    }
+
+
+    private void postLoad(List<DataProvider> providers, boolean postLoadRequested) {
+
+        log.info("Running Post load Steps ...");
+
+        if (providers.contains(DataProvider.CRL)){
+            loadAdditionalDatasets.run();
+        }
+
+        if (!providers.isEmpty() || postLoadRequested){
+
+            linkTreatmentsToNCITTerms.run();
+            createDataProjections.run();
+            setDataVisibility.run();
+            validateDB.run();               //sendNotifications .run ()
+            validateGeneSymbols.run();
+        }
+
+
     }
 
     private void callRelevantLoader(DataProvider dataProvider) {

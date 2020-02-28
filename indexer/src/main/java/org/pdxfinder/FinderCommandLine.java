@@ -56,6 +56,10 @@ public class FinderCommandLine implements Callable<Integer> {
                 description = "Skips clearing of the database before loading new data.")
         private boolean keepDatabaseRequested;
 
+        @Option(names = {"-p", "--post-load"},
+                description = "Implement Post data loading Steps", required=false)
+        private boolean postLoadRequested;
+
         @Option(names = { "--spring.data.neo4j.uri"}, paramLabel = "Neo4j DB Directory", description = "Embedded Neo4j Database location", required=false, hidden=true)
         private String springDataNeo4jUri;
 
@@ -98,7 +102,8 @@ public class FinderCommandLine implements Callable<Integer> {
             finderLoader.run(
                 providersRequested,
                 loadCacheRequested,
-                keepDatabaseRequested
+                keepDatabaseRequested,
+                postLoadRequested
             );
             return 0;
         }
