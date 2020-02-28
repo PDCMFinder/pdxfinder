@@ -1,13 +1,12 @@
 package org.pdxfinder;
 
 import org.pdxfinder.dataloaders.LoadAdditionalDatasets;
+import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
 import org.pdxfinder.mapping.LinkTreatmentsToNCITTerms;
 import org.pdxfinder.postload.CreateDataProjections;
-import org.pdxfinder.postload.SendNotifications;
 import org.pdxfinder.postload.SetDataVisibility;
 import org.pdxfinder.postload.ValidateDB;
 import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
 import org.pdxfinder.services.loader.envload.LoadNCIT;
@@ -32,6 +31,7 @@ public class FinderLoader {
 
     // PostLoad Components
     private LoadAdditionalDatasets loadAdditionalDatasets;
+    private LinkSamplesToNCITTerms linkSamplesToNCITTerms;
     private LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms;
     private CreateDataProjections createDataProjections;
     private SetDataVisibility setDataVisibility;
@@ -44,19 +44,24 @@ public class FinderLoader {
                         LoadNCITDrugs loadNCITDrugs,
                         LoadNCIT loadNCIT,
                         LoadAdditionalDatasets loadAdditionalDatasets,
+                        LinkSamplesToNCITTerms linkSamplesToNCITTerms,
                         LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms,
                         CreateDataProjections createDataProjections,
                         SetDataVisibility setDataVisibility,
                         ValidateDB validateDB,
                         DataImportService dataImportService) {
+
         this.loadMarkers = loadMarkers;
         this.loadNCITDrugs = loadNCITDrugs;
         this.loadNCIT = loadNCIT;
+
         this.loadAdditionalDatasets = loadAdditionalDatasets;
+        this.linkSamplesToNCITTerms = linkSamplesToNCITTerms;
         this.linkTreatmentsToNCITTerms = linkTreatmentsToNCITTerms;
         this.createDataProjections = createDataProjections;
         this.setDataVisibility = setDataVisibility;
         this.validateDB = validateDB;
+
         this.dataImportService = dataImportService;
     }
 
@@ -147,6 +152,7 @@ public class FinderLoader {
 
         if (!providers.isEmpty() || postLoadRequested){
 
+            linkSamplesToNCITTerms.run();
             linkTreatmentsToNCITTerms.run();
             createDataProjections.run();
             setDataVisibility.run();

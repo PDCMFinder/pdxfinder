@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.pdxfinder.dataloaders.LoadAdditionalDatasets;
+import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
 import org.pdxfinder.mapping.LinkTreatmentsToNCITTerms;
 import org.pdxfinder.postload.CreateDataProjections;
 import org.pdxfinder.postload.SendNotifications;
@@ -35,6 +36,7 @@ public class FinderLoaderTest extends BaseTest {
     @Mock private DataProviders.DataProvider dataProvider;
 
     @Mock private LoadAdditionalDatasets loadAdditionalDatasets;
+    @Mock private LinkSamplesToNCITTerms linkSamplesToNCITTerms;
     @Mock private LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms;
     @Mock private CreateDataProjections createDataProjections;
     @Mock private SetDataVisibility setDataVisibility;
@@ -51,6 +53,7 @@ public class FinderLoaderTest extends BaseTest {
         doNothing().when(this.loadNCITDrugs).loadRegimens();
         doNothing().when(this.dataProvider).load();
         doNothing().when(this.loadAdditionalDatasets).run();
+        doNothing().when(this.linkSamplesToNCITTerms).run();
         doNothing().when(this.linkTreatmentsToNCITTerms).run();
         doNothing().when(this.createDataProjections).run();
         doNothing().when(this.setDataVisibility).run();
