@@ -87,7 +87,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
 
             nsgBS = dataImportService.getHostStrain(nsgBsName, nsgBsSymbol, nsgbsURL, nsgBsName);
         } catch (Exception e) {
-            log.error("Failed to create NSG hoststrain", e);
+            log.error("Failed to createPatientSample NSG hoststrain", e);
         }
     }
 
@@ -95,7 +95,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
         try {
             nsBS = dataImportService.getHostStrain(nsBsName, nsBsSymbol, nsBsURL, nsBsName);
         } catch (Exception e) {
-            log.error("Failed to create NS hoststrain", e);
+            log.error("Failed to createPatientSample NS hoststrain", e);
         }
     }
 

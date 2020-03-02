@@ -174,7 +174,7 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     protected void step11LoadBreastMarkers() {
 
         if(dto.isSkipModel()) return ;
-        //create breast cancer markers manually if they are present
+        //createPatientSample breast cancer markers manually if they are present
         if(!dto.getModelTag().equals(Standardizer.NOT_SPECIFIED)){
 
             if(dto.getModelTag().equals("Triple Negative Breast Cancer (TNBC)")){

@@ -101,9 +101,9 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         parser.accepts("createDataProjections", "Creating data projections");
-        parser.accepts("loadALL", "Load all, then create projections");
-        parser.accepts("loadSlim", "Load slim, then create projections");
-        parser.accepts("loadEssentials", "Load essentials then create projections");
+        parser.accepts("loadALL", "Load all, then createPatientSample projections");
+        parser.accepts("loadSlim", "Load slim, then createPatientSample projections");
+        parser.accepts("loadEssentials", "Load essentials then createPatientSample projections");
 
         OptionSet options = parser.parse(args);
         long startTime = System.currentTimeMillis();
@@ -1371,7 +1371,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                     modelDrugResponseDP.get(drug).put(response,s);
                 }
             }
-            //new drug, create response and add model
+            //new drug, createPatientSample response and add model
             else{
 
                 Set s = new HashSet();

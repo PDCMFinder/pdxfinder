@@ -222,7 +222,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
         //Disable loading treatment temporarily, drug names are not harmonized!
         Boolean loadTreatment = true;
-        //don't create two treatmentsummaries for the same snapshot
+        //don't createPatientSample two treatmentsummaries for the same snapshot
         if(loadTreatment && dataImportService.findTreatmentSummaryByPatientSnapshot(dto.getPatientSnapshot()) == null){
             ts = new TreatmentSummary();
 
@@ -248,7 +248,7 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
                         currentTreatment = true;
 
                     }
-                    //not current treatment, create default TreatmentProtocol object
+                    //not current treatment, createPatientSample default TreatmentProtocol object
                     else {
 
                         drugString = treatmentObj.getString("Prior Drug");

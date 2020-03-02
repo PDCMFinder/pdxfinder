@@ -25,7 +25,7 @@ public class Loader {
             Options options = new Options();
             HelpFormatter formatter = new HelpFormatter();
 
-            Option createOpt = Option.builder("create").desc("Purgess all data and re-creates the base graph database with the basic nodes pre loaded (standard tissues, implantation details, bacckground strains, etc.").build();
+            Option createOpt = Option.builder("createPatientSample").desc("Purgess all data and re-creates the base graph database with the basic nodes pre loaded (standard tissues, implantation details, bacckground strains, etc.").build();
             Option loadOpt = Option.builder("load").desc("load command ").build();
             Option jaxOpt = Option.builder("loadJAX").desc("Load JAX PDX models from file.").build();
 

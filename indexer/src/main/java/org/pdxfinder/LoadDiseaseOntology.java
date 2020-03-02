@@ -79,7 +79,7 @@ public class LoadDiseaseOntology implements CommandLineRunner {
         int termCounter = 1;
         int requestCounter = 0;
 
-        //create cancer root term
+        //createPatientSample cancer root term
         OntologyTerm ot = dataImportService.getOntologyTerm(cancerBranchUrl,cancerRootLabel);
         System.out.println("Creating node: "+cancerRootLabel);
 

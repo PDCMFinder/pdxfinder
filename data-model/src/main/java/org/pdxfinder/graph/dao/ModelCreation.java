@@ -1,6 +1,8 @@
 package org.pdxfinder.graph.dao;
 
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 
 /**
  * Represent the PDX model
@@ -81,6 +84,7 @@ public class ModelCreation {
     }
 
     public ModelCreation(String sourcePdxId) {
+        this.omicDataShareable = false;
         this.sourcePdxId = sourcePdxId;
     }
 
@@ -250,4 +254,30 @@ public class ModelCreation {
         treatmentSummary.addTreatmentProtocol(treatmentProtocol);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ModelCreation that = (ModelCreation) o;
+
+        return new EqualsBuilder()
+            .append(getSourcePdxId(), that.getSourcePdxId())
+            .append(getDataSource(), that.getDataSource())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+            .append(getSourcePdxId())
+            .append(getDataSource())
+            .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s - %s]", this.sourcePdxId, this.dataSource);
+    }
 }

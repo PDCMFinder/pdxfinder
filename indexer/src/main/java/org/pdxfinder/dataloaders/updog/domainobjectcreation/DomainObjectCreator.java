@@ -20,6 +20,7 @@ public class DomainObjectCreator {
     private DataImportService dataImportService;
     private GroupCreator groupCreator;
     private PatientCreator patientCreator;
+    private ModelCreationCreator modelCreationCreator;
     private static final Logger log = LoggerFactory.getLogger(DomainObjectCreator.class);
 
     private static final String PATIENTS = "patient";
@@ -37,11 +38,13 @@ public class DomainObjectCreator {
     public DomainObjectCreator(
         DataImportService dataImportService,
         GroupCreator groupCreator,
-        PatientCreator patientCreator
+        PatientCreator patientCreator,
+        ModelCreationCreator modelCreationCreator
     ) {
         this.dataImportService = dataImportService;
         this.groupCreator = groupCreator;
         this.patientCreator = patientCreator;
+        this.modelCreationCreator = modelCreationCreator;
         domainObjects = new HashMap<>();
     }
 
@@ -62,6 +65,10 @@ public class DomainObjectCreator {
     public void callCreators(Map<String, Table> tableSet) {
         Group provider = patientCreator.createDependencies(tableSet);
         Set<Patient> patients = patientCreator.create(tableSet, provider);
+
+        Set<Sample> samples = modelCreationCreator.createDependencies(tableSet);
+        Set<Specimen> specimens = modelCreationCreator.createDependencies(tableSet, samples);
+        Set<ModelCreation> models = modelCreationCreator.create(tableSet, provider, specimens);
     }
 
     void createProvider(Map<String, Table> pdxDataTables) {
@@ -387,7 +394,7 @@ public class DomainObjectCreator {
     }
 
     private Specimen getOrCreateSpecimen(Row row) {
-
+        // For Mutation
         String modelId = row.getString(TSV.Mutation.model_id.name());
         String hostStrainSymbol = row.getString(TSV.Mutation.host_strain_nomenclature.name());
         String passage = getStringFromRowAndColumn(row, TSV.Mutation.passage.name());

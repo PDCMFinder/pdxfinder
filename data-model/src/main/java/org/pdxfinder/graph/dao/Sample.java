@@ -1,15 +1,17 @@
 package org.pdxfinder.graph.dao;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.StringJoiner;
 
 /**
  * Sample represents a piece of tissue taken from a specimen (human or mouse)
- * <p>
  * A sample could be cancerous or not (tissue used to compare to cancer sampled from a health tissue)
  */
 @NodeEntity
@@ -52,6 +54,11 @@ public class Sample {
     
     public Sample() {
         // Empty constructor required as of Neo4j API 2.0.5
+    }
+
+    // Minimal Constructor
+    public Sample(String sourceSampleId) {
+        this.sourceSampleId = sourceSampleId;
     }
 
     public Sample(String sourceSampleId, TumorType type, String diagnosis, Tissue originTissue, Tissue sampleSite, String extractionMethod,
@@ -181,16 +188,10 @@ public class Sample {
         return this.histology;
     }
 
-    /**
-     * @return the extractionMethod
-     */
     public String getExtractionMethod() {
         return extractionMethod;
     }
 
-    /**
-     * @param extractionMethod the extractionMethod to set
-     */
     public void setExtractionMethod(String extractionMethod) {
         this.extractionMethod = extractionMethod;
     }
@@ -261,4 +262,25 @@ public class Sample {
 
         return null;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Sample sample = (Sample) o;
+
+        return new EqualsBuilder()
+            .append(getSourceSampleId(), sample.getSourceSampleId())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+            .append(getSourceSampleId())
+            .toHashCode();
+    }
+
 }

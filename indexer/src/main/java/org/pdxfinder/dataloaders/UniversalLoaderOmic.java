@@ -368,7 +368,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 }
 
             }
-            //this passage is either not present yet or the linked sample has a different ID, create a specimen with sample and link mc
+            //this passage is either not present yet or the linked sample has a different ID, createPatientSample a specimen with sample and link mc
             if(!foundSpecimen){
                 log.info("Creating new specimen for "+mcKey);
 
