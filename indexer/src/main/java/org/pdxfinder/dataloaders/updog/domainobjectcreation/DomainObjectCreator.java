@@ -12,6 +12,7 @@ import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class DomainObjectCreator {
@@ -58,7 +59,7 @@ public class DomainObjectCreator {
         createSharingData(pdxDataTables);
         createSamplePlatformData(pdxDataTables);
         createTreatmentData(pdxDataTables);
-        createMolecularData(pdxDataTables);
+        createOmicData(pdxDataTables);
         persistNodes();
     }
 
@@ -282,7 +283,6 @@ public class DomainObjectCreator {
     }
 
     void createDrugDosingData(Map<String, Table> pdxDataTables){
-
         Table drugdosingTable = pdxDataTables.get("drugdosing-Sheet1.tsv");
         if(drugdosingTable != null){
             for(Row row : drugdosingTable){
@@ -295,18 +295,17 @@ public class DomainObjectCreator {
         }
     }
 
-    void createMolecularData(Map<String, Table> pdxDataTables) {
+    void createOmicData(Map<String, Table> pdxDataTables) {
         log.info("Creating molecular data");
         createMutationData(pdxDataTables);
-        createCNAData(pdxDataTables);
+        createCnaData(pdxDataTables);
         createCytogeneticsData(pdxDataTables);
     }
 
     private void createMutationData(Map<String, Table> pdxDataTables){
-
         Table mutationTable = pdxDataTables.get("mut.tsv");
         if(mutationTable != null){
-            createMolecularCharacterizations(mutationTable, "mutation");
+            createMolecularCharacterization(mutationTable, "mutation");
         }
         else{
             Map<String, Object> models = domainObjects.get(MODELS);
@@ -316,29 +315,16 @@ public class DomainObjectCreator {
                 mutationTable = pdxDataTables.get(mutationModelId);
                 if(mutationTable != null){
                     log.info(modelCreation.getSourcePdxId());
-                    createMolecularCharacterizations(mutationTable, "mutation");
+                    createMolecularCharacterization(mutationTable, "mutation");
                 }
             }
         }
     }
 
-    private void createMolecularCharacterizations(Table table, String molcharType){
-
-        for (Row row : table) {
-            MolecularCharacterization molecularCharacterization = getMolcharByType(row, molcharType);
-            molecularCharacterization = addMarkerAssociationWithMolecularData(molecularCharacterization, row);
-            addDomainObject("molecular_characterization", molcharType, molecularCharacterization);
-        }
-    }
-
-    private void createCNAData(Map<String, Table> pdxDataTables){
-
+    private void createCnaData(Map<String, Table> pdxDataTables){
         Table cnaTable = pdxDataTables.get("cna.tsv");
         if(cnaTable != null){
-            for (Row row : cnaTable) {
-                MolecularCharacterization molecularCharacterization = getMolcharByType(row, "copynumberalteration");
-                addMarkerAssociationWithMolecularData(molecularCharacterization, row);
-            }
+            createMolecularCharacterization(cnaTable, "copynumberalteration");
         }
         else{
             Map<String, Object> models = domainObjects.get(MODELS);
@@ -348,22 +334,27 @@ public class DomainObjectCreator {
                 cnaTable = pdxDataTables.get(cnaModelId);
                 if(cnaTable != null){
                     log.info(modelCreation.getSourcePdxId());
-                    createMolecularCharacterizations(cnaTable, "copynumberalteration");
+                    createMolecularCharacterization(cnaTable, "copynumberalteration");
                 }
             }
-
         }
     }
 
     private void createCytogeneticsData(Map<String, Table> pdxDataTables){
-
         Table cytoTable = pdxDataTables.get("cytogenetics-Sheet1.tsv");
         if(cytoTable != null){
-            for (Row row : cytoTable) {
-                MolecularCharacterization molecularCharacterization = getMolcharByType(row, "cytogenetics");
-                addMarkerAssociationWithMolecularData(molecularCharacterization, row);
-            }
+            createMolecularCharacterization(cytoTable, "cytogenetics");
         }
+    }
+
+    private void createMolecularCharacterization(Table table, String molcharType){
+        MolecularCharacterization molecularCharacterization = getMolcharByType(table.row(0), molcharType);
+        MarkerAssociation markerAssociation = new MarkerAssociation();
+        for (Row row : table)
+            markerAssociation.addMolecularData(createMolecularDataObject(molecularCharacterization, row));
+        molecularCharacterization.addMarkerAssociation(markerAssociation);
+        molecularCharacterization.setMarkers(getMarkers(markerAssociation));
+        addDomainObject("molecular_characterization", molcharType, molecularCharacterization);
     }
 
     private MolecularCharacterization getMolcharByType(Row row, String molCharType) {
@@ -383,6 +374,14 @@ public class DomainObjectCreator {
             throw new NullPointerException();}
 
         return getOrCreateMolecularCharacterization(sample, platformName, molCharType);
+    }
+
+    private Set getMarkers(MarkerAssociation markerAssociation) {
+        return markerAssociation
+            .getMolecularDataList()
+            .stream()
+            .map(MolecularData::getMarker)
+            .collect(Collectors.toSet());
     }
 
     private Sample getPatientSample(Row row) {
@@ -431,8 +430,6 @@ public class DomainObjectCreator {
             molecularCharacterization = new MolecularCharacterization();
             molecularCharacterization.setType(molCharType);
             molecularCharacterization.setPlatform(getOrCreatePlatform(platformName, molCharType));
-            MarkerAssociation markerAssociation = new MarkerAssociation();
-            molecularCharacterization.addMarkerAssociation(markerAssociation);
             sample.addMolecularCharacterization(molecularCharacterization);
         }
         return molecularCharacterization;
@@ -452,47 +449,40 @@ public class DomainObjectCreator {
         return platform;
     }
 
-    private MolecularCharacterization addMarkerAssociationWithMolecularData(
+    private MolecularData createMolecularDataObject (
         MolecularCharacterization molecularCharacterization,
         Row row
     ) {
-        MarkerAssociation markerAssociation = molecularCharacterization.getMarkerAssociations().get(0);
-        if (markerAssociation == null) {
-            markerAssociation = new MarkerAssociation();
-            molecularCharacterization.addMarkerAssociation(markerAssociation);
-        }
+        MolecularData molecularData = new MolecularData();
         String hgncSymbol = row.getString("symbol");
         String modelId = row.getString("model_id");
         Group provider = (Group) domainObjects.get(PROVIDER_GROUPS).get(null);
         String dataSource = provider.getAbbreviation();
-        NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(),
-                dataSource,
-                modelId,
-                hgncSymbol,
+        NodeSuggestionDTO nodeSuggestionDTO = dataImportService.getSuggestedMarker(
+            this.getClass().getSimpleName(),
+            dataSource,
+            modelId,
+            hgncSymbol,
+            molecularCharacterization.getType(),
+            molecularCharacterization.getPlatform().getName());
+        if (nodeSuggestionDTO.getNode() != null) {
+            logMarkerSuggestions(nodeSuggestionDTO);
+            molecularData = createMolecularCharacterization(
                 molecularCharacterization.getType(),
-                molecularCharacterization.getPlatform().getName());
-        Marker marker;
-        if (nsdto.getNode() == null) {
-            log.error(nsdto.getLogEntity().getMessage());
-        } else {
-            // step 4: assemble the MarkerAssoc object and add it to molchar
-            marker = (Marker) nsdto.getNode();
-            //if we have any message regarding the suggested marker, ie: prev symbol, synonym, etc, add it to the report
-            if (nsdto.getLogEntity() != null) {
-                log.info(nsdto.getLogEntity().getMessage());
-            }
-
-            MolecularData molecularData = createMolecularData(molecularCharacterization, row, marker);
-            markerAssociation.addMolecularData(molecularData);
-            // Convert to string here?
-            molecularCharacterization.addMarkerAssociation(markerAssociation);
+                row,
+                (Marker) nodeSuggestionDTO.getNode());
         }
-        return molecularCharacterization;
+        return molecularData;
     }
 
-    private MolecularData createMolecularData(MolecularCharacterization molecularCharacterization, Row row, Marker marker) {
+    private void logMarkerSuggestions(NodeSuggestionDTO nodeSuggestionDTO) {
+        if (nodeSuggestionDTO.getNode() == null)
+            log.error(nodeSuggestionDTO.getLogEntity().getMessage());
+    }
+
+    private MolecularData createMolecularCharacterization(String type, Row row, Marker marker) {
         MolecularData molecularData;
-        switch (molecularCharacterization.getType()) {
+        switch (type) {
             case "mutation":
                 molecularData = getMutationProperties(row, marker);
                 break;
@@ -736,7 +726,7 @@ public class DomainObjectCreator {
             for(PatientSnapshot ps: snapshots){
                 Set<Sample> patientSamples = ps.getSamples();
                 for(Sample patientSample : patientSamples){
-                    convertMarkerAssociations(patientSample);
+                    convertMarkerAssociations(patientSample); // Breaks
                 }
             }
             dataImportService.savePatient(patient);
@@ -786,11 +776,11 @@ public class DomainObjectCreator {
     private void convertMarkerAssociations(Sample sample) {
 
         if (sample.getMolecularCharacterizations() != null) {
-            for (MolecularCharacterization molecularCharacterization : sample.getMolecularCharacterizations()) {
-                if(molecularCharacterization.getMarkerAssociations() != null){
-                    molecularCharacterization.getMarkerAssociations().get(0).createMolecularDataStringFromList();
-                }
-            }
+//            for (MolecularCharacterization molecularCharacterization : sample.getMolecularCharacterizations()) {
+//                if(molecularCharacterization.getMarkerAssociations() != null){
+//                    molecularCharacterization.getMarkerAssociations().get(0).createMolecularDataStringFromList();
+//                }
+//            }
         }
     }
 

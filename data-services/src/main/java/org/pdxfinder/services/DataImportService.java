@@ -22,6 +22,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.pdxfinder.services.reporting.MarkerLogEntity.logNoSingleValidSymbol;
+import static org.pdxfinder.services.reporting.MarkerLogEntity.logUpdateFromPreviousSymbol;
+
 @Component
 public class DataImportService {
 
@@ -59,7 +62,7 @@ public class DataImportService {
     private HashMap<String, List<Marker>> markersByPrevSymbol = null;
     private HashMap<String, List<Marker>> markersBySynonym = null;
 
-    private boolean MARKERS_INITIALIZED = false;
+    private boolean markersInitialized = false;
 
     public DataImportService(TumorTypeRepository tumorTypeRepository,
                              HostStrainRepository hostStrainRepository,
@@ -1515,7 +1518,7 @@ public class DataImportService {
             System.out.print(String.format("%s markers initialized (%.0f%%)...\r", counter, percent));
         }
 
-        MARKERS_INITIALIZED = true;
+        markersInitialized = true;
     }
 
     private void addMarkerToMap(Marker marker){
@@ -1556,32 +1559,30 @@ public class DataImportService {
     public NodeSuggestionDTO getSuggestedMarker(String reporter, String dataSource, String modelId, String symbol,
                                                 String characterizationType, String platform){
 
-        if(!MARKERS_INITIALIZED) initializeMarkers();
+        if(!markersInitialized) initializeMarkers();
 
-        NodeSuggestionDTO nsdto = new NodeSuggestionDTO();
-        LogEntity le = new LogEntity(reporter, dataSource, modelId);
-        Marker m = null;
+        NodeSuggestionDTO nodeSuggestionDTO = new NodeSuggestionDTO();
+        LogEntity logEntity = new LogEntity(reporter, dataSource, modelId);
+        Marker marker = null;
 
-        //check if marker is cached
-        if(markersBySymbol.containsKey(symbol)){
-            m = markersBySymbol.get(symbol);
-            nsdto.setNode(m);
+        if (markersBySymbol.containsKey(symbol)) {
+            marker = markersBySymbol.get(symbol);
+            nodeSuggestionDTO.setNode(marker);
         }
         else if(markersByPrevSymbol.containsKey(symbol)){
 
             List<Marker> markerList = markersByPrevSymbol.get(symbol);
-
-            if(markerList.size() == 1) {
-                m = markerList.get(0);
-                le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol,
-                        m.getHgncSymbol(),"Previous symbol");
-                nsdto.setNode(m);
+            if (markerList.size() == 1) {
+                marker = markerList.get(0);
+                logEntity = logUpdateFromPreviousSymbol(reporter,dataSource, modelId, characterizationType, platform,
+                    symbol, marker.getHgncSymbol(),"Previous symbol");
+                nodeSuggestionDTO.setNode(marker);
             }
-            else{
-                le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol,
-                        symbol,"");
+            else {
+                logEntity = logNoSingleValidSymbol(reporter,dataSource, modelId, characterizationType, platform,
+                    symbol, symbol,"");
                 String prevMarkers = markerList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
-                le.setMessage("Previous symbol for multiple approved markers: {} "+prevMarkers);
+                logEntity.setMessage("Previous symbol for multiple approved markers: {} "+prevMarkers);
 
             }
 
@@ -1591,26 +1592,26 @@ public class DataImportService {
             List<Marker> markerList = markersBySynonym.get(symbol);
 
             if(markerList.size() == 1) {
-                m = markerList.get(0);
-                le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol,
-                        m.getHgncSymbol(),"Synonym");
-                nsdto.setNode(m);
+                marker = markerList.get(0);
+                logEntity = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol,
+                        marker.getHgncSymbol(),"Synonym");
+                nodeSuggestionDTO.setNode(marker);
             }
             else{
-                le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol,
+                logEntity = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol,
                         symbol,"");
                 String synMarkers = markerList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
-                le.setMessage("Synonym for multiple approved markers: {} "+synMarkers);
+                logEntity.setMessage("Synonym for multiple approved markers: {} "+synMarkers);
             }
         }
         else{
-            le.setMessage("Unknown symbol: {} "+symbol);
+            logEntity.setMessage("Unknown symbol: {} "+symbol);
 
         }
 
-        nsdto.setLogEntity(le);
+        nodeSuggestionDTO.setLogEntity(logEntity);
 
-        return nsdto;
+        return nodeSuggestionDTO;
     }
 
 

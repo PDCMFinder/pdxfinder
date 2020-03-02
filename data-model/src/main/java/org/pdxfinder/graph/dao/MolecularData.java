@@ -506,4 +506,8 @@ public class MolecularData {
     @Override public String toString() {
         return String.format("[%s]", this.marker);
     }
+
+    public String getMarkerName(MolecularData molecularData) {
+        return this.marker;
+    }
 }
