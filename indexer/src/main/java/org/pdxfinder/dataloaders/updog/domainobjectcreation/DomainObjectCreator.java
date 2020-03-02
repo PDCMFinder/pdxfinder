@@ -306,7 +306,7 @@ public class DomainObjectCreator {
 
         Table mutationTable = pdxDataTables.get("mut.tsv");
         if(mutationTable != null){
-            createMolecularCharacterization(mutationTable, "mutation");
+            createMolecularCharacterizations(mutationTable, "mutation");
         }
         else{
             Map<String, Object> models = domainObjects.get(MODELS);
@@ -316,17 +316,18 @@ public class DomainObjectCreator {
                 mutationTable = pdxDataTables.get(mutationModelId);
                 if(mutationTable != null){
                     log.info(modelCreation.getSourcePdxId());
-                    createMolecularCharacterization(mutationTable, "mutation");
+                    createMolecularCharacterizations(mutationTable, "mutation");
                 }
             }
         }
     }
 
-    private void createMolecularCharacterization(Table table, String molcharType){
+    private void createMolecularCharacterizations(Table table, String molcharType){
 
         for (Row row : table) {
             MolecularCharacterization molecularCharacterization = getMolcharByType(row, molcharType);
-            addMolecularData(molecularCharacterization, row);
+            molecularCharacterization = addMarkerAssociationWithMolecularData(molecularCharacterization, row);
+            addDomainObject("molecular_characterization", molcharType, molecularCharacterization);
         }
     }
 
@@ -336,7 +337,7 @@ public class DomainObjectCreator {
         if(cnaTable != null){
             for (Row row : cnaTable) {
                 MolecularCharacterization molecularCharacterization = getMolcharByType(row, "copynumberalteration");
-                addMolecularData(molecularCharacterization, row);
+                addMarkerAssociationWithMolecularData(molecularCharacterization, row);
             }
         }
         else{
@@ -347,7 +348,7 @@ public class DomainObjectCreator {
                 cnaTable = pdxDataTables.get(cnaModelId);
                 if(cnaTable != null){
                     log.info(modelCreation.getSourcePdxId());
-                    createMolecularCharacterization(cnaTable, "copynumberalteration");
+                    createMolecularCharacterizations(cnaTable, "copynumberalteration");
                 }
             }
 
@@ -360,7 +361,7 @@ public class DomainObjectCreator {
         if(cytoTable != null){
             for (Row row : cytoTable) {
                 MolecularCharacterization molecularCharacterization = getMolcharByType(row, "cytogenetics");
-                addMolecularData(molecularCharacterization, row);
+                addMarkerAssociationWithMolecularData(molecularCharacterization, row);
             }
         }
     }
@@ -451,8 +452,10 @@ public class DomainObjectCreator {
         return platform;
     }
 
-    private void addMolecularData(MolecularCharacterization molecularCharacterization, Row row) {
-
+    private MolecularCharacterization addMarkerAssociationWithMolecularData(
+        MolecularCharacterization molecularCharacterization,
+        Row row
+    ) {
         MarkerAssociation markerAssociation = molecularCharacterization.getMarkerAssociations().get(0);
         if (markerAssociation == null) {
             markerAssociation = new MarkerAssociation();
@@ -470,27 +473,39 @@ public class DomainObjectCreator {
                 molecularCharacterization.getPlatform().getName());
         Marker marker;
         if (nsdto.getNode() == null) {
-            //log.error(nsdto.getLogEntity().getMessage());
+            log.error(nsdto.getLogEntity().getMessage());
         } else {
             // step 4: assemble the MarkerAssoc object and add it to molchar
             marker = (Marker) nsdto.getNode();
             //if we have any message regarding the suggested marker, ie: prev symbol, synonym, etc, add it to the report
             if (nsdto.getLogEntity() != null) {
-                //log.info(nsdto.getLogEntity().getMessage());
+                log.info(nsdto.getLogEntity().getMessage());
             }
 
-            MolecularData molecularData = null;
-            if (molecularCharacterization.getType().equals("mutation")) {
-                molecularData = getMutationProperties(row, marker);
-            }
-            else if (molecularCharacterization.getType().equals("cytogenetics")) {
-                molecularData = getCytogeneticsProperties(row, marker);
-            }
-            else if(molecularCharacterization.getType().equals("copynumberalteration")){
-                molecularData = getCNAProperties(row, marker);
-            }
+            MolecularData molecularData = createMolecularData(molecularCharacterization, row, marker);
             markerAssociation.addMolecularData(molecularData);
+            // Convert to string here?
+            molecularCharacterization.addMarkerAssociation(markerAssociation);
         }
+        return molecularCharacterization;
+    }
+
+    private MolecularData createMolecularData(MolecularCharacterization molecularCharacterization, Row row, Marker marker) {
+        MolecularData molecularData;
+        switch (molecularCharacterization.getType()) {
+            case "mutation":
+                molecularData = getMutationProperties(row, marker);
+                break;
+            case "cytogenetics":
+                molecularData = getCytogeneticsProperties(row, marker);
+                break;
+            case "copynumberalteration":
+                molecularData = getCNAProperties(row, marker);
+                break;
+            default:
+                molecularData = new MolecularData();
+        }
+        return molecularData;
     }
 
     private MolecularData getMutationProperties(Row row, Marker marker) {

@@ -1511,7 +1511,8 @@ public class DataImportService {
             }
 
             counter += batchSize;
-            log.info("Initialized {} markers", counter);
+            Float percent = ((float)counter / markerCount) * 100;
+            System.out.print(String.format("%s markers initialized (%.0f%%)...\r", counter, percent));
         }
 
         MARKERS_INITIALIZED = true;

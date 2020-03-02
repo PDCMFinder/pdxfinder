@@ -502,4 +502,8 @@ public class MolecularData {
     public void setEnsemblGeneId(String ensemblGeneId) {
         this.ensemblGeneId = ensemblGeneId;
     }
+
+    @Override public String toString() {
+        return String.format("[%s]", this.marker);
+    }
 }
