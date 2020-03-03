@@ -726,7 +726,7 @@ public class DomainObjectCreator {
             for(PatientSnapshot ps: snapshots){
                 Set<Sample> patientSamples = ps.getSamples();
                 for(Sample patientSample : patientSamples){
-                    convertMarkerAssociations(patientSample); // Breaks
+                    encodeMolecularDataFor(patientSample); // Breaks
                 }
             }
             dataImportService.savePatient(patient);
@@ -743,7 +743,7 @@ public class DomainObjectCreator {
             if(model.getSpecimens() != null){
                 Set<Specimen> specimenSet = model.getSpecimens();
                 for(Specimen specimen:specimenSet){
-                    convertMarkerAssociations(specimen.getSample());
+                    encodeMolecularDataFor(specimen.getSample());
                 }
             }
             dataImportService.saveModelCreation(model);
@@ -751,7 +751,6 @@ public class DomainObjectCreator {
     }
 
     public void addDomainObject(String key1, String key2, Object object) {
-
         if (domainObjects.containsKey(key1)) {
             domainObjects.get(key1).put(key2, object);
         } else {
@@ -762,26 +761,23 @@ public class DomainObjectCreator {
     }
 
     public Object getDomainObject(String key1, String key2) {
-
-        if (containsBothKeys(key1, key2)) {
+        if (containsBothKeys(key1, key2))
             return domainObjects.get(key1).get(key2);
-        }
-        return null;
+        else return null;
     }
 
     private boolean containsBothKeys(String key1, String key2) {
         return domainObjects.containsKey(key1) && domainObjects.get(key1).containsKey(key2);
     }
 
-    private void convertMarkerAssociations(Sample sample) {
+    private void encodeMolecularDataFor(Sample sample) {
+        if (sample.hasMolecularCharacterizations())
+            for (MolecularCharacterization mc : sample.getMolecularCharacterizations()) encodeMolecularDataFor(mc);
+    }
 
-        if (sample.getMolecularCharacterizations() != null) {
-//            for (MolecularCharacterization molecularCharacterization : sample.getMolecularCharacterizations()) {
-//                if(molecularCharacterization.getMarkerAssociations() != null){
-//                    molecularCharacterization.getMarkerAssociations().get(0).createMolecularDataStringFromList();
-//                }
-//            }
-        }
+    private void encodeMolecularDataFor(MolecularCharacterization mc) {
+        if (mc.hasMarkerAssociations())
+            mc.getFirstMarkerAssociation().encodeMolecularData();
     }
 
     private TreatmentProtocol getTreatmentProtocol(Row row){

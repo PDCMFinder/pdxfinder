@@ -179,7 +179,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                     List<MolecularData> molecularData;
                     try{
 
-                      molecularData = ma.createMolecularDataListFromString();
+                      molecularData = ma.decodeMolecularData();
                     }
                     catch (Exception e){
                         log.error("No molecular data");
@@ -270,7 +270,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                     List<MolecularData> molecularData;
                     try{
 
-                        molecularData = ma.createMolecularDataListFromString();
+                        molecularData = ma.decodeMolecularData();
                     }
                     catch (Exception e){
                         log.error("No molecular data");

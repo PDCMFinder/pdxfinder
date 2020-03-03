@@ -1,5 +1,6 @@
 package org.pdxfinder.graph.dao;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -8,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.StringJoiner;
 
 /**
  * Sample represents a piece of tissue taken from a specimen (human or mouse)
@@ -153,6 +153,10 @@ public class Sample {
 
     public void setMolecularCharacterizations(Set<MolecularCharacterization> molecularCharacterizations) {
         this.molecularCharacterizations = molecularCharacterizations;
+    }
+
+    public boolean hasMolecularCharacterizations() {
+        return CollectionUtils.isNotEmpty(this.molecularCharacterizations);
     }
 
     public void addMolecularCharacterization(MolecularCharacterization mc){

@@ -469,7 +469,7 @@ public class UniversalDataExporter {
 
             List<MolecularData> molecularData;
             try{
-                ma.createMolecularDataListFromString();
+                ma.decodeMolecularData();
                 molecularData = ma.getMolecularDataList();
             }
             catch (Exception e){

@@ -1,5 +1,6 @@
 package org.pdxfinder.graph.dao;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -38,7 +39,6 @@ public class MolecularCharacterization {
 
 
     public MolecularCharacterization() {
-
         isVisible = true;
         markerAssociations = new ArrayList<>();
     }
@@ -83,6 +83,14 @@ public class MolecularCharacterization {
         this.markerAssociations = markerAssociations;
     }
 
+    public boolean hasMarkerAssociations() {
+        return CollectionUtils.isNotEmpty(this.markerAssociations);
+    }
+
+    public MarkerAssociation getFirstMarkerAssociation() {
+        return markerAssociations.get(0);
+    }
+
     public String getType() {
         return type;
     }
@@ -92,12 +100,7 @@ public class MolecularCharacterization {
     }
 
     public void addMarkerAssociation(MarkerAssociation ma){
-
-        if(this.markerAssociations == null){
-            this.markerAssociations = new ArrayList<>();
-        }
         this.markerAssociations.add(ma);
-
     }
 
     public boolean isVisible() {

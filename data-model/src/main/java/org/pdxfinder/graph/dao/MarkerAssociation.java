@@ -3,11 +3,13 @@ package org.pdxfinder.graph.dao;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,24 +28,17 @@ public class MarkerAssociation {
         molecularDataList = new ArrayList<>();
     }
 
-    public List<MolecularData> createMolecularDataListFromString() throws IOException {
-
-        List<MolecularData> molecularData = new ArrayList<>();
-        if(molecularDataString == null || molecularDataString.isEmpty()) {
-            return molecularData;
-        }
-        else{
-
-            ObjectMapper mapper = new ObjectMapper();
-            molecularData = mapper.readValue(molecularDataString, new TypeReference<List<MolecularData>>(){});
-
-            return molecularData;
-        }
+    public List<MolecularData> decodeMolecularData() throws IOException {
+        if (StringUtils.isEmpty(molecularDataString))
+            return Collections.emptyList();
+        else return new ObjectMapper().readValue(
+                molecularDataString,
+                new TypeReference<List<MolecularData>>(){});
     }
 
-    public void createMolecularDataStringFromList(){
+    public void encodeMolecularData(){
         molecularDataString = new Gson().toJson(molecularDataList);
-        molecularDataList = null;
+        molecularDataList = Collections.emptyList();
     }
 
     public Long getId() {
