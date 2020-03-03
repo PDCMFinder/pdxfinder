@@ -24,6 +24,7 @@ public class DomainObjectCreator {
     private ModelCreationCreator modelCreationCreator;
     private static final Logger log = LoggerFactory.getLogger(DomainObjectCreator.class);
 
+    private static final String FIRST = "first";
     private static final String PATIENTS = "patient";
     private static final String PROVIDER_GROUPS = "provider_group";
     private static final String MODELS = "model";
@@ -81,7 +82,7 @@ public class DomainObjectCreator {
         String internalUrl = row.getString(TSV.Metadata.internal_url.name());
         Group providerGroup = dataImportService.getProviderGroup(
                 providerName, abbrev, "", "", "", internalUrl);
-        addDomainObject(PROVIDER_GROUPS, null, providerGroup);
+        addDomainObject(PROVIDER_GROUPS, FIRST, providerGroup);
     }
 
     void createPatientData(Map<String, Table> pdxDataTables) {
@@ -91,7 +92,7 @@ public class DomainObjectCreator {
             try {
                 Patient patient = dataImportService.createPatient(
                         row.getText(TSV.Metadata.patient_id.name()),
-                        (Group) getDomainObject(TSV.Metadata.provider_group.name(), null),
+                        (Group) getDomainObject(TSV.Metadata.provider_group.name(), FIRST),
                         row.getText(TSV.Metadata.sex.name()),
                         "",
                         row.getText(TSV.Metadata.ethnicity.name()));
@@ -162,7 +163,7 @@ public class DomainObjectCreator {
     void createModelData(Map<String, Table> pdxDataTables) {
         log.info("Creating model data");
         Table modelTable = pdxDataTables.get("metadata-model.tsv");
-        Group providerGroup = (Group) domainObjects.get(PROVIDER_GROUPS).get(null);
+        Group providerGroup = (Group) domainObjects.get(PROVIDER_GROUPS).get(FIRST);
         for (Row row : modelTable) {
             String modelId = row.getString(TSV.Metadata.model_id.name());
             String hostStrainNomenclature = row.getString(TSV.Metadata.host_strain_full.name());
@@ -209,8 +210,7 @@ public class DomainObjectCreator {
         log.info("Creating sharing data");
         Table sharingTable = pdxDataTables.get("metadata-sharing.tsv");
 
-        Group providerGroup = (Group) domainObjects.get(PROVIDER_GROUPS).get(null);
-        if (providerGroup == null) throw new NullPointerException();
+        Group providerGroup = (Group) domainObjects.get(PROVIDER_GROUPS).get(FIRST);
 
         for (Row row : sharingTable) {
             String modelId = row.getString(TSV.Metadata.model_id.name());
@@ -323,10 +323,9 @@ public class DomainObjectCreator {
 
     private void createCnaData(Map<String, Table> pdxDataTables){
         Table cnaTable = pdxDataTables.get("cna.tsv");
-        if(cnaTable != null){
+        if (cnaTable != null) {
             createMolecularCharacterization(cnaTable, "copynumberalteration");
-        }
-        else{
+        } else {
             Map<String, Object> models = domainObjects.get(MODELS);
             for(Map.Entry<String, Object> entry : models.entrySet()){
                 ModelCreation modelCreation = (ModelCreation) entry.getValue();
@@ -342,9 +341,8 @@ public class DomainObjectCreator {
 
     private void createCytogeneticsData(Map<String, Table> pdxDataTables){
         Table cytoTable = pdxDataTables.get("cytogenetics-Sheet1.tsv");
-        if(cytoTable != null){
+        if (cytoTable != null)
             createMolecularCharacterization(cytoTable, "cytogenetics");
-        }
     }
 
     private void createMolecularCharacterization(Table table, String molcharType){
@@ -437,7 +435,7 @@ public class DomainObjectCreator {
 
     private Platform getOrCreatePlatform(String platformName, String molCharType) {
 
-        Group providerGroup = (Group) getDomainObject(PROVIDER_GROUPS, null);
+        Group providerGroup = (Group) getDomainObject(PROVIDER_GROUPS, FIRST);
         String platformId = molCharType + platformName;
         Platform platform = (Platform) getDomainObject(PLATFORMS, platformId);
         if (platform == null) {
@@ -456,7 +454,7 @@ public class DomainObjectCreator {
         MolecularData molecularData = new MolecularData();
         String hgncSymbol = row.getString("symbol");
         String modelId = row.getString("model_id");
-        Group provider = (Group) domainObjects.get(PROVIDER_GROUPS).get(null);
+        Group provider = (Group) domainObjects.get(PROVIDER_GROUPS).get(FIRST);
         String dataSource = provider.getAbbreviation();
         NodeSuggestionDTO nodeSuggestionDTO = dataImportService.getSuggestedMarker(
             this.getClass().getSimpleName(),
@@ -722,12 +720,9 @@ public class DomainObjectCreator {
         Map<String, Object> patients = domainObjects.get(PATIENTS);
         for (Object pat : patients.values()) {
             Patient patient = (Patient) pat;
-            Set<PatientSnapshot>  snapshots = patient.getSnapshots();
-            for(PatientSnapshot ps: snapshots){
-                Set<Sample> patientSamples = ps.getSamples();
-                for(Sample patientSample : patientSamples){
-                    encodeMolecularDataFor(patientSample); // Breaks
-                }
+            for(PatientSnapshot ps: patient.getSnapshots()){
+                for(Sample patientSample : ps.getSamples())
+                    encodeMolecularDataFor(patientSample);
             }
             dataImportService.savePatient(patient);
         }
@@ -737,15 +732,12 @@ public class DomainObjectCreator {
 
         log.info("Persisiting models");
         Map<String, Object> models = domainObjects.get(MODELS);
-        for (Object mod : models.values()) {
-            ModelCreation model = (ModelCreation) mod;
+        for (Object modelObject : models.values()) {
+            ModelCreation model = (ModelCreation) modelObject;
+            if (model.hasSpecimens())
+                for (Specimen s : model.getSpecimens()) encodeMolecularDataFor(s);
 
-            if(model.getSpecimens() != null){
-                Set<Specimen> specimenSet = model.getSpecimens();
-                for(Specimen specimen:specimenSet){
-                    encodeMolecularDataFor(specimen.getSample());
-                }
-            }
+            log.debug("Saving model {}", (model.getSourcePdxId()));
             dataImportService.saveModelCreation(model);
         }
     }
@@ -761,13 +753,17 @@ public class DomainObjectCreator {
     }
 
     public Object getDomainObject(String key1, String key2) {
-        if (containsBothKeys(key1, key2))
+        if (domainObjects.containsKey(key1))
             return domainObjects.get(key1).get(key2);
-        else return null;
+        else {
+            log.error("Tried to access nonexistant domain object key {}", key1);
+            return null;
+        }
     }
 
-    private boolean containsBothKeys(String key1, String key2) {
-        return domainObjects.containsKey(key1) && domainObjects.get(key1).containsKey(key2);
+    private void encodeMolecularDataFor(Specimen specimen) {
+        if (specimen.getSample() != null)
+            encodeMolecularDataFor(specimen.getSample());
     }
 
     private void encodeMolecularDataFor(Sample sample) {

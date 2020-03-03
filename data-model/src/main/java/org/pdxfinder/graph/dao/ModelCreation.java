@@ -1,6 +1,7 @@
 package org.pdxfinder.graph.dao;
 
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.Index;
@@ -139,6 +140,10 @@ public class ModelCreation {
 
     public void setSpecimens(Set<Specimen> specimens) {
         this.specimens = specimens;
+    }
+
+    public boolean hasSpecimens() {
+        return CollectionUtils.isNotEmpty(specimens);
     }
 
     public void addSpecimen(Specimen specimen){
