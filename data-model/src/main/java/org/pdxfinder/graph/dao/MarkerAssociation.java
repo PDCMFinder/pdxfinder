@@ -22,6 +22,8 @@ public class MarkerAssociation {
     @GeneratedValue
     private Long id;
     private String molecularDataString;
+    private int dataPoints = 0;
+
     private List<MolecularData> molecularDataList = new ArrayList<>();
 
     public MarkerAssociation() {
@@ -38,6 +40,7 @@ public class MarkerAssociation {
 
     public void encodeMolecularData(){
         molecularDataString = new Gson().toJson(molecularDataList);
+        dataPoints = molecularDataList.size();
         molecularDataList = Collections.emptyList();
     }
 
@@ -67,5 +70,13 @@ public class MarkerAssociation {
 
     public void addMolecularData(MolecularData md){
         this.molecularDataList.add(md);
+    }
+
+    public int getDataPoints() {
+        return dataPoints;
+    }
+
+    public void setDataPoints(int dataPoints) {
+        this.dataPoints = dataPoints;
     }
 }
