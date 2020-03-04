@@ -24,7 +24,7 @@ import java.util.Map;
 
 
 /**
- * This will createPatientSample a local copy of the data feeds.
+ * This will create a local copy of the data feeds.
  *
  * Directory structure:
  * finderRootDir = /abc/def/

@@ -351,10 +351,8 @@ public class DomainObjectCreator {
         MarkerAssociation markerAssociation = new MarkerAssociation();
         for (Row row : table) {
             MolecularData molecularData = createMolecularDataObject(molecularCharacterization, row);
-
-            if(molecularData.getMarker() != null){
-                markerAssociation.addMolecularData(createMolecularDataObject(molecularCharacterization, row));
-            }
+            if (molecularData.hasMarker())
+                markerAssociation.addMolecularData(molecularData);
         }
         molecularCharacterization.addMarkerAssociation(markerAssociation);
         molecularCharacterization.setMarkers(getMarkers(markerAssociation));

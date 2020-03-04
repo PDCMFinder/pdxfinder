@@ -1,7 +1,6 @@
 package org.pdxfinder.services;
 
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.repositories.*;
@@ -12,6 +11,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.join;
 
 /*
  * Created by abayomi on 09/05/2018.
@@ -44,17 +46,13 @@ public class DetailsService {
     private final String PDMR_URL = "https://pdmdb.cancer.gov/pls/apex/f?p=101:41";
     private final String PDMR_URL_TEXT = "View data at PDMR";
 
-    //private final String HCI_URL = "https://www.pdxnetwork.org/hcibcm/";
     private final String HCI_URL = "";
     private final String HCI_DS = "PDXNet-HCI-BCM";
-    //    private final String WISTAR_URL = "https://www.pdxnetwork.org/the-wistarmd-andersonpenn/";
     private final String WISTAR_URL = "";
 
     private final String WISTAR_DS = "PDXNet-Wistar-MDAnderson-Penn";
     private final String MDA_URL = "";
-    //private final String MDA_URL = "https://www.pdxnetwork.org/md-anderson/";
     private final String MDA_DS = "PDXNet-MDAnderson";
-    //private final String WUSTL_URL = "https://www.pdxnetwork.org/wustl/";
     private final String WUSTL_URL = "";
     private final String WUSTL_DS = "PDXNet-WUSTL";
 
@@ -282,7 +280,7 @@ public class DetailsService {
 
             //order the passages:
             Collections.sort(passageList);
-            edto.setPassage(StringUtils.join(passageList, ", "));
+            edto.setPassage(join(passageList, ", "));
             engraftmentData.add(edto);
 
         }
@@ -1170,7 +1168,7 @@ public class DetailsService {
 
         result = result.length() == 0 ? "Not Specified" : result;
 
-        result = StringUtils.isEmpty(incoming) ? "Not Specified" : result;
+        result = isEmpty(incoming) ? "Not Specified" : result;
 
         result = result.equals("Unknown") ? "Not Specified" : result;
 

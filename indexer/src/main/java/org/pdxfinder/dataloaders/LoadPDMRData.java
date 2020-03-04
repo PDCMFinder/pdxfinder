@@ -122,7 +122,7 @@ public class LoadPDMRData extends LoaderBase {
     @Override
     protected void step13LoadSpecimens()throws Exception {
 
-        //createPdxObjects specimens
+        //load specimens
         if(dto.getSamplesArr().length() > 0){
             for(int i=0; i<dto.getSamplesArr().length();i++){
 
@@ -171,7 +171,7 @@ public class LoadPDMRData extends LoaderBase {
 
         //Disable loading treatment temporarily, drug names are not harmonized!
         Boolean loadTreatment = true;
-        //don't createPatientSample two treatmentsummaries for the same snapshot
+        //don't create two treatmentsummaries for the same snapshot
         if(loadTreatment && dataImportService.findTreatmentSummaryByPatientSnapshot(dto.getPatientSnapshot()) == null){
             ts = new TreatmentSummary();
 
@@ -197,7 +197,7 @@ public class LoadPDMRData extends LoaderBase {
                         currentTreatment = true;
 
                     }
-                    //not current treatment, createPatientSample default TreatmentProtocol object
+                    //not current treatment, create default TreatmentProtocol object
                     else {
 
                         drugString = treatmentObj.getString("Prior Drug");
@@ -228,7 +228,6 @@ public class LoadPDMRData extends LoaderBase {
             }
 
         }
-        //loadVariationData(mc);
         dataImportService.saveModelCreation(dto.getModelCreation());
 
     }

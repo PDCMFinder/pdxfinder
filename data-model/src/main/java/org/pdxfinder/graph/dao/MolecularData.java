@@ -447,6 +447,10 @@ public class MolecularData {
         this.marker = marker;
     }
 
+    public boolean hasMarker() {
+        return marker != null;
+    }
+
     public String getBiotype() {
         return biotype;
     }

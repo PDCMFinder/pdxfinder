@@ -235,7 +235,6 @@ public class LoadAdditionalDatasets implements ApplicationContextAware{
                     for(Marker m: markerSet){
 
 
-                        //ma.setMarker(m);
                         molChar.addMarkerAssociation(ma);
                         maCounter++;
                         if(maCounter !=0 && maCounter%500==0){

@@ -368,7 +368,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 }
 
             }
-            //this passage is either not present yet or the linked sample has a different ID, createPatientSample a specimen with sample and link mc
+            //this passage is either not present yet or the linked sample has a different ID, create a specimen with sample and link mc
             if(!foundSpecimen){
                 log.info("Creating new specimen for "+mcKey);
 
@@ -417,27 +417,25 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
     private MolecularData setCNAProperties(Map<String,String> data, Marker marker){
 
-        MolecularData ma = new MolecularData();
-
-
+        MolecularData md = new MolecularData();
         //setHostStrain Name
-        ma.setChromosome(data.get(omicChromosome));
-        ma.setSeqStartPosition(data.get(omicSeqStartPosition));
-        ma.setSeqEndPosition(data.get(omicSeqEndPosition));
-        ma.setCnaLog10RCNA(data.get(omicCnaLog10RCNA));
-        ma.setCnaLog2RCNA(data.get(omicCnaLog2RCNA));
-        ma.setCnaCopyNumberStatus(data.get(omicCnaCopyNumberStatus));
-        ma.setCnaGisticValue(data.get(omicCnaGisticvalue));
-        ma.setCnaPicnicValue(data.get(omicCnaPicnicValue));
-        ma.setGenomeAssembly(data.get(omicGenomeAssembly));
+        md.setChromosome(data.get(omicChromosome));
+        md.setSeqStartPosition(data.get(omicSeqStartPosition));
+        md.setSeqEndPosition(data.get(omicSeqEndPosition));
+        md.setCnaLog10RCNA(data.get(omicCnaLog10RCNA));
+        md.setCnaLog2RCNA(data.get(omicCnaLog2RCNA));
+        md.setCnaCopyNumberStatus(data.get(omicCnaCopyNumberStatus));
+        md.setCnaGisticValue(data.get(omicCnaGisticvalue));
+        md.setCnaPicnicValue(data.get(omicCnaPicnicValue));
+        md.setGenomeAssembly(data.get(omicGenomeAssembly));
 
         marker.setHgncSymbol(data.get(omicHgncSymbol));
         marker.setUcscGeneId(data.get(omicUcscGeneId));
         marker.setNcbiGeneId(data.get(omicNcbiGeneId));
         marker.setEnsemblGeneId(data.get(omicEnsemblGeneId));
 
-        ma.setMarker(marker.getHgncSymbol());
-        return  ma;
+        md.setMarker(marker.getHgncSymbol());
+        return  md;
     }
 
 

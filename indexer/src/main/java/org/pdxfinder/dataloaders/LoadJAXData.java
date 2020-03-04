@@ -100,13 +100,13 @@ public class LoadJAXData extends LoaderBase {
         if(dto.isSkipModel()) return ;
         dto.setHistologyMap(getHistologyImageMap(dto.getModelID()));
 
-        //Check if model exists in DB, if yes, do not createPdxObjects duplicates
+        //Check if model exists in DB, if yes, do not load duplicates
         ModelCreation existingModel = dataImportService.findModelByIdAndDataSource(dto.getModelID(), dataSourceAbbreviation);
         if(existingModel != null) {
             log.error("Skipping existing model "+dto.getModelID());
             return;
         }
-        // if the diagnosis is still unknown don't createPdxObjects it
+        // if the diagnosis is still unknown don't load it
         if(dto.getDiagnosis().toLowerCase().contains("unknown") ||
                 dto.getDiagnosis().toLowerCase().contains("not specified")){
             log.info("Skipping model "+dto.getModelID()+" with diagnosis:"+dto.getDiagnosis());
@@ -135,7 +135,7 @@ public class LoadJAXData extends LoaderBase {
     protected void step11LoadBreastMarkers() {
 
         if(dto.isSkipModel()) return ;
-        //createPatientSample breast cancer markers manually if they are present
+        //create breast cancer markers manually if they are present
         if(!dto.getModelTag().equals(Standardizer.NOT_SPECIFIED)){
 
             if(dto.getModelTag().equals("Triple Negative Breast Cancer (TNBC)")){

@@ -71,14 +71,14 @@ public class CreateBaseCommand implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
 
-        if ("createPatientSample".equals(args[0])) {
+        if ("create".equals(args[0])) {
 
             log.info("Executing CreateBaseCommand");
             try {
                 cmd = parser.parse(options, args);
             } catch (UnrecognizedOptionException | MissingArgumentException e) {
                 e.printStackTrace();
-                formatter.printHelp("createPatientSample", options);
+                formatter.printHelp("create", options);
                 System.exit(1);
             }
 

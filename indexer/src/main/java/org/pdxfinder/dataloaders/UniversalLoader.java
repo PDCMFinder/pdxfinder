@@ -342,7 +342,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 if (patient == null) {
 
-                    log.error("Patient does not exist, can not createPatientSample tumor for " + patientId);
+                    log.error("Patient does not exist, can not create tumor for " + patientId);
                     row++;
                     continue;
                 }
@@ -359,7 +359,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 ps.setVirologyStatus(virologyStatus);
 
 
-                //have the correct snapshot, createPatientSample a human sample and link it to the snapshot
+                //have the correct snapshot, create a human sample and link it to the snapshot
                 tumorType = Standardizer.getTumorType(tumorType);
 
 
@@ -398,7 +398,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
     /**
-     * Targets an existing patient and snapshot to createPatientSample a treatment summary with treatment protocols
+     * Targets an existing patient and snapshot to create a treatment summary with treatment protocols
      */
     private void createPatientTreatments() {
 
@@ -477,7 +477,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
     /**
-     * Targets an existing model to createPatientSample specimens with engraftment site, type and material, host strain as well as publication groups
+     * Targets an existing model to create specimens with engraftment site, type and material, host strain as well as publication groups
      */
     private void createPdxModelDetails() {
 
@@ -549,7 +549,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 for (int i = 0; i < passageArr.length; i++) {
 
-                    //createPatientSample specimens with engraftment data
+                    //create specimens with engraftment data
                     Specimen specimen = new Specimen();
                     specimen.setPassage(passageArr[i].trim());
                     specimen.setEngraftmentSite(es);
@@ -567,7 +567,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 int passageInt = Integer.parseInt(passage);
                 passage = String.valueOf(passageInt);
 
-                //createPatientSample specimens with engraftment data
+                //create specimens with engraftment data
                 Specimen specimen = new Specimen();
                 specimen.setPassage(passage);
                 specimen.setEngraftmentSite(es);
@@ -583,7 +583,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 double passageDouble = Double.parseDouble(passage);
                 passage = String.valueOf((int)passageDouble);
 
-                //createPatientSample specimens with engraftment data
+                //create specimens with engraftment data
                 Specimen specimen = new Specimen();
                 specimen.setPassage(passage);
                 specimen.setEngraftmentSite(es);
@@ -602,7 +602,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
             //check if pubmed id is in the right format, ie id starts with PMID
             if (pubmedIdString != null && !pubmedIdString.isEmpty() && pubmedIdString.toLowerCase().contains("pmid")) {
 
-                // pubmed ids separated with a comma, createPatientSample multiple groups
+                // pubmed ids separated with a comma, create multiple groups
                 if (pubmedIdString.contains(",")) {
 
                     String[] pubmedArr = pubmedIdString.split(",");
@@ -613,7 +613,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                         model.addGroup(g);
                     }
                 }
-                //single publication, createPatientSample one group only
+                //single publication, create one group only
                 else {
 
                     Group g = dataImportService.getPublicationGroup(pubmedIdString.trim());
@@ -857,7 +857,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     continue;
                 }
 
-                //check if targeted specimen is present, if not, createPatientSample it
+                //check if targeted specimen is present, if not, create it
                 Specimen specimen = null;
 
                 for (Specimen sp : model.getSpecimens()) {
@@ -994,8 +994,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
 
         platformURL = new HashMap<>();
-        //platformURL.put("CRL__CGH_array", "/platform/curie-lc-cna/");
-        //platformURL.put("CRL__Targeted_NGS", "/platform/curie-lc-mutation/");
 
         if (dataSourceAbbreviation.equals("CRL")) {
             omicDataFilesType = "ONE_FILE_PER_MODEL";
@@ -1050,7 +1048,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             } else {
 
-                log.error("Cannot createPdxObjects omic data for missing model: " + modelId);
+                log.error("Cannot load omic data for missing model: " + modelId);
             }
 
         }
@@ -1389,7 +1387,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 }
 
 
-                //this passage is either not present yet or the linked sample has a different ID, createPatientSample a specimen with sample and link mc
+                //this passage is either not present yet or the linked sample has a different ID, create a specimen with sample and link mc
                 if(!foundSpecimen){
                     log.info("Creating new specimen for "+mcKey);
 
