@@ -1,8 +1,7 @@
-package org.pdxfinder;
+package org.pdxfinder.commandline;
 
-import org.pdxfinder.utils.DataProviders;
-import org.pdxfinder.utils.DataProviders.DataProvider;
-import org.pdxfinder.utils.DataProviders.DataProviderGroup;
+import org.pdxfinder.services.constants.DataProvider;
+import org.pdxfinder.services.constants.DataProviderGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +55,10 @@ public class FinderCommandLine implements Callable<Integer> {
                 description = "Skips clearing of the database before loading new data.")
         private boolean keepDatabaseRequested;
 
+        @Option(names = {"-p", "--post-load"},
+                description = "Implement Post data loading Steps", required=false)
+        private boolean postLoadRequested;
+
         @Option(names = { "--spring.data.neo4j.uri"}, paramLabel = "Neo4j DB Directory", description = "Embedded Neo4j Database location", required=false, hidden=true)
         private String springDataNeo4jUri;
 
@@ -67,15 +70,12 @@ public class FinderCommandLine implements Callable<Integer> {
 
         static class Exclusive {
 
-            @Option(
-                    names = {"-g", "--group"},
-                    arity = "1",
+            @Option(names = {"-g", "--group"}, arity = "1",
                     description = "Load the data for groups of dataProvider (default: [${DEFAULT-VALUE}]). " +
                             "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
             private DataProviderGroup dataProviderGroup;
 
-            @Option(
-                    names = {"-o", "--only"}, arity = "1..*",
+            @Option(names = {"-o", "--only"}, arity = "1..*",
                     description = "Load only the data for the listed dataProvider. " +
                             "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
             private DataProvider[] dataProvider;
@@ -98,7 +98,8 @@ public class FinderCommandLine implements Callable<Integer> {
             finderLoader.run(
                 providersRequested,
                 loadCacheRequested,
-                keepDatabaseRequested
+                keepDatabaseRequested,
+                postLoadRequested
             );
             return 0;
         }
@@ -119,7 +120,7 @@ public class FinderCommandLine implements Callable<Integer> {
                 return Arrays.asList(dataProviders.get());
             } else if (dataProviderGroup.isPresent()) {
 
-                return DataProviders.getProvidersFrom(dataProviderGroup.get());
+                return DataProviderGroup.getProvidersFrom(dataProviderGroup.get());
             } else {
                 return new ArrayList<>();
             }

@@ -1,4 +1,4 @@
-package org.pdxfinder;
+package org.pdxfinder.commandline;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
