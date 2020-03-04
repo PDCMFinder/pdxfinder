@@ -38,6 +38,8 @@ public class DomainObjectCreatorTest extends BaseTest {
     private Patient testPatient;
     private ModelCreation testModel;
 
+    private static final String FIRST = "first";
+
     @Before
     public void setUp(){
         MockitoAnnotations.initMocks(this);
@@ -61,7 +63,7 @@ public class DomainObjectCreatorTest extends BaseTest {
             .thenReturn(providerGroup);
         domainObjectCreator.createProvider(getTestPdxDataTables());
 
-        Group provider = (Group) domainObjectCreator.getDomainObject("provider_group", null);
+        Group provider = (Group) domainObjectCreator.getDomainObject("provider_group", FIRST);
         Assert.assertEquals("TP", provider.getAbbreviation());
     }
 
@@ -69,7 +71,7 @@ public class DomainObjectCreatorTest extends BaseTest {
     @Test
     public void Given_PatientTable_When_CreatePatient_Then_PatientNodeIsInMap(){
 
-        domainObjectCreator.addDomainObject("provider_group", null, providerGroup);
+        domainObjectCreator.addDomainObject("provider_group", FIRST, providerGroup);
         when(dataImportService.createPatient("patient 1", providerGroup, "female", "", "ethnicity"))
             .thenReturn(testPatient);
         when(dataImportService.savePatient(testPatient))
@@ -86,7 +88,7 @@ public class DomainObjectCreatorTest extends BaseTest {
     @Test
     public void Given_ModelTable_When_CreateModel_Then_ModelNodeIsInMap(){
 
-        domainObjectCreator.addDomainObject("provider_group", null, providerGroup);
+        domainObjectCreator.addDomainObject("provider_group", FIRST, providerGroup);
         domainObjectCreator.createModelData(getTestPdxDataTables());
         ModelCreation model = (ModelCreation) domainObjectCreator.getDomainObject("model", "model 1");
         Assert.assertEquals("model 1", model.getSourcePdxId());
@@ -96,7 +98,7 @@ public class DomainObjectCreatorTest extends BaseTest {
     @Test
     public void Given_SampleTable_When_CreateSample_Then_SampleIsInMap(){
 
-        domainObjectCreator.addDomainObject("provider_group", null, providerGroup);
+        domainObjectCreator.addDomainObject("provider_group", FIRST, providerGroup);
         domainObjectCreator.addDomainObject("patient", "patient 1", testPatient);
         domainObjectCreator.addDomainObject("model", "model 1", testModel);
 
@@ -117,7 +119,7 @@ public class DomainObjectCreatorTest extends BaseTest {
     @Test
     public void Given_SharingTable_When_CreateSharing_Then_SharingInfoAdded(){
 
-        domainObjectCreator.addDomainObject("provider_group", null, providerGroup);
+        domainObjectCreator.addDomainObject("provider_group", FIRST, providerGroup);
         domainObjectCreator.addDomainObject("model", "model 1", testModel);
 
         when(dataImportService.getProjectGroup("project 1")).thenReturn(getProjectGroup("project 1"));
