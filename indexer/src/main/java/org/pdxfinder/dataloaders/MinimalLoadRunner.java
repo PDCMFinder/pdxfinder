@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextAware {
@@ -22,6 +25,7 @@ public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextA
     @Value("${data.directory}") private String finderRootDir;
     private Path updogDirectory;
     private boolean validateOnlyRequested;
+    private List<String> allUpdogProviders;
 
     @Autowired
     public MinimalLoadRunner(Updog updog) {
@@ -40,11 +44,21 @@ public class MinimalLoadRunner implements CommandLineRunner, ApplicationContextA
 
         dataDirectory = options.valueOf("dataDirectory").toString();
         provider = options.valueOf("provider").toString();
-        updogDirectory = Paths.get(dataDirectory, "/data/UPDOG", provider);
         validateOnlyRequested = options.has("validateOnly");
+        allUpdogProviders = new ArrayList<>(Arrays.asList("Curie-BC", "Curie-LC", "Curie-OC", "IRCC-CRC",
+            "IRCC-GC", "PMLB", "TRACE", "UOC-BC", "UOM-BC", "VHIO-BC", "VHIO-CRC"));
 
         if (options.has("loadUniversalRefactor")) {
-            updog.run(updogDirectory, provider, validateOnlyRequested);
+            if (allUpdogProviders.contains(provider)) {
+                updogDirectory = Paths.get(dataDirectory, "/data/UPDOG", provider);
+                updog.run(updogDirectory, provider, validateOnlyRequested);
+            } else if (provider.equalsIgnoreCase("all"))
+                for (String s : allUpdogProviders) {
+                    updogDirectory = Paths.get(dataDirectory, "/data/UPDOG", s);
+                    updog.run(updogDirectory, s, validateOnlyRequested);
+                }
+            else
+                throw new IllegalArgumentException(String.format("%s was not a recognized UPDOG provider", provider));
         }
     }
 

@@ -53,6 +53,7 @@ public class DomainObjectCreator {
     public void loadDomainObjects(Map<String, Table> pdxDataTables) {
         //: Do not change the order of these unless you want to risk 1. the universe to collapse OR 2. missing nodes in the db
 
+        domainObjects = new HashMap<>();
         createProvider(pdxDataTables);
         createPatientData(pdxDataTables);
         createModelData(pdxDataTables);
