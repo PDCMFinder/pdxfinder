@@ -348,8 +348,13 @@ public class DomainObjectCreator {
     private void createMolecularCharacterization(Table table, String molcharType){
         MolecularCharacterization molecularCharacterization = getMolcharByType(table.row(0), molcharType);
         MarkerAssociation markerAssociation = new MarkerAssociation();
-        for (Row row : table)
-            markerAssociation.addMolecularData(createMolecularDataObject(molecularCharacterization, row));
+        for (Row row : table) {
+            MolecularData molecularData = createMolecularDataObject(molecularCharacterization, row);
+
+            if(molecularData.getMarker() != null){
+                markerAssociation.addMolecularData(createMolecularDataObject(molecularCharacterization, row));
+            }
+        }
         molecularCharacterization.addMarkerAssociation(markerAssociation);
         molecularCharacterization.setMarkers(getMarkers(markerAssociation));
         addDomainObject("molecular_characterization", molcharType, molecularCharacterization);

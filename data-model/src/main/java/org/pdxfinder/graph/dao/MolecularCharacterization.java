@@ -8,6 +8,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -117,5 +118,12 @@ public class MolecularCharacterization {
 
     public void setMarkers(Set<String> markers) {
         this.markers = markers;
+    }
+
+    public void addMarker(String m){
+
+        if(markers == null) markers = new HashSet<>();
+        markers.add(m);
+
     }
 }
