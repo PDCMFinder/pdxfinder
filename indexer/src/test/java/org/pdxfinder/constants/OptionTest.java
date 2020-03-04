@@ -2,8 +2,7 @@ package org.pdxfinder.constants;
 
 import org.junit.Test;
 import org.pdxfinder.BaseTest;
-
-import static org.mockito.Matchers.isA;
+import org.pdxfinder.services.constants.Option;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

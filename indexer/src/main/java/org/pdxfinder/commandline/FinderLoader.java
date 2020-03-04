@@ -1,6 +1,8 @@
-package org.pdxfinder;
+package org.pdxfinder.commandline;
 
-import org.pdxfinder.dataloaders.LoadAdditionalDatasets;
+import org.pdxfinder.services.constants.DataProvider;
+import org.pdxfinder.services.constants.DataProviderGroup;
+import org.pdxfinder.dataloaders.*;
 import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
 import org.pdxfinder.mapping.LinkTreatmentsToNCITTerms;
 import org.pdxfinder.postload.CreateDataProjections;
@@ -11,11 +13,11 @@ import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
 import org.pdxfinder.services.loader.envload.LoadNCIT;
 import org.pdxfinder.services.loader.envload.LoadNCITDrugs;
-import org.pdxfinder.utils.DataProviders.DataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -28,6 +30,16 @@ public class FinderLoader {
     private LoadMarkers loadMarkers;
     private LoadNCITDrugs loadNCITDrugs;
     private LoadNCIT loadNCIT;
+
+    // DataProvider Loading Components
+    private LoadHCI loadHCI;
+    private LoadIRCC loadIRCC;
+    private LoadJAXData loadJAXData;
+    private LoadMDAnderson loadMDAnderson;
+    private LoadPDMRData loadPDMRData;
+    private LoadWISTAR loadWISTAR;
+    private LoadWUSTL loadWUSTL;
+    private LoadUniversal loadUniversal;
 
     // PostLoad Components
     private LoadAdditionalDatasets loadAdditionalDatasets;
@@ -43,17 +55,37 @@ public class FinderLoader {
     public FinderLoader(LoadMarkers loadMarkers,
                         LoadNCITDrugs loadNCITDrugs,
                         LoadNCIT loadNCIT,
+
+                        LoadHCI loadHCI,
+                        LoadIRCC loadIRCC,
+                        LoadJAXData loadJAXData,
+                        LoadMDAnderson loadMDAnderson,
+                        LoadPDMRData loadPDMRData,
+                        LoadWISTAR loadWISTAR,
+                        LoadWUSTL loadWUSTL,
+                        LoadUniversal loadUniversal,
+
                         LoadAdditionalDatasets loadAdditionalDatasets,
                         LinkSamplesToNCITTerms linkSamplesToNCITTerms,
                         LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms,
                         CreateDataProjections createDataProjections,
                         SetDataVisibility setDataVisibility,
                         ValidateDB validateDB,
-                        DataImportService dataImportService) {
+                        DataImportService dataImportService,
+                        ApplicationContext applicationContext) {
 
         this.loadMarkers = loadMarkers;
         this.loadNCITDrugs = loadNCITDrugs;
         this.loadNCIT = loadNCIT;
+
+        this.loadHCI = loadHCI;
+        this.loadIRCC = loadIRCC;
+        this.loadJAXData = loadJAXData;
+        this.loadMDAnderson = loadMDAnderson;
+        this.loadPDMRData = loadPDMRData;
+        this.loadWISTAR = loadWISTAR;
+        this.loadWUSTL = loadWUSTL;
+        this.loadUniversal = loadUniversal;
 
         this.loadAdditionalDatasets = loadAdditionalDatasets;
         this.linkSamplesToNCITTerms = linkSamplesToNCITTerms;
@@ -64,6 +96,7 @@ public class FinderLoader {
 
         this.dataImportService = dataImportService;
     }
+
 
     private Logger log = LoggerFactory.getLogger(FinderLoader.class);
     @Value("${data-dir}")
@@ -142,6 +175,47 @@ public class FinderLoader {
     }
 
 
+    public void callRelevantLoader(DataProvider dataProvider) {
+
+        List<DataProvider> updog = DataProviderGroup.getProvidersFrom(DataProviderGroup.UPDOG);
+
+        try {
+
+            log.debug("Loading data for {}", dataProvider);
+
+            switch (dataProvider) {
+                case PDXNet_HCI_BCM:
+                    loadHCI.run();
+                    break;
+                case IRCC_CRC:
+                    loadIRCC.run();
+                    break;
+                case JAX:
+                    loadJAXData.run();
+                    break;
+                case PDXNet_MDAnderson:
+                    loadMDAnderson.run();
+                    break;
+                case PDMR:
+                    loadPDMRData.run();
+                    break;
+                case PDXNet_Wistar_MDAnderson_Penn:
+                    loadWISTAR.run();
+                    break;
+                case PDXNet_WUSTL:
+                    loadWUSTL.run();
+                    break;
+                default:
+                    if (updog.contains(dataProvider))
+                        loadUniversal.run(dataProvider.name());
+            }
+
+        } catch (Exception e) {
+            log.error("Error calling loader for {} {}:", dataProvider, e);
+        }
+    }
+
+
     private void postLoad(List<DataProvider> providers, boolean postLoadRequested) {
 
         log.info("Running Post load Steps ...");
@@ -160,15 +234,6 @@ public class FinderLoader {
         }
 
 
-    }
-
-    private void callRelevantLoader(DataProvider dataProvider) {
-        try {
-            log.debug("Loading data for {}", dataProvider);
-            dataProvider.load();
-        } catch (Exception e) {
-            log.error("Error calling loader for {}:", dataProvider, e);
-        }
     }
 
 }
