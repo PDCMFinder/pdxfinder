@@ -52,7 +52,7 @@ public class MappingService {
     private static final String ACCURACY = "PRECISE";
     private static final String ANNOTATOR = "Nathalie Conte";
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String rootDir;
 
 

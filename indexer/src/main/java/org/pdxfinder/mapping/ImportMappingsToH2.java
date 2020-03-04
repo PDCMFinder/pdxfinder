@@ -20,7 +20,7 @@ import java.util.List;
 @Component
 public class ImportMappingsToH2 implements CommandLineRunner{
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     private MappingService mappingService;

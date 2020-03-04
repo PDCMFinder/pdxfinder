@@ -1,7 +1,5 @@
 package org.pdxfinder.mapping;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.dao.Treatment;
@@ -11,9 +9,7 @@ import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.MappingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,43 +17,27 @@ import java.util.List;
 /*
  * Created by csaba on 05/06/2019.
  */
-@Component
-@Order(value = 40)
-public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
+@Service
+public class LinkTreatmentsToNCITTerms {
 
 
     private final static Logger log = LoggerFactory.getLogger(LinkTreatmentsToNCITTerms.class);
     private MappingService mappingService;
     private DataImportService dataImportService;
 
-
     public LinkTreatmentsToNCITTerms(MappingService mappingService, DataImportService dataImportService) {
         this.mappingService = mappingService;
         this.dataImportService = dataImportService;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("linkTreatmentsToNCITTerms", "Link treatments to NCIT terms");
-        parser.accepts("loadALL", "Load all, including linking treatments to NCIT terms");
-        parser.accepts("loadSlim", "Load slim, then link treatments to NCIT terms");
-        parser.accepts("loadEssentials", "Load essentials then link treatments to terms");
 
-
-        OptionSet options = parser.parse(args);
+    public void run() {
 
         long startTime = System.currentTimeMillis();
 
-        if (options.has("linkTreatmentsToNCITTerms") || options.has("loadALL")  || options.has("loadSlim") || options.has("loadEssentials")) {
+        log.info("Mapping treatments to NCIT terms.");
 
-            log.info("Mapping treatments to NCIT terms.");
-
-            mapTreatmentsToTerms();
-
-
-        }
+        mapTreatmentsToTerms();
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
@@ -66,8 +46,6 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
         int minutes = (int) ((totalTime / (1000 * 60)) % 60);
 
         log.info(this.getClass().getSimpleName() + " finished after " + minutes + " minute(s) and " + seconds + " second(s)");
-
-
 
 
     }
@@ -127,14 +105,6 @@ public class LinkTreatmentsToNCITTerms implements CommandLineRunner {
             }
 
         }
-
-
-
-
-
-
-
-
 
     }
 

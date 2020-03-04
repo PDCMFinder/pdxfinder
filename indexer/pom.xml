@@ -39,6 +39,11 @@
             <version>4.8</version>
         </dependency>
         <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli-spring-boot-starter</artifactId>
+            <version>4.0.4</version>
+        </dependency>
+        <dependency>
             <groupId>org.pdxfinder</groupId>
             <artifactId>data-services</artifactId>
         </dependency>

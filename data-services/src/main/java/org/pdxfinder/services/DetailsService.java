@@ -497,9 +497,10 @@ public class DetailsService {
 
         //STEP 1: dynamically determine the headers of the table
         for(MarkerAssociation ma: associationList){
+
             List<MolecularData> molecularData;
             try {
-                molecularData = ma.getMolecularDataList();
+                molecularData = ma.decodeMolecularData();
             }
             catch(Exception e){
                 log.error("Error getting molecular data");

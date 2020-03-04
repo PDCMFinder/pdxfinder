@@ -1,60 +1,36 @@
 package org.pdxfinder.postload;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import org.pdxfinder.services.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-/*
- * Created by csaba on 03/07/2018.
- */
-@Component
+
+@Service
 @Order(value = 96)
-public class SendNotifications implements CommandLineRunner{
-
+public class SendNotifications {
 
     private final static Logger log = LoggerFactory.getLogger(SendNotifications.class);
-
     private EmailService emailService;
 
     public SendNotifications(EmailService emailService) {
         this.emailService = emailService;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void run() {
 
+        log.info("Creating and sending email notifications");
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
+        getUnmappedSamples();
 
-
-        parser.accepts("loadALL", "Load all, then send email notifications");
-        parser.accepts("sendNotifications", "Send email notifications");
-
-        OptionSet options = parser.parse(args);
-
-        if (options.has("loadALL")  || options.has("sendNotifications")) {
-
-            log.info("Creating and sending email notifications");
-
-            getUnmappedSamples();
-
-            sendEmail("nconte@ebi.ac.uk", "NathalieConte", "URGENT: UNMAPPED TERMS FOUND", "86");
-        }
+        sendEmail("", "", "URGENT: UNMAPPED TERMS FOUND", "86");
 
     }
 
 
 
-
     private void getUnmappedSamples(){
-
-
 
     }
 
