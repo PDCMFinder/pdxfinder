@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ArgGroup;
@@ -17,8 +18,10 @@ import java.util.concurrent.Callable;
 
 @Component
 @Command(name = "indexer",
+    description = "The PDX Finder indexer command calls various data operations on the application." +
+        " Run `[COMMAND] --help` or `help [COMMAND]` for specific usage information.",
     mixinStandardHelpOptions = true,
-    subcommands = {FinderCommandLine.Load.class})
+    subcommands = {FinderCommandLine.Load.class, CommandLine.HelpCommand.class})
 @Order(value = -100)
 public class FinderCommandLine implements Callable<Integer> {
 
@@ -30,7 +33,7 @@ public class FinderCommandLine implements Callable<Integer> {
     @Component
     @Order(value = -100)
     @Command(name = "load",
-        description = "Loads and transforms data into the PDXFinder.",
+        description = "Loads and transforms data into the PDXFinder",
         mixinStandardHelpOptions = true,
         exitCodeOnExecutionException = 34)
     static class Load implements Callable<Integer> {
@@ -54,6 +57,10 @@ public class FinderCommandLine implements Callable<Integer> {
         @Option(names = {"-k", "--keep-db"},
                 description = "Skips clearing of the database before loading new data.")
         private boolean keepDatabaseRequested;
+
+        @Option(names = {"--validate-only"},
+                description = "Don't load the PDX data, only perform validation and report errors.")
+        private boolean validateOnlyRequested;
 
         @Option(names = {"-p", "--post-load"},
                 description = "Implement Post data loading Steps", required=false)
@@ -97,6 +104,8 @@ public class FinderCommandLine implements Callable<Integer> {
 
             finderLoader.run(
                 providersRequested,
+                dataDirectory,
+                validateOnlyRequested,
                 loadCacheRequested,
                 keepDatabaseRequested,
                 postLoadRequested

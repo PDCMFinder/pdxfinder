@@ -1,5 +1,6 @@
 package org.pdxfinder.dataloaders.updog;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,13 +39,12 @@ public class Updog {
     }
 
     public void run(Path updogProviderDirectory, String provider, boolean validateOnly) {
-        log.debug("Using UPDOG to import {} PDX data from [{}]", provider, updogProviderDirectory);
-
         Map<String, Table> pdxTableSet;
         Map<String, Table> omicsTableSet;
         Map<String, Table> treatmentTableSet;
         Map<String, Table> combinedTableSet = new HashMap<>();
         List<ValidationError> validationErrors;
+        log.info("Using UPDOG to import {} PDX data from [{}]", provider, updogProviderDirectory);
 
         pdxTableSet = readPdxTablesFromPath(updogProviderDirectory);
         pdxTableSet = tableSetCleaner.cleanPdxTables(pdxTableSet);
@@ -60,7 +60,9 @@ public class Updog {
         combinedTableSet.putAll(treatmentTableSet);
 
         validationErrors = validateTableSet(combinedTableSet, omicsTableSet.keySet(), provider);
-        log.info(validationErrors.toString());
+        if (CollectionUtils.isNotEmpty(validationErrors))
+            log.debug(validationErrors.toString());
+        else log.debug("There were no validation errors raised, great!");
 
         if (!validateOnly) {
             createPdxObjects(combinedTableSet);
@@ -96,6 +98,7 @@ public class Updog {
             new PdxValidationRuleset().generate(provider),
             omicSpecifications
         );
+        combinedValidationRuleset.setProvider(provider);
         return validator.validate(tableSet, combinedValidationRuleset);
     }
 

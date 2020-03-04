@@ -9,6 +9,8 @@ import org.pdxfinder.BaseTest;
 import org.pdxfinder.services.constants.DataProvider;
 import picocli.CommandLine;
 
+import java.io.File;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -23,9 +25,8 @@ public class FinderCommandLineTest extends BaseTest {
         MockitoAnnotations.initMocks(this);
         doNothing().when(this.finderLoader).run(
             anyListOf(DataProvider.class),
-            anyBoolean(),
-            anyBoolean(),
-            anyBoolean()
+            any(File.class),
+            anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean()
         );
 
     }
@@ -36,9 +37,8 @@ public class FinderCommandLineTest extends BaseTest {
         assertEquals(0, exitCode);
         verify(this.finderLoader).run(
             anyListOf(DataProvider.class),
-            anyBoolean(),
-            anyBoolean(),
-            anyBoolean()
+            any(File.class),
+            anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean()
         );
         verifyNoMoreInteractions(this.finderLoader);
     }
@@ -49,9 +49,8 @@ public class FinderCommandLineTest extends BaseTest {
         assertEquals(0, exitCode);
         verify(this.finderLoader).run(
             anyListOf(DataProvider.class),
-            anyBoolean(),
-            anyBoolean(),
-            anyBoolean()
+            any(File.class),
+            anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean()
         );
         verifyNoMoreInteractions(this.finderLoader);
     }
