@@ -24,7 +24,7 @@ public class ExportMappings implements CommandLineRunner {
     MappingService mappingService;
     Logger logger = LoggerFactory.getLogger(ExportMappings.class);
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     @Override

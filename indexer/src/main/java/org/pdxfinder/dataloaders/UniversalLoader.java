@@ -61,7 +61,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
 
-    public void initTemplates(String updogCurrDir) throws Exception {
+    public void initTemplates(String updogCurrDir) {
 
         log.info("******************************************************");
         log.info("* Initializing Sheet data                            *");

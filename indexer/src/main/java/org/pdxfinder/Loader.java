@@ -11,9 +11,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import java.util.Arrays;
+
 @SpringBootApplication
 @EnableNeo4jRepositories
-
 @EnableTransactionManagement
 public class Loader {
 

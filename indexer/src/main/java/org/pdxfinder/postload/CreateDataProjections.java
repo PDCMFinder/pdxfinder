@@ -3,6 +3,7 @@ package org.pdxfinder.postload;
 import com.google.gson.Gson;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dataloaders.UniversalLoader;
 import org.pdxfinder.graph.dao.*;
@@ -25,6 +26,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -36,9 +38,9 @@ import java.util.stream.Collectors;
 /*
  * Created by csaba on 09/03/2018.
  */
-@Component
+@Service
 @Order(value = 90)
-public class CreateDataProjections implements CommandLineRunner, ApplicationContextAware{
+public class CreateDataProjections implements ApplicationContextAware{
 
     private final static Logger log = LoggerFactory.getLogger(CreateDataProjections.class);
     private DataImportService dataImportService;
@@ -49,8 +51,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
     @Value("${user.home}")
     String homeDir;
 
-
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     protected ReportManager reportManager;
@@ -95,46 +96,34 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         this.utilityService = utilityService;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void run() {
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("createDataProjections", "Creating data projections");
-        parser.accepts("loadALL", "Load all, then createPatientSample projections");
-        parser.accepts("loadSlim", "Load slim, then createPatientSample projections");
-        parser.accepts("loadEssentials", "Load essentials then createPatientSample projections");
-
-        OptionSet options = parser.parse(args);
         long startTime = System.currentTimeMillis();
 
-        if (options.has("createDataProjections") || options.has("loadALL")  || options.has("loadSlim") || options.has("loadEssentials")) {
 
-            log.info("Creating data projections");
+        log.info("Creating data projections");
 
-            reportManager = (ReportManager) context.getBean("ReportManager");
+        reportManager = (ReportManager) context.getBean("ReportManager");
 
-            createMutationDataProjection();
+        createMutationDataProjection();
 
-            createModelForQueryDataProjection();
+        createModelForQueryDataProjection();
 
-            createModelDrugResponseDataProjection();
+        createModelDrugResponseDataProjection();
 
-            createPatientTreatmentDataProjection();
+        createPatientTreatmentDataProjection();
 
-            createImmunoHistoChemistryDataProjection();
+        createImmunoHistoChemistryDataProjection();
 
-            createCNADataProjection();
+        createCNADataProjection();
 
-            createTranscriptomicsDataProjection();
+        createTranscriptomicsDataProjection();
 
-            createDataAvailableDataProjection();
+        createDataAvailableDataProjection();
 
-            createFrequentlyMutatedGenesDataProjection();
+        createFrequentlyMutatedGenesDataProjection();
 
-            saveDataProjections();
-
-        }
+        saveDataProjections();
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
@@ -179,7 +168,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                     List<MolecularData> molecularData;
                     try{
 
-                      molecularData = ma.decodeMolecularData();
+                        molecularData = ma.decodeMolecularData();
                     }
                     catch (Exception e){
                         log.error("No molecular data");
@@ -1371,7 +1360,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                     modelDrugResponseDP.get(drug).put(response,s);
                 }
             }
-            //new drug, createPatientSample response and add model
+            //new drug, create response and add model
             else{
 
                 Set s = new HashSet();

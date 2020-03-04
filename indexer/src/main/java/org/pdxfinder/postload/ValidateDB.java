@@ -15,15 +15,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Component
+@Service
 @Order(value = 92)
-public class ValidateDB implements CommandLineRunner{
+public class ValidateDB {
 
-    private final static Logger log = LoggerFactory.getLogger(ValidateDB.class);
+    private static Logger log = LoggerFactory.getLogger(ValidateDB.class);
 
     private DataImportService dataImportService;
 
@@ -32,25 +33,13 @@ public class ValidateDB implements CommandLineRunner{
         this.dataImportService = dataImportService;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void run() {
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("validateDB", "Validating DB");
-        parser.accepts("loadALL", "Validating DB");
-        parser.accepts("loadEssentials", "Load essentials passesValidation");
-        OptionSet options = parser.parse(args);
+        log.info("******************************************************");
+        log.info("* Starting validation checks                         *");
+        log.info("******************************************************");
 
-        if (options.has("validateDB") || options.has("loadALL") || options.has("loadEssentials")) {
-
-
-            log.info("******************************************************");
-            log.info("* Starting validation checks                         *");
-            log.info("******************************************************");
-
-            runValidationChecks();
-        }
+        runValidationChecks();
 
     }
 

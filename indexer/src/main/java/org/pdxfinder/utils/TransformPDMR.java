@@ -21,7 +21,7 @@ public class TransformPDMR implements CommandLineRunner {
     private CommandLineParser parser;
     private TransformerService transformerService;
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String dataRootDir;
 
 

@@ -965,6 +965,10 @@ public class DataImportService {
         return ontologyTermRepository.getOntologyTermNumber();
     }
 
+    public boolean ontologyCacheIsEmpty() {
+        return countAllOntologyTerms() == 0;
+    }
+
     public OntologyTerm saveOntologyTerm(OntologyTerm ot){
 
         return ontologyTermRepository.save(ot);
@@ -985,6 +989,10 @@ public class DataImportService {
 
     public Integer countAllMarkers() {
         return markerRepository.countAllMarkers();
+    }
+
+    public boolean markerCacheIsEmpty() {
+        return countAllMarkers() == 0;
     }
 
     public Collection<Marker> getAllHumanMarkers() {
