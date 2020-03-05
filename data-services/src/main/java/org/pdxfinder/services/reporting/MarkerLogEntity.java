@@ -21,6 +21,50 @@ public class MarkerLogEntity extends LogEntity{
         this.reasonForChange = reasonForChange;
     }
 
+    public static MarkerLogEntity logUpdateFromPreviousSymbol(
+        String reporter,
+        String dataSource,
+        String model,
+        String characterizationType,
+        String platform,
+        String usedMarkerSymbol,
+        String suggestedMarkerSymbol,
+        String reasonForChange
+    ) {
+        return new MarkerLogEntity(
+            reporter,
+            dataSource,
+            model,
+            characterizationType,
+            platform,
+            usedMarkerSymbol,
+            suggestedMarkerSymbol,
+            reasonForChange
+        );
+    }
+
+    public static MarkerLogEntity logNoSingleValidSymbol(
+        String reporter,
+        String dataSource,
+        String model,
+        String characterizationType,
+        String platform,
+        String usedMarkerSymbol,
+        String suggestedMarkerSymbol,
+        String reasonForChange
+    ) {
+        return new MarkerLogEntity(
+            reporter,
+            dataSource,
+            model,
+            characterizationType,
+            platform,
+            usedMarkerSymbol,
+            suggestedMarkerSymbol,
+            reasonForChange
+        );
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -47,22 +91,6 @@ public class MarkerLogEntity extends LogEntity{
         return result;
     }
 
-    /*
-        @Override
-        public String toString() {
-            return "MarkerLogEntity{" +
-                    "type='" + super.getType() + '\'' +
-                    ", reporter='" + super.getReporter() + '\'' +
-                    ", dataSource='" + super.getDataSource() + '\'' +
-                    ", model='" + super.getModel() + '\'' +
-                    ", usedMarkerSymbol='" + usedMarkerSymbol + '\'' +
-                    ", suggestedMarkerSymbol='" + suggestedMarkerSymbol + '\'' +
-                    ", reasonForChange='" + reasonForChange + '\'' +
-                    ", message='" + super.getMessage() + '\'' +
-                    '}';
-        }
-
-       */
     @Override
     public String toString() {
         return

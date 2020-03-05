@@ -231,10 +231,10 @@ public class LoadAdditionalDatasets implements ApplicationContextAware{
                 if(molChar != null){
                 //STEP4: link molchar to the markers with a fake MA
                     int maCounter = 0;
+                    MarkerAssociation ma = new MarkerAssociation();
                     for(Marker m: markerSet){
 
-                        MarkerAssociation ma = new MarkerAssociation();
-                        ma.setMarker(m);
+
                         molChar.addMarkerAssociation(ma);
                         maCounter++;
                         if(maCounter !=0 && maCounter%500==0){

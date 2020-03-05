@@ -11,8 +11,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import java.util.Arrays;
-
 @SpringBootApplication
 @EnableNeo4jRepositories
 @EnableTransactionManagement
@@ -26,7 +24,11 @@ public class Loader {
             Options options = new Options();
             HelpFormatter formatter = new HelpFormatter();
 
-            Option createOpt = Option.builder("create").desc("Purgess all data and re-creates the base graph database with the basic nodes pre loaded (standard tissues, implantation details, bacckground strains, etc.").build();
+            Option createOpt = Option.builder("create")
+                .desc("Process all data and re-creates the base graph database" +
+                    " with the basic nodes pre loaded" +
+                    " (standard tissues, implantation details, background strains, etc.")
+                .build();
             Option loadOpt = Option.builder("load").desc("load command ").build();
             Option jaxOpt = Option.builder("loadJAX").desc("Load JAX PDX models from file.").build();
 

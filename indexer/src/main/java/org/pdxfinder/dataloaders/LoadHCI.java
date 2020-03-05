@@ -201,8 +201,6 @@ public class LoadHCI extends LoaderBase {
 
 
                                     MarkerAssociation ma = new MarkerAssociation();
-                                    ma.setCytogeneticsResult(result);
-                                    ma.setMarker(marker);
                                     mc.addMarkerAssociation(ma);
                                 }
                                 else {
@@ -212,8 +210,6 @@ public class LoadHCI extends LoaderBase {
                                     mc.setPlatform(pl);
 
                                     MarkerAssociation ma = new MarkerAssociation();
-                                    ma.setCytogeneticsResult(result);
-                                    ma.setMarker(marker);
                                     mc.addMarkerAssociation(ma);
 
                                     molCharMap.put(modelId + "---" + sampleId, mc);

@@ -1,5 +1,7 @@
 package org.pdxfinder.commandline;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.pdxfinder.dataloaders.updog.Updog;
 import org.pdxfinder.services.constants.DataProvider;
 import org.pdxfinder.services.constants.DataProviderGroup;
 import org.pdxfinder.dataloaders.*;
@@ -21,6 +23,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Component
@@ -39,7 +43,7 @@ public class FinderLoader {
     private LoadPDMRData loadPDMRData;
     private LoadWISTAR loadWISTAR;
     private LoadWUSTL loadWUSTL;
-    private LoadUniversal loadUniversal;
+    private Updog updog;
 
     // PostLoad Components
     private LoadAdditionalDatasets loadAdditionalDatasets;
@@ -63,7 +67,7 @@ public class FinderLoader {
                         LoadPDMRData loadPDMRData,
                         LoadWISTAR loadWISTAR,
                         LoadWUSTL loadWUSTL,
-                        LoadUniversal loadUniversal,
+                        Updog updog,
 
                         LoadAdditionalDatasets loadAdditionalDatasets,
                         LinkSamplesToNCITTerms linkSamplesToNCITTerms,
@@ -85,7 +89,7 @@ public class FinderLoader {
         this.loadPDMRData = loadPDMRData;
         this.loadWISTAR = loadWISTAR;
         this.loadWUSTL = loadWUSTL;
-        this.loadUniversal = loadUniversal;
+        this.updog = updog;
 
         this.loadAdditionalDatasets = loadAdditionalDatasets;
         this.linkSamplesToNCITTerms = linkSamplesToNCITTerms;
@@ -97,23 +101,23 @@ public class FinderLoader {
         this.dataImportService = dataImportService;
     }
 
-
     private Logger log = LoggerFactory.getLogger(FinderLoader.class);
-    @Value("${data-dir}")
-    private String predefDataDirectory;
-    @Value("${spring.data.neo4j.uri}")
-    private File databaseURI;
-    @Value("${ncitpredef.file}")
-    private String ncitFile;
+    @Value("${data-dir}") private String predefDataDirectory;
+    @Value("${spring.data.neo4j.uri}") private File databaseURI;
+    @Value("${ncitpredef.file}") private String ncitFile;
 
-    void run(List<DataProvider> dataProviders,
-             boolean loadCacheRequested,
-             boolean keepDatabaseRequested,
-             boolean postLoadRequested) {
+    void run(
+        List<DataProvider> dataProviders,
+        File dataDirectory,
+        boolean validateOnlyRequested,
+        boolean loadCacheRequested,
+        boolean keepDatabaseRequested,
+        boolean postLoadRequested
+    ) {
 
         this.keepDatabaseIfRequested(keepDatabaseRequested);
         this.loadCache(loadCacheRequested);
-        this.loadRequestedPdxData(dataProviders);
+        this.loadRequestedPdxData(dataProviders, dataDirectory, validateOnlyRequested);
         this.postLoad(dataProviders, postLoadRequested);
     }
 
@@ -164,25 +168,28 @@ public class FinderLoader {
         }
     }
 
-    private void loadRequestedPdxData(List<DataProvider> providers) {
-        if (providers.isEmpty()){
-            log.info("No PDX dataset loading at the moment because user did not request for any");
-        }
-        log.debug("Running requested PDX dataset loaders {}...", providers);
-        for (DataProvider i : providers) {
-            callRelevantLoader(i);
+    private void loadRequestedPdxData(
+        List<DataProvider> providers,
+        File dataDirectory,
+        boolean validateOnlyRequested
+    ) {
+        if (providers.isEmpty()) {
+            log.info("Skipping PDX dataset loading - No providers requested");
+        } else {
+            log.info("Running requested PDX dataset loaders {}...", providers);
+            for (DataProvider i : providers)
+                callRelevantLoader(i, dataDirectory, validateOnlyRequested);
         }
     }
 
 
-    public void callRelevantLoader(DataProvider dataProvider) {
-
-        List<DataProvider> updog = DataProviderGroup.getProvidersFrom(DataProviderGroup.UPDOG);
-
+    public void callRelevantLoader(
+        DataProvider dataProvider,
+        File dataDirectory,
+        boolean validateOnlyRequested
+    ) {
+        List<DataProvider> updogProviders = DataProviderGroup.getProvidersFrom(DataProviderGroup.UPDOG);
         try {
-
-            log.debug("Loading data for {}", dataProvider);
-
             switch (dataProvider) {
                 case PDXNet_HCI_BCM:
                     loadHCI.run();
@@ -206,12 +213,17 @@ public class FinderLoader {
                     loadWUSTL.run();
                     break;
                 default:
-                    if (updog.contains(dataProvider))
-                        loadUniversal.run(dataProvider.name());
+                    if (updogProviders.contains(dataProvider)) {
+                        Path updogDirectory = Paths.get(
+                            dataDirectory.toString(),
+                            "/data/UPDOG",
+                            dataProvider.toString());
+                        updog.run(updogDirectory, dataProvider.toString(), validateOnlyRequested);
+                    }
             }
 
         } catch (Exception e) {
-            log.error("Error calling loader for {} {}:", dataProvider, e);
+            log.error("Error calling the loader for {}:", dataProvider, e);
         }
     }
 
@@ -220,12 +232,10 @@ public class FinderLoader {
 
         log.info("Running Post load Steps ...");
 
-        if (providers.contains(DataProvider.CRL)){
+        if (providers.contains(DataProvider.CRL))
             loadAdditionalDatasets.run();
-        }
 
-        if (!providers.isEmpty() || postLoadRequested){
-
+        if (CollectionUtils.isNotEmpty(providers) || postLoadRequested) {
             linkSamplesToNCITTerms.run();
             linkTreatmentsToNCITTerms.run();
             createDataProjections.run();

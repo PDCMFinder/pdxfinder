@@ -214,69 +214,6 @@ public class LoadIRCC extends LoaderBase {
         dataImportService.saveModelCreation(dto.getModelCreation());
     }
 
-    @Transactional
-    public void loadVariantsBySpecimen() {
-        try {
-            String variationURLStr = finderRootDir +dataSourceAbbreviation+"/mut/data.json";
-            JSONObject job = new JSONObject(utilityService.parseFile(variationURLStr));
-            JSONArray jarray = job.getJSONArray("IRCCVariation");
 
-            Platform platform = dataImportService.getPlatform(tech, "mutation", providerDS, platformURL.get("targetedNgsPlatformURL"));
-            platform.setGroup(providerDS);
-            dataImportService.savePlatform(platform);
-
-            for (int i = 0; i < jarray.length(); i++) {
-                if (i == variationMax) {
-                    log.error(String.format("Quitting after loading %s maximum variants", i));
-                    break;
-                }
-
-                JSONObject variation = jarray.getJSONObject(i);
-                String sample = variation.getString("Sample ID");
-                String specimen = variation.getString("Specimen ID");
-
-                if(specimenSamples.containsKey(specimen)){
-                    specimenSamples.get(specimen).put(sample, sample);
-                }else{
-                    HashMap<String,String> samples = new HashMap();
-                    samples.put(sample,sample);
-                    specimenSamples.put(specimen,samples);
-                }
-
-                String gene = variation.getString("Gene");
-                String type = variation.getString("Type");
-
-                Marker marker = dataImportService.getMarker(gene,gene);
-                MarkerAssociation ma = new MarkerAssociation();
-                ma.setMarker(marker);
-                ma.setType(type);
-                ma.setCdsChange(variation.getString("CDS"));
-                ma.setChromosome(variation.getString("Chrom"));
-                ma.setConsequence(variation.getString("Effect"));
-                ma.setSeqPosition(variation.getString("Pos"));
-                ma.setRefAllele(variation.getString("Ref"));
-                ma.setAltAllele(variation.getString("Alt"));
-                ma.setAminoAcidChange(variation.getString("Protein"));
-                ma.setAlleleFrequency(variation.getString("VAF"));
-                ma.setRsIdVariants(variation.getString("avsnp147"));
-
-                PlatformAssociation pa = dataImportService.createPlatformAssociation(platform, marker);
-                dataImportService.savePlatformAssociation(pa);
-
-                if (markerAssociations.containsKey(sample)) {
-                    markerAssociations.get(sample).add(ma);
-                } else {
-                    HashSet<MarkerAssociation> mas = new HashSet();
-                    mas.add(ma);
-                    markerAssociations.put(sample, mas);
-                }
-
-            }
-
-        } catch (Exception e) {
-            log.error("Unable to load variants");
-        }
-
-    }
 
 }

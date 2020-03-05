@@ -8,6 +8,8 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.LoadDiseaseOntology;
+import org.pdxfinder.dataloaders.LoadJAXData;
+import org.pdxfinder.dataloaders.updog.Updog;
 import org.pdxfinder.services.constants.DataProvider;
 import org.pdxfinder.dataloaders.LoadAdditionalDatasets;
 import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
@@ -21,6 +23,8 @@ import org.pdxfinder.services.loader.envload.LoadMarkers;
 import org.pdxfinder.services.loader.envload.LoadNCIT;
 import org.pdxfinder.services.loader.envload.LoadNCITDrugs;
 
+import java.nio.file.Path;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -35,8 +39,12 @@ public class FinderLoaderTest extends BaseTest {
     @Mock private LoadNCIT loadNCIT;
     @Mock private LoadNCITDrugs loadNCITDrugs;
     @Mock private DataImportService dataImportService;
+    @Mock private LoadJAXData loadJAXData;
+    @Mock private Updog updog;
 
     private DataProvider dataProvider;
+    private DataProvider updogDataProvider;
+    private static boolean NO_VALIDATION_ONLY = false;
 
     @Mock private LoadAdditionalDatasets loadAdditionalDatasets;
     @Mock private LinkSamplesToNCITTerms linkSamplesToNCITTerms;
@@ -44,6 +52,7 @@ public class FinderLoaderTest extends BaseTest {
     @Mock private CreateDataProjections createDataProjections;
     @Mock private SetDataVisibility setDataVisibility;
     @Mock private ValidateDB validateDB;
+    @Mock private File dataDirectory;
 
     @Spy
     @InjectMocks
@@ -52,6 +61,7 @@ public class FinderLoaderTest extends BaseTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+        doNothing().when(this.loadJAXData).run();
         doNothing().when(this.loadDiseaseOntology).run();
         doNothing().when(this.loadMarkers).loadGenes(anyString());
         doNothing().when(this.loadNCIT).loadOntology(anyString());
@@ -62,82 +72,111 @@ public class FinderLoaderTest extends BaseTest {
         doNothing().when(this.createDataProjections).run();
         doNothing().when(this.setDataVisibility).run();
         doNothing().when(this.validateDB).run();
+        doNothing().when(this.updog).run(any(Path.class), anyString(), anyBoolean());
 
         this.dataProvider = DataProvider.JAX;
+        this.updogDataProvider = DataProvider.UOC_BC;
     }
 
 
 
-    @Test public void run_givenSingleProvider_callsRelevantLoader() {
-        doNothing().when(this.finderLoader).callRelevantLoader(dataProvider);
-        finderLoader.run(Collections.singletonList(dataProvider), false, true, false);
-        verify(this.finderLoader).callRelevantLoader(any(DataProvider.class));
-        //verifyNoMoreInteractions(this.finderLoader.callRelevantLoader(dataProvider));
+    @Test public void run_givenSingleProvider_callsRelevantCustomLoader() throws Exception {
+        finderLoader.run(
+            Collections.singletonList(dataProvider),
+            dataDirectory,
+            NO_VALIDATION_ONLY,
+            false, true, false);
+        verify(this.loadJAXData).run();
+        verifyNoMoreInteractions(this.loadJAXData);
     }
 
-    @Test public void run_givenTwoProviders_callsRelevantLoaderForEach() {
-        doNothing().when(this.finderLoader).callRelevantLoader(dataProvider);
-        finderLoader.run(Arrays.asList(dataProvider, dataProvider), false, true, false);
-        verify(this.finderLoader, times(2)).callRelevantLoader(any(DataProvider.class));
-//        verifyNoMoreInteractions(this.finderLoader);
+    @Test public void run_givenSingleProvider_callsRelevantUpdogLoader() throws Exception {
+        finderLoader.run(
+            Collections.singletonList(updogDataProvider),
+            dataDirectory,
+            NO_VALIDATION_ONLY,
+            false, true, false);
+        verify(this.updog).run(any(Path.class), anyString(), anyBoolean());
+        verifyNoMoreInteractions(this.updog);
+    }
+
+    @Test public void run_givenTwoProviders_callsRelevantLoaderForEach() throws Exception {
+        finderLoader.run(
+            Arrays.asList(dataProvider, updogDataProvider),
+            dataDirectory,
+            NO_VALIDATION_ONLY,
+            false, true, false);
+        verify(this.loadJAXData).run();
+        verify(this.updog).run(any(Path.class), anyString(), anyBoolean());
+        verifyNoMoreInteractions(this.loadJAXData);
+        verifyNoMoreInteractions(this.updog);
+    }
+
+    @Test public void run_givenZeroProviders_callNoLoaders() throws Exception {
+        finderLoader.run(Arrays.asList(),
+            dataDirectory,
+            NO_VALIDATION_ONLY,
+            false, true, false);
+        verify(this.loadJAXData, never()).run();
+        verify(this.updog, never()).run(any(Path.class), anyString(), anyBoolean());
     }
 
     @Test public void load_givenMarkerCache_skipLoadingMarkers() {
         givenEmptyMarkerCache(false);
-        finderLoader.run(Collections.singletonList(dataProvider), false, true, false);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, false, true, false);
         verify(this.loadMarkers, never()).loadGenes(anyString());
     }
 
     @Test public void load_givenNoMarkerCache_loadMarkers() {
         givenEmptyMarkerCache(true);
-        finderLoader.run(Collections.singletonList(dataProvider), false, true, false);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, false, true, false);
         verify(this.loadMarkers).loadGenes(anyString());
         verifyNoMoreInteractions(this.loadMarkers);
     }
 
     @Test public void load_givenMarkerCacheButReloadRequested_reloadMarkers() {
         givenEmptyMarkerCache(false);
-        finderLoader.run(Collections.singletonList(dataProvider), true, true, false);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, true, true, false);
         verify(this.loadMarkers).loadGenes(anyString());
         verifyNoMoreInteractions(this.loadMarkers);
     }
 
     @Test public void load_givenOntologyCache_skipLoadingOntologyTerms() {
         givenEmptyOntologyCache(false);
-        finderLoader.run(Collections.singletonList(dataProvider), false, true, false);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, false, true, false);
         verify(this.loadMarkers, never()).loadGenes(anyString());
     }
 
     @Test public void load_givenNoOntologyCache_loadOntologyTerms() {
         givenEmptyOntologyCache(true);
-        finderLoader.run(Collections.singletonList(dataProvider),false, true, false);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, false, true, false);
         verify(this.loadNCIT).loadOntology(DataUrl.DISEASES_BRANCH_URL.get());
         verifyNoMoreInteractions(this.loadNCIT);
     }
 
     @Test public void load_givenOntologyCacheButReloadRequested_reloadOntologyTerms() {
         givenEmptyOntologyCache(false);
-        finderLoader.run(Collections.singletonList(dataProvider), true, true, false);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, true, true, false);
         verify(this.loadNCIT).loadOntology(anyString());
         verifyNoMoreInteractions(this.loadNCIT);
     }
 
     @Test public void load_givenOntologyCache_skipLoadingRegimens() {
         givenEmptyOntologyCache(false);
-        finderLoader.run(Collections.singletonList(dataProvider), false, true, false);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, false, true, false);
         verify(this.loadNCITDrugs, never()).loadRegimens();
     }
 
     @Test public void load_givenNoOntologyCache_loadRegimens() {
         givenEmptyOntologyCache(true);
-        finderLoader.run(Collections.singletonList(dataProvider), false, true, false);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, false, true, false);
         verify(this.loadNCITDrugs).loadRegimens();
         verifyNoMoreInteractions(this.loadNCITDrugs);
     }
 
     @Test public void load_givenOntologyCacheButReloadRequested_reloadRegimens() {
         givenEmptyOntologyCache(false);
-        finderLoader.run(Collections.singletonList(dataProvider), true, true, false);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, true, true, false);
         verify(this.loadNCITDrugs).loadRegimens();
         verifyNoMoreInteractions(this.loadNCITDrugs);
     }

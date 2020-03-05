@@ -165,12 +165,22 @@ public class CreateDataProjections implements ApplicationContextAware{
 
                 for(MarkerAssociation ma: mas){
 
-                    Marker m = ma.getMarker();
+                    List<MolecularData> molecularData;
+                    try{
 
-                    if(m != null){
+                        molecularData = ma.decodeMolecularData();
+                    }
+                    catch (Exception e){
+                        log.error("No molecular data");
+                        molecularData = new ArrayList<>();
+                    }
 
-                        String variantName = ma.getAminoAcidChange();
-                        String markerName = m.getHgncSymbol();
+
+
+                    for(MolecularData md: molecularData){
+
+                        String variantName = md.getAminoAcidChange();
+                        String markerName = md.getMarker();
 
                         if(variantName != null && !variantName.isEmpty()  && markerName != null && !markerName.isEmpty()){
 
@@ -183,7 +193,10 @@ public class CreateDataProjections implements ApplicationContextAware{
 
                         }
 
+
                     }
+
+
                     count++;
                     if(count%10000 == 0) {log.info("Processed "+count+" MA objects");}
                     //if (count > 40000) break;
@@ -243,12 +256,21 @@ public class CreateDataProjections implements ApplicationContextAware{
 
                 for(MarkerAssociation ma: mas){
 
-                    Marker m = ma.getMarker();
+                    List<MolecularData> molecularData;
+                    try{
 
-                    if(m != null){
+                        molecularData = ma.decodeMolecularData();
+                    }
+                    catch (Exception e){
+                        log.error("No molecular data");
+                        molecularData = new ArrayList<>();
+                    }
 
-                        String ihcResult = ma.getCytogeneticsResult();
-                        String markerName = m.getHgncSymbol();
+
+                    for(MolecularData md:molecularData){
+
+                        String ihcResult = md.getCytogeneticsResult();
+                        String markerName = md.getMarker();
                         //log.info(ihcResult + markerName);
                         if(ihcResult != null && !ihcResult.isEmpty()  && markerName != null && !markerName.isEmpty()){
 

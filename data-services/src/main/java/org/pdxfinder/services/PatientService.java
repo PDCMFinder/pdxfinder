@@ -85,7 +85,11 @@ public class PatientService {
                     try{
                         for (MolecularCharacterization molc : sample.getMolecularCharacterizations()){
                             for (MarkerAssociation mAssoc : molc.getMarkerAssociations() ){
-                                geneticMutations.add( mAssoc.getMarker().getHgncSymbol() );
+                                List<MolecularData> maData = mAssoc.getMolecularDataList();
+                                for(MolecularData md: maData){
+                                    geneticMutations.add( md.getMarker() );
+                                }
+
                             }
                         }
                     }catch (Exception ignored) {}

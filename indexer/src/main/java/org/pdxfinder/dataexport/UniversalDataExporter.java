@@ -467,70 +467,90 @@ public class UniversalDataExporter {
 
             List<String> rowData = new ArrayList<>();
 
-            rowData.add(model.getDataSource());
-            rowData.add(model.getSourcePdxId());
-            rowData.add(sampleId);
-            rowData.add(sampleOrigin);
-
-            if(sampleOrigin.equals(patientOrigin)){
-                //no passage, host strain for patient samples
-                rowData.add("");
-                rowData.add("");
+            List<MolecularData> molecularData;
+            try{
+                ma.decodeMolecularData();
+                molecularData = ma.getMolecularDataList();
             }
-            else{
+            catch (Exception e){
+                log.error("No molecular data");
+                molecularData = new ArrayList<>();
+            }
 
-                rowData.add(specimen.getPassage());
+            for(MolecularData md : molecularData){
 
-                if(specimen.getHostStrain() != null && specimen.getHostStrain().getSymbol() != null){
-                    rowData.add(specimen.getHostStrain().getSymbol());
-                }
-                else{
+                rowData.add(model.getDataSource());
+                rowData.add(model.getSourcePdxId());
+                rowData.add(sampleId);
+                rowData.add(sampleOrigin);
+
+                if(sampleOrigin.equals(patientOrigin)){
+                    //no passage, host strain for patient samples
+                    rowData.add("");
                     rowData.add("");
                 }
+                else{
+
+                    rowData.add(specimen.getPassage());
+
+                    if(specimen.getHostStrain() != null && specimen.getHostStrain().getSymbol() != null){
+                        rowData.add(specimen.getHostStrain().getSymbol());
+                    }
+                    else{
+                        rowData.add("");
+                    }
+                }
+
+                //then get the MA data inserted
+
+                if(molcharType.equals("mutation")){
+                    rowData.add(md.getMarker());
+                    rowData.add(md.getAminoAcidChange());
+                    rowData.add(md.getNucleotideChange());
+                    rowData.add(md.getConsequence());
+                    rowData.add(md.getReadDepth());
+                    rowData.add(md.getAlleleFrequency());
+                    rowData.add(md.getChromosome());
+                    rowData.add(md.getSeqStartPosition());
+                    rowData.add(md.getRefAllele());
+                    rowData.add(md.getAltAllele());
+                    rowData.add(md.getMarker());
+                    rowData.add(md.getMarker());
+                    rowData.add(md.getMarker());
+                    //no transcript id
+                    rowData.add("");
+                    rowData.add(md.getExistingVariations());
+                    rowData.add(md.getGenomeAssembly());
+                    rowData.add(mc.getPlatform().getName());
+
+                }else if(molcharType.equals("copy number alteration")){
+
+                    rowData.add(md.getChromosome());
+                    rowData.add(md.getSeqStartPosition());
+                    rowData.add(md.getSeqEndPosition());
+                    rowData.add(md.getMarker());
+                    rowData.add(md.getMarker());
+                    rowData.add(md.getMarker());
+                    rowData.add(md.getMarker());
+                    rowData.add(md.getCnaLog10RCNA());
+                    rowData.add(md.getCnaLog2RCNA());
+                    rowData.add(md.getFold_change());
+                    rowData.add(md.getCnaCopyNumberStatus());
+                    rowData.add(md.getCnaGisticValue());
+                    rowData.add(md.getCnaPicnicValue());
+                    rowData.add(md.getGenomeAssembly());
+                    rowData.add(mc.getPlatform().getName());
+                }
+
+                sheetData.add(rowData);
+
+
+
+
             }
 
-            //then get the MA data inserted
 
-            if(molcharType.equals("mutation")){
-                rowData.add(ma.getMarker().getHgncSymbol());
-                rowData.add(ma.getAminoAcidChange());
-                rowData.add(ma.getNucleotideChange());
-                rowData.add(ma.getConsequence());
-                rowData.add(ma.getReadDepth());
-                rowData.add(ma.getAlleleFrequency());
-                rowData.add(ma.getChromosome());
-                rowData.add(ma.getSeqStartPosition());
-                rowData.add(ma.getRefAllele());
-                rowData.add(ma.getAltAllele());
-                rowData.add(ma.getMarker().getUcscGeneId());
-                rowData.add(ma.getMarker().getNcbiGeneId());
-                rowData.add(ma.getMarker().getEnsemblGeneId());
-                //no transcript id
-                rowData.add("");
-                rowData.add(ma.getRsIdVariants());
-                rowData.add(ma.getGenomeAssembly());
-                rowData.add(mc.getPlatform().getName());
 
-            }else if(molcharType.equals("copy number alteration")){
-
-                rowData.add(ma.getChromosome());
-                rowData.add(ma.getSeqStartPosition());
-                rowData.add(ma.getSeqEndPosition());
-                rowData.add(ma.getMarker().getHgncSymbol());
-                rowData.add(ma.getMarker().getUcscGeneId());
-                rowData.add(ma.getMarker().getNcbiGeneId());
-                rowData.add(ma.getMarker().getEnsemblGeneId());
-                rowData.add(ma.getCnaLog10RCNA());
-                rowData.add(ma.getCnaLog2RCNA());
-                rowData.add(ma.getFold_change());
-                rowData.add(ma.getCnaCopyNumberStatus());
-                rowData.add(ma.getCnaGisticValue());
-                rowData.add(ma.getCnaPicnicValue());
-                rowData.add(ma.getGenomeAssembly());
-                rowData.add(mc.getPlatform().getName());
-            }
-
-            sheetData.add(rowData);
         }
     }
 

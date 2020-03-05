@@ -48,6 +48,11 @@
             <artifactId>data-services</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>tech.tablesaw</groupId>
+            <artifactId>tablesaw-core</artifactId>
+            <version>LATEST</version>
+        </dependency>
 
     </dependencies>
 

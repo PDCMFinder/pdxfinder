@@ -43,7 +43,7 @@ public class PatientIntegrationTest extends BaseTest {
         patientSnapshotRepository.deleteAll();
         groupRepository.deleteAll();
 
-        providerGroup = new Group("testgroup", "tg", "groupdescription", "academia", "", "");
+        providerGroup = Group.createProviderGroup("testgroup", "tg", "groupdescription", "academia", "", "");
 
         patient = new Patient("p1", "male", "-", "-", providerGroup);
 

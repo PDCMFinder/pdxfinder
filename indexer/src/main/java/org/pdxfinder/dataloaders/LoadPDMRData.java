@@ -228,7 +228,6 @@ public class LoadPDMRData extends LoaderBase {
             }
 
         }
-        //loadVariationData(mc);
         dataImportService.saveModelCreation(dto.getModelCreation());
 
     }
