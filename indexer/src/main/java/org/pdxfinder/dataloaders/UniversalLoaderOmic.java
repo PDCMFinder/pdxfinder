@@ -261,6 +261,8 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 molecularCharacterization = new MolecularCharacterization();
                 molecularCharacterization.setType(dataType);
                 molecularCharacterization.setPlatform(platform);
+                MarkerAssociation markerAssociation = new MarkerAssociation();
+                molecularCharacterization.addMarkerAssociation(markerAssociation);
                 toBeCreatedMolcharNodes.put(molcharKey, molecularCharacterization);
             }
 
@@ -299,9 +301,13 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
                     md = setCNAProperties(data, marker);
                 }
-                else{
+                else if (dataType.equals("transcriptomics")){
 
                     md = setTranscriptomicProperties(data, marker);
+                }
+                else{
+                    log.error("Unknown datatype: {}",dataType);
+                    md = new MolecularData();
                 }
 
 
@@ -320,8 +326,9 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         //PHASE 2: save existing molchars with new data
         log.info("Saving existing molchars for model "+modelID);
         for(Map.Entry<String, MolecularCharacterization> mcEntry : existingMolcharNodes.entrySet()){
-
-            dataImportService.saveMolecularCharacterization(mcEntry.getValue());
+            MolecularCharacterization mc = mcEntry.getValue();
+            mc.getFirstMarkerAssociation().encodeMolecularData();
+            dataImportService.saveMolecularCharacterization(mc);
 
         }
 
@@ -332,6 +339,8 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             String mcKey = mcEntry.getKey();
             MolecularCharacterization mc = mcEntry.getValue();
+
+            mc.getFirstMarkerAssociation().encodeMolecularData();
 
             String[] mcKeyArr = mcKey.split("__");
             String sampleId = mcKeyArr[0];
