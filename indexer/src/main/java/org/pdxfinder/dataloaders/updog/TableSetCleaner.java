@@ -19,8 +19,8 @@ public class TableSetCleaner {
 
     public Map<String, Table> cleanOmicsTables(Map<String, Table> omicsTableSet) {
         omicsTableSet = TableSetUtilities.removeProviderNameFromFilename(omicsTableSet);
-        TableSetUtilities.removeDescriptionColumn(omicsTableSet);
         omicsTableSet = TableSetUtilities.removeHeaderRowsIfPresent(omicsTableSet);
+        TableSetUtilities.removeDescriptionColumn(omicsTableSet);
         omicsTableSet = TableSetUtilities.removeBlankRows(omicsTableSet);
         return omicsTableSet;
     }
