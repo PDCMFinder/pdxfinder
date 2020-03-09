@@ -138,8 +138,15 @@ public class LinkSamplesToNCITTerms {
         if (!this.missingMappings.containsKey(id)) {
             //log.info("No mapping found for "+id);
             Set<MissingMapping> lmm = new HashSet<>();
-            lmm.add(mm);
-            this.missingMappings.put(id, lmm);
+            try {
+                lmm.add(mm);
+                this.missingMappings.put(id, lmm);
+            }
+            catch (Exception e){
+                log.error(mm.toString());
+            }
+
+
         } else {
 
             this.missingMappings.get(id).add(mm);
