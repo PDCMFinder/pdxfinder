@@ -24,6 +24,8 @@ public class DomainObjectCreator {
     private ModelCreationCreator modelCreationCreator;
     private static final Logger log = LoggerFactory.getLogger(DomainObjectCreator.class);
 
+    Map<String, Table> pdxDataTables;
+
     private static final String FIRST = "first";
     private static final String PATIENTS = "patient";
     private static final String PROVIDER_GROUPS = "provider_group";
@@ -53,6 +55,7 @@ public class DomainObjectCreator {
     public void loadDomainObjects(Map<String, Table> pdxDataTables) {
         //: Do not change the order of these unless you want to risk 1. the universe to collapse OR 2. missing nodes in the db
 
+        this.pdxDataTables = pdxDataTables;
         domainObjects = new HashMap<>();
         createProvider(pdxDataTables);
         createPatientData(pdxDataTables);
@@ -118,6 +121,7 @@ public class DomainObjectCreator {
     void createSampleData(Map<String, Table> pdxDataTables) {
         log.info("Creating sample data");
         Table sampleTable = pdxDataTables.get("metadata-sample.tsv");
+        Group providerGroup = (Group) domainObjects.get(PROVIDER_GROUPS).get(FIRST);
         for (Row row : sampleTable) {
             String patientId = row.getString(TSV.Metadata.patient_id.name());
             String modelId = row.getString(TSV.Metadata.model_id.name());
@@ -153,6 +157,7 @@ public class DomainObjectCreator {
             }
 
             Sample sample = createPatientSample(row);
+            sample.setDataSource(providerGroup.getAbbreviation());
             patientSnapshot.addSample(sample);
             ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
             if (modelCreation == null) throw new NullPointerException();
@@ -760,7 +765,6 @@ public class DomainObjectCreator {
         if (domainObjects.containsKey(key1))
             return domainObjects.get(key1).get(key2);
         else {
-            log.error("Tried to access nonexistant domain object key {}", key1);
             return null;
         }
     }

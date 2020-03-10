@@ -175,7 +175,7 @@ public class LoadJAXData extends LoaderBase {
                 ma.addMolecularData(pra);
 
                 mc.addMarkerAssociation(ma);
-
+                mc.getFirstMarkerAssociation().encodeMolecularData();
                 dto.getPatientSample().addMolecularCharacterization(mc);
             }
         }
@@ -265,7 +265,9 @@ public class LoadJAXData extends LoaderBase {
 
     @Override
     void step18SetAdditionalGroups() {
-        throw new UnsupportedOperationException();
+
+        //throw new UnsupportedOperationException();
+        log.info("Additional groups is not supported for datasource: {}",dataSource);
     }
 
 

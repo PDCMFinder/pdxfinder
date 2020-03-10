@@ -13,6 +13,7 @@ import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
 import java.util.Map;
+import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -42,7 +43,9 @@ public class SampleCreatorTest {
         expected.setGrade(row.getString(TSV.Metadata.grade.name()));
         expected.setGradeClassification(row.getString(TSV.Metadata.grading_system.name()));
 
-        assertThat(sampleCreator.createPatientSample(testTableSet).contains(expected), is(true));
+        Set<Sample> sampleSet = sampleCreator.createPatientSample(testTableSet);
+
+        assertEquals(sampleSet.iterator().next().getSourceSampleId(), expected.getSourceSampleId());
 
     }
 }

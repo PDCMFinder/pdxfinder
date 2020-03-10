@@ -49,7 +49,12 @@ class TableSetUtilities {
     }
 
     static void removeDescriptionColumn(Map<String, Table> tableSet) {
-        tableSet.values().forEach(t -> t.removeColumns("Field"));
+        tableSet.values().forEach(t -> removeColumnIfExists(t, "Field"));
+    }
+
+    static void removeColumnIfExists(Table table, String columnToRemove) {
+        if (table.columnNames().contains(columnToRemove))
+            table.removeColumns(columnToRemove);
     }
 
     static Map<String, Table> removeProviderNameFromFilename(Map<String, Table> tableSet) {
