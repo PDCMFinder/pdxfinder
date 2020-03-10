@@ -267,24 +267,5 @@ public class Sample {
         return null;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Sample sample = (Sample) o;
-
-        return new EqualsBuilder()
-            .append(getSourceSampleId(), sample.getSourceSampleId())
-            .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-            .append(getSourceSampleId())
-            .toHashCode();
-    }
 
 }
