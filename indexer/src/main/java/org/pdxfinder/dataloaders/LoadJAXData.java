@@ -174,9 +174,13 @@ public class LoadJAXData extends LoaderBase {
                 ma.addMolecularData(era);
                 ma.addMolecularData(pra);
 
+                mc.addMarker("ERBB2");
+                mc.addMarker("ESR1");
+                mc.addMarker("PGR");
                 mc.addMarkerAssociation(ma);
                 mc.getFirstMarkerAssociation().encodeMolecularData();
                 dto.getPatientSample().addMolecularCharacterization(mc);
+                dataImportService.saveSample(dto.getPatientSample());
             }
         }
 
