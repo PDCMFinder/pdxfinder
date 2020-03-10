@@ -58,6 +58,14 @@ public class MolecularData {
     protected String illuminaHGEAProbeId;
     protected String illuminaHGEAExpressionValue;
 
+    private String fusionGeneSymbol;
+    private String fusionGenePartner1;
+    private String fusionGenePartner2;
+    private String translocationNomenclature;
+
+    private String pValue;
+    private String markerStatusComment;
+
     private String marker;
 
 
@@ -513,5 +521,53 @@ public class MolecularData {
 
     public String getMarkerName(MolecularData molecularData) {
         return this.marker;
+    }
+
+    public String getFusionGeneSymbol() {
+        return fusionGeneSymbol;
+    }
+
+    public void setFusionGeneSymbol(String fusionGeneSymbol) {
+        this.fusionGeneSymbol = fusionGeneSymbol;
+    }
+
+    public String getFusionGenePartner1() {
+        return fusionGenePartner1;
+    }
+
+    public void setFusionGenePartner1(String fusionGenePartner1) {
+        this.fusionGenePartner1 = fusionGenePartner1;
+    }
+
+    public String getFusionGenePartner2() {
+        return fusionGenePartner2;
+    }
+
+    public void setFusionGenePartner2(String fusionGenePartner2) {
+        this.fusionGenePartner2 = fusionGenePartner2;
+    }
+
+    public String getTranslocationNomenclature() {
+        return translocationNomenclature;
+    }
+
+    public void setTranslocationNomenclature(String translocationNomenclature) {
+        this.translocationNomenclature = translocationNomenclature;
+    }
+
+    public String getpValue() {
+        return pValue;
+    }
+
+    public void setpValue(String pValue) {
+        this.pValue = pValue;
+    }
+
+    public String getMarkerStatusComment() {
+        return markerStatusComment;
+    }
+
+    public void setMarkerStatusComment(String markerStatusComment) {
+        this.markerStatusComment = markerStatusComment;
     }
 }

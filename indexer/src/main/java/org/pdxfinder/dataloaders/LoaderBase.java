@@ -221,12 +221,13 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
                 step08GetMetaData();
                 step09LoadPatientData();
                 step10LoadExternalURLs();
-                step11LoadBreastMarkers();
+
                 step12CreateModels();
                 step13LoadSpecimens();
                 step14LoadPatientTreatments();
                 step17LoadModelDosingStudies();
                 step16LoadVariationData();
+                step11LoadBreastMarkers();
             }
             catch (Exception e){
                 log.error("Exception occured in loaderbase: {}",e);
@@ -235,6 +236,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
         }
 
         step15LoadImmunoHistoChemistry();
+
     }
 
     public void loadExternalURLs(String dataSourceContact, String dataSourceURL){
