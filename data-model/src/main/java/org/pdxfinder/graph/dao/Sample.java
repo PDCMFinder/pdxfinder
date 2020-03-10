@@ -23,6 +23,7 @@ public class Sample {
 
     private String sourceSampleId;
     private String diagnosis;
+    private String diagnosisNotes;
     private Tissue originTissue;
     private Tissue sampleSite;
     private String extractionMethod;
@@ -267,5 +268,11 @@ public class Sample {
         return null;
     }
 
+    public String getDiagnosisNotes() {
+        return diagnosisNotes;
+    }
 
+    public void setDiagnosisNotes(String diagnosisNotes) {
+        this.diagnosisNotes = diagnosisNotes;
+    }
 }

@@ -39,9 +39,11 @@ public class TreatmentProtocol {
 
     private String armSize;
     private String responseCalculationMethod;
-    private String passages;
+    private String passageRange;
 
     private String treatmentDate;
+
+    private String clinicalTrialId;
 
     public TreatmentProtocol() {
         components = new ArrayList<>();
@@ -80,12 +82,12 @@ public class TreatmentProtocol {
         this.responseCalculationMethod = responseCalculationMethod;
     }
 
-    public String getPassages() {
-        return passages;
+    public String getPassageRange() {
+        return passageRange;
     }
 
-    public void setPassages(String passages) {
-        this.passages = passages;
+    public void setPassageRange(String passageRange) {
+        this.passageRange = passageRange;
     }
 
     public CurrentTreatment getCurrentTreatment() {
@@ -102,6 +104,14 @@ public class TreatmentProtocol {
 
     public void setTreatmentDate(String treatmentDate) {
         this.treatmentDate = treatmentDate;
+    }
+
+    public String getClinicalTrialId() {
+        return clinicalTrialId;
+    }
+
+    public void setClinicalTrialId(String clinicalTrialId) {
+        this.clinicalTrialId = clinicalTrialId;
     }
 
     public String getTreatmentString(boolean includeControlDrugs){
