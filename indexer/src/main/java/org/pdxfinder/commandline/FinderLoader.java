@@ -194,9 +194,6 @@ public class FinderLoader {
                 case PDXNet_HCI_BCM:
                     loadHCI.run();
                     break;
-                case IRCC_CRC:
-                    loadIRCC.run();
-                    break;
                 case JAX:
                     loadJAXData.run();
                     break;

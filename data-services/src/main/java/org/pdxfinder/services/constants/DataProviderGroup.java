@@ -29,6 +29,7 @@ public enum DataProviderGroup {
 
         map.put(DataProviderGroup.UPDOG, Arrays.asList(
                 DataProvider.IRCC_GC,
+                DataProvider.IRCC_CRC,
                 DataProvider.CRL,
                 DataProvider.TRACE,
                 DataProvider.Curie_BC,

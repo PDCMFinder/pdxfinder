@@ -280,10 +280,11 @@ public class DomainObjectCreator {
            for(Row row : treatmentTable){
                 String patientId = getStringFromRowAndColumn(row, TSV.Metadata.patient_id.name());
                 Patient patient = (Patient) getDomainObject(PATIENTS, patientId);
-                if(patient == null) throw new NullPointerException();
-                PatientSnapshot patientSnapshot = patient.getLastSnapshot();
-                TreatmentProtocol treatmentProtocol = getTreatmentProtocol(row);
-                patientSnapshot.addTreatmentProtocol(treatmentProtocol);
+                if(patient != null) {
+                    PatientSnapshot patientSnapshot = patient.getLastSnapshot();
+                    TreatmentProtocol treatmentProtocol = getTreatmentProtocol(row);
+                    patientSnapshot.addTreatmentProtocol(treatmentProtocol);
+                }
            }
         }
     }

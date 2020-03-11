@@ -729,7 +729,10 @@ public class SearchDS {
 
                 mfq.setSampleOriginTissue(j.getString("sampleOriginTissue"));
                 mfq.setSampleSampleSite(j.getString("sampleSampleSite"));
-                mfq.setSampleExtractionMethod(j.getString("sampleExtractionMethod"));
+                if(j.has("sampleExtractionMethod")){
+                    mfq.setSampleExtractionMethod(j.getString("sampleExtractionMethod"));
+                }
+
                 //mfq.setSampleClassification(j.getString("sampleClassification"));
                 mfq.setSampleTumorType(j.getString("sampleTumorType"));
                 mfq.setDiagnosis(j.getString("diagnosis"));
