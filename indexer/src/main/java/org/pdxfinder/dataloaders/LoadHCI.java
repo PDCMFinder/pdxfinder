@@ -194,28 +194,28 @@ public class LoadHCI extends LoaderBase {
                                     reportManager.addMessage(nsdto.getLogEntity());
                                 }
 
+                                MolecularCharacterization mc;
 
                                 if (molCharMap.containsKey(modelId + "---" + sampleId)) {
 
-                                    MolecularCharacterization mc = molCharMap.get(modelId + "---" + sampleId);
-
-
-                                    MarkerAssociation ma = new MarkerAssociation();
-                                    mc.addMarkerAssociation(ma);
+                                    mc = molCharMap.get(modelId + "---" + sampleId);
                                 }
                                 else {
 
-                                    MolecularCharacterization mc = new MolecularCharacterization();
+                                    mc = new MolecularCharacterization();
                                     mc.setType("cytogenetics");
                                     mc.setPlatform(pl);
-
                                     MarkerAssociation ma = new MarkerAssociation();
                                     mc.addMarkerAssociation(ma);
+
 
                                     molCharMap.put(modelId + "---" + sampleId, mc);
                                 }
 
-
+                                MolecularData molecularData = new MolecularData();
+                                molecularData.setMarker(marker.getHgncSymbol());
+                                molecularData.setCytogeneticsResult(result);
+                                mc.getFirstMarkerAssociation().addMolecularData(molecularData);
 
                             }
 
@@ -250,6 +250,7 @@ public class LoadHCI extends LoaderBase {
                 }
 
                 sample.addMolecularCharacterization(mc);
+                mc.getFirstMarkerAssociation().encodeMolecularData();
                 dataImportService.saveSample(sample);
 
             }
