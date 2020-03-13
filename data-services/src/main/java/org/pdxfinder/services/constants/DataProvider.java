@@ -20,7 +20,8 @@ public enum DataProvider {
     UOC_BC("UOC-BC"),
     UOM_BC("UOM-BC"),
     VHIO_BC("VHIO-BC"),
-    VHIO_CRC("VHIO-CRC");
+    VHIO_CRC("VHIO-CRC"),
+    DFCI_CPDM("DFCI-CPDM");
 
     private String name;
     DataProvider(String name) {

@@ -39,7 +39,8 @@ public enum DataProviderGroup {
                 DataProvider.UOC_BC,
                 DataProvider.UOM_BC,
                 DataProvider.VHIO_BC,
-                DataProvider.VHIO_CRC
+                DataProvider.VHIO_CRC,
+                DataProvider.DFCI_CPDM
         ));
 
         return map.get(group);
