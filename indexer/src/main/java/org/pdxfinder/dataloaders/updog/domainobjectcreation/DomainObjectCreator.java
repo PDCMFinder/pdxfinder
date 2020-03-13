@@ -160,7 +160,11 @@ public class DomainObjectCreator {
             sample.setDataSource(providerGroup.getAbbreviation());
             patientSnapshot.addSample(sample);
             ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
-            if (modelCreation == null) throw new NullPointerException();
+            if (modelCreation == null)
+            {
+                log.error("Can't link patient sample, missing model: {}",modelId);
+                throw new NullPointerException();
+            }
             modelCreation.setSample(sample);
             modelCreation.addRelatedSample(sample);
         }
@@ -201,14 +205,22 @@ public class DomainObjectCreator {
             String hostStrainFull = row.getString(TSV.Metadata.validation_host_strain_full.name());
 
             ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
-            if (modelCreation == null) throw new NullPointerException();
+            if (modelCreation != null)
+            {
+                QualityAssurance qa = new QualityAssurance();
+                qa.setTechnology(validationTechnique);
+                qa.setDescription(description);
+                qa.setPassages(passagesTested);
+                qa.setValidationHostStrain(hostStrainFull);
+                modelCreation.addQualityAssurance(qa);
 
-            QualityAssurance qa = new QualityAssurance();
-            qa.setTechnology(validationTechnique);
-            qa.setDescription(description);
-            qa.setPassages(passagesTested);
-            qa.setValidationHostStrain(hostStrainFull);
-            modelCreation.addQualityAssurance(qa);
+            }
+            else{
+                log.error("Can't link validation, missing model {}",modelId);
+                //throw new NullPointerException();
+            }
+
+
         }
     }
 
