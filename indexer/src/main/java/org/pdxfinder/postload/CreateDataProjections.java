@@ -362,19 +362,19 @@ public class CreateDataProjections implements ApplicationContextAware{
             ModelCreation model = dataImportService.findModelWithSampleByMolChar(mc);
             Long modelId = model.getId();
 
-            Set<Marker> mas = dataImportService.findAllDistinctMarkersByMolCharId(mc.getId());
-            for(Marker m : mas){
+            Set<String> mas = mc.getMarkers();
+            for(String m : mas){
 
 
-                if(copyNumberAlterationDP.containsKey(m.getHgncSymbol())){
+                if(copyNumberAlterationDP.containsKey(m)){
 
-                    copyNumberAlterationDP.get(m.getHgncSymbol()).add(modelId);
+                    copyNumberAlterationDP.get(m).add(modelId);
                 }
                 else{
 
                     Set<Long> newSet = new HashSet<>();
                     newSet.add(modelId);
-                    copyNumberAlterationDP.put(m.getHgncSymbol(), newSet);
+                    copyNumberAlterationDP.put(m, newSet);
                 }
             }
 
@@ -404,18 +404,18 @@ public class CreateDataProjections implements ApplicationContextAware{
             ModelCreation model = dataImportService.findModelWithSampleByMolChar(mc);
             Long modelId = model.getId();
 
-            Set<Marker> mas = dataImportService.findAllDistinctMarkersByMolCharId(mc.getId());
-            for(Marker m : mas){
+            Set<String> mas = mc.getMarkers();
+            for(String m : mas){
 
-                if(transcriptomicsDP.containsKey(m.getHgncSymbol())){
+                if(transcriptomicsDP.containsKey(m)){
 
-                    transcriptomicsDP.get(m.getHgncSymbol()).add(modelId);
+                    transcriptomicsDP.get(m).add(modelId);
                 }
                 else{
 
                     Set<Long> newSet = new HashSet<>();
                     newSet.add(modelId);
-                    transcriptomicsDP.put(m.getHgncSymbol(), newSet);
+                    transcriptomicsDP.put(m, newSet);
                 }
             }
 
