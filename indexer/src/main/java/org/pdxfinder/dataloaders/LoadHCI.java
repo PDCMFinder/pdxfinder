@@ -216,7 +216,7 @@ public class LoadHCI extends LoaderBase {
                                 molecularData.setMarker(marker.getHgncSymbol());
                                 molecularData.setCytogeneticsResult(result);
                                 mc.getFirstMarkerAssociation().addMolecularData(molecularData);
-
+                                mc.addMarker(molecularData.getMarker());
                             }
 
 
