@@ -29,6 +29,10 @@ public class CbpTransformer implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(CbpTransformer.class);
     private static final String TRANSFORM_CBP = "TRANSFORM_CBP";
+    private static  enum omicType {
+        MUT,
+        GISTIC
+    };
 
     @Value("${pdxfinder.root.dir}")
     private String finderRootDir;
@@ -38,25 +42,28 @@ public class CbpTransformer implements CommandLineRunner {
 
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("TRANSFORM_CBP", "Ingest mut JSON and converts to templates");
-
+        parser.accepts("TRANSFORM_CBP", "Ingest CBP omic JSONs and converts to PdxFinder templates");
+        parser.accepts("MUT", "Pares MUT data");
+        parser.accepts("CNA", "parses CNA data");
         OptionSet options = parser.parse(args);
-        long startTime = System.currentTimeMillis();
 
         if (options.has(TRANSFORM_CBP) && args.length > 1) {
-
             log.info("Exporting data from {}", args[2]);
             String templateDir = finderRootDir + "/template";
             String exportDir = finderRootDir + "/export";
-            exportCBP(exportDir, templateDir, args[2], args[1]);
+            if (options.has(omicType.MUT.name())) {
+                exportCBP(exportDir, templateDir, args[2], omicType.MUT.name());
+            }
+            else if (options.has(omicType.GISTIC.name())){
+                exportCBP(exportDir, templateDir, args[2], omicType.GISTIC.name());
+            }
         }
     }
 
     public void exportCBP(String exportDir,String templateDir, String pathToJson, String dataType) throws IOException {
 
         if (!doesFileExist(exportDir) || !doesFileExist(templateDir) || !doesFileExist(pathToJson)) {
-
-            throw new IOException("A string argument passed to the exportCBP does not correspond to an existing file.");
+            throw new IOException("A string argument passed to the exportCBP does not point to an existing file.");
         }
 
             Group jsonGroup = createGroupWithJsonsFilename(pathToJson);
@@ -74,11 +81,11 @@ public class CbpTransformer implements CommandLineRunner {
 
         List<List<String>> sheet;
 
-        if(dataType.equals("mut")){
+        if(dataType.equals(omicType.MUT.name())){
             sheet = CbpMutJsonMapsToSheet(listMapTable);
             universalDataExporter.setMutationSheetDataExport(sheet);
         }
-       else if(dataType.equals("gistic")) {
+       else if(dataType.equals(omicType.GISTIC.name())) {
             sheet = CbpGisticsonMapsToSheet(listMapTable);
             universalDataExporter.setCnaSheetDataExport(sheet);
         }
