@@ -62,7 +62,7 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
     @Query("MATCH (m:Marker) WHERE NOT (m)--() DELETE m")
     void deleteMarkersWithoutRelationships();
 
-    @Query("MATCH (mc:MolecularCharacterization)-[awr:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mr:MARKER]-(m:Marker) " +
+    @Query("MATCH (mc:MolecularCharacterization)-[awr:ASSOCIATED_WITH]-(ma:MarkerAssociation) " +
             "WHERE ID(mc) = {id} " +
             "RETURN DISTINCT m")
     Set<Marker> findDistinctByMolCharId(@Param("id") Long id);
