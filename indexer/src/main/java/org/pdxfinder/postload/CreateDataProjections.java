@@ -78,6 +78,7 @@ public class CreateDataProjections implements ApplicationContextAware{
 
     private Map<String, List<DataAvailableDTO>> dataAvailableDP = new HashMap<>();
 
+    private TreeMap<String, Set<Long>> frequentlyMutatedMarkers = new TreeMap<>();
     private List<MutatedMarkerData> frequentlyMutatedMarkersDP = new ArrayList<>();
 
     //"treatment name"=>"set of model ids"
@@ -190,7 +191,7 @@ public class CreateDataProjections implements ApplicationContextAware{
                             addToMutatedMarkerVariantDP(markerName, variantName);
 
                             addToThreeParamDP(mutatedPlatformMarkerVariantModelDP, platformName, markerName, variantName, modelId);
-
+                            addToFrequentlyMutatedMarkers(markerName, modelId);
                         }
 
 
@@ -363,20 +364,24 @@ public class CreateDataProjections implements ApplicationContextAware{
             Long modelId = model.getId();
 
             Set<String> mas = mc.getMarkers();
-            for(String m : mas){
+            if(mas != null){
+                for(String m : mas){
 
 
-                if(copyNumberAlterationDP.containsKey(m)){
+                    if(copyNumberAlterationDP.containsKey(m)){
 
-                    copyNumberAlterationDP.get(m).add(modelId);
+                        copyNumberAlterationDP.get(m).add(modelId);
+                    }
+                    else{
+
+                        Set<Long> newSet = new HashSet<>();
+                        newSet.add(modelId);
+                        copyNumberAlterationDP.put(m, newSet);
+                    }
                 }
-                else{
 
-                    Set<Long> newSet = new HashSet<>();
-                    newSet.add(modelId);
-                    copyNumberAlterationDP.put(m, newSet);
-                }
             }
+
 
         }
 
@@ -405,19 +410,25 @@ public class CreateDataProjections implements ApplicationContextAware{
             Long modelId = model.getId();
 
             Set<String> mas = mc.getMarkers();
-            for(String m : mas){
 
-                if(transcriptomicsDP.containsKey(m)){
+            if(mas != null){
+                for(String m : mas){
 
-                    transcriptomicsDP.get(m).add(modelId);
+                    if(transcriptomicsDP.containsKey(m)){
+
+                        transcriptomicsDP.get(m).add(modelId);
+                    }
+                    else{
+
+                        Set<Long> newSet = new HashSet<>();
+                        newSet.add(modelId);
+                        transcriptomicsDP.put(m, newSet);
+                    }
                 }
-                else{
 
-                    Set<Long> newSet = new HashSet<>();
-                    newSet.add(modelId);
-                    transcriptomicsDP.put(m, newSet);
-                }
             }
+
+
 
         }
 
@@ -1331,9 +1342,17 @@ public class CreateDataProjections implements ApplicationContextAware{
     private void createFrequentlyMutatedGenesDataProjection(){
 
         log.info("Creating Frequently Mutated Genes DP");
-        frequentlyMutatedMarkersDP = dataImportService.getFrequentlyMutatedGenes();
 
+        for(Map.Entry<String, Set<Long>> entry : frequentlyMutatedMarkers.entrySet() ){
 
+            MutatedMarkerData mmd = new MutatedMarkerData();
+            mmd.setGene_name(entry.getKey());
+            mmd.setNumber_of_models(entry.getValue().size());
+
+            frequentlyMutatedMarkersDP.add(mmd);
+        }
+
+        frequentlyMutatedMarkersDP.sort(Comparator.comparing(MutatedMarkerData::getNumber_of_models).reversed());
     }
 
 
@@ -1377,7 +1396,17 @@ public class CreateDataProjections implements ApplicationContextAware{
 
     }
 
+    private void addToFrequentlyMutatedMarkers(String marker, Long modelId){
 
+        if(frequentlyMutatedMarkers.containsKey(marker)){
+            frequentlyMutatedMarkers.get(marker).add(modelId);
+        }
+        else{
+            Set<Long> set = new HashSet<>();
+            set.add(modelId);
+            frequentlyMutatedMarkers.put(marker, set);
+        }
+    }
 
     private void saveDataProjections(){
 
