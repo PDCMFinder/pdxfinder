@@ -324,7 +324,7 @@ public class DomainObjectCreator {
     private void createMutationData(Map<String, Table> pdxDataTables){
         Table mutationTable = pdxDataTables.get("mut.tsv");
         if(mutationTable != null){
-            createMolecularCharacterization(mutationTable, "mutation");
+            createMolecularData(mutationTable, "mutation");
         }
         else{
             Map<String, Object> models = domainObjects.get(MODELS);
@@ -334,7 +334,7 @@ public class DomainObjectCreator {
                 mutationTable = pdxDataTables.get(mutationModelId);
                 if(mutationTable != null){
                     log.info(modelCreation.getSourcePdxId());
-                    createMolecularCharacterization(mutationTable, "mutation");
+                    createMolecularData(mutationTable, "mutation");
                 }
             }
         }
@@ -343,7 +343,7 @@ public class DomainObjectCreator {
     private void createCnaData(Map<String, Table> pdxDataTables){
         Table cnaTable = pdxDataTables.get("cna.tsv");
         if (cnaTable != null) {
-            createMolecularCharacterization(cnaTable, "copynumberalteration");
+            createMolecularData(cnaTable, "copy number alteration");
         } else {
             Map<String, Object> models = domainObjects.get(MODELS);
             for(Map.Entry<String, Object> entry : models.entrySet()){
@@ -352,7 +352,7 @@ public class DomainObjectCreator {
                 cnaTable = pdxDataTables.get(cnaModelId);
                 if(cnaTable != null){
                     log.info(modelCreation.getSourcePdxId());
-                    createMolecularCharacterization(cnaTable, "copynumberalteration");
+                    createMolecularData(cnaTable, "copy number alteration");
                 }
             }
         }
@@ -361,22 +361,23 @@ public class DomainObjectCreator {
     private void createCytogeneticsData(Map<String, Table> pdxDataTables){
         Table cytoTable = pdxDataTables.get("cytogenetics-Sheet1.tsv");
         if (cytoTable != null)
-            createMolecularCharacterization(cytoTable, "cytogenetics");
+            createMolecularData(cytoTable, "cytogenetics");
     }
 
-    private void createMolecularCharacterization(Table table, String molcharType){
-        MolecularCharacterization molecularCharacterization = getMolcharByType(table.row(0), molcharType);
-        MarkerAssociation markerAssociation = new MarkerAssociation();
+    private void createMolecularData(Table table, String molcharType){
+
+        MolecularCharacterization molecularCharacterization = null;
+
         for (Row row : table) {
-            MolecularData molecularData = createMolecularDataObject(molecularCharacterization, row);
+            molecularCharacterization = getMolcharByType(row, molcharType);
+            MolecularData molecularData = createMolecularData(molecularCharacterization, row);
             if (molecularData.hasMarker()){
-                markerAssociation.addMolecularData(molecularData);
-                molecularCharacterization.addMarker(molecularData.getMarker());
+
+                molecularCharacterization.getFirstMarkerAssociation().addMolecularData(molecularData);
             }
         }
-        molecularCharacterization.addMarkerAssociation(markerAssociation);
-        molecularCharacterization.setMarkers(getMarkers(markerAssociation));
-        addDomainObject("molecular_characterization", molcharType, molecularCharacterization);
+
+        //addDomainObject("molecular_characterization", molcharType, molecularCharacterization);
     }
 
     private MolecularCharacterization getMolcharByType(Row row, String molCharType) {
@@ -452,6 +453,8 @@ public class DomainObjectCreator {
             molecularCharacterization = new MolecularCharacterization();
             molecularCharacterization.setType(molCharType);
             molecularCharacterization.setPlatform(getOrCreatePlatform(platformName, molCharType));
+            MarkerAssociation ma = new MarkerAssociation();
+            molecularCharacterization.addMarkerAssociation(ma);
             sample.addMolecularCharacterization(molecularCharacterization);
         }
         return molecularCharacterization;
@@ -471,7 +474,7 @@ public class DomainObjectCreator {
         return platform;
     }
 
-    private MolecularData createMolecularDataObject (
+    private MolecularData createMolecularData(
         MolecularCharacterization molecularCharacterization,
         Row row
     ) {
@@ -489,11 +492,12 @@ public class DomainObjectCreator {
             molecularCharacterization.getPlatform().getName());
         if (nodeSuggestionDTO.getNode() != null) {
             logMarkerSuggestions(nodeSuggestionDTO);
-            molecularData = createMolecularCharacterization(
+            molecularData = createMolecularData(
                 molecularCharacterization.getType(),
                 row,
                 (Marker) nodeSuggestionDTO.getNode());
         }
+
         return molecularData;
     }
 
@@ -502,7 +506,7 @@ public class DomainObjectCreator {
             log.error(nodeSuggestionDTO.getLogEntity().getMessage());
     }
 
-    private MolecularData createMolecularCharacterization(String type, Row row, Marker marker) {
+    private MolecularData createMolecularData(String type, Row row, Marker marker) {
         MolecularData molecularData;
         switch (type) {
             case "mutation":
@@ -511,8 +515,11 @@ public class DomainObjectCreator {
             case "cytogenetics":
                 molecularData = getCytogeneticsProperties(row, marker);
                 break;
-            case "copynumberalteration":
+            case "copy number alteration":
                 molecularData = getCNAProperties(row, marker);
+                break;
+            case "transcriptomics":
+                molecularData = getTranscriptomicProperties(row, marker);
                 break;
             default:
                 molecularData = new MolecularData();
@@ -795,8 +802,10 @@ public class DomainObjectCreator {
     }
 
     private void encodeMolecularDataFor(MolecularCharacterization mc) {
-        if (mc.hasMarkerAssociations())
+        if (mc.hasMarkerAssociations()) {
+            mc.setMarkers(getMarkers(mc.getFirstMarkerAssociation()));
             mc.getFirstMarkerAssociation().encodeMolecularData();
+        }
     }
 
     private TreatmentProtocol getTreatmentProtocol(Row row){
