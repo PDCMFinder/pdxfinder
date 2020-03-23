@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -41,7 +42,7 @@ public class ExportDataToTemplate  {
             try {
                 export(rootDir, g.getAbbreviation());
             } catch (IOException e) {
-                log.error(e.getStackTrace().toString());
+                log.error(Arrays.toString(e.getStackTrace()));
             }
         });
     }
