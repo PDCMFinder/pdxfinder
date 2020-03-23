@@ -1,14 +1,8 @@
 package org.pdxfinder.dataloaders;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
+
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
-import org.neo4j.ogm.session.Session;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
@@ -18,33 +12,19 @@ import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.*;
 
-/**
- * Load data from JAX.
- */
-@Component
-@Order(value = -18)
+@Service
 @PropertySource("classpath:loader.properties")
 @ConfigurationProperties(prefix = "jax")
-public class LoadJAXData extends LoaderBase implements CommandLineRunner {
+public class LoadJAXData extends LoaderBase {
 
     private final static Logger log = LoggerFactory.getLogger(LoadJAXData.class);
-
-    private Options options;
-    private CommandLineParser parser;
-    private CommandLine cmd;
-    private HelpFormatter formatter;
-
-    private Session session;
 
     @Value("${jaxpdx.variation.max}")
     private int maxVariations;
@@ -52,41 +32,22 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
     @Value("${jaxpdx.ref.assembly}")
     private String refAssembly;
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     HashMap<String, String> passageMap = null;
 
     Map<String, Platform> platformMap = new HashMap<>();
 
-    @PostConstruct
-    public void init() {
-        formatter = new HelpFormatter();
-    }
-
     public LoadJAXData(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void run() throws Exception {
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadJAX", "Load JAX PDX data");
-        parser.accepts("loadALL", "Load all, including JAX PDX data");
-        parser.accepts("loadSlim", "Load slim, then link samples to NCIT terms");
-        OptionSet options = parser.parse(args);
-
-        if (options.has("loadJAX") || options.has("loadALL")  || options.has("loadSlim")) {
-
-            initMethod();
-
-            globalLoadingOrder();
-
-        }
+        initMethod();
+        globalLoadingOrder();
     }
-
 
 
 
@@ -194,23 +155,32 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
                 nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, dto.getModelID(), "PGR", "cytogenetics", "ImmunoHistoChemistry");
                 Marker pr = (Marker) nsdto.getNode(); //dataImportService.getMarker("PR", "PR");
 
-                MarkerAssociation her2a = new MarkerAssociation();
-                her2a.setMarker(her2);
+                MarkerAssociation ma = new MarkerAssociation();
+
+
+                MolecularData her2a = new MolecularData();
+                her2a.setMarker(her2.getHgncSymbol());
                 her2a.setCytogeneticsResult("negative");
 
-                MarkerAssociation era = new MarkerAssociation();
-                era.setMarker(er);
+                MolecularData era = new MolecularData();
+                era.setMarker(er.getHgncSymbol());
                 era.setCytogeneticsResult("negative");
 
-                MarkerAssociation pra = new MarkerAssociation();
-                pra.setMarker(pr);
+                MolecularData pra = new MolecularData();
+                pra.setMarker(pr.getHgncSymbol());
                 pra.setCytogeneticsResult("negative");
 
-                mc.addMarkerAssociation(her2a);
-                mc.addMarkerAssociation(era);
-                mc.addMarkerAssociation(pra);
+                ma.addMolecularData(her2a);
+                ma.addMolecularData(era);
+                ma.addMolecularData(pra);
 
+                mc.addMarker("ERBB2");
+                mc.addMarker("ESR1");
+                mc.addMarker("PGR");
+                mc.addMarkerAssociation(ma);
+                mc.getFirstMarkerAssociation().encodeMolecularData();
                 dto.getPatientSample().addMolecularCharacterization(mc);
+                dataImportService.saveSample(dto.getPatientSample());
             }
         }
 
@@ -299,7 +269,9 @@ public class LoadJAXData extends LoaderBase implements CommandLineRunner {
 
     @Override
     void step18SetAdditionalGroups() {
-        throw new UnsupportedOperationException();
+
+        //throw new UnsupportedOperationException();
+        log.info("Additional groups is not supported for datasource: {}",dataSource);
     }
 
 

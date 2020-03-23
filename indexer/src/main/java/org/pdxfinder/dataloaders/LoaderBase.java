@@ -203,7 +203,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
      *     SKELETON OF LOADING ALGORITHM STANDARDIZED IN A TEMPLATE METHOD        *
      *******************************************************************************/
 
-    public final void globalLoadingOrder() throws Exception {
+    public final void globalLoadingOrder() {
 
         step00StartReportManager();
         step02GetMetaDataJSON();
@@ -216,20 +216,27 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
 
         for (int i = 0; i < jsonArray.length(); i++) {
             dto = new LoaderDTO();
-            this.jsonData = jsonArray.getJSONObject(i);
+            try {
+                this.jsonData = jsonArray.getJSONObject(i);
+                step08GetMetaData();
+                step09LoadPatientData();
+                step10LoadExternalURLs();
 
-            step08GetMetaData();
-            step09LoadPatientData();
-            step10LoadExternalURLs();
-            step11LoadBreastMarkers();
-            step12CreateModels();
-            step13LoadSpecimens();
-            step14LoadPatientTreatments();
-            step17LoadModelDosingStudies();
-            step16LoadVariationData();
+                step12CreateModels();
+                step13LoadSpecimens();
+                step14LoadPatientTreatments();
+                step17LoadModelDosingStudies();
+                step16LoadVariationData();
+                step11LoadBreastMarkers();
+            }
+            catch (Exception e){
+                log.error("Exception occured in loaderbase: {}",e);
+            }
+
         }
 
         step15LoadImmunoHistoChemistry();
+
     }
 
     public void loadExternalURLs(String dataSourceContact, String dataSourceURL){

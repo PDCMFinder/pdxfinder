@@ -1,12 +1,5 @@
 package org.pdxfinder.dataloaders;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.neo4j.ogm.session.Session;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
@@ -15,72 +8,32 @@ import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-
-/**
- * Load data from WUSTL PDXNet.
- */
-@Component
-@Order(value = -14)
+@Service
 @PropertySource("classpath:loader.properties")
 @ConfigurationProperties(prefix = "wustl")
-public class LoadWUSTL extends LoaderBase implements CommandLineRunner {
+public class LoadWUSTL extends LoaderBase {
 
     private final static Logger log = LoggerFactory.getLogger(LoadWUSTL.class);
 
-    //   private HostStrain nsgBS;
     private Group DS;
     private Group projectGroup;
 
-    private Options options;
-    private CommandLineParser parser;
-    private CommandLine cmd;
-    private HelpFormatter formatter;
-
-    private Session session;
-
-
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     public LoadWUSTL(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
     }
 
-    //   @Value("${mdapdx.url}")
-    //   private String urlStr;
-    @PostConstruct
-    public void init() {
-        formatter = new HelpFormatter();
-    }
-
-    @Override
-    public void run(String... args) throws Exception {
-
-
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadWUSTL", "Load WUSTL PDX data");
-
-        parser.accepts("loadALL", "Load all, including WUSTL PDX data");
-        OptionSet options = parser.parse(args);
-
-        if (options.has("loadWUSTL") || options.has("loadALL")) {
-
-            initMethod();
-
-            wustlAlgorithm();
-
-        }
+    public void run() throws Exception {
+        initMethod();
+        wustlAlgorithm();
 
     }
-
 
     public void wustlAlgorithm() throws Exception {
 

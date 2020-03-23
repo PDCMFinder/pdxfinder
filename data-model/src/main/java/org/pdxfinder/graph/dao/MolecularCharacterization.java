@@ -1,5 +1,6 @@
 package org.pdxfinder.graph.dao;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -7,7 +8,9 @@ import org.neo4j.ogm.annotation.Relationship;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by jmason on 17/03/2017.
@@ -33,8 +36,12 @@ public class MolecularCharacterization {
     @Relationship(type = "ASSOCIATED_WITH")
     List<MarkerAssociation> markerAssociations;
 
+    private Set<String> markers;
+
+
     public MolecularCharacterization() {
         isVisible = true;
+        markerAssociations = new ArrayList<>();
     }
 
     public MolecularCharacterization(String technology) {
@@ -77,6 +84,14 @@ public class MolecularCharacterization {
         this.markerAssociations = markerAssociations;
     }
 
+    public boolean hasMarkerAssociations() {
+        return CollectionUtils.isNotEmpty(this.markerAssociations);
+    }
+
+    public MarkerAssociation getFirstMarkerAssociation() {
+        return markerAssociations.get(0);
+    }
+
     public String getType() {
         return type;
     }
@@ -86,12 +101,7 @@ public class MolecularCharacterization {
     }
 
     public void addMarkerAssociation(MarkerAssociation ma){
-
-        if(this.markerAssociations == null){
-            this.markerAssociations = new ArrayList<>();
-        }
         this.markerAssociations.add(ma);
-
     }
 
     public boolean isVisible() {
@@ -100,5 +110,20 @@ public class MolecularCharacterization {
 
     public void setVisible(boolean visible) {
         isVisible = visible;
+    }
+
+    public Set<String> getMarkers() {
+        return markers;
+    }
+
+    public void setMarkers(Set<String> markers) {
+        this.markers = markers;
+    }
+
+    public void addMarker(String m){
+
+        if(markers == null) markers = new HashSet<>();
+        markers.add(m);
+
     }
 }

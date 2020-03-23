@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.pdxfinder.services;
 
-//import org.apache.commons.cli.Option;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
@@ -24,22 +18,15 @@ import org.springframework.util.Assert;
 
 import org.springframework.cache.annotation.Cacheable;
 
-import javax.management.RuntimeErrorException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * The hope was to put a lot of reused repository actions into one place ie find
- * or create a node or create a node with that requires a number of 'child'
- * nodes that are terms
- *
- * @author sbn
- */
+import static org.pdxfinder.services.reporting.MarkerLogEntity.logNoSingleValidSymbol;
+import static org.pdxfinder.services.reporting.MarkerLogEntity.logUpdateFromPreviousSymbol;
+
 @Component
 public class DataImportService {
-
-    //public static Option loadAll = new Option("LoadAll", false, "Load all PDX Finder data");
 
     private TumorTypeRepository tumorTypeRepository;
     private HostStrainRepository hostStrainRepository;
@@ -71,10 +58,11 @@ public class DataImportService {
 
     private final static Logger log = LoggerFactory.getLogger(DataImportService.class);
 
-    private HashMap<String, Marker> markersBySymbol;
-    private HashMap<String, Marker> markersByPrevSymbol;
-    private HashMap<String, Marker> markersBySynonym;
-    private HashMap<String, NodeSuggestionDTO> notFoundMarkerSymbols;
+    private HashMap<String, Marker> markersBySymbol = null;
+    private HashMap<String, List<Marker>> markersByPrevSymbol = null;
+    private HashMap<String, List<Marker>> markersBySynonym = null;
+
+    private boolean markersInitialized = false;
 
     public DataImportService(TumorTypeRepository tumorTypeRepository,
                              HostStrainRepository hostStrainRepository,
@@ -150,8 +138,6 @@ public class DataImportService {
         this.markersBySymbol = new HashMap<>();
         this.markersByPrevSymbol = new HashMap<>();
         this.markersBySynonym = new HashMap<>();
-        this.notFoundMarkerSymbols = new HashMap<>();
-
 
     }
 
@@ -177,7 +163,7 @@ public class DataImportService {
         if(g == null){
             log.info("Provider group not found. Creating {}", name);
 
-            g = new Group(name, abbrev, description, providerType, contact, url);
+            g = Group.createProviderGroup(name, abbrev, description, providerType, contact, url);
             groupRepository.save(g);
 
         }
@@ -232,8 +218,7 @@ public class DataImportService {
         if(g == null){
             log.info("Access group not found. Creating " + accessibility + " " + accessModalities);
 
-            g = new Group(accessibility, accessModalities);
-            g.setType("Accessibility");
+            g = Group.createAccessibilityGroup(accessibility, accessModalities);
             groupRepository.save(g);
 
         }
@@ -406,7 +391,6 @@ public class DataImportService {
 
         if(patient == null){
 
-            log.info("Patient not found. Creating: " + patientId );
             patient = new Patient(patientId,sex,race,ethnicity,dataSource);
             patientRepository.save(patient);
         }
@@ -424,9 +408,9 @@ public class DataImportService {
         return patientRepository.findByGroup(ds);
     }
 
-    public void savePatient(Patient patient){
+    public Patient savePatient(Patient patient){
 
-        patientRepository.save(patient);
+        return patientRepository.save(patient);
     }
 
 
@@ -472,7 +456,6 @@ public class DataImportService {
         PatientSnapshot patientSnapshot = null;
 
         Set<PatientSnapshot> pSnaps = patientSnapshotRepository.findByPatient(patient.getExternalId());
-        loop:
         for (PatientSnapshot ps : pSnaps) {
             if (ps.getAgeAtCollection().equals(age)) {
                 patientSnapshot = ps;
@@ -508,7 +491,7 @@ public class DataImportService {
         }
         //create new snapshot and save it with the patient
         ps = new PatientSnapshot(patient, ageAtCollection, collectionDate, collectionEvent, ellapsedTime);
-        patient.hasSnapshot(ps);
+        patient.addSnapshot(ps);
         ps.setPatient(patient);
         patientRepository.save(patient);
         patientSnapshotRepository.save(ps);
@@ -746,7 +729,7 @@ public class DataImportService {
 
     }
 
-    private Tissue getTissue(String t) {
+    public Tissue getTissue(String t) {
         Tissue tissue = tissueRepository.findByName(t);
         if (tissue == null) {
             log.info("Tissue '{}' not found. Creating.", t);
@@ -912,24 +895,15 @@ public class DataImportService {
     }
 
     public OntologyTerm getOntologyTerm(String url){
-
-        OntologyTerm ot;
-        ot = ontologyTermRepository.findByUrl(url);
-        return ot;
+        return ontologyTermRepository.findByUrl(url);
     }
 
     public OntologyTerm findOntologyTermByLabel(String label){
-
-        OntologyTerm ot;
-        ot = ontologyTermRepository.findByLabel(label);
-        return ot;
+        return ontologyTermRepository.findByLabel(label);
     }
 
     public OntologyTerm findOntologyTermByLabelAndType(String label, String type){
-
-
         return ontologyTermRepository.findByLabelAndType(label, type);
-
     }
 
     public OntologyTerm findOntologyTermByUrl(String url){
@@ -987,8 +961,11 @@ public class DataImportService {
     }
 
     public int countAllOntologyTerms(){
-
         return ontologyTermRepository.getOntologyTermNumber();
+    }
+
+    public boolean ontologyCacheIsEmpty() {
+        return countAllOntologyTerms() == 0;
     }
 
     public OntologyTerm saveOntologyTerm(OntologyTerm ot){
@@ -1011,6 +988,10 @@ public class DataImportService {
 
     public Integer countAllMarkers() {
         return markerRepository.countAllMarkers();
+    }
+
+    public boolean markerCacheIsEmpty() {
+        return countAllMarkers() == 0;
     }
 
     public Collection<Marker> getAllHumanMarkers() {
@@ -1525,155 +1506,120 @@ public class DataImportService {
         return markerRepository.findBySynonym(symbol);
     }
 
+    private void initializeMarkers(){
+
+        int markerCount = markerRepository.getMarkerCount();
+        log.info("Initializing {} markers.",markerCount);
+        int counter = 0;
+        int batchSize = 400;
+        while(counter < markerCount){
+
+            Collection<Marker> markerCollection = markerRepository.getAllMarkersSkipLimit(counter, batchSize);
+
+            for(Marker marker: markerCollection){
+                addMarkerToMap(marker);
+            }
+
+            counter += batchSize;
+            Float percent = ((float)counter / markerCount) * 100;
+            System.out.print(String.format("%s markers initialized (%.0f%%)...\r", counter, percent));
+        }
+
+        markersInitialized = true;
+    }
+
+    private void addMarkerToMap(Marker marker){
+
+        markersBySymbol.put(marker.getHgncSymbol(), marker);
+
+        if(marker.getAliasSymbols() != null){
+            for(String synonym : marker.getAliasSymbols()){
+
+                addMarkerToMapList(synonym, marker, markersBySynonym);
+            }
+        }
+
+        if(marker.getPrevSymbols() != null){
+            for(String prevSymbol : marker.getPrevSymbols()){
+
+                addMarkerToMapList(prevSymbol, marker, markersByPrevSymbol);
+            }
+        }
+
+    }
+
+    private void addMarkerToMapList(String key, Marker marker, Map<String, List<Marker>> mapList){
+
+        if(mapList == null) mapList = new HashMap<>();
+
+        if(mapList.containsKey(key)){
+            mapList.get(key).add(marker);
+        }
+        else{
+            List<Marker> markerList = new ArrayList<>();
+            markerList.add(marker);
+            mapList.put(key, markerList);
+        }
+
+    }
+
     public NodeSuggestionDTO getSuggestedMarker(String reporter, String dataSource, String modelId, String symbol,
                                                 String characterizationType, String platform){
 
-        //not found key to avoid looking up not found symbols multiple times
-        //key: datasource + modelId + symbol
-        if(notFoundMarkerSymbols.containsKey(dataSource+modelId+symbol)) return notFoundMarkerSymbols.get(dataSource+modelId+symbol);
+        if(!markersInitialized) initializeMarkers();
 
-        NodeSuggestionDTO nsdto = new NodeSuggestionDTO();
-        LogEntity le;
-        Marker m;
-        List<Marker> markerSuggestionList;
-        boolean ready = false;
+        NodeSuggestionDTO nodeSuggestionDTO = new NodeSuggestionDTO();
+        LogEntity logEntity = new LogEntity(reporter, dataSource, modelId);
+        Marker marker = null;
 
-        //check if marker is cached
-        if(markersBySymbol.containsKey(symbol)){
-            m = markersBySymbol.get(symbol);
-            nsdto.setNode(m);
-            ready = true;
+        if (markersBySymbol.containsKey(symbol)) {
+            marker = markersBySymbol.get(symbol);
+            nodeSuggestionDTO.setNode(marker);
         }
         else if(markersByPrevSymbol.containsKey(symbol)){
 
-            m = markersByPrevSymbol.get(symbol);
-            le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Previous symbol");
-            nsdto.setLogEntity(le);
-            ready = true;
+            List<Marker> markerList = markersByPrevSymbol.get(symbol);
+            if (markerList.size() == 1) {
+                marker = markerList.get(0);
+                logEntity = logUpdateFromPreviousSymbol(reporter,dataSource, modelId, characterizationType, platform,
+                    symbol, marker.getHgncSymbol(),"Previous symbol");
+                nodeSuggestionDTO.setNode(marker);
+            }
+            else {
+                logEntity = logNoSingleValidSymbol(reporter,dataSource, modelId, characterizationType, platform,
+                    symbol, symbol,"");
+                String prevMarkers = markerList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
+                logEntity.setMessage("Previous symbol for multiple approved markers: {} "+prevMarkers);
+
+            }
+
         }
         else if(markersBySynonym.containsKey(symbol)){
 
-            m = markersBySynonym.get(symbol);
-            le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Synonym");
-            nsdto.setLogEntity(le);
-            ready = true;
-        }
+            List<Marker> markerList = markersBySynonym.get(symbol);
 
-        if(ready) return nsdto;
-
-        m = getMarkerBySymbol(symbol);
-
-        if(m != null){
-
-            //good, pass the marker
-            //no message
-            nsdto.setNode(m);
-            markersBySymbol.put(symbol, m);
-        }
-        else{
-
-            markerSuggestionList = getMarkerByPrevSymbol(symbol);
-
-            if(markerSuggestionList != null && markerSuggestionList.size() > 0){
-
-                if(markerSuggestionList.size() == 1){
-                    //symbol found in prev symbols
-                    m = markerSuggestionList.get(0);
-                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Previous symbol");
-                    nsdto.setNode(m);
-                    nsdto.setLogEntity(le);
-                    markersByPrevSymbol.put(symbol, m);
-                }
-                else{
-
-                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
-                    String prevMarkers = markerSuggestionList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
-
-                    le.setMessage("Previous symbol for multiple approved markers: "+prevMarkers);
-                    le.setType("ERROR");
-                    nsdto.setNode(null);
-                    nsdto.setLogEntity(le);
-                }
-
-                return nsdto;
-
+            if(markerList.size() == 1) {
+                marker = markerList.get(0);
+                logEntity = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol,
+                        marker.getHgncSymbol(),"Synonym");
+                nodeSuggestionDTO.setNode(marker);
             }
             else{
-
-                markerSuggestionList = getMarkerBySynonym(symbol);
-
-                if(markerSuggestionList != null && markerSuggestionList.size() > 0){
-
-                    if(markerSuggestionList.size() == 1){
-
-                        //symbol found in synonym
-                        m = markerSuggestionList.get(0);
-                        le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Synonym");
-
-                        nsdto.setNode(m);
-                        nsdto.setLogEntity(le);
-                        markersBySynonym.put(symbol, m);
-                    }
-                    else{
-                        le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
-                        String synonymMarkers = markerSuggestionList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
-                        le.setMessage("Synonym for multiple markers: "+synonymMarkers);
-                        le.setType("ERROR");
-                        nsdto.setNode(null);
-                        nsdto.setLogEntity(le);
-                    }
-
-                    return nsdto;
-                }
-                else{
-
-                    //error, didn't find the symbol anywhere
-                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
-                    le.setMessage(symbol +" is an unrecognised symbol");
-                    le.setType("ERROR");
-                    nsdto.setLogEntity(le);
-                    notFoundMarkerSymbols.put(dataSource+modelId+symbol, nsdto);
-                }
+                logEntity = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol,
+                        symbol,"");
+                String synMarkers = markerList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
+                logEntity.setMessage("Synonym for multiple approved markers: {} "+synMarkers);
             }
+        }
+        else{
+            logEntity.setMessage("Unknown symbol: {} "+symbol);
 
         }
 
+        nodeSuggestionDTO.setLogEntity(logEntity);
 
-
-        return nsdto;
+        return nodeSuggestionDTO;
     }
 
 
 }
-
-
-/*
-
- CLASSIFYING WITH K NEAREST NEIGHBOUR (KNN):
- Have you ever seen movies categorized into genres? What defines these genres, and who says which movie goes into what genre? The movies in one genre are similar but based on what? I’m sure if you asked the people involved with making the mov- ies, they wouldn’t say that their movie is just like someone else’s movie, but in some way you know they’re similar. What makes an action movie similar to another action movie and dissimilar to a romance movie? Do people kiss in action movies, and do people kick in romance movies? Yes, but there’s probably more kissing in romance movies and more kicking in action movies. Perhaps if you measured kisses, kicks, and other things per movie, you could automatically figure out what genre a movie belongs to. I’ll use movies to explain some of the concepts of k-Nearest Neighbors; then we will move on to other applications.
-
- We’ll discuss our first machine-learning algorithm: k-Nearest Neighbors.
- > k-Nearest Neighbors is easy to grasp and very effective.
- > We’ll first discuss the theory and how you can use the concept of a distance measurement to classify items.
- > Next, you’ll see how to easily import and parse data from text files using Python.
- > We’ll address some common pitfalls when working with distance calculations and data coming from numerous sources.
- > We’ll put all of this into action in examples for improving results from a dating website and recognizing handwritten digits.
-
-
-    About K Nearest Neighbour:
-    Pros: High accuracy, insensitive to outliers, no assumptions about data
-    Cons: Computationally expensive, requires a lot of memory
-    Works with: Numeric values, nominal values
-
- How KNN Works:
-  > We have an existing set of example data, called the training data set.
-  > We have labels for all of this data
-  > We know what class each piece of the data should fall into.
-  > When we’re given a new piece of data without a label.
-  > We compare that new piece of data to the existing data
-  > We then take the most similar pieces of data (the nearest neighbors) and look at their labels.
-  > We look at the top k most similar pieces of data from our known dataset; this is where the k comes from.
-  > k is an integer and it’s usually less than 20.
-  > Lastly, we take a majority vote from the k most similar pieces of data, and the majority is the new class we assign to the data we were asked to classify.
-
- */

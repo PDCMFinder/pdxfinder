@@ -1,17 +1,14 @@
 package org.pdxfinder;
 
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import org.pdxfinder.accessionidtatamodel.AccessionData;
 import org.pdxfinder.graph.dao.Marker;
 import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
@@ -24,12 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 
 
-/**
- * Created by csaba on 30/06/2017.
- */
-@Component
+@Service
 @Order(value = 100)
-public class LoadAccessionIDs implements CommandLineRunner {
+public class LoadAccessionIDs {
 
     private static final String HGNC_URL = "http://rest.genenames.org/fetch/symbol/";
     private static final String ENSEMBL_URL = "http://rest.ensembl.org/xrefs/symbol/homo_sapiens/BRAF?content-type=application/json";
@@ -45,22 +39,12 @@ public class LoadAccessionIDs implements CommandLineRunner {
     }
 
 
-
-    @Override
     @Transactional
-    public void run(String... args) throws Exception {
-
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadAccessionIds", "Load Accession IDs");
-        //parser.accepts("loadALL", "Load all, including Accession IDs");
-        OptionSet options = parser.parse(args);
+    public void run() throws Exception {
 
         long startTime = System.currentTimeMillis();
 
-        if (options.has("loadAccessionIds") || options.has("loadALL")) {
-            loadAccessionIds();
-        }
+        loadAccessionIds();
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;

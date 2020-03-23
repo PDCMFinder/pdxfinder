@@ -9,16 +9,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/*
- * Created by csaba on 25/04/2019.
- */
-@Component
 
+@Service
 @Order(value = 94)
-public class SetDataVisibility implements CommandLineRunner{
+public class SetDataVisibility {
 
     private final static Logger log = LoggerFactory.getLogger(SetDataVisibility.class);
 
@@ -29,26 +27,13 @@ public class SetDataVisibility implements CommandLineRunner{
     }
 
 
+    public void run() {
 
-
-    @Override
-    public void run(String... args) throws Exception {
-
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("setDataVisibility", "Applying data visibility rules");
-        parser.accepts("loadALL", "Load all then apply data visibility rules");
-        parser.accepts("loadEssentials", "Load essentials then apply data visibility rules");
-
-        OptionSet options = parser.parse(args);
         long startTime = System.currentTimeMillis();
 
-        if (options.has("setDataVisibility") || options.has("loadALL")  || options.has("loadEssentials")) {
+        log.info("Applying data visibility rules");
 
-            log.info("Applying data visibility rules");
-
-            applyDataVisibilityRules("CRL");
-        }
+        applyDataVisibilityRules("CRL");
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;

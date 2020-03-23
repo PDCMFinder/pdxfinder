@@ -1,11 +1,5 @@
 package org.pdxfinder.dataloaders;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.graph.dao.*;
@@ -15,51 +9,22 @@ import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
-/**
- * Load PDMR data
- */
-@Component
-@Order(value = -16)
+@Service
 @PropertySource("classpath:loader.properties")
 @ConfigurationProperties(prefix = "pdmr")
-public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
+public class LoadPDMRData extends LoaderBase {
 
     private final static Logger log = LoggerFactory.getLogger(LoadPDMRData.class);
 
-    private Options options;
-    private CommandLineParser parser;
-    private CommandLine cmd;
-    private HelpFormatter formatter;
-
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
-
-    /*private Session session;
-
-    @Value("${pdmrpdx.variation.max}")
-    private int maxVariations;
-
-    @Value("${pdmrpdx.ref.assembly}")
-    private String refAssembly;
-
-    HashMap<String, String> passageMap = null;
-    HashMap<String, Image> histologyMap = null;
-    */
-
-    @PostConstruct
-    public void init() {
-        formatter = new HelpFormatter();
-    }
 
     public LoadPDMRData(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
@@ -67,28 +32,12 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
 
 
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void run() throws Exception{
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadPDMR", "Load PDMR PDX data");
-        parser.accepts("loadALL", "Load all, including PDMR PDX data");
-        OptionSet options = parser.parse(args);
-
-
-        if (options.has("loadPDMR") || options.has("loadALL")) {
-
-            initMethod();
-
-            globalLoadingOrder();
-        }
-
-
+        initMethod();
+        globalLoadingOrder();
 
     }
-
-
 
 
     @Override
@@ -279,7 +228,6 @@ public class LoadPDMRData extends LoaderBase implements CommandLineRunner {
             }
 
         }
-        //loadVariationData(mc);
         dataImportService.saveModelCreation(dto.getModelCreation());
 
     }

@@ -26,6 +26,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -37,9 +38,9 @@ import java.util.stream.Collectors;
 /*
  * Created by csaba on 09/03/2018.
  */
-@Component
+@Service
 @Order(value = 90)
-public class CreateDataProjections implements CommandLineRunner, ApplicationContextAware{
+public class CreateDataProjections implements ApplicationContextAware{
 
     private final static Logger log = LoggerFactory.getLogger(CreateDataProjections.class);
     private DataImportService dataImportService;
@@ -50,8 +51,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
     @Value("${user.home}")
     String homeDir;
 
-
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     protected ReportManager reportManager;
@@ -78,6 +78,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
     private Map<String, List<DataAvailableDTO>> dataAvailableDP = new HashMap<>();
 
+    private TreeMap<String, Set<Long>> frequentlyMutatedMarkers = new TreeMap<>();
     private List<MutatedMarkerData> frequentlyMutatedMarkersDP = new ArrayList<>();
 
     //"treatment name"=>"set of model ids"
@@ -96,46 +97,34 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         this.utilityService = utilityService;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void run() {
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("createDataProjections", "Creating data projections");
-        parser.accepts("loadALL", "Load all, then create projections");
-        parser.accepts("loadSlim", "Load slim, then create projections");
-        parser.accepts("loadEssentials", "Load essentials then create projections");
-
-        OptionSet options = parser.parse(args);
         long startTime = System.currentTimeMillis();
 
-        if (options.has("createDataProjections") || options.has("loadALL")  || options.has("loadSlim") || options.has("loadEssentials")) {
 
-            log.info("Creating data projections");
+        log.info("Creating data projections");
 
-            reportManager = (ReportManager) context.getBean("ReportManager");
+        reportManager = (ReportManager) context.getBean("ReportManager");
 
-            createMutationDataProjection();
+        createMutationDataProjection();
 
-            createModelForQueryDataProjection();
+        createModelForQueryDataProjection();
 
-            createModelDrugResponseDataProjection();
+        createModelDrugResponseDataProjection();
 
-            createPatientTreatmentDataProjection();
+        createPatientTreatmentDataProjection();
 
-            createImmunoHistoChemistryDataProjection();
+        createImmunoHistoChemistryDataProjection();
 
-            createCNADataProjection();
+        createCNADataProjection();
 
-            createTranscriptomicsDataProjection();
+        createTranscriptomicsDataProjection();
 
-            createDataAvailableDataProjection();
+        createDataAvailableDataProjection();
 
-            createFrequentlyMutatedGenesDataProjection();
+        createFrequentlyMutatedGenesDataProjection();
 
-            saveDataProjections();
-
-        }
+        saveDataProjections();
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
@@ -177,12 +166,22 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
                 for(MarkerAssociation ma: mas){
 
-                    Marker m = ma.getMarker();
+                    List<MolecularData> molecularData;
+                    try{
 
-                    if(m != null){
+                        molecularData = ma.decodeMolecularData();
+                    }
+                    catch (Exception e){
+                        log.error("No molecular data");
+                        molecularData = new ArrayList<>();
+                    }
 
-                        String variantName = ma.getAminoAcidChange();
-                        String markerName = m.getHgncSymbol();
+
+
+                    for(MolecularData md: molecularData){
+
+                        String variantName = md.getAminoAcidChange();
+                        String markerName = md.getMarker();
 
                         if(variantName != null && !variantName.isEmpty()  && markerName != null && !markerName.isEmpty()){
 
@@ -192,10 +191,13 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                             addToMutatedMarkerVariantDP(markerName, variantName);
 
                             addToThreeParamDP(mutatedPlatformMarkerVariantModelDP, platformName, markerName, variantName, modelId);
-
+                            addToFrequentlyMutatedMarkers(markerName, modelId);
                         }
 
+
                     }
+
+
                     count++;
                     if(count%10000 == 0) {log.info("Processed "+count+" MA objects");}
                     //if (count > 40000) break;
@@ -255,12 +257,21 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
                 for(MarkerAssociation ma: mas){
 
-                    Marker m = ma.getMarker();
+                    List<MolecularData> molecularData;
+                    try{
 
-                    if(m != null){
+                        molecularData = ma.decodeMolecularData();
+                    }
+                    catch (Exception e){
+                        log.error("No molecular data");
+                        molecularData = new ArrayList<>();
+                    }
 
-                        String ihcResult = ma.getCytogeneticsResult();
-                        String markerName = m.getHgncSymbol();
+
+                    for(MolecularData md:molecularData){
+
+                        String ihcResult = md.getCytogeneticsResult();
+                        String markerName = md.getMarker();
                         //log.info(ihcResult + markerName);
                         if(ihcResult != null && !ihcResult.isEmpty()  && markerName != null && !markerName.isEmpty()){
 
@@ -352,21 +363,25 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             ModelCreation model = dataImportService.findModelWithSampleByMolChar(mc);
             Long modelId = model.getId();
 
-            Set<Marker> mas = dataImportService.findAllDistinctMarkersByMolCharId(mc.getId());
-            for(Marker m : mas){
+            Set<String> mas = mc.getMarkers();
+            if(mas != null){
+                for(String m : mas){
 
 
-                if(copyNumberAlterationDP.containsKey(m.getHgncSymbol())){
+                    if(copyNumberAlterationDP.containsKey(m)){
 
-                    copyNumberAlterationDP.get(m.getHgncSymbol()).add(modelId);
+                        copyNumberAlterationDP.get(m).add(modelId);
+                    }
+                    else{
+
+                        Set<Long> newSet = new HashSet<>();
+                        newSet.add(modelId);
+                        copyNumberAlterationDP.put(m, newSet);
+                    }
                 }
-                else{
 
-                    Set<Long> newSet = new HashSet<>();
-                    newSet.add(modelId);
-                    copyNumberAlterationDP.put(m.getHgncSymbol(), newSet);
-                }
             }
+
 
         }
 
@@ -394,20 +409,26 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             ModelCreation model = dataImportService.findModelWithSampleByMolChar(mc);
             Long modelId = model.getId();
 
-            Set<Marker> mas = dataImportService.findAllDistinctMarkersByMolCharId(mc.getId());
-            for(Marker m : mas){
+            Set<String> mas = mc.getMarkers();
 
-                if(transcriptomicsDP.containsKey(m.getHgncSymbol())){
+            if(mas != null){
+                for(String m : mas){
 
-                    transcriptomicsDP.get(m.getHgncSymbol()).add(modelId);
+                    if(transcriptomicsDP.containsKey(m)){
+
+                        transcriptomicsDP.get(m).add(modelId);
+                    }
+                    else{
+
+                        Set<Long> newSet = new HashSet<>();
+                        newSet.add(modelId);
+                        transcriptomicsDP.put(m, newSet);
+                    }
                 }
-                else{
 
-                    Set<Long> newSet = new HashSet<>();
-                    newSet.add(modelId);
-                    transcriptomicsDP.put(m.getHgncSymbol(), newSet);
-                }
             }
+
+
 
         }
 
@@ -1321,9 +1342,17 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
     private void createFrequentlyMutatedGenesDataProjection(){
 
         log.info("Creating Frequently Mutated Genes DP");
-        frequentlyMutatedMarkersDP = dataImportService.getFrequentlyMutatedGenes();
 
+        for(Map.Entry<String, Set<Long>> entry : frequentlyMutatedMarkers.entrySet() ){
 
+            MutatedMarkerData mmd = new MutatedMarkerData();
+            mmd.setGene_name(entry.getKey());
+            mmd.setNumber_of_models(entry.getValue().size());
+
+            frequentlyMutatedMarkersDP.add(mmd);
+        }
+
+        frequentlyMutatedMarkersDP.sort(Comparator.comparing(MutatedMarkerData::getNumber_of_models).reversed());
     }
 
 
@@ -1367,7 +1396,17 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
     }
 
+    private void addToFrequentlyMutatedMarkers(String marker, Long modelId){
 
+        if(frequentlyMutatedMarkers.containsKey(marker)){
+            frequentlyMutatedMarkers.get(marker).add(modelId);
+        }
+        else{
+            Set<Long> set = new HashSet<>();
+            set.add(modelId);
+            frequentlyMutatedMarkers.put(marker, set);
+        }
+    }
 
     private void saveDataProjections(){
 

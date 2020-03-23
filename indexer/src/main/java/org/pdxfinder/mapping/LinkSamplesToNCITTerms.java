@@ -1,7 +1,5 @@
 package org.pdxfinder.mapping;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.dao.Sample;
@@ -10,83 +8,43 @@ import org.pdxfinder.ontologymapping.MissingMapping;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.MappingService;
-import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-/*
- * Created by csaba on 24/08/2017.
- */
-@Component
-@Order(value = 40)
-public class LinkSamplesToNCITTerms implements CommandLineRunner {
 
+@Service
+@Order(value = 40)
+public class LinkSamplesToNCITTerms {
 
 
     private final static Logger log = LoggerFactory.getLogger(LinkSamplesToNCITTerms.class);
     private DataImportService dataImportService;
-    private UtilityService utilityService;
     private MappingService mappingService;
 
     private Map<String, Set<MissingMapping>> missingMappings;
     private Set<String> missingTerms;
 
-    private Map<String, MappingEntity> mappingRules;
-
-    private MappingEntityRepository mappingEntityRepository;
-
     @Autowired
     public LinkSamplesToNCITTerms(DataImportService dataImportService,
-                                  UtilityService utilityService,
                                   MappingService mappingService,
                                   MappingEntityRepository mappingEntityRepository) {
         this.dataImportService = dataImportService;
-        this.utilityService = utilityService;
         this.mappingService = mappingService;
-        this.mappingEntityRepository = mappingEntityRepository;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("linkSamplesToNCITTerms", "Link samples to NCIT terms");
-        parser.accepts("linkSamplesToNCITTermsWithCleanup", "Link samples to NCIT terms, then cleanup.");
-        parser.accepts("loadALL", "Load all, including linking samples to NCIT terms");
-        parser.accepts("loadSlim", "Load slim, then link samples to NCIT terms");
-        parser.accepts("loadEssentials", "Load essentials then link samples to terms");
-
-        OptionSet options = parser.parse(args);
+    public void run() {
 
         long startTime = System.currentTimeMillis();
 
-        if (options.has("linkSamplesToNCITTerms") && options.has("linkSamplesToNCITTermsWithCleanup")) {
-            log.warn("Select one or the other of: -linkSamplesToNCITTerms, -linkSamplesToNCITTermsWithCleanup");
-            log.warn("Not loading ", this.getClass().getName());
+        log.info("Mapping samples to NCIT terms.");
 
-        } else if (options.has("linkSamplesToNCITTermsWithCleanup") || options.has("loadALL")  || options.has("loadSlim") || options.has("loadEssentials")) {
-
-            log.info("Mapping samples to NCIT terms with cleanup.");
-
-            mapSamplesToTerms();
-            updateIndirectMappingData();
-            //deleteTermsWithoutMapping();
-
-        } else if (options.has("linkSamplesToNCITTerms")) {
-
-            log.info("Mapping samples to NCIT terms.");
-
-            mapSamplesToTerms();
-            updateIndirectMappingData();
-
-        }
+        mapSamplesToTerms();
+        updateIndirectMappingData();
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
@@ -180,8 +138,15 @@ public class LinkSamplesToNCITTerms implements CommandLineRunner {
         if (!this.missingMappings.containsKey(id)) {
             //log.info("No mapping found for "+id);
             Set<MissingMapping> lmm = new HashSet<>();
-            lmm.add(mm);
-            this.missingMappings.put(id, lmm);
+            try {
+                lmm.add(mm);
+                this.missingMappings.put(id, lmm);
+            }
+            catch (Exception e){
+                log.error(mm.toString());
+            }
+
+
         } else {
 
             this.missingMappings.get(id).add(mm);

@@ -189,4 +189,21 @@ public class PatientSnapshot {
     public void setVirologyStatus(String virologyStatus) {
         this.virologyStatus = virologyStatus;
     }
+
+    public void addTreatmentProtocol(TreatmentProtocol treatmentProtocol){
+
+        if(treatmentSummary == null){
+
+            treatmentSummary = new TreatmentSummary();
+        }
+
+        treatmentSummary.addTreatmentProtocol(treatmentProtocol);
+    }
+
+
+    @Override
+    public String toString() {
+        return String.format("[%s at age %s]", getPatient().getExternalId(), getAgeAtCollection());
+    }
+
 }

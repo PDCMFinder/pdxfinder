@@ -9,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Date;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 
@@ -142,7 +140,6 @@ public class ModelIntegrationTest extends BaseTest {
         Marker marker = markerRepository.findBySymbol(markerSymbol);
 
         MarkerAssociation ma = new MarkerAssociation();
-        ma.setMarker(marker);
         mc.setMarkerAssociations(Collections.singletonList(ma));
 
         Sample sample = new Sample("sample-1", tumorType, "TEST_DIAGNOSIS", tissue, tissue, "Surgical Resection", "TEST_CLASSIFICATION", false, group.getAbbreviation());
@@ -150,7 +147,7 @@ public class ModelIntegrationTest extends BaseTest {
 
         Patient patient = new Patient("patient_id_1", "F", null, null, group);
         PatientSnapshot ps = new PatientSnapshot(patient, "67");
-        patient.hasSnapshot(ps);
+        patient.addSnapshot(ps);
 
         Sample s = new Sample("test", tumorType, "adinocarcinoma", tissue, null, "Surgical Resection", "F", false, group.getAbbreviation());
         s.setMolecularCharacterizations(new HashSet<>(Collections.singletonList(mc)));
@@ -163,33 +160,6 @@ public class ModelIntegrationTest extends BaseTest {
         patientRepository.save(patient);
 
         Group groupAlternate = groupRepository.findByNameAndType(extDsNameAlternate, "Provider");
-
-
-        /*
-        ModelCreation modelCreation = new ModelCreation(
-                modelCreationId,
-                new EngraftmentSite(tissueName),
-                new EngraftmentType("subcutis"),
-                sample,
-                new HostStrain("TEST_STRAIN"),
-                new QualityAssurance("test", "Test description", ValidationTechniques.VALIDATION));
-
-        PdxPassage pdxPassage = new PdxPassage(modelCreation, 0);
-        PdxPassage pdxPassage1 = new PdxPassage(pdxPassage, 1);
-        pdxPassage1.setPdxPassage(pdxPassage);
-
-        Specimen specimen = new Specimen("TEST_SPECIMEN", null, specimenSample);
-        specimen.setPdxPassage(pdxPassage1);
-
-
-        specimenRepository.save(specimen);
-
-        // Assert the nodes have been persisted in the correct graph
-        Specimen found = specimenRepository.findByExternalIdAndDS("TEST_SPECIMEN");
-        assert found.getPdxPassage().getPassage() == 1;
-        assert found.getPdxPassage().getPdxPassage().getModelCreation().getSample().getSampleSite() == tissue;
-
-*/
     }
 
 

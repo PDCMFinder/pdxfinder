@@ -261,6 +261,8 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 molecularCharacterization = new MolecularCharacterization();
                 molecularCharacterization.setType(dataType);
                 molecularCharacterization.setPlatform(platform);
+                MarkerAssociation markerAssociation = new MarkerAssociation();
+                molecularCharacterization.addMarkerAssociation(markerAssociation);
                 toBeCreatedMolcharNodes.put(molcharKey, molecularCharacterization);
             }
 
@@ -291,20 +293,25 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 }
 
                 MarkerAssociation ma;
-
+                MolecularData md;
                 if (dataType.equals("mutation")){
 
-                    ma = setVariationProperties(data, marker);
+                    md = setVariationProperties(data, marker);
                 }else if(dataType.equals("copy number alteration")) {
 
-                    ma = setCNAProperties(data, marker);
+                    md = setCNAProperties(data, marker);
+                }
+                else if (dataType.equals("transcriptomics")){
+
+                    md = setTranscriptomicProperties(data, marker);
                 }
                 else{
-
-                    ma = setTranscriptomicProperties(data, marker);
+                    log.error("Unknown datatype: {}",dataType);
+                    md = new MolecularData();
                 }
 
-                molecularCharacterization.addMarkerAssociation(ma);
+
+                molecularCharacterization.getMarkerAssociations().get(0).getMolecularDataList().add(md);
 
             }
 
@@ -319,8 +326,9 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         //PHASE 2: save existing molchars with new data
         log.info("Saving existing molchars for model "+modelID);
         for(Map.Entry<String, MolecularCharacterization> mcEntry : existingMolcharNodes.entrySet()){
-
-            dataImportService.saveMolecularCharacterization(mcEntry.getValue());
+            MolecularCharacterization mc = mcEntry.getValue();
+            mc.getFirstMarkerAssociation().encodeMolecularData();
+            dataImportService.saveMolecularCharacterization(mc);
 
         }
 
@@ -331,6 +339,8 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             String mcKey = mcEntry.getKey();
             MolecularCharacterization mc = mcEntry.getValue();
+
+            mc.getFirstMarkerAssociation().encodeMolecularData();
 
             String[] mcKeyArr = mcKey.split("__");
             String sampleId = mcKeyArr[0];
@@ -391,9 +401,9 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
 
 
-    private MarkerAssociation setVariationProperties(Map<String,String> data, Marker marker){
+    private MolecularData setVariationProperties(Map<String,String> data, Marker marker){
 
-        MarkerAssociation ma = new MarkerAssociation();
+        MolecularData ma = new MolecularData();
         ma.setAminoAcidChange(data.get(omicAminoAcidChange));
         ma.setConsequence(data.get(omicConsequence));
         ma.setAlleleFrequency(data.get(omicAlleleFrequency));
@@ -402,47 +412,45 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         ma.setRefAllele(data.get(omicRefAllele));
         ma.setAltAllele(data.get(omicAltAllele));
         ma.setGenomeAssembly(data.get(omicGenomeAssembly));
-        ma.setRsIdVariants(data.get(omicRsIdVariants));
+        ma.setExistingVariations(data.get(omicRsIdVariants));
         ma.setSeqStartPosition(data.get(omicSeqStartPosition));
 
         ma.setEnsemblTranscriptId(data.get(omicEnsemblTranscriptId));
         ma.setNucleotideChange(data.get(omicNucleotideChange));
-        ma.setMarker(marker);
+        ma.setMarker(marker.getHgncSymbol());
 
         return  ma;
     }
 
 
 
-    private MarkerAssociation setCNAProperties(Map<String,String> data, Marker marker){
+    private MolecularData setCNAProperties(Map<String,String> data, Marker marker){
 
-        MarkerAssociation ma = new MarkerAssociation();
-
-
+        MolecularData md = new MolecularData();
         //setHostStrain Name
-        ma.setChromosome(data.get(omicChromosome));
-        ma.setSeqStartPosition(data.get(omicSeqStartPosition));
-        ma.setSeqEndPosition(data.get(omicSeqEndPosition));
-        ma.setCnaLog10RCNA(data.get(omicCnaLog10RCNA));
-        ma.setCnaLog2RCNA(data.get(omicCnaLog2RCNA));
-        ma.setCnaCopyNumberStatus(data.get(omicCnaCopyNumberStatus));
-        ma.setCnaGisticValue(data.get(omicCnaGisticvalue));
-        ma.setCnaPicnicValue(data.get(omicCnaPicnicValue));
-        ma.setGenomeAssembly(data.get(omicGenomeAssembly));
+        md.setChromosome(data.get(omicChromosome));
+        md.setSeqStartPosition(data.get(omicSeqStartPosition));
+        md.setSeqEndPosition(data.get(omicSeqEndPosition));
+        md.setCnaLog10RCNA(data.get(omicCnaLog10RCNA));
+        md.setCnaLog2RCNA(data.get(omicCnaLog2RCNA));
+        md.setCnaCopyNumberStatus(data.get(omicCnaCopyNumberStatus));
+        md.setCnaGisticValue(data.get(omicCnaGisticvalue));
+        md.setCnaPicnicValue(data.get(omicCnaPicnicValue));
+        md.setGenomeAssembly(data.get(omicGenomeAssembly));
 
         marker.setHgncSymbol(data.get(omicHgncSymbol));
         marker.setUcscGeneId(data.get(omicUcscGeneId));
         marker.setNcbiGeneId(data.get(omicNcbiGeneId));
         marker.setEnsemblGeneId(data.get(omicEnsemblGeneId));
 
-        ma.setMarker(marker);
-        return  ma;
+        md.setMarker(marker.getHgncSymbol());
+        return  md;
     }
 
 
-    private MarkerAssociation setTranscriptomicProperties(Map<String,String> data, Marker marker){
+    private MolecularData setTranscriptomicProperties(Map<String,String> data, Marker marker){
 
-        MarkerAssociation ma = new MarkerAssociation();
+        MolecularData ma = new MolecularData();
         ma.setChromosome(data.get(omicChromosome));
         ma.setSeqStartPosition(data.get(omicSeqStartPosition));
         ma.setSeqEndPosition(data.get(omicSeqEndPosition));
@@ -457,7 +465,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
         ma.setGenomeAssembly(data.get(omicGenomeAssembly));
         ma.setZscore(data.get(omicZscore));
 
-        ma.setMarker(marker);
+        ma.setMarker(marker.getHgncSymbol());
 
         return  ma;
     }

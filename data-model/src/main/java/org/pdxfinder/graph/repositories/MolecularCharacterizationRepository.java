@@ -51,7 +51,9 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
 
     @Query("MATCH (pl:Platform)-[plr:PLATFORM_USED]-(mc:MolecularCharacterization) " +
             "WHERE ID(mc) = {id} " +
-            "RETURN pl, plr, mc")
+            "WITH pl, plr, mc " +
+            "OPTIONAL MATCH (mc)-[awr:ASSOCIATED_WITH]-(ma:MarkerAssociation) " +
+            "RETURN pl, plr, mc, awr, ma")
     MolecularCharacterization getMolecularDataById(@Param("id") Long id);
 
     @Query("MATCH (mc:MolecularCharacterization) RETURN ID(mc)")
@@ -64,7 +66,7 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
 
     @Query("MATCH (mc:MolecularCharacterization)-[awr:ASSOCIATED_WITH]-(mAss:MarkerAssociation) " +
             "WHERE ID(mc) = {id} " +
-            "RETURN count(mAss) ")
+            "RETURN sum(mAss.dataPoints) ")
     int findAssociationsNumberById(@Param("id") MolecularCharacterization mc);
 
 }

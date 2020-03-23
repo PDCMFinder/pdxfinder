@@ -39,7 +39,7 @@ public class DataExportTest extends BaseTest {
     @Before
     public void setUp() {
 
-        providerGroup = new Group("TestGroup", "TG", "", "Academia", "Bob", "Bob's page");
+        providerGroup = Group.createProviderGroup("TestGroup", "TG", "", "Academia", "Bob", "Bob's page");
 
         universalDataExporter = new UniversalDataExporter(dataImportService, utilityService);
         //universalDataExporter.init("", providerGroup);
@@ -259,10 +259,12 @@ public class DataExportTest extends BaseTest {
 
     private List<ModelCreation> getModelListForTest(){
 
+        List<ModelCreation> modelCreationList = new ArrayList<>();
+
         ModelCreation model = new ModelCreation();
         model.setSourcePdxId("m123");
 
-        Group accessGroup = new Group("Academia", "transnational");
+        Group accessGroup = Group.createAccessibilityGroup("Academia", "transnational");
         Group project = new Group("project1", "p1", "Project");
 
         Group publicationGroup = new Group();
@@ -308,15 +310,17 @@ public class DataExportTest extends BaseTest {
         xenoSample.addMolecularCharacterization(molecularCharacterization);
         model.addSpecimen(specimen);
 
-        List<ModelCreation> modelCreationList = new ArrayList<>();
+
         modelCreationList.add(model);
 
 
         //setting up mutation data
         MarkerAssociation ma = new MarkerAssociation();
-        ma.setAminoAcidChange("aminoacidchange");
+        MolecularData md = new MolecularData();
+        md.setAminoAcidChange("aminoacidchange");
         Marker m = new Marker("markersymbol", "markername");
-        ma.setMarker(m);
+        md.setMarker(m.getHgncSymbol());
+        ma.addMolecularData(md);
         molecularCharacterization.addMarkerAssociation(ma);
 
         //setting up cna data
@@ -324,9 +328,11 @@ public class DataExportTest extends BaseTest {
         molecularCharacterization2.setType("copy number alteration");
         molecularCharacterization2.setPlatform(platform);
         MarkerAssociation ma2 = new MarkerAssociation();
-        ma2.setCnaCopyNumberStatus("cnaStatus");
+        MolecularData md2 = new MolecularData();
+        md2.setCnaCopyNumberStatus("cnaStatus");
         Marker m2 = new Marker("markersymbol", "markername");
-        ma2.setMarker(m2);
+        md2.setMarker(m2.getHgncSymbol());
+        ma2.addMolecularData(md2);
         molecularCharacterization2.addMarkerAssociation(ma2);
         xenoSample.addMolecularCharacterization(molecularCharacterization2);
 

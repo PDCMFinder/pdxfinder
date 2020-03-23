@@ -1,38 +1,23 @@
 package org.pdxfinder.dataloaders;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
-import org.neo4j.ogm.session.Session;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Load models from WISTAR
- */
-@Component
-@Order(value = -15)
-public class LoadWISTAR implements CommandLineRunner {
+@Service
+public class LoadWISTAR {
 
     private final static Logger log = LoggerFactory.getLogger(LoadWISTAR.class);
 
@@ -54,56 +39,30 @@ public class LoadWISTAR implements CommandLineRunner {
     private Group wistarDS;
     private Group projectGroup;
 
-    private Options options;
-    private CommandLineParser parser;
-    private CommandLine cmd;
-    private HelpFormatter formatter;
-
     private DataImportService dataImportService;
-    private Session session;
-
-    @Autowired
     private UtilityService utilityService;
 
-
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
-    @PostConstruct
-    public void init() {
-        formatter = new HelpFormatter();
-    }
-
-    public LoadWISTAR(DataImportService dataImportService) {
+    public LoadWISTAR(DataImportService dataImportService,
+                      UtilityService utilityService) {
         this.dataImportService = dataImportService;
+        this.utilityService = utilityService;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void run() throws Exception {
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadWISTAR", "Load WISTAR PDX data");
-        parser.accepts("loadALL", "Load all, including WISTAR PDX data");
-        OptionSet options = parser.parse(args);
+        String urlStr = finderRootDir+ "/data/" +DATASOURCE_ABBREVIATION+"/pdx/models.json";
+        File file = new File(urlStr);
+        if(file.exists()){
 
-        if (options.has("loadWISTAR") || options.has("loadALL")) {
+            log.info("Loading WISTAR PDX data from URL " + urlStr);
+            parseJSON(utilityService.parseFile(urlStr));
+        }
+        else{
 
-
-            String urlStr = finderRootDir+ "/data/" +DATASOURCE_ABBREVIATION+"/pdx/models.json";
-            File file = new File(urlStr);
-            if(file.exists()){
-
-                log.info("Loading WISTAR PDX data from URL " + urlStr);
-                parseJSON(utilityService.parseFile(urlStr));
-            }
-            else{
-
-                log.info("No file found for "+DATASOURCE_ABBREVIATION+", skipping");
-            }
-
-
-
+            log.info("No file found for "+DATASOURCE_ABBREVIATION+", skipping");
         }
 
     }

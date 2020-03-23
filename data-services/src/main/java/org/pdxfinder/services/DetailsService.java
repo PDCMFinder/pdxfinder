@@ -1,7 +1,6 @@
 package org.pdxfinder.services;
 
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.repositories.*;
@@ -12,6 +11,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.join;
 
 /*
  * Created by abayomi on 09/05/2018.
@@ -44,22 +46,17 @@ public class DetailsService {
     private final String PDMR_URL = "https://pdmdb.cancer.gov/pls/apex/f?p=101:41";
     private final String PDMR_URL_TEXT = "View data at PDMR";
 
-    //private final String HCI_URL = "https://www.pdxnetwork.org/hcibcm/";
     private final String HCI_URL = "";
     private final String HCI_DS = "PDXNet-HCI-BCM";
-    //    private final String WISTAR_URL = "https://www.pdxnetwork.org/the-wistarmd-andersonpenn/";
     private final String WISTAR_URL = "";
 
     private final String WISTAR_DS = "PDXNet-Wistar-MDAnderson-Penn";
     private final String MDA_URL = "";
-    //private final String MDA_URL = "https://www.pdxnetwork.org/md-anderson/";
     private final String MDA_DS = "PDXNet-MDAnderson";
-    //private final String WUSTL_URL = "https://www.pdxnetwork.org/wustl/";
     private final String WUSTL_URL = "";
     private final String WUSTL_DS = "PDXNet-WUSTL";
 
     private final static Logger log = LoggerFactory.getLogger(DetailsService.class);
-
 
 
     public DetailsService(SampleRepository sampleRepository,
@@ -93,7 +90,6 @@ public class DetailsService {
     }
 
 
-
     public DetailsDTO getModelDetails(String dataSource, String modelId) {
 
         DetailsDTO dto = new DetailsDTO();
@@ -109,61 +105,54 @@ public class DetailsService {
 
         if (pdx != null && pdx.getExternalUrls() != null) {
 
-            pdx.getExternalUrls().stream().forEach(extUrl ->{
-                if (extUrl.getType().equals(ExternalUrl.Type.SOURCE.getValue())){
+            pdx.getExternalUrls().stream().forEach(extUrl -> {
+                if (extUrl.getType().equals(ExternalUrl.Type.SOURCE.getValue())) {
                     dto.setViewDataAtUrl(extUrl.getUrl());
-                }else{
+                } else {
                     dto.setContactProviderUrl(extUrl.getUrl());
                 }
             });
 
-            dto.setViewDataAtLabel("View Data at "+pdx.getDataSource());
-        }
-
-        else{
+            dto.setViewDataAtLabel("View Data at " + pdx.getDataSource());
+        } else {
             dto.setViewDataAtUrl("#");
             dto.setViewDataAtLabel("Unknown source");
         }
 
 
-
         PatientSnapshot currentPatientSnapshot = null;
         //since there is only one element being returned in the set, this will give the current snapshot for the patient
-        for(PatientSnapshot ps: patient.getSnapshots()){
+        for (PatientSnapshot ps : patient.getSnapshots()) {
             currentPatientSnapshot = ps;
         }
 
-        if(currentPatientSnapshot != null && currentPatientSnapshot.getAgeAtCollection() != null){
+        if (currentPatientSnapshot != null && currentPatientSnapshot.getAgeAtCollection() != null) {
 
             dto.setAgeAtTimeOfCollection(currentPatientSnapshot.getAgeAtCollection());
-        }
-        else{
+        } else {
 
             dto.setAgeAtTimeOfCollection("Not specified");
         }
 
-        if(patient.getRace() != null && !patient.getRace().isEmpty()){
+        if (patient.getRace() != null && !patient.getRace().isEmpty()) {
 
             dto.setRace(patient.getRace());
-        }
-        else{
+        } else {
 
             dto.setRace("Not specified");
         }
 
-        if(patient.getEthnicity() != null && !patient.getEthnicity().isEmpty()){
+        if (patient.getEthnicity() != null && !patient.getEthnicity().isEmpty()) {
 
             dto.setEthnicity(patient.getEthnicity());
-        }
-        else{
+        } else {
 
             dto.setEthnicity("Not specified");
         }
 
-        if(patientSample.getSampleToOntologyRelationship() != null && patientSample.getSampleToOntologyRelationship().getOntologyTerm()!=null){
+        if (patientSample.getSampleToOntologyRelationship() != null && patientSample.getSampleToOntologyRelationship().getOntologyTerm() != null) {
             dto.setMappedOntologyTermLabel(patientSample.getSampleToOntologyRelationship().getOntologyTerm().getLabel());
-        }
-        else{
+        } else {
             dto.setMappedOntologyTermLabel("");
         }
 
@@ -174,18 +163,16 @@ public class DetailsService {
 
         if (pdx != null && pdx.getExternalUrls() != null) {
 
-            pdx.getExternalUrls().stream().forEach(extUrl ->{
-                if (extUrl.getType().equals(ExternalUrl.Type.SOURCE.getValue())){
+            pdx.getExternalUrls().stream().forEach(extUrl -> {
+                if (extUrl.getType().equals(ExternalUrl.Type.SOURCE.getValue())) {
                     dto.setViewDataAtUrl(extUrl.getUrl());
-                }else{
+                } else {
                     dto.setContactProviderUrl(extUrl.getUrl());
                 }
             });
 
-            dto.setViewDataAtLabel("View Data at "+pdx.getDataSource());
-        }
-
-        else{
+            dto.setViewDataAtLabel("View Data at " + pdx.getDataSource());
+        } else {
             dto.setViewDataAtUrl("#");
             dto.setViewDataAtLabel("Unknown source");
         }
@@ -195,31 +182,31 @@ public class DetailsService {
 
         dto.setRelatedModels(getModelsOriginatedFromSamePatient(dataSource, modelId));
 
-        if(patientSample.getOriginTissue() != null){
+        if (patientSample.getOriginTissue() != null) {
             dto.setPrimaryTissue(patientSample.getOriginTissue().getName());
         }
 
-        if(patientSample.getSampleSite() != null){
+        if (patientSample.getSampleSite() != null) {
             dto.setCollectionSite(patientSample.getSampleSite().getName());
         }
 
-        if(patientSample.getType() != null){
+        if (patientSample.getType() != null) {
             dto.setTumorType(patientSample.getType().getName());
         }
 
-        if(patientSample.getStage() != null){
+        if (patientSample.getStage() != null) {
             dto.setStage(patientSample.getStage());
         }
 
-        if(patientSample.getStageClassification() != null){
+        if (patientSample.getStageClassification() != null) {
             dto.setStageClassification(patientSample.getStageClassification());
         }
 
-        if(patientSample.getGrade() != null){
+        if (patientSample.getGrade() != null) {
             dto.setGrade(patientSample.getGrade());
         }
 
-        if(patientSample.getGradeClassification() != null){
+        if (patientSample.getGradeClassification() != null) {
             dto.setGradeClassification(patientSample.getGradeClassification());
         }
 
@@ -229,11 +216,11 @@ public class DetailsService {
         //engraftments >> passages[]
         Map<EngraftmentDataDTO, Set<String>> engraftmentDataMap = new HashMap<>();
 
-        if(pdx.getSpecimens() != null){
+        if (pdx.getSpecimens() != null) {
 
-            for(Specimen sp: pdx.getSpecimens()){
+            for (Specimen sp : pdx.getSpecimens()) {
 
-                if(sp.getHostStrain() != null){
+                if (sp.getHostStrain() != null) {
 
                     EngraftmentDataDTO edto = new EngraftmentDataDTO();
 
@@ -273,7 +260,7 @@ public class DetailsService {
             }
         }
 
-        for(Map.Entry<EngraftmentDataDTO, Set<String>> entry: engraftmentDataMap.entrySet()){
+        for (Map.Entry<EngraftmentDataDTO, Set<String>> entry : engraftmentDataMap.entrySet()) {
 
             EngraftmentDataDTO edto = entry.getKey();
             Set<String> passages = entry.getValue();
@@ -282,7 +269,7 @@ public class DetailsService {
 
             //order the passages:
             Collections.sort(passageList);
-            edto.setPassage(StringUtils.join(passageList, ", "));
+            edto.setPassage(join(passageList, ", "));
             engraftmentData.add(edto);
 
         }
@@ -291,10 +278,10 @@ public class DetailsService {
 
 
         List<QualityAssurance> qaList = pdx.getQualityAssurance();
-        if(qaList == null) qaList = new ArrayList<>();
+        if (qaList == null) qaList = new ArrayList<>();
 
         List<QualityControlDTO> qcontrolList = new ArrayList<>();
-        for(QualityAssurance qa: qaList){
+        for (QualityAssurance qa : qaList) {
 
             QualityControlDTO qdto = new QualityControlDTO(qa.getTechnology(), qa.getDescription(), qa.getPassages());
             qcontrolList.add(qdto);
@@ -316,7 +303,7 @@ public class DetailsService {
         Set<String> dataTypes = new HashSet<>();
         //first add molchars linked to the patient sample
         Collection<MolecularCharacterization> patientMCs = molecularCharacterizationRepository.findAllBySample(patientSample);
-        for(MolecularCharacterization mc : patientMCs){
+        for (MolecularCharacterization mc : patientMCs) {
 
             MolecularDataEntryDTO mde = new MolecularDataEntryDTO();
             mde.setSampleId(patientSample.getSourceSampleId());
@@ -328,56 +315,52 @@ public class DetailsService {
             mde.setPlatformUsedLabel(mc.getPlatform().getName());
 
 
-            if(mc.getPlatform().getName() == null || mc.getPlatform().getName().isEmpty() || mc.getPlatform().getName().toLowerCase().equals("not specified")
-                    || mc.getPlatform().getUrl() == null || mc.getPlatform().getUrl().isEmpty()){
+            if (mc.getPlatform().getName() == null || mc.getPlatform().getName().isEmpty() || mc.getPlatform().getName().toLowerCase().equals("not specified")
+                    || mc.getPlatform().getUrl() == null || mc.getPlatform().getUrl().isEmpty()) {
 
                 mde.setPlatformUsedUrl(null);
-            }
-            else{
+            } else {
 
                 mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
             }
 
             int assocData = molecularCharacterizationRepository.findAssociationsNumberById(mc);
 
-            if(assocData == 0){
+            if (assocData == 0) {
                 mde.setDataAssociated("NO");
-            }
-            else{
+            } else {
                 mde.setDataAssociated("YES");
                 dataTypes.add(mc.getType());
             }
 
-            if(mc.isVisible()){
+            if (mc.isVisible()) {
                 mde.setIsVisible("YES");
-            }
-            else{
+            } else {
                 mde.setIsVisible("NO");
             }
             mde.setRawDataLabel("Not available");
             mde.setMolcharId(mc.getId().toString());
 
             if (patientSample.getSourceSampleId() != null)
-            mdeDTO.add(mde);
+                mdeDTO.add(mde);
         }
 
         //then add molchars linked to the xenograft sample
 
         List<Specimen> specimens = specimenRepository.findAllWithMolcharDataByModel(pdx);
 
-        for(Specimen sp: specimens){
+        for (Specimen sp : specimens) {
 
 
-
-            if(sp.getSample() != null){
+            if (sp.getSample() != null) {
 
                 Sample xenoSample = sp.getSample();
 
-                for(MolecularCharacterization mc: xenoSample.getMolecularCharacterizations()){
+                for (MolecularCharacterization mc : xenoSample.getMolecularCharacterizations()) {
 
                     MolecularDataEntryDTO mde = new MolecularDataEntryDTO();
 
-                    mde.setSampleId(xenoSample.getSourceSampleId()== null ? "Not Specified":xenoSample.getSourceSampleId());
+                    mde.setSampleId(xenoSample.getSourceSampleId() == null ? "Not Specified" : xenoSample.getSourceSampleId());
                     mde.setSampleType("Engrafted Tumor");
                     mde.setEngraftedTumorPassage(sp.getPassage());
                     mde.setMolcharType(mc.getType());
@@ -390,18 +373,16 @@ public class DetailsService {
 
                     int assocData = molecularCharacterizationRepository.findAssociationsNumberById(mc);
 
-                    if(assocData == 0){
+                    if (assocData == 0) {
                         mde.setDataAssociated("NO");
-                    }
-                    else{
+                    } else {
                         mde.setDataAssociated("YES");
                         dataTypes.add(mc.getType());
                     }
 
-                    if(mc.isVisible()){
+                    if (mc.isVisible()) {
                         mde.setIsVisible("YES");
-                    }
-                    else{
+                    } else {
                         mde.setIsVisible("NO");
                     }
                     //if (xenoSample.getSourceSampleId() != null)
@@ -411,7 +392,6 @@ public class DetailsService {
 
 
             }
-
 
 
         }
@@ -425,201 +405,51 @@ public class DetailsService {
 
 
     /**
-     * Creates a table from a selected (molchar)--(massoc)--(marker) object
+     * Creates a table from a selected (molchar)--(massoc) object
      *
      * @param id, that is the node id of the selected molchar object
      * @return
      */
-    public MolecularDataTableDTO getMolecularDataTable(String id){
+    public MolecularDataTableDTO getMolecularDataTable(String id) {
 
         Set<String> tableHeadersSet = new HashSet<>();
-        ArrayList<String> tableHeaders = new ArrayList<>();
+        List<String> tableHeaders;
         List<List<String>> tableRows = new ArrayList<>();
         MolecularDataTableDTO dto = new MolecularDataTableDTO();
 
-        int batchSize = 500;
-
         MolecularCharacterization mc = molecularCharacterizationRepository.getMolecularDataById(Long.valueOf(id));
 
-        int numberOfAssociations = markerAssociationRepository.getMarkerAssociationCountByMolCharId(Long.valueOf(id));
-        List<MarkerAssociation> associationList = new ArrayList<>();
-
-        for(int i=0; i<numberOfAssociations; i += batchSize){
-
-            List<MarkerAssociation> subList = markerAssociationRepository.findAssociationsByMolCharIdFromTo(Long.valueOf(id), i, batchSize);
-            associationList.addAll(subList);
+        if (mc == null) {
+            return getErrorTable("ERROR: this molecular characterization does not exist");
         }
-
-
-        //check if molchar exists and if not, display an error message
-        if(mc == null){
-
-            tableHeaders.add("");
-
-            List<String> notVisibleDataRow = new ArrayList<>();
-            notVisibleDataRow.add("ERROR: This molecular characterization does not exist.");
-
-            tableRows.add(notVisibleDataRow);
-
-            dto.setTableHeaders(tableHeaders);
-            dto.setTableRows(tableRows);
-
-            return dto;
-        }
-
 
         //check if data is visible and can be displayed
-        if(!mc.isVisible()){
+        if (!mc.isVisible()) {
 
-            tableHeaders.add("");
-
-            List<String> notVisibleDataRow = new ArrayList<>();
-            notVisibleDataRow.add("This data is only accessible through the provider website - please click on 'Contact Provider' button above to request access.");
-
-            tableRows.add(notVisibleDataRow);
-
-            dto.setTableHeaders(tableHeaders);
-            dto.setTableRows(tableRows);
-            dto.setVisible(false);
-
-            return dto;
+            return getErrorTable("This data is only accessible through the provider website - please click on 'Contact Provider' button above to request access.");
         }
 
-
+        List<MolecularData> molecularDataList = null;
 
         Sample sample = sampleRepository.findSampleByMolcharId(Long.valueOf(id));
         String sampleId = sample.getSourceSampleId() == null ? "" : sample.getSourceSampleId();
 
-
         //STEP 0: Add sampleid to table, we always display this
         tableHeadersSet.add("sampleid");
 
-
         //STEP 1: dynamically determine the headers of the table
-        for(MarkerAssociation ma: associationList){
+        MarkerAssociation markerAssociation = mc.getFirstMarkerAssociation();
 
+        try {
+            molecularDataList = markerAssociation.decodeMolecularData();
+        } catch (Exception e) {
+            log.error("Error getting molecular data");
+            molecularDataList = new ArrayList<>();
+        }
 
-            if(ma.getChromosome() != null && !ma.getChromosome().isEmpty()){
-                tableHeadersSet.add("chromosome");
-            }
+        for (MolecularData md : molecularDataList) {
 
-            if(ma.getSeqPosition() != null && !ma.getSeqPosition().isEmpty()){
-                tableHeadersSet.add("seqposition");
-            }
-
-            if(ma.getRefAllele() != null && !ma.getRefAllele().isEmpty()){
-                tableHeadersSet.add("refallele");
-            }
-
-            if(ma.getAltAllele() != null && !ma.getAltAllele().isEmpty()){
-                tableHeadersSet.add("altallele");
-            }
-
-            if(ma.getConsequence() != null && !ma.getConsequence().isEmpty()){
-                tableHeadersSet.add("consequence");
-            }
-
-            if(ma.getMarker() != null){
-                tableHeadersSet.add("hgncsymbol");
-            }
-
-            if(ma.getZscore() != null && !ma.getZscore().isEmpty()){
-                tableHeadersSet.add("zscore");
-            }
-
-            if(ma.getAminoAcidChange() != null && !ma.getAminoAcidChange().isEmpty()){
-                tableHeadersSet.add("aminoacidchange");
-            }
-
-            if(ma.getReadDepth() != null && !ma.getReadDepth().isEmpty()){
-                tableHeadersSet.add("readdepth");
-            }
-
-            if(ma.getAlleleFrequency() != null && !ma.getAlleleFrequency().isEmpty()){
-                tableHeadersSet.add("allelefrequency");
-            }
-
-
-            if(ma.getRsIdVariants() != null && !ma.getRsIdVariants().isEmpty()){
-                tableHeadersSet.add("rsidvariants");
-            }
-
-            if(ma.getNucleotideChange() != null && !ma.getNucleotideChange().isEmpty()){
-                tableHeadersSet.add("nucleotidechange");
-            }
-
-            if(ma.getGenomeAssembly() != null && !ma.getGenomeAssembly().isEmpty()){
-                tableHeadersSet.add("genomeassembly");
-            }
-
-            if(ma.getSeqStartPosition() != null && !ma.getSeqStartPosition().isEmpty()){
-                tableHeadersSet.add("seqstartposition");
-            }
-
-            if(ma.getSeqEndPosition() != null && !ma.getSeqEndPosition().isEmpty()){
-                tableHeadersSet.add("seqendposition");
-            }
-
-            if(ma.getStrand() != null && !ma.getStrand().isEmpty()){
-                tableHeadersSet.add("strand");
-            }
-
-            if(ma.getEnsemblTranscriptId() != null && !ma.getEnsemblTranscriptId().isEmpty()){
-                tableHeadersSet.add("ensembltranscriptid");
-            }
-
-            if(ma.getUcscTranscriptId() != null && !ma.getUcscTranscriptId().isEmpty()){
-                tableHeadersSet.add("ucsctranscriptid");
-            }
-
-            if(ma.getNcbiTranscriptId() != null && !ma.getNcbiTranscriptId().isEmpty()){
-                tableHeadersSet.add("ncbitranscriptid");
-            }
-
-            if(ma.getCdsChange() != null && !ma.getCdsChange().isEmpty()){
-                tableHeadersSet.add("cdschange");
-            }
-
-            if(ma.getType() != null && !ma.getType().isEmpty()){
-                tableHeadersSet.add("type");
-            }
-
-            if(ma.getAnnotation() != null && !ma.getAnnotation().isEmpty()){
-                tableHeadersSet.add("annotation");
-            }
-
-            if(ma.getCytogeneticsResult() != null && !ma.getCytogeneticsResult().isEmpty()){
-                tableHeadersSet.add("cytogeneticsresult");
-            }
-
-            if(ma.getMicrosatelliteResult() != null && !ma.getMicrosatelliteResult().isEmpty()){
-                tableHeadersSet.add("microsateliteresult");
-            }
-
-            if(ma.getProbeIDAffymetrix() != null && !ma.getProbeIDAffymetrix().isEmpty()){
-                tableHeadersSet.add("probeidaffymetrix");
-            }
-
-            if(ma.getCnaLog2RCNA() != null && !ma.getCnaLog2RCNA().isEmpty()){
-                tableHeadersSet.add("cnalog2rcna");
-            }
-
-            if(ma.getCnaLog10RCNA() != null && !ma.getCnaLog10RCNA().isEmpty()){
-                tableHeadersSet.add("cnalog10rcna");
-            }
-
-            if(ma.getCnaCopyNumberStatus() != null && !ma.getCnaCopyNumberStatus().isEmpty()){
-                tableHeadersSet.add("cnacopynumberstatus");
-            }
-
-            if(ma.getCnaGisticValue() != null && !ma.getCnaGisticValue().isEmpty()){
-                tableHeadersSet.add("cnagisticvalue");
-            }
-
-            if(ma.getCnaPicnicValue() != null && !ma.getCnaPicnicValue().isEmpty()){
-                tableHeadersSet.add("cnapicnicvalue");
-            }
-
+            createTableHeaderSet(md, tableHeadersSet);
         }
 
 
@@ -627,236 +457,391 @@ public class DetailsService {
         // DON'T CHANGE THE ORDER OF THESE CONDITIONS OR THE WORLD WILL TREMBLE!
         // (But if you REALLY need to change the order, don't forget to change it at step 3, too!!!)
 
-
-
-        if(tableHeadersSet.contains("sampleid")){
-            tableHeaders.add("Sample Id");
-        }
-
-        if(tableHeadersSet.contains("hgncsymbol")){
-            tableHeaders.add("HGNC Symbol");
-        }
-
-        if(tableHeadersSet.contains("aminoacidchange")){
-            tableHeaders.add("Amino Acid Change");
-        }
-
-        if(tableHeadersSet.contains("consequence")){
-            tableHeaders.add("Consequence");
-        }
-
-        if(tableHeadersSet.contains("nucleotidechange")){
-            tableHeaders.add("Nucleotide Change");
-        }
-
-        if(tableHeadersSet.contains("readdepth")){
-            tableHeaders.add("Read Depth");
-        }
-
-        if(tableHeadersSet.contains("allelefrequency")){
-            tableHeaders.add("Allele Frequency");
-        }
-
-        if(tableHeadersSet.contains("probeidaffymetrix")){
-            tableHeaders.add("Probe Id Affymetrix");
-        }
-
-        if(tableHeadersSet.contains("cnalog10rcna")){
-            tableHeaders.add("Log10 Rcna");
-        }
-
-        if(tableHeadersSet.contains("cnalog2rcna")){
-            tableHeaders.add("Log2 Rcna");
-        }
-
-        if(tableHeadersSet.contains("cnacopynumberstatus")){
-            tableHeaders.add("Copy Number Status");
-        }
-
-        if(tableHeadersSet.contains("cnagisticvalue")){
-            tableHeaders.add("Gistic Value");
-        }
-
-        if(tableHeadersSet.contains("chromosome")){
-            tableHeaders.add("Chromosome");
-        }
-
-        if(tableHeadersSet.contains("seqstartposition")){
-            tableHeaders.add("Seq. Start Position");
-        }
-
-        if(tableHeadersSet.contains("seqendposition")){
-            tableHeaders.add("Seq. End Position");
-        }
-
-        if(tableHeadersSet.contains("refallele")){
-            tableHeaders.add("Ref. Allele");
-        }
-
-        if(tableHeadersSet.contains("altallele")){
-            tableHeaders.add("Alt Allele");
-        }
-
-        if(tableHeadersSet.contains("rsidvariants")){
-            tableHeaders.add("Rs Id Variant");
-        }
-
-        if(tableHeadersSet.contains("ensembltranscriptid")){
-            tableHeaders.add("Ensembl Transcript Id");
-        }
-
-        if(tableHeadersSet.contains("ensemblgeneid")){
-            tableHeaders.add("Ensembl Gene Id");
-        }
-
-        if(tableHeadersSet.contains("ucscgeneid")){
-            tableHeaders.add("Ucsc Gene Id");
-        }
-
-        if(tableHeadersSet.contains("ncbigeneid")){
-            tableHeaders.add("Ncbi Gene Id");
-        }
-
-
-        if(tableHeadersSet.contains("zscore")){
-            tableHeaders.add("Z-Score");
-        }
-
-        if(tableHeadersSet.contains("genomeassembly")){
-            tableHeaders.add("Genome Assembly");
-        }
-
-        if(tableHeadersSet.contains("cytogeneticsresult")){
-            tableHeaders.add("Result");
-        }
-
-
+        tableHeaders = createTableHeaders(tableHeadersSet);
 
         //STEP 3: Insert the rows of the table
         // DON'T CHANGE THE ORDER OF THESE CONDITIONS OR THE WORLD WILL TREMBLE!
         // (But if you REALLY need to change the order, don't forget to change it at step 2, too!!!)
-        for(MarkerAssociation ma: associationList){
 
-            List<String> row = new ArrayList<>();
+        for (MolecularData md : molecularDataList) {
 
-
-            if(tableHeadersSet.contains("sampleid")){
-                row.add(sampleId);
-            }
-
-            if(tableHeadersSet.contains("hgncsymbol")){
-                row.add(ma.getMarker().getHgncSymbol());
-            }
-
-            if(tableHeadersSet.contains("aminoacidchange")){
-                row.add(ma.getAminoAcidChange() == null ? "" : ma.getAminoAcidChange());
-            }
-
-            if(tableHeadersSet.contains("consequence")){
-                row.add((ma.getConsequence() == null ? "": ma.getConsequence()));
-            }
-
-            if(tableHeadersSet.contains("nucleotidechange")){
-                row.add((ma.getNucleotideChange() == null ? "":ma.getNucleotideChange()));
-            }
-
-            if(tableHeadersSet.contains("readdepth")){
-                row.add((ma.getReadDepth() == null ? "":ma.getReadDepth()));
-            }
-
-            if(tableHeadersSet.contains("allelefrequency")){
-                row.add((ma.getAlleleFrequency() == null? "":ma.getAlleleFrequency()));
-            }
-
-            if(tableHeadersSet.contains("probeidaffymetrix")){
-                row.add((ma.getProbeIDAffymetrix() == null ? "":ma.getProbeIDAffymetrix()));
-            }
-
-            if(tableHeadersSet.contains("cnalog10rcna")){
-                row.add((ma.getCnaLog10RCNA() == null ? "":ma.getCnaLog10RCNA()));
-            }
-
-            if(tableHeadersSet.contains("cnalog2rcna")){
-                row.add((ma.getCnaLog2RCNA() == null ? "":ma.getCnaLog2RCNA()));
-            }
-
-            if(tableHeadersSet.contains("cnacopynumberstatus")){
-                row.add((ma.getCnaCopyNumberStatus() == null ? "":ma.getCnaCopyNumberStatus()));
-            }
-
-            if(tableHeadersSet.contains("cnagisticvalue")){
-                row.add((ma.getCnaGisticValue() == null ? "" : ma.getCnaGisticValue()));
-            }
-
-            if(tableHeadersSet.contains("chromosome")){
-                row.add((ma.getChromosome() == null ? "" : ma.getChromosome()));
-            }
-
-            if(tableHeadersSet.contains("seqstartposition")){
-                row.add((ma.getSeqStartPosition() == null ? "" : ma.getSeqStartPosition()));
-            }
-
-            if(tableHeadersSet.contains("seqendposition")){
-                row.add((ma.getSeqEndPosition() == null ? "" : ma.getSeqEndPosition()));
-            }
-
-            if(tableHeadersSet.contains("refallele")){
-                row.add((ma.getRefAllele() == null ? "" : ma.getRefAllele()));
-            }
-
-            if(tableHeadersSet.contains("altallele")){
-                row.add((ma.getAltAllele() == null ? "" : ma.getAltAllele()));
-            }
-
-            if(tableHeadersSet.contains("rsidvariants")){
-                row.add((ma.getRsIdVariants() == null ? "" : ma.getRsIdVariants()));
-            }
-
-            if(tableHeadersSet.contains("ensembltranscriptid")){
-                row.add((ma.getEnsemblTranscriptId() == null ? "" : ma.getEnsemblTranscriptId()));
-            }
-
-            if(tableHeadersSet.contains("ensemblgeneid")){
-                row.add((ma.getMarker().getEnsemblGeneId() == null ? "": ma.getMarker().getEnsemblGeneId() ));
-            }
-
-            if(tableHeadersSet.contains("ucscgeneid")){
-                row.add((ma.getMarker().getUcscGeneId() == null ? "" : ma.getMarker().getUcscGeneId()));
-            }
-
-            if(tableHeadersSet.contains("ncbigeneid")){
-                row.add((ma.getMarker().getNcbiGeneId() == null ? "" : ma.getMarker().getNcbiGeneId()));
-            }
-
-            if(tableHeadersSet.contains("zscore")){
-                row.add((ma.getZscore() == null ? "" : ma.getZscore()));
-            }
-
-            if(tableHeadersSet.contains("genomeassembly")){
-                row.add((ma.getGenomeAssembly() == null ? "" : ma.getGenomeAssembly()));
-            }
-
-            if(tableHeadersSet.contains("cytogeneticsresult")){
-                row.add(ma.getCytogeneticsResult() == null ? "" : ma.getCytogeneticsResult());
-            }
-
-
-            tableRows.add(row);
-
+            tableRows.add(createTableRow(md, tableHeadersSet, sampleId));
         }
-
 
         dto.setTableHeaders(tableHeaders);
         dto.setTableRows(tableRows);
 
-
         return dto;
     }
 
+    private void createTableHeaderSet(MolecularData md, Set<String> tableHeadersSet) {
+
+
+        if (md.getChromosome() != null && !md.getChromosome().isEmpty()) {
+            tableHeadersSet.add("chromosome");
+        }
+
+        if (md.getSeqPosition() != null && !md.getSeqPosition().isEmpty()) {
+            tableHeadersSet.add("seqposition");
+        }
+
+        if (md.getRefAllele() != null && !md.getRefAllele().isEmpty()) {
+            tableHeadersSet.add("refallele");
+        }
+
+        if (md.getAltAllele() != null && !md.getAltAllele().isEmpty()) {
+            tableHeadersSet.add("altallele");
+        }
+
+        if (md.getConsequence() != null && !md.getConsequence().isEmpty()) {
+            tableHeadersSet.add("consequence");
+        }
+
+        if (md.getMarker() != null) {
+            tableHeadersSet.add("hgncsymbol");
+        }
+
+        if (md.getZscore() != null && !md.getZscore().isEmpty()) {
+            tableHeadersSet.add("zscore");
+        }
+
+        if (md.getAminoAcidChange() != null && !md.getAminoAcidChange().isEmpty()) {
+            tableHeadersSet.add("aminoacidchange");
+        }
+
+        if (md.getReadDepth() != null && !md.getReadDepth().isEmpty()) {
+            tableHeadersSet.add("readdepth");
+        }
+
+        if (md.getAlleleFrequency() != null && !md.getAlleleFrequency().isEmpty()) {
+            tableHeadersSet.add("allelefrequency");
+        }
+
+
+        if (md.getExistingVariations() != null && !md.getExistingVariations().isEmpty()) {
+            tableHeadersSet.add("rsidvariants");
+        }
+
+        if (md.getNucleotideChange() != null && !md.getNucleotideChange().isEmpty()) {
+            tableHeadersSet.add("nucleotidechange");
+        }
+
+        if (md.getGenomeAssembly() != null && !md.getGenomeAssembly().isEmpty()) {
+            tableHeadersSet.add("genomeassembly");
+        }
+
+        if (md.getSeqStartPosition() != null && !md.getSeqStartPosition().isEmpty()) {
+            tableHeadersSet.add("seqstartposition");
+        }
+
+        if (md.getSeqEndPosition() != null && !md.getSeqEndPosition().isEmpty()) {
+            tableHeadersSet.add("seqendposition");
+        }
+
+        if (md.getStrand() != null && !md.getStrand().isEmpty()) {
+            tableHeadersSet.add("strand");
+        }
+
+        if (md.getEnsemblTranscriptId() != null && !md.getEnsemblTranscriptId().isEmpty()) {
+            tableHeadersSet.add("ensembltranscriptid");
+        }
+
+        if (md.getUcscGeneId() != null && !md.getUcscGeneId().isEmpty()) {
+            tableHeadersSet.add("ucsctranscriptid");
+        }
+
+        if (md.getNcbiTranscriptId() != null && !md.getNcbiTranscriptId().isEmpty()) {
+            tableHeadersSet.add("ncbitranscriptid");
+        }
+
+        if (md.getCdsChange() != null && !md.getCdsChange().isEmpty()) {
+            tableHeadersSet.add("cdschange");
+        }
+
+        if (md.getType() != null && !md.getType().isEmpty()) {
+            tableHeadersSet.add("type");
+        }
+
+        if (md.getAnnotation() != null && !md.getAnnotation().isEmpty()) {
+            tableHeadersSet.add("annotation");
+        }
+
+        if (md.getCytogeneticsResult() != null && !md.getCytogeneticsResult().isEmpty()) {
+            tableHeadersSet.add("cytogeneticsresult");
+        }
+
+        if (md.getMicrosatelliteResult() != null && !md.getMicrosatelliteResult().isEmpty()) {
+            tableHeadersSet.add("microsateliteresult");
+        }
+
+        if (md.getProbeIDAffymetrix() != null && !md.getProbeIDAffymetrix().isEmpty()) {
+            tableHeadersSet.add("probeidaffymetrix");
+        }
+
+        if (md.getCnaLog2RCNA() != null && !md.getCnaLog2RCNA().isEmpty()) {
+            tableHeadersSet.add("cnalog2rcna");
+        }
+
+        if (md.getCnaLog10RCNA() != null && !md.getCnaLog10RCNA().isEmpty()) {
+            tableHeadersSet.add("cnalog10rcna");
+        }
+
+        if (md.getCnaCopyNumberStatus() != null && !md.getCnaCopyNumberStatus().isEmpty()) {
+            tableHeadersSet.add("cnacopynumberstatus");
+        }
+
+        if (md.getCnaGisticValue() != null && !md.getCnaGisticValue().isEmpty()) {
+            tableHeadersSet.add("cnagisticvalue");
+        }
+
+        if (md.getCnaPicnicValue() != null && !md.getCnaPicnicValue().isEmpty()) {
+            tableHeadersSet.add("cnapicnicvalue");
+        }
+    }
+
+    private List<String> createTableHeaders(Set<String> tableHeadersSet) {
+
+        List<String> tableHeaders = new ArrayList<>();
+
+        if (tableHeadersSet.contains("sampleid")) {
+            tableHeaders.add("Sample Id");
+        }
+
+        if (tableHeadersSet.contains("hgncsymbol")) {
+            tableHeaders.add("HGNC Symbol");
+        }
+
+        if (tableHeadersSet.contains("aminoacidchange")) {
+            tableHeaders.add("Amino Acid Change");
+        }
+
+        if (tableHeadersSet.contains("consequence")) {
+            tableHeaders.add("Consequence");
+        }
+
+        if (tableHeadersSet.contains("nucleotidechange")) {
+            tableHeaders.add("Nucleotide Change");
+        }
+
+        if (tableHeadersSet.contains("readdepth")) {
+            tableHeaders.add("Read Depth");
+        }
+
+        if (tableHeadersSet.contains("allelefrequency")) {
+            tableHeaders.add("Allele Frequency");
+        }
+
+        if (tableHeadersSet.contains("probeidaffymetrix")) {
+            tableHeaders.add("Probe Id Affymetrix");
+        }
+
+        if (tableHeadersSet.contains("cnalog10rcna")) {
+            tableHeaders.add("Log10 Rcna");
+        }
+
+        if (tableHeadersSet.contains("cnalog2rcna")) {
+            tableHeaders.add("Log2 Rcna");
+        }
+
+        if (tableHeadersSet.contains("cnacopynumberstatus")) {
+            tableHeaders.add("Copy Number Status");
+        }
+
+        if (tableHeadersSet.contains("cnagisticvalue")) {
+            tableHeaders.add("Gistic Value");
+        }
+
+        if (tableHeadersSet.contains("chromosome")) {
+            tableHeaders.add("Chromosome");
+        }
+
+        if (tableHeadersSet.contains("seqstartposition")) {
+            tableHeaders.add("Seq. Start Position");
+        }
+
+        if (tableHeadersSet.contains("seqendposition")) {
+            tableHeaders.add("Seq. End Position");
+        }
+
+        if (tableHeadersSet.contains("refallele")) {
+            tableHeaders.add("Ref. Allele");
+        }
+
+        if (tableHeadersSet.contains("altallele")) {
+            tableHeaders.add("Alt Allele");
+        }
+
+        if (tableHeadersSet.contains("rsidvariants")) {
+            tableHeaders.add("Rs Id Variant");
+        }
+
+        if (tableHeadersSet.contains("ensembltranscriptid")) {
+            tableHeaders.add("Ensembl Transcript Id");
+        }
+
+        if (tableHeadersSet.contains("ensemblgeneid")) {
+            tableHeaders.add("Ensembl Gene Id");
+        }
+
+        if (tableHeadersSet.contains("ucscgeneid")) {
+            tableHeaders.add("Ucsc Gene Id");
+        }
+
+        if (tableHeadersSet.contains("ncbigeneid")) {
+            tableHeaders.add("Ncbi Gene Id");
+        }
+
+
+        if (tableHeadersSet.contains("zscore")) {
+            tableHeaders.add("Z-Score");
+        }
+
+        if (tableHeadersSet.contains("genomeassembly")) {
+            tableHeaders.add("Genome Assembly");
+        }
+
+        if (tableHeadersSet.contains("cytogeneticsresult")) {
+            tableHeaders.add("Result");
+        }
+
+        return tableHeaders;
+    }
+
+    private List<String> createTableRow(MolecularData md, Set<String> tableHeadersSet, String sampleId) {
+
+
+        List<String> row = new ArrayList<>();
+
+
+        if (tableHeadersSet.contains("sampleid")) {
+            row.add(sampleId);
+        }
+
+        if (tableHeadersSet.contains("hgncsymbol")) {
+            row.add(md.getMarker());
+        }
+
+        if (tableHeadersSet.contains("aminoacidchange")) {
+            row.add(md.getAminoAcidChange() == null ? "" : md.getAminoAcidChange());
+        }
+
+        if (tableHeadersSet.contains("consequence")) {
+            row.add((md.getConsequence() == null ? "" : md.getConsequence()));
+        }
+
+        if (tableHeadersSet.contains("nucleotidechange")) {
+            row.add((md.getNucleotideChange() == null ? "" : md.getNucleotideChange()));
+        }
+
+        if (tableHeadersSet.contains("readdepth")) {
+            row.add((md.getReadDepth() == null ? "" : md.getReadDepth()));
+        }
+
+        if (tableHeadersSet.contains("allelefrequency")) {
+            row.add((md.getAlleleFrequency() == null ? "" : md.getAlleleFrequency()));
+        }
+
+        if (tableHeadersSet.contains("probeidaffymetrix")) {
+            row.add((md.getProbeIDAffymetrix() == null ? "" : md.getProbeIDAffymetrix()));
+        }
+
+        if (tableHeadersSet.contains("cnalog10rcna")) {
+            row.add((md.getCnaLog10RCNA() == null ? "" : md.getCnaLog10RCNA()));
+        }
+
+        if (tableHeadersSet.contains("cnalog2rcna")) {
+            row.add((md.getCnaLog2RCNA() == null ? "" : md.getCnaLog2RCNA()));
+        }
+
+        if (tableHeadersSet.contains("cnacopynumberstatus")) {
+            row.add((md.getCnaCopyNumberStatus() == null ? "" : md.getCnaCopyNumberStatus()));
+        }
+
+        if (tableHeadersSet.contains("cnagisticvalue")) {
+            row.add((md.getCnaGisticValue() == null ? "" : md.getCnaGisticValue()));
+        }
+
+        if (tableHeadersSet.contains("chromosome")) {
+            row.add((md.getChromosome() == null ? "" : md.getChromosome()));
+        }
+
+        if (tableHeadersSet.contains("seqstartposition")) {
+            row.add((md.getSeqStartPosition() == null ? "" : md.getSeqStartPosition()));
+        }
+
+        if (tableHeadersSet.contains("seqendposition")) {
+            row.add((md.getSeqEndPosition() == null ? "" : md.getSeqEndPosition()));
+        }
+
+        if (tableHeadersSet.contains("refallele")) {
+            row.add((md.getRefAllele() == null ? "" : md.getRefAllele()));
+        }
+
+        if (tableHeadersSet.contains("altallele")) {
+            row.add((md.getAltAllele() == null ? "" : md.getAltAllele()));
+        }
+
+        if (tableHeadersSet.contains("rsidvariants")) {
+            row.add((md.getExistingVariations() == null ? "" : md.getExistingVariations()));
+        }
+
+        if (tableHeadersSet.contains("ensembltranscriptid")) {
+            row.add((md.getEnsemblTranscriptId() == null ? "" : md.getEnsemblTranscriptId()));
+        }
+
+        if (tableHeadersSet.contains("ensemblgeneid")) {
+            row.add((md.getMarker() == null ? "" : md.getMarker()));
+        }
+
+        if (tableHeadersSet.contains("ucscgeneid")) {
+            row.add((md.getMarker() == null ? "" : md.getMarker()));
+        }
+
+        if (tableHeadersSet.contains("ncbigeneid")) {
+            row.add((md.getMarker() == null ? "" : md.getMarker()));
+        }
+
+        if (tableHeadersSet.contains("zscore")) {
+            row.add((md.getZscore() == null ? "" : md.getZscore()));
+        }
+
+        if (tableHeadersSet.contains("genomeassembly")) {
+            row.add((md.getGenomeAssembly() == null ? "" : md.getGenomeAssembly()));
+        }
+
+        if (tableHeadersSet.contains("cytogeneticsresult")) {
+            row.add(md.getCytogeneticsResult() == null ? "" : md.getCytogeneticsResult());
+        }
+
+
+        return row;
+    }
+
+
+    private MolecularDataTableDTO getErrorTable(String message) {
+
+        //check if molchar exists and if not, display an error message
+        MolecularDataTableDTO dto = new MolecularDataTableDTO();
+        ArrayList<String> tableHeaders = new ArrayList<>();
+        List<List<String>> tableRows = new ArrayList<>();
+        tableHeaders.add("");
+
+        List<String> notVisibleDataRow = new ArrayList<>();
+        notVisibleDataRow.add(message);
+
+        tableRows.add(notVisibleDataRow);
+
+        dto.setTableHeaders(tableHeaders);
+        dto.setTableRows(tableRows);
+
+        return dto;
+
+    }
 
 
     /**
      * Return a formatted string representing the host and passage
+     *
      * @param hostStrain    the key to the map of host strains
      * @param hostStrainMap the map containing all the host strains associated to the model
      * @return a formatted string representing the host strains
@@ -868,15 +853,15 @@ public class DetailsService {
     }
 
 
-    public Map findPatientPlatforms(String dataSource, String modelId){
+    public Map findPatientPlatforms(String dataSource, String modelId) {
 
         Map<String, String> platformMap = new HashMap<>();
 
-        List<MolecularCharacterization> molecularCharacterizations = molecularCharacterizationRepository.findPatientPlatformByModelId(dataSource,modelId);
+        List<MolecularCharacterization> molecularCharacterizations = molecularCharacterizationRepository.findPatientPlatformByModelId(dataSource, modelId);
 
         for (MolecularCharacterization mc : molecularCharacterizations) {
 
-            if(mc.getPlatform() != null){
+            if (mc.getPlatform() != null) {
                 platformMap.put(mc.getPlatform().getName(), mc.getPlatform().getName());
             }
 
@@ -885,7 +870,7 @@ public class DetailsService {
         return platformMap;
     }
 
-    public Map<String, Set<String>> findModelPlatformAndPassages(String dataSource, String modelId,String passage){
+    public Map<String, Set<String>> findModelPlatformAndPassages(String dataSource, String modelId, String passage) {
 
         /**
          * Used to store a technology String with their respective List of PDX Passages
@@ -895,19 +880,18 @@ public class DetailsService {
         /**
          * Retrieve all the technologies for that mouse model
          */
-        List<Platform> platforms = platformRepository.findModelPlatformByModelId(dataSource,modelId);
+        List<Platform> platforms = platformRepository.findModelPlatformByModelId(dataSource, modelId);
 
         /**
          * For each of the technologies retrieve the list of PDX passages using the specimen repository
          */
         for (Platform platform : platforms) {
 
-            List<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform2(dataSource,modelId,platform.getName());
+            List<Specimen> specimens = specimenRepository.findSpecimenBySourcePdxIdAndPlatform2(dataSource, modelId, platform.getName());
 
             Set<String> passagesList = new HashSet<>();
-            for (Specimen specimen : specimens)
-            {
-                passagesList.add(specimen.getPassage()+"");
+            for (Specimen specimen : specimens) {
+                passagesList.add(specimen.getPassage() + "");
             }
 
             platformMap.put(platform.getName(), passagesList);
@@ -934,15 +918,14 @@ public class DetailsService {
             for (TreatmentProtocol tp : ts.getTreatmentProtocols()) {
 
 
-
                 DrugSummaryDTO dto = new DrugSummaryDTO();
                 dto.setDrugName(tp.getTreatmentString(true));
                 List<TreatmentComponent> components = tp.getComponents();
                 String dose = "";
 
-                if(components.size()>0){
-                    for(TreatmentComponent tc : components){
-                        if(!dose.equals("")){
+                if (components.size() > 0) {
+                    for (TreatmentComponent tc : components) {
+                        if (!dose.equals("")) {
                             dose += " / ";
                         }
                         dose += tc.getDose();
@@ -964,14 +947,14 @@ public class DetailsService {
     }
 
 
-    public List<String> getCsvHead(String molcharType){
+    public List<String> getCsvHead(String molcharType) {
 
 
-        List<String> commonHead = Arrays.asList("Sample ID","Sample Origin","Passage","Histology","Data Type","Platform","HGNC Symbol");
+        List<String> commonHead = Arrays.asList("Sample ID", "Sample Origin", "Passage", "Histology", "Data Type", "Platform", "HGNC Symbol");
 
-        List<String> mutHead = Arrays.asList("Nucleotide Change","Amino Acid Change","Read Depth","Allele Freq","RS ID Variant","Chromosome","Seq Start Position","Ref Allele","Alt Allele","Consequence","Genome Assembly");
+        List<String> mutHead = Arrays.asList("Nucleotide Change", "Amino Acid Change", "Read Depth", "Allele Freq", "RS ID Variant", "Chromosome", "Seq Start Position", "Ref Allele", "Alt Allele", "Consequence", "Genome Assembly");
 
-        List<String> cnaHead = Arrays.asList("Log10R CNA","Log2R CNA","CNA Status","Gistic Value CNA","Picnic Value CNA","Chromosome","Seq Start Position","Seq End Position","Genome Assembly");
+        List<String> cnaHead = Arrays.asList("Log10R CNA", "Log2R CNA", "CNA Status", "Gistic Value CNA", "Picnic Value CNA", "Chromosome", "Seq Start Position", "Seq End Position", "Genome Assembly");
 
         List<String> cytogeneticsHead = Arrays.asList("Cytogenetics Result");
 
@@ -979,13 +962,13 @@ public class DetailsService {
 
         if (molcharType.equals("mutation")) {
 
-            csvHead = ListUtils.union(commonHead,mutHead);
-        }else if (molcharType.equals("copy-number-alteration")){
+            csvHead = ListUtils.union(commonHead, mutHead);
+        } else if (molcharType.equals("copy-number-alteration")) {
 
-            csvHead = ListUtils.union(commonHead,cnaHead);
-        }else{
+            csvHead = ListUtils.union(commonHead, cnaHead);
+        } else {
 
-            csvHead = ListUtils.union(commonHead,cytogeneticsHead);
+            csvHead = ListUtils.union(commonHead, cytogeneticsHead);
         }
 
         return csvHead;
@@ -994,7 +977,7 @@ public class DetailsService {
 
     public List<List<String>> getVariationDataByMolcharTypeCSV(String dataSource, String modelId, String molcharType) {
 
-        molcharType = molcharType.replace("-"," ");
+        molcharType = molcharType.replace("-", " ");
 
         /**
          *  Retreive Diagnosis Information and get Specimens
@@ -1016,7 +999,7 @@ public class DetailsService {
             }
         }
 
-        if(patientSample != null){
+        if (patientSample != null) {
 
             variationData.addAll(buildUpDTO(patientSample, "", mappedOntologyTermLabel, molcharType));
         }
@@ -1027,8 +1010,7 @@ public class DetailsService {
     }
 
 
-
-    public List<List<String>> buildUpDTO(Sample sample,String passage,String mappedOntologyTermLabel, String molcharType){
+    public List<List<String>> buildUpDTO(Sample sample, String passage, String mappedOntologyTermLabel, String molcharType) {
 
         List<List<String>> variationData = new LinkedList<>();
 
@@ -1046,68 +1028,84 @@ public class DetailsService {
                     List<String> dData = new ArrayList<>();
 
                     dData.add(sample.getSourceSampleId());
-                    dData.add( (passage.equals("")) ? "Patient Tumor" : "Xenograft" );
+                    dData.add((passage.equals("")) ? "Patient Tumor" : "Xenograft");
                     dData.add(passage);
                     dData.add(mappedOntologyTermLabel);
                     dData.add(WordUtils.capitalizeFully(molcharType));
                     dData.add(dMolChar.getPlatform().getName());
-                    dData.add(markerAss.getMarker().getHgncSymbol());
 
-                    if (molcharType.equals("mutation")){
-                        dData.add(markerAss.getNucleotideChange());
-                        dData.add(markerAss.getAminoAcidChange());
-                        dData.add(markerAss.getReadDepth());
-                        dData.add(markerAss.getAlleleFrequency());
-                        dData.add(markerAss.getRsIdVariants());
-                        dData.add(markerAss.getChromosome());
-                        dData.add(markerAss.getSeqStartPosition());
-                        dData.add(markerAss.getRefAllele());
-                        dData.add(markerAss.getAltAllele());
-                        dData.add(markerAss.getConsequence());
-                        dData.add(markerAss.getGenomeAssembly());
+
+                    List<MolecularData> molecularData;
+                    try {
+                        molecularData = markerAss.getMolecularDataList();
+                    } catch (Exception e) {
+                        log.error("Error getting molecular data");
+                        molecularData = new ArrayList<>();
                     }
 
-                    if (molcharType.equals("copy number alteration")){
+                    for (MolecularData md : molecularData) {
 
-                        dData.add(markerAss.getCnaLog10RCNA());
-                        dData.add(markerAss.getCnaLog2RCNA());
-                        dData.add(markerAss.getCnaCopyNumberStatus());
-                        dData.add(markerAss.getCnaGisticValue());
-                        dData.add(markerAss.getCnaPicnicValue());
-                        dData.add(markerAss.getChromosome());
-                        dData.add(markerAss.getSeqStartPosition());
-                        dData.add(markerAss.getSeqEndPosition());
-                        dData.add(markerAss.getGenomeAssembly());
-                    }
+                        dData.add(md.getMarker());
 
-                    if (molcharType.equals("cytogenetics")){
+                        if (molcharType.equals("mutation")) {
+                            dData.add(md.getNucleotideChange());
+                            dData.add(md.getAminoAcidChange());
+                            dData.add(md.getReadDepth());
+                            dData.add(md.getAlleleFrequency());
+                            dData.add(md.getExistingVariations());
+                            dData.add(md.getChromosome());
+                            dData.add(md.getSeqStartPosition());
+                            dData.add(md.getRefAllele());
+                            dData.add(md.getAltAllele());
+                            dData.add(md.getConsequence());
+                            dData.add(md.getGenomeAssembly());
+                        }
 
-                        dData.add(markerAss.getCytogeneticsResult());
-                    }
+                        if (molcharType.equals("copy number alteration")) {
+
+                            dData.add(md.getCnaLog10RCNA());
+                            dData.add(md.getCnaLog2RCNA());
+                            dData.add(md.getCnaCopyNumberStatus());
+                            dData.add(md.getCnaGisticValue());
+                            dData.add(md.getCnaPicnicValue());
+                            dData.add(md.getChromosome());
+                            dData.add(md.getSeqStartPosition());
+                            dData.add(md.getSeqEndPosition());
+                            dData.add(md.getGenomeAssembly());
+                        }
+
+                        if (molcharType.equals("cytogenetics")) {
+
+                            dData.add(md.getCytogeneticsResult());
+                        }
 
                     /*
                         markerAssocArray[13] = sample.getDiagnosis();
                         markerAssocArray[14] = sample.getType().getName();
 
                      */
-                    variationData.add(dData);
+                        variationData.add(dData);
+
+                    }
+
 
                 }
             }
 
 
-        }catch (Exception e) { }
+        } catch (Exception e) {
+        }
 
 
         return variationData;
     }
 
 
-    public Sort.Direction getSortDirection(String sortDir){
+    public Sort.Direction getSortDirection(String sortDir) {
 
         Sort.Direction direction = Sort.Direction.ASC;
 
-        if (sortDir.equals("desc")){
+        if (sortDir.equals("desc")) {
             direction = Sort.Direction.DESC;
         }
 
@@ -1115,8 +1113,7 @@ public class DetailsService {
     }
 
 
-
-    public String notEmpty(String incoming){
+    public String notEmpty(String incoming) {
 
         String result = (incoming == null) ? "Not Specified" : incoming;
 
@@ -1124,7 +1121,7 @@ public class DetailsService {
 
         result = result.length() == 0 ? "Not Specified" : result;
 
-        result = StringUtils.isEmpty(incoming) ? "Not Specified" : result;
+        result = isEmpty(incoming) ? "Not Specified" : result;
 
         result = result.equals("Unknown") ? "Not Specified" : result;
 

@@ -35,7 +35,7 @@ public class ExportDataToTemplate implements CommandLineRunner {
     @Autowired
     private DataImportService dataImportService;
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     @Override

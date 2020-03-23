@@ -574,10 +574,9 @@ public class SearchService {
                 Set<String> markerSet = new HashSet<>();
 
                 for (MolecularCharacterization mc : model.getSample().getMolecularCharacterizations()) {
-                    for (MarkerAssociation ma : mc.getMarkerAssociations()) {
-                        markerSet.add(ma.getMarker().getHgncSymbol());
-                    }
+                    markerSet.addAll(mc.getMarkers());
                 }
+
                 sdto.setCancerGenomics(new ArrayList<>(markerSet));
 
             }

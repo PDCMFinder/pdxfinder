@@ -12,21 +12,17 @@ import org.pdxfinder.services.ds.Standardizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
-@Component
-@Order(value = -19)
+@Service
 @PropertySource("classpath:loader.properties")
 @ConfigurationProperties(prefix = "ircc")
-public class LoadIRCC extends LoaderBase implements CommandLineRunner {
+public class LoadIRCC extends LoaderBase {
     private static final Logger log = LoggerFactory.getLogger(LoadIRCC.class);
 
     // samples -> markerAsssociations
@@ -34,34 +30,20 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
     private HashMap<String, HashMap<String, String>> specimenSamples = new HashMap();
     private HashSet<Integer> loadedModelHashes = new HashSet<>();
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     @Value("${irccpdx.variation.max}")
     private int variationMax;
 
-    @PostConstruct
-    public void init() {
-        // Blank override - no initialisation behaviour required
-    }
-
     public LoadIRCC(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void run() throws Exception {
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadIRCC", "Load IRCC PDX data");
-        parser.accepts("loadALL", "Load all, including IRCC PDX data");
-        OptionSet options = parser.parse(args);
-
-        if (options.has("loadIRCC") || options.has("loadALL")) {
             initMethod();
             irccAlgorithm();
-        }
     }
 
 
@@ -232,69 +214,6 @@ public class LoadIRCC extends LoaderBase implements CommandLineRunner {
         dataImportService.saveModelCreation(dto.getModelCreation());
     }
 
-    @Transactional
-    public void loadVariantsBySpecimen() {
-        try {
-            String variationURLStr = finderRootDir +dataSourceAbbreviation+"/mut/data.json";
-            JSONObject job = new JSONObject(utilityService.parseFile(variationURLStr));
-            JSONArray jarray = job.getJSONArray("IRCCVariation");
 
-            Platform platform = dataImportService.getPlatform(tech, "mutation", providerDS, platformURL.get("targetedNgsPlatformURL"));
-            platform.setGroup(providerDS);
-            dataImportService.savePlatform(platform);
-
-            for (int i = 0; i < jarray.length(); i++) {
-                if (i == variationMax) {
-                    log.error(String.format("Quitting after loading %s maximum variants", i));
-                    break;
-                }
-
-                JSONObject variation = jarray.getJSONObject(i);
-                String sample = variation.getString("Sample ID");
-                String specimen = variation.getString("Specimen ID");
-
-                if(specimenSamples.containsKey(specimen)){
-                    specimenSamples.get(specimen).put(sample, sample);
-                }else{
-                    HashMap<String,String> samples = new HashMap();
-                    samples.put(sample,sample);
-                    specimenSamples.put(specimen,samples);
-                }
-
-                String gene = variation.getString("Gene");
-                String type = variation.getString("Type");
-
-                Marker marker = dataImportService.getMarker(gene,gene);
-                MarkerAssociation ma = new MarkerAssociation();
-                ma.setMarker(marker);
-                ma.setType(type);
-                ma.setCdsChange(variation.getString("CDS"));
-                ma.setChromosome(variation.getString("Chrom"));
-                ma.setConsequence(variation.getString("Effect"));
-                ma.setSeqPosition(variation.getString("Pos"));
-                ma.setRefAllele(variation.getString("Ref"));
-                ma.setAltAllele(variation.getString("Alt"));
-                ma.setAminoAcidChange(variation.getString("Protein"));
-                ma.setAlleleFrequency(variation.getString("VAF"));
-                ma.setRsIdVariants(variation.getString("avsnp147"));
-
-                PlatformAssociation pa = dataImportService.createPlatformAssociation(platform, marker);
-                dataImportService.savePlatformAssociation(pa);
-
-                if (markerAssociations.containsKey(sample)) {
-                    markerAssociations.get(sample).add(ma);
-                } else {
-                    HashSet<MarkerAssociation> mas = new HashSet();
-                    mas.add(ma);
-                    markerAssociations.put(sample, mas);
-                }
-
-            }
-
-        } catch (Exception e) {
-            log.error("Unable to load variants");
-        }
-
-    }
 
 }
