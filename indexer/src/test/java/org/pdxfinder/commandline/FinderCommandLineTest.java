@@ -10,8 +10,10 @@ import org.pdxfinder.services.constants.DataProvider;
 import picocli.CommandLine;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.*;
 
 
@@ -19,6 +21,9 @@ public class FinderCommandLineTest extends BaseTest {
 
     @Mock private FinderLoader finderLoader;
     @InjectMocks private FinderCommandLine.Load load;
+
+    @Mock private FinderTransformer finderTransformer;
+    @InjectMocks private FinderCommandLine.Transform transform;
 
     @Before
     public void setUp() {
@@ -28,7 +33,6 @@ public class FinderCommandLineTest extends BaseTest {
             any(File.class),
             anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean()
         );
-
     }
 
     @Test public void load_givenLoadOnlyMinimal_callsLoader() {
@@ -54,5 +58,24 @@ public class FinderCommandLineTest extends BaseTest {
         );
         verifyNoMoreInteractions(this.finderLoader);
     }
+
+    @Test public void load_givenTransform_When_exportAllisCalled_Then_callsTransformer() throws IOException {
+        String[] args = {"--data-dir=path/", "--all"};
+        int exitCode = new CommandLine(transform).execute(args);
+        assertEquals(0, exitCode);
+        verify(this.finderTransformer).run(
+                any(File.class),
+                any(null),
+                anyBoolean()
+        );
+        verifyNoMoreInteractions(this.finderTransformer);
+    }
+
+    @Test public void load_givenTransform_WhenTwoExclusiveArgumentsArepassed_Then_ReturnNonZeroExit() throws IOException {
+        String[] args = {"--data-dir=path/", "--export=test", "--all"};
+        int exitCode = new CommandLine(transform).execute(args);
+        assertNotEquals(0,exitCode);
+    }
+
 
 }
