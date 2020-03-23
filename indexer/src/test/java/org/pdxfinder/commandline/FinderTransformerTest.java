@@ -13,7 +13,6 @@ import java.io.IOException;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
-
 public class FinderTransformerTest extends BaseTest {
 
     @Mock
@@ -36,7 +35,7 @@ public class FinderTransformerTest extends BaseTest {
         final ArgumentCaptor<File> captor = ArgumentCaptor.forClass(File.class);
         verify(this.exportDataToTemplate).export(captor.capture(), any());
         System.out.printf(captor.getValue().getName());
-        Assert.assertEquals(captor.getValue().getName(), "tmp");
+        Assert.assertEquals("tmp",captor.getValue().getName());
     }
 
     @Test public void Given_dir_When_runIsCalled_Then_passGivenDir() throws IOException {
