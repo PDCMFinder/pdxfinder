@@ -41,7 +41,7 @@ public class ExportDataToTemplate  {
             try {
                 export(rootDir, g.getAbbreviation());
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getStackTrace().toString());
             }
         });
     }
