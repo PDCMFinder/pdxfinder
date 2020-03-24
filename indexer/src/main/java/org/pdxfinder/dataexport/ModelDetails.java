@@ -94,7 +94,9 @@ public class ModelDetails {
         for(String p : passages){
 
             try{
-                if(!p.equals("")) intList.add(Integer.valueOf(p));
+                if(p != null && !p.equals("")) {
+                    intList.add(Integer.valueOf(p));
+                }
             }
             catch(NumberFormatException e){
 

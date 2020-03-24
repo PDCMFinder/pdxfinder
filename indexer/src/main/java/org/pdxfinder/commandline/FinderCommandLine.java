@@ -13,6 +13,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.ArgGroup;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -113,7 +114,6 @@ public class FinderCommandLine implements Callable<Integer> {
             return 0;
         }
 
-
         List<DataProvider> getListOfRequestedProviders() {
 
             Optional<DataProvider[]> dataProviders = Optional.ofNullable(
@@ -133,7 +133,6 @@ public class FinderCommandLine implements Callable<Integer> {
             } else {
                 return new ArrayList<>();
             }
-
         }
 
         @Override
@@ -147,4 +146,64 @@ public class FinderCommandLine implements Callable<Integer> {
         }
     }
 
+    @Component
+    @Order(value = -100)
+    @Command(name = "transformer",
+            description = "Utilities to convert between Pdx Finder templates, Neo4j data, and Json",
+            mixinStandardHelpOptions = true,
+            exitCodeOnExecutionException = 34)
+    static class Transform implements Callable<Integer> {
+
+        Logger log = LoggerFactory.getLogger(Transform.class);
+
+        @Autowired
+        private FinderTransformer finderTransformer;
+
+        @Option(
+                names = {"-d", "--data-dir"},
+                description = "Path of the PDXFinder data directory " +
+                        "(default: [${DEFAULT-VALUE}], set in application.properties)")
+        private File dataDirectory;
+
+
+        @ArgGroup(multiplicity = "0..1")
+        Transform.Exclusive exclusiveArguments = new Transform.Exclusive();
+
+        static class Exclusive{
+            @Option(
+                    names = {"-e", "--export"},
+                    description = "Export Neo4j data to tsv templates. Requires either the provider name or use -a to export all providers")
+            private String provider;
+
+            @Option(
+                    names = {"-a", "--all"},
+                    description = "Export all providers data. Warning: do to large provider datasets this can be computationally intensive")
+            private boolean loadAll;
+
+
+            public String getProvider() {
+                return provider;
+            }
+
+            public boolean isLoadAll() {
+                return loadAll;
+            }
+        }
+
+        @Override
+        public Integer call() throws IOException {
+            log.info("Loading using supplied parameters:\n{}", this);
+            finderTransformer.run(dataDirectory,exclusiveArguments.getProvider(),exclusiveArguments.isLoadAll());
+            return 0;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner("\n", Transform.class.getSimpleName() + "[\n", "\n]")
+                    .add("dataDirectory=" + dataDirectory.getName())
+                    .add("Export provider" + exclusiveArguments.provider)
+                    .add("Load all" + exclusiveArguments.loadAll)
+                    .toString();
+        }
+    }
 }

@@ -342,25 +342,27 @@ public class UniversalDataExporter {
 
         for(ModelCreation model : models){
 
-            String modelId = model.getSourcePdxId();
+            if(model != null && model.getQualityAssurance() != null) {
 
-            for(QualityAssurance qa : model.getQualityAssurance()){
+                String modelId = model.getSourcePdxId();
 
-                List<String> dataRow = new ArrayList<>();
+                for (QualityAssurance qa : model.getQualityAssurance()) {
 
-                String validationTechnique = qa.getTechnology();
-                String validationDescription = qa.getDescription();
-                String passages = qa.getPassages();
-                String nomenclature = qa.getValidationHostStrain();
+                    List<String> dataRow = new ArrayList<>();
 
-                dataRow.add(modelId);
-                dataRow.add(validationTechnique);
-                dataRow.add(validationDescription);
-                dataRow.add(passages);
-                dataRow.add(nomenclature);
+                    String validationTechnique = qa.getTechnology();
+                    String validationDescription = qa.getDescription();
+                    String passages = qa.getPassages();
+                    String nomenclature = qa.getValidationHostStrain();
 
-                pdxModelValidationSheetDataExport.add(dataRow);
+                    dataRow.add(modelId);
+                    dataRow.add(validationTechnique);
+                    dataRow.add(validationDescription);
+                    dataRow.add(passages);
+                    dataRow.add(nomenclature);
 
+                    pdxModelValidationSheetDataExport.add(dataRow);
+                }
             }
         }
     }
@@ -633,21 +635,24 @@ public class UniversalDataExporter {
 
     private void insertSharingAndContactDataForModel(LinkedHashMap<String, String> sharingAndContactRow){
 
-        List<String> dataRow = new ArrayList<>();
+        if(sharingAndContactRow != null) {
 
-        dataRow.add(sharingAndContactRow.get("modelId"));
-        dataRow.add(sharingAndContactRow.get("providerType"));
-        dataRow.add(sharingAndContactRow.get("modelAccessibility"));
-        dataRow.add(sharingAndContactRow.get("accessModalities"));
-        dataRow.add(sharingAndContactRow.get("contactEmail"));
-        dataRow.add(sharingAndContactRow.get("contactName"));
-        dataRow.add(sharingAndContactRow.get("contactLink"));
-        dataRow.add(sharingAndContactRow.get("modelLink"));
-        dataRow.add(sharingAndContactRow.get("providerName"));
-        dataRow.add(sharingAndContactRow.get("providerAbbrev"));
-        dataRow.add(sharingAndContactRow.get("projectName"));
+            List<String> dataRow = new ArrayList<>();
 
-        sharingAndContactSheetDataExport.add(dataRow);
+            dataRow.add(sharingAndContactRow.get("modelId"));
+            dataRow.add(sharingAndContactRow.get("providerType"));
+            dataRow.add(sharingAndContactRow.get("modelAccessibility"));
+            dataRow.add(sharingAndContactRow.get("accessModalities"));
+            dataRow.add(sharingAndContactRow.get("contactEmail"));
+            dataRow.add(sharingAndContactRow.get("contactName"));
+            dataRow.add(sharingAndContactRow.get("contactLink"));
+            dataRow.add(sharingAndContactRow.get("modelLink"));
+            dataRow.add(sharingAndContactRow.get("providerName"));
+            dataRow.add(sharingAndContactRow.get("providerAbbrev"));
+            dataRow.add(sharingAndContactRow.get("projectName"));
+
+            sharingAndContactSheetDataExport.add(dataRow);
+        }
     }
 
     private Group getGroupByType(ModelCreation model, String type){
@@ -701,20 +706,20 @@ public class UniversalDataExporter {
         map.put("contactLink",  "");
         map.put("modelLink",  "");
 
-        for(ExternalUrl ex: urls){
+        if(urls != null){
 
-            if(ex.getType().equals("contact")){
+            for(ExternalUrl ex: urls) {
 
-                if(ex.getUrl()!= null && ex.getUrl().contains("@")){
-                    map.put("contactEmail", ex.getUrl());
+                if (ex.getType().equals("contact")) {
+
+                    if (ex.getUrl() != null && ex.getUrl().contains("@")) {
+                        map.put("contactEmail", ex.getUrl());
+                    } else {
+                        map.put("contactLink", ex.getUrl());
+                    }
+                } else if (ex.getType().equals("source") && ex.getUrl() != null) {
+                    map.put("modelLink", ex.getUrl());
                 }
-                else{
-                    map.put("contactLink", ex.getUrl());
-                }
-            }
-
-            else if(ex.getType().equals("source") && ex.getUrl() != null){
-                map.put("modelLink", ex.getUrl());
             }
         }
     }
@@ -805,30 +810,33 @@ public class UniversalDataExporter {
 
                 Sample sample = sp.getSample();
 
-                for(MolecularCharacterization mc : sample.getMolecularCharacterizations()){
+                if(sample != null && sample.getMolecularCharacterizations() != null && !sample.getMolecularCharacterizations().isEmpty()){
 
-                    List<String> dataRow = new ArrayList<>();
+                    for(MolecularCharacterization mc : sample.getMolecularCharacterizations()) {
 
-                    dataRow.add("");
-                    dataRow.add(sample.getSourceSampleId());
-                    dataRow.add("xenograft");
-                    dataRow.add(passage);
-                    dataRow.add("");
-                    dataRow.add(model.getSourcePdxId());
-                    dataRow.add(hostStrainName);
-                    dataRow.add(hostStrainNomenclature);
+                        List<String> dataRow = new ArrayList<>();
 
-                    dataRow.add(mc.getType());
-                    dataRow.add(mc.getPlatform().getName());
-                    dataRow.add(mc.getTechnology());
-                    dataRow.add("");
-                    dataRow.add("");
-                    dataRow.add("");
-                    dataRow.add("");
-                    dataRow.add("");
-                    dataRow.add(mc.getPlatform().getUrl());
+                        dataRow.add("");
+                        dataRow.add(sample.getSourceSampleId());
+                        dataRow.add("xenograft");
+                        dataRow.add(passage);
+                        dataRow.add("");
+                        dataRow.add(model.getSourcePdxId());
+                        dataRow.add(hostStrainName);
+                        dataRow.add(hostStrainNomenclature);
 
-                    samplePlatformDescriptionSheetDataExport.add(dataRow);
+                        dataRow.add(mc.getType());
+                        dataRow.add(mc.getPlatform().getName());
+                        dataRow.add(mc.getTechnology());
+                        dataRow.add("");
+                        dataRow.add("");
+                        dataRow.add("");
+                        dataRow.add("");
+                        dataRow.add("");
+                        dataRow.add(mc.getPlatform().getUrl());
+
+                        samplePlatformDescriptionSheetDataExport.add(dataRow);
+                    }
                 }
             }
         }
