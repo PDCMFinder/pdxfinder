@@ -113,74 +113,60 @@ public class UniversalDataExporter {
         XSSFWorkbook mutationWorkbook = getWorkbook(templateDir+"/mutation_template.xlsx");
         XSSFWorkbook cnaWorkbook = getWorkbook(templateDir+"/cna_template.xlsx");
 
-
-        if(metadataWorkbook != null){
+        if (metadataWorkbook != null && noMetaDataSheetsAreNull()) {
             updateSheetWithData(metadataWorkbook.getSheetAt(1), patientSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(2), patientTumorSheetDataExport,6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(3), pdxModelSheetDataExport,6, 2);
+            updateSheetWithData(metadataWorkbook.getSheetAt(2), patientTumorSheetDataExport, 6, 2);
+            updateSheetWithData(metadataWorkbook.getSheetAt(3), pdxModelSheetDataExport, 6, 2);
             updateSheetWithData(metadataWorkbook.getSheetAt(4), pdxModelValidationSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(5), sharingAndContactSheetDataExport, 6, 2 );
+            updateSheetWithData(metadataWorkbook.getSheetAt(5), sharingAndContactSheetDataExport, 6, 2);
             updateSheetWithData(metadataWorkbook.getSheetAt(6), loaderRelatedDataSheetDataExport, 6, 2);
         }
 
-        if(samplePlatformWorkbook != null){
+        if (samplePlatformWorkbook != null && samplePlatformDescriptionSheetDataExport != null) {
             updateSheetWithData(samplePlatformWorkbook.getSheetAt(0), samplePlatformDescriptionSheetDataExport, 6, 1);
         }
 
-        if(mutationWorkbook != null){
-            updateSheetWithData(mutationWorkbook.getSheetAt(0), mutationSheetDataExport, 2, 1);
-        }
-
-        if(cnaWorkbook != null){
-            updateSheetWithData(cnaWorkbook.getSheetAt(0), cnaSheetDataExport, 2, 1);
-        }
-
-
-        // Write the output to a new file
-        FileOutputStream fileOut = null;
-
-        Path exportProviderDir = Paths.get(exportDir +"/"+ ds.getAbbreviation());
-        if (!exportProviderDir.toFile().exists()){
+        Path exportProviderDir = Paths.get(exportDir + "/" + ds.getAbbreviation());
+        if (!exportProviderDir.toFile().exists()) {
             Files.createDirectory(exportProviderDir);
         }
 
         try {
-
-            if(metadataWorkbook != null){
-                fileOut = new FileOutputStream(exportProviderDir+"/metadata.xlsx");
-                metadataWorkbook.write(fileOut);
-                fileOut.close();
+            if(metadataWorkbook != null && noMetaDataSheetsAreNull()) {
+                writeFileFromWorkbook(metadataWorkbook, exportProviderDir + "/metadata.xlsx");
             }
-
-            if(samplePlatformWorkbook != null){
-                fileOut = new FileOutputStream(exportProviderDir+"/sampleplatform.xlsx");
-                samplePlatformWorkbook.write(fileOut);
-                fileOut.close();
+            if(samplePlatformWorkbook != null && samplePlatformDescriptionSheetDataExport != null) {
+                writeFileFromWorkbook(samplePlatformWorkbook, exportProviderDir + "/sampleplatform.xlsx");
             }
-
-            if(mutationWorkbook != null){
-                if (!Paths.get(exportProviderDir + "/mut").toFile().exists()){
-                    Files.createDirectory(Paths.get(exportProviderDir + "/mut"));
-                }
-                fileOut = new FileOutputStream(exportProviderDir+"/mut/data.xlsx");
-                mutationWorkbook.write(fileOut);
-                fileOut.close();
-            }
-
-            if(cnaWorkbook != null){
-                if (!Paths.get(exportProviderDir + "/cna").toFile().exists()){
-                    Files.createDirectory(Paths.get(exportProviderDir + "/cna"));
-                }
-                fileOut = new FileOutputStream(exportProviderDir+"/cna/data.xlsx");
-                cnaWorkbook.write(fileOut);
-                fileOut.close();
-            }
-
-
+            writeOmicFileFromWorkbook(mutationWorkbook, mutationSheetDataExport, exportProviderDir + "/mut/", "_mut.tsv");
+            writeOmicFileFromWorkbook(cnaWorkbook, cnaSheetDataExport, exportProviderDir + "/cna/", "_cna.tsv" );
         } catch (Exception e) {
             log.error("error", e);
         }
+    }
 
+    private boolean noMetaDataSheetsAreNull(){
+        return (patientSheetDataExport != null && patientTumorSheetDataExport != null
+                && pdxModelSheetDataExport != null && pdxModelValidationSheetDataExport != null
+                && sharingAndContactSheetDataExport != null && loaderRelatedDataSheetDataExport != null);
+    }
+
+    private void writeFileFromWorkbook(XSSFWorkbook dataWorkbook, String fileLocation) throws IOException {
+        if (dataWorkbook != null) {
+            FileOutputStream fileOut = new FileOutputStream(fileLocation);
+            dataWorkbook.write(fileOut);
+            fileOut.close();
+        }
+    }
+
+    private void writeOmicFileFromWorkbook(XSSFWorkbook omicWorkbook,List<List<String>> exportSheet, String fileLocation, String suffix ) throws IOException {
+        if ((omicWorkbook != null) && (exportSheet != null)) {
+            if (!Paths.get(fileLocation).toFile().exists()) {
+                Files.createDirectory(Paths.get(fileLocation));
+            }
+            String exportURI = fileLocation +  ds.getAbbreviation() + suffix;
+            ReadSheetAndWriteOmicTsvFile(omicWorkbook.getSheetAt(0),exportSheet, exportURI);
+        }
     }
 
     public void initPatientData() {
@@ -220,7 +206,6 @@ public class UniversalDataExporter {
         List<Patient> patients = dataImportService.findPatientTumorAtCollectionDataByDS(ds);
 
         for(Patient patient : patients){
-
 
 
             String patientId = patient.getExternalId();
@@ -377,7 +362,7 @@ public class UniversalDataExporter {
 
             sharingAndContactRow.put("modelId", model.getSourcePdxId());
 
-            Group providerGroup  = getGroupByType(model, "Provider");
+            Group providerGroup = getGroupByType(model, "Provider");
             Group accessGroup = getGroupByType(model, "Accessibility");
             Group projectGroup = getGroupByType(model, "Project");
 
@@ -554,35 +539,74 @@ public class UniversalDataExporter {
         }
     }
 
-    public void updateSheetWithData(Sheet sheet, List<List<String>> data, int startRow, int startColumn){
+    public void updateSheetWithData(Sheet sheet, List<List<String>> data, int startRow, int startColumn) {
 
         //Workbook rows and cells start at index 0
+        if (data != null) {
 
-        for(int i = 0; i < data.size(); i++){
+            for (int i = 0; i < data.size(); i++) {
 
-            int rowIndex = startRow + i - 1;
-            sheet.createRow(rowIndex);
+                int rowIndex = startRow + i - 1;
+                sheet.createRow(rowIndex);
 
-            for(int j = 0; j < data.get(i).size(); j++){
-
-
-                int columnIndex = startColumn + j-1;
-                sheet.getRow(rowIndex).createCell(columnIndex);
+                for (int j = 0; j < data.get(i).size(); j++) {
 
 
-                Cell cell = null;
-                try{
-                    cell = sheet.getRow(rowIndex).getCell(columnIndex);
-                    cell.setCellValue(data.get(i).get(j));
-                }
-                catch (Exception e){
+                    int columnIndex = startColumn + j - 1;
+                    sheet.getRow(rowIndex).createCell(columnIndex);
 
-                    log.error("Exception in {}  {}:{}",sheet.getSheetName(), rowIndex, columnIndex);
+
+                    Cell cell = null;
+                    try {
+                        cell = sheet.getRow(rowIndex).getCell(columnIndex);
+                        cell.setCellValue(data.get(i).get(j));
+                    } catch (Exception e) {
+
+                        log.error("Exception in {}  {}:{}", sheet.getSheetName(), rowIndex, columnIndex);
+                    }
                 }
             }
         }
-
     }
+
+    public void ReadSheetAndWriteOmicTsvFile(Sheet sheet, List<List<String>> data, String omicTsvDir) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(omicTsvDir);
+
+        if (data != null) {
+
+            for (int j = 0; j < data.get(0).size(); j++) {
+                Cell cell = null;
+                try {
+                    cell = sheet.getRow(0).getCell(j);
+                    fileWriter.append(cell.toString());
+                    fileWriter.append("\t");
+                } catch (Exception e) {
+                    log.error("Exception in loading export headers");
+                }
+            }
+            fileWriter.append("\n");
+
+            for (int i = 0; i < data.size(); i++) {
+                int rowIndex = i;
+                for (int j = 0; j < data.get(i).size(); j++) {
+                    int columnIndex = j;
+                    try {
+                        fileWriter.append(data.get(i).get(j));
+                        fileWriter.append("\t");
+                    } catch (Exception e) {
+                        log.error("Exception in {}  {}:{}", sheet.getSheetName(), rowIndex, columnIndex);
+                    }
+
+                }
+                fileWriter.append("\n");
+            }
+
+                fileWriter.flush();
+                fileWriter.close();
+        }
+    }
+
 
     private String getPubmedIDs(ModelCreation model){
 
@@ -939,6 +963,10 @@ public class UniversalDataExporter {
         return drugDosingSheetDataExport;
     }
 
+    public void setMutationSheetDataExport(List<List<String>> mutationSheetDataExport) {
+        this.mutationSheetDataExport = mutationSheetDataExport;
+    }
+
     public List<List<String>> getMutationSheetDataExport() {
         return mutationSheetDataExport;
     }
@@ -946,6 +974,11 @@ public class UniversalDataExporter {
     public List<List<String>> getCnaSheetDataExport() {
         return cnaSheetDataExport;
     }
+
+    public void setCnaSheetDataExport(List<List<String>> cnaSheetDataExport) {
+        this.cnaSheetDataExport = cnaSheetDataExport;
+    }
+
 
 
 }
