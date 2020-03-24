@@ -22,7 +22,7 @@ public class ExportDataToTemplate  {
     private DataImportService dataImportService;
 
     @Autowired
-    void ExportdataToTemplate(UtilityService utilityService, DataImportService dataImportService){
+    ExportDataToTemplate(UtilityService utilityService, DataImportService dataImportService){
         this.utilityService = utilityService;
         this.dataImportService = dataImportService;
     }
