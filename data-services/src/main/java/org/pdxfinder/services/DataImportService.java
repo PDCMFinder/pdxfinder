@@ -732,7 +732,6 @@ public class DataImportService {
     public Tissue getTissue(String t) {
         Tissue tissue = tissueRepository.findByName(t);
         if (tissue == null) {
-            log.info("Tissue '{}' not found. Creating.", t);
             tissue = new Tissue(t);
             tissueRepository.save(tissue);
         }
