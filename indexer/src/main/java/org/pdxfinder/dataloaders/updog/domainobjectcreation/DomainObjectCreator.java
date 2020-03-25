@@ -160,9 +160,14 @@ public class DomainObjectCreator {
             sample.setDataSource(providerGroup.getAbbreviation());
             patientSnapshot.addSample(sample);
             ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
-            if (modelCreation == null) throw new NullPointerException();
-            modelCreation.setSample(sample);
-            modelCreation.addRelatedSample(sample);
+            if (modelCreation == null) {
+                //throw new NullPointerException();
+                log.error(modelId);
+            }
+            else {
+                modelCreation.setSample(sample);
+                modelCreation.addRelatedSample(sample);
+            }
         }
     }
 
@@ -201,7 +206,12 @@ public class DomainObjectCreator {
             String hostStrainFull = row.getString(TSV.Metadata.validation_host_strain_full.name());
 
             ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
-            if (modelCreation == null) throw new NullPointerException();
+            if (modelCreation == null)
+            {
+                log.error(modelId);
+                //throw new NullPointerException();
+            }
+            else{
 
             QualityAssurance qa = new QualityAssurance();
             qa.setTechnology(validationTechnique);
@@ -209,6 +219,7 @@ public class DomainObjectCreator {
             qa.setPassages(passagesTested);
             qa.setValidationHostStrain(hostStrainFull);
             modelCreation.addQualityAssurance(qa);
+            }
         }
     }
 
@@ -229,7 +240,9 @@ public class DomainObjectCreator {
             String project = row.getString(TSV.Metadata.project.name());
 
             ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
-            if (modelCreation == null) throw new NullPointerException();
+            if (modelCreation == null) {
+                log.error(modelId);
+                throw new NullPointerException();}
 
             List<ExternalUrl> externalUrls = getExternalUrls(email, formUrl, databaseUrl);
             modelCreation.setExternalUrls(externalUrls);
@@ -730,11 +743,16 @@ public class DomainObjectCreator {
         Map<String, Object> patients = domainObjects.get(PATIENTS);
         for (Object pat : patients.values()) {
             Patient patient = (Patient) pat;
-            for(PatientSnapshot ps: patient.getSnapshots()){
-                for(Sample patientSample : ps.getSamples())
-                    encodeMolecularDataFor(patientSample);
+            try {
+                for (PatientSnapshot ps : patient.getSnapshots()) {
+                    for (Sample patientSample : ps.getSamples())
+                        encodeMolecularDataFor(patientSample);
+                }
+                dataImportService.savePatient(patient);
             }
-            dataImportService.savePatient(patient);
+            catch(Exception e){
+                log.error(patient.getExternalId());
+            }
         }
     }
 
