@@ -1,7 +1,5 @@
 package org.pdxfinder.dataexport;
 
-
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -11,8 +9,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.pdxfinder.BaseTest;
-import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.utils.CbpTransformer;
+import org.pdxfinder.utils.CbpTransformer.cbioType;
 
 import java.io.*;
 
@@ -23,17 +21,18 @@ public class CbpTransformerTests extends BaseTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     private CbpTransformer cbpTransformer = new CbpTransformer();
+
     private File jsonDummy;
     private File exportFolder;
     private File templatesFolder;
-    private String mutDataType;
-    private String gisticDataType;
+    private cbioType mutDataType;
+    private cbioType gisticDataType;
 
     @Before
     public void init() throws IOException {
         jsonDummy = folder.newFile("UtilityTest.json");
-        mutDataType = "mut";
-        gisticDataType = "gistic";
+        mutDataType = cbioType.MUT;
+        gisticDataType = cbioType.GISTIC;
 
         TemporaryFolder rootFolder = new TemporaryFolder();
         rootFolder.create();
@@ -61,12 +60,12 @@ public class CbpTransformerTests extends BaseTest {
 
     @Test(expected = IOException.class)
     public void Given_nonExistentJsonFilesArePassed_WhenExportCBPisCalled_Then_throwIOexception() throws IOException {
-        cbpTransformer.exportCBP(exportFolder.getAbsolutePath(), templatesFolder.getAbsolutePath(), "/tmp/not/existing", mutDataType);
+        cbpTransformer.exportCBP(exportFolder, templatesFolder, new File("/tmp/not/existing"), mutDataType);
     }
 
     @Test(expected = IOException.class)
     public void Given_nonExistentTemplateDirectoryisPassed_WhenExportCBPisCalled_Then_throwIOexception() throws IOException {
-        cbpTransformer.exportCBP(exportFolder.getAbsolutePath(), "/Fake/Path/", jsonDummy.getAbsolutePath(), mutDataType);
+        cbpTransformer.exportCBP(exportFolder, new File("/Fake/Path/"), jsonDummy, mutDataType);
     }
 
     @Test
@@ -77,7 +76,7 @@ public class CbpTransformerTests extends BaseTest {
         writer.write("[ { \"patientId\":\"1\", \"sampleId\":\"2\", \"chr\":\"3\", \"startPosition\":\"4\", \"referenceAllele\":\"5\", \"variantAllele\":\"6\", \"ncbiBuild\":\"7\"} ] ");
         writer.close();
 
-        cbpTransformer.exportCBP(exportFolder.getAbsolutePath(), templatesFolder.getAbsolutePath(), jsonDummy.getAbsolutePath(), mutDataType);
+        cbpTransformer.exportCBP(exportFolder, templatesFolder, jsonDummy, mutDataType);
 
         File actualGroupFile = new File(exportFolder.getAbsoluteFile() + "/UtilityTest.json");
         File actualMutDir = new File(actualGroupFile + "/mut");
@@ -96,7 +95,7 @@ public class CbpTransformerTests extends BaseTest {
         writer.write("[ { \"patientId\":\"1\", \"sampleId\":\"2\", \"chr\":\"3\", \"startPosition\":\"4\", \"referenceAllele\":\"5\", \"variantAllele\":\"6\", \"ncbiBuild\":\"7\"} ] ");
         writer.close();
 
-        cbpTransformer.exportCBP(exportFolder.getAbsolutePath(), templatesFolder.getAbsolutePath(), jsonDummy.getAbsolutePath(), mutDataType);
+        cbpTransformer.exportCBP(exportFolder, templatesFolder, jsonDummy, mutDataType);
 
         File actualGroupFile = new File(exportFolder.getAbsoluteFile() + "/UtilityTest.json");
         File actualMutDir = new File(actualGroupFile + "/mut");
@@ -125,7 +124,7 @@ public class CbpTransformerTests extends BaseTest {
         writer.close();
 
 
-        cbpTransformer.exportCBP(exportFolder.getAbsolutePath(), templatesFolder.getAbsolutePath(), jsonDummy.getAbsolutePath(), gisticDataType);
+        cbpTransformer.exportCBP(exportFolder, templatesFolder, jsonDummy, gisticDataType);
 
         File actualGroupFile = new File(exportFolder.getAbsoluteFile() + "/UtilityTest.json");
         File actualMutDir = new File(actualGroupFile + "/cna");

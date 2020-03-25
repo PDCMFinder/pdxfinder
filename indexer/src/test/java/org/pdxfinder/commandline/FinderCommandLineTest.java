@@ -66,10 +66,31 @@ public class FinderCommandLineTest extends BaseTest {
         verify(this.finderTransformer).run(
                 any(File.class),
                 any(null),
-                anyBoolean()
+                any(null),
+                any(File.class),
+                any(null),
+                anyBoolean(),
+                anyString()
         );
         verifyNoMoreInteractions(this.finderTransformer);
     }
+
+    @Test public void load_givenTransform_When_cbioPortalIsCalled_Then_callsTransformer() throws IOException {
+        String[] args = {"-c=MUT", "-f=/tmp"};
+        int exitCode = new CommandLine(transform).execute(args);
+        assertEquals(0, exitCode);
+        verify(this.finderTransformer).run(
+                any(null),
+                eq(null),
+                eq(null),
+                any(File.class),
+                any(null),
+                anyBoolean(),
+                eq("MUT")
+        );
+        verifyNoMoreInteractions(this.finderTransformer);
+    }
+
 
     @Test public void load_givenTransform_WhenTwoExclusiveArgumentsArepassed_Then_ReturnNonZeroExit() throws IOException {
         String[] args = {"--data-dir=path/", "--export=test", "--all"};

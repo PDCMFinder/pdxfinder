@@ -165,6 +165,20 @@ public class FinderCommandLine implements Callable<Integer> {
                         "(default: [${DEFAULT-VALUE}], set in application.properties)")
         private File dataDirectory;
 
+        @Option(
+                names = {"-f", "--file"},
+                description = "File location for utilites that require a File parameter. Includes cbioTransformer and LiftOver")
+        private File ingestFile;
+
+        @Option(
+                names = {"--template-dir"},
+                description = "Set template directory. Default is the finder root dir /template folder. This is not completely implemented.")
+        private File templatedDir;
+
+        @Option(
+                names = {"o","--exportDir"},
+                description = "Set export directory. Default is the finder root dir /export folder. This is not completely implemented.")
+        private File exportDir;
 
         @ArgGroup(multiplicity = "0..1")
         Transform.Exclusive exclusiveArguments = new Transform.Exclusive();
@@ -180,6 +194,10 @@ public class FinderCommandLine implements Callable<Integer> {
                     description = "Export all providers data. Warning: do to large provider datasets this can be computationally intensive")
             private boolean loadAll;
 
+            @Option(
+                    names = {"-c","-cbio"},
+                    description = "Transform Cbioportal Json into PdxFinder Templates for ingest into the finder. Only arguments supported 'mut' or 'gistic' ")
+            private String cbioType;
 
             public String getProvider() {
                 return provider;
@@ -188,21 +206,29 @@ public class FinderCommandLine implements Callable<Integer> {
             public boolean isLoadAll() {
                 return loadAll;
             }
+
+            public String getCbioDataType() {
+                return cbioType;
+            }
         }
 
         @Override
         public Integer call() throws IOException {
             log.info("Loading using supplied parameters:\n{}", this);
-            finderTransformer.run(dataDirectory,exclusiveArguments.getProvider(),exclusiveArguments.isLoadAll());
+            finderTransformer.run(dataDirectory, templatedDir, exportDir,ingestFile,exclusiveArguments.getProvider(),exclusiveArguments.isLoadAll(), exclusiveArguments.getCbioDataType());
             return 0;
         }
 
         @Override
         public String toString() {
             return new StringJoiner("\n", Transform.class.getSimpleName() + "[\n", "\n]")
-                    .add("dataDirectory=" + dataDirectory.getName())
-                    .add("Export provider" + exclusiveArguments.provider)
-                    .add("Load all" + exclusiveArguments.loadAll)
+                    .add("dataDirectory=" + dataDirectory)
+                    .add("File=" + ingestFile)
+                    .add("Template Dir=" + templatedDir)
+                    .add("export Dir=" + exportDir)
+                    .add("Export provider" + exclusiveArguments.getProvider())
+                    .add("CbioDataType()" + exclusiveArguments.getCbioDataType())
+                    .add("Load all" + exclusiveArguments.isLoadAll())
                     .toString();
         }
     }
