@@ -103,7 +103,7 @@ public class UniversalDataExporter {
 
         initMutationData();
         initCNAData();
-        /**initCytoData();**/
+        initCytoData();
 
     }
 
@@ -416,9 +416,9 @@ public class UniversalDataExporter {
         initGenomicData(cnaSheetDataExport, "copy number alteration");
     }
 
-   /** public void initCytoData(){
-        initGenomicData()
-    }**/
+   public void initCytoData() {
+       initGenomicData(cytogeneticsSheetDataExport, "cytogenetics");
+   }
 
 
     private void initGenomicData(List<List<String>> sheetData, String molcharType){
@@ -536,14 +536,7 @@ public class UniversalDataExporter {
                 }
 
                 sheetData.add(rowData);
-
-
-
-
             }
-
-
-
         }
     }
 
@@ -579,39 +572,46 @@ public class UniversalDataExporter {
 
     public void ReadSheetAndWriteOmicTsvFile(Sheet sheet, List<List<String>> data, String omicTsvDir) throws IOException {
 
-        FileWriter fileWriter = new FileWriter(omicTsvDir);
+        FileWriter fileWriter = null;
 
-        if (data != null) {
+        try {
+            fileWriter = new FileWriter(omicTsvDir);
+            if (data != null) {
 
-            for (int j = 0; j < data.get(0).size(); j++) {
-                Cell cell = null;
-                try {
-                    cell = sheet.getRow(0).getCell(j);
-                    fileWriter.append(cell.toString());
-                    fileWriter.append("\t");
-                } catch (Exception e) {
-                    log.error("Exception in loading export headers");
-                }
-            }
-            fileWriter.append("\n");
-
-            for (int i = 0; i < data.size(); i++) {
-                int rowIndex = i;
-                for (int j = 0; j < data.get(i).size(); j++) {
-                    int columnIndex = j;
+                for (int j = 0; j < data.get(0).size(); j++) {
+                    Cell cell = null;
                     try {
-                        fileWriter.append(data.get(i).get(j));
+                        cell = sheet.getRow(0).getCell(j);
+                        fileWriter.append(cell.toString());
                         fileWriter.append("\t");
                     } catch (Exception e) {
-                        log.error("Exception in {}  {}:{}", sheet.getSheetName(), rowIndex, columnIndex);
+                        log.error("Exception in loading export headers");
                     }
-
                 }
                 fileWriter.append("\n");
-            }
 
+                for (int i = 0; i < data.size(); i++) {
+                    int rowIndex = i;
+                    for (int j = 0; j < data.get(i).size(); j++) {
+                        int columnIndex = j;
+                        try {
+                            fileWriter.append(data.get(i).get(j));
+                            fileWriter.append("\t");
+                        } catch (Exception e) {
+                            log.error("Exception in {}  {}:{}", sheet.getSheetName(), rowIndex, columnIndex);
+                        }
+
+                    }
+                    fileWriter.append("\n");
+                }
+            }
+        } catch(Exception e) {
+            log.error("IO Error from reading omic TSV" + e.toString());
+        } finally {
+            if (fileWriter != null) {
                 fileWriter.flush();
                 fileWriter.close();
+            }
         }
     }
 

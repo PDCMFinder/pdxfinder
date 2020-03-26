@@ -783,8 +783,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
             else if(molCharType.equals("copy number alteration")){
                 platformTag = "_cna";
             }
-            else if(molCharType.equals("transcriptomics")){
-                platformTag = "_trans";
+            else if(molCharType.equals("expression")){
+                platformTag = "_expr";
             }
 
 
