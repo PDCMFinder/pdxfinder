@@ -736,6 +736,8 @@ public class TransformerService {
 
                 if (String.valueOf(oncoKb.get("SAMPLESEQNBR")).equals(String.valueOf(sample.get("SAMPLESEQNBR")))) {
 
+                    rowMap.put(OmicCSVColumn.DATASOURCE, "PDMR");
+
                     // Search for the specimenSeqNumber inside the sampleSearch Data
                     specimenSearchData.forEach(specimen -> {
                         if (String.valueOf(specimen.get("SPECIMENSEQNBR")).equals(String.valueOf(sample.get("SPECIMENSEQNBR")))) {
