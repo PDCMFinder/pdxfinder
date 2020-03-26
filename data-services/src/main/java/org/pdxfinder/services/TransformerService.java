@@ -56,7 +56,7 @@ public class TransformerService {
 
     //Transformation rule as specified here: https://docs.google.com/spreadsheets/d/1buUu5yj3Xq8tbEtL1l2UILV9kLnouGqF0vIjFlGGbEE
     public List<Map<String, String>> transformDataAndSave() {
-        
+
         String unKnown = "Not Specified";
         String modelID;
         String patientID;
@@ -338,7 +338,7 @@ public class TransformerService {
                     }
 
                     treatments.add(new Treatment(cleanDrugs(drug),null,null,null,duration,null,
-                            null,response,null,startingDate,null));
+                                                 null,response,null,startingDate,null));
 
                     drug=""; duration = unKnown; response="";
                 }
@@ -382,7 +382,7 @@ public class TransformerService {
 
 
                     treatments.add(new Treatment(null,cleanDrugs(drug),null,null,duration,null,
-                            null,response,null,null,priorDate));
+                                                 null,response,null,null,priorDate));
 
                     drug=""; duration = unKnown; response="";
                 }
@@ -736,10 +736,9 @@ public class TransformerService {
 
                 if (String.valueOf(oncoKb.get("SAMPLESEQNBR")).equals(String.valueOf(sample.get("SAMPLESEQNBR")))) {
 
-
                     // Search for the specimenSeqNumber inside the sampleSearch Data
                     specimenSearchData.forEach(specimen -> {
-                        if (String.valueOf(sample.get("SPECIMENSEQNBR")).equals(String.valueOf(sample.get("SPECIMENSEQNBR")))) {
+                        if (String.valueOf(specimen.get("SPECIMENSEQNBR")).equals(String.valueOf(sample.get("SPECIMENSEQNBR")))) {
                             rowMap.put(OmicCSVColumn.MODEL_ID, specimen.get("PATIENTID") + "-" + specimen.get("SPECIMENID"));
                         }
                     });
