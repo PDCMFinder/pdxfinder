@@ -22,7 +22,12 @@ import java.util.concurrent.Callable;
     description = "The PDX Finder indexer command calls various data operations on the application." +
         " Run `[COMMAND] --help` or `help [COMMAND]` for specific usage information.",
     mixinStandardHelpOptions = true,
-    subcommands = {FinderCommandLine.Load.class, CommandLine.HelpCommand.class})
+    subcommands = {
+        FinderCommandLine.Load.class,
+        FinderCommandLine.Transform.class,
+        CommandLine.HelpCommand.class
+    }
+)
 @Order(value = -100)
 public class FinderCommandLine implements Callable<Integer> {
 
@@ -34,7 +39,7 @@ public class FinderCommandLine implements Callable<Integer> {
     @Component
     @Order(value = -100)
     @Command(name = "load",
-        description = "Loads and transforms data into the PDXFinder",
+        description = "Loads and transforms data into the PDX Finder",
         mixinStandardHelpOptions = true,
         exitCodeOnExecutionException = 34)
     static class Load implements Callable<Integer> {
@@ -47,7 +52,7 @@ public class FinderCommandLine implements Callable<Integer> {
         @Option(
             names = {"-d", "--data-dir"},
             required = true,
-            description = "Path of the PDXFinder data directory " +
+            description = "Path of the PDX Finder data directory " +
                 "(default: [${DEFAULT-VALUE}], set in application.properties)")
         private File dataDirectory;
 
@@ -148,8 +153,8 @@ public class FinderCommandLine implements Callable<Integer> {
 
     @Component
     @Order(value = -100)
-    @Command(name = "transformer",
-            description = "Utilities to convert between Pdx Finder templates, Neo4j data, and Json",
+    @Command(name = "transform",
+            description = "Convert between PDX Finder templates, Neo4j data, and Json",
             mixinStandardHelpOptions = true,
             exitCodeOnExecutionException = 34)
     static class Transform implements Callable<Integer> {
@@ -161,24 +166,27 @@ public class FinderCommandLine implements Callable<Integer> {
 
         @Option(
                 names = {"-d", "--data-dir"},
-                description = "Path of the PDXFinder data directory " +
+                description = "Path of the PDX Finder data directory " +
                         "(default: [${DEFAULT-VALUE}], set in application.properties)")
         private File dataDirectory;
 
         @Option(
                 names = {"-f", "--file"},
-                description = "File location for utilites that require a File parameter. Includes cbioTransformer and LiftOver")
+                description = "File location for utilities that require a File parameter." +
+                    " Includes cbioTransformer and LiftOver")
         private File ingestFile;
 
         @Option(
                 names = {"--template-dir"},
-                description = "Set template directory. Default is the finder root dir /template folder. This is not completely implemented.")
-        private File templatedDir;
+                description = "Set template directory. Default is the data-directory/template folder." +
+                    " This is not completely implemented.")
+        private File templateDirectory;
 
         @Option(
-                names = {"o","--exportDir"},
-                description = "Set export directory. Default is the finder root dir /export folder. This is not completely implemented.")
-        private File exportDir;
+                names = {"o", "--exportDir"},
+                description = "Set export directory. Default is the data-directory/export folder." +
+                    " This is not completely implemented.")
+        private File exportDirectory;
 
         @ArgGroup(multiplicity = "0..1")
         Transform.Exclusive exclusiveArguments = new Transform.Exclusive();
@@ -186,17 +194,20 @@ public class FinderCommandLine implements Callable<Integer> {
         static class Exclusive{
             @Option(
                     names = {"-e", "--export"},
-                    description = "Export Neo4j data to tsv templates. Requires either the provider name or use -a to export all providers")
+                    description = "Export database to TSV templates." +
+                        " Requires either the provider name or use -a to export all providers")
             private String provider;
 
             @Option(
                     names = {"-a", "--all"},
-                    description = "Export all providers data. Warning: do to large provider datasets this can be computationally intensive")
+                    description = "Export all providers data." +
+                        " Warning: do to large provider datasets this can be computationally intensive")
             private boolean loadAll;
 
             @Option(
                     names = {"-c","-cbio"},
-                    description = "Transform Cbioportal Json into PdxFinder Templates for ingest into the finder. Only arguments supported 'mut' or 'gistic' ")
+                    description = "Transform Cbioportal Json into PdxFinder Templates for ingest into the finder." +
+                        " Only arguments supported 'mut' or 'gistic' ")
             private String cbioType;
 
             public String getProvider() {
@@ -215,7 +226,15 @@ public class FinderCommandLine implements Callable<Integer> {
         @Override
         public Integer call() throws IOException {
             log.info("Loading using supplied parameters:\n{}", this);
-            finderTransformer.run(dataDirectory, templatedDir, exportDir,ingestFile,exclusiveArguments.getProvider(),exclusiveArguments.isLoadAll(), exclusiveArguments.getCbioDataType());
+            finderTransformer.run(
+                dataDirectory,
+                templateDirectory,
+                exportDirectory,
+                ingestFile,
+                exclusiveArguments.getProvider(),
+                exclusiveArguments.isLoadAll(),
+                exclusiveArguments.getCbioDataType()
+            );
             return 0;
         }
 
@@ -224,8 +243,8 @@ public class FinderCommandLine implements Callable<Integer> {
             return new StringJoiner("\n", Transform.class.getSimpleName() + "[\n", "\n]")
                     .add("dataDirectory=" + dataDirectory)
                     .add("File=" + ingestFile)
-                    .add("Template Dir=" + templatedDir)
-                    .add("export Dir=" + exportDir)
+                    .add("Template Dir=" + templateDirectory)
+                    .add("export Dir=" + exportDirectory)
                     .add("Export provider" + exclusiveArguments.getProvider())
                     .add("CbioDataType()" + exclusiveArguments.getCbioDataType())
                     .add("Load all" + exclusiveArguments.isLoadAll())
