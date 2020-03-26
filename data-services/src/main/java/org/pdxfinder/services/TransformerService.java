@@ -772,7 +772,7 @@ public class TransformerService {
 
             // Get Gene Symbol or HGNC Symbol
             hgncSymbolData.forEach(hgncSymbol -> {
-                if ( String.valueOf(oncoKb.get("HUGOGENESYMBOLSEQNBR")).equals(hgncSymbol.get("HUGOGENESYMBOLSEQNBR")) ){
+                if ( String.valueOf(oncoKb.get("HUGOGENESYMBOLSEQNBR")).equals(String.valueOf(hgncSymbol.get("HUGOGENESYMBOLSEQNBR"))) ){
                     rowMap.put(OmicCSVColumn.HGNC_SYMBOL, hgncSymbol.get("HUGOGENESYMBOLDESCRIPTION"));
                 }
             });
@@ -789,7 +789,7 @@ public class TransformerService {
 
             // Get Consequence Column
             variantClassData.forEach(variantClass -> {
-                if ( String.valueOf(oncoKb.get("VARIANTCLASSSEQNBR")).equals(variantClass.get("VARIANTCLASSSEQNBR")) ){
+                if ( String.valueOf(oncoKb.get("VARIANTCLASSSEQNBR")).equals(String.valueOf(variantClass.get("VARIANTCLASSSEQNBR"))) ){
                     rowMap.put(OmicCSVColumn.CONSEQUENCE, variantClass.get("VARIANTCLASSDESCRIPTION"));
                 }
             });
@@ -819,8 +819,15 @@ public class TransformerService {
             // Get Alt Allele
             rowMap.put(OmicCSVColumn.ALT_ALLELE, oncoKb.get("ALTALLELE"));
 
+            // Get Gene IDs
+            rowMap.put(OmicCSVColumn.UCSC_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.NCBI_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.ENSEMBL_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.ENSEMBL_TRANSCRIPT_ID, "");
+
+
             // Get Variation Id
-            rowMap.put(OmicCSVColumn.VARIANT_ID,
+            rowMap.put(OmicCSVColumn.RS_ID_VARIANT,
                        Optional.ofNullable(oncoKb.get("EXISTINGVARIANT")).isPresent() ?
                                oncoKb.get("EXISTINGVARIANT") : "");
 
@@ -829,13 +836,6 @@ public class TransformerService {
 
             // Get Platform Column
             rowMap.put(OmicCSVColumn.PLATFORM, "OncoKB Gene Panel");
-
-            // Get Gene IDs
-            rowMap.put(OmicCSVColumn.UCSC_GENE_ID, "");
-            rowMap.put(OmicCSVColumn.NCBI_GENE_ID, "");
-            rowMap.put(OmicCSVColumn.ENSEMBL_GENE_ID, "");
-            rowMap.put(OmicCSVColumn.ENSEMBL_TRANSCRIPT_ID, "");
-
 
 
             if (validData.get())
