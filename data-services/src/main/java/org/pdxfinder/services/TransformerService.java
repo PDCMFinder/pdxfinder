@@ -253,20 +253,27 @@ public class TransformerService {
                     wholeExomeSeqYn = dSample.get("WHOLEEXOMESEQUENCEFTPYN")+"";
                     rnaSeqYn = dSample.get("RNASEQUENCEFTPYN")+"";
 
-                    if (sampleId.equals("ORIGINATOR")){
-                        sampleTumorType = "Patient Tumor";
-                    }else {
-                        sampleTumorType = "Xenograft Tumor";
+                    samplePassage = String.valueOf(dSample.get("PASSAGEOFTHISSAMPLE"));
+
+                    if ( isNumeric(samplePassage)){
+                        if (!sampleId.contains("CAF")){
+                            sampleTumorType = "engrafted Tumor";
+                            sampleList.add(new Sample(sampleId,sampleTumorType,samplePassage,wholeExomeSeqYn,wholeExomeSeqYn,wholeExomeSeqYn,rnaSeqYn,rnaSeqYn));
+                        }else {
+                            log.warn("This is Strange, CAF Culture that has passage number");
+                        }
+                    }else{
+                        if (sampleId.equals("ORIGINATOR")){
+                            sampleTumorType = "patient Tumor";
+                            samplePassage = null;
+                            sampleList.add(new Sample(sampleId,sampleTumorType,samplePassage,wholeExomeSeqYn,wholeExomeSeqYn,wholeExomeSeqYn,rnaSeqYn,rnaSeqYn));
+                        }else {
+                            log.warn("This is neither PDX nor Patient Sample ");
+                        }
                     }
 
 
 
-                    if (sampleId.equals("ORIGINATOR")){
-                        samplePassage = null;
-                    }else {
-                        samplePassage = dSample.get("PASSAGEOFTHISSAMPLE")+"";
-                    }
-                    sampleList.add(new Sample(sampleId,sampleTumorType,samplePassage,wholeExomeSeqYn,wholeExomeSeqYn,wholeExomeSeqYn,rnaSeqYn,rnaSeqYn));
 
 
                     // Retrieve Grade Value
@@ -729,8 +736,6 @@ public class TransformerService {
 
                 if (String.valueOf(oncoKb.get("SAMPLESEQNBR")).equals(String.valueOf(sample.get("SAMPLESEQNBR")))) {
 
-                    // Get Sample ID Column
-                    rowMap.put(OmicCSVColumn.SAMPLE_ID, sample.get("SAMPLEID"));
 
                     // Search for the specimenSeqNumber inside the sampleSearch Data
                     specimenSearchData.forEach(specimen -> {
@@ -739,18 +744,20 @@ public class TransformerService {
                         }
                     });
 
+                    // Get Sample ID Column
+                    rowMap.put(OmicCSVColumn.SAMPLE_ID, sample.get("SAMPLEID"));
+
                     String samplePassage = sample.get("PASSAGEOFTHISSAMPLE");
-                    rowMap.put(OmicCSVColumn.PASSAGE, "");
 
                     // Get Sample Origin
                     if ( isNumeric(samplePassage) ){
-
                         rowMap.put(OmicCSVColumn.SAMPLE_ORIGIN, "engrafted tumor");
                         rowMap.put(OmicCSVColumn.PASSAGE, samplePassage);
                         validData.set(true);
                     }else {
                         if (sample.get("SAMPLEID").equals("ORIGINATOR")){
                             rowMap.put(OmicCSVColumn.SAMPLE_ORIGIN, "patient tumor");
+                            rowMap.put(OmicCSVColumn.PASSAGE, "");
                             validData.set(true);
                         }else {
                             validData.set(false);
