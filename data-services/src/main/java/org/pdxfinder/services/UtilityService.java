@@ -642,8 +642,11 @@ public class UtilityService {
             for (Map<String, String> data : dataList) {
 
                 for (String dKey : csvHead){
-
-                    fileWriter.append(String.valueOf(data.get(dKey)));
+                    if(data.get(dKey).contains(",")){
+                        fileWriter.append(String.format("\"%s\"", data.get(dKey)));
+                    }else {
+                        fileWriter.append(String.valueOf(data.get(dKey)));
+                    }
                     fileWriter.append(COMMA_DELIMITER);
                 }
 

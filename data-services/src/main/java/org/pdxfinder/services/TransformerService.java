@@ -17,10 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Created by Mosaku Abayomi on 12/12/2017.
- */
 
 @Service
 public class TransformerService {
@@ -155,6 +153,7 @@ public class TransformerService {
 
         List<String> modelIDList = new ArrayList<>();
         List<Map<String, String>> mappingList = new ArrayList<>();
+
 
         for (JsonNode node : rootArray) {
 
@@ -687,6 +686,162 @@ public class TransformerService {
     }
 
 
+    public boolean isNumeric(String val) {
+        boolean report = false;
+
+        try {
+            Double.parseDouble(val);
+            report = true;
+        } catch (Exception e) { }
+
+        return report;
+    }
+
+
+    public List transformOncoKB(){
+
+
+        String oncoKbUrl = String.format("%s%s", this.dataRootDir, "/PDMR/raw/PDMR_ONCOKBGENEPANEL.json");
+        String sampleUrl = String.format("%s%s", this.dataRootDir, "/PDMR/raw/PDMR_SAMPLE.json");
+        String specimenSearchUrl = String.format("%s%s", this.dataRootDir, "/PDMR/raw/PDMR_SPECIMENSEARCH.json");
+        String hgncSymbolUrl = String.format("%s%s", this.dataRootDir, "/PDMR/raw/PDMR_HUGOGENESYMBOL.json");
+        String variantClassUrl = String.format("%s%s", this.dataRootDir, "/PDMR/raw/PDMR_VARIANTCLASS.json");
+
+
+
+        List<Map<String, String>> oncoKbData = util.serializeDataToMaps(oncoKbUrl);
+        List<Map<String, String>> sampleData = util.serializeDataToMaps(sampleUrl);
+        List<Map<String, String>> specimenSearchData = util.serializeDataToMaps(specimenSearchUrl);
+        List<Map<String, String>> hgncSymbolData = util.serializeDataToMaps(hgncSymbolUrl);
+        List<Map<String, String>> variantClassData = util.serializeDataToMaps(variantClassUrl);
+
+
+        List<Map<OmicCSVColumn, String>> transformedData = new ArrayList<>();
+
+        for (Map<String, String> oncoKb : oncoKbData) {
+
+            AtomicBoolean validData = new AtomicBoolean(false);
+            Map<OmicCSVColumn, String> rowMap = new LinkedHashMap<>();
+
+            // Get Model ID Column
+            // Get Sample from Sample Data and if SAMPLESEQNBR is found, get SPECIMENSEQNBR
+            sampleData.forEach(sample -> {
+
+                if (String.valueOf(oncoKb.get("SAMPLESEQNBR")).equals(String.valueOf(sample.get("SAMPLESEQNBR")))) {
+
+                    // Get Sample ID Column
+                    rowMap.put(OmicCSVColumn.SAMPLE_ID, sample.get("SAMPLEID"));
+
+                    // Search for the specimenSeqNumber inside the sampleSearch Data
+                    specimenSearchData.forEach(specimen -> {
+                        if (String.valueOf(sample.get("SPECIMENSEQNBR")).equals(String.valueOf(sample.get("SPECIMENSEQNBR")))) {
+                            rowMap.put(OmicCSVColumn.MODEL_ID, specimen.get("PATIENTID") + "-" + specimen.get("SPECIMENID"));
+                        }
+                    });
+
+                    String samplePassage = sample.get("PASSAGEOFTHISSAMPLE");
+                    rowMap.put(OmicCSVColumn.PASSAGE, "");
+
+                    // Get Sample Origin
+                    if ( isNumeric(samplePassage) ){
+
+                        rowMap.put(OmicCSVColumn.SAMPLE_ORIGIN, "engrafted tumor");
+                        rowMap.put(OmicCSVColumn.PASSAGE, samplePassage);
+                        validData.set(true);
+                    }else {
+                        if (sample.get("SAMPLEID").equals("ORIGINATOR")){
+                            rowMap.put(OmicCSVColumn.SAMPLE_ORIGIN, "patient tumor");
+                            validData.set(true);
+                        }else {
+                            validData.set(false);
+                        }
+                    }
+
+                    // Get Host Strain name Column
+                    rowMap.put(OmicCSVColumn.HOST_STRAIN_NAME, "NOD.Cg-Prkdcscid Il2rgtm1Wjl/SzJ");
+                }
+            });
+
+            // Get Gene Symbol or HGNC Symbol
+            hgncSymbolData.forEach(hgncSymbol -> {
+                if ( String.valueOf(oncoKb.get("HUGOGENESYMBOLSEQNBR")).equals(hgncSymbol.get("HUGOGENESYMBOLSEQNBR")) ){
+                    rowMap.put(OmicCSVColumn.HGNC_SYMBOL, hgncSymbol.get("HUGOGENESYMBOLDESCRIPTION"));
+                }
+            });
+
+            // Get Coding Sequence Change
+            rowMap.put(OmicCSVColumn.CODING_SEQUENCE_CHANGE,
+                       Optional.ofNullable(oncoKb.get("HGVSCDNACHANGE")).isPresent() ?
+                               oncoKb.get("HGVSCDNACHANGE").replace("c.","") : "");
+
+            // Get Amino Acid Change
+            rowMap.put(OmicCSVColumn.AMINO_ACID_CHANGE,
+                       Optional.ofNullable(oncoKb.get("HGVSPROTEINCHANGE")).isPresent() ?
+                               oncoKb.get("HGVSPROTEINCHANGE").replace("p.","") : "");
+
+            // Get Consequence Column
+            variantClassData.forEach(variantClass -> {
+                if ( String.valueOf(oncoKb.get("VARIANTCLASSSEQNBR")).equals(variantClass.get("VARIANTCLASSSEQNBR")) ){
+                    rowMap.put(OmicCSVColumn.CONSEQUENCE, variantClass.get("VARIANTCLASSDESCRIPTION"));
+                }
+            });
+
+            // Get Functional Prediction
+            rowMap.put(OmicCSVColumn.FUNCTIONAL_PREDICTION,
+                       Optional.ofNullable(oncoKb.get("POLYPHEN")).isPresent() ?
+                               String.format("%s|sift",oncoKb.get("POLYPHEN")) : "");
+
+            // Read Depth
+            rowMap.put(OmicCSVColumn.READ_DEPTH, oncoKb.get("TOTALREADS"));
+
+            // Get Allele Frequency
+            rowMap.put(OmicCSVColumn.ALLELE_FREQUENCY, oncoKb.get("VARIANTADELLEFREQ"));
+
+            // Get Chromoseme Column
+            rowMap.put(OmicCSVColumn.CHROMOSOME,
+                       Optional.ofNullable(oncoKb.get("CHROMOSOME")).isPresent() ?
+                               oncoKb.get("CHROMOSOME").replace("chr","") : "");
+
+            // Seq Start Position
+            rowMap.put(OmicCSVColumn.SEQ_START_POSITION, oncoKb.get("STARTPOSITION"));
+
+            // Get Ref Allele
+            rowMap.put(OmicCSVColumn.REF_ALLELE, oncoKb.get("REFERENCEALLELE"));
+
+            // Get Alt Allele
+            rowMap.put(OmicCSVColumn.ALT_ALLELE, oncoKb.get("ALTALLELE"));
+
+            // Get Variation Id
+            rowMap.put(OmicCSVColumn.VARIANT_ID,
+                       Optional.ofNullable(oncoKb.get("EXISTINGVARIANT")).isPresent() ?
+                               oncoKb.get("EXISTINGVARIANT") : "");
+
+            // Get Genome Assembly
+            rowMap.put(OmicCSVColumn.GENOME_ASSEMBLY, "hg19");
+
+            // Get Platform Column
+            rowMap.put(OmicCSVColumn.PLATFORM, "OncoKB Gene Panel");
+
+            // Get Gene IDs
+            rowMap.put(OmicCSVColumn.UCSC_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.NCBI_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.ENSEMBL_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.ENSEMBL_TRANSCRIPT_ID, "");
+
+
+
+            if (validData.get())
+                transformedData.add(rowMap);
+
+        }
+
+
+        return transformedData;
+
+    }
+
+
+
     public List transformPDMRGenomics(List<Map<String, String>> untransformedGenomicData){
 
         List<Map<OmicCSVColumn, String>> transformedData = new ArrayList<>();
@@ -790,5 +945,6 @@ public class TransformerService {
 
         return transformedData;
     }
+
 
 }
