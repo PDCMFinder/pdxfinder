@@ -211,6 +211,23 @@ public class DataExportTest extends BaseTest {
         Path mutation = Paths.get("/tmp/mutation_template.xlsx");
         Path cnaTemplate = Paths.get("/tmp/cna_template.xlsx");
 
+        List<List<String>> genericSheet = new ArrayList<>();
+        List<String> genericColumn = new ArrayList<>();
+        genericSheet.add(genericColumn);
+
+        universalDataExporter.setPatientSheetDataExport(genericSheet);
+        universalDataExporter.setPatientTumorSheetDataExport(genericSheet);
+        universalDataExporter.setPatientTreatmentSheetDataExport(genericSheet);
+        universalDataExporter.setPdxModelSheetDataExport(genericSheet);
+        universalDataExporter.setPdxModelValidationSheetDataExport(genericSheet);
+        universalDataExporter.setSamplePlatformDescriptionSheetDataExport(genericSheet);
+        universalDataExporter.setSharingAndContactSheetDataExport(genericSheet);
+        universalDataExporter.setCytogeneticsSheetDataExport(genericSheet);
+        universalDataExporter.setLoaderRelatedDataSheetDataExport(genericSheet);
+        universalDataExporter.setDrugDosingSheetDataExport(genericSheet);
+        universalDataExporter.setCnaSheetDataExport(genericSheet);
+        universalDataExporter.setMutationSheetDataExport(genericSheet);
+
         Workbook metaDataXlsx = new XSSFWorkbook();
         Workbook samplePlatformXlsx = new XSSFWorkbook();
         Workbook mutationXlsx = new XSSFWorkbook();                                                           

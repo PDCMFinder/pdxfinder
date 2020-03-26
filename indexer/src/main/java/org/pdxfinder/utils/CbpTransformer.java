@@ -19,7 +19,7 @@ import java.util.Map;
 public class CbpTransformer {
 
     @Autowired
-    private UtilityService utilityService;
+    private UtilityService utilityService = new UtilityService();
     private UniversalDataExporter universalDataExporter = new UniversalDataExporter();
 
     public enum cbioType {
@@ -89,11 +89,11 @@ public class CbpTransformer {
             row.add("Not Specified");
             row.add("Not Specified");
             row.add("Not Specified");
-            addBlanksToList(row,6);
+            addBlanksToList(row,4);
             row.add(f.get("entrezGeneId").toString());
-            addBlanksToList(row, 3);
+            addBlanksToList(row, 6);
             row.add(f.get("alteration").toString());
-            row.add("");
+            addBlanksToList(row, 3);
 
             sheet.add(row);
         });

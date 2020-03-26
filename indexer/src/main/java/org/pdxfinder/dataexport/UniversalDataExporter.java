@@ -103,6 +103,7 @@ public class UniversalDataExporter {
 
         initMutationData();
         initCNAData();
+        /**initCytoData();**/
 
     }
 
@@ -414,6 +415,11 @@ public class UniversalDataExporter {
 
         initGenomicData(cnaSheetDataExport, "copy number alteration");
     }
+
+   /** public void initCytoData(){
+        initGenomicData()
+    }**/
+
 
     private void initGenomicData(List<List<String>> sheetData, String molcharType){
 
@@ -987,6 +993,45 @@ public class UniversalDataExporter {
         this.cnaSheetDataExport = cnaSheetDataExport;
     }
 
+    public void setPatientSheetDataExport(List<List<String>> patientSheetDataExport) {
+        this.patientSheetDataExport = patientSheetDataExport;
+    }
+
+    public void setPatientTumorSheetDataExport(List<List<String>> patientTumorSheetDataExport) {
+        this.patientTumorSheetDataExport = patientTumorSheetDataExport;
+    }
+
+    public void setPatientTreatmentSheetDataExport(List<List<String>> patientTreatmentSheetDataExport) {
+        this.patientTreatmentSheetDataExport = patientTreatmentSheetDataExport;
+    }
+
+    public void setPdxModelSheetDataExport(List<List<String>> pdxModelSheetDataExport) {
+        this.pdxModelSheetDataExport = pdxModelSheetDataExport;
+    }
+
+    public void setPdxModelValidationSheetDataExport(List<List<String>> pdxModelValidationSheetDataExport) {
+        this.pdxModelValidationSheetDataExport = pdxModelValidationSheetDataExport;
+    }
+
+    public void setSamplePlatformDescriptionSheetDataExport(List<List<String>> samplePlatformDescriptionSheetDataExport) {
+        this.samplePlatformDescriptionSheetDataExport = samplePlatformDescriptionSheetDataExport;
+    }
+
+    public void setSharingAndContactSheetDataExport(List<List<String>> sharingAndContactSheetDataExport) {
+        this.sharingAndContactSheetDataExport = sharingAndContactSheetDataExport;
+    }
+
+    public void setCytogeneticsSheetDataExport(List<List<String>> cytogeneticsSheetDataExport) {
+        this.cytogeneticsSheetDataExport = cytogeneticsSheetDataExport;
+    }
+
+    public void setLoaderRelatedDataSheetDataExport(List<List<String>> loaderRelatedDataSheetDataExport) {
+        this.loaderRelatedDataSheetDataExport = loaderRelatedDataSheetDataExport;
+    }
+
+    public void setDrugDosingSheetDataExport(List<List<String>> drugDosingSheetDataExport) {
+        this.drugDosingSheetDataExport = drugDosingSheetDataExport;
+    }
 
 
 }

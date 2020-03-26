@@ -109,10 +109,10 @@ public class CbpTransformerTests extends BaseTest {
 
         Assert.assertEquals(header[0], "1");
         Assert.assertEquals(header[1], "2");
-        Assert.assertEquals(header[17], "3");
-        Assert.assertEquals(header[18], "4");
-        Assert.assertEquals(header[19], "5");
-        Assert.assertEquals(header[20], "6");
+        Assert.assertEquals(header[15], "3");
+        Assert.assertEquals(header[16], "4");
+        Assert.assertEquals(header[17], "5");
+        Assert.assertEquals(header[18], "6");
         Assert.assertEquals(header[25], "7");
     }
 
@@ -120,7 +120,7 @@ public class CbpTransformerTests extends BaseTest {
     public void Give_GisticData_When_exportsIsCalled__ThenGisticIsCreated() throws IOException {
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(jsonDummy));
-        writer.write("[ { \"patientId\":\"1\", \"sampleId\":\"2\", \"chr\":\"3\", \"startPosition\":\"4\"} ] ");
+        writer.write("[ { \"patientId\":\"1\", \"sampleId\":\"2\", \"entrezGeneId\":\"3\", \"alteration\":\"4\"} ] ");
         writer.close();
 
 
@@ -136,10 +136,11 @@ public class CbpTransformerTests extends BaseTest {
         reader.readLine();
         String[] actualRow = reader.readLine().split("\t");
 
+        Assert.assertEquals(actualRow.length, 17);
         Assert.assertEquals(actualRow[0], "1");
         Assert.assertEquals(actualRow[1], "2");
-        Assert.assertEquals(actualRow[13], "3");
-        Assert.assertEquals(actualRow[17], "4");
+        Assert.assertEquals(actualRow[9], "3");
+        Assert.assertEquals(actualRow[16], "4");
     }
 }
 
