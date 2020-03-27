@@ -160,14 +160,13 @@ public class DomainObjectCreator {
             sample.setDataSource(providerGroup.getAbbreviation());
             patientSnapshot.addSample(sample);
             ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
-            if (modelCreation == null) {
-                //throw new NullPointerException();
-                log.error(modelId);
+            if (modelCreation == null)
+            {
+                log.error("Can't link patient sample, missing model: {}",modelId);
+                throw new NullPointerException();
             }
-            else {
-                modelCreation.setSample(sample);
-                modelCreation.addRelatedSample(sample);
-            }
+            modelCreation.setSample(sample);
+            modelCreation.addRelatedSample(sample);
         }
     }
 
@@ -206,20 +205,22 @@ public class DomainObjectCreator {
             String hostStrainFull = row.getString(TSV.Metadata.validation_host_strain_full.name());
 
             ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
-            if (modelCreation == null)
+            if (modelCreation != null)
             {
-                log.error(modelId);
-                //throw new NullPointerException();
+                QualityAssurance qa = new QualityAssurance();
+                qa.setTechnology(validationTechnique);
+                qa.setDescription(description);
+                qa.setPassages(passagesTested);
+                qa.setValidationHostStrain(hostStrainFull);
+                modelCreation.addQualityAssurance(qa);
+
             }
             else{
-
-            QualityAssurance qa = new QualityAssurance();
-            qa.setTechnology(validationTechnique);
-            qa.setDescription(description);
-            qa.setPassages(passagesTested);
-            qa.setValidationHostStrain(hostStrainFull);
-            modelCreation.addQualityAssurance(qa);
+                log.error("Can't link validation, missing model {}",modelId);
+                //throw new NullPointerException();
             }
+
+
         }
     }
 
@@ -240,9 +241,7 @@ public class DomainObjectCreator {
             String project = row.getString(TSV.Metadata.project.name());
 
             ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
-            if (modelCreation == null) {
-                log.error(modelId);
-                throw new NullPointerException();}
+            if (modelCreation == null) throw new NullPointerException();
 
             List<ExternalUrl> externalUrls = getExternalUrls(email, formUrl, databaseUrl);
             modelCreation.setExternalUrls(externalUrls);
@@ -743,16 +742,11 @@ public class DomainObjectCreator {
         Map<String, Object> patients = domainObjects.get(PATIENTS);
         for (Object pat : patients.values()) {
             Patient patient = (Patient) pat;
-            try {
-                for (PatientSnapshot ps : patient.getSnapshots()) {
-                    for (Sample patientSample : ps.getSamples())
-                        encodeMolecularDataFor(patientSample);
-                }
-                dataImportService.savePatient(patient);
+            for(PatientSnapshot ps: patient.getSnapshots()){
+                for(Sample patientSample : ps.getSamples())
+                    encodeMolecularDataFor(patientSample);
             }
-            catch(Exception e){
-                log.error(patient.getExternalId());
-            }
+            dataImportService.savePatient(patient);
         }
     }
 

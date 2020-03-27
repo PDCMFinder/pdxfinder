@@ -56,8 +56,8 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             omicDir = "cna";
 
         }
-        else if(dataType.equals("transcriptomics")){
-            omicDir = "trans";
+        else if(dataType.equals("expression")){
+            omicDir = "expr";
         }
 
         if(omicDir == null) {
@@ -301,7 +301,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
                     md = setCNAProperties(data, marker);
                 }
-                else if (dataType.equals("transcriptomics")){
+                else if (dataType.equals("expression")){
 
                     md = setTranscriptomicProperties(data, marker);
                 }

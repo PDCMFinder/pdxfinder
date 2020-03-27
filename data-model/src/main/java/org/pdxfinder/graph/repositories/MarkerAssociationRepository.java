@@ -23,10 +23,10 @@ public interface MarkerAssociationRepository extends PagingAndSortingRepository<
     @Query("MATCH (n:MarkerAssociation)-[]-(m:Marker) where n.description = {type} and m.name={name} return n")
     MarkerAssociation findByTypeAndMarkerName(@Param("type") String type, @Param("name") String name);
 
-    @Query("MATCH (mc:MolecularCharacterization)--(ma:MarkerAssociation)-[mr:MARKER]-(m:Marker) WHERE id(mc) = {mc} AND exists(ma.aminoAcidChange) RETURN ma, mr, m")
+    @Query("MATCH (mc:MolecularCharacterization)--(ma:MarkerAssociation) WHERE id(mc) = {mc} RETURN ma")
     Set<MarkerAssociation> findMutationByMolChar(@Param("mc") MolecularCharacterization mc);
 
-    @Query("MATCH (mc:MolecularCharacterization)--(ma:MarkerAssociation)-[mr:MARKER]-(m:Marker) WHERE id(mc) = {mc} RETURN ma, mr, m")
+    @Query("MATCH (mc:MolecularCharacterization)--(ma:MarkerAssociation) WHERE id(mc) = {mc} RETURN ma")
     Set<MarkerAssociation> findByMolChar(@Param("mc") MolecularCharacterization mc);
 
     @Query("MATCH (mc:MolecularCharacterization)-[awr:ASSOCIATED_WITH]-(ma:MarkerAssociation) " +

@@ -198,11 +198,12 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource}) " +
             "WITH mod ORDER BY mod.sourcePdxId " +
             "OPTIONAL MATCH (mod)-[iir:IMPLANTED_IN]-(psamp:Sample)-[cbr2:CHARACTERIZED_BY]-(mc2:MolecularCharacterization) " +
-            "OPTIONAL MATCH (mod)-[spr:SPECIMENS]-(sp:Specimen)-[sfr:SAMPLED_FROM]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization) " +
-            "WITH mod, iir, psamp, spr, sp, sfr, s, cbr, mc, mc2, cbr2 " +
+            "OPTIONAL MATCH (mod)-[spr:SPECIMENS]-(sp:Specimen)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
+            "WITH mod, iir, psamp, spr, sp, cbr2, mc2, hsr, hs " +
+            "OPTIONAL MATCH (sp)-[sfr:SAMPLED_FROM]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization) " +
             "OPTIONAL MATCH (mc)-[pur:PLATFORM_USED]-(pl:Platform) " +
             "OPTIONAL MATCH (mc2)-[pur2:PLATFORM_USED]-(pl2:Platform) " +
-            "RETURN mod, iir, psamp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, pur, pl, pur2, pl2")
+            "RETURN mod, iir, psamp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, pur, pl, pur2, pl2, hs, hsr")
     List<ModelCreation> findModelPlatformSampleByDS(@Param("dataSource") String dataSource);
 
 

@@ -255,7 +255,7 @@ public class LoadJAXData extends LoaderBase {
 
         loadOmicData(dto.getModelCreation(), providerDS,"copy number alteration", dataDirectory);
 
-        loadOmicData(dto.getModelCreation(), providerDS,"transcriptomics", dataDirectory);
+        loadOmicData(dto.getModelCreation(), providerDS,"expression", dataDirectory);
 
     }
 
