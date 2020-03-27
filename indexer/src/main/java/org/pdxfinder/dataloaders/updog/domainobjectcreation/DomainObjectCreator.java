@@ -704,7 +704,7 @@ public class DomainObjectCreator {
         sample.setOriginTissue(primarySite);
 
         sample.setSourceSampleId(sampleId);
-        sample.setDiagnosis(diagnosis);
+        sample.setDiagnosis(diagnosis.trim());
         sample.setStage(stage);
         sample.setStageClassification(stagingSystem);
         sample.setGrade(grade);
