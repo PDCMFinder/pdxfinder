@@ -739,6 +739,22 @@ public class DomainObjectCreator {
     public void persistPatients(){
 
         log.info("Persisiting patients");
+
+
+        Iterator<Map.Entry<String, Object>> iter = domainObjects.get(PATIENTS).entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<String,Object> entry = iter.next();
+            Patient patient = (Patient)entry.getValue();
+            for(PatientSnapshot ps: patient.getSnapshots()){
+                for(Sample patientSample : ps.getSamples())
+                    encodeMolecularDataFor(patientSample);
+            }
+            dataImportService.savePatient(patient);
+            iter.remove();
+        }
+
+
+/*
         Map<String, Object> patients = domainObjects.get(PATIENTS);
         for (Object pat : patients.values()) {
             Patient patient = (Patient) pat;
@@ -750,11 +766,29 @@ public class DomainObjectCreator {
             patient = null;
         }
         domainObjects.get(PATIENTS).clear();
+
+
+ */
     }
 
     public void persistModels(){
 
         log.info("Persisiting models");
+
+        Iterator<Map.Entry<String, Object>> iter = domainObjects.get(MODELS).entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<String,Object> entry = iter.next();
+            ModelCreation model = (ModelCreation) entry.getValue();
+            if (model.hasSpecimens())
+                for (Specimen s : model.getSpecimens()) encodeMolecularDataFor(s);
+
+            log.debug("Saving model {}", (model.getSourcePdxId()));
+            dataImportService.saveModelCreation(model);
+
+            iter.remove();
+        }
+
+/*
         Map<String, Object> models = domainObjects.get(MODELS);
         for (Object modelObject : models.values()) {
             ModelCreation model = (ModelCreation) modelObject;
@@ -766,6 +800,9 @@ public class DomainObjectCreator {
             model = null;
         }
         domainObjects.get(MODELS).clear();
+
+
+ */
     }
 
     public void addDomainObject(String key1, String key2, Object object) {
