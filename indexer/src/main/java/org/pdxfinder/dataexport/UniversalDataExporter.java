@@ -574,36 +574,44 @@ public class UniversalDataExporter {
 
         try(FileWriter fileWriter = new FileWriter(omicTsvDir)) {
             if (data != null) {
-
-                for (int j = 0; j < data.get(0).size(); j++) {
-                    Cell cell = null;
-                    try {
-                        cell = sheet.getRow(0).getCell(j);
-                        fileWriter.append(cell.toString());
-                        fileWriter.append("\t");
-                    } catch (Exception e) {
-                        log.error("Exception in loading export headers");
-                    }
-                }
-                fileWriter.append("\n");
-
-                for (int i = 0; i < data.size(); i++) {
-                    int rowIndex = i;
-                    for (int j = 0; j < data.get(i).size(); j++) {
-                        int columnIndex = j;
-                        try {
-                            fileWriter.append(data.get(i).get(j));
-                            fileWriter.append("\t");
-                        } catch (Exception e) {
-                            log.error("Exception in {}  {}:{}", sheet.getSheetName(), rowIndex, columnIndex);
-                        }
-
-                    }
-                    fileWriter.append("\n");
-                }
+                copyHeadersFromSheetToTsv(sheet, data, fileWriter);
+                writeDataToTsv(sheet, data, fileWriter);
             }
         } catch(Exception e) {
             log.error(String.format("IO Error from reading omic TSV %s",e.toString()));
+        }
+    }
+
+
+    private void copyHeadersFromSheetToTsv(Sheet sheet, List<List<String>> data, FileWriter fileWriter) throws IOException {
+
+        for (int j = 0; j < data.get(0).size(); j++) {
+            Cell cell = null;
+            try {
+                cell = sheet.getRow(0).getCell(j);
+                fileWriter.append(cell.toString());
+                fileWriter.append("\t");
+            } catch (Exception e) {
+                log.error("Exception in loading export headers");
+            }
+        }
+        fileWriter.append("\n");
+    }
+
+    private void writeDataToTsv(Sheet sheet, List<List<String>> data, FileWriter fileWriter) throws IOException {
+        for (int i = 0; i < data.size(); i++) {
+            int rowIndex = i;
+            for (int j = 0; j < data.get(i).size(); j++) {
+                int columnIndex = j;
+                try {
+                    fileWriter.append(data.get(i).get(j));
+                    fileWriter.append("\t");
+                } catch (Exception e) {
+                    log.error("Exception in {}  {}:{}", sheet.getSheetName(), rowIndex, columnIndex);
+                }
+
+            }
+            fileWriter.append("\n");
         }
     }
 
