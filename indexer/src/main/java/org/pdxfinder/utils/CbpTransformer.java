@@ -22,10 +22,14 @@ public class CbpTransformer {
     private UtilityService utilityService = new UtilityService();
     private UniversalDataExporter universalDataExporter = new UniversalDataExporter();
 
+    private static String NOT_SPECIFIED = "Not Specified";
+    private static String PATIENT_ID = "patientId";
+    private static String SAMPLE_ID = "sampleId";
+
     public enum cbioType {
         MUT,
         GISTIC
-    };
+    }
 
     public void exportCBP(File exportDir,File templateDir, File pathToJson, cbioType dataType) throws IOException {
 
@@ -35,36 +39,36 @@ public class CbpTransformer {
             Group jsonGroup = createGroupWithJsonsFilename(pathToJson.getAbsolutePath());
 
             List<Map<String, Object>> listMapTable = utilityService.serializeJSONToMaps(pathToJson.getAbsolutePath());
-            CbpMapsToSheetsByDataType(listMapTable, dataType);
+            cbpMapsToSheetsByDataType(listMapTable, dataType);
 
             universalDataExporter.setDs(jsonGroup);
             universalDataExporter.setTemplateDir(templateDir.getAbsolutePath());
             universalDataExporter.export(exportDir.getAbsolutePath());
     }
 
-    private void CbpMapsToSheetsByDataType(List<Map<String, Object>> listMapTable, cbioType dataType){
+    private void cbpMapsToSheetsByDataType(List<Map<String, Object>> listMapTable, cbioType dataType){
 
         List<List<String>> sheet;
         if(dataType.equals(cbioType.MUT)){
-            sheet = CbpMutJsonMapsToSheet(listMapTable);
+            sheet = cbpMutJsonMapsToSheet(listMapTable);
             universalDataExporter.setMutationSheetDataExport(sheet);
         }
        else if(dataType.equals(cbioType.GISTIC)) {
-            sheet = CbpGisticsonMapsToSheet(listMapTable);
+            sheet = cbpGisticsonMapsToSheet(listMapTable);
             universalDataExporter.setCnaSheetDataExport(sheet);
         }
     }
 
-    private List<List<String>> CbpMutJsonMapsToSheet(List<Map<String, Object>> jsonMap){
+    private List<List<String>> cbpMutJsonMapsToSheet(List<Map<String, Object>> jsonMap){
 
         List<List<String>> sheet = new ArrayList<>();
         jsonMap.forEach(f -> {
             List<String> row = new LinkedList<>();
-            row.add(f.get("patientId").toString());
-            row.add(f.get("sampleId").toString());
-            row.add("Not Specified");
-            row.add("Not Specified");
-            row.add("Not Specified");
+            row.add(f.get(PATIENT_ID).toString());
+            row.add(f.get(SAMPLE_ID).toString());
+            row.add(NOT_SPECIFIED);
+            row.add(NOT_SPECIFIED);
+            row.add(NOT_SPECIFIED);
             addBlanksToList(row,10);
             row.add(f.get("chr").toString());
             row.add(f.get("startPosition").toString());
@@ -79,16 +83,16 @@ public class CbpTransformer {
         return sheet;
     }
 
-    private List<List<String>> CbpGisticsonMapsToSheet(List<Map<String,Object>> jsonMap){
+    private List<List<String>> cbpGisticsonMapsToSheet(List<Map<String,Object>> jsonMap){
 
         List<List<String>> sheet = new ArrayList<>();
         jsonMap.forEach(f -> {
             List<String> row = new LinkedList<>();
-            row.add(f.get("patientId").toString());
-            row.add(f.get("sampleId").toString());
-            row.add("Not Specified");
-            row.add("Not Specified");
-            row.add("Not Specified");
+            row.add(f.get(PATIENT_ID).toString());
+            row.add(f.get(SAMPLE_ID).toString());
+            row.add(NOT_SPECIFIED);
+            row.add(NOT_SPECIFIED);
+            row.add(NOT_SPECIFIED);
             addBlanksToList(row,4);
             row.add(f.get("entrezGeneId").toString());
             addBlanksToList(row, 6);

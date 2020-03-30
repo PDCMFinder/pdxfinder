@@ -107,13 +107,14 @@ public class CbpTransformerTests extends BaseTest {
         reader.readLine();
         String[] header = reader.readLine().split("\t");
 
-        Assert.assertEquals(header[0], "1");
-        Assert.assertEquals(header[1], "2");
-        Assert.assertEquals(header[15], "3");
-        Assert.assertEquals(header[16], "4");
-        Assert.assertEquals(header[17], "5");
-        Assert.assertEquals(header[18], "6");
-        Assert.assertEquals(header[25], "7");
+        Assert.assertEquals("1", header[0]);
+        Assert.assertEquals("2", header[1]);
+        Assert.assertEquals("3", header[15]);
+        Assert.assertEquals("4", header[16]);
+        Assert.assertEquals("5",header[17]);
+        Assert.assertEquals("6",header[18]);
+        Assert.assertEquals("7", header[25]);
+
     }
 
     @Test
@@ -136,11 +137,11 @@ public class CbpTransformerTests extends BaseTest {
         reader.readLine();
         String[] actualRow = reader.readLine().split("\t");
 
-        Assert.assertEquals(actualRow.length, 17);
-        Assert.assertEquals(actualRow[0], "1");
-        Assert.assertEquals(actualRow[1], "2");
-        Assert.assertEquals(actualRow[9], "3");
-        Assert.assertEquals(actualRow[16], "4");
+        Assert.assertEquals( 17, actualRow.length);
+        Assert.assertEquals( "1",actualRow[0]);
+        Assert.assertEquals( "2", actualRow[1]);
+        Assert.assertEquals( "3", actualRow[9]);
+        Assert.assertEquals("4",actualRow[16]);
     }
 }
 

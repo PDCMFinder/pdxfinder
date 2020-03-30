@@ -166,7 +166,7 @@ public class UniversalDataExporter {
                 Files.createDirectory(Paths.get(fileLocation));
             }
             String exportURI = fileLocation +  ds.getAbbreviation() + suffix;
-            ReadSheetAndWriteOmicTsvFile(omicWorkbook.getSheetAt(0),exportSheet, exportURI);
+            readSheetAndWriteOmicTsvFile(omicWorkbook.getSheetAt(0),exportSheet, exportURI);
         }
     }
 
@@ -570,7 +570,7 @@ public class UniversalDataExporter {
         }
     }
 
-    public void ReadSheetAndWriteOmicTsvFile(Sheet sheet, List<List<String>> data, String omicTsvDir) throws IOException {
+    public void readSheetAndWriteOmicTsvFile(Sheet sheet, List<List<String>> data, String omicTsvDir) throws IOException {
 
         FileWriter fileWriter = null;
 
