@@ -22,9 +22,9 @@ public class CbpTransformer {
     private UtilityService utilityService = new UtilityService();
     private UniversalDataExporter universalDataExporter = new UniversalDataExporter();
 
-    private static String NOT_SPECIFIED = "Not Specified";
-    private static String PATIENT_ID = "patientId";
-    private static String SAMPLE_ID = "sampleId";
+    private static String notSpecified = "Not Specified";
+    private static String patientId = "patientId";
+    private static String sampleId = "sampleId";
 
     public enum cbioType {
         MUT,
@@ -64,11 +64,11 @@ public class CbpTransformer {
         List<List<String>> sheet = new ArrayList<>();
         jsonMap.forEach(f -> {
             List<String> row = new LinkedList<>();
-            row.add(f.get(PATIENT_ID).toString());
-            row.add(f.get(SAMPLE_ID).toString());
-            row.add(NOT_SPECIFIED);
-            row.add(NOT_SPECIFIED);
-            row.add(NOT_SPECIFIED);
+            row.add(f.get(patientId).toString());
+            row.add(f.get(sampleId).toString());
+            row.add(notSpecified);
+            row.add(notSpecified);
+            row.add(notSpecified);
             addBlanksToList(row,10);
             row.add(f.get("chr").toString());
             row.add(f.get("startPosition").toString());
@@ -88,11 +88,11 @@ public class CbpTransformer {
         List<List<String>> sheet = new ArrayList<>();
         jsonMap.forEach(f -> {
             List<String> row = new LinkedList<>();
-            row.add(f.get(PATIENT_ID).toString());
-            row.add(f.get(SAMPLE_ID).toString());
-            row.add(NOT_SPECIFIED);
-            row.add(NOT_SPECIFIED);
-            row.add(NOT_SPECIFIED);
+            row.add(f.get(patientId).toString());
+            row.add(f.get(sampleId).toString());
+            row.add(notSpecified);
+            row.add(notSpecified);
+            row.add(notSpecified);
             addBlanksToList(row,4);
             row.add(f.get("entrezGeneId").toString());
             addBlanksToList(row, 6);

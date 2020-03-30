@@ -572,10 +572,7 @@ public class UniversalDataExporter {
 
     public void readSheetAndWriteOmicTsvFile(Sheet sheet, List<List<String>> data, String omicTsvDir) throws IOException {
 
-        FileWriter fileWriter = null;
-
-        try {
-            fileWriter = new FileWriter(omicTsvDir);
+        try(FileWriter fileWriter = new FileWriter(omicTsvDir)) {
             if (data != null) {
 
                 for (int j = 0; j < data.get(0).size(); j++) {
@@ -606,12 +603,7 @@ public class UniversalDataExporter {
                 }
             }
         } catch(Exception e) {
-            log.error("IO Error from reading omic TSV" + e.toString());
-        } finally {
-            if (fileWriter != null) {
-                fileWriter.flush();
-                fileWriter.close();
-            }
+            log.error(String.format("IO Error from reading omic TSV %s",e.toString()));
         }
     }
 
