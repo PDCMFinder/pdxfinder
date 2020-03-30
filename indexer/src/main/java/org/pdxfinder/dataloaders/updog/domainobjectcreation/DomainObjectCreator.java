@@ -747,7 +747,9 @@ public class DomainObjectCreator {
                     encodeMolecularDataFor(patientSample);
             }
             dataImportService.savePatient(patient);
+            patient = null;
         }
+        domainObjects.get(PATIENTS).clear();
     }
 
     public void persistModels(){
@@ -761,7 +763,9 @@ public class DomainObjectCreator {
 
             log.debug("Saving model {}", (model.getSourcePdxId()));
             dataImportService.saveModelCreation(model);
+            model = null;
         }
+        domainObjects.get(MODELS).clear();
     }
 
     public void addDomainObject(String key1, String key2, Object object) {
