@@ -19,8 +19,8 @@ public class FinderTransformer {
 
     @Value("${data-dir}")
     private String defaultDirectory;
-    private String defaultTemplateDirectory = defaultDirectory + "/template";
-    private String defaultExportDirectory = defaultDirectory + "/export";
+    private String defaultTemplateDirectory;
+    private String defaultExportDirectory;
     private ExportDataToTemplate exportDataToTemplate;
     private CbpTransformer cbioTransformer;
     private File rootDir;
@@ -48,21 +48,23 @@ public class FinderTransformer {
     }
 
     private void resolveDirEnv(File dataDirectory, File overideTemplateDir, File overideExportDir) throws IOException{
-        rootDir = new File(defaultDirectory);
-        templateDir = new File(defaultTemplateDirectory);
-        exportDir = new File(defaultExportDirectory);
-
         if(dataDirectory != null && dataDirectory.exists()){
             log.info(String.format("Using %s as root directory", dataDirectory));
             rootDir = dataDirectory;
+        } else {
+            rootDir = new File(defaultDirectory);
         }
         if(doesFileExists(overideTemplateDir)){
             log.info(String.format("Using %s as template directory", overideTemplateDir));
             templateDir = overideTemplateDir;
+        } else {
+            templateDir = new File(rootDir.getAbsoluteFile() + "/template");
         }
         if(doesFileExists(overideExportDir)){
             log.info(String.format("Using %s as export directory", overideExportDir));
             exportDir = overideExportDir;
+        } else {
+            exportDir = new File(rootDir.getAbsoluteFile() + "/export");
         }
         if (!(doesFileExists(rootDir) && doesFileExists(templateDir) && doesFileExists(exportDir))){
             throw new IOException("Erorr resolving root, template, or export directory. Either default directories in the Finder root directory or arguments");
