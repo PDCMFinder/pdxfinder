@@ -19,10 +19,10 @@ import java.util.concurrent.Callable;
 
 @Component
 @Command(name = "indexer",
-    description = "The PDX Finder indexer command calls various data operations on the application." +
-        " Run `[COMMAND] --help` or `help [COMMAND]` for specific usage information.",
-    mixinStandardHelpOptions = true,
-    subcommands = {FinderCommandLine.Load.class, CommandLine.HelpCommand.class})
+        description = "The PDX Finder indexer command calls various data operations on the application." +
+                " Run `[COMMAND] --help` or `help [COMMAND]` for specific usage information.",
+        mixinStandardHelpOptions = true,
+        subcommands = {FinderCommandLine.Load.class, CommandLine.HelpCommand.class})
 @Order(value = -100)
 public class FinderCommandLine implements Callable<Integer> {
 
@@ -34,9 +34,9 @@ public class FinderCommandLine implements Callable<Integer> {
     @Component
     @Order(value = -100)
     @Command(name = "load",
-        description = "Loads and transforms data into the PDXFinder",
-        mixinStandardHelpOptions = true,
-        exitCodeOnExecutionException = 34)
+            description = "Loads and transforms data into the PDXFinder",
+            mixinStandardHelpOptions = true,
+            exitCodeOnExecutionException = 34)
     static class Load implements Callable<Integer> {
 
         Logger log = LoggerFactory.getLogger(Load.class);
@@ -45,15 +45,19 @@ public class FinderCommandLine implements Callable<Integer> {
         private FinderLoader finderLoader;
 
         @Option(
-            names = {"-d", "--data-dir"},
-            required = true,
-            description = "Path of the PDXFinder data directory " +
-                "(default: [${DEFAULT-VALUE}], set in application.properties)")
+                names = {"-d", "--data-dir"},
+                required = true,
+                description = "Path of the PDXFinder data directory " +
+                        "(default: [${DEFAULT-VALUE}], set in application.properties)")
         private File dataDirectory;
 
         @Option(names = {"-c", "--cache"},
                 description = "Clear cached data and reload, including NCIT ontology terms, etc.")
         private boolean loadCacheRequested;
+
+        @Option(names = {"-m", "--mapping"},
+                description = "Delete mapping database content, and reload from maping file")
+        private boolean initializeMappingDB;
 
         @Option(names = {"-k", "--keep-db"},
                 description = "Skips clearing of the database before loading new data.")
@@ -64,13 +68,13 @@ public class FinderCommandLine implements Callable<Integer> {
         private boolean validateOnlyRequested;
 
         @Option(names = {"-p", "--post-load"},
-                description = "Implement Post data loading Steps", required=false)
+                description = "Implement Post data loading Steps", required = false)
         private boolean postLoadRequested;
 
-        @Option(names = { "--spring.data.neo4j.uri"}, paramLabel = "Neo4j DB Directory", description = "Embedded Neo4j Database location", required=false, hidden=true)
+        @Option(names = {"--spring.data.neo4j.uri"}, paramLabel = "Neo4j DB Directory", description = "Embedded Neo4j Database location", required = false, hidden = true)
         private String springDataNeo4jUri;
 
-        @Option(names = { "--spring.datasource.url"}, paramLabel = "H2 DB Directory", description = "Embedded H2 Database location", required=false, hidden=true)
+        @Option(names = {"--spring.datasource.url"}, paramLabel = "H2 DB Directory", description = "Embedded H2 Database location", required = false, hidden = true)
         private String springDatasourceUrl;
 
         @ArgGroup(multiplicity = "0..1")
@@ -104,12 +108,13 @@ public class FinderCommandLine implements Callable<Integer> {
             List<DataProvider> providersRequested = getListOfRequestedProviders();
 
             finderLoader.run(
-                providersRequested,
-                dataDirectory,
-                validateOnlyRequested,
-                loadCacheRequested,
-                keepDatabaseRequested,
-                postLoadRequested
+                    providersRequested,
+                    dataDirectory,
+                    validateOnlyRequested,
+                    loadCacheRequested,
+                    keepDatabaseRequested,
+                    postLoadRequested,
+                    initializeMappingDB
             );
             return 0;
         }
@@ -125,10 +130,8 @@ public class FinderCommandLine implements Callable<Integer> {
             );
 
             if (dataProviders.isPresent()) {
-
                 return Arrays.asList(dataProviders.get());
             } else if (dataProviderGroup.isPresent()) {
-
                 return DataProviderGroup.getProvidersFrom(dataProviderGroup.get());
             } else {
                 return new ArrayList<>();
@@ -138,13 +141,14 @@ public class FinderCommandLine implements Callable<Integer> {
         @Override
         public String toString() {
             return new StringJoiner("\n", Load.class.getSimpleName() + "[\n", "\n]")
-                .add("dataDirectory=" + dataDirectory)
-                .add("clearCacheRequested=" + loadCacheRequested)
-                .add("keepDatabaseRequested=" + keepDatabaseRequested)
-                .add("datasetRequested=" + getListOfRequestedProviders())
-                .toString();
+                    .add("dataDirectory=" + dataDirectory)
+                    .add("clearCacheRequested=" + loadCacheRequested)
+                    .add("keepDatabaseRequested=" + keepDatabaseRequested)
+                    .add("datasetRequested=" + getListOfRequestedProviders())
+                    .toString();
         }
     }
+
 
     @Component
     @Order(value = -100)
@@ -159,8 +163,7 @@ public class FinderCommandLine implements Callable<Integer> {
         @Autowired
         private FinderTransformer finderTransformer;
 
-        @Option(
-                names = {"-d", "--data-dir"},
+        @Option(names = {"-d", "--data-dir"},
                 description = "Path of the PDXFinder data directory " +
                         "(default: [${DEFAULT-VALUE}], set in application.properties)")
         private File dataDirectory;
@@ -169,14 +172,12 @@ public class FinderCommandLine implements Callable<Integer> {
         @ArgGroup(multiplicity = "0..1")
         Transform.Exclusive exclusiveArguments = new Transform.Exclusive();
 
-        static class Exclusive{
-            @Option(
-                    names = {"-e", "--export"},
+        static class Exclusive {
+            @Option(names = {"-e", "--export"},
                     description = "Export Neo4j data to tsv templates. Requires either the provider name or use -a to export all providers")
             private String provider;
 
-            @Option(
-                    names = {"-a", "--all"},
+            @Option(names = {"-a", "--all"},
                     description = "Export all providers data. Warning: do to large provider datasets this can be computationally intensive")
             private boolean loadAll;
 
@@ -193,7 +194,7 @@ public class FinderCommandLine implements Callable<Integer> {
         @Override
         public Integer call() throws IOException {
             log.info("Loading using supplied parameters:\n{}", this);
-            finderTransformer.run(dataDirectory,exclusiveArguments.getProvider(),exclusiveArguments.isLoadAll());
+            finderTransformer.run(dataDirectory, exclusiveArguments.getProvider(), exclusiveArguments.isLoadAll());
             return 0;
         }
 

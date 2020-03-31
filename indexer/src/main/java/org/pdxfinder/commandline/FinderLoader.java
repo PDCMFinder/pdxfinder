@@ -2,6 +2,7 @@ package org.pdxfinder.commandline;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.pdxfinder.dataloaders.updog.Updog;
+import org.pdxfinder.mapping.InitMappingDatabase;
 import org.pdxfinder.services.constants.DataProvider;
 import org.pdxfinder.services.constants.DataProviderGroup;
 import org.pdxfinder.dataloaders.*;
@@ -37,7 +38,6 @@ public class FinderLoader {
 
     // DataProvider Loading Components
     private LoadHCI loadHCI;
-    private LoadIRCC loadIRCC;
     private LoadJAXData loadJAXData;
     private LoadMDAnderson loadMDAnderson;
     private LoadPDMRData loadPDMRData;
@@ -53,6 +53,8 @@ public class FinderLoader {
     private SetDataVisibility setDataVisibility;
     private ValidateDB validateDB;
 
+    private InitMappingDatabase initMappingDatabase;
+
     private DataImportService dataImportService;
 
     @Autowired
@@ -61,7 +63,6 @@ public class FinderLoader {
                         LoadNCIT loadNCIT,
 
                         LoadHCI loadHCI,
-                        LoadIRCC loadIRCC,
                         LoadJAXData loadJAXData,
                         LoadMDAnderson loadMDAnderson,
                         LoadPDMRData loadPDMRData,
@@ -76,14 +77,14 @@ public class FinderLoader {
                         SetDataVisibility setDataVisibility,
                         ValidateDB validateDB,
                         DataImportService dataImportService,
-                        ApplicationContext applicationContext) {
+                        ApplicationContext applicationContext,
+                        InitMappingDatabase initMappingDatabase) {
 
         this.loadMarkers = loadMarkers;
         this.loadNCITDrugs = loadNCITDrugs;
         this.loadNCIT = loadNCIT;
 
         this.loadHCI = loadHCI;
-        this.loadIRCC = loadIRCC;
         this.loadJAXData = loadJAXData;
         this.loadMDAnderson = loadMDAnderson;
         this.loadPDMRData = loadPDMRData;
@@ -97,6 +98,8 @@ public class FinderLoader {
         this.createDataProjections = createDataProjections;
         this.setDataVisibility = setDataVisibility;
         this.validateDB = validateDB;
+
+        this.initMappingDatabase = initMappingDatabase;
 
         this.dataImportService = dataImportService;
     }
@@ -112,13 +115,16 @@ public class FinderLoader {
         boolean validateOnlyRequested,
         boolean loadCacheRequested,
         boolean keepDatabaseRequested,
-        boolean postLoadRequested
+        boolean postLoadRequested,
+        boolean initializeMappingDb
     ) {
 
         this.keepDatabaseIfRequested(keepDatabaseRequested);
         this.loadCache(loadCacheRequested);
         this.loadRequestedPdxData(dataProviders, dataDirectory, validateOnlyRequested);
         this.postLoad(dataProviders, postLoadRequested);
+
+        this.initializeMappingDb(initializeMappingDb);
     }
 
     private void keepDatabaseIfRequested(boolean keepDatabaseRequested) {
@@ -224,7 +230,6 @@ public class FinderLoader {
         }
     }
 
-
     private void postLoad(List<DataProvider> providers, boolean postLoadRequested) {
 
         log.info("Running Post load Steps ...");
@@ -239,8 +244,11 @@ public class FinderLoader {
             setDataVisibility.run();
             validateDB.run();
         }
-
-
+    }
+    
+    private void initializeMappingDb(boolean initMappingDb){
+        if (initMappingDb)
+            initMappingDatabase.run();
     }
 
 }
