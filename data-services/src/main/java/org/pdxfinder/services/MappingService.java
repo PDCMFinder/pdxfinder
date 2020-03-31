@@ -770,6 +770,10 @@ public class MappingService {
         }
     }
 
+    public void purgeMappingDatabase(){
+        log.warn("Deleting H2 database and all its {} mapping data", mappingEntityRepository.findAll().size());
+        mappingEntityRepository.deleteAll();
+    }
 
     public List<MappingEntity> loadMappingsFromFile(String jsonFile) {
 
@@ -793,7 +797,6 @@ public class MappingService {
 
 
     public void readArchive(String entityType) {
-
 
         String jsonKey = "mappings";
 

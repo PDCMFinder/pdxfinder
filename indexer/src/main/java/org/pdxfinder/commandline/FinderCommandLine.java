@@ -56,7 +56,7 @@ public class FinderCommandLine implements Callable<Integer> {
         private boolean loadCacheRequested;
 
         @Option(names = {"-m", "--mapping"},
-                description = "Delete mapping database content, and reload from maping file")
+                description = "Delete mapping database content, and reload from mapping file")
         private boolean initializeMappingDB;
 
         @Option(names = {"-k", "--keep-db"},
