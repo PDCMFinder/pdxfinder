@@ -45,11 +45,7 @@ public class FinderExporterTest extends BaseTest {
     @Test
     public void Given_provider_CallExport() throws IOException {
         finderExporter.setDefaultDirectory(tempFile.getAbsolutePath());
-        finderExporter.run(
-                null,
-                "test",
-                false
-        );
+        finderExporter.run(null, "test", false);
         verify(finderExporter).export(
                 eq(tempFile.getAbsoluteFile()),
                 eq("test")
