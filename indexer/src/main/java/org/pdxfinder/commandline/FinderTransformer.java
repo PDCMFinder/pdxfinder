@@ -65,11 +65,12 @@ public class FinderTransformer {
 
     private void runCbioportal(File ingestFile, String cmdCbioType) throws IOException {
         resolveCbioType(cmdCbioType);
-        if (!(doesFileExists(ingestFile)))
-        {
+        if (doesFileExists(ingestFile)) {
+            cbioTransformer.exportCBP(exportDir,templateDir,ingestFile,resolvedCbioType);
+        } else {
             throw new IOException("Ingest file directory does not exist");
         }
-        cbioTransformer.exportCBP(exportDir,templateDir,ingestFile,resolvedCbioType);
+        
     }
 
     private void resolveCbioType(String cmdCbioType){
