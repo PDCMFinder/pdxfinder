@@ -128,9 +128,7 @@ public class UniversalDataExporter {
         }
 
         Path exportProviderDir = Paths.get(exportDir + "/" + ds.getAbbreviation());
-        if (!exportProviderDir.toFile().exists()) {
-            Files.createDirectory(exportProviderDir);
-        }
+        Files.createDirectories(exportProviderDir);
 
         try {
             if(metadataWorkbook != null && noMetaDataSheetsAreNull()) {
