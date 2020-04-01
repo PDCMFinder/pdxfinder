@@ -2,7 +2,7 @@ package org.pdxfinder.commandline;
 
 import org.pdxfinder.utils.CbpTransformer;
 import org.pdxfinder.utils.CbpTransformer.cbioType;
-import org.pdxfinder.utils.ExportDataToTemplate;;
+;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,6 @@ public class FinderTransformer {
     private String defaultDirectory;
     private String defaultTemplateDirectory;
     private String defaultExportDirectory;
-    private ExportDataToTemplate exportDataToTemplate;
     private CbpTransformer cbioTransformer;
     private File rootDir;
     private File templateDir;
@@ -29,20 +28,13 @@ public class FinderTransformer {
     private cbioType resolvedCbioType;
 
     @Autowired
-    FinderTransformer(ExportDataToTemplate exportDataToTemplate, CbpTransformer cbioTransformer){
-       this.exportDataToTemplate = exportDataToTemplate;
+    FinderTransformer(CbpTransformer cbioTransformer){
        this.cbioTransformer = cbioTransformer;
     }
 
-    void run(File dataDirectory, File overideTemplateDir, File overideExportDir, File ingestFile,  String provider, boolean loadAll, String cmdCbioType) throws IOException {
+    void run(File dataDirectory, File overideTemplateDir, File overideExportDir, File ingestFile, String cmdCbioType) throws IOException {
         resolveDirEnv(dataDirectory,overideTemplateDir,overideExportDir);
-        if(loadAll){
-            exportDataToTemplate.exportAllGroups(rootDir);
-        }
-        else if (provider != null && !provider.isEmpty()) {
-            exportDataToTemplate.export(rootDir, provider);
-        }
-        else if (cmdCbioType != null && !cmdCbioType.isEmpty()){
+        if (cmdCbioType != null && !cmdCbioType.isEmpty()){
            runCbioportal(ingestFile, cmdCbioType);
         }
     }

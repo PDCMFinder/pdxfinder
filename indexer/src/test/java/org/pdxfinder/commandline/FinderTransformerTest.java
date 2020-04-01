@@ -8,8 +8,8 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.*;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.utils.CbpTransformer;
-import org.pdxfinder.utils.ExportDataToTemplate;
 import org.pdxfinder.utils.CbpTransformer.cbioType;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +26,8 @@ public class FinderTransformerTest extends BaseTest {
     private File template;
     private File export;
 
-    @Mock ExportDataToTemplate exportDataToTemplate;
-    @Mock CbpTransformer cbpTransformer;
+    @MockBean
+    CbpTransformer cbpTransformer;
 
     @InjectMocks
     FinderTransformer finderTransformer;
@@ -35,9 +35,11 @@ public class FinderTransformerTest extends BaseTest {
     @Before
     public void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
-        doNothing().when(this.exportDataToTemplate).export(
+        doNothing().when(this.cbpTransformer).exportCBP(
                 any(File.class),
-                anyString()
+                any(File.class),
+                any(File.class),
+                any(cbioType.class)
         );
         rootDir = folder.newFolder();
         tempFile = new File(rootDir + "/tempFile");
@@ -47,23 +49,25 @@ public class FinderTransformerTest extends BaseTest {
         export = new File(rootDir + "/export");
         export.mkdir();
     }
-    @Test public void Given_NoPassDataDir_When_runIsCalled_returnDefault() throws IOException {
+    @Test public void Given_NoDataisPassed_When_runIsCalled_returnDefaultValues() throws IOException {
         finderTransformer.setDefaultDirectories(rootDir.getAbsolutePath());
         finderTransformer.run(
                 null,
                 null,
                 null,
                 null,
-                "TEST",
-                false,
-                null);
-        final ArgumentCaptor<File> captor = ArgumentCaptor.forClass(File.class);
-        final ArgumentCaptor<String> captorStr = ArgumentCaptor.forClass(String.class);
-        verify(this.exportDataToTemplate).export(
-                captor.capture(),
-                captorStr.capture());
-        Assert.assertEquals(rootDir.getAbsolutePath() ,captor.getValue().getAbsolutePath());
-        Assert.assertEquals("TEST", captorStr.getValue());
+                "mut");
+        final ArgumentCaptor<File> actualTemplateDir = ArgumentCaptor.forClass(File.class);
+        final ArgumentCaptor<File> actualExportDir = ArgumentCaptor.forClass(File.class);
+        final ArgumentCaptor<cbioType> captorBiotype = ArgumentCaptor.forClass(cbioType.class);
+        verify(this.cbpTransformer).exportCBP(
+                actualTemplateDir.capture(),
+                actualExportDir.capture(),
+                eq(null),
+                captorBiotype.capture());
+        Assert.assertEquals(actualTemplateDir.getValue(), new File(rootDir.getAbsoluteFile() + "/template"));
+        Assert.assertEquals(actualExportDir.getValue(), new File(rootDir.getAbsoluteFile() + "/export"));
+        Assert.assertEquals(captorBiotype.getValue(), cbioType.MUT);
     }
 
     @Test public void Given_dir_When_runIsCalled_Then_passGivenDir() throws IOException {
@@ -73,45 +77,18 @@ public class FinderTransformerTest extends BaseTest {
                 null,
                 null,
                 null,
-                "TEST",
-                false,
-                null);
+                "TEST"
+        );
         final ArgumentCaptor<File> captor = ArgumentCaptor.forClass(File.class);
-        verify(this.exportDataToTemplate).export(captor.capture(), any());
+        verify(this.cbpTransformer).exportCBP(
+                captor.capture(),
+                any(File.class),
+                any(File.class),
+                any(cbioType.class));
         File actualFile = captor.getValue();
         Assert.assertEquals(tempFile,actualFile);
     }
-    @Test public void Given_loadAll_CallExportAll() throws IOException {
-        finderTransformer.setDefaultDirectories(rootDir.toString());
-        finderTransformer.run(
-                null,
-                null,
-                null,
-                null,
-                null,
-                true,
-                null);
-        verify(exportDataToTemplate).exportAllGroups(any(File.class)) ;
-    }
 
-    @Test
-    public void Given_cbioportalDataTypeMut_callCbioportalExportMUT() throws IOException {
-        finderTransformer.setDefaultDirectories(rootDir.toString());
-        finderTransformer.run(
-                null,
-                null,
-                null,
-                tempFile,
-                null,
-                false,
-                "MUT");
-        verify(cbpTransformer).exportCBP(
-                any(File.class),
-                any(File.class),
-                eq(tempFile),
-                eq(cbioType.MUT)
-        );
-    }
     @Test
     public void Given_cbioportalDataTypeGISTIC_callCbioportalExportGISTIC() throws IOException {
         finderTransformer.setDefaultDirectories(rootDir.toString());
@@ -120,8 +97,6 @@ public class FinderTransformerTest extends BaseTest {
                 null,
                 null,
                 tempFile,
-                null,
-                false,
                 "GISTIC");
         verify(cbpTransformer).exportCBP(
                 any(File.class),
@@ -143,8 +118,6 @@ public class FinderTransformerTest extends BaseTest {
                 overrideTemplate,
                 overrideExport,
                 tempFile,
-                null,
-                false,
                 "GISTIC");
         verify(cbpTransformer).exportCBP(
                 eq(overrideExport),

@@ -24,6 +24,7 @@ import java.util.concurrent.Callable;
     mixinStandardHelpOptions = true,
     subcommands = {
         FinderCommandLine.Load.class,
+        FinderCommandLine.Export.class,
         FinderCommandLine.Transform.class,
         CommandLine.HelpCommand.class
     }
@@ -153,6 +154,66 @@ public class FinderCommandLine implements Callable<Integer> {
 
     @Component
     @Order(value = -100)
+    @Command(name = "export",
+            description = "Convert between PDX Finder templates, Neo4j data, and Json",
+            mixinStandardHelpOptions = true,
+            exitCodeOnExecutionException = 34)
+    static class Export implements Callable<Integer> {
+
+        @Autowired
+        private FinderExporter finderExporter;
+
+        @Option(
+                names = {"-d", "--data-dir"},
+                description = "Path of the PDX Finder data directory " +
+                        "(default: [${DEFAULT-VALUE}], set in application.properties)")
+        private File dataDirectory;
+
+        @ArgGroup(multiplicity = "0..1")
+        Export.Exclusive exclusiveArguments = new Export.Exclusive();
+
+        static class Exclusive{
+
+            @Option(
+                    names = {"-e", "--export"},
+                    description = "Export database to TSV templates." +
+                            " Requires either the provider name or use -a to export all providers")
+            private String provider;
+
+            @Option(
+                    names = {"-a", "--all"},
+                    description = "Export all providers data." +
+                            " Warning: do to large provider datasets this can be computationally intensive")
+            private boolean loadAll;
+
+            public String getProvider() {
+                return provider;
+            }
+
+            public boolean isLoadAll() {
+                return loadAll;
+            }
+        }
+        @Override
+        public Integer call() throws IOException {
+            finderExporter.run(dataDirectory, exclusiveArguments.getProvider(), exclusiveArguments.isLoadAll());
+            return 0;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner("\n", Transform.class.getSimpleName() + "[\n", "\n]")
+                    .add("dataDirectory=" + dataDirectory)
+                    .add("Export provider" + exclusiveArguments.getProvider())
+                    .add("Load all" + exclusiveArguments.isLoadAll())
+                    .toString();
+        }
+    }
+
+
+
+    @Component
+    @Order(value = -100)
     @Command(name = "transform",
             description = "Convert between PDX Finder templates, Neo4j data, and Json",
             mixinStandardHelpOptions = true,
@@ -166,7 +227,7 @@ public class FinderCommandLine implements Callable<Integer> {
 
         @Option(
                 names = {"-d", "--data-dir"},
-                description = "Path of the PDX Finder data directory " +
+                description = "Path of the PDX Finder data directory (overrides existing value)" +
                         "(default: [${DEFAULT-VALUE}], set in application.properties)")
         private File dataDirectory;
 
@@ -192,31 +253,12 @@ public class FinderCommandLine implements Callable<Integer> {
         Transform.Exclusive exclusiveArguments = new Transform.Exclusive();
 
         static class Exclusive{
-            @Option(
-                    names = {"-e", "--export"},
-                    description = "Export database to TSV templates." +
-                        " Requires either the provider name or use -a to export all providers")
-            private String provider;
-
-            @Option(
-                    names = {"-a", "--all"},
-                    description = "Export all providers data." +
-                        " Warning: do to large provider datasets this can be computationally intensive")
-            private boolean loadAll;
 
             @Option(
                     names = {"-c","-cbio"},
                     description = "Transform Cbioportal Json into PdxFinder Templates for ingest into the finder." +
                         " Only arguments supported 'mut' or 'gistic' ")
             private String cbioType;
-
-            public String getProvider() {
-                return provider;
-            }
-
-            public boolean isLoadAll() {
-                return loadAll;
-            }
 
             public String getCbioDataType() {
                 return cbioType;
@@ -231,8 +273,6 @@ public class FinderCommandLine implements Callable<Integer> {
                 templateDirectory,
                 exportDirectory,
                 ingestFile,
-                exclusiveArguments.getProvider(),
-                exclusiveArguments.isLoadAll(),
                 exclusiveArguments.getCbioDataType()
             );
             return 0;
@@ -245,9 +285,7 @@ public class FinderCommandLine implements Callable<Integer> {
                     .add("File=" + ingestFile)
                     .add("Template Dir=" + templateDirectory)
                     .add("export Dir=" + exportDirectory)
-                    .add("Export provider" + exclusiveArguments.getProvider())
                     .add("CbioDataType()" + exclusiveArguments.getCbioDataType())
-                    .add("Load all" + exclusiveArguments.isLoadAll())
                     .toString();
         }
     }

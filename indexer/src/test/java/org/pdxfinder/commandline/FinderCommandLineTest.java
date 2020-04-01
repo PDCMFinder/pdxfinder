@@ -25,6 +25,9 @@ public class FinderCommandLineTest extends BaseTest {
     @Mock private FinderTransformer finderTransformer;
     @InjectMocks private FinderCommandLine.Transform transform;
 
+    @Mock private FinderExporter finderExporter;
+    @InjectMocks private FinderCommandLine.Export export;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -60,7 +63,7 @@ public class FinderCommandLineTest extends BaseTest {
     }
 
     @Test public void load_givenTransform_When_exportAllisCalled_Then_callsTransformer() throws IOException {
-        String[] args = {"--data-dir=path/", "--all"};
+        String[] args = {"--data-dir=path/", "-c=mut"};
         int exitCode = new CommandLine(transform).execute(args);
         assertEquals(0, exitCode);
         verify(this.finderTransformer).run(
@@ -68,9 +71,7 @@ public class FinderCommandLineTest extends BaseTest {
                 any(null),
                 any(null),
                 any(File.class),
-                any(null),
-                anyBoolean(),
-                anyString()
+                any(null)
         );
         verifyNoMoreInteractions(this.finderTransformer);
     }
@@ -84,19 +85,20 @@ public class FinderCommandLineTest extends BaseTest {
                 eq(null),
                 eq(null),
                 any(File.class),
-                any(null),
-                anyBoolean(),
-                eq("MUT")
+                any(null)
         );
         verifyNoMoreInteractions(this.finderTransformer);
     }
 
 
-    @Test public void load_givenTransform_WhenTwoExclusiveArgumentsArepassed_Then_ReturnNonZeroExit() throws IOException {
+    @Test public void load_givenTransform_WhenTwoExclusiveArgumentsArepassed_Then_ReturnNonZeroExit() {
         String[] args = {"--data-dir=path/", "--export=test", "--all"};
         int exitCode = new CommandLine(transform).execute(args);
         assertNotEquals(0,exitCode);
     }
+
+
+
 
 
 }
