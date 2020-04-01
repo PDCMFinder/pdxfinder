@@ -33,39 +33,55 @@ public class FinderTransformer {
     }
 
     void run(File dataDirectory, File overideTemplateDir, File overideExportDir, File ingestFile, String cmdCbioType) throws IOException {
-        resolveDirEnv(dataDirectory,overideTemplateDir,overideExportDir);
+        resolveRootDir(dataDirectory);
+        resolveTemplateDir(overideTemplateDir);
+        resolveExportDir(overideExportDir);
+
         if (cmdCbioType != null && !cmdCbioType.isEmpty()){
            runCbioportal(ingestFile, cmdCbioType);
         }
     }
 
-    private void resolveDirEnv(File dataDirectory, File overideTemplateDir, File overideExportDir) throws IOException{
-        if(dataDirectory != null && dataDirectory.exists()){
+    private void resolveRootDir(File dataDirectory) throws IOException {
+        if (dataDirectory != null && dataDirectory.exists()) {
             log.info(String.format("Using %s as root directory", dataDirectory));
             rootDir = dataDirectory;
         } else {
             rootDir = new File(defaultDirectory);
         }
-        if(doesFileExists(overideTemplateDir)){
+        if (!(fileExists(rootDir))) {
+            throw new IOException(String.format("Erorr resolving root data directory: %s", rootDir.getAbsoluteFile()));
+        }
+    }
+
+    private void resolveTemplateDir(File overideTemplateDir) throws IOException {
+        if (fileExists(overideTemplateDir)) {
             log.info(String.format("Using %s as template directory", overideTemplateDir));
             templateDir = overideTemplateDir;
         } else {
             templateDir = new File(rootDir.getAbsoluteFile() + "/template");
         }
-        if(doesFileExists(overideExportDir)){
+        if (!(fileExists(templateDir))){
+            throw new IOException(String.format("Erorr resolving template directory %s", templateDir.getAbsoluteFile()));
+        }
+    }
+
+    private void resolveExportDir(File overideExportDir) throws IOException {
+
+        if(fileExists(overideExportDir)){
             log.info(String.format("Using %s as export directory", overideExportDir));
             exportDir = overideExportDir;
         } else {
             exportDir = new File(rootDir.getAbsoluteFile() + "/export");
         }
-        if (!(doesFileExists(rootDir) && doesFileExists(templateDir) && doesFileExists(exportDir))){
-            throw new IOException("Erorr resolving root, template, or export directory. Either default directories in the Finder root directory or arguments");
+        if (!(fileExists(exportDir))){
+            throw new IOException(String.format("Erorr resolving export directory %s", exportDir.getAbsoluteFile()));
         }
     }
 
     private void runCbioportal(File ingestFile, String cmdCbioType) throws IOException {
         resolveCbioType(cmdCbioType);
-        if (!(doesFileExists(ingestFile)))
+        if (!(fileExists(ingestFile)))
         {
             throw new IOException("Ingest file directory does not exist");
         }
@@ -81,7 +97,7 @@ public class FinderTransformer {
         } else throw new IllegalArgumentException("Only MUT and GISTIC types are currently supported");
     }
 
-    private boolean doesFileExists(File file) {
+    private boolean fileExists(File file) {
         return file != null && file.exists();
     }
 
