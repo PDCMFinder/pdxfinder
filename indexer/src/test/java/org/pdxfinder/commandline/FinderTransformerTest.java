@@ -67,7 +67,7 @@ public class FinderTransformerTest extends BaseTest {
                 captorBiotype.capture());
         Assert.assertEquals(actualExportDir.getValue(), new File(rootDir.getAbsoluteFile() + "/export"));
         Assert.assertEquals(actualTemplateDir.getValue(), new File(rootDir.getAbsoluteFile() + "/template"));
-        Assert.assertEquals(captorBiotype.getValue(), cbioType.MUT);
+        Assert.assertEquals(cbioType.MUT, captorBiotype.getValue());
     }
 
     @Test
