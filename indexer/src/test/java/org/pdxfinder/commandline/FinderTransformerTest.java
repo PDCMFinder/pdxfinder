@@ -55,38 +55,19 @@ public class FinderTransformerTest extends BaseTest {
                 null,
                 null,
                 null,
-                null,
-                "mut");
-        final ArgumentCaptor<File> actualTemplateDir = ArgumentCaptor.forClass(File.class);
+                tempFile,
+                "MUT");
         final ArgumentCaptor<File> actualExportDir = ArgumentCaptor.forClass(File.class);
+        final ArgumentCaptor<File> actualTemplateDir = ArgumentCaptor.forClass(File.class);
         final ArgumentCaptor<cbioType> captorBiotype = ArgumentCaptor.forClass(cbioType.class);
         verify(this.cbpTransformer).exportCBP(
-                actualTemplateDir.capture(),
                 actualExportDir.capture(),
-                eq(null),
+                actualTemplateDir.capture(),
+                eq(tempFile),
                 captorBiotype.capture());
-        Assert.assertEquals(actualTemplateDir.getValue(), new File(rootDir.getAbsoluteFile() + "/template"));
         Assert.assertEquals(actualExportDir.getValue(), new File(rootDir.getAbsoluteFile() + "/export"));
+        Assert.assertEquals(actualTemplateDir.getValue(), new File(rootDir.getAbsoluteFile() + "/template"));
         Assert.assertEquals(captorBiotype.getValue(), cbioType.MUT);
-    }
-
-    @Test public void Given_dir_When_runIsCalled_Then_passGivenDir() throws IOException {
-        finderTransformer.setDefaultDirectories(rootDir.toString());
-        finderTransformer.run(
-                tempFile,
-                null,
-                null,
-                null,
-                "TEST"
-        );
-        final ArgumentCaptor<File> captor = ArgumentCaptor.forClass(File.class);
-        verify(this.cbpTransformer).exportCBP(
-                captor.capture(),
-                any(File.class),
-                any(File.class),
-                any(cbioType.class));
-        File actualFile = captor.getValue();
-        Assert.assertEquals(tempFile,actualFile);
     }
 
     @Test
