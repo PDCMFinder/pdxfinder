@@ -779,14 +779,16 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             switch(molCharType) {
                 case "mutation" :
-                platformTag = "_mut";
-                break;
+                    platformTag = "_mut";
+                    break;
                 case "copy number alteration" :
-                platformTag = "_cna";
-                break;
+                    platformTag = "_cna";
+                    break;
                 case "expression" :
-                platformTag = "_expr";
-                break;
+                    platformTag = "_expr";
+                    break;
+                default:
+                    break;
             }
 
 
