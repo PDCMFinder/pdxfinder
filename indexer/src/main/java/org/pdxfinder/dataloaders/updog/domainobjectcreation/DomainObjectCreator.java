@@ -285,10 +285,11 @@ public class DomainObjectCreator {
     }
 
     void createTreatmentData(Map<String, Table> pdxDataTables){
-        log.info("Creating patient treatments");
+
         Table treatmentTable = pdxDataTables.get("patienttreatment-Sheet1.tsv");
 
         if(treatmentTable != null){
+            log.info("Creating patient treatments");
            for(Row row : treatmentTable){
                 String patientId = getStringFromRowAndColumn(row, TSV.Metadata.patient_id.name());
                 Patient patient = (Patient) getDomainObject(PATIENTS, patientId);
@@ -739,20 +740,24 @@ public class DomainObjectCreator {
     public void persistPatients(){
 
         log.info("Persisiting patients");
-
-
-        Iterator<Map.Entry<String, Object>> iter = domainObjects.get(PATIENTS).entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String,Object> entry = iter.next();
-            Patient patient = (Patient)entry.getValue();
-            for(PatientSnapshot ps: patient.getSnapshots()){
-                for(Sample patientSample : ps.getSamples())
-                    encodeMolecularDataFor(patientSample);
+        String patientId = "";
+        try {
+            Iterator<Map.Entry<String, Object>> iter = domainObjects.get(PATIENTS).entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<String, Object> entry = iter.next();
+                Patient patient = (Patient) entry.getValue();
+                patientId = patient.getExternalId();
+                for (PatientSnapshot ps : patient.getSnapshots()) {
+                    for (Sample patientSample : ps.getSamples())
+                        encodeMolecularDataFor(patientSample);
+                }
+                dataImportService.savePatient(patient);
+                iter.remove();
             }
-            dataImportService.savePatient(patient);
-            iter.remove();
         }
-
+        catch(Exception e){
+            log.error("Exception when saving patient {}",patientId);
+        }
 
 /*
         Map<String, Object> patients = domainObjects.get(PATIENTS);
@@ -840,13 +845,19 @@ public class DomainObjectCreator {
 
     private TreatmentProtocol getTreatmentProtocol(Row row){
 
-        String drugString = "";
-        String doseString = "";
-        String response = "";
-        String responseClassification = "";
+        String drugString = row.getString(TSV.Treatment.treatment_name.name());
+        String doseString = row.getString(TSV.Treatment.treatment_dose.name());
+        String responseString = row.getString(TSV.Treatment.treatment_response.name());
+        String responseClassificationString = row.getString(TSV.Treatment.response_classification.name());;
         String[] drugArray = drugString.split("\\+");
         String[] doseArray = doseString.split(";");
+
+
         TreatmentProtocol tp = new TreatmentProtocol();
+        Response response = new Response();
+        response.setDescription(responseString);
+        response.setDescriptionClassification(responseClassificationString);
+        tp.setResponse(response);
         if(drugArray.length == doseArray.length){
             for(int i=0;i<drugArray.length;i++){
                 Treatment treatment = new Treatment();
@@ -857,18 +868,19 @@ public class DomainObjectCreator {
                 tp.addTreatmentComponent(tc);
             }
             return tp;
-        } else if(drugArray.length != doseArray.length && doseArray.length == 1){
+        } else if(drugArray.length != doseArray.length ){
 
             for(int i=0;i<drugArray.length;i++){
                 Treatment treatment = new Treatment();
                 treatment.setName(drugArray[i].trim());
                 TreatmentComponent tc = new TreatmentComponent();
-                tc.setDose(doseArray[0].trim());
+                tc.setDose(doseString.trim());
                 tc.setTreatment(treatment);
                 tp.addTreatmentComponent(tc);
             }
             return tp;
         }
+
         return null;
     }
 
