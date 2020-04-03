@@ -777,14 +777,18 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             String platformTag = "";
 
-            if(molCharType.equals("mutation")){
-                platformTag = "_mut";
-            }
-            else if(molCharType.equals("copy number alteration")){
-                platformTag = "_cna";
-            }
-            else if(molCharType.equals("transcriptomics")){
-                platformTag = "_trans";
+            switch(molCharType) {
+                case "mutation" :
+                    platformTag = "_mut";
+                    break;
+                case "copy number alteration" :
+                    platformTag = "_cna";
+                    break;
+                case "expression" :
+                    platformTag = "_expr";
+                    break;
+                default:
+                    break;
             }
 
 
