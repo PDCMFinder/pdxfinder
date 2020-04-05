@@ -64,6 +64,7 @@ public class DomainObjectCreator {
         createSharingData(pdxDataTables);
         createSamplePlatformData(pdxDataTables);
         createTreatmentData(pdxDataTables);
+        createDrugDosingData(pdxDataTables);
         createOmicData(pdxDataTables);
         persistNodes();
     }
@@ -305,6 +306,7 @@ public class DomainObjectCreator {
     void createDrugDosingData(Map<String, Table> pdxDataTables){
         Table drugdosingTable = pdxDataTables.get("drugdosing-Sheet1.tsv");
         if(drugdosingTable != null){
+            log.info("Creating drug dosing data");
             for(Row row : drugdosingTable){
                 String modelId = getStringFromRowAndColumn(row, TSV.Metadata.model_id.name());
                 ModelCreation model = (ModelCreation) getDomainObject(MODELS, modelId);
