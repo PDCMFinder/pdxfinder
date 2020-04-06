@@ -322,6 +322,7 @@ public class DomainObjectCreator {
         createMutationData(pdxDataTables);
         createCnaData(pdxDataTables);
         createCytogeneticsData(pdxDataTables);
+        createExpressionData(pdxDataTables);
     }
 
     private void createMutationData(Map<String, Table> pdxDataTables){
@@ -356,6 +357,24 @@ public class DomainObjectCreator {
                 if(cnaTable != null){
                     log.info(modelCreation.getSourcePdxId());
                     createMolecularCharacterization(cnaTable, "copynumberalteration");
+                }
+            }
+        }
+    }
+
+    private void createExpressionData(Map<String, Table> pdxDataTables){
+        Table expressionTable = pdxDataTables.get("expression.tsv");
+        if (expressionTable != null) {
+            createMolecularCharacterization(expressionTable, "expression");
+        } else {
+            Map<String, Object> models = domainObjects.get(MODELS);
+            for(Map.Entry<String, Object> entry : models.entrySet()){
+                ModelCreation modelCreation = (ModelCreation) entry.getValue();
+                String cnaModelId = "exp_"+modelCreation.getSourcePdxId()+".tsv";
+                expressionTable = pdxDataTables.get(cnaModelId);
+                if(expressionTable != null){
+                    log.info(modelCreation.getSourcePdxId());
+                    createMolecularCharacterization(expressionTable, "expression");
                 }
             }
         }
@@ -515,6 +534,9 @@ public class DomainObjectCreator {
             case "copynumberalteration":
                 molecularData = getCNAProperties(row, marker);
                 break;
+            case "expression":
+                molecularData = getExpressionProperties(row, marker);
+                break;
             default:
                 molecularData = new MolecularData();
         }
@@ -568,7 +590,7 @@ public class DomainObjectCreator {
         return  ma;
     }
 
-    private MolecularData getTranscriptomicProperties(Row row, Marker marker){
+    private MolecularData getExpressionProperties(Row row, Marker marker){
 
         MolecularData ma = new MolecularData();
         ma.setChromosome("");
