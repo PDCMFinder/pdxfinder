@@ -149,7 +149,7 @@ public class LinkSamplesToNCITTerms {
         for(Map.Entry<String, MissingMapping> entry : missingMappings.entrySet()){
 
             MissingMapping mm = entry.getValue();
-            log.warn("Datasource: " + mm.getDataSource() + ", Diagnosis: " + mm.getDiagnosis() + ", Origin Tissue: " + mm.getOriginTissue() + ", Tumor Type: " + mm.getTumorType());
+            System.out.println("Datasource: " + mm.getDataSource() + ", Diagnosis: " + mm.getDiagnosis() + ", Origin Tissue: " + mm.getOriginTissue() + ", Tumor Type: " + mm.getTumorType());
             mappingService.saveUnmappedDiagnosis(mm.getDataSource(), mm.getDiagnosis(), mm.getOriginTissue(), mm.getTumorType());
         }
 
