@@ -10,21 +10,21 @@ import org.pdxfinder.rdbms.repositories.TransPdxInfoRepository;
 import org.pdxfinder.rdbms.repositories.TransSampleRepository;
 import org.pdxfinder.rdbms.repositories.TransTreatmentRepository;
 import org.pdxfinder.rdbms.repositories.TransValidationRepository;
+import org.pdxfinder.services.constants.OmicCSVColumn;
+import org.pdxfinder.services.constants.PdmrOmicCol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Created by Mosaku Abayomi on 12/12/2017.
- */
 
 @Service
 public class TransformerService {
 
 
-    private final static Logger log = LoggerFactory.getLogger(TransformerService.class);
+    private static final Logger log = LoggerFactory.getLogger(TransformerService.class);
 
     private ObjectMapper mapper = new ObjectMapper();
     private TransPdxInfoRepository transPdxInfoRepository;
@@ -56,7 +56,7 @@ public class TransformerService {
 
     //Transformation rule as specified here: https://docs.google.com/spreadsheets/d/1buUu5yj3Xq8tbEtL1l2UILV9kLnouGqF0vIjFlGGbEE
     public List<Map<String, String>> transformDataAndSave() {
-        
+
         String unKnown = "Not Specified";
         String modelID;
         String patientID;
@@ -102,8 +102,6 @@ public class TransformerService {
 
         String specimenSearchUrl = "/PDMR/raw/PDMR_SPECIMENSEARCH.json";
         log.info(specimenSearchUrl);
-
-        //If seqnumber is ) input in finder "Heterotopic" else if (1,2,3,4,5,6) put "Orthotopic" else(99) put not specified
 
         // Read the whole JSON as a JsonNode type & Retrieve each specimen search record as a Map (key value type) type
         JsonNode rootArray = util.readJsonLocal(this.dataRootDir+ specimenSearchUrl);
@@ -152,16 +150,12 @@ public class TransformerService {
         List patientList = mapper.convertValue(patientInfo, List.class);
 
 
-        //engraftmentType
-        int count = 0;
-        Set<PdmrPdxInfo> pdmrPdxInfoList = new HashSet<>();
 
         List<String> modelIDList = new ArrayList<>();
-        List<Map<String, String>> mappingList = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> mappingList = new ArrayList<>();
+
 
         for (JsonNode node : rootArray) {
-
-            count++;
 
             Map specimenSearch = mapper.convertValue(node, Map.class);
 
@@ -240,27 +234,10 @@ public class TransformerService {
                     }
                 }
 
-               // index++; \r\n\r\n \"
             }
-            //clinicalDiagnosis = clinicalDiagnosis.replaceAll("\\r|\\\"|\\n", "");
 
             clinicalDiagnosis = new StringBuilder(clinicalDiagnosis.toString().replaceAll("[^a-zA-Z,0-9 +_-]", "").trim());
             clinicalDiagnosis = new StringBuilder(clinicalDiagnosis.toString().replaceAll("\\s\\s", " "));
-
-            log.info(clinicalDiagnosis.toString());
-
-            // Treatment naive
-            /*try {
-                if (specimenSearch.get("CURRENTREGIMEN").toString().equalsIgnoreCase("Treatment naive")) {
-                    treatmentNaive = "Treatment Naive";
-                }
-            } catch (Exception e) {
-            }*/
-
-            // From specimensearch table - pick SPECIMENSEQNBR column
-            // Look SAMPLE table for key SPECIMENSEQNBR and retrieve the SAMPLESEQNBR column
-            // Look HISTOLOGY table for key SAMPLESEQNBR and retrieve TUMORGRADESEQNBR
-            // Look TumorGrade  table for key TUMORGRADESEQNBR and set Grade as retrieved TUMORGRADESHORTNAME
 
 
             List<Sample> sampleList = new ArrayList<>();
@@ -276,21 +253,27 @@ public class TransformerService {
                     wholeExomeSeqYn = dSample.get("WHOLEEXOMESEQUENCEFTPYN")+"";
                     rnaSeqYn = dSample.get("RNASEQUENCEFTPYN")+"";
 
-                    if (sampleId.equals("ORIGINATOR")){
-                        sampleTumorType = "Patient Tumor";
-                    }else {
-                        sampleTumorType = "Xenograft Tumor";
+                    samplePassage = String.valueOf(dSample.get("PASSAGEOFTHISSAMPLE"));
+
+                    if ( isNumeric(samplePassage)){
+                        if (!sampleId.contains("CAF")){
+                            sampleTumorType = "engrafted Tumor";
+                            sampleList.add(new Sample(sampleId,sampleTumorType,samplePassage,wholeExomeSeqYn,wholeExomeSeqYn,wholeExomeSeqYn,rnaSeqYn,rnaSeqYn));
+                        }else {
+                            log.warn("This is Strange, CAF Culture that has passage number");
+                        }
+                    }else{
+                        if (sampleId.equals("ORIGINATOR")){
+                            sampleTumorType = "patient Tumor";
+                            samplePassage = null;
+                            sampleList.add(new Sample(sampleId,sampleTumorType,samplePassage,wholeExomeSeqYn,wholeExomeSeqYn,wholeExomeSeqYn,rnaSeqYn,rnaSeqYn));
+                        }else {
+                            log.warn("This is neither PDX nor Patient Sample ");
+                        }
                     }
 
 
 
-                    if (sampleId.equals("ORIGINATOR")){
-                        samplePassage = null;
-                    }else {
-                        samplePassage = dSample.get("PASSAGEOFTHISSAMPLE")+"";
-                    }
-                    sampleList.add(new Sample(sampleId,sampleTumorType,samplePassage,wholeExomeSeqYn,wholeExomeSeqYn,wholeExomeSeqYn,rnaSeqYn,rnaSeqYn));
-                    sampleId = ""; sampleTumorType = ""; samplePassage = ""; wholeExomeSeqYn=""; rnaSeqYn="";
 
 
                     // Retrieve Grade Value
@@ -317,19 +300,6 @@ public class TransformerService {
 
 
 
-                    /*
-                        model ID - mpdelID
-                        diagnosis - clinicalDiagnosis
-                        primary tissue - primarySite
-                        tumour type - tumorType
-                     */
-
-            // From specimensearch table - pick PATIENTSEQNBR column
-            //Look CURRENTTHERAPY table for key PATIENTSEQNBR and retrieve the STANDARDIZEDREGIMENSEQNBR column
-            // Look STANDARDIZEDREGIMENS table for key STANDARDIZEDREGIMENSEQNBR and retrieve DISPLAYEDREGIMEN
-
-            //From CURRENTTHERAPY table also retrieve the BESTRESPONSESEQNBR column
-            // Look CLINICALRESPONSES table for key CLINICALRESPONSESEQNBR (->BESTRESPONSESEQNBR) and retrieve CLINICALRESPONSEDESCRIPTION
 
             List<Treatment> treatments = new ArrayList<>();
 
@@ -343,7 +313,9 @@ public class TransformerService {
                     startingDate = dCurrentTherapy.get("DATEREGIMENSTARTED")+"";
                     try {
                         startingDate = startingDate.equals("null") ? unKnown : startingDate.substring(0, 10);
-                    } catch (Exception e) {}
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
+                    }
 
 
 
@@ -366,9 +338,9 @@ public class TransformerService {
                     }
 
                     treatments.add(new Treatment(cleanDrugs(drug),null,null,null,duration,null,
-                            null,response,null,startingDate,null));
+                                                 null,response,null,startingDate,null));
 
-                    drug=""; duration = unKnown; response=""; startingDate = "";
+                    drug=""; duration = unKnown; response="";
                 }
 
             }
@@ -384,7 +356,7 @@ public class TransformerService {
                     priorDate = dPriorTherapy.get("DATEREGIMENSTARTED")+"";
                     try {
                         priorDate = priorDate.equals("null") ? unKnown : priorDate.substring(0, 10);
-                    } catch (Exception e) {}
+                    } catch (Exception e) { log.error(e.getMessage());}
 
                     duration = dPriorTherapy.get("DURATIONMONTHS")+" Months";
 
@@ -410,9 +382,9 @@ public class TransformerService {
 
 
                     treatments.add(new Treatment(null,cleanDrugs(drug),null,null,duration,null,
-                            null,response,null,null,priorDate));
+                                                 null,response,null,null,priorDate));
 
-                    drug=""; duration = unKnown; response=""; priorDate = "";
+                    drug=""; duration = unKnown; response="";
                 }
             }
 
@@ -460,11 +432,7 @@ public class TransformerService {
                     age = specimen.get("AGEATSAMPLING") + "";
                     specimenSite = specimen.get("BIOPSYSITE") + "";
 
-                    dateAtCollection = specimen.get("COLLECTIONDATE") + "";
-                    try {
-                        dateAtCollection = dateAtCollection.substring(0, 10);
-                    } catch (Exception e) {
-                    }
+                    dateAtCollection = specimen.get("COLLECTIONDATE").toString().substring(0, 10);
 
                     accessibility = specimen.get("PUBLICACCESSYN") + "";
                     if (accessibility.equals("Y")) {
@@ -533,7 +501,7 @@ public class TransformerService {
                                                           treatmentNaive, engraftmentSite, engraftmentType, sourceUrl, extractionMethod, dateAtCollection, accessibility, treatments, validations, sampleList);
 
                 // GENERATE DATA FOR MAPPING
-                Map<String, String> mappingData = new LinkedHashMap<String, String>();
+                Map<String, String> mappingData = new LinkedHashMap<>();
                 mappingData.put("MODEL ID",modelID);
                 mappingData.put("DIAGNOSIS", clinicalDiagnosis.toString());
                 mappingData.put("PRIMARY TISSUE", primarySite);
@@ -568,7 +536,6 @@ public class TransformerService {
 
             report.append("Loaded Record for Patient ").append(specimenSearch.get("PATIENTID")).append("<br>");
 
-            // if (count == 40){ break; }
         }
 
         return mappingList;
@@ -620,7 +587,7 @@ public class TransformerService {
             }
         }catch (Exception e){
 
-            log.info("{} has no sample in the database", modelID);
+            log.trace("{} has no sample in the database", modelID);
         }
 
         return passage;
@@ -724,5 +691,268 @@ public class TransformerService {
 
         return mapToString;
     }
+
+
+    public boolean isNumeric(String val) {
+        boolean report = false;
+
+        try {
+            Double.parseDouble(val);
+            report = true;
+        } catch (Exception e) { }
+
+        return report;
+    }
+
+
+    public List transformOncoKB(){
+
+
+        String oncoKbUrl = String.format("%s%s", this.dataRootDir, "/PDMR/raw/PDMR_ONCOKBGENEPANEL.json");
+        String sampleUrl = String.format("%s%s", this.dataRootDir, "/PDMR/raw/PDMR_SAMPLE.json");
+        String specimenSearchUrl = String.format("%s%s", this.dataRootDir, "/PDMR/raw/PDMR_SPECIMENSEARCH.json");
+        String hgncSymbolUrl = String.format("%s%s", this.dataRootDir, "/PDMR/raw/PDMR_HUGOGENESYMBOL.json");
+        String variantClassUrl = String.format("%s%s", this.dataRootDir, "/PDMR/raw/PDMR_VARIANTCLASS.json");
+
+
+
+        List<Map<String, String>> oncoKbData = util.serializeDataToMaps(oncoKbUrl);
+        List<Map<String, String>> sampleData = util.serializeDataToMaps(sampleUrl);
+        List<Map<String, String>> specimenSearchData = util.serializeDataToMaps(specimenSearchUrl);
+        List<Map<String, String>> hgncSymbolData = util.serializeDataToMaps(hgncSymbolUrl);
+        List<Map<String, String>> variantClassData = util.serializeDataToMaps(variantClassUrl);
+
+
+        List<Map<OmicCSVColumn, String>> transformedData = new ArrayList<>();
+
+        for (Map<String, String> oncoKb : oncoKbData) {
+
+            AtomicBoolean validData = new AtomicBoolean(false);
+            Map<OmicCSVColumn, String> rowMap = new LinkedHashMap<>();
+
+            // Get Model ID Column
+            // Get Sample from Sample Data and if SAMPLESEQNBR is found, get SPECIMENSEQNBR
+            sampleData.forEach(sample -> {
+
+                if (String.valueOf(oncoKb.get("SAMPLESEQNBR")).equals(String.valueOf(sample.get("SAMPLESEQNBR")))) {
+
+                    rowMap.put(OmicCSVColumn.DATASOURCE, "PDMR");
+
+                    // Search for the specimenSeqNumber inside the sampleSearch Data
+                    specimenSearchData.forEach(specimen -> {
+                        if (String.valueOf(specimen.get("SPECIMENSEQNBR")).equals(String.valueOf(sample.get("SPECIMENSEQNBR")))) {
+                            rowMap.put(OmicCSVColumn.MODEL_ID, specimen.get("PATIENTID") + "-" + specimen.get("SPECIMENID"));
+                        }
+                    });
+
+                    // Get Sample ID Column
+                    rowMap.put(OmicCSVColumn.SAMPLE_ID, sample.get("SAMPLEID"));
+
+                    String samplePassage = sample.get("PASSAGEOFTHISSAMPLE");
+
+                    // Get Sample Origin
+                    if ( isNumeric(samplePassage) ){
+                        rowMap.put(OmicCSVColumn.SAMPLE_ORIGIN, "engrafted tumor");
+                        rowMap.put(OmicCSVColumn.PASSAGE, samplePassage);
+                        validData.set(true);
+                    }else {
+                        if (sample.get("SAMPLEID").equals("ORIGINATOR")){
+                            rowMap.put(OmicCSVColumn.SAMPLE_ORIGIN, "patient tumor");
+                            rowMap.put(OmicCSVColumn.PASSAGE, "");
+                            validData.set(true);
+                        }else {
+                            validData.set(false);
+                        }
+                    }
+
+                    // Get Host Strain name Column
+                    rowMap.put(OmicCSVColumn.HOST_STRAIN_NAME, "NOD.Cg-Prkdcscid Il2rgtm1Wjl/SzJ");
+                }
+            });
+
+            // Get Gene Symbol or HGNC Symbol
+            hgncSymbolData.forEach(hgncSymbol -> {
+                if ( String.valueOf(oncoKb.get("HUGOGENESYMBOLSEQNBR")).equals(String.valueOf(hgncSymbol.get("HUGOGENESYMBOLSEQNBR"))) ){
+                    rowMap.put(OmicCSVColumn.HGNC_SYMBOL, hgncSymbol.get("HUGOGENESYMBOLDESCRIPTION"));
+                }
+            });
+
+            // Get Coding Sequence Change
+            rowMap.put(OmicCSVColumn.CODING_SEQUENCE_CHANGE,
+                       Optional.ofNullable(oncoKb.get("HGVSCDNACHANGE")).isPresent() ?
+                               oncoKb.get("HGVSCDNACHANGE").replace("c.","") : "");
+
+            // Get Amino Acid Change
+            rowMap.put(OmicCSVColumn.AMINO_ACID_CHANGE,
+                       Optional.ofNullable(oncoKb.get("HGVSPROTEINCHANGE")).isPresent() ?
+                               oncoKb.get("HGVSPROTEINCHANGE").replace("p.","") : "");
+
+            // Get Consequence Column
+            variantClassData.forEach(variantClass -> {
+                if ( String.valueOf(oncoKb.get("VARIANTCLASSSEQNBR")).equals(String.valueOf(variantClass.get("VARIANTCLASSSEQNBR"))) ){
+                    rowMap.put(OmicCSVColumn.CONSEQUENCE, variantClass.get("VARIANTCLASSDESCRIPTION"));
+                }
+            });
+
+            // Get Functional Prediction
+            rowMap.put(OmicCSVColumn.FUNCTIONAL_PREDICTION,
+                       Optional.ofNullable(oncoKb.get("POLYPHEN")).isPresent() ?
+                               String.format("%s|sift",oncoKb.get("POLYPHEN")) : "");
+
+            // Read Depth
+            rowMap.put(OmicCSVColumn.READ_DEPTH, oncoKb.get("TOTALREADS"));
+
+            // Get Allele Frequency
+            rowMap.put(OmicCSVColumn.ALLELE_FREQUENCY, oncoKb.get("VARIANTADELLEFREQ"));
+
+            // Get Chromoseme Column
+            rowMap.put(OmicCSVColumn.CHROMOSOME,
+                       Optional.ofNullable(oncoKb.get("CHROMOSOME")).isPresent() ?
+                               oncoKb.get("CHROMOSOME").replace("chr","") : "");
+
+            // Seq Start Position
+            rowMap.put(OmicCSVColumn.SEQ_START_POSITION, oncoKb.get("STARTPOSITION"));
+
+            // Get Ref Allele
+            rowMap.put(OmicCSVColumn.REF_ALLELE, oncoKb.get("REFERENCEALLELE"));
+
+            // Get Alt Allele
+            rowMap.put(OmicCSVColumn.ALT_ALLELE, oncoKb.get("ALTALLELE"));
+
+            // Get Gene IDs
+            rowMap.put(OmicCSVColumn.UCSC_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.NCBI_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.ENSEMBL_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.ENSEMBL_TRANSCRIPT_ID, "");
+
+
+            // Get Variation Id
+            rowMap.put(OmicCSVColumn.RS_ID_VARIANT,
+                       Optional.ofNullable(oncoKb.get("EXISTINGVARIANT")).isPresent() ?
+                               oncoKb.get("EXISTINGVARIANT") : "");
+
+            // Get Genome Assembly
+            rowMap.put(OmicCSVColumn.GENOME_ASSEMBLY, "hg19");
+
+            // Get Platform Column
+            rowMap.put(OmicCSVColumn.PLATFORM, "OncoKB Gene Panel");
+
+
+            if (validData.get())
+                transformedData.add(rowMap);
+
+        }
+
+
+        return transformedData;
+
+    }
+
+
+
+    public List transformPDMRGenomics(List<Map<String, String>> untransformedGenomicData){
+
+        List<Map<OmicCSVColumn, String>> transformedData = new ArrayList<>();
+
+        for (Map<String, String> data : untransformedGenomicData) {
+
+            boolean validData = true;
+            Map<OmicCSVColumn, String> rowMap = new LinkedHashMap<>();
+
+
+            // Get Sample ID Column
+            rowMap.put(OmicCSVColumn.DATASOURCE, "PDMR");
+            rowMap.put(OmicCSVColumn.MODEL_ID, data.get(PdmrOmicCol.PATIENT_ID.get()).concat("-").concat(data.get(PdmrOmicCol.SPECIMEN_ID.get())));
+
+            // Get Sample ID Column
+            if (data.get(PdmrOmicCol.PDM_TYPE.get()).equals("PDX") || data.get(PdmrOmicCol.PDM_TYPE.get()).equals(PdmrOmicCol.PDM_TYPE_PATENT.get())){
+
+                rowMap.put(OmicCSVColumn.SAMPLE_ID, data.get(PdmrOmicCol.SAMPLE_ID.get()));
+            }else {
+                validData = false;
+            }
+
+            String modelID = rowMap.get(OmicCSVColumn.MODEL_ID);
+            String sampleID = rowMap.get(OmicCSVColumn.SAMPLE_ID);
+
+            // Get Sample Origin and Passage Column
+            if (data.get(PdmrOmicCol.PDM_TYPE.get()).equals("PDX")){
+
+                rowMap.put(OmicCSVColumn.SAMPLE_ORIGIN, "engrafted tumor");
+
+                String passage = getPassageByModelIDAndSampleID(modelID, sampleID);
+                rowMap.put(OmicCSVColumn.PASSAGE, passage);
+
+            }else if (data.get(PdmrOmicCol.PDM_TYPE.get()).equals(PdmrOmicCol.PDM_TYPE_PATENT.get())){
+
+                rowMap.put(OmicCSVColumn.SAMPLE_ORIGIN, "patient tumor");
+                rowMap.put(OmicCSVColumn.PASSAGE, "");
+            }else {
+                validData = false;
+            }
+
+
+            // Get Host Strain name Column
+            rowMap.put(OmicCSVColumn.HOST_STRAIN_NAME, "");
+
+            // Get Gene Symbol or HGNC Symbol
+            if (data.get(PdmrOmicCol.GENE.get()).equals("None Found")){
+
+                validData = false;
+            }else {
+                rowMap.put(OmicCSVColumn.HGNC_SYMBOL, data.get(PdmrOmicCol.GENE.get()));
+            }
+
+            // Get Amino Acid Change
+            rowMap.put(OmicCSVColumn.AMINO_ACID_CHANGE, data.get(PdmrOmicCol.AA_CHANGE.get()));
+
+            // Get Nucleotide Change
+            rowMap.put(OmicCSVColumn.NUCLEOTIDE_CHANGE, data.get(PdmrOmicCol.CODON_CHANGE.get()));
+
+            // Get Consequence Column
+            rowMap.put(OmicCSVColumn.CONSEQUENCE, data.get(PdmrOmicCol.IMPACT.get()));
+
+            // Read Depth
+            rowMap.put(OmicCSVColumn.READ_DEPTH, data.get(PdmrOmicCol.READ_DEPTH.get()));
+
+            // Get Allele Frequency
+            rowMap.put(OmicCSVColumn.ALLELE_FREQUENCY, data.get(PdmrOmicCol.ALLELE_FREQUENCY.get()));
+
+            // Get Chromoseme Column
+            rowMap.put(OmicCSVColumn.CHROMOSOME, data.get(PdmrOmicCol.CHR.get()));
+
+            // Seq Start Position
+            rowMap.put(OmicCSVColumn.SEQ_START_POSITION, data.get(PdmrOmicCol.POSITION.get()));
+
+            // Get Ref Allele
+            rowMap.put(OmicCSVColumn.REF_ALLELE, data.get(PdmrOmicCol.REF_ALLELE.get()));
+
+            // Get Alt Allele
+            rowMap.put(OmicCSVColumn.ALT_ALLELE, data.get(PdmrOmicCol.ALT_ALLELE.get()));
+
+            // Get Gene IDs
+            rowMap.put(OmicCSVColumn.UCSC_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.NCBI_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.ENSEMBL_GENE_ID, "");
+            rowMap.put(OmicCSVColumn.ENSEMBL_TRANSCRIPT_ID, "");
+
+            // Get RS ID Variant
+            rowMap.put(OmicCSVColumn.RS_ID_VARIANT, data.get(PdmrOmicCol.DB_SNP_ID.get()));
+
+            // Get Genome Assembly
+            rowMap.put(OmicCSVColumn.GENOME_ASSEMBLY, "hg19");
+
+            // Get Platform Column
+            rowMap.put(OmicCSVColumn.PLATFORM, "NCI cancer gene panel");
+
+            if (validData)
+                transformedData.add(rowMap);
+
+        }
+
+
+        return transformedData;
+    }
+
 
 }

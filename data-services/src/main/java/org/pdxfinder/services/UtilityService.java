@@ -522,7 +522,8 @@ public class UtilityService {
         try {
 
             while ((thisLine = csvData.readLine()) != null) {
-                String[] rowDataArr = thisLine.split(",");
+                String[] rowDataArr = thisLine.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+
                 int column = 0;
 
                 if (row == 0) {
@@ -616,8 +617,11 @@ public class UtilityService {
             for (Map<String, String> data : dataList) {
 
                 for (String dKey : csvHead){
-
-                    fileWriter.append(String.valueOf(data.get(dKey)));
+                    if(data.get(dKey).contains(",")){
+                        fileWriter.append(String.format("\"%s\"", data.get(dKey)));
+                    }else {
+                        fileWriter.append(String.valueOf(data.get(dKey)));
+                    }
                     fileWriter.append(COMMA_DELIMITER);
                 }
 
@@ -652,6 +656,28 @@ public class UtilityService {
         }
 
         writeCsvFile(mapList, destination);
+    }
+
+    public void writeCsvFileGenerics(List<Map<?, ?>> genericMapList, String destination) {
+
+        List<Map<String, String>> stringMapList = new ArrayList<>();
+
+        // Convert the generic key and value types to string data types
+        genericMapList.forEach(genericMap->{
+
+            // Empty map of strings to temporarily hold retrieved string data
+            Map<String, String> temp = new LinkedHashMap<>();
+
+            // Get Map of Generics, stringify the keys and values and put in stringMapList
+            genericMap.entrySet().forEach(map -> {
+                temp.put(String.valueOf(map.getKey()), String.valueOf(map.getValue()));
+            });
+
+            stringMapList.add(temp);
+        });
+
+        // write to csv at the specified destination
+        writeCsvFile(stringMapList, destination);
     }
 
 
