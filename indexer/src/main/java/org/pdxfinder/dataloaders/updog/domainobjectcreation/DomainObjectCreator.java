@@ -614,6 +614,7 @@ public class DomainObjectCreator {
 
         MolecularData ma = new MolecularData();
         try {
+            ma.setCytogeneticsResult(getStringFromRowAndColumn(row, "marker_status"));
             ma.setMarker(marker.getHgncSymbol());
         } catch (Exception e) {
         }
