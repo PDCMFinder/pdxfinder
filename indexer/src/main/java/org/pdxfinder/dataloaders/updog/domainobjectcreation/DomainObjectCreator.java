@@ -593,19 +593,19 @@ public class DomainObjectCreator {
     private MolecularData getExpressionProperties(Row row, Marker marker){
 
         MolecularData ma = new MolecularData();
-        ma.setChromosome("");
-        ma.setSeqStartPosition("");
-        ma.setSeqEndPosition("");
-        ma.setRnaSeqCoverage("");
-        ma.setRnaSeqFPKM("");
-        ma.setRnaSeqTPM("");
-        ma.setRnaSeqCount("");
-        ma.setAffyHGEAProbeId("");
-        ma.setAffyHGEAExpressionValue("");
-        ma.setIlluminaHGEAProbeId("");
-        ma.setIlluminaHGEAExpressionValue("");
-        ma.setGenomeAssembly("");
-        ma.setZscore("");
+        ma.setChromosome(getStringFromRowAndColumn(row, TSV.Expression.chromosome.name()));
+        ma.setSeqStartPosition(getStringFromRowAndColumn(row, TSV.Expression.seq_start_position.name()));
+        ma.setSeqEndPosition(getStringFromRowAndColumn(row, TSV.Expression.seq_end_position.name()));
+        ma.setRnaSeqCoverage(getStringFromRowAndColumn(row, TSV.Expression.rnaseq_coverage.name()));
+        ma.setRnaSeqFPKM(getStringFromRowAndColumn(row, TSV.Expression.rnaseq_fpkm.name()));
+        ma.setRnaSeqTPM(getStringFromRowAndColumn(row, TSV.Expression.rnaseq_tpm.name()));
+        ma.setRnaSeqCount(getStringFromRowAndColumn(row, TSV.Expression.rnaseq_count.name()));
+        ma.setAffyHGEAProbeId(getStringFromRowAndColumn(row, TSV.Expression.affy_hgea_probe_id.name()));
+        ma.setAffyHGEAExpressionValue(getStringFromRowAndColumn(row, TSV.Expression.affy_hgea_expression_value.name()));
+        ma.setIlluminaHGEAProbeId(getStringFromRowAndColumn(row, TSV.Expression.illumina_hgea_probe_id.name()));
+        ma.setIlluminaHGEAExpressionValue(getStringFromRowAndColumn(row, TSV.Expression.illumina_hgea_expression_value.name()));
+        ma.setGenomeAssembly(getStringFromRowAndColumn(row, TSV.Expression.genome_assembly.name()));
+        ma.setZscore(getStringFromRowAndColumn(row, TSV.Expression.z_score.name()));
         ma.setMarker(marker.getHgncSymbol());
         return  ma;
     }
