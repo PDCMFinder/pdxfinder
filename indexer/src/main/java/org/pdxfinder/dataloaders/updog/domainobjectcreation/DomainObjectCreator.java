@@ -328,7 +328,7 @@ public class DomainObjectCreator {
     private void createMutationData(Map<String, Table> pdxDataTables){
         Table mutationTable = pdxDataTables.get("mut.tsv");
         if(mutationTable != null){
-            createMolecularCharacterization(mutationTable, "mutation");
+            createMolecularData(mutationTable, "mutation");
         }
         else{
             Map<String, Object> models = domainObjects.get(MODELS);
@@ -338,7 +338,7 @@ public class DomainObjectCreator {
                 mutationTable = pdxDataTables.get(mutationModelId);
                 if(mutationTable != null){
                     log.info(modelCreation.getSourcePdxId());
-                    createMolecularCharacterization(mutationTable, "mutation");
+                    createMolecularData(mutationTable, "mutation");
                 }
             }
         }
@@ -347,7 +347,7 @@ public class DomainObjectCreator {
     private void createCnaData(Map<String, Table> pdxDataTables){
         Table cnaTable = pdxDataTables.get("cna.tsv");
         if (cnaTable != null) {
-            createMolecularCharacterization(cnaTable, "copynumberalteration");
+            createMolecularData(cnaTable, "copynumberalteration");
         } else {
             Map<String, Object> models = domainObjects.get(MODELS);
             for(Map.Entry<String, Object> entry : models.entrySet()){
@@ -356,7 +356,7 @@ public class DomainObjectCreator {
                 cnaTable = pdxDataTables.get(cnaModelId);
                 if(cnaTable != null){
                     log.info(modelCreation.getSourcePdxId());
-                    createMolecularCharacterization(cnaTable, "copynumberalteration");
+                    createMolecularData(cnaTable, "copynumberalteration");
                 }
             }
         }
@@ -365,7 +365,7 @@ public class DomainObjectCreator {
     private void createExpressionData(Map<String, Table> pdxDataTables){
         Table expressionTable = pdxDataTables.get("expression.tsv");
         if (expressionTable != null) {
-            createMolecularCharacterization(expressionTable, "expression");
+            createMolecularData(expressionTable, "expression");
         } else {
             Map<String, Object> models = domainObjects.get(MODELS);
             for(Map.Entry<String, Object> entry : models.entrySet()){
@@ -374,7 +374,7 @@ public class DomainObjectCreator {
                 expressionTable = pdxDataTables.get(cnaModelId);
                 if(expressionTable != null){
                     log.info(modelCreation.getSourcePdxId());
-                    createMolecularCharacterization(expressionTable, "expression");
+                    createMolecularData(expressionTable, "expression");
                 }
             }
         }
@@ -383,10 +383,10 @@ public class DomainObjectCreator {
     private void createCytogeneticsData(Map<String, Table> pdxDataTables){
         Table cytoTable = pdxDataTables.get("cytogenetics-Sheet1.tsv");
         if (cytoTable != null)
-            createMolecularCharacterization(cytoTable, "cytogenetics");
+            createMolecularData(cytoTable, "cytogenetics");
     }
 
-    private void createMolecularCharacterization(Table table, String molcharType){
+    private void createMolecularData(Table table, String molcharType){
         MolecularCharacterization molecularCharacterization = getMolcharByType(table.row(0), molcharType);
         MarkerAssociation markerAssociation = new MarkerAssociation();
         for (Row row : table) {
@@ -509,7 +509,7 @@ public class DomainObjectCreator {
             molecularCharacterization.getPlatform().getName());
         if (nodeSuggestionDTO.getNode() != null) {
             logMarkerSuggestions(nodeSuggestionDTO);
-            molecularData = createMolecularCharacterization(
+            molecularData = createMolecularData(
                 molecularCharacterization.getType(),
                 row,
                 (Marker) nodeSuggestionDTO.getNode());
@@ -522,7 +522,7 @@ public class DomainObjectCreator {
             log.error(nodeSuggestionDTO.getLogEntity().getMessage());
     }
 
-    private MolecularData createMolecularCharacterization(String type, Row row, Marker marker) {
+    private MolecularData createMolecularData(String type, Row row, Marker marker) {
         MolecularData molecularData;
         switch (type) {
             case "mutation":

@@ -70,7 +70,7 @@ public class Updog {
     }
 
     private Map<String, Table> readOmicsTablesFromPath(Path updogProviderDirectory) {
-        PathMatcher allTsvFiles = FileSystems.getDefault().getPathMatcher("glob:**/{cyto,mut,cna}/*.tsv");
+        PathMatcher allTsvFiles = FileSystems.getDefault().getPathMatcher("glob:**/{cyto,mut,cna,expression}/*.tsv");
         return reader.readAllOmicsFilesIn(updogProviderDirectory, allTsvFiles);
     }
 

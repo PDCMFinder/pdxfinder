@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public class Reader {
 
     private static final Logger log = LoggerFactory.getLogger(Reader.class);
-    private static final List<String> allowedOmicData = Arrays.asList("cna", "cyto", "mut");
+    private static final List<String> allowedOmicData = Arrays.asList("cna", "cyto", "mut", "expression");
     private static final List<String> allowedTreatmentData = Arrays.asList("treatment", "drug");
 
     Map<String, Table> readAllTsvFilesIn(Path targetDirectory, PathMatcher filter) {
