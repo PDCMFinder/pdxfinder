@@ -601,8 +601,6 @@ public class TransformerService {
     }
 
 
-
-
     public String getPassageByModelIDAndSampleID(String modelID, String sampleID) {
 
         PdmrPdxInfo pdmrPdxInfos = transPdxInfoRepository.findByModelID(modelID);
@@ -724,5 +722,6 @@ public class TransformerService {
 
         return mapToString;
     }
+
 
 }

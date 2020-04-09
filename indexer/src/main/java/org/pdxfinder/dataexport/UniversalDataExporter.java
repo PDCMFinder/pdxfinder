@@ -38,12 +38,13 @@ public class UniversalDataExporter {
     private List<List<String>> pdxModelValidationSheetDataExport;
     private List<List<String>> samplePlatformDescriptionSheetDataExport;
     private List<List<String>> sharingAndContactSheetDataExport;
-    private List<List<String>> cytogeneticsSheetDataExport;
     private List<List<String>> loaderRelatedDataSheetDataExport;
     private List<List<String>> drugDosingSheetDataExport;
 
     private List<List<String>> mutationSheetDataExport;
     private List<List<String>> cnaSheetDataExport;
+    private List<List<String>> cytogeneticsSheetDataExport;
+    private List<List<String>> expressionSheetDataExport;
 
     private Group ds;
 
@@ -69,6 +70,8 @@ public class UniversalDataExporter {
 
         mutationSheetDataExport = new ArrayList<>();
         cnaSheetDataExport = new ArrayList<>();
+        cytogeneticsSheetDataExport = new ArrayList<>();
+        expressionSheetDataExport = new ArrayList<>();
     }
 
     public Group getDs() {
@@ -101,44 +104,45 @@ public class UniversalDataExporter {
 
         initSamplePlatformDescription();
 
-        initMutationData();
-        initCNAData();
-        initCytoData();
-
+        initOmicData();
     }
 
     public void export(String exportDir) throws IOException {
 
-        XSSFWorkbook metadataWorkbook = getWorkbook(templateDir+"/metadata_template.xlsx");
-        XSSFWorkbook samplePlatformWorkbook = getWorkbook(templateDir+"/sampleplatform_template.xlsx");
-        XSSFWorkbook mutationWorkbook = getWorkbook(templateDir+"/mutation_template.xlsx");
-        XSSFWorkbook cnaWorkbook = getWorkbook(templateDir+"/cna_template.xlsx");
+        XSSFWorkbook metadataTemplate = getWorkbook(templateDir+"/metadata_template.xlsx");
+        XSSFWorkbook samplePlatformTemplate = getWorkbook(templateDir+"/sampleplatform_template.xlsx");
+        XSSFWorkbook mutationTemplate = getWorkbook(templateDir+"/mutation_template.xlsx");
+        XSSFWorkbook cnaTemplate = getWorkbook(templateDir+"/cna_template.xlsx");
+        XSSFWorkbook cytoTemplate = getWorkbook(templateDir + "/cytogenetics_template.xlsx");
+        XSSFWorkbook exprTemplate = getWorkbook(templateDir + "/expression_template.xlsx");
 
-        if (metadataWorkbook != null && noMetaDataSheetsAreNull()) {
-            updateSheetWithData(metadataWorkbook.getSheetAt(1), patientSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(2), patientTumorSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(3), pdxModelSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(4), pdxModelValidationSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(5), sharingAndContactSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(6), loaderRelatedDataSheetDataExport, 6, 2);
+        if (metadataTemplate != null && noMetaDataSheetsAreNull()) {
+            updateSheetWithData(metadataTemplate.getSheetAt(1), patientSheetDataExport, 6, 2);
+            updateSheetWithData(metadataTemplate.getSheetAt(2), patientTumorSheetDataExport, 6, 2);
+            updateSheetWithData(metadataTemplate.getSheetAt(3), pdxModelSheetDataExport, 6, 2);
+            updateSheetWithData(metadataTemplate.getSheetAt(4), pdxModelValidationSheetDataExport, 6, 2);
+            updateSheetWithData(metadataTemplate.getSheetAt(5), sharingAndContactSheetDataExport, 6, 2);
+            updateSheetWithData(metadataTemplate.getSheetAt(6), loaderRelatedDataSheetDataExport, 6, 2);
         }
 
-        if (samplePlatformWorkbook != null && samplePlatformDescriptionSheetDataExport != null) {
-            updateSheetWithData(samplePlatformWorkbook.getSheetAt(0), samplePlatformDescriptionSheetDataExport, 6, 1);
+        if (samplePlatformTemplate != null && samplePlatformDescriptionSheetDataExport != null) {
+            updateSheetWithData(samplePlatformTemplate.getSheetAt(0), samplePlatformDescriptionSheetDataExport, 6, 1);
         }
 
         Path exportProviderDir = Paths.get(exportDir + "/" + ds.getAbbreviation());
         Files.createDirectories(exportProviderDir);
 
         try {
-            if(metadataWorkbook != null && noMetaDataSheetsAreNull()) {
-                writeFileFromWorkbook(metadataWorkbook, exportProviderDir + "/metadata.xlsx");
+            if(metadataTemplate != null && noMetaDataSheetsAreNull()) {
+                writeFileFromWorkbook(metadataTemplate, exportProviderDir + "/metadata.xlsx");
             }
-            if(samplePlatformWorkbook != null && samplePlatformDescriptionSheetDataExport != null) {
-                writeFileFromWorkbook(samplePlatformWorkbook, exportProviderDir + "/sampleplatform.xlsx");
+            if(samplePlatformTemplate != null && samplePlatformDescriptionSheetDataExport != null) {
+                writeFileFromWorkbook(samplePlatformTemplate, exportProviderDir + "/sampleplatform.xlsx");
             }
-            writeOmicFileFromWorkbook(mutationWorkbook, mutationSheetDataExport, exportProviderDir + "/mut/", "_mut.tsv");
-            writeOmicFileFromWorkbook(cnaWorkbook, cnaSheetDataExport, exportProviderDir + "/cna/", "_cna.tsv" );
+            writeOmicFileFromWorkbook(mutationTemplate, mutationSheetDataExport, exportProviderDir + "/mut/", "_mut.tsv");
+            writeOmicFileFromWorkbook(cnaTemplate, cnaSheetDataExport, exportProviderDir + "/cna/", "_cna.tsv" );
+            writeOmicFileFromWorkbook(cytoTemplate, cytogeneticsSheetDataExport, exportProviderDir + "/cyto/", "_cyto.tsv" );
+            writeOmicFileFromWorkbook(exprTemplate, expressionSheetDataExport, exportProviderDir + "/expr/", "_expr.tsv");
         } catch (Exception e) {
             log.error("error", e);
         }
@@ -159,7 +163,7 @@ public class UniversalDataExporter {
     }
 
     private void writeOmicFileFromWorkbook(XSSFWorkbook omicWorkbook,List<List<String>> exportSheet, String fileLocation, String suffix ) throws IOException {
-        if ((omicWorkbook != null) && (exportSheet != null)) {
+        if (omicWorkbook != null && exportSheet != null && !exportSheet.isEmpty()) {
             if (!Paths.get(fileLocation).toFile().exists()) {
                 Files.createDirectory(Paths.get(fileLocation));
             }
@@ -205,7 +209,6 @@ public class UniversalDataExporter {
         List<Patient> patients = dataImportService.findPatientTumorAtCollectionDataByDS(ds);
 
         for(Patient patient : patients){
-
 
             String patientId = patient.getExternalId();
 
@@ -403,30 +406,19 @@ public class UniversalDataExporter {
 
     }
 
-    public void initMutationData(){
-
-        initGenomicData(mutationSheetDataExport, "mutation");
-
-    }
-
-    public void initCNAData(){
-
-        initGenomicData(cnaSheetDataExport, "copy number alteration");
-    }
-
-   public void initCytoData() {
-       initGenomicData(cytogeneticsSheetDataExport, "cytogenetics");
+    public void initOmicData(){
+    initGenomicData(mutationSheetDataExport, "mutation");
+    initGenomicData(cnaSheetDataExport, "copy number alteration");
+    initGenomicData(cytogeneticsSheetDataExport, "cytogenetics");
+    initGenomicData(expressionSheetDataExport, "expression");
    }
 
 
     private void initGenomicData(List<List<String>> sheetData, String molcharType){
 
-
         List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(ds.getAbbreviation());
 
-        for(ModelCreation m: models){
-
-            ModelCreation model = dataImportService.
+        for(ModelCreation m: models){ ModelCreation model = dataImportService.
               findModelWithMolecularDataByDSAndIdAndMolcharType(
                   ds.getAbbreviation(),
                   m.getSourcePdxId(),
@@ -440,9 +432,7 @@ public class UniversalDataExporter {
                 initPatientGenomicData(model, sheetData);
                 initXenoGenomicData(model, sheetData);
             }
-
         }
-
     }
 
     private void insertOmicDataToSheet(
@@ -455,22 +445,16 @@ public class UniversalDataExporter {
         List<List<String>> sheetData){
 
         for(MarkerAssociation ma: mc.getMarkerAssociations()){
-
-            List<String> rowData = new ArrayList<>();
-
             List<MolecularData> molecularData;
             try{
-                ma.decodeMolecularData();
-                molecularData = ma.getMolecularDataList();
+                molecularData = ma.decodeMolecularData();
             }
-            catch (Exception e){
+            catch(Exception e){
                 log.error("No molecular data");
                 molecularData = new ArrayList<>();
             }
-
             for(MolecularData md : molecularData){
-
-                rowData.add(model.getDataSource());
+                List<String> rowData = new ArrayList<>();
                 rowData.add(model.getSourcePdxId());
                 rowData.add(sampleId);
                 rowData.add(sampleOrigin);
@@ -531,8 +515,16 @@ public class UniversalDataExporter {
                     rowData.add(md.getCnaPicnicValue());
                     rowData.add(md.getGenomeAssembly());
                     rowData.add(mc.getPlatform().getName());
-                }
+                } else if(molcharType.equals("cytogenetics")){
+                    rowData.add(md.getMarker());
+                    rowData.add(md.getCytogeneticsResult());
+                    rowData.add(md.getMarkerStatusComment());
+                    rowData.add(mc.getPlatform().getName());
+                    rowData.add("");
+                    rowData.add("");
+                } else if(molcharType.equals("expression")) {
 
+                }
                 sheetData.add(rowData);
             }
         }
@@ -568,12 +560,12 @@ public class UniversalDataExporter {
         }
     }
 
-    public void readSheetAndWriteOmicTsvFile(Sheet sheet, List<List<String>> data, String omicTsvDir) throws IOException {
+    public void readSheetAndWriteOmicTsvFile(Sheet xlsxTemplate, List<List<String>> exportSheet, String omicTsvDir) throws IOException {
 
         try(FileWriter fileWriter = new FileWriter(omicTsvDir)) {
-            if (data != null) {
-                copyHeadersFromSheetToTsv(sheet, data, fileWriter);
-                writeDataToTsv(sheet, data, fileWriter);
+            if (exportSheet != null) {
+                copyHeadersFromSheetToTsv(xlsxTemplate, exportSheet, fileWriter);
+                writeDataToTsv(xlsxTemplate, exportSheet, fileWriter);
             }
         } catch(Exception e) {
             log.error(String.format("IO Error from reading omic TSV %s",e.toString()));
@@ -581,12 +573,12 @@ public class UniversalDataExporter {
     }
 
 
-    private void copyHeadersFromSheetToTsv(Sheet sheet, List<List<String>> data, FileWriter fileWriter) throws IOException {
+    private void copyHeadersFromSheetToTsv(Sheet xlsxTemplate, List<List<String>> exportSheet, FileWriter fileWriter) throws IOException {
 
-        for (int j = 0; j < data.get(0).size(); j++) {
-            Cell cell = null;
+        for (int j = 0; j < xlsxTemplate.getRow(0).getLastCellNum(); j++) {
+            Cell cell;
             try {
-                cell = sheet.getRow(0).getCell(j);
+                cell = xlsxTemplate.getRow(0).getCell(j);
                 fileWriter.append(cell.toString());
                 fileWriter.append("\t");
             } catch (Exception e) {
@@ -873,7 +865,6 @@ public class UniversalDataExporter {
 
     private void initPatientGenomicData(ModelCreation model, List<List<String>> sheetData){
 
-        //check for molchars on patient sample
         if(model.getSample() != null && model.getSample().getMolecularCharacterizations() != null){
 
             String sampleId = model.getSample().getSourceSampleId();
@@ -882,7 +873,7 @@ public class UniversalDataExporter {
 
                 insertOmicDataToSheet(model, sampleId, patientOrigin, mc.getType(), null, mc, sheetData);
             }
-        }
+        } else System.out.printf(String.format("No sample found for model %s \n", model.getId() ));
     }
 
     private void initXenoGenomicData(ModelCreation model, List<List<String>> sheetData){
@@ -902,7 +893,7 @@ public class UniversalDataExporter {
                     }
                 }
             }
-        }
+        } else System.out.printf(String.format("No specimen found for model %s \n", model.getId()));
     }
 
 

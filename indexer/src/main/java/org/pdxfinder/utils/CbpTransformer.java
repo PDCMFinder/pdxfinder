@@ -1,11 +1,14 @@
 package org.pdxfinder.utils;
 
+import org.checkerframework.checker.units.qual.A;
 import org.pdxfinder.dataexport.UniversalDataExporter;
 import org.pdxfinder.graph.dao.Group;
+import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -20,6 +23,8 @@ public class CbpTransformer {
 
     @Autowired
     private UtilityService utilityService = new UtilityService();
+    @Autowired
+    private DataImportService dataImportService;
     private UniversalDataExporter universalDataExporter = new UniversalDataExporter();
 
     private static String notSpecified = "Not Specified";

@@ -28,6 +28,9 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
     @Query("MATCH (t:Marker) WHERE t.ensembleId = {id} RETURN t")
     Marker findByEnsemblId(@Param("id") String id);
 
+    @Query("MATCH (t:Marker) WHERE t.ncbiGeneId = {id} return t")
+    Marker findByNcbiGeneId(@Param("id") String id);
+
     @Query("MATCH (m:Marker) RETURN m")
     Collection<Marker> findAllMarkers();
 

@@ -103,8 +103,8 @@ public class FinderTransformer {
 
     public void setDefaultDirectories(String defaultDirectory) {
         this.defaultDirectory = defaultDirectory;
-         defaultTemplateDirectory = defaultDirectory + "/template";
-         defaultExportDirectory = defaultDirectory + "/export";
+        this.defaultTemplateDirectory = defaultDirectory + "/template";
+        this.defaultExportDirectory = defaultDirectory + "/export";
     }
     public void setDefaultDirectory(String defaultDirectory){
         this.defaultDirectory = defaultDirectory;
