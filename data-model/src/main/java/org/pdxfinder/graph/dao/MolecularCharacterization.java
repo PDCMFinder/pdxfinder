@@ -89,6 +89,7 @@ public class MolecularCharacterization {
     }
 
     public MarkerAssociation getFirstMarkerAssociation() {
+        if(markerAssociations == null || markerAssociations.size() == 0) return null;
         return markerAssociations.get(0);
     }
 

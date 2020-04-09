@@ -382,21 +382,34 @@ public class DomainObjectCreator {
 
     private void createCytogeneticsData(Map<String, Table> pdxDataTables){
         Table cytoTable = pdxDataTables.get("cytogenetics-Sheet1.tsv");
-        if (cytoTable != null)
+        if (cytoTable != null){
+            log.info("Creating cytogenetics");
             createMolecularData(cytoTable, "cytogenetics");
+        }
     }
 
     private void createMolecularData(Table table, String molcharType){
-        MolecularCharacterization molecularCharacterization = getMolcharByType(table.row(0), molcharType);
-        MarkerAssociation markerAssociation = new MarkerAssociation();
+
+
+        MarkerAssociation markerAssociation = null;
         for (Row row : table) {
-            MolecularData molecularData = createMolecularDataObject(molecularCharacterization, row);
-            if (molecularData.hasMarker())
-                markerAssociation.addMolecularData(molecularData);
+
+            if(row.getRowNumber() != 0){
+                MolecularCharacterization molecularCharacterization = getMolcharByType(row, molcharType);
+                markerAssociation = molecularCharacterization.getFirstMarkerAssociation();
+                if(markerAssociation == null){
+                    markerAssociation = new MarkerAssociation();
+                    molecularCharacterization.addMarkerAssociation(markerAssociation);
+                }
+
+
+                MolecularData molecularData = createMolecularDataObject(molecularCharacterization, row);
+                if (molecularData.hasMarker())
+                    markerAssociation.addMolecularData(molecularData);
+
+            }
+
         }
-        molecularCharacterization.addMarkerAssociation(markerAssociation);
-        molecularCharacterization.setMarkers(getMarkers(markerAssociation));
-        addDomainObject("molecular_characterization", molcharType, molecularCharacterization);
     }
 
     private MolecularCharacterization getMolcharByType(Row row, String molCharType) {
@@ -430,7 +443,11 @@ public class DomainObjectCreator {
 
         String modelId = row.getString(TSV.Mutation.model_id.name());
         ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
-        if (modelCreation == null) throw new NullPointerException();
+        if (modelCreation == null)
+        {
+            log.error(modelId);
+            throw new NullPointerException();
+        }
 
         return modelCreation.getSample();
     }
@@ -864,8 +881,10 @@ public class DomainObjectCreator {
     }
 
     private void encodeMolecularDataFor(MolecularCharacterization mc) {
-        if (mc.hasMarkerAssociations())
+        if (mc.hasMarkerAssociations()) {
             mc.getFirstMarkerAssociation().encodeMolecularData();
+            mc.setMarkers(getMarkers(mc.getFirstMarkerAssociation()));
+        }
     }
 
     private TreatmentProtocol getTreatmentProtocol(Row row){
