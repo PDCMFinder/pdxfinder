@@ -322,7 +322,7 @@ public class DomainObjectCreator {
         createMutationData(pdxDataTables);
         createCnaData(pdxDataTables);
         createCytogeneticsData(pdxDataTables);
-        createExpressionData(pdxDataTables);
+        //createExpressionData(pdxDataTables);
     }
 
     private void createMutationData(Map<String, Table> pdxDataTables){
@@ -394,7 +394,7 @@ public class DomainObjectCreator {
         MarkerAssociation markerAssociation = null;
         for (Row row : table) {
 
-            if(row.getRowNumber() != 0){
+            if(row.getRowNumber() != 1){
                 MolecularCharacterization molecularCharacterization = getMolcharByType(row, molcharType);
                 markerAssociation = molecularCharacterization.getFirstMarkerAssociation();
                 if(markerAssociation == null){
