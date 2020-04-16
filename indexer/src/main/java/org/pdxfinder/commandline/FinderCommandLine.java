@@ -74,8 +74,12 @@ public class FinderCommandLine implements Callable<Integer> {
         @Option(names = {"--spring.data.neo4j.uri"}, paramLabel = "Neo4j DB Directory", description = "Embedded Neo4j Database location", required = false, hidden = true)
         private String springDataNeo4jUri;
 
+        @Option(names = {"--db-refresh"}, paramLabel = "Neo4j DB Delete and ReInitialize", description = "clear off database and intialize cache before loading new data.", required = false, hidden = true)
+        private String debReload;
+
         @Option(names = {"--spring.datasource.url"}, paramLabel = "H2 DB Directory", description = "Embedded H2 Database location", required = false, hidden = true)
         private String springDatasourceUrl;
+
 
         @ArgGroup(multiplicity = "0..1")
         Exclusive datasetRequested = new Exclusive();
