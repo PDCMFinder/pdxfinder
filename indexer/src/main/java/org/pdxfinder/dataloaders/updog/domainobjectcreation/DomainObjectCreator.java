@@ -295,9 +295,14 @@ public class DomainObjectCreator {
                 String patientId = getStringFromRowAndColumn(row, TSV.Metadata.patient_id.name());
                 Patient patient = (Patient) getDomainObject(PATIENTS, patientId);
                 if(patient != null) {
-                    PatientSnapshot patientSnapshot = patient.getLastSnapshot();
-                    TreatmentProtocol treatmentProtocol = getTreatmentProtocol(row);
-                    patientSnapshot.addTreatmentProtocol(treatmentProtocol);
+                    try{
+                        PatientSnapshot patientSnapshot = patient.getLastSnapshot();
+                        TreatmentProtocol treatmentProtocol = getTreatmentProtocol(row);
+                        patientSnapshot.addTreatmentProtocol(treatmentProtocol);
+                    }
+                    catch (Exception e){
+                        log.error("Exception when loading treatment for patient {}",patientId);
+                    }
                 }
            }
         }
