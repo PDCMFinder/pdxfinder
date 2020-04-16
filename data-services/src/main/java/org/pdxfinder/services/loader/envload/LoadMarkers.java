@@ -39,6 +39,8 @@ public class LoadMarkers {
         String symbol;
         String hgncId;
         String ensemblId;
+        String[] entrezId;
+
 
         int rows = 0;
 
@@ -81,6 +83,12 @@ public class LoadMarkers {
                         synonyms = rowData[5].split(", ");
                     } else {
                         synonyms = new String[0];
+                    }
+
+                    if (rowData.length > 7 && rowData[7] != null && !rowData[7].isEmpty()) {
+                        entrezId= rowData[7].split(", ");
+                    } else {
+                        entrezId = new String[0];
                     }
 
                     if (rowData.length > 9 && rowData[9] != null && !rowData[9].isEmpty()) {

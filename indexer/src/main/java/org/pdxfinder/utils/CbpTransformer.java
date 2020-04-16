@@ -1,14 +1,16 @@
 package org.pdxfinder.utils;
 
-import org.checkerframework.checker.units.qual.A;
+
 import org.pdxfinder.dataexport.UniversalDataExporter;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.OmicTransformationService;
 import org.pdxfinder.services.UtilityService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -21,10 +23,14 @@ import java.util.Map;
 @Component
 public class CbpTransformer {
 
+    private static final Logger log = LoggerFactory.getLogger(CbpTransformer.class);
+
     @Autowired
     private UtilityService utilityService = new UtilityService();
     @Autowired
     private DataImportService dataImportService;
+    @Autowired
+    private OmicTransformationService omicTransformationService;
     private UniversalDataExporter universalDataExporter = new UniversalDataExporter();
 
     private static String notSpecified = "Not Specified";
@@ -51,6 +57,12 @@ public class CbpTransformer {
             universalDataExporter.export(exportDir.getAbsolutePath());
     }
 
+    public void convertListOfEntrez(List<String> entrezIds){
+        entrezIds.forEach(e -> {
+            log.info(omicTransformationService.ncbiGeneIdtoHgncSymbol(e));
+        });
+    }
+
     private void cbpMapsToSheetsByDataType(List<Map<String, Object>> listMapTable, cbioType dataType){
 
         List<List<String>> sheet;
@@ -74,7 +86,8 @@ public class CbpTransformer {
             row.add(notSpecified);
             row.add(notSpecified);
             row.add(notSpecified);
-            addBlanksToList(row,10);
+            row.add(omicTransformationService.ncbiGeneIdtoHgncSymbol(String.valueOf(f.get("entrezGeneId"))));
+            addBlanksToList(row,9);
             row.add(f.get("chr").toString());
             row.add(f.get("startPosition").toString());
             row.add(f.get("referenceAllele").toString());
@@ -98,7 +111,8 @@ public class CbpTransformer {
             row.add(notSpecified);
             row.add(notSpecified);
             row.add(notSpecified);
-            addBlanksToList(row,4);
+            addBlanksToList(row,3);
+            row.add(omicTransformationService.ncbiGeneIdtoHgncSymbol(String.valueOf(f.get("entrezGeneId"))));
             row.add(f.get("entrezGeneId").toString());
             addBlanksToList(row, 6);
             row.add(f.get("alteration").toString());

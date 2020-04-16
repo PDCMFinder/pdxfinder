@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class FinderTransformer {
@@ -32,14 +33,22 @@ public class FinderTransformer {
        this.cbioTransformer = cbioTransformer;
     }
 
-    void run(File dataDirectory, File overideTemplateDir, File overideExportDir, File ingestFile, String cmdCbioType) throws IOException {
-        resolveRootDir(dataDirectory);
-        resolveTemplateDir(overideTemplateDir);
-        resolveExportDir(overideExportDir);
+    void run(File dataDirectory, File overideTemplateDir, File overideExportDir, File ingestFile, String cmdCbioType, List<String> entrezToHugo) throws IOException {
+        if(entrezToHugo != null && !entrezToHugo.isEmpty()){
+            convertGenes(entrezToHugo);
+        } else {
+            resolveRootDir(dataDirectory);
+            resolveTemplateDir(overideTemplateDir);
+            resolveExportDir(overideExportDir);
 
-        if (cmdCbioType != null && !cmdCbioType.isEmpty()){
-           runCbioportal(ingestFile, cmdCbioType);
+            if (cmdCbioType != null && !cmdCbioType.isEmpty()) {
+                runCbioportal(ingestFile, cmdCbioType);
+            }
         }
+    }
+
+    private void convertGenes(List<String> entrezGenes){
+        cbioTransformer.convertListOfEntrez(entrezGenes);
     }
 
     private void resolveRootDir(File dataDirectory) throws IOException {

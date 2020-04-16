@@ -173,8 +173,7 @@ public class DataExportTest extends BaseTest {
           .thenReturn(getModelListForTest().get(0));
 
         universalDataExporter.setDs(providerGroup);
-        universalDataExporter.initMutationData();
-        universalDataExporter.initCNAData();
+        universalDataExporter.initOmicData();
 
         List<List<String>> mutationData = universalDataExporter.getMutationSheetDataExport();
         List<List<String>> cnaData = universalDataExporter.getCnaSheetDataExport();

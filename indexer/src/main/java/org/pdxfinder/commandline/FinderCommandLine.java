@@ -260,9 +260,16 @@ public class FinderCommandLine implements Callable<Integer> {
                         " Only arguments supported 'mut' or 'gistic' ")
             private String cbioType;
 
+            @Option(
+                    names = {"-entrez2hugo"},
+                    description = "Convert entrez id's to hugo",
+                    split = " ")
+            private List<String> entrezToHugo;
+
             public String getCbioDataType() {
                 return cbioType;
             }
+            public List<String> getEntrezToHugo() { return entrezToHugo;}
         }
 
         @Override
@@ -273,7 +280,8 @@ public class FinderCommandLine implements Callable<Integer> {
                 templateDirectory,
                 exportDirectory,
                 ingestFile,
-                exclusiveArguments.getCbioDataType()
+                exclusiveArguments.getCbioDataType(),
+                    exclusiveArguments.getEntrezToHugo()
             );
             return 0;
         }

@@ -71,6 +71,7 @@ public class FinderCommandLineTest extends BaseTest {
                 any(null),
                 any(null),
                 any(File.class),
+                any(null),
                 any(null)
         );
         verifyNoMoreInteractions(this.finderTransformer);
@@ -85,6 +86,7 @@ public class FinderCommandLineTest extends BaseTest {
                 eq(null),
                 eq(null),
                 any(File.class),
+                any(null),
                 any(null)
         );
         verifyNoMoreInteractions(this.finderTransformer);
