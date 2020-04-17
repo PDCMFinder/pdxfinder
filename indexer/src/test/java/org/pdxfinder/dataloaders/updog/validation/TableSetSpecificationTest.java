@@ -1,7 +1,8 @@
-package org.pdxfinder.dataloaders.updog;
+package org.pdxfinder.dataloaders.updog.validation;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
+import org.pdxfinder.dataloaders.updog.validation.TableSetSpecification;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,11 +19,10 @@ public class TableSetSpecificationTest {
         .of("file_1.tsv", "file_2.tsv")
         .collect(Collectors.toSet());
 
-    private final Pair<String, String> REQUIRED_COLUMN_1 = Pair.of("table.tsv", "column_1");
-    private final Pair<String, String> REQUIRED_COLUMN_2 = Pair.of("table.tsv", "column_2");
+    private final ColumnReference REQUIRED_COLUMN_1 = ColumnReference.of("table.tsv", "column_1");
+    private final ColumnReference REQUIRED_COLUMN_2 = ColumnReference.of("table.tsv", "column_2");
 
-    @Test
-    public void builderMethods_givenInstantiation_allReturnInstanceOfThisClass() {
+    @Test public void builderMethods_givenInstantiation_allReturnInstanceOfThisClass() {
         TableSetSpecification tableSetSpecification = TableSetSpecification.create();
         assertThat(tableSetSpecification, isA(TableSetSpecification.class));
     }
@@ -55,7 +55,7 @@ public class TableSetSpecificationTest {
         assertEquals(
             expected,
             TableSetSpecification.create()
-                .addRequiredColumns(new HashSet<>(Arrays.asList(REQUIRED_COLUMN_1, REQUIRED_COLUMN_2)))
+                .addRequiredColumns(new HashSet<ColumnReference>(Arrays.asList(REQUIRED_COLUMN_1, REQUIRED_COLUMN_2)))
         );
     }
 

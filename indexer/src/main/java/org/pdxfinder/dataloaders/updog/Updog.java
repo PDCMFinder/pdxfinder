@@ -2,9 +2,13 @@ package org.pdxfinder.dataloaders.updog;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
+import org.pdxfinder.dataloaders.updog.validation.OmicValidationRuleset;
+import org.pdxfinder.dataloaders.updog.validation.PdxValidationRuleset;
+import org.pdxfinder.dataloaders.updog.validation.TableSetSpecification;
+import org.pdxfinder.dataloaders.updog.validation.ValidationError;
+import org.pdxfinder.dataloaders.updog.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
@@ -88,7 +92,7 @@ public class Updog {
         Map<String, Table> tableSet,
         Set<String> omicTables,
         String provider
-    ){
+    ) {
         TableSetSpecification omicSpecifications = TableSetSpecification.create();
         for (String tableName : omicTables) {
             merge(omicSpecifications, new OmicValidationRuleset().generateForOmicTable(tableName, provider));
@@ -114,7 +118,7 @@ public class Updog {
             mergedTableSetSpecifications.addRequiredColumns(tss.getRequiredColumns());
             mergedTableSetSpecifications.addNonEmptyColumns(tss.getNonEmptyColumns());
             mergedTableSetSpecifications.addUniqueColumns(tss.getUniqueColumns());
-            mergedTableSetSpecifications.addHasRelations(tss.getHasRelations());
+            mergedTableSetSpecifications.addRelations(tss.getHasRelations());
         }
         return mergedTableSetSpecifications;
     }

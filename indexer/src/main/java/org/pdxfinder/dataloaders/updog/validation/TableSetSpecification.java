@@ -1,6 +1,5 @@
-package org.pdxfinder.dataloaders.updog;
+package org.pdxfinder.dataloaders.updog.validation;
 
-import org.apache.commons.lang3.tuple.Pair;
 import tech.tablesaw.api.Table;
 
 import java.util.HashSet;
@@ -11,10 +10,10 @@ import java.util.StringJoiner;
 public class TableSetSpecification {
 
     private Set<String> requiredTables;
-    private Set<Pair<String, String>> requiredColumns;
-    private Set<Pair<String, String>> nonEmptyColumns;
-    private Set<Pair<String, String>> uniqueColumns;
-    private Set<Pair<Pair<String, String>, Pair<String, String>>> relations;
+    private Set<ColumnReference> requiredColumns;
+    private Set<ColumnReference> nonEmptyColumns;
+    private Set<ColumnReference> uniqueColumns;
+    private Set<Relation> relations;
     private String provider = "Not Specified";
 
     private TableSetSpecification() {
@@ -29,18 +28,13 @@ public class TableSetSpecification {
         return new TableSetSpecification();
     }
 
-    public TableSetSpecification addHasRelations(
-        Pair<String, String> leftTable,
-        Pair<String, String> rightTable
-    ) {
-        this.relations.add(Pair.of(leftTable, rightTable));
+    public TableSetSpecification addRelations(Relation relation) {
+        this.relations.add(relation);
         return this;
     }
 
-    public TableSetSpecification addHasRelations(
-        Set<Pair<Pair<String, String>, Pair<String, String>>> relation
-    ) {
-        this.relations.addAll(relation);
+    public TableSetSpecification addRelations(Set<Relation> relations) {
+        this.relations.addAll(relations);
         return this;
     }
 
@@ -49,33 +43,33 @@ public class TableSetSpecification {
         return this;
     }
 
-    public TableSetSpecification addRequiredColumns(Pair<String, String> tableColumn) {
+    public TableSetSpecification addRequiredColumns(ColumnReference tableColumn) {
         this.requiredColumns.add(tableColumn);
         return this;
     }
 
-    public TableSetSpecification addRequiredColumns(Set<Pair<String, String>> tableColumn) {
+    public TableSetSpecification addRequiredColumns(Set<ColumnReference> tableColumn) {
         this.requiredColumns.addAll(tableColumn);
         return this;
     }
 
-    public TableSetSpecification addNonEmptyColumns(Pair<String, String> tableColumn) {
+    public TableSetSpecification addNonEmptyColumns(ColumnReference tableColumn) {
         this.nonEmptyColumns.add(tableColumn);
         return this;
     }
 
-    public TableSetSpecification addNonEmptyColumns(Set<Pair<String, String>> tableColumns) {
+    public TableSetSpecification addNonEmptyColumns(Set<ColumnReference> tableColumns) {
         this.nonEmptyColumns.addAll(tableColumns);
         return this;
     }
 
-    public TableSetSpecification addUniqueColumns(Pair<String, String> tableColumn) {
-        this.uniqueColumns.add(tableColumn);
+    public TableSetSpecification addUniqueColumns(ColumnReference columnReference) {
+        this.uniqueColumns.add(columnReference);
         return this;
     }
 
-    public TableSetSpecification addUniqueColumns(Set<Pair<String, String>> tableColumns) {
-        this.uniqueColumns.addAll(tableColumns);
+    public TableSetSpecification addUniqueColumns(Set<ColumnReference> columnReferences) {
+        this.uniqueColumns.addAll(columnReferences);
         return this;
     }
 
@@ -88,11 +82,11 @@ public class TableSetSpecification {
         return this;
     }
 
-    public Set<Pair<String, String>> getNonEmptyColumns() {
+    public Set<ColumnReference> getNonEmptyColumns() {
         return this.nonEmptyColumns;
     }
 
-    public Set<Pair<String, String>> getUniqueColumns() {
+    public Set<ColumnReference> getUniqueColumns() {
         return this.uniqueColumns;
     }
 
@@ -100,7 +94,7 @@ public class TableSetSpecification {
         return this.requiredTables;
     }
 
-    public Set<Pair<String, String>> getRequiredColumns() {
+    public Set<ColumnReference> getRequiredColumns() {
         return this.requiredColumns;
     }
 
@@ -108,7 +102,7 @@ public class TableSetSpecification {
         return getRequiredColumns() != null;
     }
 
-    public Set<Pair<Pair<String, String>, Pair<String, String>>> getHasRelations() {
+    public Set<Relation> getHasRelations() {
         return this.relations;
     }
 

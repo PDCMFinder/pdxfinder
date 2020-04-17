@@ -1,6 +1,6 @@
-package org.pdxfinder.dataloaders.updog;
+package org.pdxfinder.dataloaders.updog.validation;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -27,21 +27,21 @@ public class Validator {
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        checkAllRequiredTablesPresent(tableSet, tableSetSpecification);
-        if (!validationErrors.isEmpty()) {
+        checkRequiredTablesPresent(tableSet, tableSetSpecification);
+        if (CollectionUtils.isNotEmpty(validationErrors)) {
             log.error(
                 "Not all required tables where present for {}. Aborting further validation",
                 tableSetSpecification.getProvider());
             return validationErrors;
         }
-        checkAllRequiredColumnsPresent(tableSet, tableSetSpecification);
+        checkRequiredColumnsPresent(tableSet, tableSetSpecification);
         checkAllNonEmptyValuesPresent(tableSet, tableSetSpecification);
         checkAllUniqueValuesForDuplicates(tableSet, tableSetSpecification);
         checkRelationsValid(tableSet, tableSetSpecification);
         return validationErrors;
     }
 
-    private void checkAllRequiredTablesPresent(
+    private void checkRequiredTablesPresent(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
@@ -50,25 +50,23 @@ public class Validator {
                 ValidationError.missingFile(f).setProvider(tableSetSpecification.getProvider())));
     }
 
-    private void checkAllRequiredColumnsPresent(
+    private void checkRequiredColumnsPresent(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
         if (tableSetSpecification.hasRequiredColumns()) {
-            createValidationErrorsForMissingColumns(tableSet, tableSetSpecification);
+            addErrorsForMissingColumns(tableSet, tableSetSpecification);
         }
     }
 
-    private void createValidationErrorsForMissingColumns(
+    private void addErrorsForMissingColumns(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        for (Pair<String, String> tableColumn : tableSetSpecification.getRequiredColumns()) {
-            String tableName = tableColumn.getKey();
-            String columnName = tableColumn.getValue();
-            if (tableIsMissingColumn(tableSet, tableName, columnName)) {
+        for (ColumnReference required : tableSetSpecification.getRequiredColumns()) {
+            if (tableIsMissingColumn(tableSet, required.table(), required.column())) {
                 validationErrors.add(ValidationError
-                    .missingColumn(tableName, columnName)
+                    .missingColumn(required.table(), required.column())
                     .setProvider(tableSetSpecification.getProvider()));
             }
         }
@@ -82,16 +80,14 @@ public class Validator {
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        Set<Pair<String, String>> nonEmptyTableColumns = tableSetSpecification.getNonEmptyColumns();
-        for (Pair<String, String> tableColumn : nonEmptyTableColumns) {
-            String tableName = tableColumn.getKey();
-            String columnName = tableColumn.getValue();
-            Table table = tableSet.get(tableName);
+        Set<ColumnReference> nonEmptyTableColumns = tableSetSpecification.getNonEmptyColumns();
+        for (ColumnReference tested : nonEmptyTableColumns) {
+            Table table = tableSet.get(tested.table());
             Table missing = table.where(
-                table.stringColumn(columnName).isMissing());
+                table.stringColumn(tested.column()).isMissing());
             if (missing.rowCount() > 0) {
                 validationErrors.add(ValidationError
-                    .missingRequiredValue(tableName, columnName, missing)
+                    .missingRequiredValue(tested.table(), tested.column(), missing)
                     .setProvider(tableSetSpecification.getProvider()));
             }
         }
@@ -101,15 +97,13 @@ public class Validator {
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        Set<Pair<String, String>> uniqueTableColumns = tableSetSpecification.getUniqueColumns();
-        for (Pair<String, String> tableColumn : uniqueTableColumns) {
-            String tableName = tableColumn.getKey();
-            String columnName = tableColumn.getValue();
-            Table table = tableSet.get(tableName);
-            Set<String> duplicates = findDuplicates(table.stringColumn(columnName).asList());
+        Set<ColumnReference> uniqueTableColumns = tableSetSpecification.getUniqueColumns();
+        for (ColumnReference tested : uniqueTableColumns) {
+            Table table = tableSet.get(tested.table());
+            Set<String> duplicates = findDuplicates(table.stringColumn(tested.column()).asList());
             if (!duplicates.isEmpty()) {
                 validationErrors.add(ValidationError
-                    .duplicateValue(tableName, columnName, duplicates)
+                    .duplicateValue(tested.table(), tested.column(), duplicates)
                     .setProvider(tableSetSpecification.getProvider()));
             }
         }
@@ -129,7 +123,7 @@ public class Validator {
         TableSetSpecification tableSetSpecification
     ) {
         String provider = tableSetSpecification.getProvider();
-        for (Pair<Pair<String, String>, Pair<String, String>> relation
+        for (Relation relation
             : tableSetSpecification.getHasRelations()) {
             reportMissingColumnsInRelation(tableSet, relation, provider);
             reportOrphanRowsWhenMissingValuesInRelation(tableSet, relation, provider);
@@ -139,20 +133,20 @@ public class Validator {
 
     private void reportMissingColumnsInRelation(
         Map<String, Table> tableSet,
-        Pair<Pair<String, String>, Pair<String, String>> relation,
+        Relation relation,
         String provider
     ) {
         if (missingLeftColumn(tableSet, relation)) {
-            String leftTableName = relation.getLeft().getLeft();
-            String leftColName = relation.getLeft().getRight();
+            String leftTableName = relation.leftTable();
+            String leftColName = relation.leftColumn();
             validationErrors.add(ValidationError
-                .brokenRelation(leftTableName, relation, tableSet.get(leftTableName).emptyCopy())
+                .brokenRelation(relation.leftTable(), relation, tableSet.get(relation.leftTable()).emptyCopy())
                 .setDescription(String.format("because [%s] is missing column [%s]", leftTableName, leftColName))
                 .setProvider(provider));
         }
         if (missingRightColumn(tableSet, relation)) {
-            String rightTableName = relation.getRight().getLeft();
-            String rightColName = relation.getRight().getRight();
+            String rightTableName = relation.rightTable();
+            String rightColName = relation.rightColumn();
             validationErrors.add(ValidationError
                 .brokenRelation(rightTableName, relation, tableSet.get(rightTableName).emptyCopy())
                 .setDescription(String.format("because [%s] is missing column [%s]", rightTableName, rightColName))
@@ -162,37 +156,31 @@ public class Validator {
 
     private void reportOrphanRowsWhenMissingValuesInRelation(
         Map<String, Table> tableSet,
-        Pair<Pair<String, String>, Pair<String, String>> relation,
+        Relation relation,
         String provider
     ) {
-        String leftTableName = relation.getLeft().getLeft();
-        String leftColumnName = relation.getLeft().getRight();
-        String rightTableName = relation.getRight().getLeft();
-        String rightColumnName = relation.getRight().getRight();
         if (bothColumnsPresent(tableSet, relation)) {
-            reportOrphanRowsFor(tableSet, relation, provider, leftTableName, leftColumnName);
-            reportOrphanRowsFor(tableSet, relation, provider, rightTableName, rightColumnName);
+            reportOrphanRowsFor(tableSet, relation, provider, relation.leftTable(), relation.leftColumn());
+            reportOrphanRowsFor(tableSet, relation, provider, relation.rightTable(), relation.rightColumn());
         }
     }
 
     private void reportOrphanRowsFor(
         Map<String, Table> tableSet,
-        Pair<Pair<String, String>, Pair<String, String>> relation,
+        Relation relation,
         String provider,
         String childTableName,
         String childColName
     ) {
-        Pair<String, String> otherColumn = getOtherColumn(childTableName, childColName, relation);
-        String parentTableName = otherColumn.getKey();
-        String parentColName = otherColumn.getValue();
+        ColumnReference otherColumn = getOtherColumn(childTableName, childColName, relation);
         Table orphanTable = getTableOfOrphanRows(
             tableSet.get(childTableName),
             tableSet.get(childTableName).stringColumn(childColName),
-            tableSet.get(parentTableName).stringColumn(parentColName)
+            tableSet.get(otherColumn.table()).stringColumn(otherColumn.column())
         );
         if (orphanTable.rowCount() > 0) {
             validationErrors.add(ValidationError
-                .brokenRelation(parentTableName, relation, orphanTable)
+                .brokenRelation(otherColumn.table(), relation, orphanTable)
                 .setDescription(
                     String.format("%s orphan row(s) found in [%s]",
                         orphanTable.rowCount(),
@@ -201,15 +189,14 @@ public class Validator {
         }
     }
 
-    private Pair<String, String> getOtherColumn(
-        String tableName,
-        String columnName,
-        Pair<Pair<String, String>, Pair<String, String>> relation
+    private ColumnReference getOtherColumn(String tableName, String columnName, Relation relation) {
+        if (
+            tableName.equals(relation.leftTable())
+                && columnName.equals(relation.leftColumn())
         ) {
-        if (tableName.equals(relation.getLeft().getLeft()) && columnName.equals(relation.getLeft().getRight())) {
-            return Pair.of(relation.getRight().getLeft(), relation.getRight().getRight());
+            return relation.rightColumnReference();
         } else {
-            return Pair.of(relation.getLeft().getLeft(), relation.getLeft().getRight());
+            return relation.leftColumnReference();
         }
     }
 
@@ -220,27 +207,21 @@ public class Validator {
 
     private boolean bothColumnsPresent(
         Map<String, Table> tableSet,
-        Pair<Pair<String, String>, Pair<String, String>> relation
+        Relation relation
     ) {
         return (!missingLeftColumn(tableSet, relation) && !missingRightColumn(tableSet, relation));
     }
 
-    private boolean missingLeftColumn(
-        Map<String, Table> tableSet,
-        Pair<Pair<String, String>, Pair<String, String>> relation
-    ) {
+    private boolean missingLeftColumn(Map<String, Table> tableSet, Relation relation) {
         return tableMissingColumn(
-            tableSet.get(relation.getLeft().getLeft()),
-            relation.getLeft().getRight());
+            tableSet.get(relation.leftTable()),
+            relation.leftColumn());
     }
 
-    private boolean missingRightColumn(
-        Map<String, Table> tableSet,
-        Pair<Pair<String, String>, Pair<String, String>> relation
-    ) {
+    private boolean missingRightColumn(Map<String, Table> tableSet, Relation relation) {
         return tableMissingColumn(
-            tableSet.get(relation.getRight().getLeft()),
-            relation.getRight().getRight());
+            tableSet.get(relation.rightTable()),
+            relation.rightColumn());
     }
 
     private boolean tableMissingColumn(Table table, String columnName) {

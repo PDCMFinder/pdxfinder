@@ -1,6 +1,5 @@
-package org.pdxfinder.dataloaders.updog;
+package org.pdxfinder.dataloaders.updog.validation;
 
-import org.apache.commons.lang3.tuple.Pair;
 import tech.tablesaw.api.Table;
 
 import java.util.Objects;
@@ -13,7 +12,7 @@ public class ValidationError {
     private String provider;
     private Type errorType;
     private String column;
-    private Pair<Pair<String, String>, Pair<String, String>> relation;
+    private Relation relation;
     private Table invalidRows;
     private String description;
 
@@ -56,7 +55,7 @@ public class ValidationError {
         return Optional.ofNullable(provider);
     }
 
-    public Optional<Pair<Pair<String, String>, Pair<String, String>>> getRelation() {
+    public Optional<Relation> getRelation() {
         return Optional.ofNullable(relation);
     }
 
@@ -104,7 +103,7 @@ public class ValidationError {
 
     public static ValidationError brokenRelation(
         String tableName,
-        Pair<Pair<String, String>, Pair<String, String>> relation,
+        Relation relation,
         Table invalidRows
     ) {
         return new ValidationError(tableName)
@@ -139,21 +138,10 @@ public class ValidationError {
     }
 
     public ValidationError setRelation(
-        Pair<Pair<String, String>, Pair<String, String>> relation
+        Relation relation
     ) {
         this.relation = relation;
         return this;
-    }
-
-    private String prettyPrintRelation(
-        Pair<Pair<String, String>, Pair<String, String>> relation
-    ) {
-        return String.format(
-            "(%s) %s -> %s (%s)",
-            relation.getLeft().getKey(),
-            relation.getLeft().getValue(),
-            relation.getRight().getValue(),
-            relation.getRight().getKey());
     }
 
     @Override
@@ -182,8 +170,7 @@ public class ValidationError {
                     getColumn().orElse(notSpecified)));
                 break;
             case BROKEN_RELATION:
-                message.add(String.format(
-                    "Broken relation [%s]", prettyPrintRelation(relation)));
+                message.add(String.format("Broken relation [%s]", relation));
                 break;
             case GENERIC:
                 message.add("Generic error");

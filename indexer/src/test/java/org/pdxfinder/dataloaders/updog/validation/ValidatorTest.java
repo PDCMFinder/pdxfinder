@@ -1,6 +1,5 @@
-package org.pdxfinder.dataloaders.updog;
+package org.pdxfinder.dataloaders.updog.validation;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -28,8 +27,10 @@ public class ValidatorTest {
     private final String TABLE_1 = "table_1.tsv";
     private final String LEFT_TABLE = "left_table.tsv";
     private final String RIGHT_TABLE = "right_table.tsv";
-    private final Pair<Pair<String, String>, Pair<String, String>> RELATION =
-        Pair.of(Pair.of(LEFT_TABLE, "id"), Pair.of(RIGHT_TABLE, "table_1_id"));
+    private final Relation RELATION = Relation.between(
+        ColumnReference.of(LEFT_TABLE, "id"),
+        ColumnReference.of(RIGHT_TABLE, "table_1_id")
+    );
     private final String PROVIDER = "PROVIDER-BC";
 
     @Before public void setUp() {
@@ -86,9 +87,8 @@ public class ValidatorTest {
     @Test public void checkAllRequiredColsPresent_givenMissingColumnDefinedInColSpec_addsMissingColErrorTotErrorList() {
         List<ValidationError> expected = Collections.singletonList(
                 ValidationError.missingColumn(TABLE_1, "missing_column").setProvider(PROVIDER));
-        Pair<String, String> requiredColumn = Pair.of(TABLE_1, "missing_column");
         TableSetSpecification tableSetSpecification = TableSetSpecification.create().setProvider(PROVIDER)
-            .addRequiredColumns(requiredColumn);
+            .addRequiredColumns(ColumnReference.of(TABLE_1, "missing_column"));
         assertEquals(
             expected,
             validator.validate(completeTableSet, tableSetSpecification)
@@ -146,7 +146,7 @@ public class ValidatorTest {
         tableSetWithUniqueValues.put(TABLE_1, tableWithUniqueValues);
 
         TableSetSpecification tableSetSpecification = TableSetSpecification.create().setProvider(PROVIDER)
-            .addUniqueColumns(Pair.of(TABLE_1, "unique_col"));
+            .addUniqueColumns(ColumnReference.of(TABLE_1, "unique_col"));
 
         assertThat(validator.validate(tableSetWithUniqueValues, tableSetSpecification).isEmpty(), is(true));
     }
@@ -158,7 +158,7 @@ public class ValidatorTest {
         tableSetWithDuplicateValues.put(TABLE_1, tableWithUniqueValues);
 
         TableSetSpecification tableSetSpecification = TableSetSpecification.create().setProvider(PROVIDER)
-            .addUniqueColumns(Pair.of(TABLE_1, "unique_col"));
+            .addUniqueColumns(ColumnReference.of(TABLE_1, "unique_col"));
 
         Set<String> duplicateValue = Stream.of("1").collect(Collectors.toSet());
         List<ValidationError> expected = Arrays.asList(
@@ -264,7 +264,7 @@ public class ValidatorTest {
         .addRequiredTables(minimalRequiredTable);
 
     private TableSetSpecification requireColumn = TableSetSpecification.create().setProvider(PROVIDER)
-        .addNonEmptyColumns(Pair.of(TABLE_1, "required_col"));
+        .addNonEmptyColumns(ColumnReference.of(TABLE_1, "required_col"));
 
     private Map<String, Table> makeCompleteTableSet() {
         Map<String, Table> completeFileSet = new HashMap<>();
@@ -290,5 +290,5 @@ public class ValidatorTest {
     }
 
     private final TableSetSpecification SIMPLE_JOIN_SPECIFICATION = TableSetSpecification.create().setProvider(PROVIDER)
-        .addHasRelations(RELATION.getKey(), RELATION.getValue());
+        .addRelations(RELATION);
 }

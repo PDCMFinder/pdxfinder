@@ -1,4 +1,4 @@
-package org.pdxfinder.dataloaders.updog;
+package org.pdxfinder.dataloaders.updog.validation;
 
 import org.junit.Test;
 import tech.tablesaw.api.StringColumn;
@@ -109,8 +109,9 @@ public class ValidationErrorTest {
             "Error in [bar.tsv]: Broken relation [(foo.tsv) foo_id -> foo_id (bar.tsv)]:\n" +
             " not_foo_id  |\n" +
             "--------------";
-        Pair<Pair<String, String>, Pair<String, String>> relation =
-            Pair.of(Pair.of("foo.tsv", "foo_id"), Pair.of("bar.tsv", "foo_id"));
+        Relation relation = Relation.between(
+            ColumnReference.of("foo.tsv", "foo_id"),
+            ColumnReference.of("bar.tsv", "foo_id"));
         Table tableMissingColumn = Table.create().addColumns(StringColumn.create("not_foo_id"));
         ValidationError error = ValidationError.brokenRelation("bar.tsv", relation, tableMissingColumn);
 
@@ -130,8 +131,9 @@ public class ValidationErrorTest {
                 "----------\n" +
                 "      1  |\n" +
                 "      1  |";
-        Pair<Pair<String, String>, Pair<String, String>> relation =
-            Pair.of(Pair.of("foo.tsv", "foo_id"), Pair.of("bar.tsv", "foo_id"));
+        Relation relation = Relation.between(
+            ColumnReference.of("foo.tsv", "foo_id"),
+            ColumnReference.of("bar.tsv", "foo_id"));
         Table tableMissingValues = Table.create().addColumns(
             StringColumn.create("foo_id", Arrays.asList("1", "1")));
         ValidationError error = ValidationError
