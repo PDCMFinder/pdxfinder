@@ -230,7 +230,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
                 step11LoadBreastMarkers();
             }
             catch (Exception e){
-                log.error("Exception occured in loaderbase: {}",e);
+                log.error("Exception occurred in loaderbase", e);
             }
 
         }
