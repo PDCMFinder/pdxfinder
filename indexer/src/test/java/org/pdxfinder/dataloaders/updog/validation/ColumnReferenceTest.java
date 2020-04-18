@@ -47,6 +47,17 @@ public class ColumnReferenceTest {
         assertEquals(x.hashCode(), y.hashCode());
     }
 
+    @Test public void equals_givenSameObject_returnsTrue() {
+        ColumnReference x = ColumnReference.of("x", "x");
+        assertEquals(x, x);
+    }
+
+    @Test public void equals_givenNonIdenticalObjects_returnsFalse() {
+        ColumnReference x = ColumnReference.of("x", "x");
+        ColumnReference y = ColumnReference.of("y", "y");
+        assertNotEquals(x, y);
+    }
+
     @Test public void hashCode_givenObjectPutInMap_identicalKeyRetrievesTheValue() {
         ColumnReference x = ColumnReference.of("x", "x");
         ColumnReference y = ColumnReference.of("x", "x");

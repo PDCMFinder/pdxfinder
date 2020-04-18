@@ -102,7 +102,7 @@ public class TableSetSpecification {
         return getRequiredColumns() != null;
     }
 
-    public Set<Relation> getHasRelations() {
+    public Set<Relation> getRelations() {
         return this.relations;
     }
 
@@ -135,9 +135,9 @@ public class TableSetSpecification {
             ? !getUniqueColumns().equals(that.getUniqueColumns())
             : that.getUniqueColumns() != null)
             return false;
-        if (getHasRelations() != null
-            ? !getHasRelations().equals(that.getHasRelations())
-            : that.getHasRelations() != null)
+        if (getRelations() != null
+            ? !getRelations().equals(that.getRelations())
+            : that.getRelations() != null)
             return false;
         return getProvider().equals(that.getProvider());
     }
@@ -148,7 +148,7 @@ public class TableSetSpecification {
         result = 31 * result + (getRequiredColumns() != null ? getRequiredColumns().hashCode() : 0);
         result = 31 * result + (getNonEmptyColumns() != null ? getNonEmptyColumns().hashCode() : 0);
         result = 31 * result + (getUniqueColumns() != null ? getUniqueColumns().hashCode() : 0);
-        result = 31 * result + (getHasRelations() != null ? getHasRelations().hashCode() : 0);
+        result = 31 * result + (getRelations() != null ? getRelations().hashCode() : 0);
         result = 31 * result + getProvider().hashCode();
         return result;
     }

@@ -118,7 +118,7 @@ public class Updog {
             mergedTableSetSpecifications.addRequiredColumns(tss.getRequiredColumns());
             mergedTableSetSpecifications.addNonEmptyColumns(tss.getNonEmptyColumns());
             mergedTableSetSpecifications.addUniqueColumns(tss.getUniqueColumns());
-            mergedTableSetSpecifications.addRelations(tss.getHasRelations());
+            mergedTableSetSpecifications.addRelations(tss.getRelations());
         }
         return mergedTableSetSpecifications;
     }

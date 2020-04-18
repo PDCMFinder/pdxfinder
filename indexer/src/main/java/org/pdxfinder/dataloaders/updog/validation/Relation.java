@@ -25,6 +25,19 @@ public class Relation {
         return new Relation(left.table(), left.column(), right.table(), right.column());
     }
 
+    ColumnReference getOtherColumn(ColumnReference queriedColumn) {
+        ColumnReference otherColumn;
+        if (queriedColumn.equals(this.leftColumnReference()))
+            otherColumn = this.rightColumnReference();
+        else if (queriedColumn.equals(this.rightColumnReference()))
+            otherColumn = this.leftColumnReference();
+        else
+            otherColumn = ColumnReference.of(
+                String.format("table linked to %s not found", queriedColumn.table()),
+                String.format("column linked to %s not found", queriedColumn.column()));
+        return otherColumn;
+    }
+
     String leftTable() {
         return this.leftTableName;
     }
