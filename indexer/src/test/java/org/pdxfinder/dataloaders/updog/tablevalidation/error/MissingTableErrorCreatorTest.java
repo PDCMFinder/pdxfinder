@@ -53,48 +53,48 @@ public class MissingTableErrorCreatorTest {
 
     @Test public void passesValidation_givenEmptyFileSet_failsValidation() {
         Map<String, Table> emptyHashMap = new HashMap<>();
-        assertThat(missingTableErrorCreator.create(emptyHashMap, requireTable).isEmpty(),
+        assertThat(missingTableErrorCreator.generateErrors(emptyHashMap, requireTable).isEmpty(),
             is(false));
     }
 
     @Test public void passesValidation_givenEmptyFileSetAndEmptySpecification_passesValidation() {
         Map<String, Table> emptyHashMap = new HashMap<>();
         TableSetSpecification emptyTableSetSpecification = TableSetSpecification.create();
-        assertThat(missingTableErrorCreator.create(emptyHashMap, emptyTableSetSpecification).isEmpty(),
+        assertThat(missingTableErrorCreator.generateErrors(emptyHashMap, emptyTableSetSpecification).isEmpty(),
             is(true));
     }
 
     @Test public void passesValidation_givenIncompleteFileSet_failsValidation() {
         List<ValidationError> expected = Collections.singletonList(
-            missingTableErrorCreator.missingTable(TABLE_1, PROVIDER));
+            missingTableErrorCreator.create(TABLE_1, PROVIDER));
         assertEquals(
             expected.toString(),
-            missingTableErrorCreator.create(incompleteTableSet, requireTable).toString()
+            missingTableErrorCreator.generateErrors(incompleteTableSet, requireTable).toString()
         );
     }
 
     @Test public void passesValidation_givenCompleteFileSet_passesValidation() {
-        assertThat(missingTableErrorCreator.create(completeTableSet, requireTable).isEmpty(),
+        assertThat(missingTableErrorCreator.generateErrors(completeTableSet, requireTable).isEmpty(),
             is(true));
     }
 
     @Test public void passesValidation_givenExtraFileInFileSet_passesValidation() {
         Map<String, Table> completeFileSetPlusOne = new HashMap<>(completeTableSet);
         completeFileSetPlusOne.put("extra-table.tsv", Table.create());
-        assertThat(missingTableErrorCreator.create(completeFileSetPlusOne, requireTable).isEmpty(),
+        assertThat(missingTableErrorCreator.generateErrors(completeFileSetPlusOne, requireTable).isEmpty(),
             is(true));
     }
 
     @Test public void validate_givenCompleteFileSet_producesEmptyErrorList() {
-        assertThat(missingTableErrorCreator.create(completeTableSet, requireTable).isEmpty(), is(true));
+        assertThat(missingTableErrorCreator.generateErrors(completeTableSet, requireTable).isEmpty(), is(true));
     }
 
     @Test public void validate_givenIncompleteFileSet_addsErrorWithCorrectContextToErrorList() {
         List<ValidationError> expected = Collections.singletonList(
-            missingTableErrorCreator.missingTable(TABLE_1, PROVIDER));
+            missingTableErrorCreator.create(TABLE_1, PROVIDER));
         assertEquals(
             expected.toString(),
-            missingTableErrorCreator.create(incompleteTableSet, requireTable).toString()
+            missingTableErrorCreator.generateErrors(incompleteTableSet, requireTable).toString()
         );
     }
 }

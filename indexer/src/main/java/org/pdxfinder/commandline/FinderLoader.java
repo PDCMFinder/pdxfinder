@@ -189,7 +189,7 @@ public class FinderLoader {
     }
 
 
-    public void callRelevantLoader(
+    private void callRelevantLoader(
         DataProvider dataProvider,
         File dataDirectory,
         boolean validateOnlyRequested

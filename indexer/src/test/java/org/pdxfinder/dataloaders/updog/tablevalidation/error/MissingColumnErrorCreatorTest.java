@@ -7,7 +7,6 @@ import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
-import tech.tablesaw.columns.Column;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,19 +44,20 @@ public class MissingColumnErrorCreatorTest {
         TableSetSpecification tableSetSpecification = TableSetSpecification.create().setProvider(PROVIDER)
             .addRequiredColumns(ColumnReference.of(TABLE_1, "valid_col"));
 
-        assertThat(missingColumnErrorCreator.create(completeTableSet, tableSetSpecification)
+        assertThat(missingColumnErrorCreator.generateErrors(completeTableSet, tableSetSpecification)
             .isEmpty(), is(true));
     }
 
     @Test public void checkAllRequiredColsPresent_givenMissingColumnDefinedInColSpec_addsMissingColErrorTotErrorList() {
+        ColumnReference missing = ColumnReference.of(TABLE_1, "missing_column");
         List<ValidationError> expected = Collections.singletonList(
-            missingColumnErrorCreator.missingColumn(TABLE_1, "missing_column", PROVIDER));
+            missingColumnErrorCreator.create(missing, PROVIDER));
         TableSetSpecification tableSetSpecification = TableSetSpecification.create().setProvider(PROVIDER)
-            .addRequiredColumns(ColumnReference.of(TABLE_1, "missing_column"));
+            .addRequiredColumns(missing);
 
         assertEquals(
             expected.toString(),
-            missingColumnErrorCreator.create(completeTableSet, tableSetSpecification).toString()
+            missingColumnErrorCreator.generateErrors(completeTableSet, tableSetSpecification).toString()
         );
     }
 

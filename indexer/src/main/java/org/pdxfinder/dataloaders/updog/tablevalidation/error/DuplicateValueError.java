@@ -1,5 +1,7 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation.error;
 
+import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
+
 import java.util.Set;
 
 public class DuplicateValueError implements ValidationError {
@@ -8,7 +10,7 @@ public class DuplicateValueError implements ValidationError {
     private Set<String> duplicateValues;
     private String provider;
 
-    DuplicateValueError(String tableName, String columnName, Set<String> duplicateValues, String provider) {
+    DuplicateValueError(ColumnReference uniqueColumn, Set<String> duplicateValues, String provider) {
         this.tableName = tableName;
         this.columnName = columnName;
         this.duplicateValues = duplicateValues;

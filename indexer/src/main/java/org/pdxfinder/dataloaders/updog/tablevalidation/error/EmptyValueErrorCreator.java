@@ -2,16 +2,16 @@ package org.pdxfinder.dataloaders.updog.tablevalidation.error;
 
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
+import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class EmptyValueErrorCreator extends ErrorCreator {
-    private List<ValidationError> errors = new ArrayList<>();
 
-    public List<ValidationError> create(
+    public List<ValidationError> generateErrors(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
@@ -20,19 +20,14 @@ public class EmptyValueErrorCreator extends ErrorCreator {
             Table missing = table.where(
                 table.stringColumn(tested.column()).isMissing());
             if (missing.rowCount() > 0) {
-                errors.add(
-                    new EmptyValueError(
-                        tested.table(),
-                        tested.column(),
-                        missing,
-                        tableSetSpecification.getProvider()));
+                errors.add(create(tested, missing, tableSetSpecification.getProvider()));
             }
         }
         return errors;
     }
 
-    public EmptyValueError emptyValueError(String tableName, String columnName, Table invalidRows, String provider) {
-        return new EmptyValueError(tableName, columnName, invalidRows, provider);
+    public EmptyValueError create(ColumnReference columnReference, Table invalidRows, String provider) {
+        return new EmptyValueError(columnReference, invalidRows, provider);
     }
 
 }

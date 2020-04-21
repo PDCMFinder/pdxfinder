@@ -1,5 +1,6 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation.error;
 
+import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import tech.tablesaw.api.Table;
 
 public class EmptyValueError implements ValidationError {
@@ -8,7 +9,7 @@ public class EmptyValueError implements ValidationError {
     private Table invalidRows;
     private String provider;
 
-    EmptyValueError(String tableName, String columnName, Table invalidRows, String provider) {
+    EmptyValueError(ColumnReference columnReference, Table invalidRows, String provider) {
         this.tableName = tableName;
         this.columnName = columnName;
         this.invalidRows = invalidRows;

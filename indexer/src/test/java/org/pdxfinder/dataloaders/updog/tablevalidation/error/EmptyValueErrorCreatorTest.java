@@ -55,7 +55,7 @@ public class EmptyValueErrorCreatorTest {
         Table tableWithNoMissingValues = completeTableSet.get(TABLE_1).addColumns(
             StringColumn.create("required_col", Collections.singletonList("required_value")));
         fileSetWithValidTable.put(TABLE_1, tableWithNoMissingValues);
-        assertThat(emptyValueErrorCreator.create(fileSetWithValidTable, requireColumn)
+        assertThat(emptyValueErrorCreator.generateErrors(fileSetWithValidTable, requireColumn)
             .isEmpty(), is(true));
     }
 
@@ -63,14 +63,16 @@ public class EmptyValueErrorCreatorTest {
         Map<String, Table> fileSetWithInvalidTable = new HashMap<>();
         Table tableWithMissingValue = completeTableSet.get(TABLE_1).addColumns(
             StringColumn.create("required_col", Collections.singletonList("")));
+        ColumnReference requiredCol =  ColumnReference.of(TABLE_1, "required_col");
+
         fileSetWithInvalidTable.put(TABLE_1, tableWithMissingValue);
         List<ValidationError> expected = Collections.singletonList(
-            emptyValueErrorCreator.emptyValueError(TABLE_1, "required_col", tableWithMissingValue, PROVIDER)
+            emptyValueErrorCreator.create(requiredCol, tableWithMissingValue, PROVIDER)
         );
 
         assertEquals(
             expected.toString(),
-            emptyValueErrorCreator.create(fileSetWithInvalidTable, requireColumn).toString()
+            emptyValueErrorCreator.generateErrors(fileSetWithInvalidTable, requireColumn).toString()
         );
     }
 
@@ -81,16 +83,16 @@ public class EmptyValueErrorCreatorTest {
             StringColumn.create("other_col", Arrays.asList("", "This is the invalid row"))
         );
         fileSetWithInvalidTable.put(TABLE_1, tableWithMissingValue);
+        ColumnReference requiredCol =  ColumnReference.of(TABLE_1, "required_col");
 
         List<ValidationError> expected = Collections.singletonList(
-            emptyValueErrorCreator.emptyValueError(
-                TABLE_1,
-                "required_col",
+            emptyValueErrorCreator.create(
+                requiredCol,
                 tableWithMissingValue.where(tableWithMissingValue.stringColumn("required_col").isEqualTo("")),
                 PROVIDER));
         assertEquals(
             expected.toString(),
-            emptyValueErrorCreator.create(fileSetWithInvalidTable, requireColumn).toString()
+            emptyValueErrorCreator.generateErrors(fileSetWithInvalidTable, requireColumn).toString()
         );
     }
 

@@ -5,19 +5,20 @@ import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Component
 public class BrokenRelationErrorCreator extends ErrorCreator {
-    private List<ValidationError> errors = new ArrayList<>();
+
     private static final Logger log = LoggerFactory.getLogger(BrokenRelationErrorCreator.class);
 
-    public List<ValidationError> create(
+    public List<ValidationError> generateErrors(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
@@ -27,7 +28,7 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
         return errors;
     }
 
-    public BrokenRelationError brokenRelation(
+    public BrokenRelationError create(
         String tableName,
         Relation relation,
         Table invalidRows,
@@ -49,7 +50,7 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
     private void reportMissingColumnsInRelation(Map<String, Table> tableSet, Relation relation, String provider) {
         if (missingLeftColumn(tableSet, relation)) {
             errors.add(
-                new BrokenRelationError(
+                create(
                     relation.leftTable(),
                     relation,
                     tableSet.get(relation.leftTable()).emptyCopy(),
@@ -59,7 +60,7 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
         }
         if (missingRightColumn(tableSet, relation)) {
             errors.add(
-                new BrokenRelationError(
+                create(
                     relation.rightTable(),
                     relation,
                     tableSet.get(relation.rightTable()).emptyCopy(),

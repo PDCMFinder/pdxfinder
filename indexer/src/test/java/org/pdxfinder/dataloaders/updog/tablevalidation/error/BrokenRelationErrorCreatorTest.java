@@ -45,7 +45,7 @@ public class BrokenRelationErrorCreatorTest {
     @Test public void checkRelationsValid_givenValidOneToManyJoin_emptyErrorList() {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
 
-        assertThat(brokenRelationErrorCreator.create(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).isEmpty(),
+        assertThat(brokenRelationErrorCreator.generateErrors(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).isEmpty(),
             is(true));
     }
 
@@ -53,13 +53,13 @@ public class BrokenRelationErrorCreatorTest {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.get(LEFT_TABLE).removeColumns("id");
 
-        BrokenRelationError expected = brokenRelationErrorCreator.brokenRelation(
+        BrokenRelationError expected = brokenRelationErrorCreator.create(
             LEFT_TABLE, RELATION, tableSetWithSimpleJoin.get(LEFT_TABLE).emptyCopy(),
             String.format("because [%s] is missing column [%s]", LEFT_TABLE, "id"), PROVIDER);
 
         assertEquals(
             Collections.singletonList(expected).toString(),
-            brokenRelationErrorCreator.create(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
+            brokenRelationErrorCreator.generateErrors(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
         );
     }
 
@@ -67,13 +67,13 @@ public class BrokenRelationErrorCreatorTest {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.get(RIGHT_TABLE).removeColumns("table_1_id");
 
-        BrokenRelationError expected = brokenRelationErrorCreator.brokenRelation(
+        BrokenRelationError expected = brokenRelationErrorCreator.create(
             RIGHT_TABLE, RELATION, tableSetWithSimpleJoin.get(RIGHT_TABLE).emptyCopy(),
             String.format("because [%s] is missing column [%s]", RIGHT_TABLE, "table_1_id"), PROVIDER);
 
         assertEquals(
             Collections.singletonList(expected).toString(),
-            brokenRelationErrorCreator.create(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
+            brokenRelationErrorCreator.generateErrors(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
         );
     }
 
@@ -81,13 +81,13 @@ public class BrokenRelationErrorCreatorTest {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.get(RIGHT_TABLE).replaceColumn(
             StringColumn.create("table_1_id", Collections.EMPTY_LIST));
-        BrokenRelationError expected = brokenRelationErrorCreator.brokenRelation(
+        BrokenRelationError expected = brokenRelationErrorCreator.create(
             RIGHT_TABLE, RELATION, tableSetWithSimpleJoin.get(LEFT_TABLE),
             String.format("1 orphan row(s) found in [%s]", LEFT_TABLE), PROVIDER);
 
         assertEquals(
             Collections.singletonList(expected).toString(),
-            brokenRelationErrorCreator.create(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
+            brokenRelationErrorCreator.generateErrors(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
         );
     }
 
@@ -95,14 +95,14 @@ public class BrokenRelationErrorCreatorTest {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.get(LEFT_TABLE).replaceColumn(
             StringColumn.create("id", Collections.EMPTY_LIST));
-        BrokenRelationError expected = brokenRelationErrorCreator.brokenRelation(
+        BrokenRelationError expected = brokenRelationErrorCreator.create(
             LEFT_TABLE, RELATION, tableSetWithSimpleJoin.get(RIGHT_TABLE),
             String.format("1 orphan row(s) found in [%s]", RIGHT_TABLE), PROVIDER
         );
 
         assertEquals(
             Collections.singletonList(expected).toString(),
-            brokenRelationErrorCreator.create(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
+            brokenRelationErrorCreator.generateErrors(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
         );
     }
 
@@ -112,15 +112,15 @@ public class BrokenRelationErrorCreatorTest {
             StringColumn.create("table_1_id", Arrays.asList("not 1", "not 1"))
         );
         List<ValidationError> expected = Arrays.asList(
-            brokenRelationErrorCreator.brokenRelation(RIGHT_TABLE, RELATION, tableSetWithSimpleJoin.get(LEFT_TABLE),
+            brokenRelationErrorCreator.create(RIGHT_TABLE, RELATION, tableSetWithSimpleJoin.get(LEFT_TABLE),
                 String.format("1 orphan row(s) found in [%s]", LEFT_TABLE), PROVIDER),
-            brokenRelationErrorCreator.brokenRelation(LEFT_TABLE, RELATION, tableSetWithSimpleJoin.get(RIGHT_TABLE),
+            brokenRelationErrorCreator.create(LEFT_TABLE, RELATION, tableSetWithSimpleJoin.get(RIGHT_TABLE),
                 String.format("2 orphan row(s) found in [%s]", RIGHT_TABLE), PROVIDER)
         );
 
         assertEquals(
             expected.toString(),
-            brokenRelationErrorCreator.create(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
+            brokenRelationErrorCreator.generateErrors(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).toString()
         );
     }
 

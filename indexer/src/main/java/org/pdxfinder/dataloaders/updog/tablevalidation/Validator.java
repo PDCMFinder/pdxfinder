@@ -21,9 +21,12 @@ public class Validator {
 
     private static final Logger log = LoggerFactory.getLogger(Validator.class);
     private List<ValidationError> validationErrors;
-    private BrokenRelationErrorCreator brokenRelationError = new BrokenRelationErrorCreator();
+    private MissingTableErrorCreator missingTableErrorCreator;
 
-    public Validator() {
+    public Validator(
+        MissingTableErrorCreator missingTableErrorCreator
+    ) {
+        this.missingTableErrorCreator = missingTableErrorCreator;
         this.validationErrors = new ArrayList<>();
     }
 
@@ -51,7 +54,7 @@ public class Validator {
         TableSetSpecification tableSetSpecification
     ) {
         if (tableSetSpecification.hasRequiredColumns())
-            validationErrors.addAll(new MissingTableErrorCreator().create(tableSet, tableSetSpecification));
+            validationErrors.addAll(missingTableErrorCreator.generateErrors(tableSet, tableSetSpecification));
     }
 
     private void checkRequiredColumnsPresent(
@@ -59,28 +62,28 @@ public class Validator {
         TableSetSpecification tableSetSpecification
     ) {
         if (tableSetSpecification.hasRequiredColumns())
-            validationErrors.addAll(new MissingColumnErrorCreator().create(tableSet, tableSetSpecification));
+            validationErrors.addAll(new MissingColumnErrorCreator().generateErrors(tableSet, tableSetSpecification));
     }
 
     private void checkAllNonEmptyValuesPresent(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        validationErrors.addAll(new EmptyValueErrorCreator().create(tableSet, tableSetSpecification));
+        validationErrors.addAll(new EmptyValueErrorCreator().generateErrors(tableSet, tableSetSpecification));
     }
 
     private void checkAllUniqueColumnsForDuplicates(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        validationErrors.addAll(new DuplicateValueErrorCreator().create(tableSet, tableSetSpecification));
+        validationErrors.addAll(new DuplicateValueErrorCreator().generateErrors(tableSet, tableSetSpecification));
     }
 
     private void checkRelationsValid(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        validationErrors.addAll(brokenRelationError.create(tableSet, tableSetSpecification));
+        validationErrors.addAll(new BrokenRelationErrorCreator().generateErrors(tableSet, tableSetSpecification));
     }
 
     boolean passesValidation(

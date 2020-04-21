@@ -57,7 +57,7 @@ public class DuplicateValueErrorCreatorTest {
         TableSetSpecification tableSetSpecification = TableSetSpecification.create().setProvider(PROVIDER)
             .addUniqueColumns(ColumnReference.of(TABLE_1, "unique_col"));
 
-        assertThat(duplicateValueErrorCreator.create(tableSetWithUniqueValues, tableSetSpecification).isEmpty(),
+        assertThat(duplicateValueErrorCreator.generateErrors(tableSetWithUniqueValues, tableSetSpecification).isEmpty(),
             is(true));
     }
 
@@ -67,17 +67,18 @@ public class DuplicateValueErrorCreatorTest {
         Map<String, Table> tableSetWithDuplicateValues = new HashMap<>();
         tableSetWithDuplicateValues.put(TABLE_1, tableWithUniqueValues);
 
+        ColumnReference uniqueCol = ColumnReference.of(TABLE_1, "unique_col");
         TableSetSpecification tableSetSpecification = TableSetSpecification.create().setProvider(PROVIDER)
-            .addUniqueColumns(ColumnReference.of(TABLE_1, "unique_col"));
+            .addUniqueColumns(uniqueCol);
 
         Set<String> duplicateValue = Stream.of("1").collect(Collectors.toSet());
         List<ValidationError> expected = Arrays.asList(
-            duplicateValueErrorCreator.duplicateValue(TABLE_1, "unique_col", duplicateValue, PROVIDER)
+            duplicateValueErrorCreator.create(uniqueCol, duplicateValue, PROVIDER)
         );
 
         assertEquals(
             expected.toString(),
-            duplicateValueErrorCreator.create(tableSetWithDuplicateValues, tableSetSpecification).toString()
+            duplicateValueErrorCreator.generateErrors(tableSetWithDuplicateValues, tableSetSpecification).toString()
         );
     }
 

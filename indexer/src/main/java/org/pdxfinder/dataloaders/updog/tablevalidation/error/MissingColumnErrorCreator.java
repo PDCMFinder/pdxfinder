@@ -2,25 +2,22 @@ package org.pdxfinder.dataloaders.updog.tablevalidation.error;
 
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
+import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class MissingColumnErrorCreator extends ErrorCreator {
-    private List<ValidationError> errors = new ArrayList<>();
 
-    public List<ValidationError> create(
+    public List<ValidationError> generateErrors(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
         for (ColumnReference required : tableSetSpecification.getRequiredColumns()) {
             if (tableIsMissingColumn(tableSet, required)) {
-                errors.add(
-                    new MissingColumnError(required.table(), required.column(),
-                        tableSetSpecification.getProvider())
-                );
+                errors.add(create(required, tableSetSpecification.getProvider()));
             }
         }
 
@@ -31,12 +28,8 @@ public class MissingColumnErrorCreator extends ErrorCreator {
         return !tableSet.get(columnReference.table()).columnNames().contains(columnReference.column());
     }
 
-    public MissingColumnError missingColumn(
-        String tableName,
-        String columnName,
-        String provider
-    ) {
-        return new MissingColumnError(tableName, columnName, provider);
+    public MissingColumnError create(ColumnReference columnReference, String provider) {
+        return new MissingColumnError(columnReference, provider);
     }
 
 }
