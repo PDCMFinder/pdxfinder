@@ -893,7 +893,7 @@ public class UniversalDataExporter {
             return new XSSFWorkbook(fileInputStream);
 
         } catch (IOException e) {
-            log.error("There was a problem accessing the file: {}", e);
+            log.error("There was a problem accessing the file: {}", file, e);
         }
         return null;
     }
