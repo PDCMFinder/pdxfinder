@@ -129,7 +129,7 @@ public class LoadPDMRData extends LoaderBase {
                 JSONObject sampleObj = dto.getSamplesArr().getJSONObject(i);
                 String sampleType = sampleObj.getString("Tumor Type");
 
-                if(sampleType.equals("Xenograft Tumor")){
+                if(sampleType.equals("engrafted Tumor")){
 
                     String specimenId = sampleObj.getString("Sample ID");
                     String passage = sampleObj.getString("Passage");

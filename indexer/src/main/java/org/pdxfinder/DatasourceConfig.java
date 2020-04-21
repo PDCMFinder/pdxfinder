@@ -124,7 +124,6 @@ public class DatasourceConfig {
       if (cache.isDirectory() && dataDeleted){
         FileUtils.copyDirectory(cache, data);
       }
-
     }
   }
 
