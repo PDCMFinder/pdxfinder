@@ -2,11 +2,12 @@ package org.pdxfinder.dataloaders.updog;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
-import org.pdxfinder.dataloaders.updog.validation.OmicValidationRuleset;
-import org.pdxfinder.dataloaders.updog.validation.PdxValidationRuleset;
-import org.pdxfinder.dataloaders.updog.validation.TableSetSpecification;
-import org.pdxfinder.dataloaders.updog.validation.ValidationError;
-import org.pdxfinder.dataloaders.updog.validation.Validator;
+import org.pdxfinder.dataloaders.updog.tablevalidation.OmicValidationRuleset;
+import org.pdxfinder.dataloaders.updog.tablevalidation.PdxValidationRuleset;
+import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
+import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
+import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationErrorImpl;
+import org.pdxfinder.dataloaders.updog.tablevalidation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

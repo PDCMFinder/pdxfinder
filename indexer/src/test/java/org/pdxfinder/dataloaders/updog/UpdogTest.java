@@ -6,11 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
-import org.pdxfinder.dataloaders.updog.validation.ColumnReference;
-import org.pdxfinder.dataloaders.updog.validation.Relation;
-import org.pdxfinder.dataloaders.updog.validation.TableSetSpecification;
-import org.pdxfinder.dataloaders.updog.validation.ValidationError;
-import org.pdxfinder.dataloaders.updog.validation.Validator;
+import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
+import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
+import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
+import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
+import org.pdxfinder.dataloaders.updog.tablevalidation.Validator;
 import tech.tablesaw.api.Table;
 
 import java.nio.file.Paths;
@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang3.tuple.Pair;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;

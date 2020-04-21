@@ -1,7 +1,9 @@
-package org.pdxfinder.dataloaders.updog.validation;
+package org.pdxfinder.dataloaders.updog.tablevalidation;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.StringJoiner;
 
 public class ColumnReference {
     private String tableName;
@@ -46,4 +48,11 @@ public class ColumnReference {
             .toHashCode();
     }
 
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", ColumnReference.class.getSimpleName() + "[", "]")
+            .add("tableName='" + tableName + "'")
+            .add("columnName='" + columnName + "'")
+            .toString();
+    }
 }

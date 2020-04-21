@@ -1,4 +1,4 @@
-package org.pdxfinder.dataloaders.updog.validation;
+package org.pdxfinder.dataloaders.updog.tablevalidation;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -22,10 +22,14 @@ public class Relation {
     }
 
     public static Relation between(ColumnReference left, ColumnReference right) {
+        if (left.equals(right))
+            throw new IllegalArgumentException(
+                String.format("Unable to define a relation from a column to itself (%s)", left));
+
         return new Relation(left.table(), left.column(), right.table(), right.column());
     }
 
-    ColumnReference getOtherColumn(ColumnReference queriedColumn) {
+    public ColumnReference getOtherColumn(ColumnReference queriedColumn) {
         ColumnReference otherColumn;
         if (queriedColumn.equals(this.leftColumnReference()))
             otherColumn = this.rightColumnReference();
@@ -38,27 +42,27 @@ public class Relation {
         return otherColumn;
     }
 
-    String leftTable() {
+    public String leftTable() {
         return this.leftTableName;
     }
 
-    String leftColumn() {
+    public String leftColumn() {
         return this.leftColumnName;
     }
 
-    String rightTable() {
+    public String rightTable() {
         return this.rightTableName;
     }
 
-    String rightColumn() {
+    public String rightColumn() {
         return this.rightColumnName;
     }
 
-    ColumnReference leftColumnReference() {
+    public ColumnReference leftColumnReference() {
         return ColumnReference.of(leftTable(), leftColumn());
     }
 
-    ColumnReference rightColumnReference() {
+    public ColumnReference rightColumnReference() {
         return ColumnReference.of(rightTable(), rightColumn());
     }
 

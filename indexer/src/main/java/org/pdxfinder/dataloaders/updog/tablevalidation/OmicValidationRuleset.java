@@ -1,4 +1,4 @@
-package org.pdxfinder.dataloaders.updog.validation;
+package org.pdxfinder.dataloaders.updog.tablevalidation;
 
 import org.pdxfinder.dataloaders.updog.TableSetUtilities;
 

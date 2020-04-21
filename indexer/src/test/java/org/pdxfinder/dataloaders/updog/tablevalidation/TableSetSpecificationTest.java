@@ -1,4 +1,4 @@
-package org.pdxfinder.dataloaders.updog.validation;
+package org.pdxfinder.dataloaders.updog.tablevalidation;
 
 import org.junit.Test;
 
@@ -54,6 +54,16 @@ public class TableSetSpecificationTest {
             expected,
             TableSetSpecification.create()
                 .addRequiredColumns(setOfRequiredColumns)
+        );
+    }
+
+    @Test public void toString_givenRequiredFiles_returnsAppropriateMessage() {
+        TableSetSpecification tableSetSpecification = TableSetSpecification.create()
+            .addRequiredTables(new HashSet<>(Arrays.asList("file1.tsv")));
+
+        assertEquals(
+            "[file1.tsv]",
+            tableSetSpecification.getRequiredTables().toString()
         );
     }
 
