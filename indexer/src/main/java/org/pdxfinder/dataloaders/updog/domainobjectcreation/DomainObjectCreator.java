@@ -679,6 +679,7 @@ public class DomainObjectCreator {
         EngraftmentMaterial engraftmentMaterial = getOrCreateEngraftmentMaterial(sampleType);
 
         Sample xenoSample = new Sample();
+        xenoSample.setSourceSampleId("");
         Specimen specimen = new Specimen();
         specimen.setPassage(passageNum);
         specimen.setHostStrain(hostStrain);
