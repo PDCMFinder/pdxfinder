@@ -327,7 +327,7 @@ public class DomainObjectCreator {
         createMutationData(pdxDataTables);
         createCnaData(pdxDataTables);
         createCytogeneticsData(pdxDataTables);
-        //createExpressionData(pdxDataTables);
+        createExpressionData(pdxDataTables);
     }
 
     private void createMutationData(Map<String, Table> pdxDataTables){
@@ -375,8 +375,8 @@ public class DomainObjectCreator {
             Map<String, Object> models = domainObjects.get(MODELS);
             for(Map.Entry<String, Object> entry : models.entrySet()){
                 ModelCreation modelCreation = (ModelCreation) entry.getValue();
-                String cnaModelId = "exp_"+modelCreation.getSourcePdxId()+".tsv";
-                expressionTable = pdxDataTables.get(cnaModelId);
+                String expModelId = "expression_"+modelCreation.getSourcePdxId()+".tsv";
+                expressionTable = pdxDataTables.get(expModelId);
                 if(expressionTable != null){
                     log.info(modelCreation.getSourcePdxId());
                     createMolecularData(expressionTable, "expression");
