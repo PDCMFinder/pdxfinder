@@ -476,8 +476,6 @@ public class UniversalDataExporter {
                     }
                 }
 
-                //then get the MA data inserted
-
                 if(molcharType.equals("mutation")){
                     rowData.add(md.getMarker());
                     rowData.add(md.getAminoAcidChange());
@@ -523,7 +521,24 @@ public class UniversalDataExporter {
                     rowData.add("");
                     rowData.add("");
                 } else if(molcharType.equals("expression")) {
-
+                    rowData.add(md.getChromosome());
+                    rowData.add("");
+                    rowData.add(md.getSeqStartPosition());
+                    rowData.add(md.getSeqEndPosition());
+                    rowData.add(md.getUcscGeneId());
+                    rowData.add("");
+                    rowData.add("");
+                    rowData.add(md.getRnaSeqCoverage());
+                    rowData.add(md.getRnaSeqFPKM());
+                    rowData.add(md.getRnaSeqTPM());
+                    rowData.add(md.getRnaSeqCount());
+                    rowData.add(md.getAffyHGEAProbeId());
+                    rowData.add(md.getAffyHGEAExpressionValue());
+                    rowData.add(md.getIlluminaHGEAProbeId());
+                    rowData.add(md.getIlluminaHGEAExpressionValue());
+                    rowData.add(md.getZscore());
+                    rowData.add(md.getGenomeAssembly());
+                    rowData.add(mc.getPlatform().getName());
                 }
                 sheetData.add(rowData);
             }
