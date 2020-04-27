@@ -178,19 +178,24 @@ public class DomainObjectCreator {
         for (Row row : modelTable) {
             String modelId = row.getString(TSV.Metadata.model_id.name());
             String hostStrainNomenclature = row.getString(TSV.Metadata.host_strain_full.name());
-            String passageNum = row.getString(TSV.Metadata.passage_number.name());
+            String passageString = row.getString(TSV.Metadata.passage_number.name());
 
             ModelCreation modelCreation = new ModelCreation();
             modelCreation.setSourcePdxId(modelId);
             modelCreation.setDataSource(providerGroup.getAbbreviation());
             addDomainObject(MODELS, modelId, modelCreation);
 
-            Specimen specimen = modelCreation.getSpecimenByPassageAndHostStrain(passageNum, hostStrainNomenclature);
-            if (specimen == null) {
-                specimen = createSpecimen(row, row.getRowNumber());
-                modelCreation.addSpecimen(specimen);
-                modelCreation.addRelatedSample(specimen.getSample());
+            String[] passageArr = passageString.split(",");
+
+            for(String passage: passageArr){
+                Specimen specimen = modelCreation.getSpecimenByPassageAndHostStrain(passage, hostStrainNomenclature);
+                if (specimen == null) {
+                    specimen = createSpecimen(row, passage);
+                    modelCreation.addSpecimen(specimen);
+                    modelCreation.addRelatedSample(specimen.getSample());
+                }
             }
+
         }
         createModelValidationData(pdxDataTables);
     }
@@ -475,7 +480,7 @@ public class DomainObjectCreator {
             specimen = new Specimen();
             specimen.setPassage(passage);
 
-            HostStrain hostStrain = getOrCreateHostStrain(NOT_SPECIFIED, hostStrainSymbol, row.getRowNumber());
+            HostStrain hostStrain = getOrCreateHostStrain(NOT_SPECIFIED, hostStrainSymbol);
             specimen.setHostStrain(hostStrain);
 
             Sample sample = new Sample();
@@ -664,16 +669,16 @@ public class DomainObjectCreator {
         return externalUrls;
     }
 
-    private Specimen createSpecimen(Row row, int rowNumber) {
+    private Specimen createSpecimen(Row row, String passage) {
 
         String hostStrainName = row.getString(TSV.Metadata.host_strain.name());
         String hostStrainNomenclature = row.getString(TSV.Metadata.host_strain_full.name());
         String engraftmentSiteName = row.getString(TSV.Metadata.engraftment_site.name());
         String engraftmentTypeName = row.getString(TSV.Metadata.engraftment_type.name());
         String sampleType = row.getString(TSV.Metadata.sample_type.name());
-        String passageNum = row.getString(TSV.Metadata.passage_number.name());
+        String passageNum = passage.trim();
 
-        HostStrain hostStrain = getOrCreateHostStrain(hostStrainName, hostStrainNomenclature, rowNumber);
+        HostStrain hostStrain = getOrCreateHostStrain(hostStrainName, hostStrainNomenclature);
         EngraftmentSite engraftmentSite = getOrCreateEngraftment(engraftmentSiteName);
         EngraftmentType engraftmentType = getOrCreateEngraftmentType(engraftmentTypeName);
         EngraftmentMaterial engraftmentMaterial = getOrCreateEngraftmentMaterial(sampleType);
@@ -718,7 +723,7 @@ public class DomainObjectCreator {
         return engraftmentSite;
     }
 
-    private HostStrain getOrCreateHostStrain(String hostStrainName, String hostStrainNomenclature, int rowNumber) {
+    private HostStrain getOrCreateHostStrain(String hostStrainName, String hostStrainNomenclature) {
         HostStrain hostStrain = (HostStrain) getDomainObject(HOST_STRAINS, hostStrainNomenclature);
         if (hostStrain == null) {
             try {
