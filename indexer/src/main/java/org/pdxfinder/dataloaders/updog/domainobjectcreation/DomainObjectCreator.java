@@ -357,7 +357,7 @@ public class DomainObjectCreator {
     private void createCnaData(Map<String, Table> pdxDataTables){
         Table cnaTable = pdxDataTables.get("cna.tsv");
         if (cnaTable != null) {
-            createMolecularData(cnaTable, "copynumberalteration");
+            createMolecularData(cnaTable, "copy number alteration");
         } else {
             Map<String, Object> models = domainObjects.get(MODELS);
             for(Map.Entry<String, Object> entry : models.entrySet()){
@@ -366,7 +366,7 @@ public class DomainObjectCreator {
                 cnaTable = pdxDataTables.get(cnaModelId);
                 if(cnaTable != null){
                     log.info(modelCreation.getSourcePdxId());
-                    createMolecularData(cnaTable, "copynumberalteration");
+                    createMolecularData(cnaTable, "copy number alteration");
                 }
             }
         }
@@ -558,7 +558,7 @@ public class DomainObjectCreator {
             case "cytogenetics":
                 molecularData = getCytogeneticsProperties(row, marker);
                 break;
-            case "copynumberalteration":
+            case "copy number alteration":
                 molecularData = getCNAProperties(row, marker);
                 break;
             case "expression":
