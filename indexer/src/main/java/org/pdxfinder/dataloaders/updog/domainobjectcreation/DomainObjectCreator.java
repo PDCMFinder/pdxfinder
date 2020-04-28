@@ -840,7 +840,7 @@ public class DomainObjectCreator {
             if (model.hasSpecimens())
                 for (Specimen s : model.getSpecimens()) encodeMolecularDataFor(s);
 
-            log.info("Saving model {}", (model.getSourcePdxId()));
+            log.debug("Saving model {}", (model.getSourcePdxId()));
             dataImportService.saveModelCreation(model);
 
             iter.remove();
