@@ -840,7 +840,7 @@ public class DomainObjectCreator {
             if (model.hasSpecimens())
                 for (Specimen s : model.getSpecimens()) encodeMolecularDataFor(s);
 
-            log.debug("Saving model {}", (model.getSourcePdxId()));
+            log.info("Saving model {}", (model.getSourcePdxId()));
             dataImportService.saveModelCreation(model);
 
             iter.remove();
@@ -893,8 +893,9 @@ public class DomainObjectCreator {
 
     private void encodeMolecularDataFor(MolecularCharacterization mc) {
         if (mc.hasMarkerAssociations()) {
-            mc.getFirstMarkerAssociation().encodeMolecularData();
             mc.setMarkers(getMarkers(mc.getFirstMarkerAssociation()));
+            mc.getFirstMarkerAssociation().encodeMolecularData();
+
         }
     }
 
