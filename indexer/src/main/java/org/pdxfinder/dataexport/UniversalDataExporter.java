@@ -487,11 +487,11 @@ public class UniversalDataExporter {
                     rowData.add(md.getSeqStartPosition());
                     rowData.add(md.getRefAllele());
                     rowData.add(md.getAltAllele());
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getMarker());
-                    //no transcript id
-                    rowData.add("");
+                    rowData.add(md.getUcscGeneId());
+                    rowData.add(md.getNcbiGeneId()); // ensemble_gene_id	ensemble_transcript_id	variation_id	genome_assembly	platform
+                    rowData.add(md.getNcbiTranscriptId());
+                    rowData.add(md.getEnsemblGeneId());
+                    rowData.add(md.getEnsemblTranscriptId());
                     rowData.add(md.getExistingVariations());
                     rowData.add(md.getGenomeAssembly());
                     rowData.add(mc.getPlatform().getName());
@@ -502,9 +502,9 @@ public class UniversalDataExporter {
                     rowData.add(md.getSeqStartPosition());
                     rowData.add(md.getSeqEndPosition());
                     rowData.add(md.getMarker());
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getMarker());
+                    rowData.add(md.getUcscGeneId());
+                    rowData.add(md.getNcbiGeneId());
+                    rowData.add(md.getEnsemblGeneId());
                     rowData.add(md.getCnaLog10RCNA());
                     rowData.add(md.getCnaLog2RCNA());
                     rowData.add(md.getFold_change());
@@ -514,6 +514,7 @@ public class UniversalDataExporter {
                     rowData.add(md.getGenomeAssembly());
                     rowData.add(mc.getPlatform().getName());
                 } else if(molcharType.equals("cytogenetics")){
+                    rowData.add("");
                     rowData.add(md.getMarker());
                     rowData.add(md.getCytogeneticsResult());
                     rowData.add(md.getMarkerStatusComment());
@@ -525,7 +526,8 @@ public class UniversalDataExporter {
                     rowData.add("");
                     rowData.add(md.getSeqStartPosition());
                     rowData.add(md.getSeqEndPosition());
-                    rowData.add(md.getUcscGeneId());
+                    rowData.add(md.getMarker());
+                    rowData.add(""); //UCSC gene ideas that are never used.
                     rowData.add("");
                     rowData.add("");
                     rowData.add(md.getRnaSeqCoverage());
