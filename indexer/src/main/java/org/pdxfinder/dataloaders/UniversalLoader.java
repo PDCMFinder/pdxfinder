@@ -783,8 +783,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
             else if(molCharType.equals("copy number alteration")){
                 platformTag = "_cna";
             }
-            else if(molCharType.equals("transcriptomics")){
-                platformTag = "_trans";
+            else if(molCharType.equals("expression")){
+                platformTag = "_exp";
             }
 
 
@@ -1041,8 +1041,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 // Transcriptomics
                 if(transcriptomicData.exists()){
-                    log.info("Loading transcriptomics for "+modelId);
-                    loadOmicData(modelCreation, ds, "transcriptomics", providerDataRootDir);
+                    log.info("Loading expression for "+modelId);
+                    loadOmicData(modelCreation, ds, "expression", providerDataRootDir);
                 }
 
 

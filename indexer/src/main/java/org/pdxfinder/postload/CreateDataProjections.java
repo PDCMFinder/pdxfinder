@@ -399,8 +399,8 @@ public class CreateDataProjections implements ApplicationContextAware{
     private void createTranscriptomicsDataProjection(){
 
 
-        Collection<MolecularCharacterization> transMolchars = dataImportService.findMolCharsByType("transcriptomics");
-        log.info("Looking at "+transMolchars.size()+" Transcriptomics MolChar objects. This may take a while folks...");
+        Collection<MolecularCharacterization> transMolchars = dataImportService.findMolCharsByType("expression");
+        log.info("Looking at "+transMolchars.size()+" Expression MolChar objects. This may take a while folks...");
 
         int count = 0;
 
@@ -890,7 +890,7 @@ public class CreateDataProjections implements ApplicationContextAware{
 
                                     cytogeneticsPlatformsByModel.get(mc.getId()).add(platformName);
                                 }
-                                else if (molc.getType().toLowerCase().equals("transcriptomics")) {
+                                else if (molc.getType().toLowerCase().equals("expression")) {
 
                                     if (!transcriptomicsPlatformsByModel.containsKey(mc.getId())) {
 
@@ -989,7 +989,7 @@ public class CreateDataProjections implements ApplicationContextAware{
             }
 
             if(transcriptomicsPlatformsByModel.containsKey(mc.getId())){
-                dataAvailable.add("Transcriptomics");
+                dataAvailable.add("Expression");
             }
 
 
@@ -1457,7 +1457,7 @@ public class CreateDataProjections implements ApplicationContextAware{
 
         if(transDP == null){
             transDP = new DataProjection();
-            transDP.setLabel("transcriptomics");
+            transDP.setLabel("expression");
         }
 
 
