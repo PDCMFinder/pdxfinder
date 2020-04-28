@@ -25,7 +25,8 @@ public enum DataProviderGroup {
                 DataProvider.UOC_BC,
                 DataProvider.UOM_BC,
                 DataProvider.VHIO_BC,
-                DataProvider.VHIO_CRC
+                DataProvider.VHIO_CRC,
+                DataProvider.NKI
         ));
 
         map.put(DataProviderGroup.UPDOG, Arrays.asList(
