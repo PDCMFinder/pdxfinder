@@ -15,14 +15,21 @@ public class EmptyValueError implements ValidationError {
     }
 
     @Override
+    public String verboseMessage() {
+        return String.format(
+            "%s:%n%s",
+            message(),
+            getInvalidRows()
+        );
+    }
+
+    @Override
     public String message() {
         return String.format(
-            "Error in [%s] for provider [%s]: Missing value(s) in required column [%s]:" +
-                "%n%s",
+            "Error in [%s] for provider [%s]: Missing value(s) in required column [%s]",
             nonEmptyColumn.table(),
             provider,
-            nonEmptyColumn.column(),
-            getInvalidRows()
+            nonEmptyColumn.column()
         );
     }
 
@@ -32,6 +39,6 @@ public class EmptyValueError implements ValidationError {
 
     @Override
     public String toString() {
-        return message();
+        return verboseMessage();
     }
 }

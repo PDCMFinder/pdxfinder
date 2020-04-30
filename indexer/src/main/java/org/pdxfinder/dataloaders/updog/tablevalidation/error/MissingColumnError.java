@@ -3,13 +3,11 @@ package org.pdxfinder.dataloaders.updog.tablevalidation.error;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 
 public class MissingColumnError implements ValidationError {
-    private String tableName;
-    private String columnName;
+    private ColumnReference columnReference;
     private String provider;
 
     MissingColumnError(ColumnReference columnReference, String provider) {
-        this.tableName = tableName;
-        this.columnName = columnName;
+        this.columnReference = columnReference;
         this.provider = provider;
     }
 
@@ -17,9 +15,9 @@ public class MissingColumnError implements ValidationError {
     public String message() {
         return String.format(
             "Error in [%s] for provider [%s]: Missing column: [%s]",
-            tableName,
+            columnReference.table(),
             provider,
-            columnName);
+            columnReference.column());
     }
 
     @Override

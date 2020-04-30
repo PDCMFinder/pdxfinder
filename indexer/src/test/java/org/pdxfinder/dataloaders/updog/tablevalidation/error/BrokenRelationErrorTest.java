@@ -11,6 +11,7 @@ import java.util.Arrays;
 import static org.junit.Assert.*;
 
 public class BrokenRelationErrorTest {
+    private BrokenRelationErrorCreator brokenRelationErrorCreator = new BrokenRelationErrorCreator();
 
     @Test public void toString_givenBrokenRelationMissingRightColumn_returnsAppropriateMessage() {
         String expected =
@@ -22,21 +23,22 @@ public class BrokenRelationErrorTest {
             ColumnReference.of("foo.tsv", "foo_id"),
             ColumnReference.of("bar.tsv", "foo_id"));
         Table tableMissingColumn = Table.create().addColumns(StringColumn.create("not_foo_id"));
-        BrokenRelationError error = new BrokenRelationError(
+        BrokenRelationError error = brokenRelationErrorCreator.create(
             "bar.tsv",
             relation,
             tableMissingColumn,
             "because [bar.tsv] is missing column [foo_id]",
-            "TEST");
+            "TEST"
+        );
 
         assertEquals(
             expected,
-            error.toString()
+            error.verboseMessage()
         );
     }
 
 
-    @Test public void toString_givenBrokenRelationOrphanIdsInRightColumn_returnsAppropriateMessage() {
+    @Test public void verboseMessage_givenBrokenRelationOrphanIdsInRightColumn_returnsAppropriateMessage() {
         String expected =
             "Error in [bar.tsv] for provider [PROVIDER-BC]: " +
                 "Broken relation [(foo.tsv) foo_id -> foo_id (bar.tsv)]: " +
@@ -50,14 +52,40 @@ public class BrokenRelationErrorTest {
             ColumnReference.of("bar.tsv", "foo_id"));
         Table tableMissingValues = Table.create().addColumns(
             StringColumn.create("foo_id", Arrays.asList("1", "1")));
-        ValidationErrorImpl error = ValidationErrorImpl
-            .brokenRelation("bar.tsv", relation, tableMissingValues)
-            .setDescription("2 orphan row(s) found in [bar.tsv]")
-            .setProvider("PROVIDER-BC");
+        BrokenRelationError error = brokenRelationErrorCreator.create(
+            "bar.tsv",
+            relation,
+            tableMissingValues,
+            "2 orphan row(s) found in [bar.tsv]",
+            "PROVIDER-BC"
+        );
 
         assertEquals(
             expected,
-            error.toString()
+            error.verboseMessage()
+        );
+    }
+
+    @Test public void message_givenError_returnsAppropriateMessage() {
+        String expected =
+            "Error in [bar.tsv] for provider [PROVIDER-BC]: " +
+                "Broken relation [(foo.tsv) foo_id -> foo_id (bar.tsv)]: " +
+                "2 orphan row(s) found in [bar.tsv]";
+        Relation relation = Relation.between(
+            ColumnReference.of("foo.tsv", "foo_id"),
+            ColumnReference.of("bar.tsv", "foo_id"));
+        Table tableMissingValues = Table.create().addColumns(
+            StringColumn.create("foo_id", Arrays.asList("1", "1")));
+        BrokenRelationError error = brokenRelationErrorCreator.create(
+            "bar.tsv",
+            relation,
+            tableMissingValues,
+            "2 orphan row(s) found in [bar.tsv]",
+            "PROVIDER-BC"
+        );
+        assertEquals(
+            expected,
+            error.message()
         );
     }
 

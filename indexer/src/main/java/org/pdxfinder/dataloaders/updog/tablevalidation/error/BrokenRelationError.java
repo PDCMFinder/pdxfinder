@@ -29,19 +29,23 @@ public class BrokenRelationError implements ValidationError {
     }
 
     @Override
+    public String verboseMessage() {
+        return String.format("%s:%n%s", message(), getInvalidRows());
+    }
+
+    @Override
     public String message() {
         return String.format(
-            "Error in [%s] for provider [%s]: Broken relation [%s]: %s:%n%s",
+            "Error in [%s] for provider [%s]: Broken relation [%s]: %s",
             tableName,
             provider,
             relation,
-            description,
-            getInvalidRows()
+            description
         );
     }
 
     @Override
     public String toString() {
-        return message();
+        return verboseMessage();
     }
 }

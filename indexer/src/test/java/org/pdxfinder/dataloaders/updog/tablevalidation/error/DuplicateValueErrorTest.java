@@ -25,7 +25,7 @@ public class DuplicateValueErrorTest {
 
         assertEquals(
             expected,
-            error.message()
+            error.verboseMessage()
         );
     }
 }

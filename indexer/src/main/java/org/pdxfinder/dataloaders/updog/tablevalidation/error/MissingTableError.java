@@ -19,6 +19,6 @@ public class MissingTableError implements ValidationError {
 
     @Override
     public String toString() {
-        return message();
+        return verboseMessage();
     }
 }

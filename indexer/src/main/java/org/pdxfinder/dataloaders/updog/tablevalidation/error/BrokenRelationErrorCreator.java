@@ -93,12 +93,8 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
             tableSet.get(child.table()).stringColumn(child.column()),
             tableSet.get(parent.table()).stringColumn(parent.column()));
         if (orphanTable.rowCount() > 0) {
-            errors.add(ValidationErrorImpl
-                .brokenRelation(parent.table(), relation, orphanTable)
-                .setDescription(String.format("%s orphan row(s) found in [%s]",
-                    orphanTable.rowCount(),
-                    child.table()))
-                .setProvider(provider));
+            String description = String.format("%s orphan row(s) found in [%s]", orphanTable.rowCount(), child.table());
+            errors.add(create(parent.table(), relation, orphanTable, description, provider));
         }
     }
 

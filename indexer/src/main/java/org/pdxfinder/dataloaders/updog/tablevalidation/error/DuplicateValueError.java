@@ -32,6 +32,6 @@ public class DuplicateValueError implements ValidationError {
 
     @Override
     public String toString() {
-        return message();
+        return verboseMessage();
     }
 }

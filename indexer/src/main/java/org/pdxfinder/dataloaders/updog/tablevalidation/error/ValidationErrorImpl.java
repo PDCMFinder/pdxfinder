@@ -18,8 +18,8 @@ public class ValidationErrorImpl implements ValidationError {
     private String description;
 
     public String message() {
-        return "Not implemented";
-    };
+        return toString();
+    }
 
     public enum Type {
         GENERIC("Generic error"),
