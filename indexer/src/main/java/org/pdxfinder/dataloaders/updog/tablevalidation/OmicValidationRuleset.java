@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class OmicValidationRuleset extends ValidationRuleCreator {
 
-    private Set<ColumnReference> createColumns(String tableName) {
+    private static Set<ColumnReference> createColumns(String tableName) {
         Set<ColumnReference> columnReferences = new HashSet<>();
         if (tableName.contains("cna")) {
             Arrays.asList(
@@ -79,6 +79,35 @@ public class OmicValidationRuleset extends ValidationRuleCreator {
                 "result_file_name"
             ).forEach(s -> columnReferences.add(ColumnReference.of(tableName, s)));
         }
+        if (tableName.contains("expression")) {
+            Arrays.asList(
+                "sample_id",
+                "sample_origin",
+                "passage",
+                "host_strain_nomenclature",
+                "model_id",
+                "chromosome",
+                "strand",
+                "seq_start_position",
+                "seq_end_position",
+                "symbol",
+                "ucsc_gene_id",
+                "ncbi_gene_id",
+                "ensembl_gene_id",
+                "ensembl_transcript_id",
+                "rnaseq_coverage",
+                "rnaseq_fpkm",
+                "rnaseq_tpm",
+                "rnaseq_count",
+                "affy_hgea_probe_id",
+                "affy_hgea_expression_value",
+                "illumina_hgea_probe_id",
+                "illumina_hgea_expression_value",
+                "z_score",
+                "genome_assembly",
+                "platform"
+            ).forEach(s -> columnReferences.add(ColumnReference.of(tableName, s)));
+        }
         return columnReferences;
     }
 
@@ -87,7 +116,7 @@ public class OmicValidationRuleset extends ValidationRuleCreator {
         return TableSetSpecification.create();
     }
 
-    public TableSetSpecification generateForOmicTable(String tableName, String provider) {
+     public static TableSetSpecification generateFor(String tableName, String provider) {
         Set<ColumnReference> tableColumns = createColumns(tableName);
 
         Set<ColumnReference> modelColumns = matchingColumnsFromAnyTable(tableColumns, "model_id");

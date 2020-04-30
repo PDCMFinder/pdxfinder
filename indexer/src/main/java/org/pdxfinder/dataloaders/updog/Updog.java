@@ -6,7 +6,6 @@ import org.pdxfinder.dataloaders.updog.tablevalidation.OmicValidationRuleset;
 import org.pdxfinder.dataloaders.updog.tablevalidation.PdxValidationRuleset;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
 import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationErrorImpl;
 import org.pdxfinder.dataloaders.updog.tablevalidation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,13 +64,23 @@ public class Updog {
         combinedTableSet.putAll(treatmentTableSet);
 
         validationErrors = validateTableSet(combinedTableSet, omicsTableSet.keySet(), provider);
-        if (CollectionUtils.isNotEmpty(validationErrors))
-            log.debug(validationErrors.toString());
-        else log.debug("There were no validation errors raised, great!");
+        reportAnyErrors(validationErrors);
 
         if (!validateOnly) {
             createPdxObjects(combinedTableSet);
         }
+    }
+
+    private void reportAnyErrors(List<ValidationError> validationErrors) {
+        String errors = validationErrors.toString();
+        if (CollectionUtils.isNotEmpty(validationErrors))
+            log.error(errors);
+        else
+            log.info("There were no validation errors raised, great!");
+    }
+
+    private boolean hasNoValidationErrors(List<ValidationError> errors) {
+        return CollectionUtils.isEmpty(errors);
     }
 
     private Map<String, Table> readOmicsTablesFromPath(Path updogProviderDirectory) {
@@ -96,7 +105,7 @@ public class Updog {
     ) {
         TableSetSpecification omicSpecifications = TableSetSpecification.create();
         for (String tableName : omicTables) {
-            merge(omicSpecifications, new OmicValidationRuleset().generateForOmicTable(tableName, provider));
+            omicSpecifications =  omicSpecifications.merge(OmicValidationRuleset.generateFor(tableName, provider));
         }
 
         TableSetSpecification combinedValidationRuleset = merge(

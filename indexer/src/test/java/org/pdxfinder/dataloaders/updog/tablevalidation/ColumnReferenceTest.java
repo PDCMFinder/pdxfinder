@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 public class ColumnReferenceTest {
 
     @Test public void getters_givenInstantiation_returnsValues() {
-        ColumnReference columnReference = new ColumnReference("table", "column");
+        ColumnReference columnReference = ColumnReference.of("table", "column");
         assertEquals(
             "table",
             columnReference.table()

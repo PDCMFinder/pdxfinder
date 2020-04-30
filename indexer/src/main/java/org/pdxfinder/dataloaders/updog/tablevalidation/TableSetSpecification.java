@@ -112,6 +112,19 @@ public class TableSetSpecification {
         return missingFiles;
     }
 
+    public TableSetSpecification merge(TableSetSpecification ...tableSetSpecifications) {
+        TableSetSpecification mergedTableSetSpecifications = TableSetSpecification.create();
+        for (TableSetSpecification tss : tableSetSpecifications) {
+            mergedTableSetSpecifications.setProvider(tss.getProvider());
+            mergedTableSetSpecifications.addRequiredTables(tss.getRequiredTables());
+            mergedTableSetSpecifications.addRequiredColumns(tss.getRequiredColumns());
+            mergedTableSetSpecifications.addNonEmptyColumns(tss.getNonEmptyColumns());
+            mergedTableSetSpecifications.addUniqueColumns(tss.getUniqueColumns());
+            mergedTableSetSpecifications.addRelations(tss.getRelations());
+        }
+        return mergedTableSetSpecifications;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

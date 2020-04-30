@@ -13,7 +13,7 @@ abstract class ValidationRuleCreator {
 
     abstract TableSetSpecification generate(String provider);
 
-    protected Set<ColumnReference> matchingColumnsFromTable(
+    protected static Set<ColumnReference> matchingColumnsFromTable(
         Set<ColumnReference> columns,
         String tableName,
         String[] columnNamePatterns) {
@@ -24,7 +24,7 @@ abstract class ValidationRuleCreator {
             .collect(Collectors.toSet());
     }
 
-    protected Set<ColumnReference> matchingColumnsFromAnyTable(
+    protected static Set<ColumnReference> matchingColumnsFromAnyTable(
         Set<ColumnReference> columns,
         String columnNamePattern
     ) {

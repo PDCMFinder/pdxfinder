@@ -99,15 +99,15 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
         Set<ColumnReference> idColumns = matchingColumnsFromAnyTable(columnReferences, "_id");
         Set<ColumnReference> hostStrainColumns = matchingColumnsFromAnyTable(columnReferences, "host_strain");
 
-        Set<ColumnReference>essentialSampleColumns = matchingColumnsFromTable(columnReferences, "sample",
-            new String[]{"age_in_years", "diagnosis", "tumour", "_site", "treatment_naive"});
-        Set<ColumnReference>essentialModelColumns = matchingColumnsFromTable(columnReferences, "model.",
+        Set<ColumnReference> essentialSampleColumns = matchingColumnsFromTable(columnReferences, "sample",
+            new String[]{"age_in_years", "diagnosis", "tumour", "_site"});
+        Set<ColumnReference> essentialModelColumns = matchingColumnsFromTable(columnReferences, "model.",
             new String[]{"engraftment_", "sample_type", "passage_number"});
-        Set<ColumnReference>essentialModelValidationColumns = matchingColumnsFromTable(columnReferences, "model_validation",
+        Set<ColumnReference> essentialModelValidationColumns = matchingColumnsFromTable(columnReferences, "model_validation",
             new String[]{"validation_technique", "description", "passages_tested"});
-        Set<ColumnReference>essentialSharingColumns = matchingColumnsFromTable(columnReferences, "sharing",
+        Set<ColumnReference> essentialSharingColumns = matchingColumnsFromTable(columnReferences, "sharing",
             new String[]{"provider_", "access", "email", "name", "project"});
-        Set<ColumnReference>essentialLoaderColumns = matchingColumnsFromTable(columnReferences, "loader",
+        Set<ColumnReference> essentialLoaderColumns = matchingColumnsFromTable(columnReferences, "loader",
             new String[]{"name", "abbreviation"});
 
         Set<ColumnReference> essentialColumns = TableSetUtilities.concatenate(

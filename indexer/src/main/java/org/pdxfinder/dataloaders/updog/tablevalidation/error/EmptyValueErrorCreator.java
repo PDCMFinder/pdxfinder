@@ -18,7 +18,7 @@ public class EmptyValueErrorCreator extends ErrorCreator {
         for (ColumnReference tested : tableSetSpecification.getNonEmptyColumns()) {
             Table table = tableSet.get(tested.table());
             Table missing = table.where(
-                table.stringColumn(tested.column()).isMissing());
+                table.column(tested.column()).isMissing());
             if (missing.rowCount() > 0) {
                 errors.add(create(tested, missing, tableSetSpecification.getProvider()));
             }

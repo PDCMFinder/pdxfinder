@@ -4,14 +4,12 @@ import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import tech.tablesaw.api.Table;
 
 public class EmptyValueError implements ValidationError {
-    private String tableName;
-    private String columnName;
+    private ColumnReference nonEmptyColumn;
     private Table invalidRows;
     private String provider;
 
-    EmptyValueError(ColumnReference columnReference, Table invalidRows, String provider) {
-        this.tableName = tableName;
-        this.columnName = columnName;
+    EmptyValueError(ColumnReference nonEmptyColumn, Table invalidRows, String provider) {
+        this.nonEmptyColumn = nonEmptyColumn;
         this.invalidRows = invalidRows;
         this.provider = provider;
     }
@@ -21,9 +19,9 @@ public class EmptyValueError implements ValidationError {
         return String.format(
             "Error in [%s] for provider [%s]: Missing value(s) in required column [%s]:" +
                 "%n%s",
-            tableName,
+            nonEmptyColumn.table(),
             provider,
-            columnName,
+            nonEmptyColumn.column(),
             getInvalidRows()
         );
     }

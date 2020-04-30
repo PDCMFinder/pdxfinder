@@ -3,13 +3,11 @@ package org.pdxfinder.dataloaders.updog.tablevalidation;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.StringJoiner;
-
 public class ColumnReference {
     private String tableName;
     private String columnName;
 
-    ColumnReference(String tableName, String columnName) {
+    private ColumnReference(String tableName, String columnName) {
         this.tableName = tableName;
         this.columnName = columnName;
     }
@@ -50,9 +48,6 @@ public class ColumnReference {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", ColumnReference.class.getSimpleName() + "[", "]")
-            .add("tableName='" + tableName + "'")
-            .add("columnName='" + columnName + "'")
-            .toString();
+        return String.format("%s > %s", table(), column());
     }
 }
