@@ -137,9 +137,14 @@ public class OmicValidationRuleset extends ValidationRuleCreator {
             essentialCytogeneticsColumns
         );
 
+        Relation relations = Relation.between(
+            ColumnReference.of("metadata-model.tsv", "model_id"),
+            ColumnReference.of(tableName, "model_id"));
+
         return TableSetSpecification.create()
             .addRequiredColumns(essentialColumns)
             .addNonEmptyColumns(essentialColumns)
+            .addRelations(relations)
             .setProvider(provider);
     }
 

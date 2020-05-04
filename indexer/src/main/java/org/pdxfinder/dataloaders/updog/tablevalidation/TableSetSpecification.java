@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 public class TableSetSpecification {
 
@@ -168,13 +169,17 @@ public class TableSetSpecification {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", TableSetSpecification.class.getSimpleName() + "[", "]")
-            .add("requiredTables=" + requiredTables)
-            .add("requiredColumns=" + requiredColumns)
-            .add("nonEmptyColumns=" + nonEmptyColumns)
-            .add("uniqueColumns=" + uniqueColumns)
-            .add("relations=" + relations)
-            .add("provider='" + provider + "'")
+        return new StringJoiner("\n ", TableSetSpecification.class.getSimpleName() + "[\n", "]")
+            .add("requiredTables=\n\t" + String.join("\n\t", requiredTables))
+            .add("requiredColumns=\n\t" + String.join("\n\t",
+                requiredColumns.stream().map(ColumnReference::toString).collect(Collectors.toSet())))
+            .add("nonEmptyColumns=\n\t" + String.join("\n\t",
+                nonEmptyColumns.stream().map(ColumnReference::toString).collect(Collectors.toSet())))
+            .add("uniqueColumns=\n\t" + String.join("\n\t",
+                uniqueColumns.stream().map(ColumnReference::toString).collect(Collectors.toSet())))
+            .add("relations=\n\t" + String.join("\n\t",
+                relations.stream().map(Relation::toString).collect(Collectors.toSet())))
+            .add("provider=\n\t'" + provider + "'")
             .toString();
     }
 }
