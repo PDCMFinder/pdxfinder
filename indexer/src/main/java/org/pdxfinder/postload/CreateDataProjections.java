@@ -75,6 +75,9 @@ public class CreateDataProjections implements ApplicationContextAware{
     //"cnamarker"=>set of model ids
     private Map<String, Set<Long>> copyNumberAlterationDP = new HashMap<>();
 
+    //"platform"=>"marker"=>"set of model ids"
+    private Map<String, Map<String, Set<Long>>> expressionDP = new HashMap<>();
+
     private Map<String, List<DataAvailableDTO>> dataAvailableDP = new HashMap<>();
 
     private TreeMap<String, Set<Long>> frequentlyMutatedMarkers = new TreeMap<>();
@@ -82,9 +85,6 @@ public class CreateDataProjections implements ApplicationContextAware{
 
     //"treatment name"=>"set of model ids"
     private Map<String, Set<Long>> patientTreatmentDP = new HashMap<>();
-
-
-    private Map<String, Set<Long>> transcriptomicsDP = new HashMap<>();
 
     protected static ApplicationContext context;
 
@@ -117,7 +117,7 @@ public class CreateDataProjections implements ApplicationContextAware{
 
         createCNADataProjection();
 
-        createTranscriptomicsDataProjection();
+        createExpressionDataProjection();
 
         createDataAvailableDataProjection();
 
@@ -389,44 +389,25 @@ public class CreateDataProjections implements ApplicationContextAware{
 
     }
 
-    private void createTranscriptomicsDataProjection(){
+    private void createExpressionDataProjection(){
 
 
-        Collection<MolecularCharacterization> transMolchars = dataImportService.findMolCharsByType("expression");
-        log.info("Looking at "+transMolchars.size()+" Expression MolChar objects. This may take a while folks...");
+        Collection<MolecularCharacterization> expressionMolchars = dataImportService.findMolCharsByType("expression");
+        log.info("Looking at "+expressionMolchars.size()+" Expression MolChar objects. This may take a while folks...");
 
-        int count = 0;
-
-        for(MolecularCharacterization mc:transMolchars) {
+        for(MolecularCharacterization mc:expressionMolchars) {
 
             ModelCreation model = dataImportService.findModelWithSampleByMolChar(mc);
             Long modelId = model.getId();
-
+            String platform = mc.getPlatform().getName();
             Set<String> mas = mc.getMarkers();
 
             if(mas != null){
                 for(String m : mas){
-
-                    if(transcriptomicsDP.containsKey(m)){
-
-                        transcriptomicsDP.get(m).add(modelId);
-                    }
-                    else{
-
-                        Set<Long> newSet = new HashSet<>();
-                        newSet.add(modelId);
-                        transcriptomicsDP.put(m, newSet);
-                    }
+                    addToTwoParamDP(expressionDP, platform, m, modelId);
                 }
-
             }
-
-
-
         }
-
-        count++;
-
 
     }
 
@@ -1452,12 +1433,12 @@ public class CreateDataProjections implements ApplicationContextAware{
         }
 
 
-        DataProjection transDP = dataImportService.findDataProjectionByLabel("expression");
+        DataProjection expDP = dataImportService.findDataProjectionByLabel("expression");
 
 
-        if(transDP == null){
-            transDP = new DataProjection();
-            transDP.setLabel("expression");
+        if(expDP == null){
+            expDP = new DataProjection();
+            expDP.setLabel("expression");
         }
 
 
@@ -1484,12 +1465,12 @@ public class CreateDataProjections implements ApplicationContextAware{
 
 
 
-        JSONObject j1 ,j2, j3, j4, j5, j6, j7,j8;
+        JSONObject json;//1 ,j2, j3, j4, j5, j6, j7,j8;
 
 
         try{
-            j1 = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
-            pmvmDP.setValue(j1.toString());
+            json = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
+            pmvmDP.setValue(json.toString());
         }
         catch(Exception e){
 
@@ -1498,16 +1479,16 @@ public class CreateDataProjections implements ApplicationContextAware{
         }
 
         try{
-            j2 = new JSONObject(mutatedMarkerVariantDP.toString());
-            mvDP.setValue(j2.toString());
+            json = new JSONObject(mutatedMarkerVariantDP.toString());
+            mvDP.setValue(json.toString());
         }
         catch(Exception e){
             e.printStackTrace();
             log.error(mutatedMarkerVariantDP.toString());
         }
         try{
-            j3 = new JSONObject(modelDrugResponseDP.toString());
-            drugDP.setValue(j3.toString());
+            json = new JSONObject(modelDrugResponseDP.toString());
+            drugDP.setValue(json.toString());
         }
         catch(Exception e){
             e.printStackTrace();
@@ -1515,8 +1496,8 @@ public class CreateDataProjections implements ApplicationContextAware{
         }
 
         try{
-            j4 = new JSONObject(immunoHistoChemistryDP.toString());
-            ihcDP.setValue(j4.toString());
+            json = new JSONObject(immunoHistoChemistryDP.toString());
+            ihcDP.setValue(json.toString());
         }
         catch(Exception e){
             e.printStackTrace();
@@ -1524,8 +1505,8 @@ public class CreateDataProjections implements ApplicationContextAware{
         }
 
         try{
-            j5 = new JSONObject(copyNumberAlterationDP.toString());
-            cnaDP.setValue(j5.toString());
+            json = new JSONObject(copyNumberAlterationDP.toString());
+            cnaDP.setValue(json.toString());
         }
         catch(Exception e){
             e.printStackTrace();
@@ -1533,8 +1514,8 @@ public class CreateDataProjections implements ApplicationContextAware{
         }
 
         try{
-            j6 = new JSONObject(dataAvailableDP.toString());
-            daDP.setValue(j6.toString());
+            json = new JSONObject(dataAvailableDP.toString());
+            daDP.setValue(json.toString());
         }
         catch(Exception e){
 
@@ -1543,8 +1524,8 @@ public class CreateDataProjections implements ApplicationContextAware{
         }
 
         try{
-            j7 = new JSONObject(patientTreatmentDP.toString());
-            ptDP.setValue(j7.toString());
+            json = new JSONObject(patientTreatmentDP.toString());
+            ptDP.setValue(json.toString());
             System.out.println();
         }
         catch(Exception e){
@@ -1554,7 +1535,6 @@ public class CreateDataProjections implements ApplicationContextAware{
 
 
         try{
-            //ja1 = new JSONArray(frequentlyMutatedMarkersDP.toString());
             fmgDP.setValue(frequentlyMutatedMarkersDP.toString());
         }
         catch(Exception e){
@@ -1564,14 +1544,23 @@ public class CreateDataProjections implements ApplicationContextAware{
         }
 
         try{
-            j8 = new JSONObject(cytogeneticsDP.toString());
-            cytoDP.setValue(j8.toString());
+            json = new JSONObject(cytogeneticsDP.toString());
+            cytoDP.setValue(json.toString());
 
         }
         catch(Exception e){
             e.printStackTrace();
             log.error(cytogeneticsDP.toString());
-            System.out.println();
+        }
+
+        try{
+            json = new JSONObject(expressionDP.toString());
+            expDP.setValue(json.toString());
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(expressionDP.toString());
         }
 
 
@@ -1584,6 +1573,7 @@ public class CreateDataProjections implements ApplicationContextAware{
         dataImportService.saveDataProjection(fmgDP);
         dataImportService.saveDataProjection(ptDP);
         dataImportService.saveDataProjection(cytoDP);
+        dataImportService.saveDataProjection(expDP);
 
     }
 
