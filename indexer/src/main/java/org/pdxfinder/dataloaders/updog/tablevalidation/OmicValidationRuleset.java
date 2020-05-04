@@ -71,7 +71,7 @@ public class OmicValidationRuleset extends ValidationRuleCreator {
                 "passage",
                 "host_strain_nomenclature",
                 "model_id",
-                "marker_name",
+                "symbol",
                 "marker_status",
                 "essential_or_additional_marker",
                 "platform",
