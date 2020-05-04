@@ -1,9 +1,6 @@
 package org.pdxfinder.postload;
 
 import com.google.gson.Gson;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dataloaders.UniversalLoader;
 import org.pdxfinder.graph.dao.*;
@@ -21,11 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
@@ -72,6 +68,9 @@ public class CreateDataProjections implements ApplicationContextAware{
 
     //"platform"=>"markercombos"=>"set of model ids"
     private Map<String, Map<String, Set<Long>>> immunoHistoChemistryDP = new HashMap<>();
+
+    //marker=>status=>set of model ids
+    private Map<String, Map<String, Set<Long>>> cytogeneticsDP = new HashMap<>();
 
     //"cnamarker"=>set of model ids
     private Map<String, Set<Long>> copyNumberAlterationDP = new HashMap<>();
@@ -251,8 +250,6 @@ public class CreateDataProjections implements ApplicationContextAware{
 
             Set<MarkerAssociation> mas = dataImportService.findMarkerAssocsByMolChar(mc);
 
-            Set<String> markerSet = new HashSet<>();
-
             if(mas != null){
 
                 for(MarkerAssociation ma: mas){
@@ -277,6 +274,9 @@ public class CreateDataProjections implements ApplicationContextAware{
 
                             //this was needed to avoid issues with variants where the value was a single space " "
                             if(ihcResult.length()<3) ihcResult = "Not applicable";
+
+                            addToTwoParamDP(cytogeneticsDP, markerName, ihcResult.toLowerCase(), modelId);
+
                             if(ihcResult.toLowerCase().contains("pos")) ihcResult = "pos";
                             if(ihcResult.toLowerCase().contains("neg")) ihcResult = "neg";
 
@@ -386,13 +386,6 @@ public class CreateDataProjections implements ApplicationContextAware{
         }
 
         count++;
-
-
-        try {
-            addCharlesRiverCNA();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
 
@@ -1443,6 +1436,13 @@ public class CreateDataProjections implements ApplicationContextAware{
             ihcDP.setLabel("cytogenetics");
         }
 
+        DataProjection cytoDP = dataImportService.findDataProjectionByLabel("cytogenetics2");
+
+        if(cytoDP == null){
+            cytoDP = new DataProjection();
+            cytoDP.setLabel("cytogenetics2");
+        }
+
         DataProjection cnaDP = dataImportService.findDataProjectionByLabel("copy number alteration");
 
 
@@ -1452,7 +1452,7 @@ public class CreateDataProjections implements ApplicationContextAware{
         }
 
 
-        DataProjection transDP = dataImportService.findDataProjectionByLabel("transcriptomics");
+        DataProjection transDP = dataImportService.findDataProjectionByLabel("expression");
 
 
         if(transDP == null){
@@ -1484,7 +1484,7 @@ public class CreateDataProjections implements ApplicationContextAware{
 
 
 
-        JSONObject j1 ,j2, j3, j4, j5, j6, j7;
+        JSONObject j1 ,j2, j3, j4, j5, j6, j7,j8;
 
 
         try{
@@ -1563,6 +1563,17 @@ public class CreateDataProjections implements ApplicationContextAware{
             log.error(frequentlyMutatedMarkersDP.toString());
         }
 
+        try{
+            j8 = new JSONObject(cytogeneticsDP.toString());
+            cytoDP.setValue(j8.toString());
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(cytogeneticsDP.toString());
+            System.out.println();
+        }
+
 
         dataImportService.saveDataProjection(pmvmDP);
         dataImportService.saveDataProjection(mvDP);
@@ -1572,6 +1583,7 @@ public class CreateDataProjections implements ApplicationContextAware{
         dataImportService.saveDataProjection(daDP);
         dataImportService.saveDataProjection(fmgDP);
         dataImportService.saveDataProjection(ptDP);
+        dataImportService.saveDataProjection(cytoDP);
 
     }
 
