@@ -71,7 +71,7 @@ public class OmicValidationRuleset extends ValidationRuleCreator {
                 "passage",
                 "host_strain_nomenclature",
                 "model_id",
-                "marker_name",
+                "symbol",
                 "marker_status",
                 "essential_or_additional_marker",
                 "platform",
@@ -137,9 +137,14 @@ public class OmicValidationRuleset extends ValidationRuleCreator {
             essentialCytogeneticsColumns
         );
 
+        Relation relations = Relation.between(
+            ColumnReference.of("metadata-model.tsv", "model_id"),
+            ColumnReference.of(tableName, "model_id"));
+
         return TableSetSpecification.create()
             .addRequiredColumns(essentialColumns)
             .addNonEmptyColumns(essentialColumns)
+            .addRelations(relations)
             .setProvider(provider);
     }
 
