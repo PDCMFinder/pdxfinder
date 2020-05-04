@@ -476,71 +476,75 @@ public class UniversalDataExporter {
                     }
                 }
 
-                if(molcharType.equals("mutation")){
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getAminoAcidChange());
-                    rowData.add(md.getNucleotideChange());
-                    rowData.add(md.getConsequence());
-                    rowData.add(md.getReadDepth());
-                    rowData.add(md.getAlleleFrequency());
-                    rowData.add(md.getChromosome());
-                    rowData.add(md.getSeqStartPosition());
-                    rowData.add(md.getRefAllele());
-                    rowData.add(md.getAltAllele());
-                    rowData.add(md.getUcscGeneId());
-                    rowData.add(md.getNcbiGeneId()); // ensemble_gene_id	ensemble_transcript_id	variation_id	genome_assembly	platform
-                    rowData.add(md.getNcbiTranscriptId());
-                    rowData.add(md.getEnsemblGeneId());
-                    rowData.add(md.getEnsemblTranscriptId());
-                    rowData.add(md.getExistingVariations());
-                    rowData.add(md.getGenomeAssembly());
-                    rowData.add(mc.getPlatform().getName());
+                switch (molcharType) {
+                    case "mutation":
+                        rowData.add(md.getMarker());
+                        rowData.add(md.getAminoAcidChange());
+                        rowData.add(md.getNucleotideChange());
+                        rowData.add(md.getConsequence());
+                        rowData.add(md.getReadDepth());
+                        rowData.add(md.getAlleleFrequency());
+                        rowData.add(md.getChromosome());
+                        rowData.add(md.getSeqStartPosition());
+                        rowData.add(md.getRefAllele());
+                        rowData.add(md.getAltAllele());
+                        rowData.add(md.getUcscGeneId());
+                        rowData.add(md.getNcbiGeneId()); 
 
-                }else if(molcharType.equals("copy number alteration")){
-
-                    rowData.add(md.getChromosome());
-                    rowData.add(md.getSeqStartPosition());
-                    rowData.add(md.getSeqEndPosition());
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getUcscGeneId());
-                    rowData.add(md.getNcbiGeneId());
-                    rowData.add(md.getEnsemblGeneId());
-                    rowData.add(md.getCnaLog10RCNA());
-                    rowData.add(md.getCnaLog2RCNA());
-                    rowData.add(md.getFold_change());
-                    rowData.add(md.getCnaCopyNumberStatus());
-                    rowData.add(md.getCnaGisticValue());
-                    rowData.add(md.getCnaPicnicValue());
-                    rowData.add(md.getGenomeAssembly());
-                    rowData.add(mc.getPlatform().getName());
-                } else if(molcharType.equals("cytogenetics")){
-                    rowData.add("");
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getCytogeneticsResult());
-                    rowData.add(md.getMarkerStatusComment());
-                    rowData.add(mc.getPlatform().getName());
-                    rowData.add("");
-                    rowData.add("");
-                } else if(molcharType.equals("expression")) {
-                    rowData.add(md.getChromosome());
-                    rowData.add("");
-                    rowData.add(md.getSeqStartPosition());
-                    rowData.add(md.getSeqEndPosition());
-                    rowData.add(md.getMarker());
-                    rowData.add(""); //UCSC gene ideas that are never used.
-                    rowData.add("");
-                    rowData.add("");
-                    rowData.add(md.getRnaSeqCoverage());
-                    rowData.add(md.getRnaSeqFPKM());
-                    rowData.add(md.getRnaSeqTPM());
-                    rowData.add(md.getRnaSeqCount());
-                    rowData.add(md.getAffyHGEAProbeId());
-                    rowData.add(md.getAffyHGEAExpressionValue());
-                    rowData.add(md.getIlluminaHGEAProbeId());
-                    rowData.add(md.getIlluminaHGEAExpressionValue());
-                    rowData.add(md.getZscore());
-                    rowData.add(md.getGenomeAssembly());
-                    rowData.add(mc.getPlatform().getName());
+                        rowData.add(md.getNcbiTranscriptId());
+                        rowData.add(md.getEnsemblGeneId());
+                        rowData.add(md.getEnsemblTranscriptId());
+                        rowData.add(md.getExistingVariations());
+                        rowData.add(md.getGenomeAssembly());
+                        rowData.add(mc.getPlatform().getName());
+                        break;
+                    case "copy number alteration":
+                        rowData.add(md.getChromosome());
+                        rowData.add(md.getSeqStartPosition());
+                        rowData.add(md.getSeqEndPosition());
+                        rowData.add(md.getMarker());
+                        rowData.add(md.getUcscGeneId());
+                        rowData.add(md.getNcbiGeneId());
+                        rowData.add(md.getEnsemblGeneId());
+                        rowData.add(md.getCnaLog10RCNA());
+                        rowData.add(md.getCnaLog2RCNA());
+                        rowData.add(md.getFold_change());
+                        rowData.add(md.getCnaCopyNumberStatus());
+                        rowData.add(md.getCnaGisticValue());
+                        rowData.add(md.getCnaPicnicValue());
+                        rowData.add(md.getGenomeAssembly());
+                        rowData.add(mc.getPlatform().getName());
+                        break;
+                    case "cytogenetics":
+                        rowData.add("");
+                        rowData.add(md.getMarker());
+                        rowData.add(md.getCytogeneticsResult());
+                        rowData.add(md.getMarkerStatusComment());
+                        rowData.add(mc.getPlatform().getName());
+                        rowData.add("");
+                        rowData.add("");
+                        break;
+                    case "expression":
+                        rowData.add(md.getChromosome());
+                        rowData.add("");
+                        rowData.add(md.getSeqStartPosition());
+                        rowData.add(md.getSeqEndPosition());
+                        rowData.add(md.getMarker());
+                        rowData.add("");
+                        rowData.add("");
+                        rowData.add("");
+                        rowData.add(md.getRnaSeqCoverage());
+                        rowData.add(md.getRnaSeqFPKM());
+                        rowData.add(md.getRnaSeqTPM());
+                        rowData.add(md.getRnaSeqCount());
+                        rowData.add(md.getAffyHGEAProbeId());
+                        rowData.add(md.getAffyHGEAExpressionValue());
+                        rowData.add(md.getIlluminaHGEAProbeId());
+                        rowData.add(md.getIlluminaHGEAExpressionValue());
+                        rowData.add(md.getZscore());
+                        rowData.add(md.getGenomeAssembly());
+                        rowData.add(mc.getPlatform().getName());
+                        break;
                 }
                 sheetData.add(rowData);
             }
