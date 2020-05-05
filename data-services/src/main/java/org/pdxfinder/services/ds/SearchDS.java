@@ -926,7 +926,7 @@ public class SearchDS {
 
         Map<String, Map<String, Set<Long>>> data = new HashMap<>();
 
-        DataProjection dataProjection = dataProjectionRepository.findByLabel("cytogenetics");
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("breast cancer markers");
         String responses = "{}";
 
         if(dataProjection != null){

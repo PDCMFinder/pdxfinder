@@ -1410,18 +1410,18 @@ public class CreateDataProjections implements ApplicationContextAware{
             drugDP.setLabel("ModelDrugData");
         }
 
-        DataProjection ihcDP = dataImportService.findDataProjectionByLabel("cytogenetics");
+        DataProjection ihcDP = dataImportService.findDataProjectionByLabel("breast cancer markers");
 
         if(ihcDP == null){
             ihcDP = new DataProjection();
-            ihcDP.setLabel("cytogenetics");
+            ihcDP.setLabel("breast cancer markers");
         }
 
-        DataProjection cytoDP = dataImportService.findDataProjectionByLabel("cytogenetics2");
+        DataProjection cytoDP = dataImportService.findDataProjectionByLabel("cytogenetics");
 
         if(cytoDP == null){
             cytoDP = new DataProjection();
-            cytoDP.setLabel("cytogenetics2");
+            cytoDP.setLabel("cytogenetics");
         }
 
         DataProjection cnaDP = dataImportService.findDataProjectionByLabel("copy number alteration");
