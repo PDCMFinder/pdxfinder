@@ -87,6 +87,11 @@ public class SearchDS {
     private TwoParamLinkedSearch breastCancerMarkersSearch;
 
 
+    private TwoParamUnlinkedSearch cytogeneticsSearch;
+
+
+    private TwoParamUnlinkedSearch expressionSearch;
+
     public SearchDS(DataProjectionRepository dataProjectionRepository) {
         Assert.notNull(dataProjectionRepository, "Data projection repository cannot be null");
 
@@ -157,7 +162,7 @@ public class SearchDS {
         tumorTypeOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
         OneParamCheckboxFilter tumorType = new OneParamCheckboxFilter("TUMOR_TYPE", "sample_tumor_type", false, FilterType.OneParamCheckboxFilter.get(),
-              tumorTypeOptions, new ArrayList<>());
+                tumorTypeOptions, new ArrayList<>());
         patientTumorSection.addComponent(tumorType);
         facetOptionMap.put("sample_tumor_type", tumorTypeOptions);
 
@@ -167,7 +172,7 @@ public class SearchDS {
         patientSexOptions.add(new FacetOption("Female", "Female"));
         patientSexOptions.add(new FacetOption("Not Specified", "Not_Specified"));
         OneParamCheckboxFilter sex = new OneParamCheckboxFilter("SEX", "patient_gender", false, FilterType.OneParamCheckboxFilter.get(),
-        patientSexOptions, new ArrayList<>());
+                patientSexOptions, new ArrayList<>());
         patientTumorSection.addComponent(sex);
         facetOptionMap.put("patient_gender", patientSexOptions);
 
@@ -186,7 +191,7 @@ public class SearchDS {
         ageOptions.add(new FacetOption("Not Specified", "Not_Specified"));
 
         OneParamCheckboxFilter age = new OneParamCheckboxFilter("AGE", "patient_age", false, FilterType.OneParamCheckboxFilter.get(),
-        ageOptions, new ArrayList<>());
+                ageOptions, new ArrayList<>());
         patientTumorSection.addComponent(age);
         facetOptionMap.put("patient_age",ageOptions);
 
@@ -273,7 +278,7 @@ public class SearchDS {
         //gene mutation filter def
         //TODO: look up platforms, genes and variants
         TwoParamLinkedFilter geneMutation = new TwoParamLinkedFilter("GENE MUTATION", "mutation", false, FilterType.TwoParamLinkedFilter.get(),
-                 "GENE", "VARIANT",getMutationOptions(), getMutationAndVariantOptions(), new HashMap<>());
+                "GENE", "VARIANT",getMutationOptions(), getMutationAndVariantOptions(), new HashMap<>());
 
         molecularDataSection.addComponent(geneMutation);
 
@@ -284,10 +289,14 @@ public class SearchDS {
         molecularDataSection.addComponent(copyNumberAlteration);
 
 
+        OneParamTextFilter expression = new OneParamTextFilter("GENE EXPRESSION", "gene_expression", false,
+                FilterType.OneParamTextFilter.get(), "GENE", getExpressionOptions(), new ArrayList<>());
+        molecularDataSection.addComponent(expression);
+
         //Breast cancer markers
         //labelIDs should be alphabetically ordered(ER, HER, PR) as per dataprojection requirement
         List<FacetOption> breastCancerMarkerOptions = new ArrayList<>();
-                                                                                    //DP> ERBB2(HER2)--ESR1(ER)--PGR(PR)
+        //DP> ERBB2(HER2)--ESR1(ER)--PGR(PR)
         //breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR+", "ERBB2neg_ESR1neg_PGRpos"));
         //breastCancerMarkerOptions.add(new FacetOption("HER2- ER- PR-", "ERBB2neg_ESR1neg_PGRneg"));
         //breastCancerMarkerOptions.add(new FacetOption("HER2- ER+ PR-", "ERBB2neg_ESR1pos_PGRneg"));
@@ -309,6 +318,16 @@ public class SearchDS {
         molecularDataSection.addComponent(breastCancerMarkers);
         facetOptionMap.put("breast_cancer_markers",breastCancerMarkerOptions);
 
+        List<String> cytogeneticsStatusList = new ArrayList<>();
+        cytogeneticsStatusList.add("positive");
+        cytogeneticsStatusList.add("negative");
+        List<String> cytogeneticsMarkerList = new ArrayList<>(getCytogeneticsDP().keySet());
+
+        TwoParamUnlinkedFilter cytogenetics = new TwoParamUnlinkedFilter("CYTOGENETICS", "cytogenetics", false,
+                FilterType.TwoParamUnlinkedFilter.get(), "Gene", "Result", cytogeneticsMarkerList,
+                cytogeneticsStatusList , new HashMap() );
+
+        molecularDataSection.addComponent(cytogenetics);
 
         //treatment status filter
         List<FacetOption> patientTreatmentStatusOptions = new ArrayList<>();
@@ -379,6 +398,12 @@ public class SearchDS {
 
         patientTreatmentSearch = new OneParamTextSearch("patientTreatment", "patient_treatment", getPatientTreatmentsFromDP());
 
+        expressionSearch = new TwoParamUnlinkedSearch();
+        expressionSearch.setData(getExpressionDP());
+
+        cytogeneticsSearch = new TwoParamUnlinkedSearch();
+        cytogeneticsSearch.setData(getCytogeneticsDP());
+
         INITIALIZED = true;
     }
 
@@ -436,7 +461,7 @@ public class SearchDS {
                 for(FacetOption fo: facetOptionMap.get(facetName)){
 
                     if(selected.contains(fo.getLabelId()))
-                    decodedSelected.add(fo.getLabelId());
+                        decodedSelected.add(fo.getLabelId());
                 }
             }
             //no overwrite rule
@@ -552,6 +577,11 @@ public class SearchDS {
         //reset patient treatments
         result.forEach(x -> x.setPatientTreatments(new ArrayList<>()));
 
+        result.forEach(x -> x.setGeneExpression(new ArrayList<>()));
+
+        result.forEach(x -> x.setCytogenetics(new ArrayList<>()));
+
+
         // If no filters have been specified, return the complete set
         if (filters == null) {
             return result;
@@ -653,6 +683,15 @@ public class SearchDS {
                 case patient_treatment:
                     result = patientTreatmentSearch.search(filters.get(SearchFacetName.patient_treatment), result, ModelForQuery::addPatientTreatment, ComparisonOperator.OR);
                     break;
+
+                case gene_expression:
+                    result = expressionSearch.search(filters.get(SearchFacetName.gene_expression), result, ModelForQuery::addGeneExpression);
+                    break;
+
+                case cytogenetics:
+                    result = cytogeneticsSearch.search(filters.get(SearchFacetName.cytogenetics), result, ModelForQuery::addCytogenetics);
+                    break;
+
                 default:
                     //undexpected filter option
                     log.warn("Unrecognised facet {} passed to search, skipping", facet.getName());
@@ -920,6 +959,48 @@ public class SearchDS {
         return modelDrugResponses;
     }
 
+    private Map<String, Map<String, Set<Long>>> getExpressionDP(){
+
+        Map<String, Map<String, Set<Long>>> data = new HashMap<>();
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("expression");
+        String responses = "{}";
+
+        if(dataProjection != null){
+            responses = dataProjection.getValue();
+        }
+
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            data = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return data;
+    }
+
+    private Map<String, Map<String, Set<Long>>> getCytogeneticsDP() {
+
+        Map<String, Map<String, Set<Long>>> data = new HashMap<>();
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("cytogenetics");
+        String responses = "{}";
+
+        if (dataProjection != null) {
+            responses = dataProjection.getValue();
+        }
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            data = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>() {
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return data;
+    }
+
     private Map<String, Map<String, Set<Long>>> getBreastCancerMarkersFromDP(){
 
         log.info("Initializing breast cancer markers ");
@@ -1004,6 +1085,19 @@ public class SearchDS {
         }
 
         return data;
+    }
+
+    private List<String> getExpressionOptions(){
+
+        Map<String, Map<String, Set<Long>>> data = getExpressionDP();
+        Set<String> optionsSet = new HashSet<>();
+        for(Map.Entry<String, Map<String, Set<Long>>> entry : data.entrySet()){
+
+            optionsSet.addAll(entry.getValue().keySet());
+        }
+
+        List<String> options = new ArrayList<>(optionsSet);
+        return options;
     }
 
     private List<String> getPatientTreatmentOptions(){
