@@ -501,6 +501,10 @@ public class DetailsService {
             tableHeadersSet.add("hgncsymbol");
         }
 
+        if(md.getRnaSeqCount() != null){
+            tableHeadersSet.add("rnaseqcount");
+        }
+
         if (md.getZscore() != null && !md.getZscore().isEmpty()) {
             tableHeadersSet.add("zscore");
         }
@@ -691,6 +695,9 @@ public class DetailsService {
             tableHeaders.add("Ncbi Gene Id");
         }
 
+        if(tableHeadersSet.contains("rnaseqcount")){
+            tableHeaders.add("RNAseq Count");
+        }
 
         if (tableHeadersSet.contains("zscore")) {
             tableHeaders.add("Z-Score");
@@ -799,6 +806,10 @@ public class DetailsService {
 
         if (tableHeadersSet.contains("ncbigeneid")) {
             row.add((md.getMarker() == null ? "" : md.getMarker()));
+        }
+
+        if(tableHeadersSet.contains("rnaseqcount")){
+            row.add((md.getRnaSeqCount() == null ? "" : md.getRnaSeqCount()));
         }
 
         if (tableHeadersSet.contains("zscore")) {
