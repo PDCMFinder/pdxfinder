@@ -87,6 +87,11 @@ public class SearchDS {
     private TwoParamLinkedSearch breastCancerMarkersSearch;
 
 
+    private TwoParamUnlinkedSearch cytogeneticsSearch;
+
+
+    private TwoParamUnlinkedSearch expressionSearch;
+
     public SearchDS(DataProjectionRepository dataProjectionRepository) {
         Assert.notNull(dataProjectionRepository, "Data projection repository cannot be null");
 
@@ -283,6 +288,9 @@ public class SearchDS {
 
         molecularDataSection.addComponent(copyNumberAlteration);
 
+        OneParamTextFilter expression = new OneParamTextFilter("EXPRESSION", "expression", false,
+                FilterType.OneParamTextFilter.get(), "GENE", getExpressionOptions(), new ArrayList<>());
+        molecularDataSection.addComponent(expression);
 
         //Breast cancer markers
         //labelIDs should be alphabetically ordered(ER, HER, PR) as per dataprojection requirement
@@ -309,7 +317,16 @@ public class SearchDS {
         molecularDataSection.addComponent(breastCancerMarkers);
         facetOptionMap.put("breast_cancer_markers",breastCancerMarkerOptions);
 
+        List<String> cytogeneticsStatusList = new ArrayList<>();
+        cytogeneticsStatusList.add("positive");
+        cytogeneticsStatusList.add("negative");
+        List<String> cytogeneticsMarkerList = new ArrayList<>(getCytogeneticsDP().keySet());
 
+        TwoParamUnlinkedFilter cytogenetics = new TwoParamUnlinkedFilter("CYTOGENETICS", "cytogenetics", false,
+                FilterType.TwoParamUnlinkedFilter.get(), "Gene", "Result", cytogeneticsMarkerList,
+                cytogeneticsStatusList , new HashMap() );
+
+        molecularDataSection.addComponent(cytogenetics);
         //treatment status filter
         List<FacetOption> patientTreatmentStatusOptions = new ArrayList<>();
         patientTreatmentStatusOptions.add(new FacetOption("Treatment Naive", "treatment_naive"));
@@ -694,7 +711,6 @@ public class SearchDS {
      */
     private void initializeModels() {
 
-
         String modelJson = dataProjectionRepository.findByLabel("ModelForQuery").getValue();
 
         try {
@@ -703,9 +719,7 @@ public class SearchDS {
             for (int i = 0; i < jarray.length(); i++) {
 
                 JSONObject j = jarray.getJSONObject(i);
-
                 ModelForQuery mfq = new ModelForQuery();
-
                 mfq.setModelId(parseLong(j.getString("modelId")));
                 mfq.setDatasource(j.getString("datasource"));
 
@@ -742,22 +756,17 @@ public class SearchDS {
                     mfq.setPatientTreatmentStatus(j.getString("patientTreatmentStatus"));
                 }
 
-
-
                 JSONArray ja = j.getJSONArray("cancerSystem");
                 List<String> cancerSystem = new ArrayList<>();
                 for (int k = 0; k < ja.length(); k++) {
-
                     cancerSystem.add(ja.getString(k));
                 }
 
                 mfq.setCancerSystem(cancerSystem);
-
                 ja = j.getJSONArray("allOntologyTermAncestors");
                 Set<String> ancestors = new HashSet<>();
 
                 for (int k = 0; k < ja.length(); k++) {
-
                     ancestors.add(ja.getString(k));
                 }
 
@@ -768,7 +777,6 @@ public class SearchDS {
                     List<String> dataAvailable = new ArrayList<>();
 
                     for(int k=0; k<ja.length(); k++){
-
                         dataAvailable.add(ja.getString(k));
                     }
 
@@ -776,9 +784,7 @@ public class SearchDS {
                 }
 
                 if(j.has("projects")){
-
                     ja = j.getJSONArray("projects");
-
                     for(int k = 0; k < ja.length(); k++){
                         mfq.addProject(ja.getString(k));
                     }
@@ -792,11 +798,8 @@ public class SearchDS {
                     mfq.setAccessModalities("");
                 }
 
-
                 this.models.add(mfq);
             }
-
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -809,20 +812,14 @@ public class SearchDS {
         log.info("Initializing mutations");
         //platform=> marker=> variant=>{set of model ids}
         Map<String, Map<String, Map<String, Set<Long>>>> mutations = new HashMap<>();
-
         String mut = dataProjectionRepository.findByLabel("PlatformMarkerVariantModel").getValue();
 
         try{
-
             ObjectMapper mapper = new ObjectMapper();
-
             mutations = mapper.readValue(mut, new TypeReference<Map<String, Map<String, Map<String, Set<Long>>>>>(){});
-
             //log.info("Lookup: "+mutations.get("TargetedNGS_MUT").get("RB1").get("N123D").toString());
-
         }
         catch(Exception e){
-
             e.printStackTrace();
         }
 
@@ -832,11 +829,9 @@ public class SearchDS {
     private Map<String, List<String>> getMutationAndVariantOptions(){
 
         Map<String,Set<String>> tempResults = getMutationOptionsFromDP();
-
         Map<String, List<String>> resultMap = new HashMap<>();
 
         for(Map.Entry<String, Set<String>> entry : tempResults.entrySet()){
-
             resultMap.put(entry.getKey(), new ArrayList<>(new TreeSet<>(entry.getValue())));
         }
 
@@ -846,11 +841,9 @@ public class SearchDS {
     private List<String> getMutationOptions(){
 
         Map<String,Set<String>> tempResults = getMutationOptionsFromDP();
-
         List<String> resultList = new ArrayList<>();
 
         for(Map.Entry<String, Set<String>> entry : tempResults.entrySet()){
-
             resultList.add(entry.getKey());
         }
 
@@ -879,9 +872,7 @@ public class SearchDS {
                         Set<String> set = new HashSet<>();
                         set.add(v);
                         tempResults.put(m, set);
-
                     }
-
                 }
             }
         }
@@ -892,58 +883,41 @@ public class SearchDS {
     private Map<String, Map<String, Set<Long>>> getModelDrugResponsesFromDP(){
 
         log.info("Initializing model drug responses");
-
         Map<String, Map<String, Set<Long>>> modelDrugResponses = new HashMap<>();
-
         DataProjection dataProjection = dataProjectionRepository.findByLabel("ModelDrugData");
         String responses = "{}";
 
         if(dataProjection != null){
-
             responses = dataProjection.getValue();
         }
 
         try{
-
             ObjectMapper mapper = new ObjectMapper();
-
             modelDrugResponses = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
-
             //log.info("Lookup: "+modelDrugResponses.get("doxorubicincyclophosphamide").get("progressive disease").toString());
-
         }
         catch(Exception e){
-
             e.printStackTrace();
         }
-
         return modelDrugResponses;
     }
 
     private Map<String, Map<String, Set<Long>>> getBreastCancerMarkersFromDP(){
 
         log.info("Initializing breast cancer markers ");
-
         Map<String, Map<String, Set<Long>>> data = new HashMap<>();
-
         DataProjection dataProjection = dataProjectionRepository.findByLabel("breast cancer markers");
         String responses = "{}";
 
         if(dataProjection != null){
-
             responses = dataProjection.getValue();
         }
 
         try{
-
             ObjectMapper mapper = new ObjectMapper();
-
             data = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
-
-
         }
         catch(Exception e){
-
             e.printStackTrace();
         }
 
@@ -953,26 +927,60 @@ public class SearchDS {
     private Map<String, Set<Long>> getCopyNumberAlterationDP(){
 
         Map<String, Set<Long>> data = new HashMap<>();
-
         DataProjection dataProjection = dataProjectionRepository.findByLabel("copy number alteration");
-
         String responses = "{}";
 
         if(dataProjection != null){
-
             responses = dataProjection.getValue();
         }
 
         try{
-
             ObjectMapper mapper = new ObjectMapper();
-
             data = mapper.readValue(responses, new TypeReference<Map<String, Set<Long>>>(){});
-
-
         }
         catch(Exception e){
+            e.printStackTrace();
+        }
 
+        return data;
+    }
+
+    private Map<String, Map<String, Set<Long>>> getExpressionDP(){
+
+        Map<String, Map<String, Set<Long>>> data = new HashMap<>();
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("expression");
+        String responses = "{}";
+
+        if(dataProjection != null){
+            responses = dataProjection.getValue();
+        }
+
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            data = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return data;
+    }
+
+    private Map<String, Map<String, Set<Long>>> getCytogeneticsDP(){
+
+        Map<String, Map<String, Set<Long>>> data = new HashMap<>();
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("cytogenetics");
+        String responses = "{}";
+
+        if(dataProjection != null){
+            responses = dataProjection.getValue();
+        }
+
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            data = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
+        }
+        catch(Exception e){
             e.printStackTrace();
         }
 
@@ -1019,6 +1027,19 @@ public class SearchDS {
         Map<String, Set<Long>> data = getCopyNumberAlterationDP();
         List<String> options = new ArrayList<>(data.keySet());
 
+        return options;
+    }
+
+    private List<String> getExpressionOptions(){
+
+        Map<String, Map<String, Set<Long>>> data = getExpressionDP();
+        Set<String> optionsSet = new HashSet<>();
+        for(Map.Entry<String, Map<String, Set<Long>>> entry : data.entrySet()){
+
+            optionsSet.addAll(entry.getValue().keySet());
+        }
+
+        List<String> options = new ArrayList<>(optionsSet);
         return options;
     }
 
