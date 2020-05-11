@@ -29,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "Ensembl Gene Id",
         "Ucsc Gene Id",
         "Ncbi Gene Id",
+        "RNAseq Count",
         "Z-Score",
         "Genome Assembly",
         "Result"
@@ -44,6 +45,7 @@ public class MolecularDataRowDTO {
     private String altAllele;
     private String consequence;
     private String hgncSymbol;
+    protected String rnaSeqCount;
     private String zscore;
     private String aminoAcidChange;
     private String readDepth;
@@ -79,8 +81,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Sample Id")
-    public void setSampleId(String sampleId) {
+    public MolecularDataRowDTO setSampleId(String sampleId) {
         this.sampleId = sampleId;
+        return this;
     }
 
     @JsonProperty("Chromosome")
@@ -89,8 +92,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Chromosome")
-    public void setChromosome(String chromosome) {
+    public MolecularDataRowDTO setChromosome(String chromosome) {
         this.chromosome = chromosome;
+        return this;
     }
 
     @JsonProperty("")
@@ -99,8 +103,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("")
-    public void setSeqPosition(String seqPosition) {
+    public MolecularDataRowDTO setSeqPosition(String seqPosition) {
         this.seqPosition = seqPosition;
+        return this;
     }
 
     @JsonProperty("Ref. Allele")
@@ -109,18 +114,19 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Ref. Allele")
-    public void setRefAllele(String refAllele) {
+    public MolecularDataRowDTO setRefAllele(String refAllele) {
         this.refAllele = refAllele;
+        return this;
     }
 
     @JsonProperty("Alt Allele")
     public String getAltAllele() {
         return altAllele;
     }
-
     @JsonProperty("Alt Allele")
-    public void setAltAllele(String altAllele) {
+    public MolecularDataRowDTO setAltAllele(String altAllele) {
         this.altAllele = altAllele;
+        return this;
     }
 
     @JsonProperty("Consequence")
@@ -129,8 +135,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Consequence")
-    public void setConsequence(String consequence) {
+    public MolecularDataRowDTO setConsequence(String consequence) {
         this.consequence = consequence;
+        return this;
     }
 
     @JsonProperty("HGNC Symbol")
@@ -139,8 +146,20 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("HGNC Symbol")
-    public void setHgncSymbol(String hgncSymbol) {
+    public MolecularDataRowDTO setHgncSymbol(String hgncSymbol) {
         this.hgncSymbol = hgncSymbol;
+        return this;
+    }
+
+    @JsonProperty("RNAseq Count")
+    public String getRnaSeqCount() {
+        return rnaSeqCount;
+    }
+
+    @JsonProperty("RNAseq Count")
+    public MolecularDataRowDTO setRnaSeqCount(String rnaSeqCount) {
+        this.rnaSeqCount = rnaSeqCount;
+        return this;
     }
 
     @JsonProperty("Z-Score")
@@ -149,8 +168,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Z-Score")
-    public void setZscore(String zscore) {
+    public MolecularDataRowDTO setZscore(String zscore) {
         this.zscore = zscore;
+        return this;
     }
 
     @JsonProperty("Amino Acid Change")
@@ -159,8 +179,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Amino Acid Change")
-    public void setAminoAcidChange(String aminoAcidChange) {
+    public MolecularDataRowDTO setAminoAcidChange(String aminoAcidChange) {
         this.aminoAcidChange = aminoAcidChange;
+        return this;
     }
 
     @JsonProperty("Read Depth")
@@ -169,8 +190,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Read Depth")
-    public void setReadDepth(String readDepth) {
+    public MolecularDataRowDTO setReadDepth(String readDepth) {
         this.readDepth = readDepth;
+        return this;
     }
 
     @JsonProperty("Allele Frequency")
@@ -179,8 +201,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Allele Frequency")
-    public void setAlleleFrequency(String alleleFrequency) {
+    public MolecularDataRowDTO setAlleleFrequency(String alleleFrequency) {
         this.alleleFrequency = alleleFrequency;
+        return this;
     }
 
     @JsonProperty("Rs Id Variant")
@@ -189,8 +212,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Rs Id Variant")
-    public void setRsidVariants(String rsidVariants) {
+    public MolecularDataRowDTO setRsidVariants(String rsidVariants) {
         this.rsidVariants = rsidVariants;
+        return this;
     }
 
     @JsonProperty("Nucleotide Change")
@@ -199,8 +223,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Nucleotide Change")
-    public void setNucleotideChange(String nucleotideChange) {
+    public MolecularDataRowDTO setNucleotideChange(String nucleotideChange) {
         this.nucleotideChange = nucleotideChange;
+        return this;
     }
 
     @JsonProperty("Genome Assembly")
@@ -209,8 +234,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Genome Assembly")
-    public void setGenomeAssembly(String genomeAssembly) {
+    public MolecularDataRowDTO setGenomeAssembly(String genomeAssembly) {
         this.genomeAssembly = genomeAssembly;
+        return this;
     }
 
     @JsonProperty("Seq. Start Position")
@@ -219,8 +245,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Seq. Start Position")
-    public void setSeqStartPosition(String seqStartPosition) {
+    public MolecularDataRowDTO setSeqStartPosition(String seqStartPosition) {
         this.seqStartPosition = seqStartPosition;
+        return this;
     }
 
     @JsonProperty("Seq. End Position")
@@ -229,8 +256,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Seq. End Position")
-    public void setSeqEndPosition(String seqEndPosition) {
+    public MolecularDataRowDTO setSeqEndPosition(String seqEndPosition) {
         this.seqEndPosition = seqEndPosition;
+        return this;
     }
 
     @JsonProperty("")
@@ -239,8 +267,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("")
-    public void setStrand(String strand) {
+    public MolecularDataRowDTO setStrand(String strand) {
         this.strand = strand;
+        return this;
     }
 
     @JsonProperty("Ensembl Transcript Id")
@@ -249,8 +278,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Ensembl Transcript Id")
-    public void setEnsemblTranscriptId(String ensemblTranscriptId) {
+    public MolecularDataRowDTO setEnsemblTranscriptId(String ensemblTranscriptId) {
         this.ensemblTranscriptId = ensemblTranscriptId;
+        return this;
     }
 
     @JsonProperty("")
@@ -259,8 +289,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("")
-    public void setUcscTranscriptId(String ucscTranscriptId) {
+    public MolecularDataRowDTO setUcscTranscriptId(String ucscTranscriptId) {
         this.ucscTranscriptId = ucscTranscriptId;
+        return this;
     }
 
     @JsonIgnore
@@ -269,8 +300,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonIgnore
-    public void setNcbiTranscriptId(String ncbiTranscriptId) {
+    public MolecularDataRowDTO setNcbiTranscriptId(String ncbiTranscriptId) {
         this.ncbiTranscriptId = ncbiTranscriptId;
+        return this;
     }
 
     @JsonProperty("")
@@ -279,8 +311,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("")
-    public void setCdsChange(String cdsChange) {
+    public MolecularDataRowDTO setCdsChange(String cdsChange) {
         this.cdsChange = cdsChange;
+        return this;
     }
 
     @JsonProperty("")
@@ -289,8 +322,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("")
-    public void setType(String type) {
+    public MolecularDataRowDTO setType(String type) {
         this.type = type;
+        return this;
     }
 
     @JsonProperty("")
@@ -299,8 +333,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("")
-    public void setAnnotation(String annotation) {
+    public MolecularDataRowDTO setAnnotation(String annotation) {
         this.annotation = annotation;
+        return this;
     }
 
     @JsonProperty("Result")
@@ -309,8 +344,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Result")
-    public void setCytogeneticsResult(String cytogeneticsResult) {
+    public MolecularDataRowDTO setCytogeneticsResult(String cytogeneticsResult) {
         this.cytogeneticsResult = cytogeneticsResult;
+        return this;
     }
 
     @JsonProperty("")
@@ -319,8 +355,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("")
-    public void setMicrosateliteResult(String microsateliteResult) {
+    public MolecularDataRowDTO setMicrosateliteResult(String microsateliteResult) {
         this.microsateliteResult = microsateliteResult;
+        return this;
     }
 
     @JsonProperty("Probe Id Affymetrix")
@@ -329,8 +366,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Probe Id Affymetrix")
-    public void setProbeIdAffymetrix(String probeIdAffymetrix) {
+    public MolecularDataRowDTO setProbeIdAffymetrix(String probeIdAffymetrix) {
         this.probeIdAffymetrix = probeIdAffymetrix;
+        return this;
     }
 
     @JsonProperty("Log2 Rcna")
@@ -339,8 +377,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Log2 Rcna")
-    public void setCnaLog2rCna(String cnaLog2rCna) {
+    public MolecularDataRowDTO setCnaLog2rCna(String cnaLog2rCna) {
         this.cnaLog2rCna = cnaLog2rCna;
+        return this;
     }
 
     @JsonProperty("Log10 Rcna")
@@ -349,8 +388,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Log10 Rcna")
-    public void setCnaLog10rCna(String cnaLog10rCna) {
+    public MolecularDataRowDTO setCnaLog10rCna(String cnaLog10rCna) {
         this.cnaLog10rCna = cnaLog10rCna;
+        return this;
     }
 
     @JsonProperty("Copy Number Status")
@@ -359,8 +399,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Copy Number Status")
-    public void setCnaCopyNumberStatus(String cnaCopyNumberStatus) {
+    public MolecularDataRowDTO setCnaCopyNumberStatus(String cnaCopyNumberStatus) {
         this.cnaCopyNumberStatus = cnaCopyNumberStatus;
+        return this;
     }
 
     @JsonProperty("Gistic Value")
@@ -369,8 +410,9 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Gistic Value")
-    public void setCnaGisticValue(String cnaGisticValue) {
+    public MolecularDataRowDTO setCnaGisticValue(String cnaGisticValue) {
         this.cnaGisticValue = cnaGisticValue;
+        return this;
     }
 
     @JsonProperty("")
@@ -379,8 +421,13 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("")
-    public void setCnaPicnicValue(String cnaPicnicValue) {
+    public MolecularDataRowDTO setCnaPicnicValue(String cnaPicnicValue) {
         this.cnaPicnicValue = cnaPicnicValue;
+        return this;
+    }
+
+    public MolecularDataRowDTO build() {
+        return this;
     }
 }
 
