@@ -94,6 +94,8 @@ public class SearchService {
                                   Optional<List<String>> data_available,
                                   Optional<List<String>> breast_cancer_markers,
                                   Optional<List<String>> copy_number_alteration,
+                                  Optional<List<String>> gene_expression,
+                                  Optional<List<String>> cytogenetics,
                                   Integer page,
                                   Integer size){
 
@@ -114,7 +116,9 @@ public class SearchService {
                 project,
                 data_available,
                 breast_cancer_markers,
-                copy_number_alteration
+                copy_number_alteration,
+                gene_expression,
+                cytogenetics
         );
 
         WebSearchDTO wsDTO = new WebSearchDTO();
@@ -195,7 +199,9 @@ public class SearchService {
                             Optional<List<String>> project,
                             Optional<List<String>> data_available,
                             Optional<List<String>> breast_cancer_markers,
-                            Optional<List<String>> copy_number_alteration){
+                            Optional<List<String>> copy_number_alteration,
+                            Optional<List<String>> gene_expression,
+                            Optional<List<String>> cytogenetics){
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
                 query,
@@ -213,7 +219,9 @@ public class SearchService {
                 project,
                 data_available,
                 breast_cancer_markers,
-                copy_number_alteration
+                copy_number_alteration,
+                gene_expression,
+                cytogenetics
 
         );
 
@@ -242,7 +250,9 @@ public class SearchService {
             Optional<List<String>> project,
             Optional<List<String>> data_available,
             Optional<List<String>> breast_cancer_markers,
-            Optional<List<String>> copy_number_alteration
+            Optional<List<String>> copy_number_alteration,
+            Optional<List<String>> gene_expression,
+            Optional<List<String>> cytogenetics
 
 
             ) {
@@ -356,6 +366,20 @@ public class SearchService {
             configuredFacets.put(SearchFacetName.copy_number_alteration, new ArrayList<>());
             for (String s : copy_number_alteration.get()) {
                 configuredFacets.get(SearchFacetName.copy_number_alteration).add(s);
+            }
+        }
+
+        if (gene_expression.isPresent() && !gene_expression.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.gene_expression, new ArrayList<>());
+            for (String s : gene_expression.get()) {
+                configuredFacets.get(SearchFacetName.gene_expression).add(s);
+            }
+        }
+
+        if (cytogenetics.isPresent() && !cytogenetics.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.cytogenetics, new ArrayList<>());
+            for (String s : cytogenetics.get()) {
+                configuredFacets.get(SearchFacetName.cytogenetics).add(s);
             }
         }
 
@@ -473,6 +497,13 @@ public class SearchService {
                     break;
                 case copy_number_alteration:
                     headers.add("COPY NUMBER ALTERATION");
+                    break;
+                case gene_expression:
+                    headers.add("GENE EXPRESSION");
+                    break;
+                case cytogenetics:
+                    headers.add("CYTOGENETICS");
+                    break;
 
 
             }

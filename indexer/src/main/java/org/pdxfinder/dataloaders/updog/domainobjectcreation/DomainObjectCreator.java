@@ -65,6 +65,20 @@ public class DomainObjectCreator {
         createSamplePlatformData(pdxDataTables);
         createTreatmentData(pdxDataTables);
         createDrugDosingData(pdxDataTables);
+        //TODO: loop through all the models
+        //TODO: read omics file per model and validate
+        //TODO: call createOmicData per model
+        //TODO: persist data per model
+        /*
+        for(ModelCreation model: models){
+            Map<String, Table> omicDataTables = getOmicForModel(dataSource, modelId);
+            validateOmic(omicDataTables);
+            createOmicData(omicDataTables);
+            persistNodes(patientId, modelId);
+        }
+         */
+
+
         createOmicData(pdxDataTables);
         persistNodes();
     }

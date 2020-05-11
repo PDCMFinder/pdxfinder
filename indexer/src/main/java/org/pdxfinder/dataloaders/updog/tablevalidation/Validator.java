@@ -44,7 +44,7 @@ public class Validator {
         checkRequiredColumnsPresent(tableSet, tableSetSpecification);
         checkAllNonEmptyValuesPresent(tableSet, tableSetSpecification);
         checkAllUniqueColumnsForDuplicates(tableSet, tableSetSpecification);
-        checkRelationsValid(tableSet, tableSetSpecification);
+        //checkRelationsValid(tableSet, tableSetSpecification);
 
         return validationErrors;
     }

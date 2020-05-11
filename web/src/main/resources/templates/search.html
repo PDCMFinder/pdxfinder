@@ -275,6 +275,8 @@
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'PATIENT TREATMENT STATUS')}">TREATMENT STATUS</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'PATIENT TREATMENT')}">PATIENT TREATMENT</th>
                                 <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'COPY NUMBER ALTERATION')}">COPY NUMBER ALTERATION</th>
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'GENE EXPRESSION')}">GENE EXPRESSION</th>
+                                <th th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'CYTOGENETICS')}">CYTOGENETICS</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -363,6 +365,20 @@
                                     <div th:each="cnaMarker : ${model.cnaMarkers}">
                                         <span th:text="${cnaMarker}"></span>
                                     </div>
+                                </td>
+
+                                <td data-title="GENE EXPRESSION" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'GENE EXPRESSION')}">
+                                    <th:block th:each="dData : ${model.geneExpression}">
+                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation' }"
+                                           class="size12" th:utext="${dData} + '<br />'">dData</a>
+                                    </th:block>
+                                </td>
+
+                                <td data-title="CYTOGENETICS" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'CYTOGENETICS')}">
+                                    <th:block th:each="dData : ${model.cytogenetics}">
+                                        <a th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}+'#variation' }"
+                                           class="size12" th:utext="${dData} + '<br />'">dData</a>
+                                    </th:block>
                                 </td>
 
                             </tr>
