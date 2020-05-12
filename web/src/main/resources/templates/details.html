@@ -858,10 +858,10 @@
                                                             ...
                                                         </a>
                                                         <!-- TODO: Remove this quickFix in April -->
-                                                        <a th:if="${dataRow.platformUsedLabel == 'NCI cancer gene panel'}" target="_blank"
+                                                        <a th:if="${dataRow.platformUsedLabel == 'OncoKB Gene Panel'}" target="_blank"
                                                            style="color: #06369d; text-decoration: none;"
                                                            th:text="${dataRow.platformUsedLabel}"
-                                                           th:onclick="'window.open(\''+${'https://pdmr.cancer.gov/content/docs/NCI_Cancer_Gene_Panel.pdf'}+'\')'">
+                                                           th:onclick="'window.open(\''+${'https://pdmr.cancer.gov/content/docs/MCCRD_SOP0053_Generating_oncoKB_Report.pdf'}+'\')'">
                                                             ...
                                                         </a>
                                                         <span th:if="${dataRow.platformUsedUrl == null && dataRow.platformUsedLabel != 'NCI cancer gene panel'}" th:text="${dataRow.platformUsedLabel}"></span>
