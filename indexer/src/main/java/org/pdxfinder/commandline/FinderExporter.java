@@ -1,5 +1,7 @@
 package org.pdxfinder.commandline;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.dataexport.UniversalDataExporter;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.services.DataImportService;
@@ -18,28 +20,25 @@ import java.util.List;
 @Component
 public class FinderExporter {
 
-    UniversalDataExporter downDog;
-    private UtilityService utilityService;
-    private DataImportService dataImportService;
-
-    @Autowired
-    FinderExporter(UtilityService utilityService, DataImportService dataImportService, UniversalDataExporter universalDataExporter){
-        this.utilityService = utilityService;
-        this.dataImportService = dataImportService;
-        this.downDog = universalDataExporter;
-    }
-
     @Value("${data-dir}")
     private String defaultDirectory;
     private File rootDir;
     private static final Logger log = LoggerFactory.getLogger(FinderExporter.class);
 
-    public void run(File dataDirectory,String provider,boolean loadAll) throws IOException {
+    private UtilityService utilityService;
+    private DataImportService dataImportService;
+
+    @Autowired
+    FinderExporter(UtilityService utilityService, DataImportService dataImportService){
+        this.utilityService = utilityService;
+        this.dataImportService = dataImportService;
+    }
+    public void run(File dataDirectory, String provider, boolean loadAll) throws IOException {
         resolveRootDir(dataDirectory);
         if(loadAll){
             exportAllGroups(rootDir);
         }
-        else if (provider != null && !provider.isEmpty()) {
+        else if (StringUtils.isNotEmpty(provider)) {
             export(rootDir, provider);
         }
     }

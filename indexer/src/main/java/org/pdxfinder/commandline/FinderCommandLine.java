@@ -170,7 +170,7 @@ public class FinderCommandLine implements Callable<Integer> {
         private File dataDirectory;
 
         @ArgGroup(multiplicity = "0..1")
-        Export.Exclusive exclusiveArguments = new Export.Exclusive();
+        Export.Exclusive datasetRequested = new Export.Exclusive();
 
         static class Exclusive{
 
@@ -178,7 +178,7 @@ public class FinderCommandLine implements Callable<Integer> {
                     names = {"-e", "--export"},
                     description = "Export database to TSV templates." +
                             " Requires either the provider name or use -a to export all providers")
-            private String provider;
+            private DataProvider provider;
 
             @Option(
                     names = {"-a", "--all"},
@@ -187,7 +187,7 @@ public class FinderCommandLine implements Callable<Integer> {
             private boolean loadAll;
 
             public String getProvider() {
-                return provider;
+                return provider.toString();
             }
 
             public boolean isLoadAll() {
@@ -196,7 +196,7 @@ public class FinderCommandLine implements Callable<Integer> {
         }
         @Override
         public Integer call() throws IOException {
-            finderExporter.run(dataDirectory, exclusiveArguments.getProvider(), exclusiveArguments.isLoadAll());
+            finderExporter.run(dataDirectory, datasetRequested.getProvider(), datasetRequested.isLoadAll());
             return 0;
         }
 
@@ -204,8 +204,8 @@ public class FinderCommandLine implements Callable<Integer> {
         public String toString() {
             return new StringJoiner("\n", Transform.class.getSimpleName() + "[\n", "\n]")
                     .add("dataDirectory=" + dataDirectory)
-                    .add("Export provider" + exclusiveArguments.getProvider())
-                    .add("Load all" + exclusiveArguments.isLoadAll())
+                    .add("Export provider" + datasetRequested.getProvider())
+                    .add("Load all" + datasetRequested.isLoadAll())
                     .toString();
         }
     }

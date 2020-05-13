@@ -894,7 +894,9 @@ public class UniversalDataExporter {
 
                 insertOmicDataToSheet(model, sampleId, patientOrigin, mc.getType(), null, mc, sheetData);
             }
-        } else System.out.printf(String.format("No sample found for model %s \n", model.getId() ));
+        } else {
+            log.error("No molecular data on patient sample found for model {} \n", model.getSourcePdxId());
+        }
     }
 
     private void initXenoGenomicData(ModelCreation model, List<List<String>> sheetData){
