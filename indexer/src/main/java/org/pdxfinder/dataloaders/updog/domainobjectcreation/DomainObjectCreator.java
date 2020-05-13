@@ -65,22 +65,55 @@ public class DomainObjectCreator {
         createSamplePlatformData(pdxDataTables);
         createTreatmentData(pdxDataTables);
         createDrugDosingData(pdxDataTables);
-        //TODO: loop through all the models
-        //TODO: read omics file per model and validate
-        //TODO: call createOmicData per model
-        //TODO: persist data per model
+
         /*
-        for(ModelCreation model: models){
-            Map<String, Table> omicDataTables = getOmicForModel(dataSource, modelId);
-            validateOmic(omicDataTables);
-            createOmicData(omicDataTables);
-            persistNodes(patientId, modelId);
+        //read one omic file, add molchar data to domain object
+        List<Path> omicFiles = reader.getOmicFilePaths();
+        for(Path p: omicFiles) {
+            Table omicTable = reader.readOneOmic(p);
+            String dataType = reader.getDataType(p);
+            createMolecularData(omicTable, dataType);
         }
-         */
+        */
 
 
+
+        /*
+        //Persist data per patient, remove domain objects afterwards
+        Map<String, Set<String>> patientToModelsMap = getPatientsToModels(pdxDataTables.get("metadata-sample.tsv"));
+        Group providerGroup = (Group) domainObjects.get(PROVIDER_GROUPS).get(FIRST);
+
+        for(Map.Entry<String, Set<String>> entry:patientToModelsMap.entrySet()){
+            String patientId = entry.getKey();
+            for(String modelId:entry.getValue()){
+                Map<String, Table> omicDataTables = getOmicForModel(providerGroup.getAbbreviation(), modelId);
+                createOmicData(omicDataTables);
+                persistModel(modelId);
+            }
+            persistPatient(patientId);
+        }
+
+        */
         createOmicData(pdxDataTables);
         persistNodes();
+    }
+
+    public Map<String, Set<String>> getPatientsToModels(Table sampleTable){
+        Map<String, Set<String>> patientToModelsMap = new HashMap<>();
+        for (Row row : sampleTable) {
+            String patientId = row.getString(TSV.Metadata.patient_id.name());
+            String modelId = row.getString(TSV.Metadata.model_id.name());
+
+            if(patientToModelsMap.containsKey(patientId)){
+                patientToModelsMap.get(patientId).add(modelId);
+            }
+            else{
+                Set<String> models = new HashSet<>();
+                models.add(modelId);
+                patientToModelsMap.put(patientId, models);
+            }
+        }
+        return patientToModelsMap;
     }
 
     public void callCreators(Map<String, Table> tableSet) {
